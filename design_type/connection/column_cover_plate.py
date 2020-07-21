@@ -2753,7 +2753,7 @@ class ColumnCoverPlate(MomentConnection):
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Connector", bgcolor)
+        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
 
     ################################ Outlist Dict #####################################################################################

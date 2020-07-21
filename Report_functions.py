@@ -3346,16 +3346,20 @@ def large_grip_prov(d,pt,mt,blj,blg):
 
     return large_grip_eqn
 
-def bolt_red_capacity_prov(blj,blg,V,Vrd):
+def bolt_red_capacity_prov(blj,blg,V,Vrd,type):
     blj = str(blj)
     blg = str(blg)
     V = str(V)
     Vrd = str(Vrd)
-
     bolt_capacity_eqn = Math(inline=True)
-    bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} * \beta_{lg} *  V_{db} \\'))
-    bolt_capacity_eqn.append(NoEscape(r' &= ' + blj + '*' + blg + '*' + V + r'\\'))
-    bolt_capacity_eqn.append(NoEscape(r'& = ' + Vrd + r'\end{aligned}'))
+    if type == "b":
+        bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} * \beta_{lg} *  V_{db} \\'))
+        bolt_capacity_eqn.append(NoEscape(r' &= ' + blj + '*' + blg + '*' + V + r'\\'))
+        bolt_capacity_eqn.append(NoEscape(r'& = ' + Vrd + r'\end{aligned}'))
+    else:
+        bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} * V_{db} \\'))
+        bolt_capacity_eqn.append(NoEscape(r' &= ' + blj + '*' + V + r'\\'))
+        bolt_capacity_eqn.append(NoEscape(r'& = ' + Vrd + r'\end{aligned}'))
 
     return bolt_capacity_eqn
 

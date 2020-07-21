@@ -313,6 +313,12 @@ class Tension_bolted(Member):
         t5 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
         lst.append(t5)
 
+        t4 = ([KEY_TYP], KEY_REDUCTION_LARGE_GRIP, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        lst.append(t4)
+
+        t5 = ([KEY_TYP], KEY_REDUCTION_LARGE_GRIP, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        lst.append(t5)
+
         t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
         lst.append(t5)
 
@@ -501,14 +507,21 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - (root radius not included in edge distance)")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Spacing Details based on member's depth \n (root radius not included in edge distance)")
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
                ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
         spacing.append(t99)
 
-        t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
+        if self.sec_profile == 'Star Angles':
+            t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
+                   int(self.plate.bolts_one_line/2) if status else '', True)
+            spacing.append(t16)
+        else:
+            pass
+
+        t16 = (KEY_OUT_BOLTS_ONE_LINE_S, KEY_OUT_DISP_BOLTS_ONE_LINE_S, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
         spacing.append(t16)
 
         t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
@@ -2567,11 +2580,19 @@ class Tension_bolted(Member):
             self.report_check.append(t7)
             t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),long_joint_bolted_prov(self.plate.bolt_line,self.plate.bolts_one_line,self.plate.pitch_provided,self.plate.gauge_provided,self.bolt.bolt_diameter_provided,bolt_capacity_kn,bolt_capacity_red_kn), "")
             self.report_check.append(t10)
-            t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),large_grip_prov(self.bolt.bolt_diameter_provided, self.plate.thickness_provided, self.thick, self.plate.beta_lj, self.plate.beta_lg), "")
-            self.report_check.append(t10)
-            t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_red_capacity_prov(self.plate.beta_lj,self.plate.beta_lg,bolt_capacity_kn,bolt_capacity_red_kn),
-                  get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
-            self.report_check.append(t5)
+            if self.bolt.bolt_type == TYP_BEARING:
+                t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),large_grip_prov(self.bolt.bolt_diameter_provided, self.plate.thickness_provided, self.thick, self.plate.beta_lj, self.plate.beta_lg), "")
+                self.report_check.append(t10)
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_red_capacity_prov(self.plate.beta_lj,self.plate.beta_lg,bolt_capacity_kn,bolt_capacity_red_kn,"b"),
+                      get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
+                self.report_check.append(t5)
+            else:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,
+                      bolt_red_capacity_prov(self.plate.beta_lj, self.plate.beta_lg, bolt_capacity_kn,
+                                             bolt_capacity_red_kn, "f"),
+                      get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
+                self.report_check.append(t5)
+
 
         else:
             pass

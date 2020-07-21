@@ -1361,15 +1361,18 @@ KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
-KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
+KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
+KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Total Rows (nos)'
+
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (nos)'
 
 
 KEY_OUT_SPACING = 'spacing'

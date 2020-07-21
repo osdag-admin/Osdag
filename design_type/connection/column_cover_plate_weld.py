@@ -1955,7 +1955,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         t1 = ('Model', self.call_3DModel)
         components.append(t1)
 
-        t2 = ('Beam', self.call_3DBeam)
+        t2 = ('Column', self.call_3DColumn)
         components.append(t2)
 
         t4 = ('Cover Plate', self.call_3DPlate)
@@ -1971,7 +1971,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Connector", bgcolor)
+        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     ##########################################################################################################################
     def results_to_test(self):

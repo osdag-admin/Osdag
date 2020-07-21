@@ -343,7 +343,7 @@ class FinPlateConnection(ShearConnection):
         t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if status else '')
         capacities.append(t19)
 
-        t20 = (KEY_MEMBER_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.supported_section.moment_capacity/1000000,2) if status else '')
+        t20 = (KEY_MEMBER_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.supported_section.cl_8_2_moment_capacity_member / 1000000, 2) if status else '')
         capacities.append(t20)
 
         return capacities
@@ -635,7 +635,7 @@ class FinPlateConnection(ShearConnection):
                 self.design_weld(self, available_welds)
                 while self.supported_section.design_status == False or self.plate.design_status_capacity == False or \
                         self.weld.design_status == False:
-                    if self.supported_section.moment_capacity > self.plate.moment_demand and self.plate.height+10 <= self.max_plate_height:
+                    if self.supported_section.cl_8_2_moment_capacity_member > self.plate.moment_demand and self.plate.height+10 <= self.max_plate_height:
                         self.plate.height += 10
                         h_recalc = (self.plate.gauge_provided + 5) * (self.plate.bolts_one_line - 1) + self.plate.edge_dist_provided
                         if self.plate.block_shear_capacity_axial > self.load.axial_force*1000 or \
@@ -721,11 +721,11 @@ class FinPlateConnection(ShearConnection):
             logger.info(": Choose a Beam of higher size or material grade")
             logger.info(": Lesser number of bolts per line increases the rupture capacity")
 
-        if self.supported_section.moment_capacity < self.plate.moment_demand:
+        if self.supported_section.cl_8_2_moment_capacity_member < self.plate.moment_demand:
             self.design_status = False
             logger.error(": Beam moment capacity is less than the moment demand, {} kNm [cl. 8.2.1.2]"
                          .format(round(self.plate.moment_demand/1000000,2)))
-            logger.warning(":Moment capacity of plate is {} kN-m" .format(round(self.supported_section.moment_capacity/1000000,2)))
+            logger.warning(":Moment capacity of plate is {} kN-m" .format(round(self.supported_section.cl_8_2_moment_capacity_member / 1000000, 2)))
             logger.info(": Increase the plate thickness or material grade")
             logger.info(": Arranging bolts in one line will reduce moment induced")
 
@@ -795,20 +795,20 @@ class FinPlateConnection(ShearConnection):
         else:
             self.supported_section.design_status = True
 
-        self.supported_section.moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength\
+        self.supported_section.cl_8_2_moment_capacity_member = IS800_2007.cl_8_2_1_2_design_moment_strength\
             (self.supported_section.elast_sec_mod_z, self.supported_section.plast_sec_mod_z, self.supported_section.fy, 'plastic')
 
-        if self.supported_section.moment_capacity < self.plate.moment_demand:
+        if self.supported_section.cl_8_2_moment_capacity_member < self.plate.moment_demand:
             logger.warning(
                 'Moment capacity of section is less than moment demand, choose bigger section or increase section material strength')
             self.supported_section.design_status = False
         else:
             self.supported_section.design_status = True
 
-        self.supported_section.IR = round(self.plate.moment_demand / self.supported_section.moment_capacity + (
+        self.supported_section.IR = round(self.plate.moment_demand / self.supported_section.cl_8_2_moment_capacity_member + (
                     self.load.axial_force * 1000) / self.supported_section.tension_capacity, 2)
 
-        if self.supported_section.IR > 1 or self.supported_section.moment_capacity < self.plate.moment_demand or\
+        if self.supported_section.IR > 1 or self.supported_section.cl_8_2_moment_capacity_member < self.plate.moment_demand or\
                 self.supported_section.tension_capacity < self.load.axial_force * 1000 or \
                 self.supported_section.shear_capacity < self.load.shear_force * 1000:
             logger.warning(
@@ -943,15 +943,12 @@ class FinPlateConnection(ShearConnection):
             self.design_status = True
             logger.info("=== End Of Design ===")
 
-    # def h_recalc_check(self):
-    #     h_recalc = (self.plate.gauge_provided + 5) * (self.plate.bolts_one_line - 1) + self.plate.edge_dist_provided
-    #     v_res = self.plate.get_vres(self.plate.bolts_one_line, self.plate.pitch_provided,self.plate.gauge_provided,
-    #                                 self.plate.bolt_line,self.load.shear_force*1000,self.load.axial_force*1000, )
-
     #############################
     # End of Calculations
     #############################
     # Function to create input output dictionary for testing
+    # Save Output CSV file gets data from input_values and output_values functions
+    # This results to test function is used to check in available excel files created bu intern swaroop
     #############################
     def results_to_test(self):
         test_in_list = {KEY_MODULE: self.module,
@@ -1016,7 +1013,7 @@ class FinPlateConnection(ShearConnection):
                          KEY_TENSION_YIELDCAPACITY: self.supported_section.tension_yielding_capacity,
                          KEY_TENSION_RUPTURECAPACITY: self.supported_section.tension_rupture_capacity,
                          KEY_TENSION_BLOCKSHEARCAPACITY: self.supported_section.block_shear_capacity_axial,
-                         KEY_MEMBER_MOM_CAPACITY: self.supported_section.moment_capacity,
+                         KEY_MEMBER_MOM_CAPACITY: self.supported_section.cl_8_2_moment_capacity_member,
                         KEY_OUT_WELD_SIZE:self.weld.size,
                         KEY_OUT_WELD_STRENGTH:self.weld.strength,
                         KEY_OUT_WELD_STRESS:self.weld.stress}
@@ -1033,27 +1030,27 @@ class FinPlateConnection(ShearConnection):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        if self.plate.design_status is False:
-            t1 = ('SubSection', 'Section Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-            self.report_check.append(t1)
 
-            a = self.supported_section
-            h = a.web_height
-            t = a.web_thickness
-            t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
-                  shear_yield_prov(h, t, a.fy, gamma_m0, round(a.shear_yielding_capacity/1000,2)),
-                  get_pass_fail(self.load.shear_force, round(a.shear_yielding_capacity/1000,2), relation="lesser"))
-            self.report_check.append(t1)
+        t1 = ('SubSection', 'Initial Section Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
 
-            t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,
-                  allow_shear_capacity(round(a.shear_yielding_capacity/1000,2), round(a.low_shear_capacity/1000,2)),
-                  get_pass_fail(self.load.shear_force, round(a.low_shear_capacity/1000,2), relation="lesser"))
-            self.report_check.append(t1)
+        a = self.supported_section
+        h = a.web_height
+        t = a.web_thickness
+        t1 = (KEY_DISP_SHEAR_YLD, self.load.shear_force,
+              cl_8_4_shear_yielding_capacity_member(h, t, a.fy, gamma_m0, round(a.shear_yielding_capacity / 1000, 2)),
+              get_pass_fail(self.load.shear_force, round(a.shear_yielding_capacity/1000,2), relation="lesser"))
+        self.report_check.append(t1)
 
-            t1 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force,
-                  tension_yield_prov(h, t, a.fy, gamma_m0, round(a.tension_yielding_capacity/1000, 2)),
-                  get_pass_fail(self.load.axial_force, round(a.tension_yielding_capacity/1000, 2), relation="lesser"))
-            self.report_check.append(t1)
+        t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,
+              allow_shear_capacity(round(a.shear_yielding_capacity/1000,2), round(a.low_shear_capacity/1000,2)),
+              get_pass_fail(self.load.shear_force, round(a.low_shear_capacity/1000,2), relation="lesser"))
+        self.report_check.append(t1)
+
+        t1 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
+              cl_6_2_tension_yield_capacity_member(h, t, a.fy, gamma_m0, round(a.tension_yielding_capacity / 1000, 2)),
+              get_pass_fail(self.load.axial_force, round(a.tension_yielding_capacity/1000, 2), relation="lesser"))
+        self.report_check.append(t1)
 
         if not self.thickness_possible and self.supported_section.design_status_initial is True:
             t1 = ('SubSection', 'Minimum Plate thickness check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -1078,7 +1075,7 @@ class FinPlateConnection(ShearConnection):
                                   shear_capacity_1=round(self.supported_section.shear_yielding_capacity/1000,2)), "")
             self.report_check.append(t1)
 
-            t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, self.load.axial_force, self.load.axial_force, "")
+            t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, self.load.axial_force, self.load.axial_force, "")
             self.report_check.append(t1)
 
             connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
@@ -1175,26 +1172,26 @@ class FinPlateConnection(ShearConnection):
                 if self.bolt.bolt_type == TYP_BEARING:
                     bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
                     bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-                    t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu,1,self.bolt.bolt_net_area,
-                                                                       self.bolt.gamma_mb,bolt_shear_capacity_kn), '')
+                    t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.bolt.bolt_fu, 1, self.bolt.bolt_net_area,
+                                                                                     self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
                     self.report_check.append(t1)
-                    t8 = (KEY_DISP_KB, " ", kb_prov(self.plate.edge_dist_provided, self.plate.gauge_provided, self.bolt.dia_hole,
-                                              self.bolt.bolt_fu, self.bolt.fu_considered), '')
+                    t8 = (KEY_DISP_KB, " ", cl_10_3_4_calculate_kb(self.plate.edge_dist_provided, self.plate.gauge_provided, self.bolt.dia_hole,
+                                                                   self.bolt.bolt_fu, self.bolt.fu_considered), '')
                     self.report_check.append(t8)
-                    t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(self.bolt.kb,self.bolt.bolt_diameter_provided,
-                                                                           self.bolt_conn_plates_t_fu_fy,self.bolt.gamma_mb,
-                                                                           bolt_bearing_capacity_kn), '')
+                    t2 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(self.bolt.kb, self.bolt.bolt_diameter_provided,
+                                                                                         self.bolt_conn_plates_t_fu_fy, self.bolt.gamma_mb,
+                                                                                         bolt_bearing_capacity_kn), '')
                     self.report_check.append(t2)
                     t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
-                          bolt_capacity_prov(bolt_shear_capacity_kn,bolt_bearing_capacity_kn,bolt_capacity_kn),
+                          cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
                           '')
                     self.report_check.append(t3)
                 else:
                     kh_disp = round(self.bolt.kh, 2)
                     t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
-                          HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f,n_e=1,K_h=kh_disp,fub = self.bolt.bolt_fu,
-                                                  Anb= self.bolt.bolt_net_area,gamma_mf=self.bolt.gamma_mf,
-                                                  capacity=bolt_capacity_kn),'')
+                          cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub = self.bolt.bolt_fu,
+                                                       Anb= self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
+                                                       capacity=bolt_capacity_kn), '')
                     self.report_check.append(t4)
 
 
@@ -1235,6 +1232,7 @@ class FinPlateConnection(ShearConnection):
                 #######################
                 # Plate and Section Capacities
                 #######################
+                self.plate.plast_sec_mod_z = self.plate.height ** 2 * self.plate.thickness_provided / 4
                 for a in [self.plate,self.supported_section]:
 
                     if a == self.plate:
@@ -1246,8 +1244,8 @@ class FinPlateConnection(ShearConnection):
                         h = a.web_height
                         t = a.web_thickness
 
-                    t1 = (KEY_DISP_SHEAR_YLD, '', shear_yield_prov(h,t,a.fy, gamma_m0,
-                                                                   round(a.shear_yielding_capacity / 1000, 2)),'')
+                    t1 = (KEY_DISP_SHEAR_YLD, '', cl_8_4_shear_yielding_capacity_member(h, t, a.fy, gamma_m0,
+                                                                                        round(a.shear_yielding_capacity / 1000, 2)),'')
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.load.shear_force, "V"),
@@ -1255,48 +1253,51 @@ class FinPlateConnection(ShearConnection):
                           get_pass_fail(self.load.shear_force, round(a.low_shear_capacity/1000,2), relation="lesser"))
                     self.report_check.append(t1)
 
-                    t1 = (KEY_DISP_SHEAR_RUP, '', shear_rupture_prov(h,t, self.plate.bolts_one_line, self.bolt.dia_hole,
-                                                                     a.fu,round(a.shear_rupture_capacity / 1000, 2)),'')
+                    t1 = (KEY_DISP_SHEAR_RUP, '', AISC_J4_shear_rupture_capacity_member(h, t, self.plate.bolts_one_line, self.bolt.dia_hole,
+                                                                                        a.fu, round(a.shear_rupture_capacity / 1000, 2)),'')
                     self.report_check.append(t1)
 
-                    t1 = (KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '', blockshear_prov(Tdb=round(a.block_shear_capacity_shear/1000, 2),stress='shear'), '')
+                    t1 = (KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '', cl_6_4_blockshear_capacity_member(Tdb=round(a.block_shear_capacity_shear / 1000, 2), stress='shear'), '')
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
-                          shear_capacity_prov(round(a.low_shear_capacity / 1000, 2),
-                                              round(a.shear_rupture_capacity / 1000, 2),
-                                              round(a.block_shear_capacity_shear / 1000, 2)),
+                          cl_8_4_shear_capacity_member(round(a.low_shear_capacity / 1000, 2),
+                                                       round(a.shear_rupture_capacity / 1000, 2),
+                                                       round(a.block_shear_capacity_shear / 1000, 2)),
                           get_pass_fail(self.load.shear_force, round(a.shear_capacity / 1000, 2), relation="lesser"))
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                          tension_yield_prov(h,t, a.fy, gamma_m0,round(a.tension_yielding_capacity / 1000, 2)), '')
+                          cl_6_2_tension_yield_capacity_member(h, t, a.fy, gamma_m0, round(a.tension_yielding_capacity / 1000, 2)), '')
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          tension_rupture_bolted_prov(h,t,self.plate.bolts_one_line, self.bolt.dia_hole,
-                                                      a.fu, gamma_m1,round(a.tension_rupture_capacity / 1000, 2)), '')
+                          cl_6_3_tension_rupture_capacity_member(h, t, self.plate.bolts_one_line, self.bolt.dia_hole,
+                                                                 a.fu, gamma_m1, round(a.tension_rupture_capacity / 1000, 2)), '')
                     self.report_check.append(t1)
 
-                    t1 = (KEY_DISP_PLATE_BLK_SHEAR_TENSION, '', blockshear_prov(Tdb=round(a.block_shear_capacity_axial/1000, 2),stress='axial'), '')
+                    t1 = (KEY_DISP_PLATE_BLK_SHEAR_TENSION, '', cl_6_4_blockshear_capacity_member(Tdb=round(a.block_shear_capacity_axial / 1000, 2), stress='axial'), '')
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force,
-                          tensile_capacity_prov(round(a.tension_yielding_capacity / 1000, 2),
-                                                round(a.tension_rupture_capacity / 1000, 2),
-                                                round(a.block_shear_capacity_axial / 1000, 2)),
+                          cl_6_1_tension_capacity_member(round(a.tension_yielding_capacity / 1000, 2),
+                                                         round(a.tension_rupture_capacity / 1000, 2),
+                                                         round(a.block_shear_capacity_axial / 1000, 2)),
                           get_pass_fail(self.load.axial_force, round(a.tension_capacity / 1000, 2), relation="lesser"))
                     self.report_check.append(t1)
 
                     t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, round(self.plate.moment_demand / 1000000, 2),
-                          round(a.moment_capacity / 1000000, 2),
+                          cl_8_2_1_2_plastic_moment_capacity_member(beta_b=1.0, Z_p=round(self.a.plast_sec_mod_z, 2),
+                                                                    f_y=self.a.fy,
+                                                                    gamma_m0=gamma_m0,
+                                                                    Pmc=self.a.moment_capacity),
                           get_pass_fail(self.plate.moment_demand, a.moment_capacity, relation="lesser"))
                     self.report_check.append(t1)
 
-                    t1 = (KEY_DISP_IR, IR_req(IR=1),
-                          IR_prov(round(self.plate.moment_demand / 1000000, 2),
-                                            round(a.moment_capacity / 1000000, 2),
-                                            self.load.axial_force, round(a.tension_capacity / 1000, 2), a.IR),
+                    t1 = (KEY_DISP_IR, required_IR_or_utilisation_ratio(IR=1),
+                          cl_9_3_combined_moment_axial_IR_section(round(self.plate.moment_demand / 1000000, 2),
+                                                                  round(a.moment_capacity / 1000000, 2),
+                                                                  self.load.axial_force, round(a.tension_capacity / 1000, 2), a.IR),
                           get_pass_fail(1, a.IR, relation="greater"))
                     self.report_check.append(t1)
 
@@ -1307,10 +1308,10 @@ class FinPlateConnection(ShearConnection):
                 t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
-                t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req(self.weld_connecting_plates,self.weld_size_min), self.weld.size,
+                t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld_size_min), self.weld.size,
                       get_pass_fail(self.weld_size_min, self.weld.size, relation="leq"))
                 self.report_check.append(t1)
-                t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(self.weld_connecting_plates, self.weld_size_max), self.weld.size,
+                t1 = (DISP_MAX_WELD_SIZE, cl_10_5_3_1_max_weld_size(self.weld_connecting_plates, self.weld_size_max), self.weld.size,
                       get_pass_fail(self.weld_size_max, self.weld.size, relation="geq"))
                 self.report_check.append(t1)
                 Ip_weld = round(2 * self.weld.eff_length ** 3 / 12,2)
@@ -1321,7 +1322,7 @@ class FinPlateConnection(ShearConnection):
                                                                 M=self.plate.moment_demand,Ip_w=Ip_weld,
                                                                 y_max= self.weld.eff_length/2,x_max=0.0,l_w=2*self.weld.eff_length,
                                                                 R_w=self.weld.stress),
-                          weld_strength_prov(weld_conn_plates_fu, gamma_mw, self.weld.throat_tk,self.weld.strength),
+                          cl_10_5_7_1_1_weld_strength(weld_conn_plates_fu, gamma_mw, self.weld.throat_tk, self.weld.strength),
                           get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
                     self.report_check.append(t1)
 

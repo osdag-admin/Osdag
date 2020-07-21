@@ -1935,39 +1935,38 @@ class ColumnEndPlate(MomentConnection):
         t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        t1 = (SECTION_CLASSIFICATION, "", section_classification(class_of_section=self.class_of_section), "")
+        t1 = (SECTION_CLASSIFICATION, "", cl_3_7_2_section_classification(class_of_section=self.class_of_section), "")
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, self.load.axial_force, axial_capacity(area=round(self.section.area, 2),
-                                                                                 fy=self.section.fy,
-                                                                                 gamma_m0=gamma_m0,
-                                                                                 axial_capacity=round(
-                                                                                     self.axial_capacity / 1000, 2)),
-              '')
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, self.load.axial_force,
+
+              cl_6_2_tension_yield_capacity_member(l=None, t=None, f_y=self.section.fy, gamma=gamma_m0,
+                                                   T_dg=round(self.axial_capacity / 1000, 2), multiple=None,
+                                                   area=round(self.section.area, 2)),'')
         self.report_check.append(t1)
 
         # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
         #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
 
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, self.load.shear_force, shear_yield_prov(h=h, t=self.section.web_thickness,
-                                                                                   f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                                                   V_dg=round(self.shear_capacity / 1000, 2)),
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, self.load.shear_force, cl_8_4_shear_yielding_capacity_member(h=h, t=self.section.web_thickness,
+                                                                                                        f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                                                        V_dg=round(self.shear_capacity / 1000, 2)),
               'Restricted to low shear')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
-                                                                               Z_p=round(self.Z_p, 2),
-                                                                               f_y=self.section.fy,
-                                                                               gamma_m0=gamma_m0,
-                                                                               Pmc=round(self.Pmc / 1000000, 2)), '')
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', cl_8_2_1_2_plastic_moment_capacity_member(beta_b=round(self.beta_b, 2),
+                                                                                                  Z_p=round(self.Z_p, 2),
+                                                                                                  f_y=self.section.fy,
+                                                                                                  gamma_m0=gamma_m0,
+                                                                                                  Pmc=round(self.Pmc / 1000000, 2)), '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '', moment_d_deformation_criteria(fy=self.section.fy,
-                                                                                   Z_e=round(
+        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '', cl_8_2_1_2_deformation_moment_capacity_member(fy=self.section.fy,
+                                                                                                   Z_e=round(
                                                                                        self.section.elast_sec_mod_z, 2),
-                                                                                   Mdc=round(self.Mdc / 1000000, 2)),
+                                                                                                   Mdc=round(self.Mdc / 1000000, 2)),
               '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, self.load.moment, moment_capacity(Pmc=round(self.Pmc / 1000000, 2),
-                                                                              Mdc=round(self.Mdc / 1000000, 2),
-                                                                              M_c=round(
+        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, self.load.moment, cl_8_2_moment_capacity_member(Pmc=round(self.Pmc / 1000000, 2),
+                                                                                            Mdc=round(self.Mdc / 1000000, 2),
+                                                                                            M_c=round(
                                                                                   self.section.moment_capacity / 1000000,
                                                                                   2)),
               '')
@@ -2027,29 +2026,29 @@ class ColumnEndPlate(MomentConnection):
 
         if self.bolt.bolt_type == TYP_BEARING:
              bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1,
-                                                                          self.bolt.bolt_net_area,
-                                                                          self.bolt.gamma_mb,
-                                                                          bolt_shear_capacity_kn), '')
-             self.report_check.append(t1)
-             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp,
-                                                                              self.bolt.bolt_diameter_provided,
-                                                                              self.bolt_conn_plates_t_fu_fy,
+             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.bolt.bolt_fu, 1,
+                                                                              self.bolt.bolt_net_area,
                                                                               self.bolt.gamma_mb,
-                                                                              bolt_bearing_capacity_kn), '')
+                                                                              bolt_shear_capacity_kn), '')
+             self.report_check.append(t1)
+             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(kb_disp,
+                                                                                  self.bolt.bolt_diameter_provided,
+                                                                                  self.bolt_conn_plates_t_fu_fy,
+                                                                                  self.bolt.gamma_mb,
+                                                                                  bolt_bearing_capacity_kn), '')
              self.report_check.append(t2)
-             t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(bolt_shear_capacity_kn,
-                                                                                bolt_bearing_capacity_kn,
-                                                                                bolt_capacity_kn), '')
+             t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn,
+                                                                           bolt_bearing_capacity_kn,
+                                                                           bolt_capacity_kn), '')
              self.report_check.append(t3)
         else:
 
-             t4 = (KEY_OUT_DISP_BOLT_SLIP, '', HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1,
-                                                                                 K_h=1,
-                                                                                 fub=self.bolt.bolt_fu,
-                                                                                 Anb=self.bolt.bolt_net_area,
-                                                                                 gamma_mf=self.bolt.gamma_mf,
-                                                                                 capacity=bolt_capacity_kn), '')
+             t4 = (KEY_OUT_DISP_BOLT_SLIP, '', cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=1,
+                                                                            K_h=1,
+                                                                            fub=self.bolt.bolt_fu,
+                                                                            Anb=self.bolt.bolt_net_area,
+                                                                            gamma_mf=self.bolt.gamma_mf,
+                                                                            capacity=bolt_capacity_kn), '')
              self.report_check.append(t4)
 
         t1 = (KEY_OUT_BOLT_TENSION_CAPACITY, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
@@ -2057,8 +2056,9 @@ class ColumnEndPlate(MomentConnection):
                                                                                         M=round(self.load_moment/1000,2),
                                                                                         y_max=self.y_max,
                                                                                         y_sqr=round(self.y_sqr ,2),T_b=round(self.t_b/1000 ,2)) ,
-               tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu,A_nb=self.bolt.bolt_net_area,T_db=round(self.bolt.bolt_tension_capacity /1000 ,2),gamma_mf=1.25),
-               get_pass_fail(self.t_b,self.bolt.bolt_tension_capacity,relation='leq'))
+              cl_10_3_5_bearing_bolt_tension_resistance(self.bolt.bolt_fu, self.bolt.bolt_fy, self.bolt.bolt_shank_area,
+                                                        self.bolt.bolt_net_area, round(self.bolt.bolt_tension_capacity / 1000, 2)),
+              get_pass_fail(self.t_b,self.bolt.bolt_tension_capacity,relation='leq'))
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.fact_shear_load /1000 ,2),n_wb=self.n_bw*2,V_sb=round(self.v_sb /1000, 2)),
                  round(self.bolt.bolt_capacity /1000,2),

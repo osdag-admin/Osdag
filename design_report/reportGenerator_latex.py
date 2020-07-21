@@ -130,10 +130,10 @@ class CreateLatex(Document):
                                      MultiColumn(2, align='|c|', data=a[x]),
                                      MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                             elif x <= 4:
-                                table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                               MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                               MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
                             else:
-                                table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
+                                table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
                                                sectiondetails[a[merge_rows + x - 4]],))
                             table.add_hline(2, 5)
                     elif uiObj[i] == "TITLE":

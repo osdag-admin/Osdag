@@ -632,7 +632,7 @@ class Plate(Material):
                 float((flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2),
                 2)
         else:
-            gauge = 0.
+            gauge = 0
             edge_dist = round(
                 float((flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2),
                 2)
@@ -713,6 +713,7 @@ class Plate(Material):
                     self.beta_lj = round(self.beta_lj, 2)
                 bolt_capacity_red = round(self.beta_lj, 2) * bolt_capacity
             else:
+                self.beta_lj = 1
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
@@ -733,6 +734,7 @@ class Plate(Material):
                 bolt_capacity_red = round( self.beta_lj, 2) * bolt_capacity
                 print('beta', round( self.beta_lj, 2))
             else:
+                self.beta_lj = 1.0
                 bolt_capacity_red = bolt_capacity
 
         self.beta_lg = beta_lg

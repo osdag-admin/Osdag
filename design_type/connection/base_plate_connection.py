@@ -269,9 +269,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_plt_height_along_web = 0.0
         self.stiffener_plt_height_across_web = 0.0
 
+        self.stiffener_plt_len_btwn_D = 0.0
+        self.stiffener_plt_width_btwn_D = 0.0
+        self.stiffener_plt_thick_btwn_D = 0.0
+
         self.stiffener_along_flange = ''
         self.stiffener_along_web = ''
         self.stiffener_across_web = ''
+        self.stiffener_inside_flange = ''
         self.eff_stiffener_plt_len_along_flange = 0.0
         self.eff_stiffener_plt_len_along_web = 0.0
 
@@ -1430,8 +1435,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns: None
         """
-        # attributes of input dock
         self.mainmodule = "Moment Connection"
+        # attributes of input dock
         self.connectivity = str(design_dictionary[KEY_CONN])
         self.end_condition = str(design_dictionary[KEY_END_CONDITION])
         self.column_section = str(design_dictionary[KEY_SECSIZE])
@@ -1443,9 +1448,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.load_axial_tension = float(design_dictionary[KEY_AXIAL_TENSION_BP] if design_dictionary[KEY_AXIAL_TENSION_BP] != 'Disabled' else 0)
         self.load_axial_tension = self.load_axial_tension * 10 ** 3  # N
 
-        # self.load_shear = float(design_dictionary[KEY_SHEAR_BP])
-        # self.load_shear = self.load_shear * 10 ** 3  # N
-
         self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])  # shear force acting along the major axis (i.e. depth of the column)
         self.load_shear_major = self.load_shear_major * 10 ** 3  # N
 
@@ -1455,11 +1457,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # shear load for shear key (designed in both directions)
         self.load_shear_major = max(self.load_shear_major, self.load_shear_minor)
         self.load_shear_minor = self.load_shear_major
-        # TODO: check the condition given below
-        # if self.load_shear_major < self.load_shear_minor:
-        #     self.load_shear_major = self.load_shear_minor
-        # else:
-        #     pass
 
         self.load_moment_major = float(design_dictionary[KEY_MOMENT_MAJOR]
                                        if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)  # bending moment acting about the major axis
@@ -1485,17 +1482,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_type = str(design_dictionary[KEY_WELD_TYPE])
 
         # attributes of design preferences
+
+        # column
         self.dp_column_designation = str(design_dictionary[KEY_SECSIZE])
         self.dp_column_material = str(design_dictionary[KEY_SEC_MATERIAL])
-        # self.dp_column_type = str(design_dictionary['Label_8'])
-        # self.dp_column_source = str(design_dictionary['Label_21'])
-        # self.dp_column_fu = float(design_dictionary[KEY_SEC_FU])
-        # self.dp_column_fy = float(design_dictionary[KEY_SEC_FY])
 
+        # base plate
         self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
         self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])
         self.dp_bp_fy = float(design_dictionary[KEY_BASE_PLATE_FY])
 
+        # anchor bolt
         self.dp_anchor_designation = str(design_dictionary[KEY_DP_ANCHOR_BOLT_DESIGNATION])
         self.dp_anchor_type = str(design_dictionary[KEY_DP_ANCHOR_BOLT_TYPE])
         self.dp_anchor_hole = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE])
@@ -1504,12 +1501,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_anchor_friction = float(design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] if
                                         design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] != "" else 0.30)
 
+        # weld
         self.dp_weld_fab = str(design_dictionary[KEY_DP_WELD_FAB])
         self.dp_weld_fu_overwrite = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
 
+        # detailing
         self.dp_detail_edge_type = str(design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
         self.dp_detail_is_corrosive = str(design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
 
+        # method
         self.dp_design_method = str(design_dictionary[KEY_DP_DESIGN_METHOD])
         self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
 
@@ -3087,6 +3087,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.stiffener_along_flange = 'No'
                         self.stiffener_along_web = 'No'
                         self.stiffener_across_web = 'No'
+                        self.stiffener_inside_flange = 'No'
 
                         self.weld_size_flange = self.weld_size  # mm
                         self.weld_size_stiffener = self.weld_size  # mm
@@ -3164,6 +3165,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_along_flange = 'Yes'
                     self.stiffener_along_web = 'Yes'
                     self.stiffener_across_web = 'No'
+                    self.stiffener_inside_flange = 'No'
 
                 self.weld_size_flange = self.column_tf  # mm
                 self.weld_size_web = self.column_tw  # mm
@@ -3500,6 +3502,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # the governing ratio is D/t_g < 29.30 (Table 2, IS 800:2007)
             if self.connectivity == 'Moment Base Plate':
                 if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+
+                    self.stiffener_inside_flange = 'Yes'
+
                     self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30
                     self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)  # mm
 
@@ -3979,6 +3984,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 pass
 
+        #stiffener plate inside flange
+        if self.connectivity == 'Moment Base Plate':
+            if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+                if self.stiffener_inside_flange == 'Yes':
+
+                    print(self.stiffener_plt_len_btwn_D)
+                    print(self.stiffener_plt_width_btwn_D)
+                    print(self.stiffener_plt_thick_btwn_D)
+
         else:
             # Stiffener Plate Along Column Flange
             if self.stiffener_along_flange == 'Yes':
@@ -4085,7 +4099,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.stiffener_across_web == 'Yes':
                 print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
-
+            if self.stiffener_inside_flange == 'Yes':
+                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

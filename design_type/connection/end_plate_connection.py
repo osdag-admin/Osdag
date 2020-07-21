@@ -47,8 +47,7 @@ from Common import *
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 import logging
-import time
-start_time = time.clock()
+
 
 class EndPlateConnection(ShearConnection):
 

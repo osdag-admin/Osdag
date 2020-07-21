@@ -109,7 +109,6 @@ def cl_6_2_tension_yield_capacity_member(l, t, f_y, gamma, T_dg, multiple =None,
         area = str(area)
     f_y = str(f_y)
     gamma = str(gamma)
-    multiple = str(multiple)
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{A_g*f_y}{\gamma_{mo}}\\'))
@@ -117,6 +116,7 @@ def cl_6_2_tension_yield_capacity_member(l, t, f_y, gamma, T_dg, multiple =None,
         if multiple is None or multiple == 1:
             tension_yield_eqn.append(NoEscape(r'A_{g} &= l \times t ='+l+r'\times'+t+r'\\'))
         else:
+            multiple = str(multiple)
             tension_yield_eqn.append(NoEscape(r'A_{g} &='+multiple+r' l \times t =' +multiple+
                                               r'\times'+ l + r'\times' + t + r'\\'))
 
@@ -474,11 +474,11 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
     shear_yield_eqn = Math(inline=True)
     shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dy} &= \frac{A_v~f_y}{\sqrt{3}~\gamma_{mo}}\\'))
     if multiple == 1:
-        shear_yield_eqn.append(NoEscape(r'&=\frac{'+h+r'\times'+t+r'\times'+f_y+'}{\sqrt{3}\times'+gamma_m0+r'}\\'))
+        shear_yield_eqn.append(NoEscape(r'&=\frac{'+h+r'\times'+t+r'\times'+f_y+r'}{\sqrt{3} \times'+gamma_m0+r'}\\'))
     else:
         multiple = str(multiple)
         shear_yield_eqn.append(
-            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + '}{\sqrt{3}\times' + gamma_m0 + r'}\\'))
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\'))
     shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl. 10.4.3]\end{aligned}'))
     return shear_yield_eqn

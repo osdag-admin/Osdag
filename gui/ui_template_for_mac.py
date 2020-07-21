@@ -211,29 +211,27 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
-        if main.design_status:
-
-
-            self.modelTab = qtViewer3d(self)
-            self.mytabWidget.addTab(self.modelTab, "")
-            self.show()
-            self.modelTab.InitDriver()
-            off_display = self.modelTab._display
-
-            self.commLogicObj.display = off_display
-            self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
-            off_display.ExportToImage('./ResourceFiles/images/3d.png')
-            off_display.View_Front()
-            off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/front.png')
-            off_display.View_Top()
-            off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/top.png')
-            off_display.View_Right()
-            off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/side.png')
-            self.commLogicObj.display = self.display
+        # if main.design_status:
+            # self.modelTab = qtViewer3d(self)
+            # self.mytabWidget.addTab(self.modelTab, "")
+            # self.show()
+            # self.modelTab.InitDriver()
+            # off_display = self.modelTab._display
+            #
+            # self.commLogicObj.display = off_display
+            # self.commLogicObj.display_3DModel("Model", "gradient_bg")
+            # # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+            # off_display.ExportToImage('./ResourceFiles/images/3d.png')
+            # off_display.View_Front()
+            # off_display.FitAll()
+            # off_display.ExportToImage('./ResourceFiles/images/front.png')
+            # off_display.View_Top()
+            # off_display.FitAll()
+            # off_display.ExportToImage('./ResourceFiles/images/top.png')
+            # off_display.View_Right()
+            # off_display.FitAll()
+            # off_display.ExportToImage('./ResourceFiles/images/side.png')
+            # self.commLogicObj.display = self.display
 
         self.new_window = QtWidgets.QDialog(self)
         self.new_ui = Ui_Dialog1(main.design_status,loggermsg=self.textEdit.toPlainText())

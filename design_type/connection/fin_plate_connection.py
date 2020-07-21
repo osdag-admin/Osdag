@@ -443,7 +443,7 @@ class FinPlateConnection(ShearConnection):
 
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 
-        self.start_time = time.time()
+
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
@@ -1210,7 +1210,7 @@ class FinPlateConnection(ShearConnection):
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
-                      get_pass_fail(self.min_plate_height, self.plate.height,relation="lesser"))
+                      get_pass_fail(self.min_plate_height, self.plate.height,relation="leq"))
                 self.report_check.append(t1)
 
                 t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity,self.supported_section.depth,
@@ -1287,10 +1287,10 @@ class FinPlateConnection(ShearConnection):
                     self.report_check.append(t1)
 
                     t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, round(self.plate.moment_demand / 1000000, 2),
-                          cl_8_2_1_2_plastic_moment_capacity_member(beta_b=1.0, Z_p=round(self.a.plast_sec_mod_z, 2),
-                                                                    f_y=self.a.fy,
+                          cl_8_2_1_2_plastic_moment_capacity_member(beta_b=1.0, Z_p=round(a.plast_sec_mod_z, 2),
+                                                                    f_y=a.fy,
                                                                     gamma_m0=gamma_m0,
-                                                                    Pmc=self.a.moment_capacity),
+                                                                    Pmc=a.moment_capacity),
                           get_pass_fail(self.plate.moment_demand, a.moment_capacity, relation="lesser"))
                     self.report_check.append(t1)
 

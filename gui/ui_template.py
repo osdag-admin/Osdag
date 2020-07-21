@@ -205,7 +205,7 @@ class Window(QMainWindow):
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             self.commLogicObj.display = off_display
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+            off_display.set_bg_gradient_color([255,255,255], [255,255,255])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()

@@ -628,8 +628,6 @@ class ColumnEndPlate(MomentConnection):
         self.section = Column(designation=design_dictionary[KEY_SECSIZE],
                               material_grade=design_dictionary[KEY_SEC_MATERIAL])
 
-        self.start_time = time.time()
-
         self.module = design_dictionary[KEY_MODULE]
         self.connection = design_dictionary[KEY_CONN]
         # self.design_pref = design_dictionary[KEY_CONN_PREFERENCE]

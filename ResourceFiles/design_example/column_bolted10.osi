@@ -59,7 +59,7 @@ Connector.Web_Plate.Thickness_List:
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
-Detailing.Gap: '10'
+Detailing.Gap: '3'
 Load.Axial: '100'
 Load.Moment: '50'
 Load.Shear: '150'

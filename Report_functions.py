@@ -210,7 +210,8 @@ def row_col_limit(min=1,max=None,parameter ="rows"):
 
     return row_col_limit_eqn
 
-def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
+
+def bolt_shear_prov(f_ub, n_n, a_nb, gamma_mb, bolt_shear_capacity):
     """
     Calculate bolt shearing capacity
     Args:
@@ -231,14 +232,13 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
     f_ub = str(f_ub)
     n_n = str(n_n)
     a_nb = str(a_nb)
-    gamma_mb= str(gamma_mb)
-    bolt_shear_capacity=str(bolt_shear_capacity)
+    gamma_mb = str(gamma_mb)
+    bolt_shear_capacity = str(bolt_shear_capacity)
     bolt_shear_eqn = Math(inline=True)
     bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{1000*\sqrt{3} ~\gamma_{mb}}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= \frac{'+f_ub+'*'+n_n+'*'+a_nb+'}{1000*\sqrt{3}~*~'+ gamma_mb+r'}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= '+bolt_shear_capacity+r'\\'))
     bolt_shear_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.3]\end{aligned}'))
-
 
     return bolt_shear_eqn
 
@@ -270,6 +270,7 @@ def end_plate_gauge(connection,e_min,s,t_w,T_w,R_r,module='None'):
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r' \end{aligned}'))
 
     return end_plate_gauge
+
 
 def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     """
@@ -314,7 +315,7 @@ def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     return bolt_bearing_eqn
 
 
-def bolt_capacity_prov(bolt_shear_capacity,bolt_bearing_capacity,bolt_capacity):
+def bolt_capacity_prov(bolt_shear_capacity, bolt_bearing_capacity, bolt_capacity):
     """
     Calculate bolt  capacity (min of bearing and shearing)
 
@@ -346,7 +347,7 @@ def bolt_capacity_prov(bolt_shear_capacity,bolt_bearing_capacity,bolt_capacity):
     return bolt_capacity_eqn
 
 
-def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_capacity, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
     """
     Calculate design tensile strength of bearing bolt
     Args:
@@ -354,6 +355,7 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_fact
         f_yb - Yield strength of the bolt in MPa (float)
         A_sb - Shank area of bolt in sq. mm  (float)
         A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
+        tension_capacity - Tension resistance/capacity of a bolt in KN (float)
     return:
         T_db - Design tensile strength of bearing bolt in N (float)
     Note:
@@ -366,10 +368,12 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_fact
     A_n = str(A_n)
     gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
     gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+    tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n < f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))
     tension_resistance.append(NoEscape(r'\begin &= 0.90~' + f_ub + '~ ' + A_n + '< ' + f_yb + '~ ' + A_sb + '~(' + gamma_mb + '~/~' + gamma_m0 + ''))
     tension_resistance.append(NoEscape(r'\begin &= 0.90~' + f_ub + '~ ' + A_n + ''))
+    tension_resistance.append(NoEscape(r'&= '+ tension_capacity + r'\\'))
     tension_resistance.append(NoEscape(r'&[Ref.~IS~&800:2007,~Cl.~10.3.5]\end{aligned}'))
 
     return tension_resistance
@@ -866,7 +870,7 @@ def ep_max_plate_width_avail(conn,D,T_w,R_r,T_f,wp_max):
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + D + '-2*' + T_f + '-2*' + R_r +  r'\\'))
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + wp_max + '\end{aligned}'))
     else:
-        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} N/A \end{aligned}\\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} N/A \end{aligned}'))
     return ep_max_plate_w_eqn
 
 def end_plate_ht_req(D,e,h_p):
@@ -2904,18 +2908,19 @@ def gusset_lt_w_prov(weld,cls,length):
 def long_joint_bolted_req():
     """
      Returns:
-        Reduced bolt capacity  in KN (float)
+        Long joint reduction factor
     Note:
               Reference:
               IS 800:2007,  cl 10.3.3.1
     """
     long_joint_bolted_eqn = Math(inline=True)
-    long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& if~l < 15 * d~then~V_{rd} = V_{db} \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l_j\geq 15 d~then~V_{rd} = \beta_{lj}. V_{db} \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& if~l_j < 15 d~then~V_{rd} = V_{db} \\'))
     long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& l = ((nc~or~nr) - 1) * (p~or~g) \\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - l/(200 * d) \\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& but~0.75\leq\beta_{ij}\leq1.0 \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& l_j = ((nc~or~nr) - 1).(p~or~g) \\'))
+
+    long_joint_bolted_eqn.append(NoEscape(r'& \beta_{lj} = 1.075 - l/(200 d) \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& but~0.75\leq\beta_{lj}\leq1.0 \\'))
     long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
     return long_joint_bolted_eqn
 
@@ -2934,7 +2939,7 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
          Tr: Reduced bolt capacity  in KN (float)
          direction: n_r or None(string)
     Returns:
-        Reduced bolt capacity  in KN (float)
+        Long joint reduction factor
     Note:
               Reference:
               IS 800:2007,  cl 10.3.3.1
@@ -2947,7 +2952,7 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
     l = max(lc,lr)
     lt = 15 * d
     B = 1.075 - (l / (200 * d))
-    Bi = round(B,2)
+    Bi = round(B,3)
     nc= str(nc)
     nr= str(nr)
     g= str(g)
@@ -2961,38 +2966,234 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
         B =1
     else:
         B=B
-    B = str(round(B,2))
+    B = str(round(B,3))
     Bi = str(Bi)
     lc_str = str(lc)
     lr_str = str(lr)
     l_str = str(l)
     lt_str = str(lt)
     long_joint_bolted_eqn = Math(inline=True)
-    # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{lj} * V_{db} \\'))
     # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
 
     if direction == 'n_r':
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= (n_r - 1) * p \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l_j &= (n_r - 1) * p \\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
     else:
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((n_c~or~n_r) - 1) * (p~or~g) \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l_j &= ((n_c~or~n_r) - 1) * (p~or~g) \\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
     long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
     long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
     if l < (lt):
-        long_joint_bolted_eqn.append(NoEscape(r'& since,~l < 15 * d~then~V_{rd} = V_{db} \\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& since,~l_j < 15 * d~then~V_{rd} = V_{db} \\'))
+        # long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
     else:
-        long_joint_bolted_eqn.append(NoEscape(r'& since,~l \geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - '+ l_str +'/(200*'+d+') ='+Bi+r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& since,~l_j \geq 15 * d~then~V_{rd} = \beta_{lj} * V_{db} \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& \beta_{lj} = 1.075 - '+ l_str +'/(200*'+d+') ='+Bi+r'\\'))
+        # long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
-
 
     return long_joint_bolted_eqn
 
+
+def large_grip_bolted_req():
+    """
+     Returns:
+        Large grip reduction factor
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3.2
+    """
+    large_grip_bolted_eqn = Math(inline=True)
+    large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l_g\geq 5 * d~then~V_{rd} = \beta_{lg} * V_{db} \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'& if~l_g < 5 * d~then~V_{rd} = V_{db} \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'& l_g \leq 8 * d \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'& where,\\'))
+    large_grip_bolted_eqn.append(NoEscape(r'& l_g = \Sigma (t_{ep}+t_{member}) \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = 8*d/(3*d + l_g) \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'& but~\beta_{lg}\leq \beta_{lj} \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
+    return large_grip_bolted_eqn
+
+
+def large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
+    """
+    Calculate reduced bolt capacity in case of large grip
+
+    Args:
+         t_sum : Sum of thickness of the connected plates
+         d:Diameter of the bolt in mm (float)
+    Returns:
+        Large grip reduction factor
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3.2
+
+    """
+    lg = t_sum
+    B = 8*d/(3*d+lg)
+    Bi = round(B,3)
+    #
+    # Tc = str(Tc)
+    # Tr = str(Tr)
+    if lg <= 5*d:
+        B = 1.0
+    # elif B>=beta_lj:
+    #     B = beta_lj
+    else:
+        B=B
+    d5_str = str(5*d)
+    d_str = str(d)
+    # B = str(round(B,3))
+    Bi = str(Bi)
+    lg_str = str(lg)
+    t_sum_str = str(t_sum)
+    beta_lj_str = str(round(beta_lj,3))
+    large_grip_bolted_eqn = Math(inline=True)
+    # large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    # large_grip_bolted_eqn.append(NoEscape(r'& where,\\'))
+
+    large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} l_g &= \Sigma (t_{ep}+t_{member}) \\'))
+    # large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
+    large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
+    large_grip_bolted_eqn.append(NoEscape(r' 5*d &= ' + d5_str + r'\\'))
+    if lg <= 5*d:
+        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g < 5 * d~then~\beta_{lg} = 1.0 \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'& V_{rd} = V_{db} \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
+    else:
+        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g \geq 5 * d~then~V_{rd} = \beta_{lg} * V_{db} \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = 8*'+ d_str +'/(3*'+ d_str +' + '+ lg_str +') ='+Bi+r'\\'))
+        if B > beta_lj:
+            large_grip_bolted_eqn.append(NoEscape(r'& since,~\beta_{lg} \geq \beta_{lj}~then~\beta_{lg} = \beta_{lj} \\'))
+            large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = ' + beta_lj_str + r'\\'))
+        # large_grip_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
+
+    return large_grip_bolted_eqn
+
+
+def packing_plate_bolted_req():
+    """
+     Returns:
+        Packing plate reduction factor
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3.3
+    """
+    packing_plate_bolted_eqn = Math(inline=True)
+    packing_plate_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~t_{pk}\geq 6 mm~then~V_{rd} = \beta_{pk} * V_{db} \\'))
+    packing_plate_bolted_eqn.append(NoEscape(r'& if~t_{pk} < 6 mm~then~V_{rd} = V_{db} \\'))
+    packing_plate_bolted_eqn.append(NoEscape(r'& where,\\'))
+    packing_plate_bolted_eqn.append(NoEscape(r'& t_{pk} = packing~plate~thickness \\'))
+    packing_plate_bolted_eqn.append(NoEscape(r'& \beta_{pk} = 1.0 - 0.0125*t_{pk} \\'))
+    packing_plate_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.3]\end{aligned}'))
+    return packing_plate_bolted_eqn
+
+
+def packing_plate_bolted_prov(gap):
+    """
+    Calculate reduced bolt capacity in case of large grip
+
+    Args:
+         gap: Gap between connector plate and the supporting element
+    Returns:
+        Packing plate reduction factor
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3.3
+
+    """
+    tpk = gap
+    B = 1 - 0.0125*tpk
+    Bi = round(B,3)
+
+    if tpk<=6:
+        B =1.0
+    # elif B>=beta_lj:
+    #     B = beta_lj
+    else:
+        B=B
+    tpk_str = str(tpk)
+    # B = str(round(B,3))
+    Bi = str(Bi)
+    packing_plate_bolted_eqn = Math(inline=True)
+    # packing_plate_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    # packing_plate_bolted_eqn.append(NoEscape(r'& where,\\'))
+
+    packing_plate_bolted_eqn.append(NoEscape(r'\begin{aligned} t_{pk}&= gap \\'))
+    packing_plate_bolted_eqn.append(NoEscape(r' &= ' + tpk_str + ' mm 'r'\\'))
+    if tpk <= 6:
+        packing_plate_bolted_eqn.append(NoEscape(r'& since,~t_{pk} ~\leq~ 6 mm ~then~V_{rd} = V_{db}\\'))
+        # packing_plate_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
+        packing_plate_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.3]\end{aligned}'))
+    else:
+        packing_plate_bolted_eqn.append(NoEscape(r'& since,~t_{pk} \geq 6 mm~then~V_{rd} = \beta_{pk} * V_{db} \\'))
+        packing_plate_bolted_eqn.append(NoEscape(r'& \beta_{pk} = 1.0 - 0.0125 * '+tpk_str+' ='+Bi+r'\\'))
+
+        # packing_plate_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
+        packing_plate_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.3]\end{aligned}'))
+
+    return packing_plate_bolted_eqn
+
+
+def bolt_capacity_reduced_req():
+    """
+     Returns:
+        Bolt capacity post reduction factors
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3
+    """
+    bolt_capacity_reduced_eqn = Math(inline=True)
+    bolt_capacity_reduced_eqn.append(NoEscape(r'\begin{aligned} V_{rd} &= \beta_{lj} * \beta_{lg} * \beta_{pk} * V_{db} \\'))
+
+    return bolt_capacity_reduced_eqn
+
+
+def bolt_capacity_reduced_prov(beta_lj, beta_lg, beta_pk, Vdb):
+    """
+    Calculate reduced bolt capacity
+
+    Args:
+         beta_lj : Long joint reduction factor
+         beta_lg : Large grip reduction factor
+         beta_pk : Packing plate reduction factor
+         V_{db} : Original Bolt Capacity
+    Returns:
+        Reduced bolt capacity
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3
+
+    """
+    Blj = beta_lj
+    Blg = beta_lg
+    Bpk = beta_pk
+    Vred = Blj * Blg * Bpk * Vdb
+    Vdb = round(Vdb, 2)
+    Vred = round(Vred, 2)
+    Blj_str = str(round(Blj, 3))
+    Blg_str = str(round(Blg, 3))
+    Bpk_str = str(round(Bpk, 3))
+    Vdb_str = str(round(Vdb,2))
+    Vred_str = str(Vred)
+
+    bolt_capacity_reduced_eqn = Math(inline=True)
+    # packing_plate_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    # packing_plate_bolted_eqn.append(NoEscape(r'& where,\\'))
+    bolt_capacity_reduced_eqn.append(
+        NoEscape(r'\begin{aligned} V_{rd} &= \beta_{lj} * \beta_{lg} * \beta_{pk} * V_{db} \\'))
+    bolt_capacity_reduced_eqn.append(
+        NoEscape(r' &= ' + Blj_str + ' * ' + Blg_str + ' * ' + Bpk_str + ' * ' + Vdb_str + r'\\'))
+
+    bolt_capacity_reduced_eqn.append(NoEscape(r' &= ' + Vred_str + r'\\'))
+
+    bolt_capacity_reduced_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3]\end{aligned}'))
+
+    return bolt_capacity_reduced_eqn
 
 
 def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_thickness,root_radius,conn=None):
@@ -3060,7 +3261,7 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
     gap =str(gap)
     root_radius =str(root_radius)
     long_joint_bolted_eqn = Math(inline=True)
-    # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{lj} * V_{db} \\'))
     # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
     if l < (lt):
 
@@ -3113,8 +3314,8 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
 
             long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
             long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
-            long_joint_bolted_eqn.append(NoEscape(r'&since,~l \geq 15 * d~ \\&then~V_{rd} = \beta_{ij} * V_{db} \\'))
-            long_joint_bolted_eqn.append(NoEscape(r'\beta_{ij} &= 1.075 - '+ l_str +'/(200*'+d+r') \\&='+Bi+r'\\'))
+            long_joint_bolted_eqn.append(NoEscape(r'&since,~l \geq 15 * d~ \\&then~V_{rd} = \beta_{lj} * V_{db} \\'))
+            long_joint_bolted_eqn.append(NoEscape(r'\beta_{lj} &= 1.075 - '+ l_str +'/(200*'+d+r') \\&='+Bi+r'\\'))
             long_joint_bolted_eqn.append(NoEscape(r'V_{rd} &= '+Bi+' * '+Tc+'='+Tr+ r' \\'))
             long_joint_bolted_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.3.1]&\end{aligned}'))
         else:
@@ -3131,8 +3332,8 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
 
             long_joint_bolted_eqn.append(NoEscape(r' l~&= ' + l_str + r'\\'))
             long_joint_bolted_eqn.append(NoEscape(r'&15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
-            long_joint_bolted_eqn.append(NoEscape(r'&since,~l \geq 15 * d~\\ &then~V_{rd} = \beta_{ij} * V_{db} \\'))
-            long_joint_bolted_eqn.append(NoEscape(r'\beta_{ij} &= 1.075 - '+ l_str +'/(200*'+d+ r')\\& ='+Bi+r'\\'))
+            long_joint_bolted_eqn.append(NoEscape(r'&since,~l \geq 15 * d~\\ &then~V_{rd} = \beta_{lj} * V_{db} \\'))
+            long_joint_bolted_eqn.append(NoEscape(r'\beta_{lj} &= 1.075 - '+ l_str +'/(200*'+d+ r')\\& ='+Bi+r'\\'))
             long_joint_bolted_eqn.append(NoEscape(r' V_{rd}& = '+Bi+' * '+Tc+'='+Tr+ r' \\'))
             long_joint_bolted_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.3.1]&\end{aligned}'))
     return long_joint_bolted_eqn
@@ -3286,6 +3487,75 @@ def long_joint_welded_prov(h,l,t_t,ws,wsr,direction=None):
         long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
 
     return long_joint_welded_prov
+
+def large_grip_req():
+    """
+     Returns:
+        Reduced bolt capacity  in KN (float)
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.3.3.2
+    """
+    large_grip_eqn = Math(inline=True)
+    large_grip_eqn.append(NoEscape(r'\begin{aligned} &if~l_g \geq 5 * d~then~\beta_{lg} = 8/(3+l_g/d)\\'))
+    large_grip_eqn.append(NoEscape(r' &if~l_g \leq 5 * d~then~\beta_{lg} = 1\\'))
+    large_grip_eqn.append(NoEscape(r'& where,\\'))
+    large_grip_eqn.append(NoEscape(r'&  l_g ~=~plate.thk~+~member.thk \\'))
+    large_grip_eqn.append(NoEscape(r'& if~\beta_{lg} \geq \beta_{lj}~then~\beta_{lg} = \beta_{lj} \\'))
+    large_grip_eqn.append(NoEscape(r'& V_{rd} = \beta_{lg} * V_{db} \\'))
+    large_grip_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
+    return large_grip_eqn
+
+
+def large_grip_prov(d,pt,mt,blj,blg):
+
+    l_g = pt + mt
+    l_g1 = str(l_g)
+    pt1 = str(pt)
+    mt1 = str(mt)
+    blj1 = str(blj)
+    blg1 = str(blg)
+    d1= str(d)
+    d2 = str((5*d))
+
+
+    large_grip_eqn = Math(inline=True)
+    # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{lj} * V_{db} \\'))
+    # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
+
+    if l_g > 5 * d :
+        large_grip_eqn.append(NoEscape(r'\begin{aligned} l_g & = ~plate.thk~+~member.thk \\'))
+        large_grip_eqn.append(NoEscape(r' &= '+pt1+'+'+mt1+ '='+l_g1+ r'\\'))
+        large_grip_eqn.append(NoEscape(r'&5~*~d= 5 *'+d1+r' ='+d2+r' \\'))
+        large_grip_eqn.append(NoEscape(r'&since,~l_g \geq 5 * d~then~\beta_{lg} = 8/(3+l_g/d)\\'))
+        large_grip_eqn.append(NoEscape(r'&\beta_{lg}= 8/(3+ '+l_g1+'/'+d1+r') = '+blg1+r'\\'))
+        if blg>blj:
+            large_grip_eqn.append(NoEscape(r'&since,~\beta_{lg} \geq \beta_{lj},\beta_{lg} = '+blj1+r' \\'))
+        else:
+            large_grip_eqn.append(NoEscape(r'&since,~\beta_{lg} \leq \beta_{lj},\beta_{lg} = ' + blg1 + r' \\'))
+
+    else:
+        large_grip_eqn.append(NoEscape(r'\begin{aligned} l_g & = ~plate.thk~+~member.thk \\'))
+        large_grip_eqn.append(NoEscape(r' &= ' + pt1 + '+' + mt1 + '=' + l_g1 + r'\\'))
+        large_grip_eqn.append(NoEscape(r'&5~*~d~= 5 *' + d1 + r' \\'))
+        large_grip_eqn.append(NoEscape(r'&since,~l_g \leq 5 * d~then~\beta_{lg} = 1\\'))
+    large_grip_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
+
+    return large_grip_eqn
+
+def bolt_red_capacity_prov(blj,blg,V,Vrd):
+    blj = str(blj)
+    blg = str(blg)
+    V = str(V)
+    Vrd = str(Vrd)
+
+    bolt_capacity_eqn = Math(inline=True)
+    bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} * \beta_{lg} *  V_{db} \\'))
+    bolt_capacity_eqn.append(NoEscape(r' &= ' + blj + '*' + blg + '*' + V + r'\\'))
+    bolt_capacity_eqn.append(NoEscape(r'& = ' + Vrd + r'\end{aligned}'))
+
+    return bolt_capacity_eqn
+
 
 
 def throat_req():
@@ -3824,7 +4094,10 @@ def tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tens
     else:
         tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 2 (Not pre-tensioned) \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min(e, 1.1*t*\sqrt{\frac{\beta *f_o}{f_y}}) \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min('+end_dist+', 1.1*'+t+r'*\sqrt{\frac{'+beta+'*'+f_o+r'}{'+f_y+r'}}) \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r' &= min('+end_dist+', 1.1*'+t+r'*\sqrt{\frac{'+beta+'*'+f_o+r'}{'+f_y+r'}}) \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r' &= ' + l_e + r' \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'l_v &= ' + l_v + r' \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'b_e &= ' + b_e + r' \\'))
     tension_in_bolt_due_to_prying.append(
         NoEscape(r'Q &=\frac{'+l_v+'}{2*'+l_e+r'}*\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'&[' + T_e + r'- \frac{'+beta+' *' + eta + '*' + f_o + '*' + b_e +r'*'+ t+r'^4}{27 *'+ l_e+ '*'+ l_v+r'^2}]\\'))
@@ -4215,7 +4488,7 @@ def kb_prov(e, p, d, fub, fu):
     kb_1 = str(kb_1)
     kb_2 = str(kb_2)
     kb_eqn = Math(inline=True)
-    if pitch != 0 :
+    if pitch != 0:
         kb_eqn.append(NoEscape(r'\begin{aligned} k_b & = min(\frac{e}{3*d_0},\frac{p}{3*d_0}-0.25,\frac{f_{ub}}{f_u},1.0)\\' ))
         kb_eqn.append(NoEscape(r'& = min(\frac{'+e+'}{3*'+d+r'},\frac{'+p+'}{3*'+d+r'}-0.25,\frac{'+fub+'}{'+fu+r'},1.0)\\'))
         kb_eqn.append(NoEscape(r'& = min('+kb1+','+kb2+','+kb3+','+kb4+r')\\'))

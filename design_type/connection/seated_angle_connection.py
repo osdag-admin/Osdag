@@ -451,7 +451,7 @@ class SeatedAngleConnection(ShearConnection):
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.bolt.bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
-        t6 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.beta_lg if flag else '', True)
+        t6 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.beta_lg if flag and self.bolt.bolt_type == TYP_BEARING else 'N/A', True)
         out_list.append(t6)
 
         t7 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_reduced_disp if flag else '', True)
@@ -765,7 +765,10 @@ class SeatedAngleConnection(ShearConnection):
                 t_sum = 0.0
                 for i in self.bolt_conn_plates_t_fu_fy:
                     t_sum = t_sum + i[0]
-                self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+                if self.bolt.bolt_type == TYP_BEARING:
+                    self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+                else:
+                    self.beta_lg = 1.0
                 self.bolt.number = round_up(float(self.load.shear_force * 1000) / (self.bolt.bolt_capacity * self.beta_lg), 1)
                 if self.connectivity == VALUES_CONN_1[0]:
                     self.bolt.number = round_up(float(self.bolt.number) / n, 1)
@@ -908,7 +911,10 @@ class SeatedAngleConnection(ShearConnection):
             t_sum = 0.0
             for i in self.bolt_conn_plates_t_fu_fy:
                 t_sum = t_sum + i[0]
-            self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+            if self.bolt.bolt_type == TYP_BEARING:
+                self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+            else:
+                self.beta_lg = 1.0
             if self.bolt.bolt_capacity * self.beta_lg < self.bolt.bolt_force * 1000 and count >= 1:
                 self.bolt.bolt_PC_provided = bolt_PC_previous
                 self.get_bolt_capacity_updated(self)
@@ -976,9 +982,12 @@ class SeatedAngleConnection(ShearConnection):
         t_sum = 0.0
         for i in self.bolt_conn_plates_t_fu_fy:
             t_sum = t_sum + i[0]
-        self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
-        print(t_sum)
-        print(self.beta_lg)
+        if self.bolt.bolt_type == TYP_BEARING:
+            self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+        else:
+            self.beta_lg = 1.0
+        # print(t_sum)
+        # print(self.beta_lg)
         self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity/1000, 2)
         self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity/1000, 2)
         # self.bolt.bolt_shear_capacity_reduced_disp = round(self.bolt.bolt_shear_capacity * self.beta_lg / 1000, 2)
@@ -998,9 +1007,12 @@ class SeatedAngleConnection(ShearConnection):
         t_sum = 0.0
         for i in self.bolt_conn_plates_t_fu_fy:
             t_sum = t_sum + i[0]
-        self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
-        print(t_sum)
-        print(self.beta_lg)
+        if self.bolt.bolt_type == TYP_BEARING:
+            self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+        else:
+            self.beta_lg = 1.0
+        # print(t_sum)
+        # print(self.beta_lg)
         self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity / 1000, 2)
         self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 2)
         # self.bolt.bolt_shear_capacity_reduced_disp = round(self.bolt.bolt_shear_capacity * self.beta_lg / 1000, 2)

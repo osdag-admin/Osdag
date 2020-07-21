@@ -1273,9 +1273,9 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
             elif self.component == "Plate":
-                osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=Quantity_NOC_RED, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=Quantity_NOC_RED, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE4, update=True)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -1286,8 +1286,8 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                     update=True)
                 if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
-                    osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-                    osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=Quantity_NOC_RED, update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=Quantity_NOC_RED, update=True)
                     osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
                                         update=True)
 
@@ -1320,10 +1320,10 @@ class CommonDesignLogic(object):
 
                 elif self.component == "Connector":
                     osdag_display_shape(self.display, self.CPObj.get_flangewebplatesModel(), update=True,
-                                        color='Blue')
+                                        color=Quantity_NOC_BLUE1)
                     if self.B.preference != 'Outside':
                         osdag_display_shape(self.display, self.CPObj.get_innetplatesModels(), update=True,
-                                            color='Blue')
+                                            color=Quantity_NOC_BLUE1)
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
                                         color='black')
@@ -1331,13 +1331,13 @@ class CommonDesignLogic(object):
                 elif self.component == "Model":
                     osdag_display_shape(self.display, self.CPObj.get_beamsModel(), update=True)
                     osdag_display_shape(self.display, self.CPObj.get_flangewebplatesModel(), update=True,
-                                        color='Blue')
+                                        color=Quantity_NOC_BLUE1)
 
                     # Todo: remove velove commented lines
 
                     if self.B.preference != 'Outside':
                         osdag_display_shape(self.display, self.CPObj.get_innetplatesModels(), update=True,
-                                            color='Blue')
+                                            color=Quantity_NOC_BLUE1)
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
                                         color='black')
@@ -1353,12 +1353,12 @@ class CommonDesignLogic(object):
                     # Displays both beams
                     osdag_display_shape(self.display, beams, update=True)
                 elif self.component == "Connector":
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, welds, update=True, color='Red')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
                 elif self.component == "Model":
                     osdag_display_shape(self.display, beams, update=True)
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, welds, update=True, color='Red')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE:
                 self.C = self.module_class()
@@ -1372,12 +1372,12 @@ class CommonDesignLogic(object):
                     # Displays both beams
                     osdag_display_shape(self.display, onlycolumn, update=True)
                 elif self.component == "Cover Plate":
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, nutbolt, update=True, color=Quantity_NOC_YELLOW)
                 elif self.component == "Model":
                     osdag_display_shape(self.display, columns, update=True)
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, nutbolt, update=True, color=Quantity_NOC_YELLOW)
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()
@@ -1390,12 +1390,12 @@ class CommonDesignLogic(object):
                     # Displays both beams
                     osdag_display_shape(self.display, columns, update=True)
                 elif self.component == "Cover Plate":
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, welds, update=True, color='Red')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
                 elif self.component == "Model":
                     osdag_display_shape(self.display, columns, update=True)
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, welds, update=True, color='Red')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
 
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
                 self.CEP = self.module_class()
@@ -1409,15 +1409,15 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, columns, update=True)
 
                 elif self.component == "Connector":
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, welds, update=True, color='Red')
-                    osdag_display_shape(self.display, nutBolts, update=True, color='YELLOW')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
+                    osdag_display_shape(self.display, nutBolts, update=True, color=Quantity_NOC_YELLOW)
 
                 elif self.component == "Model":
                     osdag_display_shape(self.display, columns, update=True)
-                    osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, welds, update=True, color='Red')
-                    osdag_display_shape(self.display, nutBolts, update=True, color='YELLOW')
+                    osdag_display_shape(self.display, plates, update=True, color=Quantity_NOC_BLUE1)
+                    osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
+                    osdag_display_shape(self.display, nutBolts, update=True, color=Quantity_NOC_YELLOW)
 
             elif self.connection == KEY_DISP_BASE_PLATE:
                 self.Bp = self.module_class
@@ -1433,9 +1433,9 @@ class CommonDesignLogic(object):
 
                 if self.component == "Model":  # Todo: change this into key
                     osdag_display_shape(self.display, column, update=True)
-                    osdag_display_shape(self.display, plate, color='Blue', update=True)
-                    osdag_display_shape(self.display, weld, color='RED', update=True)
-                    osdag_display_shape(self.display, nut_bolt, color='YELLOW', update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, weld, color=Quantity_NOC_RED, update=True)
+                    osdag_display_shape(self.display, nut_bolt, color=Quantity_NOC_YELLOW, update=True)
                     osdag_display_shape(self.display, conc, color=GRAY, transparency=0.5, update=True)
                     osdag_display_shape(self.display, grout, color=GRAY, transparency=0.5, update=True)
 
@@ -1443,9 +1443,9 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, column, update=True)
 
                 elif self.component == "Connector":
-                    osdag_display_shape(self.display, plate, color='Blue', update=True)
-                    osdag_display_shape(self.display, weld, color='RED', update=True)
-                    osdag_display_shape(self.display, nut_bolt, color='YELLOW', update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, weld, color=Quantity_NOC_RED, update=True)
+                    osdag_display_shape(self.display, nut_bolt, color=Quantity_NOC_YELLOW, update=True)
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
@@ -1459,15 +1459,15 @@ class CommonDesignLogic(object):
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, onlymember, update=True)
                 elif self.component == "Plate":
-                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
-                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
                 else:
                     connector = BRepAlgoAPI_Fuse(nutbolt, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
                     self.TObj.shape = shape
                     osdag_display_shape(self.display, member, update=True)
-                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
-                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
 
                 # elif self.component == "end bolt":
                 #     pass
@@ -1484,15 +1484,15 @@ class CommonDesignLogic(object):
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, member, update=True)
                 elif self.component == "Plate":
-                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
-                    osdag_display_shape(self.display, welds, color='RED', update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
                 else:
                     connector = BRepAlgoAPI_Fuse(welds, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
                     self.TObj.shape = shape
                     osdag_display_shape(self.display, member, update=True)
-                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
-                    osdag_display_shape(self.display, welds, color='RED', update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
 
                 # elif self.component == "end bolt":
                 #     pass

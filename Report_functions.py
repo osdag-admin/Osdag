@@ -2019,7 +2019,7 @@ def ir_sum_bb_cc(Al, M , A_c ,M_c,IR_axial ,IR_moment ,sum_IR):
     M_c = str(M_c)
     sum_IR =str(sum_IR)
     ir_sum_bb_cc_eqn = Math(inline=True)
-    ir_sum_bb_cc_eqn.append(NoEscape(r'\begin{aligned} IR ~axial~~~~&= A_l / A_c \\'))
+    ir_sum_bb_cc_eqn.append(NoEscape(r'\begin{aligned} IR ~axial~~~~&= A_L / A_c \\'))
     ir_sum_bb_cc_eqn.append(NoEscape(r'& ='+ Al +'/'+ A_c+r' \\'))
     ir_sum_bb_cc_eqn.append(NoEscape(r'& ='+ IR_axial +r' \\'))
 

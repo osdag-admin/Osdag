@@ -1136,7 +1136,7 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.design_status = False
                 logger.error("The number of bolt rows are not sufficient to cater for the given section and loads combination.\\"
-                             "Please do a manual check with increased number of rows. Osdag is not currently equipped to design such cases.")
+                             "Please do a manual check with increased number of rows outside the column depth. Osdag is not currently equipped to design such cases.")
                 logger.info("Else you can try with cover plate connection.")
 
 
@@ -1983,8 +1983,8 @@ class ColumnEndPlate(MomentConnection):
         t1 = (KEY_INTERACTION_RATIO, '', ir_sum_bb_cc(Al=self.load.axial_force, M=self.load.moment,
                                                       A_c=round(self.axial_capacity / 1000, 2),
                                                       M_c=round(self.section.moment_capacity / 1000000, 2),
-                                                      IR_axial=self.IR_axial, IR_moment=self.IR_moment,
-                                                      sum_IR=self.sum_IR), '')
+                                                      IR_axial=round(self.IR_axial,2), IR_moment=round(self.IR_moment,2),
+                                                      sum_IR=round(self.sum_IR,2)), '')
         self.report_check.append(t1)
         #############################
         #### Min load Required ###############

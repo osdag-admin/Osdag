@@ -484,7 +484,7 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
     return shear_yield_eqn
 
 
-def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, multiple =1):
+def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, gamma_m1=1.25,multiple =1):
     """
      Calculate shear rupture capacity of  plate (provided)
      Args:
@@ -494,6 +494,7 @@ def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, multiple =1)
           d_o:Nominal diameter of bolt provide in plate in mm (float)
           fu: Ultimate strength of  plate material in N/mm square (float)
           v_dn: Shear rupture of plate in KN (float)
+          gamma_m1: material factor of safety at ultimate load
           multiple: 1 (int)
     Returns:
           shear rupture capacity of  plate
@@ -507,10 +508,15 @@ def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, multiple =1)
     d_o = str(d_o)
     f_u = str(fu)
     v_dn = str(v_dn)
+    gamma_m1 = str(gamma_m1)
     multiple = str(multiple)
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75~A_{vn}~f_u}{\sqrt{3}~\gamma_{mo}}\\'))
-    shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'\times('+h+'-('+n_r+r'\times'+d_o+r'))\times'+t+r'\times'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75~A_{vn}~f_u}{\sqrt{3}~\gamma_{m1}}\\'))
+    if multiple == 1:
+        shear_rup_eqn.append(NoEscape(
+            r'&=' + r'\times \frac{(' + h + '-(' + n_r + r'\times' + d_o + r'))\times' + t + r'\times' + f_u + r'}{\sqrt{3}\times' + gamma_m1 + r'}\\'))
+    else:
+        shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'\times \frac{('+h+'-('+n_r+r'\times'+d_o+r'))\times'+t+r'\times'+f_u+r'}{\sqrt{3}\times' +gamma_m1+ r'}\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + r'\\'))
     shear_rup_eqn.append(NoEscape(r' [Ref.& AISC~~Sect.J4] \end{aligned}'))
 
@@ -961,8 +967,9 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_cap
     f_yb = str(f_yb)
     A_sb = str(A_sb)
     A_n = str(A_n)
-    gamma_mb = 1.5
+    gamma_mb = str(1.5)
     gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+    gamma_m0 = str(gamma_m0)
     tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n < f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))

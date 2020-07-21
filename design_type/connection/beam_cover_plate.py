@@ -3936,7 +3936,6 @@ class BeamCoverPlate(MomentConnection):
                 t1 = (KEY_DISP_SHEARRUPTURECAP_WEB_PLATE, '', AISC_J4_shear_rupture_capacity_member(self.web_plate.height, self.web_plate.thickness_provided,
                                                                       self.web_plate.bolts_one_line ,self.web_bolt.dia_hole,
                                                                       self.web_plate.fu,
-
                                                                       round(self.web_plate.shear_rupture_capacity / 1000, 2),
                                                                       gamma_m1,2), '')
 

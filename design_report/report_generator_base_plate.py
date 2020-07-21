@@ -70,7 +70,7 @@ class SaveDesignBP(BasePlateConnection):
         }
 
         self.report_supported = {
-            KEY_DISP_SEC_PROFILE: "ISection",  #Image shall be save with this name.png in resource files
+            KEY_DISP_SEC_PROFILE: "ISection",  # Image shall be save with this name.png in resource files
             KEY_DISP_SUPTDSEC: self.dp_column_designation,
             KEY_DISP_MATERIAL: self.dp_column_material,
             KEY_DISP_FU: self.dp_column_fu,
@@ -106,56 +106,97 @@ class SaveDesignBP(BasePlateConnection):
         Returns:
 
         """
-        # defining attributes used in the BasePlateCaculation Class
+        # defining attributes used in the BasePlateCalculation Class
         k_b = min((self.end_distance / (3.0 * self.anchor_hole_dia)), (self.dp_anchor_fu_overwrite / self.dp_column_fu), 1.0)
 
         # start of checks
 
-        # Check 1: Anchor Bolt Design Checks
-        t1 = ('SubSection', 'Anchor Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        # Check 1: Anchor Bolt - Outside Column Flange
+        t1 = ('SubSection', 'Anchor Bolt - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_D_PROVIDED, '', self.anchor_dia_provided, 'N/A')
+        t1 = (KEY_OUT_DISP_D_PROVIDED, '', self.anchor_dia_outside_flange, 'N/A')
         self.report_check.append(t1)
 
         t2 = (KEY_OUT_DISP_PC_PROVIDED, '', self.anchor_grade, 'N/A')
         self.report_check.append(t2)
 
-        t3 = (KEY_DISP_DP_ANCHOR_BOLT_LENGTH, '', self.anchor_length_provided, 'N/A')
-        self.report_check.append(t3)
+        t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_outside_flange, 'N/A')
+        self.report_check.append(t8)
 
         t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
-                                                           self.shear_capacity_anchor), '')
+                                                           self.shear_capacity_anchor), 'N/A')
         self.report_check.append(t4)
 
+        t9 = (KEY_DISP_KB, '', kb_prov(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
+                                       self.dp_column_fu), 'N/A')
+        self.report_check.append(t9)
+
         t5 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
-                                                               self.gamma_mb, self.bearing_capacity_anchor), '')
+                                                               self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
         self.report_check.append(t5)
 
         t6 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
         self.report_check.append(t6)
 
-        t7 = (KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, '', cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db,
-                                                                                                       self.combined_capacity_anchor), '')
-        self.report_check.append(t7)
+        # t7 = (KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, '', cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db,
+        #                                                                                                self.combined_capacity_anchor), '')
+        # self.report_check.append(t7)
 
-        # Check 2: Anchor Bolt for Uplift - Design Checks (optional: will be called only when there is uplift load defined by the user)
-        t1 = ('SubSection', 'Anchor Bolt for Uplift - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
+        if self.connectivity == 'Moment Base Plate':
+            t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, self.tension_demand_anchor, cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                   self.anchor_area[0], self.anchor_area[1],
+                                                                                                   self.tension_capacity_anchor,
+                                                                                                   safety_factor_parameter=self.dp_weld_fab), '')
+            self.report_check.append(t10)
 
-        t1 = (KEY_OUT_DISP_D_PROVIDED, '', self.anchor_dia_tension, 'N/A')
-        self.report_check.append(t1)
-
-        t2 = (KEY_OUT_DISP_PC_PROVIDED, '', self.anchor_grade_tension, 'N/A')
-        self.report_check.append(t2)
-
-        t3 = (KEY_DISP_DP_ANCHOR_BOLT_LENGTH, '', self.anchor_length_provided, 'N/A')
+        t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')
         self.report_check.append(t3)
 
-        t4 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, '', cl_10_3_5_bearing_bolt_tension_resistance(self.dp_anchor_fu_overwrite,
-                                                                                              self.dp_anchor_fu_overwrite, self.anchor_area[0],
-                                                                                              self.anchor_area[1], self.dp_weld_fab), '')
-        self.report_check.append(t4)
+        # Check 2: Anchor Bolt - Inside Column Flange
+        # This check is applicable only when there is an uplift force acting on the column
+
+        if (self.connectivity == 'Moment Base Plate') and (self.load_axial_tension > 0):
+
+            t1 = ('SubSection', 'Anchor Bolt - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t1 = (KEY_OUT_DISP_INTER_D_PROVIDED, '', self.anchor_dia_inside_flange, 'N/A')
+            self.report_check.append(t1)
+
+            t2 = (KEY_OUT_DISP_PC_PROVIDED, '', self.anchor_grade_inside_flange, 'N/A')
+            self.report_check.append(t2)
+
+            t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_inside_flange, 'N/A')
+            self.report_check.append(t8)
+
+            # t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
+            #                                                    self.shear_capacity_anchor), 'N/A')
+            # self.report_check.append(t4)
+
+            # t9 = (KEY_DISP_KB, '', kb_prov(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
+            #                                self.dp_column_fu), 'N/A')
+            # self.report_check.append(t9)
+
+            # t5 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
+            #                                                        self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
+            # self.report_check.append(t5)
+
+            # t6 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
+            # self.report_check.append(t6)
+
+            # t7 = (KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, '', cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db,
+            #                                                                                                self.combined_capacity_anchor), '')
+            # self.report_check.append(t7)
+
+            t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, self.tension_demand_anchor_uplift, cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                   self.anchor_area[0], self.anchor_area[1],
+                                                                                                   self.tension_capacity_anchor_uplift,
+                                                                                                   safety_factor_parameter=self.dp_weld_fab), '')
+            self.report_check.append(t10)
+
+            t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')
+            self.report_check.append(t3)
 
         # Check 3: Base Plate - Design Checks
         t1 = ('SubSection', 'Base Plate - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')

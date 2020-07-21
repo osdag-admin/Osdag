@@ -18,7 +18,7 @@ from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
-from PIL import Image
+# from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
 # from OCC.Display.backend import off
 import os
@@ -34,7 +34,6 @@ import openpyxl
 import configparser
 import pickle
 #import cairosvg
-
 from update_version_check import Update
 import pandas as pd
 
@@ -935,6 +934,7 @@ class Window(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height()+100)
                 b.setText(v[0])
                 b.setDisabled(True)
+                b.setVisible(True if option[4] else False)
                 fields += 1
                 self.output_title_fields[current_key][1] = fields
                 #b.setFixedSize(b.size())
@@ -1602,7 +1602,8 @@ class Window(QMainWindow):
                     visible_fields += 1
 
             elif option[2] == TYPE_OUT_BUTTON:
-                visible_fields += 1
+                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).isVisible():
+                    visible_fields += 1
 
         self.output_title_visiblity(visible_fields, key, titles, title_repeat)
 

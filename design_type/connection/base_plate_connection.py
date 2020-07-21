@@ -140,6 +140,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_type = ""
         self.anchor_grade = []
         self.anchor_fu_fy = []
+        self.anchor_grade_inside_lst = []
+        self.anchor_fu_fy_inside_flange = []
 
         self.footing_grade = 0.0
 
@@ -195,6 +197,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.neglect_anchor_dia = []
         self.anchor_bolt = ''
         self.anchor_dia_provided = 'M20'
+        self.anchor_dia_provided_inside_flange = '20'
         self.grout_thk = 50
         self.plate_washer_details = {}
         self.plate_washer_thk = 1
@@ -351,6 +354,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bolt_columns_outside_flange = 1
 
         self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
+        self.anchor_area_inside_flange = 0.0
         self.gusset_fy = self.dp_column_fy
         self.stiffener_fy = self.dp_column_fy
         self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
@@ -1637,12 +1641,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_bolt = i  # anchor dia provided (str)
             break
 
-        # select anchor diameter (outside and inside column flange)
+        # select anchor diameter - outside flange
         self.anchor_dia_provided = self.table1(self.anchor_bolt)[0]  # mm, anchor dia provided (int)
         self.anchor_dia_outside_flange = self.anchor_dia_provided  # mm, anchor dia provided outside the column flange (int)
-        self.anchor_dia_inside_flange = self.anchor_dia_provided  # mm, anchor dia provided inside the column flange (int)
-
         self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
+
+        # select anchor diameter - inside flange
+        self.anchor_dia_provided_inside_flange = [20, 24, 30, 36, 42, 48, 56, 64, 72]
+        self.anchor_dia_inside_flange = self.anchor_dia_provided_inside_flange[0]  # mm, anchor dia provided inside the column flange (int)
+        self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)  # list of areas [shank area, thread area] mm^2
 
         # hole diameter
         self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)  # mm
@@ -1651,11 +1658,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # trying the design with the highest selected grade
         self.anchor_grade = list(reversed(self.anchor_grade))
         for i in self.anchor_grade:
-            self.anchor_grade = i
+            self.anchor_grade = i  # outside flange
             break
 
-        self.anchor_grade_inside_flange = self.anchor_grade
-        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
+        # outside flange
+        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # strength values - [bolt_fu, bolt_fy] (list)
+
+        # inside flange
+        self.anchor_grade_inside_lst = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+        self.anchor_grade_inside_flange = self.anchor_grade_inside_lst[0]
+        self.anchor_fu_fy_inside_flange = self.get_bolt_fu_fy(self.anchor_grade_inside_flange, self.anchor_dia_inside_flange)
 
         # anchor bolts outside the column flange (provided to resist tension due to moment or as minimum requirement)
         self.anchors_outside_flange = self.anchors_outside_flange
@@ -2562,15 +2574,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.load_axial_tension > 0:
                 self.anchor_inside_flange = 'Yes'
 
-                self.anchor_area = self.bolt_area(self.anchor_dia_inside_flange)  # list of areas [shank area, thread area] mm^2
+                # self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)  # list of areas [shank area, thread area] mm^2
                 # hole diameter
                 self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_inside_flange, self.dp_anchor_hole)  # mm
-                self.anchor_grade_inside_flange = self.anchor_grade
-                self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
+                # self.anchor_grade_inside_flange = self.anchor_grade
+                # self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
-                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
-                                                                                              self.anchor_area[0], self.anchor_area[1],
-                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
+                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                     self.anchor_fu_fy_inside_flange[1],
+                                                                                                     self.anchor_area_inside_flange[0],
+                                                                                                     self.anchor_area_inside_flange[1],
+                                                                                                     safety_factor_parameter=self.dp_weld_fab)  # N
                 self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
                 self.anchors_inside_flange = self.load_axial_tension / (self.tension_capacity_anchor_uplift * 1000)
@@ -2578,7 +2592,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # tension demand
                 self.tension_demand_anchor_uplift = self.load_axial_tension / self.anchors_inside_flange
-                self.tension_demand_anchor_uplift = round(self.tension_demand_anchor_uplift, 2)  # kN
+                self.tension_demand_anchor_uplift = round(self.tension_demand_anchor_uplift / 1000, 2)  # kN
 
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
@@ -3784,26 +3798,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # if the number of bolts exceeds 4 in number, provide a higher diameter of bolt from the given list of anchor diameters
                         n = 1
                         while self.anchors_inside_flange > 4:  # trying for 4 bolts with higher diameter
-                            bolt_list = self.anchor_dia[n - 1:]
+                            bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
 
                             for i in bolt_list:
                                 self.anchor_dia_inside_flange = i
                                 break
 
-                            self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_inside_flange)[0])
-                            self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
-                                                                                                                 self.anchor_fu_fy[1],
-                                                                                                                 self.anchor_area[0],
-                                                                                                                 self.anchor_area[1],
+                            self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
+                            self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                                 self.anchor_fu_fy_inside_flange[1],
+                                                                                                                 self.anchor_area_inside_flange[0],
+                                                                                                                 self.anchor_area_inside_flange[1],
                                                                                                                  safety_factor_parameter=self.dp_weld_fab)  # N
                             self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
                             self.anchors_inside_flange = max(((self.load_axial_tension * 10 ** -3) / self.tension_capacity_anchor_uplift), 4)
                             n += 1
 
-                            self.anchor_dia_inside_flange = self.table1(i)[0]  # updating the initialised anchor diameter with the latest one
+                            self.anchor_dia_inside_flange = i  # updating the initialised anchor diameter with the latest one
 
-                            if n > len(self.anchor_dia):  # if 4 bolts with highest diameter is not sufficient
+                            if n > len(bolt_list):  # if 4 bolts with highest diameter is not sufficient
                                 self.safe = False
                                 # TODO: give log errors
                                 logger.error("Cannot compute anchor bolt for resisting the uplift force")
@@ -3821,11 +3835,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.anchors_inside_flange = 8  # minimum 8 bolts provided in this case
                         self.anchor_dia_inside_flange = 20  # trying with 20mm anchor dia
 
-                        self.anchor_area = self.bolt_area(self.anchor_dia_inside_flange)
-                        self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
-                                                                                                             self.anchor_fu_fy[1],
-                                                                                                             self.anchor_area[0],
-                                                                                                             self.anchor_area[1],
+                        self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
+                        self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                             self.anchor_fu_fy_inside_flange[1],
+                                                                                                             self.anchor_area_inside_flange[0],
+                                                                                                             self.anchor_area_inside_flange[1],
                                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
                         self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
@@ -3837,26 +3851,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # if the number of bolts exceeds 8 in number, provide a higher diameter of bolt from the given list of anchor diameters
                             n = 1
                             while self.anchors_inside_flange > 8:  # trying for 8 bolts with higher diameter
-                                bolt_list = self.anchor_dia[n - 1:]
+                                bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
 
                                 for i in bolt_list:
                                     self.anchor_dia_inside_flange = i
                                     break
 
-                                self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_inside_flange)[0])
-                                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
-                                                                                                                     self.anchor_fu_fy[1],
-                                                                                                                     self.anchor_area[0],
-                                                                                                                     self.anchor_area[1],
+                                self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
+                                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                                     self.anchor_fu_fy_inside_flange[1],
+                                                                                                                     self.anchor_area_inside_flange[0],
+                                                                                                                     self.anchor_area_inside_flange[1],
                                                                                                                      safety_factor_parameter=self.dp_weld_fab)  # N
                                 self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
                                 self.anchors_inside_flange = max(((self.load_axial_tension * 10 ** -3) / self.tension_capacity_anchor_uplift), 8)
                                 n += 1
 
-                                self.anchor_dia_inside_flange = self.table1(i)[0]  # updating the initialised anchor diameter with the latest one
+                                self.anchor_dia_inside_flange = i  # updating the initialised anchor diameter with the latest one
 
-                                if n > len(self.anchor_dia):  # if 8 bolts with highest diameter is not sufficient
+                                if n > len(bolt_list):  # if 8 bolts with highest diameter is not sufficient
                                     self.safe = False
                                     # TODO: give log errors
                                     logger.error("Cannot compute anchor bolt for resisting the uplift force")
@@ -3877,34 +3891,34 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # if the number of bolts exceeds 2 in number, provide a higher diameter of bolt from the given list of anchor diameters
                         n = 1
                         while self.anchors_inside_flange > 2:  # trying for 2 bolts with higher diameter
-                            bolt_list = self.anchor_dia[n - 1:]
+                            bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
 
                             for i in bolt_list:
                                 self.anchor_dia_inside_flange = i
                                 break
 
-                            self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_inside_flange)[0])
-                            self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
-                                                                                                                 self.anchor_fu_fy[1],
-                                                                                                                 self.anchor_area[0],
-                                                                                                                 self.anchor_area[1],
+                            self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
+                            self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                                 self.anchor_fu_fy_inside_flange[1],
+                                                                                                                 self.anchor_area_inside_flange[0],
+                                                                                                                 self.anchor_area_inside_flange[1],
                                                                                                                  safety_factor_parameter=self.dp_weld_fab)  # N
                             self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
                             self.anchors_inside_flange = max(((self.load_axial_tension * 10 ** -3) / self.tension_capacity_anchor_uplift), 2)
                             n += 1
 
-                            self.anchor_dia_inside_flange = self.table1(i)[0]  # updating the initialised anchor diameter with the latest one
+                            self.anchor_dia_inside_flange = i  # updating the initialised anchor diameter with the latest one
 
-                            if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_inside_flange > 2):
+                            if ((n - 1) >= len(bolt_list)) and (self.anchors_inside_flange > 2):
                                 # try with 4 bolts if 2 is not sufficient with the highest diameter
-                                self.anchor_dia_inside_flange = self.anchor_dia_provided
+                                # self.anchor_dia_inside_flange = self.anchor_dia_provided
 
-                                self.anchor_area = self.bolt_area(self.anchor_dia_inside_flange)
-                                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
-                                                                                                                     self.anchor_fu_fy[1],
-                                                                                                                     self.anchor_area[0],
-                                                                                                                     self.anchor_area[1],
+                                self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
+                                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                                     self.anchor_fu_fy_inside_flange[1],
+                                                                                                                     self.anchor_area_inside_flange[0],
+                                                                                                                     self.anchor_area_inside_flange[1],
                                                                                                                      safety_factor_parameter=self.dp_weld_fab)  # N
                                 self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
@@ -3915,30 +3929,30 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                     # if the number of bolts exceeds 4, provide a higher diameter of bolt from the given list of anchor diameters
                                     n = 1
                                     while self.anchors_inside_flange > 4:  # trying for 4 bolts with higher diameter
-                                        bolt_list = self.anchor_dia[n - 1:]
+                                        bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
 
                                         for i in bolt_list:
                                             self.anchor_dia_inside_flange = i
                                             break
 
-                                        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_inside_flange)[0])
+                                        self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
                                         # self.anchor_area = self.bolt_area(self.anchor_dia_inside_flange)
-                                        self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
-                                                                                                                             self.anchor_fu_fy[1],
-                                                                                                                             self.anchor_area[0],
-                                                                                                                             self.anchor_area[1],
+                                        self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                                             self.anchor_fu_fy_inside_flange[1],
+                                                                                                                             self.anchor_area_inside_flange[0],
+                                                                                                                             self.anchor_area_inside_flange[1],
                                                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
                                         self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
                                         self.anchors_inside_flange = max(((self.load_axial_tension * 10 ** -3) / self.tension_capacity_anchor_uplift), 4)
                                         n += 1
 
-                                        self.anchor_dia_inside_flange = self.table1(i)[0]  # updating the initialised anchor diameter
+                                        self.anchor_dia_inside_flange = i  # updating the initialised anchor diameter with the latest one
 
                                         if (self.anchor_dia_inside_flange <= 72) and (self.anchors_inside_flange == 4):
                                             break
 
-                                        if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_inside_flange > 4):
+                                        if ((n - 1) >= len(bolt_list)) and (self.anchors_inside_flange > 4):
                                             # if 4 bolts with highest diameter is not sufficient
                                             self.safe = False
                                             # TODO: give log errors
@@ -3958,7 +3972,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # Tension Demand
                 self.tension_demand_anchor_uplift = self.load_axial_tension / self.anchors_inside_flange
-                self.tension_demand_anchor_uplift = round(self.tension_demand_anchor_uplift, 2)
+                self.tension_demand_anchor_uplift = round(self.tension_demand_anchor_uplift / 1000, 2)
 
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
@@ -4006,22 +4020,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Anchor Bolt - Inside Column Flange
         if self.connectivity == 'Moment Base Plate':
-            print(self.anchor_dia_inside_flange)  # Diameter (mm)
-            print(self.anchor_grade_inside_flange)  # Property Class
-            print(self.anchors_inside_flange)  # No. of Anchor Bolts
-
             if self.load_axial_tension > 0:
-                print(self.tension_demand_anchor_uplift)  # Tension Demand (kN)
-            else:
-                print(self.tension_demand_anchor_uplift)
-            if self.connectivity == 'Moment Base Plate':
-                print(self.tension_capacity_anchor_uplift)  # Tension capacity (kN)
-            else:
-                pass
 
-            print(self.anchor_len_above_footing)
-            print(self.anchor_len_below_footing)
-            print(self.anchor_length_provided)  # Anchor Length (total) (mm)
+                print(self.anchor_dia_inside_flange)  # Diameter (mm)
+                print(self.anchor_grade_inside_flange)  # Property Class
+
+                if self.load_axial_tension > 0:
+                    print(self.tension_demand_anchor_uplift)  # Tension Demand (kN)
+                else:
+                    print(self.tension_demand_anchor_uplift)
+                if self.connectivity == 'Moment Base Plate':
+                    print(self.tension_capacity_anchor_uplift)  # Tension capacity (kN)
+
+                print(self.anchors_inside_flange)  # No. of Anchor Bolts
+
+                print(self.anchor_len_above_footing)
+                print(self.anchor_len_below_footing)
+                print(self.anchor_length_provided)  # Anchor Length (total) (mm)
 
         # Base Plate
         print(self.plate_thk)  # Thickness (mm)

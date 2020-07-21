@@ -8,13 +8,10 @@
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-# import pdfkit
 import configparser
 import os
 import re
 import pickle
-# import cairosvg
 # from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from design_report.reportGenerator_latex import CreateLatex

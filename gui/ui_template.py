@@ -1,39 +1,13 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'app/gui/ui_template.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!\
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-from design_report import reportGenerator
-
-
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *   
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
-
-from design_type.connection.column_cover_plate import ColumnCoverPlate
-# from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
-# from OCC.Display.backend import off
-import os
 import yaml
-import json
-import logging
-from drawing_2D.Svg_Window import SvgWindow
-import sys
-import sqlite3
 import shutil
-import openpyxl
-#import pdfkit
-import configparser
-import pickle
-#import cairosvg
 from update_version_check import Update
 import pandas as pd
 
@@ -169,7 +143,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
             event.ignore()
 
 class Window(QMainWindow):
-    #closed = pyqtSignal()
+    closed = QtCore.pyqtSignal()
     def center(self):
         frameGm = self.frameGeometry()
         screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
@@ -204,7 +178,7 @@ class Window(QMainWindow):
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             self.commLogicObj.display = off_display
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+            off_display.set_bg_gradient_color([255,255,255], [255,255,255])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()

@@ -47,7 +47,7 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
-        osdagheader = '/ResourceFiles/images/OsdagHeader.png'
+        osdagheader = '/ResourceFiles/images/Osdag_header_report.png'
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options,indent=False)
@@ -58,8 +58,8 @@ class CreateLatex(Document):
         doc.append(pyl.Command('selectfont'))
 
 
-        doc.add_color('OsdagGreen', 'RGB', '127,146,51')
-        doc.add_color('PassColor','RGB', '127,146,51')
+        doc.add_color('OsdagGreen', 'RGB', '153,169,36')
+        doc.add_color('PassColor','RGB', '153,169,36')
         doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
@@ -98,7 +98,7 @@ class CreateLatex(Document):
         doc.preamble.append(header)
         doc.change_document_style("header")
         with doc.create(Section('Input Parameters')):
-            with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
+            with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
@@ -130,10 +130,10 @@ class CreateLatex(Document):
                                      MultiColumn(2, align='|c|', data=a[x]),
                                      MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                             elif x <= 4:
-                                table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                               MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                               MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
                             else:
-                                table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
+                                table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
                                                sectiondetails[a[merge_rows + x - 4]],))
                             table.add_hline(2, 5)
                     elif uiObj[i] == "TITLE":
@@ -251,12 +251,13 @@ class CreateLatex(Document):
                     else:
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("PassColor", bold(check[3])))
                     table.add_hline()
-        # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-
-        doc.append(NewPage())
 
 
-        if does_design_exist:
+
+
+
+        if does_design_exist and sys.platform != 'darwin':
+            doc.append(NewPage())
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
             Disp_front_image = "/ResourceFiles/images/front.png"
@@ -288,6 +289,7 @@ class CreateLatex(Document):
                 #     view_3D.add_caption('3D View')
 
         with doc.create(Section('Design Log')):
+            doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
             logger_msgs=reportsummary['logger_messages'].split('\n')
             for msg in logger_msgs:
                 if('WARNING' in msg):

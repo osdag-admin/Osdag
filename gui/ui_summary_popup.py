@@ -8,12 +8,10 @@
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
-#import pdfkit
 import configparser
 import os
 import re
 import pickle
-#import cairosvg
 # from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from design_report.reportGenerator_latex import CreateLatex
@@ -203,7 +201,7 @@ class Ui_Dialog1(object):
             logfile=open(fname_no_ext+'.log','r')
             #TODO: This logic can be improved so that log is not read twice.
             logs=logfile.read()
-            if('! I can\'t write on file' in logs):
+            if(r'! I can\'t write on file' in logs):
                 QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
             else:
                 missing_package = None
@@ -214,8 +212,7 @@ class Ui_Dialog1(object):
                 if missing_package != None:
                     QMessageBox.critical(QMessageBox(), 'Error',missing_package +' Please install missing package')
                 else:
-                    QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. Please run <latex> in terminal (or) command prompt to check if latex is installed.'
-                                                                 'If it is installed and this error persists, send us the log file created in the same folder choosen for the Design Report.')
+                    QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. Please send us the log file created in the same folder choosen for the Design Report.')
             logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):

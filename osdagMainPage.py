@@ -158,7 +158,12 @@ import APP_CRASH.Appcrash.api as appcrash
 import configparser
 import os.path
 import subprocess
-from gui.ui_template import Ui_ModuleWindow
+if sys.platform == 'darwin':
+    print('its mac')
+    from gui.ui_template_for_mac import Ui_ModuleWindow
+else:
+    from gui.ui_template import Ui_ModuleWindow
+# from gui.ui_template import Ui_ModuleWindow
 import io
 import traceback
 import time
@@ -209,7 +214,7 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
 
-        self.rdbtn.setIconSize(QSize(scale*500, scale*500))
+        self.rdbtn.setIconSize(QSize(scale*300, scale*300))
 
         layout.addWidget(self.rdbtn)
         self.setStyleSheet(

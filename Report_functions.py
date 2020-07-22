@@ -4093,3 +4093,1044 @@ def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     web_plate_area_prov.append(NoEscape(r'&= ' + y +r'\times2* ' + webwidth + r'\\'))
     web_plate_area_prov.append(NoEscape(r'&= ' + wp_area + r'\end{aligned}'))
     return web_plate_area_prov
+
+# functions for base plate
+
+
+def square_washer_size(side):
+    """ equation for the size of square plate washer """
+    side = str(side)
+
+    washer_dim = Math(inline=True)
+    washer_dim.append(NoEscape(r'\begin{aligned} Square - ' + side + r' X ' + side + r' \\'))
+    washer_dim.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
+
+    return washer_dim
+
+
+def square_washer_thk(thickness):
+    """ equation for the thickness of square plate washer """
+    thickness = str(thickness)
+
+    washer_thk = Math(inline=True)
+    washer_thk.append(NoEscape(r'\begin{aligned} t_{w} = ' + thickness + r' \\'))
+    washer_thk.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
+
+    return washer_thk
+
+
+def square_washer_in_dia(dia):
+    """ equation for the hole diameter of square plate washer """
+    dia = str(dia)
+
+    washer_in_dia = Math(inline=True)
+    washer_in_dia.append(NoEscape(r'\begin{aligned} ' + dia + r' \\'))
+    washer_in_dia.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
+
+    return washer_in_dia
+
+
+def hexagon_nut_thickness(nut_thick):
+    """ equation for the thickness of the hexagon nut """
+    nut_thick = str(nut_thick)
+
+    nut_thickness = Math(inline=True)
+    nut_thickness.append(NoEscape(r'\begin{aligned} t_{n} = ' + nut_thick + r' \\'))
+    nut_thickness.append(NoEscape(r'&[Ref.~IS~1364-3:2002,~(Table~1)]\end{aligned}'))
+
+    return nut_thickness
+
+
+def anchor_len_above_footing(length):
+    """ equation for the length of the anchor bolt above footing """
+    length = str(length)
+
+    anchor_len = Math(inline=True)
+    anchor_len.append(NoEscape(r'\begin{aligned} grout thickness + thickness of base plate + thickness of plate washer +nut thickness + 20 \\'))
+    anchor_len.append(NoEscape(r'\begin{aligned} = ' + length + r' \\'))
+
+    return anchor_len
+
+
+def bp_length(col_depth, end_distance, length):
+    """ equation for the min length of the base plate"""
+    col_depth = str(col_depth)
+    end_distance = str(end_distance)
+    length = str(length)
+
+    bp_length_min = Math(inline=True)
+    bp_length_min.append(NoEscape(r'\begin{aligned} L = column~depth ~+~2~(e~+~e) \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + col_depth + r' ~+~2~(' + end_distance + r'~+~' + end_distance + r') \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + length + r' \\'))
+    bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement]\end{aligned}'))
+
+    return bp_length_min
+
+
+def bp_length_sb(col_depth, end_distance, length, projection):
+    """ equation for the min length of the welded slab base/base plate for hollow/tubular sections"""
+    col_depth = str(col_depth)
+    end_distance = str(end_distance)
+    length = str(length)
+    projection = str(projection)
+
+    bp_length_min = Math(inline=True)
+    bp_length_min.append(NoEscape(r'\begin{aligned} L = column~depth ~+~2~(c~+~e) \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + col_depth + r' ~+~2~(' + projection + r'~+~' + end_distance + r') \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + length + r' \\'))
+    bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement]\end{aligned}'))
+
+    return bp_length_min
+
+
+def bp_width(flange_width, edge_distance, width):
+    """ equation for the min length of the base plate"""
+    flange_width = str(flange_width)
+    edge_distance = str(edge_distance)
+    width = str(width)
+
+    bp_width_min = Math(inline=True)
+    bp_width_min.append(NoEscape(r'\begin{aligned} W = flange~width ~+~2~(1.5 \times e~+~1.5 \times e) \\'))  # TODO add e' instead of e
+    bp_width_min.append(NoEscape(r'\begin{aligned}   = ' + flange_width + r' ~+~2~(1.5 \times ' + edge_distance + r'~+~1.5 \times ' + edge_distance +
+                                 r') \\'))
+    bp_width_min.append(NoEscape(r'\begin{aligned}   = ' + width + r') \\'))
+    bp_width_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement]\end{aligned}'))
+
+    return bp_width_min
+
+
+def bearing_strength_concrete(concrete_grade, bearing_strength_value):
+    """ equation for the bearing strength of concrete"""
+    concrete_grade = str(concrete_grade)
+    bearing_strength_value = str(bearing_strength_value)
+
+    bearing_strength = Math(inline=True)
+    bearing_strength.append(NoEscape(r'\begin{aligned} \sigma_{br} = 0.45f_{ck} \\'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}             = 0.45 ' + concrete_grade + r' \\'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}             = ' + bearing_strength_value + r' \\'))
+    bearing_strength.append(NoEscape(r'&[Ref.~IS~800:2007,~(Cl.7.4.1)]\end{aligned}'))
+
+    return bearing_strength
+
+
+def actual_bearing_pressure(axial_load, bp_area_provided, bearing_pressure):
+    """ """
+    axial_load = str(axial_load)
+    bp_area_provided = str(bp_area_provided)
+    bearing_pressure = str(bearing_pressure)
+
+    bp_bearing_pressure = Math(inline=True)
+    bp_bearing_pressure.append(NoEscape(r'\begin{aligned} {\sigma_{br}}_{actual} = \frac{P}{A_{provided}} \\'))
+    bp_bearing_pressure.append(NoEscape(r'\begin{aligned}                        = \frac{' + axial_load + r'}{' + bp_area_provided + r'} \\'))
+    bp_bearing_pressure.append(NoEscape(r'\begin{aligned}                        = ' + bearing_pressure + r' \\'))
+
+    return bp_bearing_pressure
+
+
+def bp_thk_1(plate_thk, projection, actual_bearing_stress, gamma_m0, fy_plate):
+    """ """
+    plate_thk = str(plate_thk)
+    projection = str(projection)
+    actual_bearing_stress = str(actual_bearing_stress)
+    gamma_m0 = str(gamma_m0)
+    fy_plate = str(fy_plate)
+
+    thk = Math(inline=True)
+    thk.append(NoEscape(r'\begin{aligned} t_p = c~\Bigg[\frac{2.5~{\sigma_{br}}_{actual}~\gamma_{m0}}{{f_{y}}_{plate}}\Bigg]^{0.5} \\'))
+    thk.append(NoEscape(r'\begin{aligned}     = ' + projection + r'~\Bigg[\frac{2.5~' + actual_bearing_stress + r'~' + gamma_m0 + r'}{'
+                        + fy_plate + r'}\Bigg]^{0.5} \\'))
+    thk.append(NoEscape(r'\begin{aligned}     = ' + plate_thk + r' \\'))
+
+    return thk
+
+
+def eccentricity(moment, axial_load, eccentricity_zz):
+    """ calculate eccentricity along the major axis"""
+    moment = str(moment)
+    axial_load = str(axial_load)
+    eccentricity_zz = str(eccentricity_zz)
+
+    ecc_zz = Math(inline=True)
+    ecc_zz.append(NoEscape(r'\begin{aligned} e_{zz} = \frac{M_{zz}}{P} \\'))
+    ecc_zz.append(NoEscape(r'\begin{aligned}        = \frac{' + moment + r'}{' + axial_load + r'} \\'))
+    ecc_zz.append(NoEscape(r'\begin{aligned}        = ' + eccentricity_zz + r' \\'))
+
+    return ecc_zz
+
+
+def k1(ecc_zz, bp_length, k1_value):
+    """ calculate k1
+
+    Args:
+        ecc_zz (e) - end distance in mm (float)
+        bp_length (L) - length of the base plate in mm (float)
+        k1_value - value of k1 (float)
+
+    Returns:
+        k1 [k1 = 3 * (e - L/2)] (float)
+    """
+    ecc_zz = str(ecc_zz)
+    bp_length = str(bp_length)
+    k1_value = str(k1_value)
+
+    k1 = Math(inline=True)
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e_{zz} ~-~\frac{L}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned}       = 3~\Big(' + ecc_zz + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned}       = ' + k1_value + r' \\'))
+    k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return k1
+
+
+def modular_ratio(E_s, f_ck, modular_ratio):
+    """ calculate modular ratio
+
+    """
+    E_s = str(E_s)
+    E_c = round((5000 * math.sqrt(f_ck)), 3)
+    E_c = str(E_c)
+    f_ck = str(f_ck)
+
+    n = Math(inline=True)
+    n.append(NoEscape(r'\begin{aligned} n = \frac{E_{s}}{E_{c}} \\'))
+    n.append(NoEscape(r'\begin{aligned} E_s = 2 \times 10 ^ {5}~(N/mm^{2}) \\'))
+    n.append(NoEscape(r'\begin{aligned} E_c = 5000~\sqrt{f_{ck}}~(N/mm^{2}) \\'))
+    n.append(NoEscape(r'\begin{aligned}     = 5000~\sqrt{' + f_ck + r'}~=~' + E_c + r' \\'))
+    n.append(NoEscape(r'\begin{aligned} n = \frac{' + E_s + r'}{' + E_c + r'} \\'))
+    n.append(NoEscape(r'\begin{aligned}   =  ' + modular_ratio + r'\\'))
+    n.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)] \end{aligned}'))
+
+    return n
+
+
+def epsilon(yield_stress, epsilon_value):
+    """ """
+    yield_stress = str(yield_stress)
+    epsilon_value = str(epsilon_value)
+
+    value = Math(inline=True)
+    value.append(NoEscape(r'\begin{aligned} \epsilon_{st} = \sqrt{\frac{250}{f_{y}}} \\'))
+    value.append(NoEscape(r'\begin{aligned}               = \sqrt{\frac{250}{' + yield_stress + r'}} \\'))
+    value.append(NoEscape(r'\begin{aligned}               = ' + epsilon_value + r' \end{aligned}'))
+
+    return value
+
+
+def total_anchor_area_tension(anchor_dia, anchor_nos_tension, anchor_area_tension):
+    """
+
+    """
+    anchor_dia = str(anchor_dia)
+    anchor_nos_tension = str(anchor_nos_tension)
+    anchor_area_tension = str(anchor_area_tension)
+
+    total_anchor_area = Math(inline=True)
+    total_anchor_area.append(NoEscape(r'\begin{aligned} A_{s} = n \times~\Big(\frac{\pi}{4}\Big)~d^{2} \\'))
+    total_anchor_area.append(NoEscape(r'\begin{aligned}       = ' + anchor_nos_tension + r' \times~\Big(\frac{\pi}{4}\Big)~ '
+                                      + anchor_dia + r'^{2} \\'))
+    total_anchor_area.append(NoEscape(r'\begin{aligned} = ' + anchor_area_tension + r' \\'))
+
+    return total_anchor_area
+
+
+def calc_f(end_distance, bp_length, f):
+    """
+
+    """
+    end_distance = str(end_distance)
+    bp_length = str(bp_length)
+
+    dist_f = Math(inline=True)
+    dist_f.append(NoEscape(r'\begin{aligned} f = \Big(\frac{L}{2} - e\Big) \\'))
+    dist_f.append(NoEscape(r'\begin{aligned}   = \Big(\frac{' + bp_length + r'}{2} - ' + end_distance + r'\Big) \\'))
+    dist_f.append(NoEscape(r'\begin{aligned}   = ' + f + r' \\'))
+    dist_f.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return dist_f
+
+
+def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
+    """ calculate k2
+
+    Args:
+        n - modular ratio (float)
+        anchor_area_tension (A_s) - total area of the anchor hold down bolts under tension (float)
+        bp_width (B) - width of the base plate in mm (float)
+        f = distance between the centre of the base plate and the centre of the anchor bolt(s) under tension (float)
+        e = eccentricity (float)
+        k2_value (float)
+
+    Returns:
+        k2 [k2 = (6*n*A_s / W) * (f + e) ] (float)
+    """
+    n = str(n)
+    anchor_area_tension = str(anchor_area_tension)
+    bp_width = str(bp_width)
+    f = str(f)
+    e = str(e)
+    k2_value = str(k2_value)
+
+    k2 = Math(inline=True)
+    k2.append(NoEscape(r'\begin{aligned} k_2 = \frac{6~n~A_s}{W}~\Big(f~+~e_{zz}\Big) \\'))
+    k2.append(
+        NoEscape(r'\begin{aligned}     = \frac{6~' + n + r'~' + anchor_area_tension + r'}{' + bp_width + r'}~\Big(' + f + r'~+~' + e + r'\Big) \\'))
+    k2.append(NoEscape(r'\begin{aligned}     = ' + k2_value + r' \\'))
+    k2.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return k2
+
+
+def k3(k2_value, bp_length, f, k3_value):
+    """ calculate k3 """
+    k2_value = str(k2_value)
+    bp_length = str(bp_length)
+    f = str(f)
+    k3_value = str(k3_value)
+
+    k3 = Math(inline=True)
+    k3.append(NoEscape(r'\begin{aligned} k_3 = - ~k_2~\Big(\frac{L}{2}~+~f\Big) \\'))
+    k3.append(NoEscape(r'\begin{aligned}     = - ~' + k2_value + r'~\Big(\frac{' + bp_length + r'}{2}~+~' + f + r'\Big) \\'))
+    k3.append(NoEscape(r'\begin{aligned}     = ' + k3_value + r' \\'))
+    k3.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return k3
+
+
+def y(k1_value, k2_value, k3_value, y_value):
+    """ calculate the distance (y) of the base plate under compression"""
+    k1_value = str(k1_value)
+    k2_value = str(k2_value)
+    k3_value = str(k3_value)
+    y_value = str(y_value)
+
+    y = Math(inline=True)
+    y.append(NoEscape(r'\begin{aligned} y^{3}~+~k_{1}~y^{2}~+~k_{2}~y~+~k_{3} = 0 \\'))
+    y.append(NoEscape(r'\begin{aligned} y^{3}~+~' + k1_value + r'~y^{2}~+~' + k2_value + r'~y~+~' + k3_value + r' = 0 \\'))
+    y.append(NoEscape(r'\begin{aligned} y = ' + y_value + r' \\'))
+    y.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return y
+
+
+def tension_demand_anchor(axial_load, bp_length, dist_y, ecc_zz, f, anchor_tension):
+    """ calculate total tension demand on the hold down bolt(s)"""
+    axial_load = str(axial_load)
+    bp_length = str(bp_length)
+    dist_y = str(dist_y)
+    ecc_zz = str(ecc_zz)
+    f = str(f)
+    anchor_tension = str(anchor_tension)
+
+    tension_total = Math(inline=True)
+    tension_total.append(NoEscape(r'\begin{aligned} P_t = -~P_c~\Bigg[\frac{\frac{L}{2}-\frac{y}{3}-e_{zz}}{\frac{L}{2}-\frac{y}{3}+f}\Bigg] \\'))
+    tension_total.append(NoEscape(r'\begin{aligned}     = -~P_c~\Bigg[\frac{\frac{' + bp_length + r'}{2}-\frac{' + dist_y + r'}{3}-' + ecc_zz + r'}'
+                                                                                                                                                r'{\frac{' + bp_length + r'}{2}-\frac{' + dist_y + r'}{3}+' + f + r'}\Bigg] \\'))
+    tension_total.append(NoEscape(r'\begin{aligned}     = ' + anchor_tension + r' \\'))
+    tension_total.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return tension_total
+
+
+def tension_demand_each_anchor(total_tension_demand, anchor_nos, tension_each_anchor):
+    """ """
+    total_tension_demand = str(total_tension_demand)
+    anchor_nos = str(anchor_nos)
+    tension_each_anchor = str(tension_each_anchor)
+
+    tension_total = Math(inline=True)
+    tension_total.append(NoEscape(r'\begin{aligned} T_{d} = \frac{P_{t}}{n} \\'))
+    tension_total.append(NoEscape(r'\begin{aligned}       = \frac{' + total_tension_demand + r'}{' + anchor_nos + r'} \\'))
+    tension_total.append(NoEscape(r'\begin{aligned}       = ' + tension_each_anchor + r'\end{aligned}'))
+
+    return tension_total
+
+
+def eff_bearing_area(col_depth, col_flange_width, col_flange_thk, col_web_thk):
+    """ calculate min area req for base plate (only for axial loads)"""
+    col_depth = str(col_depth)
+    col_flange_width = str(col_flange_width)
+    col_flange_thk = str(col_flange_thk)
+    col_web_thk = str(col_web_thk)
+
+    area = Math(inline=True)
+    area.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} = (D~+~2 c) (B~+~2 c) - \Big[ \big(D - 2(T~+~c)\big) \big(B - t\big) \Big] \\'))
+    area.append(NoEscape(r'\begin{aligned}                = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c) - \Big[ \big('
+                         + col_depth + r' - 2(' + col_flange_thk + r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\'))
+    area.append(NoEscape(r'\begin{aligned} Note: c is the projection beyond the face of the column \\'))
+    area.append(NoEscape(r'&[Ref.~Design~of~Steel~Structures~-~N.~Subramanian~(Limit~State~Method~-~edition~2019)]\end{aligned}'))
+
+    return area
+
+
+def eff_projection(col_depth, col_flange_width, col_flange_thk, col_web_thk, min_area, projection, end_distance):
+    """ calculate min area req for base plate (only for axial loads)"""
+    col_depth = str(col_depth)
+    col_flange_width = str(col_flange_width)
+    col_flange_thk = str(col_flange_thk)
+    col_web_thk = str(col_web_thk)
+    min_area = str(min_area)
+    projection = str(projection)
+    end_distance = str(end_distance)
+
+    c = Math(inline=True)
+    c.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} = {A_{req}}_{min} \\'))
+    c.append(NoEscape(r'\begin{aligned}                = ' + min_area + r' \\'))
+    c.append(NoEscape(r'\begin{aligned} Therefore,~ ' + min_area + r' = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c) - \Big[ \big('
+                      + col_depth + r' - 2(' + col_flange_thk + r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\'))
+    c.append(NoEscape(r'\begin{aligned}              c  = ' + projection + r' \\'))
+    c.append(NoEscape(r'\begin{aligned} projection = max(' + projection + r',~' + end_distance + r') \\'))
+    c.append(NoEscape(r'\begin{aligned}            = ' + projection + r' \\'))
+    c.append(NoEscape(r'&[Ref.~Design~of~Steel~Structures~-~N.~Subramanian~(Limit~State~Method~-~edition~2019)]\end{aligned}'))
+
+    return c
+
+
+def min_area_req(axial_load, bearing_strength, bp_min_area):
+    """ calculate min area req for base plate (only for axial loads)"""
+    axial_load = str(axial_load)
+    bearing_strength = str(bearing_strength)
+    bp_min_area = str(bp_min_area)
+
+    area = Math(inline=True)
+    area.append(NoEscape(r'\begin{aligned} {A_{req}}_{min} = \frac{P_c}{\sigma_{br}} \\'))
+    area.append(NoEscape(r'\begin{aligned}                 = \frac{' + axial_load + r'}{' + bearing_strength + r'} \\'))
+    area.append(NoEscape(r'\begin{aligned}        = ' + bp_min_area + r' \end{aligned}'))
+
+    return area
+
+
+def mom_bp_case(case, eccentricity, bp_length):
+    """ """
+    case = str(case)
+    eccentricity = str(eccentricity)
+    bp_length = str(bp_length)
+
+    bp_case = Math(inline=True)
+    if case == 'Case1':
+        bp_length = int(bp_length)
+        value = bp_length / 6
+        value = str(value)
+        bp_length = str(bp_length)
+
+        bp_case.append(NoEscape(r'\begin{aligned} e_{zz} \leq \frac{L_{min}}{6} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \leq \frac{' + bp_length + r'}{6} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \leq ' + value + r' \end{aligned}'))
+    elif case == 'Case2':
+        bp_length = int(bp_length)
+        value1 = bp_length / 6
+        value2 = bp_length / 3
+        value1 = str(value1)
+        value2 = str(value2)
+        bp_length = str(bp_length)
+
+        bp_case.append(NoEscape(r'\begin{aligned} \frac{L_{min}}{6} < e_{zz} < \frac{L_{min}}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} \frac{' + bp_length + r'}{6} < ' + eccentricity + r' < \frac{' + bp_length + r'}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + value1 + r' < ' + eccentricity + r' < ' + value2 + r'\end{aligned}'))
+    elif case == 'Case3':
+        bp_length = int(bp_length)
+        value = bp_length / 3
+        value = str(value)
+        bp_length = str(bp_length)
+
+        bp_case.append(NoEscape(r'\begin{aligned} e_{zz} \geq \frac{L_{min}}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \geq \frac{' + bp_length + r'}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \leq ' + value + r'\end{aligned}'))
+
+    return bp_case
+
+
+def bp_section_modulus(bp_length, bp_width, section_modulus):
+    """ """
+    bp_length = str(bp_length)
+    bp_width = str(bp_width)
+    section_modulus = str(section_modulus)
+
+    ze_zz = Math(inline=True)
+    ze_zz.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} = \frac{W L^{2}}{6} \\'))
+    ze_zz.append(NoEscape(r'\begin{aligned}                 = \frac{' + bp_width + r' ' + bp_length + r'^{2}}{6} \\'))
+    ze_zz.append(NoEscape(r'\begin{aligned}                 = ' + section_modulus + r'\end{aligned}'))
+
+    return ze_zz
+
+
+def bending_stress(axial_load, moment_major, bp_area, section_modulus, sigma_max, sigma_min):
+    """ """
+    axial_load = str(axial_load)
+    moment_major = str(moment_major)
+    bp_area = str(bp_area)
+    section_modulus = str(section_modulus)
+    sigma_max = str(sigma_max)
+    sigma_min = str(sigma_min)
+
+    sigma = Math(inline=True)
+    sigma.append(NoEscape(r'\begin{aligned} {\sigma_{b}}_{max} = \frac{P_{c}}{A}~+~\frac{M_{zz}}{{z_{e}}_{plate}} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                    = \frac{' + axial_load + r'}{' + bp_area + r'}~+~\frac{' + moment_major + r'}{' +
+                          section_modulus + r'} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                 = ' + sigma_max + r' \\'))
+
+    sigma.append(NoEscape(r'\begin{aligned} {\sigma_{b}}_{min} = \frac{P_{c}}{A}~-~\frac{M_{zz}}{{z_{e}}_{plate}} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                    = \frac{' + axial_load + r'}{' + bp_area + r'}~-~\frac{' + moment_major + r'}{' +
+                          section_modulus + r'} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                 = ' + sigma_min + r'\end{aligned}'))
+
+    return sigma
+
+
+def critical_section(bp_length, col_depth, critical_len):
+    """ """
+    bp_length = str(bp_length)
+    col_depth = str(col_depth)
+    critical_len = str(critical_len)
+
+    length = Math(inline=True)
+    length.append(NoEscape(r'\begin{aligned} y_{critical} = \frac{L ~- ~(0.95D)}{2} \\'))
+    length.append(NoEscape(r'\begin{aligned}              = \frac{' + bp_length + r' ~- ~(0.95' + col_depth + r')}{2} \\'))
+    length.append(NoEscape(r'\begin{aligned}              = ' + critical_len + r'\end{aligned}'))
+
+    return length
+
+
+def critical_section_case_2_3(critical_xx, y):
+    """ """
+    critical_len = Math(inline=True)
+
+    if y > critical_xx:
+        critical_xx = str(critical_xx)
+        y = str(y)
+        critical_len.append(NoEscape(r'\begin{aligned} y~ > ~y_{critical}~~~ (' + y + r'~ > ~' + critical_xx + r') \\'))
+        critical_len.append(NoEscape(r'\begin{aligned} \therefore y_{critical} = ' + critical_xx + r' \\'))
+    else:
+        critical_xx = str(critical_xx)
+        y = str(y)
+        critical_len.append(NoEscape(r'\begin{aligned} y~ < ~y_{critical}~~~ (' + y + r'~ < ~' + critical_xx + r') \\'))
+        critical_len.append(NoEscape(r'\begin{aligned} \therefore y_{critical} = ' + y + r' \\'))
+
+    return critical_len
+
+
+def bending_stress_critical_sec(bending_stress_critical):
+    """ """
+    bending_stress_critical = str(bending_stress_critical)
+
+    stress = Math(inline=True)
+    stress.append(NoEscape(r'\begin{aligned} {\sigma_{b}}_{critical} = ' + bending_stress_critical + r'\\'))
+
+    return stress
+
+
+def moment_critical_section(sigma_x, sigma_max, critical_len, moment, concrete_bearing_stress, bp_width, case='Case1'):
+    """ """
+    sigma_x = str(sigma_x)
+    sigma_max = str(sigma_max)
+    critical_len = str(critical_len)
+    moment = str(moment)
+    concrete_bearing_stress = str(concrete_bearing_stress)
+    bp_width = str(bp_width)
+
+    critical_moment = Math(inline=True)
+
+    if case == 'Case1':
+        critical_moment.append(NoEscape(r'\begin{aligned} M_{critical} =  \bigg({\sigma_{b}}_{critical} \times y_{critical}\times '
+                                        r'\frac{y_{critical}}{2}\bigg)~ + \bigg(\frac{1}{2}\times y_{critical}\times '
+                                        r'\big({{\sigma_{b}}_{max} - \sigma_{b}}_{critical}\big)\times \frac{2}{3}\times y_{critical}\bigg) \\'))
+
+        critical_moment.append(NoEscape(r'\begin{aligned}              =  \bigg(' + sigma_x + r' \times ' + critical_len + r'\times '
+                                                                                                                           r'\frac{' + critical_len + r'}{2}\bigg)~ + \bigg(\frac{1}{2}\times ' + critical_len + r'\times '
+                                                                                                                                                                                                                 r'\big({' + sigma_max + r' - ' + sigma_x + r'\big)\times \frac{2}{3}\times ' + critical_len + r'\bigg) \\'))
+
+        critical_moment.append(NoEscape(r'\begin{aligned}              = ' + moment + r' \end{aligned}'))
+    else:
+        critical_moment.append(NoEscape(r'\begin{aligned} {M_{critical}}_{1} = 0.45f_{ck}~W~y_{critical}\times\bigg(\frac{y_{critical}}{2}\bigg) \\'))
+        critical_moment.append(NoEscape(r'\begin{aligned} {M_{critical}}_{1} = 0.45' + concrete_bearing_stress + r'~' + bp_width + r'~'
+                                        + critical_len + r'\times\bigg(\frac{' + critical_len + r'}{2}\bigg) \\'))
+        critical_moment.append(NoEscape(r'\begin{aligned}                    = ' + moment + r' \end{aligned}'))
+
+    return critical_moment
+
+
+def lever_arm_tension(bp_len, column_D, column_T, end_distance, lever_arm):
+    """ """
+    bp_len = str(bp_len)
+    column_D = str(column_D)
+    column_T = str(column_T)
+    end_distance = str(end_distance)
+    lever_arm = str(lever_arm)
+
+    dist = Math(inline=True)
+    dist.append(NoEscape(r'\begin{aligned} l = \frac{L}{2}-\frac{D}{2}+\frac{T}{2}-e \\'))
+    dist.append(NoEscape(r'\begin{aligned}   = \frac{' + bp_len + r'}{2}-\frac{' + column_D + r'}{2}+\frac{' + column_T + r'}{2}-'
+                         + end_distance + r' \\'))
+    dist.append(NoEscape(r'\begin{aligned}  = ' + lever_arm + r'\end{aligned}'))
+
+    return dist
+
+
+def lever_arm_moment(tension_demand, lever_arm, moment):
+    """ """
+    tension_demand = str(tension_demand)
+    lever_arm = str(lever_arm)
+    moment = str(moment)
+
+    moment_critical = Math(inline=True)
+    moment_critical.append(NoEscape(r'\begin{aligned} {M_{critical}}_{2} = T_{d}~l\times1000 \\'))
+    moment_critical.append(NoEscape(r'\begin{aligned}   = ' + tension_demand + r'~ ' + lever_arm + r'\times1000 \\'))
+    moment_critical.append(NoEscape(r'\begin{aligned}  = ' + moment + r'\end{aligned}'))
+
+    return moment_critical
+
+
+def max_moment(critical_mom_1, critical_mom_2):
+    """ """
+    moment = max(critical_mom_1, critical_mom_2)
+    moment = str(moment)
+    critical_mom_1 = str(critical_mom_1)
+    critical_mom_2 = str(critical_mom_2)
+
+    moment_critical = Math(inline=True)
+    moment_critical.append(NoEscape(r'\begin{aligned} M_{critical} = max~\big({M_{critical}}_{1}, ~{M_{critical}}_{2}\big) \\'))
+    moment_critical.append(NoEscape(r'\begin{aligned}              = max~\big(' + critical_mom_1 + r', ~' + critical_mom_2 + r'\big) \\'))
+    moment_critical.append(NoEscape(r'\begin{aligned}              = ' + moment + r'\end{aligned}'))
+
+    return moment_critical
+
+
+def md_plate():
+    """ """
+    moment_demand = Math(inline=True)
+    moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} = \frac{b{t_{p}}^{2}}{6} ,~where~(b = 1) \\'))
+    moment_demand.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} = \frac{1.5~{f_{y}}_{p}~{z_{e}}_{plate}}{\gamma_{m0}} \\'))
+    moment_demand.append(NoEscape(r'\begin{aligned}                 = \frac{1.5~{f_{y}}_{p}~\bigg(\frac{b\times t_p^{2}}{6}\bigg)}{\gamma_{m0}} \\'))
+    moment_demand.append(NoEscape(r'&[Ref.~IS~800:2007,~(Cl.8.2.1.2)]\end{aligned}'))
+
+    return moment_demand
+
+
+def plate_thk1(critical_mom, plate_thk, gamma_m0, f_y_plate, bp_width):
+    """ """
+    critical_mom = str(critical_mom)
+    plate_thk = str(plate_thk)
+    gamma_m0 = str(gamma_m0)
+    f_y_plate = str(f_y_plate)
+    bp_width = str(bp_width)
+
+    thk = Math(inline=True)
+    thk.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} = M_{critical} \\'))
+    thk.append(NoEscape(r'\begin{aligned} t_{p} = \bigg[\frac{4~M_{critical}~ \gamma_{m0}} { {f_{y}}_{p}~W }\bigg]^{0.5}  \\'))
+    thk.append(NoEscape(r'\begin{aligned}       = \bigg[\frac{4~' + critical_mom + r'~' + gamma_m0 + r'}{' + f_y_plate + r'~'
+                        + bp_width + r'}\bigg]^{0.5}  \\'))
+    thk.append(NoEscape(r'\begin{aligned}       = ' + plate_thk + r' \\'))
+
+    return thk
+
+
+def max_bearing_stress(tension_demand, y, area_anchor_tension, n, bp_length, f, sigma_c):
+    """ """
+    tension_demand = str(tension_demand)
+    y = str(y)
+    area_anchor_tension = str(area_anchor_tension)
+    n = str(n)
+    bp_length = str(bp_length)
+    f = str(f)
+    y = str(y)
+    sigma_c = str(sigma_c)
+
+    sigma_max = Math(inline=True)
+    sigma_max.append(NoEscape(r'\begin{aligned} {\sigma_{c}}_{_{{max}}} = \frac{P_{t}~y}{A_{s}~n~\big(\frac{L}{2} - y + f\big)}  \\'))
+    sigma_max.append(NoEscape(r'\begin{aligned}                         = \frac{' + tension_demand + r'~' + y + r'}{' + area_anchor_tension + r'~'
+                              + n + r'~\big(\frac{' + bp_length + r'}{2} - ' + y + r' + ' + f + r'\big)} \\'))
+    sigma_max.append(NoEscape(r'\begin{aligned}       = ' + sigma_c + r' \\'))
+
+    return sigma_max
+
+
+def anchor_len_above(grout_thk, plate_thk, plate_washer_thk, nut_thk, len):
+    """ """
+    grout_thk = str(grout_thk)
+    plate_thk = str(plate_thk)
+    plate_washer_thk = str(plate_washer_thk)
+    nut_thk = str(nut_thk)
+    len = str(len)
+
+    length = Math(inline=True)
+    length.append(NoEscape(r'\begin{aligned} l_{1} = t_{g}~+~t_{p}~+~t_{w}~+~t_{n}~+~20 \\'))
+    length.append(NoEscape(r'\begin{aligned}       = ' + grout_thk + r'~+~' + plate_thk + r'~+~' + plate_washer_thk + r'~+~' + nut_thk + r'~+~20 \\'))
+    length.append(NoEscape(r'\begin{aligned}       = ' + len + r' \end{aligned}'))
+
+    return length
+
+
+def anchor_len_below(bolt_tension, bearing_strength, len):
+    """ """
+    bolt_tension = str(bolt_tension)
+    bearing_strength = str(bearing_strength)
+    len = str(len)
+
+    length = Math(inline=True)
+    length.append(NoEscape(r'\begin{aligned} l_{2} = \Bigg[\frac{T_{b}}{15.5\sqrt{f_{ck}}}\Bigg]^{0.67} \\'))
+    length.append(NoEscape(r'\begin{aligned}       = \Bigg[\frac{' + bolt_tension + r'}{15.5\sqrt{' + bearing_strength + r'}}\Bigg]^{0.67} \\'))
+    length.append(NoEscape(r'\begin{aligned}       = ' + len + r' \end{aligned}'))
+
+    return length
+
+
+def anchor_range(anchor_len_min, anchor_len_max):
+    """ """
+    anchor_len_min = str(anchor_len_min)
+    anchor_len_max = str(anchor_len_max)
+
+    len_range = Math(inline=True)
+    len_range.append(NoEscape(r'\begin{aligned} ' + anchor_len_min + r' \leq ~l_{a}~\leq ' + anchor_len_max + r'\end{aligned}'))
+
+    return len_range
+
+
+def anchor_length(anchor_len_above, anchor_len_below, anchor_len_total):
+    """ """
+    anchor_len_above = str(anchor_len_above)
+    anchor_len_below = str(anchor_len_below)
+    anchor_len_total = str(anchor_len_total)
+
+    length = Math(inline=True)
+    length.append(NoEscape(r'\begin{aligned} l_{a} = l_{1}~+~l_{2} \\'))
+    length.append(NoEscape(r'\begin{aligned}            = ' + anchor_len_above + r' ~+~' + anchor_len_below + r' \\'))
+    length.append(NoEscape(r'\begin{aligned}            = ' + anchor_len_total + r' \end{aligned}'))
+
+    return length
+
+
+def uplift_demand(uplift_tension):
+    """ """
+    uplift_tension = str(uplift_tension)
+
+    tension = Math(inline=True)
+    tension.append(NoEscape(r'\begin{aligned} P_{up} = ' + uplift_tension + r' \end{aligned}'))
+
+    return tension
+
+
+def no_bolts_uplift(uplift_force, tension_capa):
+    """ """
+    bolts = uplift_force / tension_capa
+    bolts = str(bolts)
+    uplift_force = str(uplift_force)
+    tension_capa = str(tension_capa)
+
+    n = Math(inline=True)
+    n.append(NoEscape(r'\begin{aligned} n_{up} = \frac{P_{up}}{T_{db}} \\'))
+    n.append(NoEscape(r'\begin{aligned}        = \frac{' + uplift_force + r'}{' + tension_capa + r'} \\'))
+    n.append(NoEscape(r'\begin{aligned}        = ' + bolts + r' \end{aligned}'))
+
+    return n
+
+
+def stiff_len_flange(bp_width, col_flange_width, stiff_length):
+    """ """
+    bp_width = str(bp_width)
+    col_flange_width = str(col_flange_width)
+    stiff_length = str(stiff_length)
+
+    len = Math(inline=True)
+    len.append(NoEscape(r'\begin{aligned} {L_{st}}_{f} = \frac{W - B}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = \frac{' + bp_width + r' - ' + col_flange_width + r'}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = ' + stiff_length + r' \\'))
+    len.append(NoEscape(r'&[Ref.~based~on~detailing~requirement \end{aligned}'))
+
+    return len
+
+
+def stiff_height_flange(stiff_length_flange, stiff_height):
+    """ """
+    stiff_height = str(stiff_height)
+    stiff_length_flange = str(stiff_length_flange)
+
+    height = Math(inline=True)
+    height.append(NoEscape(r'\begin{aligned} {H_{st}}_{f} = {L_{st}}_{f}~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_length_flange + r'~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_height + r' \\'))
+    height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
+
+    return height
+
+
+def stiff_thk_flange(stiff_length_flange, epsilon, col_flange_thk):
+    """ """
+    stiff_thk = stiff_length_flange / (8.4 * epsilon)
+    stiff_thk = str(stiff_thk)
+    stiff_length_flange = str(stiff_length_flange)
+    epsilon = str(epsilon)
+    col_flange_thk = str(col_flange_thk)
+
+    thickness = Math(inline=True)
+    thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{f} = \bigg(\frac{{L_{st}}_{f}}{8.4\times \epsilon_{st}}\bigg) \geq T \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = \bigg(\frac{' + stiff_length_flange + r'}{8.4\times ' + epsilon + r'}\bigg) \geq '
+                              + col_flange_thk + r' \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = ' + stiff_thk + r' \geq ' + col_flange_thk + r' \\'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+
+    return thickness
+
+
+def stiff_len_web(bp_length, col_depth, stiff_length):
+    """ """
+    bp_length = str(bp_length)
+    col_depth = str(col_depth)
+    stiff_length = str(stiff_length)
+
+    len = Math(inline=True)
+    len.append(NoEscape(r'\begin{aligned} {L_{st}}_{w} = \frac{L - D}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = \frac{' + bp_length + r' - ' + col_depth + r'}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = ' + stiff_length + r' \\'))
+    len.append(NoEscape(r'&[Ref.~based~on~detailing~requirement \end{aligned}'))
+
+    return len
+
+
+def stiff_height_web(stiff_length_web, stiff_height):
+    """ """
+    stiff_height = str(stiff_height)
+    stiff_length_web = str(stiff_length_web)
+
+    height = Math(inline=True)
+    height.append(NoEscape(r'\begin{aligned} {H_{st}}_{w} = {L_{st}}_{w}~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_length_web + r'~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_height + r' \\'))
+    height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
+
+    return height
+
+
+def stiff_thk_web(stiff_length_web, epsilon, col_web_thk):
+    """ """
+    stiff_thk = stiff_length_web / (8.4 * epsilon)
+    stiff_thk = str(stiff_thk)
+    stiff_length_web = str(stiff_length_web)
+    epsilon = str(epsilon)
+    col_web_thk = str(col_web_thk)
+
+    thickness = Math(inline=True)
+    thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{w} = \bigg(\frac{{L_{st}}_{w}}{8.4\times \epsilon_{st}}\bigg) \geq t \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = \bigg(\frac{' + stiff_length_web + r'}{8.4\times ' + epsilon + r'}\bigg) \geq '
+                              + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = ' + stiff_thk + r' \geq ' + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+
+    return thickness
+
+
+def stiff_len_across_web(stiff_length_flange, stiff_length_web, stiff_length):
+    """ """
+    stiff_length_flange = str(stiff_length_flange)
+    stiff_length_web = str(stiff_length_web)
+    stiff_length = str(stiff_length)
+
+    len = Math(inline=True)
+    # len.append(NoEscape(r'\begin{aligned} {L_{st}}_{w} = \frac{L - D}{2} '))
+    len.append(NoEscape(r'\begin{aligned} {L_{st}}_{aw} = max~(a, ~b) \\'))
+    len.append(NoEscape(r'\begin{aligned}               = max~(' + stiff_length_flange + r', ~' + stiff_length_web + r') \\'))
+    len.append(NoEscape(r'\begin{aligned}               = ' + stiff_length + r' \\'))
+    len.append(NoEscape(r'&[Ref.~based~on~detailing~requirement \end{aligned}'))
+
+    return len
+
+
+def stiff_height_across_web(stiff_length_across_web, stiff_height):
+    """ """
+    stiff_height = str(stiff_height)
+    stiff_length_across_web = str(stiff_length_across_web)
+
+    height = Math(inline=True)
+    height.append(NoEscape(r'\begin{aligned} {H_{st}}_{aw} = {L_{st}}_{aw}~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_length_across_web + r'~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_height + r' \\'))
+    height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
+
+    return height
+
+
+def stiff_thk_across_web(stiff_length_across_web, epsilon, col_web_thk):
+    """ """
+    stiff_thk = stiff_length_across_web / (8.4 * epsilon)
+    stiff_thk = str(stiff_thk)
+    stiff_length_across_web = str(stiff_length_across_web)
+    epsilon = str(epsilon)
+    col_web_thk = str(col_web_thk)
+
+    thickness = Math(inline=True)
+    thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{aw} = \bigg(\frac{{L_{st}}_{aw}}{8.4\times \epsilon_{st}}\bigg) \geq t \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = \bigg(\frac{' + stiff_length_across_web + r'}{8.4\times ' + epsilon + r'}\bigg) \geq '
+                              + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = ' + stiff_thk + r' \geq ' + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+
+    return thickness
+
+
+def stiffener_stress_flange(sigma_crit):
+    """ """
+    sigma_crit = str(sigma_crit)
+
+    stress_along_flange = Math(inline=True)
+    stress_along_flange.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{f} = {\sigma_{br}}_{critical} \\'))
+    stress_along_flange.append(NoEscape(r'\begin{aligned}                   = ' + sigma_crit + r' \end{aligned}'))
+
+    return stress_along_flange
+
+
+def stiffener_stress_web(sigma_max, sigma_crit, sigma_val, f_ck, type='welded_hollow_bp', case='None'):
+    """ """
+    sigma_val = str(sigma_val)
+
+    stress_along_web = Math(inline=True)
+
+    if (type == 'welded_hollow_bp') and (case == 'None'):
+        stress_along_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{w} = {\sigma_{br}}_{actual} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = ' + sigma_val + r' \end{aligned}'))
+
+    elif (type == 'moment_bp') and (case == 'Case2&3'):
+        f_ck = str(f_ck)
+        stress_along_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{w} = 0.45f_{ck} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = 0.45' + f_ck + r' \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = ' + sigma_val + r'\end{aligned}'))
+
+    else:
+        sigma_val = (sigma_max + sigma_crit) / 2
+        sigma_val = str(sigma_val)
+        sigma_max = str(sigma_max)
+        sigma_crit = str(sigma_crit)
+
+        stress_along_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{w} = \frac{{\sigma_{b}}_{max} + {\sigma_{b}}_{critical}}{2} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = \frac{' + sigma_max + r' + ' + sigma_crit + r'}{2} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = ' + sigma_val + r' \end{aligned}'))
+
+    return stress_along_web
+
+
+def stiffener_stress_across_web(sigma, sigma_max, sigma_min, type='welded_hollow_bp', case='None'):
+    """ """
+    sigma = str(sigma)
+
+    stress_across_web = Math(inline=True)
+
+    if (type == 'welded_hollow_bp') and (case == 'None'):
+        stress_across_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{aw} = {\sigma_{br}}_{actual} \\'))
+    elif (type == 'moment_bp') and (case == 'Case2&3'):
+        stress_across_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{aw} = {\sigma_{br}}_{actual} \\'))
+    else:
+        sigma_max = str(sigma_max)
+        sigma_min = str(sigma_min)
+
+        stress_across_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{aw} = \frac{{\sigma_{b}}_{max}~ - ~{\sigma_{b}}_{min}}{2} \\'))
+        stress_across_web.append(NoEscape(r'\begin{aligned}                    = \frac{' + sigma_max + r'~ - ~' + sigma_min + r'}{2} \\'))
+
+    stress_across_web.append(NoEscape(r'\begin{aligned}                    = ' + sigma + r' \end{aligned}'))
+
+    return stress_across_web
+
+
+def shear_demand_stiffener(sigma, stiff_length, stiff_height, shear, location='flange'):
+    """ """
+    sigma = str(sigma)
+    stiff_length = str(stiff_length)
+    stiff_height = str(stiff_height)
+    shear = str(shear)
+
+    shear_demand = Math(inline=True)
+
+    if location == 'flange':
+        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} =  {\sigma_{st}}_{f} \times {L_{st}}_{f}~{H_{st}}_{f} \\'))
+    elif location == 'web':
+        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{w} =  {\sigma_{st}}_{w} \times {L_{st}}_{w}~{H_{st}}_{w} \\'))
+    else:
+        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{aw} =  {\sigma_{st}}_{aw} \times {L_{st}}_{aw}~{H_{st}}_{aw} \\'))
+
+    shear_demand.append(NoEscape(r'\begin{aligned}              =  ' + sigma + r' \times ' + stiff_length + r'~' + stiff_height + r' \\'))
+    shear_demand.append(NoEscape(r'\begin{aligned}              =  ' + shear + r' \end{aligned}'))
+
+    return shear_demand
+
+
+def shear_capacity_stiffener(stiff_thk, stiff_height, stiff_fy, shear_capa, gamma_m0, location='flange'):
+    """ """
+    stiff_thk = str(stiff_thk)
+    stiff_height = str(stiff_height)
+    stiff_fy = str(stiff_fy)
+    shear_capa = str(shear_capa)
+    gamma_m0 = str(gamma_m0)
+
+    shear_capacity = Math(inline=True)
+
+    if location == 'flange':
+        shear_capacity.append(NoEscape(r'\begin{aligned} {V_{d}}_{f} =  \frac{A_{vg}~f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+        shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{{(H_{st}}_{f}\times {t_{st}}_{f})f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+    elif location == 'web':
+        shear_capacity.append(NoEscape(r'\begin{aligned} {V_{d}}_{w} =  \frac{A_{vg}~f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+        shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{{(H_{st}}_{w}\times {t_{st}}_{w})f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+    else:
+        shear_capacity.append(NoEscape(r'\begin{aligned} {V_{d}}_{aw} =  \frac{A_{vg}~f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+        shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{{(H_{st}}_{aw}\times {t_{st}}_{aw})f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+
+    shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{' + stiff_height + r' \times ' + stiff_thk + r')' + stiff_fy + r'}'
+                                                                                                                                         r'{\sqrt{3}~' + gamma_m0 + r'} \\'))
+
+    shear_capacity.append(NoEscape(r'\begin{aligned}              =  ' + shear_capa + r' \\'))
+    shear_capacity.append(NoEscape(r'&[Ref.~IS~800:2007~(Cl.~8.4.1) \end{aligned}'))
+
+    return shear_capacity
+
+
+def moment_demand_stiffener(sigma, stiff_thk, stiff_length, moment, location='flange'):
+    """ """
+    sigma = str(sigma)
+    stiff_length = str(stiff_length)
+    stiff_thk = str(stiff_thk)
+    moment = str(moment)
+
+    moment_demand = Math(inline=True)
+
+    if location == 'flange':
+        moment_demand.append(NoEscape(r'\begin{aligned} {M_{st}}_{f} =  {\sigma_{st}}_{f} \times {t_{st}}_{f}~\frac{{{L_{st}}_{f}}^{2}}{2} \\'))
+    elif location == 'web':
+        moment_demand.append(NoEscape(r'\begin{aligned} {M_{st}}_{w} =  {\sigma_{st}}_{w} \times {t_{st}}_{f}~\frac{{{L_{st}}_{f}}^{2}}{2} \\'))
+    else:
+        moment_demand.append(NoEscape(r'\begin{aligned} {M_{st}}_{aw} =  {\sigma_{st}}_{aw} \times {t_{st}}_{f}~\frac{{{L_{st}}_{f}}^{2}}{2} \\'))
+
+    moment_demand.append(NoEscape(r'\begin{aligned}              =  ' + sigma + r' \times ' + stiff_thk + r'~\frac{' + stiff_length + r'^{2}}{2} \\'))
+    moment_demand.append(NoEscape(r'\begin{aligned}              =  ' + moment + r' \end{aligned}'))
+
+    return moment_demand
+
+
+def zp_stiffener(zp_val):
+    """ """
+    zp_val = str(zp_val)
+
+    zp = Math(inline=True)
+    zp.append(NoEscape(r'\begin{aligned} {z_{p}}_{st} = ' + zp_val + r' \end{aligned}'))
+
+    return zp
+
+
+def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='flange'):
+    """ """
+    zp = str(zp)
+    stiff_fy = str(stiff_fy)
+    moment_capa = str(moment_capa)
+    gamma_m0 = str(gamma_m0)
+
+    moment_capacity = Math(inline=True)
+
+    if location == 'flange':
+        moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{f} =  \frac{\beta_{b}~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}} \\'))
+    elif location == 'web':
+        moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{w} =  \frac{\beta_{b}~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}} \\'))
+    else:
+        moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{aw} =  \frac{\beta_{b}~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}} \\'))
+
+    moment_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{1\times~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}}~~~~(\beta_{b} = 1) \\'))
+    moment_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{1\times~' + zp + r'~' + stiff_fy + r'}{' + gamma_m0 + r'} \\'))
+    moment_capacity.append(NoEscape(r'\begin{aligned}              =  ' + moment_capa + r' \\'))
+    moment_capacity.append(NoEscape(r'&[Ref.~IS~800:2007~(Cl.~8.2.1.2) \end{aligned}'))
+
+    return moment_capacity
+
+

@@ -440,7 +440,15 @@ class ColumnCoverPlateWeld(MomentConnection):
         t15 = (KEY_WEB_WELD_STRENGTH, KEY_WEB_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
                self.web_weld.strength if flag else '')
         web_weld_details.append(t15)  # in N/mm
+        t5 = (
+        KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION, TYPE_TEXTBOX, round(self.Reduction_factor_web, 2) if flag else '',
+        True)
+        web_weld_details.append(t5)
 
+        t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX,
+               round(self.web_weld.strength_red, 2) if flag else '',
+               True)
+        web_weld_details.append(t10)
         t16 = (KEY_WEB_WELD_STRESS, KEY_WEB_DISP_WELD_STRESS, TYPE_TEXTBOX, self.web_weld.stress if flag else '')
         web_weld_details.append(t16)
 
@@ -482,7 +490,14 @@ class ColumnCoverPlateWeld(MomentConnection):
         t15 = (KEY_FLANGE_WELD_STRENGTH, KEY_FLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
                self.flange_weld.strength if flag else '')
         flange_weld_details.append(t15)  # in N/mm
-
+        t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION, TYPE_TEXTBOX,
+              round(self.Reduction_factor_flange, 2) if flag else '',
+              True)
+        flange_weld_details.append(t5)
+        t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX,
+               round(self.flange_weld.strength_red, 2) if flag else '',
+               True)
+        flange_weld_details.append(t10)
         t16 = (
         KEY_FLANGE_WELD_STRESS, KEY_FLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, self.flange_weld.stress if flag else '')
         flange_weld_details.append(t16)  # in N/mm
@@ -589,20 +604,20 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         t21 = (
             KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
-            ['Flange Plate Weld', self.flange_weld_details], True)
+            ['Flange Plate Weld', self.flange_weld_details],  True)
         out_list.append(t21)
 
-        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None,  False)
 
         out_list.append(t17)
 
         t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.Innerheight if flag else '', False)
+               self.flange_plate.Innerheight if flag else '',  False)
         out_list.append(t18)
 
         t19 = (
             KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.plate_in_len if flag else '', False)
+            self.plate_in_len if flag else '',  False)
 
         out_list.append(t19)
 
@@ -610,9 +625,9 @@ class ColumnCoverPlateWeld(MomentConnection):
                self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
 
-        t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
-               ['Inner plate Weld', self.Innerflange_weld_details], False)
-        out_list.append(t21)
+        # t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
+        #        ['Inner plate Weld', self.Innerflange_weld_details], False)
+        # out_list.append(t21)
 
         # t17 = (None, DISP_EFF, TYPE_TITLE, None, True)
         # out_list.append(t17)
@@ -1171,6 +1186,8 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.available_long_web_length = round_up((self.section.flange_width / 2) - (self.flange_plate.gap / 2), 5)
         # self.available_long_web_length = round_up((self.web_plate.height/2) - (2*self.web_weld.size)- (self.flange_plate.gap/2) , 5)
 
+        self.web_weld.strength_red = round(self.web_weld.strength, 2)
+        # self.available_long_web_length = round_up((self.web_plate.height/2) - (2*self.web_weld.size)- (self.flange_plate.gap/2) , 5)
         self.web_plate_weld_status = False
         while self.web_plate_weld_status == False:
             self.weld_stress(self, d=self.available_long_web_length,
@@ -1179,18 +1196,20 @@ class ColumnCoverPlateWeld(MomentConnection):
                              plate_height=(self.web_plate.height - (2 * self.web_weld.size)),
                              weld_size=self.web_weld.size, axial_force_w=self.axial_force_w)
 
-            self.web_plate.length = 2 * (
-                        self.available_long_web_length + (2 * self.web_weld.size)) + self.web_plate.gap
+            self.web_plate.length = 2 * (self.available_long_web_length + (2 * self.web_weld.size)) + self.web_plate.gap
+            self.Reduction_factor_web = 1
             if self.web_plate.length >= 150 * self.web_weld.throat_tk:
-                Reduction_factor = round(IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
-                                                                                t_t=self.web_weld.throat_tk), 2)
-                self.web_weld.strength_red = self.web_weld.strength * Reduction_factor
+                self.Reduction_factor_web = round(IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
+                                                                                         t_t=self.web_weld.throat_tk),
+                                                  2)
+                self.web_weld.strength_red = self.web_weld.strength * self.Reduction_factor_web
                 if self.web_weld.strength_red > self.web_weld.stress:
                     self.web_plate_weld_status = True
                     break
                 else:
                     self.available_long_web_length = self.available_long_web_length + 50
             else:
+                self.Reduction_factor_web = 1
                 if self.web_weld.strength > self.web_weld.stress:
                     self.web_weld.strength_red = self.web_weld.strength
                     self.web_plate_weld_status = True
@@ -1206,6 +1225,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                 (2 * self.section.root_radius) - (2 * self.webspace)), 5)
             self.web_weld.height = round_down((self.web_plate.height - (2 * self.web_weld.size)), 5)
             self.l_req_weblength = round_up(self.l_req_weblength, 5)
+            self.web_weld.strength = round(self.web_weld.strength, 2)
+            self.web_weld.strength_red = round(self.web_weld.strength_red, 2)
             self.flange_plate_weld(self)
 
         else:
@@ -1262,11 +1283,16 @@ class ColumnCoverPlateWeld(MomentConnection):
             self.flange_weld.stress = self.flange_force / self.l_req_flangelength
             self.flange_plate.length = (2 * (self.available_long_flange_length + (2 * self.flange_weld.size))
                                         + self.flange_plate.gap)
+            self.Reduction_factor_flange = 1
+            self.flange_weld.strength_red = round(self.flange_weld.strength, 2)
 
+            # self.flange_plate.length =200
+            # self.flange_weld.throat_tk =1
             while self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
-                Reduction_factor = round(IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
-                                                                                t_t=self.web_weld.throat_tk), 2)
-                self.flange_weld.strength_red = self.flange_weld.strength * Reduction_factor
+                self.Reduction_factor_flange = round(
+                    IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.flange_plate.length,
+                                                           t_t=self.flange_weld.throat_tk), 2)
+                self.flange_weld.strength_red = self.flange_weld.strength * self.Reduction_factor_flange
                 self.flange_weld.stress = self.flange_force / self.l_req_flangelength
                 if self.flange_weld.strength_red > self.flange_weld.stress:
                     break
@@ -1278,7 +1304,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                     self.flange_plate.length = 2 * (
                                 self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap
 
-            self.flange_weld.strength_red = round(self.flange_weld.strength, 2)
+            # self.flange_weld.strength_red = round(self.flange_weld.strength,2)
 
             if self.flange_weld.strength_red > self.flange_weld.stress:
                 self.flange_plate_weld_status = True
@@ -1292,6 +1318,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                     (2 * self.flange_weld.size)), 5)
                 self.flange_weld.strength = round(self.flange_weld.strength, 2)
                 self.flange_weld.stress = round(self.flange_weld.stress, 2)
+                self.flange_weld.strength_red = round(self.flange_weld.strength_red, 2)
                 self.flange_plate_capacity_axial(self)
             else:
                 self.flange_plate_weld_status = False
@@ -1318,27 +1345,32 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.design_status = False
 
             self.flange_plate.height = (self.section.flange_width - (2 * self.flangespace))
-            self.Area_flange_plates = ((
-                                                   2 * self.flange_plate.Innerheight) + self.flange_plate.height) * self.flange_plate.thickness_provided
+            self.Area_flange_plates = ((2 * self.flange_plate.Innerheight) + self.flange_plate.height) * self.flange_plate.thickness_provided
             self.Outside_plate_area = self.flange_plate.height * self.flange_plate.thickness_provided
             self.Area_ratio = self.Outside_plate_area / self.Area_flange_plates
             self.weld_eff_length_outer = round_up(self.Required_weld_flange_length * self.Area_ratio, 5)
 
-            self.available_long_flange_length = round_up(int((self.weld_eff_length_outer - self.flange_plate.height - (
-                    2 * self.flange_weld.size)) / 2), 5, (
-                                                             self.section.flange_width))  # half of the one side of the flange plate
+
+            h_weld = self.flange_plate.height - (2 * self.flange_weld.size)
+            self.available_long_flange_length = round_up(int((self.weld_eff_length_outer - h_weld) / 2), 5,
+                                                         (self.section.flange_width)) # half of the one side of the flange plate
+
             self.flange_plate.length = (2 * (self.available_long_flange_length + (2 * self.flange_weld.size))
                                         + self.flange_plate.gap)
             self.l_req_flangelength = ((6 * self.available_long_flange_length) + self.flange_plate.height +
                                        2 * self.flange_plate.Innerheight - (6 * self.flange_weld.size))
             self.flange_weld.stress = self.flange_force / self.l_req_flangelength
-
+            self.flange_weld.strength_red = round(self.flange_weld.strength, 2)
+            self.Reduction_factor_flange = 1
+            # self.flange_plate.length = 200
+            # self.flange_weld.throat_tk = 1
             while self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
                 self.flange_weld.stress = self.flange_force / self.l_req_flangelength
-                Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
-                                                                          t_t=self.web_weld.throat_tk)
-                self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
-                if self.flange_weld.strength > self.flange_weld.stress:
+                self.Reduction_factor_flange = round(
+                    IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.flange_plate.length,
+                                                           t_t=self.flange_weld.throat_tk), 2)
+                self.flange_weld.strength_red = self.flange_weld.strength * self.Reduction_factor_flange
+                if self.flange_weld.strength_red > self.flange_weld.stress:
                     break
                 else:
                     self.available_long_flange_length = self.available_long_flange_length + 50
@@ -1347,8 +1379,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                         + (2 * self.flange_plate.Innerheight) - (6 * self.flange_weld.size), 2)
                     self.flange_plate.length = (2 * (self.available_long_flange_length + (2 * self.flange_weld.size))
                                                 + self.flange_plate.gap)
-            self.flange_weld.strength_red = round(self.flange_weld.strength, 2)
-            if self.flange_weld.strength_red  > self.flange_weld.stress:
+
+            if self.flange_weld.strength_red > self.flange_weld.stress:
                 self.flange_plate_weld_status = True
                 # Outer Plate Details
                 self.flange_weld.length = round_up((self.available_long_flange_length), 5)
@@ -1364,6 +1396,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.flange_plate.Innerlength = self.flange_plate.length
                 self.flange_plate.Innerheight = round_down(self.flange_plate.Innerheight, 5)
                 self.flange_weld.inner_height = (self.flange_plate.Innerheight - 2 * self.flange_weld.size)
+                self.flange_weld.strength_red = round(self.flange_weld.strength_red, 2)
                 self.flange_weld.strength = round(self.flange_weld.strength, 2)
                 self.flange_weld.stress = round(self.flange_weld.stress, 2)
 
@@ -1962,7 +1995,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         t1 = ('Model', self.call_3DModel)
         components.append(t1)
 
-        t2 = ('Beam', self.call_3DBeam)
+        t2 = ('Column', self.call_3DColumn)
         components.append(t2)
 
         t4 = ('Cover Plate', self.call_3DPlate)

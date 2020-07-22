@@ -675,7 +675,7 @@ KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND = 'Tension Demand (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
 
-DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt - Outside Column Flange'
+DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt - Inside Column Flange'
 KEY_OUT_DIA_ANCHOR_UPLIFT = 'Anchor Bolt.Diameter_Uplift'
 KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter (mm)'
 KEY_OUT_GRD_ANCHOR_UPLIFT = 'Anchor Bolt.Grade_Uplift'

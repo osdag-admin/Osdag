@@ -487,6 +487,7 @@ VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceF
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
 VALUES_IMG_BEAM = ["ResourceFiles/images/Slope_Beam.png","ResourceFiles/images/Parallel_Beam.png"]
+VALUES_IMG_HOLLOWSECTION = ["ResourceFiles/images/SHS.png","ResourceFiles/images/RHS.png","ResourceFiles/images/CHS.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -512,23 +513,23 @@ DISP_LOWSHEAR = 'Limited to low shear capacity'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
-DISP_MIN_PITCH = 'Min. Pitch (mm)'
-DISP_MAX_PITCH = 'Max. Pitch (mm)'
-DISP_MIN_GAUGE = 'Min. Gauge (mm)'
-DISP_MAX_GAUGE = 'Max. Gauge (mm)'
-DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+DISP_MIN_PITCH = 'Min. pitch (mm)'
+DISP_MAX_PITCH = 'Max. pitch (mm)'
+DISP_MIN_GAUGE = 'Min. gauge (mm)'
+DISP_MAX_GAUGE = 'Max. gauge (mm)'
+DISP_MIN_EDGE = 'Min. edge distance (mm)'
 KEY_SPACING = "Spacing Check"
-DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
-DISP_MIN_END = 'Min. End Distance (mm)'
-DISP_MAX_END = 'Max. End Distance (mm)'
-DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
-DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
-DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
-DISP_MAX_PLATE_WIDTH = 'Max. Plate Width (mm)'
-DISP_MIN_PLATE_WIDTH = 'Min. Plate Width (mm)'
-DISP_MIN_LEG_LENGTH = 'Min. Leg Length (mm)'
-DISP_MIN_WIDTH = 'Minimum Width (mm)'
-DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
+DISP_MAX_EDGE = 'Max. edge distance (mm)'
+DISP_MIN_END = 'Min. end distance (mm)'
+DISP_MAX_END = 'Max. end distance (mm)'
+DISP_MIN_PLATE_HEIGHT = 'Min. plate height (mm)'
+DISP_MAX_PLATE_HEIGHT = 'Max. plate height (mm)'
+DISP_MIN_PLATE_LENGTH = 'Min. plate length (mm)'
+DISP_MAX_PLATE_WIDTH = 'Max. plate width (mm)'
+DISP_MIN_PLATE_WIDTH = 'Min. plate width (mm)'
+DISP_MIN_LEG_LENGTH = 'Min. leg length (mm)'
+DISP_MIN_WIDTH = 'Minimum width (mm)'
+DISP_MIN_PLATE_THICK = 'Min. plate thickness (mm)'
 
 ######### Minimun for Flange####
 DISP_MIN_FLANGE_PLATE_HEIGHT = 'Min. Flange Plate Width (mm)'
@@ -641,9 +642,9 @@ KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 # Applied load
 KEY_INTERACTION_RATIO ="Interaction Ratio"
 MIN_LOADS_REQUIRED ="Minimun Required Loads"
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied shear force (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied axial force (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied moment (kNm)'
 KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 
 # capacity
@@ -885,7 +886,7 @@ KEY_DISP_GAMMA_MF = "Connection Bolts - Friction Type"
 KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
-KEY_DISP_DP_WELD_TYPE = 'Weld Type'
+KEY_DISP_DP_WELD_TYPE = 'Weld type'
 KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
 KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
@@ -1311,7 +1312,7 @@ KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
 
 
 
-KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
+KEY_OUT_DISP_PC_PROVIDED = 'Property class'
 KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_COL_PROVIDED = 'Bolt.Cols'
@@ -1355,8 +1356,10 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-KEY_OUT_LONG_JOINT = 'Long Joint Factor'
-KEY_OUT_LARGE_GRIP = 'Large Grip Factor'
+KEY_OUT_LONG_JOINT = 'Long joint reduction factor'
+KEY_OUT_LARGE_GRIP = 'Large grip length reduction factor'
+KEY_OUT_PACKING_PLATE = 'Packing plate reduction factor'
+KEY_OUT_BOLT_CAPACITY_REDUCED = 'Bolt Capacity post reduction factors (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
@@ -1667,9 +1670,9 @@ KEY_DISP_CLEATSEC='Cleat Section *'
 KEY_DISP_SEATEDANGLE = 'Seated Angle *'
 KEY_DISP_TOPANGLE = 'Top Angle *'
 #Design Report Strings
-DISP_NUM_OF_BOLTS = 'No of Bolts'
-DISP_NUM_OF_ROWS = 'No of Rows'
-DISP_NUM_OF_COLUMNS = 'No of Columns'
+DISP_NUM_OF_BOLTS = 'No. of Bolts'
+DISP_NUM_OF_ROWS = 'No. of bolt rows'
+DISP_NUM_OF_COLUMNS = 'No. of bolt columns'
 DISP_TITLE_COMPMEM='Compression member'
 KEY_SECTYPE = 'Section Type'
 KEY_DISP_SECTYPE = 'Section Type*'
@@ -1682,7 +1685,7 @@ KEY_DISP_AXFOR = 'Axial Force (kN)*'
 KEY_PLTHK = 'Plate thk'
 KEY_DISP_PLTHK = 'Plate thk (mm)'
 KEY_PLTHICK = 'Plate thk'
-KEY_DISP_PLTHICK = 'Plate Thickness'
+KEY_DISP_PLTHICK = 'Plate thickness (mm)'
 KEY_DIAM = 'Diameter'
 KEY_DISP_DIAM = 'Diameter (mm)'
 KEY_NOROWS = 'No of Rows of Bolts'

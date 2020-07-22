@@ -2144,17 +2144,17 @@ class Tension_bolted(Member):
         if self.member_design_status == True:
             if self.bolt.bolt_type == TYP_BEARING:
                 variable = KEY_DISP_GAMMA_MB
-                value = gamma(self.bolt.gamma_mb,"mb")
+                value = cl_5_4_1_table_4_5_gamma_value(self.bolt.gamma_mb, "mb")
             else:
                 variable = KEY_DISP_GAMMA_MF
-                value = gamma(self.bolt.gamma_mf,"mf")
+                value = cl_5_4_1_table_4_5_gamma_value(self.bolt.gamma_mf, "mf")
         else:
             if self.bolt.bolt_type == TYP_BEARING:
                 variable = KEY_DISP_GAMMA_MF
-                value = gamma(1.25,"mf")
+                value = cl_5_4_1_table_4_5_gamma_value(1.25, "mf")
             else:
                 variable = KEY_DISP_GAMMA_MF
-                value = gamma(1.25, "mf")
+                value = cl_5_4_1_table_4_5_gamma_value(1.25, "mf")
 
         if self.member_design_status == True:
             member_yield_kn = round((section_size.tension_yielding_capacity / 1000), 2)
@@ -2364,8 +2364,8 @@ class Tension_bolted(Member):
              KEY_DISP_FU: round(self.plate.fu, 2),
              KEY_DISP_FY: round(self.plate.fy, 2),
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
-             KEY_DISP_GAMMA_M0 : gamma(1.1,"m0"),
-             KEY_DISP_GAMMA_M1 : gamma(1.25,"m1"),
+             KEY_DISP_GAMMA_M0 : cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
+             KEY_DISP_GAMMA_M1 : cl_5_4_1_table_4_5_gamma_value(1.25, "m1"),
              variable : value }
         if self.bolt.bolt_type != TYP_FRICTION_GRIP:
             del self.report_input[KEY_DISP_DP_BOLT_SLIP_FACTOR]
@@ -2448,17 +2448,21 @@ class Tension_bolted(Member):
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(section_size.area,section_size.fy,gamma_m0,member_yield_kn,multiple), '')
+            t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', cl_6_2_tension_yield_capacity_member(l=None, t=None,
+                                                                                           f_y=section_size.fy,
+                                                                                           gamma=gamma_m0, T_dg=member_yield_kn,
+                                                                                           multiple =multiple,
+                                                                                           area=section_size.area), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,section_size.fu, section_size.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,section_size.beta,member_rupture_kn,multiple), '')
             self.report_check.append(t3)
-            t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
+            t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', cl_6_4_blockshear_capacity_member(Tdb= member_blockshear_kn), '')
             self.report_check.append(t4)
-            t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,section_size.tension_capacity, relation="leq"))
+            t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, cl_6_1_tension_capacity_member(member_yield_kn, member_rupture_kn, member_blockshear_kn), get_pass_fail(self.load.axial_force, section_size.tension_capacity, relation="leq"))
             self.report_check.append(t8)
-            t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(gyration,2), slenderness), get_pass_fail(400,slenderness, relation="geq"))
+            t5 = (KEY_DISP_SLENDER, slenderness_req(), cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2), slenderness), get_pass_fail(400, slenderness, relation="geq"))
             self.report_check.append(t5)
-            t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
+            t6 = (KEY_DISP_EFFICIENCY, required_IR_or_utilisation_ratio(1),
                   efficiency_prov(self.load.axial_force, section_size.tension_capacity, self.efficiency), '')
             self.report_check.append(t6)
             t1 = (KEY_DISP_AXIAL_FORCE_CON, axial_capacity_req(axial_capacity=round((section_size.tension_yielding_capacity/1000), 2),
@@ -2471,13 +2475,14 @@ class Tension_bolted(Member):
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
-                  member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn,
-                                    multiple), get_pass_fail(self.load.axial_force, member_yield_kn, relation="leq"))
+                  cl_6_2_tension_yield_capacity_member(l=None, t=None,f_y=section_size.fy,gamma=gamma_m0,
+                                                       T_dg=member_yield_kn,multiple=multiple,area=section_size.area),
+                  get_pass_fail(self.load.axial_force, member_yield_kn, relation="leq"))
             self.report_check.append(t2)
 
             t5 = (KEY_DISP_SLENDER, slenderness_req(),
-                  slenderness_prov(1, self.length, round(gyration, 2),
-                                  slenderness), get_pass_fail(400,slenderness, relation="geq"))
+                  cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2),
+                                                       slenderness), get_pass_fail(400,slenderness, relation="geq"))
             self.report_check.append(t5)
 
 
@@ -2545,30 +2550,30 @@ class Tension_bolted(Member):
             self.report_check.append(t4)
             if self.bolt.bolt_type == TYP_BEARING:
                 t8 = (
-                KEY_DISP_KB, " ", kb_prov(self.plate.end_dist_provided, self.plate.pitch_provided, self.bolt.dia_hole,
-                                          self.bolt.bolt_fu, self.bolt.fu_considered), '')
+                    KEY_DISP_KB, " ", cl_10_3_4_calculate_kb(self.plate.end_dist_provided, self.plate.pitch_provided, self.bolt.dia_hole,
+                                                             self.bolt.bolt_fu, self.bolt.fu_considered), '')
                 self.report_check.append(t8)
 
                 bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
                 t1 = (
-                KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, self.planes, self.bolt.bolt_net_area,
-                                                             self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
+                    KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.bolt.bolt_fu, self.planes, self.bolt.bolt_net_area,
+                                                                               self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
                 self.report_check.append(t1)
-                t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp, self.bolt.bolt_diameter_provided,
-                                                                       self.bolt_conn_plates_t_fu_fy,
-                                                                       self.bolt.gamma_mb,
-                                                                       bolt_bearing_capacity_kn), '')
+                t2 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(kb_disp, self.bolt.bolt_diameter_provided,
+                                                                                     self.bolt_conn_plates_t_fu_fy,
+                                                                                     self.bolt.gamma_mb,
+                                                                                     bolt_bearing_capacity_kn), '')
                 self.report_check.append(t2)
                 t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
-                      bolt_capacity_prov(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
+                      cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
                       '')
                 self.report_check.append(t3)
             else:
 
                 t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
-                      HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=self.planes, K_h=kh_disp, fub=self.bolt.bolt_fu,
-                                              Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
-                                              capacity=bolt_capacity_kn), '')
+                      cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=self.planes, K_h=kh_disp, fub=self.bolt.bolt_fu,
+                                                   Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
+                                                   capacity=bolt_capacity_kn), '')
                 self.report_check.append(t4)
 
             t5 = (DISP_NUM_OF_BOLTS,get_trial_bolts(self.load.shear_force, round((self.res_force / 1000), 2), bolt_capacity_kn),
@@ -2578,10 +2583,11 @@ class Tension_bolted(Member):
             self.report_check.append(t6)
             t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.plate.bolts_one_line, "n_r"), '')
             self.report_check.append(t7)
-            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),long_joint_bolted_prov(self.plate.bolt_line,self.plate.bolts_one_line,self.plate.pitch_provided,self.plate.gauge_provided,self.bolt.bolt_diameter_provided,bolt_capacity_kn,bolt_capacity_red_kn), "")
+            t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),cl_10_3_3_1_long_joint_bolted_prov(self.plate.bolt_line,self.plate.bolts_one_line,self.plate.pitch_provided,self.plate.gauge_provided,self.bolt.bolt_diameter_provided,bolt_capacity_kn,bolt_capacity_red_kn), "")
             self.report_check.append(t10)
+
             if self.bolt.bolt_type == TYP_BEARING:
-                t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),large_grip_prov(self.bolt.bolt_diameter_provided, self.plate.thickness_provided, self.thick, self.plate.beta_lj, self.plate.beta_lg), "")
+                t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),cl_10_3_3_2_large_grip_bolted_prov( (self.plate.thickness_provided + self.thick),self.bolt.bolt_diameter_provided, self.plate.beta_lj), "")
                 self.report_check.append(t10)
                 t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_red_capacity_prov(self.plate.beta_lj,self.plate.beta_lg,bolt_capacity_kn,bolt_capacity_red_kn,"b"),
                       get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
@@ -2592,6 +2598,7 @@ class Tension_bolted(Member):
                                              bolt_capacity_red_kn, "f"),
                       get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
                 self.report_check.append(t5)
+
 
 
         else:
@@ -2606,51 +2613,51 @@ class Tension_bolted(Member):
             if self.sec_profile in ["Channels", 'Back to Back Channels']:
                 t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,int(self.plate.height),1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                      tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
-                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_bolted_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.bolts_one_line, self.bolt.dia_hole,self.plate.fu, gamma_m1,plate_rupture_kn), '')
+                      cl_6_2_tension_yield_capacity_member(l = self.section_size_1.depth, t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', cl_6_3_tension_rupture_capacity_member(self.section_size_1.depth, self.plate.thickness_provided, self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
             elif self.sec_profile in ["Angles", 'Back to Back Angles']:
                 if self.loc == "Long Leg":
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 1), "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                          tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg =plate_yield_kn), '')
+                          cl_6_2_tension_yield_capacity_member(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg =plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          tension_rupture_bolted_prov(self.section_size_1.max_leg, self.plate.thickness_provided,
-                                               self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                               plate_rupture_kn), '')
+                          cl_6_3_tension_rupture_capacity_member(self.section_size_1.max_leg, self.plate.thickness_provided,
+                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                                 plate_rupture_kn), '')
 
                 else:
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.min_leg, self.clearance,int(self.plate.height),1), "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                          tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
-                                             f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                          cl_6_2_tension_yield_capacity_member(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                                               f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg=plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          tension_rupture_bolted_prov(self.section_size_1.min_leg, self.plate.thickness_provided,
-                                               self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                               plate_rupture_kn), '')
+                          cl_6_3_tension_rupture_capacity_member(self.section_size_1.min_leg, self.plate.thickness_provided,
+                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                                 plate_rupture_kn), '')
             else:
                 if self.loc == "Long Leg":
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 2), "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                          tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                          cl_6_2_tension_yield_capacity_member(l=2 * self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg=plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          tension_rupture_bolted_prov(2*self.section_size_1.max_leg, self.plate.thickness_provided,
-                                               self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                               plate_rupture_kn), '')
+                          cl_6_3_tension_rupture_capacity_member(2 * self.section_size_1.max_leg, self.plate.thickness_provided,
+                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                                 plate_rupture_kn), '')
                 else:
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 2)
                           , "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                          tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
-                                             f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                          cl_6_2_tension_yield_capacity_member(l=2 * self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                                               f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg=plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          tension_rupture_bolted_prov(2 * self.section_size_1.min_leg, self.plate.thickness_provided,
-                                               self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                               plate_rupture_kn), '')
+                          cl_6_3_tension_rupture_capacity_member(2 * self.section_size_1.min_leg, self.plate.thickness_provided,
+                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                                 plate_rupture_kn), '')
             self.report_check.append(t3)
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "",
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))
@@ -2673,11 +2680,11 @@ class Tension_bolted(Member):
 
             self.report_check.append(t1)
 
-            t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
+            t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', cl_6_4_blockshear_capacity_member(Tdb=plate_blockshear_kn), '')
             self.report_check.append(t4)
 
-            t8 = (KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-            get_pass_fail(round((self.res_force/1000),2), round(self.plate_tension_capacity/1000,2), relation="leq"))
+            t8 = (KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), cl_6_1_tension_capacity_member(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+                  get_pass_fail(round((self.res_force/1000),2), round(self.plate_tension_capacity/1000,2), relation="leq"))
             self.report_check.append(t8)
         else:
             pass

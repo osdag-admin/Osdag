@@ -1906,9 +1906,9 @@ class Tension_welded(Member):
              KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
              KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu,
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
-             KEY_DISP_GAMMA_M0: gamma(1.1, "m0"),
-             KEY_DISP_GAMMA_M1: gamma(1.25, "m1"),
-             KEY_DISP_GAMMA_MW: gamma(gamma_mw, "mw")}
+             KEY_DISP_GAMMA_M0: cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
+             KEY_DISP_GAMMA_M1: cl_5_4_1_table_4_5_gamma_value(1.25, "m1"),
+             KEY_DISP_GAMMA_MW: cl_5_4_1_table_4_5_gamma_value(gamma_mw, "mw")}
 
 
 
@@ -1960,7 +1960,8 @@ class Tension_welded(Member):
             self.report_check.append(t1)
 
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                  member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn, multiple), '')
+                  cl_6_2_tension_yield_capacity_member(l=None, t=None,f_y=section_size.fy,gamma=gamma_m0,
+                                                       T_dg=member_yield_kn,multiple=multiple,area=section_size.area), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
                   member_rupture_prov(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w,
@@ -1969,13 +1970,13 @@ class Tension_welded(Member):
             self.report_check.append(t3)
             # t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=member_blockshear_kn), '')
             # self.report_check.append(t4)
-            t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn),
-            get_pass_fail(self.load.axial_force, self.section_size_1.tension_capacity, relation="lesser"))
+            t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, cl_6_1_tension_capacity_member(member_yield_kn, member_rupture_kn),
+                  get_pass_fail(self.load.axial_force, self.section_size_1.tension_capacity, relation="lesser"))
             self.report_check.append(t8)
-            t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov(1, self.length, round(gyration, 2), slenderness),
-            get_pass_fail(400, slenderness, relation="greater"))
+            t5 = (KEY_DISP_SLENDER, slenderness_req(), cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2), slenderness),
+                  get_pass_fail(400, slenderness, relation="greater"))
             self.report_check.append(t5)
-            t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
+            t6 = (KEY_DISP_EFFICIENCY, required_IR_or_utilisation_ratio(1),
                   efficiency_prov(self.load.axial_force, section_size.tension_capacity, self.efficiency), '')
             self.report_check.append(t6)
             t1 = (KEY_DISP_AXIAL_FORCE_CON,
@@ -1990,13 +1991,14 @@ class Tension_welded(Member):
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
-                  member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn,
-                                    multiple), get_pass_fail(self.load.axial_force, member_yield_kn, relation="lesser"))
+                  cl_6_2_tension_yield_capacity_member(l=None, t=None, f_y=section_size.fy, gamma=gamma_m0,
+                                                       T_dg=member_yield_kn, multiple=multiple, area=section_size.area),
+                  get_pass_fail(self.load.axial_force, member_yield_kn, relation="lesser"))
             self.report_check.append(t2)
 
             t5 = (KEY_DISP_SLENDER, slenderness_req(),
-                  slenderness_prov(1, self.length, round(gyration, 2),
-                                   slenderness), get_pass_fail(400, slenderness, relation="greater"))
+                  cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2),
+                                                       slenderness), get_pass_fail(400, slenderness, relation="greater"))
             self.report_check.append(t5)
 
         # if self.member_design_status == True:
@@ -2032,17 +2034,17 @@ class Tension_welded(Member):
 
             t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{6.5 cm}|p{5cm}|p{1cm}|')
             self.report_check.append(t7)
-
-            t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req_01(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,
+            #TODO
+            t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,
                   get_pass_fail(weld_thickness, self.weld.size, relation="leq"))
             self.report_check.append(t1)
 
-            self.weld_size_max = int(min(self.weld_connecting_plates))
-            t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(self.weld_connecting_plates, self.weld_size_max), self.weld.size,
+            self.weld_size_max = 16.0
+            t1 = (DISP_MAX_WELD_SIZE, cl_10_5_3_1_max_weld_size(self.weld_connecting_plates, self.weld_size_max), self.weld.size,
                   get_pass_fail(self.weld_size_max, self.weld.size, relation="geq"))
             self.report_check.append(t1)
 
-            t1 = (DISP_THROAT, throat_req(), throat_prov(self.weld.size, self.Kt),
+            t1 = (DISP_THROAT, cl_10_5_3_1_throat_thickness_req(), cl_10_5_3_1_throat_thickness_weld(self.weld.size, self.Kt),
                   get_pass_fail(3.0, self.weld.size, relation="leq"))
             self.report_check.append(t1)
 
@@ -2064,13 +2066,13 @@ class Tension_welded(Member):
                                                         y_max=0.0, x_max=0.0,
                                                         l_w=self.weld.length,
                                                        R_w=self.weld.stress),
-                  weld_strength_prov(weld_conn_plates_fu, gamma_mw, round((self.weld.throat),2), round((self.weld.strength),2)),
+                  cl_10_5_7_1_1_weld_strength(weld_conn_plates_fu, gamma_mw, round((self.weld.throat), 2), round((self.weld.strength), 2)),
                   get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
             self.report_check.append(t1)
 
             t15 = (KEY_OUT_LONG_JOINT_WELD, long_joint_welded_req(),
-                   long_joint_welded_prov(h=self.plate.height,l=self.plate.length, t_t=self.weld.throat,
-                                             ws= self.weld.strength, wsr = self.weld.strength_red), "")
+                   cl_10_5_7_3_weld_strength_post_long_joint(h=self.plate.height, l=self.plate.length, t_t=self.weld.throat,
+                                                             ws= self.weld.strength, wsr = self.weld.strength_red), "")
             self.report_check.append(t15)
             t5 = (KEY_OUT_DISP_RED_WELD_STRENGTH, self.weld.stress, self.weld.strength_red,
                 get_pass_fail(self.weld.stress, self.weld.strength_red,
@@ -2084,36 +2086,36 @@ class Tension_welded(Member):
 
             if self.sec_profile in ["Channels", 'Back to Back Channels']:
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                      tension_yield_prov(l=self.section_size.depth, t=self.plate.thickness_provided, f_y=self.plate.fy,
-                                         gamma=gamma_m0, T_dg=plate_yield_kn),
+                      cl_6_2_tension_yield_capacity_member(l=self.section_size.depth, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                                           gamma=gamma_m0, T_dg=plate_yield_kn),
                       get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
 
             elif self.sec_profile in ["Angles", 'Back to Back Angles']:
                 if self.loc == "Long Leg":
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          tension_yield_prov(l=self.section_size.max_leg, t=self.plate.thickness_provided,
-                                             f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg=plate_yield_kn),
+                          cl_6_2_tension_yield_capacity_member(l=self.section_size.max_leg, t=self.plate.thickness_provided,
+                                                               f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
                 else:
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          tension_yield_prov(l=self.section_size.min_leg, t=self.plate.thickness_provided,
-                                             f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg=plate_yield_kn),
+                          cl_6_2_tension_yield_capacity_member(l=self.section_size.min_leg, t=self.plate.thickness_provided,
+                                                               f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
             else:
                 if self.loc == "Long Leg":
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          tension_yield_prov(l=2 * self.section_size.max_leg, t=self.plate.thickness_provided,
-                                             f_y=self.plate.fy,
-                                             gamma=gamma_m0, T_dg=plate_yield_kn),
+                          cl_6_2_tension_yield_capacity_member(l=2 * self.section_size.max_leg, t=self.plate.thickness_provided,
+                                                               f_y=self.plate.fy,
+                                                               gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
 
 
                 else:
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          tension_yield_prov(l=2 * self.section_size.min_leg, t=self.plate.thickness_provided,
-                                             f_y=self.plate.fy, gamma=gamma_m0, T_dg=plate_yield_kn),
+                          cl_6_2_tension_yield_capacity_member(l=2 * self.section_size.min_leg, t=self.plate.thickness_provided,
+                                                               f_y=self.plate.fy, gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
 
             self.report_check.append(t2)
@@ -2188,12 +2190,12 @@ class Tension_welded(Member):
                 # self.report_check.append(t2)
                 self.report_check.append(t1)
 
-                t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
+                t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', cl_6_4_blockshear_capacity_member(Tdb=plate_blockshear_kn), '')
                 self.report_check.append(t4)
 
                 t8 = (
-                KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-                get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
+                    KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), cl_6_1_tension_capacity_member(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+                    get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
                 self.report_check.append(t8)
             else:
                 pass

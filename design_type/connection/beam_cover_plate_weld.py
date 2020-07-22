@@ -278,7 +278,7 @@ class BeamCoverPlateWeld(MomentConnection):
         lst.append(t8)
         t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_WELD_DETAILS,TYPE_OUT_DOCK, self.preference_type)
         lst.append(t8)
-        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON, self.preference_type)
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_WELD_DETAILS, TYPE_OUT_LABEL, self.preference_type)
         lst.append(t8)
 
         return lst
@@ -301,7 +301,7 @@ class BeamCoverPlateWeld(MomentConnection):
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t19 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE, True, 'No Validator')
+        t19 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX,  ["Fillet Weld"], True, 'No Validator')
         options_list.append(t19)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -838,16 +838,23 @@ class BeamCoverPlateWeld(MomentConnection):
 
         ############################### WEB MENBER CAPACITY CHECK ############################
         ###### # capacity Check for web in axial = yielding
+
         if (previous_thk_flange) == None:
             pass
         else:
-            for i in previous_thk_flange:
-                self.flange_plate.thickness.remove(i)
+            # for i in previous_thk_flange:
+            if previous_thk_flange in self.flange_plate.thickness:
+                self.flange_plate.thickness.remove(previous_thk_flange)
+            else:
+                pass
+
         if (previous_thk_web) == None:
             pass
         else:
-            for i in previous_thk_web:
-                self.web_plate.thickness.remove(i)
+            if previous_thk_web in self.web_plate.thickness:
+                self.web_plate.thickness.remove(previous_thk_web)
+            else:
+                pass
 
         self.initial_pt_thk_status = False
         self.initial_pt_thk_status_web = False
@@ -1292,7 +1299,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 # self.flange_plate_capacity_axial_status = False
                 if len(self.flange_plate.thickness) >= 2:
                     thk = self.flange_plate.thickness_provided
-                    self.initial_pt_thk(self, previous_thk_web=thk)
+                    self.initial_pt_thk(self, previous_thk_flange=thk)
                 else:
                     self.flange_plate_capacity_axial_status = False
                     self.design_status =False
@@ -1321,7 +1328,7 @@ class BeamCoverPlateWeld(MomentConnection):
             if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
                 if len(self.flange_plate.thickness) >= 2:
                     thk = self.flange_plate.thickness_provided
-                    self.initial_pt_thk(self, previous_thk_web=thk)
+                    self.initial_pt_thk(self, previous_thk_flange=thk)
                 else:
                     self.flange_plate_capacity_axial_status = False
                     self.design_status = False
@@ -2041,9 +2048,9 @@ class BeamCoverPlateWeld(MomentConnection):
              # KEY_WEBPLATE_THICKNESS:str(self.plate_thick_customized()),
              # KEY_FLANGEPLATE_THICKNESS:str(self.plate_thick_customized()),
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
-             KEY_DISP_GAMMA_M0: gamma(1.1, "m0"),
-             KEY_DISP_GAMMA_M1: gamma(1.25, "m1"),
-             KEY_DISP_GAMMA_MW: gamma(self.gamma_mw_flange, "mw"),
+             KEY_DISP_GAMMA_M0: cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
+             KEY_DISP_GAMMA_M1: cl_5_4_1_table_4_5_gamma_value(1.25, "m1"),
+             KEY_DISP_GAMMA_MW: cl_5_4_1_table_4_5_gamma_value(self.gamma_mw_flange, "mw"),
              "Plate Details": "TITLE",
              KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
              KEY_DISP_FU: self.flange_plate.fu,
@@ -2079,22 +2086,20 @@ class BeamCoverPlateWeld(MomentConnection):
         t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        t1 = (SECTION_CLASSIFICATION, "", section_classification(class_of_section=self.class_of_section), "")
+        t1 = (SECTION_CLASSIFICATION, "", cl_3_7_2_section_classification(class_of_section=self.class_of_section), "")
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, display_prov(self.load.axial_force, "Al"), axial_capacity(area=round(self.section.area, 2),
-                                                                                 fy=self.section.fy,
-                                                                                 gamma_m0=gamma_m0,
-                                                                                 axial_capacity=round(
-                                                                                     self.axial_capacity / 1000, 2)),
-              '')
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, display_prov(self.load.axial_force, "Al"),
+              cl_6_2_tension_yield_capacity_member(l=None, t=None, f_y=self.section.fy, gamma=gamma_m0,
+                                                   T_dg=round(self.axial_capacity / 1000, 2), multiple=None,
+                                                   area=round(self.section.area, 2)),'')
         self.report_check.append(t1)
 
         # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
         #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
 
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_yield_prov(h=h, t=self.section.web_thickness,
-                                                                                                      f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                                                                      V_dg=round(
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', cl_8_4_shear_yielding_capacity_member(h=h, t=self.section.web_thickness,
+                                                                                     f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                                     V_dg=round(
                                                                                      self.shear_capacity1 / 1000/0.6, 2)),'')
         self.report_check.append(t1)
         initial_shear_capacity = round(self.shear_capacity1 / 1000/0.6, 2)
@@ -2103,21 +2108,21 @@ class BeamCoverPlateWeld(MomentConnection):
               allow_shear_capacity(initial_shear_capacity,reduced_shear_capacity),
               get_pass_fail(self.load.shear_force, reduced_shear_capacity, relation="lesser"))
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
-                                                                               Z_p=round(self.Z_p, 2),
-                                                                               f_y=self.section.fy,
-                                                                               gamma_m0=gamma_m0,
-                                                                               Pmc=round(self.Pmc / 1000000, 2)), '')
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', cl_8_2_1_2_plastic_moment_capacity_member(beta_b=round(self.beta_b, 2),
+                                                                                                  Z_p=round(self.Z_p, 2),
+                                                                                                  f_y=self.section.fy,
+                                                                                                  gamma_m0=gamma_m0,
+                                                                                                  Pmc=round(self.Pmc / 1000000, 2)), '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '', moment_d_deformation_criteria(fy=self.section.fy,
-                                                                                   Z_e=round(
+        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '', cl_8_2_1_2_deformation_moment_capacity_member(fy=self.section.fy,
+                                                                                                   Z_e=round(
                                                                                        self.section.elast_sec_mod_z, 2),
-                                                                                   Mdc=round(self.Mdc / 1000000, 2)),
+                                                                                                   Mdc=round(self.Mdc / 1000000, 2)),
               '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, display_prov(self.load.moment, "M"), moment_capacity(Pmc=round(self.Pmc / 1000000, 2),
-                                                                              Mdc=round(self.Mdc / 1000000, 2),
-                                                                              M_c=round(
+        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, display_prov(self.load.moment, "M"), cl_8_2_moment_capacity_member(Pmc=round(self.Pmc / 1000000, 2),
+                                                                                                               Mdc=round(self.Mdc / 1000000, 2),
+                                                                                                               M_c=round(
                                                                                   self.section.moment_capacity / 1000000,
                                                                                   2)),
               '')
@@ -2184,18 +2189,18 @@ class BeamCoverPlateWeld(MomentConnection):
             if self.member_capacity_status == True:
                 t2 = ('SubSection', 'Initial Member Check', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
                 self.report_check.append(t2)
-                t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE, display_prov( round(self.flange_force / 1000, 2),"F_f"), tension_yield_prov(self.section.flange_width,
-                                                                                 self.section.flange_thickness,
-                                                                                 self.section.fy, gamma_m0,
-                                                                                 round(self.section.tension_yielding_capacity / 1000,2), 1),
+                t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE, display_prov( round(self.flange_force / 1000, 2),"F_f"), cl_6_2_tension_yield_capacity_member(self.section.flange_width,
+                                                                                                                                                        self.section.flange_thickness,
+                                                                                                                                                        self.section.fy, gamma_m0,
+                                                                                                                                                        round(self.section.tension_yielding_capacity / 1000,2), 1),
                       get_pass_fail(round(self.flange_force / 1000, 2), round(self.section.tension_yielding_capacity / 1000,2), relation="leq"))
                 self.report_check.append(t1)
                 if self.section.tension_yielding_capacity > self.flange_force :
                     webheight = round((self.section.depth - 2 * self.section.flange_thickness) ,2)
-                    t1 = (KEY_DISP_TENSIONYIELDINGCAP_WEB, display_prov( round(self.axial_force_w / 1000, 2),"A_w"), tension_yield_prov(webheight,
-                                                                                  self.section.web_thickness,
-                                                                                  self.section.fy, gamma_m0,
-                                                                                  round(self.section.tension_yielding_capacity_web / 1000,), 1),
+                    t1 = (KEY_DISP_TENSIONYIELDINGCAP_WEB, display_prov( round(self.axial_force_w / 1000, 2),"A_w"), cl_6_2_tension_yield_capacity_member(webheight,
+                                                                                                                                                          self.section.web_thickness,
+                                                                                                                                                          self.section.fy, gamma_m0,
+                                                                                                                                                          round(self.section.tension_yielding_capacity_web / 1000,), 1),
                           get_pass_fail(round(self.axial_force_w / 1000, 2),round(self.section.tension_yielding_capacity_web / 1000,), relation="leq"))
                     self.report_check.append(t1)
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (len(self.flange_plate_thickness_possible) != 0):
@@ -2305,20 +2310,20 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.report_check.append(t2)
 
             # Flange Weld size#
-            t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,min_weld_size=self.flange_weld_size_min),display_prov(self.flange_weld.size, "t_w"),get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="leq"))
+            t2 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(conn_plates_weld=self.flange_weld_connecting_plates, min_weld_size=self.flange_weld_size_min), display_prov(self.flange_weld.size, "t_w"), get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="leq"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,max_weld_size=self.min_flange_platethk),display_prov(self.flange_weld.size, "t_w"),get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
+            t2 = (DISP_MAX_WELD_SIZE, cl_10_5_3_1_max_weld_size(conn_plates_weld=self.flange_weld_connecting_plates, max_weld_size=self.min_flange_platethk), display_prov(self.flange_weld.size, "t_w"), get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
             self.report_check.append(t2)
             t2 = (KEY_DISP_CLEARANCE, spacing (sp = self.flangespace,t_w = self.flange_weld.size),display_prov(self.flangespace, "sp"),get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
             self.report_check.append(t2)
             # Throat thickness #
-            t1 = (DISP_THROAT, throat_req(), throat_prov(self.flange_weld.size, self.Kt),get_pass_fail(3.0, self.flange_weld.size, relation="leq"))
+            t1 = (DISP_THROAT, cl_10_5_3_1_throat_thickness_req(), cl_10_5_3_1_throat_thickness_weld(self.flange_weld.size, self.Kt), get_pass_fail(3.0, self.flange_weld.size, relation="leq"))
             self.report_check.append(t1)
             #####Strength of the weld ####
             if self.preference == "Outside":
                 t1 = (DISP_EFF,' ',eff_len_prov(l_w=self.flange_weld.length,b_fp= self.flange_plate.height,t_w=self.flange_weld.size, l_eff =self.l_req_flangelength,con = "Flange"), "")
                 self.report_check.append(t1)
-                t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress,2)),weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =self.gamma_mw_flange ,t_t =self.flange_weld.throat_tk,f_w =self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+                t2 = (KEY_FLANGE_DISP_WELD_STRENGTH, flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress,2)), cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu =  flange_weld_conn_plates_fu, gamma_mw =self.gamma_mw_flange, t_t =self.flange_weld.throat_tk, f_w =self.flange_weld.strength), get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
                 self.report_check.append(t2)
                 t15 = (KEY_OUT_LONG_JOINT_WELD, long_joint_welded_req(),
                        long_joint_welded_beam_prov(plate_height=self.flange_plate.height,
@@ -2337,7 +2342,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 #Outside
                 t1 = (KEY_DISP_WELD_LEN_EFF_OUTSIDE ,'', eff_len_prov_out_in(l_w=self.flange_weld.length,b_fp=self.flange_plate.height,b_ifp=self.flange_plate.Innerheight,t_w=self.flange_weld.size, l_eff=self.l_req_flangelength), "")
                 self.report_check.append(t1)
-                t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress, 2)),weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=self.gamma_mw_flange,t_t=self.flange_weld.throat_tk,f_w=self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+                t2 = (KEY_FLANGE_DISP_WELD_STRENGTH, flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress, 2)), cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=self.gamma_mw_flange, t_t=self.flange_weld.throat_tk, f_w=self.flange_weld.strength), get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
                 self.report_check.append(t2)
                 t15 = (KEY_OUT_LONG_JOINT_WELD, long_joint_welded_req(),
                        long_joint_welded_beam_prov(plate_height=self.flange_plate.height,
@@ -2450,15 +2455,15 @@ class BeamCoverPlateWeld(MomentConnection):
                   display_prov(self.web_plate.thickness_provided, "t_{wp}"),
                   get_pass_fail(self.section.web_thickness / 2, self.web_plate.thickness_provided, relation="lesser"))
             self.report_check.append(t2)
-            t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.web_weld_connecting_plates,min_weld_size=self.web_weld_size_min),display_prov(self.web_weld.size, "t_w"),get_pass_fail(self.web_weld_size_min, self.web_weld.size, relation="leq"))
+            t2 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(conn_plates_weld=self.web_weld_connecting_plates, min_weld_size=self.web_weld_size_min), display_prov(self.web_weld.size, "t_w"), get_pass_fail(self.web_weld_size_min, self.web_weld.size, relation="leq"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.web_weld_connecting_plates,max_weld_size=self.min_web_platethk),display_prov(self.web_weld.size, "t_w"),get_pass_fail(self.min_web_platethk, self.web_weld.size, relation="geq"))
+            t2 = (DISP_MAX_WELD_SIZE, cl_10_5_3_1_max_weld_size(conn_plates_weld=self.web_weld_connecting_plates, max_weld_size=self.min_web_platethk), display_prov(self.web_weld.size, "t_w"), get_pass_fail(self.min_web_platethk, self.web_weld.size, relation="geq"))
             self.report_check.append(t2)
             t1 = (DISP_EFF, "", eff_len_prov(l_w=self.web_weld.length, b_fp=self.web_plate.height,t_w=self.web_weld.size, l_eff=self.l_req_weblength,con = "web"), "")
             self.report_check.append(t1)
             t2 = (KEY_DISP_CLEARANCE, spacing(sp=self.webspace, t_w=self.web_weld.size),display_prov(self.webspace, "sp"),get_pass_fail(self.min_web_platethk, self.web_weld.size, relation="geq"))
             self.report_check.append(t2)
-            t1 = (DISP_THROAT, throat_req(), throat_prov(self.web_weld.size, self.Kt),get_pass_fail(3.0, self.web_weld.size, relation="leq"))
+            t1 = (DISP_THROAT, cl_10_5_3_1_throat_thickness_req(), cl_10_5_3_1_throat_thickness_weld(self.web_weld.size, self.Kt), get_pass_fail(3.0, self.web_weld.size, relation="leq"))
             self.report_check.append(t1)
             t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT,moment_demand_req_bolt_force(shear_load=round((self.fact_shear_load / 1000)/2, 2),
                                                                                web_moment=round((self.moment_web / 1000000)/2, 2),
@@ -2466,14 +2471,14 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                moment_demand=round(self.weld_twist / 1000000, 2)),'' ,'')
             self.report_check.append(t10)
 
-            t2 = (KEY_WEB_DISP_WELD_STRENGTH,weld_strength_stress(V_u=round((self.fact_shear_load/2),2),A_w=round((self.axial_force_w/2),2),
+            t2 = (KEY_WEB_DISP_WELD_STRENGTH, weld_strength_stress(V_u=round((self.fact_shear_load/2),2),A_w=round((self.axial_force_w/2),2),
                                                                     M_d=round(self.weld_twist, 2),
                                                                     Ip_w= round(self.Ip_weld,2),
                                                                     y_max=round(self.y_max,2),
                                                                     x_max=round(self.x_max,2),
                                                                     l_eff=self.l_req_weblength,
                                                                     R_w=web_weld_stress_kn),
-                weld_strength_prov(conn_plates_weld_fu =  self.web_weld_conn_plates_fu,gamma_mw =self.gamma_mw_web ,t_t =self.web_weld.throat_tk,f_w =web_weld_strength_kn),get_pass_fail(web_weld_stress_kn, web_weld_strength_kn, relation="lesser"))
+                  cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu =  self.web_weld_conn_plates_fu, gamma_mw =self.gamma_mw_web, t_t =self.web_weld.throat_tk, f_w =web_weld_strength_kn), get_pass_fail(web_weld_stress_kn, web_weld_strength_kn, relation="lesser"))
             self.report_check.append(t2)
 
             t15 = (KEY_OUT_LONG_JOINT_WELD, long_joint_welded_req(),
@@ -2528,10 +2533,10 @@ class BeamCoverPlateWeld(MomentConnection):
             self.report_check.append(t1)
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
-            t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE, '', tension_yield_prov(self.section.flange_width,
-                                                                         self.section.flange_thickness,
-                                                                         self.section.fy, gamma_m0,
-                                                                         round(self.section.tension_yielding_capacity / 1000, 2),1), '')
+            t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE, '', cl_6_2_tension_yield_capacity_member(self.section.flange_width,
+                                                                                               self.section.flange_thickness,
+                                                                                               self.section.fy, gamma_m0,
+                                                                                               round(self.section.tension_yielding_capacity / 1000, 2), 1), '')
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
@@ -2540,7 +2545,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                  fu=self.section.fu, gamma_m1=gamma_m1,T_dn=round((self.section.tension_rupture_capacity / 1000),2),multiple =1), '')
 
             self.report_check.append(t1)
-            t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f") ,tensile_capacity_prov(round(self.section.tension_yielding_capacity / 1000, 2),round(self.section.tension_rupture_capacity / 1000, 2)),get_pass_fail(round(self.flange_force / 1000, 2), round(self.section.tension_capacity_flange / 1000, 2),relation="lesser"))
+            t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f") , cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity / 1000, 2), round(self.section.tension_rupture_capacity / 1000, 2)), get_pass_fail(round(self.flange_force / 1000, 2), round(self.section.tension_capacity_flange / 1000, 2), relation="lesser"))
             self.report_check.append(t1)
 
         ### web Check ###
@@ -2548,10 +2553,10 @@ class BeamCoverPlateWeld(MomentConnection):
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
             # A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
             webheight = round((self.section.depth - 2 * self.section.flange_thickness) ,2)
-            t1 = (KEY_DISP_TENSIONYIELDINGCAP_WEB, '', tension_yield_prov(webheight,
-                                                                      self.section.web_thickness,
-                                                                      self.section.fy, gamma_m0,
-                                                                      round(self.section.tension_yielding_capacity_web / 1000,2),1), '')
+            t1 = (KEY_DISP_TENSIONYIELDINGCAP_WEB, '', cl_6_2_tension_yield_capacity_member(webheight,
+                                                                                            self.section.web_thickness,
+                                                                                            self.section.fy, gamma_m0,
+                                                                                            round(self.section.tension_yielding_capacity_web / 1000,2), 1), '')
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
             t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', tension_rupture_welded_prov(w_p=webheight,
@@ -2559,11 +2564,11 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                               fu=self.section.fu, gamma_m1=gamma_m1,
                                                                               T_dn=round(self.section.tension_rupture_capacity_web / 1000,2),multiple =1), '')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_BLOCKSHEARCAP_WEB, '',blockshear_prov(Tdb = round(self.section.block_shear_capacity_web / 1000, 2)), '')
+            t1 = (KEY_DISP_BLOCKSHEARCAP_WEB, '', cl_6_4_blockshear_capacity_member(Tdb = round(self.section.block_shear_capacity_web / 1000, 2)), '')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_WEB_TEN_CAPACITY,display_prov( round(self.axial_force_w / 1000, 2),"A_w"), tensile_capacity_prov(round(self.section.tension_yielding_capacity_web / 1000, 2),
-                                    round(self.section.tension_rupture_capacity_web / 1000, 2),
-                                    round(self.section.block_shear_capacity_web / 1000, 2)),get_pass_fail(round(self.axial_force_w / 1000, 2), round(self.section.tension_capacity_web / 1000, 2),relation="lesser"))
+            t1 = (KEY_DISP_WEB_TEN_CAPACITY, display_prov( round(self.axial_force_w / 1000, 2),"A_w"), cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity_web / 1000, 2),
+                                                                                                                                      round(self.section.tension_rupture_capacity_web / 1000, 2),
+                                                                                                                                      round(self.section.block_shear_capacity_web / 1000, 2)), get_pass_fail(round(self.axial_force_w / 1000, 2), round(self.section.tension_capacity_web / 1000, 2),relation="lesser"))
             self.report_check.append(t1)
 
 ####################### Flange plate Capacities check########################
@@ -2575,11 +2580,11 @@ class BeamCoverPlateWeld(MomentConnection):
                self.report_check.append(t1)
                gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
-               t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE_PLATE, '', tension_yield_prov(self.flange_plate.height,
-                                                                             self.flange_plate.thickness_provided,
-                                                                             self.flange_plate.fy, gamma_m0,
-                                                                             round(self.flange_plate.tension_yielding_capacity / 1000,
-                                                                                 2),1), '')
+               t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE_PLATE, '', cl_6_2_tension_yield_capacity_member(self.flange_plate.height,
+                                                                                                        self.flange_plate.thickness_provided,
+                                                                                                        self.flange_plate.fy, gamma_m0,
+                                                                                                        round(self.flange_plate.tension_yielding_capacity / 1000,
+                                                                                 2), 1), '')
                self.report_check.append(t1)
                gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
@@ -2591,9 +2596,9 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                             2),multiple =1), '')
                self.report_check.append(t1)
                t1 = (KEY_DISP_FLANGE_PLATE_TEN_CAP, display_prov(round(self.flange_force / 1000, 2), "F_f") ,
-                  tensile_capacity_prov(round(self.flange_plate.tension_yielding_capacity / 1000, 2),
-                                        round(self.flange_plate.tension_rupture_capacity / 1000, 2)),
-                  get_pass_fail(round(self.flange_force / 1000, 2),
+                     cl_6_1_tension_capacity_member(round(self.flange_plate.tension_yielding_capacity / 1000, 2),
+                                                    round(self.flange_plate.tension_rupture_capacity / 1000, 2)),
+                     get_pass_fail(round(self.flange_force / 1000, 2),
                                 round(self.flange_plate.tension_capacity_flange_plate / 1000, 2),
                                 relation="lesser"))
                self.report_check.append(t1)
@@ -2603,11 +2608,11 @@ class BeamCoverPlateWeld(MomentConnection):
                gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
                total_height = self.flange_plate.height + (2 * self.flange_plate.Innerheight)
 
-               t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE_PLATE, '', tension_yield_prov(total_height,
-                                                                         self.flange_plate.thickness_provided,
-                                                                         self.flange_plate.fy, gamma_m0,
-                                                                         round(self.flange_plate.tension_yielding_capacity / 1000,
-                                                                             2),1), '')
+               t1 = (KEY_DISP_TENSIONYIELDINGCAP_FLANGE_PLATE, '', cl_6_2_tension_yield_capacity_member(total_height,
+                                                                                                        self.flange_plate.thickness_provided,
+                                                                                                        self.flange_plate.fy, gamma_m0,
+                                                                                                        round(self.flange_plate.tension_yielding_capacity / 1000,
+                                                                             2), 1), '')
                self.report_check.append(t1)
 
                gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
@@ -2622,9 +2627,9 @@ class BeamCoverPlateWeld(MomentConnection):
                self.report_check.append(t1)
 
                t1 = (KEY_DISP_FLANGE_PLATE_TEN_CAP, display_prov(round(self.flange_force / 1000, 2), "F_f") ,
-                  tensile_capacity_prov(round(self.flange_plate.tension_yielding_capacity / 1000, 2),
-                                        round(self.flange_plate.tension_rupture_capacity / 1000, 2)),
-                                        get_pass_fail(round(self.flange_force / 1000, 2),
+                     cl_6_1_tension_capacity_member(round(self.flange_plate.tension_yielding_capacity / 1000, 2),
+                                                    round(self.flange_plate.tension_rupture_capacity / 1000, 2)),
+                     get_pass_fail(round(self.flange_force / 1000, 2),
                                    round(self.flange_plate.tension_capacity_flange_plate / 1000, 2),
                                    relation="lesser"))
                self.report_check.append(t1)
@@ -2635,11 +2640,11 @@ class BeamCoverPlateWeld(MomentConnection):
             t1 = ('SubSection', 'Web Plate Capacity Checks in Axial', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-            t1 = (KEY_DISP_TENSION_YIELDCAPACITY_WEB_PLATE, '', tension_yield_prov(self.web_plate.height,
-                                                                        self.web_plate.thickness_provided,
-                                                                        self.web_plate.fy,
-                                                                        gamma_m0,
-                                                                        round(self.web_plate.tension_yielding_capacity / 1000,2) , 2), '')
+            t1 = (KEY_DISP_TENSION_YIELDCAPACITY_WEB_PLATE, '', cl_6_2_tension_yield_capacity_member(self.web_plate.height,
+                                                                                                     self.web_plate.thickness_provided,
+                                                                                                     self.web_plate.fy,
+                                                                                                     gamma_m0,
+                                                                                                     round(self.web_plate.tension_yielding_capacity / 1000,2), 2), '')
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
             t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', tension_rupture_welded_prov(self.web_plate.height,
@@ -2648,7 +2653,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                    gamma_m1,
                                                                                    round(self.web_plate.tension_rupture_capacity / 1000, 2),2), '')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_WEB_PLATE_CAPACITY, display_prov( round(self.axial_force_w / 1000, 2),"A_w"),tensile_capacity_prov(round(self.web_plate.tension_yielding_capacity / 1000, 2),round(self.web_plate.tension_rupture_capacity / 1000, 2)),get_pass_fail(round(self.axial_force_w / 1000, 2), round(self.web_plate.tension_capacity_web_plate / 1000, 2),relation="lesser"))
+            t1 = (KEY_DISP_WEB_PLATE_CAPACITY, display_prov( round(self.axial_force_w / 1000, 2),"A_w"), cl_6_1_tension_capacity_member(round(self.web_plate.tension_yielding_capacity / 1000, 2), round(self.web_plate.tension_rupture_capacity / 1000, 2)), get_pass_fail(round(self.axial_force_w / 1000, 2), round(self.web_plate.tension_capacity_web_plate / 1000, 2), relation="lesser"))
             self.report_check.append(t1)
 
            # Web plate Capacities check Shear
@@ -2656,9 +2661,9 @@ class BeamCoverPlateWeld(MomentConnection):
         if self.web_plate_capacity_axial_status == True:
             t1 = ('SubSection', 'Web Plate Capacity Checks in Shear', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_SHEARYIELDINGCAP_WEB_PLATE, '', shear_yield_prov(self.web_plate.height, self.web_plate.thickness_provided,
-                                                          self.web_plate.fy, gamma_m0,
-                                                          round(self.web_plate.shear_yielding_capacity / 1000/0.6, 2),2), '')
+            t1 = (KEY_DISP_SHEARYIELDINGCAP_WEB_PLATE, '', cl_8_4_shear_yielding_capacity_member(self.web_plate.height, self.web_plate.thickness_provided,
+                                                                                                 self.web_plate.fy, gamma_m0,
+                                                                                                 round(self.web_plate.shear_yielding_capacity / 1000/0.6, 2), 2), '')
             self.report_check.append(t1)
 
             initial_shear_capacity = round(self.web_plate.shear_yielding_capacity / 1000/0.6, 2)
@@ -2673,10 +2678,10 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                      round(self.web_plate.shear_rupture_capacity / 1000, 2),gamma_m1, 2),'')
                 self.report_check.append(t1)
             t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, display_prov( round(self.fact_shear_load / 1000, 2),"V_u"),
-               shear_capacity_prov(V_dy=round(self.web_plate.shear_yielding_capacity / 1000, 2),
-                              V_dn= round(self.web_plate.shear_rupture_capacity / 1000, 2),
-                              V_db= 00 ),
-               get_pass_fail(round(self.fact_shear_load / 1000, 2),
+                  cl_8_4_shear_capacity_member(V_dy=round(self.web_plate.shear_yielding_capacity / 1000, 2),
+                                               V_dn= round(self.web_plate.shear_rupture_capacity / 1000, 2),
+                                               V_db= 00),
+                  get_pass_fail(round(self.fact_shear_load / 1000, 2),
                         round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))
             self.report_check.append(t1)
 

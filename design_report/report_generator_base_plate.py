@@ -124,19 +124,19 @@ class SaveDesignBP(BasePlateConnection):
         t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_outside_flange, 'N/A')
         self.report_check.append(t8)
 
-        t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
-                                                           self.shear_capacity_anchor), 'N/A')
+        t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
+                                                                         self.shear_capacity_anchor), 'N/A')
         self.report_check.append(t4)
 
-        t9 = (KEY_DISP_KB, '', kb_prov(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
-                                       self.dp_column_fu), 'N/A')
+        t9 = (KEY_DISP_KB, '', cl_10_3_4_calculate_kb(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
+                                                      self.dp_column_fu), 'N/A')
         self.report_check.append(t9)
 
-        t5 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
-                                                               self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
+        t5 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
+                                                                             self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
         self.report_check.append(t5)
 
-        t6 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
+        t6 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
         self.report_check.append(t6)
 
         # t7 = (KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, '', cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db,
@@ -146,8 +146,7 @@ class SaveDesignBP(BasePlateConnection):
         if self.connectivity == 'Moment Base Plate':
             t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, self.tension_demand_anchor, cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
                                                                                                    self.anchor_area[0], self.anchor_area[1],
-                                                                                                   self.tension_capacity_anchor,
-                                                                                                   safety_factor_parameter=self.dp_weld_fab), '')
+                                                                                                   self.tension_capacity_anchor), '')
             self.report_check.append(t10)
 
         t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')
@@ -191,8 +190,7 @@ class SaveDesignBP(BasePlateConnection):
 
             t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, self.tension_demand_anchor_uplift, cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
                                                                                                    self.anchor_area[0], self.anchor_area[1],
-                                                                                                   self.tension_capacity_anchor_uplift,
-                                                                                                   safety_factor_parameter=self.dp_weld_fab), '')
+                                                                                                   self.tension_capacity_anchor_uplift), '')
             self.report_check.append(t10)
 
             t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')

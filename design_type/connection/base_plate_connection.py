@@ -482,7 +482,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t20)
 
-        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, [VALUES_WELD_TYPE[0]], True, 'No Validator')
+        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, [VALUES_WELD_TYPE[1]], True, 'No Validator')
         options_list.append(t21)
 
         return options_list
@@ -544,7 +544,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t101)
 
-        t4 = (KEY_OUT_ANCHOR_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX,
+        t4 = (KEY_OUT_ANCHOR_UPLIFT_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX,
               self.anchors_inside_flange if flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t4)
 
@@ -839,12 +839,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             return False
 
     def conn_weld_type(self):
-        if self[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base', 'Moment Base Plate']:
-            return VALUES_WELD_TYPE
-        else:
-            weld = []
-            weld.append(VALUES_WELD_TYPE[0])
-            return weld
+        # if self[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base', 'Moment Base Plate']:
+        #     return VALUES_WELD_TYPE
+        # else:
+        weld = []
+        weld.append(VALUES_WELD_TYPE[1])
+        return weld
 
     def out_weld(self):
 

@@ -1880,18 +1880,20 @@ class Window(QMainWindow):
                     for n in new:
 
                         if n[0] == key_str and n[0] == KEY_SECSIZE:
-                            if uiObj[key_str] != n[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                                                          KEY_SEC_PROFILE).currentText()):
-                                data[key_str + "_customized"] = uiObj[key_str]
+                            if set(uiObj[key_str]) != set(n[1]([self.dockWidgetContents.findChild(QtWidgets.QWidget,
+                                                          KEY_SEC_PROFILE).currentText()])):
                                 key.setCurrentIndex(1)
                             else:
-                                pass
+                                key.setCurrentIndex(0)
+                            data[key_str + "_customized"] = uiObj[key_str]
+
                         elif n[0] == key_str and n[0] != KEY_SECSIZE:
-                            if uiObj[key_str] != n[1]():
-                                data[key_str + "_customized"] = uiObj[key_str]
+                            if set(uiObj[key_str]) != set(n[1]()):
                                 key.setCurrentIndex(1)
                             else:
-                                pass
+                                key.setCurrentIndex(1)
+                            data[key_str + "_customized"] = uiObj[key_str]
+
             else:
                 pass
 

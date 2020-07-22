@@ -3264,15 +3264,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # self.stiffener_across_web = 'Yes'
             if (self.stiffener_along_flange == 'Yes') or (self.stiffener_along_web == 'Yes') or (self.stiffener_across_web == 'Yes'):
 
-                # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 8.4 * epsilon]
+                # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 13.6 * epsilon] (semi-compact)
                 if self.bolt_columns_outside_flange == 2:  # TODO: CAD for this?
-                    thk_req_stiffener_along_flange = (self.stiffener_plt_len_along_flange / 2) / (8.4 * self.epsilon)  # mm
-                    thk_req_stiffener_along_web = (self.stiffener_plt_len_along_web / 2) / (8.4 * self.epsilon)  # mm
-                    thk_req_stiffener_across_web = (self.stiffener_plt_len_across_web / 2) / (8.4 * self.epsilon)  # mm
+                    thk_req_stiffener_along_flange = (self.stiffener_plt_len_along_flange / 2) / (13.6 * self.epsilon)  # mm
+                    thk_req_stiffener_along_web = (self.stiffener_plt_len_along_web / 2) / (13.6 * self.epsilon)  # mm
+                    thk_req_stiffener_across_web = (self.stiffener_plt_len_across_web / 2) / (13.6 * self.epsilon)  # mm
                 else:
-                    thk_req_stiffener_along_flange = self.stiffener_plt_len_along_flange / (8.4 * self.epsilon)  # mm
-                    thk_req_stiffener_along_web = self.stiffener_plt_len_along_web / (8.4 * self.epsilon)  # mm
-                    thk_req_stiffener_across_web = self.stiffener_plt_len_across_web / (8.4 * self.epsilon)  # mm
+                    thk_req_stiffener_along_flange = self.stiffener_plt_len_along_flange / (13.6 * self.epsilon)  # mm
+                    thk_req_stiffener_along_web = self.stiffener_plt_len_along_web / (13.6 * self.epsilon)  # mm
+                    thk_req_stiffener_across_web = self.stiffener_plt_len_across_web / (13.6 * self.epsilon)  # mm
 
                 # stiffener plate should be at-least equal to the flange thickness along the flange and web thickness along the web
                 self.stiffener_plt_thick_along_flange = round_up(thk_req_stiffener_along_flange, 2, self.column_tf)  # mm
@@ -3290,7 +3290,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # sigma_max_zz - at the edge of the base plate on compression side
                 # sigma_xx - at the critical section (0.95 * column depth) of the base plate on compression side
                 # sigma_web - at the centre of the base plate on compression side
-                if self.connectivity == 'Welded Column Base':
+                if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
                     self.sigma_max_zz = self.w  # MPa
                     self.sigma_xx = self.w  # MPa
                     self.sigma_web = self.w  # MPa
@@ -3309,12 +3309,63 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # shear yielding and moment capacity checks for the stiffener - along the flange
                 if self.stiffener_along_flange == 'Yes':
-                    # shear and moment demand calculations
-                    self.shear_on_stiffener_along_flange = self.sigma_xx * self.stiffener_plt_len_along_flange * self.stiffener_plt_height_along_flange
+
+                    # Note: the loop below calculates the influence area lying under the stiffener
+                    # it will be helpful for the reader in interpreting the calculation by referring the Base Plate DDCL
+
+                    # shear demand
+                    if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                        self.shear_on_stiffener_along_flange = self.w * (self.bp_length_provided / 2) * \
+                                                               ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)
+                    else:
+                        if self.moment_bp_case == 'Case1':
+                            self.shear_on_stiffener_along_flange = self.sigma_xx * (self.bp_length_provided / 2) * \
+                                                                    ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)
+                        else:
+                            if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 4):
+                                self.shear_on_stiffener_along_flange = self.sigma_xx * self.y * \
+                                                                        ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)
+                            else:
+                                if self.y > self.critical_xx:
+                                    self.shear_on_stiffener_along_flange = self.sigma_xx * (self.y - self.critical_xx) * \
+                                                                            ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) + \
+                                                                            self.sigma_xx * self.critical_xx * \
+                                                                            ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * 0.50
+                                else:
+                                    self.shear_on_stiffener_along_flange = self.sigma_xx * self.y * \
+                                                                            ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * 0.50
+
                     self.shear_on_stiffener_along_flange = round((self.shear_on_stiffener_along_flange / 1000), 3)  # kN
 
-                    self.moment_on_stiffener_along_flange = self.sigma_xx * self.stiffener_plt_thick_along_flange * \
-                                                            self.stiffener_plt_len_along_flange ** 2 * 0.5
+                    # moment demand
+                    if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                        self.moment_on_stiffener_along_flange = self.w * (self.bp_length_provided / 2) * \
+                                                                ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * \
+                                                                (self.stiffener_plt_len_along_flange / 2)
+                    else:
+                        if self.moment_bp_case == 'Case1':
+                            self.moment_on_stiffener_along_flange = self.sigma_xx * (self.bp_length_provided / 2) * \
+                                                                    ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * \
+                                                                    (self.stiffener_plt_len_along_flange / 2)
+                        else:
+                            if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 4):
+                                self.moment_on_stiffener_along_flange = self.sigma_xx * self.y * \
+                                                                        ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * \
+                                                                        (self.stiffener_plt_len_along_flange / 2)
+
+                            else:
+                                if self.y > self.critical_xx:
+                                    self.moment_on_stiffener_along_flange = self.sigma_xx * (self.y - self.critical_xx) * \
+                                                                            ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * \
+                                                                            (self.stiffener_plt_len_along_flange / 2) + \
+                                                                            self.sigma_xx * self.critical_xx * \
+                                                                            ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * 0.50 * \
+                                                                            (self.stiffener_plt_len_along_flange / 2)
+                                else:
+                                    self.moment_on_stiffener_along_flange = self.sigma_xx * self.y * \
+                                                                            ((self.bp_width_provided - (0.85 * self.column_bf)) / 2) * 0.50 * \
+                                                                            (self.stiffener_plt_len_along_flange / 2)
+
                     self.moment_on_stiffener_along_flange = round((self.moment_on_stiffener_along_flange * 10 ** -6), 3)  # kN-m
 
                     # shear and moment capacity calculations
@@ -3323,17 +3374,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                      self.stiffener_fy)
                     self.shear_capa_stiffener_along_flange = round((self.shear_capa_stiffener_along_flange / 1000), 3)  # kN
 
-                    # zp of stiffener is calculated assuming a landing of 50mm on top (horizontal side) and 100mm at bottom (vertical side)
-                    # the subtracted portion in the below eqn accounts for the same
-                    self.z_p_stiffener_along_flange = ((self.stiffener_plt_len_along_flange * self.stiffener_plt_height_along_flange ** 2) / 4) - \
-                                                      (((self.stiffener_plt_len_along_flange - 50) *
-                                                        (self.stiffener_plt_height_along_flange - 100) ** 2) / 8)  # mm^3
-
                     self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
-                    self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(1, self.z_p_stiffener_along_flange,
+                    self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                            self.stiffener_fy,
-                                                                                                           section_class='compact')
+                                                                                                           section_class='semi-compact')
                     self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
 
                     # checks
@@ -3352,15 +3397,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             n += 1
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
-                        self.z_p_stiffener_along_flange = ((self.stiffener_plt_len_along_flange * self.stiffener_plt_height_along_flange ** 2) / 4) - \
-                                                          (((self.stiffener_plt_len_along_flange - 50) *
-                                                            (self.stiffener_plt_height_along_flange - 100) ** 2) / 8)  # mm^3
-
                         self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
-                        self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(1, self.z_p_stiffener_along_flange,
+                        self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                                self.stiffener_fy,
-                                                                                                               section_class='compact')
+                                                                                                               section_class='semi-compact')
                         self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
                     else:
                         pass
@@ -3374,32 +3415,58 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.stiffener_plt_thick_along_flange += 2
 
                             # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
-                            self.z_p_stiffener_along_flange = ((self.stiffener_plt_len_along_flange * self.stiffener_plt_height_along_flange ** 2) / 4) - \
-                                                              (((self.stiffener_plt_len_along_flange - 50) *
-                                                                (self.stiffener_plt_height_along_flange - 100) ** 2) / 8)  # mm^3
 
                             self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
-                            self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(1, self.z_p_stiffener_along_flange,
+                            self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                                    self.stiffener_fy,
-                                                                                                                   section_class='compact')
+                                                                                                                   section_class='semi-compact')
                             self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
                             n += 1
-                    else:
-                        pass
-                else:
-                    pass
 
                 # shear yielding and moment capacity checks for the stiffener - along the web
                 if self.stiffener_along_web == 'Yes':
-                    # shear and moment demand calculations
-                    self.shear_on_stiffener_along_web = ((self.sigma_max_zz + self.sigma_xx) / 2) * self.stiffener_plt_len_along_web * \
-                                                        self.stiffener_plt_height_along_web
+
+                    # shear demand
+                    if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                        self.shear_on_stiffener_along_web = self.w * ((self.bp_length_provided - (0.95 * self.column_D)) / 2) * \
+                                                            (0.85 * self.column_bf)
+                    else:
+                        if self.moment_bp_case == 'Case1':
+                            self.shear_on_stiffener_along_web = ((self.sigma_max_zz + self.sigma_xx) / 2) * \
+                                                                ((self.bp_length_provided - (0.95 * self.column_D)) / 2) * \
+                                                            (0.85 * self.column_bf)
+                        else:
+                            if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 4):
+                                self.shear_on_stiffener_along_web = self.sigma_xx * ((self.bp_length_provided - (0.95 * self.column_D)) / 2) * \
+                                                                    (0.85 * self.column_bf)
+                            else:
+                                if self.y > self.critical_xx:
+                                    self.shear_on_stiffener_along_web = (self.sigma_xx * (self.critical_xx * ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)) * 0.50) + (self.sigma_xx * (self.critical_xx * ((0.85 * self.column_bf) / 2)))
+                                else:
+                                    self.shear_on_stiffener_along_web = (self.sigma_xx * (self.y * ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)) * 0.50) + (self.sigma_xx * (self.y * ((0.85 * self.column_bf) / 2)))
+
                     self.shear_on_stiffener_along_web = round((self.shear_on_stiffener_along_web / 1000), 3)  # kN
 
-                    self.moment_on_stiffener_along_web = (self.sigma_xx * self.stiffener_plt_height_along_web * self.stiffener_plt_len_along_web ** 2 * 0.5) \
-                                                         + (0.5 * self.stiffener_plt_len_along_web * (self.sigma_max_zz - self.sigma_xx) *
-                                                            self.stiffener_plt_height_along_web * (2 / 3) * self.stiffener_plt_len_along_web)
+                    # moment demand
+                    if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                        self.moment_on_stiffener_along_web = self.w * ((self.bp_length_provided - (0.95 * self.column_D)) / 2) * \
+                                                            (0.85 * self.column_bf) * (self.stiffener_plt_len_along_web / 2)
+                    else:
+                        if self.moment_bp_case == 'Case1':
+                            self.moment_on_stiffener_along_web = ((self.sigma_max_zz + self.sigma_xx) / 2) * \
+                                                                ((self.bp_length_provided - (0.95 * self.column_D)) / 2) * \
+                                                            (0.85 * self.column_bf) * (self.stiffener_plt_len_along_web / 2)
+                        else:
+                            if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 4):
+                                self.moment_on_stiffener_along_web = self.sigma_xx * ((self.bp_length_provided - (0.95 * self.column_D)) / 2) * \
+                                                                    (0.85 * self.column_bf) * (self.stiffener_plt_len_along_web / 2)
+                            else:
+                                if self.y > self.critical_xx:
+                                    self.moment_on_stiffener_along_web = ((self.sigma_xx * (self.critical_xx * ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)) * 0.50) + (self.sigma_xx * (self.critical_xx * ((0.85 * self.column_bf) / 2)))) * (self.stiffener_plt_len_along_web / 2)
+                                else:
+                                    self.moment_on_stiffener_along_web = ((self.sigma_xx * (self.y * ((self.bp_width_provided - (0.85 * self.column_bf)) / 2)) * 0.50) + (self.sigma_xx * (self.y * ((0.85 * self.column_bf) / 2)))) * (self.stiffener_plt_len_along_web / 2)
+
                     self.moment_on_stiffener_along_web = round((self.moment_on_stiffener_along_web * 10 ** -6), 3)  # kN-m
 
                     # shear and moment capacity calculations
@@ -3408,17 +3475,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                   self.stiffener_fy)
                     self.shear_capa_stiffener_along_web = round((self.shear_capa_stiffener_along_web / 1000), 3)  # kN
 
-                    # zp of stiffener is calculated assuming a landing of 50mm on top (horizontal side) and 100mm at bottom (vertical side)
-                    # the subtracted portion in the below eqn accounts for the same
-                    self.z_p_stiffener_along_web = ((self.stiffener_plt_len_along_web * self.stiffener_plt_height_along_web ** 2) / 4) - \
-                                                      (((self.stiffener_plt_len_along_web - 50) *
-                                                        (self.stiffener_plt_height_along_web - 100) ** 2) / 8)  # mm^3
-
                     self.z_e_stiffener_along_web = (self.stiffener_plt_thick_along_web * self.stiffener_plt_height_along_web ** 2) / 6  # mm^3
 
-                    self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(1, self.z_p_stiffener_along_web,
+                    self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 1,
                                                                                                            self.stiffener_fy,
-                                                                                                           section_class='compact')
+                                                                                                           section_class='semi-compact')
                     self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
 
                     # checks
@@ -3439,13 +3500,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness along web
                         self.z_e_stiffener_along_web = (self.stiffener_plt_thick_along_web * self.stiffener_plt_height_along_web ** 2) / 6  # mm^3
-                        self.z_p_stiffener_along_web = ((self.stiffener_plt_len_along_web * self.stiffener_plt_height_along_web ** 2) / 4) - \
-                                                       (((self.stiffener_plt_len_along_web - 50) *
-                                                         (self.stiffener_plt_height_along_web - 100) ** 2) / 8)  # mm^3
-
-                        self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(1, self.z_p_stiffener_along_web,
+                        self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 1,
                                                                                                             self.stiffener_fy,
-                                                                                                            section_class='compact')
+                                                                                                            section_class='semi-compact')
                         self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
 
                     else:
@@ -3461,19 +3518,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                             # re-calculating the moment capacity by incorporating the improvised stiffener thickness along web
                             self.z_e_stiffener_along_web = (self.stiffener_plt_thick_along_web * self.stiffener_plt_height_along_web ** 2) / 6  # mm^3
-                            self.z_p_stiffener_along_web = ((self.stiffener_plt_len_along_web * self.stiffener_plt_height_along_web ** 2) / 4) - \
-                                                           (((self.stiffener_plt_len_along_web - 50) *
-                                                             (self.stiffener_plt_height_along_web - 100) ** 2) / 8)  # mm^3
-
-                            self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(1, self.z_p_stiffener_along_web,
+                            self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 1,
                                                                                                                 self.stiffener_fy,
-                                                                                                                section_class='compact')
+                                                                                                                section_class='semi-compact')
                             self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
                             n += 1
-                    else:
-                        pass
-                else:
-                    pass
 
                 # shear yielding and moment capacity checks for the stiffener - across the web
                 if self.stiffener_across_web == 'Yes':

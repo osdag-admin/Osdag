@@ -327,7 +327,7 @@ class IS800_2007(object):
 
         if section_class == 'semi-compact':
             M_d = (Z_e * f_y) / gamma_m0  # N-mm
-        else:
+        else:  # 'compact'
             M_d = (1.0 * Z_p * f_y) / gamma_m0  # N-mm
 
         return M_d

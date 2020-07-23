@@ -541,9 +541,9 @@ class Tension_welded(Member):
                (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
         out_list.append(t21)
 
-        t21 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
-               (round(self.plate.tension_rupture_capacity / 1000, 2)) if flag else '', True)
-        out_list.append(t21)
+        # t21 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+        #        (round(self.plate.tension_rupture_capacity / 1000, 2)) if flag else '', True)
+        # out_list.append(t21)
 
         t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
                (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
@@ -2036,7 +2036,7 @@ class Tension_welded(Member):
             self.report_check.append(t7)
             #TODO
             t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,
-                  get_pass_fail(weld_thickness, self.weld.size, relation="leq"))
+                  min_prov_max(min(self.weld_connecting_plates)- self.weld.red, self.weld.size, self.weld.min_weld))
             self.report_check.append(t1)
 
             self.weld_size_max = 16.0
@@ -2127,7 +2127,7 @@ class Tension_welded(Member):
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size.depth, self.clearance,self.plate.height,1),"")
                     # t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                     #       tension_yield_prov(l = self.section_size.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
-                    t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_welded_prov(self.section_size.depth, self.plate.thickness_provided,self.plate.fu, gamma_m1,plate_rupture_kn), '')
+                    # t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_welded_prov(self.section_size.depth, self.plate.thickness_provided,self.plate.fu, gamma_m1,plate_rupture_kn), '')
 
                 elif self.sec_profile in ["Angles", 'Back to Back Angles']:
                     if self.loc == "Long Leg":
@@ -2136,9 +2136,9 @@ class Tension_welded(Member):
                         # t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                         #       tension_yield_prov(l=self.section_size.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                         #                          gamma=gamma_m0, T_dg =plate_yield_kn), '')
-                        t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                              tension_rupture_welded_prov(self.section_size.max_leg, self.plate.thickness_provided,
-                                                          self.plate.fu, gamma_m1, plate_rupture_kn), '')
+                        # t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                        #       tension_rupture_welded_prov(self.section_size.max_leg, self.plate.thickness_provided,
+                        #                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
                     else:
                         t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size.min_leg, self.clearance,self.plate.height,1),"")
@@ -2146,9 +2146,9 @@ class Tension_welded(Member):
                         #       tension_yield_prov(l=self.section_size.min_leg, t=self.plate.thickness_provided,
                         #                          f_y=self.plate.fy,
                         #                          gamma=gamma_m0, T_dg=plate_yield_kn), '')
-                        t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                              tension_rupture_welded_prov(self.section_size.min_leg, self.plate.thickness_provided,
-                                                          self.plate.fu, gamma_m1, plate_rupture_kn), '')
+                        # t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                        #       tension_rupture_welded_prov(self.section_size.min_leg, self.plate.thickness_provided,
+                        #                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
                 else:
                     if self.loc == "Long Leg":
@@ -2156,9 +2156,9 @@ class Tension_welded(Member):
                         # t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                         #       tension_yield_prov(l=2*self.section_size.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                         #                          gamma=gamma_m0, T_dg=plate_yield_kn), '')
-                        t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                              tension_rupture_welded_prov(2*self.section_size.max_leg, self.plate.thickness_provided,
-                                                          self.plate.fu, gamma_m1, plate_rupture_kn), '')
+                        # t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                        #       tension_rupture_welded_prov(2*self.section_size.max_leg, self.plate.thickness_provided,
+                        #                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
                     else:
                         t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '',
@@ -2167,9 +2167,9 @@ class Tension_welded(Member):
                         #       tension_yield_prov(l=2*self.section_size.min_leg, t=self.plate.thickness_provided,
                         #                          f_y=self.plate.fy,
                         #                          gamma=gamma_m0, T_dg=plate_yield_kn), '')
-                        t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                              tension_rupture_welded_prov(2*self.section_size.min_leg, self.plate.thickness_provided,
-                                                          self.plate.fu, gamma_m1, plate_rupture_kn), '')
+                        # t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                        #       tension_rupture_welded_prov(2*self.section_size.min_leg, self.plate.thickness_provided,
+                        #                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
                 self.report_check.append(t3)
                 t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH,  '',
@@ -2194,7 +2194,7 @@ class Tension_welded(Member):
                 self.report_check.append(t4)
 
                 t8 = (
-                    KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), cl_6_1_tension_capacity_member(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+                    KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), cl_6_1_tension_capacity_member(plate_yield_kn,0, plate_blockshear_kn),
                     get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
                 self.report_check.append(t8)
             else:

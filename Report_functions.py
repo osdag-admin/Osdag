@@ -46,7 +46,7 @@ def cl_5_4_1_table_4_5_gamma_value(v, t):
     return gamma
 
 
-def cl_6_1_tension_capacity_member(T_dg, T_dn, T_db =0.0):
+def cl_6_1_tension_capacity_member(T_dg, T_dn=0.0, T_db =0.0):
     """
     Calculate Design strength of member
     Args:
@@ -62,7 +62,7 @@ def cl_6_1_tension_capacity_member(T_dg, T_dn, T_db =0.0):
     """
 
     tension_capacity_eqn = Math(inline=True)
-    if T_db != 0.0:
+    if T_db != 0.0 and T_dn!=0.0:
         T_d = min(T_dg,T_dn,T_db)
         T_d = str(T_d)
         T_dg = str(T_dg)
@@ -70,15 +70,29 @@ def cl_6_1_tension_capacity_member(T_dg, T_dn, T_db =0.0):
         T_db = str(T_db)
         tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= min(T_{dg},T_{dn},T_{db})\\'))
         tension_capacity_eqn.append(NoEscape(r'&= min(' + T_dg + ',' + T_dn + ',' + T_db + r')\\'))
-    else:
+    elif T_db == 0.0 and T_dn!=0.0:
         T_d = min(T_dg, T_dn)
         T_dg = str(T_dg)
         T_dn = str(T_dn)
         T_d = str(T_d)
         tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= min(T_{dg},T_{dn})\\'))
         tension_capacity_eqn.append(NoEscape(r'&= min(' + T_dg + ',' + T_dn + r')\\'))
+    elif T_db != 0.0 and T_dn == 0.0:
+        T_d = min(T_dg, T_db)
+        T_d = str(T_d)
+        T_dg = str(T_dg)
+        T_db = str(T_db)
+        tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= min(T_{dg},T_{db})\\'))
+        tension_capacity_eqn.append(NoEscape(r'&= min(' + T_dg + ',' + T_db + r')\\'))
+    else:
+        T_d = T_dg
+        # T_dg = str(T_dg)
+        T_d = str(T_d)
+        tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= T_{dg}\\'))
+        # tension_capacity_eqn.append(NoEscape(r'&= min(' + T_dg + ',' + T_dn + r')\\'))
     tension_capacity_eqn.append(NoEscape(r'&='+ T_d + r'\\'))
     tension_capacity_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.1]\end{aligned}'))
+
     return tension_capacity_eqn
 
 
@@ -111,7 +125,7 @@ def cl_6_2_tension_yield_capacity_member(l, t, f_y, gamma, T_dg, multiple =None,
     gamma = str(gamma)
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
-    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{A_g \times f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{A_gf_y}{\gamma_{mo}}\\'))
     if l is not None and t is not None:
         if multiple is None or multiple == 1:
             tension_yield_eqn.append(NoEscape(r'A_{g} &= l \times t ='+l+r'\times'+t+r'\\'))
@@ -1246,7 +1260,7 @@ def cl_10_5_3_1_throat_thickness_weld(tw, f):
     t_t = str(round(t_t,2))
 
     throat_eqn = Math(inline=True)
-    throat_eqn.append(NoEscape(r'\begin{aligned} t_t & = '+ f+r'\times t_w 'r'\\'))
+    throat_eqn.append(NoEscape(r'\begin{aligned} t_t & = '+ f+r't_w 'r'\\'))
     throat_eqn.append(NoEscape(r'& = ' + f +r'\times'+ tw +r'\\'))
     throat_eqn.append(NoEscape(r't_t & = ' + t_t + r'\\'))
     throat_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.3.1]\end{aligned}'))
@@ -1878,11 +1892,11 @@ def bolt_red_capacity_prov(blj,blg,V,Vrd,type):
     Vrd = str(Vrd)
     bolt_capacity_eqn = Math(inline=True)
     if type == "b":
-        bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} \times \beta_{lg} \times V_{db} \\'))
+        bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} \beta_{lg} V_{db} \\'))
         bolt_capacity_eqn.append(NoEscape(r' &= ' + blj + r'\times' + blg + r'\times' + V + r'\\'))
         bolt_capacity_eqn.append(NoEscape(r'& = ' + Vrd + r'\end{aligned}'))
     else:
-        bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} \times V_{db} \\'))
+        bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{rd} &= \beta_{lj} V_{db} \\'))
         bolt_capacity_eqn.append(NoEscape(r' &= ' + blj + r'\times' + V + r'\\'))
         bolt_capacity_eqn.append(NoEscape(r'& = ' + Vrd + r'\end{aligned}'))
 
@@ -2021,7 +2035,7 @@ def axial_capacity_req(axial_capacity,min_ac):
     min_ac = str(min_ac)
     axial_capacity = str(axial_capacity)
     ac_req_eqn = Math(inline=True)
-    ac_req_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 \times A_c\\'))
+    ac_req_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3A_c\\'))
     ac_req_eqn.append(NoEscape(r'&= 0.3 \times' + axial_capacity + r'\\'))
     ac_req_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
     ac_req_eqn.append(NoEscape(r'Ac_{max} &=' +axial_capacity +r'\\'))
@@ -2304,7 +2318,7 @@ def min_prov_max(min, provided,max):
     if provided==0:
         return 'N/A'
     else:
-        if max >= provided and min<=provided:
+        if (max >= provided and min<=provided) or (min >= provided and max<=provided):
             return 'Pass'
         else:
             return 'Fail'
@@ -3109,41 +3123,41 @@ def plate_Length_req(l_w,t_w,g,l_fp,conn =None): #weld
 
 
 #TODO: DARSHAN, ANJALI (Tension rupture for welded is not required)
-def tension_rupture_welded_prov(w_p, t_p, fu,gamma_m1,T_dn,multiple =1):
-    """
-    Calculate design in tension as governed by rupture of net
-         cross-sectional area in case of welded connection
-    Args:
-         w_p: Width of given section in mm (float)
-         t_p: Thikness of given section in mm (float)
-         fu: Ultimate stress of material in N/mm square (float)
-         gamma_m1:Partial safety factor for failure at ultimate stress  (float)
-         T_dn: rupture strength of net cross-sectional area in N (float)
-         multiple: 1 (int)
-    Returns:
-          design in tension as governed by rupture of net cross-sectional area
-    Note:
-            Reference:
-            IS 800:2007,  cl 6.3
-
-
-    """
-    w_p = str(w_p)
-    t_p = str(t_p)
-    f_u = str(fu)
-    T_dn = str(T_dn)
-    gamma_m1 = str(gamma_m1)
-    multiple = str(multiple)
-    T_dn = str(T_dn)
-    gamma_m1 = str(gamma_m1)
-    Tensile_rup_eqnw = Math(inline=True)
-    Tensile_rup_eqnw.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9 A_{n}~f_u}{\gamma_{m1}}\\'))
-    # Tensile_rup_eqnw.append(NoEscape(r'&=\frac{0.9\times'+w_p+'\times'+t_p+'\times'+f_u+'}{'+gamma_m1+r'}\\'))
-    Tensile_rup_eqnw.append(NoEscape(r'&=\frac{' + multiple + r'\times 0.9 \times' + w_p + r'\times' + t_p + r'\times' + f_u + '}{' + gamma_m1 + r'}\\'))
-    Tensile_rup_eqnw.append(NoEscape(r'&=' + T_dn +r'\\'))
-    Tensile_rup_eqnw.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.3]\end{aligned}'))
-
-    return Tensile_rup_eqnw
+# def tension_rupture_welded_prov(w_p, t_p, fu,gamma_m1,T_dn,multiple =1):
+#     """
+#     Calculate design in tension as governed by rupture of net
+#          cross-sectional area in case of welded connection
+#     Args:
+#          w_p: Width of given section in mm (float)
+#          t_p: Thikness of given section in mm (float)
+#          fu: Ultimate stress of material in N/mm square (float)
+#          gamma_m1:Partial safety factor for failure at ultimate stress  (float)
+#          T_dn: rupture strength of net cross-sectional area in N (float)
+#          multiple: 1 (int)
+#     Returns:
+#           design in tension as governed by rupture of net cross-sectional area
+#     Note:
+#             Reference:
+#             IS 800:2007,  cl 6.3
+#
+#
+#     """
+#     w_p = str(w_p)
+#     t_p = str(t_p)
+#     f_u = str(fu)
+#     T_dn = str(T_dn)
+#     gamma_m1 = str(gamma_m1)
+#     multiple = str(multiple)
+#     T_dn = str(T_dn)
+#     gamma_m1 = str(gamma_m1)
+#     Tensile_rup_eqnw = Math(inline=True)
+#     Tensile_rup_eqnw.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9 A_{n}~f_u}{\gamma_{m1}}\\'))
+#     # Tensile_rup_eqnw.append(NoEscape(r'&=\frac{0.9\times'+w_p+'\times'+t_p+'\times'+f_u+'}{'+gamma_m1+r'}\\'))
+#     Tensile_rup_eqnw.append(NoEscape(r'&=\frac{' + multiple + r'\times 0.9 \times' + w_p + r'\times' + t_p + r'\times' + f_u + '}{' + gamma_m1 + r'}\\'))
+#     Tensile_rup_eqnw.append(NoEscape(r'&=' + T_dn +r'\\'))
+#     Tensile_rup_eqnw.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.3]\end{aligned}'))
+#
+#     return Tensile_rup_eqnw
 
 
 def spacing (sp,t_w):
@@ -3516,7 +3530,7 @@ def gusset_lt_b_prov(nc,p,e,length):
     length = str(length)
     length_htb_eqn = Math(inline=True)
     length_htb_eqn.append(
-        NoEscape(r'\begin{aligned} L &= (nc -1) \times p + 2 \times e\\'))
+        NoEscape(r'\begin{aligned} L &= (nc -1) p + 2  e\\'))
     length_htb_eqn.append(
         NoEscape(r'&= ('+nc+r'-1) \times'+ p + r'+ (2 \times'+ e + r')\\'))
     length_htb_eqn.append(NoEscape(r'&= ' + length + r'\end{aligned}'))
@@ -3629,7 +3643,7 @@ def efficiency_prov(F, Td, eff):
     Td = str(round(Td/1000,2))
     eff = str(eff)
     eff_eqn = Math(inline=True)
-    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization~Ratio &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
+    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization~Ratio &= \frac{F}{T_d}&=\frac{'+F+'}{'+Td+r'}\\'))
     eff_eqn.append(NoEscape(r'&= ' + eff + r'\end{aligned}'))
 
     return eff_eqn

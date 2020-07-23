@@ -1372,7 +1372,7 @@ KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
 KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
-KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Total Rows (nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(nos)'
 
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
 KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (nos)'

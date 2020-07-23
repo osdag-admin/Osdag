@@ -16,10 +16,11 @@ class NutBoltArray():
     add a diagram here
     """
 
-    def __init__(self, BP, nut, bolt, nutSpace):
+    def __init__(self, BP, nut, bolt, bolt_in, nutSpace):
         self.BP = BP
         self.nut = nut
         self.bolt = bolt
+        self.bolt_in = bolt_in
         self.gap = nutSpace
         self.origin = None
         self.gaugeDir = None
@@ -45,16 +46,16 @@ class NutBoltArray():
         self.ab12 = copy.deepcopy(self.bolt)
 
 
-        self.ab_inflg1 = copy.deepcopy(self.bolt)
-        self.ab_inflg2 = copy.deepcopy(self.bolt)
+        self.ab_inflg1 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg2 = copy.deepcopy(self.bolt_in)
 
-        self.ab_inflg3 = copy.deepcopy(self.bolt)
-        self.ab_inflg4 = copy.deepcopy(self.bolt)
+        self.ab_inflg3 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg4 = copy.deepcopy(self.bolt_in)
 
-        self.ab_inflg5 = copy.deepcopy(self.bolt)
-        self.ab_inflg6 = copy.deepcopy(self.bolt)
-        self.ab_inflg7 = copy.deepcopy(self.bolt)
-        self.ab_inflg8 = copy.deepcopy(self.bolt)
+        self.ab_inflg5 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg6 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg7 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg8 = copy.deepcopy(self.bolt_in)
 
         self.nt1 = copy.deepcopy(self.nut)
         self.nt2 = copy.deepcopy(self.nut)

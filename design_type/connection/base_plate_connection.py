@@ -528,7 +528,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t8)
 
         t4 = (KEY_OUT_ANCHOR_BOLT_LENGTH, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX,
-              self.anchor_length_provided if flag else '', True)
+              self.anchor_length_provided_out if flag else '', True)
         out_list.append(t4)
 
         t101 = (None, DISP_TITLE_ANCHOR_BOLT_UPLIFT, TYPE_TITLE, None, True)
@@ -558,7 +558,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_length_provided if
+                self.anchor_length_provided_in if
                 flag and self.connectivity == 'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
         out_list.append(t101)
 
@@ -1127,7 +1127,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             fu = ''
             fy = ''
 
-        length = str(self.anchor_length_provided if self.design_button_status else 0)
+        length = str(self.anchor_length_provided_out if self.design_button_status else 0)
 
         val = {KEY_BASE_PLATE_FU: str(fu),
                KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(fu),
@@ -1220,7 +1220,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if status:
             if not float(self.anchor_length_min) <= float(length) <= float(self.anchor_length_max):
                 valid = False
-                length = self.anchor_length_provided
+                length = self.anchor_length_provided_out
 
         d = {"Validation": [valid, "The selected value of anchor length exceeds the recommended limit [Reference: "
                                    "IS 5624:1993, Table 1]."], KEY_DP_ANCHOR_BOLT_LENGTH: str(length)}
@@ -1277,7 +1277,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass
         else:
-            length = str(self.anchor_length_provided if self.design_button_status else 0)
+            length = str(self.anchor_length_provided_out if self.design_button_status else 0)
             designation = str(input_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"
             anchor_type = input_dictionary[KEY_TYP_ANCHOR]
             fu = Material(input_dictionary[KEY_MATERIAL]).fu
@@ -2607,6 +2607,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             #         # TODO: give log errors
             #         logger.error("Cannot compute anchor bolt for resisting the uplift force")
 
+            self.anchor_dia_outside_flange = self.anchor_dia_provided
+
             if self.moment_bp_case == 'Case1':
                 self.anchor_nos_provided = self.anchor_nos_provided
             else:
@@ -2988,25 +2990,35 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bolt_columns_outside_flange = 2
 
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
-        self.anchor_length_min = self.table1(self.anchor_bolt)[1]
-        self.anchor_length_max = self.table1(self.anchor_bolt)[2]
+        self.anchor_length_min_out = self.table1('M' + str(self.anchor_dia_outside_flange))[1]
+        self.anchor_length_max_out = self.table1('M' + str(self.anchor_dia_outside_flange))[2]
 
-        # design of anchor length [Reference: Design of Steel Structures by N. Subramanian 2nd. edition 2018, Example 15.5]
+        self.anchor_length_min_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[1]
+        self.anchor_length_max_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[2]
+
+        # design of anchor length - outside flange [Reference: Design of Steel Structures by N. Subramanian 2nd. edition 2018, Example 15.5]
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            self.anchor_length_provided = self.anchor_length_min  # mm
+            self.anchor_length_provided_out = self.anchor_length_min_out  # mm
 
         # Equation: T_b = k * sqrt(fck) * (anchor_length_req)^1.5
         elif self.connectivity == 'Moment Base Plate':
 
             if self.moment_bp_case == 'Case1':
-                self.anchor_length_provided = self.anchor_length_min  # mm
+                self.anchor_length_provided_out = self.anchor_length_min_out  # mm
+                self.anchor_length_provided_in = self.anchor_length_min_in  # mm
 
             else:
                 # length of anchor for cast-in situ anchor bolts (k = 15.5)
-                self.anchor_length_provided = (self.tension_capacity_anchor * 1000 /
+                self.anchor_length_provided_out = (self.tension_capacity_anchor * 1000 /
                                                (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
-                self.anchor_length_provided = round_up(self.anchor_length_provided, 5)
-                self.anchor_length_provided = max(self.anchor_length_provided, self.anchor_length_min)
+                self.anchor_length_provided_out = round_up(self.anchor_length_provided_out, 5)
+                self.anchor_length_provided_out = max(self.anchor_length_provided_out, self.anchor_length_min_out)
+
+            if self.load_axial_tension > 0:
+                self.anchor_length_provided_in = (self.tension_capacity_anchor_uplift * 1000 /
+                                               (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
+                self.anchor_length_provided_in = round_up(self.anchor_length_provided_in, 5)
+                self.anchor_length_provided_in = max(self.anchor_length_provided_in, self.anchor_length_min_in)
 
             logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"
                         " during the erection of the column.")
@@ -3018,53 +3030,87 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # updating anchor length (adding the length above the concrete pedestal)
         if self.connectivity == 'Moment Base Plate':
-            if self.anchor_dia_inside_flange == 'N/A':
-                self.anchor_dia_inside_flange = 0
 
             # washer details - dictionary {inner diameter, side dimension, washer thickness}
-            self.plate_washer_details = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_inside_flange))
+            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
 
-            self.nut_thk = IS1364.nut_thick((max(self.anchor_dia_provided, self.anchor_dia_inside_flange)))  # nut thickness, mm
+            # nut
+            self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
+
+            if self.load_axial_tension > 0:
+                self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
+                self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
 
         elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            self.plate_washer_details = IS6649.square_washer_dimensions(self.anchor_dia_provided)
-
-            self.nut_thk = IS1364.nut_thick(self.anchor_dia_provided)  # nut thickness, mm
+            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
+            self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
 
         # square plate washer details
-        self.plate_washer_thk = self.plate_washer_details['washer_thk']  # washer thickness, mm
-        self.plate_washer_inner_dia = self.plate_washer_details['dia_in']  # inner dia, mm
-        self.plate_washer_dim = self.plate_washer_details['side']  # dimensions of the square washer plate, mm
+        self.plate_washer_thk_out = self.plate_washer_details_out['washer_thk']  # washer thickness, mm
+        self.plate_washer_inner_dia_out = self.plate_washer_details_out['dia_in']  # inner dia, mm
+        self.plate_washer_dim_out = self.plate_washer_details_out['side']  # dimensions of the square washer plate, mm
 
-        # anchor length
-        self.anchor_len_below_footing = self.anchor_length_provided  # mm
-        self.anchor_len_above_footing = self.grout_thk + self.plate_thk + self.plate_washer_thk + self.nut_thk + 20  # mm, 20 mm is extra len
+        if self.load_axial_tension > 0:
+            self.plate_washer_thk_in = self.plate_washer_details_in['washer_thk']  # washer thickness, mm
+            self.plate_washer_inner_dia_in = self.plate_washer_details_in['dia_in']  # inner dia, mm
+            self.plate_washer_dim_in = self.plate_washer_details_in['side']  # dimensions of the square washer plate, mm
 
-        self.anchor_length_provided = self.anchor_len_below_footing + self.anchor_len_above_footing  # total length of the anchor bolt
+        # anchor length - outside flange bolts
+        self.anchor_len_below_footing_out = self.anchor_length_provided_out  # mm
+        self.anchor_len_above_footing_out = self.grout_thk + self.plate_thk + self.plate_washer_thk_out + self.nut_thk_out + 20  # mm, 20 mm is extra len
+
+        self.anchor_length_provided_out = self.anchor_len_below_footing_out + self.anchor_len_above_footing_out  # total length of the anchor bolt
+
+        # anchor length - inside flange bolts
+        if self.load_axial_tension > 0:
+            self.anchor_len_below_footing_in = self.anchor_length_provided_in  # mm
+            self.anchor_len_above_footing_in = self.grout_thk + self.plate_thk + self.plate_washer_thk_in + self.nut_thk_in + 20  # mm, 20 mm is extra len
+
+            self.anchor_length_provided_in = self.anchor_len_below_footing_in + self.anchor_len_above_footing_in  # total length of the anchor bolt
 
         # calling value of the anchor length from user from design preferences
         if self.dp_anchor_length == 0:
-            self.anchor_length_provided = self.anchor_length_provided  # mm
+            self.anchor_length_provided_out = self.anchor_length_provided_out  # mm
         else:
-            self.anchor_length_provided = self.dp_anchor_length
+            self.anchor_length_provided_out = self.dp_anchor_length
 
-        if self.anchor_len_below_footing < self.anchor_length_min:
+        # length check
+        if self.anchor_len_below_footing_out < self.anchor_length_min_out:
             logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
             logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
             logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
-        elif self.anchor_len_below_footing > self.anchor_length_max:
+        elif self.anchor_len_below_footing_out > self.anchor_length_max_out:
             logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
             logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
             logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
         else:
             logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
-                        .format(self.anchor_dia_provided))
+                        .format(self.anchor_dia_outside_flange))
             logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
-                        .format(self.anchor_length_min, self.anchor_length_max))
-            logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided))
+                        .format(self.anchor_length_min_out, self.anchor_length_max_out))
+            logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided_out))
             logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
                         "of standard lengths and sizes, satisfying the suggested range.")
             logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
+
+        if self.load_axial_tension > 0:
+            if self.anchor_len_below_footing_in < self.anchor_length_min_in:
+                logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
+                logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
+                logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+            elif self.anchor_len_below_footing_in > self.anchor_length_max_in:
+                logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
+                logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
+                logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+            else:
+                logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
+                            .format(self.anchor_dia_inside_flange))
+                logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
+                            .format(self.anchor_length_min_in, self.anchor_length_max_in))
+                logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided_in))
+                logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
+                            "of standard lengths and sizes, satisfying the suggested range.")
+                logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
 
     def design_weld(self):
         """ design weld for the base plate and stiffeners
@@ -4137,9 +4183,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         print(self.combined_capacity_anchor)  # Combined capacity (kN)
 
-        print(self.anchor_len_above_footing)
-        print(self.anchor_len_below_footing)
-        print(self.anchor_length_provided)  # Anchor Length (total) (mm)
+        print(self.anchor_len_above_footing_out)
+        print(self.anchor_len_below_footing_out)
+        print(self.anchor_length_provided_out)  # Anchor Length (total) (mm)
 
         # Anchor Bolt - Inside Column Flange
         if self.connectivity == 'Moment Base Plate':
@@ -4157,9 +4203,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 print(self.anchors_inside_flange)  # No. of Anchor Bolts
 
-                print(self.anchor_len_above_footing)
-                print(self.anchor_len_below_footing)
-                print(self.anchor_length_provided)  # Anchor Length (total) (mm)
+                print(self.anchor_len_above_footing_in)
+                print(self.anchor_len_below_footing_in)
+                print(self.anchor_length_provided_in)  # Anchor Length (total) (mm)
 
         # Base Plate
         print(self.plate_thk)  # Thickness (mm)

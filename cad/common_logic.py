@@ -985,17 +985,19 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-            ex_length = BP.anchor_len_above_footing_out
+            ex_length_out = BP.anchor_len_above_footing_out
             if BP.dp_anchor_type == 'IS 5624-Type A':
                 bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
                                     r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
+                                    ex=ex_length_out)
             elif BP.dp_anchor_type == 'IS 5624-Type B':
                 bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
+                                    ex=ex_length_out)
             else:  # BP.dp_anchor_type == 'End Plate Type':
                 bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
-                                           ex=ex_length)
+                                           ex=ex_length_out)
+
+            bolt_in = bolt
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
             nutSpace = bolt.c + baseplate.T
@@ -1004,7 +1006,7 @@ class CommonDesignLogic(object):
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, bolt_in, nutSpace)
 
             basePlate = HollowBasePlateCad(BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
@@ -1088,21 +1090,29 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-            ex_length = BP.anchor_len_above_footing_out
+            ex_length_out = BP.anchor_len_above_footing_out
+            ex_length_in = BP.anchor_len_above_footing_in
             if BP.dp_anchor_type == 'IS 5624-Type A':
                 bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
+                                    ex=ex_length_out)
+                bolt_in = AnchorBolt_A(l=float(BP.anchor_len_below_footing_in), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
+                                    ex=ex_length_in)
             elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2, ex=ex_length_out)
+                bolt_in = AnchorBolt_B(l=float(BP.anchor_len_below_footing_in), r=float(BP.anchor_dia_provided) / 2,
+                                    ex=ex_length_in)
             else: #BP.dp_anchor_type == 'End Plate Type':
                 bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
-                                           ex=ex_length)
+                                           ex=ex_length_out)
+                bolt_in = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_in),
+                                           r=float(BP.anchor_dia_provided) / 2,
+                                           ex=ex_length_in)
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
             nutSpace = bolt.c + baseplate.T
             bolthight = nut.T + 50
 
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, bolt_in, nutSpace)
 
             basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                      concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,

@@ -16,10 +16,12 @@ class NutBoltArray():
     add a diagram here
     """
 
-    def __init__(self, BP, nut, bolt, bolt_in, nutSpace, washer, washer_in):
+    def __init__(self, BP, nut, nut_in, bolt, bolt_in, nutSpace, washer, washer_in):
+
 
         self.BP = BP
         self.nut = nut
+        self.nut_in = nut_in
         self.bolt = bolt
         self.bolt_in = bolt_in
         self.gap = nutSpace
@@ -97,16 +99,16 @@ class NutBoltArray():
         self.nt11 = copy.deepcopy(self.nut)
         self.nt12 = copy.deepcopy(self.nut)
 
-        self.nt_inflg1 = copy.deepcopy(self.nut)
-        self.nt_inflg2 = copy.deepcopy(self.nut)
+        self.nt_inflg1 = copy.deepcopy(self.nut_in)
+        self.nt_inflg2 = copy.deepcopy(self.nut_in)
 
-        self.nt_inflg3 = copy.deepcopy(self.nut)
-        self.nt_inflg4 = copy.deepcopy(self.nut)
+        self.nt_inflg3 = copy.deepcopy(self.nut_in)
+        self.nt_inflg4 = copy.deepcopy(self.nut_in)
 
-        self.nt_inflg5 = copy.deepcopy(self.nut)
-        self.nt_inflg6 = copy.deepcopy(self.nut)
-        self.nt_inflg7 = copy.deepcopy(self.nut)
-        self.nt_inflg8 = copy.deepcopy(self.nut)
+        self.nt_inflg5 = copy.deepcopy(self.nut_in)
+        self.nt_inflg6 = copy.deepcopy(self.nut_in)
+        self.nt_inflg7 = copy.deepcopy(self.nut_in)
+        self.nt_inflg8 = copy.deepcopy(self.nut_in)
         # self.initBoltPlaceParam(plateObj)
         self.initBoltPlaceParam()
 

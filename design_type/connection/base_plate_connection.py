@@ -1695,12 +1695,28 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # total number of anchor bolts provided (bolts outside + inside, the column flange)
         self.anchor_nos_provided = self.anchors_outside_flange + self.anchors_inside_flange
 
+        # washer details - dictionary {inner diameter, side dimension, washer thickness}
+        self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)  # outside flange
+        self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
+        if self.load_axial_tension > 0:  # inside flange
+            self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
+            self.plate_washer_dim_in = self.plate_washer_details_in['side']  # inside flange, mm
+
         # perform detailing checks
         # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
 
         # end distance [Reference: Clause 10.2.4.2 and 10.2.4.3, IS 800:2007]
         self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
         self.end_distance = round_up(1.5 * self.end_distance, 5)  # mm, adding 50% extra to end distance to incorporate weld etc.
+
+        # checking if the provided end distance fits the washer with enough spacing
+        if self.end_distance < (self.plate_washer_dim_out):
+            self.end_distance = self.plate_washer_dim_out
+
+        if self.load_axial_tension > 0:
+            if self.end_distance < (self.plate_washer_dim_in):
+                self.end_distance = self.plate_washer_dim_in
 
         # If the shear force acting along any axis of the column is large (braced frames or buildings designed for seismic forces, heavy winds etc.),
         # the minimum recommended end/edge distance is six times the anchor diameter (min_end_distance = 6 * anchor_diameter).
@@ -2018,7 +2034,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 3)
 
                     # re-checking the detailing check with 3 bolts
+                    self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                    self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
                     self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
+
+                    if self.end_distance < (self.plate_washer_dim_out):
+                        self.end_distance = self.plate_washer_dim_out
+
                     self.edge_distance = self.end_distance
 
                     if (0.85 * self.column_bf) < (2 * self.edge_distance):
@@ -2050,8 +2073,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
 
                             # re-checking the detailing check with 3 bolts
+                            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                            self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
                             self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
                                                                                    self.dp_detail_edge_type)
+
+                            if self.end_distance < (self.plate_washer_dim_out):
+                                self.end_distance = self.plate_washer_dim_out
+
                             self.edge_distance = self.end_distance
 
                             if (0.85 * self.column_bf) < (2 * self.edge_distance):
@@ -2129,8 +2159,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 6)
 
                     # re-checking the detailing check with 6 bolts
-                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
-                                                                           self.dp_detail_edge_type)
+                    self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                    self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
+                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
+
+                    if self.end_distance < (self.plate_washer_dim_out):
+                        self.end_distance = self.plate_washer_dim_out
+
                     self.edge_distance = self.end_distance
 
                     if (0.85 * self.column_bf) < (2 * self.edge_distance):
@@ -2161,8 +2197,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
 
                             # re-checking the detailing check with 6 bolts
+                            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                            self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
                             self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
                                                                                    self.dp_detail_edge_type)
+
+                            if self.end_distance < (self.plate_washer_dim_out):
+                                self.end_distance = self.plate_washer_dim_out
+
                             self.edge_distance = self.end_distance
 
                             if (0.85 * self.column_bf) < (2 * self.edge_distance):
@@ -2187,6 +2230,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # updating the end/edge and pitch/gauge distance (if the anchor diameter or numbers is improvised in the above loop(s))
                 self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
                 self.end_distance = round_up(1.5 * self.end_distance, 5)
+
+                self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
+                if self.end_distance < (self.plate_washer_dim_out):
+                    self.end_distance = self.plate_washer_dim_out
+
                 self.edge_distance = self.end_distance
 
                 if (self.anchors_outside_flange == 4) or (self.anchors_outside_flange == 6):
@@ -2393,6 +2443,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # updating the end/edge and pitch/gauge distance (if the anchor diameter or numbers is improvised in the above loop(s))
                             self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
                                                                                    self.dp_detail_edge_type)
+
+                            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                            self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
+                            if self.end_distance < (self.plate_washer_dim_out):
+                                self.end_distance = self.plate_washer_dim_out
+
                             self.edge_distance = self.end_distance
 
                             if (0.85 * self.column_bf) < (2 * self.edge_distance):
@@ -2482,6 +2539,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # updating the end/edge and pitch/gauge distance (if the anchor diameter or numbers is improvised in the above loop(s))
                             self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
                                                                                    self.dp_detail_edge_type)
+
+                            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided)  # outside flange
+                            self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
+                            if self.end_distance < (self.plate_washer_dim_out):
+                                self.end_distance = self.plate_washer_dim_out
+
                             self.edge_distance = self.end_distance
 
                             if (0.85 * self.column_bf) < (2 * self.edge_distance):
@@ -3051,21 +3115,27 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # updating anchor length (adding the length above the concrete pedestal)
-        if self.connectivity == 'Moment Base Plate':
 
-            # washer details - dictionary {inner diameter, side dimension, washer thickness}
-            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
+        # nut thickness
+        self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
+        if self.load_axial_tension > 0:
+            self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
 
-            # nut
-            self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
-
-            if self.load_axial_tension > 0:
-                self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
-                self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
-
-        elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
-            self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
+        # if self.connectivity == 'Moment Base Plate':
+        #
+        #     # washer details - dictionary {inner diameter, side dimension, washer thickness}
+        #     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
+        #
+        #     # nut
+        #     self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
+        #
+        #     if self.load_axial_tension > 0:
+        #         self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
+        #         self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
+        #
+        # elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+        #     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
+        #     self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
 
         # square plate washer details
         self.plate_washer_thk_out = self.plate_washer_details_out['washer_thk']  # washer thickness, mm

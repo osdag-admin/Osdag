@@ -6,9 +6,11 @@ Created on 29-Nov-2014
 '''
 import numpy
 from cad.items.ModelUtils import *
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
+from OCC.Core.gp import gp_Ax2
 
-
-class Plate(object):
+class Washer(object):
     '''
 
                                     a2   XX-------------------------+
@@ -59,18 +61,23 @@ v dir                                    |   |                          |
 
     def compute_params(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a1 = self.sec_origin + (self.T / 2.0) * self.uDir + (self.L / 2.0) * self.vDir
-        self.a2 = self.sec_origin + (-self.T / 2.0) * self.uDir + (self.L / 2.0) * self.vDir
-        self.a3 = self.sec_origin + (-self.T / 2.0) * self.uDir + (-self.L / 2.0) * self.vDir
-        self.a4 = self.sec_origin + (self.T / 2.0) * self.uDir + (-self.L / 2.0) * self.vDir
+        self.a1 = self.sec_origin + (self.a / 2.0) * self.uDir + (self.a / 2.0) * self.vDir
+        self.a2 = self.sec_origin + (-self.a / 2.0) * self.uDir + (self.a / 2.0) * self.vDir
+        self.a3 = self.sec_origin + (-self.a / 2.0) * self.uDir + (-self.a / 2.0) * self.vDir
+        self.a4 = self.sec_origin + (self.a / 2.0) * self.uDir + (-self.a / 2.0) * self.vDir
         self.points = [self.a1, self.a2, self.a3, self.a4]
 
     def create_model(self):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.W * self.wDir  # extrudeDir is a numpy array
+        extrudeDir = self.T * -self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
+
+        cylOrigin = self.sec_origin
+        innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(-self.wDir)), self.d/2, self.T+1).Shape()
+
+        prism = BRepAlgoAPI_Cut(prism, innerCyl).Shape()
 
         return prism
 
@@ -90,15 +97,15 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    L = 8
+    a = 8
     T = 0.5
-    W = 8
+    d = 2
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     wDir = numpy.array([0.,0.,1.])
 
-    plate = Plate(L, W, T)
+    plate = Washer(a, d, T)
     _place = plate.place(origin, uDir, wDir)
     point = plate.compute_params()
     prism = plate.create_model()

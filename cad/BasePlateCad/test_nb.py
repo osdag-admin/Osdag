@@ -16,19 +16,20 @@ class NutBoltArray():
     add a diagram here
     """
 
-    def __init__(self, column, baseplate, nut, bolt, numberOfBolts, nutSpace):
+    def __init__(self, column, baseplate, nut, bolt, numberOfBolts, nutSpace, washer):
         self.baseplate = baseplate
         self.column = column
         self.nut = nut
         self.bolt = bolt
         self.numberOfBolts = numberOfBolts
+        self.washer = washer
         self.gap = nutSpace
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
         self.boltDir = None
 
-        self.noOfBolts_outFlange = 4
+        self.noOfBolts_outFlange = 2
         self.noofBolts_inFlange = 2
 
         self.ab1 = copy.deepcopy(self.bolt)
@@ -57,6 +58,28 @@ class NutBoltArray():
         self.ab_inflg6 = copy.deepcopy(self.bolt)
         self.ab_inflg7 = copy.deepcopy(self.bolt)
         self.ab_inflg8 = copy.deepcopy(self.bolt)
+
+        self.w1 = copy.deepcopy(self.washer)
+        self.w2 = copy.deepcopy(self.washer)
+        self.w3 = copy.deepcopy(self.washer)
+        self.w4 = copy.deepcopy(self.washer)
+        self.w5 = copy.deepcopy(self.washer)
+        self.w6 = copy.deepcopy(self.washer)
+        self.w7 = copy.deepcopy(self.washer)
+        self.w8 = copy.deepcopy(self.washer)
+        self.w9 = copy.deepcopy(self.washer)
+        self.w10 = copy.deepcopy(self.washer)
+        self.w11 = copy.deepcopy(self.washer)
+        self.w12 = copy.deepcopy(self.washer)
+
+        self.w_in1 = copy.deepcopy(self.washer)
+        self.w_in2 = copy.deepcopy(self.washer)
+        self.w_in3 = copy.deepcopy(self.washer)
+        self.w_in4 = copy.deepcopy(self.washer)
+        self.w_in5 = copy.deepcopy(self.washer)
+        self.w_in6 = copy.deepcopy(self.washer)
+        self.w_in7 = copy.deepcopy(self.washer)
+        self.w_in8 = copy.deepcopy(self.washer)
 
         self.nt1 = copy.deepcopy(self.nut)
         self.nt2 = copy.deepcopy(self.nut)
@@ -88,6 +111,7 @@ class NutBoltArray():
 
         self.bolts = []
         self.nuts = []
+        self.washers = []
 
         self.positions = []
 
@@ -406,6 +430,7 @@ if __name__ == '__main__':
     from cad.items.nut import Nut
     from cad.items.ISection import ISection
     from cad.items.plate import Plate
+    from cad.items.washer import Washer
 
     from OCC.Display.SimpleGui import init_display
 
@@ -416,7 +441,7 @@ if __name__ == '__main__':
     pitchDir = numpy.array([0, 1.0, 0])
     boltDir = numpy.array([0, 0, 1.0])
 
-    numberOfBolts = 6
+    numberOfBolts = 4
     column = ISection(B=250, T=13.7, D=450, t=9.8, R1=14.0, R2=7.0, alpha=94, length=1500, notchObj=None)
     baseplate = Plate(L=700, W=500, T=30)
 
@@ -430,10 +455,11 @@ if __name__ == '__main__':
     # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
 
     nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+    washer = Washer(a= 8*bolt.r, d= 2*bolt.r, t= 2)
 
     nutSpace = bolt.c + baseplate.T
 
-    nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
+    nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace, washer)
 
     place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 

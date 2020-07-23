@@ -1047,7 +1047,7 @@ class CommonDesignLogic(object):
                                        T=float(BP.stiffener_plt_thick_along_web),
                                        L11=float(BP.stiffener_plt_len_along_web - 50), L12=float(BP.stiffener_plt_height_along_web - 100), R21=15, R22=15)
 
-            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
+            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=float(BP.anchor_len_below_footing_out)* 1.3)
             grout = Grout(L=concrete.L, W=concrete.W, T=50)
 
             stiffener_acrsWeb = StiffenerPlate(L=float(BP.stiffener_plt_len_across_web) - float(BP.weld_size_stiffener), W=float(BP.stiffener_plt_height_across_web), T=float(BP.stiffener_plt_thick_across_web),

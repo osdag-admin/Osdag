@@ -42,8 +42,8 @@ v dir                                    |   |                          |
     '''
 
     def __init__(self, a, d, t):
-        self.L = a
-        self.W = d
+        self.a = a
+        self.d = d
         self.T = t
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])

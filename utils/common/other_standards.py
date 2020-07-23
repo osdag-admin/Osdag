@@ -389,7 +389,7 @@ class IS6649(object):
               The sizes of the washer is adjusted such that its size is atleast greater than the bolt/anchor diameter
 
               The 'side' dimension of the washer is chosen maximum considering the nut size as per IS:3757(1989) and IS:1364 (PART-1) : 2002
-              Adding 5 mm extra on each side
+              Adding 10 mm extra on each side
 
               boltHeadDia = {5: 8, 6: 10, 8: 13, 10: 16, 12: 18, 14: 21, 16: 24, 18: 27, 20: 30, 22: 34, 24: 36, 27: 41,
                                30: 46, 33: 50, 36: 55, 39: 60, 42: 65, 48: 75, 56: 85, 64: 95, 72: 110}

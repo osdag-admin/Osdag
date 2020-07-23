@@ -521,7 +521,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t3 = (KEY_OUT_GRD_ANCHOR, KEY_DISP_OUT_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '', True)
         out_list.append(t3)
 
-        t4 = (KEY_OUT_ANCHOR_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX, self.anchors_outside_flange if flag else '', True)
+        t4 = (KEY_OUT_ANCHOR_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX, 2 * self.anchors_outside_flange if flag else '', True)
         out_list.append(t4)
 
         t5 = (KEY_OUT_ANCHOR_BOLT_SHEAR, KEY_OUT_DISP_ANCHOR_BOLT_SHEAR, TYPE_TEXTBOX,
@@ -1681,8 +1681,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # outside flange
         self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # strength values - [bolt_fu, bolt_fy] (list)
 
-        # inside flange
-        self.anchor_grade_inside_lst = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+        # inside flange (grade - '3.6' is ignored due to its non availability)
+        self.anchor_grade_inside_lst = ['4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
         self.anchor_grade_inside_flange = self.anchor_grade_inside_lst[0]
         self.anchor_fu_fy_inside_flange = self.get_bolt_fu_fy(self.anchor_grade_inside_flange, self.anchor_dia_inside_flange)
 
@@ -1851,7 +1851,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
 
             # total number of anchor bolts provided
-            self.anchor_nos_provided = self.anchors_outside_flange
+            self.anchor_nos_provided = self.anchors_outside_flange  # there are not bolts inside flange
 
         elif self.connectivity == 'Moment Base Plate':
 
@@ -2086,6 +2086,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                             if (0.85 * self.column_bf) < (2 * self.edge_distance):
                                 detailing_check = 'Fail'
+                                logger.warning(" Fails in detailing check with 3 bolts")
+                                logger.info("Checking with 4 bolts")
                             else:
                                 detailing_check = 'Pass'
 
@@ -2171,6 +2173,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     if (0.85 * self.column_bf) < (2 * self.edge_distance):
                         detailing_check = 'Fail'
+                        logger.warning(" Fails in detailing check with 6 bolts of -- dia")
+                        logger.info("Checking with 6 bolts of higher dia")
                     else:
                         detailing_check = 'Pass'
 
@@ -2391,6 +2395,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.anchor_dia_provided = i
                             break
 
+                        if self.anchor_dia_provided == 72:
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                      (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
                         if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
                             bearing_stress_check = 'Fail'
                             self.anchor_dia_provided = 20  # initialise with 20 mm dia for next iteration
@@ -2430,6 +2439,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         for i in sort_bolt:
                             self.anchor_dia_provided = i
                             break
+
+                        if self.anchor_dia_provided == 72:
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                      (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
 
                         if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
                             bearing_stress_check = 'Fail'
@@ -2487,6 +2501,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.anchor_dia_provided = i
                             break
 
+                        if self.anchor_dia_provided == 72:
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                      (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
                         if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
                             bearing_stress_check = 'Fail'
                             self.anchor_dia_provided = 20  # initialise with 20 mm dia for next iteration
@@ -2526,6 +2545,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         for i in sort_bolt:
                             self.anchor_dia_provided = i
                             break
+
+                        if self.anchor_dia_provided == 72:
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                      (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
 
                         if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
                             bearing_stress_check = 'Fail'
@@ -4261,7 +4285,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Anchor Bolt - Outside Column Flange
         print(self.anchor_dia_outside_flange)  # Diameter (mm)
         print(self.anchor_grade)  # Property Class
-        print(self.anchors_outside_flange)  # No. of Anchor Bolts
+        print(2 * self.anchors_outside_flange)  # No. of Anchor Bolts
 
         print(self.shear_capacity_anchor)  # Shear Capacity (kN)
         print(self.bearing_capacity_anchor)  # Bearing Capacity (kN)

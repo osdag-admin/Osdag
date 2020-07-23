@@ -985,16 +985,16 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-            ex_length = BP.anchor_len_above_footing
+            ex_length = BP.anchor_len_above_footing_out
             if BP.dp_anchor_type == 'IS 5624-Type A':
-                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing), c=125, a=75,
+                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
                                     r=float(BP.anchor_dia_provided) / 2,
                                     ex=ex_length)
             elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2,
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
                                     ex=ex_length)
             else:  # BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2,
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
                                            ex=ex_length)
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
@@ -1088,14 +1088,14 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-            ex_length = BP.anchor_len_above_footing
+            ex_length = BP.anchor_len_above_footing_out
             if BP.dp_anchor_type == 'IS 5624-Type A':
-                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
+                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
                                     ex=ex_length)
             elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
             else: #BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2,
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
                                            ex=ex_length)
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)

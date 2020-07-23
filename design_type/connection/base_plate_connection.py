@@ -2993,8 +2993,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_length_min_out = self.table1('M' + str(self.anchor_dia_outside_flange))[1]
         self.anchor_length_max_out = self.table1('M' + str(self.anchor_dia_outside_flange))[2]
 
-        self.anchor_length_min_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[1]
-        self.anchor_length_max_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[2]
+        if self.load_axial_tension > 0:
+            self.anchor_length_min_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[1]
+            self.anchor_length_max_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[2]
 
         # design of anchor length - outside flange [Reference: Design of Steel Structures by N. Subramanian 2nd. edition 2018, Example 15.5]
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):

@@ -126,6 +126,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.shear_resistance = 0.0
         self.shear_key_required = 'No'
+        self.weld_size_shear_key = 0
+        self.shear_key_stress_ColDepth = 'N/A'
+        self.shear_key_stress_ColWidth = 'N/A'
         self.plate_thk = 0.0
 
         self.shear_key_along_ColDepth = 'No'
@@ -202,6 +205,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.plate_washer_details = {}
         self.plate_washer_thk = 1
         self.nut_thk = 1
+        self.anchor_length_min_out = 0.001
+        self.anchor_length_min_in = 0.001
+        self.plate_washer_details_out = {}
+        self.plate_washer_details_in = {}
+        self.nut_thk_out = 0.001
+        self.nut_thk_in = 0.001
+        self.plate_washer_thk_out = 0.001
+        self.plate_washer_thk_in = 0.001
+        self.plate_washer_inner_dia_out = 0.001
+        self.plate_washer_inner_dia_in = 0.001
+        self.plate_washer_dim_out = 0.001
+        self.plate_washer_dim_in = 0.001
+        self.anchor_len_below_footing_out = 0.001
+        self.anchor_len_below_footing_in = 0.001
+        self.anchor_len_above_footing_out = 0.001
+        self.anchor_len_above_footing_in = 0.001
+        self.anchor_length_provided_out = 0.001
+        self.anchor_length_provided_in = 0.001
         self.anchor_length_min = 1
         self.anchor_length_max = 1
         self.anchor_length_provided = 1

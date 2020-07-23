@@ -1383,7 +1383,7 @@ class SeatedAngleConnection(ShearConnection):
 
         initial_shear_capacity = round(self.supported_section.shear_yielding_capacity/0.6,2)
         t1 = (KEY_DISP_SHEAR_CAPACITY, '',
-              shear_yield_prov(h, t, self.supported_section.fy, gamma_m0, initial_shear_capacity),'')
+              cl_8_4_shear_yielding_capacity_member(h, t, self.supported_section.fy, gamma_m0, initial_shear_capacity), '')
         self.report_check.append(t1)
         t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,
               allow_shear_capacity(initial_shear_capacity,self.supported_section.shear_yielding_capacity),
@@ -1507,37 +1507,37 @@ class SeatedAngleConnection(ShearConnection):
             bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 2)
             if self.bolt.bolt_type == TYP_BEARING:
                 shear_cap_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
-                t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1, self.bolt.bolt_net_area,
-                                                                   self.bolt.gamma_mb, shear_cap_kn),
+                t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.bolt.bolt_fu, 1, self.bolt.bolt_net_area,
+                                                                                 self.bolt.gamma_mb, shear_cap_kn),
                       '')
                 self.report_check.append(t1)
                 t8 = (KEY_DISP_KB, " ",
-                      kb_prov(self.bolt.min_end_dist_round, self.bolt.min_pitch_round, self.bolt.dia_hole,
-                              self.bolt.bolt_fu, self.bolt.fu_considered), '')
+                      cl_10_3_4_calculate_kb(self.bolt.min_end_dist_round, self.bolt.min_pitch_round, self.bolt.dia_hole,
+                                             self.bolt.bolt_fu, self.bolt.fu_considered), '')
                 self.report_check.append(t8)
                 kb = self.bolt.calculate_kb(self.bolt.min_end_dist_round, self.bolt.min_pitch_round, self.bolt.dia_hole,
                                             self.bolt.bolt_fu, self.bolt.fu_considered)
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
 
                 t2 = (
-                    KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb, self.bolt.bolt_diameter_provided,
-                                                                     self.bolt_conn_plates_t_fu_fy, self.bolt.gamma_mb,
-                                                                     bolt_bearing_capacity_disp), '')
+                    KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(kb, self.bolt.bolt_diameter_provided,
+                                                                                   self.bolt_conn_plates_t_fu_fy, self.bolt.gamma_mb,
+                                                                                   bolt_bearing_capacity_disp), '')
                 self.report_check.append(t2)
 
                 t3 = (KEY_OUT_DISP_BOLT_CAPACITY, force_in_bolt_due_to_load(P=round(self.load.shear_force, 2),
                                                                             n=self.bolt.bolts_required, T_ba=V_b,
                                                                             load='shear'),
-                      bolt_capacity_prov(shear_cap_kn, bolt_bearing_capacity_disp,
-                                         bolt_capacity_disp),
+                      cl_10_3_2_bolt_capacity(shear_cap_kn, bolt_bearing_capacity_disp,
+                                              bolt_capacity_disp),
                       '')
                 self.report_check.append(t3)
             else:
                 kh_disp = round(self.bolt.kh, 2)
                 t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
-                      HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
-                                              Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
-                                              capacity=bolt_capacity_disp), '')
+                      cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
+                                                   Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
+                                                   capacity=bolt_capacity_disp), '')
                 self.report_check.append(t4)
 
                 t3 = (KEY_OUT_DISP_BOLT_CAPACITY, force_in_bolt_due_to_load(P=round(self.load.shear_force, 2),
@@ -1600,8 +1600,8 @@ class SeatedAngleConnection(ShearConnection):
 
             t1 = ('SubSection', 'Seated Angle Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
-            t2 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force, shear_yield_prov(h=h, t=t, f_y=self.seated.fy, gamma_m0=gamma_m0,
-                                                                                   V_dg=self.plate.shear_capacity),'')
+            t2 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force, cl_8_4_shear_yielding_capacity_member(h=h, t=t, f_y=self.seated.fy, gamma_m0=gamma_m0,
+                                                                                                        V_dg=self.plate.shear_capacity),'')
             self.report_check.append(t2)
             red_shear_capacity_angle = round(0.6 * self.plate.shear_capacity,2)
             t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,
@@ -1619,10 +1619,10 @@ class SeatedAngleConnection(ShearConnection):
             self.report_check.append(t2)
 
             t2 = (KEY_DISP_MOM_CAPACITY, moment_demand_SA(self.b1,self.b2,self.load.shear_force,self.plate.moment_demand),
-                  plastic_moment_capacty(beta_b=1.0,
-                                         Z_p=Z_p, f_y=self.seated.fy,
-                                         gamma_m0=gamma_m0,
-                                         Pmc=round(self.plate.moment_capacity, 2)),
+                  cl_8_2_1_2_plastic_moment_capacity_member(beta_b=1.0,
+                                                            Z_p=Z_p, f_y=self.seated.fy,
+                                                            gamma_m0=gamma_m0,
+                                                            Pmc=round(self.plate.moment_capacity, 2)),
                   get_pass_fail(self.plate.moment_demand, self.plate.moment_capacity, relation='lesser'))
             self.report_check.append(t2)
 

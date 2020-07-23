@@ -229,8 +229,8 @@ class CleatAngleConnection(ShearConnection):
         list1.append(t1)
         t2 = (KEY_ANGLE_LIST, self.cleatsec_customized)
         list1.append(t2)
-        # t3 = (KEY_D, self.diam_bolt_customized)
-        # list1.append(t3)
+        t3 = (KEY_D, self.diam_bolt_customized)
+        list1.append(t3)
         return list1
 
     def fn_conn_suptngsec_lbl(self):
@@ -478,7 +478,7 @@ class CleatAngleConnection(ShearConnection):
         t19 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX, round(self.sptd_leg.moment_demand/1000000,2) if flag else '', True)
         out_list.append(t19)
 
-        t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.moment_capacity,2) if flag else '', True)
+        t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.cl_8_2_moment_capacity_member, 2) if flag else '', True)
         out_list.append(t20)
 
         return out_list

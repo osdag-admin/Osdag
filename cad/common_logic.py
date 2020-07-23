@@ -9,6 +9,7 @@ from cad.items.notch import Notch
 from cad.items.bolt import Bolt
 from cad.items.nut import Nut
 from cad.items.plate import Plate
+from cad.items.washer import Washer
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.groove_weld import GrooveWeld
@@ -985,6 +986,7 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
+
             ex_length_out = BP.anchor_len_above_footing_out
             if BP.dp_anchor_type == 'IS 5624-Type A':
                 bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
@@ -1000,13 +1002,15 @@ class CommonDesignLogic(object):
             bolt_in = bolt
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
+            washer = Washer(a=BP.plate_washer_dim_out , d=BP.plate_washer_inner_dia_out , t=BP.plate_washer_thk_out)
+            washer_in = washer
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = washer.T + nut.T + 50
 
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, bolt_in, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, bolt_in, nutSpace,  washer, washer_in)
 
             basePlate = HollowBasePlateCad(BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
@@ -1090,6 +1094,18 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
+            if BP.load_axial_tension > 0:
+                BP.anchor_len_above_footing_in = BP.anchor_len_above_footing_in
+                BP.anchor_len_below_footing_in = BP.anchor_len_below_footing_in
+                BP.plate_washer_dim_in = BP.plate_washer_dim_in
+                BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_in
+                BP.plate_washer_thk_in = BP.plate_washer_thk_in
+            else:
+                BP.anchor_len_above_footing_in = BP.anchor_len_above_footing_out
+                BP.anchor_len_below_footing_in = BP.anchor_len_below_footing_out
+                BP.plate_washer_dim_in = BP.plate_washer_dim_out
+                BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_out
+                BP.plate_washer_thk_in = BP.plate_washer_thk_out
             ex_length_out = BP.anchor_len_above_footing_out
             ex_length_in = BP.anchor_len_above_footing_in
             if BP.dp_anchor_type == 'IS 5624-Type A':
@@ -1109,10 +1125,12 @@ class CommonDesignLogic(object):
                                            ex=ex_length_in)
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
+            washer = Washer(a=BP.plate_washer_dim_out , d=BP.plate_washer_inner_dia_out , t=BP.plate_washer_thk_out)
+            washer_in = Washer(a=BP.plate_washer_dim_in, d=BP.plate_washer_inner_dia_in, t=BP.plate_washer_thk_out)
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = washer.T + nut.T + 50
 
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, bolt_in, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, bolt_in, nutSpace, washer, washer_in)
 
             basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                      concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,

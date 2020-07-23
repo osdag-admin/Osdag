@@ -1461,6 +1461,7 @@ if __name__ == '__main__':
     from cad.items.grout import Grout
     from cad.items.rect_hollow import RectHollow
     from cad.items.circular_hollow import CircularHollow
+    from cad.items.washer import Washer
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -1537,10 +1538,12 @@ if __name__ == '__main__':
         # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
         bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
         nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+        washer = Washer(a=8 * bolt.r, d=2 * bolt.r, t=2)
         nutSpace = bolt.c + baseplate.T
-        bolthight = nut.T + 50
+        bolthight = nut.T + washer.T + 50
 
-        nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
+
+        nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace, washer)
 
         basePlate = BasePlateCad(type, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                  concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
@@ -1568,9 +1571,11 @@ if __name__ == '__main__':
             # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
             bolt = AnchorBolt_Endplate(l=314.5, c=125, a=75, r=10, ex=ex_length)
             nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+            washer = Washer(a=8 * bolt.r, d=2 * bolt.r, t=2)
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = nut.T + washer.T + 50
             type = 'rect'
+
 
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
@@ -1593,16 +1598,19 @@ if __name__ == '__main__':
             # bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
             # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
             bolt = AnchorBolt_Endplate(l= 314.5, c= 125, a= 75, r= 10, ex=ex_length)
+            bolt_in = bolt
             nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+            washer = Washer(a=8 * bolt.r, d=2 * bolt.r, t=2)
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = nut.T + washer.T + 50
             type = 'rect'
+
 
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W *1.5, T=50)
 
             column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
-        nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
+        nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace, washer)
 
         basePlate = HollowBasePlateCad(type, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout, stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v, weld_stiff_b_h)
 

@@ -193,7 +193,7 @@ class AnchorBolt_Endplate(object):
         self.cyl1_length = self.l
         self.endplate_thickness = 5
         self.head = self.endplate_thickness / 5
-        self.endplate_width = self.l / 2
+        self.endplate_width = self.r * 8
 
         self.p1 = self.origin
         self.p2 = self.p1 - (self.l - self.endplate_thickness - self.head) * self.shaftDir

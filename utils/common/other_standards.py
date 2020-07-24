@@ -423,7 +423,7 @@ class IS1364(object):
         Note: The nut thk for 72 diameter is not available in IS code, however an approximated value is assumed.
               72 mm dia bolt is used in the base plate module.
         """
-        nut_dia = {
+        nut_thickness = {
             5: 4.7,
             6: 5.2,
             8: 6.8,
@@ -447,4 +447,4 @@ class IS1364(object):
             72: 60.0
         }[bot_dia]
 
-        return nut_dia
+        return nut_thickness

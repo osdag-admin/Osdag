@@ -8,17 +8,13 @@
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
-# import pdfkit
 import configparser
 import os
+import re
 import pickle
-# import cairosvg
 # from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from design_report.reportGenerator_latex import CreateLatex
-
-
-
 # from design_type.connection.fin_plate_connection import sa
 from get_DPI_scale import scale
 class Ui_Dialog1(object):
@@ -195,15 +191,25 @@ class Ui_Dialog1(object):
         if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
             self.Dialog.accept()
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
+        elif not os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
+            QMessageBox.critical(QMessageBox(), 'Error',
+                                 'Latex Creation Error. Please run <latex> in command prompt to check if latex is installed.')
         else:
             logfile=open(fname_no_ext+'.log','r')
+            #TODO: This logic can be improved so that log is not read twice.
             logs=logfile.read()
-
-            if('! I can\'t write on file' in logs):
+            if(r'! I can\'t write on file' in logs):
                 QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
             else:
-                print(logs)
-                QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
+                missing_package = None
+                log_lines = logs.split('\n')
+                for line in log_lines:
+                    if '! LaTeX Error: File' in line:
+                        missing_package = line
+                if missing_package != None:
+                    QMessageBox.critical(QMessageBox(), 'Error',missing_package +' Please install missing package')
+                else:
+                    QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. Please send us the log file created in the same folder choosen for the Design Report.')
             logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):

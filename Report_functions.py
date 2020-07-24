@@ -1123,7 +1123,7 @@ def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist
 
 
 #TODO: DARSHAN, Keep only one of the following Ans: Use the one with weld thickness reduction
-def cl_10_5_2_3_min_fillet_weld_size_required(conn_plates_weld, red, min_weld_size):
+def cl_10_5_2_3_min_fillet_weld_size_required(conn_plates_weld, min_weld_size,red=0.0):
     """
     Calculate minimum size of fillet weld,to avoid the
         risk of cracking in the absence of preheating

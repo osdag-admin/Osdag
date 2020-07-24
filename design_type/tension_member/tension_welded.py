@@ -2035,7 +2035,7 @@ class Tension_welded(Member):
             t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{6.5 cm}|p{5cm}|p{1cm}|')
             self.report_check.append(t7)
             #TODO
-            t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,
+            t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.min_weld ,self.weld.red), self.weld.size,
                   min_prov_max(min(self.weld_connecting_plates)- self.weld.red, self.weld.size, self.weld.min_weld))
             self.report_check.append(t1)
 

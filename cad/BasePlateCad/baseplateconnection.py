@@ -16,7 +16,7 @@ class BasePlateCad(object):
     def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
                  concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v, stiffener_algflangeL,
                  stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh, weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh,
-                 weld_stiffener_inflange_d, stiffener_insideflange, weld_stiffener_inflange):
+                  stiffener_insideflange, weld_stiffener_inflange, weld_stiffener_inflange_d):
 
         """
 

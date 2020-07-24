@@ -385,25 +385,33 @@ class IS6649(object):
               The dimensions of these washers are thus calculated/approximated referring to those specified by the code
 
               Table 2 gives washer thickness for tapered washers, however for non-tapered washers, mean thickness is used.
+
+              The sizes of the washer is adjusted such that its size is atleast greater than the bolt/anchor diameter
+
+              The 'side' dimension of the washer is chosen maximum considering the nut size as per IS:3757(1989) and IS:1364 (PART-1) : 2002
+              Adding 10 mm extra on each side
+
+              boltHeadDia = {5: 8, 6: 10, 8: 13, 10: 16, 12: 18, 14: 21, 16: 24, 18: 27, 20: 30, 22: 34, 24: 36, 27: 41,
+                               30: 46, 33: 50, 36: 55, 39: 60, 42: 65, 48: 75, 56: 85, 64: 95, 72: 110}
+
         """
         washer_dimensions = {
-            8: {'dia_in': 10, 'side': 25, 'washer_thk': 6.0},
-            10: {'dia_in': 12, 'side': 25, 'washer_thk': 6.0},
-            12: {'dia_in': 14, 'side': 25, 'washer_thk': 6.0},
-            16: {'dia_in': 18, 'side': 45, 'washer_thk': 8.5},
-            20: {'dia_in': 22, 'side': 45, 'washer_thk': 8.5},
-            22: {'dia_in': 24, 'side': 45, 'washer_thk': 8.5},
-            24: {'dia_in': 26, 'side': 45, 'washer_thk': 8.5},
-            27: {'dia_in': 30, 'side': 58, 'washer_thk': 8.5},
-            30: {'dia_in': 33, 'side': 58, 'washer_thk': 8.5},
-            36: {'dia_in': 39, 'side': 58, 'washer_thk': 8.5},
-            42: {'dia_in': 45, 'side': 80, 'washer_thk': 10.0},
-            48: {'dia_in': 51, 'side': 80, 'washer_thk': 10.0},
-            56: {'dia_in': 59, 'side': 100, 'washer_thk': 12.0},
-            64: {'dia_in': 67, 'side': 100, 'washer_thk': 12.0},
-            72: {'dia_in': 75, 'side': 100, 'washer_thk': 12.0},
+            8: {'dia_in': 10, 'side': max(25, 23), 'washer_thk': 6.0},
+            10: {'dia_in': 12, 'side': max(25, 26), 'washer_thk': 6.0},
+            12: {'dia_in': 14, 'side': max(25, 28), 'washer_thk': 6.0},
+            16: {'dia_in': 18, 'side': max(45, 34), 'washer_thk': 8.5},
+            20: {'dia_in': 22, 'side': max(45, 40), 'washer_thk': 8.5},
+            22: {'dia_in': 24, 'side': max(45, 44), 'washer_thk': 8.5},
+            24: {'dia_in': 26, 'side': max(45, 46), 'washer_thk': 8.5},
+            27: {'dia_in': 30, 'side': max(58, 52), 'washer_thk': 8.5},
+            30: {'dia_in': 33, 'side': max(58, 56), 'washer_thk': 8.5},
+            36: {'dia_in': 39, 'side': max(58, 65), 'washer_thk': 8.5},
+            42: {'dia_in': 45, 'side': max(80, 75), 'washer_thk': 10.0},
+            48: {'dia_in': 51, 'side': max(80, 85), 'washer_thk': 10.0},
+            56: {'dia_in': 59, 'side': max(100, 95), 'washer_thk': 12.0},
+            64: {'dia_in': 67, 'side': max(100, 105), 'washer_thk': 12.0},
+            72: {'dia_in': 75, 'side': max(100, 120), 'washer_thk': 12.0},
         }[bolt_dia]
-
         return washer_dimensions
 
 

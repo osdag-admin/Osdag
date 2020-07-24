@@ -1151,7 +1151,6 @@ class Tension_welded(Member):
 
         "Selection of weld size based on the initial thickness considered"
 
-        # self.res_force = self.load.axial_force*1000
         self.web_weld_status = True
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.thick = self.section_size_1.web_thickness

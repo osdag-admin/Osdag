@@ -1063,7 +1063,7 @@ class CommonDesignLogic(object):
             stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
 
             #TODO: add varaiable names to this
-            stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  # self.extraspace=5
+            stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12,  R21 = column.R1 + 5, R22= column.R1 + 5, L21 = column.R1 + 5, L22= column.R1 + 5)  # self.extraspace=5
 
 
             weld_stiffener_algflng_v = GrooveWeld(b=column.T, h=float(BP.weld_size_stiffener), L=stiffener_algflangeL.H)
@@ -1084,7 +1084,8 @@ class CommonDesignLogic(object):
             weld_stiffener_alongWeb_gh = GrooveWeld(b=stiffener.T, h=float(BP.weld_size_stiffener), L=stiffener.L - stiffener.R22)
 
             weld_stiffener_inflange = GrooveWeld(b=stiffener_insideflange.T, h=float(BP.weld_size_stiffener), L=stiffener_insideflange.W)
-
+            weld_stiffener_inflange_d = GrooveWeld(b=stiffener_insideflange.T, h=float(BP.weld_size_stiffener),
+                                                   L=stiffener_insideflange.L - stiffener_insideflange.R22 - 2 * weld_stiffener_inflange.h)
 
             if BP.load_axial_tension > 0:
                 BP.anchor_len_above_footing_in = BP.anchor_len_above_footing_in
@@ -1147,7 +1148,7 @@ class CommonDesignLogic(object):
             basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                      concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
                                      stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
-                                     weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
+                                     weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange, weld_stiffener_inflange_d)
 
         basePlate.create_3DModel()
 

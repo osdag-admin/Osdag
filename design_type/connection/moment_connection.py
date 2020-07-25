@@ -1,5 +1,5 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection, RHS, SHS, CHS
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -26,7 +26,7 @@ class MomentConnection(Connection, IS800_2007):
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''
@@ -50,37 +50,102 @@ class MomentConnection(Connection, IS800_2007):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const = ''
+            warping_const = ''
+            image = ''
+
 
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation)
-            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
-            source = str(I_sec_attributes.source)
-            fu = str(I_sec_attributes.fu)
-            fy = str(I_sec_attributes.fy)
-            depth = str(I_sec_attributes.depth)
-            flange_width = str(I_sec_attributes.flange_width)
-            flange_thickness = str(I_sec_attributes.flange_thickness)
-            web_thickness = str(I_sec_attributes.web_thickness)
-            flange_slope = str(I_sec_attributes.flange_slope)
-            root_radius = str(I_sec_attributes.root_radius)
-            toe_radius = str(I_sec_attributes.toe_radius)
             m_o_e = "200"
             m_o_r = "76.9"
             p_r = "0.3"
             t_e = "12"
-            mass = str(I_sec_attributes.mass)
-            area = str(I_sec_attributes.area)
-            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
-            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
-            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
-            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+            image = VALUES_IMG_BEAM[0]
+            if designation in connectdb("RHS", call_type="popup"):
+                RHS_sec_attributes = RHS(designation, material_grade)
+                fu = str(RHS_sec_attributes.fu)
+                fy = str(RHS_sec_attributes.fy)
+                source = str(RHS_sec_attributes.source)
+                depth = str(RHS_sec_attributes.depth)
+                width = str(RHS_sec_attributes.flange_width)
+                thickness = str(RHS_sec_attributes.flange_thickness)
+                mass = str(RHS_sec_attributes.mass)
+                area = str(round((RHS_sec_attributes.area / 10 ** 2), 2))
+                mom_inertia_z = str(round((RHS_sec_attributes.mom_inertia_z / 10 ** 4), 2))
+                mom_inertia_y = str(round((RHS_sec_attributes.mom_inertia_y / 10 ** 4), 2))
+                rad_of_gy_z = str(round((RHS_sec_attributes.rad_of_gy_z / 10), 2))
+                rad_of_gy_y = str(round((RHS_sec_attributes.rad_of_gy_y / 10), 2))
+                elast_sec_mod_z = str(round((RHS_sec_attributes.elast_sec_mod_z / 10 ** 3), 2))
+                elast_sec_mod_y = str(round((RHS_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
+                plast_sec_mod_z = str(round((RHS_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
+                plast_sec_mod_y = str(round((RHS_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+                image = VALUES_IMG_HOLLOWSECTION[1]
+            elif designation in connectdb("SHS", call_type="popup"):
+                SHS_sec_attributes = SHS(designation, material_grade)
+                fu = str(SHS_sec_attributes.fu)
+                fy = str(SHS_sec_attributes.fy)
+                source = str(SHS_sec_attributes.source)
+                depth = str(SHS_sec_attributes.depth)
+                width = str(SHS_sec_attributes.flange_width)
+                thickness = str(SHS_sec_attributes.flange_thickness)
+                mass = str(SHS_sec_attributes.mass)
+                area = str(round((SHS_sec_attributes.area / 10 ** 2), 2))
+                mom_inertia_z = str(round((SHS_sec_attributes.mom_inertia_z / 10 ** 4), 2))
+                mom_inertia_y = str(round((SHS_sec_attributes.mom_inertia_y / 10 ** 4), 2))
+                rad_of_gy_z = str(round((SHS_sec_attributes.rad_of_gy_z / 10), 2))
+                rad_of_gy_y = str(round((SHS_sec_attributes.rad_of_gy_y / 10), 2))
+                elast_sec_mod_z = str(round((SHS_sec_attributes.elast_sec_mod_z / 10 ** 3), 2))
+                elast_sec_mod_y = str(round((SHS_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
+                plast_sec_mod_z = str(round((SHS_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
+                plast_sec_mod_y = str(round((SHS_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+                image = VALUES_IMG_HOLLOWSECTION[0]
+            elif designation in connectdb("CHS", call_type="popup"):
+                CHS_sec_attributes = CHS(designation, material_grade)
+                fu = str(CHS_sec_attributes.fu)
+                fy = str(CHS_sec_attributes.fy)
+                source = str(CHS_sec_attributes.source)
+                nominal_bore = str(CHS_sec_attributes.nominal_bore)
+                out_diameter = str(CHS_sec_attributes.out_diameter)
+                thickness = str(CHS_sec_attributes.flange_thickness)
+                mass = str(CHS_sec_attributes.mass)
+                area = str(round((CHS_sec_attributes.area / 10 ** 2), 2))
+                internal_vol = str(CHS_sec_attributes.internal_vol)
+                mom_inertia = str(CHS_sec_attributes.mom_inertia)
+                rad_of_gy = str(round((CHS_sec_attributes.rad_of_gy / 10), 2))
+                elast_sec_mod = str(round((CHS_sec_attributes.elast_sec_mod / 10 ** 3), 2))
+                image = VALUES_IMG_HOLLOWSECTION[2]
+            else:
+                I_sec_attributes = ISection(designation)
+                table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
+                I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
+                source = str(I_sec_attributes.source)
+                fu = str(I_sec_attributes.fu)
+                fy = str(I_sec_attributes.fy)
+                depth = str(I_sec_attributes.depth)
+                flange_width = str(I_sec_attributes.flange_width)
+                flange_thickness = str(I_sec_attributes.flange_thickness)
+                web_thickness = str(I_sec_attributes.web_thickness)
+                flange_slope = float(I_sec_attributes.flange_slope)
+                root_radius = str(I_sec_attributes.root_radius)
+                toe_radius = str(I_sec_attributes.toe_radius)
+                mass = str(I_sec_attributes.mass)
+                area = str(round((I_sec_attributes.area / 10 ** 2), 2))
+                mom_inertia_z = str(round((I_sec_attributes.mom_inertia_z / 10 ** 4), 2))
+                mom_inertia_y = str(round((I_sec_attributes.mom_inertia_y / 10 ** 4), 2))
+                rad_of_gy_z = str(round((I_sec_attributes.rad_of_gy_z / 10), 2))
+                rad_of_gy_y = str(round((I_sec_attributes.rad_of_gy_y / 10), 2))
+                elast_sec_mod_z = str(round((I_sec_attributes.elast_sec_mod_z / 10 ** 3), 2))
+                elast_sec_mod_y = str(round((I_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
+                plast_sec_mod_z = str(round((I_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
+                plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+                torsion_const = str(round((I_sec_attributes.It / 10 ** 4), 2))
+                warping_const = str(round((I_sec_attributes.Iw / 10 ** 6), 2))
+                if flange_slope != 90:
+                    image = VALUES_IMG_BEAM[0]
+                else:
+                    image = VALUES_IMG_BEAM[1]
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -95,7 +160,7 @@ class MomentConnection(Connection, IS800_2007):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 
@@ -105,105 +170,193 @@ class MomentConnection(Connection, IS800_2007):
         t4 = (KEY_SEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         section.append(t4)
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
-        section.append(t5)
-
-        t6 = ('Label_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
-        section.append(t6)
-
-        t7 = ('Label_2', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
-        section.append(t7)
-
-        t8 = ('Label_3', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
-        section.append(t8)
-
-        t9 = ('Label_4', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, web_thickness)
-        section.append(t9)
-
-        t10 = ('Label_5', KEY_DISP_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
-        section.append(t10)
-
-        t11 = ('Label_6', KEY_DISP_ROOT_R, TYPE_TEXTBOX, None, root_radius)
-        section.append(t11)
-
-        t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
-        section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
         t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
         section.append(t15)
 
         t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
         section.append(t16)
 
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
-        section.append(t17)
-
-        t18 = ('Label_11', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
-        section.append(t18)
-
-        t19 = ('Label_12', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
-        section.append(t19)
-
-        t20 = ('Label_13', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
-        section.append(t20)
-
-        t21 = ('Label_14', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
-        section.append(t21)
-
-        t22 = ('Label_15', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
-        section.append(t22)
-
-        t23 = ('Label_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
-        section.append(t23)
-
-        t24 = ('Label_17', KEY_DISP_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
-        section.append(t24)
-
-        t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
-        section.append(t25)
-
-        t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
-        section.append(t26)
-
-        t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
-        section.append(t27)
-
-        t28 = (None, None, TYPE_BREAK, None, None)
-        section.append(t28)
-
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
-        section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
         section.append(t31)
 
         t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
-        section.append(t33)
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        section.append(t14)
+
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
+        section.append(t29)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        section.append(t5)
+
+        if designation in connectdb("RHS", call_type="popup") or designation in connectdb("SHS", call_type="popup"):
+
+            t6 = ('Label_HS_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
+            section.append(t6)
+
+            t7 = ('Label_HS_2', KEY_DISP_WIDTH, TYPE_TEXTBOX, None, width)
+            section.append(t7)
+
+            t8 = ('Label_HS_3', KEY_DISP_THICKNESS, TYPE_TEXTBOX, None, thickness)
+            section.append(t8)
+
+        elif designation in connectdb("CHS", call_type="popup"):
+
+            t6 = ('Label_CHS_1', KEY_DISP_NB, TYPE_TEXTBOX, None, nominal_bore)
+            section.append(t6)
+
+            t7 = ('Label_CHS_2', KEY_DISP_OD, TYPE_TEXTBOX, None, out_diameter)
+            section.append(t7)
+
+            t8 = ('Label_CHS_3', KEY_DISP_THICKNESS, TYPE_TEXTBOX, None, thickness)
+            section.append(t8)
+
+        else:
+
+            t6 = ('Label_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
+            section.append(t6)
+
+            t7 = ('Label_2', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+            section.append(t7)
+
+            t8 = ('Label_3', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+            section.append(t8)
+
+            t9 = ('Label_4', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+            section.append(t9)
+
+            t10 = ('Label_5', KEY_DISP_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
+            section.append(t10)
+
+            t11 = ('Label_6', KEY_DISP_ROOT_R, TYPE_TEXTBOX, None, root_radius)
+            section.append(t11)
+
+            t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
+            section.append(t12)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
+        if designation in connectdb("RHS", call_type="popup") or designation in connectdb("SHS", call_type="popup"):
+
+            t18 = ('Label_HS_11', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
+            section.append(t18)
+
+            t19 = ('Label_HS_12', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
+            section.append(t19)
+
+            t20 = ('Label_HS_13', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
+            section.append(t20)
+
+            t21 = ('Label_HS_14', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
+            section.append(t21)
+
+            t22 = ('Label_HS_15', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+            section.append(t22)
+
+            t23 = ('Label_HS_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+            section.append(t23)
+
+            t24 = ('Label_HS_17', KEY_DISP_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+            section.append(t24)
+
+            t25 = ('Label_HS_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+            section.append(t25)
+
+            t28 = (None, None, TYPE_BREAK, None, None)
+            section.append(t28)
+
+            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+            section.append(t33)
+
+            t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+            section.append(t17)
+
+            t26 = ('Label_HS_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+            section.append(t26)
+
+            t27 = ('Label_HS_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+            section.append(t27)
+
+        elif designation in connectdb("CHS", call_type="popup"):
+
+            t18 = ('Label_CHS_11', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
+            section.append(t18)
+
+            t19 = ('Label_CHS_12', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
+            section.append(t19)
+
+            t20 = ('Label_CHS_13', KEY_DISP_IV, TYPE_TEXTBOX, None, internal_vol)
+            section.append(t20)
+
+            t21 = ('Label_HS_14', KEY_DISP_MOA, TYPE_TEXTBOX, None, mom_inertia)
+            section.append(t21)
+
+            t23 = ('Label_HS_15', KEY_DISP_ROG, TYPE_TEXTBOX, None, rad_of_gy)
+            section.append(t23)
+
+            t24 = ('Label_HS_16', KEY_DISP_SM, TYPE_TEXTBOX, None, elast_sec_mod)
+            section.append(t24)
+
+            t28 = (None, None, TYPE_BREAK, None, None)
+            section.append(t28)
+
+            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+            section.append(t33)
+
+        else:
+
+            t18 = ('Label_11', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
+            section.append(t18)
+
+            t19 = ('Label_12', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
+            section.append(t19)
+
+            t20 = ('Label_13', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
+            section.append(t20)
+
+            t21 = ('Label_14', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
+            section.append(t21)
+
+            t22 = ('Label_15', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+            section.append(t22)
+
+            t23 = ('Label_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+            section.append(t23)
+
+            t24 = ('Label_17', KEY_DISP_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+            section.append(t24)
+
+            t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+            section.append(t25)
+
+            t28 = (None, None, TYPE_BREAK, None, None)
+            section.append(t28)
+
+            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+            section.append(t33)
+
+            t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+            section.append(t17)
+
+            t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+            section.append(t26)
+
+            t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+            section.append(t27)
+
+            t26 = ('Label_21', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+            section.append(t26)
+
+            t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+            section.append(t27)
 
         return section
-
-
 
 
     def get_fu_fy_I_section(self):
@@ -214,7 +367,7 @@ class MomentConnection(Connection, IS800_2007):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -233,6 +386,7 @@ class MomentConnection(Connection, IS800_2007):
     ###########################################
     # Design Preferences Functions End
     ###########################################
+
     @staticmethod
     def pltthk_customized():
         a = VALUES_PLATETHK_CUSTOMIZED
@@ -305,7 +459,7 @@ class MomentConnection(Connection, IS800_2007):
 
     # Base Plate module
     @staticmethod
-    def calculate_c(flange_width, depth, web_thickness, flange_thickness, min_area_req, anchor_hole_dia):
+    def calculate_c(flange_width, depth, web_thickness, flange_thickness, min_area_req, anchor_hole_dia, section_type='I-section'):
         """ calculate the 'projection' based on the Effective Area Method for rolled and welded columns only.
 
         Args:
@@ -315,20 +469,35 @@ class MomentConnection(Connection, IS800_2007):
             flange_thickness (float) - flange thickness of the column section (tf)
             min_area_req (float) - minimum effective bearing area (A_bc)
             anchor_hole_dia (int) - diameter of the anchor hole
+            section_type (str) - type of section used as column ['I-section' or 'SHS' or 'RHS' or 'CHS']
 
-        Returns: projection in 'mm' (float)
+        Returns: effective projection from the face of the column in 'mm' (float)
 
         Note: 1) The following expression is used to calculate a, b and c [Ref: Design of Steel Structures,
                  N. Subramanian, 2nd. edition 2018, Example 15.2]:
-                 A_bc = (bf + 2c) (h + 2c) - [{h - 2(tf + c)}(bf - tw)]
 
-              2) Adding anchor hole diameter (half on each side) to the value of the projection to avoid punching
-                 of the hole in the effective area which in turn shall avoid any stress concentration
+                    For I -section: A_bc = (bf + 2c) (h + 2c) - [{h - 2(tf + c)}(bf - tw)]
+                    For Hollow SHS & RHS: A_bc = (D + 2c) (B + 2c)  [D = Depth, B = Width]
+                    For Hollow CHS: A_bc = (3.14/4) * (OD + 2c)^2  [OD = outside diameter of the tube]
+
+                    c is the effective projection from the outer face of the respective column section
+
+              2) Adding anchor hole diameter (half on each side) to the value of the projection to avoid punching of the hole
+                 (for anchor bolts) in the effective area which in turn shall avoid any stress concentration at holes
         """
         a = 4
-        b = (4 * flange_width) + (2 * depth) - (2 * web_thickness)
-        c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness) \
-            - min_area_req
+        if section_type == 'I-section':
+            b = (4 * flange_width) + (2 * depth) - (2 * web_thickness)
+            c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness) \
+                - min_area_req
+
+        elif section_type == 'SHS' or 'RHS':
+            b = 2 * (depth * flange_width)  # for SHS & RHS, depth = D and flange_width = B
+            c = (depth * flange_width) - min_area_req
+
+        else:
+            b = 4 * depth  # for CHS, depth = OD (outside diameter)
+            c = depth ** 2 - ((4 * min_area_req) / math.pi)
 
         roots = np.roots([a, b, c])  # finding roots of the equation
         r_1 = roots[0]

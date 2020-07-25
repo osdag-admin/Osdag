@@ -18,6 +18,154 @@ class IS800_2007(object):
     """    SECTION  1     GENERAL   """
     # ==========================================================================
     """    SECTION  2     MATERIALS   """
+    # -------------------------------------------------------------
+    #   5.4 Strength
+    # -------------------------------------------------------------
+
+    # Clause 3.7 - Classification of cross-section, Table 2, Limiting width to thickness ratio
+    @staticmethod
+    def Table2_web_OfI_H_box_section(depth, web_thickness, f_y, axial_load, load_type='Compression', section_class='Plastic'):
+        """ Calculate the limiting width to thickness ratio; for web of an I, H or Box section in accordance to Table 2
+
+        Args:
+            depth: depth of the web in mm (float or int)
+            web_thickness: thickness of the web in mm (float or int)
+            f_y: yield stress of the section material in N/MPa (float or int)
+            axial_load: Axial load (Tension or Compression) acting on the member (i.e. web) in N (float or int)
+            load_type: Type of axial load (Tension or Compression) (string)
+            section_class: Class of the section (Class1 - Plastic, Class2 - Compact or Class3 - Semi-compact) (string)
+
+        Returns:
+            Results of the checks; 1. Neutral axis at mid-depth, 2. Generally (when there is axial tension or compression force acting on the section),
+            and 3. Axial compression, in the form of (list)
+            'Pass', if the section qualifies as the required section_class, 'Fail' if it does not
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        epsilon = math.sqrt(f_y / 250)
+
+        ratio = depth / web_thickness  # ratio of the web/component
+
+        # Check 1: Neutral axis at mid-depth
+        if section_class == 'Plastic':
+            if ratio <= (84 * epsilon):
+                check_1 = 'Pass'
+            else:
+                check_1 = 'Fail'
+        elif section_class == 'Compact':
+            if ratio <= (105 * epsilon):
+                check_1 = 'Pass'
+            else:
+                check_1 = 'Fail'
+        else:  # 'Semi-compact'
+            if ratio <= (126 * epsilon):
+                check_1 = 'Pass'
+            else:
+                check_1 = 'Fail'
+
+        # Check 2: Generally (when there is axial tension or compression force acting on the section)
+        actual_avg_stress = axial_load / (depth * web_thickness)  # N/mm^2 or MPa
+        design_compressive_stress = f_y / gamma_m0  # N/mm^2 or MPa, design compressive stress only of web (cl. 7.1.2.1, IS 800:2007)
+        r_1 = actual_avg_stress / design_compressive_stress  # stress ratio
+
+        if load_type == 'Compression':
+            r_1 = r_1
+        else:
+            r_1 = - r_1  # r_1 is negative for axial tension
+
+        if section_class == 'Plastic':
+            if ratio <= (min(((84 * epsilon) / (1 + r_1)), 42 * epsilon)):
+                check_2 = 'Pass'
+            else:
+                check_2 = 'Fail'
+        elif section_class == 'Compact':
+            if r_1 < 0:
+                if ratio <= ((105 * epsilon) / (1 + r_1)):
+                    check_2 = 'Pass'
+                else:
+                    check_2 = 'Fail'
+            else:
+                if ratio <= (min(((105 * epsilon) / (1 + (1.5 * r_1))), 42 * epsilon)):
+                    check_2 = 'Pass'
+                else:
+                    check_2 = 'Fail'
+        else:  # 'Semi-compact'
+            if ratio <= (min(((126 * epsilon) / (1 + (2 * r_1))), 42 * epsilon)):
+                check_2 = 'Pass'
+            else:
+                check_2 = 'Fail'
+
+        # Check 3: Axial compression
+        if section_class == 'Semi-compact':
+            if ratio <= (42 * epsilon):
+                check_3 = 'Pass'
+            else:
+                check_3 = 'Fail'
+        else:
+            check_3 = 'Pass'  # Not-applicable to Plastic and Compact sections (hence, Pass)
+
+        return [check_1, check_2, check_3]
+
+    @staticmethod
+    def Table2_hollow_tube(diameter, thickness, f_y, load='Axial Compression', section_class='Plastic'):
+        """ Calculate the limiting width to thickness ratio; for a hollow tube section in accordance to Table 2
+
+        Args:
+            diameter: diameter of the tube in mm (float or int)
+            thickness: thickness of the tube in mm (float or int)
+            f_y: yield stress of the section material in N/MPa (float or int)
+            load: Type of load ('Axial Compression' or 'Moment') (string)
+            section_class: Class of the section (Class1 - Plastic, Class2 - Compact or Class3 - Semi-compact) (string)
+
+        Returns:
+            Results of the section classification check(s)
+            'Pass', if the section qualifies as the required section_class, 'Fail' if it does not
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(f_y / 250)
+
+        ratio = diameter / thickness  # ratio of the web/component
+
+        # Check 1: If the load acting is Moment
+        if load == 'Moment':
+
+            if section_class == 'Plastic':
+                if ratio <= (42 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+            elif section_class == 'Compact':
+                if ratio <= (52 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+            else:
+                if ratio <= (146 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+
+        # Check 1: If the load acting is Axial Compression
+        elif load == 'Axial Compression':
+
+            if section_class == 'Plastic':
+                check = 'Pass'
+            elif section_class == 'Compact':
+                check = 'Pass'
+            else:
+                if ratio <= (88 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+        else:
+            pass
+
+        return check
+
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """
     # ==========================================================================
@@ -179,7 +327,7 @@ class IS800_2007(object):
 
         if section_class == 'semi-compact':
             M_d = (Z_e * f_y) / gamma_m0  # N-mm
-        else:
+        else:  # 'compact'
             M_d = (1.0 * Z_p * f_y) / gamma_m0  # N-mm
 
         return M_d
@@ -316,7 +464,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.2  Minimum Edge and End Distances
     @staticmethod
-    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut'):
+    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='Sheared or hand flame cut'):
         """Calculate minimum end and edge distance
         Args:
              d - Nominal diameter of fastener in mm (float)
@@ -329,7 +477,7 @@ class IS800_2007(object):
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        if edge_type == 'a - Sheared or hand flame cut':
+        if edge_type == 'Sheared or hand flame cut':
             return 1.7 * d_0
         else:
             # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
@@ -340,8 +488,8 @@ class IS800_2007(object):
     def cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy, corrosive_influences=False):
         """Calculate maximum end and edge distance
         Args:
-             plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
-             f_y - Yield strength of plate material in MPa (float)
+             conn_plates_t_fu_fy - List of tuples with plate thicknesses in mm, fu in MPa, fy in MPa (list of tuples)
+                                example:- [ (12, 410, 250), (10, 440, 300) ]
              corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
         Returns:
             Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
@@ -438,7 +586,7 @@ class IS800_2007(object):
 
     # 10.3.3.2 Large grip lengths
     @staticmethod
-    def cl_10_3_3_2_bolt_large_grip(d, l_g, l_j=0):
+    def cl_10_3_3_2_bolt_large_grip(d, l_g, l_j=0.0):
         """ Calculate reduction factor for large grip lengths.
         Args:
             l_g = Grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2 (float)
@@ -450,13 +598,35 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.3.2
         """
         beta_lg = 8.0 / (3.0 + l_g / d)
-        if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
-            beta_lg = IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j)
+        if l_j != 0.0:
+            if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
+                beta_lg = IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j)
+        else:
+            pass
         if l_g <= 5.0 * d:
-            beta_lg = 1
-        elif l_g > 8.0 * d:
-            return "GRIP LENGTH TOO LARGE"
-        return beta_lg
+            beta_lg = 1.0
+        # TODO: Check the maximum limit of 8d in each individual modules
+        # elif l_g > 8.0 * d:
+        #     return "GRIP LENGTH TOO LARGE"
+        return round(beta_lg,2)
+
+    # 10.3.3.3 Packing Plates
+    @staticmethod
+    def cl_10_3_3_3_packing_plates(t=0.0):
+        """ Calculate reduction factor for packing plates.
+        Args:
+            t = thickness of the thickest packing plate, in mm
+        Return:
+            beta_pk = Reduction factor for packing plates (float) if applicable
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.3.3
+        """
+        if t > 6.0:
+            beta_pk = (1.0 - 0.0125 * t)
+        else:
+            beta_pk = 1.0
+        return beta_pk
 
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
@@ -705,20 +875,8 @@ class IS800_2007(object):
             return 0.7 * min(part1_thickness, part2_thickness)
 
     @staticmethod
-    def cl_10_5_3_2_fillet_weld_effective_throat_thickness(fillet_size, fusion_face_angle=90):
+    def cl_10_5_3_2_factor_for_throat_thickness (fusion_face_angle = 90):
 
-        """Calculate effective throat thickness of fillet weld for stress calculation
-        Args:
-            fillet_size - Size of fillet weld in mm (float)
-            fusion_face_angle - Angle between fusion faces in degrees (int)
-        Returns:
-            Effective throat thickness of fillet weld for stress calculation in mm (float)
-        Note:
-            Reference:
-
-            IS 800:2007,  cl 10.5.3.2
-
-        """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
         fusion_face_angle = int(round(fusion_face_angle))
         if 60 <= fusion_face_angle <= 90:
@@ -738,7 +896,27 @@ class IS800_2007(object):
         except ValueError:
             return
 
-        throat = max((K * fillet_size), 3)
+        return K
+
+
+    @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness(fillet_size, fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+        Args:
+            fillet_size - Size of fillet weld in mm (float)
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+        Returns:
+            Effective throat thickness of fillet weld for stress calculation in mm (float)
+        Note:
+            Reference:
+
+            IS 800:2007,  cl 10.5.3.2
+
+        """
+        K = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(fusion_face_angle)
+
+        throat = max(round((K * fillet_size),2), 3)
 
         return throat
 
@@ -779,6 +957,21 @@ class IS800_2007(object):
 
         return K
 
+        # Cl. 10.5.3.3 Effective throat size of groove (butt) welds
+
+    @staticmethod
+    def cl_10_5_3_3_groove_weld_effective_throat_thickness(*args):
+
+        """Calculate effective throat thickness of complete penetration butt welds
+        *args:
+            Thicknesses of each plate element being welded in mm (tuple of float)
+        Returns:
+            Effective throat thickness of CJP butt weld in mm (float)
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.3
+        """
+        return min(*args)
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
@@ -793,8 +986,10 @@ class IS800_2007(object):
             Reference:
             IS 800:2007,  cl 10.5.4.1
         """
-        # TODO :  if available_length >= 4 * fillet_size
-        effective_length = available_length - 2 * fillet_size
+        if available_length <= 4 * fillet_size:
+            effective_length = 0
+        else:
+            effective_length = available_length - 2 * fillet_size
         return effective_length
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds

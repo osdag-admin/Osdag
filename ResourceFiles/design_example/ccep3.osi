@@ -1,0 +1,26 @@
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list:
+- '14'
+- '20'
+- '28'
+Connector.Material: E 350 (Fe 490)
+Connector.Web_Plate.Thickness_List:
+- '10'
+- '16'
+- '20'
+- '22'
+- '26'
+- '28'
+- '36'
+Design.Design_Method: Limit State Design
+Detailing.Gap: '3'
+Load.Axial: '25'
+Load.Moment: '80'
+Load.Shear: '50'
+Material: E 350 (Fe 490)
+Member.Designation: UC 305 x 305 x 137
+Member.Material: E 350 (Fe 490)
+Module: Column Coverplate Weld Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '490'
+Weld.Type: Fillet Weld

@@ -1,5 +1,8 @@
-Connector.Flange_Plate.Preferences: Outside + Inside
-Connector.Flange_Plate.Thickness_list: &id001
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list:
+- '30'
+Connector.Material: E 410 (Fe 540)
+Connector.Web_Plate.Thickness_List:
 - '6'
 - '8'
 - '10'
@@ -10,14 +13,10 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '20'
 - '22'
 - '24'
+- '25'
 - '26'
 - '28'
 - '30'
-- '32'
-- '36'
-- '40'
-- '25'
-- '28'
 - '32'
 - '36'
 - '40'
@@ -26,10 +25,8 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '56'
 - '63'
 - '80'
-Connector.Material: E 410 (Fe 540)
-Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
-Detailing.Gap: '10'
+Detailing.Gap: '3'
 Load.Axial: '5'
 Load.Moment: '1'
 Load.Shear: '5'

@@ -1,6 +1,7 @@
 from Common import *
 from utils.common.load import Load
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import *
 
 class Main():
 
@@ -8,26 +9,13 @@ class Main():
         pass
 
     #########################################
-    # Design Preferences Functions End
+    # Design Preferences Functions Start
     #########################################
 
     def bolt_values(self, input_dictionary):
 
         values = {KEY_DP_BOLT_TYPE: 'Pretensioned', KEY_DP_BOLT_HOLE_TYPE: 'Standard',
-                  KEY_DP_BOLT_MATERIAL_G_O: '', KEY_DP_BOLT_SLIP_FACTOR: '0.3'}
-
-        if not input_dictionary or 'Select Material' in [input_dictionary[KEY_MATERIAL]]:
-            pass
-            # bolt_type = 'Pretensioned'
-            # hole_type = 'Standard'
-            # material_g_o = ''
-            # slip_factor = '0.3'
-        else:
-            values[KEY_DP_BOLT_MATERIAL_G_O] = Material(input_dictionary[KEY_MATERIAL]).fu
-            # bolt_type = 'Pretensioned'
-            # hole_type = 'Standard'
-            # material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
-            # slip_factor = '0.3'
+                  KEY_DP_BOLT_SLIP_FACTOR: '0.3'}
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -40,9 +28,6 @@ class Main():
 
         t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'], values[KEY_DP_BOLT_HOLE_TYPE])
         bolt.append(t2)
-
-        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None, values[KEY_DP_BOLT_MATERIAL_G_O])
-        bolt.append(t3)
 
         t4 = (None, None, TYPE_ENTER, None, None)
         bolt.append(t4)
@@ -70,7 +55,7 @@ class Main():
 
         values = {KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}
 
-        if not input_dictionary or 'Select Material' in [input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass
         else:
             values[KEY_DP_WELD_MATERIAL_G_O] = Material(input_dictionary[KEY_MATERIAL]).fu
@@ -95,7 +80,7 @@ class Main():
 
     def detailing_values(self, input_dictionary):
 
-        values = {KEY_DP_DETAILING_EDGE_TYPE: 'a - Sheared or hand flame cut',
+        values = {KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
                   KEY_DP_DETAILING_GAP: '10',
                   KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
 
@@ -106,7 +91,7 @@ class Main():
         detailing = []
 
         t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
-              ['a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
+              ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
               values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
@@ -141,8 +126,8 @@ class Main():
 
     def plate_connector_values(self, input_dictionary):
 
-        if not input_dictionary or 'Select Material' in [input_dictionary[KEY_MATERIAL]]:
-            material_grade = 'Select Material'
+        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
+            material_grade = ''
             fu = ''
             fy_20 = ''
             fy_20_40 = ''
@@ -165,7 +150,7 @@ class Main():
 
         connector = []
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t1 = (KEY_CONNECTOR_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         connector.append(t1)
 
@@ -198,12 +183,14 @@ class Main():
             pm_y = ''
             I_t = ''
             I_w = ''
+            image = ''
 
         else:
             D = float(self[0])
             B = float(self[1])
             t_w = float(self[2])
             t_f = float(self[3])
+            sl = float(self[4])
 
             sec_prop = I_sectional_Properties()
             mass = sec_prop.calc_Mass(D, B, t_w, t_f)
@@ -216,8 +203,12 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
-            I_t = sec_prop.calc_torsion_const(D,B,t_w,t_f)
-            I_w = sec_prop.calc_torsion_const(D, B, t_w, t_f)
+            I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
+            I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
+            if sl != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
 
         d = {'Label_11': str(mass),
              'Label_12': str(area),
@@ -231,225 +222,27 @@ class Main():
              'Label_20': str(pm_y),
              'Label_21': str(I_t),
              'Label_22': str(I_w),
+             KEY_IMAGE: image
             }
 
         return d
 
+    def change_source(self):
 
-    def get_Angle_sec_properties(self):
-        # print(self,profile,"shxv")
-        # print(self, "shxv")
-        if '' in self:
-            mass = ''
-            area = ''
-            Cz = ''
-            Cy = ''
-            moa_z = ''
-            moa_y = ''
-            moa_u = ''
-            moa_v = ''
-            rog_z = ''
-            rog_y = ''
-            rog_u = ''
-            rog_v = ''
-            em_z = ''
-            em_y = ''
-            pm_z = ''
-            pm_y = ''
-            I_t = ''
+        designation = self[0]
+        source = 'Custom'
+        if designation in connectdb("Columns", call_type="dropdown"):
+            source = get_source("Columns", designation)
+        elif designation in connectdb("Beams", call_type="dropdown"):
+            source = get_source("Beams", designation)
+        elif designation in connectdb("Angles", call_type="dropdown"):
+            source = get_source("Angles", designation)
+        elif designation in connectdb("Channels", call_type="dropdown"):
+            source = get_source("Channels", designation)
 
-        else:
-            a = float(self[0])
-            b = float(self[1])
-            t = float(self[2])
-            l = str(self[3])
-            p = str(self[4])
-            if p == "Angles":
-                sec_prop = Single_Angle_Properties()
-            elif p == "Back to Back Angles":
-                sec_prop = BBAngle_Properties()
-            else:
-                sec_prop = SAngle_Properties()
-            # sec_prop = Single_Angle_Properties()
-            mass = sec_prop.calc_Mass(a,b,t,l)
-            area = sec_prop.calc_Area(a,b,t,l)
-            Cz = sec_prop.calc_Cz(a,b,t,l)
-            Cy = sec_prop.calc_Cy(a,b,t,l)
-            moa_z = sec_prop.calc_MomentOfAreaZ(a,b,t,l)
-            moa_y = sec_prop.calc_MomentOfAreaY(a,b,t,l)
-            moa_u = sec_prop.calc_MomentOfAreaU(a,b,t,l)
-            moa_v = sec_prop.calc_MomentOfAreaV(a,b,t,l)
-            rog_z = sec_prop.calc_RogZ(a,b,t,l)
-            rog_y = sec_prop.calc_RogY(a,b,t,l)
-            rog_u = sec_prop.calc_RogU(a,b,t,l)
-            rog_v = sec_prop.calc_RogV(a,b,t,l)
-            em_z = sec_prop.calc_ElasticModulusZz(a,b,t,l)
-            em_y = sec_prop.calc_ElasticModulusZy(a,b,t,l)
-            pm_z = sec_prop.calc_PlasticModulusZpz(a,b,t,l)
-            pm_y = sec_prop.calc_PlasticModulusZpy(a,b,t,l)
-            I_t = sec_prop.calc_TorsionConstantIt(a,b,t,l)
-
-
-        d = {'Label_9': str(mass),
-             'Label_10': str(area),
-             'Label_7': str(Cz),
-             'Label_8': str(Cy),
-             'Label_11': str(moa_z),
-             'Label_12': str(moa_y),
-             'Label_13': str(moa_u),
-             'Label_14': str(moa_v),
-             'Label_15': str(rog_z),
-             'Label_16': str(rog_y),
-             'Label_17': str(rog_u),
-             'Label_18': str(rog_v),
-             'Label_19': str(em_z),
-             'Label_20': str(em_y),
-             'Label_21': str(pm_z),
-             'Label_22': str(pm_y),
-             'Label_23': str(I_t),
-             }
-
+        d = {KEY_SOURCE: str(source)}
         return d
 
-    # def get_BBAngle_sec_properties(self):
-    #
-    #     if '' in self:
-    #         mass = ''
-    #         area = ''
-    #         Cz = ''
-    #         Cy = ''
-    #         moa_z = ''
-    #         moa_y = ''
-    #         moa_u = ''
-    #         moa_v = ''
-    #         rog_z = ''
-    #         rog_y = ''
-    #         rog_u = ''
-    #         rog_v = ''
-    #         em_z = ''
-    #         em_y = ''
-    #         pm_z = ''
-    #         pm_y = ''
-    #         I_t = ''
-    #
-    #     else:
-    #         a = float(self[0])
-    #         b = float(self[1])
-    #         t = float(self[2])
-    #         l = float(self[3])
-    #
-    #         sec_prop = BBAngle_Properties()
-    #         mass = sec_prop.calc_Mass(a,b,t,l)
-    #         area = sec_prop.calc_Area(a,b,t,l)
-    #         Cz = sec_prop.calc_Cz(a,b,t,l)
-    #         Cy = sec_prop.calc_Cy(a,b,t,l)
-    #         moa_z = sec_prop.calc_MomentOfAreaZ(a,b,t,l)
-    #         moa_y = sec_prop.calc_MomentOfAreaY(a,b,t,l)
-    #         moa_u = sec_prop.calc_MomentOfAreaU(a,b,t,l)
-    #         moa_v = sec_prop.calc_MomentOfAreaV(a,b,t,l)
-    #         rog_z = sec_prop.calc_RogZ(a,b,t,l)
-    #         rog_y = sec_prop.calc_RogY(a,b,t,l)
-    #         rog_u = sec_prop.calc_RogU(a,b,t,l)
-    #         rog_v = sec_prop.calc_RogV(a,b,t,l)
-    #         em_z = sec_prop.calc_ElasticModulusZz(a,b,t,l)
-    #         em_y = sec_prop.calc_ElasticModulusZy(a,b,t,l)
-    #         pm_z = sec_prop.calc_PlasticModulusZpz(a,b,t,l)
-    #         pm_y = sec_prop.calc_PlasticModulusZpy(a,b,t,l)
-    #         I_t = sec_prop.calc_TorsionConstantIt(a,b,t,l)
-    #
-    #
-    #     d = {'Label_9': str(mass),
-    #          'Label_10': str(area),
-    #          'Label_7': str(Cz),
-    #          'Label_8': str(Cy),
-    #          'Label_11': str(moa_z),
-    #          'Label_12': str(moa_y),
-    #          'Label_13': str(moa_u),
-    #          'Label_14': str(moa_v),
-    #          'Label_15': str(rog_z),
-    #          'Label_16': str(rog_y),
-    #          'Label_17': str(rog_u),
-    #          'Label_18': str(rog_v),
-    #          'Label_19': str(em_z),
-    #          'Label_20': str(em_y),
-    #          'Label_21': str(pm_z),
-    #          'Label_22': str(pm_y),
-    #          'Label_23': str(I_t),
-    #          }
-    #
-    #     return d
-
-    def get_Channel_sec_properties(self):
-
-        if '' in self:
-            mass = ''
-            area = ''
-            C_y = ''
-            moa_z = ''
-            moa_y = ''
-
-            rog_z = ''
-            rog_y = ''
-
-            em_z = ''
-            em_y = ''
-            pm_z = ''
-            pm_y = ''
-
-        else:
-            f_w = float(self[0])
-            f_t = float(self[1])
-            w_h = float(self[2])
-            w_t = float(self[3])
-
-            sec_prop = Single_Channel_Properties()
-            mass = sec_prop.calc_Mass(f_w, f_t, w_h, w_t)
-            area = sec_prop.calc_Area(f_w, f_t, w_h, w_t)
-            C_y = sec_prop.calc_C_y(f_w, f_t, w_h, w_t)
-            moa_z = sec_prop.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t)
-            moa_y = sec_prop.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
-
-            rog_z = sec_prop.calc_RogZ(f_w, f_t, w_h, w_t)
-            rog_y = sec_prop.calc_RogY(f_w, f_t, w_h, w_t)
-
-            em_z = sec_prop.calc_ElasticModulusZz(f_w, f_t, w_h, w_t)
-            em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
-            pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
-            pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
-
-        d = {'Label_9': str(mass),
-             'Label_10': str(area),
-             'Label_11': str(moa_z),
-             'Label_12': str(moa_y),
-             'Label_15': str(rog_z),
-             'Label_16': str(rog_y),
-             'Label_17': str(C_y),
-             'Label_19': str(em_z),
-             'Label_20': str(em_y),
-             'Label_21': str(pm_z),
-             'Label_22': str(pm_y),
-             }
-
-        return d
-
-
-    #########################################
-    # Design Preferences Functions End
-    #########################################
-
-
-    # def customized_input(self):
-    #
-    #     list1 = []
-    #     t1 = (KEY_GRD, self.grdval_customized)
-    #     list1.append(t1)
-    #     t3 = (KEY_D, self.diam_bolt_customized)
-    #     list1.append(t3)
-    #     t6 = (KEY_PLATETHK, self.plate_thick_customized)
-    #     list1.append(t6)
-    #     # t8 = (KEY_SIZE, self.size_customized)
-    #     # list1.append(t8)
-    #     return list1
 
     @staticmethod
     def grdval_customized():
@@ -466,25 +259,39 @@ class Main():
         d = VALUES_PLATETHK_CUSTOMIZED
         return d
 
-    #
-    # @staticmethod
-    # def size_customized():
-    #     d = VALUES_SIZE_CUSTOMIZED
-    #     return d
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
 
-    # def input_value_changed(self):
-    #     pass
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     def set_input_values(self, design_dictionary):
         pass
-        # self.mainmodule = "Tension"
-        # self.connectivity = design_dictionary[KEY_CONN]
 
-        # if self.connectivity in VALUES_CONN_1:
-        #     self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
-        # else:
-        #     self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
-
-
-
-
+    def call_3DModel(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Model':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Model", bgcolor)

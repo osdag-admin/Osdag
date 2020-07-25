@@ -1,6 +1,8 @@
-from utils.common.component import Section,I_sectional_Properties, Material
+from utils.common.component import ISection, Material, Beam
+from utils.common.Section_Properties_Calculator import I_sectional_Properties
 from design_type.main import Main
 from Common import *
+import numpy as np
 
 
 class Connection(Main):
@@ -17,7 +19,7 @@ class Connection(Main):
             KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''
@@ -43,13 +45,11 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-
+            image= ''
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation, material_grade)
-            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            Section.connect_to_database_update_other_attributes(I_sec_attributes, table, designation,material_grade)
+            I_sec_attributes = ISection(designation, material_grade)
             source = str(I_sec_attributes.source)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -57,7 +57,7 @@ class Connection(Main):
             flange_width = str(I_sec_attributes.flange_width)
             flange_thickness = str(I_sec_attributes.flange_thickness)
             web_thickness = str(I_sec_attributes.web_thickness)
-            flange_slope = str(I_sec_attributes.flange_slope)
+            flange_slope = float(I_sec_attributes.flange_slope)
             root_radius = str(I_sec_attributes.root_radius)
             toe_radius = str(I_sec_attributes.toe_radius)
             m_o_e = "200"
@@ -65,17 +65,22 @@ class Connection(Main):
             p_r = "0.3"
             t_e = "12"
             mass = str(I_sec_attributes.mass)
-            area = str(I_sec_attributes.area)
-            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
-            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
-            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
-            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
-            torsion_const = str(I_sec_attributes.torsion_const)
-            warping_const = str(I_sec_attributes.warping_const)
+            area = str(round((I_sec_attributes.area/10**2),2))
+            mom_inertia_z = str(round((I_sec_attributes.mom_inertia_z/10**4),2))
+            mom_inertia_y = str(round((I_sec_attributes.mom_inertia_y/10**4),2))
+            rad_of_gy_z = str(round((I_sec_attributes.rad_of_gy_z/10),2))
+            rad_of_gy_y = str(round((I_sec_attributes.rad_of_gy_y/10),2))
+            elast_sec_mod_z = str(round((I_sec_attributes.elast_sec_mod_z/10**3),2))
+            elast_sec_mod_y = str(round((I_sec_attributes.elast_sec_mod_y/10**3),2))
+            plast_sec_mod_z = str(round((I_sec_attributes.plast_sec_mod_z/10**3),2))
+            plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y/10**3),2))
+            torsion_const = str(round((I_sec_attributes.It/10**4),2))
+            warping_const = str(round((I_sec_attributes.Iw/10**6),2))
+            if flange_slope != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
+
 
         if KEY_SUPTNGSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTNGSEC_MATERIAL]
@@ -100,8 +105,26 @@ class Connection(Main):
         t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
-        supporting_section.append(t5)
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        supporting_section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        supporting_section.append(t16)
+
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        supporting_section.append(t31)
+
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        supporting_section.append(t32)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        supporting_section.append(t14)
+
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
+        supporting_section.append(t29)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
 
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
@@ -126,24 +149,6 @@ class Connection(Main):
 
         t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         supporting_section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        supporting_section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        supporting_section.append(t15)
-
-        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        supporting_section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         supporting_section.append(t17)
@@ -172,6 +177,15 @@ class Connection(Main):
         t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         supporting_section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+        supporting_section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t17)
+
         t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         supporting_section.append(t26)
 
@@ -184,27 +198,6 @@ class Connection(Main):
         t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
         supporting_section.append(t27)
 
-        t28 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t28)
-
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
-        supporting_section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        supporting_section.append(t31)
-
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        supporting_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
-        supporting_section.append(t33)
-
         return supporting_section
 
     def tab_supported_section(self, input_dictionary):
@@ -215,7 +208,7 @@ class Connection(Main):
             KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''
@@ -241,11 +234,12 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
+            image = ''
 
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
 
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation,material_grade)
@@ -256,7 +250,7 @@ class Connection(Main):
             flange_width = str(I_sec_attributes.flange_width)
             flange_thickness = str(I_sec_attributes.flange_thickness)
             web_thickness = str(I_sec_attributes.web_thickness)
-            flange_slope = str(I_sec_attributes.flange_slope)
+            flange_slope = float(I_sec_attributes.flange_slope)
             root_radius = str(I_sec_attributes.root_radius)
             toe_radius = str(I_sec_attributes.toe_radius)
             m_o_e = "200"
@@ -264,17 +258,21 @@ class Connection(Main):
             p_r = "0.3"
             t_e = "12"
             mass = str(I_sec_attributes.mass)
-            area = str(I_sec_attributes.area)
-            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
-            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
-            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
-            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
-            torsion_const = str(I_sec_attributes.torsion_const)
-            warping_const = str(I_sec_attributes.warping_const)
+            area = str(round((I_sec_attributes.area / 10 ** 2), 2))
+            mom_inertia_z = str(round((I_sec_attributes.mom_inertia_z / 10 ** 4), 2))
+            mom_inertia_y = str(round((I_sec_attributes.mom_inertia_y / 10 ** 4), 2))
+            rad_of_gy_z = str(round((I_sec_attributes.rad_of_gy_z / 10), 2))
+            rad_of_gy_y = str(round((I_sec_attributes.rad_of_gy_y / 10), 2))
+            elast_sec_mod_z = str(round((I_sec_attributes.elast_sec_mod_z / 10 ** 3), 2))
+            elast_sec_mod_y = str(round((I_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
+            plast_sec_mod_z = str(round((I_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
+            plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+            torsion_const = str(round((I_sec_attributes.It / 10 ** 4), 2))
+            warping_const = str(round((I_sec_attributes.Iw / 10 ** 6), 2))
+            if flange_slope != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
 
         if KEY_SUPTDSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTDSEC_MATERIAL]
@@ -299,6 +297,27 @@ class Connection(Main):
         t4 = (KEY_SUPTDSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
 
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        supporting_section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        supporting_section.append(t16)
+
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        supporting_section.append(t31)
+
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        supporting_section.append(t32)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        supporting_section.append(t14)
+
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
+        supporting_section.append(t29)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
 
@@ -322,24 +341,6 @@ class Connection(Main):
 
         t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         supporting_section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        supporting_section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        supporting_section.append(t15)
-
-        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        supporting_section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         supporting_section.append(t17)
@@ -368,6 +369,18 @@ class Connection(Main):
         t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         supporting_section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
+        # if flange_slope != 90:
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None,image)
+        # else:
+        #     t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM[1])
+        supporting_section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t17)
+
         t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         supporting_section.append(t26)
 
@@ -380,27 +393,6 @@ class Connection(Main):
         t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
         supporting_section.append(t27)
 
-        t28 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t28)
-
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
-        supporting_section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        supporting_section.append(t31)
-
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        supporting_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
-        supporting_section.append(t33)
-
         return supporting_section
 
     def get_fu_fy_I_section_suptng(self):
@@ -410,7 +402,7 @@ class Connection(Main):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -429,7 +421,7 @@ class Connection(Main):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -441,7 +433,6 @@ class Connection(Main):
              KEY_SUPTDSEC_FY: fy}
 
         return d
-
 
     def get_fu_fy(self):
         material_grade = self[0]
@@ -457,6 +448,8 @@ class Connection(Main):
             fy_20 = m_conn.fy_20
             fy_20_40 = m_conn.fy_20_40
             fy_40 = m_conn.fy_40
+            fu = m_conn.fu
+            fy = m_conn.fy
         else:
             pass
 
@@ -509,28 +502,6 @@ class Connection(Main):
         return fu_fy_list
 
 
-    def get_values_for_design_pref(self, key, design_dictionary):
-
-        if design_dictionary[KEY_MATERIAL] != 'Select Material':
-            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
-        else:
-            fu = ''
-
-        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
-               KEY_DP_BOLT_HOLE_TYPE: "Standard",
-               KEY_DP_BOLT_MATERIAL_G_O: str(fu),
-               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
-               KEY_DP_WELD_MATERIAL_G_O: str(fu),
-               KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
-               KEY_DP_DETAILING_GAP: '10',
-               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
-               KEY_DP_DESIGN_METHOD: "Limit State Design",
-               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
-               }[key]
-
-        return val
-
     def refresh_input_dock(self):
 
         add_buttons = []
@@ -550,6 +521,84 @@ class Connection(Main):
     # Design Preference Functions End
     ########################################
 
+    def func_for_validation(self, design_dictionary):
+        print('input dictionary')
+        print(design_dictionary)
+        all_errors = []
+        self.design_status = False
+        flag1 = False
+        flag2=True
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                if design_dictionary[option[0]] == 'Select Section' or design_dictionary[option[0]] == 'Select Grade':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    missing_fields_list.append(option[1])
+
+        if len(missing_fields_list) == 0:
+            if KEY_CONN in design_dictionary and design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
+                primary = design_dictionary[KEY_SUPTNGSEC]
+                secondary = design_dictionary[KEY_SUPTDSEC]
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+                lst = []
+                rows = cursor.fetchall()
+                for row in rows:
+                    lst.append(row)
+                p_val = lst[0][0]
+                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+                lst1 = []
+                rows1 = cursor2.fetchall()
+                for row1 in rows1:
+                    lst1.append(row1)
+                s_val = lst1[0][0]
+                if p_val <= s_val:
+                    error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+
+            elif KEY_CONN in design_dictionary and design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
+                primary = design_dictionary[KEY_SUPTNGSEC]
+                secondary = design_dictionary[KEY_SUPTDSEC]
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
+                p_beam_details = cursor.fetchone()
+                p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
+                cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+
+                s_beam_details = cursor2.fetchone()
+                s_val = s_beam_details[0]
+                #print(p_val,s_val)
+                if p_val <= s_val:
+                    error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+            else:
+                flag1 = True
+            if design_dictionary[KEY_MODULE] == KEY_DISP_FINPLATE:
+                selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
+                supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
+                available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
+                if not available_plates:
+                    error = "Plate thickness should be greater than suppported section web thicknesss."
+                    all_errors.append(error)
+                    flag2 = False
+                else:
+                    flag2=True
+            if flag1 and flag2:
+                self.set_input_values(self, design_dictionary)
+            else:
+                return all_errors
+
+        else:
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
+            return all_errors
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -575,15 +624,8 @@ class Connection(Main):
 
         return information
 
-    def call_3DModel(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Model':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
+
 
     def call_3DColumn(self, ui, bgcolor):
         from PyQt5.QtWidgets import QCheckBox
@@ -612,6 +654,92 @@ class Connection(Main):
             return True
         else:
             return False
+
+    def save_design(self):
+        if self.supporting_section.flange_slope != 90:
+            section1 = "Slope_Beam"
+        else:
+            section1 = "Parallel_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: section1,
+                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
+                                  KEY_DISP_MATERIAL: self.supporting_section.material,
+                                  'Ultimate strength, $f_u$': self.supporting_section.fu,
+                                  'Yield strength, $f_y$': self.supporting_section.fy,
+                                  'Mass, $m$ (kg/m)': self.supporting_section.mass,
+                                  'Area, $A$ (cm$^2$)': round(self.supporting_section.area/100,2),
+                                  '$D$ (mm)': self.supporting_section.depth,
+                                  '$B$ (mm)': self.supporting_section.flange_width,
+                                  '$t$ (mm)': self.supporting_section.web_thickness,
+                                  '$T$ (mm)': self.supporting_section.flange_thickness,
+                                  'FlangeSlope': self.supporting_section.flange_slope,
+                                  '$R_1$ (mm)': self.supporting_section.root_radius,
+                                  '$R_2$ (mm)': self.supporting_section.toe_radius,
+                                  '$I_z$ (cm$^4$)': round(self.supporting_section.mom_inertia_z/10000,2),
+                                  '$I_y$(cm$^4$)': round(self.supporting_section.mom_inertia_y/10000,2),
+                                  '$r_z$ (cm)': round(self.supporting_section.rad_of_gy_z/10,2),
+                                  '$r_y$ (cm)': round(self.supporting_section.rad_of_gy_y/10,2),
+                                  '$Z_z$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_z/1000,2),
+                                  '$Z_y$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_y/1000,2),
+                                  '$Z_{pz}$ (cm$^3$)': round(self.supporting_section.plast_sec_mod_z/1000,2),
+                                  '$Z_{py}$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_y/1000,2)}
+
+        if self.supported_section.flange_slope != 90:
+            section2 = "Slope_Beam"
+        else:
+            section2 = "Parallel_Beam"
+        self.report_supported = {
+            KEY_DISP_SEC_PROFILE: section2,  # Image shall be saved with this name.png in resource files
+            KEY_DISP_SUPTDSEC: self.supported_section.designation,
+            KEY_DISP_MATERIAL: self.supported_section.material,
+            'Ultimate strength, $f_u$': self.supported_section.fu,
+            'Yield strength, $f_y$': self.supported_section.fy,
+            'Mass, $M$ (kg/m)': self.supported_section.mass,
+            'Area, $A$ (cm$^2$)': round(self.supported_section.area / 100, 2),
+            '$D$ (mm)': self.supported_section.depth,
+            '$B$ (mm)': self.supported_section.flange_width,
+            '$t$ (mm)': self.supported_section.web_thickness,
+            '$T$ (mm)': self.supported_section.flange_thickness,
+            'FlangeSlope': self.supported_section.flange_slope,
+            '$R_1$ (mm)': self.supported_section.root_radius,
+            '$R_2$ (mm)': self.supported_section.toe_radius,
+            '$I_z$ (cm$^4$)': round(self.supported_section.mom_inertia_z / 10000, 2),
+            '$I_y$(cm$^4$)': round(self.supported_section.mom_inertia_y / 10000, 2),
+            '$r_z$ (cm)': round(self.supported_section.rad_of_gy_z / 10, 2),
+            '$r_y$ (cm)': round(self.supported_section.rad_of_gy_y / 10, 2),
+            '$Z_z$ (cm$^3$)': round(self.supported_section.elast_sec_mod_z / 1000, 2),
+            '$Z_y$ (cm$^3$)': round(self.supported_section.elast_sec_mod_y / 1000, 2),
+            '$Z_{pz}$ (cm$^3$)': round(self.supported_section.plast_sec_mod_z / 1000, 2),
+            '$Z_{py}$ (cm$^3$)': round(self.supported_section.elast_sec_mod_y / 1000, 2)}
+        if self.module == KEY_DISP_FINPLATE or self.module == KEY_DISP_ENDPLATE:
+            self.report_input = \
+                {KEY_MAIN_MODULE: self.mainmodule,
+                 KEY_MODULE: self.module,
+                 KEY_CONN: self.connectivity,
+                 KEY_DISP_SHEAR: self.load.shear_force,
+                 KEY_DISP_AXIAL: self.load.axial_force,
+                 "Supporting Section": "TITLE",
+                 "Supporting Section Details": self.report_supporting,
+                 "Supported Section": "TITLE",
+                 "Supported Section Details": self.report_supported,
+                 "Bolt Details": "TITLE",
+                 KEY_DISP_D: str(self.bolt.bolt_diameter),
+                 KEY_DISP_GRD: str(self.bolt.bolt_grade),
+                 KEY_DISP_TYP: self.bolt.bolt_type,
+                 KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                 KEY_DISP_DP_BOLT_TYPE:self.bolt.bolt_tensioning,
+                 KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+                 KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                 KEY_DISP_GAP: self.plate.gap,
+                 KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
+                 "Plate Details": "TITLE",
+                 KEY_DISP_PLATETHK: str(self.plate.thickness),
+                 KEY_DISP_MATERIAL: self.plate.material,
+                 KEY_DISP_FU: self.plate.fu,
+                 KEY_DISP_FY: self.plate.fy,
+                 "Weld Details": "TITLE",
+                 KEY_DISP_DP_WELD_TYPE: "Fillet",
+                 KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+                 KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
 
 if __name__ == "__main__":
     connection = Connection()

@@ -3,6 +3,54 @@ QWidget {
 
 }
 
+#TitleBar QToolButton#close_button {
+    background-color: transparent;
+    image: url("themes/rc/titlebar_close.png");
+}
+
+#TitleBar QToolButton#close_button:hover {
+    background-color: #FF3333;
+    image: url("themes/rc/titlebar_close_hover.png");
+}
+#TitleBar QToolButton#save_log {
+	background-color: transparent;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar QToolButton#report_issue {
+	background-color: transparent;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar QToolButton#report_issue:hover {
+	background-color: cadetblue;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar QToolButton#save_log:hover {
+	background-color: limegreen;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar {
+    background-color: lightgray;
+    /*background-color: rgba(22, 31, 38, 1);*/
+}
+#TitleBar QLabel{
+	font-family: Arial;
+	font-size: 10pt;
+	}
+#CriticalExceptionDialog {
+	background-color: lightgray;
+}
+#CriticalExceptionDialog QTextEdit{
+	font-family: Georgia;
+	font-size: 9pt;
+}
 QTextEdit {
 	border-width: 1px;
 	border-style: solid;
@@ -295,7 +343,7 @@ QSlider::sub-page:vertical {
 QScrollBar:horizontal {
   height: 16px;
   margin: 2px 16px 2px 16px;
-  border: 1px solid #32414B;
+  border: 0.1px solid #32414B;
   border-radius: 4px;
   background-color: white;
 }
@@ -310,14 +358,14 @@ QScrollBar:vertical {
 
 QScrollBar::handle:horizontal {
   background-color: lightgray;
-  border: 1px solid #32414B;
+  border: 0.3px solid #32414B;
   border-radius: 4px;
   min-width: 8px;
 }
 
 QScrollBar::handle:horizontal:hover {
   background-color: #abc250;
-  border: 1px solid #148CD2;
+  border: 0.1px solid #148CD2;
   border-radius: 4px;
   min-width: 8px;
 }
@@ -433,16 +481,19 @@ QComboBox QAbstractItemView
   selection-color:black ;
 
 }
+QDialog#DesignPreferences QTabWidget::tab-bar{
+    alignment: left;
+}
 QDialog#DesignPreferences QTabBar::tab {
-                margin-right: 10;
+				margin-right:2px;
                 border-top-left-radius: 2px ;
                 border-top-right-radius: 2px ;
                 border-bottom-left-radius: 0px ;
                 border-bottom-right-radius: 0px ;
-                height: 35px;
-                width: 150px;
+                height: 30px;
+                width: 120px;
 				background: lightgray;
-                font-size: 18px;
+                font-size: 9pt;
 				color: black;
 				border: 0.5px inset #abc250;
                }
@@ -461,6 +512,11 @@ QDialog#DesignPreferences QPushButton{
 		background:lightgray;
 		border: 1.2px inset #abc250;
 
+		padding-left: 7px;
+		padding-right: 7px;
+		font-family: Arial;
+		font-size:9pt;
+
 }
 
 QDialog#DesignPreferences QPushButton:hover{
@@ -476,15 +532,11 @@ QDialog#DesignPreferences QTabBar::tab:selected
 	border:none;
 }
 QTabBar::tab {
-                margin-right: 10;
-                border-top-left-radius: 2px ;
-                border-top-right-radius: 2px ;
-                border-bottom-left-radius: 0px ;
-                border-bottom-right-radius: 0px ;
-                height: 35px;
-                width: 200px;
 
-                font-size: 18px;
+                height: 35px;
+                width: 180px;
+                font-size: 12pt;
+                font-family:Arial
 
 
                         }
@@ -573,7 +625,7 @@ QDialog#Dialog QPushButton{
 }
 QFrame#frame{
 
- background: #abc250;
+ background: #91B014;
 
  }
 
@@ -585,3 +637,11 @@ QFrame#frame{
  QScrollArea{
  background: white;
  }
+
+QLineEdit:disabled{
+	background-color: lightgray;
+}
+
+QComboBox:disabled{
+	background-color: lightgray;
+}

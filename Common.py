@@ -1141,11 +1141,10 @@ KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 
-KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
+KEY_REDUCTION_LONG_JOINT ='bolt.long_joint'
+KEY_DISP_REDUCTION_LONG_JOINT ="Long Joint Red.Factor"
+
 KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
-
-
-KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
 KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
 
 
@@ -1365,15 +1364,18 @@ KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
-KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
+KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
+KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(nos)'
+
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (nos)'
 
 
 KEY_OUT_SPACING = 'spacing'

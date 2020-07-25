@@ -1195,10 +1195,10 @@ class FinPlateConnection(ShearConnection):
                     self.report_check.append(t4)
 
 
-                t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
-                       long_joint_bolted_prov(self.plate.bolt_line,self.plate.bolts_one_line,
-                                              self.plate.pitch_provided,self.plate.gauge_provided,
-                                              self.bolt.bolt_diameter_provided,bolt_capacity_kn,bolt_capacity_red_kn,'n_r'), "")
+                t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
+                       cl_10_3_3_1_long_joint_bolted_prov(self.plate.bolt_line, self.plate.bolts_one_line,
+                                                          self.plate.pitch_provided, self.plate.gauge_provided,
+                                                          self.bolt.bolt_diameter_provided, bolt_capacity_kn, bolt_capacity_red_kn,'n_r'), "")
                 self.report_check.append(t10)
 
                 t5=(KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,bolt_capacity_red_kn,

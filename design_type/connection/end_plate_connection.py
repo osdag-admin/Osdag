@@ -1475,8 +1475,8 @@ class EndPlateConnection(ShearConnection):
                    "")
             self.report_check.append(t10)
 
-            t11 = (KEY_OUT_LARGE_GRIP, large_grip_bolted_req(),
-                   large_grip_bolted_prov(self.t_sum, self.bolt.bolt_diameter_provided, beta_lj),
+            t11 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
+                   cl_10_3_3_2_large_grip_bolted_prov(self.t_sum, self.bolt.bolt_diameter_provided, beta_lj),
                    "")
             self.report_check.append(t11)
 

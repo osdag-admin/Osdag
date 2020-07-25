@@ -1453,7 +1453,6 @@ def cl_10_3_3_1_long_joint_bolted_prov(nc, nr, p, g, d, Tc, Tr, direction=None):
 
     return long_joint_bolted_eqn
 
-
 def cl_10_3_3_2_large_grip_bolted_req():
     """
      Returns:
@@ -1472,7 +1471,6 @@ def cl_10_3_3_2_large_grip_bolted_req():
     large_grip_bolted_eqn.append(NoEscape(r'& but~\beta_{lg}\leq \beta_{lj} \\'))
     large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
     return large_grip_bolted_eqn
-
 
 def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
     """

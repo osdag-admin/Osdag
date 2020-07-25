@@ -1640,7 +1640,7 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 
 KEY_LENZZ = 'Member.Length_zz'

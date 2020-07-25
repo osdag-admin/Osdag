@@ -48,6 +48,7 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
+from gusset_connection import GussetConnection
 import logging
 import subprocess
 from get_DPI_scale import scale,height,width
@@ -749,6 +750,7 @@ class Window(QMainWindow):
                     arg_list = []
                     if onchange_key_popup != []:
                         for change_key in onchange_key_popup[0][0]:
+                            print(change_key)
                             arg_list.append(self.dockWidgetContents.findChild(QtWidgets.QWidget, change_key).currentText())
                         data[t[0] + "_customized"] = t[1](arg_list)
                     else:
@@ -1800,6 +1802,8 @@ class Window(QMainWindow):
             return Tension_bolted
         elif name == KEY_DISP_TENSION_WELDED:
             return Tension_welded
+        else:
+            return GussetConnection
 # Function for getting inputs from a file
     '''
     @author: Umair

@@ -1468,15 +1468,15 @@ class EndPlateConnection(ShearConnection):
                 beta_pk = 1.0
             bolt_capacity_red = round(self.bolt.bolt_capacity * beta_lj*beta_lg*beta_pk, 2)
 
-            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
-                   long_joint_bolted_prov(self.plate.bolt_line, self.plate.bolts_one_line,
-                                          self.plate.gauge_provided, self.plate.pitch_provided,
-                                          self.bolt.bolt_diameter_provided, self.bolt.bolt_capacity, bolt_capacity_red,direction='n_r'),
+            t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
+                   cl_10_3_3_1_long_joint_bolted_prov(self.plate.bolt_line, self.plate.bolts_one_line,
+                                                      self.plate.gauge_provided, self.plate.pitch_provided,
+                                                      self.bolt.bolt_diameter_provided, self.bolt.bolt_capacity, bolt_capacity_red, direction='n_r'),
                    "")
             self.report_check.append(t10)
 
-            t11 = (KEY_OUT_LARGE_GRIP, large_grip_bolted_req(),
-                   large_grip_bolted_prov(self.t_sum, self.bolt.bolt_diameter_provided, beta_lj),
+            t11 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
+                   cl_10_3_3_2_large_grip_bolted_prov(self.t_sum, self.bolt.bolt_diameter_provided, beta_lj),
                    "")
             self.report_check.append(t11)
 

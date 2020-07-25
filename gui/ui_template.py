@@ -7,9 +7,6 @@
 # WARNING! All changes made in this file will be lost!\
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from design_report import reportGenerator
-
-
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *   
@@ -77,9 +74,9 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
-from get_DPI_scale import scale
+from get_DPI_scale import scale,height,width
 from cad.cad3dconnection import cadconnection
-
+from pynput.mouse import Button, Controller
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -128,7 +125,21 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
 
     def resizeEvent(self, event):
         self.resized.emit()
+        print('event:', event)
         return super(Ui_ModuleWindow, self).resizeEvent(event)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.WindowStateChange:
+            if event.oldState() == Qt.WindowNoState or self.windowState() == Qt.WindowMaximized:
+                print("WindowMaximized")
+
+                x=width/2
+                y=height/2
+                mouse = Controller()
+                original = mouse.position
+                mouse.postion=(x,y)
+                mouse.click(Button.left,1)
+                mouse.position = original
 
     def resize_dockComponents(self):
 
@@ -2018,9 +2029,9 @@ class Window(QMainWindow):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(True)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(True)
-                # fName = str('./ResourceFiles/images/3d.png')
-                # file_extension = fName.split(".")[-1]
-                #
+                fName = str('./ResourceFiles/images/3d.png')
+                file_extension = fName.split(".")[-1]
+
                 # if file_extension == 'png':
                 #     self.display.ExportToImage(fName)
                 #     im = Image.open('./ResourceFiles/images/3d.png')

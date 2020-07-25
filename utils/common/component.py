@@ -74,7 +74,7 @@ class Bolt:
         self.bolt_fy = 0.0
         self.fu_considered = 0.0
         self.thk_considered = 0.0
-
+        self.beta_lg = 1.0
         if corrosive_influences == "Yes":
             self.corrosive_influences = True
         else:
@@ -189,6 +189,7 @@ class Bolt:
             else:
                 self.kb = min(e / (3.0 * self.d_0), self.bolt_fu / fu_considered,
                               1.0)  # calculate k_b when there is no pitch (p = 0)
+            self.beta_lg = IS800_2007.cl_10_3_3_2_bolt_large_grip(d=self.bolt_diameter_provided, l_g=t_sum)
 
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity, self.kh, self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
@@ -199,7 +200,7 @@ class Bolt:
 
         # def length_grip_bolt_cap_red(self, plate_quantity, parent_tk, plate_tk, diameter, bolt_capacity,vres):
         #     length_grip_l_g = (plate_quantity * plate_tk) + parent_tk
-        self.beta_lg = IS800_2007.cl_10_3_3_2_bolt_large_grip(d=self.bolt_diameter_provided, l_g=t_sum)
+
         # #     bolt_capacity_red =self.beta_lg * bolt_capacity
         #     if vres > bolt_capacity_red:
         #         self.design_status = False
@@ -491,6 +492,7 @@ class Plate(Material):
         self.vres = 0.0
         self.spacing_status = 0.0
         self.beta_lj = 1.0
+        self.beta_lg = 1.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)
@@ -632,7 +634,7 @@ class Plate(Material):
                 float((flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2),
                 2)
         else:
-            gauge = 0.
+            gauge = 0
             edge_dist = round(
                 float((flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2),
                 2)
@@ -706,13 +708,14 @@ class Plate(Material):
                 self.beta_lj = 1.075 - self.length_avail / (200 * bolt_dia)
                 print('long joint case')
                 if self.beta_lj > 1:
-                    self.beta_lj = 1
+                    self.beta_lj = 1.0
                 elif self.beta_lj < 0.75:
                     self.beta_lj = 0.75
                 else:
                     self.beta_lj = round(self.beta_lj, 2)
                 bolt_capacity_red = round(self.beta_lj, 2) * bolt_capacity
             else:
+                self.beta_lj = 1.0
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
@@ -725,7 +728,7 @@ class Plate(Material):
             if self.length_avail > 15 * bolt_dia:
                 self.beta_lj = 1.075 - self.length_avail / (200 * bolt_dia)
                 if  self.beta_lj > 1:
-                    self.beta_lj = 1
+                    self.beta_lj = 1.0
                 elif  self.beta_lj < 0.75:
                     self.beta_lj = 0.75
                 else:
@@ -733,6 +736,7 @@ class Plate(Material):
                 bolt_capacity_red = round( self.beta_lj, 2) * bolt_capacity
                 print('beta', round( self.beta_lj, 2))
             else:
+                self.beta_lj = 1.0
                 bolt_capacity_red = bolt_capacity
 
         self.beta_lg = beta_lg

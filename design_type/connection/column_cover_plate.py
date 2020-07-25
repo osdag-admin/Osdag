@@ -3412,7 +3412,7 @@ class ColumnCoverPlate(MomentConnection):
             #       self.flange_plate.bolts_required, '')
             # self.report_check.append(t6)
 
-            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+            t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
                    long_joint_bolted_beam(self.flange_plate.bolt_line, self.flange_plate.bolts_one_line,
                                           self.flange_plate.pitch_provided,
                                           self.flange_plate.gauge_provided, self.bolt.bolt_diameter_provided,
@@ -3561,7 +3561,7 @@ class ColumnCoverPlate(MomentConnection):
                                                       vres=round(self.web_plate.bolt_force / 1000, 2),conn ="col_col"),'', '')
             self.report_check.append(t10)
 
-            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+            t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
                    long_joint_bolted_beam(self.web_plate.bolt_line, self.web_plate.bolts_one_line,
                                           self.web_plate.pitch_provided,
                                           self.web_plate.gauge_provided, self.bolt.bolt_diameter_provided,

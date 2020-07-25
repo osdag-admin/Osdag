@@ -1,13 +1,40 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'app/gui/ui_template.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.0
+#
+# WARNING! All changes made in this file will be lost!\
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+from design_report import reportGenerator
+
+
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *   
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
+
+from design_type.connection.column_cover_plate import ColumnCoverPlate
+# from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
+# from OCC.Display.backend import off
+import os
 import yaml
+import json
+import logging
+from drawing_2D.Svg_Window import SvgWindow
+import sys
+import sqlite3
 import shutil
+import openpyxl
+# import pdfkit
+import configparser
+import pickle
+# import cairosvg
+
 from update_version_check import Update
 import pandas as pd
 
@@ -50,9 +77,19 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
-from get_DPI_scale import scale,height,width
+from get_DPI_scale import scale
 from cad.cad3dconnection import cadconnection
-from pynput.mouse import Button, Controller
+from OCC.Display.backend import load_backend, get_qt_modules
+from osdagMainSettings import backend_name
+used_backend = load_backend(backend_name())
+
+global display, start_display, app, _, USED_BACKEND
+if 'qt' in used_backend:
+    from OCC.Display.qtDisplay import qtViewer3d
+    QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+# from OCC.Display.pyqt4Display import qtViewer3d
+from OCC.Display.qtDisplay import qtViewer3d
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -77,17 +114,18 @@ class MyAskQuestion(QDialog):
 
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
     resized = QtCore.pyqtSignal()
-    closed = pyqtSignal()
-    def  __init__(self, main,folder,parent=None):
+    closed = QtCore.pyqtSignal()
+
+    def __init__(self, main, folder, parent=None):
         super(Ui_ModuleWindow, self).__init__(parent=parent)
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width*(0.75),height*(0.7))
+        self.resize(width * (0.75), height * (0.7))
         self.ui = Window()
-        self.ui.setupUi(self,main,folder)
-        #self.showMaximized()
-        #self.showNormal()
+        self.ui.setupUi(self, main, folder)
+        # self.showMaximized()
+        # self.showNormal()
         self.resized.connect(self.resize_dockComponents)
 
     def center(self):
@@ -99,41 +137,27 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
 
     def resizeEvent(self, event):
         self.resized.emit()
-        print('event:', event)
         return super(Ui_ModuleWindow, self).resizeEvent(event)
-
-    def changeEvent(self, event):
-        if event.type() == QEvent.WindowStateChange:
-            if event.oldState() == Qt.WindowNoState or self.windowState() == Qt.WindowMaximized:
-                print("WindowMaximized")
-
-                x=width/2
-                y=height/2
-                mouse = Controller()
-                original = mouse.position
-                mouse.postion=(x,y)
-                mouse.click(Button.left,1)
-                mouse.position = original
 
     def resize_dockComponents(self):
 
-        posi = (3/4)*(self.height())
+        posi = (3 / 4) * (self.height())
 
         # Input Dock
         width = self.ui.inputDock.width()
-        self.ui.inputDock.resize(width,self.height())
-        self.ui.in_widget.resize(width,posi)
+        self.ui.inputDock.resize(width, self.height())
+        self.ui.in_widget.resize(width, posi)
 
-        self.ui.btn_Reset.move((width/2)-110,posi+8)
-        self.ui.btn_Design.move((width/2)+17,posi+8)
-        #self.ui.btn_Design.move(,posi+10)
+        self.ui.btn_Reset.move((width / 2) - 110, posi + 8)
+        self.ui.btn_Design.move((width / 2) + 17, posi + 8)
+        # self.ui.btn_Design.move(,posi+10)
 
         # Output Dock
         width = self.ui.outputDock.width()
-        self.ui.outputDock.resize(width,self.height())
-        self.ui.out_widget.resize(width,posi)
-        self.ui.btn_CreateDesign.move((width/2)-(186/2),posi+8)
-        self.ui.save_outputDock.move((width/2)-(186/2),posi+52)
+        self.ui.outputDock.resize(width, self.height())
+        self.ui.out_widget.resize(width, posi)
+        self.ui.btn_CreateDesign.move((width / 2) - (186 / 2), posi + 8)
+        self.ui.save_outputDock.move((width / 2) - (186 / 2), posi + 52)
 
         # Designed model
         self.ui.splitter.setSizes([0.85 * posi, 0.15 * posi])
@@ -148,7 +172,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            logger = logging.getLogger('osdag')  #  Remove all the previous handlers
+            logger = logging.getLogger('osdag')  # Remove all the previous handlers
             for handler in logger.handlers[:]:
                 logger.removeHandler(handler)
             self.closed.emit()
@@ -157,7 +181,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
             event.ignore()
 
 class Window(QMainWindow):
-    closed = QtCore.pyqtSignal()
+    # closed = pyqtSignal()
     def center(self):
         frameGm = self.frameGeometry()
         screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
@@ -187,23 +211,27 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
-        if main.design_status:
-            from osdagMainSettings import backend_name
-            off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
-            self.commLogicObj.display = off_display
-            self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            off_display.set_bg_gradient_color([255,255,255], [255,255,255])
-            off_display.ExportToImage('./ResourceFiles/images/3d.png')
-            off_display.View_Front()
-            off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/front.png')
-            off_display.View_Top()
-            off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/top.png')
-            off_display.View_Right()
-            off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/side.png')
-            self.commLogicObj.display = self.display
+        # if main.design_status:
+            # self.modelTab = qtViewer3d(self)
+            # self.mytabWidget.addTab(self.modelTab, "")
+            # self.show()
+            # self.modelTab.InitDriver()
+            # off_display = self.modelTab._display
+            #
+            # self.commLogicObj.display = off_display
+            # self.commLogicObj.display_3DModel("Model", "gradient_bg")
+            # # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+            # off_display.ExportToImage('./ResourceFiles/images/3d.png')
+            # off_display.View_Front()
+            # off_display.FitAll()
+            # off_display.ExportToImage('./ResourceFiles/images/front.png')
+            # off_display.View_Top()
+            # off_display.FitAll()
+            # off_display.ExportToImage('./ResourceFiles/images/top.png')
+            # off_display.View_Right()
+            # off_display.FitAll()
+            # off_display.ExportToImage('./ResourceFiles/images/side.png')
+            # self.commLogicObj.display = self.display
 
         self.new_window = QtWidgets.QDialog(self)
         self.new_ui = Ui_Dialog1(main.design_status,loggermsg=self.textEdit.toPlainText())
@@ -234,12 +262,12 @@ class Window(QMainWindow):
 
         return str(filename)
 
-    def desired_location(self, filename, base_type):
-        if base_type == ".svg":
-            cairosvg.svg2png(file_obj=filename,
-                             write_to=os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
-        else:
-            shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+    # def desired_location(self, filename, base_type):
+    #     if base_type == ".svg":
+    #         cairosvg.svg2png(file_obj=filename,
+    #                          write_to=os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+    #     else:
+    #         shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
 
     def saveUserProfile(self, window):
 
@@ -318,7 +346,6 @@ class Window(QMainWindow):
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
-
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/Osdag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -922,7 +949,6 @@ class Window(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height()+100)
                 b.setText(v[0])
                 b.setDisabled(True)
-                b.setVisible(True if option[4] else False)
                 fields += 1
                 self.output_title_fields[current_key][1] = fields
                 #b.setFixedSize(b.size())
@@ -1382,7 +1408,7 @@ class Window(QMainWindow):
         self.ui_loaded = True
 
         from osdagMainSettings import backend_name
-        self.display, _ = self.init_display(backend_str=backend_name())
+        self.display, _ = self.init_display(backend_str=backend_name(),window=MainWindow)
         self.connectivity = None
         self.fuse_model = None
 
@@ -1590,8 +1616,7 @@ class Window(QMainWindow):
                     visible_fields += 1
 
             elif option[2] == TYPE_OUT_BUTTON:
-                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).isVisible():
-                    visible_fields += 1
+                visible_fields += 1
 
         self.output_title_visiblity(visible_fields, key, titles, title_repeat)
 
@@ -1894,20 +1919,18 @@ class Window(QMainWindow):
                     for n in new:
 
                         if n[0] == key_str and n[0] == KEY_SECSIZE:
-                            if set(uiObj[key_str]) != set(n[1]([self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                                                          KEY_SEC_PROFILE).currentText()])):
+                            if uiObj[key_str] != n[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
+                                                          KEY_SEC_PROFILE).currentText()):
+                                data[key_str + "_customized"] = uiObj[key_str]
                                 key.setCurrentIndex(1)
                             else:
-                                key.setCurrentIndex(0)
-                            data[key_str + "_customized"] = uiObj[key_str]
-
+                                pass
                         elif n[0] == key_str and n[0] != KEY_SECSIZE:
-                            if set(uiObj[key_str]) != set(n[1]()):
+                            if uiObj[key_str] != n[1]():
+                                data[key_str + "_customized"] = uiObj[key_str]
                                 key.setCurrentIndex(1)
                             else:
-                                key.setCurrentIndex(1)
-                            data[key_str + "_customized"] = uiObj[key_str]
-
+                                pass
             else:
                 pass
 
@@ -2007,9 +2030,9 @@ class Window(QMainWindow):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(True)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(True)
-                fName = str('./ResourceFiles/images/3d.png')
-                file_extension = fName.split(".")[-1]
-
+                # fName = str('./ResourceFiles/images/3d.png')
+                # file_extension = fName.split(".")[-1]
+                #
                 # if file_extension == 'png':
                 #     self.display.ExportToImage(fName)
                 #     im = Image.open('./ResourceFiles/images/3d.png')
@@ -2615,25 +2638,15 @@ class Window(QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
-    def init_display(self, backend_str=None, size=(1024, 768)):
+    def init_display(self, backend_str=None, window=None,size=(1024, 768)):
 
-        from OCC.Display.backend import load_backend, get_qt_modules
 
-        used_backend = load_backend(backend_str)
-
-        global display, start_display, app, _, USED_BACKEND
-        if 'qt' in used_backend:
-            from OCC.Display.qtDisplay import qtViewer3d
-            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-
-        # from OCC.Display.pyqt4Display import qtViewer3d
-        from OCC.Display.qtDisplay import qtViewer3d
         self.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag Fin Plate")
         #self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
-
+        window.show()
         self.modelTab.InitDriver()
         display = self.modelTab._display
         key_function = {Qt.Key_Up: lambda: self.Pan_Rotate_model("Up"),

@@ -29,14 +29,14 @@ class BasePlateCad(object):
         :param alist: input and output values
         """
 
-        self.numberOfBolts = 6
-        self.Weld_type = "Groove" # "Fillet"  #
+        self.numberOfBolts = 4
+        self.weld_type = "Groove" # "Fillet"  #
         self.extraspace = 5 #for stiffener inside flange
         self.filletWeldcolm = False
         self.stif_algFlg = True
         self.stif_algWeb = True
-        self.stif_acrWeb = True
-        self.stif_inFlg = True
+        self.stif_acrWeb = False
+        self.stif_inFlg = False
 
         self.BP = BP
         self.column = column
@@ -177,9 +177,6 @@ class BasePlateCad(object):
         # self.weld_stiffener_inflange8 = copy.deepcopy(self.weld_stiffener_inflange)
 
 
-
-
-
     def create_3DModel(self):
         """
 
@@ -218,7 +215,7 @@ class BasePlateCad(object):
             if self.numberOfBolts == 4:
                 stiffener_gap = 0  # self.column.B * 0.4
                 y_axis = self.column.D / 2 + self.stiffener.L / 2 + self.weld_stiffener_alongWeb_v.h
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     z_axis = self.stiffener.W / 2  # + self.weld_stiffener_alongWeb_h.h
                 else:
                     z_axis = self.stiffener.W / 2 + self.weld_stiffener_alongWeb_gh1.h  # + self.weld_stiffener_alongWeb_h.h
@@ -241,7 +238,7 @@ class BasePlateCad(object):
             if self.numberOfBolts == 6:
                 stiffener_gap =  self.column.B * 0.4
                 y_axis = self.column.D / 2 + self.stiffener.L / 2 + self.weld_stiffener_alongWeb_v.h
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     z_axis = self.stiffener.W / 2  # + self.weld_stiffener_alongWeb_h.h
                 else:
                     z_axis = self.stiffener.W / 2 + self.weld_stiffener_alongWeb_gh1.h  # + self.weld_stiffener_alongWeb_h.h
@@ -281,7 +278,7 @@ class BasePlateCad(object):
 
             x_axis = self.column.B/2 + 10       #todo: add web length here
             y_axis = self.column.D / 2
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 z_axis = 0 # self.stiffener_algflangeL1.H / 2 + self.weld_stiffener_alongWeb_h.h
             else:
                 z_axis = self.weld_stiffener_algflag_gh.h
@@ -317,9 +314,9 @@ class BasePlateCad(object):
 
             # if self.BP.stiffener_along_web == 'Yes':
             stiffener_gap = 0 #self.column.B * 0.4
-            x_axis = self.column.t/2 + self.stiffener_acrsWeb.L/2 + 10  #todo: add weld ht here
+            x_axis = self.column.t/2 + self.stiffener_acrsWeb.L/2 + self.weld_stiffener_alongWeb_h.h  #todo: add weld ht here
             y_axis = self.stiffener_acrsWeb.T/2
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 z_axis = self.stiffener.W / 2 #+ self.weld_stiffener_alongWeb_h.h
             else:
                 z_axis = self.stiffener.W / 2 + self.weld_stiffener_acrsWeb_gh.h
@@ -443,7 +440,7 @@ class BasePlateCad(object):
 
         if self.stif_algWeb == True:
             if self.numberOfBolts == 4:
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     x_axis =  self.stiffener.T/2
                     y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
                     z_axis = 0.0
@@ -499,7 +496,7 @@ class BasePlateCad(object):
 
                 x_axis = self.stiffener.T / 2
                 y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     z_axis = self.stiffener.R22
                 else:
                     z_axis =  self.stiffener.R22 + self.weld_stiffener_alongWeb_gh.h
@@ -518,7 +515,7 @@ class BasePlateCad(object):
                 self.weld_stiffener_alongWeb_v_2Model = self.weld_stiffener_alongWeb_v_2.create_model()
 
             if self.numberOfBolts == 6:
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     stiffener_gap = self.column.B * 0.4
                     x_axis = self.stiffener.T / 2
                     y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
@@ -619,7 +616,7 @@ class BasePlateCad(object):
                 stiffener_gap = self.column.B * 0.4
                 x_axis = self.stiffener.T / 2
                 y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     z_axis = self.stiffener.R22
                 else:
                     z_axis =  self.stiffener.R22 + self.weld_stiffener_alongWeb_gh.h
@@ -660,7 +657,7 @@ class BasePlateCad(object):
             x_axis = self.column.B / 2 + self.weld_stiffener_algflng_v.h/2  # todo: add web length here
             z_axis = 0  # self.stiffener_algflangeL1.H / 2 + self.weld_stiffener_alongWeb_h.h
             y_axis = self.column.D / 2 - self.weld_stiffener_algflng_v.b/2
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 z_axis = 0  # self.stiffener_algflangeL1.H / 2 + self.weld_stiffener_alongWeb_h.h
             else:
                 z_axis = self.weld_stiffener_acrsWeb_gh.h
@@ -697,7 +694,7 @@ class BasePlateCad(object):
             self.weld_stiffener_algflng_v4Model = self.weld_stiffener_algflng_v4.create_model()
 
 
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 #Fillet weld for stiffeners across flange
                 x_axis = self.column.B / 2 + self.weld_stiffener_algflng_v.h  # todo: add web length here
                 z_axis = 0  # self.stiffener_algflangeL1.H / 2 + self.weld_stiffener_alongWeb_h.h
@@ -806,7 +803,7 @@ class BasePlateCad(object):
             stiffener_gap = 0 #self.column.B * 0.4
             x_axis = self.column.t/2 + self.weld_stiffener_acrsWeb_v.h/2  #todo: add weld ht here
             y_axis = 0.0
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 z_axis = self.stiffener_acrsWeb.R22    #self.stiffener.W / 2 #+ self.weld_stiffener_alongWeb_h.h
             else:
                 z_axis = self.stiffener_acrsWeb.R22 + self.weld_stiffener_acrsWeb_gh.h
@@ -827,7 +824,7 @@ class BasePlateCad(object):
 
 
             #horizonrtal fillet welds for stiffner across web
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 x_axis = self.column.t/2 + self.weld_stiffener_acrsWeb_v.h + self.stiffener_acrsWeb.R22
                 z_axis = 0.0
                 y_axis = self.stiffener_acrsWeb.T/2
@@ -945,8 +942,6 @@ class BasePlateCad(object):
         """
         concreteOrigin = numpy.array(
             [-self.concrete.W / 2, 0.0, -self.baseplate.T - self.grout.T - self.concrete.T / 2])
-        # concrete_uDir = numpy.array([1.0, 0.0, 0.0])
-        # concrete_wDir = numpy.array([0.0, 0.0, 1.0])
         concrete_uDir = numpy.array([0.0, 0.0, 1.0])
         concrete_wDir = numpy.array([1.0, 0.0, 0.0])
         self.concrete.place(concreteOrigin, concrete_uDir, concrete_wDir)
@@ -981,7 +976,7 @@ class BasePlateCad(object):
         else:
             welded_sec = [self.weldAbvFlang_11Model, self.weldAbvFlang_12Model, self.weldSideWeb_11Model]
         if self.stif_algFlg == True:
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 sec = [self.weld_stiffener_algflng_v1Model, self.weld_stiffener_algflng_v2Model, self.weld_stiffener_algflng_v3Model, self.weld_stiffener_algflng_v4Model,
                               self.weld_stiffener_algflng_h11Model, self.weld_stiffener_algflng_h12Model, self.weld_stiffener_algflng_h21Model, self.weld_stiffener_algflng_h22Model,
                               self.weld_stiffener_algflng_h31Model, self.weld_stiffener_algflng_h32Model, self.weld_stiffener_algflng_h41Model, self.weld_stiffener_algflng_h42Model,]
@@ -993,7 +988,7 @@ class BasePlateCad(object):
             welded_sec.extend(sec)
         if self.stif_algWeb == True:
             if self.numberOfBolts == 4:
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     sec = [self.weld_stiffener_alongWeb_v_1Model, self.weld_stiffener_alongWeb_v_2Model,
                                   self.weld_stiffener_alongWeb_h_11Model, self.weld_stiffener_alongWeb_h_21Model,
                                   self.weld_stiffener_alongWeb_h_12Model, self.weld_stiffener_alongWeb_h_22Model]
@@ -1002,7 +997,7 @@ class BasePlateCad(object):
                                   self.weld_stiffener_alongWeb_gh1Model, self.weld_stiffener_alongWeb_gh2Model]
 
             if self.numberOfBolts == 6:
-                if self.Weld_type == "Fillet":
+                if self.weld_type == "Fillet":
                     sec = [self.weld_stiffener_alongWeb_v_1Model, self.weld_stiffener_alongWeb_v_2Model,
                                   self.weld_stiffener_alongWeb_h_11Model, self.weld_stiffener_alongWeb_h_21Model,
                                   self.weld_stiffener_alongWeb_h_12Model, self.weld_stiffener_alongWeb_h_22Model,
@@ -1018,7 +1013,7 @@ class BasePlateCad(object):
             welded_sec.extend(sec)
 
         if self.stif_acrWeb == True:
-            if self.Weld_type == "Fillet":
+            if self.weld_type == "Fillet":
                 sec = [self.weld_stiffener_acrsWeb_v1Model, self.weld_stiffener_acrsWeb_v2Model, self.weld_stiffener_acrsWeb_h1Model,
                               self.weld_stiffener_acrsWeb_gh2Model, self.weld_stiffener_acrsWeb_h3Model, self.weld_stiffener_acrsWeb_h4Model]
             else:
@@ -1110,6 +1105,345 @@ class BasePlateCad(object):
 
         return CAD
 
+class HollowBasePlateCad(object):
+    def __init__(self, BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout, stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v, weld_stiff_b_h):
+        """
+
+        """
+
+        self.stiffener_l = True
+        self.stiffener_b = True
+        self.BP = BP
+        self.column = sec
+        self.weld_sec = weld_sec
+        self.nut_bolt_array = nut_bolt_array
+        self.bolthight = bolthight
+        self.baseplate = baseplate
+        self.concrete = concrete
+        self.grout = grout
+        self.stiff_alg_l = stiff_alg_l
+        self.stiff_alg_b = stiff_alg_b
+        self.weld_stiff_l_v = weld_stiff_l_v
+        self.weld_stiff_l_h = weld_stiff_l_h
+        self.weld_stiff_b_v = weld_stiff_b_v
+        self.weld_stiff_b_h = weld_stiff_b_h
+
+        self.stiff_alg_l1 = copy.deepcopy(self.stiff_alg_l)
+        self.stiff_alg_b1 = copy.deepcopy(self.stiff_alg_b)
+        self.stiff_alg_l2 = copy.deepcopy(self.stiff_alg_l)
+        self.stiff_alg_b2 = copy.deepcopy(self.stiff_alg_b)
+
+        self.weld_stiff_l_v1 = copy.deepcopy(self.weld_stiff_l_v)
+        self.weld_stiff_l_v2 = copy.deepcopy(self.weld_stiff_l_v)
+        self.weld_stiff_l_h1 = copy.deepcopy(self.weld_stiff_l_h)
+        self.weld_stiff_l_h2 = copy.deepcopy(self.weld_stiff_l_h)
+
+        self.weld_stiff_b_v1 = copy.deepcopy(self.weld_stiff_b_v)
+        self.weld_stiff_b_v2 = copy.deepcopy(self.weld_stiff_b_v)
+        self.weld_stiff_b_h1 = copy.deepcopy(self.weld_stiff_b_h)
+        self.weld_stiff_b_h2 = copy.deepcopy(self.weld_stiff_b_h)
+
+    def create_3DModel(self):
+        """
+
+        """
+        self.createcolumnGeometry()
+        self.createBasePlateGeometry()
+        self.createWeldGeometry()
+        self.createConcreteGeometry()
+        self.create_nut_bolt_array()
+        self.createGroutGeometry()
+
+    def createcolumnGeometry(self):
+        """
+
+        :return: Geometric Orientation of this component
+        """
+        columnOriginL = numpy.array([0.0, 0.0, self.weld_sec.H + self.column.H/2])
+        columnL_uDir = numpy.array([1.0, 0.0, 0.0])
+        columnL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.column.place(columnOriginL, columnL_uDir, columnL_wDir)
+
+        self.columnModel = self.column.create_model()
+
+    def createBasePlateGeometry(self):
+        baseplateOriginL = numpy.array([-self.baseplate.W / 2, 0.0, -self.baseplate.T / 2])
+        baseplateL_uDir = numpy.array([0.0, 0.0, 1.0])
+        baseplateL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.baseplate.place(baseplateOriginL, baseplateL_uDir, baseplateL_wDir)
+
+        self.baseplateModel = self.baseplate.create_model()
+
+        if self.stiffener_l == True:
+
+            if rect_hollow == True:
+                D = self.column.W
+                B = self.column.L
+            else:
+                D = self.column.r*2
+                B = self.column.r*2
+
+            x_axis = self.stiff_alg_l.T/2
+            y_axis = D/2 + self.stiff_alg_l.L / 2 + self.weld_stiff_l_v.h
+            z_axis = self.stiff_alg_l.W / 2 + self.weld_stiff_l_h.h # + self.weld_stiffener_alongWeb_h.h
+            stiff_alg_l1OriginL = numpy.array([x_axis, y_axis, z_axis])
+            stiff_alg_l1L_uDir = numpy.array([0.0, -1.0, 0.0])
+            stiff_alg_l1L_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.stiff_alg_l1.place(stiff_alg_l1OriginL, stiff_alg_l1L_uDir, stiff_alg_l1L_wDir)
+
+            self.stiff_alg_l1Model = self.stiff_alg_l1.create_model()
+
+
+            stiff_alg_l2OriginL = numpy.array([-x_axis, -(y_axis), z_axis])
+            stiff_alg_l2L_uDir = numpy.array([0.0, 1.0, 0.0])
+            stiff_alg_l2L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.stiff_alg_l2.place(stiff_alg_l2OriginL, stiff_alg_l2L_uDir, stiff_alg_l2L_wDir)
+
+            self.stiff_alg_l2Model = self.stiff_alg_l2.create_model()
+
+        if self.stiffener_b == True:
+            if rect_hollow == True:
+                D = self.column.W
+                B = self.column.L
+            else:
+                D = self.column.r*2
+                B = self.column.r*2
+
+            x_axis = B/2 + self.stiff_alg_b.L / 2 + self.weld_stiff_b_v.h  # todo: add weld ht here
+            y_axis = self.stiff_alg_b.T / 2
+            z_axis = self.stiff_alg_b2.W / 2 +  self.weld_stiff_b_h.h
+            stiff_alg_b1OriginL = numpy.array([-x_axis, y_axis, z_axis])
+            stiff_alg_b1L_uDir = numpy.array([1.0, 0.0, 0.0])
+            stiff_alg_b1L_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.stiff_alg_b1.place(stiff_alg_b1OriginL, stiff_alg_b1L_uDir, stiff_alg_b1L_wDir)
+
+            self.stiff_alg_b1Model = self.stiff_alg_b1.create_model()
+
+            stiff_alg_b2OriginL = numpy.array([x_axis, -(y_axis), z_axis])
+            stiff_alg_b2L_uDir = numpy.array([-1.0, 0.0, 0.0])
+            stiff_alg_b2L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.stiff_alg_b2.place(stiff_alg_b2OriginL, stiff_alg_b2L_uDir, stiff_alg_b2L_wDir)
+
+            self.stiff_alg_b2Model = self.stiff_alg_b2.create_model()
+
+    def createWeldGeometry(self):
+        weld_secOriginL = numpy.array([0.0, 0.0, self.weld_sec.H/2])
+        weld_secL_uDir = numpy.array([1.0, 0.0, 0.0])
+        weld_secL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.weld_sec.place(weld_secOriginL, weld_secL_uDir, weld_secL_wDir)
+
+        self.weld_secModel = self.weld_sec.create_model()
+
+        if self.stiffener_l == True:
+            if rect_hollow == True:
+                D = self.column.W
+                B = self.column.L
+            else:
+                D = self.column.r*2
+                B = self.column.r*2
+
+            x_axis = 0.0
+            y_axis = D/2 + self. stiff_alg_l.L + self.weld_stiff_l_v.h
+            z_axis = self.weld_stiff_l_v.h/2
+
+            stiffenerweldOrigin_h_11 = numpy.array([-x_axis , y_axis, z_axis])
+            uDirAbv_11 = numpy.array([1.0, 0.0, 0.0])
+            wDirAbv_11 = numpy.array([0.0, -1.0, 0])
+            self.weld_stiff_l_h1.place(stiffenerweldOrigin_h_11, uDirAbv_11, wDirAbv_11)
+
+            self.weld_stiff_l_h1Model = self.weld_stiff_l_h1.create_model()
+
+            stiffenerweldOrigin_h_21 = numpy.array(
+                [-x_axis, -y_axis + self.weld_stiff_l_h2.L, z_axis])
+            uDirAbv_11 = numpy.array([1.0, 0.0, 0.0])
+            wDirAbv_11 = numpy.array([0.0, -1.0, 0])
+            self.weld_stiff_l_h2.place(stiffenerweldOrigin_h_21, uDirAbv_11, wDirAbv_11)
+
+            self.weld_stiff_l_h2Model = self.weld_stiff_l_h2.create_model()
+
+            x_axis = self. stiff_alg_l.T / 2
+            y_axis = D/2 + self. stiff_alg_l.L + self.weld_stiff_l_v.h
+            z_axis = self. stiff_alg_l.R22 + self.weld_stiff_l_v.h
+            stiffenerweldOrigin_v_1 = numpy.array(
+                [0.0, y_axis - self. stiff_alg_l.L - self.weld_stiff_l_v.h / 2, z_axis])
+            uDirAbv_11 = numpy.array([1.0, 0.0, 0.0])
+            wDirAbv_11 = numpy.array([0.0, 0, 1.0])
+            self.weld_stiff_l_v1.place(stiffenerweldOrigin_v_1, uDirAbv_11, wDirAbv_11)
+
+            self.weld_stiff_l_v1Model = self.weld_stiff_l_v1.create_model()
+
+            stiffenerweldOrigin_v_2 = numpy.array(
+                [0.0, -y_axis + self. stiff_alg_l.L + self.weld_stiff_l_v.h / 2, z_axis])
+            uDirAbv_11 = numpy.array([1.0, 0.0, 0.0])
+            wDirAbv_11 = numpy.array([0.0, 0.0, 1.0])
+            self.weld_stiff_l_v2.place(stiffenerweldOrigin_v_2, uDirAbv_11, wDirAbv_11)
+
+            self.weld_stiff_l_v2Model = self.weld_stiff_l_v2.create_model()
+
+        if self.stiffener_b == True:
+            if rect_hollow == True:
+                D = self.column.W
+                B = self.column.L
+            else:
+                D = self.column.r*2
+                B = self.column.r*2
+            x_axis = B/2 + self.weld_stiff_b_v.h/2  #todo: add weld ht here
+            y_axis = 0.0
+            z_axis = self.stiff_alg_b.R22 + self.weld_stiff_b_h.h
+
+            weld_stiff_b_v1OriginL = numpy.array([-x_axis, -y_axis, z_axis])
+            weld_stiff_b_v1L_uDir = numpy.array([0.0, 1.0, 0.0])
+            weld_stiff_b_v1L_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.weld_stiff_b_v1.place(weld_stiff_b_v1OriginL, weld_stiff_b_v1L_uDir, weld_stiff_b_v1L_wDir)
+
+            self.weld_stiff_b_v1Model = self.weld_stiff_b_v1.create_model()
+
+            weld_stiff_b_v2OriginL = numpy.array([x_axis, -(y_axis), z_axis])
+            weld_stiff_b_v2L_uDir = numpy.array([0.0, 1.0, 0.0])
+            weld_stiff_b_v2L_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.weld_stiff_b_v2.place(weld_stiff_b_v2OriginL, weld_stiff_b_v2L_uDir, weld_stiff_b_v2L_wDir)
+
+            self.weld_stiff_b_v2Model = self.weld_stiff_b_v2.create_model()
+
+            x_axis = B/2 + self.weld_stiff_b_v.h + self.stiff_alg_b.R22
+            z_axis = self.weld_stiff_b_h.h / 2
+            y_axis = 0.0
+            weld_stiff_b_h1OriginL = numpy.array([-x_axis - self.weld_stiff_b_h.L, y_axis, z_axis])
+            weld_stiff_b_h1L_uDir = numpy.array([0.0, 1.0, 0.0])
+            weld_stiff_b_h1L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.weld_stiff_b_h1.place(weld_stiff_b_h1OriginL, weld_stiff_b_h1L_uDir,
+                                                  weld_stiff_b_h1L_wDir)
+
+            self.weld_stiff_b_h1Model = self.weld_stiff_b_h1.create_model()
+
+            weld_stiff_b_h2OriginL = numpy.array([x_axis, (y_axis), z_axis])
+            weld_stiff_b_h2L_uDir = numpy.array([0.0, 1.0, 0.0])
+            weld_stiff_b_h2L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.weld_stiff_b_h2.place(weld_stiff_b_h2OriginL, weld_stiff_b_h2L_uDir,
+                                                  weld_stiff_b_h2L_wDir)
+
+            self.weld_stiff_b_h2Model = self.weld_stiff_b_h2.create_model()
+
+    def create_nut_bolt_array(self):
+        """
+
+        :return: Geometric Orientation of this component
+        """
+        # nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array([0.0, 0.0, self.baseplate.T /2+ 100])
+        nutboltArrayOrigin = numpy.array([-self.baseplate.W / 2, self.baseplate.L / 2, self.bolthight])
+        gaugeDir = numpy.array([1.0, 0, 0])
+        pitchDir = numpy.array([0, -1.0, 0])
+        boltDir = numpy.array([0, 0, 1.0])
+        self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+        self.nutBoltArrayModels = self.nut_bolt_array.create_model()
+
+    def createGroutGeometry(self):
+        """
+        :return: Geometric Orientaion of grout
+        """
+        groutOriginL = numpy.array([-self.grout.W / 2, 0.0, -self.baseplate.T - self.grout.T / 2])
+        groutL_uDir = numpy.array([0.0, 0.0, 1.0])
+        groutL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.grout.place(groutOriginL, groutL_uDir, groutL_wDir)
+
+        self.groutModel = self.grout.create_model()
+
+    def createConcreteGeometry(self):
+        """
+
+        :return: Geometric Orientation of concrete
+        """
+        concreteOrigin = numpy.array(
+            [-self.concrete.W / 2, 0.0, -self.baseplate.T - self.grout.T - self.concrete.T / 2])
+        concrete_uDir = numpy.array([0.0, 0.0, 1.0])
+        concrete_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.concrete.place(concreteOrigin, concrete_uDir, concrete_wDir)
+
+        self.concreteModel = self.concrete.create_model()
+
+    def get_column_model(self):
+        column = self.columnModel
+        return column
+
+    def get_nut_bolt_array_models(self):
+        nut_bolts = self.nut_bolt_array.get_models()
+        array = nut_bolts[0]
+        for comp in nut_bolts:
+            array = BRepAlgoAPI_Fuse(comp, array).Shape()
+
+        return array
+
+    def get_welded_models(self):
+        """
+
+        :return: CAD model for all the fillet welds
+        """
+        weld_sec = [self.weld_secModel]
+        if self.stiffener_l == True:
+            sec = [ self.weld_stiff_l_v1Model,  self.weld_stiff_l_v2Model,  self.weld_stiff_l_h1Model,  self.weld_stiff_l_h2Model]
+            weld_sec.extend(sec)
+
+        if self.stiffener_b == True:
+            sec = [self.weld_stiff_b_v1Model, self.weld_stiff_b_v2Model, self.weld_stiff_b_h1Model, self.weld_stiff_b_h2Model]
+            weld_sec.extend(sec)
+
+        weld = weld_sec[0]
+
+        for item in weld_sec[1:]:
+            weld = BRepAlgoAPI_Fuse(weld, item).Shape()
+
+        return weld
+
+    def get_plate_connector_models(self):
+        plate = self.baseplateModel
+        if self.stiffener_l == True:
+            plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_l1Model).Shape()
+            plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_l2Model).Shape()
+        if self.stiffener_b == True:
+            plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_b1Model).Shape()
+            plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_b2Model).Shape()
+
+        return plate
+
+    def get_grout_models(self):
+        grout = self.groutModel
+
+        return grout
+
+    def get_concrete_models(self):
+        conc = self.concreteModel
+        return conc
+
+    def get_connector_models(self):
+        plate_connectors = self.get_plate_connector_models()
+        welds = self.get_welded_models()
+        nut_bolt_array = self.get_nut_bolt_array_models()
+
+        CAD_list = [plate_connectors, welds, nut_bolt_array]
+        CAD = CAD_list[0]
+
+        for model in CAD_list[1:]:
+            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
+
+        return CAD
+
+    def get_models(self):
+        column = self.get_column_model()
+        plate_connectors = self.get_plate_connector_models()
+        welds = self.get_welded_models()
+        nut_bolt_array = self.get_nut_bolt_array_models()
+        conc = self.get_concrete_models()
+        grt = self.get_grout_models()
+
+        CAD_list = [column, welds, plate_connectors, nut_bolt_array, conc, grt]  # , welds, nut_bolt_array]
+        CAD = CAD_list[0]
+
+        for model in CAD_list[1:]:
+            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
+
+        return CAD
+
 if __name__ == '__main__':
 
     from cad.items.bolt import Bolt
@@ -1125,6 +1459,8 @@ if __name__ == '__main__':
     from cad.items.stiffener_plate import StiffenerPlate
     from cad.items.stiffener_flange import Stiffener_flange
     from cad.items.grout import Grout
+    from cad.items.rect_hollow import RectHollow
+    from cad.items.circular_hollow import CircularHollow
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -1140,73 +1476,136 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     filletWeldcolm = False
-    numberOfBolts = 6
+    numberOfBolts = 4
+    hollow_sec = True
+    Isec = False
 
-    column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
-    baseplate = Plate(L=700, W=500, T=45)
+    if Isec == True:
+        column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
+        baseplate = Plate(L=700, W=500, T=45)
 
-    if filletWeldcolm ==  True:U
-        weldAbvFlang = FilletWeld(b=10, h=10, L=250)
-        weldBelwFlang = FilletWeld(b=10, h=10, L=100)
-        weldSideWeb = FilletWeld(b=10, h=10, L=420)
-    else:
-        weldAbvFlang = GrooveWeld(b= column.T, h=10, L=column.B)
-        weldBelwFlang = GrooveWeld(b= column.T, h=10, L=column.B)
-        weldSideWeb = GrooveWeld(b=column.t, h=10, L=column.D)
+        if filletWeldcolm ==  True:
+            weldAbvFlang = FilletWeld(b=10, h=10, L=250)
+            weldBelwFlang = FilletWeld(b=10, h=10, L=100)
+            weldSideWeb = FilletWeld(b=10, h=10, L=420)
+        else:
+            weldAbvFlang = GrooveWeld(b= column.T, h=10, L=column.B)
+            weldBelwFlang = GrooveWeld(b= column.T, h=10, L=column.B)
+            weldSideWeb = GrooveWeld(b=column.t, h=10, L=column.D)
 
-    # concrete = Concrete(L= baseplate.W*1.5, W= baseplate.L*1.5, T= baseplate.T*10)
-    concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
-    grout = Grout(L=baseplate.L + 200, W=baseplate.W + 200, T=50)
+        # concrete = Concrete(L= baseplate.W*1.5, W= baseplate.L*1.5, T= baseplate.T*10)
+        concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
+        grout = Grout(L=baseplate.L + 200, W=baseplate.W + 200, T=50)
 
-    gusset = StiffenerPlate(L=baseplate.W, W=200, T=14, L11=(baseplate.W - (column.B + 100)) / 2, L12=200 - 100,
-                            R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
+        gusset = StiffenerPlate(L=baseplate.W, W=200, T=14, L11=(baseplate.W - (column.B + 100)) / 2, L12=200 - 100,
+                                R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
 
-    stiffener = StiffenerPlate(L=(baseplate.L - column.D - 2 * gusset.T) / 2 - 10, W=gusset.W, T=gusset.T,
-                               L11=(baseplate.L - column.D - 2 * gusset.T) / 2 - 50, L12=gusset.W - 100, R21 = 15, R22 = 15)    #todo: add L21 and L22 as max(15, weldsize + 3)
+        stiffener = StiffenerPlate(L=(baseplate.L - column.D - 2 * gusset.T) / 2 - 10, W=gusset.W, T=gusset.T,
+                                   L11=(baseplate.L - column.D - 2 * gusset.T) / 2 - 50, L12=gusset.W - 100, R21 = 15, R22 = 15)    #todo: add L21 and L22 as max(15, weldsize + 3)
 
-    stiffener_acrsWeb = StiffenerPlate(L=(baseplate.L - column.D - 2 * gusset.T) / 2 - 10, W=gusset.W, T=gusset.T,
-                               L11=(baseplate.L - column.D - 2 * gusset.T) / 2 - 50, L12=gusset.W - 100, R21 = 15, R22 = 15)    #todo: add L21 and L22 as max(15, weldsize + 3)
+        stiffener_acrsWeb = StiffenerPlate(L=(baseplate.L - column.D - 2 * gusset.T) / 2 - 10, W=gusset.W, T=gusset.T,
+                                   L11=(baseplate.L - column.D - 2 * gusset.T) / 2 - 50, L12=gusset.W - 100, R21 = 15, R22 = 15)    #todo: add L21 and L22 as max(15, weldsize + 3)
 
-    stiffener_algflangeL = Stiffener_flange(H= gusset.W, L = (baseplate.W-column.B)/2 - 10, T = column.T +5, t_f = column.T, L_h= 50, L_v = 100, to_left = True)
-    stiffener_algflangeR = Stiffener_flange(H=gusset.W, L=(baseplate.W - column.B) / 2 - 10, T=column.T + 5,
-                                           t_f=column.T, L_h=50, L_v=100, to_left=False)
-    stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
+        stiffener_algflangeL = Stiffener_flange(H= gusset.W, L = (baseplate.W-column.B)/2 - 10, T = column.T +5, t_f = column.T, L_h= 50, L_v = 100, to_left = True)
+        stiffener_algflangeR = Stiffener_flange(H=gusset.W, L=(baseplate.W - column.B) / 2 - 10, T=column.T + 5,
+                                               t_f=column.T, L_h=50, L_v=100, to_left=False)
+        stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
 
-    stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  #self.extraspace=5
+        stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  #self.extraspace=5
 
-    weld_stiffener_algflng_v = GrooveWeld(b= column.T, h = 10, L = stiffener_algflangeL.H)
-    weld_stiffener_algflng_h = FilletWeld(b= 10, h= 10, L= stiffener_algflangeL.L)    #Todo: create another weld for inner side of the stiffener
-    weld_stiffener_algflag_gh = GrooveWeld(b= stiffener_algflangeR.T, h = 10, L= stiffener_algflangeL.L - stiffener_algflange_tapperLength )
+        weld_stiffener_algflng_v = GrooveWeld(b= column.T, h = 10, L = stiffener_algflangeL.H)
+        weld_stiffener_algflng_h = FilletWeld(b= 10, h= 10, L= stiffener_algflangeL.L)    #Todo: create another weld for inner side of the stiffener
+        weld_stiffener_algflag_gh = GrooveWeld(b= stiffener_algflangeR.T, h = 10, L= stiffener_algflangeL.L - stiffener_algflange_tapperLength )
 
-    weld_stiffener_acrsWeb_v = GrooveWeld(b= stiffener_acrsWeb.T, h = 10, L = stiffener_acrsWeb.W - stiffener_acrsWeb.R22)
-    weld_stiffener_acrsWeb_h = FilletWeld(b= 10, h= 10, L = stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
-    weld_stiffener_acrsWeb_gh = GrooveWeld(b= stiffener_acrsWeb.T, h = 10, L = stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
+        weld_stiffener_acrsWeb_v = GrooveWeld(b= stiffener_acrsWeb.T, h = 10, L = stiffener_acrsWeb.W - stiffener_acrsWeb.R22)
+        weld_stiffener_acrsWeb_h = FilletWeld(b= 10, h= 10, L = stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
+        weld_stiffener_acrsWeb_gh = GrooveWeld(b= stiffener_acrsWeb.T, h = 10, L = stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
 
-    gussetweld = GrooveWeld(b=gusset.T, h = 10, L= gusset.L)
-    weld_stiffener_alongWeb_h = FilletWeld(b= 10, h= 10, L=stiffener.L - stiffener.R22)
-    weld_stiffener_alongWeb_v = GrooveWeld(b= stiffener.T, h=10, L=stiffener.W - stiffener.R22)
-    weld_stiffener_alongWeb_gh = GrooveWeld(b= stiffener.T, h=10, L=stiffener.L - stiffener.R22)
+        gussetweld = GrooveWeld(b=gusset.T, h = 10, L= gusset.L)
+        weld_stiffener_alongWeb_h = FilletWeld(b= 10, h= 10, L=stiffener.L - stiffener.R22)
+        weld_stiffener_alongWeb_v = GrooveWeld(b= stiffener.T, h=10, L=stiffener.W - stiffener.R22)
+        weld_stiffener_alongWeb_gh = GrooveWeld(b= stiffener.T, h=10, L=stiffener.L - stiffener.R22)
 
-    weld_stiffener_inflange = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.W)
+        weld_stiffener_inflange = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.W)
 
-    type = 'gusset'  # 'no_gusset'
+        type = 'gusset'  # 'no_gusset'
 
-    # Todo: Make this class in another file
+        # Todo: Make this class in another file
 
-    ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
-    # bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
-    # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
-    bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
-    nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
-    nutSpace = bolt.c + baseplate.T
-    bolthight = nut.T + 50
+        ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
+        # bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
+        # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
+        bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
+        nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+        nutSpace = bolt.c + baseplate.T
+        bolthight = nut.T + 50
 
-    nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
+        nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
 
-    basePlate = BasePlateCad(type, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
-                             concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
-                             stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
-                             weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
+        basePlate = BasePlateCad(type, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+                                 concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
+                                 stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
+                                 weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
+
+    if hollow_sec == True:
+        rect_hollow = True
+        # circ_hollow = False
+        if rect_hollow == True:
+            sec = RectHollow(L= 50, W= 100, H=1000, T=4)
+            weld_sec = RectHollow(L= sec.L, W= sec.W, H= 10, T= sec.T)
+
+            baseplate = Plate(L=375, W=325, T=18)
+
+            stiff_alg_l = StiffenerPlate(L= (baseplate.L - sec.W)/2 - 10, W= 187.5, T= 4, L11=(baseplate.L - sec.W)/2 - 10 - 50, L12=187.5 - 100, R21=15, R22=15)
+            stiff_alg_b = StiffenerPlate(L= (baseplate.W - sec.L)/2 - 10, W= 187.5, T= 4, L11=(baseplate.L - sec.W)/2 - 10 - 50, L12=187.5 - 100, R21=15, R22=15)
+            weld_stiff_l_v = GrooveWeld(b=stiff_alg_l.T, h=10, L=stiff_alg_l.W - stiff_alg_l.R22)
+            weld_stiff_l_h = GrooveWeld(b=stiff_alg_l.T, h=10, L=stiff_alg_l.L - stiff_alg_l.R22)
+            weld_stiff_b_v = GrooveWeld(b=stiff_alg_b.T, h=10, L=stiff_alg_b.W - stiff_alg_b.R22)
+            weld_stiff_b_h = GrooveWeld(b=stiff_alg_b.T, h=10, L=stiff_alg_b.L - stiff_alg_b.R22)
+
+            ex_length = 114.5  # (50 + 24 + baseplate.T)  # nut.T = 24
+            # bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
+            # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
+            bolt = AnchorBolt_Endplate(l=314.5, c=125, a=75, r=10, ex=ex_length)
+            nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+            nutSpace = bolt.c + baseplate.T
+            bolthight = nut.T + 50
+            type = 'rect'
+
+            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
+            grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
+
+            column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
+        else:
+            sec = CircularHollow(r = 200/2, T=12, H= 1500)
+            weld_sec = CircularHollow(r = sec.r, T= sec.T, H= 10)
+
+            baseplate = Plate(L=375, W=325, T=18)
+
+            stiff_alg_l = StiffenerPlate(L= baseplate.L/2 - sec.r -10, W= 187.5, T= 4, L11=baseplate.L/2 - sec.r -10 - 50, L12=187.5 - 100, R21=15, R22=15)
+            stiff_alg_b = StiffenerPlate(L= baseplate.W/2 - sec.r -10, W= 187.5, T= 4, L11=baseplate.L/2 - sec.r -10 - 50, L12=187.5 - 100, R21=15, R22=15)
+            weld_stiff_l_v = GrooveWeld(b=stiff_alg_l.T, h=10, L=stiff_alg_l.W - stiff_alg_l.R22)
+            weld_stiff_l_h = GrooveWeld(b=stiff_alg_l.T, h=10, L=stiff_alg_l.L - stiff_alg_l.R22)
+            weld_stiff_b_v = GrooveWeld(b=stiff_alg_b.T, h=10, L=stiff_alg_b.W - stiff_alg_b.R22)
+            weld_stiff_b_h = GrooveWeld(b=stiff_alg_b.T, h=10, L=stiff_alg_b.L - stiff_alg_b.R22)
+
+            ex_length = 114.5 #(50 + 24 + baseplate.T)  # nut.T = 24
+            # bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
+            # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
+            bolt = AnchorBolt_Endplate(l= 314.5, c= 125, a= 75, r= 10, ex=ex_length)
+            nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+            nutSpace = bolt.c + baseplate.T
+            bolthight = nut.T + 50
+            type = 'rect'
+
+            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
+            grout = Grout(L=baseplate.L * 1.5, W=baseplate.W *1.5, T=50)
+
+            column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
+        nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
+
+        basePlate = HollowBasePlateCad(type, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout, stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v, weld_stiff_b_h)
+
 
     basePlate.create_3DModel()
     prism = basePlate.get_models()
@@ -1240,18 +1639,18 @@ if __name__ == '__main__':
     start_display()
 
 
-    # display.ExportToImage("/home/rahul/Osdag_workspace/3DtestbasePlatw.png")
+# display.ExportToImage("/home/rahul/Osdag_workspace/3DtestbasePlatw.png")
 
-    # display = CommonDesignLogic.display
-    # display.EraseAll()
-    # display.View_Iso()
-    # display.FitAll()
-    # display.DisableAntiAliasing()
-    #
-    # if bgcolor == "gradient_bg":
-    #
-    #     display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
-    # else:
-    #     display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
-    #
-    # osdag_display_shape(self.display, basePlate.get_models(), update=True, color='Blue')
+# display = CommonDesignLogic.display
+# display.EraseAll()
+# display.View_Iso()
+# display.FitAll()
+# display.DisableAntiAliasing()
+#
+# if bgcolor == "gradient_bg":
+#
+#     display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+# else:
+#     display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+#
+# osdag_display_shape(self.display, basePlate.get_models(), update=True, color='Blue')

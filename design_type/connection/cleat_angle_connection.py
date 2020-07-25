@@ -389,7 +389,6 @@ class CleatAngleConnection(ShearConnection):
         out_list.append(t2)
 
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '', True)
-
         out_list.append(t3)
 
         t4 = (None, DISP_OUT_TITLE_SPTDLEG, TYPE_TITLE, None, True)
@@ -460,6 +459,9 @@ class CleatAngleConnection(ShearConnection):
         t20 = (None, DISP_OUT_TITLE_CLEAT, TYPE_TITLE, None, True)
         out_list.append(t20)
 
+        t21 = (KEY_OUT_CLEAT_SECTION, KEY_OUT_DISP_CLEAT_SECTION, TYPE_TEXTBOX, self.cleat.designation if flag else '', True)
+        out_list.append(t21)
+
         t15 = (KEY_OUT_CLEAT_HEIGHT, KEY_OUT_DISP_CLEAT_HEIGHT, TYPE_TEXTBOX, self.sptd_leg.height if flag else '', True)
         out_list.append(t15)
 
@@ -475,11 +477,11 @@ class CleatAngleConnection(ShearConnection):
         t18 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_BLK_SHEAR, TYPE_TEXTBOX, round(self.sptd_leg.block_shear_capacity,2) if flag else '', True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX, round(self.sptd_leg.moment_demand/1000000,2) if flag else '', True)
-        out_list.append(t19)
-
-        t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.cl_8_2_moment_capacity_member, 2) if flag else '', True)
-        out_list.append(t20)
+        # t19 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX, round(self.sptd_leg.moment_demand/1000000,2) if flag else '', True)
+        # out_list.append(t19)
+        #
+        # t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.cl_8_2_moment_capacity_member, 2) if flag else '', True)
+        # out_list.append(t20)
 
         return out_list
 
@@ -535,20 +537,20 @@ class CleatAngleConnection(ShearConnection):
 
     def check_available_cleat_thk(self):
         self.sptd_leg.thickness = []
-
+        self.cleat_list_thk = []
         min_thickness = self.supported_section.web_thickness / 2
         for designation in self.cleat_list:
-            cleat = Angle(designation=designation,material_grade=self.cleat_material_grade)
-            if cleat.thickness*2 <= self.supported_section.web_thickness:
-                self.cleat_list.pop()
+            cleat = Angle(designation=designation, material_grade=self.cleat_material_grade)
+            if cleat.thickness*2 >= self.supported_section.web_thickness:
+                self.cleat_list_thk.append(designation)
                 print("popped", designation)
-                print(self.cleat_list)
+                print(self.cleat_list_thk)
             else:
                 if cleat.thickness not in self.sptd_leg.thickness:
                     self.sptd_leg.thickness.append(cleat.thickness)
                     print("added", designation,self.sptd_leg.thickness)
 
-        if self.cleat_list:
+        if self.cleat_list_thk:
             logger.info("Required cleat thickness available. Doing preliminary member checks")
             self.member_capacity(self)
         else:
@@ -596,11 +598,11 @@ class CleatAngleConnection(ShearConnection):
         else:
             available_length = (self.supporting_section.depth - 2 * self.supporting_section.flange_thickness -
                                 2 * self.supporting_section.root_radius - self.supported_section.web_thickness) / 2
-
-        for designation in self.cleat_list:
+        self.cleat_list_leg = []
+        for designation in self.cleat_list_thk:
             cleat = Angle(designation=designation,material_grade=self.cleat_material_grade)
-            if cleat.leg_a_length > available_length:
-                self.cleat_list.pop()
+            if cleat.leg_a_length < available_length:
+                self.cleat_list_leg.append(designation)
                 # print("popped", designation)
                 # print(self.cleat_list)
             # else:
@@ -608,7 +610,7 @@ class CleatAngleConnection(ShearConnection):
             #         self.sptd_leg.thickness.append(cleat.thickness)
             #         print("added", designation,self.sptd_leg.thickness)
 
-        for self.cleatAngle in self.cleat_list:
+        for self.cleatAngle in self.cleat_list_leg:
             self.cleat = Angle(designation=self.cleatAngle, material_grade=self.cleat_material_grade)
             # self.sptd_leg.thickness_provided = min(self.sptd_leg.thickness)
             self.sptd_leg.thickness_provided = self.cleat.thickness

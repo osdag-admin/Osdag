@@ -1380,8 +1380,8 @@ def cl_10_3_3_1_long_joint_bolted_req():
     long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
     return long_joint_bolted_eqn
 
-
-def cl_10_3_3_1_long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
+cl_10_3_3_1_long_joint_bolted_prov
+def cl_10_3_3_1_long_joint_bolted_prov(nc, nr, p, g, d, Tc, Tr, direction=None):
     """
     Calculate reduced bolt capacity in case of long joint
 

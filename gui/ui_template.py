@@ -107,13 +107,12 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         if event.type() == QEvent.WindowStateChange:
             if event.oldState() == Qt.WindowNoState or self.windowState() == Qt.WindowMaximized:
                 print("WindowMaximized")
-
-                x=width/2
-                y=height/2
+                x = width/2
+                y = height/2
                 mouse = Controller()
                 original = mouse.position
-                mouse.postion = (x,y)
-                mouse.click(Button.left,1)
+                mouse.position = (x, y)
+                mouse.click(Button.left, 1)
                 mouse.position = original
 
     def resize_dockComponents(self):

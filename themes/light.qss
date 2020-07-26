@@ -1,13 +1,12 @@
 QWidget {
-  font-family: Arial;
-
+  font-family: Helvetica;
+  font-size: 9pt;
 }
 
 #TitleBar QToolButton#close_button {
     background-color: transparent;
     image: url("themes/rc/titlebar_close.png");
 }
-
 #TitleBar QToolButton#close_button:hover {
     background-color: #FF3333;
     image: url("themes/rc/titlebar_close_hover.png");
@@ -15,42 +14,35 @@ QWidget {
 #TitleBar QToolButton#save_log {
 	background-color: transparent;
 	font-weight:600;
-	font-family:Arial;
-
 }
 #TitleBar QToolButton#report_issue {
 	background-color: transparent;
 	font-weight:600;
-	font-family:Arial;
-
 }
 #TitleBar QToolButton#report_issue:hover {
 	background-color: cadetblue;
 	font-weight:600;
-	font-family:Arial;
-
 }
 #TitleBar QToolButton#save_log:hover {
 	background-color: limegreen;
 	font-weight:600;
-	font-family:Arial;
-
 }
 #TitleBar {
     background-color: lightgray;
     /*background-color: rgba(22, 31, 38, 1);*/
 }
 #TitleBar QLabel{
-	font-family: Arial;
 	font-size: 10pt;
 	}
+
+
 #CriticalExceptionDialog {
 	background-color: lightgray;
 }
 #CriticalExceptionDialog QTextEdit{
-	font-family: Georgia;
 	font-size: 9pt;
 }
+
 QTextEdit {
 	border-width: 1px;
 	border-style: solid;
@@ -100,7 +92,6 @@ QToolButton:pressed{
 
 QPushButton{
 	border-style: solid;
-	font-family: Arial;
 	border-top-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgb(215, 215, 215), stop:1 rgb(222, 222, 222));
 	border-right-color: qlineargradient(spread:pad, x1:0, y1:0.5, x2:1, y2:0.5, stop:0 rgb(217, 217, 217), stop:1 rgb(227, 227, 227));
 	border-left-color: qlineargradient(spread:pad, x1:0, y1:0.5, x2:1, y2:0.5, stop:0 rgb(227, 227, 227), stop:1 rgb(217, 217, 217));
@@ -152,13 +143,34 @@ QPushButton:disabled{
 	background-color: rgb(142,142,142);
 }
 QLineEdit {
+    font-size: 9pt;
 	border-width: 1px; border-radius: 4px;
 	border-style: solid;
 	border-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(0, 113, 255, 255), stop:1 rgba(91, 171, 252, 255));
 }
+
 QLabel {
 	color: #000000;
+	font-size: 9pt;
 }
+
+QLabel#_title
+{
+	font-size: 9pt;
+	font-weight:600;
+	}
+
+QLabel#module_name_label
+{
+	font-size: 10pt;
+	font-weight:600;
+	}
+QLabel#under_developement
+{
+	font-size: 14pt;
+	font-weight:600;
+	}
+
 QLCDNumber {
 	color: rgb(0, 113, 255, 255);
 }
@@ -481,6 +493,29 @@ QComboBox QAbstractItemView
   selection-color:black ;
 
 }
+
+#DesignPreferences QLineEdit {
+    font-size: 8pt;
+	border-width: 1px; border-radius: 4px;
+	border-style: solid;
+	border-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(0, 113, 255, 255), stop:1 rgba(91, 171, 252, 255));
+}
+#DesignPreferences QComboBox
+{
+	font-size: 8pt;
+	}
+#DesignPreferences QLabel#_title
+{
+	font-size: 8pt;
+	font-weight:600;
+	}
+
+#DesignPreferences QLabel
+{
+	font-size: 8pt;
+	}
+
+
 QDialog#DesignPreferences QTabWidget::tab-bar{
     alignment: left;
 }
@@ -514,7 +549,6 @@ QDialog#DesignPreferences QPushButton{
 
 		padding-left: 7px;
 		padding-right: 7px;
-		font-family: Arial;
 		font-size:9pt;
 
 }
@@ -535,10 +569,7 @@ QTabBar::tab {
 
                 height: 35px;
                 width: 180px;
-                font-size: 12pt;
-                font-family:Arial
-
-
+                font-size: 10pt;
                         }
 
 QTabBar::tab:last

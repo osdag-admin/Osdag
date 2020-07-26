@@ -1,3 +1,31 @@
+QWidget {
+  /*background-color: #19232D;*/
+  background-color:rgba(19, 27, 33, 1);
+  border: 0px solid #1D282F;
+  padding: 0px;
+  color: #F0F0F0;
+  selection-background-color: #1464A0;
+  selection-color: #F0F0F0;
+
+}
+
+QWidget:disabled {
+  background-color: #19232D;
+  color: #787878;
+  selection-background-color: #14506E;
+  selection-color: #787878;
+}
+
+
+QWidget::item:hover {
+  background-color: #148CD2;
+  color: #1D282F;
+}
+
+QWidget {
+  font-family: Helvetica;
+  font-size: 9pt;
+}
 
 #TitleBar QToolButton#close_button {
     background-color: transparent;
@@ -23,32 +51,9 @@
     border: 1px solid #37495b;
     selection-color: #d9d9d9;
     color: #bbbbbb;
-    font-family: Georgia;
 	font-size: 9pt;
 }
-QWidget {
-  /*background-color: #19232D;*/
-  background-color:rgba(19, 27, 33, 1);
-  border: 0px solid #1D282F;
-  padding: 0px;
-  color: #F0F0F0;
-  selection-background-color: #1464A0;
-  selection-color: #F0F0F0;
 
-}
-
-QWidget:disabled {
-  background-color: #19232D;
-  color: #787878;
-  selection-background-color: #14506E;
-  selection-color: #787878;
-}
-
-
-QWidget::item:hover {
-  background-color: #148CD2;
-  color: #1D282F;
-}
 
 /* QMainWindow ------------------------------------------------------------
 
@@ -62,7 +67,6 @@ QMainWindow::separator {
   border: 0px solid rgba(19, 27, 33, 1);
   spacing: 0px;
   padding: 2px;
-  font-family: Georgia;
 
 }
 
@@ -803,6 +807,17 @@ QLabel {
   color: #F0F0F0;
 }
 
+QLabel#module_name_label
+{
+	font-size: 10pt;
+	font-weight:600;
+	}
+QLabel#under_developement
+{
+	font-size: 14pt;
+	font-weight:600;
+	}
+
 QLabel::disabled {
   background-color: rgba(19, 27, 33, 1);
   border: 0px solid #1D282F;
@@ -1076,7 +1091,6 @@ QComboBox {
     border: 1px solid #37495b;
     border-radius: 0;
     /*padding: 3px;*/
-    font: 10pt "Arial";
     min-height: 25px;
 }
 
@@ -1087,7 +1101,6 @@ QComboBox:hover{
 QComboBox QAbstractItemView {
     /*background-color: #242424;*/
     color: #bbbbbb;
-    font: 10pt "Arial";
     border-radius: 0;
     border: 1px solid #37495b;
     outline: 0;
@@ -1243,8 +1256,9 @@ https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qtabwidget-and-qtabb
 --------------------------------------------------------------------------- */
 
 QDialog#DesignPreferences QTabBar::tab{
-            height: 28px;
+            height: 30px;
             width: 120px;
+            font-size: 9pt
 }
 QDialog#DesignPreferences QComboBox{
 		min-height: 22px;
@@ -1253,6 +1267,23 @@ QDialog#DesignPreferences QComboBox{
 QDialog#DesignPreferences QTabWidget::tab-bar{
     alignment: left;
 }
+
+#DesignPreferences QComboBox
+{
+	font-size: 8pt;
+	}
+#DesignPreferences QLabel#_title
+{
+	font-size: 8pt;
+	font-weight:600;
+	}
+
+#DesignPreferences QLabel
+{
+	font-size: 8pt;
+	}
+
+
 QTabWidget#mytabWidget QTabBar::tab {
 
 	background: rgba(19, 27, 33, 1);
@@ -1274,7 +1305,7 @@ QTabBar::tab{
 	height: 35px;
 	width: 200px;
     margin-bottom: 0px;
-    font-size: 12pt;
+    font-size: 10pt;
     background: rgba(19, 27, 33, 1);
 }
 

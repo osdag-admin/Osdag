@@ -159,12 +159,6 @@ class Window(QDialog):
                     button.setText(btn_text)
                     button.setFixedSize(button_size_x,button_size_y)
 
-                    # font = QtGui.QFont()
-                    # font.setPointSize(9)
-                    # font.setBold(False)
-                    # font.setWeight(50)
-                    # button.setFont(font)
-
                 r = 1
                 grid = QGridLayout()
                 horizontalLayout.addLayout(grid)
@@ -181,30 +175,16 @@ class Window(QDialog):
                         label.setText("<html><head/><body><p>" + lable + "</p></body></html>")
                         grid.addWidget(label,r,1)
                         label.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        font = QtGui.QFont()
-                        font.setPointSize(9)
-                        if lable in [KEY_DISP_DESIGNATION, 'Type', 'Source']:
-                            font.setWeight(75)
-                        else:
-                            font.setWeight(50)
-                        label.setFont(font)
 
                     if type ==TYPE_TEXTBOX:
                         line = QLineEdit(tab)
                         grid.addWidget(line,r,2)
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        font = QtGui.QFont()
-                        font.setPointSize(8)
-                        font.setBold(False)
-                        font.setWeight(50)
-                        line.setFont(font)
                         line.setFixedSize(85, 20)
                         if lable == 'Designation' or lable == KEY_DISP_SEC_PROFILE:
                             line.textChanged.connect(self.manage_designation_size(line))
 
-                        # if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
-                        #     line.setValidator(QDoubleValidator())
                         if input_dictionary:
                             line.setText(str(element[4]))
 
@@ -241,12 +221,7 @@ class Window(QDialog):
                         combo.addItems(element[3])
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
-                        font = QtGui.QFont()
-                        font.setPointSize(8)
-                        font.setBold(False)
-                        font.setWeight(50)
-                        combo.setFont(font)
-
+                        font = combo.font()
                         metrices = QtGui.QFontMetrics(font)
                         item_width = 0
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
@@ -266,12 +241,9 @@ class Window(QDialog):
 
                     if type == TYPE_TITLE:
                         title = QLabel(tab)
-                        title.setText("<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>")
+                        title.setText(lable)
                         grid.addWidget(title,r,1,1,2)
                         title.setObjectName("_title")
-                        font = QtGui.QFont()
-                        font.setPointSize(9)
-                        title.setFont(font)
                         title.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         last_title = lable
                         r += 1
@@ -319,13 +291,10 @@ class Window(QDialog):
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
 
                 label_1 = QLabel(tab)
-                label_1.setObjectName("label_1")
+                label_1.setObjectName("_title")
                 label_1.setText("Inputs")
                 grid.addWidget(label_1,r,1)
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setWeight(75)
-                label_1.setFont(font)
+
 
                 r += 3
 
@@ -341,10 +310,6 @@ class Window(QDialog):
                         label.setObjectName(element[0] + "_label")
                         grid.addWidget(label,r,1)
                         label.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        font = QtGui.QFont()
-                        font.setPointSize(9)
-                        font.setWeight(50)
-                        label.setFont(font)
 
                     if type == TYPE_TEXTBOX:
                         line = QLineEdit(tab)
@@ -352,11 +317,6 @@ class Window(QDialog):
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         line.setObjectName(element[0])
                         line.setFixedSize(130, 22)
-                        font = QtGui.QFont()
-                        font.setPointSize(9)
-                        font.setBold(False)
-                        font.setWeight(50)
-                        line.setFont(font)
                         if element[3]:
                             line.setText(element[3])
                         dbl_validator = QDoubleValidator()
@@ -384,11 +344,7 @@ class Window(QDialog):
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                         combo.setFixedSize(130, 22)
                         combo.addItems(element[3])
-                        font = QtGui.QFont()
-                        font.setPointSize(9)
-                        font.setBold(False)
-                        font.setWeight(50)
-                        combo.setFont(font)
+                        font = combo.font()
                         metrices = QtGui.QFontMetrics(font)
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
@@ -403,12 +359,12 @@ class Window(QDialog):
 
                     if type == 'Title':
                         title = QLabel(tab)
+                        title.setProperty("heading", True)
+                        title.style().unpolish(title)
+                        title.style().polish(title)
                         title.setText(element[1])
                         grid.addWidget(title,r,1)
                         title.setObjectName("_title")
-                        font = QtGui.QFont()
-                        font.setPointSize(10)
-                        title.setFont(font)
                         title.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         r += 1
 
@@ -431,10 +387,6 @@ class Window(QDialog):
                         lbl.setText('Description')
                         grid.addWidget(lbl,r,1)
                         lbl.setObjectName("label_3")
-                        font = QtGui.QFont()
-                        font.setFamily("Arial")
-                        font.setWeight(75)
-                        lbl.setFont(font)
                         lbl.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         r += 1
 
@@ -467,11 +419,8 @@ class Window(QDialog):
                     for lable in Notes:
                         lbl = QLabel(tab)
                         lbl.setWordWrap(True)
-                        lbl.setText("<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>")
+                        lbl.setText("<html><head/><body><p>" + lable + "</p></body></html>")
                         lbl.setObjectName("_title")
-                        font = QtGui.QFont()
-                        font.setPointSize(10)
-                        lbl.setFont(font)
                         vertical.addWidget(lbl)
 
 

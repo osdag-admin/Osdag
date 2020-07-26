@@ -8,9 +8,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow
 from .toggle_button import Switch
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowModality(QtCore.Qt.NonModal)
@@ -55,13 +58,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.comboBox_help.sizePolicy().hasHeightForWidth())
         self.comboBox_help.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        font.setKerning(True)
-        self.comboBox_help.setFont(font)
         self.comboBox_help.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.comboBox_help.setAutoFillBackground(False)
         self.comboBox_help.setFrame(True)
@@ -74,7 +70,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.comboBox_help, 1, 0)
         layout = QtWidgets.QHBoxLayout()
         self.lbl = QtWidgets.QLabel(self.centralwidget)
-        self.gridLayout.setHorizontalSpacing(20)
+        # self.gridLayout.setHorizontalSpacing(20)
         self.lbl.setText('Dark Mode  ')
         layout.addWidget(self.lbl)
         self.switch = Switch(self.centralwidget, thumb_radius=8, track_radius=6)
@@ -82,7 +78,6 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(layout,1,1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         self.lbl.setSizePolicy(sizePolicy)
-        self.lbl.setStyleSheet("font-family:Arial;font-size:10pt;font-weight:600;")
         self.switch.setSizePolicy(sizePolicy)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -93,12 +88,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.myStackedWidget.sizePolicy().hasHeightForWidth())
         self.myStackedWidget.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.myStackedWidget.setFont(font)
         self.myStackedWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.myStackedWidget.setFrameShadow(QtWidgets.QFrame.Plain)
         self.myStackedWidget.setObjectName("myStackedWidget")
@@ -131,16 +120,17 @@ class Ui_MainWindow(object):
         self.lbl_fosseelogo.setObjectName("lbl_fosseelogo")
         self.gridLayout_2.addWidget(self.lbl_fosseelogo, 3, 3, 1, 1)
         self.lbl_iitblogo = QtWidgets.QLabel(self.Osdagpage)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lbl_iitblogo.sizePolicy().hasHeightForWidth())
-        self.lbl_iitblogo.setSizePolicy(sizePolicy)
+        # sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        # sizePolicy.setHorizontalStretch(0)
+        # sizePolicy.setVerticalStretch(0)
+        # sizePolicy.setHeightForWidth(self.lbl_iitblogo.sizePolicy().hasHeightForWidth())
+        # self.lbl_iitblogo.setSizePolicy(sizePolicy)
         self.lbl_iitblogo.setMinimumSize(QtCore.QSize(0, 0))
+        self.lbl_iitblogo.setMaximumSize(QtCore.QSize(100, 100))
         self.lbl_iitblogo.setText("")
         self.lbl_iitblogo.setPixmap(QtGui.QPixmap(":/newPrefix/images/logoiitb.png"))
         #self.lbl_iitblogo.setScaledContents(True)
-        self.lbl_iitblogo.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.lbl_iitblogo.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.lbl_iitblogo.setObjectName("lbl_iitblogo")
         self.gridLayout_2.addWidget(self.lbl_iitblogo, 3, 0, 1, 1)
         self.myStackedWidget.addWidget(self.Osdagpage)

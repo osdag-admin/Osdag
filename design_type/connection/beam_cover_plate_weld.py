@@ -2584,7 +2584,11 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                  fu=self.section.fu, gamma_m1=gamma_m1,T_dn=round((self.section.tension_rupture_capacity / 1000),2),multiple =1), '')
 
             self.report_check.append(t1)
-            t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f") , cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity / 1000, 2), round(self.section.tension_rupture_capacity / 1000, 2)), get_pass_fail(round(self.flange_force / 1000, 2), round(self.section.tension_capacity_flange / 1000, 2), relation="lesser"))
+            t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f") ,
+                  cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity / 1000, 2),
+                                                 round(self.section.tension_rupture_capacity / 1000, 2)),
+                  get_pass_fail(round(self.flange_force / 1000, 2),
+                                round(self.section.tension_capacity_flange / 1000, 2), relation="lesser"))
             self.report_check.append(t1)
 
         ### web Check ###
@@ -2605,7 +2609,8 @@ class BeamCoverPlateWeld(MomentConnection):
             self.report_check.append(t1)
             t1 = (KEY_DISP_BLOCKSHEARCAP_WEB, '', cl_6_4_blockshear_capacity_member(Tdb = round(self.section.block_shear_capacity_web / 1000, 2)), '')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_WEB_TEN_CAPACITY, display_prov( round(self.axial_force_w / 1000, 2),"A_w"), cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity_web / 1000, 2),
+            t1 = (KEY_DISP_WEB_TEN_CAPACITY, display_prov( round(self.axial_force_w / 1000, 2),"A_w"),
+                  cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity_web / 1000, 2),
                                                                                                                                       round(self.section.tension_rupture_capacity_web / 1000, 2),
                                                                                                                                       round(self.section.block_shear_capacity_web / 1000, 2)), get_pass_fail(round(self.axial_force_w / 1000, 2), round(self.section.tension_capacity_web / 1000, 2),relation="lesser"))
             self.report_check.append(t1)
@@ -2718,8 +2723,8 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.report_check.append(t1)
             t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, display_prov( round(self.fact_shear_load / 1000, 2),"V_u"),
                   cl_8_4_shear_capacity_member(V_dy=round(self.web_plate.shear_yielding_capacity / 1000, 2),
-                                               V_dn= round(self.web_plate.shear_rupture_capacity / 1000, 2),
-                                               V_db= 00),
+                                               V_dn= 0.0,
+                                               V_db= 0.0),
                   get_pass_fail(round(self.fact_shear_load / 1000, 2),
                         round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))
             self.report_check.append(t1)

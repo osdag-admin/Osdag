@@ -3750,7 +3750,7 @@ def plate_area_req(crs_area, flange_web_area):
     flange_web_area = str(flange_web_area)
 
     plate_crs_sec_area_eqn =Math(inline=True)
-    plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} &pt.area >= \\&connected~member~area \times 1.05\\'))
+    plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} &pt.area >= \\& connected~member~area \times 1.05\\'))
     # plate_crs_sec_area_eqn.append(NoEscape(r'& = '+crs_area+ r' * 1.05 \\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area  +  r'\\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' &[Ref: Cl.8.6.3.2 ~IS ~800:2007]\end{aligned}'))
@@ -3781,12 +3781,12 @@ def width_pt_chk(B,t,r_1,pref):
     r_1 = str(r_1)
     Innerwidth_pt_chk_eqn = Math(inline=True)
     if pref == "Outside":
-        Innerwidth_pt_chk_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= B-(2\times21)\\'))
-        Innerwidth_pt_chk_eqn.append(NoEscape(r'&=' + B + r'-(2\times21)\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= B-(2 \times 21)\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'&=' + B + r'-(2 \times 21)\\'))
         Innerwidth_pt_chk_eqn.append(NoEscape(r'&= ' + outerwidth +r'\end{aligned}'))
     else:
-        Innerwidth_pt_chk_eqn.append(NoEscape(r'\begin{aligned} B_{ifp} &= \frac{B-t-(2\timesR1)-(4 \times 21)}{2}\\'))
-        Innerwidth_pt_chk_eqn.append(NoEscape(r'&=\frac{'+B+'-'+t+r'-(2\times'+r_1+r')-(4 \times 21)}{2}\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'\begin{aligned} B_{ifp} &= \frac{B-t-(2 \times R1)-(4 \times 21)}{2}\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'&=\frac{'+B+'-'+t+r'-(2 \times'+r_1+r')-(4 \times 21)}{2}\\'))
         Innerwidth_pt_chk_eqn.append(NoEscape(r'&= ' + innerwidth + r'\end{aligned}'))
     return Innerwidth_pt_chk_eqn
 
@@ -3809,8 +3809,8 @@ def width_pt_chk_bolted(B,t,r_1):
     innerwidth = str(innerwidth)
     width_pt_chk_bolted_eqn = Math(inline=True)
 
-    width_pt_chk_bolted_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= \frac{B-t-(2\timesR1)}{2}\\'))
-    width_pt_chk_bolted_eqn.append(NoEscape(r'&=\frac{' + B + '-' + t + r'-(2\times' + r_1 + r')}{2}\\'))
+    width_pt_chk_bolted_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= \frac{B-t-(2 \times R1)}{2}\\'))
+    width_pt_chk_bolted_eqn.append(NoEscape(r'&=\frac{' + B + '-' + t + r'-(2 \times' + r_1 + r')}{2}\\'))
     width_pt_chk_bolted_eqn.append(NoEscape(r'&= ' + innerwidth + r'\end{aligned}'))
     return width_pt_chk_bolted_eqn
 
@@ -3935,7 +3935,7 @@ def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= B - (2 \times 21)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= '+B+r' - (2 \times 21)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + outerwidth + r' \\'))
-        flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &= '+y+ r' \times '+outerwidth+r'\\'))
+        flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &= '+y+ r' \times' +outerwidth+r'\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= '+fp_area+r'\end{aligned}'))
     else:
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= B-(2 \times 21)\\'))
@@ -3944,7 +3944,7 @@ def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'B_{ifp}&= \frac{B-t-(2 \times R1)-(4 \times 21)}{2}\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&=\frac{'+B+'-'+t+r'-(2 \times '+r_1+r')-(4 \times 21)}{2}\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + innerwidth + r' \\'))
-        flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &=('+outerwidth+r'+(2 \times'+innerwidth+r')) \times'+y+r'\\'))
+        flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &=('+outerwidth+r'+(2 \times' +innerwidth+r')) \times' +y+r'\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + fp_area + r'\end{aligned}'))
 
 
@@ -3988,7 +3988,7 @@ def plate_recheck_area_weld(outerwidth,innerwidth=None,f_tp=None,t_wp=None,conn=
     if conn == "flange":
         if pref =="Outside":
             flange_plate_area = str(flange_plate_area)
-            plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=B_{fp} \times  t_{ifp}\\'))
+            plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=B_{fp} \times t_{ifp}\\'))
             plate_recheck_area_weld_eqn.append(NoEscape(r' &='+outerwidth+r'\times'+f_tp+r'\\'))
             plate_recheck_area_weld_eqn.append(NoEscape(r'&= ' + flange_plate_area + r'\end{aligned}'))
         else:
@@ -3998,7 +3998,7 @@ def plate_recheck_area_weld(outerwidth,innerwidth=None,f_tp=None,t_wp=None,conn=
             plate_recheck_area_weld_eqn.append(NoEscape(r'&= ' + flange_plate_area +r'\end{aligned}'))
     else:
         web_plate_area  = str(web_plate_area)
-        plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=2\timesW_{wp} \times t_{wp}  \\'))
+        plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=2\times W_{wp} \times t_{wp}  \\'))
         plate_recheck_area_weld_eqn.append(NoEscape(r' &=2\times' + outerwidth +r' \times' + t_wp + r'\\'))
         plate_recheck_area_weld_eqn.append(NoEscape(r'&= ' + web_plate_area + r'\end{aligned}'))
     return plate_recheck_area_weld_eqn
@@ -4040,10 +4040,10 @@ def flange_plate_area_prov_bolt(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =No
 
         flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= B\\'))
         flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'&= ' + outerwidth + r' \\'))
-        flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'B_{ifp} &= \frac{B-t-(2\timesR1)}{2}\\'))
-        flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'&=\frac{' + B + '-' + t + r'-(2\times' + r_1 + r')}{2}\\'))
+        flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'B_{ifp} &= \frac{B-t-(2 \times R1)}{2}\\'))
+        flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'&=\frac{' + B + '-' + t + r'-(2 \times' + r_1 + r')}{2}\\'))
         flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'&= ' + innerwidth + r' \\'))
-        flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r' pt.area &=(' + outerwidth + r'+(2\times' + innerwidth + r'))\times' + y + r'\\'))
+        flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r' pt.area &=(' + outerwidth + r'+(2 \times' + innerwidth + r')) \times' + y + r'\\'))
         flangeplate_crs_sec_area_bolt_eqn.append(NoEscape(r'&= ' + fp_area + r'\end{aligned}'))
 
     return flangeplate_crs_sec_area_bolt_eqn

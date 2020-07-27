@@ -2013,7 +2013,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Connector", bgcolor)
+        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     ##########################################################################################################################
     def results_to_test(self):
@@ -2705,16 +2705,16 @@ class ColumnCoverPlateWeld(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', tension_rupture_welded_prov(w_p=self.section.flange_width,
-                                                                                     t_p=self.section.flange_thickness,
-                                                                                     fu=self.section.fu,
-                                                                                     gamma_m1=gamma_m1, T_dn=round(
-                    (self.section.tension_rupture_capacity / 1000), 2), multiple=1), '')
-
-            self.report_check.append(t1)
+            # t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', tension_rupture_welded_prov(w_p=self.section.flange_width,
+            #                                                                          t_p=self.section.flange_thickness,
+            #                                                                          fu=self.section.fu,
+            #                                                                          gamma_m1=gamma_m1, T_dn=round(
+            #         (self.section.tension_rupture_capacity / 1000), 2), multiple=1), '')
+            #
+            # self.report_check.append(t1)
             t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f"),
                   cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity / 1000, 2),
-                                                 round(self.section.tension_rupture_capacity / 1000, 2)),
+                                                 0),
                   get_pass_fail(round(self.flange_force / 1000, 2),
                                 round(self.section.tension_capacity_flange / 1000, 2), relation="lesser"))
             self.report_check.append(t1)
@@ -2732,20 +2732,20 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                               2), 1), '')
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-            t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', tension_rupture_welded_prov(w_p=webheight,
-                                                                                  t_p=self.section.web_thickness,
-                                                                                  fu=self.section.fu,
-                                                                                  gamma_m1=gamma_m1,
-                                                                                  T_dn=round(
-                                                                                      self.section.tension_rupture_capacity_web / 1000,
-                                                                                      2), multiple=1), '')
-            self.report_check.append(t1)
+            # t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', tension_rupture_welded_prov(w_p=webheight,
+            #                                                                       t_p=self.section.web_thickness,
+            #                                                                       fu=self.section.fu,
+            #                                                                       gamma_m1=gamma_m1,
+            #                                                                       T_dn=round(
+            #                                                                           self.section.tension_rupture_capacity_web / 1000,
+            #                                                                           2), multiple=1), '')
+            # self.report_check.append(t1)
             t1 = (KEY_DISP_BLOCKSHEARCAP_WEB, '',
                   cl_6_4_blockshear_capacity_member(Tdb=round(self.section.block_shear_capacity_web / 1000, 2)), '')
             self.report_check.append(t1)
             t1 = (KEY_DISP_WEB_TEN_CAPACITY, display_prov(round(self.axial_force_w / 1000, 2), "A_w"),
                   cl_6_1_tension_capacity_member(round(self.section.tension_yielding_capacity_web / 1000, 2),
-                                                 round(self.section.tension_rupture_capacity_web / 1000, 2),
+                                                 0,
                                                  round(self.section.block_shear_capacity_web / 1000, 2)),
                   get_pass_fail(round(self.axial_force_w / 1000, 2),
                                 round(self.section.tension_capacity_web / 1000, 2), relation="lesser"))
@@ -2770,17 +2770,17 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.report_check.append(t1)
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '',
-                      tension_rupture_welded_prov(w_p=self.flange_plate.height,
-                                                  t_p=self.flange_plate.thickness_provided,
-                                                  fu=self.flange_plate.fu,
-                                                  gamma_m1=gamma_m1,
-                                                  T_dn=round(self.flange_plate.tension_rupture_capacity / 1000,
-                                                             2), multiple=1), '')
-                self.report_check.append(t1)
+                # t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '',
+                #       tension_rupture_welded_prov(w_p=self.flange_plate.height,
+                #                                   t_p=self.flange_plate.thickness_provided,
+                #                                   fu=self.flange_plate.fu,
+                #                                   gamma_m1=gamma_m1,
+                #                                   T_dn=round(self.flange_plate.tension_rupture_capacity / 1000,
+                #                                              2), multiple=1), '')
+                # self.report_check.append(t1)
                 t1 = (KEY_DISP_FLANGE_PLATE_TEN_CAP, display_prov(round(self.flange_force / 1000, 2), "F_f"),
                       cl_6_1_tension_capacity_member(round(self.flange_plate.tension_yielding_capacity / 1000, 2),
-                                                     round(self.flange_plate.tension_rupture_capacity / 1000, 2)),
+                                                     0),
                       get_pass_fail(round(self.flange_force / 1000, 2),
                                     round(self.flange_plate.tension_capacity_flange_plate / 1000, 2),
                                     relation="lesser"))
@@ -2803,20 +2803,20 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.report_check.append(t1)
 
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-
-                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', tension_rupture_welded_prov(w_p=total_height,
-                                                                                               t_p=self.flange_plate.thickness_provided,
-                                                                                               fu=self.flange_plate.fu,
-                                                                                               gamma_m1=gamma_m1,
-                                                                                               T_dn=round(
-                                                                                                   self.flange_plate.tension_rupture_capacity / 1000,
-                                                                                                   2), multiple=1),
-                      '')
-                self.report_check.append(t1)
+                #
+                # t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', tension_rupture_welded_prov(w_p=total_height,
+                #                                                                                t_p=self.flange_plate.thickness_provided,
+                #                                                                                fu=self.flange_plate.fu,
+                #                                                                                gamma_m1=gamma_m1,
+                #                                                                                T_dn=round(
+                #                                                                                    self.flange_plate.tension_rupture_capacity / 1000,
+                #                                                                                    2), multiple=1),
+                #       '')
+                # self.report_check.append(t1)
 
                 t1 = (KEY_DISP_FLANGE_PLATE_TEN_CAP, display_prov(round(self.flange_force / 1000, 2), "F_f"),
                       cl_6_1_tension_capacity_member(round(self.flange_plate.tension_yielding_capacity / 1000, 2),
-                                                     round(self.flange_plate.tension_rupture_capacity / 1000, 2)),
+                                                     0),
                       get_pass_fail(round(self.flange_force / 1000, 2),
                                     round(self.flange_plate.tension_capacity_flange_plate / 1000, 2),
                                     relation="lesser"))
@@ -2837,17 +2837,17 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                                        2), 2), '')
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', tension_rupture_welded_prov(self.web_plate.height,
-                                                                                              self.web_plate.thickness_provided,
-                                                                                              self.web_plate.fu,
-                                                                                              gamma_m1,
-                                                                                              round(
-                                                                                                  self.web_plate.tension_rupture_capacity / 1000,
-                                                                                                  2), 2), '')
-            self.report_check.append(t1)
+            # t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', tension_rupture_welded_prov(self.web_plate.height,
+            #                                                                                   self.web_plate.thickness_provided,
+            #                                                                                   self.web_plate.fu,
+            #                                                                                   gamma_m1,
+            #                                                                                   round(
+            #                                                                                       self.web_plate.tension_rupture_capacity / 1000,
+            #                                                                                       2), 2), '')
+            # self.report_check.append(t1)
             t1 = (KEY_DISP_WEB_PLATE_CAPACITY, display_prov(round(self.axial_force_w / 1000, 2), "A_w"),
                   cl_6_1_tension_capacity_member(round(self.web_plate.tension_yielding_capacity / 1000, 2),
-                                                 round(self.web_plate.tension_rupture_capacity / 1000, 2)),
+                                                 0),
                   get_pass_fail(round(self.axial_force_w / 1000, 2),
                                 round(self.web_plate.tension_capacity_web_plate / 1000, 2), relation="lesser"))
             self.report_check.append(t1)
@@ -2869,15 +2869,15 @@ class ColumnCoverPlateWeld(MomentConnection):
                   allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
                   get_pass_fail(self.load.shear_force, reduced_shear_capacity, relation="lesser"))
             self.report_check.append(t1)
-            if self.shear_yielding_status == True:
-                t1 = (KEY_DISP_SHEAR_RUP, '',
-                      shear_Rupture_prov_weld(self.web_plate.height, self.web_plate.thickness_provided,
-                                              self.web_plate.fu,
-                                              round(self.web_plate.shear_rupture_capacity / 1000, 2), gamma_m1, 2), '')
-                self.report_check.append(t1)
+            # if self.shear_yielding_status == True:
+            #     t1 = (KEY_DISP_SHEAR_RUP, '',
+            #           shear_Rupture_prov_weld(self.web_plate.height, self.web_plate.thickness_provided,
+            #                                   self.web_plate.fu,
+            #                                   round(self.web_plate.shear_rupture_capacity / 1000, 2), gamma_m1, 2), '')
+            #     self.report_check.append(t1)
             t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, display_prov(round(self.fact_shear_load / 1000, 2), "V_u"),
                   cl_8_4_shear_capacity_member(V_dy=round(self.web_plate.shear_yielding_capacity / 1000, 2),
-                                               V_dn=round(self.web_plate.shear_rupture_capacity / 1000, 2),
+                                               V_dn=00,
                                                V_db=00),
                   get_pass_fail(round(self.fact_shear_load / 1000, 2),
                                 round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))

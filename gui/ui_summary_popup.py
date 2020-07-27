@@ -15,9 +15,6 @@ import pickle
 # from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from design_report.reportGenerator_latex import CreateLatex
-
-
-
 # from design_type.connection.fin_plate_connection import sa
 from get_DPI_scale import scale
 class Ui_Dialog1(object):

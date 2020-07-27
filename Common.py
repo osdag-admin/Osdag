@@ -620,7 +620,7 @@ KEY_DISP_END_DIST_FLANGE = 'End Distance'
 KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange Plate Tension Capacity (kN)"
 DISP_TITLE_SECTION = 'Section Details'
 DISP_TITLE_TENSION_SECTION = 'Section Details'
 SECTION_CLASSIFICATION ="Section Classification"
@@ -675,7 +675,7 @@ KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND = 'Tension Demand (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
 
-DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt - Outside Column Flange'
+DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt - Inside Column Flange'
 KEY_OUT_DIA_ANCHOR_UPLIFT = 'Anchor Bolt.Diameter_Uplift'
 KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter (mm)'
 KEY_OUT_GRD_ANCHOR_UPLIFT = 'Anchor Bolt.Grade_Uplift'
@@ -1013,7 +1013,7 @@ KEY_SLENDER = "Member.Slenderness"
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 KEY_OUT_FLANGESPLATE_THICKNESS = 'flange_plate.Thickness'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Flange Plate Thickness'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
@@ -1141,7 +1141,6 @@ KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 # FLANGE AND WEB -REDUCTION FACTOR
-
 KEY_REDUCTION_FACTOR_LONG_FLANGE ='flange_plate.red,factor'
 KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
 
@@ -1208,7 +1207,7 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Width'
 KEY_OUT_WEBPLATE_THICKNESS = 'Web_Plate.Thickness'
-KEY_DISP_WEBPLATE_THICKNESS = 'Web Plate Thickness'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)'
 KEY_DISP_WEB_PLATE_LENGTH ='Width (mm)'
 DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
 KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'
@@ -1379,15 +1378,18 @@ KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
-KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
+KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
+KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(nos)'
+
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (nos)'
 
 
 KEY_OUT_SPACING = 'spacing'
@@ -1630,6 +1632,8 @@ KEY_OUT_DISP_WELD_STRENGTH_RED = 'Red.Strength (N/mm)'
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTINGLEG = "Supporting Leg"
 DISP_OUT_TITLE_CLEAT = "Cleat Angle"
+KEY_OUT_CLEAT_SECTION = "Cleat.Angle"
+KEY_OUT_DISP_CLEAT_SECTION = "Cleat Angle"
 KEY_OUT_CLEATTHK = 'Plate.Thickness'
 KEY_OUT_DISP_CLEATTHK = 'Thickness (mm)'
 KEY_OUT_CLEAT_HEIGHT = 'Plate.Height'
@@ -1650,7 +1654,7 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 
 KEY_LENZZ = 'Member.Length_zz'

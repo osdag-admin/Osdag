@@ -91,17 +91,21 @@ class IntermittentNutBoltPlateArray():
         Calculate the exact position for nut, bolts and plates.
         """
         self.positions = []
-        self.origin = self.origin + (self.spacing - 2*self.end)*self.pitchDir
+        self.origin = self.origin + (self.spacing - 2 * self.end)*self.pitchDir
         for connec in np.arange(self.no_intermitent_connections):
             pltpos = self.origin
             pltpos = pltpos + (connec * self.spacing) * self.pitchDir
-            pltpos = pltpos + (self.intermittentPlate.T/2) * self.boltDir
+            pltpos = pltpos + (self.intermittentPlate.T/2) * self.boltDir  
             pltpos = pltpos
 
             self.platePositions.append(pltpos)
             for rw in np.arange(self.row):
                 for col in np.arange(self.col):
-                    pos = self.origin +(self.member_thickness + self.root_radius - self.memberdeepth/2) * self.gaugeDir
+                    # pos = self.origin + (self.member_thickness + self.root_radius - self.memberdeepth / 2) * self.gaugeDir
+                    if self.plateObj.sec_profile != 'Star Angles':
+                        pos = self.origin +(self.member_thickness + self.root_radius - self.memberdeepth/2) * self.gaugeDir
+                    else:
+                        pos = self.origin + (self.member_thickness + self.root_radius) * self.gaugeDir
                     # pos = pos + 5 * self.gaugeDir
                     pos = pos + self.edge * self.gaugeDir
                     pos = pos + col * self.pitch * self.pitchDir
@@ -113,7 +117,6 @@ class IntermittentNutBoltPlateArray():
                     self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
-
         self.origin = origin
         self.gaugeDir = gaugeDir
         self.pitchDir = pitchDir
@@ -125,10 +128,12 @@ class IntermittentNutBoltPlateArray():
             for index, pos in enumerate(self.positions):
                 self.bolts[index].place(pos + self.memberdeepth/2 * self.gaugeDir , self.gaugeDir, self.boltDir)
                 self.nuts[index].place((pos + (self.gap) * self.boltDir + self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, -self.boltDir)
-                self.boltsabv[index].place(pos + (self.gap ) * self.boltDir - self.memberdeepth/2 * self.gaugeDir - 2 * self.member_web_thickness * self.gaugeDir, self.gaugeDir, -self.boltDir)
-                self.nutsabv[index].place((pos - self.memberdeepth/2 * self.gaugeDir - 2 * self.member_web_thickness * self.gaugeDir), self.gaugeDir, self.boltDir)
+                self.boltsabv[index].place(pos + (self.gap - self.nut.T + self.member_web_thickness) * self.boltDir -
+                                           (self.member_thickness + self.root_radius + self.memberdeepth) * self.gaugeDir, self.gaugeDir, -self.boltDir)
+                self.nutsabv[index].place((pos + (- self.nut.T + self.member_web_thickness) * self.boltDir -
+                                           (self.member_thickness + self.root_radius + self.memberdeepth) * self.gaugeDir), self.gaugeDir, self.boltDir)
 
-            for index, pltpos in enumerate(self.platePositions):
+        for index, pltpos in enumerate(self.platePositions):
                 self.plates[index].place(pltpos, self.boltDir, self.pitchDir)
 
         else:
@@ -156,20 +161,7 @@ class IntermittentNutBoltPlateArray():
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
-        #
-        # nut_bolts = self.models
-        # nbarray = nut_bolts[0]
-        # for comp in nut_bolts:
-        #     nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
-        #
-        # plates = self.platemodels
-        # parray = plates[0]
-        # for comp in plates:
-        #     parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
-        #
-        # array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
-        #
-        # return array
+
 
     def get_nut_bolt_models(self):
         nut_bolts = self.models

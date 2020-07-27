@@ -210,6 +210,7 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.setLayout(layout)
         label=QLabel(Module_Name)
         layout.addWidget(label)
+        label.setObjectName('module_name_label')
         self.rdbtn=QRadioButton()
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
@@ -217,23 +218,14 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn.setIconSize(QSize(scale*300, scale*300))
 
         layout.addWidget(self.rdbtn)
-        self.setStyleSheet(
-                    '''
-                        QLabel{
-                            font-family: "Arial", Helvetica, sans-serif;
-                            font-size: 12pt;
-                            font-weight: bold;
-                              }
-                    '''
-                )
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
 
 class ModulePage(QWidget):              # Empty Page with a layout
-    def __init__(self):
+    def __init__(self,margin=0):
         super().__init__()
         self.layout=QGridLayout()
         self.setLayout(self.layout)
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(80,0,0,0)
 
 class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
     def __init__(self,text):
@@ -490,14 +482,7 @@ class OsdagMainWindow(QMainWindow):
         label=QLabel('This Module is Currently Under Development')
         Page.layout.addWidget(label)
         label.setAlignment(Qt.AlignCenter)
-        Page.setStyleSheet(
-            '''
-                QLabel{
-                    font-family: "Times New Roman", Times, serif;
-                    font-size: 30px;
-                }
-            '''
-        )
+        label.setObjectName('under_development_label')
         return Page
 
     def ButtonConnection(self,Button,Modules,ModuleName):

@@ -1322,13 +1322,13 @@ class ColumnCoverPlate(MomentConnection):
         # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS
         # FOR FLANGE
         if self.preference == "Outside":
-            t_sum1 = self.flange_plate.thickness_provided + self.section.flange_thickness
+            self.t_sum1 = self.flange_plate.thickness_provided + self.section.flange_thickness
         else:
-            t_sum1 = (2 * self.flange_plate.thickness_provided) + self.section.flange_thickness
+            self.t_sum1 = (2 * self.flange_plate.thickness_provided) + self.section.flange_thickness
 
         # FOR WEB
-        t_sum2 = (2 * self.web_plate.thickness_provided) + self.section.web_thickness
-        self.t_sum_max = max(t_sum1,t_sum2)
+        self.t_sum2 = (2 * self.web_plate.thickness_provided) + self.section.web_thickness
+        self.t_sum_max = max(self.t_sum1,self.t_sum2)
         self.large_grip_status = False
         self.bolt.bolt_diameter_possible = []
         for d in self.bolt.bolt_diameter:
@@ -2778,7 +2778,7 @@ class ColumnCoverPlate(MomentConnection):
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Connector", bgcolor)
+        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
 
     ################################ Outlist Dict #####################################################################################
@@ -3424,7 +3424,7 @@ class ColumnCoverPlate(MomentConnection):
             #       self.flange_plate.bolts_required, '')
             # self.report_check.append(t6)
 
-            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+            t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
                    long_joint_bolted_beam(self.flange_plate.bolt_line, self.flange_plate.bolts_one_line,
                                           self.flange_plate.pitch_provided,
                                           self.flange_plate.gauge_provided, self.bolt.bolt_diameter_provided,
@@ -3433,8 +3433,8 @@ class ColumnCoverPlate(MomentConnection):
                                           self.flange_plate.gap, self.flange_plate.edge_dist_provided,
                                           self.section.web_thickness, self.section.root_radius,conn="col_col"), "")
             self.report_check.append(t10)
-            t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),
-                   large_grip_bolted_prov(self.t_sum_max, self.flange_bolt.bolt_diameter_provided,
+            t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
+                   cl_10_3_3_2_large_grip_bolted_prov(self.t_sum1, self.flange_bolt.bolt_diameter_provided,
                                           self.flange_plate.beta_lj), "")
             self.report_check.append(t10)
             ##
@@ -3443,18 +3443,31 @@ class ColumnCoverPlate(MomentConnection):
             #                              flange_bolt_capacity_red_kn),
             #       get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
             # self.report_check.append(t5)
-
-            t5 = (KEY_OUT_DISP_BOLT_CAPACITY,  vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
-                                                     bolt_capacity=round(self.flange_plate.bolt_force / 1000, 2),
-                                                         bolt_req=self.flange_plate.bolts_required, multiple=2,
-                                                     conn="flange_web"), bolt_red_capacity_prov(self.flange_plate.beta_lj,
-                                                                                                self.flange_plate.beta_lg,
-                                                                                                flange_bolt_capacity_kn,
-                                         flange_bolt_capacity_red_kn),
-            get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
-                          relation="lesser"))
-            self.report_check.append(t5)
-
+            if self.flange_bolt.bolt_type == TYP_BEARING:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY,  vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
+                                                         bolt_capacity=round(self.flange_plate.bolt_force / 1000, 2),
+                                                             bolt_req=self.flange_plate.bolts_required, multiple=2,
+                                                         conn="flange_web"), bolt_red_capacity_prov(self.flange_plate.beta_lj,
+                                                                                                    self.flange_plate.beta_lg,
+                                                                                                    flange_bolt_capacity_kn,
+                                             flange_bolt_capacity_red_kn,"b"),
+                get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
+                              relation="lesser"))
+                self.report_check.append(t5)
+            else:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
+                                                                      bolt_capacity=round(
+                                                                          self.flange_plate.bolt_force / 1000, 2),
+                                                                      bolt_req=self.flange_plate.bolts_required,
+                                                                      multiple=2,
+                                                                      conn="flange_web"),
+                      bolt_red_capacity_prov(self.flange_plate.beta_lj,
+                                             self.flange_plate.beta_lg,
+                                             flange_bolt_capacity_kn,
+                                             flange_bolt_capacity_red_kn, "f"),
+                      get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
         if self.web_plate.spacing_status == True and self.flange_plate.spacing_status == True:
             t1 = ('SubSection', 'Web Bolt Checks', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
@@ -3521,7 +3534,7 @@ class ColumnCoverPlate(MomentConnection):
                                 relation="geq"))
             self.report_check.append(t4)
 
-            if self.flange_bolt.bolt_type == TYP_BEARING:
+            if self.web_bolt.bolt_type == TYP_BEARING:
                 web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
                 t1 = (KEY_OUT_DISP_WEB_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.web_bolt.bolt_fu, 2,
                                                                                      self.web_bolt.bolt_net_area,
@@ -3580,7 +3593,7 @@ class ColumnCoverPlate(MomentConnection):
                                                       vres=round(self.web_plate.bolt_force / 1000, 2),conn ="col_col"),'', '')
             self.report_check.append(t10)
 
-            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+            t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
                    long_joint_bolted_beam(self.web_plate.bolt_line, self.web_plate.bolts_one_line,
                                           self.web_plate.pitch_provided,
                                           self.web_plate.gauge_provided, self.bolt.bolt_diameter_provided,
@@ -3590,19 +3603,28 @@ class ColumnCoverPlate(MomentConnection):
                                           self.section.web_thickness, self.section.root_radius,conn="col_col"), "")
             self.report_check.append(t10)
 
-            t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),
-                   large_grip_bolted_prov(self.t_sum_max, self.web_bolt.bolt_diameter_provided,
+            t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
+                   cl_10_3_3_2_large_grip_bolted_prov(self.t_sum2, self.web_bolt.bolt_diameter_provided,
                                           self.web_plate.beta_lj), "")
             self.report_check.append(t10)
-
-            t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000,2),
-                  bolt_red_capacity_prov(self.web_plate.beta_lj,
-                                         self.web_plate.beta_lg,
-                                         web_bolt_capacity_kn,
-                                         web_bolt_capacity_red_kn),
-                  get_pass_fail(round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
-                                relation="lesser"))
-            self.report_check.append(t5)
+            if self.web_bolt.bolt_type == TYP_BEARING:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000,2),
+                      bolt_red_capacity_prov(self.web_plate.beta_lj,
+                                             self.web_plate.beta_lg,
+                                             web_bolt_capacity_kn,
+                                             web_bolt_capacity_red_kn,"b"),
+                      get_pass_fail(round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
+            else:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000, 2),
+                      bolt_red_capacity_prov(self.web_plate.beta_lj,
+                                             self.web_plate.beta_lg,
+                                             web_bolt_capacity_kn,
+                                             web_bolt_capacity_red_kn,"f"),
+                      get_pass_fail(round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
 
         ######Flange plate check####
         if self.select_bolt_dia_status == True:

@@ -171,7 +171,7 @@ class AnchorBolt_Endplate(object):
     def __init__(self, l, r, ex, c=0, a=0):
         self.ex = ex
         self.l = l
-        self.c = c
+        self.c = a
         self.a = a
         self.r = r
         self.origin = None
@@ -193,7 +193,7 @@ class AnchorBolt_Endplate(object):
         self.cyl1_length = self.l
         self.endplate_thickness = 5
         self.head = self.endplate_thickness / 5
-        self.endplate_width = self.r * 8
+        self.endplate_width = self.a
 
         self.p1 = self.origin
         self.p2 = self.p1 - (self.l - self.endplate_thickness - self.head) * self.shaftDir

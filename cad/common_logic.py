@@ -996,7 +996,7 @@ class CommonDesignLogic(object):
                 bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
                                     ex=ex_length_out)
             else:  # BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,  a= BP.plate_washer_dim_out*1.5,
                                            ex=ex_length_out)
 
             bolt_in = bolt
@@ -1129,10 +1129,10 @@ class CommonDesignLogic(object):
                 bolt_in = AnchorBolt_B(l=float(BP.anchor_len_below_footing_in), r=float(BP.anchor_dia_inside_flange) / 2,
                                     ex=ex_length_in)
             else: #BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,  a= BP.plate_washer_dim_out * 1.5,
                                            ex=ex_length_out)
                 bolt_in = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_in),
-                                           r=float(BP.anchor_dia_inside_flange) / 2,
+                                           r=float(BP.anchor_dia_inside_flange) / 2, a= BP.plate_washer_inner_dia_in * 1.5,
                                            ex=ex_length_in)
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)

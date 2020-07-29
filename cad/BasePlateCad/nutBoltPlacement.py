@@ -384,7 +384,7 @@ class NutBoltArray():
             self.w7Model = self.w7.create_model()
             self.w8Model = self.w8.create_model()
 
-            models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.w5Model, self.w6Model, self.nt7Model, self.w8Model, self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model]
+            models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.w5Model, self.w6Model, self.w7Model, self.w8Model, self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model]
             self.models.extend(models)
 
         if 2* self.BP.anchors_outside_flange == 12:

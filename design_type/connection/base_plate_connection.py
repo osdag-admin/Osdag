@@ -2539,18 +2539,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     logger.info("Provide a higher grade of concrete")
 
                 # optimise bolt diameter based on passed bearing check
-                anchor_dia_init = self.anchor_dia_provided
-
-                self.anchor_area_tension = (self.tension_demand_anchor * 1000 * self.y) / \
-                                          ((self.max_bearing_stress * self.n) * ((self.bp_length_provided / 2) - self.y + self.f))  # mm^2
-
-                self.anchor_dia_provided = math.sqrt((4 * self.anchor_area_tension) / (math.pi * self.n))  # mm
-
-                sort_bolt = filter(lambda x: self.anchor_dia_provided <= x <= 72, self.anchor_dia_list)
-
-                for i in sort_bolt:
-                    self.anchor_dia_provided = i  # optimised anchor dia provided (mm)
-                    break
+                # anchor_dia_init = self.anchor_dia_provided
+                #
+                # self.anchor_area_tension = (self.tension_demand_anchor * 1000 * self.y) / \
+                #                           ((self.max_bearing_stress * self.n) * ((self.bp_length_provided / 2) - self.y + self.f))  # mm^2
+                #
+                # self.anchor_dia_provided = math.sqrt((4 * self.anchor_area_tension) / (math.pi * self.n))  # mm
+                #
+                # sort_bolt = filter(lambda x: self.anchor_dia_provided <= x <= 72, self.anchor_dia_list)
+                #
+                # for i in sort_bolt:
+                #     self.anchor_dia_provided = i  # optimised anchor dia provided (mm)
+                #     break
 
                 # fixing bp size and parameters calculations after the iteration checks
                 if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
@@ -4157,6 +4157,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         n = 1
                         while self.anchors_inside_flange > 2:  # trying for 2 bolts with higher diameter
                             bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
+                            itr = len(self.anchor_dia_provided_inside_flange) + 1
 
                             for i in bolt_list:
                                 self.anchor_dia_inside_flange = i
@@ -4191,7 +4192,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 logger.error("Trying with 4 bolts of smaller dia")
 
                             # if ((n - 1) >= len(bolt_list)) and (self.anchors_inside_flange > 2):
-                            if (self.anchor_dia_inside_flange == 72) and (self.anchors_inside_flange > 2):
+                            # if (self.anchor_dia_inside_flange == 72) and (self.anchors_inside_flange > 2):
+                            if (n == itr) and (self.anchors_inside_flange > 2):
                                 # try with 4 bolts if 2 is not sufficient with the highest diameter
                                 logger.error("Exceeds 2 bolts")
                                 logger.info("Trying with 4 bolts")
@@ -4234,6 +4236,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                     n = 1
                                     while self.anchors_inside_flange > 4:  # trying for 4 bolts with higher diameter
                                         bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
+                                        itr = len(self.anchor_dia_provided_inside_flange) + 1
 
                                         for i in bolt_list:
                                             self.anchor_dia_inside_flange = i
@@ -4253,10 +4256,30 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                         self.anchor_dia_inside_flange = i  # updating the initialised anchor diameter with the latest one
 
+                                        # detailing check - 4 bolts with larger dia
+                                        self.pitch_distance_in = self.cl_10_2_2_min_spacing(self.anchor_dia_inside_flange)  # mm
+
+                                        end_available = (self.column_D - (2 * self.column_tf) - self.pitch_distance_in) / 2
+
+                                        self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
+                                        self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
+
+                                        self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                                                                                                  self.dp_detail_edge_type)
+                                        self.end_distance_in = round_up(self.end_distance_in, 5)
+
+                                        end_required = max(self.end_distance_in, self.plate_washer_dim_in)
+
+                                        if end_required > end_available:
+                                            self.anchors_inside_flange = 8  # trying with 8 bolts as detailing check fails
+                                            logger.error("Fails detailing check with 4 bolts")
+                                            itr = n
+
                                         if (self.anchor_dia_inside_flange <= 72) and (self.anchors_inside_flange == 4):
                                             break
 
-                                        if ((n - 1) >= len(bolt_list)) and (self.anchors_inside_flange > 4):
+                                        # if ((n - 1) >= len(bolt_list)) and (self.anchors_inside_flange > 4):
+                                        if (n == itr) and (self.anchors_inside_flange > 4):
                                             # if 4 bolts with highest diameter is not sufficient
                                             # self.safe = False
                                             # TODO: give log errors
@@ -4285,6 +4308,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                 n = 1
                                                 while self.anchors_inside_flange > 8:  # trying for 8 bolts with higher diameter
                                                     bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
+                                                    itr = len(self.anchor_dia_provided_inside_flange) + 1
 
                                                     for i in bolt_list:
                                                         self.anchor_dia_inside_flange = i
@@ -4307,7 +4331,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                                     self.anchor_dia_inside_flange = i  # updating the initialised anchor diameter with the latest one
 
-                                                    if n > len(bolt_list):  # if 8 bolts with highest diameter is not sufficient
+                                                    # if n > len(bolt_list):  # if 8 bolts with highest diameter is not sufficient
+                                                    if n > itr:
                                                         self.safe = False
                                                         # TODO: give log errors
                                                         logger.error("Cannot compute anchor bolt for resisting the uplift force with 8 bolts")
@@ -4342,28 +4367,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                             if self.anchor_dia_inside_flange <= 72:
                                                 if self.anchors_inside_flange == 8:
                                                     break
-
-                                        # detailing check - 4 bolts with larger dia
-                                        self.pitch_distance_in = self.cl_10_2_2_min_spacing(self.anchor_dia_inside_flange)  # mm
-
-                                        end_available = (self.column_D - (2 * self.column_tf) - self.pitch_distance_in) / 2
-
-                                        self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
-                                        self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
-
-                                        self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
-                                                                                                  self.dp_detail_edge_type)
-                                        self.end_distance_in = round_up(self.end_distance_in, 5)
-
-                                        end_required = max(self.end_distance_in, self.plate_washer_dim_in)
-
-                                        if end_required > end_available:
-                                            self.safe = False
-                                            logger.error("Fails detailing check with 4 bolts")
+                                                else:
+                                                    self.safe = False
+                                                    logger.error("Cannot compute anchor bolt for resisting the uplift force")
+                                                    break
 
                             if self.anchor_dia_inside_flange <= 72:
-                                if (self.anchors_inside_flange == 2) or (self.anchors_inside_flange == 4):
+                                if (self.anchors_inside_flange == 2) or (self.anchors_inside_flange == 4) or (self.anchors_inside_flange == 8):
                                     break
+                                else:
+                                    logger.error("Cannot compute")
 
                             if (self.anchor_dia_inside_flange >= 72) and (self.anchors_inside_flange > 4):
                                 # self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)

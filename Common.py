@@ -416,9 +416,15 @@ KEY_DISP_TOPANGLE_LIST = 'Top Angle List'
 
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
-KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+KEY_ANCHOR_OCF = 'Anchor Bolt.OCF'
+KEY_DISP_ANCHOR_OCF = 'Outside Column Flange'
+KEY_ANCHOR_ICF = 'Anchor Bolt.ICF'
+KEY_DISP_ANCHOR_ICF = 'Inside Column Flange'
+KEY_DIA_ANCHOR_OCF = 'Anchor Bolt.OCF.Diameter'
+KEY_DIA_ANCHOR_ICF = 'Anchor Bolt.ICF.Diameter'
 KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
-KEY_GRD_ANCHOR = 'Anchor Bolt.Grade'
+KEY_GRD_ANCHOR_OCF = 'Anchor Bolt.OCF.Grade'
+KEY_GRD_ANCHOR_ICF = 'Anchor Bolt.ICF.Grade'
 KEY_GRD_FOOTING = 'Footing.Grade'
 
 
@@ -825,19 +831,25 @@ KEY_OUT_DISP_SHEAR_KEY_STRESS = 'Stress (N/mm2)'
 # KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 
-KEY_DP_ANCHOR_BOLT_DESIGNATION = 'DesignPreferences.Anchor_Bolt.Designation'
-KEY_DP_ANCHOR_BOLT_TYPE = 'DesignPreferences.Anchor_Bolt.Type'
+KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Designation'
+KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Designation'
+KEY_DP_ANCHOR_BOLT_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Type'
+KEY_DP_ANCHOR_BOLT_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Type'
 KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor Bolt type'
-KEY_DP_ANCHOR_BOLT_HOLE_TYPE = 'DesignPreferences.Anchor_Bolt.Bolt_Hole_Type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type'
 KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor Bolt hole type'
-KEY_DP_ANCHOR_BOLT_MATERIAL_G_O = 'DesignPreferences.Anchor_Bolt.Material_Grade_OverWrite'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite'
 KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
 KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
-KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
+KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Galvanized'
+KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Galvanized'
 KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Anchor bolt galvanized?'
-KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
+KEY_DP_ANCHOR_BOLT_LENGTH_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Length'
+KEY_DP_ANCHOR_BOLT_LENGTH_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Length'
 KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
 KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
@@ -1141,11 +1153,10 @@ KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 
-KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
+KEY_REDUCTION_LONG_JOINT ='bolt.long_joint'
+KEY_DISP_REDUCTION_LONG_JOINT ="Long Joint Red.Factor"
+
 KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
-
-
-KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
 KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
 
 
@@ -1365,15 +1376,18 @@ KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
-KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
+KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
+KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(nos)'
+
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (nos)'
 
 
 KEY_OUT_SPACING = 'spacing'
@@ -1616,6 +1630,8 @@ KEY_OUT_DISP_WELD_STRENGTH_RED = 'Red.Strength (N/mm)'
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTINGLEG = "Supporting Leg"
 DISP_OUT_TITLE_CLEAT = "Cleat Angle"
+KEY_OUT_CLEAT_SECTION = "Cleat.Angle"
+KEY_OUT_DISP_CLEAT_SECTION = "Cleat Angle"
 KEY_OUT_CLEATTHK = 'Plate.Thickness'
 KEY_OUT_DISP_CLEATTHK = 'Thickness (mm)'
 KEY_OUT_CLEAT_HEIGHT = 'Plate.Height'
@@ -1636,7 +1652,7 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 
 KEY_LENZZ = 'Member.Length_zz'

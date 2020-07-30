@@ -1788,8 +1788,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             break
 
         # select anchor diameter
-        self.anchor_dia_provided_inside_flange = self.table1(self.anchor_bolt)[0]  # mm, anchor dia provided (int)
-        self.anchor_dia_inside_flange = self.anchor_dia_provided_inside_flange[0]  # mm, anchor dia provided inside the column flange (int)
+        self.anchor_dia_provided_inside_flange = self.table1(self.anchor_bolt)[0]  # mm (int)
+        self.anchor_dia_inside_flange = self.anchor_dia_provided_inside_flange  # mm (int)
         self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)  # list of areas [shank area, thread area] mm^2
 
         # 2: Anchor Hole Diameter:
@@ -1797,7 +1797,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # 2.1: Outside flange
         self.anchor_hole_dia_out = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole_out)  # mm
         # 2.2: Inside flange
-        self.anchor_hole_dia_in = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided_inside_flange, self.dp_anchor_hole)  # mm
+        self.anchor_hole_dia_in = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided_inside_flange, self.dp_anchor_hole_in)  # mm
 
         # 3: Anchor Grade Selection:
         # assign anchor grade from the selected list
@@ -1817,7 +1817,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_grade_in = i
             break
 
-        self.anchor_grade_in = self.anchor_grade_in[0]
+        self.anchor_grade_in = self.anchor_grade_in
         self.anchor_fu_fy_inside_flange = self.get_bolt_fu_fy(self.anchor_grade_in, self.anchor_dia_inside_flange)
 
         # 4: Number of Anchor Bolts:
@@ -3154,7 +3154,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.anchor_inside_flange = 'Yes'
 
                 # hole diameter
-                self.anchor_hole_dia_in = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_inside_flange, self.dp_anchor_hole)  # mm
+                self.anchor_hole_dia_in = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_inside_flange, self.dp_anchor_hole_in)  # mm
 
                 self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
                                                                                                      self.anchor_fu_fy_inside_flange[1],
@@ -3177,7 +3177,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                     self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
 
-                    self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                    self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
                                                                               self.dp_detail_edge_type)
                     self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
                     self.edge_distance_in = self.end_distance_in
@@ -4198,8 +4198,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # if the number of bolts exceeds 4 in number, provide a higher diameter of bolt from the given list of anchor diameters
                         n = 1
                         while self.anchors_inside_flange > 4:  # trying for 4 bolts with higher diameter
-                            bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
-                            itr = len(self.anchor_dia_provided_inside_flange) + 1
+                            bolt_list = self.anchor_dia_list_in[n - 1:]
+                            itr = len(self.anchor_dia_list_in) + 1
 
                             for i in bolt_list:
                                 self.anchor_dia_inside_flange = i
@@ -4236,7 +4236,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                     self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
 
-                    self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                    self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
                                                                               self.dp_detail_edge_type)
                     self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
                     self.edge_distance_in = self.end_distance_in
@@ -4264,8 +4264,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # if the number of bolts exceeds 8 in number, provide a higher diameter of bolt from the given list of anchor diameters
                             n = 1
                             while self.anchors_inside_flange > 8:  # trying for 8 bolts with higher diameter
-                                bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
-                                itr = len(self.anchor_dia_provided_inside_flange) + 1
+                                bolt_list = self.anchor_dia_list_in[n - 1:]
+                                itr = len(self.anchor_dia_list_in) + 1
 
                                 for i in bolt_list:
                                     self.anchor_dia_inside_flange = i
@@ -4299,7 +4299,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                         self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
 
-                        self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                        self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
                                                                           self.dp_detail_edge_type)
                         self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
                         self.edge_distance_in = self.end_distance_in
@@ -4317,8 +4317,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # if the number of bolts exceeds 2 in number, provide a higher diameter of bolt from the given list of anchor diameters
                         n = 1
                         while self.anchors_inside_flange > 2:  # trying for 2 bolts with higher diameter
-                            bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
-                            itr = len(self.anchor_dia_provided_inside_flange) + 1
+                            bolt_list = self.anchor_dia_list_in[n - 1:]
+                            itr = len(self.anchor_dia_list_in) + 1
 
                             for i in bolt_list:
                                 self.anchor_dia_inside_flange = i
@@ -4343,7 +4343,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                             self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
 
-                            self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                            self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
                                                                               self.dp_detail_edge_type)
                             self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
                             self.edge_distance_in = self.end_distance_in
@@ -4376,7 +4376,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                                 self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
 
-                                self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                                self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
                                                                                   self.dp_detail_edge_type)
                                 self.end_distance_in = round_up(self.end_distance_in, 5)
                                 self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
@@ -4399,8 +4399,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                     n = 1
                                     while self.anchors_inside_flange > 4:  # trying for 4 bolts with higher diameter
-                                        bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
-                                        itr = len(self.anchor_dia_provided_inside_flange) + 1
+                                        bolt_list = self.anchor_dia_list_in[n - 1:]
+                                        itr = len(self.anchor_dia_list_in) + 1
 
                                         for i in bolt_list:
                                             self.anchor_dia_inside_flange = i
@@ -4424,7 +4424,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                         self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                                         self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
 
-                                        self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                                        self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
                                                                                                   self.dp_detail_edge_type)
                                         self.end_distance_in = round_up(self.end_distance_in, 5)
                                         self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
@@ -4473,8 +4473,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                 # if the number of bolts exceeds 8 in number, provide a higher diameter of bolt from the given list of anchor diameters
                                                 n = 1
                                                 while self.anchors_inside_flange > 8:  # trying for 8 bolts with higher diameter
-                                                    bolt_list = self.anchor_dia_provided_inside_flange[n - 1:]
-                                                    itr = len(self.anchor_dia_provided_inside_flange) + 1
+                                                    bolt_list = self.anchor_dia_list_in[n - 1:]
+                                                    itr = len(self.anchor_dia_list_in) + 1
 
                                                     for i in bolt_list:
                                                         self.anchor_dia_inside_flange = i
@@ -4509,7 +4509,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                 self.plate_washer_dim_in = self.plate_washer_details_in['side']  # mm
 
                                                 self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange,
-                                                                                                          self.dp_anchor_hole,
+                                                                                                          self.dp_anchor_hole_in,
                                                                                                           self.dp_detail_edge_type)
                                                 self.end_distance_in = round_up(self.end_distance_in, 5)
                                                 self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)

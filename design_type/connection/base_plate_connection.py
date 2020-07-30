@@ -3035,8 +3035,25 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 if self.shear_key_required == 'Yes':
                     self.anchors_inside_flange = round_up(self.anchors_inside_flange, 4)  # provide minimum 4 bolts in this case
+                    # detailing check for this case is done in additional_calculations method
                 else:
                     self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
+
+                    # detailing check - 2 bolts
+                    end_available = (self.column_D - (2 * self.column_tf)) / 2
+
+                    self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
+                    self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
+
+                    self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole,
+                                                                              self.dp_detail_edge_type)
+                    self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in)
+                    self.edge_distance_in = self.end_distance_in
+
+                    if self.end_distance_in > end_available:
+                        self.anchors_inside_flange = 4
+                        logger.error("Fails detailing check with 2 bolts")
+                        logger.error("Trying with 4 bolts of smaller dia")
 
                 # tension demand
                 self.tension_demand_anchor_uplift = self.load_axial_tension / self.anchors_inside_flange
@@ -4081,7 +4098,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     # end distance available (along web)
                     if self.stiffener_across_web == 'Yes':
                         end_available = (self.column_D - (2 * self.column_tf) - self.stiffener_plt_thick_across_web) / 4  # mm
-                    else:  # for shear key
+                    if self.shear_key_required == 'Yes':
                         end_available = (self.column_D - (2 * self.column_tf) - self.shear_key_thk) / 4  # mm
 
                     self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
@@ -4469,6 +4486,31 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.anchor_len_above_footing_in)
                 print(self.anchor_len_below_footing_in)
                 print(self.anchor_length_provided_in)  # Anchor Length (total) (mm)
+
+        # Detailing for anchor bolts inside flange
+        if self.connectivity == 'Moment Base Plate':
+            if self.load_axial_tension > 0:
+
+                if (self.stiffener_across_web == 'Yes') or (self.shear_key_required == 'Yes'):
+
+                    if self.anchors_inside_flange == 4:
+                        print(self.end_distance_in)
+                        print(self.edge_distance_in)
+
+                    if self.anchors_inside_flange == 8:
+                        print(self.end_distance_in)
+                        print(self.edge_distance_in)
+                        print(self.gauge_distance_in)
+                else:
+                    if self.anchors_inside_flange == 4:
+                        print(self.end_distance_in)
+                        print(self.pitch_distance_in)
+
+                    if self.anchors_inside_flange == 8:
+                        print(self.end_distance_in)
+                        print(self.edge_distance_in)
+                        print(self.pitch_distance_in)
+                        print(self.gauge_distance_in)
 
         # Base Plate
         print(self.plate_thk)  # Thickness (mm)

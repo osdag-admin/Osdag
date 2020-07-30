@@ -486,14 +486,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t14 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t14)
 
-        t15 = (KEY_DIA_ANCHOR, KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_DIA_ANCHOR, True, 'No Validator')
+        t11 = (KEY_ANCHOR_OCF, KEY_DISP_ANCHOR_OCF, '', None, True, 'No Validator')
+        options_list.append(t11)
+
+        t15 = (KEY_DIA_ANCHOR_OCF, "- "+KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_DIA_ANCHOR, True, 'No Validator')
         options_list.append(t15)
+
+        t17 = (KEY_GRD_ANCHOR_OCF, "- "+KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD_ANCHOR, True, 'No Validator')
+        options_list.append(t17)
+
+        t11 = (KEY_ANCHOR_ICF, KEY_DISP_ANCHOR_ICF, '', None, True, 'No Validator')
+        options_list.append(t11)
+
+        t15 = (KEY_DIA_ANCHOR_ICF, "- "+KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_DIA_ANCHOR, True, 'No Validator')
+        options_list.append(t15)
+
+        t17 = (KEY_GRD_ANCHOR_ICF, "- "+KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD_ANCHOR, True, 'No Validator')
+        options_list.append(t17)
 
         t16 = (KEY_TYP_ANCHOR, KEY_DISP_TYP_ANCHOR, TYPE_COMBOBOX, VALUES_TYP_ANCHOR, True, 'No Validator')
         options_list.append(t16)
-
-        t17 = (KEY_GRD_ANCHOR, KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD_ANCHOR, True, 'No Validator')
-        options_list.append(t17)
 
         t18 = (None, DISP_TITLE_FOOTING, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t18)
@@ -1011,9 +1023,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def customized_input(self):
 
         list1 = []
-        t1 = (KEY_DIA_ANCHOR, self.diam_bolt_customized)
+        t1 = (KEY_DIA_ANCHOR_OCF, self.diam_bolt_customized, ['M8', 'M10', 'M12', 'M16'],
+              "Anchor bolts M8, M10, M12 and M16 are not available to <br>"
+              "perform design. Minimum recommend diameter by Osdag is <br> M20.")
         list1.append(t1)
-        t2 = (KEY_GRD_ANCHOR, self.grdval_customized)
+        t2 = (KEY_GRD_ANCHOR_OCF, self.grdval_customized)
+        list1.append(t2)
+        t1 = (KEY_DIA_ANCHOR_ICF, self.diam_bolt_customized, ['M8', 'M10', 'M12', 'M16'],
+              "Anchor bolts M8, M10, M12 and M16 are not available to <br>"
+              "perform design. Minimum recommend diameter by Osdag is <br> M20.")
+        list1.append(t1)
+        t2 = (KEY_GRD_ANCHOR_ICF, self.grdval_customized)
         list1.append(t2)
 
         return list1
@@ -1078,11 +1098,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         design_input.append(t2)
 
         t3 = ("Anchor bolt", TYPE_TEXTBOX,
-              [KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O,
-               KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_ANCHOR_BOLT_TYPE])
+              [KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+               KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+               KEY_DP_ANCHOR_BOLT_TYPE_ICF])
         design_input.append(t3)
 
-        t3 = ("Anchor bolt", TYPE_COMBOBOX, [KEY_DP_ANCHOR_BOLT_HOLE_TYPE])
+        t3 = ("Anchor bolt", TYPE_COMBOBOX, [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF])
         design_input.append(t3)
 
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
@@ -1105,13 +1127,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE], 'Input Dock')
+        t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE_OCF, KEY_DP_ANCHOR_BOLT_TYPE_ICF], 'Input Dock')
         design_input.append(t2)
 
-        t3 = (None, [KEY_BASE_PLATE_FU, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_BASE_PLATE_FY,
-                     KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_HOLE_TYPE,
-                     KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE,
-                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
+        t3 = (None, [KEY_BASE_PLATE_FU, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+                     KEY_BASE_PLATE_FY, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+                     KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+                     KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB,
+                     KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+                     KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
         design_input.append(t3)
 
         return design_input
@@ -1152,12 +1176,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         length = str(self.anchor_length_provided_out if self.design_button_status else 0)
 
         val = {KEY_BASE_PLATE_FU: str(fu),
-               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(fu),
+               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: str(fu),
+               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: str(fu),
                KEY_BASE_PLATE_FY: str(fy),
-               KEY_DP_ANCHOR_BOLT_DESIGNATION:
-                   str(str(design_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"),
-               KEY_DP_ANCHOR_BOLT_LENGTH: str(length),
-               KEY_DP_ANCHOR_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF:
+                   str(str(design_dictionary[KEY_DIA_ANCHOR_OCF][0]) + "X" + length + " IS5624 GALV"),
+               KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF:
+                   str(str(design_dictionary[KEY_DIA_ANCHOR_ICF][0]) + "X" + length + " IS5624 GALV"),
+               KEY_DP_ANCHOR_BOLT_LENGTH_OCF: str(length),
+               KEY_DP_ANCHOR_BOLT_LENGTH_ICF: str(length),
+               KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: "Standard",
+               KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: "Standard",
                KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30),
                KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
@@ -1193,12 +1222,28 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
               self.get_fu_fy)
         change_tab.append(t2)
 
-        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH], [KEY_DP_ANCHOR_BOLT_LENGTH], TYPE_OVERWRITE_VALIDATION,
+        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH_OCF], [KEY_DP_ANCHOR_BOLT_LENGTH_OCF], TYPE_OVERWRITE_VALIDATION,
               self.anchor_length_validation)
         change_tab.append(t3)
 
-        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_GALVANIZED],
-              [KEY_DP_ANCHOR_BOLT_DESIGNATION], TYPE_TEXTBOX, self.anchor_bolt_designation)
+        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH_ICF], [KEY_DP_ANCHOR_BOLT_LENGTH_ICF], TYPE_OVERWRITE_VALIDATION,
+              self.anchor_length_validation)
+        change_tab.append(t3)
+
+        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF], [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF],
+              TYPE_OVERWRITE_VALIDATION, self.anchor_hole_type_validation)
+        change_tab.append(t3)
+
+        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF], [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF],
+              TYPE_OVERWRITE_VALIDATION, self.anchor_hole_type_validation)
+        change_tab.append(t3)
+
+        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF],
+              [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF], TYPE_TEXTBOX, self.anchor_bolt_designation)
+        change_tab.append(t3)
+
+        t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF],
+              [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF], TYPE_TEXTBOX, self.anchor_bolt_designation)
         change_tab.append(t3)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
@@ -1219,7 +1264,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if not input_dictionary:
             d = ''
         else:
-            d = input_dictionary[KEY_DIA_ANCHOR][0]
+            d = input_dictionary[KEY_DIA_ANCHOR_OCF][0]
         new_des = str(d) + 'X'
 
         if galvanized == 'Yes':
@@ -1229,7 +1274,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             new_des = ''
 
-        d = {KEY_DP_ANCHOR_BOLT_DESIGNATION: str(new_des)}
+        d = {KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF: str(new_des),
+             KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF: str(new_des)}
         return d
 
     def anchor_length_validation(self):
@@ -1238,15 +1284,28 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         status = self[2]
         valid = True
         if length == "":
-            return {"Validation": [valid, ""], KEY_DP_ANCHOR_BOLT_LENGTH: length}
+            return {"Validation": [valid, ""], KEY_DP_ANCHOR_BOLT_LENGTH_OCF: length,
+                    KEY_DP_ANCHOR_BOLT_LENGTH_ICF: length}
         if status:
             if not float(self.anchor_length_min) <= float(length) <= float(self.anchor_length_max):
                 valid = False
                 length = self.anchor_length_provided_out
 
         d = {"Validation": [valid, "The selected value of anchor length exceeds the recommended limit [Reference: "
-                                   "IS 5624:1993, Table 1]."], KEY_DP_ANCHOR_BOLT_LENGTH: str(length)}
+                                   "IS 5624:1993, Table 1]."],
+             KEY_DP_ANCHOR_BOLT_LENGTH_OCF: str(length),
+             KEY_DP_ANCHOR_BOLT_LENGTH_ICF: str(length)}
         return d
+
+    def anchor_hole_type_validation(self):
+
+        hole_type = str(self[0])
+        if hole_type == 'Standard':
+            return {"Validation":
+                    [False, "Over-sized hole type for anchor is recommended by Osdag for Base Plate module."]
+                    }
+        else:
+            return {"Validation": [True, ""]}
 
     def list_for_fu_fy_validation(self):
 
@@ -1293,20 +1352,28 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.input_dictionary = input_dictionary
 
-        values = {KEY_DP_ANCHOR_BOLT_LENGTH: '', KEY_DP_ANCHOR_BOLT_DESIGNATION: '',
-                  KEY_DP_ANCHOR_BOLT_TYPE: '', KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: ''}
+        values = {KEY_DP_ANCHOR_BOLT_LENGTH_OCF: '', KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF: '',
+                  KEY_DP_ANCHOR_BOLT_TYPE_OCF: '', KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: '',
+                  KEY_DP_ANCHOR_BOLT_LENGTH_ICF: '', KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF: '',
+                  KEY_DP_ANCHOR_BOLT_TYPE_ICF: '', KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: ''
+                  }
         if not input_dictionary or input_dictionary[KEY_SECSIZE] == 'Select Section' or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass
         else:
             length = str(self.anchor_length_provided_out if self.design_button_status else 0)
-            designation = str(input_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"
+            designation_ocf = str(input_dictionary[KEY_DIA_ANCHOR_OCF][0]) + "X" + length + " IS5624 GALV"
+            designation_icf = str(input_dictionary[KEY_DIA_ANCHOR_ICF][0]) + "X" + length + " IS5624 GALV"
             anchor_type = input_dictionary[KEY_TYP_ANCHOR]
             fu = Material(input_dictionary[KEY_MATERIAL]).fu
-            values[KEY_DP_ANCHOR_BOLT_LENGTH] = length
-            values[KEY_DP_ANCHOR_BOLT_DESIGNATION] = designation
-            values[KEY_DP_ANCHOR_BOLT_TYPE] = anchor_type
-            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O] = fu
+            values[KEY_DP_ANCHOR_BOLT_LENGTH_OCF] = length
+            values[KEY_DP_ANCHOR_BOLT_LENGTH_ICF] = length
+            values[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF] = designation_ocf
+            values[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF] = designation_icf
+            values[KEY_DP_ANCHOR_BOLT_TYPE_OCF] = anchor_type
+            values[KEY_DP_ANCHOR_BOLT_TYPE_ICF] = anchor_type
+            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF] = fu
+            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF] = fu
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -1314,27 +1381,56 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         anchor_bolt = []
 
-        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None,
-              str(values[KEY_DP_ANCHOR_BOLT_DESIGNATION]))
+        t0 = (None, KEY_DISP_ANCHOR_OCF, TYPE_TITLE, None, None)
+        anchor_bolt.append(t0)
+
+        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]))
         anchor_bolt.append(t1)
 
-        t2 = (KEY_DP_ANCHOR_BOLT_TYPE, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, None,
-              str(values[KEY_DP_ANCHOR_BOLT_TYPE]))
+        t2 = (KEY_DP_ANCHOR_BOLT_TYPE_OCF, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_TYPE_OCF]))
         anchor_bolt.append(t2)
 
-        t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'], 'Yes')
+        t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'], 'Yes')
         anchor_bolt.append(t3)
 
-        t4 = (KEY_DP_ANCHOR_BOLT_HOLE_TYPE, KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE, TYPE_COMBOBOX,
+        t4 = (KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE, TYPE_COMBOBOX,
               ['Standard', 'Over-sized'], 'Over-sized')
         anchor_bolt.append(t4)
 
-        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, None,
-              values[KEY_DP_ANCHOR_BOLT_LENGTH])
+        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, None,
+              values[KEY_DP_ANCHOR_BOLT_LENGTH_OCF])
         anchor_bolt.append(t5)
 
-        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None,
-              str(values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O]))
+        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]))
+        anchor_bolt.append(t6)
+
+        t0 = (None, KEY_DISP_ANCHOR_ICF, TYPE_TITLE, None, None)
+        anchor_bolt.append(t0)
+
+        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]))
+        anchor_bolt.append(t1)
+
+        t2 = (KEY_DP_ANCHOR_BOLT_TYPE_ICF, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_TYPE_ICF]))
+        anchor_bolt.append(t2)
+
+        t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'], 'Yes')
+        anchor_bolt.append(t3)
+
+        t4 = (KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE, TYPE_COMBOBOX,
+              ['Standard', 'Over-sized'], 'Over-sized')
+        anchor_bolt.append(t4)
+
+        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, None,
+              values[KEY_DP_ANCHOR_BOLT_LENGTH_ICF])
+        anchor_bolt.append(t5)
+
+        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]))
         anchor_bolt.append(t6)
 
         t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, None, str(0.30))
@@ -1495,9 +1591,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             pass
 
-        self.anchor_dia = design_dictionary[KEY_DIA_ANCHOR]
+        self.anchor_dia = design_dictionary[KEY_DIA_ANCHOR_OCF]
         self.anchor_type = str(design_dictionary[KEY_TYP_ANCHOR])
-        self.anchor_grade = design_dictionary[KEY_GRD_ANCHOR]
+        self.anchor_grade = design_dictionary[KEY_GRD_ANCHOR_OCF]
         self.anchor_grade_inside_flange = self.anchor_grade
 
         self.footing_grade = str(design_dictionary[KEY_GRD_FOOTING])
@@ -1516,11 +1612,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_bp_fy = float(design_dictionary[KEY_BASE_PLATE_FY])
 
         # anchor bolt
-        self.dp_anchor_designation = str(design_dictionary[KEY_DP_ANCHOR_BOLT_DESIGNATION])
-        self.dp_anchor_type = str(design_dictionary[KEY_DP_ANCHOR_BOLT_TYPE])
-        self.dp_anchor_hole = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE])
-        self.dp_anchor_length = float(design_dictionary[KEY_DP_ANCHOR_BOLT_LENGTH])
-        self.dp_anchor_fu_overwrite = float(design_dictionary[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O])
+        self.dp_anchor_designation = str(design_dictionary[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF])
+        self.dp_anchor_type = str(design_dictionary[KEY_DP_ANCHOR_BOLT_TYPE_OCF])
+        self.dp_anchor_hole = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF])
+        self.dp_anchor_length = float(design_dictionary[KEY_DP_ANCHOR_BOLT_LENGTH_OCF])
+        self.dp_anchor_fu_overwrite = float(design_dictionary[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF])
         self.dp_anchor_friction = float(design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] if
                                         design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] != "" else 0.30)
 

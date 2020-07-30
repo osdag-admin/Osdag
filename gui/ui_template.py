@@ -178,7 +178,7 @@ class Window(QMainWindow):
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
-    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
+    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED, disabled_values=None, note=""):
         """
         Function to connect the customized_popup with the ui_template file
         on clicking the customized option
@@ -186,10 +186,11 @@ class Window(QMainWindow):
 
         # @author : Amir
 
-
+        if disabled_values is None:
+            disabled_values = []
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
-        self.ui.setupUi(self.window)
+        self.ui.setupUi(self.window, disabled_values, note)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.window.exec()
         return self.ui.get_right_elements()
@@ -705,6 +706,9 @@ class Window(QMainWindow):
         if new_list != []:
             for t in new_list:
                 Combobox_key = t[0]
+                disabled_values = []
+                if len(t) == 4:
+                    disabled_values = t[2]
                 d[Combobox_key] = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 if updated_list != None:
                     onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
@@ -713,11 +717,14 @@ class Window(QMainWindow):
                         for change_key in onchange_key_popup[0][0]:
                             print(change_key)
                             arg_list.append(self.dockWidgetContents.findChild(QtWidgets.QWidget, change_key).currentText())
-                        data[t[0] + "_customized"] = t[1](arg_list)
+                        data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1](arg_list)
+                                                      if all_values_available not in disabled_values]
                     else:
-                        data[t[0] + "_customized"] = t[1]()
+                        data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
+                                                      if all_values_available not in disabled_values]
                 else:
-                    data[t[0] + "_customized"] = t[1]()
+                    data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
+                                                  if all_values_available not in disabled_values]
             try:
                 d.get(new_list[0][0]).activated.connect(lambda: self.popup(d.get(new_list[0][0]), new_list,updated_list,data))
                 d.get(new_list[1][0]).activated.connect(lambda: self.popup(d.get(new_list[1][0]), new_list,updated_list,data))
@@ -1243,6 +1250,8 @@ class Window(QMainWindow):
                 continue
             selected = key.currentText()
             f = c_tup[1]
+            disabled_values = None
+            note = ""
             if updated_list != None:
                 onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
             else:
@@ -1255,26 +1264,37 @@ class Window(QMainWindow):
                 options = f(arg_list)
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+                    if len(c_tup) == 4:
+                        disabled_values = c_tup[2]
+                        note = c_tup[3]
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
+                                                                                disabled_values, note)
                     if data[c_tup[0] + "_customized"] == []:
-                        data[c_tup[0] + "_customized"] = f(arg_list)
+                        data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                                                          if all_values_available not in disabled_values]
                         key.setCurrentIndex(0)
                 else:
-                    data[c_tup[0] + "_customized"] = f(arg_list)
+                    data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                                                      if all_values_available not in disabled_values]
 
-                    input = f(arg_list)
-                    data[c_tup[0] + "_customized"] = input
+                    # input = f(arg_list)
+                    # data[c_tup[0] + "_customized"] = input
             else:
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+                    if len(c_tup) == 4:
+                        disabled_values = c_tup[2]
+                        note = c_tup[3]
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
+                                                                                disabled_values, note)
                     if data[c_tup[0] + "_customized"] == []:
-                        data[c_tup[0] + "_customized"] = f()
+                        data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                                                      if all_values_available not in disabled_values]
                         key.setCurrentIndex(0)
                 else:
-                    data[c_tup[0] + "_customized"] = f()
-
+                    data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                                                      if all_values_available not in disabled_values]
     def on_change_connect(self, key_changed, updated_list, data, main):
         key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, main))
 
@@ -1742,6 +1762,13 @@ class Window(QMainWindow):
             self.textEdit.clear()
             with open("logging_text.log", 'w') as log_file:
                 pass
+
+            for data_key_tuple in main.customized_input(main):
+                data_key = data_key_tuple[0]
+                if data_key in data.keys() and len(data_key_tuple) == 4:
+                    data[data_key] = [data_values for data_values in data[data_key]
+                                      if data_values not in data_key_tuple[2]]
+
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(status)
@@ -2290,9 +2317,10 @@ class Window(QMainWindow):
                 print(k2_key_name)
                 k2 = tab.findChild(QtWidgets.QWidget, k2_key_name)
                 if isinstance(k2, QtWidgets.QComboBox):
-                    k2.clear()
-                    for values in val[k2_key_name]:
-                        k2.addItem(str(values))
+                    if k2_key_name in val.keys():
+                        k2.clear()
+                        for values in val[k2_key_name]:
+                            k2.addItem(str(values))
                 if isinstance(k2, QtWidgets.QLineEdit):
                     k2.setText(str(val[k2_key_name]))
                 if isinstance(k2, QtWidgets.QLabel):

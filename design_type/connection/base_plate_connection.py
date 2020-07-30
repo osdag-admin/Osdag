@@ -1886,7 +1886,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
         self.bp_length_min = round_up(self.column_D + (2 * (2 * self.end_distance_out)), 5)  # mm
         self.bp_width_min = round_up((0.85 * self.column_bf) + (2 * (2 * self.edge_distance_out)), 5)  # mm
-        
+
         # 7: Design Parameters
 
         # define parameters for the stiffener plates

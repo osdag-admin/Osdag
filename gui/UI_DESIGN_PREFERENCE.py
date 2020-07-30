@@ -253,7 +253,7 @@ class Window(QDialog):
                         img.setObjectName(element[0])
                         grid.addWidget(img,r,1,10,2)
                         pmap = QPixmap(element[4])
-                        img.setPixmap(pmap.scaled(scale*300,scale*300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio
+                        img.setPixmap(pmap.scaled(300,300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio
                         r += 10
 
                     if type == TYPE_BREAK:
@@ -1402,7 +1402,7 @@ class DesignPreferences():
         width = resolution.width()
         height = resolution.height()
         # self.ui.resize(width*(0.67),height*(0.60))
-        self.ui.resize(width * 0.6, height * 0.6)
+        self.ui.resize(width * 0.7, height * 0.6)
         # self.ui.center()
         # self.ui.tabWidget.resize(width * (0.67), height * (0.60))
         self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)

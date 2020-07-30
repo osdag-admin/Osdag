@@ -161,8 +161,8 @@ class Tension_bolted(Member):
         # t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
         # design_input.append(t4)
         #
-        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        # design_input.append(t5)
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
 
         t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES,KEY_DP_DETAILING_EDGE_TYPE])
         design_input.append(t5)
@@ -191,7 +191,7 @@ class Tension_bolted(Member):
         design_input.append(t1)
 
         t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 
@@ -1901,38 +1901,46 @@ class Tension_bolted(Member):
                 print(self.design_status)
 
     def status_pass(self,design_dictionary):
-        self.plate_design_status = True
-        self.design_status = True
-        self.intermittent_bolt(self, design_dictionary)
-        logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
-        if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
-            logger.info(
-                "In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+        if (2 * self.plate.length) > self.length:
+            self.design_status = False
+            logger.warning("Plate length of {} mm is higher than Member length of {} mm".format(2 * self.plate.length,
+                                                                                                self.length))
+            logger.info("Try higher diameter of bolt or increase member length to get a safe design.")
+            logger.error(": Design is not safe. \n ")
+            logger.debug(" :=========End Of design===========")
         else:
-            pass
-        if self.load.axial_force < (self.res_force / 1000):
-            logger.info(
-                "Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
-                    round(self.res_force / 1000, 2)))
-        else:
-            pass
-        logger.info(": Overall bolted tension member design is safe. \n")
-        logger.debug(" :=========End Of design===========")
-        if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-            self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
-                                       material_grade=self.material,
-                                       key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
-                                       B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
-        else:
-            self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
-                                       material_grade=self.material,
-                                       key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
-                                       B_b=self.section_size_1.flange_width,
-                                       T_t=self.section_size_1.flange_thickness,
-                                       t=self.section_size_1.web_thickness)
+            self.plate_design_status = True
+            self.design_status = True
+            self.intermittent_bolt(self, design_dictionary)
+            logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+            if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
+                logger.info(
+                    "In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+            else:
+                pass
+            if self.load.axial_force < (self.res_force / 1000):
+                logger.info(
+                    "Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
+                        round(self.res_force / 1000, 2)))
+            else:
+                pass
+            logger.info(": Overall bolted tension member design is safe. \n")
+            logger.debug(" :=========End Of design===========")
+            if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
+                self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                                           material_grade=self.material,
+                                           key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
+                                           B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
+            else:
+                self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                                           material_grade=self.material,
+                                           key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
+                                           B_b=self.section_size_1.flange_width,
+                                           T_t=self.section_size_1.flange_thickness,
+                                           t=self.section_size_1.web_thickness)
 
-        self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                         r=self.min_radius_gyration)
+            self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+                                                             r=self.min_radius_gyration)
 
 
     def intermittent_bolt(self, design_dictionary):

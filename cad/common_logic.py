@@ -1366,7 +1366,7 @@ class CommonDesignLogic(object):
                                             color=Quantity_NOC_BLUE1)
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
-                                        color='black')
+                                        color=Quantity_NOC_YELLOW)
 
                 elif self.component == "Model":
                     osdag_display_shape(self.display, self.CPObj.get_beamsModel(), update=True)
@@ -1380,7 +1380,7 @@ class CommonDesignLogic(object):
                                             color=Quantity_NOC_BLUE1)
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
-                                        color='black')
+                                        color=Quantity_NOC_YELLOW)
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 self.B = self.module_class()

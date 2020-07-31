@@ -1579,6 +1579,7 @@ class Member(Main):
                KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '0',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
                KEY_DP_DESIGN_METHOD: "Limit State Design",
                KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
@@ -1611,6 +1612,7 @@ class Member(Main):
     def detailing_values(self, input_dictionary):
 
         values = {KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
+                  KEY_DP_DETAILING_GAP:"0",
                   KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
 
         for key in values.keys():
@@ -1624,8 +1626,8 @@ class Member(Main):
               values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
-        # t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, None, values[KEY_DP_DETAILING_GAP])
-        # detailing.append(t2)
+        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, None, values[KEY_DP_DETAILING_GAP])
+        detailing.append(t2)
 
         t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
               ['No', 'Yes'], values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])

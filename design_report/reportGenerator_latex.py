@@ -60,6 +60,8 @@ class CreateLatex(Document):
 
         doc.add_color('OsdagGreen', 'RGB', '153,169,36')
         doc.add_color('PassColor','RGB', '153,169,36')
+        doc.add_color('Red', 'RGB', '255,0,0')
+        doc.add_color('Green', 'RGB', '0,200,0')
         doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
@@ -186,7 +188,20 @@ class CreateLatex(Document):
         doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
+            with doc.create(Tabular(r'|>{\centering}m{12.5cm}|>{\centering\arraybackslash}m{4cm}|', row_height=1.2)) as table:
+                table.add_hline()
+                # Fail = TextColor("FailColor", bold("Fail"))
+                # Pass = TextColor("PassColor", bold("Pass"))
+                if does_design_exist != True:
+                    table.add_row(bold('Design Status'),color_cell("Red",bold("Fail")))
+                else:
+                    table.add_row(bold('Design Status'),color_cell("Green",bold("Pass")))
+                table.add_hline()
+
+
+
             for check in Design_Check:
+
                 if check[0] == 'SubSection':
                     if count >=1:
                         # doc.append(NewPage())
@@ -247,9 +262,9 @@ class CreateLatex(Document):
                 else:
 
                     if check[3] == 'Fail':
-                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("FailColor", bold(check[3])))
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
                     else:
-                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("PassColor", bold(check[3])))
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Green", bold(check[3])))
                     table.add_hline()
 
 

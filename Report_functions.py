@@ -1442,7 +1442,7 @@ def cl_10_3_3_1_long_joint_bolted_prov(nc, nr, p, g, d, Tc, Tr, direction=None):
     long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
     long_joint_bolted_eqn.append(NoEscape(r'& 15 \times d = 15 \times ' + d + ' = ' + lt_str + r' \\'))
     if l < (lt):
-        long_joint_bolted_eqn.append(NoEscape(r'& since,~l_j < 15 \times d~then~V_{rd} = V_{db} \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& since,~l_j < 15 \times d~then~\beta_{lj} = 1.0 \\'))
         # long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
     else:

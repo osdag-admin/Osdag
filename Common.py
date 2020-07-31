@@ -626,7 +626,7 @@ KEY_DISP_END_DIST_FLANGE = 'End Distance'
 KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange Plate Tension Capacity (kN)"
 DISP_TITLE_SECTION = 'Section Details'
 DISP_TITLE_TENSION_SECTION = 'Section Details'
 SECTION_CLASSIFICATION ="Section Classification"
@@ -1025,7 +1025,7 @@ KEY_SLENDER = "Member.Slenderness"
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 KEY_OUT_FLANGESPLATE_THICKNESS = 'flange_plate.Thickness'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Flange Plate Thickness'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
@@ -1152,12 +1152,26 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+# FLANGE AND WEB -REDUCTION FACTOR
+KEY_REDUCTION_FACTOR_LONG_FLANGE ='flange_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
 
-KEY_REDUCTION_LONG_JOINT ='bolt.long_joint'
+KEY_REDUCTION_FACTOR_LONG_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_LONG_WEB ="Long Joint Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_WEB = 'web_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_WEB = "Large Grip Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_FLANGE = 'flange_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_FLANGE = "Large Grip Red.Factor"
+
+# COMMON -REDUCTION FACTOR
+KEY_REDUCTION_LONG_JOINT ="bolt.long_joint"
 KEY_DISP_REDUCTION_LONG_JOINT ="Long Joint Red.Factor"
 
-KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
+KEY_REDUCTION_LARGE_GRIP ="bolt.large_grip"
 KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
+
 
 
 KEY_DISP_REDUCTION ="Strength Red.Factor"
@@ -1205,7 +1219,7 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Width'
 KEY_OUT_WEBPLATE_THICKNESS = 'Web_Plate.Thickness'
-KEY_DISP_WEBPLATE_THICKNESS = 'Web Plate Thickness'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)'
 KEY_DISP_WEB_PLATE_LENGTH ='Width (mm)'
 DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
 KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'

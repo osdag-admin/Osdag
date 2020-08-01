@@ -1964,9 +1964,9 @@ class Tension_welded(Member):
                                                        T_dg=member_yield_kn,multiple=multiple,area=section_size.area), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                  member_rupture_prov(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w,
-                                      self.b_s, self.t, gamma_m0, gamma_m1, section_size.beta, member_rupture_kn,
-                                      multiple), '')
+                  cl_6_3_3_tension_rupture_member(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w,
+                                                  self.b_s, self.t, gamma_m0, gamma_m1, section_size.beta, member_rupture_kn,
+                                                  multiple), '')
             self.report_check.append(t3)
             # t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=member_blockshear_kn), '')
             # self.report_check.append(t4)

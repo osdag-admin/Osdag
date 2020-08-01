@@ -97,6 +97,8 @@ class SaveDesignBP(BasePlateConnection):
         self.report_check = []
 
     def save_design(self, popup_summary):
+        super(SaveDesignBP, self).save_design(self)
+        self.report_check = []
         """ create design report for the base plate module
 
         Args:
@@ -377,19 +379,19 @@ class SaveDesignBP(BasePlateConnection):
         t1 = ('SubSection', 'Anchor Bolt Design - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t2 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
+        t2 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
                                                            self.shear_capacity_anchor), 'N/A')
         self.report_check.append(t2)
 
-        t3 = (KEY_DISP_KB, '', kb_prov(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
+        t3 = (KEY_DISP_KB, '', cl_10_3_4_calculate_kb(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
                                        self.dp_column_fu), 'N/A')
         self.report_check.append(t3)
 
-        t4 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
+        t4 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
                                                                self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
         self.report_check.append(t4)
 
-        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
+        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
         self.report_check.append(t5)
 
         if self.connectivity == 'Moment Base Plate':
@@ -624,3 +626,31 @@ class SaveDesignBP(BasePlateConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, display_3D_image)
+
+    # Function for individual component calls in 3D view
+    # def get_3d_components(self):
+    #     components = []
+    #
+    #     t1 = ('Model', self.call_3DModel)
+    #     components.append(t1)
+    #
+    #     t2 = ('Beam', self.call_3DBeam)
+    #     components.append(t2)
+    #
+    #     t3 = ('Column', self.call_3DColumn)
+    #     components.append(t3)
+    #
+    #     t4 = ('Fin Plate', self.call_3DPlate)
+    #     components.append(t4)
+    #
+    #     return components
+    #
+    # def call_3DPlate(self, ui, bgcolor):
+    #     from PyQt5.QtWidgets import QCheckBox
+    #     from PyQt5.QtCore import Qt
+    #     for chkbox in ui.frame.children():
+    #         if chkbox.objectName() == 'Fin Plate':
+    #             continue
+    #         if isinstance(chkbox, QCheckBox):
+    #             chkbox.setChecked(Qt.Unchecked)
+    #     ui.commLogicObj.display_3DModel("Plate", bgcolor)

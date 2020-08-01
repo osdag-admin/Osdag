@@ -42,22 +42,16 @@ class My_ListWidgetItem(QListWidgetItem):
 class Ui_Popup(object):
 
 
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, disabled_values, note):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(scale*540, scale*470)
+        self.disabled_values = disabled_values
+        self.note = note
         self.label = QtWidgets.QLabel(MainWindow)
         self.label.setGeometry(QtCore.QRect(20, 20, 150, 30))
-        font = QtGui.QFont()
-        font.setFamily("Myanmar Text")
-        font.setPointSize(12)
-        self.label.setFont(font)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(MainWindow)
         self.label_2.setGeometry(QtCore.QRect(scale*320, 20, 150, 30))
-        font = QtGui.QFont()
-        font.setFamily("Myanmar Text")
-        font.setPointSize(12)
-        self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         # self.listWidget = QtWidgets.QListWidget(MainWindow)
         self.listWidget = My_ListWidget(MainWindow)
@@ -75,33 +69,33 @@ class Ui_Popup(object):
         self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
         self.pushButton = QtWidgets.QPushButton(MainWindow)
-        self.pushButton.setGeometry(QtCore.QRect(scale*225, 80, scale*70, scale*30))
+        self.pushButton.setGeometry(QtCore.QRect(scale*225, scale*140, scale*70, scale*30))
         self.pushButton.setObjectName("pushButton")
         self.pushButton.setAutoDefault(False)
         self.pushButton_2 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_2.setGeometry(QtCore.QRect(scale*225, 120, scale*70, scale*30))
+        self.pushButton_2.setGeometry(QtCore.QRect(scale*225, scale*180, scale*70, scale*30))
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.setAutoDefault(False)
         self.pushButton_3 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_3.setGeometry(QtCore.QRect(scale*225, 160, scale*70, scale*30))
+        self.pushButton_3.setGeometry(QtCore.QRect(scale*225, scale*220, scale*70, scale*30))
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_3.setAutoDefault(False)
         self.pushButton_4 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_4.setGeometry(QtCore.QRect(scale*225, 200, scale*70, scale*30))
+        self.pushButton_4.setGeometry(QtCore.QRect(scale*225, scale*260, scale*70, scale*30))
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.setAutoDefault(False)
         self.pushButton_5 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_5.setGeometry(QtCore.QRect(scale*170, 280, scale*140, scale*35))
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(10)
-        self.pushButton.setFont(font)
-        self.pushButton_2.setFont(font)
-        self.pushButton_3.setFont(font)
-        self.pushButton_4.setFont(font)
-        self.pushButton_5.setFont(font)
+        self.pushButton_5.setGeometry(QtCore.QRect(scale*190, scale*400, scale*140, scale*35))
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_5.setDefault(True)
+        if self.note != "":
+            self.note_label = QtWidgets.QLabel(MainWindow)
+            self.note_label.setGeometry(QtCore.QRect(20, scale * 450, scale * 320, scale * 150))
+            self.note_label.setObjectName("note_label")
+            self.note_label.setText("<b>Note</b>: "+self.note)
+            self.note_label.setStyleSheet("background-color: white;")
+            self.note_label.resize(QtCore.QSize(self.note_label.sizeHint()))
+            MainWindow.resize(scale * 540, scale * 550)
         self.connections(MainWindow)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -184,15 +178,21 @@ class Ui_Popup(object):
         if items not in KEY_EXISTINGVAL_CUSTOMIZED:
             for item in KEY_EXISTINGVAL_CUSTOMIZED:
                 # self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
+                if item in self.disabled_values:
+                    continue
                 self.listWidget_2.addItem(item)
 
             a = list(set(items) - set(KEY_EXISTINGVAL_CUSTOMIZED))
-            for item_a in a:
+            for item_a in list(set(a + self.disabled_values)):
                 self.listWidget.addItem(item_a)
             # self.listWidget.addItems(a)
         else:
             for it in items:
                 self.listWidget_2.addItem(it)
+
+        for all_items in [self.listWidget.item(i) for i in range(self.listWidget.count())]:
+            if all_items.text() in self.disabled_values:
+                all_items.setFlags(QtCore.Qt.NoItemFlags)
 
             # self.listWidget_2.addItems(items)
     # def addAvailableItems1(self,items1,KEY_EXISTINGVAL_CUSTOMIZED):

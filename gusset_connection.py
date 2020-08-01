@@ -1,11 +1,12 @@
 from design_type.connection.connection import Connection
-# from Common import *
+from design_type.member import Member
+from Common import *
 import sqlite3
 import logging
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QMessageBox
 import sys
-from gui.ui_template import Ui_ModuleWindow
+
 from utils.common.component import Bolt
 from design_report.reportGenerator_latex import CreateLatex
 
@@ -199,10 +200,204 @@ class OurLog(logging.Handler):
         self.key.append(msg)
         # self.key.append(record.levelname)
 
-class GussetConnection(Connection):
+class GussetConnection(Connection,Member):
 
     def __init__(self):
         super(GussetConnection, self).__init__()
+
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+
+    def tab_list(self):
+        """
+
+        :return: This function returns the list of tuples. Each tuple will create a tab in design preferences, in the
+        order they are appended. Format of the Tuple is:
+        [Tab Title, Type of Tab, function for tab content)
+        Tab Title : Text which is displayed as Title of Tab,
+        Type of Tab: There are Three types of tab layouts.
+            Type_TAB_1: This have "Add", "Clear", "Download xlsx file" "Import xlsx file"
+            TYPE_TAB_2: This contains a Text box for side note.
+            TYPE_TAB_3: This is plain layout
+        function for tab content: All the values like labels, input widgets can be passed as list of tuples,
+        which will be displayed in chosen tab layout
+
+        """
+        tabs = []
+
+        t1 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
+        tabs.append(t1)
+
+        t2 = (DISP_TITLE_CHANNEL, TYPE_TAB_1, self.tab_channel_section)
+        tabs.append(t2)
+
+        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)
+        tabs.append(t6)
+
+        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t3)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+        """
+
+        :return: This function is used to update the values of the keys in design preferences,
+         which are dependent on other inputs.
+         It returns list of tuple which contains, tab name, keys whose values will be changed,
+         function to change the values and arguments for the function.
+
+         [Tab Name, [Argument list], [list of keys to be updated], input widget type of keys, change_function]
+
+         Here Argument list should have only one element.
+         Changing of this element,(either changing index or text depending on widget type),
+         will update the list of keys (this can be more than one).
+         TODO: input widget type of keys (3rd element) is no longer required. needs to be removed
+
+         """
+        change_tab = []
+
+        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
+               'Label_7', 'Label_8', 'Label_9',
+               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+               'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24', KEY_IMAGE], TYPE_TEXTBOX,
+              self.get_new_angle_section_properties)
+        change_tab.append(t1)
+
+        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3', 'Label_0'],
+              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
+               'Label_15',
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
+               KEY_IMAGE],
+              TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        change_tab.append(t2)
+
+        t3 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13',
+               'Label_14',
+               'Label_4', 'Label_5',
+               'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
+               'Label_19', 'Label_20', 'Label_21',
+               'Label_22', 'Label_23', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
+              self.get_new_channel_section_properties)
+        change_tab.append(t3)
+
+        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14'],
+              ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17', 'Label_19',
+               'Label_20', 'Label_21', 'Label_22', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
+              self.get_Channel_sec_properties)
+
+        change_tab.append(t4)
+
+        t5 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+
+        change_tab.append(t5)
+
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
+        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t7)
+
+        return change_tab
+
+    def input_dictionary_design_pref(self):
+        """
+
+        :return: This function is used to choose values of design preferences to be saved to design dictionary.
+
+         It returns list of tuple which contains, tab name, input widget type of keys, keys whose values to be saved,
+
+         [(Tab Name, input widget type of keys, [List of keys to be saved])]
+
+         """
+        design_input = []
+
+        t2 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t2)
+
+        t2 = (DISP_TITLE_CHANNEL, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        # t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        # design_input.append(t4)
+        #
+        # t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        # design_input.append(t4)
+        #
+        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        # design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DETAILING_EDGE_TYPE])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t7)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        """
+
+        :return: Returns list of tuples which have the design preference keys to be stored if user does not open
+        design preference (since deisgn preference values are saved on click of 'save' this function is necessary'
+
+        ([Key need to get default values, list of design prefernce values, source of key])
+
+        TODO: list of design preference values are sufficient in this function
+         since whole of input dock design dictionary is being passed anyway in ui template
+        """
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+    def refresh_input_dock(self):
+        """
+
+         :return: This function returns list of tuples which has keys that needs to be updated,
+          on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
+
+          [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
+         """
+
+        add_buttons = []
+
+        t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
+              ['Angles', 'Back to Back Angles', 'Star Angles'], "Angles")
+        add_buttons.append(t2)
+
+        t2 = (DISP_TITLE_CHANNEL, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
+              ['Channels', 'Back to Back Channels'], "Channels")
+        add_buttons.append(t2)
+
+        return add_buttons
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
 
     def set_osdaglogger(key):
 
@@ -310,7 +505,7 @@ class GussetConnection(Connection):
 
         lst = []
 
-        t2 = (KEY_SEC_PROFILE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+        t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
         return lst
@@ -337,55 +532,13 @@ class GussetConnection(Connection):
         else:
             return all_errors
 
-    def tab_list(self):
-        tabs = []
-
-        t1 = ("Column", TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t7)
-
-        return tabs
-
-    @staticmethod
-    def tab_column_section():
-        supporting_section = []
-        t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
-        supporting_section.append(t1)
-
-        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
-        supporting_section.append(t2)
-
-        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-        supporting_section.append(t3)
-
-        return supporting_section
-
-    @staticmethod
-    def connector_values():
-        connector = []
-
-        material = connectdb("Material", call_type="popup")
-        material.append('Custom')
-        t1 = (KEY_PLATE_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material)
-        connector.append(t1)
-
-        t2 = (KEY_PLATE_FU, KEY_DISP_PLATE_FU, TYPE_TEXTBOX, None)
-        connector.append(t2)
-
-        t3 = (KEY_PLATE_FY, KEY_DISP_PLATE_FY, TYPE_TEXTBOX, None)
-        connector.append(t3)
-
-        return connector
 
     def set_input_values(self, design_dictionary):
         self.section = design_dictionary[KEY_SECSIZE][0]
         self.membercount = design_dictionary[KEY_MEMBER_COUNT]
         self.load = design_dictionary[KEY_AXIAL]
         self.bolt = Bolt(grade=[8.8], diameter=design_dictionary[KEY_D],
-                         bolt_type='Bearing Bolt',
-                         material_grade=design_dictionary[KEY_MATERIAL])
+                         bolt_type='Bearing Bolt')
         self.bolt_details = {
             'diameter':self.bolt.bolt_diameter[0],
             'grade': 8.8,
@@ -472,19 +625,38 @@ class GussetConnection(Connection):
     def show_error_message(self):
         QMessageBox.about(self, 'information', "Your message!")
 
-class MainController(QMainWindow):
-    closed = pyqtSignal()
+    def get_3d_components(self):
+        components = []
 
-    def __init__(self, Ui_ModuleWindow, main):
-        super(MainController,self).__init__()
-        QMainWindow.__init__(self)
-        self.ui = Ui_ModuleWindow()
-        self.ui.setupUi(self, main, '')
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Beam', self.call_3DBeam)
+        components.append(t2)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('End Plate', self.call_3DPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'End Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MainController(Ui_ModuleWindow,GussetConnection)
+    from gui.ui_template import Ui_ModuleWindow
+    window = Ui_ModuleWindow(GussetConnection,'')
     window.show()
     try:
         sys.exit(app.exec_())

@@ -161,8 +161,8 @@ class Tension_bolted(Member):
         # t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
         # design_input.append(t4)
         #
-        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        # design_input.append(t5)
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
 
         t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES,KEY_DP_DETAILING_EDGE_TYPE])
         design_input.append(t5)
@@ -191,7 +191,7 @@ class Tension_bolted(Member):
         design_input.append(t1)
 
         t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 
@@ -796,32 +796,6 @@ class Tension_bolted(Member):
             # print(design_dictionary)
         else:
             return all_errors
-
-
-
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-
-        for item in missing_fields_list:
-            information = information + item + ", "
-
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
-
-        return information
 
     def warn_text(self):
 
@@ -1927,38 +1901,46 @@ class Tension_bolted(Member):
                 print(self.design_status)
 
     def status_pass(self,design_dictionary):
-        self.plate_design_status = True
-        self.design_status = True
-        self.intermittent_bolt(self, design_dictionary)
-        logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
-        if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
-            logger.info(
-                "In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+        if (2 * self.plate.length) > self.length:
+            self.design_status = False
+            logger.warning("Plate length of {} mm is higher than Member length of {} mm".format(2 * self.plate.length,
+                                                                                                self.length))
+            logger.info("Try higher diameter of bolt or increase member length to get a safe design.")
+            logger.error(": Design is not safe. \n ")
+            logger.debug(" :=========End Of design===========")
         else:
-            pass
-        if self.load.axial_force < (self.res_force / 1000):
-            logger.info(
-                "Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
-                    round(self.res_force / 1000, 2)))
-        else:
-            pass
-        logger.info(": Overall bolted tension member design is safe. \n")
-        logger.debug(" :=========End Of design===========")
-        if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-            self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
-                                       material_grade=self.material,
-                                       key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
-                                       B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
-        else:
-            self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
-                                       material_grade=self.material,
-                                       key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
-                                       B_b=self.section_size_1.flange_width,
-                                       T_t=self.section_size_1.flange_thickness,
-                                       t=self.section_size_1.web_thickness)
+            self.plate_design_status = True
+            self.design_status = True
+            self.intermittent_bolt(self, design_dictionary)
+            logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+            if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
+                logger.info(
+                    "In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+            else:
+                pass
+            if self.load.axial_force < (self.res_force / 1000):
+                logger.info(
+                    "Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
+                        round(self.res_force / 1000, 2)))
+            else:
+                pass
+            logger.info(": Overall bolted tension member design is safe. \n")
+            logger.debug(" :=========End Of design===========")
+            if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
+                self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                                           material_grade=self.material,
+                                           key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
+                                           B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
+            else:
+                self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                                           material_grade=self.material,
+                                           key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
+                                           B_b=self.section_size_1.flange_width,
+                                           T_t=self.section_size_1.flange_thickness,
+                                           t=self.section_size_1.web_thickness)
 
-        self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                         r=self.min_radius_gyration)
+            self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+                                                             r=self.min_radius_gyration)
 
 
     def intermittent_bolt(self, design_dictionary):
@@ -2454,7 +2436,7 @@ class Tension_bolted(Member):
                                                                                            multiple =multiple,
                                                                                            area=section_size.area), '')
             self.report_check.append(t2)
-            t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,section_size.fu, section_size.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,section_size.beta,member_rupture_kn,multiple), '')
+            t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', cl_6_3_3_tension_rupture_member(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w, self.b_s, self.t, gamma_m0, gamma_m1, section_size.beta, member_rupture_kn, multiple), '')
             self.report_check.append(t3)
             t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', cl_6_4_blockshear_capacity_member(Tdb= member_blockshear_kn), '')
             self.report_check.append(t4)
@@ -2614,7 +2596,7 @@ class Tension_bolted(Member):
                 t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,int(self.plate.height),1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       cl_6_2_tension_yield_capacity_member(l = self.section_size_1.depth, t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
-                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', cl_6_3_tension_rupture_capacity_member(self.section_size_1.depth, self.plate.thickness_provided, self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1, plate_rupture_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', cl_6_3_1_tension_rupture_plate(self.section_size_1.depth, self.plate.thickness_provided, self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
             elif self.sec_profile in ["Angles", 'Back to Back Angles']:
                 if self.loc == "Long Leg":
@@ -2623,9 +2605,9 @@ class Tension_bolted(Member):
                           cl_6_2_tension_yield_capacity_member(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg =plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          cl_6_3_tension_rupture_capacity_member(self.section_size_1.max_leg, self.plate.thickness_provided,
-                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                                                 plate_rupture_kn), '')
+                          cl_6_3_1_tension_rupture_plate(self.section_size_1.max_leg, self.plate.thickness_provided,
+                                                         self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                         plate_rupture_kn), '')
 
                 else:
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.min_leg, self.clearance,int(self.plate.height),1), "")
@@ -2634,9 +2616,9 @@ class Tension_bolted(Member):
                                                                f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg=plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          cl_6_3_tension_rupture_capacity_member(self.section_size_1.min_leg, self.plate.thickness_provided,
-                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                                                 plate_rupture_kn), '')
+                          cl_6_3_1_tension_rupture_plate(self.section_size_1.min_leg, self.plate.thickness_provided,
+                                                         self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                         plate_rupture_kn), '')
             else:
                 if self.loc == "Long Leg":
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 2), "")
@@ -2644,9 +2626,9 @@ class Tension_bolted(Member):
                           cl_6_2_tension_yield_capacity_member(l=2 * self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg=plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          cl_6_3_tension_rupture_capacity_member(2 * self.section_size_1.max_leg, self.plate.thickness_provided,
-                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                                                 plate_rupture_kn), '')
+                          cl_6_3_1_tension_rupture_plate(2 * self.section_size_1.max_leg, self.plate.thickness_provided,
+                                                         self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                         plate_rupture_kn), '')
                 else:
                     t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 2)
                           , "")
@@ -2655,9 +2637,9 @@ class Tension_bolted(Member):
                                                                f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg=plate_yield_kn), '')
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          cl_6_3_tension_rupture_capacity_member(2 * self.section_size_1.min_leg, self.plate.thickness_provided,
-                                                                 self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
-                                                                 plate_rupture_kn), '')
+                          cl_6_3_1_tension_rupture_plate(2 * self.section_size_1.min_leg, self.plate.thickness_provided,
+                                                         self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                                         plate_rupture_kn), '')
             self.report_check.append(t3)
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "",
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))

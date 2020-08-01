@@ -193,7 +193,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '3',
@@ -1164,7 +1164,7 @@ class ColumnCoverPlateWeld(MomentConnection):
             pass
         self.webspace = max(15, (self.web_weld.size + 5))
         self.web_weld.get_weld_strength(connecting_fu=[self.web_weld.fu, self.section.fu, self.web_plate.fu],
-                                        weld_fabrication=KEY_DP_WELD_FAB_SHOP,
+                                        weld_fabrication=KEY_DP_FAB_SHOP,
                                         t_weld=self.web_weld.size, weld_angle=90)  # in N/mm
         self.web_plate.height = round_down((self.section.depth - (2 * self.section.flange_thickness)
                                             - (2 * self.section.root_radius) - (2 * self.webspace)), 5)
@@ -1242,7 +1242,7 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         self.flange_weld.get_weld_strength(
             connecting_fu=[self.flange_weld.fu, self.section.fu, self.flange_plate.fu],
-            weld_fabrication=KEY_DP_WELD_FAB_SHOP,
+            weld_fabrication=KEY_DP_FAB_SHOP,
             t_weld=self.flange_weld.size,
             weld_angle=90)
 

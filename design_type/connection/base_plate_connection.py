@@ -1137,7 +1137,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                KEY_DP_ANCHOR_BOLT_LENGTH: str(length),
                KEY_DP_ANCHOR_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: "No",

@@ -207,7 +207,7 @@ class ColumnCoverPlate(MomentConnection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '0',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',

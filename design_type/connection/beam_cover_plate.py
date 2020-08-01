@@ -3784,12 +3784,12 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', cl_6_3_tension_rupture_capacity_member(w_p=self.section.flange_width,
-                                                                                                t_p=self.section.flange_thickness,
-                                                                                                n_c=self.flange_plate.bolts_one_line,
-                                                                                                d_o=self.flange_bolt.dia_hole,
-                                                                                                fu=self.section.fu, gamma_m1=gamma_m1,
-                                                                                                T_dn=round(
+            t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', cl_6_3_1_tension_rupture_plate(w_p=self.section.flange_width,
+                                                                                        t_p=self.section.flange_thickness,
+                                                                                        n_c=self.flange_plate.bolts_one_line,
+                                                                                        d_o=self.flange_bolt.dia_hole,
+                                                                                        fu=self.section.fu, gamma_m1=gamma_m1,
+                                                                                        T_dn=round(
                                                                                          self.section.tension_rupture_capacity / 1000,
                                                                                          2)), '')
 
@@ -3821,12 +3821,12 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', cl_6_3_tension_rupture_capacity_member(w_p=webheight,
-                                                                                             t_p=self.section.web_thickness,
-                                                                                             n_c=self.web_plate.bolts_one_line,
-                                                                                             d_o=self.web_bolt.dia_hole,
-                                                                                             fu=self.section.fu, gamma_m1=gamma_m1,
-                                                                                             T_dn=round(
+            t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', cl_6_3_1_tension_rupture_plate(w_p=webheight,
+                                                                                     t_p=self.section.web_thickness,
+                                                                                     n_c=self.web_plate.bolts_one_line,
+                                                                                     d_o=self.web_bolt.dia_hole,
+                                                                                     fu=self.section.fu, gamma_m1=gamma_m1,
+                                                                                     T_dn=round(
                                                                                       self.section.tension_rupture_capacity_web / 1000,
                                                                                       2)), '')
             self.report_check.append(t1)
@@ -3863,13 +3863,13 @@ class BeamCoverPlate(MomentConnection):
                 self.report_check.append(t1)
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_tension_rupture_capacity_member(w_p=self.flange_plate.height,
-                                                                                                          t_p=self.flange_plate.thickness_provided,
-                                                                                                          n_c=self.flange_plate.bolts_one_line,
-                                                                                                          d_o=self.flange_bolt.dia_hole,
-                                                                                                          fu=self.flange_plate.fu,
-                                                                                                          gamma_m1=gamma_m1,
-                                                                                                          T_dn=round(
+                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_1_tension_rupture_plate(w_p=self.flange_plate.height,
+                                                                                                  t_p=self.flange_plate.thickness_provided,
+                                                                                                  n_c=self.flange_plate.bolts_one_line,
+                                                                                                  d_o=self.flange_bolt.dia_hole,
+                                                                                                  fu=self.flange_plate.fu,
+                                                                                                  gamma_m1=gamma_m1,
+                                                                                                  T_dn=round(
                                                                                             self.flange_plate.tension_rupture_capacity / 1000,
                                                                                             2)), '')
                 self.report_check.append(t1)
@@ -3904,13 +3904,13 @@ class BeamCoverPlate(MomentConnection):
 
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_tension_rupture_capacity_member(w_p=total_height,
-                                                                                                          t_p=self.flange_plate.thickness_provided,
-                                                                                                          n_c=self.flange_plate.bolts_one_line,
-                                                                                                          d_o=self.flange_bolt.dia_hole,
-                                                                                                          fu=self.flange_plate.fu,
-                                                                                                          gamma_m1=gamma_m1,
-                                                                                                          T_dn=round(
+                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_1_tension_rupture_plate(w_p=total_height,
+                                                                                                  t_p=self.flange_plate.thickness_provided,
+                                                                                                  n_c=self.flange_plate.bolts_one_line,
+                                                                                                  d_o=self.flange_bolt.dia_hole,
+                                                                                                  fu=self.flange_plate.fu,
+                                                                                                  gamma_m1=gamma_m1,
+                                                                                                  T_dn=round(
                                                                                             self.flange_plate.tension_rupture_capacity / 1000,
                                                                                             2)), '')
                 self.report_check.append(t1)
@@ -3947,12 +3947,12 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', cl_6_3_tension_rupture_capacity_member(self.web_plate.height,
-                                                                                                         self.web_plate.thickness_provided,
-                                                                                                         self.web_plate.bolts_one_line,
-                                                                                                         self.web_bolt.dia_hole,
-                                                                                                         self.web_plate.fu, gamma_m1,
-                                                                                                         round(
+            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', cl_6_3_1_tension_rupture_plate(self.web_plate.height,
+                                                                                                 self.web_plate.thickness_provided,
+                                                                                                 self.web_plate.bolts_one_line,
+                                                                                                 self.web_bolt.dia_hole,
+                                                                                                 self.web_plate.fu, gamma_m1,
+                                                                                                 round(
                                                                                         self.web_plate.tension_rupture_capacity / 1000,
                                                                                         2), 2), '')
 

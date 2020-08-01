@@ -140,7 +140,7 @@ def cl_6_2_tension_yield_capacity_member(l, t, f_y, gamma, T_dg, multiple =None,
     return tension_yield_eqn
 
 
-def cl_6_3_tension_rupture_capacity_member(w_p, t_p, n_c, d_o, fu, gamma_m1, T_dn, multiple=1):
+def cl_6_3_1_tension_rupture_plate(w_p, t_p, n_c, d_o, fu, gamma_m1, T_dn, multiple=1):
     """
     Calculate design in tension as governed by rupture of net
          cross-sectional area in case of bolted connection
@@ -174,14 +174,13 @@ def cl_6_3_tension_rupture_capacity_member(w_p, t_p, n_c, d_o, fu, gamma_m1, T_d
     Tensile_rup_eqnb.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9 A_{n}f_u}{\gamma_{m1}}\\'))
     Tensile_rup_eqnb.append(NoEscape(r'&=\frac{'+multiple+r'\times~0.9\times ('+ w_p + '-' + n_c +r'\times'+ d_o + r')\times' + t_p + r'\times' + f_u + r'}{' + gamma_m1 + r'}\\'))
     Tensile_rup_eqnb.append(NoEscape(r'&=' + T_dn + r'\\'))
-    Tensile_rup_eqnb.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.3]\end{aligned}'))
+    Tensile_rup_eqnb.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.3.1]\end{aligned}'))
 
 
     return Tensile_rup_eqnb
 
 
-#TODO:Darshan is it possible to follow same format (as above equation) for all tension rupture equations? Ans: No
-def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,beta,member_rup,multiple = 1):
+def cl_6_3_3_tension_rupture_member(A_nc, A_go, F_u, F_y, L_c, w, b_s, t, gamma_m0, gamma_m1, beta, member_rup, multiple = 1):
     """
     Calculate design strength due to rupture of critical section
     Args:
@@ -228,7 +227,7 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     member_rup_eqn.append(NoEscape(r'T_{dn} &= '+multiple+r'\times (\frac{0.9 A_{nc}f_{u}}{\gamma_{m1}} + \frac{\beta A_{go} f_{y}}{\gamma_{m0}})\\'))
     member_rup_eqn.append(NoEscape(r'&= '+multiple+ r'\times(\frac{0.9\times'+ A_nc +r'\times' + fu + '}{'+ gamma_m1 + r'} + \frac{' + beta +r'\times' + A_go +r'\times' + fy + '}{' + gamma_m0 + r'})\\'))
     member_rup_eqn.append(NoEscape(r'&= '+ member_rup + r'\\'))
-    member_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3]\end{aligned}'))
+    member_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3.3]\end{aligned}'))
     return member_rup_eqn
 
 
@@ -282,7 +281,6 @@ def cl_6_4_blockshear_capacity_member(Tdb, A_vg = None, A_vn = None, A_tg = None
     return member_block_eqn
 
 
-# TODO:DARSHAN I don't think this is required Ans: It's required
 def slenderness_req():
     """
     :return:
@@ -292,6 +290,7 @@ def slenderness_req():
     slenderlimit_eqn.append(NoEscape(r'\begin{aligned}\frac{K L}{r} &\leq 400\end{aligned}'))
 
     return slenderlimit_eqn
+
 
 def cl_7_1_2_effective_slenderness_ratio(K, L, r, slender):
     """
@@ -680,7 +679,8 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
     Calculate maximum end and edge distance(new)
      Args:
 
-         t_fu_fy: Thickness of thinner plate in mm (float)
+         t_fu_fy: List of tuples with thickness fu fy of each connecting member.
+                    ex: [(thickness_plate_1, fu_plate_1, fy_plate_1),(thickness_plate_1, fu_plate_1, fy_plate_1)]
          corrosive_influences: Whether the members are exposed to corrosive influences or not (Boolean)
 
     Returns:
@@ -807,7 +807,6 @@ def cl_10_3_3_bolt_shear_capacity(f_ub, n_n, a_nb, gamma_mb, bolt_shear_capacity
 
     return bolt_shear_eqn
 
-# #TODO:DARSHAN I don't think this is required Ans: User will not require to see code and gives better understanding.
 # def cl_10_3_3_2_large_grip_req():
 #     """
 #      Returns:
@@ -987,10 +986,10 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_cap
     tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n < f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))
-    tension_resistance.append(NoEscape(r'\begin &= 0.90~' + f_ub + '~ ' + A_n + '< ' + f_yb + '~ ' + A_sb + '~(' + gamma_mb + '~/~' + gamma_m0 + ''))
-    tension_resistance.append(NoEscape(r'\begin &= 0.90~' + f_ub + '~ ' + A_n + ''))
+    tension_resistance.append(NoEscape(r'&= 0.90~' + f_ub + r'\times' + A_n + '< ' + f_yb + r'\times' + A_sb + r'\times('+ gamma_mb + '/' + gamma_m0))
+    tension_resistance.append(NoEscape(r'&= 0.90~' + f_ub + '~ ' + A_n + ''))
     tension_resistance.append(NoEscape(r'&= '+ tension_capacity + r'\\'))
-    tension_resistance.append(NoEscape(r'&[Ref.~IS~&800:2007,~Cl.~10.3.5]\end{aligned}'))
+    tension_resistance.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.5]\end{aligned}'))
 
     return tension_resistance
 
@@ -1114,10 +1113,10 @@ def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist
         NoEscape(r'Q &=\frac{'+l_v+r'}{2\times'+l_e+r'}\times\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'&[' + T_e + r'- \frac{'+beta+r' \times' + eta +r'\times' + f_o +r'\times' + b_e +r'\times'+ t+r'^4}{27 \times'+ l_e+r'\times'+ l_v+r'^2}]\\'))
     if Q <= 0.0:
-        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \end{aligned}'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \\'))
     else:
         Q = str(Q)
-        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= ' + Q + r'\end{aligned}'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= ' + Q+r'\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.4.7]\end{aligned}'))
     return tension_in_bolt_due_to_prying
 
@@ -1519,6 +1518,7 @@ def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
         large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
     else:
         large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g \geq 5d~then~V_{rd} = \beta_{lg}~V_{db} \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = 8d/(3d + l_g) \\'))
         large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = 8\times'+ d_str +r'/(3\times'+ d_str +' + '+ lg_str +') ='+Bi+r'\\'))
         if B > beta_lj:
             large_grip_bolted_eqn.append(NoEscape(r'& since,~\beta_{lg} \geq \beta_{lj}~then~\beta_{lg} = \beta_{lj} \\'))

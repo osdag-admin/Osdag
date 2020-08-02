@@ -184,9 +184,9 @@ class Ui_Dialog1(object):
     def save_inputSummary(self, main):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
-        filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
-                                                  file_type)
-        # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
+        # filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
+        #                                           file_type)
+        filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
         # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
         '''
         Uncomment the third QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
@@ -199,6 +199,9 @@ class Ui_Dialog1(object):
 
         if filename == '':
             return
+        # else:
+        #     self.create_pdf_file(filename,main, input_summary)
+        #     self.pdf_file_message(filename)
 
         loading_widget = QDialog(self.module_window)
         window_width = self.module_window.width() / 2
@@ -230,9 +233,9 @@ class Ui_Dialog1(object):
         input_summary['filename'] = fname_no_ext
         input_summary['does_design_exist'] = self.design_exist
         input_summary['logger_messages'] = self.loggermsg
-        self.progress_bar.setValue(30)
+        # self.progress_bar.setValue(30)
         main.save_design(main, input_summary)
-        self.progress_bar.setValue(80)
+        # self.progress_bar.setValue(80)
 
     def pdf_file_message(self, filename):
         fname_no_ext = filename.split(".")[0]

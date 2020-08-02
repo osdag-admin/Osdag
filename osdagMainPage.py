@@ -225,7 +225,7 @@ class ModulePage(QWidget):              # Empty Page with a layout
         super().__init__()
         self.layout=QGridLayout()
         self.setLayout(self.layout)
-        self.layout.setContentsMargins(80,0,0,0)
+        self.layout.setContentsMargins(0,0,0,0)
 
 class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
     def __init__(self,text):

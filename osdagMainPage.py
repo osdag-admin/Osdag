@@ -416,6 +416,7 @@ class OsdagMainWindow(QMainWindow):
     def current_changed(self, index):
         l = list(self.Modules.keys())
         items = list(self.ui.verticalLayout.itemAt(i) for i in range(self.ui.verticalLayout.count()))
+        # print(items,"hfhh")
         for item in range(len(items)):
             if item == index-1:
                 items[item].widget().ui.LP_Button.setStyleSheet('''

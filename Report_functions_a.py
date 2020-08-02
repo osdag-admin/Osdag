@@ -323,7 +323,7 @@ def bolt_capacity_prov(bolt_shear_capacity,bolt_bearing_capacity,bolt_capacity):
     return bolt_capacity_eqn
 
 
-def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_FAB_FIELD):
     """
     Calculate design tensile strength of bearing bolt
     Args:

@@ -53,7 +53,7 @@ class Main():
 
     def weld_values(self, input_dictionary):
 
-        values = {KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}
+        values = {KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}
 
         if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass

@@ -240,8 +240,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.end_distance_max = 0.0
         self.edge_distance_out = 0.0
         self.edge_distance_max = 0.0
-        self.pitch_distance = 0.0
-        self.gauge_distance = 0.0
+        self.pitch_distance_out = 0.0
+        self.gauge_distance_out = 0.0
         self.bp_area_provided = 0.0
 
         self.shear_capacity_anchor = 0.0
@@ -626,11 +626,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t16)
 
         t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
-               self.pitch_distance if flag else '', True)
+               self.pitch_distance_out if flag else '', True)
         out_list.append(t21)
 
         t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
-               self.gauge_distance if flag else '', True)
+               self.gauge_distance_out if flag else '', True)
         out_list.append(t22)
 
         t17 = (KEY_OUT_DETAILING_PROJECTION, KEY_OUT_DISP_DETAILING_PROJECTION, TYPE_TEXTBOX,
@@ -1858,12 +1858,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.edge_distance_out = self.end_distance_out  # mm
 
         # 6.1.3: pitch and gauge distance [Reference: Clause 10.2.2 and 10.2.3.1, IS 800:2007]
-        if self.anchors_outside_flange == 4:
-            self.pitch_distance = 0.0
-            self.gauge_distance = self.pitch_distance
+        if self.anchors_outside_flange == 4 or 6:
+            self.pitch_distance_out = 0.0
+            self.gauge_distance_out = self.pitch_distance_out
         else:
-            self.pitch_distance = self.cl_10_2_2_min_spacing(self.anchor_dia_outside_flange)  # mm
-            self.gauge_distance = self.pitch_distance
+            self.pitch_distance_out = self.cl_10_2_2_min_spacing(self.anchor_dia_outside_flange)  # mm
+            self.gauge_distance_out = self.pitch_distance_out
 
         # 6.2: Inside flange
 
@@ -2391,17 +2391,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.bolt_columns_outside_flange = 2
 
                         # provide pitch and gauge
-                        self.pitch_distance = self.cl_10_2_2_min_spacing(self.anchor_dia_outside_flange)  # mm
-                        self.pitch_distance = 1.5 * self.pitch_distance
+                        self.pitch_distance_out = self.cl_10_2_2_min_spacing(self.anchor_dia_outside_flange)  # mm
+                        self.pitch_distance_out = 1.5 * self.pitch_distance_out
 
-                        if self.pitch_distance < self.plate_washer_dim_out:
-                            self.pitch_distance = self.plate_washer_dim_out
+                        if self.pitch_distance_out < self.plate_washer_dim_out:
+                            self.pitch_distance_out = self.plate_washer_dim_out
 
-                        self.pitch_distance = round_up(self.pitch_distance, 5)
-                        self.gauge_distance = self.pitch_distance
+                        self.pitch_distance_out = round_up(self.pitch_distance_out, 5)
+                        self.gauge_distance_out = self.pitch_distance_out
 
                         # updating the bp dimension
-                        self.bp_length_provided = round_up(self.column_D + (2 * (2 * self.end_distance_out)) + (2 * self.pitch_distance), 5)  # mm
+                        self.bp_length_provided = round_up(self.column_D + (2 * (2 * self.end_distance_out)) + (2 * self.pitch_distance_out), 5)  # mm
                         self.bp_width_provided = round_up((0.85 * self.column_bf) + (2 * (2 * self.edge_distance_out)), 5)  # mm
 
                     # recalculating the parameters for bearing check
@@ -2696,20 +2696,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.bolt_columns_outside_flange = 2
 
                     # provide pitch and gauge
-                    self.pitch_distance = self.cl_10_2_2_min_spacing(self.anchor_dia_provided_outside_flange)  # mm
-                    self.pitch_distance = 1.5 * self.pitch_distance  # pitch increased to accommodate the end plate at the end of anchor inside footing
+                    self.pitch_distance_out = self.cl_10_2_2_min_spacing(self.anchor_dia_provided_outside_flange)  # mm
+                    self.pitch_distance_out = 1.5 * self.pitch_distance_out  # pitch increased to accommodate the end plate at the end of anchor inside footing
 
                     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided_outside_flange)  # outside flange
                     self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
 
-                    if self.pitch_distance < (self.plate_washer_dim_out):
-                        self.pitch_distance = self.pitch_distance
+                    if self.pitch_distance_out < (self.plate_washer_dim_out):
+                        self.pitch_distance_out = self.pitch_distance_out
 
-                    self.pitch_distance = round_up(self.pitch_distance, 5)
-                    self.gauge_distance = self.pitch_distance
+                    self.pitch_distance_out = round_up(self.pitch_distance_out, 5)
+                    self.gauge_distance_out = self.pitch_distance_out
 
                     # updating the bp dimension
-                    self.bp_length_provided = round_up(self.column_D + (2 * (2 * self.end_distance_out)) + (2 * self.pitch_distance), 5)  # mm
+                    self.bp_length_provided = round_up(self.column_D + (2 * (2 * self.end_distance_out)) + (2 * self.pitch_distance_out), 5)  # mm
                     self.bp_width_provided = round_up((0.85 * self.column_bf) + (2 * (2 * self.edge_distance_out)), 5)  # mm
 
                 # recalculating the parameters with updated dimensions
@@ -2863,7 +2863,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite_out, self.plate_thk,
                                                                             self.anchor_dia_provided_outside_flange, self.end_distance_out,
-                                                                            self.pitch_distance, self.dp_anchor_hole_out, self.dp_weld_fab)
+                                                                            self.pitch_distance_out, self.dp_anchor_hole_out, self.dp_weld_fab)
         self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
 
         self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)  # kN
@@ -2959,7 +2959,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     #         self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite,
                     #                                                                             self.plate_thk,
                     #                                                                             self.anchor_dia_provided_outside_flange, self.end_distance_out,
-                    #                                                                             self.pitch_distance, self.dp_anchor_hole_out,
+                    #                                                                             self.pitch_distance_out, self.dp_anchor_hole_out,
                     #                                                                             self.dp_weld_fab)
                     #         self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
                     #
@@ -3011,7 +3011,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     #                                                                                         self.plate_thk,
                     #                                                                                         self.anchor_dia_provided_outside_flange,
                     #                                                                                         self.end_distance_out,
-                    #                                                                                         self.pitch_distance,
+                    #                                                                                         self.pitch_distance_out,
                     #                                                                                         self.dp_anchor_hole_out,
                     #                                                                                         self.dp_weld_fab)
                     #                     self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
@@ -4655,8 +4655,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.end_distance_out)  # End Distance (mm)
         print(self.edge_distance_out)  # Edge Distance (mm)
 
-        print(self.pitch_distance)  # Pitch Distance (mm)
-        print(self.gauge_distance)  # Gauge Distance (mm)
+        print(self.pitch_distance_out)  # Pitch Distance (mm)
+        print(self.gauge_distance_out)  # Gauge Distance (mm)
 
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
             print(self.projection)  # Effective Projection (mm)

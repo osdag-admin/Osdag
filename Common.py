@@ -416,9 +416,15 @@ KEY_DISP_TOPANGLE_LIST = 'Top Angle List'
 
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
-KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+KEY_ANCHOR_OCF = 'Anchor Bolt.OCF'
+KEY_DISP_ANCHOR_OCF = 'Outside Column Flange'
+KEY_ANCHOR_ICF = 'Anchor Bolt.ICF'
+KEY_DISP_ANCHOR_ICF = 'Inside Column Flange'
+KEY_DIA_ANCHOR_OCF = 'Anchor Bolt.OCF.Diameter'
+KEY_DIA_ANCHOR_ICF = 'Anchor Bolt.ICF.Diameter'
 KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
-KEY_GRD_ANCHOR = 'Anchor Bolt.Grade'
+KEY_GRD_ANCHOR_OCF = 'Anchor Bolt.OCF.Grade'
+KEY_GRD_ANCHOR_ICF = 'Anchor Bolt.ICF.Grade'
 KEY_GRD_FOOTING = 'Footing.Grade'
 
 
@@ -620,7 +626,7 @@ KEY_DISP_END_DIST_FLANGE = 'End Distance'
 KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange Plate Tension Capacity (kN)"
 DISP_TITLE_SECTION = 'Section Details'
 DISP_TITLE_TENSION_SECTION = 'Section Details'
 SECTION_CLASSIFICATION ="Section Classification"
@@ -825,19 +831,25 @@ KEY_OUT_DISP_SHEAR_KEY_STRESS = 'Stress (N/mm2)'
 # KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 
-KEY_DP_ANCHOR_BOLT_DESIGNATION = 'DesignPreferences.Anchor_Bolt.Designation'
-KEY_DP_ANCHOR_BOLT_TYPE = 'DesignPreferences.Anchor_Bolt.Type'
+KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Designation'
+KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Designation'
+KEY_DP_ANCHOR_BOLT_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Type'
+KEY_DP_ANCHOR_BOLT_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Type'
 KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor Bolt type'
-KEY_DP_ANCHOR_BOLT_HOLE_TYPE = 'DesignPreferences.Anchor_Bolt.Bolt_Hole_Type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type'
 KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor Bolt hole type'
-KEY_DP_ANCHOR_BOLT_MATERIAL_G_O = 'DesignPreferences.Anchor_Bolt.Material_Grade_OverWrite'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite'
 KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
 KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
-KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
+KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Galvanized'
+KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Galvanized'
 KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Anchor bolt galvanized?'
-KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
+KEY_DP_ANCHOR_BOLT_LENGTH_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Length'
+KEY_DP_ANCHOR_BOLT_LENGTH_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Length'
 KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
 KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
@@ -892,11 +904,11 @@ KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
 
 KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
-KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
-KEY_DP_WELD_FAB_FIELD = 'Field weld'
-KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
+KEY_DP_FAB_SHOP = 'Shop Weld'
+KEY_DP_FAB_FIELD = 'Field weld'
+KEY_DP_WELD_FAB_VALUES = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD]
 
-KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite, Fu (MPa)'
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
@@ -1013,7 +1025,7 @@ KEY_SLENDER = "Member.Slenderness"
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 KEY_OUT_FLANGESPLATE_THICKNESS = 'flange_plate.Thickness'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Flange Plate Thickness'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
@@ -1140,12 +1152,26 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+# FLANGE AND WEB -REDUCTION FACTOR
+KEY_REDUCTION_FACTOR_LONG_FLANGE ='flange_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
 
-KEY_REDUCTION_LONG_JOINT ='bolt.long_joint'
+KEY_REDUCTION_FACTOR_LONG_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_LONG_WEB ="Long Joint Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_WEB = 'web_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_WEB = "Large Grip Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_FLANGE = 'flange_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_FLANGE = "Large Grip Red.Factor"
+
+# COMMON -REDUCTION FACTOR
+KEY_REDUCTION_LONG_JOINT ="bolt.long_joint"
 KEY_DISP_REDUCTION_LONG_JOINT ="Long Joint Red.Factor"
 
-KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
+KEY_REDUCTION_LARGE_GRIP ="bolt.large_grip"
 KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
+
 
 
 KEY_DISP_REDUCTION ="Strength Red.Factor"
@@ -1193,7 +1219,7 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Width'
 KEY_OUT_WEBPLATE_THICKNESS = 'Web_Plate.Thickness'
-KEY_DISP_WEBPLATE_THICKNESS = 'Web Plate Thickness'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)'
 KEY_DISP_WEB_PLATE_LENGTH ='Width (mm)'
 DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
 KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'

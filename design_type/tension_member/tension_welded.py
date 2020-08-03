@@ -500,6 +500,7 @@ class Tension_welded(Member):
         t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
         out_list.append(t10)
 
+
         t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION_LONG_JOINT, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
         out_list.append(t5)
 
@@ -1964,9 +1965,9 @@ class Tension_welded(Member):
                                                        T_dg=member_yield_kn,multiple=multiple,area=section_size.area), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                  member_rupture_prov(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w,
-                                      self.b_s, self.t, gamma_m0, gamma_m1, section_size.beta, member_rupture_kn,
-                                      multiple), '')
+                  cl_6_3_3_tension_rupture_member(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w,
+                                                  self.b_s, self.t, gamma_m0, gamma_m1, section_size.beta, member_rupture_kn,
+                                                  multiple), '')
             self.report_check.append(t3)
             # t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=member_blockshear_kn), '')
             # self.report_check.append(t4)

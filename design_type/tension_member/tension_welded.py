@@ -1894,6 +1894,7 @@ class Tension_welded(Member):
              "Selected Section Details": self.report_supporting,
              # "Supported Section Details": "TITLE",
              # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE: str(self.sizelist),
              "Plate Details": "TITLE",
              "Plate Thickness (mm)*": str(self.plate.thickness),

@@ -1924,8 +1924,8 @@ class Tension_bolted(Member):
                         round(self.res_force / 1000, 2)))
             else:
                 pass
-            logger.info(": Overall bolted tension member design is safe. \n")
-            logger.debug(" :=========End Of design===========")
+            logger.info("Overall bolted tension member design is safe. \n")
+            logger.debug("=========End Of design===========")
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                 self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
                                            material_grade=self.material,
@@ -2156,8 +2156,8 @@ class Tension_bolted(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation,self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_DISP_FU: round(section_size.fu,2),
-                                      KEY_DISP_FY: round(section_size.fy,2),
+                                      'Section ultimate strength, fu (MPa)': round(section_size.fu,2),
+                                      'Section yield strength, fy (MPa)': round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
                                       'Area(mm2) - Ag': round(section_size.area,2),
                                       'D(mm)': round(section_size.depth,2),
@@ -2186,8 +2186,8 @@ class Tension_bolted(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation, self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_DISP_FU: round(section_size.fu, 2),
-                                      KEY_DISP_FY: round(section_size.fy, 2),
+                                      'Section ultimate strength, fu (MPa)': round(section_size.fu, 2),
+                                      'Section yield strength, fy (MPa)': round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round(section_size.area, 2),
                                       'D(mm)': round(section_size.depth, 2),
@@ -2215,8 +2215,8 @@ class Tension_bolted(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation,self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_DISP_FU: round(section_size.fu,2),
-                                      KEY_DISP_FY: round(section_size.fy,2),
+                                      'Section ultimate strength, fu (MPa)': round(section_size.fu,2),
+                                      'Section yield strength, fy (MPa)': round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
                                       'Area(mm2) - Ag': round((section_size.area),2),
                                       'A(mm)': round(section_size.max_leg,2),
@@ -2256,8 +2256,8 @@ class Tension_bolted(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation,self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_DISP_FU: round(section_size.fu,2),
-                                      KEY_DISP_FY: round(section_size.fy,2),
+                                      'Section ultimate strength, fu (MPa)': round(section_size.fu,2),
+                                      'Section yield strength, fy (MPa)': round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
                                       'Area(mm2) - Ag': round((section_size.area),2),
                                       'A(mm)': round(section_size.max_leg,2),
@@ -2291,8 +2291,8 @@ class Tension_bolted(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation, self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_DISP_FU: round(section_size.fu, 2),
-                                      KEY_DISP_FY: round(section_size.fy, 2),
+                                      'Section ultimate strength, fu (MPa)': round(section_size.fu, 2),
+                                      'Section yield strength, fy (MPa)': round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
                                       'A(mm)': round(section_size.max_leg, 2),
@@ -2326,7 +2326,11 @@ class Tension_bolted(Member):
              "Selected Section Details":self.report_supporting,
              # "Supported Section Details": "TITLE",
              # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE : str(self.sizelist),
+             "Section material": section_size.material,
+             'Section ultimate strength, fu (MPa)': round(section_size.fu, 2),
+             'Section yield strength, fy (MPa)': round(section_size.fy, 2),
              "Bolt Details": "TITLE",
 
              KEY_DISP_D: str(self.bolt.bolt_diameter),
@@ -2434,7 +2438,7 @@ class Tension_bolted(Member):
                                                                                            f_y=section_size.fy,
                                                                                            gamma=gamma_m0, T_dg=member_yield_kn,
                                                                                            multiple =multiple,
-                                                                                           area=section_size.area), '')
+                                                                                           area=round(section_size.area,2)), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,section_size.fu, section_size.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,section_size.beta,member_rupture_kn,multiple), '')
             self.report_check.append(t3)

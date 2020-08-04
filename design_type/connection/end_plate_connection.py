@@ -310,49 +310,62 @@ class EndPlateConnection(ShearConnection):
         self.member_capacity(self)
 
     def member_capacity(self):
-        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
-        if self.connectivity in VALUES_CONN_1:
-            if self.supported_section.type == "Rolled":
-                self.supported_section.length = self.supported_section.depth
+        super(EndPlateConnection, self).member_capacity(self)
+        if self.connectivity == VALUES_CONN_2[0]:
+            if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
+                    self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force:
+
+                if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                                40.0):
+                    logger.warning(" : User input for shear force is very less compared to section capacity. "
+                                   "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                    self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                                40.0)
+
+                print("preliminary member check is satisfactory. Checking available Bolt Diameters")
+                self.select_bolt_plate_arrangement(self)
+
             else:
-                self.supported_section.length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
+                self.design_status = False
+                if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
+                    logger.error(" : Shear yielding capacity of supported section, {} kN is less "
+                                 "than shear force, Please select larger sections or decrease loads"
+                                 .format(round(self.supported_section.shear_yielding_capacity/1000, 2)))
+                else:  # self.supported_section.tension_yielding_capacity / 1000 < self.load.axial_force:
+                    logger.error(" : Tension yielding capacity of supported section, {} kN is less "
+                                 "than axial force, Please select larger sections or decrease loads"
+                                 .format(round(self.supported_section.tension_yielding_capacity/1000, 2)))
+                print("failed in preliminary member checks. Select larger sections or decrease loads")
         else:
-            self.supported_section.notch_ht = round_up(self.supporting_section.flange_thickness + self.supporting_section.root_radius + 5, 5)
-            # length = self.supported_section.depth - self.supported_section.notch_ht
-            if self.supported_section.type == "Rolled":
-                self.supported_section.length = self.supported_section.depth - self.supported_section.notch_ht
+            if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
+                    self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force and \
+                    self.supporting_section.tension_yielding_capacity / 1000 > self.load.shear_force:
+
+                if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                                40.0):
+                    logger.warning(" : User input for shear force is very less compared to section capacity. "
+                                   "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                    self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                                40.0)
+
+                print("preliminary member check is satisfactory. Checking available Bolt Diameters")
+                self.select_bolt_plate_arrangement(self)
+
             else:
-                self.supported_section.length = self.supported_section.depth - (self.supported_section.flange_thickness + self.supported_section.notch_ht)    # -(2*self.supported_section.root_radius)
-
-            # length = self.supported_section.depth - round_up((2*self.supporting_section.flange_thickness),5)  # TODO: Subtract notch height for beam-beam connection
-
-        # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        self.supported_section.shear_yielding_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
-            self.supported_section.length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
-        self.supported_section.shear_capacity = self.supported_section.shear_yielding_capacity
-        # self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        self.supported_section.tension_yielding_capacity = round(IS800_2007.cl_6_2_tension_yielding_strength(
-            self.supported_section.length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
-        self.supported_section.tension_capacity = self.supported_section.tension_yielding_capacity
-        if self.load.shear_force <= min(0.15 * self.supported_section.shear_yielding_capacity, 40.0):
-            logger.warning(" : User input for shear force is very less compared to section capacity. "
-                "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
-            self.load.shear_force = min(0.15 * self.supported_section.shear_yielding_capacity, 40.0)
-
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
-                self.supported_section.tension_yielding_capacity > self.load.axial_force:
-            print("preliminary member check is satisfactory. Doing bolt checks")
-            self.supported_section.design_status = True
-            self.design_status = True
-            self.select_bolt_plate_arrangement(self)
-        else:
-            self.supported_section.design_status = False
-            self.design_status = False
-            logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
-                           "than applied loads, Please select larger sections or decrease loads"
-                            .format(self.supported_section.shear_yielding_capacity,
-                                    self.supported_section.tension_yielding_capacity))
-            print("failed in preliminary member checks. Select larger sections or decrease loads")
+                self.design_status = False
+                if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
+                    logger.error(" : Shear yielding capacity of supported section, {} kN is less "
+                                 "than shear force, Please select larger sections or decrease loads"
+                                 .format(round(self.supported_section.shear_yielding_capacity / 1000, 2)))
+                if self.supported_section.tension_yielding_capacity / 1000 < self.load.axial_force:
+                    logger.error(" : Tension yielding capacity of supported section, {} kN is less "
+                                 "than axial force, Please select larger sections or decrease loads"
+                                 .format(round(self.supported_section.tension_yielding_capacity / 1000, 2)))
+                if self.supporting_section.tension_yielding_capacity / 1000 < self.load.shear_force:
+                    logger.error(" : Axial yielding capacity of supporting section, {} kN is less "
+                                 "than shear force, Please select larger sections or decrease loads"
+                                 .format(round(self.supporting_section.tension_yielding_capacity / 1000, 2)))
+                print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_bolt_plate_arrangement(self):
         self.output = []

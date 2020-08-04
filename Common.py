@@ -507,7 +507,7 @@ VALUES_PRIBM = connectdb("Beams")
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
 
-KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (kN)'
+KEY_DISP_SHEAR_YLD = 'Shear yielding Capacity (kN)'
 KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (kN)'
@@ -516,9 +516,9 @@ KEY_DISP_BEARING_LENGTH = 'Bearing Length'
 KEY_DISP_ALLOW_SHEAR = 'Allowable Shear Capacity (kN)'
 DISP_LOWSHEAR = 'Limited to low shear capacity'
 
-KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
-KEY_DISP_MOM_DEMAND = 'Moment Demand'
-KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
+KEY_DISP_BLK_SHEAR = 'Block Shear Capacity (kN)'
+KEY_DISP_MOM_DEMAND = 'Moment Demand (kN-m)'
+KEY_DISP_MOM_CAPACITY = 'Moment Capacity (kN-m)'
 DISP_MIN_PITCH = 'Min. pitch (mm)'
 DISP_MAX_PITCH = 'Max. pitch (mm)'
 DISP_MIN_GAUGE = 'Min. gauge (mm)'
@@ -1656,7 +1656,7 @@ KEY_OUT_CLEAT_SPTINGLEG = 'Cleat.SupportingLength'
 KEY_OUT_DISP_CLEAT_SPTINGLEG = 'Length (mm)'
 
 KEY_OUT_CLEAT_SHEAR = 'Cleat.Shear'
-
+KEY_OUT_DISP_CLEAT_SHEAR = 'Shear '
 KEY_OUT_CLEAT_BLK_SHEAR = 'Cleat.BlockShear'
 
 KEY_OUT_CLEAT_MOM_DEMAND = 'Cleat.MomDemand'

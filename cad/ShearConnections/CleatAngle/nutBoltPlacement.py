@@ -71,12 +71,12 @@ class NutBoltArray():
             self.cNuts1.append(Nut(n.R, n.T, n.H, n.r1))
         
     def init_bolt_place_params(self, bolt_place_obj):
-        self.pitch = bolt_place_obj.gauge_spting
-        self.gauge = bolt_place_obj.pitch_spting
-        self.edge = bolt_place_obj.edge_spting
-        self.end = bolt_place_obj.end_spting
-        self.row = bolt_place_obj.bolt_one_line_spting
-        self.col = bolt_place_obj.bolt_lines_spting
+        self.pitch = bolt_place_obj.gauge_sptd
+        self.gauge = bolt_place_obj.pitch_sptd
+        self.edge = bolt_place_obj.edge_sptd
+        self.end = bolt_place_obj.end_sptd
+        self.row = bolt_place_obj.bolt_one_line_sptd
+        self.col = bolt_place_obj.bolt_lines_sptd
 
 
 # ########changes have been made after 3d is integreted with main files####

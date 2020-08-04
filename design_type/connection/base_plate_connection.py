@@ -1738,6 +1738,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.moment_on_stiffener_across_web = 0
         self.moment_capa_stiffener_across_web = 0
 
+        self.plate_thk = 0
+        self.shear_key_thk = self.plate_thk
+
         self.bp_analyses_parameters(self)
         print('bp_analyses_parameters done')
         self.bp_analyses(self)

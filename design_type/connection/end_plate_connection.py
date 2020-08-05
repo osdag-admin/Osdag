@@ -1361,12 +1361,12 @@ class EndPlateConnection(ShearConnection):
         self.report_check.append(t1)
 
         a = self.supported_section
-        h = a.length
+        h = a.web_height
         t = a.web_thickness
 
         t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
-              cl_8_4_shear_yielding_capacity_member(h, t, a.fy, gamma_m0, a.shear_capacity),
-              get_pass_fail(self.load.shear_force, a.shear_capacity, relation="lesser"))
+              cl_8_4_shear_yielding_capacity_member(h, t, a.fy, gamma_m0, a.shear_yielding_capacity),
+              get_pass_fail(self.load.shear_force, a.shear_yielding_capacity, relation="lesser"))
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force,
@@ -1384,7 +1384,7 @@ class EndPlateConnection(ShearConnection):
             self.report_check.append(t1)
 
         if self.supported_section.design_status is True and self.design_status_plate_tk is True:
-            t1 = ('SubSection', 'Bolt Design Checks', '|p{3cm}|p{5cm}|p{6.3cm}|p{1.2cm}|')
+            t1 = ('SubSection', 'Bolt Design Checks', '|p{3cm}|p{5.5cm}|p{6.3cm}|p{1.2cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
@@ -1644,7 +1644,7 @@ class EndPlateConnection(ShearConnection):
                 weld_conn_plates_fu = [self.plate.fu, self.supported_section.fu, self.weld.fu]
                 weld_conn_plates_tk = [self.plate.thickness_provided,self.supported_section.web_thickness]
                 [available_welds,weld_min,weld_max] = self.get_available_welds(self,weld_conn_plates_tk)
-                t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{5.5cm}|p{4.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(weld_conn_plates_tk, weld_min),

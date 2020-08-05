@@ -792,7 +792,10 @@ class Plate(Material):
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required
                                                 , min_edge_dist, min_gauge, min_bolts_one_line, min_bolt_line)
         count = 0
-
+        if min_end_dist == 0.0:
+            end_dist = min_edge_dist
+        else:
+            end_dist = min_end_dist
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
             self.bolt_line = min_bolt_line
@@ -801,8 +804,8 @@ class Plate(Material):
             self.pitch_provided = min_gauge
             self.gauge_provided = min_gauge
             self.edge_dist_provided = min_edge_dist
-            self.end_dist_provided = min_edge_dist
-            self.length = gap + self.edge_dist_provided * 2 + self.gauge_provided * (self.bolt_line - 1)
+            self.end_dist_provided = end_dist
+            self.length = gap + self.end_dist_provided * 2 + self.pitch_provided * (self.bolt_line - 1)
             self.height = self.get_web_plate_h_req(self.bolts_one_line, self.gauge_provided , self.edge_dist_provided)
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
@@ -820,10 +823,7 @@ class Plate(Material):
                 pitch = min_pitch
             else:
                 pitch = min_gauge
-            if min_end_dist ==0.0:
-                end_dist = min_edge_dist
-            else:
-                end_dist = min_end_dist
+
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated

@@ -986,8 +986,8 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_cap
     tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n < f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))
-    tension_resistance.append(NoEscape(r'&= 0.90~' + f_ub + r'\times' + A_n + '< ' + f_yb + r'\times' + A_sb + r'\times('+ gamma_mb + '/' + gamma_m0))
-    tension_resistance.append(NoEscape(r'&= 0.90~' + f_ub + '~ ' + A_n + ''))
+    tension_resistance.append(NoEscape(r'&= 0.90~'+ r'\times' + f_ub + r'\times' + A_n + '< ' + f_yb + r'\times' + A_sb + r'\times('+ gamma_mb + '/' + gamma_m0 + r')\\'))
+    tension_resistance.append(NoEscape(r'&= 0.90~'+ r'\times' + f_ub + r'\times' + A_n + r'\\'))
     tension_resistance.append(NoEscape(r'&= '+ tension_capacity + r'\\'))
     tension_resistance.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.5]\end{aligned}'))
 
@@ -1015,10 +1015,10 @@ def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db, val
     value = str(value)
 
     combined_capacity_eqn = Math(inline=True)
-    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sb}}{V_{db}}\bigg)^2 + \bigg(\frac{T_{b}}{T_{db}}\bigg)^2  \leq 1.0\\'))
-    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sb + '}{' + V_db + r'}\bigg)^2 + \bigg(\frac{' + T_b + '}{' + T_db + r'}\bigg)^2 = '
-                                          + value + ''))
-    combined_capacity_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.6]&\end{aligned}'))
+    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sb}}{V_{db}}\bigg)^2 + \bigg(\frac{T_{b}}{T_{db}}\bigg)^2  &\leq 1.0\\'))
+    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sb + '}{' + V_db + r'}\bigg)^2 + \bigg(\frac{' + T_b + '}{' + T_db + r'}\bigg)^2 &= '
+                                          + value + r'\\'))
+    combined_capacity_eqn.append(NoEscape(r'[Ref.~IS~800:2007,~Cl.~10.3.6]\end{aligned}'))
 
     return combined_capacity_eqn
 

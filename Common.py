@@ -1354,6 +1354,8 @@ KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
 KEY_OUT_BOLT_IR_DETAILS = 'Bolt.IRDetails'
+KEY_OUT_BOLT_IR_DETAILS_SPTD = 'Bolt.IRDetails_sptd'
+KEY_OUT_BOLT_IR_DETAILS_SPTING = 'Bolt.IRDetails_spting'
 KEY_OUT_DISP_BOLT_IR_DETAILS = 'Capacity Details'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
@@ -1367,6 +1369,8 @@ KEY_OUT_BETA_PK = 'Bolt.Betapk'
 KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
+KEY_OUT_BOLT_CAPACITY_SPTD = 'Bolt.Capacity_sptd'
+KEY_OUT_BOLT_CAPACITY_SPTING = 'Bolt.Capacity_spting'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (kN)'
 KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force (kN)'
@@ -1388,7 +1392,7 @@ KEY_OUT_PACKING_PLATE = 'Packing plate reduction factor'
 KEY_OUT_BOLT_CAPACITY_REDUCED = 'Bolt Capacity post reduction factors (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
-KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
+KEY_OUT_DISP_BOLT_LINE = 'Bolt Columns (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
 KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
@@ -1396,7 +1400,7 @@ KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolt Rows (nos)'
 KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
 KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(nos)'
 
@@ -1422,6 +1426,10 @@ KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
 KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+KEY_OUT_GAUGE1 = 'Bolt.Gauge1'
+KEY_OUT_DISP_GAUGE1 = 'Gauge 1 (mm)'
+KEY_OUT_GAUGE2 = 'Bolt.Gauge2'
+KEY_OUT_DISP_GAUGE2 = 'Gauge 2 (mm)'
 KEY_OUT_GAUGE_CENTRAL = 'Bolt.GaugeCentral'
 KEY_OUT_DISP_GAUGE_CENTRAL = 'Central Gauge (mm)'
 
@@ -1641,11 +1649,11 @@ KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 KEY_OUT_WELD_STRENGTH_RED = 'Weld.Strength_red'
 KEY_OUT_DISP_WELD_STRENGTH_RED = 'Red.Strength (N/mm)'
 
-DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
-DISP_OUT_TITLE_SPTINGLEG = "Supporting Leg"
+DISP_OUT_TITLE_SPTDLEG = "Bolts on Supported Leg"
+DISP_OUT_TITLE_SPTINGLEG = "Bolts on Supporting Leg"
 DISP_OUT_TITLE_CLEAT = "Cleat Angle"
 KEY_OUT_CLEAT_SECTION = "Cleat.Angle"
-KEY_OUT_DISP_CLEAT_SECTION = "Cleat Angle"
+KEY_OUT_DISP_CLEAT_SECTION = "Cleat Angle Designation"
 KEY_OUT_CLEATTHK = 'Plate.Thickness'
 KEY_OUT_DISP_CLEATTHK = 'Thickness (mm)'
 KEY_OUT_CLEAT_HEIGHT = 'Plate.Height'

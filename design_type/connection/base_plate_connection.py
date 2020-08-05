@@ -4777,15 +4777,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             print(self.weld_size_shear_key)
         else:
             print(self.shear_key_along_ColDepth)
-            self.shear_key_len_ColDepth = 'N/A'
-            self.shear_key_depth_ColDepth = 'N/A'
-            self.shear_key_stress_ColDepth = 'N/A'
+            # self.shear_key_len_ColDepth = 'N/A'
+            # self.shear_key_depth_ColDepth = 'N/A'
+            # self.shear_key_stress_ColDepth = 'N/A'
+            #
+            # print(self.shear_key_along_ColWidth)
+            # self.shear_key_len_ColWidth = 'N/A'
+            # self.shear_key_depth_ColWidth = 'N/A'
+            # self.shear_key_stress_ColWidth = 'N/A'
+            # print(self.weld_size_shear_key)
+            self.shear_key_len_ColDepth = 0
+            self.shear_key_depth_ColDepth = 0
+            self.shear_key_stress_ColDepth = 0
 
             print(self.shear_key_along_ColWidth)
-            self.shear_key_len_ColWidth = 'N/A'
-            self.shear_key_depth_ColWidth = 'N/A'
-            self.shear_key_stress_ColWidth = 'N/A'
-            print(self.weld_size_shear_key)
+            self.shear_key_len_ColWidth = 0
+            self.shear_key_depth_ColWidth = 0
+            self.shear_key_stress_ColWidth = 0
+            # print(self.weld_size_shear_key)
 
         print("Shear key details end")
 

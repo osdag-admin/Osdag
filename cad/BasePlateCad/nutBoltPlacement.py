@@ -137,14 +137,15 @@ class NutBoltArray():
         self.pitch = self.BP.bp_length_provided - 2 * self.enddist
         self.gauge = self.BP.bp_width_provided - 2 * self.edgedist
 
-        self.pitch1 = self.BP.pitch_distance
-        self.gauge1 = self.BP.gauge_distance
+        self.pitch1 = self.BP.pitch_distance_out
+        self.gauge1 = self.BP.gauge_distance_out
 
         if self.BP.load_axial_tension > 0:
             self.enddist_in = self.BP.end_distance_in
             self.edgedist_in = self.BP.edge_distance_in
-            self.pitch_in = self.BP.pitch_distance_in
-            self.gauge_in = self.BP.gauge_distance_in
+            if self.BP.anchors_inside_flange == 8:
+                self.pitch_in = self.BP.pitch_distance_in
+                self.gauge_in = self.BP.gauge_distance_in
 
         if self.BP.connectivity != 'Hollow/Tubular Column Base':
             if self.BP.stiffener_across_web != 'Yes':

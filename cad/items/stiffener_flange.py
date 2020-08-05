@@ -10,7 +10,7 @@ class Stiffener_flange(object):
         self.L = L
         self.T = T
         self.t = t_f
-        self.t_l = (T - t_f) * 5  #length of the cut
+        self.t_l = (T - t_f) * 5 + 0.001  #length of the cut
         self.L_h = L_h
         self.L_v = L_v
         self.to_left = to_left
@@ -39,7 +39,7 @@ class Stiffener_flange(object):
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5]
 
         self.b1 = self.sec_origin
-        self.b2 = self.sec_origin + (self.T - self.t) * self.vDir - 0.01 * self.vDir
+        self.b2 = self.sec_origin + (self.T - self.t) * self.vDir - 0.001 * self.vDir
         self.b3 = self.sec_origin + self.t_l * self.uDir
         self.points2 = [self.b1, self.b2, self.b3] 
 

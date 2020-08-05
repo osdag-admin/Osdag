@@ -205,8 +205,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.plate_washer_thk = 1
         self.nut_thk = 1
         self.anchor_length_min_out = 0.001
+        self.anchor_length_max_out = 0.001
         self.anchor_length_min_in = 0.001
+        self.anchor_length_max_in = 0.001
         self.plate_washer_details_out = {}
+        self.plate_washer_dim_out = {}
         self.plate_washer_details_in = {}
         self.nut_thk_out = 0.001
         self.nut_thk_in = 0.001
@@ -237,6 +240,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bp_length_provided = 0.0
         self.bp_width_provided = 0.0
         self.end_distance_out = 0.0
+        self.edge_distance_out = self.end_distance_out
+        self.end_distance_in = 0.0
+        self.edge_distance_in = self.end_distance_in
+        self.pitch_distance_in = 0.0
+        self.gauge_distance_in = self.pitch_distance_in
         self.end_distance_max = 0.0
         self.edge_distance_out = 0.0
         self.edge_distance_max = 0.0
@@ -2175,7 +2183,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     self.end_distance_out = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole_out, self.dp_detail_edge_type)
 
-                    if self.end_distance_out < (self.plate_washer_dim_out):
+                    if self.end_distance_out < self.plate_washer_dim_out:
                         self.end_distance_out = self.plate_washer_dim_out
 
                     self.edge_distance_out = self.end_distance_out
@@ -2215,7 +2223,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.end_distance_out = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole_out,
                                                                                    self.dp_detail_edge_type)
 
-                            if self.end_distance_out < (self.plate_washer_dim_out):
+                            if self.end_distance_out < self.plate_washer_dim_out:
                                 self.end_distance_out = self.plate_washer_dim_out
 
                             self.edge_distance_out = self.end_distance_out
@@ -2299,7 +2307,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     self.end_distance_out = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole_out, self.dp_detail_edge_type)
 
-                    if self.end_distance_out < (self.plate_washer_dim_out):
+                    if self.end_distance_out < self.plate_washer_dim_out:
                         self.end_distance_out = self.plate_washer_dim_out
 
                     self.edge_distance_out = self.end_distance_out
@@ -2340,7 +2348,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.end_distance_out = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole_out,
                                                                                    self.dp_detail_edge_type)
 
-                            if self.end_distance_out < (self.plate_washer_dim_out):
+                            if self.end_distance_out < self.plate_washer_dim_out:
                                 self.end_distance_out = self.plate_washer_dim_out
 
                             self.edge_distance_out = self.end_distance_out
@@ -2377,7 +2385,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided_outside_flange)  # outside flange
                     self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
 
-                    if self.end_distance_out < (self.plate_washer_dim_out):
+                    if self.end_distance_out < self.plate_washer_dim_out:
                         self.end_distance_out = self.plate_washer_dim_out
 
                     self.edge_distance_out = self.end_distance_out
@@ -2543,7 +2551,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided_outside_flange)  # outside flange
                             self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
 
-                            if self.end_distance_out < (self.plate_washer_dim_out):
+                            if self.end_distance_out < self.plate_washer_dim_out:
                                 self.end_distance_out = self.plate_washer_dim_out
 
                             self.edge_distance_out = self.end_distance_out
@@ -2656,7 +2664,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided_outside_flange)  # outside flange
                             self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
 
-                            if self.end_distance_out < (self.plate_washer_dim_out):
+                            if self.end_distance_out < self.plate_washer_dim_out:
                                 self.end_distance_out = self.plate_washer_dim_out
 
                             self.edge_distance_out = self.end_distance_out
@@ -2705,7 +2713,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided_outside_flange)  # outside flange
                     self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
 
-                    if self.pitch_distance_out < (self.plate_washer_dim_out):
+                    if self.pitch_distance_out < self.plate_washer_dim_out:
                         self.pitch_distance_out = self.pitch_distance_out
 
                     self.pitch_distance_out = round_up(self.pitch_distance_out, 5)

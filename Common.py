@@ -289,6 +289,7 @@ class MaterialValidator(object):
 # Type Keys (Type of input field, tab type etc.)
 ###########################
 TYPE_COMBOBOX = 'ComboBox'
+TYPE_COMBOBOX_FREEZE = 'Disable_ComboBoc'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'

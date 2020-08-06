@@ -2093,6 +2093,7 @@ class HollowSection(Material):
         self.plast_sec_mod_y = row[14] * 1000  # mm^3
         self.root_radius = 0.0
         self.toe_radius = 0.0
+        self.flange_slope = 'N/A'
         self.source = row[15]  # IS 4923:1997
         conn.close()
 
@@ -2135,6 +2136,7 @@ class CHS(Material):
         self.mom_inertia = row[10]  # cm^4/m
         self.elast_sec_mod = row[11] * 1000  # mm^3
         self.rad_of_gy = row[12] * 10  # mm
+        self.flange_slope = 'N/A'
         self.source = row[14]  # IS 1161:2014
 
         conn.close()

@@ -1769,8 +1769,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print('design_stiffeners done')
         self.additional_calculations(self)
         print('additional_calculations done')
-        self.save_design(self)
-        print('save_design done')
+        # self.save_design(self)
+        # print('save_design done')
 
     def bp_analyses_parameters(self):
         """ initialize detailing parameters like the end/edge/pitch/gauge distances, anchor bolt diameter and grade,

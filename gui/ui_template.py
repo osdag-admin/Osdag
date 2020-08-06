@@ -340,7 +340,7 @@ class Window(QMainWindow):
         self.thread_1.start()
         self.thread_2 = DummyThread(0.00001, self)
         self.thread_1.finished.connect(lambda: loading_widget.exec())
-        self.thread_1.finished.connect(lambda: self.progress_bar.setValue(10))
+        # self.thread_1.finished.connect(lambda: self.progress_bar.setValue(10))
         self.thread_1.finished.connect(lambda: self.thread_2.start())
         self.thread_2.finished.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.thread_2.finished.connect(lambda: loading_widget.close())
@@ -1118,8 +1118,8 @@ class Window(QMainWindow):
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
-        self.btn_Design.clicked.connect(lambda: self.start_loadingWindow(main, data))
-        # self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
+        # self.btn_Design.clicked.connect(lambda: self.start_loadingWindow(main, data))
+        self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         self.actionChange_background.triggered.connect(self.showColorDialog)
@@ -1795,7 +1795,7 @@ class Window(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            self.progress_bar.setValue(50)
+            # self.progress_bar.setValue(50)
             self.output_title_change(main)
 
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
@@ -1821,7 +1821,7 @@ class Window(QMainWindow):
             with open(str(last_design_file), 'w') as last_design:
                 yaml.dump(self.design_inputs, last_design)
             self.design_inputs.pop("out_titles_status")
-            self.progress_bar.setValue(60)
+            # self.progress_bar.setValue(60)
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
@@ -1832,7 +1832,7 @@ class Window(QMainWindow):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
-                self.progress_bar.setValue(80)
+                # self.progress_bar.setValue(80)
                 self.commLogicObj.call_3DModel(status, module_class)
                 self.display_x = 90
                 self.display_y = 90
@@ -1866,7 +1866,7 @@ class Window(QMainWindow):
                 for action in self.menugraphics_component_list:
                     action.setEnabled(False)
 
-            self.progress_bar.setValue(100)
+            # self.progress_bar.setValue(100)
 
 
     def retakeScreenshot(self,fName):

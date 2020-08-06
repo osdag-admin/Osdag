@@ -323,7 +323,7 @@ TYP_FRICTION_GRIP = "Friction Grip Bolt"
 ###################################
 # Module Keys
 ###################################
-KEY_MAIN_MODULE = 'MainModule'
+KEY_MAIN_MODULE = 'Main Module'
 KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'

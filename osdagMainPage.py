@@ -225,7 +225,7 @@ class ModulePage(QWidget):              # Empty Page with a layout
         super().__init__()
         self.layout=QGridLayout()
         self.setLayout(self.layout)
-        self.layout.setContentsMargins(80,0,0,0)
+        self.layout.setContentsMargins(0,0,0,0)
 
 class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
     def __init__(self,text):
@@ -416,6 +416,7 @@ class OsdagMainWindow(QMainWindow):
     def current_changed(self, index):
         l = list(self.Modules.keys())
         items = list(self.ui.verticalLayout.itemAt(i) for i in range(self.ui.verticalLayout.count()))
+        # print(items,"hfhh")
         for item in range(len(items)):
             if item == index-1:
                 items[item].widget().ui.LP_Button.setStyleSheet('''

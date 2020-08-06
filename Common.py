@@ -289,6 +289,7 @@ class MaterialValidator(object):
 # Type Keys (Type of input field, tab type etc.)
 ###########################
 TYPE_COMBOBOX = 'ComboBox'
+TYPE_COMBOBOX_FREEZE = 'Disable_ComboBoc'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
@@ -626,7 +627,7 @@ KEY_DISP_END_DIST_FLANGE = 'End Distance'
 KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange Plate Tension Capacity (kN)"
 DISP_TITLE_SECTION = 'Section Details'
 DISP_TITLE_TENSION_SECTION = 'Section Details'
 SECTION_CLASSIFICATION ="Section Classification"
@@ -904,11 +905,11 @@ KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
 
 KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
-KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
-KEY_DP_WELD_FAB_FIELD = 'Field weld'
-KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
+KEY_DP_FAB_SHOP = 'Shop Weld'
+KEY_DP_FAB_FIELD = 'Field weld'
+KEY_DP_WELD_FAB_VALUES = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD]
 
-KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite, Fu (MPa)'
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
@@ -1025,7 +1026,7 @@ KEY_SLENDER = "Member.Slenderness"
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 KEY_OUT_FLANGESPLATE_THICKNESS = 'flange_plate.Thickness'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Flange Plate Thickness'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
@@ -1152,12 +1153,26 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+# FLANGE AND WEB -REDUCTION FACTOR
+KEY_REDUCTION_FACTOR_LONG_FLANGE ='flange_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
 
-KEY_REDUCTION_LONG_JOINT ='bolt.long_joint'
+KEY_REDUCTION_FACTOR_LONG_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_LONG_WEB ="Long Joint Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_WEB = 'web_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_WEB = "Large Grip Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_FLANGE = 'flange_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_FLANGE = "Large Grip Red.Factor"
+
+# COMMON -REDUCTION FACTOR
+KEY_REDUCTION_LONG_JOINT ="bolt.long_joint"
 KEY_DISP_REDUCTION_LONG_JOINT ="Long Joint Red.Factor"
 
-KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
+KEY_REDUCTION_LARGE_GRIP ="bolt.large_grip"
 KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
+
 
 
 KEY_DISP_REDUCTION ="Strength Red.Factor"
@@ -1205,7 +1220,7 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Width'
 KEY_OUT_WEBPLATE_THICKNESS = 'Web_Plate.Thickness'
-KEY_DISP_WEBPLATE_THICKNESS = 'Web Plate Thickness'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)'
 KEY_DISP_WEB_PLATE_LENGTH ='Width (mm)'
 DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
 KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'
@@ -1880,13 +1895,26 @@ WELD_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"htt
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>")
 
+# DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+#                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+#                "p, li { white-space: pre-wrap; }\n"
+#                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+#                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
+#                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
+#                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
+#                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
+#                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
+#                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+
+
 DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
-               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm or 1.5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5mm {tolerance} or if the assumed clearance is 1.5mm, then the gap should be = 3mm (= 1.5mm {clearance} + 1.5mm {tolerance}. These are the default gap values based on the site practice for convenience of erection and IS 7215,Clause 2.3.1. The gap value can also be zero based on the nature of connection where clearance is not required.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")

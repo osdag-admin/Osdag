@@ -281,7 +281,7 @@ class Nut(Material):
 
 class Weld:
 
-    def __init__(self, material_g_o="", type=KEY_DP_WELD_TYPE_FILLET, fabrication= KEY_DP_WELD_FAB_SHOP):
+    def __init__(self, material_g_o="", type=KEY_DP_WELD_TYPE_FILLET, fabrication= KEY_DP_FAB_SHOP):
         self.design_status = True
         self.type = type
         self.fabrication = fabrication
@@ -1075,6 +1075,7 @@ class Plate(Material):
         Avn = thk * ((numrow - 1) * gauge + edge_dist - (numrow - 0.5) * dia_hole)
         Atg = thk * (pitch * (numcol - 1) + end_dist)
         Atn = thk * (pitch * (numcol - 1) + end_dist - (numcol - 0.5) * dia_hole)
+
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
@@ -1168,6 +1169,23 @@ class Plate(Material):
 
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
+
+    def cleat_angle_check(self, h, t, nr, nc, p, en, g, ed, dh, fu, fy, m_d, h_max, v, n=2):
+        self.design_status = False
+        self.cleat_shear_capacity = IS800_2007.cl_8_4_design_shear_strength(n*h*t, fy)
+        self.cleat_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(n*t*h*h/6, n*t*h*h/4, fy, 'plastic')
+        self.blockshear(nr, nc, g, p, n*t, ed, en, dh, fy, fu)
+        while (self.cleat_shear_capacity < v or self.block_shear_capacity < v or self.cleat_moment_capacity < m_d) and h_max-h >= 10:
+            h += 10
+            ed += 5
+            self.cleat_shear_capacity = IS800_2007.cl_8_4_design_shear_strength(n*h*t, fy)
+            self.cleat_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(n*t*h*h/6, n*t*h*h/4, fy, 'plastic')
+            self.blockshear(nr, nc, g, p, n*t, ed, en, dh, fy, fu)
+        self.height = h
+        if self.cleat_shear_capacity < v or self.block_shear_capacity < v or self.cleat_moment_capacity < m_d:
+            self.design_status = False
+        else:
+            self.design_status = True
 
     def __repr__(self):
         repr = "Plate\n"

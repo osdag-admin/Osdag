@@ -1272,8 +1272,8 @@ class FinPlateConnection(ShearConnection):
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                          cl_6_3_tension_rupture_capacity_member(h, t, self.plate.bolts_one_line, self.bolt.dia_hole,
-                                                                 a.fu, gamma_m1, round(a.tension_rupture_capacity / 1000, 2)), '')
+                          cl_6_3_1_tension_rupture_plate(h, t, self.plate.bolts_one_line, self.bolt.dia_hole,
+                                                         a.fu, gamma_m1, round(a.tension_rupture_capacity / 1000, 2)), '')
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_PLATE_BLK_SHEAR_TENSION, '', cl_6_4_blockshear_capacity_member(Tdb=round(a.block_shear_capacity_axial / 1000, 2), stress='axial'), '')

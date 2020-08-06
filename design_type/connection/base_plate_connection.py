@@ -434,7 +434,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.module = KEY_DISP_BASE_PLATE
 
-        self.design_button_status = False
+        # self.design_button_status = False
 
         options_list = []
 
@@ -469,7 +469,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t9 = (KEY_AXIAL_BP, KEY_DISP_AXIAL_BP, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t9)
 
-        t22 = (KEY_AXIAL_TENSION_BP, KEY_DISP_AXIAL_TENSION_BP, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t22 = (KEY_AXIAL_TENSION_BP, KEY_DISP_AXIAL_TENSION_BP, TYPE_TEXTBOX, None, False, 'Int Validator')
         options_list.append(t22)
 
         t10 = (KEY_SHEAR_BP, KEY_DISP_SHEAR_BP, '', None, True, 'Int Validator')
@@ -493,7 +493,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t14 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t14)
 
-        t11 = (KEY_ANCHOR_OCF, KEY_DISP_ANCHOR_OCF, '', None, True, 'No Validator')
+        t11 = (KEY_ANCHOR_OCF, KEY_DISP_ANCHOR_OCF, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t11)
 
         t15 = (KEY_DIA_ANCHOR_OCF, "- "+KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_DIA_ANCHOR, True, 'No Validator')
@@ -502,7 +502,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t17 = (KEY_GRD_ANCHOR_OCF, "- "+KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD_ANCHOR, True, 'No Validator')
         options_list.append(t17)
 
-        t11 = (KEY_ANCHOR_ICF, KEY_DISP_ANCHOR_ICF, '', None, True, 'No Validator')
+        t11 = (KEY_ANCHOR_ICF, KEY_DISP_ANCHOR_ICF, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t11)
 
         t15 = (KEY_DIA_ANCHOR_ICF, "- "+KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_DIA_ANCHOR, True, 'No Validator')
@@ -1015,6 +1015,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t20 = ([KEY_CONN], KEY_SECSIZE, TYPE_COMBOBOX, self.secsize_for_hollow)
         lst.append(t20)
+
+        t20 = ([KEY_CONN], KEY_DIA_ANCHOR_ICF, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
+        lst.append(t20)
+
+        t20 = ([KEY_CONN], KEY_GRD_ANCHOR_ICF, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
+        lst.append(t20)
+
         return lst
 
     @staticmethod
@@ -1195,7 +1202,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: "Standard",
                KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: "Standard",
                KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: "No",

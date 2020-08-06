@@ -413,7 +413,6 @@ class Compression(Member):
 
         print(self.section_size)
 
-
     def get_3d_components(self):
 
         components = []

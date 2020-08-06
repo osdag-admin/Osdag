@@ -188,7 +188,7 @@ class CreateLatex(Document):
         doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
-            with doc.create(Tabular(r'|>{\centering}m{12.5cm}|>{\centering\arraybackslash}m{4cm}|', row_height=1.2)) as table:
+            with doc.create(Tabularx(r'|>{\centering}p{12.5cm}|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
                 table.add_hline()
                 # Fail = TextColor("FailColor", bold("Fail"))
                 # Pass = TextColor("PassColor", bold("Pass"))
@@ -281,7 +281,7 @@ class CreateLatex(Document):
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
             with doc.create(Section('3D View')):
-                with doc.create(Tabular(r'|>{\centering}m{7.75cm}|>{\centering\arraybackslash}m{7.75cm}|', row_height=1.2)) as table:
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
                     view_topimg_path = rel_path + Disp_top_image
                     view_sideimg_path = rel_path + Disp_side_image

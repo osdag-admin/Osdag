@@ -656,7 +656,7 @@ class CommonDesignLogic(object):
             # nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
             # colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array,gap)
             nut_space = A.supported_section.web_thickness + 2 * A.cleat.thickness + nut_T
-            cnut_space = A.supporting_section.web_thickness + A.cleat.thickness + nut_T
+            cnut_space = A.supporting_section.flange_thickness + A.cleat.thickness + nut_T
             nut_bolt_array = cleatNutBoltArray(A.cleat, nut, bolt, nut_space, cnut_space)
             colflangeconn = cleatColFlangeBeamWeb(supporting, supported, angle, nut_bolt_array, gap)
 

@@ -735,7 +735,12 @@ class FinPlateConnection(ShearConnection):
             logger.error(": Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
             logger.warning(": Weld stress is {}N/mm and current weld strength is {} N/mm".format(self.weld.stress,self.weld.strength))
             logger.info(": Should increase length of weld/fin plate")
+
         else:
+            if self.weld.size in (3, 4):
+                logger.info(": Minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
+                            "cl. 10.5.3.1. Weld throat thickness is not considered as per cl. 10.5.3.2. Please take " +
+                            "necessary detailing precautions at site accordingly.")
             self.weld.design_status = True
 
     def section_shear_checks(self):

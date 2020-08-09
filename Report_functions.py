@@ -696,17 +696,18 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
     for i in t_fu_fy:
         t = i[0]
         f_y = i[2]
-        epsilon = math.sqrt(250 / f_y)
-        if t * epsilon <= t_epsilon_considered:
-            t_epsilon_considered = t * epsilon
-            t_considered = t
-        if t < t_min:
-            t_min = t
+        if f_y > 0:
+            epsilon = math.sqrt(250 / f_y)
+            if t * epsilon <= t_epsilon_considered:
+                t_epsilon_considered = t * epsilon
+                t_considered = t
+            if t < t_min:
+                t_min = t
 
     if corrosive_influences is True:
-        max_edge_dist =  round(40.0 + 4 * t_min,2)
+        max_edge_dist = round(40.0 + 4 * t_min, 2)
     else:
-        max_edge_dist = round(12 * t_epsilon_considered,2)
+        max_edge_dist = round(12 * t_epsilon_considered, 2)
 
     max_edge_dist = str(max_edge_dist)
     t1=str(t_fu_fy[0][0])
@@ -4119,7 +4120,7 @@ def square_washer_size(side):
     side = str(side)
 
     washer_dim = Math(inline=True)
-    washer_dim.append(NoEscape(r'\begin{aligned} Square - ' + side + r' X ' + side + r' \\'))
+    washer_dim.append(NoEscape(r'\begin{aligned} $ Square - ' + side + r' X ' + side + r' $$ \\'))
     washer_dim.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
 
     return washer_dim
@@ -4222,10 +4223,10 @@ def bearing_strength_concrete(concrete_grade, bearing_strength_value):
     bearing_strength_value = str(bearing_strength_value)
 
     bearing_strength = Math(inline=True)
-    bearing_strength.append(NoEscape(r'\begin{aligned} \sigma_{br} = 0.45f_{ck} \\'))
-    bearing_strength.append(NoEscape(r'\begin{aligned}             = 0.45 ' + concrete_grade + r' \\'))
-    bearing_strength.append(NoEscape(r'\begin{aligned}             = ' + bearing_strength_value + r' \\'))
-    bearing_strength.append(NoEscape(r'&[Ref.~IS~800:2007,~(Cl.7.4.1)]\end{aligned}'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}  \sigma_{br} &= 0.45fck \\'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}              &= 0.45 \times ' + concrete_grade + r' \\'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}              &= ' + bearing_strength_value + r' \\'))
+    bearing_strength.append(NoEscape(r'[Ref.~IS~800:2007,~(Cl.7.4.1)] \end{aligned}'))
 
     return bearing_strength
 
@@ -4307,6 +4308,7 @@ def modular_ratio(E_s, f_ck, modular_ratio):
     E_c = round((5000 * math.sqrt(f_ck)), 3)
     E_c = str(E_c)
     f_ck = str(f_ck)
+    modular_ratio = str(modular_ratio)
 
     n = Math(inline=True)
     n.append(NoEscape(r'\begin{aligned} n = \frac{E_{s}}{E_{c}} \\'))
@@ -4356,6 +4358,7 @@ def calc_f(end_distance, bp_length, f):
     """
     end_distance = str(end_distance)
     bp_length = str(bp_length)
+    f = str(f)
 
     dist_f = Math(inline=True)
     dist_f.append(NoEscape(r'\begin{aligned} f = \Big(\frac{L}{2} - e\Big) \\'))

@@ -328,9 +328,9 @@ class Window(QMainWindow):
         loading_widget.setFixedSize(window_width, 1.5 * window_height)
         loading_widget.setWindowFlag(Qt.FramelessWindowHint)
 
-        self.progress_bar = QProgressBar(loading_widget)
-        self.progress_bar.setMaximum(100)
-        self.progress_bar.setGeometry(QRect(0, 0, window_width, window_height / 2))
+        # self.progress_bar = QProgressBar(loading_widget)
+        # self.progress_bar.setMaximum(100)
+        # self.progress_bar.setGeometry(QRect(0, 0, window_width, window_height / 2))
         loading_label = QLabel(loading_widget)
         loading_label.setGeometry(QRect(0, window_height / 2, window_width, window_height))
         loading_label.setFixedSize(window_width, window_height)

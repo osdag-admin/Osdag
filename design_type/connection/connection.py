@@ -655,6 +655,20 @@ class Connection(Main):
         """ """
         if self.module == KEY_DISP_BASE_PLATE:  # base plate module
 
+            # select image of section for displaying in report
+            if self.connectivity == 'Hollow/Tubular Column Base':
+                if self.dp_column_designation[1:4] == 'SHS':
+                    select_section_img = 'SHS'
+                elif self.dp_column_designation[1:4] == 'RHS':
+                    select_section_img = 'RHS'
+                else:
+                    select_section_img = 'CHS'
+            else:
+                if self.column_properties.flange_slope != 90:
+                    select_section_img = "Slope_Beam"
+                else:
+                    select_section_img = "Parallel_Beam"
+
             # column section properties
             if self.connectivity == 'Hollow/Tubular Column Base':
                 if self.dp_column_designation[1:4] == 'SHS':
@@ -667,13 +681,14 @@ class Connection(Main):
                 section_type = 'I Section'
 
             self.column_properties = {
+                KEY_DISP_SEC_PROFILE: select_section_img,
                 'Column Section': self.dp_column_designation,
                 'Section Type': section_type,
                 'Type': self.dp_column_type,
-                'Source': self.dp_column_source,
+                'Source': '$' + self.dp_column_source + '$',
                 KEY_DISP_MATERIAL: self.dp_column_material,
-                'Ultimate strength, $f_u$': self.self.dp_column_fu,
-                'Yield strength, $f_y$': self.self.dp_column_fy,
+                'Ultimate strength, $f_u$': self.dp_column_fu,
+                'Yield strength, $f_y$': self.dp_column_fy,
                 'Mass, $m$ (kg/m)': self.column_properties.mass,
                 'Area, $A$ (cm$^2$)': round(self.column_properties.area / 100, 2),
                 'Nominal bore, NB (mm)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.nominal_bore
@@ -719,20 +734,31 @@ class Connection(Main):
             }
 
             self.report_input = {
+                # general parameters
                 KEY_MAIN_MODULE: self.mainmodule,
                 KEY_MODULE: self.module,
                 KEY_CONN: self.connectivity,
                 KEY_END_CONDITION: self.end_condition,
-                KEY_DISP_AXIAL_BP: self.load_axial_compression,
-                KEY_DISP_AXIAL_TENSION_BP: self.load_axial_tension,
+                KEY_DISP_AXIAL_BP: self.load_axial_compression * 10 ** -3,
+                KEY_DISP_AXIAL_TENSION_BP: self.load_axial_tension * 10 ** -3,
                 KEY_DISP_SHEAR_BP: None,
-                KEY_DISP_SHEAR_MAJOR: self.load_shear_major,
-                KEY_DISP_SHEAR_MINOR: self.load_shear_minor,
+                KEY_DISP_SHEAR_MAJOR: self.load_shear_major * 10 ** -3,
+                KEY_DISP_SHEAR_MINOR: self.load_shear_minor * 10 ** -3,
                 KEY_DISP_MOMENT: None,
-                KEY_DISP_MOMENT_MAJOR: self.load_moment_major,
-                KEY_DISP_MOMENT_MINOR: self.load_moment_minor,
+                KEY_DISP_MOMENT_MAJOR: self.load_moment_major * 10 ** -6,
+                KEY_DISP_MOMENT_MINOR: self.load_moment_minor * 10 ** -6,
+
+                # column section
                 "Column Section": "TITLE",
                 "Column Section - Details and Design Preference": self.column_properties,
+
+                # base plate
+                "Base Plate - Design Preference": "TITLE",
+                KEY_DISP_MATERIAL: self.dp_bp_material,
+                'Ultimate strength, $f_u$': self.dp_bp_fu,
+                'Yield strength, $f_y$': self.dp_bp_fy,
+
+                # anchor bolt outside column flange
                 "Anchor Bolt Outside Column Flange - Details and Design Preference": "TITLE",
                 'Diameter': str(self.anchor_dia_out),
                 'Property Class': str(self.anchor_grade_out),
@@ -741,6 +767,8 @@ class Connection(Main):
                 'Hole Type': self.dp_anchor_hole_out,
                 'Total Length (mm)': self.dp_anchor_length_out,
                 KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O: self.dp_anchor_fu_overwrite_out,
+
+                # anchor bolt inside column flange
                 None if self.connectivity == 'Hollow/Tubular Column Base' else "Anchor Bolt Inside Column Flange - Details and Design Preference":
                                                                             None if self.connectivity == 'Hollow/Tubular Column Base' else "TITLE",
                 None if self.connectivity == 'Hollow/Tubular Column Base' else 'Diameter': None if self.connectivity == 'Hollow/Tubular Column Base'
@@ -758,19 +786,21 @@ class Connection(Main):
                 None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O: None if self.connectivity ==
                                                                                  'Hollow/Tubular Column Base' else  self.dp_anchor_fu_overwrite_out,
 
-                ### detailing ###
-                KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-                KEY_DISP_GAP: self.plate.gap,
-                KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
-                "Plate Details": "TITLE",
-                KEY_DISP_PLATETHK: str(self.plate.thickness),
-                KEY_DISP_MATERIAL: self.plate.material,
-                KEY_DISP_FU: self.plate.fu,
-                KEY_DISP_FY: self.plate.fy,
-                "Weld Details": "TITLE",
-                KEY_DISP_DP_WELD_TYPE: "Fillet",
-                KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-                KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu
+                # weld
+                "Weld - Design Preference": "TITLE",
+                KEY_DISP_DP_WELD_FAB: self.dp_weld_fab,
+                KEY_DISP_DP_WELD_MATERIAL_G_O: self.dp_weld_fu_overwrite,
+
+                # detailing
+                "Detailing - Design Preference": "TITLE",
+                KEY_DISP_DP_DETAILING_EDGE_TYPE: self.dp_detail_edge_type,
+                KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.dp_detail_is_corrosive,
+
+                # design method
+                "Design - Design Preference": "TITLE",
+                KEY_DISP_DP_DESIGN_METHOD: self.dp_design_method,
+                None if self.connectivity == 'Moment Base Plate' else KEY_DISP_DP_DESIGN_BASE_PLATE: None if self.connectivity ==
+                                                                                                        'Moment Base Plate' else self.dp_bp_method
             }
 
         else:

@@ -84,9 +84,11 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
+available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
+                    KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
-                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate}
+                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, KEY_DISP_ENDPLATE:EndPlateConnection,
+                    KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
 
 
 #predefined pop-up summary.

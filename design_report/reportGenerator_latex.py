@@ -314,7 +314,7 @@ class CreateLatex(Document):
                 elif('ERROR' in msg):
                     colour='red'
                 else:
-                    colour = 'black'
+                    continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

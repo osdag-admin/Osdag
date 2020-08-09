@@ -1866,8 +1866,8 @@ def long_joint_welded_beam_prov(plate_height,l_w,t_w,gap,t_t,Tc,Tr):
         long_joint_welded_beam_prov.append(NoEscape(r' &='+ ll_str+ r' \\'))
         long_joint_welded_beam_prov.append(NoEscape(r'l_h& =' +lh_str+r' \\'))
         long_joint_welded_beam_prov.append(NoEscape(r' l~&= ' + l_str + r'\\'))
-        long_joint_welded_beam_prov.append(NoEscape(r'& 150 \timest_t =150 \times'+t_t+' = '+lt_str +r' \\'))
-        long_joint_welded_beam_prov.append(NoEscape(r'& since,~l < 150 \timest_t~\\&then~V_{rd} = V_{db} \\'))
+        long_joint_welded_beam_prov.append(NoEscape(r'& 150 \times t_t =150 \times'+t_t+' = '+lt_str +r' \\'))
+        long_joint_welded_beam_prov.append(NoEscape(r'& since,~l < 150 \times t_t~\\&then~V_{rd} = V_{db} \\'))
         long_joint_welded_beam_prov.append(NoEscape(r' V_{rd} &= ' + Tc +r' \\'))
         long_joint_welded_beam_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]&\end{aligned}'))
     else:
@@ -3135,11 +3135,11 @@ def plate_Length_req(l_w,t_w,g,l_fp,conn =None): #weld
     l_fp = str(l_fp)
     min_plate_Length_eqn = Math(inline=True)
     if conn =="Flange":
-        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{fp} & = [2 \times(l_{w} + 2\timest_w) + g]\\'))
+        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{fp} & = [2 \times(l_{w} + 2\times t_w) + g]\\'))
         min_plate_Length_eqn.append(NoEscape(r'&= [2\times('+ l_w + r'+2\times'+t_w+') +' + g+ r']\\'))
         min_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
     else:
-        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{wp} & = [2\times(l_{w} + 2\timest_w) + g]\\'))
+        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{wp} & = [2\times(l_{w} + 2\times t_w) + g]\\'))
         min_plate_Length_eqn.append(NoEscape(r'&= [2\times(' + l_w + r'+2\times' + t_w + ') +' + g + r']\\'))
         min_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
 
@@ -3302,7 +3302,7 @@ def weld_strength_stress(V_u,A_w,M_d,Ip_w,y_max,x_max,l_eff,R_w):
     R_w = str(R_w)
     weld_stress_eqn = Math(inline=True)
     weld_stress_eqn.append(NoEscape(r'\begin{aligned} R_w&=\sqrt{(T_{wh}+A_{wh})^2 + (T_{wv}+V_{wv})^2}\\'))
-    weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M_d\timesy_{max}}{I{pw}}\\'))
+    weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M_d\times y_{max}}{I{pw}}\\'))
     weld_stress_eqn.append(NoEscape(r'&=\frac{'+M_d+r'\times'+y_max+'}{'+Ip_w+r'}\\'))
     weld_stress_eqn.append(NoEscape(r'T_{wv}&=\frac{M_d \times x_{max}}{I{pw}}\\'))
     weld_stress_eqn.append(NoEscape(r'&=\frac{'+M_d+r'\times'+x_max+'}{'+Ip_w+r'}\\'))
@@ -3345,7 +3345,7 @@ def shear_Rupture_prov_weld(h, t,fu,v_dn,gamma_m1,multiple =1):  #weld
     multiple = str(multiple)
 
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75\timesA_{vn}~f_u}{\sqrt{3}~\gamma_{m1}}\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75\times A_{vn}~f_u}{\sqrt{3}~\gamma_{m1}}\\'))
     shear_rup_eqn.append(NoEscape(r'&=\frac{'+ multiple+r'\times 0.75\times'+h+r'\times'+t+r'\times'+f_u+r'}{\sqrt{3}\times' +gamma_m1+ r'}\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + r'\\'))
     shear_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3]\end{aligned}'))
@@ -3395,7 +3395,7 @@ def no_of_bolts_along_web(D,T_f,e,p,n_bw):
     T_f = str(T_f)
     n_bw = str(n_bw)
     no_of_bolts_along_web = Math(inline=True)
-    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &= 2 \times ( \frac{D -(2\timesT_f) -(2\timese)}{\ p}  + 1 )\\'))
+    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &= 2 \times ( \frac{D -(2\times T_f) -(2\times e)}{\ p}  + 1 )\\'))
     no_of_bolts_along_web.append(NoEscape(r'&= 2 \times (\frac{' + D + r' -(2\times'+T_f +r')-(2\times'+e + r')}{' + p + r'} +1 ) \\'))
     no_of_bolts_along_web.append(NoEscape(r'&= ' + n_bw + r'\end{aligned}'))
     return no_of_bolts_along_web
@@ -3420,7 +3420,7 @@ def no_of_bolts_along_flange(b,T_w,e,p,n_bf):
     T_w = str(T_w)
     n_bf = str(n_bf)
     no_of_bolts_along_flange = Math(inline=True)
-    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &= 2 \times ( \frac{b/2 -(T_w / 2) -(2\timese)}{\ p}  + 1 )\\'))
+    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &= 2 \times ( \frac{b/2 -(T_w / 2) -(2\times e)}{\ p}  + 1 )\\'))
     no_of_bolts_along_flange.append(NoEscape(r'&= 2 \times (\frac{' + b + r'/2 -(0.5\times'+T_w +r')-(2\times'+e + r')}{' + p + r'} +1 )\\'))
     no_of_bolts_along_flange.append(NoEscape(r'&= ' + n_bf + r'\end{aligned}'))
     return no_of_bolts_along_flange
@@ -3721,11 +3721,11 @@ def eff_len_prov(l_eff, b_fp, t_w, l_w,con= None):
     t_w = str(t_w)
     eff_len_eqn = Math(inline=True)
     if con == "Flange":
-        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\timesl_w) + B_{fp} - 2\timest_w\\'))
+        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\times l_w) + B_{fp} - 2\times t_w\\'))
         eff_len_eqn.append(NoEscape(r'&= (2\times' + l_w + ') +' + b_fp + r' - 2\times' + t_w + r'\\'))
         eff_len_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
     else:
-        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\timesl_w) + W_{wp} - 2\timest_w\\'))
+        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\times l_w) + W_{wp} - 2\times t_w\\'))
         eff_len_eqn.append(NoEscape(r'&= (2\times' + l_w + ') +' + b_fp + r' - 2\times' + t_w + r'\\'))
         eff_len_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
 
@@ -3751,7 +3751,7 @@ def eff_len_prov_out_in(l_eff, b_fp,b_ifp, t_w, l_w):
     b_ifp = str(b_ifp)
     t_w = str(t_w)
     eff_len_prov_out_in_eqn = Math(inline=True)
-    eff_len_prov_out_in_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (6\timesl_w) + B_{fp} + (2 \times B_{ifp})- 6\timest_w\\'))
+    eff_len_prov_out_in_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (6\times l_w) + B_{fp} + (2 \times B_{ifp})- 6\times t_w\\'))
     eff_len_prov_out_in_eqn.append(NoEscape(r'&= (6\times' + l_w + ') +' + b_fp + r'+ 2\times' +b_ifp + r'- 6\times' + t_w + r'\\'))
     eff_len_prov_out_in_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
 

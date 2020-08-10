@@ -121,7 +121,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.load_shear_major = 0.0
         self.load_shear_minor = 0.0
         self.load_moment_major = 0.0
+        self.load_moment_major_report = 0.0
         self.load_moment_minor = 0.0
+        self.load_moment_minor_report = 0.0
 
         self.shear_resistance = 0.0
         self.shear_key_required = 'No'
@@ -162,10 +164,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.dp_anchor_designation_out = ""  # dp for anchor bolt
         self.dp_anchor_type_out = ""
-        self.dp_anchor_hole_out = "Standard"
+        self.dp_anchor_galv_out = "Yes"
+        self.dp_anchor_hole_out = "Over-sized"
         self.dp_anchor_length_out = 0
         self.dp_anchor_fu_overwrite_out = 0.0
         self.dp_anchor_friction = 0.0
+
+        self.anchor_dia_in = []
+        self.dp_anchor_designation_in = ""
+        self.dp_anchor_type_in = ""
+        self.dp_anchor_galv_in = "Yes"
+        self.dp_anchor_hole_in = "Over-sized"
+        self.dp_anchor_length_in = 0.0
+        self.dp_anchor_fu_overwrite_in = 0.0
 
         self.dp_weld_fab = "Shop Weld"  # dp for weld
         self.dp_weld_fu_overwrite = 0.0
@@ -1119,7 +1130,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                KEY_DP_ANCHOR_BOLT_TYPE_ICF])
         design_input.append(t3)
 
-        t3 = ("Anchor bolt", TYPE_COMBOBOX, [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF])
+        t3 = ("Anchor bolt", TYPE_COMBOBOX, [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+                                             KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF])
         design_input.append(t3)
 
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
@@ -1150,7 +1162,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                      KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
                      KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB,
                      KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-                     KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
+                     KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE, KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF], '')
         design_input.append(t3)
 
         return design_input
@@ -1200,8 +1212,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                    str(str(design_dictionary[KEY_DIA_ANCHOR_ICF][0]) + "X" + length + " IS5624 GALV"),
                KEY_DP_ANCHOR_BOLT_LENGTH_OCF: str(length),
                KEY_DP_ANCHOR_BOLT_LENGTH_ICF: str(length),
-               KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: "Standard",
-               KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: "Standard",
+               KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: "Over-sized",
+               KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: "Over-sized",
+               KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF: "Yes",
+               KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF: "Yes",
                KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30),
                KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
@@ -1594,10 +1608,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.load_moment_major = float(design_dictionary[KEY_MOMENT_MAJOR]
                                        if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)  # bending moment acting about the major axis
+        self.load_moment_major_report = round(self.load_moment_major, 2)  # for design report (actual input)
         self.load_moment_major = self.load_moment_major * 10 ** 6  # N-mm
 
         self.load_moment_minor = float(design_dictionary[KEY_MOMENT_MINOR]
                                        if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0)  # bending moment acting about the minor axis
+        self.load_moment_minor_report = round(self.load_moment_minor, 2)  # for design report (actual input)
         self.load_moment_minor = self.load_moment_minor * 10 ** 6  # N-mm
 
         # checking if the user input for minor axis moment exceeds the major axis moment (practically, it shouldn't)
@@ -1636,6 +1652,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # outside flange
         self.dp_anchor_designation_out = str(design_dictionary[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF])
         self.dp_anchor_type_out = str(design_dictionary[KEY_DP_ANCHOR_BOLT_TYPE_OCF])
+        self.dp_anchor_galv_out = str(design_dictionary[KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF])
+        # self.dp_anchor_galv_out = "Yes"
         self.dp_anchor_hole_out = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF])
         self.dp_anchor_length_out = float(design_dictionary[KEY_DP_ANCHOR_BOLT_LENGTH_OCF])
         self.dp_anchor_fu_overwrite_out = float(design_dictionary[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF])
@@ -1643,6 +1661,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # inside flange
         self.dp_anchor_designation_in = str(design_dictionary[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF])
         self.dp_anchor_type_in = str(design_dictionary[KEY_DP_ANCHOR_BOLT_TYPE_ICF])
+        self.dp_anchor_galv_in = str(design_dictionary[KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF])
+        # self.dp_anchor_galv_in = "Yes"
         self.dp_anchor_hole_in = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF])
         self.dp_anchor_length_in = float(design_dictionary[KEY_DP_ANCHOR_BOLT_LENGTH_ICF])
         self.dp_anchor_fu_overwrite_in = float(design_dictionary[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF])
@@ -2103,6 +2123,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # Reference: Omer Blodgett, Column Bases, section 3.3, equation 13
 
                 self.n = 2 * 10 ** 5 / (5000 * math.sqrt(self.cl_7_4_1_bearing_strength_concrete(self.footing_grade) / 0.45))
+                self.n = round(self.n, 3)
                 self.anchor_area_tension = self.anchor_area_outside_flange[0] * (self.anchor_nos_provided / 2)  # mm^2, area of anchor under tension
                 # TODO: update f value for 4 and 6 bolts (should be column centre to the centre of the bolt group)
                 self.f = (self.bp_length_provided / 2) - self.end_distance_out  # mm
@@ -4744,69 +4765,77 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # start of checks
 
-        # Check 1: Design Parameters
-        t1 = ('SubSection', 'Design Parameters', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        # Check 1.1: Design Parameters
+        t1 = ('SubSection', 'Design Parameters', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t1 = ('Bearing Strength of Concrete $(N/mm^2)$', '', bearing_strength_concrete((self.bearing_strength_concrete / 0.45),
+        t1 = ('Bearing Strength of Concrete $(N/mm^2)$', '', bearing_strength_concrete((int(self.bearing_strength_concrete / 0.45)),
                                                                                      self.bearing_strength_concrete), 'N/A')
         self.report_check.append(t1)
 
         t1 = ('Grout Thickness (mm)', '', 't_g = ' + str(self.grout_thk) + '', 'N/A')
         self.report_check.append(t1)
 
-        t1 = ('Plate Washer Size (mm) - Outside Column Flange', '', square_washer_size(self.plate_washer_dim_out), 'N/A')
-        self.report_check.append(t1)
-
-        t1 = ('Plate Washer Thickness (mm) - Outside Column Flange', '', square_washer_thk(self.plate_washer_thk_out), 'N/A')
-        self.report_check.append(t1)
-
-        t1 = ('Plate Washer Hole Diameter (mm) - Outside Column Flange', '', square_washer_in_dia(self.plate_washer_inner_dia_out), 'N/A')
-        self.report_check.append(t1)
-
-        t1 = ('Nut (Hexagon) Thickness (mm) - Outside Column Flange', '', hexagon_nut_thickness(self.nut_thk_out), 'N/A')
-        self.report_check.append(t1)
-
-        if self.load_axial_tension > 0:
-            t1 = ('Plate Washer Size (mm) - Inside Column Flange', '', square_washer_size(self.plate_washer_dim_in), 'N/A')
-            self.report_check.append(t1)
-
-            t1 = ('Plate Washer Thickness (mm) - Inside Column Flange', '', square_washer_thk(self.plate_washer_thk_in), 'N/A')
-            self.report_check.append(t1)
-
-            t1 = ('Plate Washer Hole Diameter (mm) - Inside Column Flange', '', square_washer_in_dia(self.plate_washer_inner_dia_in), 'N/A')
-            self.report_check.append(t1)
-
-            t1 = ('Nut (Hexagon) Thickness (mm) - Inside Column Flange', '', hexagon_nut_thickness(self.nut_thk_in), 'N/A')
-            self.report_check.append(t1)
-
         if self.connectivity == 'Moment Base Plate':
-            t1 = ('Modular Ratio', '', modular_ratio((2 * 10 ** 5), (self.bearing_strength_concrete / 0.45), self.n), 'N/A')
+            t1 = ('Modular Ratio', '', modular_ratio((2 * 10 ** 5), (int(self.bearing_strength_concrete / 0.45)), self.n), 'N/A')
             self.report_check.append(t1)
 
         t1 = ('Epsilon - Stiffener Plate', '', epsilon(self.stiffener_fy, self.epsilon), 'N/A')
         self.report_check.append(t1)
 
-        # Check 2-1: Anchor Bolt Details - Outside Column Flange
-        t1 = ('SubSection', 'Anchor Bolt Details - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        # Check 1.2: Plate Washer and Nut Details - Anchor Bolts Outside Column Flange
+        t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolts Outside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t2 = ('Diameter (mm)', '', self.anchor_dia_outside_flange, 'N/A')
+        t1 = ('Plate Washer Size (mm)', '', square_washer_size(self.plate_washer_dim_out), 'Pass')
+        self.report_check.append(t1)
+
+        t1 = ('Plate Washer Thickness (mm)', '', square_washer_thk(self.plate_washer_thk_out), 'Pass')
+        self.report_check.append(t1)
+
+        t1 = ('Plate Washer Hole Diameter (mm)', '', square_washer_in_dia(self.plate_washer_inner_dia_out), 'Pass')
+        self.report_check.append(t1)
+
+        t1 = ('Nut (Hexagon) Thickness (mm)', '', hexagon_nut_thickness(self.nut_thk_out), 'Pass')
+        self.report_check.append(t1)
+
+        if self.load_axial_tension > 0:
+            # Check 1.3: Plate Washer and Nut Details - Anchor Bolts Outside Column Flange
+            t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolts Inside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t1 = ('Plate Washer Size (mm)', '', square_washer_size(self.plate_washer_dim_in), 'Pass')
+            self.report_check.append(t1)
+
+            t1 = ('Plate Washer Thickness (mm)', '', square_washer_thk(self.plate_washer_thk_in), 'Pass')
+            self.report_check.append(t1)
+
+            t1 = ('Plate Washer Hole Diameter (mm)', '', square_washer_in_dia(self.plate_washer_inner_dia_in), 'Pass')
+            self.report_check.append(t1)
+
+            t1 = ('Nut (Hexagon) Thickness (mm)', '', hexagon_nut_thickness(self.nut_thk_in), 'Pass')
+            self.report_check.append(t1)
+
+        # Check 2-1: Anchor Bolt Summary - Outside Column Flange
+        t1 = ('SubSection', 'Anchor Bolt Summary - Outside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = ('Diameter (mm)', '', self.anchor_dia_outside_flange, 'Pass')
         self.report_check.append(t2)
 
-        t3 = ('Property Class', '', self.anchor_grade_out, 'N/A')
+        t3 = ('Property Class', '', self.anchor_grade_out, 'Pass')
         self.report_check.append(t3)
 
-        # Check 2-2: Anchor Bolt Details - Inside Column Flange
-        t1 = ('SubSection', 'Anchor Bolt Details - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        # Check 2-2: Anchor Bolt Summary - Inside Column Flange
+        t1 = ('SubSection', 'Anchor Bolt Summary - Inside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         if self.load_axial_tension > 0:
 
-            t2 = ('Diameter (mm)', '', self.anchor_dia_inside_flange, 'N/A')
+            t2 = ('Diameter (mm)', '', self.anchor_dia_inside_flange, 'Pass')
             self.report_check.append(t2)
 
-            t3 = ('Property Class', '', self.anchor_grade_in, 'N/A')
+            t3 = ('Property Class', '', self.anchor_grade_in, 'Pass')
             self.report_check.append(t3)
         else:
             t2 = ('Diameter (mm)', 'Factored Uplift Force = 0 kN', 'N/A', 'N/A')
@@ -4816,7 +4845,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t3)
 
         # Check 3-1: Detailing Checks - Outside Column Flange
-        t1 = ('SubSection', 'Detailing Checks - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Detailing Checks - Outside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         t2 = ('Min. End Distance (mm)', cl_10_2_4_2_min_edge_end_dist(self.anchor_hole_dia_out, edge_type=self.dp_detail_edge_type, parameter='end_dist'),
@@ -4852,7 +4881,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Check 3-2: Detailing Checks - Inside Column Flange
         if self.load_axial_tension > 0:
 
-            t1 = ('SubSection', 'Detailing Checks - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Detailing Checks - Inside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t2 = ('Min. End Distance (mm)', cl_10_2_4_2_min_edge_end_dist(self.anchor_hole_dia_in, edge_type=self.dp_detail_edge_type, parameter='end_dist'),

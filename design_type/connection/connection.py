@@ -680,15 +680,22 @@ class Connection(Main):
             else:
                 section_type = 'I Section'
 
+            if self.dp_column_source == 'IS808_Rev':
+                self.dp_column_source = 'IS 808\_Rev'
+
             self.column_properties = {
-                KEY_DISP_SEC_PROFILE: select_section_img,
+                KEY_DISP_SEC_PROFILE: select_section_img,  # select image of the section for displaying in design report
+
+                # properties fro DP
                 'Column Section': self.dp_column_designation,
-                'Section Type': section_type,
-                'Type': self.dp_column_type,
-                'Source': '$' + self.dp_column_source + '$',
+                # 'Section Type': section_type,
+                # 'Type': self.dp_column_type,
+                # 'Source': self.dp_column_source,
                 KEY_DISP_MATERIAL: self.dp_column_material,
-                'Ultimate strength, $f_u$': self.dp_column_fu,
-                'Yield strength, $f_y$': self.dp_column_fy,
+                'Ultimate strength, ($f_{u}$)': self.dp_column_fu,
+                'Yield strength, ($f_{y}$)': self.dp_column_fy,
+
+                # properties from DB
                 'Mass, $m$ (kg/m)': self.column_properties.mass,
                 'Area, $A$ (cm$^2$)': round(self.column_properties.area / 100, 2),
                 'Nominal bore, NB (mm)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.nominal_bore
@@ -739,68 +746,73 @@ class Connection(Main):
                 KEY_MODULE: self.module,
                 KEY_CONN: self.connectivity,
                 KEY_END_CONDITION: self.end_condition,
-                KEY_DISP_AXIAL_BP: self.load_axial_compression * 10 ** -3,
-                KEY_DISP_AXIAL_TENSION_BP: self.load_axial_tension * 10 ** -3,
+                KEY_DISP_AXIAL_BP: round(self.load_axial_compression * 10 ** -3, 2),
+                KEY_DISP_AXIAL_TENSION_BP: round(self.load_axial_tension * 10 ** -3, 2),
                 KEY_DISP_SHEAR_BP: None,
-                KEY_DISP_SHEAR_MAJOR: self.load_shear_major * 10 ** -3,
-                KEY_DISP_SHEAR_MINOR: self.load_shear_minor * 10 ** -3,
+                KEY_DISP_SHEAR_MAJOR: round(self.load_shear_major * 10 ** -3, 2),
+                KEY_DISP_SHEAR_MINOR: round(self.load_shear_minor * 10 ** -3, 2),
                 KEY_DISP_MOMENT: None,
-                KEY_DISP_MOMENT_MAJOR: self.load_moment_major * 10 ** -6,
-                KEY_DISP_MOMENT_MINOR: self.load_moment_minor * 10 ** -6,
+                '- Major axis ($M_{z-z}$)': self.load_moment_major_report,
+                '- Minor axis ($M_{y-y}$)': self.load_moment_minor_report,
 
                 # column section
-                "Column Section": "TITLE",
+                "Column Section - Mechanical Properties": "TITLE",
                 "Column Section - Details and Design Preference": self.column_properties,
 
                 # base plate
                 "Base Plate - Design Preference": "TITLE",
                 KEY_DISP_MATERIAL: self.dp_bp_material,
-                'Ultimate strength, $f_u$': self.dp_bp_fu,
-                'Yield strength, $f_y$': self.dp_bp_fy,
+                'Ultimate strength, ($f_{u}$)': self.dp_bp_fu,
+                'Yield strength, ($f_{y}$)': self.dp_bp_fy,
 
                 # anchor bolt outside column flange
                 "Anchor Bolt Outside Column Flange - Details and Design Preference": "TITLE",
                 'Diameter': str(self.anchor_dia_out),
                 'Property Class': str(self.anchor_grade_out),
                 KEY_DISP_DP_ANCHOR_BOLT_TYPE: self.dp_anchor_type_out,
+                KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED: self.dp_anchor_galv_out,
                 KEY_DISP_DESIGNATION: self.dp_anchor_designation_out,
                 'Hole Type': self.dp_anchor_hole_out,
                 'Total Length (mm)': self.dp_anchor_length_out,
-                KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O: self.dp_anchor_fu_overwrite_out,
+                'Material grade overwrite, f_{u} (MPa) ': self.dp_anchor_fu_overwrite_out,
+                'Friction coefficient between concrete and anchor bolt': self.dp_anchor_friction,
 
                 # anchor bolt inside column flange
-                None if self.connectivity == 'Hollow/Tubular Column Base' else "Anchor Bolt Inside Column Flange - Details and Design Preference":
+                None if (self.connectivity == 'Hollow/Tubular Column Base') else "Anchor Bolt Inside Column Flange - Details and Design Preference":
                                                                             None if self.connectivity == 'Hollow/Tubular Column Base' else "TITLE",
-                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Diameter': None if self.connectivity == 'Hollow/Tubular Column Base'
-                                                                                                                    else  str(self.anchor_dia_out),
+                None if (self.connectivity == 'Hollow/Tubular Column Base') else 'Diameter': None if self.connectivity == 'Hollow/Tubular Column Base'
+                                                                                                                    else str(self.anchor_dia_out),
                 None if self.connectivity == 'Hollow/Tubular Column Base' else 'Property Class': None if self.connectivity ==
-                                                                                     'Hollow/Tubular Column Base' else  str(self.anchor_grade_out),
+                                                                                     'Hollow/Tubular Column Base' else str(self.anchor_grade_out),
                 None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_TYPE: None if self.connectivity ==
-                                                                                        'Hollow/Tubular Column Base' else  self.dp_anchor_type_out,
+                                                                                        'Hollow/Tubular Column Base' else self.dp_anchor_type_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED: None if self.connectivity ==
+                                                                                         'Hollow/Tubular Column Base' else self.dp_anchor_galv_in,
                 None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DESIGNATION: None if self.connectivity ==
-                                                                                 'Hollow/Tubular Column Base' else  self.dp_anchor_designation_out,
+                                                                                 'Hollow/Tubular Column Base' else self.dp_anchor_designation_out,
                 None if self.connectivity == 'Hollow/Tubular Column Base' else 'Hole Type': None if self.connectivity ==
-                                                                                        'Hollow/Tubular Column Base' else  self.dp_anchor_hole_out,
+                                                                                        'Hollow/Tubular Column Base' else self.dp_anchor_hole_out,
                 None if self.connectivity == 'Hollow/Tubular Column Base' else 'Total Length (mm)': None if self.connectivity ==
-                                                                                        'Hollow/Tubular Column Base' else  self.dp_anchor_length_out,
+                                                                                        'Hollow/Tubular Column Base' else self.dp_anchor_length_out,
                 None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O: None if self.connectivity ==
-                                                                                 'Hollow/Tubular Column Base' else  self.dp_anchor_fu_overwrite_out,
+                                                                                 'Hollow/Tubular Column Base' else self.dp_anchor_fu_overwrite_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Friction coefficient between concrete and anchor bolt':
+                                                            None if self.connectivity == 'Hollow/Tubular Column Base' else self.dp_anchor_friction,
 
                 # weld
                 "Weld - Design Preference": "TITLE",
                 KEY_DISP_DP_WELD_FAB: self.dp_weld_fab,
-                KEY_DISP_DP_WELD_MATERIAL_G_O: self.dp_weld_fu_overwrite,
+                'Material grade overwrite, $f_{u}$ (MPa) ': self.dp_weld_fu_overwrite,
 
                 # detailing
                 "Detailing - Design Preference": "TITLE",
                 KEY_DISP_DP_DETAILING_EDGE_TYPE: self.dp_detail_edge_type,
-                KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.dp_detail_is_corrosive,
+                'Are the members exposed to corrosive influences?': self.dp_detail_is_corrosive,
 
                 # design method
                 "Design - Design Preference": "TITLE",
                 KEY_DISP_DP_DESIGN_METHOD: self.dp_design_method,
-                None if self.connectivity == 'Moment Base Plate' else KEY_DISP_DP_DESIGN_BASE_PLATE: None if self.connectivity ==
-                                                                                                        'Moment Base Plate' else self.dp_bp_method
+                KEY_DISP_DP_DESIGN_BASE_PLATE: 'Elastic Analysis Method' if self.connectivity == 'Moment Base Plate' else self.dp_bp_method
             }
 
         else:

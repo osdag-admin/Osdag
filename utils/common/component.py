@@ -241,9 +241,12 @@ class Bolt:
             self.bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
                 f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
 
-    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy):
+    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy,n=1):
+        self.single_conn_plates_t_fu_fy = []
+        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
+        self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])
+        self.connecting_plates_tk = [i[0] for i in self.single_conn_plates_t_fu_fy]
 
-        self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
         self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided), 2)
@@ -253,7 +256,7 @@ class Bolt:
                                                      self.edge_type), 2)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk), 2)
-        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy,
+        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.single_conn_plates_t_fu_fy,
                                                                         self.corrosive_influences), 2)
 
         self.max_end_dist = self.max_edge_dist
@@ -814,6 +817,12 @@ class Plate(Material):
         elif bolt_line > bolt_line_limit:
             self.design_status = False
             self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
+        elif min_edge_dist > max_edge_dist:
+            self.design_status = False
+            self.reason = "Minimum end/edge distance is greater than max end/edge distance."
+        elif min_gauge > max_spacing:
+            self.design_status = False
+            self.reason = "Minimum pitch/gauge distance is greater than max pitch/gauge distance."
         else:
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
                                                                        max_spacing, max_edge_dist,count=0)

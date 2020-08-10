@@ -104,7 +104,7 @@ class CreateLatex(Document):
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST:
+                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     # if type(uiObj[i]) == list:
                         continue
                     if type(uiObj[i]) == dict:
@@ -164,7 +164,7 @@ class CreateLatex(Document):
                         table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
             for i in uiObj:
-                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST:
+                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
@@ -225,7 +225,7 @@ class CreateLatex(Document):
                                 # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
 
                                 print(i)
-                                if type(uiObj[i]) == dict:
+                                if type(uiObj[i]) == dict and i == 'Selected Section Details':
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
                                     image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
@@ -248,14 +248,14 @@ class CreateLatex(Document):
                                                 (MultiRow(merge_rows,
                                                           data=StandAloneGraphic(image_options="width=5cm,height=5cm",
                                                                                  filename=rel_path + Img_path)),
-                                                 MultiColumn(2, align='|c|', data=a[x]),
-                                                 MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                                 MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                                 MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
                                         elif x <= 4:
-                                            table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                                           MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                            table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                                           MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
                                         else:
-                                            table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
-                                                           sectiondetails[a[merge_rows + x - 4]],))
+                                            table.add_row(('', NoEscape(a[x]), NoEscape(sectiondetails[a[x]]), NoEscape(a[merge_rows + x - 4]),
+                                                           NoEscape(sectiondetails[a[merge_rows + x - 4]]),))
                                         table.add_hline(2, 5)
                             table.add_hline()
                         count = count + 1
@@ -314,7 +314,7 @@ class CreateLatex(Document):
                 elif('ERROR' in msg):
                     colour='red'
                 else:
-                    colour = 'black'
+                    continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

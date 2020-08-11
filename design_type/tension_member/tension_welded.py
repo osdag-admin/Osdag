@@ -1032,7 +1032,7 @@ class Tension_welded(Member):
                         round(self.load.axial_force, 2), round(self.force1 / 1000, 2), self.max_area))
                 logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 # logge r.error(": Design is not safe. \n ")
-                # logger.debug(" :=========End Of design===========")
+                # logger.info(" :=========End Of design===========")
                 break
 
                 "condition to limit loop based on max length derived from max available size"
@@ -1045,7 +1045,7 @@ class Tension_welded(Member):
                         self.length, round(self.len2,2), self.max_gyr))
                 logger.info(" : Select Members with higher radius of gyration value than the above mentioned Member.")
                 # logger.error(": Design is not safe. \n ")
-                # logger.debug(" :=========End Of design===========")
+                # logger.info(" :=========End Of design===========")
                 break
 
             else:
@@ -1057,7 +1057,7 @@ class Tension_welded(Member):
                     self.bolt_diameter_min))
             logger.info(" : Reduce the bolt size or increase the Member Depth.")
             # logger.error(": Design is not safe. \n ")
-            # logger.debug(" :=========End Of design===========")
+            # logger.info(" :=========End Of design===========")
 
         if self.member_design_status == True:
             print("pass")
@@ -1067,7 +1067,7 @@ class Tension_welded(Member):
             # print(self.member_design_status,"hxfv")
             self.design_status = False
             logger.error(": Design is not safe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
     def initial_plate_check(self, design_dictionary):
 
@@ -1140,13 +1140,13 @@ class Tension_welded(Member):
                     logger.warning( " : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
                             round(self.res_force / 1000, 2), round(self.max_tension_yield/1000,2)))
                     logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
             else:
                 self.design_status = False
                 logger.warning(" : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
                         round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2)))
                 logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
 
     def select_weld(self,design_dictionary):
 
@@ -1180,7 +1180,7 @@ class Tension_welded(Member):
         # if self.plate.length > (150 * self.weld.throat):
         #     logger.info(" Length of Joint is more than Long Joint Limit. Hence not possible.")
         #     logger.error(": Design is not safe. \n ")
-        #     logger.debug(" :=========End Of design===========")
+        #     logger.info(" :=========End Of design===========")
         self.weld.strength_red = self.weld.strength
         while self.plate.length > (150 * self.weld.throat):
 
@@ -1210,7 +1210,7 @@ class Tension_welded(Member):
             self.design_status = False
             logger.warning(": The member fails in long joint \n ")
             logger.error(": Design is not safe.\n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
 
     def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, force, weld_angle = 90):
@@ -1379,7 +1379,7 @@ class Tension_welded(Member):
                         round(self.load.axial_force, 2), round(self.section_size_1.tension_rupture_capacity / 1000, 2), self.max_area))
                 logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
 
     def get_plate_thickness(self,design_dictionary):
 
@@ -1429,7 +1429,7 @@ class Tension_welded(Member):
                     " : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
                         round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2)))
                 logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
 
             else:
                 pass
@@ -1440,7 +1440,7 @@ class Tension_welded(Member):
                                                                                                     self.length))
                 logger.info("Try higher diameter of bolt or increase member length to get a safe design.")
                 logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
             else:
                 self.plate_design_status = True
                 self.design_status = True
@@ -1457,7 +1457,7 @@ class Tension_welded(Member):
                     pass
                 logger.info(self.weld.reason)
                 logger.info(": Overall welded tension member design is safe. \n")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
                 if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                     self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
                                                material_grade=self.material,
@@ -1477,7 +1477,7 @@ class Tension_welded(Member):
         else:
             self.design_status = False
             logger.error(": Design is not safe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
     def intermittent_bolt(self, design_dictionary):
 

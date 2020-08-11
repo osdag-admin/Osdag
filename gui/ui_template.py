@@ -1246,11 +1246,12 @@ class Window(QMainWindow):
         # @author: Amir
 
         for c_tup in for_custom_list:
+            a= key.objectName()
             if c_tup[0] != key.objectName():
                 continue
             selected = key.currentText()
             f = c_tup[1]
-            disabled_values = None
+            disabled_values = []
             note = ""
             if updated_list != None:
                 onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]

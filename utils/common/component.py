@@ -241,9 +241,12 @@ class Bolt:
             self.bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
                 f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
 
-    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy):
+    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy,n=1):
+        self.single_conn_plates_t_fu_fy = []
+        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
+        self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])
+        self.connecting_plates_tk = [i[0] for i in self.single_conn_plates_t_fu_fy]
 
-        self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
         self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided), 2)
@@ -253,7 +256,7 @@ class Bolt:
                                                      self.edge_type), 2)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk), 2)
-        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy,
+        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.single_conn_plates_t_fu_fy,
                                                                         self.corrosive_influences), 2)
 
         self.max_end_dist = self.max_edge_dist
@@ -792,7 +795,10 @@ class Plate(Material):
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required
                                                 , min_edge_dist, min_gauge, min_bolts_one_line, min_bolt_line)
         count = 0
-
+        if min_end_dist == 0.0:
+            end_dist = min_edge_dist
+        else:
+            end_dist = min_end_dist
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
             self.bolt_line = min_bolt_line
@@ -801,8 +807,8 @@ class Plate(Material):
             self.pitch_provided = min_gauge
             self.gauge_provided = min_gauge
             self.edge_dist_provided = min_edge_dist
-            self.end_dist_provided = min_edge_dist
-            self.length = gap + self.edge_dist_provided * 2 + self.gauge_provided * (self.bolt_line - 1)
+            self.end_dist_provided = end_dist
+            self.length = gap + self.end_dist_provided * 2 + self.pitch_provided * (self.bolt_line - 1)
             self.height = self.get_web_plate_h_req(self.bolts_one_line, self.gauge_provided , self.edge_dist_provided)
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
@@ -811,6 +817,12 @@ class Plate(Material):
         elif bolt_line > bolt_line_limit:
             self.design_status = False
             self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
+        elif min_edge_dist > max_edge_dist:
+            self.design_status = False
+            self.reason = "Minimum end/edge distance is greater than max end/edge distance."
+        elif min_gauge > max_spacing:
+            self.design_status = False
+            self.reason = "Minimum pitch/gauge distance is greater than max pitch/gauge distance."
         else:
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
                                                                        max_spacing, max_edge_dist,count=0)
@@ -820,10 +832,7 @@ class Plate(Material):
                 pitch = min_pitch
             else:
                 pitch = min_gauge
-            if min_end_dist ==0.0:
-                end_dist = min_edge_dist
-            else:
-                end_dist = min_end_dist
+
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated

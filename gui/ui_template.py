@@ -328,9 +328,9 @@ class Window(QMainWindow):
         loading_widget.setFixedSize(window_width, 1.5 * window_height)
         loading_widget.setWindowFlag(Qt.FramelessWindowHint)
 
-        self.progress_bar = QProgressBar(loading_widget)
-        self.progress_bar.setMaximum(100)
-        self.progress_bar.setGeometry(QRect(0, 0, window_width, window_height / 2))
+        # self.progress_bar = QProgressBar(loading_widget)
+        # self.progress_bar.setMaximum(100)
+        # self.progress_bar.setGeometry(QRect(0, 0, window_width, window_height / 2))
         loading_label = QLabel(loading_widget)
         loading_label.setGeometry(QRect(0, window_height / 2, window_width, window_height))
         loading_label.setFixedSize(window_width, window_height)
@@ -340,7 +340,7 @@ class Window(QMainWindow):
         self.thread_1.start()
         self.thread_2 = DummyThread(0.00001, self)
         self.thread_1.finished.connect(lambda: loading_widget.exec())
-        self.thread_1.finished.connect(lambda: self.progress_bar.setValue(10))
+        # self.thread_1.finished.connect(lambda: self.progress_bar.setValue(10))
         self.thread_1.finished.connect(lambda: self.thread_2.start())
         self.thread_2.finished.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.thread_2.finished.connect(lambda: loading_widget.close())
@@ -711,14 +711,14 @@ class Window(QMainWindow):
                     disabled_values = t[2]
                 d[Combobox_key] = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 if updated_list != None:
-                    onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
+                    onchange_key_popup = [item for item in updated_list if item[1] == t[0] and item[2] == TYPE_COMBOBOX_CUSTOMIZED]
                     arg_list = []
                     if onchange_key_popup != []:
                         for change_key in onchange_key_popup[0][0]:
                             print(change_key)
                             arg_list.append(self.dockWidgetContents.findChild(QtWidgets.QWidget, change_key).currentText())
-                        data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1](arg_list)
-                                                      if all_values_available not in disabled_values]
+                        data[t[0] + "_customized"] = [all_values_available for all_values_available in
+                                                      t[1](arg_list) if all_values_available not in disabled_values]
                     else:
                         data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                       if all_values_available not in disabled_values]
@@ -1118,8 +1118,8 @@ class Window(QMainWindow):
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
-        self.btn_Design.clicked.connect(lambda: self.start_loadingWindow(main, data))
-        # self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
+        # self.btn_Design.clicked.connect(lambda: self.start_loadingWindow(main, data))
+        self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         self.actionChange_background.triggered.connect(self.showColorDialog)
@@ -1271,12 +1271,10 @@ class Window(QMainWindow):
                     data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
                                                                                 disabled_values, note)
                     if data[c_tup[0] + "_customized"] == []:
-                        data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
-                                                          if all_values_available not in disabled_values]
+                        data[c_tup[0] + "_customized"] = options
                         key.setCurrentIndex(0)
                 else:
-                    data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
-                                                      if all_values_available not in disabled_values]
+                    data[c_tup[0] + "_customized"] = options
 
                     # input = f(arg_list)
                     # data[c_tup[0] + "_customized"] = input
@@ -1290,12 +1288,11 @@ class Window(QMainWindow):
                     data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
                                                                                 disabled_values, note)
                     if data[c_tup[0] + "_customized"] == []:
-                        data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
-                                                      if all_values_available not in disabled_values]
+                        data[c_tup[0] + "_customized"] = options
                         key.setCurrentIndex(0)
                 else:
-                    data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
-                                                      if all_values_available not in disabled_values]
+                    data[c_tup[0] + "_customized"] = options
+
     def on_change_connect(self, key_changed, updated_list, data, main):
         key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, main))
 
@@ -1364,6 +1361,12 @@ class Window(QMainWindow):
                     k2.setEnabled(True)
                 else:
                     k2.setDisabled(True)
+                    k2.setText("")
+            elif typ == TYPE_COMBOBOX_FREEZE:
+                if val:
+                    k2.setEnabled(False)
+                else:
+                    k2.setEnabled(True)
             elif typ == TYPE_WARNING:
                 if val:
                     QMessageBox.warning(self, "Application", k2)
@@ -1706,7 +1709,7 @@ class Window(QMainWindow):
                                 str(key_str) + ": (" + str(uiObj[key_str]) + ") - Default Value Considered! \n"
             elif op[2] == TYPE_TEXTBOX:
                 if key_str in uiObj.keys():
-                    key.setText(uiObj[key_str])
+                    key.setText(uiObj[key_str] if uiObj[key_str] != 'Disabled' else "")
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
                     for n in new:
@@ -1735,7 +1738,15 @@ class Window(QMainWindow):
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
         # @author: Amir
+
         option_list = main.input_values(self)
+
+        for data_key_tuple in main.customized_input(main):
+            data_key = data_key_tuple[0] + "_customized"
+            if data_key in data.keys() and len(data_key_tuple) == 4:
+                data[data_key] = [data_values for data_values in data[data_key]
+                                  if data_values not in data_key_tuple[2]]
+
         self.design_fn(option_list, data, main)
 
         if trigger_type == "Save":
@@ -1764,12 +1775,6 @@ class Window(QMainWindow):
             with open("logging_text.log", 'w') as log_file:
                 pass
 
-            for data_key_tuple in main.customized_input(main):
-                data_key = data_key_tuple[0]
-                if data_key in data.keys() and len(data_key_tuple) == 4:
-                    data[data_key] = [data_values for data_values in data[data_key]
-                                      if data_values not in data_key_tuple[2]]
-
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(status)
@@ -1791,9 +1796,8 @@ class Window(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            self.progress_bar.setValue(20)
+            # self.progress_bar.setValue(50)
             self.output_title_change(main)
-            self.progress_bar.setValue(30)
 
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
             if not os.path.isdir(last_design_folder):
@@ -1818,7 +1822,7 @@ class Window(QMainWindow):
             with open(str(last_design_file), 'w') as last_design:
                 yaml.dump(self.design_inputs, last_design)
             self.design_inputs.pop("out_titles_status")
-            self.progress_bar.setValue(40)
+            # self.progress_bar.setValue(60)
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
@@ -1827,10 +1831,9 @@ class Window(QMainWindow):
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
 
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                self.progress_bar.setValue(50)
                 status = main.design_status
                 module_class = self.return_class(main.module)
-                self.progress_bar.setValue(80)
+                # self.progress_bar.setValue(80)
                 self.commLogicObj.call_3DModel(status, module_class)
                 self.display_x = 90
                 self.display_y = 90
@@ -1864,7 +1867,7 @@ class Window(QMainWindow):
                 for action in self.menugraphics_component_list:
                     action.setEnabled(False)
 
-            self.progress_bar.setValue(100)
+            # self.progress_bar.setValue(100)
 
 
     def retakeScreenshot(self,fName):

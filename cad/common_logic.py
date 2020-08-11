@@ -979,7 +979,7 @@ class CommonDesignLogic(object):
 
             baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
 
-            bolt_d = float(BP.anchor_dia_provided)
+            bolt_d = float(BP.anchor_dia_outside_flange)
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
             bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
             # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
@@ -988,15 +988,15 @@ class CommonDesignLogic(object):
 
 
             ex_length_out = BP.anchor_len_above_footing_out
-            if BP.dp_anchor_type == 'IS 5624-Type A':
+            if BP.anchor_type == 'IS 5624-Type A':
                 bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
-                                    r=float(BP.anchor_dia_provided) / 2,
+                                    r=float(BP.anchor_dia_outside_flange) / 2,
                                     ex=ex_length_out)
-            elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,
+            elif BP.anchor_type == 'IS 5624-Type B':
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2,
                                     ex=ex_length_out)
-            else:  # BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,  a= BP.plate_washer_dim_out*1.5,
+            else:  # BP.anchor_type == 'End Plate Type':
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2,  a= BP.plate_washer_dim_out*1.5,
                                            ex=ex_length_out)
 
             bolt_in = bolt
@@ -1096,13 +1096,13 @@ class CommonDesignLogic(object):
             else:
                 BP.anchor_len_above_footing_in = BP.anchor_len_above_footing_out
                 BP.anchor_len_below_footing_in = BP.anchor_len_below_footing_out
-                BP.anchor_dia_inside_flange = BP.anchor_dia_provided
+                BP.anchor_dia_inside_flange = BP.anchor_dia_outside_flange
                 BP.plate_washer_dim_in = BP.plate_washer_dim_out
                 BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_out
                 BP.plate_washer_thk_in = BP.plate_washer_thk_out
 
 
-            bolt_d = float(BP.anchor_dia_provided)
+            bolt_d = float(BP.anchor_dia_outside_flange)
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
             bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
             # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
@@ -1119,17 +1119,17 @@ class CommonDesignLogic(object):
 
             ex_length_out = BP.anchor_len_above_footing_out
             ex_length_in = BP.anchor_len_above_footing_in
-            if BP.dp_anchor_type == 'IS 5624-Type A':
-                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
+            if BP.anchor_type == 'IS 5624-Type A':
+                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75, r=float(BP.anchor_dia_outside_flange) / 2,
                                     ex=ex_length_out)
                 bolt_in = AnchorBolt_A(l=float(BP.anchor_len_below_footing_in), c=125, a=75, r=float(BP.anchor_dia_inside_flange) / 2,
                                     ex=ex_length_in)
-            elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2, ex=ex_length_out)
+            elif BP.anchor_type == 'IS 5624-Type B':
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2, ex=ex_length_out)
                 bolt_in = AnchorBolt_B(l=float(BP.anchor_len_below_footing_in), r=float(BP.anchor_dia_inside_flange) / 2,
                                     ex=ex_length_in)
-            else: #BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_provided) / 2,  a= BP.plate_washer_dim_out * 1.5,
+            else: #BP.anchor_type == 'End Plate Type':
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2,  a= BP.plate_washer_dim_out * 1.5,
                                            ex=ex_length_out)
                 bolt_in = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_in),
                                            r=float(BP.anchor_dia_inside_flange) / 2, a= BP.plate_washer_inner_dia_in * 1.5,
@@ -1142,9 +1142,12 @@ class CommonDesignLogic(object):
             nutSpace = bolt.c + baseplate.T
             bolthight = washer.T + nut.T + 50
 
+            shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T= float(BP.shear_key_depth_ColDepth))
+            shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_depth_ColWidth), T=float(BP.shear_key_len_ColWidth))
+
             nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace, washer, washer_in)
 
-            basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+            basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                      concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
                                      stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
                                      weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange, weld_stiffener_inflange_d)

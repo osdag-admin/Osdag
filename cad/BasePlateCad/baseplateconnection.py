@@ -13,7 +13,7 @@ import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
-    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                  concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v, stiffener_algflangeL,
                  stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh, weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh,
                   stiffener_insideflange, weld_stiffener_inflange, weld_stiffener_inflange_d):
@@ -42,6 +42,8 @@ class BasePlateCad(object):
         self.nut_bolt_array = nut_bolt_array
         self.bolthight = bolthight
         self.baseplate = baseplate
+        self.shearkey_1 = shearkey_1
+        self.shearkey_2 = shearkey_2
         self.weldAbvFlang = weldAbvFlang
         self.weldBelwFlang = weldBelwFlang
         self.weldSideWeb = weldSideWeb
@@ -212,6 +214,22 @@ class BasePlateCad(object):
         self.baseplate.place(baseplateOriginL, baseplateL_uDir, baseplateL_wDir)
 
         self.baseplateModel = self.baseplate.create_model()
+
+        if self.BP.shear_key_required == 'Yes':
+
+            shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 -self.baseplate.T])
+            shearkey_1L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_1L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_1.place(shearkey_1OriginL, shearkey_1L_uDir, shearkey_1L_wDir)
+
+            self.shearkey_1Model = self.shearkey_1.create_model()
+
+            shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 -self.baseplate.T])
+            shearkey_2L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_2L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_2.place(shearkey_2OriginL, shearkey_2L_uDir, shearkey_2L_wDir)
+
+            self.shearkey_2Model = self.shearkey_2.create_model()
 
         if self.BP.stiffener_along_web == 'Yes':
 
@@ -1063,6 +1081,9 @@ class BasePlateCad(object):
         #               self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
 
         plate_list = [self.baseplateModel]
+        if self.BP.shear_key_required == 'Yes':
+            list = [self.shearkey_1Model, self.shearkey_2Model]
+            plate_list.extend(list)
         if self.BP.stiffener_along_flange == 'Yes':
             list = [self.stiffener_algflangeL1Model, self.stiffener_algflangeR1Model, self.stiffener_algflangeL2Model,
                           self.stiffener_algflangeR2Model]

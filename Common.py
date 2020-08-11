@@ -289,6 +289,7 @@ class MaterialValidator(object):
 # Type Keys (Type of input field, tab type etc.)
 ###########################
 TYPE_COMBOBOX = 'ComboBox'
+TYPE_COMBOBOX_FREEZE = 'Disable_ComboBoc'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
@@ -322,7 +323,7 @@ TYP_FRICTION_GRIP = "Friction Grip Bolt"
 ###################################
 # Module Keys
 ###################################
-KEY_MAIN_MODULE = 'MainModule'
+KEY_MAIN_MODULE = 'Main Module'
 KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
@@ -916,7 +917,8 @@ KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite, Fu (MPa)'
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
-KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edges'
+# KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edge'
+KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Edge preparation method'  # added by Danish Ansari
 
 DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
 DISP_TITLE_BOLTD = 'Bolt Details'

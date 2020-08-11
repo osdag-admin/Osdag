@@ -580,3 +580,6 @@ class ShearConnection(Connection):
 
         print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
               self.supported_section.tension_yielding_capacity, self.load.axial_force)
+
+        self.supporting_section.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(self.supporting_section.area,
+                                                                                                       self.supporting_section.fy)

@@ -661,24 +661,32 @@ class SeatedAngleConnection(ShearConnection):
     ####################################
 
     def member_capacity(self):
-        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
-        if self.supported_section.type == "Rolled":
-            self.supported_section.length = self.supported_section.depth
-        else:
-            self.supported_section.length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
+        super(SeatedAngleConnection, self).member_capacity(self)
 
-        # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        self.supported_section.shear_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
-            self.supported_section.length * self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
-        if self.supported_section.shear_capacity > self.load.shear_force :
-            # print("preliminary member check is satisfactory. Checking available angle thickness")
-            self.design_status = True
+        if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
+                self.supporting_section.tension_yielding_capacity / 1000 > self.load.shear_force:
+
+            if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                            40.0):
+                logger.warning(" : User input for shear force is very less compared to section capacity. "
+                               "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                            40.0)
+
+            print("preliminary member check is satisfactory. Checking available Bolt Diameters")
             self.select_angle_thickness(self)
+
         else:
             self.design_status = False
-            logger.error(" : shear yielding capacity {} is less than applied load, Please select larger sections or decrease loads"
-                            .format(self.supported_section.shear_capacity))
-            # print("failed in preliminary member checks. Select larger sections or decrease loads")
+            if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
+                logger.error(" : Shear yielding capacity of supported section, {} kN is less "
+                             "than shear force, Please select larger sections or decrease loads"
+                             .format(round(self.supported_section.shear_yielding_capacity / 1000, 2)))
+            if self.supporting_section.tension_yielding_capacity / 1000 < self.load.shear_force:
+                logger.error(" : Axial yielding capacity of supporting section, {} kN is less "
+                             "than shear force, Please select larger sections or decrease loads"
+                             .format(round(self.supporting_section.tension_yielding_capacity / 1000, 2)))
+            print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_angle_thickness(self):
         self. plate.thickness = []

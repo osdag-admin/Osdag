@@ -405,7 +405,7 @@ def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
     return  Mdc_eqn
 
 
-def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db = 0.0):
+def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db = 0.0,shear_case='low'):
     """
     Calculate shear capacity of member
 
@@ -450,7 +450,10 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db = 0.0):
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{db})\\'))
+        if shear_case == 'full':
+            shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{db})\\'))
+        else:
+            shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_db + r')\\'))
 
     shear_capacity_eqn.append(NoEscape(r'&='+V_d + r'\\'))
@@ -628,6 +631,7 @@ def cl_10_2_3_1_max_spacing(t,parameter=None):#TODO:write condition for pitch an
         max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
 
     max_pitch_eqn.append(NoEscape(r'&=\min(32\times' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+
     max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 
@@ -716,24 +720,24 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
     max_end_edge_eqn = Math(inline=True)
     if corrosive_influences is False:
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max} &= 12~ t~ \varepsilon&\\'))
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max} &= 12~ t~ \varepsilon ;~\varepsilon = \sqrt{\frac{250}{f_y}}\\'))
         else: #'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max} &= 12~ t~ \varepsilon&\\'))
-        max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max} &= 12~ t~ \varepsilon ;~\varepsilon = \sqrt{\frac{250}{f_y}}\\'))
+        # max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
         max_end_edge_eqn.append(NoEscape(r'e1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}}\\'))
         max_end_edge_eqn.append(NoEscape(r'e2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}}\\'))
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)\\'))
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)=' + max_edge_dist +r'\\'))
         else: #'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)\\'))
-        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)=' + max_edge_dist +r'\\'))
+        # max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
     else:
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max}&=40 + 4t\\'))
         else: #'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=40 + 4t\\'))
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max}&=40 + 4t\\'))
         max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +','+t2+r')\\'))
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'e_{max}&='+max_edge_dist+r'\\'))
@@ -986,8 +990,8 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_cap
     tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n < f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))
-    tension_resistance.append(NoEscape(r'&= 0.90~' + f_ub + r'\times' + A_n + '< ' + f_yb + r'\times' + A_sb + r'\times('+ gamma_mb + '/' + gamma_m0))
-    tension_resistance.append(NoEscape(r'&= 0.90~' + f_ub + '~ ' + A_n + ''))
+    tension_resistance.append(NoEscape(r'&= 0.90~'+ r'\times' + f_ub + r'\times' + A_n + '< ' + f_yb + r'\times' + A_sb + r'\times('+ gamma_mb + '/' + gamma_m0 + r')\\'))
+    tension_resistance.append(NoEscape(r'&= 0.90~'+ r'\times' + f_ub + r'\times' + A_n + r'\\'))
     tension_resistance.append(NoEscape(r'&= '+ tension_capacity + r'\\'))
     tension_resistance.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.5]\end{aligned}'))
 
@@ -1015,10 +1019,10 @@ def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db, val
     value = str(value)
 
     combined_capacity_eqn = Math(inline=True)
-    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sb}}{V_{db}}\bigg)^2 + \bigg(\frac{T_{b}}{T_{db}}\bigg)^2  \leq 1.0\\'))
-    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sb + '}{' + V_db + r'}\bigg)^2 + \bigg(\frac{' + T_b + '}{' + T_db + r'}\bigg)^2 = '
-                                          + value + ''))
-    combined_capacity_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.6]&\end{aligned}'))
+    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sb}}{V_{db}}\bigg)^2 + \bigg(\frac{T_{b}}{T_{db}}\bigg)^2  &\leq 1.0\\'))
+    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sb + '}{' + V_db + r'}\bigg)^2 + \bigg(\frac{' + T_b + '}{' + T_db + r'}\bigg)^2 &= '
+                                          + value + r'\\'))
+    combined_capacity_eqn.append(NoEscape(r'[Ref.~IS~800:2007,~Cl.~10.3.6]\end{aligned}'))
 
     return combined_capacity_eqn
 
@@ -1223,7 +1227,6 @@ def cl_10_5_3_1_max_weld_size(conn_plates_weld, max_weld_size):
     return max_weld_size_eqn
 
 
-# TODO: DARSHAN,ANJALI I don't think this is required Ans: It's required.
 def cl_10_5_3_1_throat_thickness_req():
     """
     Note:
@@ -1508,7 +1511,7 @@ def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
     # large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
     # large_grip_bolted_eqn.append(NoEscape(r'& where,\\'))
 
-    large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} l_g &= \Sigma (t_{ep}+t_{member}) \\'))
+    large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} l_g &= \Sigma (t_{p}+t_{member}) \\'))
     # large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
     large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
     large_grip_bolted_eqn.append(NoEscape(r' 5d &= ' + d5_str + r'\\'))
@@ -1864,8 +1867,8 @@ def long_joint_welded_beam_prov(plate_height,l_w,t_w,gap,t_t,Tc,Tr):
         long_joint_welded_beam_prov.append(NoEscape(r' &='+ ll_str+ r' \\'))
         long_joint_welded_beam_prov.append(NoEscape(r'l_h& =' +lh_str+r' \\'))
         long_joint_welded_beam_prov.append(NoEscape(r' l~&= ' + l_str + r'\\'))
-        long_joint_welded_beam_prov.append(NoEscape(r'& 150 \timest_t =150 \times'+t_t+' = '+lt_str +r' \\'))
-        long_joint_welded_beam_prov.append(NoEscape(r'& since,~l < 150 \timest_t~\\&then~V_{rd} = V_{db} \\'))
+        long_joint_welded_beam_prov.append(NoEscape(r'& 150 \times t_t =150 \times'+t_t+' = '+lt_str +r' \\'))
+        long_joint_welded_beam_prov.append(NoEscape(r'& since,~l < 150 \times t_t~\\&then~V_{rd} = V_{db} \\'))
         long_joint_welded_beam_prov.append(NoEscape(r' V_{rd} &= ' + Tc +r' \\'))
         long_joint_welded_beam_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]&\end{aligned}'))
     else:
@@ -2484,6 +2487,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment,moment_demand,ecc):
 
     loads_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned}  M_d &= (V_u \times ecc + M_w)\\'))
     loads_req_bolt_force_eqn.append(NoEscape(r'ecc &= eccentricity\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r'M_w &= external~moment~acting~on~web\\'))
     loads_req_bolt_force_eqn.append(NoEscape(r' &= \frac{('+shear_load+r' \times 10^3 \times'+ecc+' + '+web_moment+r'\times10^6)}{10^6}\\'))
     loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
     return loads_req_bolt_force_eqn
@@ -2934,6 +2938,28 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_plate_length_eqn
 
+def min_angle_leg_length(min_pitch, min_end_dist,gap, angle_thickness, root_radius,bolt_line, min_leg_length):
+    min_pitch = str(min_pitch)
+    min_end_dist = str(min_end_dist)
+    bolt_line = str(bolt_line)
+    angle_thickness=str(angle_thickness)
+    root_radius = str(root_radius)
+    min_leg_length = str(min_leg_length)
+    min_plate_length_eqn = Math(inline=True)
+    if gap > 0.0:
+        gap = str(gap)
+        min_plate_length_eqn.append(NoEscape(
+            r'\begin{aligned} &max(gap, t_{cleat}+r_{r-angle}) + 2e`_{min} + (n_c-1) g_{min}\\'))
+        min_plate_length_eqn.append(NoEscape(r'&=max('+gap+',~'+angle_thickness+'+'+root_radius+')'+r'+2\times' +
+                                             min_end_dist + '+(' + bolt_line + r'-1)  \times  ' + min_pitch + r'\\'))
+    else:
+        min_plate_length_eqn.append(NoEscape(
+            r'\begin{aligned} &t_{cleat}+r_{r-angle} + 2e`_{min} + (n_c-1) g_{min}\\'))
+        min_plate_length_eqn.append(
+            NoEscape(r'&=' + angle_thickness + '+' + root_radius+ r' +2\times' + min_end_dist +
+                     '+(' + bolt_line + r'-1)  \times  ' + min_pitch + r'\\'))
+    min_plate_length_eqn.append(NoEscape(r'&=' + min_leg_length + '\end{aligned}'))
+    return min_plate_length_eqn
 
 def min_flange_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length,gap,sec =None):
 
@@ -3110,11 +3136,11 @@ def plate_Length_req(l_w,t_w,g,l_fp,conn =None): #weld
     l_fp = str(l_fp)
     min_plate_Length_eqn = Math(inline=True)
     if conn =="Flange":
-        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{fp} & = [2 \times(l_{w} + 2\timest_w) + g]\\'))
+        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{fp} & = [2 \times(l_{w} + 2\times t_w) + g]\\'))
         min_plate_Length_eqn.append(NoEscape(r'&= [2\times('+ l_w + r'+2\times'+t_w+') +' + g+ r']\\'))
         min_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
     else:
-        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{wp} & = [2\times(l_{w} + 2\timest_w) + g]\\'))
+        min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} L_{wp} & = [2\times(l_{w} + 2\times t_w) + g]\\'))
         min_plate_Length_eqn.append(NoEscape(r'&= [2\times(' + l_w + r'+2\times' + t_w + ') +' + g + r']\\'))
         min_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
 
@@ -3224,8 +3250,8 @@ def weld_strength_req(V,A,M,Ip_w,y_max,x_max,l_w,R_w):
 
         weld_stress_eqn = Math(inline=True)
         weld_stress_eqn.append(NoEscape(r'\begin{aligned} R_w&=\sqrt{(T_{wh}+A_{wh})^2 + (T_{wv}+V_{wv})^2}\\'))
-        weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M\timesy_{max}}{I{pw}}=\frac{'+M+r'\times'+y_max+'}{'+Ip_w+r'}\\'))
-        weld_stress_eqn.append(NoEscape(r'T_{wv}&=\frac{M\timesx_{max}}{I{pw}}=\frac{'+M+r'\times'+x_max+'}{'+Ip_w+r'}\\'))
+        weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M\times y_{max}}{I{pw}}=\frac{'+M+r'\times'+y_max+'}{'+Ip_w+r'}\\'))
+        weld_stress_eqn.append(NoEscape(r'T_{wv}&=\frac{M\times x_{max}}{I{pw}}=\frac{'+M+r'\times'+x_max+'}{'+Ip_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V}{l_w}=\frac{'+V+'}{'+l_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A}{l_w}=\frac{'+A+'}{'+l_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'R_w&=\sqrt{('+T_wh+'+'+A_wh+r')^2 + ('+T_wv+'+'+V_wv+r')^2}\\'))
@@ -3277,7 +3303,7 @@ def weld_strength_stress(V_u,A_w,M_d,Ip_w,y_max,x_max,l_eff,R_w):
     R_w = str(R_w)
     weld_stress_eqn = Math(inline=True)
     weld_stress_eqn.append(NoEscape(r'\begin{aligned} R_w&=\sqrt{(T_{wh}+A_{wh})^2 + (T_{wv}+V_{wv})^2}\\'))
-    weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M_d\timesy_{max}}{I{pw}}\\'))
+    weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M_d\times y_{max}}{I{pw}}\\'))
     weld_stress_eqn.append(NoEscape(r'&=\frac{'+M_d+r'\times'+y_max+'}{'+Ip_w+r'}\\'))
     weld_stress_eqn.append(NoEscape(r'T_{wv}&=\frac{M_d \times x_{max}}{I{pw}}\\'))
     weld_stress_eqn.append(NoEscape(r'&=\frac{'+M_d+r'\times'+x_max+'}{'+Ip_w+r'}\\'))
@@ -3320,7 +3346,7 @@ def shear_Rupture_prov_weld(h, t,fu,v_dn,gamma_m1,multiple =1):  #weld
     multiple = str(multiple)
 
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75\timesA_{vn}~f_u}{\sqrt{3}~\gamma_{m1}}\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75\times A_{vn}~f_u}{\sqrt{3}~\gamma_{m1}}\\'))
     shear_rup_eqn.append(NoEscape(r'&=\frac{'+ multiple+r'\times 0.75\times'+h+r'\times'+t+r'\times'+f_u+r'}{\sqrt{3}\times' +gamma_m1+ r'}\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + r'\\'))
     shear_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3]\end{aligned}'))
@@ -3370,7 +3396,7 @@ def no_of_bolts_along_web(D,T_f,e,p,n_bw):
     T_f = str(T_f)
     n_bw = str(n_bw)
     no_of_bolts_along_web = Math(inline=True)
-    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &= 2 \times ( \frac{D -(2\timesT_f) -(2\timese)}{\ p}  + 1 )\\'))
+    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &= 2 \times ( \frac{D -(2\times T_f) -(2\times e)}{\ p}  + 1 )\\'))
     no_of_bolts_along_web.append(NoEscape(r'&= 2 \times (\frac{' + D + r' -(2\times'+T_f +r')-(2\times'+e + r')}{' + p + r'} +1 ) \\'))
     no_of_bolts_along_web.append(NoEscape(r'&= ' + n_bw + r'\end{aligned}'))
     return no_of_bolts_along_web
@@ -3395,7 +3421,7 @@ def no_of_bolts_along_flange(b,T_w,e,p,n_bf):
     T_w = str(T_w)
     n_bf = str(n_bf)
     no_of_bolts_along_flange = Math(inline=True)
-    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &= 2 \times ( \frac{b/2 -(T_w / 2) -(2\timese)}{\ p}  + 1 )\\'))
+    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &= 2 \times ( \frac{b/2 -(T_w / 2) -(2\times e)}{\ p}  + 1 )\\'))
     no_of_bolts_along_flange.append(NoEscape(r'&= 2 \times (\frac{' + b + r'/2 -(0.5\times'+T_w +r')-(2\times'+e + r')}{' + p + r'} +1 )\\'))
     no_of_bolts_along_flange.append(NoEscape(r'&= ' + n_bf + r'\end{aligned}'))
     return no_of_bolts_along_flange
@@ -3696,11 +3722,11 @@ def eff_len_prov(l_eff, b_fp, t_w, l_w,con= None):
     t_w = str(t_w)
     eff_len_eqn = Math(inline=True)
     if con == "Flange":
-        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\timesl_w) + B_{fp} - 2\timest_w\\'))
+        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\times l_w) + B_{fp} - 2\times t_w\\'))
         eff_len_eqn.append(NoEscape(r'&= (2\times' + l_w + ') +' + b_fp + r' - 2\times' + t_w + r'\\'))
         eff_len_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
     else:
-        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\timesl_w) + W_{wp} - 2\timest_w\\'))
+        eff_len_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (2\times l_w) + W_{wp} - 2\times t_w\\'))
         eff_len_eqn.append(NoEscape(r'&= (2\times' + l_w + ') +' + b_fp + r' - 2\times' + t_w + r'\\'))
         eff_len_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
 
@@ -3726,7 +3752,7 @@ def eff_len_prov_out_in(l_eff, b_fp,b_ifp, t_w, l_w):
     b_ifp = str(b_ifp)
     t_w = str(t_w)
     eff_len_prov_out_in_eqn = Math(inline=True)
-    eff_len_prov_out_in_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (6\timesl_w) + B_{fp} + (2 \times B_{ifp})- 6\timest_w\\'))
+    eff_len_prov_out_in_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (6\times l_w) + B_{fp} + (2 \times B_{ifp})- 6\times t_w\\'))
     eff_len_prov_out_in_eqn.append(NoEscape(r'&= (6\times' + l_w + ') +' + b_fp + r'+ 2\times' +b_ifp + r'- 6\times' + t_w + r'\\'))
     eff_len_prov_out_in_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
 

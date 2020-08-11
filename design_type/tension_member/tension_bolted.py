@@ -1160,7 +1160,7 @@ class Tension_bolted(Member):
                 logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
                 logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 # logge r.error(": Design is not safe. \n ")
-                # logger.debug(" :=========End Of design===========")
+                # logger.info(" :=========End Of design===========")
                 break
 
                 "condition to limit loop based on max length derived from max available size"
@@ -1171,7 +1171,7 @@ class Tension_bolted(Member):
                 logger.warning(" : Member Length {} mm exceeds maximum allowable length of {} mm for maximum available member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
                 logger.info(" : Select Members with higher radius of gyration value than the above mentioned Member.")
                 # logger.error(": Design is not safe. \n ")
-                # logger.debug(" :=========End Of design===========")
+                # logger.info(" :=========End Of design===========")
                 break
 
             else:
@@ -1181,7 +1181,7 @@ class Tension_bolted(Member):
             logger.warning(" : Member Depth can't accomodate minimum available bolt diameter of {} mm based on minimum spacing limit (IS 800:2007 - Clause 10.2).".format(self.bolt_diameter_min))
             logger.info(" : Reduce the bolt size or increase the Member Depth.")
             # logger.error(": Design is not safe. \n ")
-            # logger.debug(" :=========End Of design===========")
+            # logger.info(" :=========End Of design===========")
 
         if self.member_design_status == True:
             print("pass")
@@ -1191,7 +1191,7 @@ class Tension_bolted(Member):
             # print(self.member_design_status,"hxfv")
             self.design_status = False
             logger.error(": Design is not safe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
     def select_bolt_dia(self,design_dictionary,dia_remove =None):
 
@@ -1234,7 +1234,7 @@ class Tension_bolted(Member):
 
         elif design_dictionary[KEY_SEC_PROFILE]== 'Star Angles':
             bolts_required_previous = 1
-            self.thick = 2* self.section_size_1.thickness
+            self.thick = self.section_size_1.thickness
             if self.loc =="Long Leg":
                 self.thick_plate = (self.res_force * 1.1) / (2*self.section_size_1.max_leg * self.plate.fy)
             else:
@@ -1269,9 +1269,10 @@ class Tension_bolted(Member):
             self.planes = 2
 
         self.bolt_conn_plates_t_fu_fy = []
-        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
         self.bolt_conn_plates_t_fu_fy.append(
             (self.thick, self.section_size_1.fu, self.section_size_1.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+
 
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
@@ -1291,14 +1292,14 @@ class Tension_bolted(Member):
             self.design_status = False
             logger.warning(" :Combined thickness of {} mm exceeds Large grip limit of {} mm for bolt miniumum bolt diameter {} mm (IS 800:2007 - Cl.10.3.3.2)". format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
             # logger.error(": Design is not safe. \n ")
-            # logger.debug(" :=========End Of design===========")
+            # logger.info(" :=========End Of design===========")
         else:
             self.bolt_design_status = False
             for self.bolt.bolt_diameter_provided in reversed(self.bolt_diameter_possible):
 
                 # print(self.bolt.bolt_diameter_provided)
                 self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
 
                 self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                              'machine_flame_cut'), 2)
@@ -1384,7 +1385,7 @@ class Tension_bolted(Member):
             if self.plate.reason != "":
                 logger.warning(self.plate.reason)
             logger.error(": Design is not safe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
 
 
@@ -1403,14 +1404,15 @@ class Tension_bolted(Member):
         #     self.plate.thickness_provided = min([i for i in self.plate.thickness if i >= self.thick])
 
         self.bolt_conn_plates_t_fu_fy = []
-        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
         self.bolt_conn_plates_t_fu_fy.append(
             (self.thick, self.section_size_1.fu, self.section_size_1.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+
 
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
 
             self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                          'machine_flame_cut'), 2)
@@ -1420,8 +1422,8 @@ class Tension_bolted(Member):
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                              n_planes=self.planes, e=self.plate.end_dist_provided,
-                                              p=self.plate.pitch_provided)
+                                              n_planes=self.planes, e=self.bolt.min_end_dist_round,
+                                              p=self.bolt.min_pitch_round)
 
             # print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
 
@@ -1438,7 +1440,7 @@ class Tension_bolted(Member):
             count += 1
 
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
 
         self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                      'machine_flame_cut'), 2)
@@ -1666,7 +1668,7 @@ class Tension_bolted(Member):
                 logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area))
                 logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
 
     def get_plate_thickness(self,design_dictionary):
 
@@ -1705,12 +1707,12 @@ class Tension_bolted(Member):
 
         self.plate.length = (self.plate.bolt_line - 1) * self.plate.pitch_provided + 2 * self.plate.end_dist_provided
 
-        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-            self.thick = self.section_size_1.web_thickness
-        elif design_dictionary[KEY_SEC_PROFILE] in ["Angles", "Star Angles"]:
-            self.thick = self.section_size_1.thickness
-        else:
-            self.thick = 2* self.section_size_1.thickness
+        # if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+        #     self.thick = self.section_size_1.web_thickness
+        # elif design_dictionary[KEY_SEC_PROFILE] in ["Angles", "Star Angles"]:
+        #     self.thick = self.section_size_1.thickness
+        # else:
+        #     self.thick = 2* self.section_size_1.thickness
 
         # self.thickness_possible = [i for i in self.plate.thickness if i >= self.thick_plate]
 
@@ -1792,7 +1794,7 @@ class Tension_bolted(Member):
             #     self.design_status = False
             #     logger.error("Plate thickness is not sufficient.")
             #     # logger.error(": Design is not safe. \n ")
-            #     # logger.debug(" :=========End Of design===========")
+            #     # logger.info(" :=========End Of design===========")
             else:
                 pass
 
@@ -1801,11 +1803,12 @@ class Tension_bolted(Member):
 
 
         self.bolt_conn_plates_t_fu_fy = []
-        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
         self.bolt_conn_plates_t_fu_fy.append((self.thick, self.section_size_1.fu, self.section_size_1.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+
 
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
 
         self.bolt.min_edge_dist = round(
             IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
@@ -1853,6 +1856,7 @@ class Tension_bolted(Member):
                 logger.info(":Try higher diameter of bolt or increase member length to get a safe design.")
                 logger.error(":Design is not safe. \n ")
                 logger.debug(":=========End Of design===========")
+
             elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
                 print("bolt check")
                 status = False
@@ -1908,6 +1912,7 @@ class Tension_bolted(Member):
                     self.initial_member_capacity(self, design_dictionary, size)
                 else:
                     self.design_status = False
+
                     logger.warning(":Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of {} mm.". format(round(self.res_force/1000,2),round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
                     logger.error(":Design is not safe. \n ")
                     logger.debug(":=========End Of design===========")
@@ -1917,6 +1922,7 @@ class Tension_bolted(Member):
                         round(self.res_force / 1000, 2), round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
                 logger.error(":Design is not safe. \n ")
                 logger.debug(":=========End Of design===========")
+
                 print(self.design_status)
 
     def status_pass(self,design_dictionary):
@@ -1924,9 +1930,11 @@ class Tension_bolted(Member):
             self.design_status = False
             logger.warning(":Plate length of {} mm is higher than Member length of {} mm".format(2 * self.plate.length,
                                                                                                 self.length))
+
             logger.info(":Try higher diameter of bolt or increase member length to get a safe design.")
             logger.error(":Design is not safe. \n ")
             logger.debug(":=========End Of design===========")
+
         else:
             self.plate_design_status = True
             self.design_status = True
@@ -1936,15 +1944,17 @@ class Tension_bolted(Member):
                 logger.info(":In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
             else:
                 pass
-            logger.info(":To reduce quantity of bolts, select a list of plate thickness or member thickness higher than the current list .")
+            logger.info(":To reduce quantity of bolts, select a list of diameter, plate thickness or member thickness higher than the current list.")
 
             if self.load.axial_force < (self.res_force / 1000):
                 logger.info(":Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
                         round(self.res_force / 1000, 2)))
             else:
                 pass
+
             logger.info(":Overall bolted tension member design is safe. \n")
             logger.debug(":=========End Of design===========")
+
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                 self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
                                            material_grade=self.material,
@@ -2064,7 +2074,7 @@ class Tension_bolted(Member):
         # if self.member_design_status == True:
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             if self.sec_profile == "Back to Back Channels":
-                connecting_plates = [self.plate.thickness_provided, 2*section_size.web_thickness]
+                connecting_plates = [self.plate.thickness_provided, section_size.web_thickness]
                 if section_size.flange_slope ==90:
                     image = "Parallel_BBChannel"
                 else:
@@ -2081,7 +2091,7 @@ class Tension_bolted(Member):
             depth =  2 * self.edge_dist_min_round + self.pitch_round
         elif section_size.max_leg == section_size.min_leg:
             if self.sec_profile == "Back to Back Angles":
-                connecting_plates = [self.plate.thickness_provided, 2 * section_size.thickness]
+                connecting_plates = [self.plate.thickness_provided, section_size.thickness]
                 if self.loc == "Long Leg":
                     image = "bblequaldp"
                 else:
@@ -2104,7 +2114,7 @@ class Tension_bolted(Member):
 
         else:
             if self.sec_profile == "Back to Back Angles":
-                connecting_plates = [self.plate.thickness_provided, 2 * section_size.thickness]
+                connecting_plates = [self.plate.thickness_provided, section_size.thickness]
                 if self.loc == "Long Leg":
                     image = "bblunequaldp"
                 else:
@@ -2526,7 +2536,7 @@ class Tension_bolted(Member):
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)
 
-            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt.single_conn_plates_t_fu_fy,
                                                               corrosive_influences=self.bolt.corrosive_influences,
                                                               parameter='end_dist'),
                   self.plate.end_dist_provided,
@@ -2536,7 +2546,7 @@ class Tension_bolted(Member):
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt.single_conn_plates_t_fu_fy,
                                                               corrosive_influences=self.bolt.corrosive_influences,
                                                               parameter='end_dist'),
                   self.plate.edge_dist_provided,

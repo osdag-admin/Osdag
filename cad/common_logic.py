@@ -117,6 +117,7 @@ import OCC.Core.V3d
 from OCC.Core.Quantity import *
 from OCC.Core.Graphic3d import *
 from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
+import multiprocessing
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData
@@ -1509,6 +1510,8 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
 
+
+
                 # elif self.component == "end bolt":
                 #     pass
                 # elif self.component == "intermediate bolt":
@@ -1538,6 +1541,7 @@ class CommonDesignLogic(object):
                 #     pass
                 # elif self.component == "intermediate bolt":
                 #     pass
+
 
     def call_3DModel(self, flag, module_class):  # Done
 
@@ -1841,3 +1845,10 @@ class CommonDesignLogic(object):
         #     final_model = cadlist[0]
         #     for model in cadlist[1:]:
         #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+# if __name__!= "__main__":
+#
+#     CommonDesignLogic()
+
+
+

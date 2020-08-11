@@ -627,7 +627,7 @@ def cl_10_2_3_1_max_spacing(t,parameter=None):#TODO:write condition for pitch an
     else:
         max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
 
-    max_pitch_eqn.append(NoEscape(r'&=\min(32~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+    max_pitch_eqn.append(NoEscape(r'&=\min(32\times' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
     max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 

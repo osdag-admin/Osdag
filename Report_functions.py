@@ -222,7 +222,7 @@ def cl_6_3_3_tension_rupture_member(A_nc, A_go, F_u, F_y, L_c, w, b_s, t, gamma_
     member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076 \times \frac{w}{t}\times\frac{f_{y}}{0.9 f_{u}}\times\frac{b_s}{L_c}\\'))
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9~f_{u}~\gamma_{m0}}{f_{y}~\gamma_{m1}} \geq 0.7 \\'))
     member_rup_eqn.append(NoEscape(r'&= 1.4 - 0.076 \times \frac{'+ w +'}{'+ t + r'}\times\frac{'+ fy +r'}{0.9\times'+ fu + r'}\times\frac{'+ b_s +'}{' + L_c + r' }\\'))
-    member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9'+ fu +r'\times'+ gamma_m0 +'}{' +fy+r'\times'+gamma_m1 + r'} \geq 0.7 \\'))
+    member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9\times'+ fu +r'\times'+ gamma_m0 +'}{' +fy+r'\times'+gamma_m1 + r'} \geq 0.7 \\'))
     member_rup_eqn.append(NoEscape(r'&= '+ beta + r'\\'))
     member_rup_eqn.append(NoEscape(r'T_{dn} &= '+multiple+r'\times (\frac{0.9 A_{nc}f_{u}}{\gamma_{m1}} + \frac{\beta A_{go} f_{y}}{\gamma_{m0}})\\'))
     member_rup_eqn.append(NoEscape(r'&= '+multiple+ r'\times(\frac{0.9\times'+ A_nc +r'\times' + fu + '}{'+ gamma_m1 + r'} + \frac{' + beta +r'\times' + A_go +r'\times' + fy + '}{' + gamma_m0 + r'})\\'))
@@ -630,7 +630,8 @@ def cl_10_2_3_1_max_spacing(t,parameter=None):#TODO:write condition for pitch an
     else:
         max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
 
-    max_pitch_eqn.append(NoEscape(r'&=\min(32 \times' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+    max_pitch_eqn.append(NoEscape(r'&=\min(32\times' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+
     max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 

@@ -562,8 +562,8 @@ DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
-KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
-KEY_DISP_FY = 'Yield strength , fy (MPa)'
+KEY_DISP_FU = 'Ultimate strength, $f_u$ (MPa)'
+KEY_DISP_FY = 'Yield strength, $f_y$ (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
@@ -586,7 +586,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_MATERIAL = 'Material'
+KEY_DISP_MATERIAL = 'Plate material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 KEY_DISP_PRIBM = 'Primary beam *'
@@ -892,7 +892,7 @@ KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 
 
-KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
+KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor $\mu_f$'
 
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield strength (N/mm2)'

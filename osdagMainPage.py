@@ -789,6 +789,9 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
 if __name__ == '__main__':
+    # from cad.common_logic import CommonDesignLogic
+    from multiprocessing import Pool
+    import multiprocessing
 
     # app = QApplication(sys.argv)
     # screen = app.screens()[0]
@@ -805,7 +808,14 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
-    window = OsdagMainWindow()
+    print(multiprocessing.cpu_count())
+    pool = Pool()
+    try:
+        result = pool.apply_async(OsdagMainWindow())
+    finally:
+        pool.terminate()
+    # window = OsdagMainWindow()
+
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
     ############################     Exception Dialog and Error Reporting  ###################

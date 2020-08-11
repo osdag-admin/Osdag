@@ -501,7 +501,6 @@ class Connection(Main):
 
         return fu_fy_list
 
-
     def refresh_input_dock(self):
 
         add_buttons = []
@@ -624,9 +623,6 @@ class Connection(Main):
 
         return information
 
-
-
-
     def call_3DColumn(self, ui, bgcolor):
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
@@ -656,90 +652,255 @@ class Connection(Main):
             return False
 
     def save_design(self):
-        if self.supporting_section.flange_slope != 90:
-            section1 = "Slope_Beam"
-        else:
-            section1 = "Parallel_Beam"
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: section1,
-                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
-                                  KEY_DISP_MATERIAL: self.supporting_section.material,
-                                  'Ultimate strength, $f_u$ (MPa)': self.supporting_section.fu,
-                                  'Yield strength, $f_y$ (MPa)': self.supporting_section.fy,
-                                  'Mass, $m$ (kg/m)': self.supporting_section.mass,
-                                  'Area, $A$ (cm$^2$)': round(self.supporting_section.area/100,2),
-                                  '$D$ (mm)': self.supporting_section.depth,
-                                  '$B$ (mm)': self.supporting_section.flange_width,
-                                  '$t$ (mm)': self.supporting_section.web_thickness,
-                                  '$T$ (mm)': self.supporting_section.flange_thickness,
-                                  'Flange slope,'+r'$~\alpha$': self.supporting_section.flange_slope,
-                                  '$R_1$ (mm)': self.supporting_section.root_radius,
-                                  '$R_2$ (mm)': self.supporting_section.toe_radius,
-                                  '$I_z$ (cm$^4$)': round(self.supporting_section.mom_inertia_z/10000,2),
-                                  '$I_y$ (cm$^4$)': round(self.supporting_section.mom_inertia_y/10000,2),
-                                  '$r_z$ (cm)': round(self.supporting_section.rad_of_gy_z/10,2),
-                                  '$r_y$ (cm)': round(self.supporting_section.rad_of_gy_y/10,2),
-                                  '$Z_z$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_z/1000,2),
-                                  '$Z_y$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_y/1000,2),
-                                  '$Z_{pz}$ (cm$^3$)': round(self.supporting_section.plast_sec_mod_z/1000,2),
-                                  '$Z_{py}$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_y/1000,2)}
+        """ """
+        if self.module == KEY_DISP_BASE_PLATE:  # base plate module
 
-        if self.supported_section.flange_slope != 90:
-            section2 = "Slope_Beam"
+            # select image of section for displaying in report
+            if self.connectivity == 'Hollow/Tubular Column Base':
+                if self.dp_column_designation[1:4] == 'SHS':
+                    select_section_img = 'SHS'
+                elif self.dp_column_designation[1:4] == 'RHS':
+                    select_section_img = 'RHS'
+                else:
+                    select_section_img = 'CHS'
+            else:
+                if self.column_properties.flange_slope != 90:
+                    select_section_img = "Slope_Beam"
+                else:
+                    select_section_img = "Parallel_Beam"
+
+            # column section properties
+            if self.connectivity == 'Hollow/Tubular Column Base':
+                if self.dp_column_designation[1:4] == 'SHS':
+                    section_type = 'Square Hollow Section (SHS)'
+                elif self.dp_column_designation[1:4] == 'RHS':
+                    section_type = 'Rectangular Hollow Section (RHS)'
+                else:
+                    section_type = 'Circular Hollow Section (CHS)'
+            else:
+                section_type = 'I Section'
+
+            if self.dp_column_source == 'IS808_Rev':
+                self.dp_column_source = 'IS 808\_Rev'
+
+            self.column_properties = {
+                KEY_DISP_SEC_PROFILE: select_section_img,  # select image of the section for displaying in design report
+
+                # properties fro DP
+                'Column Section': self.dp_column_designation,
+                # 'Section Type': section_type,
+                # 'Type': self.dp_column_type,
+                # 'Source': self.dp_column_source,
+                KEY_DISP_MATERIAL: self.dp_column_material,
+                'Ultimate strength, ($f_{u}$)': self.dp_column_fu,
+                'Yield strength, ($f_{y}$)': self.dp_column_fy,
+
+                # properties from DB
+                'Mass, $m$ (kg/m)': self.column_properties.mass,
+                'Area, $A$ (cm$^2$)': round(self.column_properties.area / 100, 2),
+                'Nominal bore, NB (mm)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.nominal_bore
+                                                                            if self.dp_column_designation[1:4] == 'CHS' else None,
+                'Out diameter, OD (mm)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.out_diameter
+                                                                            if self.dp_column_designation[1:4] == 'CHS' else None,
+                None if self.dp_column_designation[1:4] == 'CHS' else '$D$ (mm)': None if self.dp_column_designation[1:4] == 'CHS' else
+                                                                                                            self.column_properties.depth,
+                None if self.dp_column_designation[1:4] == 'CHS' else '$B$ (mm)': None if self.dp_column_designation[1:4] == 'CHS' else
+                                                                                                    self.column_properties.flange_width,
+                None if self.dp_column_designation[1:4] == 'CHS' else '$t$ (mm)': None if self.dp_column_designation[1:4] == 'CHS' else
+                                                                                                    self.column_properties.web_thickness,
+                '$T$ (mm)': self.column_properties.flange_thickness,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Flange Slope (deg)': None if self.connectivity ==
+                                                                            'Hollow/Tubular Column Base' else self.column_properties.flange_slope,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$R_1$ (mm)': None if self.connectivity == 'Hollow/Tubular Column Base'
+                                                                                                            else self.column_properties.root_radius,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$R_1$ (mm)': None if self.connectivity == 'Hollow/Tubular Column Base'
+                                                                                                            else self.column_properties.toe_radius,
+
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$I_z$ (cm$^4$)': None if self.connectivity ==
+                                                            'Hollow/Tubular Column Base' else round(self.column_properties.mom_inertia_z / 10000, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$I_y$(cm$^4$)': None if self.connectivity ==
+                                                            'Hollow/Tubular Column Base' else round(self.column_properties.mom_inertia_y / 10000, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$r_z$ (cm)': None if self.connectivity ==
+                                                                 'Hollow/Tubular Column Base' else round(self.column_properties.rad_of_gy_z / 10, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$r_y$ (cm)': None if self.connectivity ==
+                                                                 'Hollow/Tubular Column Base' else round(self.column_properties.rad_of_gy_y / 10, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$Z_z$ (cm$^3$)': None if self.connectivity ==
+                                                             'Hollow/Tubular Column Base' else round(self.column_properties.elast_sec_mod_z / 1000, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$Z_y$ (cm$^3$)': None if self.connectivity ==
+                                                            'Hollow/Tubular Column Base' else round(self.column_properties.elast_sec_mod_y / 1000, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$Z_{pz}$ (cm$^3$)': None if self.connectivity ==
+                                                            'Hollow/Tubular Column Base' else round(self.column_properties.plast_sec_mod_z / 1000, 2),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else '$Z_{py}$ (cm$^3$)': None if self.connectivity ==
+                                                            'Hollow/Tubular Column Base' else round(self.column_properties.elast_sec_mod_y / 1000, 2),
+                '2nd Moment of area, I ($cm^{4}/m$)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.mom_inertia if
+                                                                                            self.dp_column_designation[1:4] == 'CHS' else None,
+                'Radius of gyration, r ($cm$)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.rad_of_gy if
+                                                                                    self.dp_column_designation[1:4] == 'CHS' else None,
+                'Modulus of section, Z ($cm^{3}$)' if self.dp_column_designation[1:4] == 'CHS' else None: self.column_properties.elast_sec_mod if
+                                                                                            self.dp_column_designation[1:4] == 'CHS' else None
+            }
+
+            self.report_input = {
+                # general parameters
+                KEY_MAIN_MODULE: self.mainmodule,
+                KEY_MODULE: self.module,
+                KEY_CONN: self.connectivity,
+                KEY_END_CONDITION: self.end_condition,
+                KEY_DISP_AXIAL_BP: round(self.load_axial_compression * 10 ** -3, 2),
+                KEY_DISP_AXIAL_TENSION_BP: round(self.load_axial_tension * 10 ** -3, 2),
+                KEY_DISP_SHEAR_BP: None,
+                KEY_DISP_SHEAR_MAJOR: round(self.load_shear_major * 10 ** -3, 2),
+                KEY_DISP_SHEAR_MINOR: round(self.load_shear_minor * 10 ** -3, 2),
+                KEY_DISP_MOMENT: None,
+                '- Major axis ($M_{z-z}$)': self.load_moment_major_report,
+                '- Minor axis ($M_{y-y}$)': self.load_moment_minor_report,
+
+                # column section
+                "Column Section - Mechanical Properties": "TITLE",
+                "Column Section - Details and Design Preference": self.column_properties,
+
+                # base plate
+                "Base Plate - Design Preference": "TITLE",
+                KEY_DISP_MATERIAL: self.dp_bp_material,
+                'Ultimate strength, ($f_{u}$)': self.dp_bp_fu,
+                'Yield strength, ($f_{y}$)': self.dp_bp_fy,
+
+                # anchor bolt outside column flange
+                "Anchor Bolt Outside Column Flange - Details and Design Preference": "TITLE",
+                'Diameter': str(self.anchor_dia_out),
+                'Property Class': str(self.anchor_grade_out),
+                KEY_DISP_DP_ANCHOR_BOLT_TYPE: self.dp_anchor_type_out,
+                KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED: self.dp_anchor_galv_out,
+                KEY_DISP_DESIGNATION: self.dp_anchor_designation_out,
+                'Hole Type': self.dp_anchor_hole_out,
+                'Total Length (mm)': self.dp_anchor_length_out,
+                'Material grade overwrite, f_{u} (MPa) ': self.dp_anchor_fu_overwrite_out,
+                'Friction coefficient between concrete and anchor bolt': self.dp_anchor_friction,
+
+                # anchor bolt inside column flange
+                None if (self.connectivity == 'Hollow/Tubular Column Base') else "Anchor Bolt Inside Column Flange - Details and Design Preference":
+                                                                            None if self.connectivity == 'Hollow/Tubular Column Base' else "TITLE",
+                None if (self.connectivity == 'Hollow/Tubular Column Base') else 'Diameter': None if self.connectivity == 'Hollow/Tubular Column Base'
+                                                                                                                    else str(self.anchor_dia_out),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Property Class': None if self.connectivity ==
+                                                                                     'Hollow/Tubular Column Base' else str(self.anchor_grade_out),
+                None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_TYPE: None if self.connectivity ==
+                                                                                        'Hollow/Tubular Column Base' else self.dp_anchor_type_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED: None if self.connectivity ==
+                                                                                         'Hollow/Tubular Column Base' else self.dp_anchor_galv_in,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DESIGNATION: None if self.connectivity ==
+                                                                                 'Hollow/Tubular Column Base' else self.dp_anchor_designation_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Hole Type': None if self.connectivity ==
+                                                                                        'Hollow/Tubular Column Base' else self.dp_anchor_hole_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Total Length (mm)': None if self.connectivity ==
+                                                                                        'Hollow/Tubular Column Base' else self.dp_anchor_length_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O: None if self.connectivity ==
+                                                                                 'Hollow/Tubular Column Base' else self.dp_anchor_fu_overwrite_out,
+                None if self.connectivity == 'Hollow/Tubular Column Base' else 'Friction coefficient between concrete and anchor bolt':
+                                                            None if self.connectivity == 'Hollow/Tubular Column Base' else self.dp_anchor_friction,
+
+                # weld
+                "Weld - Design Preference": "TITLE",
+                KEY_DISP_DP_WELD_FAB: self.dp_weld_fab,
+                'Material grade overwrite, $f_{u}$ (MPa) ': self.dp_weld_fu_overwrite,
+
+                # detailing
+                "Detailing - Design Preference": "TITLE",
+                KEY_DISP_DP_DETAILING_EDGE_TYPE: self.dp_detail_edge_type,
+                'Are the members exposed to corrosive influences?': self.dp_detail_is_corrosive,
+
+                # design method
+                "Design - Design Preference": "TITLE",
+                KEY_DISP_DP_DESIGN_METHOD: self.dp_design_method,
+                KEY_DISP_DP_DESIGN_BASE_PLATE: 'Elastic Analysis Method' if self.connectivity == 'Moment Base Plate' else self.dp_bp_method
+            }
+
         else:
-            section2 = "Parallel_Beam"
-        self.report_supported = {
-            KEY_DISP_SEC_PROFILE: section2,  # Image shall be saved with this name.png in resource files
-            KEY_DISP_SUPTDSEC: self.supported_section.designation,
-            KEY_DISP_MATERIAL: self.supported_section.material,
-            'Ultimate strength, $f_u$': self.supported_section.fu,
-            'Yield strength, $f_y$': self.supported_section.fy,
-            'Mass, $M$ (kg/m)': self.supported_section.mass,
-            'Area, $A$ (cm$^2$)': round(self.supported_section.area / 100, 2),
-            '$D$ (mm)': self.supported_section.depth,
-            '$B$ (mm)': self.supported_section.flange_width,
-            '$t$ (mm)': self.supported_section.web_thickness,
-            '$T$ (mm)': self.supported_section.flange_thickness,
-            'Flange slope,'+r'$~\alpha$': self.supported_section.flange_slope,
-            '$R_1$ (mm)': self.supported_section.root_radius,
-            '$R_2$ (mm)': self.supported_section.toe_radius,
-            '$I_z$ (cm$^4$)': round(self.supported_section.mom_inertia_z / 10000, 2),
-            '$I_y$ (cm$^4$)': round(self.supported_section.mom_inertia_y / 10000, 2),
-            '$r_z$ (cm)': round(self.supported_section.rad_of_gy_z / 10, 2),
-            '$r_y$ (cm)': round(self.supported_section.rad_of_gy_y / 10, 2),
-            '$Z_z$ (cm$^3$)': round(self.supported_section.elast_sec_mod_z / 1000, 2),
-            '$Z_y$ (cm$^3$)': round(self.supported_section.elast_sec_mod_y / 1000, 2),
-            '$Z_{pz}$ (cm$^3$)': round(self.supported_section.plast_sec_mod_z / 1000, 2),
-            '$Z_{py}$ (cm$^3$)': round(self.supported_section.elast_sec_mod_y / 1000, 2)}
-        if self.module == KEY_DISP_FINPLATE or self.module == KEY_DISP_ENDPLATE:
-            self.report_input = \
-                {KEY_MAIN_MODULE: self.mainmodule,
-                 KEY_MODULE: self.module,
-                 KEY_CONN: self.connectivity,
-                 KEY_DISP_SHEAR: self.load.shear_force,
-                 KEY_DISP_AXIAL: self.load.axial_force,
-                 "Supporting Section": "TITLE",
-                 "Supporting Section Details": self.report_supporting,
-                 "Supported Section": "TITLE",
-                 "Supported Section Details": self.report_supported,
-                 "Bolt Details": "TITLE",
-                 KEY_DISP_D: str(self.bolt.bolt_diameter),
-                 KEY_DISP_GRD: str(self.bolt.bolt_grade),
-                 KEY_DISP_TYP: self.bolt.bolt_type,
-                 KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-                 KEY_DISP_DP_BOLT_TYPE:self.bolt.bolt_tensioning,
-                 KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-                 KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-                 KEY_DISP_GAP: self.plate.gap,
-                 KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
-                 "Plate Details": "TITLE",
-                 KEY_DISP_PLATETHK: str(self.plate.thickness),
-                 KEY_DISP_MATERIAL: self.plate.material,
-                 KEY_DISP_FU: self.plate.fu,
-                 KEY_DISP_FY: self.plate.fy,
-                 "Weld Details": "TITLE",
-                 KEY_DISP_DP_WELD_TYPE: "Fillet",
-                 KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-                 KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
+            if self.supporting_section.flange_slope != 90:
+                section1 = "Slope_Beam"
+            else:
+                section1 = "Parallel_Beam"
+            self.report_supporting = {KEY_DISP_SEC_PROFILE: section1,
+                                      KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
+                                      KEY_DISP_MATERIAL: self.supporting_section.material,
+                                      'Ultimate strength, $f_u$': self.supporting_section.fu,
+                                      'Yield strength, $f_y$': self.supporting_section.fy,
+                                      'Mass, $m$ (kg/m)': self.supporting_section.mass,
+                                      'Area, $A$ (cm$^2$)': round(self.supporting_section.area/100,2),
+                                      '$D$ (mm)': self.supporting_section.depth,
+                                      '$B$ (mm)': self.supporting_section.flange_width,
+                                      '$t$ (mm)': self.supporting_section.web_thickness,
+                                      '$T$ (mm)': self.supporting_section.flange_thickness,
+                                      'FlangeSlope': self.supporting_section.flange_slope,
+                                      '$R_1$ (mm)': self.supporting_section.root_radius,
+                                      '$R_2$ (mm)': self.supporting_section.toe_radius,
+                                      '$I_z$ (cm$^4$)': round(self.supporting_section.mom_inertia_z/10000,2),
+                                      '$I_y$(cm$^4$)': round(self.supporting_section.mom_inertia_y/10000,2),
+                                      '$r_z$ (cm)': round(self.supporting_section.rad_of_gy_z/10,2),
+                                      '$r_y$ (cm)': round(self.supporting_section.rad_of_gy_y/10,2),
+                                      '$Z_z$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_z/1000,2),
+                                      '$Z_y$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_y/1000,2),
+                                      '$Z_{pz}$ (cm$^3$)': round(self.supporting_section.plast_sec_mod_z/1000,2),
+                                      '$Z_{py}$ (cm$^3$)': round(self.supporting_section.elast_sec_mod_y/1000,2)}
+
+            if self.supported_section.flange_slope != 90:
+                section2 = "Slope_Beam"
+            else:
+                section2 = "Parallel_Beam"
+            self.report_supported = {
+                KEY_DISP_SEC_PROFILE: section2,  # Image shall be saved with this name.png in resource files
+                KEY_DISP_SUPTDSEC: self.supported_section.designation,
+                KEY_DISP_MATERIAL: self.supported_section.material,
+                'Ultimate strength, $f_u$': self.supported_section.fu,
+                'Yield strength, $f_y$': self.supported_section.fy,
+                'Mass, $M$ (kg/m)': self.supported_section.mass,
+                'Area, $A$ (cm$^2$)': round(self.supported_section.area / 100, 2),
+                '$D$ (mm)': self.supported_section.depth,
+                '$B$ (mm)': self.supported_section.flange_width,
+                '$t$ (mm)': self.supported_section.web_thickness,
+                '$T$ (mm)': self.supported_section.flange_thickness,
+                'FlangeSlope': self.supported_section.flange_slope,
+                '$R_1$ (mm)': self.supported_section.root_radius,
+                '$R_2$ (mm)': self.supported_section.toe_radius,
+                '$I_z$ (cm$^4$)': round(self.supported_section.mom_inertia_z / 10000, 2),
+                '$I_y$(cm$^4$)': round(self.supported_section.mom_inertia_y / 10000, 2),
+                '$r_z$ (cm)': round(self.supported_section.rad_of_gy_z / 10, 2),
+                '$r_y$ (cm)': round(self.supported_section.rad_of_gy_y / 10, 2),
+                '$Z_z$ (cm$^3$)': round(self.supported_section.elast_sec_mod_z / 1000, 2),
+                '$Z_y$ (cm$^3$)': round(self.supported_section.elast_sec_mod_y / 1000, 2),
+                '$Z_{pz}$ (cm$^3$)': round(self.supported_section.plast_sec_mod_z / 1000, 2),
+                '$Z_{py}$ (cm$^3$)': round(self.supported_section.elast_sec_mod_y / 1000, 2)}
+
+            if self.module == KEY_DISP_FINPLATE or self.module == KEY_DISP_ENDPLATE:
+                self.report_input = \
+                    {KEY_MAIN_MODULE: self.mainmodule,
+                     KEY_MODULE: self.module,
+                     KEY_CONN: self.connectivity,
+                     KEY_DISP_SHEAR: self.load.shear_force,
+                     KEY_DISP_AXIAL: self.load.axial_force,
+                     "Supporting Section": "TITLE",
+                     "Supporting Section Details": self.report_supporting,
+                     "Supported Section": "TITLE",
+                     "Supported Section Details": self.report_supported,
+                     "Bolt Details": "TITLE",
+                     KEY_DISP_D: str(self.bolt.bolt_diameter),
+                     KEY_DISP_GRD: str(self.bolt.bolt_grade),
+                     KEY_DISP_TYP: self.bolt.bolt_type,
+                     KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                     KEY_DISP_DP_BOLT_TYPE:self.bolt.bolt_tensioning,
+                     KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+                     KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                     KEY_DISP_GAP: self.plate.gap,
+                     KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
+                     "Plate Details": "TITLE",
+                     KEY_DISP_PLATETHK: str(self.plate.thickness),
+                     KEY_DISP_MATERIAL: self.plate.material,
+                     KEY_DISP_FU: self.plate.fu,
+                     KEY_DISP_FY: self.plate.fy,
+                     "Weld Details": "TITLE",
+                     KEY_DISP_DP_WELD_TYPE: "Fillet",
+                     KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+                     KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
 
 if __name__ == "__main__":
     connection = Connection()

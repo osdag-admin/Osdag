@@ -1254,7 +1254,7 @@ class Window(QMainWindow):
             disabled_values = []
             note = ""
             if updated_list != None:
-                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
+                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0] and item[2] == TYPE_COMBOBOX_CUSTOMIZED]
             else:
                 onchange_key_popup = []
             if onchange_key_popup != []:

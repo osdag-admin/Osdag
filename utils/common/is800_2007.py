@@ -504,17 +504,18 @@ class IS800_2007(object):
         for i in conn_plates_t_fu_fy:
             t = i[0]
             f_y = i[2]
-            epsilon = math.sqrt(250 / f_y)
-            if t * epsilon <= t_epsilon_considered:
-                t_epsilon_considered = t * epsilon
-                t_considered = t
-            if t < t_min:
-                t_min = t
+            if f_y > 0:
+                epsilon = math.sqrt(250 / f_y)
+                if t * epsilon <= t_epsilon_considered:
+                    t_epsilon_considered = t * epsilon
+                    t_considered = t
+                if t < t_min:
+                    t_min = t
 
          # epsilon = math.sqrt(250 / f_y)
 
         if corrosive_influences is True:
-            return 40.0 + 4 * t_min
+            return 40.0 + (4 * t_min)
         else:
             return 12 * t_epsilon_considered
 

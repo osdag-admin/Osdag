@@ -241,7 +241,7 @@ class Bolt:
             self.bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
                 f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
 
-    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy,n=1):
+    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy, n=1):
         self.single_conn_plates_t_fu_fy = []
         self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
         self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])

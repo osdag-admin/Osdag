@@ -344,7 +344,7 @@ KEY_DISP_BCENDPLATE = 'Beam Column Endplate'
 KEY_DISP_TENSION_BOLTED = 'Tension Members Bolted Design'
 KEY_DISP_TENSION_WELDED = 'Tension Members Welded Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
-
+KEY_DISP_BB_EP_SPLICE = 'Beam-Beam End Plate Splice'
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -445,11 +445,12 @@ KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 ###################
 
 RED_LIST = [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]
+VALUES_CONN_SPLICE = ['Coplanar tension-compression flange', 'Coplanar tension flange', 'Coplanar compression flange']
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
-VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
-VALUES_ENDPLATE_TYPE = ['Flush End Plate','Extended One Way','Extended Both Ways']
+VALUES_CONN_3 = ['Flush End Plate', 'Extended Both Ways']
+VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irreversible Moment', 'Extended Both Ways - Reversible Moment']
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
@@ -475,9 +476,22 @@ TYP_BEARING = 'Bearing Bolt'
 
 # VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
 VALUES_GRD_CUSTOMIZED = IS1367_Part3_2002.get_bolt_PC()
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24','25', '26', '28', '30','32','36','40','45','50','56','63','80']
-VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
-VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
+
+# standard as per IS 1730:1989
+PLATE_THICKNESS_IS_1730_1989 = ['5', '6', '7', '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63']
+# standard as per SAIL's product brochure
+PLATE_THICKNESS_SAIL = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
+                        '110', '120']
+
+# TODO: delete the below list (commented) after verification
+# VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24','25', '26', '28', '30','32','36','40','45','50','56','63','80']
+# VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+# VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
+
+VALUES_PLATETHK_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
@@ -594,7 +608,7 @@ KEY_DISP_SUPTDSEC = 'Supported Section'
 KEY_DISP_BEAMSEC = 'Beam Section *'
 KEY_DISP_SECBM = 'Secondary beam *'
 DISP_TITLE_FSL = 'Factored load'
-KEY_DISP_MOMENT = 'Moment(kNm)'
+KEY_DISP_MOMENT = 'Moment (kN-m)'
 
 KEY_DISP_TOP_ANGLE = 'Top Angle'
 
@@ -1131,7 +1145,8 @@ KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE = 'Type'
 VALUES_WELD_TYPE = ["Fillet Weld", "Groove Weld"]
-VALUES_WELD_TYPE_EP = ["Groove Weld","Fillet Weld"]
+VALUES_WELD_TYPE_EP = ["Groove Weld", "Fillet Weld"]
+VALUES_WELD_TYPE_BB_FLUSH = ["Groove Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
 KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size (mm)'

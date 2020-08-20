@@ -149,6 +149,7 @@ from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
@@ -262,6 +263,7 @@ class OsdagMainWindow(QMainWindow):
                                                                 ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
+                                                                ('End Plate Splice', 'ResourceFiles/images/extended.png', 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam to Column': [
@@ -530,6 +532,11 @@ class OsdagMainWindow(QMainWindow):
         elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(BeamEndPlate,' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton, 'B2B_End_Plate_Splice').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

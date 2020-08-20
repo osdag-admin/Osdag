@@ -201,8 +201,7 @@ class Connection(Main):
         return supporting_section
 
     def tab_supported_section(self, input_dictionary):
-
-        "In design preference, it shows other properties of section used "
+        """ show properties of the supported section (beam) """
 
         if not input_dictionary or input_dictionary[KEY_SUPTDSEC] == 'Select Section' or input_dictionary[
             KEY_MATERIAL] == 'Select Material':
@@ -235,7 +234,6 @@ class Connection(Main):
             torsion_const = ''
             warping_const = ''
             image = ''
-
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])

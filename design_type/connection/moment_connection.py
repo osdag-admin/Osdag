@@ -409,7 +409,7 @@ class MomentConnection(Connection, IS800_2007):
 
     @staticmethod
     def endplate_thick_customized():
-        d = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED
+        d = PLATE_THICKNESS_SAIL
         return d
 
     def customized_input(self):

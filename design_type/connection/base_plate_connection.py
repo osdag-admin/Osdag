@@ -2030,6 +2030,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy))  # mm
 
             self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
+            # calculating tension capacity of the anchor bolt
+            self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_outside_flange[0],
+                                                                                          self.anchor_fu_fy_outside_flange[1],
+                                                                                          self.anchor_area_outside_flange[0],
+                                                                                          self.anchor_area_outside_flange[1],
+                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
+            self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
 
         elif self.connectivity == 'Moment Base Plate':
 
@@ -2869,7 +2876,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
 
         # assign appropriate plate thickness according to available sizes in the marked
-
         self.plate_thk = max(self.plate_thk, self.column_tf)  # base plate thickness should be larger than the flange thickness
 
         # assigning plate thickness according to the available standard sizes
@@ -4813,8 +4819,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = ('Epsilon - Stiffener Plate', '', epsilon(self.stiffener_fy, self.epsilon), 'N/A')
         self.report_check.append(t1)
 
-        # Check 1.2: Plate Washer and Nut Details - Anchor Bolts Outside Column Flange
-        t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolts Outside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
+        # Check 1.2: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
+        t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolt Outside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         t1 = ('Plate Washer Size (mm)', '', square_washer_size(self.plate_washer_dim_out), 'Pass')
@@ -4830,8 +4836,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.report_check.append(t1)
 
         if self.load_axial_tension > 0:
-            # Check 1.3: Plate Washer and Nut Details - Anchor Bolts Outside Column Flange
-            t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolts Inside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
+            # Check 1.3: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
+            t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolt Inside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = ('Plate Washer Size (mm)', '', square_washer_size(self.plate_washer_dim_in), 'Pass')
@@ -4981,9 +4987,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                        get_pass_fail(max_gauge_in, self.gauge_distance_in, relation='geq'))
                 self.report_check.append(t11)
 
-        # Check 4-1: Base Plate Dimension (only for Moment Base Plate)
+        # Check 4: Base Plate Dimension
         if self.connectivity == 'Moment Base Plate':
-            t1 = ('SubSection', 'Base Plate Dimension', '|p{4cm}|p{6.5cm}|p{4cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6.5cm}|p{4cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t2 = ('Length (mm)', bp_length(self.column_D, self.end_distance_out, self.bp_length_min), self.bp_length_provided,
@@ -4994,24 +5000,49 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                   get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
             self.report_check.append(t3)
 
+        else:
+            t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t2 = ('Length (mm)', bp_length_sb(self.column_D, self.end_distance_out, self.bp_length_min, self.projection), self.bp_length_provided,
+                  get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
+            self.report_check.append(t2)
+
+            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min), self.bp_width_provided,
+                  get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
+            self.report_check.append(t3)
+
         # Check 5: Base Plate Analyses
-        t1 = ('SubSection', 'Base Plate Analyses', '|p{3cm}|p{6.5cm}|p{5.5cm}|p{1cm}|')
-        self.report_check.append(t1)
 
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+            t1 = ('SubSection', 'Base Plate Analyses', '|p{3cm}|p{8.2cm}|p{4.3cm}|p{1cm}|')
+            self.report_check.append(t1)
 
             t2 = ('Min. Area Required (mm^2)', min_area_req(self.load_axial_compression, self.bearing_strength_concrete, self.min_area_req),
-                  self.bp_area_provided, '')
+                  min_area_provided(self.bp_area_provided), get_pass_fail(self.min_area_req, self.bp_area_provided, relation='leq'))
             self.report_check.append(t2)
 
             t3 = ('Effective Bearing Area (mm^2)', eff_bearing_area(self.column_D, self.column_bf, self.column_tf, self.column_tw), '', 'N/A')
             self.report_check.append(t3)
 
             t4 = ('Projection (mm)', eff_projection(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.min_area_req,
-                                                    self.projection, self.end_distance_out), self.projection, '')
+                                                    self.projection, self.end_distance_out), self.projection, 'Pass')
             self.report_check.append(t4)
 
+            t5 = ('Actual Bearing Stress (N/mm^2)', self.bearing_strength_concrete, actual_bearing_pressure(self.load_axial_compression,
+                                                                                                            self.bp_area_provided, self.w),
+                  get_pass_fail(self.bearing_strength_concrete, self.w, relation='geq'))
+            self.report_check.append(t5)
+
+            t6 = ('Thickness (mm)', 'max (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')', bp_thk_1(self.plate_thk, self.projection,
+                                                                                                                 self.w, self.gamma_m0,
+                                                                                                                 self.dp_bp_fy),
+                  get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk, relation='leq'))
+            self.report_check.append(t6)
+
         elif self.connectivity == 'Moment Base Plate':
+            t1 = ('SubSection', 'Base Plate Analyses', '|p{3cm}|p{6.5cm}|p{5.5cm}|p{1cm}|')
+            self.report_check.append(t1)
 
             if self.minimum_load_status_Mzz == True:
                 t1 = ('Minimum Load - moment about major axis (Kn-m)', 'The external factored bending moment is less than the minimum design '
@@ -5145,25 +5176,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                   relation='geq'))
                 self.report_check.append(t18)
 
-        # Check 4-2: Base Plate Dimensions (for Welded Column Base and Hollow/Tubular Sections)
-        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            t1 = ('SubSection', 'Base Plate Dimensions', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-            self.report_check.append(t1)
-
-            t2 = ('Length (mm)', bp_length_sb(self.column_D, self.end_distance_out, self.bp_length_min, self.projection), self.bp_length_provided, '')
-            self.report_check.append(t2)
-
-            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min), self.bp_width_provided, '')
-            self.report_check.append(t3)
-
-            t4 = ('Actual Bearing Stress (N/mm^2)', self.bearing_strength_concrete, actual_bearing_pressure(self.load_axial_compression,
-                                                                                                            self.bp_area_provided, self.w), '')
-            self.report_check.append(t4)
-
-            t5 = ('Thickness (mm)', 'max (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')', bp_thk_1(self.plate_thk, self.projection,
-                                                                                                         self.w, self.gamma_m0, self.dp_bp_fy), '')
-            self.report_check.append(t5)
-
         # Check 6: Anchor Bolt Design - Outside Column Flange
         t1 = ('SubSection', 'Anchor Bolt Design - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
@@ -5219,13 +5231,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(self.tension_capacity_anchor,
                                                                                           self.bearing_strength_concrete,
-                                                                                          self.anchor_len_below_footing_out), 'Pass')
+                                                                                          self.anchor_len_below_footing_out,
+                                                                                          connectivity='Moment Base Plate', case='Case2&3'), 'Pass')
                 self.report_check.append(t8)
             else:
-                t8 = ('Anchor Length - below concrete footing (mm)', '', 'l_{2} = ' + str(self.anchor_length_provided_out) + '', 'Pass')
+                t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(0, 0, self.anchor_length_provided_out,
+                                                                                          connectivity='Moment Base Plate', case='Case1'), 'Pass')
                 self.report_check.append(t8)
         else:
-            t8 = ('Anchor Length - below concrete footing (mm)', '', 'l_{2} = ' + str(self.anchor_length_provided_out) + '', 'Pass')
+            t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(0, 0, self.anchor_length_provided_out,
+                                                                                      connectivity='Welded Column Base', case='None'), 'Pass')
             self.report_check.append(t8)
 
         t9 = ('Anchor Length (total) (mm)', anchor_range(self.anchor_length_min_out, self.anchor_length_max_out),

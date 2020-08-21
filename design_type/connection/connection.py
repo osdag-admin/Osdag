@@ -750,8 +750,8 @@ class Connection(Main):
                 KEY_DISP_SHEAR_MAJOR: round(self.load_shear_major * 10 ** -3, 2),
                 KEY_DISP_SHEAR_MINOR: round(self.load_shear_minor * 10 ** -3, 2),
                 KEY_DISP_MOMENT: None,
-                '- Major axis ($M_{z-z}$)': self.load_moment_major_report,
-                '- Minor axis ($M_{y-y}$)': self.load_moment_minor_report,
+                '- Major axis ($f_{u}$) ($M_{zz}$)': self.load_moment_major_report,
+                '- Minor axis ($M_{yy}$)': self.load_moment_minor_report,
 
                 # column section
                 "Column Section - Mechanical Properties": "TITLE",

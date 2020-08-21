@@ -36,6 +36,7 @@ class OurLog(logging.Handler):
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
 
+
 def connectdb1():
     """
     Function to fetch diameter values from Bolt Table

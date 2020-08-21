@@ -711,7 +711,7 @@ def cl_10_2_4_2_min_edge_end_dist(d_0,edge_type='Sheared or hand flame cut', par
         end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &= ' + end_edge_multiplier + r'~d_0 \\'))
 
     end_edge_eqn.append(NoEscape(r'&= ' + end_edge_multiplier + r'\times' + d_0 + r'\\'))
-    end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\'))
+    end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\ \\'))
     end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.2]\end{aligned}'))
     return end_edge_eqn
 
@@ -842,9 +842,9 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
         max_end_edge_eqn.append(NoEscape(r'e1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}}\\'))
         max_end_edge_eqn.append(NoEscape(r'e2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}}\\'))
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)=' + max_edge_dist +r'\\'))
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)=' + max_edge_dist +r' \\ \\'))
         else: #'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)=' + max_edge_dist +r'\\'))
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)=' + max_edge_dist + r' \\ \\'))
         # max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
@@ -860,10 +860,10 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
             max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +','+t2+r')\\'))
 
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&='+max_edge_dist+r'\\'))
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&='+max_edge_dist+r'\\ \\'))
         else: #'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'e`_{max}&='+max_edge_dist+r'\\'))
-        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&='+max_edge_dist+r'\\ \\'))
+        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3] \end{aligned}'))
 
 
     return max_end_edge_eqn
@@ -4303,7 +4303,7 @@ def square_washer_size(side):
     side = str(side)
 
     washer_dim = Math(inline=True)
-    washer_dim.append(NoEscape(r'\begin{aligned} & Square - ' + side + r'  X ' + side + r' \\'))
+    washer_dim.append(NoEscape(r'\begin{aligned} & Square - ' + side + r'  X ' + side + r' \\ \\'))
     washer_dim.append(NoEscape(r'&[Ref.~IS~6649:1985,~Table~2] \end{aligned}'))
 
     return washer_dim
@@ -4314,7 +4314,7 @@ def square_washer_thk(thickness):
     thickness = str(thickness)
 
     washer_thk = Math(inline=True)
-    washer_thk.append(NoEscape(r'\begin{aligned} t_{w} &= ' + thickness + r' \\'))
+    washer_thk.append(NoEscape(r'\begin{aligned} t_{w} &= ' + thickness + r' \\ \\'))
     washer_thk.append(NoEscape(r'&[Ref.~IS~6649:1985,~Table~2] \end{aligned}'))
 
     return washer_thk
@@ -4325,7 +4325,7 @@ def square_washer_in_dia(dia):
     dia = str(dia)
 
     washer_in_dia = Math(inline=True)
-    washer_in_dia.append(NoEscape(r'\begin{aligned} d_{h} &= ' + dia + r' \\'))
+    washer_in_dia.append(NoEscape(r'\begin{aligned} d_{h} &= ' + dia + r' \\ \\'))
     washer_in_dia.append(NoEscape(r'&[Ref.~IS~6649:1985,~Table~2] \end{aligned}'))
 
     return washer_in_dia
@@ -4336,7 +4336,7 @@ def hexagon_nut_thickness(nut_thick):
     nut_thick = str(nut_thick)
 
     nut_thickness = Math(inline=True)
-    nut_thickness.append(NoEscape(r'\begin{aligned} t_{n} &= ' + nut_thick + r' \\'))
+    nut_thickness.append(NoEscape(r'\begin{aligned} t_{n} &= ' + nut_thick + r' \\ \\'))
     nut_thickness.append(NoEscape(r'&[Ref.~IS~1364-3:2002,~Table~1] \end{aligned}'))
 
     return nut_thickness
@@ -4362,7 +4362,7 @@ def bp_length(col_depth, end_distance, length):
     bp_length_min = Math(inline=True)
     bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2 \times (e~+~e) \\'))
     bp_length_min.append(NoEscape(r'   &= ' + col_depth + r' ~+~2 \times (' + end_distance + r'~+~' + end_distance + r') \\'))
-    bp_length_min.append(NoEscape(r'   &= ' + length + r' \\'))
+    bp_length_min.append(NoEscape(r'   &= ' + length + r' \\ \\'))
     bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement] \end{aligned}'))
 
     return bp_length_min
@@ -4408,8 +4408,8 @@ def bearing_strength_concrete(concrete_grade, bearing_strength_value):
     bearing_strength = Math(inline=True)
     bearing_strength.append(NoEscape(r'\begin{aligned} \sigma_{br} &= 0.45fck \\'))
     bearing_strength.append(NoEscape(r' &= 0.45 \times ' + concrete_grade + r' \\'))
-    bearing_strength.append(NoEscape(r' &= ' + bearing_strength_value + r' \\'))
-    bearing_strength.append(NoEscape(r' &[Ref.~IS~800:2007,~Cl.7.4.1] \end{aligned}'))
+    bearing_strength.append(NoEscape(r' &= ' + bearing_strength_value + r' \\ \\'))
+    bearing_strength.append(NoEscape(r' &[Ref.~IS~456:2000,~Cl.~34.4] \end{aligned}'))
 
     return bearing_strength
 
@@ -4438,7 +4438,7 @@ def bp_thk_1(plate_thk, projection, actual_bearing_stress, gamma_m0, fy_plate):
 
     thk = Math(inline=True)
     thk.append(NoEscape(r'\begin{aligned} t_p &= c~\Bigg[\frac{2.5~{\sigma_{br}}_{actual}~\gamma_{m0}}{{f_{y}}_{plate}}\Bigg]^{0.5} \\'))
-    thk.append(NoEscape(r'      &= ' + projection + r'~\Bigg[\frac{2.5~\times ' + actual_bearing_stress + r'\times ~' + gamma_m0 + r'\times }{'
+    thk.append(NoEscape(r'      &= ' + projection + r'~\Bigg[\frac{2.5~\times ' + actual_bearing_stress + r'\times ~' + gamma_m0 + r' }{'
                         + fy_plate + r'}\Bigg]^{0.5} \\'))
     thk.append(NoEscape(r'     &= ' + plate_thk + r' \\ \\'))
     thk.append(NoEscape(r' & [Ref.~IS~800:2007,~Cl.7.4.3.1] \end{aligned}'))
@@ -4523,7 +4523,7 @@ def modular_ratio(E_s, f_ck, modular_ratio):
     n.append(NoEscape(r' &= 5000~\times \sqrt{' + f_ck + r'}~=~' + E_c + r' \\ \\'))
     n.append(NoEscape(r' n &= \frac{E_{s}}{E_{c}} \\'))
     n.append(NoEscape(r' n &= \frac{' + E_s + r'}{' + E_c + r'} \\'))
-    n.append(NoEscape(r' &=  ' + modular_ratio + r'\\'))
+    n.append(NoEscape(r' &=  ' + modular_ratio + r'\\ \\'))
     n.append(NoEscape(r' &[Ref.~IS~800:2007,~IS~456:2000] \end{aligned}'))
     # n.append(NoEscape(r' & [Ref.~Design~of~Welded~Structures~- \\'))
     # n.append(NoEscape(r' & Omer~W~Blodgett~(section~3.3)] \end{aligned}'))
@@ -4539,7 +4539,7 @@ def epsilon(yield_stress, epsilon_value):
     value = Math(inline=True)
     value.append(NoEscape(r'\begin{aligned} \epsilon_{st} &= \sqrt{\frac{250}{{f_{y}}_{st}}} \\'))
     value.append(NoEscape(r'&= \sqrt{\frac{250}{' + yield_stress + r'}} \\'))
-    value.append(NoEscape(r'&= ' + epsilon_value + r' \\'))
+    value.append(NoEscape(r'&= ' + epsilon_value + r' \\ \\'))
     value.append(NoEscape(r' &[Ref.~IS~800:2007,~Table~2] \end{aligned}'))
 
     return value
@@ -5066,16 +5066,12 @@ def anchor_len_below(bolt_tension, bearing_strength, len, connectivity='Moment B
         length.append(NoEscape(r'\begin{aligned} l_{2} &= \Bigg[\frac{T_{b}}{15.5\sqrt{f_{ck}}}\Bigg]^{0.67} \\'))
         length.append(NoEscape(r' &= \Bigg[\frac{' + bolt_tension + r' \times 10^{3}}{15.5 \times \sqrt{' + bearing_strength + r'}}\Bigg]^{0.67} \\'))
         length.append(NoEscape(r' &= ' + len + r' \\'))
-    else:
-        length.append(NoEscape(r'\begin{aligned} l_{2} &= \Bigg[\frac{T_{b}}{15.5\sqrt{f_{ck}}}\Bigg]^{0.67} \\'))
-
-    length.append(NoEscape(r'& [Reference:~Design~of~Steel~Structures \\'))
-    length.append(NoEscape(r'& -~N.Subramanian,~(2019~edition), \\'))
-
-    if connectivity == 'Moment Base Plate' and case == 'Case2&3':
+        length.append(NoEscape(r'& [Reference:~Design~of~Steel~Structures \\'))
+        length.append(NoEscape(r'& -~N.Subramanian,~(2019~edition), \\'))
         length.append(NoEscape(r'& Chapter~15,~Example~15.5] \end{aligned}'))
     else:
-        length.append(NoEscape(r'& Chapter~15] \end{aligned}'))
+        length.append(NoEscape(r'\begin{aligned} l_{2} &= ' + len + r' \\'))
+        length.append(NoEscape(r'& [Reference:~ IS ~5624:1993,~ Table ~1] \end{aligned}'))
 
     return length
 
@@ -5159,9 +5155,8 @@ def stiff_height_flange(stiff_length_flange, stiff_height):
     return height
 
 
-def stiff_thk_flange(stiff_length_flange, epsilon, col_flange_thk):
+def stiff_thk_flange(stiff_thk, stiff_length_flange, epsilon, col_flange_thk):
     """ """
-    stiff_thk = round(stiff_length_flange / (8.4 * epsilon), 2)
     stiff_thk = str(stiff_thk)
     stiff_length_flange = str(stiff_length_flange)
     epsilon = str(epsilon)
@@ -5172,7 +5167,7 @@ def stiff_thk_flange(stiff_length_flange, epsilon, col_flange_thk):
     thickness.append(NoEscape(r'&        = max \Bigg(\bigg(\frac{' + stiff_length_flange + r'}{8.4\times ' + epsilon + r'}\bigg),~ '
                               + col_flange_thk + r' \Bigg) \\'))
     thickness.append(NoEscape(r'&        = max(' + stiff_thk + r' , ' + col_flange_thk + r') \\'))
-    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007,~Table~2] \end{aligned}'))
 
     return thickness
 
@@ -5206,9 +5201,8 @@ def stiff_height_web(stiff_length_web, stiff_height):
     return height
 
 
-def stiff_thk_web(stiff_length_web, epsilon, col_web_thk):
+def stiff_thk_web(stiff_thk, stiff_length_web, epsilon, col_web_thk):
     """ """
-    stiff_thk = round(stiff_length_web / (8.4 * epsilon), 2)
     stiff_thk = str(stiff_thk)
     stiff_length_web = str(stiff_length_web)
     epsilon = str(epsilon)
@@ -5219,7 +5213,7 @@ def stiff_thk_web(stiff_length_web, epsilon, col_web_thk):
     thickness.append(NoEscape(r'&        =max \Bigg(\bigg(\frac{' + stiff_length_web + r'}{8.4\times ' + epsilon + r'}\bigg) , '
                               + col_web_thk + r'\Bigg) \\'))
     thickness.append(NoEscape(r'&        = max(' + stiff_thk + r' , ' + col_web_thk + r') \\'))
-    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~,Table~2 \end{aligned}'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~,Table~2] \end{aligned}'))
 
     return thickness
 
@@ -5254,9 +5248,8 @@ def stiff_height_across_web(stiff_length_across_web, stiff_height):
     return height
 
 
-def stiff_thk_across_web(stiff_length_across_web, epsilon, col_web_thk):
+def stiff_thk_across_web(stiff_thk, stiff_length_across_web, epsilon, col_web_thk):
     """ """
-    stiff_thk = round(stiff_length_across_web / (8.4 * epsilon), 2)
     stiff_thk = str(stiff_thk)
     stiff_length_across_web = str(stiff_length_across_web)
     epsilon = str(epsilon)
@@ -5267,7 +5260,7 @@ def stiff_thk_across_web(stiff_length_across_web, epsilon, col_web_thk):
     thickness.append(NoEscape(r'&        = max \Bigg(\bigg(\frac{' + stiff_length_across_web + r'}{8.4\times ' + epsilon + r'}\bigg) ,~ '
                               + col_web_thk + r'\Bigg) \\'))
     thickness.append(NoEscape(r'&        = max(' + stiff_thk + r' , ' + col_web_thk + r') \\'))
-    thickness.append(NoEscape(r'& [Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+    thickness.append(NoEscape(r'& [Ref.~IS~800:2007,~Table~2] \end{aligned}'))
 
     return thickness
 

@@ -2075,7 +2075,7 @@ class Angle(Material):
 
 class HollowSection(Material):
 
-    def __init__(self, designation, material_grade,table):
+    def __init__(self, designation, material_grade, table):
         self.connect_to_database_update_other_attributes(table, designation, material_grade)
         super(HollowSection, self).__init__(designation, material_grade)
 
@@ -2116,7 +2116,7 @@ class SHS(HollowSection):
 class RHS(HollowSection):
 
     def __init__(self, designation, material_grade):
-        super(RHS, self).__init__(designation, material_grade,"RHS")
+        super(RHS, self).__init__(designation, material_grade, "RHS")
 
 
 class CHS(Material):

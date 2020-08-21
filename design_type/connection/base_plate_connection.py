@@ -1705,8 +1705,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.dp_column_type = str(self.column_properties.type)
 
         self.dp_column_source = str(self.column_properties.source)
-        self.dp_column_fu = float(self.column_properties.fu)
-        self.dp_column_fy = float(self.column_properties.fy)
+        # self.dp_column_fu = float(self.column_properties.fu)
+        # self.dp_column_fy = float(self.column_properties.fy)
+        self.dp_column_fu = 410
+        self.dp_column_fy = 250
 
         self.column_D = self.column_properties.depth  # mm
         self.column_bf = self.column_properties.flange_width  # mm
@@ -1937,14 +1939,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # 7: Design Parameters
 
         # define parameters for the stiffener plates
-        # TODO: call from dp for hollow section
-        if self.connectivity == 'Hollow/Tubular Column Base':
-            self.dp_column_fy = 250
-            self.stiffener_fy = 250
-        else:
-            self.stiffener_fy = self.dp_column_fy  # MPa
+        self.stiffener_fy = self.dp_bp_fy  # MPa
         self.epsilon = math.sqrt(250 / self.stiffener_fy)
 
+        # grout thickness fixed at 50 mm
         self.grout_thk = 50  # mm
 
     def bp_analyses(self):
@@ -3183,33 +3181,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"
                         " during the erection of the column.")
 
-        elif self.connectivity == 'Welded+Bolted Column Base':
-            pass
-        elif self.connectivity == 'Hollow/Tubular Column Base':
-            pass
-
         # updating anchor length (adding the length above the concrete pedestal)
 
         # nut thickness
         self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
         if self.load_axial_tension > 0:
             self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
-
-        # if self.connectivity == 'Moment Base Plate':
-        #
-        #     # washer details - dictionary {inner diameter, side dimension, washer thickness}
-        #     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
-        #
-        #     # nut
-        #     self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
-        #
-        #     if self.load_axial_tension > 0:
-        #         self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
-        #         self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
-        #
-        # elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-        #     self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)
-        #     self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
 
         # square plate washer details
         self.plate_washer_thk_out = self.plate_washer_details_out['washer_thk']  # washer thickness, mm
@@ -3294,7 +3271,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.stiffener_plt_len_along_D = (self.bp_length_provided - self.column_D) / 2  # mm, (for SHS & RHS)
             self.stiffener_plt_len_along_B = (self.bp_width_provided - self.column_bf) / 2  # mm, (for SHS & RHS)
             self.stiffener_plt_len_across_D = (self.bp_length_provided - self.column_D) / 2  # mm, (for CHS)
-            self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (8.4 * self.epsilon)  # mm
+            self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (13.6 * self.epsilon)  # mm
             self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2, self.column_tf)
             self.stiffener_plt_height = max(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) + 50  # mm
         else:
@@ -3457,7 +3434,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
                         self.stiffener_plt_len_along_D = (self.bp_length_provided - self.column_D) / 2  # mm
                         self.stiffener_plt_len_along_B = (self.bp_width_provided - self.column_bf) / 2  # mm
-                        self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (8.4 * self.epsilon)  # mm
+                        self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (13.6 * self.epsilon)  # mm
                         self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2, self.column_tf)
                         self.stiffener_plt_height = max(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) + 50  # mm
 
@@ -3467,7 +3444,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     else:
                         self.stiffener_plt_len_across_D = (self.bp_length_provided - self.column_D) / 2  # mm
-                        self.stiffener_plt_thk = self.stiffener_plt_len_across_D / (8.4 * self.epsilon)  # mm
+                        self.stiffener_plt_thk = self.stiffener_plt_len_across_D / (13.6 * self.epsilon)  # mm
                         self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2, self.column_tf)
                         self.stiffener_plt_height = self.stiffener_plt_len_across_D + 50  # mm
 
@@ -4804,19 +4781,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.report_check.append(t1)
 
         t1 = ('Bearing Strength of Concrete $(N/mm^2)$', '', bearing_strength_concrete((int(self.bearing_strength_concrete / 0.45)),
-                                                                                       self.bearing_strength_concrete), 'N/A')
+                                                                                       self.bearing_strength_concrete), 'Pass')
         self.report_check.append(t1)
 
-        t1 = ('Grout Thickness (mm)', '', 't_g = ' + str(self.grout_thk) + '', 'N/A')
+        t1 = ('Grout Thickness (mm)', '', 't_g = ' + str(self.grout_thk) + '', 'Pass')
         self.report_check.append(t1)
 
         if self.connectivity == 'Moment Base Plate':
 
             if self.moment_bp_case == 'Case2&3':
-                t1 = ('Modular Ratio', '', modular_ratio((2 * 10 ** 5), (int(self.bearing_strength_concrete / 0.45)), self.n), 'N/A')
+                t1 = ('Modular Ratio', '', modular_ratio((2 * 10 ** 5), (int(self.bearing_strength_concrete / 0.45)), self.n), 'Pass')
                 self.report_check.append(t1)
 
-        t1 = ('Epsilon - Stiffener Plate', '', epsilon(self.stiffener_fy, self.epsilon), 'N/A')
+        t1 = ('Epsilon - Stiffener Plate', '', epsilon(self.stiffener_fy, round(self.epsilon, 2)), 'Pass')
         self.report_check.append(t1)
 
         # Check 1.2: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
@@ -5235,11 +5212,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                           connectivity='Moment Base Plate', case='Case2&3'), 'Pass')
                 self.report_check.append(t8)
             else:
-                t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(0, 0, self.anchor_length_provided_out,
+                t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(0, 0, self.anchor_len_below_footing_out,
                                                                                           connectivity='Moment Base Plate', case='Case1'), 'Pass')
                 self.report_check.append(t8)
         else:
-            t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(0, 0, self.anchor_length_provided_out,
+            t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(0, 0, self.anchor_len_below_footing_out,
                                                                                       connectivity='Welded Column Base', case='None'), 'Pass')
             self.report_check.append(t8)
 
@@ -5315,15 +5292,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       'Pass')
                 self.report_check.append(t2)
 
-                t3 = (
-                'Height of Stiffener (mm)', '', stiff_height_flange(self.stiffener_plt_len_along_flange, self.stiffener_plt_height_along_flange),
+                t3 = ('Height of Stiffener (mm)', '', stiff_height_flange(self.stiffener_plt_len_along_flange, self.stiffener_plt_height_along_flange),
                 'Pass')
                 self.report_check.append(t3)
 
-                t4 = ('Thickness of Stiffener (mm)', stiff_thk_flange(self.stiffener_plt_len_along_flange, self.epsilon, self.column_tf),
+                stiff_thk = round(self.stiffener_plt_len_along_flange / (13.6 * self.epsilon), 2)
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_flange(stiff_thk, self.stiffener_plt_len_along_flange, self.epsilon, self.column_tf),
                       self.stiffener_plt_thick_along_flange,
-                      get_pass_fail(max((round(self.stiffener_plt_len_along_flange / (8.4 * self.epsilon), 2)), self.column_tf),
-                                    self.stiffener_plt_thick_along_flange, relation='leq'))
+                      get_pass_fail(max(stiff_thk, self.column_tf), self.stiffener_plt_thick_along_flange, relation='leq'))
                 self.report_check.append(t4)
 
                 t5 = ('Max. Stress at Stiffener (N/mm^2)', stiffener_stress_allowable(self.bearing_strength_concrete),
@@ -5360,10 +5336,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t3 = ('Height of Stiffener (mm)', '', stiff_height_web(self.stiffener_plt_len_along_web, self.stiffener_plt_height_along_web), 'Pass')
                 self.report_check.append(t3)
 
-                t4 = ('Thickness of Stiffener (mm)', stiff_thk_web(self.stiffener_plt_len_along_web, self.epsilon, self.column_tw),
+                stiff_thk = round(self.stiffener_plt_len_along_web / (13.6 * self.epsilon), 2)
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_web(stiff_thk, self.stiffener_plt_len_along_web, self.epsilon, self.column_tw),
                       self.stiffener_plt_thick_along_web,
-                      get_pass_fail(max((round(self.stiffener_plt_len_along_web / (8.4 * self.epsilon), 2)), self.column_tw),
-                                    self.stiffener_plt_thick_along_web, relation='leq'))
+                      get_pass_fail(max(stiff_thk, self.column_tw), self.stiffener_plt_thick_along_web, relation='leq'))
                 self.report_check.append(t4)
 
                 if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
@@ -5419,9 +5395,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                               self.stiffener_plt_height_across_web), 'Pass')
                 self.report_check.append(t3)
 
-                t4 = ('Thickness of Stiffener (mm)', stiff_thk_across_web(self.stiffener_plt_len_across_web, self.epsilon, self.column_tw),
-                      self.stiffener_plt_thick_across_web, get_pass_fail(max((round(self.stiffener_plt_len_across_web / (8.4 * self.epsilon), 2)),
-                                                                             self.column_tw), self.stiffener_plt_thick_across_web, relation='leq'))
+                stiff_thk = round(self.stiffener_plt_len_across_web / (13.6 * self.epsilon), 2)
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_across_web(stiff_thk, self.stiffener_plt_len_across_web, self.epsilon, self.column_tw),
+                      self.stiffener_plt_thick_across_web,
+                      get_pass_fail(max(stiff_thk, self.column_tw), self.stiffener_plt_thick_across_web, relation='leq'))
                 self.report_check.append(t4)
 
                 if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):

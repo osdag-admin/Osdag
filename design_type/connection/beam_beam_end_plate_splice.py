@@ -22,6 +22,7 @@
 # Importing modules from the project directory
 
 from design_type.connection.moment_connection import MomentConnection
+from design_type.connection.shear_connection import ShearConnection
 from utils.common.is800_2007 import IS800_2007
 from utils.common.other_standards import IS_5624_1993
 from utils.common.component import *
@@ -385,8 +386,23 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
 
-        print("input values are set. Doing preliminary member checks")
-        self.warn_text()
-        # self.member_capacity()
+        # warn if a beam of older version of IS 808 is selected
+        # self.warn_text(self)
+
+    # def warn_text(self):
+    #     """ give logger warning when a beam from the older version of IS 808 is selected """
+    #     global logger
+    #     red_list = red_list_function()
+    #     if self.supported_section.designation in red_list:
+    #         logger.warning(
+    #             " : You are using a section (in red color) that is not available in latest version of IS 808")
+    #         logger.info(
+    #             " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     # start of design simulation
+
+    def set_parameters(self):
+        """ set/initialize parameters for performing the analyses and design """
+
+        print(self.load.shear_force)
+        print(self.bolt.bolt_diameter)

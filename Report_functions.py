@@ -4384,16 +4384,42 @@ def bp_length_sb(col_depth, end_distance, length, projection):
     return bp_length_min
 
 
-def bp_width(flange_width, edge_distance, width):
+def bp_width_case1(load_axial, bp_length_min, bearing_strength, bp_width):
+    """ """
+    load_axial = str(load_axial * 10 ** -3)
+    bp_length_min = str(bp_length_min)
+    bearing_strength = str(bearing_strength)
+    bp_width = str(bp_width)
+
+    bp_length_min = Math(inline=True)
+    bp_length_min.append(NoEscape(r'\begin{aligned} W = \frac{2P}{L_{min} \times \sigma_{br}} \\'))
+    bp_length_min.append(NoEscape(r'   &= \frac{2 \times ' + load_axial + r' \times 10^{3}}{' + bp_length_min + r' \times ' + bearing_strength + r'} \\'))
+    bp_length_min.append(NoEscape(r'   &= ' + bp_width + r' \end{aligned}'))
+
+    return bp_length_min
+
+
+def bp_width(flange_width, edge_distance, width, designation, connectivity, bp_type='welded_moment_bp', mom_bp_case='None'):
     """ equation for the min length of the base plate"""
     flange_width = str(flange_width)
     edge_distance = str(edge_distance)
     width = str(width)
 
     bp_width_min = Math(inline=True)
-    bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2 (1.5 \times e`~+~1.5 \times e`) \\'))  # TODO add e' instead of e
-    bp_width_min.append(NoEscape(r'    &= ' + flange_width + r' ~+~2 \times (1.5 \times ' + edge_distance + r'~+~1.5 \times ' + edge_distance +
-                                 r') \\'))
+
+    if bp_type == 'welded_moment_bp':
+        if mom_bp_case == 'Case1':
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= 0.85 \times B ~+~2 (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'    &= 0.85 \times' + flange_width + r' ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
+        else:
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= 0.85 \times B ~+~2 (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'    &= 0.85 \times' + flange_width + r' ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
+    else:
+        if designation[1:4] == 'CHS':
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= D ~+~2 \times (e`~+~e`) \\'))
+        else:
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2 \times (e`~+~e`) \\'))
+
     bp_width_min.append(NoEscape(r'    &= ' + width + r' \\ \\'))
     bp_width_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement] \end{aligned}'))
 
@@ -4769,7 +4795,6 @@ def mom_bp_case(case, eccentricity, bp_length):
     """ """
     case = str(case)
     eccentricity = str(round(eccentricity, 2))
-    bp_length = str(bp_length)
 
     bp_case = Math(inline=True)
 

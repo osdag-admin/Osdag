@@ -412,6 +412,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.minimum_load_status_Mzz = False
         self.minimum_load_status_Myy = False
+        self.min_width_check_Case1 = False
 
     def set_osdaglogger(key):
         """
@@ -1728,6 +1729,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
         self.safe = True
+        self.min_width_check_Case1 = False
 
         self.stiffener_plt_thick_along_flange = 0.0
         self.stiffener_plt_thick_along_web = 0.0
@@ -1933,8 +1935,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # 6: Base Plate Dimensions
         # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
-        self.bp_length_min = round_up(self.column_D + (2 * (2 * self.end_distance_out)), 5)  # mm
-        self.bp_width_min = round_up((0.85 * self.column_bf) + (2 * (2 * self.edge_distance_out)), 5)  # mm
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            self.bp_length_min = self.column_D + (2 * (2 * self.end_distance_out))  # mm
+            self.bp_width_min = self.column_bf + (2 * (2 * self.end_distance_out))  # mm
+        else:
+            self.bp_length_min = self.column_D + (2 * (2 * self.end_distance_out))  # mm
+            self.bp_width_min = 0.85 * self.column_bf + (2 * (2 * self.edge_distance_out))  # mm
 
         # 7: Design Parameters
 
@@ -2076,6 +2082,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # fixing length and width of the base plate
                 width_min = 2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete)  # mm
                 if width_min < self.bp_width_min:
+                    self.min_width_check_Case1 = True
                     width_min = self.bp_width_min
                 else:
                     pass
@@ -3184,9 +3191,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # updating anchor length (adding the length above the concrete pedestal)
 
         # nut thickness
-        self.nut_thk_out = IS1364.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
+        self.nut_thk_out = IS1364Part3.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
         if self.load_axial_tension > 0:
-            self.nut_thk_in = IS1364.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
+            self.nut_thk_in = IS1364Part3.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
 
         # square plate washer details
         self.plate_washer_thk_out = self.plate_washer_details_out['washer_thk']  # washer thickness, mm
@@ -4965,29 +4972,58 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t11)
 
         # Check 4: Base Plate Dimension
-        if self.connectivity == 'Moment Base Plate':
-            t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6.5cm}|p{4cm}|p{1.5cm}|')
-            self.report_check.append(t1)
 
-            t2 = ('Length (mm)', bp_length(self.column_D, self.end_distance_out, self.bp_length_min), self.bp_length_provided,
-                  get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
-            self.report_check.append(t2)
+        if self.connectivity == 'Hollow/Tubular Column Base':
 
-            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min), self.bp_width_provided,
-                  get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
-            self.report_check.append(t3)
-
-        else:
             t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t2 = ('Length (mm)', bp_length_sb(self.column_D, self.end_distance_out, self.bp_length_min, self.projection), self.bp_length_provided,
                   get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
             self.report_check.append(t2)
-
-            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min), self.bp_width_provided,
-                  get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
+            # width_min = 2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete)
+            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
+                                         bp_type='hollow_bp', mom_bp_case='None'),
+                  self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
             self.report_check.append(t3)
+        else:
+            if self.connectivity == 'Moment Base Plate':
+                t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6.5cm}|p{4cm}|p{1.5cm}|')
+                self.report_check.append(t1)
+            else:
+                t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|')
+                self.report_check.append(t1)
+
+            t2 = ('Length (mm)', bp_length(self.column_D, self.end_distance_out, self.bp_length_min), self.bp_length_provided,
+                  get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
+            self.report_check.append(t2)
+
+            if self.connectivity == 'Moment Base Plate':
+                if self.moment_bp_case == 'Case1':
+                    if self.min_width_check_Case1:
+
+                        t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
+                                                     bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
+                              bp_width_case1(self.load_axial_compression, self.bp_length_min, self.bearing_strength_concrete, self.bp_width_provided),
+                              get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
+                        self.report_check.append(t3)
+                    else:
+                        t3 = ('Width (mm)',
+                              bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
+                                       bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
+                              self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
+                        self.report_check.append(t3)
+                else:
+                    t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
+                                                 bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
+                          self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
+                    self.report_check.append(t3)
+
+            else:
+                t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
+                                             bp_type='welded_moment_bp', mom_bp_case='None'),
+                      self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
+                self.report_check.append(t3)
 
         # Check 5: Base Plate Analyses
 

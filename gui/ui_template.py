@@ -601,6 +601,10 @@ class Window(QMainWindow):
                     maxi_width_right = max(maxi_width_right+8, item_width)
                 combo.view().setMinimumWidth(item_width + 25)
 
+                if len(option) == 7:
+                    for disabled in option[6]:
+                        combo.model().item(disabled).setEnabled(False)
+
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
                 r.setObjectName(option[0])

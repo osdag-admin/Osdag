@@ -415,10 +415,11 @@ class IS6649(object):
         return washer_dimensions
 
 
-class IS1364(object):
-    """ Hexagon Head Bolts, Screws, and Nuts of Product Grade C, Part : Hexagon Nuts (Size Range M5 to M64)
+class IS1364Part3(object):
+    """ Hexagon Head Bolts, Screws, and Nuts of Product Grade A, and B, Part 3: Hexagon Nuts (Size Range M5 to M64)
 
     """
+
     @staticmethod
     def nut_thick(bot_dia):
         """ Returns the thickness of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
@@ -456,3 +457,40 @@ class IS1364(object):
         }[bot_dia]
 
         return nut_thickness
+
+    @staticmethod
+    def nut_size(bot_dia):
+        """ Returns the size of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
+
+        Args:
+            bot_dia: diameter of the bolt in mm (int)
+
+        Returns: size of the hexagon nut [maximum of s and e, refer fig. 1 of IS 1364-3:2002] (float)
+
+        Note: The nut size for 72 diameter is not available in IS code, however an approximated value is assumed.
+              72 mm dia bolt is used in the base plate module.
+        """
+        nut_size = {
+            5: max(8.0, 8.79),
+            6: max(10.0, 11.5),
+            8: max(16.0, 14.38),
+            10: max(16.0, 17.77),
+            12: max(18.0, 20.03),
+            14: max(21.0, 23.36),
+            16: max(24.0, 26.75),
+            18: max(27.0, 29.56),
+            20: max(30.0, 32.95),
+            22: max(34.0, 37.29),
+            24: max(36.0, 39.55),
+            27: max(41.0, 45.2),
+            30: max(46.0, 50.85),
+            33: max(50.0, 55.37),
+            36: max(55.0, 60.79),
+            39: max(60.0, 66.44),
+            42: max(65.0, 71.3),
+            48: max(75.0, 82.6),
+            56: max(85.0, 93.56),
+            64: max(95.0, 104.86),
+        }[bot_dia]
+
+        return nut_size

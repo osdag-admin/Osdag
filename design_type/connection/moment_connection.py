@@ -53,8 +53,6 @@ class MomentConnection(Connection, IS800_2007):
             torsion_const = ''
             warping_const = ''
             image = ''
-
-
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])

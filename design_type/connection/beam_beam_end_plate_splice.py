@@ -36,6 +36,7 @@ from Report_functions import *
 from design_report.reportGenerator_latex import CreateLatex
 
 import logging
+import math
 
 
 class BeamBeamEndPlateSplice(MomentConnection):
@@ -403,6 +404,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.dp_beam_fu = float(self.supported_section.fu)
         self.dp_beam_fy = float(self.supported_section.fy)
 
+        # bolt
+        if self.bolt.bolt_tensioning == 'Pretensioned':
+            self.beta = 1
+        else:
+            self.beta = 2
+
         # end plate
 
         # weld
@@ -487,9 +494,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         """ perform analysis and design of bolt and end plate """
 
         # calculate tension due to external factored moment
-        if self.connectivity == 'Extended One Way - Irreversible Moment' or 'Extended Both Ways - Reversible Moment':
-
-            self.load_tension_flange = round((self.load_moment / (self.beam_D - self.beam_tf)), 2)  # kN
+        # if self.connectivity == 'Extended One Way - Irreversible Moment' or 'Extended Both Ways - Reversible Moment':
+        self.load_tension_flange = round((self.load_moment / (self.beam_D - self.beam_tf)), 2)  # kN
 
         # start checks
 
@@ -502,6 +508,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # loop starts - performing all the checks considering minimum plate thickness and so on..
         for i in self.plate_thickness:
+            self.plate_thickness = i
             if self.plate_design_status == False:
 
                 # selecting a single dia-grade combination for checks
@@ -509,6 +516,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
                     test_list = j
                     self.bolt_diameter_provided = test_list[0]
                     self.bolt_grade_provided = test_list[1]
+
+                    # bolt mechanical properties
+                    self.bolt_fu = self.bolt.bolt_fu
+                    self.dp_bolt_fy = self.bolt.bolt_fy
 
                     # detailing checks
 
@@ -537,8 +548,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
                     # plate height (maximum) - fixing maximum two rows above and below flange for ep extending beyond the flange
                     if self.connectivity == 'Flushed - Reversible Moment':
                         self.ep_height_max = self.beam_D + 25  # mm, 12.5 mm beyond either flanges
-                    else:
-                        space_available_above_flange = (2 * self.end_distance_provided) + self.pitch_distance_provided  # mm
+                    else:  # assuming two rows
+                        space_available_above_flange = (2 * self.end_distance_provided) + self.pitch_distance_provided  # mm, extension on each side
 
                         if self.connectivity == 'Extended One Way - Irreversible Moment':
                             self.ep_height_max = self.beam_D + space_available_above_flange  # mm
@@ -547,17 +558,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                     # number of rows of bolt - above and below beam depth
                     if self.connectivity == 'Flushed - Reversible Moment':
-                        self.rows_above_D_max = 0
-                        self.rows_above_D_provided = 0
+                        self.rows_outside_D_max = 0
+                        self.rows_outside_D_provided = 0
                     else:
-                        self.rows_above_D_max = 2
-                        self.rows_above_D_provided = 1  # initialize with minimum 1 row
+                        self.rows_outside_D_max = 2
+                        self.rows_outside_D_provided = 1  # initialize with minimum 1 row
 
-                    space_available_below_flange = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * self.end_distance_provided)
-                    self.rows_inside_D_max = 2 + (space_available_below_flange / self.pitch_distance_provided)  # minimum is two
-                    self.rows_inside_D_max = round_up(self.rows_inside_D_max, 2)  # 
+                    space_available_inside_flange = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * self.end_distance_provided)
+                    self.rows_inside_D_max = 2 + (round(space_available_inside_flange / self.pitch_distance_provided))  # minimum is two
+                    # self.rows_inside_D_max = round_up(self.rows_inside_D_max, 2)  #
 
-                    self.rows_near_tension_flange = 2  # allowing max 2 rows near tension flange
+                    self.rows_near_tension_flange = 2  # allowing max 2 rows near tension flange to allow T-stub action of bolts
 
                     # number of columns of bolt on each side (minimum is 1, maximum is 2)
 
@@ -565,17 +576,34 @@ class BeamBeamEndPlateSplice(MomentConnection):
                     space_available_2col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (2 * self.edge_distance_provided)
 
                     if space_available_2col >= self.ep_width_provided:
-                        self.bolt_coumn = 2
+                        self.bolt_column = 2
                         logger.info("The provided beam can accommodate two column of bolts on either side of the web [Ref. based on detailing "
                                     "requirement]")
                         logger.info("Performing the design with two column of bolts on each side")
                     else:
-                        self.bolt_coumn = 1
-                        logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on detailing "
-                                    "requirement]")
+                        self.bolt_column = 1
+                        logger.info("The provided beam can accommodate only a single column of bolt on either side of the web [Ref. based on "
+                                    "detailing requirement]")
                         logger.info("Performing the design with a single column of bolt on each side")
 
-                    # maximum number of rows as per detailing requirement
+                    # tension capacity of bolt
+                    self.bolt_tension_capacity = self.bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)
+
+                    # bolt design
+                    n = 1
+                    while self.rows_inside_D_max
+
+                    # prying force
+                    self.lv = self.end_distance_provided - (self.beam_r1 / 2)
+                    self.le_1 = self.end_distance_provided
+                    self.le_2 = 1.1 * self.plate_thickness * (math.sqrt((self.beta * self.bolt.proof_load) / self.dp_bolt_fy))
+                    self.le = min(self.le_1, self.le_2)
+                    self.eta = 1
+                    self.b_e = self.ep_width_provided - (2 * self.edge_distance_provided)
+
+                    self.prying_force = 1
+
+
 
 
 

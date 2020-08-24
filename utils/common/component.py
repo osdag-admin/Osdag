@@ -100,6 +100,8 @@ class Bolt:
         self.max_edge_dist_round = round_down(self.max_edge_dist, 5)
         self.max_end_dist_round = round_down(self.max_end_dist, 5)
 
+        self.proof_load = 0.0
+
     def __repr__(self):
         repr = "Bolt\n"
         repr += "Type: {}\n".format(self.bolt_type)
@@ -251,9 +253,7 @@ class Bolt:
 
         self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided), 2)
         self.min_gauge = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided), 2)
-        self.min_edge_dist = round(
-            IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                     self.edge_type), 2)
+        self.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type, self.edge_type), 2)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk), 2)
         self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.single_conn_plates_t_fu_fy,
@@ -268,6 +268,14 @@ class Bolt:
         self.max_edge_dist_round = round_down(self.max_edge_dist, 5)
         self.max_end_dist_round = round_down(self.max_end_dist, 5)
         self.dia_hole = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_provided, self.bolt_hole_type)
+
+    def calculate_bolt_proof_load(self, bolt_diameter_provided, bolt_grade_provided):
+        """ calculate proof load of bolt: F_0 = A_nb*f_0 (f_0 = 0.7*f_ub) """
+        [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided,
+                                                                        self.bolt_diameter_provided)
+
+        self.proof_load = self.bolt_net_area * 0.7 * self.bolt_fu
 
 
 class Nut(Material):

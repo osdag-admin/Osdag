@@ -43,7 +43,7 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.beam_end_plate import BeamBeamEndPlateSplice
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
@@ -1637,7 +1637,7 @@ class Window(QMainWindow):
         elif name == KEY_DISP_BEAMCOVERPLATEWELD:
             return BeamCoverPlateWeld
         elif name == KEY_DISP_BEAMENDPLATE:
-            return BeamEndPlate
+            return BeamBeamEndPlateSplice
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate
         elif name == KEY_DISP_BASE_PLATE:
@@ -1850,17 +1850,33 @@ class Window(QMainWindow):
             self.design_inputs.pop("out_titles_status")
             # self.progress_bar.setValue(60)
 
+            # if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
+            #                                       KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
+            #                                       KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
+            #                                       KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
+            #                                       KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
+
+            ##############trial##############
+            status = True
+            ##############trial##############
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
-
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
+                                                  KEY_DISP_COLUMNCOVERPLATE,
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,KEY_DISP_BEAMENDPLATE]:
+                print(self.display, self.folder, main.module, main.mainmodule)
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
+                ##############trial##############
+                status = True
+                ##############trial##############
+
                 module_class = self.return_class(main.module)
                 # self.progress_bar.setValue(80)
+
                 self.commLogicObj.call_3DModel(status, module_class)
+                print("3D started")
                 self.display_x = 90
                 self.display_y = 90
                 for chkbox in main.get_3d_components(main):

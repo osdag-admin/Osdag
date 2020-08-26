@@ -4,10 +4,10 @@ from Common import *
 from utils.common.load import Load
 import logging
 
-class BeamEndPlate(MomentConnection):
+class BeamBeamEndPlateSplice(MomentConnection):
 
     def __init__(self):
-        super(BeamEndPlate, self).__init__()
+        super(BeamBeamEndPlateSplice, self).__init__()
 
     ###############################################
     # Design Preference Functions Start
@@ -191,6 +191,7 @@ class BeamEndPlate(MomentConnection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '0',
@@ -326,7 +327,27 @@ class BeamEndPlate(MomentConnection):
         return list1
 
     def output_values(self, flag):
-        return []
+
+        ###################trial########################################todo darshan
+
+        out_list = []
+        t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
+        out_list.append(t4)
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
+        out_list.append(t1)
+
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
+              self.bolt.bolt_diameter_provided if flag else '', True)
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_GRD, TYPE_TEXTBOX,
+              self.bolt.bolt_grade_provided if flag else '', True)
+        out_list.append(t3)
+
+        return out_list
+
+        ######################################################################
 
     def set_input_values(self, design_dictionary):
         print(design_dictionary)
@@ -358,3 +379,77 @@ class BeamEndPlate(MomentConnection):
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Plate", bgcolor)
 
+
+    ######################3D Trail######################
+
+    def set_input_values(self, design_dictionary):
+        """ get the input values from UI (input dock and DP) for performing the design etc. """
+        super(BeamBeamEndPlateSplice, self).set_input_values(self, design_dictionary)
+
+        # section details
+        self.mainmodule = "Moment Connection"
+        self.module = KEY_DISP_BEAMENDPLATE
+        self.connectivity = "Flush"
+        self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
+        self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
+
+        # self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC],
+        #                                      material_grade=design_dictionary[KEY_SUPTNGSEC_MATERIAL])
+        self.supported_section = Beam(designation=design_dictionary[KEY_SECSIZE],
+                                      material_grade=design_dictionary[KEY_SEC_MATERIAL])
+
+        # bolt details
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
+                         bolt_type=design_dictionary[KEY_TYP],
+                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
+                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
+                         bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
+
+        # force details
+        # self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
+        #                  axial_force=float(design_dictionary[KEY_AXIAL]),
+        #                  moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
+
+        # plate details
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
+                           gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+        self.stiffener = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
+                           gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+
+        self.plate.design_status_capacity = False
+
+        # weld details
+        self.flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                                    type=design_dictionary[KEY_DP_WELD_TYPE],
+                                    fabrication=design_dictionary[KEY_DP_WELD_FAB])
+        # self.bottom_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+        #                                type=design_dictionary[KEY_DP_WELD_TYPE],
+        #                                fabrication=design_dictionary[KEY_DP_WELD_FAB])
+        self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                             type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
+
+
+        self.plate.height = 420.0
+        self.plate.width = 265.0
+        self.plate.thickness_provided = 12.0
+        self.bolt.bolt_diameter_provided = 24.0
+        self.bolt.bolt_grade_provided = 8.8
+        self.plate.bolts_required = 4
+        self.plate.edge_dist_provided = self.bolt.min_edge_dist_round
+        self.plate.pitch_provided = self.bolt.min_pitch_round
+        self.flange_weld.size = 4.0
+        self.web_weld.size = 4.0
+
+        # self.stiffener.height
+        #
+        # beam_stiffeners = StiffenerPlate(W=BBE.stiffener.height, L=BBE.stiffener.length,
+        #                                  T=BBE.stiffener.thickness_provided,
+        #                                  R11=BBE.stiffener.length - 25,
+        #                                  R12=BBE.stiffener.height - 25,
+        #                                  L21=BBE.stiffener.notch, L22=BBE.stiffener.notch)

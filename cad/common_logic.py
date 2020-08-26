@@ -50,7 +50,8 @@ from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 
 from cad.MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
-
+from cad.MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
+from cad.MomentConnections.BBEndplate.BBEndplate_cadFile import CADGroove
 from cad.MomentConnections.CCSpliceCoverPlateCAD.WeldedCAD import CCSpliceCoverPlateWeldedCAD
 from cad.MomentConnections.CCSpliceCoverPlateCAD.BoltedCAD import CCSpliceCoverPlateBoltedCAD
 from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutBoltArray_AF as CCSpliceNutBolt_AF
@@ -80,6 +81,7 @@ from cad.BBCad.nutBoltPlacement_AF import NutBoltArray_AF
 from cad.BBCad.nutBoltPlacement_BF import NutBoltArray_BF
 from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+from cad.MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
 from Common import *
 
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
@@ -164,6 +166,7 @@ class CommonDesignLogic(object):
         self.display = display
         self.mainmodule = mainmodule
         self.connection = connection
+        print(self.connection)
         # self.resultObj = self.call_calculation()
 
         self.connectivityObj = None
@@ -805,6 +808,131 @@ class CommonDesignLogic(object):
 
         return bbCoverPlate
 
+    def createBBEndPlateCAD(self):
+        """
+        Calls the CAD components like beam, plate, stiffeners, fillet and grove weld, nut and bolt. Also calls CAD file
+        :return: creates CAD model
+        """
+
+        BBE = self.module_class()
+
+        beam_tw = float(BBE.supported_section.web_thickness)
+        print(beam_tw)
+        beam_T = float(BBE.supported_section.flange_thickness)
+        beam_d = float(BBE.supported_section.depth)
+        beam_B = float(BBE.supported_section.flange_width)
+        beam_R1 = float(BBE.supported_section.root_radius)
+        beam_R2 = float(BBE.supported_section.toe_radius)
+        beam_alpha = float(BBE.supported_section.flange_slope)
+        beam_length = 500
+
+
+
+        beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+                             R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                             length=beam_length, notchObj=None)
+        beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+
+        # outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
+
+        plate_Left = Plate(W=BBE.plate.width,
+                           L=BBE.plate.height,
+                           T=BBE.plate.thickness_provided)
+        plate_Right = copy.copy(plate_Left)  # Since both the end plates are identical
+
+        # Beam stiffeners 4 if extended both ways, only 1 and 3 if extended oneway and non for flus type
+        # beam_stiffeners = StiffenerPlate(W=BBE.stiffener.height, L=BBE.stiffener.length,
+        #                                  T=BBE.stiffener.thickness_provided,
+        #                                  R11=BBE.stiffener.length - 25,
+        #                                  R12=BBE.stiffener.height - 25,
+        #                                  L21=BBE.stiffener.notch, L22=BBE.stiffener.notch)  # TODO: given hard inputs to L21 and L22
+        #
+        # # Beam stiffeners for the flush type endplate
+        # beam_stiffenerFlush = StiffenerPlate(W=BBE.stiffener.height, L=BBE.stiffener.length,
+        #                                  T=BBE.stiffener.thickness_provided,
+        #                                  L21=BBE.stiffener.notch, L22=BBE.stiffener.notch)
+
+
+        # alist = self.designParameters()  # An object to save all input values entered by user
+
+        bolt_d = float(BBE.bolt.bolt_diameter_provided)  # Bolt diameter, entered by user
+        bolt_r = bolt_d / 2
+        bolt_T = self.boltHeadThick_Calculation(bolt_d)
+        bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2
+        bolt_Ht = self.boltLength_Calculation(bolt_d)
+
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component repo
+        nut_T = self.nutThick_Calculation(bolt_d)
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+
+        numberOfBolts = int(BBE.plate.bolts_required)
+
+        nutSpace = 2 * float(BBE.plate.thickness_provided) + nut_T  # Space between bolt head and nut
+
+        bbNutBoltArray = BBENutBoltArray(BBE, nut, bolt, numberOfBolts, nutSpace)
+
+        # Following welds are for to weld stiffeners for extended bothways and ext4ended oneway
+        # bbWeld for stiffener hight on left side
+        # bbWeldStiffHeight = FilletWeld(b=float(BBE.weld.size), h=float(BBE.weld.size),
+        #                                L=BBE.stiffener.height - BBE.stiffener.notch)  # outputobj['Stiffener']['Length'] - 25
+        #
+        # # bbWeld for stiffener length on left side
+        # bbWeldStiffLength = FilletWeld(b=float(BBE.weld.size), h=float(BBE.weld.size),
+        #                                L=BBE.stiffener.length - BBE.stiffener.notch)
+        #
+        # # following welds are fillet welds for the flush endplate stiffeners
+        # bbWeldFlushstiffHeight = FilletWeld(b=float(BBE.weld.size), h=float(BBE.weld.size),
+        #                                L=BBE.stiffener.height - BBE.stiffener.notch)
+        #
+        # bbWeldFlushstiffLength = FilletWeld(b=float(BBE.weld.size), h=float(BBE.weld.size),
+        #                                L=BBE.stiffener.length - BBE.stiffener.notch)
+        #
+        # # if BBE.weld.type == "Fillet Weld":
+        # #
+            # Fillet Weld for connecting end plate to beam
+
+        # # Followings welds are welds above beam flange, Qty = 4
+        # bbWeldAbvFlang = FilletWeld(b=float(BBE.flange_weld.size), h=float(BBE.flange_weld.size),
+        #                             L=beam_B)
+        #
+        # # Followings welds are welds below beam flange, Qty = 8
+        # bbWeldBelwFlang = FilletWeld(b=float(BBE.flange_weld.size), h=float(BBE.flange_weld.size),
+        #                              L=(beam_B - beam_tw) / 2 -
+        #                                beam_R1 - beam_R2)
+        #
+        # # Followings welds are welds placed aside of beam web, Qty = 4
+        # bbWeldSideWeb = FilletWeld(b=float(BBE.web_weld.size), h=float(BBE.web_weld.size),
+        #                            L=beam_d - 2 * (beam_T + beam_R1) - (2 * 5))
+        # # #
+        # #     extbothWays = BBEndplateCAD(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,
+        # #                             bbWeldAbvFlang, bbWeldBelwFlang, bbWeldSideWeb, bbWeldFlushstiffHeight,
+        # #                             bbWeldFlushstiffLength,
+        # #                             bbWeldStiffHeight, bbWeldStiffLength, beam_stiffeners, beam_stiffenerFlush, alist,
+        # #                             outputobj)
+        # #     extbothWays.create_3DModel()
+        # #
+        # #     return extbothWays
+        # #
+        # # else:  # Groove Weld
+        #
+        # # Grove Weld for connecting end plate to beam
+        bbWeldFlang = GrooveWeld(b=BBE.flange_weld.size, h=float(BBE.supported_section.flange_thickness),
+                                 L=beam_B)  # outputobj["Weld"]["Size"]
+        #
+        # # Followings welds are welds placed aside of beam web, Qty = 4           # edited length value by Anand Swaroop
+        bbWeldWeb = GrooveWeld(b=BBE.web_weld.size, h=float(BBE.supported_section.web_thickness),
+                               L=beam_d - 2 * beam_T)  # outputobj["Weld"]["Size"]
+
+
+
+        extbothWays = CADGroove(BBE,beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,bbWeldFlang,
+                                    bbWeldWeb)
+        extbothWays.create_3DModel()
+
+        return extbothWays
+
+
     def createCCCoverPlateCAD(self):
 
         if self.connection == KEY_DISP_COLUMNCOVERPLATE:
@@ -1385,6 +1513,32 @@ class CommonDesignLogic(object):
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
                                         color=Quantity_NOC_YELLOW)
+            elif self.connection == KEY_DISP_BEAMENDPLATE:
+                self.B = self.module_class()
+
+                self.ExtObj = self.createBBEndPlateCAD()
+
+                if component == "Beam":
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True)
+
+                elif component == "Connector":
+                    osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
+                                        color=Quantity_NOC_SADDLEBROWN)
+
+                elif component == "Model":
+
+                    # osdag_display_shape(self.display, self.ExtObj.get_models(), update=True)
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True)
+                    osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
+                                        color='Blue')
+                    # osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
+                                        color=Quantity_NOC_SADDLEBROWN)
+
+
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 self.B = self.module_class()
@@ -1549,6 +1703,7 @@ class CommonDesignLogic(object):
     def call_3DModel(self, flag, module_class):  # Done
 
         self.module_class = module_class
+        print(self.module_class,flag,"hghghh")
 
         if self.mainmodule == "Shear Connection":
 
@@ -1586,6 +1741,16 @@ class CommonDesignLogic(object):
                     self.CPObj = self.createBBCoverPlateCAD()
 
                     self.display_3DModel("Model", "gradient_bg")
+
+                else:
+                    self.display.EraseAll()
+
+            elif self.connection == KEY_DISP_BEAMENDPLATE:
+                if flag is True:
+                    print("hii")
+                    self.CPObj = self.createBBEndPlateCAD()
+
+                    self.display_3DModel("Model", "gg")
 
                 else:
                     self.display.EraseAll()
@@ -1750,6 +1915,22 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE or self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
+                if self.component == "Beam":
+                    if self.connection == KEY_DISP_BEAMCOVERPLATE:
+                        final_model = self.CPObj.get_only_beams_Models()
+                    else:
+                        final_model = self.CPObj.get_beam_models()
+                elif self.component == "Connector":
+                    if self.connection == KEY_DISP_BEAMCOVERPLATE:
+                        cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
+                        if self.B.preference != 'Outside':
+                            cadlist.insert(1, self.CPObj.get_innetplatesModels())
+                    else:
+                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+                else:
+                    cadlist = self.CPObj.get_models()
+
+            elif self.connection == KEY_DISP_BEAMENDPLATE:
                 if self.component == "Beam":
                     if self.connection == KEY_DISP_BEAMCOVERPLATE:
                         final_model = self.CPObj.get_only_beams_Models()

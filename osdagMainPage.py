@@ -148,7 +148,7 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
-from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.beam_end_plate import BeamBeamEndPlateSplice
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
@@ -529,7 +529,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
             self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamEndPlate,' ')
+            self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice,' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

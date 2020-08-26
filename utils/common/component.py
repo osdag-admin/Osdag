@@ -271,11 +271,20 @@ class Bolt:
 
     def calculate_bolt_proof_load(self, bolt_diameter_provided, bolt_grade_provided):
         """ calculate proof load of bolt: F_0 = A_nb*f_0 (f_0 = 0.7*f_ub) """
-        [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
-        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided,
-                                                                        self.bolt_diameter_provided)
+
+        [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(bolt_diameter_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(bolt_grade_provided, bolt_diameter_provided)
 
         self.proof_load = self.bolt_net_area * 0.7 * self.bolt_fu
+
+    def calculate_combined_shear_tension_capacity(self, shear_demand, shear_capacity, tension_demand, tension_capacity, bolt_type='Bearing Bolt'):
+        """ """
+        if bolt_type == "Bearing Bolt":
+            self.bolt_combined_capacity = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(shear_demand, shear_capacity, tension_demand,
+                                                                                                       tension_capacity)  # kN
+        else:  # "Friction Grip Bolt"
+            self.bolt_combined_capacity = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(shear_demand, shear_capacity, tension_demand,
+                                                                                                       tension_capacity)  # kN
 
 
 class Nut(Material):

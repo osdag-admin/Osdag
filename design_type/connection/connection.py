@@ -909,6 +909,7 @@ class Connection(Main):
                      KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
                      KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
 
+
 if __name__ == "__main__":
     connection = Connection()
     connection.test()

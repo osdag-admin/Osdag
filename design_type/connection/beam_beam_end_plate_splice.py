@@ -24,6 +24,7 @@
 
 from design_type.connection.moment_connection import MomentConnection
 from design_type.connection.end_plate_splice_helper import EndPlateSpliceHelper
+from design_type.connection import end_plate_splice_helper
 from design_type.connection.shear_connection import ShearConnection
 from utils.common.is800_2007 import IS800_2007
 from utils.common.other_standards import IS_5624_1993
@@ -47,8 +48,62 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def __init__(self):
         super(BeamBeamEndPlateSplice, self).__init__()
 
+        self.load_moment = 0.0
+        self.load_moment_effective = 0.0
+        self.load_shear = 0.0
+        self.load_axial = 0.0
+
+        # self.supported_section = Beam
+        self.bolt_diameter = []
+        self.bolt_list = []
+        self.bolt_diameter_provided = 0
+        self.bolt_grade = []
+        self.bolt_grade_provided = 0.0
+        self.bolt_type = ""
+        self.plate_thickness = []
+
+        self.beam_plastic_mom_capa_zz = 0.0
+        self.tension_due_to_moment = 0.0
+        self.tension_due_to_axial_force = 0.0
+        self.load_tension_flange = 0.0
         self.bolt_tension = 0.0
-        # self.bolt_list = []
+        self.bolt_fu = 0.0
+        self.dp_bolt_fy = 0.0
+        self.proof_load = 0.0
+
+        self.pitch_distance_provided = 0.0
+        self.gauge_distance_provided = self.pitch_distance_provided
+        self.end_distance_provided = 0.0
+        self.edge_distance_provided = self.end_distance_provided
+        self.gauge_cs_distance_provided = 0.0
+        self.space_available_inside_D = 0.0
+        self.rows_inside_D_max = 0
+        self.rows_outside_D_max = 0
+        self.rows_total_max = 0
+        self.rows_minimum_req = 0
+        self.rows_outside_D_provided = 0
+        self.rows_inside_D_provided = 0
+        self.rows_near_tension_flange = (self.rows_outside_D_provided / 2) + (self.rows_inside_D_provided / 2)
+        self.rows_near_web = 0
+        self.rows_near_tension_flange_max = 0
+        self.rows_near_web_max = 0
+        self.bolt_numbers_tension_flange = 0
+        self.bolt_numbers_web = 0
+
+        self.bolt_column = 0
+        self.bolt_row = 0
+        self.bolt_numbers = self.bolt_column * self.bolt_row
+
+        self.ep_width_provided = 0.0
+        self.ep_height_max = 0.0
+
+        self.minimum_load_status_moment = False
+        self.plate_design_status = False
+        self.bolt_design_status = False
+        self.deep_beam_status = False
+
+        self.beam_properties = {}
+        self.safety_factors = {}
 
     # Set logger
     def set_osdaglogger(key):
@@ -397,6 +452,18 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # properties fro design preferences
 
         # beam properties
+        self.beam_properties = {
+            "beam_D": self.supported_section.depth,
+            "beam_B": self.supported_section.flange_width,
+            "beam_T": self.supported_section.flange_thickness,
+            "beam_t": self.supported_section.web_thickness,
+            "beam_r1": self.supported_section.root_radius,
+            "beam_r2": self.supported_section.toe_radius,
+            "beam_zp_zz": self.supported_section.plast_sec_mod_z,
+            "beam_fu": self.supported_section.fu,
+            "beam_fy": self.supported_section.fy
+        }
+
         self.beam_D = self.supported_section.depth
         self.beam_bf = self.supported_section.flange_width
         self.beam_tf = self.supported_section.flange_thickness
@@ -422,6 +489,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.dp_weld_fu_overwrite = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
 
         # safety factors (Table 5, IS 800:2007)
+        self.safety_factors = {
+            "gamma_m0": self.cl_5_4_1_Table_5["gamma_m0"]["yielding"],
+            "gamma_m1": self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"],
+            "gamma_mb": self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab],
+            "gamma_mw": self.cl_5_4_1_Table_5["gamma_mw"]["Field weld"]
+        }
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
         self.gamma_m1 = self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]  # gamma_m1 = 1.25
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
@@ -440,6 +513,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
     #         logger.info(
     #             " : You are using a section (in red color) that is not available in latest version of IS 808")
 
+        # helper function
+        self.call_helper = EndPlateSpliceHelper(self.load, self.bolt, ep_type=self.endplate_type, bolt_design_status=self.bolt_design_status)
+
     # start of design simulation
 
     def set_parameters(self):
@@ -450,21 +526,26 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
         self.beam_plastic_mom_capa_zz = (1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0
 
-        if self.load.moment < (0.7 * self.beam_plastic_mom_capa_zz):
+        if self.load.moment < (0.5 * self.beam_plastic_mom_capa_zz):
             self.minimum_load_status_moment = True
             # update moment value
-            self.load_moment = round(0.7 * self.beam_plastic_mom_capa_zz, 2)
+            self.load_moment = round(0.5 * self.beam_plastic_mom_capa_zz, 2)  # kN
 
-            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kN-m) is less than 0.7 times the plastic moment "
+            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kN-m) is less than 0.5 times the plastic moment "
                            "capacity of the beam ({} kN-m)".format(self.load.moment, self.load_moment))
-            logger.info("The minimum factored bending moment should be at-least 0.7 times the plastic moment capacity of the beam to qualify the "
-                        "connection as rigid in terms of strength requirement (Annex F, F-4.3.1, Table 43, IS 800:2007)")
+            logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
+                        "connection as rigid and transfer full moment from the spliced beam (Cl. 10.7, IS 800:2007)")
             logger.info("Designing the connection for a load of {} kN-m".format(self.load_moment))
         else:
             self.minimum_load_status_moment = False
-            self.load_moment = self.load.moment
+            self.load_moment = self.load.moment  # kN
 
         # TODO: check min loads for shear and axial
+        self.load_shear = self.load.shear_force  # kN
+        self.load_axial = self.load.axial_force  # kN
+
+        # effective moment is the moment due to external factored moment plus moment due to axial force
+        self.load_moment_effective = self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2)))  # kN-m
 
         # setting bolt ist
         self.bolt_diameter = self.bolt.bolt_diameter
@@ -492,42 +573,45 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.bolt_list = self.bolt_list
 
         # create a list of tuple with a combination of each bolt diameter with each grade for iteration
+        # list is created using the approach --- minimum diameter, small grade to maximum diameter, high grade
         self.bolt_list = [i for i in zip(*[iter(self.bolt_list)]*2)]
         logger.info("Checking the design with the following bolt diameter-grade combination {}".format(self.bolt_list))
 
     def design_connection(self):
         """ perform analysis and design of bolt and end plate """
 
-        # Check 1: calculate tension due to external factored moment
+        # Check 1: calculate tension due to external factored moment and axial force in the tension flange
         # Assumption: the NA is assumed at the centre of the bottom flange
-        # if self.connectivity == 'Extended One Way - Irreversible Moment' or 'Extended Both Ways - Reversible Moment':
-        self.load_tension_flange = round((self.load_moment / (self.beam_D - self.beam_tf)), 2)  # kN
+
+        self.tension_due_to_moment = round((self.load_moment / (self.beam_D - self.beam_tf)), 2)  # kN
+        self.tension_due_to_axial_force = round((self.load_axial / ((self.beam_D / 2) - (self.beam_tf / 2))), 2)  # kN
+        self.load_tension_flange = self.tension_due_to_moment + self.tension_due_to_axial_force  # kN
 
         # performing the check with minimum plate thickness and a suitable bolt dia-grade combination (thin plate - large dia approach)
         logger.info("[Optimisation] Performing the design by optimising the plate thickness, using the thin plate and large (suitable) bolt diameter "
                     "approach")
         logger.info("If you wish to optimise the bolt diameter-grade combination, pass a higher value of plate thickness using the Input Dock")
 
-        # loop starts - performing all the checks considering minimum plate thickness and performing all the checks
-
+        # loop starts
         self.plate_design_status = False  # initialise plate status to False to activate the loop for first (and subsequent, if required) iteration(s)
+
         for i in self.plate_thickness:
             self.plate_thickness = i  # assigns plate thickness from the list
 
-            if self.plate_design_status == False:
+            if not self.plate_design_status:
 
-                self.bolt_design_status = False  # initialize bolt status as False to start the loop
+                self.bolt_design_status = False  # initialize bolt status as False to activate the bolt design loop
 
-                # selecting a single dia-grade combination for checks
+                # selecting a single dia-grade combination (from the list of a tuple) each time for performing all the checks
                 for j in self.bolt_list:
 
-                    if self.bolt_design_status == False:
+                    if not self.bolt_design_status:
 
                         test_list = j  # choose a tuple from the list of bolt dia and grade - (dia, grade)
                         self.bolt_diameter_provided = test_list[0]  # select trial diameter
-                        self.bolt_grade_provided = test_list[1]  # seect trial grade
+                        self.bolt_grade_provided = test_list[1]  # select trial grade
 
-                        # bolt mechanical properties
+                        # assign bolt mechanical properties
                         self.bolt_fu = self.bolt.bolt_fu
                         self.dp_bolt_fy = self.bolt.bolt_fy
                         self.proof_load = self.bolt.proof_load
@@ -551,82 +635,95 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
                         self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
-                        # Check 3: end plate dimensions (designed for groove weld only)
+                        # Check 3: end plate dimensions (designed for groove weld at flange only)
 
                         # plate width (provided and maximum are same)
                         self.ep_width_provided = self.beam_bf + 25  # mm, 12.5 mm on each side
 
                         # plate height (maximum) - fixing maximum two rows above and below flange for ep extending beyond the flange
-                        if self.connectivity == 'Flushed - Reversible Moment':
+                        if self.endplate_type == 'Flushed - Reversible Moment':
                             self.ep_height_max = self.beam_D + 25  # mm, 12.5 mm beyond either flanges
                         else:  # assuming two rows
                             space_available_above_flange = (2 * self.end_distance_provided) + self.pitch_distance_provided  # mm, extension on each side
 
-                            if self.connectivity == 'Extended One Way - Irreversible Moment':
+                            if self.endplate_type == 'Extended One Way - Irreversible Moment':
                                 self.ep_height_max = self.beam_D + space_available_above_flange  # mm
                             else:
                                 self.ep_height_max = self.beam_D + (2 * space_available_above_flange)  # mm
 
                         # Check 4: number of rows of bolt - above and below beam depth
+                        # Note: space_available_inside_D is calculated assuming minimum space available after providing minimum rows inside (i.e. 2)
+                        self.space_available_inside_D = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * self.end_distance_provided)
+                        self.rows_inside_D_max = 2 + round_down(self.space_available_inside_D, self.pitch_distance_provided, 1)
 
-                        # max space available inside D to accommodate (2 + n) rows - both for tension and shear design
-                        self.space_available_inside_flange = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * self.end_distance_provided)
+                        if self.endplate_type == 'Extended One Way - Irreversible Moment':
+                            self.rows_outside_D_max = 2
+                            self.rows_total_max = self.rows_outside_D_max + self.rows_inside_D_max
 
-                        # max (total) rows inside
-                        self.rows_inside_D_max = 2 + (round_down((self.space_available_inside_flange / self.pitch_distance_provided), 2))  # minimum is two
+                            self.rows_minimum_req = 3  # 2 near tension flange and 1 near the bottom flange
+                        else:
+                            if self.endplate_type == 'Flushed - Reversible Moment':
+                                self.rows_outside_D_max = 0
+                                self.rows_minimum_req = 2  # 2 at each flanges (inside flanges)
+
+                            else:  # extended both way
+                                self.rows_outside_D_max = 2 * 2  # 2 on outside of both the flanges
+                                self.rows_minimum_req = 2 * 2  # 2 at each flanges (above and below)
+
+                            self.rows_total_max = self.rows_outside_D_max + self.rows_inside_D_max
 
                         if self.rows_inside_D_max <= 0:
                             logger.error("[Detailing] The selected beam cannot accommodate at-least a single row of bolt inside it's depth")
                             logger.info("Select/Provide a beam of suitable depth")
 
-                        # checking if the beam is deep enough (based on detailing thumb rule)
-                        # Allowing max of 3 rows (each inside top and bottom flange)
-                        # If the space available after providing a total of 6 rows inside flange is greater than or equal to max pitch, then the beam
-                        # is considered as deep enough from detailing perspective ONLY.
-                        # This check will help in assessing how many rows of bolts can be provided near the web to carry shear and axial force
+                        # # checking if the beam is deep enough (based on detailing thumb rule)
+                        # # Allowing max of 3 rows (each inside top and bottom flange)
+                        # # If the space available after providing a total of 6 rows inside flange is greater than or equal to max pitch, then the beam
+                        # # is considered as deep enough from detailing perspective ONLY.
+                        # # This check will help in assessing how many rows of bolts can be provided near the web to carry shear and axial force
+                        #
+                        # if (self.space_available_inside_flange - (4 * self.pitch_distance_provided)) >= min(32 * self.plate_thickness, 300):
+                        #     self.deep_beam_status = True
+                        # else:
+                        #     self.deep_beam_status = False
+                        #
+                        # # initialising with minimum number of rows to start the iteration
+                        # if self.connectivity == 'Flushed - Reversible Moment':
+                        #     self.rows_outside_D_max = 0
+                        #     self.rows_outside_D_provided = 0
+                        #
+                        #     self.rows_inside_D_provided = 2  # initialize with minimum 2 rows (1 at top and bottom flange each)
+                        # else:
+                        #     self.rows_outside_D_max = 4  # 2 beyond each flange
+                        #     self.rows_outside_D_provided = 2  # initialize with minimum 2 rows (1 row beyond each top and bottom flange)
+                        #
+                        #     self.rows_inside_D_provided = 2  # initialize with minimum 2 rows (1 at top and bottom flange each)
+                        #
+                        # # Minimum values: at each flange (out + in)
+                        # self.rows_near_tension_flange = (self.rows_outside_D_provided / 2) + (self.rows_inside_D_provided / 2)
+                        # # at web
+                        # self.rows_near_web = 1  # initialize with 1 row
 
-                        if (self.space_available_inside_flange - (4 * self.pitch_distance_provided)) >= min(32 * self.plate_thickness, 300):
-                            self.deep_beam_status = True
-                        else:
-                            self.deep_beam_status = False
-
-                        # initialising with minimum number of rows to start the iteration
-                        if self.connectivity == 'Flushed - Reversible Moment':
-                            self.rows_outside_D_max = 0
-                            self.rows_outside_D_provided = 0
-
-                            self.rows_inside_D_provided = 2  # initialize with minimum 2 rows (1 at top and bottom flange each)
-                        else:
-                            self.rows_outside_D_max = 4  # 2 beyond each flange
-                            self.rows_outside_D_provided = 2  # initialize with minimum 2 rows (1 row beyond each top and bottom flange)
-
-                            self.rows_inside_D_provided = 2  # initialize with minimum 2 rows (1 at top and bottom flange each)
-
-                        # Minimum values: at each flange (out + in)
-                        self.rows_near_tension_flange = (self.rows_outside_D_provided / 2) + (self.rows_inside_D_provided / 2)
-                        # at web
-                        self.rows_near_web = 1  # initialize with 1 row
-
-                        # check for max rows inside
-                        if (self.rows_inside_D_provided + self.rows_near_web) > self.rows_inside_D_max:
-                            logger.error("[Detailing] The minimum required number of rows inside beam depth ({}) exceeds the maximum allowed rows "
-                                         "({}) [as per detailing requirement]".format(self.rows_near_tension_flange + self.rows_near_web,
-                                                                                      self.rows_inside_D_max))
-                            logger.info("Select/Provide a beam of suitable depth")
-
-                        # Maximum values: at each flange (out + in)
-                        self.rows_near_tension_flange_max = min(5, 2 + (self.rows_inside_D_max / 2))  # on each side, total
-
-                        # checking for space availability to add bolts for shear design
-                        space_available_shear_bolts = self.space_available_inside_flange - (((self.rows_inside_D_provided - 2) / 2) *
-                                                                                            self.pitch_distance_provided)
-
-                        # space available (s), rows (r) and pitch (p) relation is given as; [s = (r + 1) * p]
-                        # max rows of bolt near web
-                        self.rows_near_web_max = round_down(((space_available_shear_bolts / self.pitch_distance_provided) - 1), 1)
-                        if self.rows_near_web_max <= 0:
-                            self.rows_near_web = 0
-                            self.bolt_design_status = False
+                        # # check for max rows inside
+                        # if (self.rows_inside_D_provided + self.rows_near_web) > self.rows_inside_D_max:
+                        #     logger.error("[Detailing] The minimum required number of rows inside beam depth ({}) exceeds the maximum allowed rows "
+                        #                  "({}) [as per detailing requirement]".format(self.rows_near_tension_flange + self.rows_near_web,
+                        #                                                               self.rows_inside_D_max))
+                        #     logger.info("Select/Provide a beam of suitable depth")
+                        #
+                        # # Maximum values: at each flange (out + in)
+                        # self.rows_near_tension_flange_max = min(5, 2 + (self.rows_inside_D_max / 2))  # on each side, total
+                        #
+                        # # checking for space availability to add bolts for shear design
+                        # space_available_shear_bolts = self.space_available_inside_flange - (((self.rows_inside_D_provided - 2) / 2) *
+                        #                                                                     self.pitch_distance_provided)
+                        #
+                        # # space available (s), rows (r) and pitch (p) relation is given as; [s = (r + 1) * p]
+                        # # max rows of bolt near web
+                        # self.rows_near_web_max = round_down(((space_available_shear_bolts / self.pitch_distance_provided) - 1), 1)
+                        # if self.rows_near_web_max <= 0:
+                        #     self.rows_near_web = 0
+                        #     self.bolt_design_status = False
 
                         # Check 5: number of columns of bolt on each side (minimum is 1, maximum is 2)
 
@@ -652,61 +749,64 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                         # Check 6: bolt design
 
-                        # row combination for running iterations
-                        row_list_flange = np.arange(self.rows_near_tension_flange, self.rows_near_tension_flange_max + 1, 1).tolist()
-                        row_list_web = np.arange(self.rows_near_web, self.rows_near_web + 1, 1).tolist()
-                        column_list = np.arange(2, self.bolt_column + 1, 1).tolist()
+                        # column and row combination for running iterations
+                        if self.endplate_type == 'Extended One Way - Irreversible Moment':
+                            row_list = np.arange(self.rows_minimum_req, self.rows_total_max + 1, 1).tolist()
+                        else:
+                            row_list = np.arange(self.rows_minimum_req, self.rows_total_max + 1, 2).tolist()
+                        column_list = np.arange(2, self.bolt_column + 1, 2).tolist()
+
+                        if self.bolt_column == 4:
+                            column_list = column_list[::-1]
 
                         combined_list = []
 
                         # combine each possible row and column combination starting from minimum to maximum
                         for q in column_list:
-                            for r in row_list_flange:
-                                if r == 3:
-                                    r = 4  # r can be either; 2, 4 or 5 (5 as max)
-                                for s in row_list_web:
+                            for r in row_list:
 
-                                    combined_list.append(q)
-                                    combined_list.append(r)
-                                    combined_list.append(s)
+                                combined_list.append(q)
+                                combined_list.append(r)
 
                         combined_list = combined_list
 
-                        # create a list of tuple with a combination of rows at flange and web for iteration
-                        combined_list = [i for i in zip(*[iter(combined_list)] * 3)]
-                        logger.info("Checking the design with the following number of column and rows combination each at tension flange and web {}".
-                                    format(combined_list))
+                        # create a list of tuple with a combination of number of columns and rows for running the iteration
+                        combined_list = [i for i in zip(*[iter(combined_list)] * 2)]
+                        logger.info("Checking the design with the following number of column and rows combination {}".format(combined_list))
 
                         # set bolt design status to False to activate the bolt design loop
                         self.bolt_design_status = False
 
-                        # selecting each possible combination of columns and row iteratively to perform design checks
+                        # selecting each possible combination of column and row iteratively to perform design checks
+                        # starting from minimum column and row to maximum until overall bolt design status is True
                         for x in combined_list:
-                            if self.bolt_design_status == False:
+                            if not self.bolt_design_status:
                                 select_list = x  # selected tuple from the list
 
                                 self.bolt_column = select_list[0]
-                                self.rows_near_tension_flange = select_list[1]
-                                self.rows_near_web = select_list[2]
+                                self.bolt_row = select_list[1]
 
-                                # number of bolts to perform the check (on each side of flange for rows and total number of columns)
-                                self.bolt_numbers_tension_flange = self.bolt_column * self.rows_near_tension_flange
-                                self.bolt_numbers_web = self.bolt_column * self.rows_near_web
+                                # run the bolt check function from the helper class
+                                self.design_bolt = self.call_helper.perform_bolt_design(self.endplate_type, self.beam_properties, self.safety_factors,
+                                                                                        self.bolt_column, self.bolt_row, self.bolt_diameter_provided,
+                                                                                        self.bolt_grade_provided, self.load_moment_effective,
+                                                                                        self.end_distance_provided, self.pitch_distance_provided)
+                                z = self.call_helper.bolt_shear_check_UR
 
-                                # results from the bolt check function
-                                self.bolt_design_results = EndPlateSpliceHelper.perform_bolt_design(self.bolt_numbers_tension_flange,
-                                                                                                    self.bolt_numbers_web)
+                                self.bolt_design_results = end_plate_splice_helper.EndPlateSpliceHelper.perform_bolt_design\
+                                    (self.bolt_numbers_tension_flange, self.bolt_numbers_web, self.bolt_diameter_provided, self.bolt_grade_provided)
 
                         # fixing bolt configuration
                         if self.bolt_design_status == True:
                             logger.info("[Bolt Design] All the checks pertaining to bolt design have successfully passed with an optimised "
                                         "combination of bolt diameter = {} mm, bolt grade = {} and, {} total number of bolts".
-                                        format(self.bolt_diameter_provided, self.bolt_grade_provided, self.total_number_bolts))
+                                        format(self.bolt_diameter_provided, self.bolt_grade_provided, 1))
                             logger.info("[Detailing] Fixing bolt configuration as per detailing requirements")
                         else:
                             logger.error("[Bolt Design] The bolt design checks fail with a trial diameter of {} mm and {} grade".
                                          format(self.bolt_diameter_provided, self.bolt_grade_provided))
                             logger.info("Trying to re-design with a higher bolt diameter-grade combination")
+
 
 
 

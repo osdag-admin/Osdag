@@ -25,7 +25,7 @@ import logging
 import math
 
 
-class EndPlateSpliceHelper:
+class EndPlateSpliceHelper(object):
 
     def __init__(self, load, bolt, ep_type="", bolt_design_status="False", plate_design_status="False", overall_design_status="False"):
         """ helper file to run simulation for bolt design, plate design etc. """

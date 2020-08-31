@@ -172,7 +172,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/extended.png", True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/flush_ep.png", True, 'No Validator')
         options_list.append(t15)
 
         t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, connectdb("Beams"), True, 'No Validator')
@@ -190,7 +190,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None,True, 'Int Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -224,7 +224,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         """ """
         lst = []
 
-        t1 = ([KEY_CONN, KEY_ENDPLATE_TYPE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        t1 = ([KEY_ENDPLATE_TYPE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t1)
 
         t2 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
@@ -234,8 +234,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def fn_conn_image(self):
         """ display representative images of end plate type """
-        conn = self[0]
-        ep_type = self[1]
+        # conn = self[0]
+        ep_type = self[0]
         if ep_type == 'Flushed - Reversible Moment':
             return './ResourceFiles/images/flush_ep.png'
         elif ep_type == 'Extended One Way - Irreversible Moment':
@@ -264,7 +264,164 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def output_values(self, flag):
         """ create a list of tuples to be displayed as the UI in the Output Dock """
         out_list = []
-        return []
+
+        # Critical Bolt
+        t1 = (None, DISP_TITLE_CRITICAL_BOLT, TYPE_TITLE, None, True)
+        out_list.append(t1)
+
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt_diameter_provided if flag else '', True)
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt_grade_provided if flag else '', True)
+        out_list.append(t3)
+
+        t12 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_DEMAND, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t12)
+
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t4)
+
+        bolt_bearing_capacity_disp = ''
+        if flag is True:
+            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE: bolt_bearing_capacity_disp = 0.0
+
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_BOLT_CAPACITY, DISP_TITLE_BOLT_CAPACITY, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t6)
+
+        t7 = (KEY_OUT_BOLT_TENSION_FORCE, KEY_OUT_DISP_CRITICAL_BOLT_TENSION, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t7)
+
+        t8 = (KEY_OUT_BOLT_PRYING_FORCE, KEY_OUT_DISP_BOLT_PRYING_FORCE_EP, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t8)
+
+        t9 = (KEY_OUT_BOLT_TENSION_TOTAL, KEY_OUT_DISP_BOLT_TENSION_DEMAND, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_BOLT_TENSION_CAPACITY, KEY_OUT_CRITICAL_BOLT_TENSION_CAPACITY, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t10)
+
+        t11 = (KEY_OUT_BOLT_IR, KEY_OUT_DISP_BOLT_COMBINED_CAPACITY, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        out_list.append(t11)
+
+        # Detailing
+        t12 = (None, DISP_TITLE_DETAILING, TYPE_TITLE, None, True)
+        out_list.append(t12)
+
+        t13 = (KEY_OUT_DISP_DETAILING_BOLT_NUMBERS, KEY_OUT_DISP_DETAILING_BOLT_NUMBERS_EP, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t13)
+
+        t14 = (KEY_OUT_DISP_DETAILING_BOLT_COLUMNS, KEY_OUT_DISP_DETAILING_BOLT_COLUMNS_EP, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t14)
+
+        t15 = (KEY_OUT_DISP_DETAILING_BOLT_ROWS, KEY_OUT_DISP_DETAILING_BOLT_ROWS_EP, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t15)
+
+        t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
+               0 if flag else '', True)
+        out_list.append(t21)
+
+        t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
+               0 if flag else '', True)
+        out_list.append(t22)
+
+        t22 = (KEY_OUT_DETAILING_CS_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_CS_GAUGE_DISTANCE, TYPE_TEXTBOX,
+               0 if flag else '', True)
+        out_list.append(t22)
+
+        t16 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t16)
+
+        t17 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t17)
+
+        # End Plate
+        t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
+        out_list.append(t18)
+
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t19)
+
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t20)
+
+        t21 = (KEY_OUT_PLATE_WIDTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t21)
+
+        t22 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, 0, True)
+        out_list.append(t22)
+
+        # Stiffener Details
+        t32 = (None, DISP_TITLE_STIFFENER_PLATE, TYPE_TITLE, None, True)
+        out_list.append(t32)
+
+        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_OUT_BUTTON,
+               ['Stiffener Details', self.stiffener_details], True)
+        out_list.append(t33)
+
+        # Weld
+        t23 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
+        out_list.append(t23)
+
+        t24 = (None, DISP_TITLE_WELD_WEB, TYPE_TITLE, None, True)
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t25)
+
+        t28 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t28)
+
+        t27 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t27)
+
+        t29 = (KEY_OUT_WELD_STRESS_COMBINED, KEY_OUT_DISP_WELD_STRESS_COMBINED, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t29)
+
+        t26 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, 0 if flag else '', True)
+        out_list.append(t26)
+
+        t30 = (None, DISP_TITLE_WELD_FLANGE, TYPE_TITLE, None, True)
+        out_list.append(t30)
+
+        # t31 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD_FLANGE, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
+        # out_list.append(t31)
+
+        return out_list
+
+    # stiffener details
+    def stiffener_details(self, flag):
+
+        stiffener = []
+
+        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX,
+               0 if flag else '', True)
+        stiffener.append(t28)
+
+        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX,
+               0 if flag else '', True)
+        stiffener.append(t29)
+
+        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX,
+               0 if flag else '', True)
+        stiffener.append(t30)
+
+        return stiffener
+
+    # display weld details image
+    def weld_details(self):
+
+        weld = []
+
+        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_flange.png')
+        weld.append(t99)
+
+        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_web.png')
+        weld.append(t99)
+
+        return weld
 
     # create UI for DP
     def tab_list(self):
@@ -302,7 +459,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # change_tab.append(t1)
 
         t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY], TYPE_TEXTBOX,
-        self.get_fu_fy_I_section_suptd)
+              self.get_fu_fy_I_section_suptd)
         change_tab.append(t2)
 
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
@@ -524,19 +681,19 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # warn if a beam of older version of IS 808 is selected
         # self.warn_text(self)
 
-    # def warn_text(self):
-    #     """ give logger warning when a beam from the older version of IS 808 is selected """
-    #     global logger
-    #     red_list = red_list_function()
-    #     if self.supported_section.designation in red_list:
-    #         logger.warning(
-    #             " : You are using a section (in red color) that is not available in latest version of IS 808")
-    #         logger.info(
-    #             " : You are using a section (in red color) that is not available in latest version of IS 808")
+        # def warn_text(self):
+        #     """ give logger warning when a beam from the older version of IS 808 is selected """
+        #     global logger
+        #     red_list = red_list_function()
+        #     if self.supported_section.designation in red_list:
+        #         logger.warning(
+        #             " : You are using a section (in red color) that is not available in latest version of IS 808")
+        #         logger.info(
+        #             " : You are using a section (in red color) that is not available in latest version of IS 808")
 
         # helper function
-        self.call_helper = EndPlateSpliceHelper(self.load, self.bolt, ep_type=self.endplate_type, bolt_design_status=self.bolt_design_status,
-                                                plate_design_status=self.plate_design_status, overall_design_status=self.overall_design_status)
+        self.call_helper = EndPlateSpliceHelper(load=self.load, bolt=self.bolt, ep_type=self.endplate_type, bolt_design_status=False,
+                                                plate_design_status=False, overall_design_status=False)
 
     # start of design simulation
 
@@ -596,7 +753,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # create a list of tuple with a combination of each bolt diameter with each grade for iteration
         # list is created using the approach --- minimum diameter, small grade to maximum diameter, high grade
-        self.bolt_list = [x for x in zip(*[iter(self.bolt_list)]*2)]
+        self.bolt_list = [x for x in zip(*[iter(self.bolt_list)] * 2)]
         logger.info("Checking the design with the following bolt diameter-grade combination {}".format(self.bolt_list))
 
     def design_connection(self):
@@ -649,7 +806,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                         # end/edge
                         end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type, self.bolt.edge_type)
-                        end_distance = end_distance + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
+                        end_distance = end_distance + (
+                                (1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
 
                         self.end_distance_provided = round_up(end_distance, 2)  # mm
                         self.edge_distance_provided = self.end_distance_provided
@@ -667,7 +825,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         if self.endplate_type == 'Flushed - Reversible Moment':
                             self.ep_height_max = self.beam_D + 25  # mm, 12.5 mm beyond either flanges
                         else:  # assuming two rows
-                            space_available_above_flange = (2 * self.end_distance_provided) + self.pitch_distance_provided  # mm, extension on each side
+                            space_available_above_flange = (
+                                                                   2 * self.end_distance_provided) + self.pitch_distance_provided  # mm, extension on each side
 
                             if self.endplate_type == 'Extended One Way - Irreversible Moment':
                                 self.ep_height_max = self.beam_D + space_available_above_flange  # mm
@@ -702,7 +861,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         # Check 5: number of columns of bolt on each side (minimum is 1, maximum is 2)
 
                         # checking space available to accommodate two column of bolts on each side
-                        space_available_2col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (2 * self.edge_distance_provided)
+                        space_available_2col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (
+                                2 * self.edge_distance_provided)
 
                         if space_available_2col >= self.ep_width_provided:
                             self.bolt_column = 4  # two columns on each side
@@ -738,7 +898,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         # combine each possible row and column combination starting from minimum to maximum
                         for q in column_list:
                             for r in row_list:
-
                                 combined_list.append(q)
                                 combined_list.append(r)
 
@@ -765,14 +924,3 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
                                                                                         self.plate_thickness, self.dp_plate_fu)
                                 z = self.call_helper.bolt_shear_check_UR
-
-
-
-
-
-
-
-
-
-
-

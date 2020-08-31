@@ -275,7 +275,7 @@ class Bolt:
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(bolt_diameter_provided)
         [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(bolt_grade_provided, bolt_diameter_provided)
 
-        self.proof_load = self.bolt_net_area * 0.7 * self.bolt_fu
+        self.proof_load = (self.bolt_net_area * 0.7 * self.bolt_fu) / 1000  # kN
 
     def calculate_combined_shear_tension_capacity(self, shear_demand, shear_capacity, tension_demand, tension_capacity, bolt_type='Bearing Bolt'):
         """ """

@@ -555,7 +555,10 @@ class EndPlateSpliceHelper(object):
                                           self.end_distance_provided, self.pitch_distance_provided, seatedangle_e=0)  # kN
 
         self.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity * 1e-3, 2)  # kN
-        self.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity * 1e-3, 2)  # kN
+        if self.bolt.bolt_type == "Bearing Bolt":
+            self.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity * 1e-3, 2)  # kN
+        else:
+            self.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity  # N/A
         self.bolt_capacity = round(self.bolt.bolt_capacity * 1e-3, 2)  # kN
 
         # Check 9.3: combined shear + tension check

@@ -964,9 +964,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.bolt_capacity = self.call_helper.bolt_capacity
 
                         # tension design
-                        self.tension_critical_bolt = self.call_helper.t_1
+                        self.tension_critical_bolt = round(self.call_helper.t_1, 2)
                         self.prying_critical_bolt = self.call_helper.prying_force
-                        self.tension_demand_critical_bolt = self.call_helper.bolt_tension_demand
+                        self.tension_demand_critical_bolt = round(self.call_helper.bolt_tension_demand, 2)
                         self.tension_capacity_critical_bolt = self.call_helper.bolt_tension_capacity
                         self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
 
@@ -1058,7 +1058,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         """ design fillet weld at web for the connection """
 
         # weld size calculation
-        self.weld_length_web = (self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - 20)  # mm, on either side of the web
+        self.weld_length_web = 2 * (self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - 20)  # mm, on either side of the web
         self.weld_size_web = (self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.web_weld.fu)  # mm
 
         self.web_weld.set_min_max_sizes(self.plate_thickness, self.beam_tw, special_circumstance=False, fusion_face_angle=90)
@@ -1066,12 +1066,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.weld_size_web = round_up(max(self.weld_size_web, self.web_weld.min_size), 2)  # mm
 
         # combination of stress check
-        self.f_a = (self.load_axial * 1e3) / (0.7 * self.weld_size_web * self.weld_length_web)  # N/mm^2, stress due to axial force
-        self.q = (self.load_shear * 1e3) / (0.7 * self.weld_size_web * self.weld_length_web)  # N/mm^2, stress due to shear force
+        self.f_a = round((self.load_axial * 1e3) / (0.7 * self.weld_size_web * self.weld_length_web), 2)  # N/mm^2, stress due to axial force
+        self.q = round((self.load_shear * 1e3) / (0.7 * self.weld_size_web * self.weld_length_web), 2)  # N/mm^2, stress due to shear force
 
-        self.f_e = math.sqrt(self.f_a + (3 * self.q ** 2))  # N/mm^2, stress due to combined load
+        self.f_e = round(math.sqrt(self.f_a + (3 * self.q ** 2)), 2)  # N/mm^2, stress due to combined load
 
-        self.allowable_stress = self.web_weld.fu / (math.sqrt(3) * self.gamma_mw)  # N/mm^2, allowable stress in the weld
+        self.allowable_stress = round(self.web_weld.fu / (math.sqrt(3) * self.gamma_mw), 2)  # N/mm^2, allowable stress in the weld
 
         # allowable stress check
         if self.f_e > self.allowable_stress:

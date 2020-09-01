@@ -67,8 +67,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.tension_due_to_axial_force = 0.0
         self.load_tension_flange = 0.0
         self.bolt_tension = 0.0
-        self.bolt_fu = 0.0
-        self.dp_bolt_fy = 0.0
+        # self.bolt_fu = 0.0
+        # self.dp_bolt_fy = 0.0
         self.proof_load = 0.0
         self.proof_stress = 0.0
         self.beta = 2
@@ -97,6 +97,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.bolt_numbers = self.bolt_column * self.bolt_row
 
         self.ep_width_provided = 0.0
+        self.ep_height_provided = 0.0
+        self.ep_moment_capacity = 0.0
         self.ep_height_max = 0.0
 
         self.beam_D = 0.0
@@ -123,6 +125,16 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.gamma_m1 = 0.0
         self.gamma_mb = 0.0
         self.gamma_mw = 0.0
+
+        self.bolt_shear_demand = 0.0
+        self.bolt_shear_capacity = 0.0
+        self.bolt_bearing_capacity = 0.0
+        self.bolt_capacity = 0.0
+        self.tension_critical_bolt = 0.0
+        self.prying_critical_bolt = 0.0
+        self.tension_demand_critical_bolt = 0.0
+        self.tension_capacity_critical_bolt = 0.0
+        self.combined_capacity_critical_bolt = 0.0
 
     # Set logger
     def set_osdaglogger(key):
@@ -275,82 +287,79 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt_grade_provided if flag else '', True)
         out_list.append(t3)
 
-        t12 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_DEMAND, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t12 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_DEMAND, TYPE_TEXTBOX, self.bolt_shear_demand if flag else '', True)
         out_list.append(t12)
 
-        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX, self.bolt_shear_capacity if flag else '', True)
         out_list.append(t4)
 
         bolt_bearing_capacity_disp = ''
         if flag is True:
-            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE: bolt_bearing_capacity_disp = 0.0
+            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE: bolt_bearing_capacity_disp = self.bolt_bearing_capacity
 
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
-        t6 = (KEY_OUT_BOLT_CAPACITY, DISP_TITLE_BOLT_CAPACITY, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t6 = (KEY_OUT_BOLT_CAPACITY, DISP_TITLE_BOLT_CAPACITY, TYPE_TEXTBOX, self.bolt_capacity if flag else '', True)
         out_list.append(t6)
 
-        t7 = (KEY_OUT_BOLT_TENSION_FORCE, KEY_OUT_DISP_CRITICAL_BOLT_TENSION, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t7 = (KEY_OUT_BOLT_TENSION_FORCE, KEY_OUT_DISP_CRITICAL_BOLT_TENSION, TYPE_TEXTBOX, self.tension_critical_bolt if flag else '', True)
         out_list.append(t7)
 
-        t8 = (KEY_OUT_BOLT_PRYING_FORCE, KEY_OUT_DISP_BOLT_PRYING_FORCE_EP, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t8 = (KEY_OUT_BOLT_PRYING_FORCE, KEY_OUT_DISP_BOLT_PRYING_FORCE_EP, TYPE_TEXTBOX, self.prying_critical_bolt if flag else '', True)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_BOLT_TENSION_TOTAL, KEY_OUT_DISP_BOLT_TENSION_DEMAND, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t9 = (KEY_OUT_BOLT_TENSION_TOTAL, KEY_OUT_DISP_BOLT_TENSION_DEMAND, TYPE_TEXTBOX, self.tension_demand_critical_bolt if flag else '', True)
         out_list.append(t9)
 
-        t10 = (KEY_OUT_BOLT_TENSION_CAPACITY, KEY_OUT_CRITICAL_BOLT_TENSION_CAPACITY, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t10 = (KEY_OUT_BOLT_TENSION_CAPACITY, KEY_OUT_CRITICAL_BOLT_TENSION_CAPACITY, TYPE_TEXTBOX, self.tension_capacity_critical_bolt if flag else '', True)
         out_list.append(t10)
 
-        t11 = (KEY_OUT_BOLT_IR, KEY_OUT_DISP_BOLT_COMBINED_CAPACITY, TYPE_TEXTBOX, 0.0 if flag else '', True)
+        t11 = (KEY_OUT_BOLT_IR, KEY_OUT_DISP_BOLT_COMBINED_CAPACITY, TYPE_TEXTBOX, self.combined_capacity_critical_bolt if flag else '', True)
         out_list.append(t11)
 
         # Detailing
         t12 = (None, DISP_TITLE_DETAILING, TYPE_TITLE, None, True)
         out_list.append(t12)
 
-        t13 = (KEY_OUT_DISP_DETAILING_BOLT_NUMBERS, KEY_OUT_DISP_DETAILING_BOLT_NUMBERS_EP, TYPE_TEXTBOX, 0 if flag else '', True)
+        t13 = (KEY_OUT_DISP_DETAILING_BOLT_NUMBERS, KEY_OUT_DISP_DETAILING_BOLT_NUMBERS_EP, TYPE_TEXTBOX, self.bolt_numbers if flag else '', True)
         out_list.append(t13)
 
-        t14 = (KEY_OUT_DISP_DETAILING_BOLT_COLUMNS, KEY_OUT_DISP_DETAILING_BOLT_COLUMNS_EP, TYPE_TEXTBOX, 0 if flag else '', True)
+        t14 = (KEY_OUT_DISP_DETAILING_BOLT_COLUMNS, KEY_OUT_DISP_DETAILING_BOLT_COLUMNS_EP, TYPE_TEXTBOX, self.bolt_column if flag else '', True)
         out_list.append(t14)
 
-        t15 = (KEY_OUT_DISP_DETAILING_BOLT_ROWS, KEY_OUT_DISP_DETAILING_BOLT_ROWS_EP, TYPE_TEXTBOX, 0 if flag else '', True)
+        t15 = (KEY_OUT_DISP_DETAILING_BOLT_ROWS, KEY_OUT_DISP_DETAILING_BOLT_ROWS_EP, TYPE_TEXTBOX, self.bolt_row if flag else '', True)
         out_list.append(t15)
 
-        t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
-               0 if flag else '', True)
+        t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX, self.pitch_distance_provided if flag else '', True)
         out_list.append(t21)
 
-        t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
-               0 if flag else '', True)
+        t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX, self.gauge_distance_provided if flag else '', True)
         out_list.append(t22)
 
-        t22 = (KEY_OUT_DETAILING_CS_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_CS_GAUGE_DISTANCE, TYPE_TEXTBOX,
-               0 if flag else '', True)
+        t22 = (KEY_OUT_DETAILING_CS_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_CS_GAUGE_DISTANCE, TYPE_TEXTBOX, self.gauge_cs_distance_provided if flag else '', True)
         out_list.append(t22)
 
-        t16 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX, 0 if flag else '', True)
+        t16 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX, self.end_distance_provided if flag else '', True)
         out_list.append(t16)
 
-        t17 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, 0 if flag else '', True)
+        t17 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.edge_distance_provided if flag else '', True)
         out_list.append(t17)
 
         # End Plate
         t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, 0 if flag else '', True)
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate_thickness if flag else '', True)
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, 0 if flag else '', True)
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.ep_height_provided if flag else '', True)
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_WIDTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, 0 if flag else '', True)
+        t21 = (KEY_OUT_PLATE_WIDTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self.ep_width_provided if flag else '', True)
         out_list.append(t21)
 
-        t22 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, 0, True)
+        t22 = (KEY_OUT_EP_MOM_CAPACITY, KEY_OUT_DISP_EP_MOM_CAPACITY, TYPE_TEXTBOX, self.ep_moment_capacity if flag else '', True)
         out_list.append(t22)
 
         # Stiffener Details
@@ -386,8 +395,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t30 = (None, DISP_TITLE_WELD_FLANGE, TYPE_TITLE, None, True)
         out_list.append(t30)
 
-        # t31 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD_FLANGE, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
-        # out_list.append(t31)
+        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_FLANGE, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
+        out_list.append(t31)
 
         return out_list
 
@@ -691,9 +700,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
         #         logger.info(
         #             " : You are using a section (in red color) that is not available in latest version of IS 808")
 
+        # initialize design status
+        self.bolt_design_status = False
+        self.plate_design_status = False
+        self.overall_design_status = False
+
         # helper function
         self.call_helper = EndPlateSpliceHelper(load=self.load, bolt=self.bolt, ep_type=self.endplate_type, bolt_design_status=False,
                                                 plate_design_status=False, overall_design_status=False)
+
+        self.set_parameters(self)
+        self.design_connection(self)
 
     # start of design simulation
 
@@ -703,7 +720,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # set minimum load (Cl. 10.7, IS 800:2007)
 
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
-        self.beam_plastic_mom_capa_zz = (1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0
+        self.beam_plastic_mom_capa_zz = round(((1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0) * 1e-6, 2)  # kN-m
 
         if self.load.moment < (0.5 * self.beam_plastic_mom_capa_zz):
             self.minimum_load_status_moment = True
@@ -717,14 +734,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
             logger.info("Designing the connection for a load of {} kN-m".format(self.load_moment))
         else:
             self.minimum_load_status_moment = False
-            self.load_moment = self.load.moment  # kN
+            self.load_moment = round(self.load.moment * 1e-6, 2)  # kN-m
 
         # TODO: check min loads for shear and axial
-        self.load_shear = self.load.shear_force  # kN
-        self.load_axial = self.load.axial_force  # kN
+        self.load_shear = round(self.load.shear_force * 1e-3, 2)  # kN
+        self.load_axial = round(self.load.axial_force * 1e-3, 2)  # kN
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
-        self.load_moment_effective = self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2)))  # kN-m
+        self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
 
         # setting bolt ist
         self.bolt_diameter = self.bolt.bolt_diameter
@@ -750,6 +767,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                 self.bolt_list.append(k)
 
         self.bolt_list = self.bolt_list
+        logger.info("[Bolt Design] Bolt diameter and grade combination ready to perform bolt design")
+        logger.info("The solver has selected {} combinations of bolt diameter and grade to perform optimum bolt design in an iterative manner "
+                    .format(len(self.bolt_list)))
 
         # create a list of tuple with a combination of each bolt diameter with each grade for iteration
         # list is created using the approach --- minimum diameter, small grade to maximum diameter, high grade
@@ -762,8 +782,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # Check 1: calculate tension due to external factored moment and axial force in the tension flange
         # Assumption: the NA is assumed at the centre of the bottom flange
 
-        self.tension_due_to_moment = round((self.load_moment / (self.beam_D - self.beam_tf)), 2)  # kN
-        self.tension_due_to_axial_force = round((self.load_axial / ((self.beam_D / 2) - (self.beam_tf / 2))), 2)  # kN
+        self.tension_due_to_moment = round((self.load_moment * 1e3 / (self.beam_D - self.beam_tf)), 2)  # kN
+        self.tension_due_to_axial_force = round(self.load_axial / 2, 2)  # kN
         self.load_tension_flange = self.tension_due_to_moment + self.tension_due_to_axial_force  # kN
 
         # performing the check with minimum plate thickness and a suitable bolt dia-grade combination (thin plate - large dia approach)
@@ -923,4 +943,41 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                         self.end_distance_provided, self.pitch_distance_provided,
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
                                                                                         self.plate_thickness, self.dp_plate_fu)
-                                z = self.call_helper.bolt_shear_check_UR
+
+                        # calling bolt design results
+
+                        # shear design
+                        self.bolt_shear_demand = self.call_helper.bolt_shear_demand
+                        self.bolt_shear_capacity = self.call_helper.bolt_shear_capacity
+                        self.bolt_bearing_capacity = self.call_helper.bolt_bearing_capacity
+                        self.bolt_capacity = self.call_helper.bolt_capacity
+
+                        # tension design
+                        self.tension_critical_bolt = self.call_helper.t_1
+                        self.prying_critical_bolt = self.call_helper.prying_force
+                        self.tension_demand_critical_bolt = self.call_helper.bolt_tension_demand
+                        self.tension_capacity_critical_bolt = self.call_helper.bolt_tension_capacity
+                        self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
+
+                        # number of bolts
+                        self.bolt_numbers = self.bolt_column * self.bolt_row
+
+                        # End Plate
+                        self.ep_moment_capacity = self.call_helper.mp_plate
+
+                        if self.endplate_type == 'Flushed - Reversible Moment':
+                            self.ep_height_provided = self.beam_D + 25
+
+                        elif self.endplate_type == 'Extended One Way - Irreversible Moment':
+                            if self.bolt_row <= 4:  # 1 row above tension flange
+                                self.ep_height_provided = self.beam_D + 12.5 + (2 * self.end_distance_provided)
+                            else:  # 2 rows above tension flange which is maximum allowable
+                                self.ep_height_provided = self.beam_D + 12.5 + (2 * self.end_distance_provided) + self.pitch_distance_provided
+
+                        else:
+                            if self.bolt_row < 8:  # 1 row outside tension and compressionflange
+                                self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided))
+                            else:  # 2 rows outside tension and compression flange which is maximum allowable
+                                self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (2 * self.pitch_distance_provided)
+
+

@@ -78,6 +78,8 @@ class EndPlateSpliceHelper(object):
         self.bolt_numbers_provided = 0
         self.bolt_shear_demand = 0.0
         self.bolt_shear_capacity = 0.0
+        self.bolt_bearing_capacity = 0.0
+        self.bolt_capacity = 0.0
         self.bolt_combined_check_UR = 0.0
 
     def perform_bolt_design(self, endplate_type, beam_properties, safety_factors, bolt_column, bolt_row, bolt_diameter_provided, bolt_grade_provided,
@@ -538,15 +540,18 @@ class EndPlateSpliceHelper(object):
         # Check 9.1: shear demand
         self.bolt_shear_demand = self.load.shear_force / self.bolt_numbers_provided  # kN, shear on each bolt
 
-        # Check 9.2: shear capacity
-        self.bolt_shear_capacity = self.bolt.calculate_bolt_capacity(self.bolt_diameter_provided, self.bolt_grade_provided,
+        # Check 9.2: bolt capacity - shear design
+        self.bolt_capacity = self.bolt.calculate_bolt_capacity(self.bolt_diameter_provided, self.bolt_grade_provided,
                                                                      [(self.plate_thickness, self.dp_plate_fu, self.dp_plate_fy),
                                                                       (self.plate_thickness, self.dp_plate_fu, self.dp_plate_fy)], 1,
                                                                      self.end_distance_provided, self.pitch_distance_provided,
                                                                      seatedangle_e=0)  # kN
 
+        self.bolt_shear_capacity = self.bolt.bolt_shear_capacity  # kN
+        self.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity  # kN
+
         # Check 9.3: combined shear + tension check
-        self.bolt_combined_check_UR = self.bolt.calculate_combined_shear_tension_capacity(self.bolt_shear_demand, self.bolt_shear_capacity,
+        self.bolt_combined_check_UR = self.bolt.calculate_combined_shear_tension_capacity(self.bolt_shear_demand, self.bolt_capacity,
                                                                                           self.bolt_tension_demand, self.bolt_tension_capacity,
                                                                                           self.bolt.bolt_type)
 

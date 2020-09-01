@@ -1580,7 +1580,8 @@ KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP = 'Moment Demand per Bolt (kN-m)'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kN-m)'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP = 'Moment Capacity per Bolt (kN-m)'
-
+KEY_OUT_EP_MOM_CAPACITY = 'Plate.MomentCapacity'
+KEY_OUT_DISP_EP_MOM_CAPACITY = 'Moment Capacity (kN-m)'
 
 KEY_OUT_PLATE_TENSION = 'Plate.TensionYield'
 
@@ -1679,7 +1680,7 @@ KEY_OUT_DISP_STIFFENER_HEIGHT = 'Height (mm)'
 KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.Thickness'
 KEY_OUT_DISP_STIFFENER_THICKNESS = 'Thickness (mm)'
 
-
+KEY_OUT_WELD_DETAILS = 'Weld.Details'
 DISP_TITLE_WELD = 'Weld'
 DISP_TITLE_WELD_FLANGE = 'Weld at Flange'
 DISP_TITLE_WELD_WEB = 'Weld at Web'

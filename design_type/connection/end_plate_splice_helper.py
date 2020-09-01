@@ -36,6 +36,8 @@ class EndPlateSpliceHelper(object):
         self.bolt_design_status = bolt_design_status
         self.plate_design_status = plate_design_status
         self.overall_design_status = overall_design_status
+        self.prying_force_check_status = False
+        self.bolt_tension_design_status = False
         self.flange_capacity_status = False
         self.bolt_design_combined_check_status = False
 
@@ -114,11 +116,11 @@ class EndPlateSpliceHelper(object):
         # start of checks
 
         # Check 1: Capacity of the flange under compression [A_g*f_y / gamma_m0]
-        self.flange_capacity = (self.beam_B * self.beam_T * self.beam_fy) / self.gamma_m0  # kN
+        self.flange_capacity = round(((self.beam_B * self.beam_T * self.beam_fy) / self.gamma_m0) * 1e-3, 2)  # kN
 
         # Check 2: Find lever arm of each bolt under tension
         # Assumption: NA passes through the centre of the bottom/compression flange
-        self.self.lever_arm = []
+        self.lever_arm = []
 
         if self.endplate_type == 'Flushed - Reversible Moment':
             row_list = np.arange(1, self.bolt_row + 1, 1).tolist()
@@ -268,6 +270,7 @@ class EndPlateSpliceHelper(object):
 
         # Check 3: Find force on each bolt under tension
         self.tension = []
+        self.load_moment_effective = self.load_moment_effective * 1e3  # kN-mm
 
         a = 0
         if self.endplate_type == 'Flushed - Reversible Moment':
@@ -492,7 +495,7 @@ class EndPlateSpliceHelper(object):
             self.r_c = self.r_c + self.tension[val]  # adding all the values of tension
 
         # total tension considering the bolt columns
-        self.r_c = self.r_c * self.bolt_column  # kN
+        self.r_c = round(self.r_c * self.bolt_column, 2)  # kN
 
         # Check 5: Reaction at bottom flange
         if self.r_c > self.flange_capacity:
@@ -504,7 +507,7 @@ class EndPlateSpliceHelper(object):
 
         # Check 6: Moment capacity of the end plate
         self.b_e = self.beam_B / self.bolt_column
-        self.mp_plate = (self.dp_plate_fy / self.gamma_m0) * ((self.b_e * self.plate_thickness ** 2) / 4)
+        self.mp_plate = round((self.dp_plate_fy / self.gamma_m0) * ((self.b_e * self.plate_thickness ** 2) / 4) * 1e-6, 2)  # kN-m
 
         # Check 7: Prying force check in the critical bolt
         self.lv = self.end_distance_provided - (self.beam_r1 / 2)
@@ -514,46 +517,52 @@ class EndPlateSpliceHelper(object):
 
         # taking moment about the toe of weld or edge of the flange from bolt center-line to find the actual prying force (Q) in the critical bolt
         # Mp_plate = T*l_v - Q.l_e
-        self.prying_force = ((self.t_1 * self.lv) - self.mp_plate) / self.le  # kN
+        self.prying_force = round(((self.t_1 * self.lv) - (self.mp_plate * 1e-3)) / self.le, 2)  # kN
 
         if self.prying_force < 0:
+            self.prying_force_check_status = False
             self.plate_design_status = False
             self.bolt_design_status = False
         else:
+            self.prying_force_check_status = True
             self.plate_design_status = True
             self.bolt_design_status = True
 
         # Check 8: Tension capacity of bolt
-        self.bolt_tension_capacity = Bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)  # kN
+        self.bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)
+        self.bolt_tension_capacity = round(self.bolt.bolt_tension_capacity * 1e-3, 2)  # kN
 
         # checking the critical bolt for its tension capacity against tension due to moment + prying force
         self.bolt_tension_demand = self.t_1 + self.prying_force
 
         if self.bolt_tension_demand > self.bolt_tension_capacity:
+            self.bolt_tension_design_status = False
             self.bolt_design_status = False
         else:
+            self.bolt_tension_design_status = True
             self.bolt_design_status = True
 
         # Check 9: combined shear + tension check of bolts
         self.bolt_numbers_provided = self.bolt_column * self.bolt_row
 
         # Check 9.1: shear demand
-        self.bolt_shear_demand = self.load.shear_force / self.bolt_numbers_provided  # kN, shear on each bolt
+        self.bolt_shear_demand = round((self.load.shear_force * 1e-3) / self.bolt_numbers_provided, 2)  # kN, shear on each bolt
 
         # Check 9.2: bolt capacity - shear design
-        self.bolt_capacity = self.bolt.calculate_bolt_capacity(self.bolt_diameter_provided, self.bolt_grade_provided,
-                                                                     [(self.plate_thickness, self.dp_plate_fu, self.dp_plate_fy),
-                                                                      (self.plate_thickness, self.dp_plate_fu, self.dp_plate_fy)], 1,
-                                                                     self.end_distance_provided, self.pitch_distance_provided,
-                                                                     seatedangle_e=0)  # kN
+        self.bolt.calculate_bolt_capacity(self.bolt_diameter_provided, self.bolt_grade_provided,
+                                          [(self.plate_thickness, self.dp_plate_fu, self.dp_plate_fy), (self.plate_thickness, self.dp_plate_fu,
+                                                                                                        self.dp_plate_fy)], 1,
+                                          self.end_distance_provided, self.pitch_distance_provided, seatedangle_e=0)  # kN
 
-        self.bolt_shear_capacity = self.bolt.bolt_shear_capacity  # kN
-        self.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity  # kN
+        self.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity * 1e-3, 2)  # kN
+        self.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity * 1e-3, 2)  # kN
+        self.bolt_capacity = round(self.bolt.bolt_capacity * 1e-3, 2)  # kN
 
         # Check 9.3: combined shear + tension check
-        self.bolt_combined_check_UR = self.bolt.calculate_combined_shear_tension_capacity(self.bolt_shear_demand, self.bolt_capacity,
-                                                                                          self.bolt_tension_demand, self.bolt_tension_capacity,
-                                                                                          self.bolt.bolt_type)
+        self.bolt.calculate_combined_shear_tension_capacity(self.bolt_shear_demand, self.bolt_capacity, self.bolt_tension_demand,
+                                                            self.bolt_tension_capacity, self.bolt.bolt_type)
+
+        self.bolt_combined_check_UR = round(self.bolt.bolt_combined_capacity, 3)
 
         if self.bolt_combined_check_UR > 1.0:
             self.bolt_design_combined_check_status = False
@@ -563,7 +572,8 @@ class EndPlateSpliceHelper(object):
             self.bolt_design_status = True
 
         # overall status
-        if self.bolt_design_status and self.plate_design_status and self.bolt_design_combined_check_status and self.flange_capacity_status is True:
+        if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status and self.prying_force_check_status \
+                and self.plate_design_status and self.flange_capacity_status is True:
             self.overall_design_status = True
         else:
             self.overall_design_status = False

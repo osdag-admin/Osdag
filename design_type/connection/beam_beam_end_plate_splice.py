@@ -1100,3 +1100,66 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
 
 
+    def save_design(self, popup_summary):
+        # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
+
+        if self.supported_section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  KEY_DISP_BEAMSEC: self.supported_section.designation,
+                                  KEY_DISP_MATERIAL: self.supported_section.material,
+                                  KEY_DISP_FU: self.supported_section.fu,
+                                  KEY_DISP_FY: self.supported_section.fy,
+                                  'Mass': self.supported_section.mass,
+                                  'Area(mm2) - A': round(self.supported_section.area, 2),
+                                  'D(mm)': self.supported_section.depth,
+                                  'B(mm)': self.supported_section.flange_width,
+                                  't(mm)': self.supported_section.web_thickness,
+                                  'T(mm)': self.supported_section.flange_thickness,
+                                  'FlangeSlope': self.supported_section.flange_slope,
+                                  'R1(mm)': self.supported_section.root_radius,
+                                  'R2(mm)': self.supported_section.toe_radius,
+                                  'Iz(mm4)': self.supported_section.mom_inertia_z,
+                                  'Iy(mm4)': self.supported_section.mom_inertia_y,
+                                  'rz(mm)': self.supported_section.rad_of_gy_z,
+                                  'ry(mm)': self.supported_section.rad_of_gy_y,
+                                  'Zz(mm3)': self.supported_section.elast_sec_mod_z,
+                                  'Zy(mm3)': self.supported_section.elast_sec_mod_y,
+                                  'Zpz(mm3)': self.supported_section.plast_sec_mod_z,
+                                  'Zpy(mm3)': self.supported_section.elast_sec_mod_y}
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             KEY_MAIN_MODULE: self.mainmodule,
+             # KEY_CONN: self.connectivity,
+             KEY_DISP_MOMENT: self.load.moment,
+             KEY_DISP_SHEAR: self.load.shear_force,
+             KEY_DISP_AXIAL: self.load.axial_force,
+
+             "Section": "TITLE",
+             "Section Details": self.report_supporting,
+
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_GAP: self.plate.gap,
+             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
+             "Plate Details": "TITLE",
+             KEY_DISP_PLATETHK: str(self.plate.thickness),
+             KEY_DISP_MATERIAL: self.plate.material,
+             KEY_DISP_FU: self.plate.fu,
+             KEY_DISP_FY: self.plate.fy,
+             "Weld Details": "TITLE",
+             # KEY_DISP_DP_WELD_TYPE: "Fillet",
+             # KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+             # KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu
+             }
+
+        self.report_check = []

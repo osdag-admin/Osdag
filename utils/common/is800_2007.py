@@ -816,13 +816,17 @@ class IS800_2007(object):
         else:
             beta = 2
 
-        l_e = min(end_dist, (1.1 * t * math.sqrt((beta * f_o) / f_y)))
-        Q = (l_v / (2 / l_e)) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))  # kN
+        le_1 = end_dist
+        le_2 = (1.1 * t) * math.sqrt((beta * f_o) / f_y)  # here f_o is taken as N/mm^2
+        l_e = min(le_1, le_2)
+
+        # Note: In the below equation of Q, f_o is taken as kN since the value of T_e is in kN
+        Q = (l_v / (2 / l_e)) * (T_e - ((beta * eta * f_o * b_e * 1e-3 * t ** 4) / (27 * l_e * l_v ** 2)))  # kN
 
         if Q < 0:
             Q = 0.0
 
-        return Q
+        return round(Q * 1e-3, 2)  # kN
 
     # -------------------------------------------------------------
     #   10.5 Welds and Welding

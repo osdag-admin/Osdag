@@ -36,7 +36,6 @@ class EndPlateSpliceHelper(object):
         self.bolt_design_status = bolt_design_status
         self.plate_design_status = plate_design_status
         self.overall_design_status = overall_design_status
-        self.prying_force_check_status = False
         self.bolt_tension_design_status = False
         self.flange_capacity_status = False
         self.bolt_design_combined_check_status = False
@@ -66,6 +65,7 @@ class EndPlateSpliceHelper(object):
         self.dp_plate_fy = 0.0
         self.dp_plate_fu = 0.0
         self.plate_thickness = 0.0
+        self.plate_thickness_req = 0.0
         self.b_e = 0.0
         self.mp_plate = 0.0
         self.lv = 0.0
@@ -505,26 +505,35 @@ class EndPlateSpliceHelper(object):
             self.flange_capacity_status = True
             self.bolt_design_status = True
 
-        # Check 6: Moment capacity of the end plate
+        # Check 6: Prying force check in the critical bolt
         self.b_e = self.beam_B / self.bolt_column
-        self.mp_plate = round((self.dp_plate_fy / self.gamma_m0) * ((self.b_e * self.plate_thickness ** 2) / 4) * 1e-6, 2)  # kN-m
-
-        # Check 7: Prying force check in the critical bolt
         self.lv = self.end_distance_provided - (self.beam_r1 / 2)
         self.le_1 = self.end_distance_provided
         self.le_2 = (1.1 * self.plate_thickness) * math.sqrt((self.beta * self.proof_stress) / self.dp_plate_fy)
         self.le = min(self.le_1, self.le_2)
 
+        self.prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(self.t_1, self.lv, self.proof_stress, self.b_e, self.plate_thickness,
+                                                                   self.dp_plate_fy, self.end_distance_provided, self.bolt.bolt_tensioning, eta=1.5)
+        self.prying_force = round(self.prying_force, 2)
+
+        # Check 7: Moment capacity of the end plate and plate thickness check
+
         # taking moment about the toe of weld or edge of the flange from bolt center-line to find the actual prying force (Q) in the critical bolt
         # Mp_plate = T*l_v - Q.l_e
-        self.prying_force = round(((self.t_1 * self.lv) - (self.mp_plate * 1e-3)) / self.le, 2)  # kN
+        self.mp_plate = round((self.t_1 * 1e3 * self.lv) - (self.prying_force * 1e3 * self.le))  # N-mm
 
-        if self.prying_force < 0:
-            self.prying_force_check_status = False
+        # negative Mp means prying force is higher than the tension in bolt and the yielding location would be outside the bolts and not near the
+        # root of the beam
+        if self.mp_plate < 0:
+            self.mp_plate = - 1 * self.mp_plate
+
+        # equation Mp_plate with the plate moment capacity to find thickness of plate required
+        self.plate_thickness_req = round(math.sqrt((4 * self.gamma_m0 * self.mp_plate) / (self.dp_plate_fy * self.b_e)), 2)  # mm
+
+        if self.plate_thickness < self.plate_thickness_req:
             self.plate_design_status = False
             self.bolt_design_status = False
         else:
-            self.prying_force_check_status = True
             self.plate_design_status = True
             self.bolt_design_status = True
 
@@ -555,7 +564,10 @@ class EndPlateSpliceHelper(object):
                                           self.end_distance_provided, self.pitch_distance_provided, seatedangle_e=0)  # kN
 
         self.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity * 1e-3, 2)  # kN
-        self.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity * 1e-3, 2)  # kN
+        if self.bolt.bolt_type == "Bearing Bolt":
+            self.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity * 1e-3, 2)  # kN
+        else:
+            self.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity  # N/A
         self.bolt_capacity = round(self.bolt.bolt_capacity * 1e-3, 2)  # kN
 
         # Check 9.3: combined shear + tension check
@@ -572,7 +584,7 @@ class EndPlateSpliceHelper(object):
             self.bolt_design_status = True
 
         # overall status
-        if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status and self.prying_force_check_status \
+        if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status \
                 and self.plate_design_status and self.flange_capacity_status is True:
             self.overall_design_status = True
         else:

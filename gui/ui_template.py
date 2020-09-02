@@ -585,15 +585,33 @@ class Window(QMainWindow):
                 combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                 combo.setMaxVisibleItems(5)
                 combo.setObjectName(option[0])
+                # combo.setFixedSize(combo.sizeHint().width(), combo.sizeHint().height())
+                # combo.setSizePolicy(sizePolicy)
                 if option[0] in input_dp_conn_list:
                     self.input_dp_connection(combo)
                 metrices = QtGui.QFontMetrics(font)
                 item_width = 10
-
+                # max_width=""
+                # count = 0
                 for item in option[3]:
 
                     combo.addItem(item)
+                    # if count ==0:
+                    #     max_width = item
+                    #     count+=1
+                    # else:
+                    #     pass
+                    # if len(item)>=len(max_width):
+                    #     max_width = item
+                    # else:
+                    #     pass
+
                     item_width = max(item_width, metrices.boundingRect(item).width())
+                # print(metrices.boundingRect(item).width(), "item 1")
+                # print(len(item),"item")
+                # print(len(max_width),"max")
+                # item_width = max(item_width,metrices.boundingRect(max_width).width())
+                # print(metrices.boundingRect(max_width).width(), "max1")
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
                 if lable == 'Material':
@@ -670,7 +688,7 @@ class Window(QMainWindow):
 
         maxi_width = maxi_width_left + maxi_width_right
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
-        maxi_width += 82
+        maxi_width += 200
         maxi_width = max(maxi_width, scale*350)    # In case there is no widget
         self.inputDock.setFixedWidth(maxi_width)
         self.in_widget.setFixedWidth( maxi_width)
@@ -1275,9 +1293,13 @@ class Window(QMainWindow):
                     data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
                                                                                 disabled_values, note)
                     if data[c_tup[0] + "_customized"] == []:
+                        # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                        #                                   if all_values_available not in disabled_values]
                         data[c_tup[0] + "_customized"] = options
                         key.setCurrentIndex(0)
                 else:
+                    # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                    #                                   if all_values_available not in disabled_values]
                     data[c_tup[0] + "_customized"] = options
 
                     # input = f(arg_list)
@@ -1292,9 +1314,13 @@ class Window(QMainWindow):
                     data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
                                                                                 disabled_values, note)
                     if data[c_tup[0] + "_customized"] == []:
+                        # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                        #                               if all_values_available not in disabled_values]
                         data[c_tup[0] + "_customized"] = options
                         key.setCurrentIndex(0)
                 else:
+                    # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                    #                                   if all_values_available not in disabled_values]
                     data[c_tup[0] + "_customized"] = options
 
     def on_change_connect(self, key_changed, updated_list, data, main):

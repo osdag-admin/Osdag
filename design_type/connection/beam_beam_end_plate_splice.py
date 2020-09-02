@@ -71,7 +71,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.dp_bolt_fy = 0.0
         self.proof_load = 0.0
         self.proof_stress = 0.0
-        self.beta = 2
+        self.beta = 0
 
         self.pitch_distance_provided = 0.0
         self.gauge_distance_provided = self.pitch_distance_provided
@@ -719,8 +719,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
 
+        self.load.moment = round(self.load.moment * 1e-6, 2)  # kN-m
         # set minimum load (Cl. 10.7, IS 800:2007)
-
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
         self.beam_plastic_mom_capa_zz = round(((1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0) * 1e-6, 2)  # kN-m
 
@@ -734,13 +734,22 @@ class BeamBeamEndPlateSplice(MomentConnection):
             logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
                         "connection as rigid and transfer full moment from the spliced beam (Cl. 10.7, IS 800:2007)")
             logger.info("Designing the connection for a load of {} kN-m".format(self.load_moment))
+
+        elif self.load.moment > self.beam_plastic_mom_capa_zz:
+            self.load_moment = self.beam_plastic_mom_capa_zz  # kN
+            self.minimum_load_status_moment = True
+            self.design_status = False
+            logger.error("[Maximum Factored Load] The external factored bending moment ({} kN-m) is greater than the plastic moment capacity of the "
+                         "beam ({} kN-m)".format(self.load.moment, self.beam_plastic_mom_capa_zz))
+            logger.warning("The maximum capacity of the connection is {} kN-m".format(self.beam_plastic_mom_capa_zz))
+            logger.info("Define the value of factored bending moment as {} kN-m or less".format(self.beam_plastic_mom_capa_zz))
         else:
             self.minimum_load_status_moment = False
-            self.load_moment = round(self.load.moment * 1e-6, 2)  # kN-m
+            self.load_moment = self.load.moment  # kN-m
 
         # TODO: check min loads for shear and axial
-        self.load_shear = round(self.load.shear_force * 1e-3, 2)  # kN
-        self.load_axial = round(self.load.axial_force * 1e-3, 2)  # kN
+        self.load_shear = round(max(self.load.shear_force, 1) * 1e-3, 2)  # kN
+        self.load_axial = round(max(self.load.axial_force, 1) * 1e-3, 2)  # kN
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
         self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
@@ -1007,14 +1016,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                         " {} kN. The flange strength requirement is satisfied.".
                                         format(round(self.call_helper.r_c, 2), self.call_helper.flange_capacity))
 
-                        if self.call_helper.prying_force_check_status is False:
-                            logger.error("[End Plate] The end plate of {} mm is insufficient and fails in the Prying Force (Q) check".
+                        if self.call_helper.plate_design_status is False:
+                            logger.error("[End Plate] The selected trial end plate of {} mm is insufficient and fails in the moment capacity check".
                                          format(self.plate_thickness))
-                            logger.info("Re-designing the connection with a plate of higher thickness")
+                            logger.info("The minimum required thickness of end plate is {} mm".format(round(self.call_helper.plate_thickness_req, 2)))
+                            logger.info("Re-designing the connection with a plate of available higher thickness")
                         else:
-                            logger.info("[End Plate] The end plate of {} mm passes the Prying force check".format(self.plate_thickness))
-                            logger.info("The Prying Force (Q) on the critical bolt with a plate thickness of {} mm is {} kN".
-                                        format(self.plate_thickness, self.call_helper.prying_force))
+                            logger.info("[End Plate] The end plate of {} mm passes the moment capacity check. The end plate is checked for yielding "
+                                        "due tension caused by bending moment and prying force".format(self.plate_thickness))
 
                         if self.call_helper.bolt_tension_design_status is False:
                             logger.error("[Bolt Design] The bolt of {} mm diameter and {} grade fails the tension check".

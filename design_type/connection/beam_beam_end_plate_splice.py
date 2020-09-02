@@ -1068,7 +1068,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
              # KEY_CONN: self.connectivity,
              KEY_DISP_MOMENT: self.load.moment,
              KEY_DISP_SHEAR: self.load.shear_force,
-             KEY_DISP_AXIAL: self.load.axial_force,
+             KEY_DISP_AXIAL: self.load.axial
+             _force,
 
              "Section": "TITLE",
              "Section Details": self.report_supporting,

@@ -100,6 +100,8 @@ class Bolt:
         self.max_edge_dist_round = round_down(self.max_edge_dist, 5)
         self.max_end_dist_round = round_down(self.max_end_dist, 5)
 
+        self.proof_load = 0.0
+
     def __repr__(self):
         repr = "Bolt\n"
         repr += "Type: {}\n".format(self.bolt_type)
@@ -241,7 +243,7 @@ class Bolt:
             self.bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
                 f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
 
-    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy,n=1):
+    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy, n=1):
         self.single_conn_plates_t_fu_fy = []
         self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
         self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])
@@ -251,9 +253,7 @@ class Bolt:
 
         self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided), 2)
         self.min_gauge = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided), 2)
-        self.min_edge_dist = round(
-            IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                     self.edge_type), 2)
+        self.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type, self.edge_type), 2)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk), 2)
         self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.single_conn_plates_t_fu_fy,
@@ -268,6 +268,23 @@ class Bolt:
         self.max_edge_dist_round = round_down(self.max_edge_dist, 5)
         self.max_end_dist_round = round_down(self.max_end_dist, 5)
         self.dia_hole = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_provided, self.bolt_hole_type)
+
+    def calculate_bolt_proof_load(self, bolt_diameter_provided, bolt_grade_provided):
+        """ calculate proof load of bolt: F_0 = A_nb*f_0 (f_0 = 0.7*f_ub) """
+
+        [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(bolt_diameter_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(bolt_grade_provided, bolt_diameter_provided)
+
+        self.proof_load = (self.bolt_net_area * 0.7 * self.bolt_fu) / 1000  # kN
+
+    def calculate_combined_shear_tension_capacity(self, shear_demand, shear_capacity, tension_demand, tension_capacity, bolt_type='Bearing Bolt'):
+        """ """
+        if bolt_type == "Bearing Bolt":
+            self.bolt_combined_capacity = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(shear_demand, shear_capacity, tension_demand,
+                                                                                                       tension_capacity)  # kN
+        else:  # "Friction Grip Bolt"
+            self.bolt_combined_capacity = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(shear_demand, shear_capacity, tension_demand,
+                                                                                                       tension_capacity)  # kN
 
 
 class Nut(Material):
@@ -2075,7 +2092,7 @@ class Angle(Material):
 
 class HollowSection(Material):
 
-    def __init__(self, designation, material_grade,table):
+    def __init__(self, designation, material_grade, table):
         self.connect_to_database_update_other_attributes(table, designation, material_grade)
         super(HollowSection, self).__init__(designation, material_grade)
 
@@ -2116,7 +2133,7 @@ class SHS(HollowSection):
 class RHS(HollowSection):
 
     def __init__(self, designation, material_grade):
-        super(RHS, self).__init__(designation, material_grade,"RHS")
+        super(RHS, self).__init__(designation, material_grade, "RHS")
 
 
 class CHS(Material):

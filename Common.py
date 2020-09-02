@@ -36,6 +36,7 @@ class OurLog(logging.Handler):
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
 
+
 def connectdb1():
     """
     Function to fetch diameter values from Bolt Table
@@ -344,7 +345,7 @@ KEY_DISP_BCENDPLATE = 'Beam Column Endplate'
 KEY_DISP_TENSION_BOLTED = 'Tension Members Bolted Design'
 KEY_DISP_TENSION_WELDED = 'Tension Members Welded Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
-
+KEY_DISP_BB_EP_SPLICE = 'Beam-Beam End Plate Splice'
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -445,11 +446,12 @@ KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 ###################
 
 RED_LIST = [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]
+VALUES_CONN_SPLICE = ['Coplanar tension-compression flange', 'Coplanar tension flange', 'Coplanar compression flange']
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
-VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
-VALUES_ENDPLATE_TYPE = ['Flush End Plate','Extended One Way','Extended Both Ways']
+VALUES_CONN_3 = ['Flush End Plate', 'Extended Both Ways']
+VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irreversible Moment', 'Extended Both Ways - Reversible Moment']
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
@@ -475,9 +477,22 @@ TYP_BEARING = 'Bearing Bolt'
 
 # VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
 VALUES_GRD_CUSTOMIZED = IS1367_Part3_2002.get_bolt_PC()
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24','25', '26', '28', '30','32','36','40','45','50','56','63','80']
-VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
-VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
+
+# standard as per IS 1730:1989
+PLATE_THICKNESS_IS_1730_1989 = ['5', '6', '7', '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63']
+# standard as per SAIL's product brochure
+PLATE_THICKNESS_SAIL = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
+                        '110', '120']
+
+# TODO: delete the below list (commented) after verification
+# VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24','25', '26', '28', '30','32','36','40','45','50','56','63','80']
+# VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+# VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
+
+VALUES_PLATETHK_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
@@ -594,12 +609,14 @@ KEY_DISP_SUPTDSEC = 'Supported Section'
 KEY_DISP_BEAMSEC = 'Beam Section *'
 KEY_DISP_SECBM = 'Secondary beam *'
 DISP_TITLE_FSL = 'Factored load'
-KEY_DISP_MOMENT = 'Moment(kNm)'
+KEY_DISP_MOMENT = 'Moment (kN-m)'
 
 KEY_DISP_TOP_ANGLE = 'Top Angle'
 
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)'
 DISP_TITLE_BOLT = 'Bolt'
+DISP_TITLE_CRITICAL_BOLT = 'Critical Bolt'
+DISP_TITLE_CRITICAL_BOLT_SHEAR = 'Critical Bolt - Shear Design'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate '
@@ -714,6 +731,7 @@ KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'Total No. of Anchor Bolts'
 KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
 
 KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
+KEY_OUT_DISP_DETAILING_CS_GAUGE_DISTANCE = 'Cross-centre Gauge (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
 
 KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (mm)'
@@ -1008,9 +1026,18 @@ KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
 KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Deatiling.No of Anchor bolts'
 KEY_OUT_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
 KEY_OUT_DETAILING_GAUGE_DISTANCE = 'Detailing.Gauge Distance'
+KEY_OUT_DETAILING_CS_GAUGE_DISTANCE = 'Detailing.Cross-centre Gauge Distance'
 KEY_OUT_DETAILING_PITCH_DISTANCE = 'Detailing.Pitch Distance'
 KEY_BOLT_FU = 'Bolt.fu'
 KEY_BOLT_FY = 'Bolt.fy'
+
+KEY_OUT_DISP_DETAILING_BOLT_COLUMNS = 'Detailing.No. of Columns'
+KEY_OUT_DISP_DETAILING_BOLT_COLUMNS_EP = 'No. of Columns'
+KEY_OUT_DISP_DETAILING_BOLT_ROWS = 'Detailing.No. of Rows'
+KEY_OUT_DISP_DETAILING_BOLT_ROWS_EP = 'No. of Rows'
+KEY_OUT_DISP_DETAILING_BOLT_NUMBERS = 'Detailing.No. of Bolts'
+KEY_OUT_DISP_DETAILING_BOLT_NUMBERS_EP = 'No. of Bolts'
+
 
 KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
 KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
@@ -1131,7 +1158,8 @@ KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE = 'Type'
 VALUES_WELD_TYPE = ["Fillet Weld", "Groove Weld"]
-VALUES_WELD_TYPE_EP = ["Groove Weld","Fillet Weld"]
+VALUES_WELD_TYPE_EP = ["Groove Weld", "Fillet Weld"]
+VALUES_WELD_TYPE_BB_FLUSH = ["Groove Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
 KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size (mm)'
@@ -1305,7 +1333,7 @@ KEY_OUT_LONG_JOINT_WELD = 'Weld Strength post Long Joint (N/mm)'
 KEY_OUT_DISP_RED_WELD_STRENGTH = 'Weld Strength (N/mm)'
 
 
-DISP_TITLE_ENDPLATE = 'End plate'
+DISP_TITLE_ENDPLATE = 'End Plate'
 
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
 KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
@@ -1384,13 +1412,18 @@ KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force (kN)'
 KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
 KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
+KEY_OUT_DISP_CRITICAL_BOLT_TENSION = 'Tension due to Moment (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
+KEY_OUT_DISP_BOLT_PRYING_FORCE_EP = 'Prying Force (kN)'
 KEY_OUT_BOLT_TENSION_TOTAL = 'Bolt.TensionTotal'
 KEY_OUT_DISP_BOLT_TENSION_TOTAL = 'Total Bolt Tension (kN)'
+KEY_OUT_DISP_BOLT_TENSION_DEMAND = 'Tension Demand (kN)'
+KEY_OUT_DISP_BOLT_SHEAR_DEMAND = 'Shear Demand (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
+KEY_OUT_CRITICAL_BOLT_TENSION_CAPACITY = 'Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Long joint reduction factor'
 KEY_OUT_LARGE_GRIP = 'Large grip length reduction factor'
@@ -1403,6 +1436,7 @@ KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
 KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
+KEY_OUT_DISP_BOLT_COMBINED_CAPACITY = 'Combined Capacity IR'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1546,7 +1580,8 @@ KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP = 'Moment Demand per Bolt (kN-m)'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kN-m)'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP = 'Moment Capacity per Bolt (kN-m)'
-
+KEY_OUT_EP_MOM_CAPACITY = 'Plate.MomentCapacity'
+KEY_OUT_DISP_EP_MOM_CAPACITY = 'Moment Capacity (kN-m)'
 
 KEY_OUT_PLATE_TENSION = 'Plate.TensionYield'
 
@@ -1629,7 +1664,7 @@ KEY_OUT_WELD_TYPE = 'Stiffener.weld'
 KEY_OUT_WELD_TYPE1 = 'Stiffener.weld_flange'
 KEY_OUT_DISP_WELD_TYPE = 'Weld Between Stiffener and Column flange'
 KEY_OUT_DISP_WELD_TYPE1 = 'Weld Between Stiffener and End plate'
-KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
+KEY_OUT_STIFFENER_DETAILS = 'Stiffener.Details'
 KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
 KEY_OUT_STIFFENER_TITLE = 'Stiffener.Title'
 KEY_P2_WEB = 'Bolt.pitch2_web'
@@ -1638,18 +1673,30 @@ KEY_Y_SQR = 'Bolt.y_sqr'
 KEY_BOLT_TENSION = 'Bolt.t_b'
 KEY_BOLT_SHEAR = 'Bolt.v_sb'
 KEY_PLATE_MOMENT = 'Plate.m_ep'
+KEY_OUT_STIFFENER_LENGTH = 'Stiffener.Length'
+KEY_OUT_DISP_STIFFENER_LENGTH = 'Length (mm)'
+KEY_OUT_STIFFENER_HEIGHT = 'Stiffener.Height'
+KEY_OUT_DISP_STIFFENER_HEIGHT = 'Height (mm)'
+KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.Thickness'
+KEY_OUT_DISP_STIFFENER_THICKNESS = 'Thickness (mm)'
 
+KEY_OUT_WELD_DETAILS = 'Weld.Details'
 DISP_TITLE_WELD = 'Weld'
+DISP_TITLE_WELD_FLANGE = 'Weld at Flange'
+DISP_TITLE_WELD_WEB = 'Weld at Web'
 KEY_OUT_WELD_SIZE = 'Weld.Size'
 KEY_OUT_WELD_TYPE = 'Weld.Type'
 KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
+KEY_OUT_DISP_WELD_SIZE_EP = 'Size (mm)'
 KEY_OUT_DISP_WELD_TYPE = 'Type'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
-KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm^2)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_WELD_STRESS_COMBINED = 'Weld.StressCombined'
+KEY_OUT_DISP_WELD_STRESS_COMBINED = 'Combined Stress (N/mm^2)'
 KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
-KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_WELD_LENGTH = 'Total Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
 KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 KEY_OUT_WELD_STRENGTH_RED = 'Weld.Strength_red'

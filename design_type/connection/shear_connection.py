@@ -8,7 +8,6 @@ from utils.common.common_calculation import *
 from utils.common.is800_2007 import IS800_2007
 
 
-
 class ShearConnection(Connection):
     def __init__(self):
         super(ShearConnection, self).__init__()

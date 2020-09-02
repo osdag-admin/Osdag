@@ -197,7 +197,7 @@ class IS1367_Part3_2002(object):
         # (these might not be available in IS 1367 (Part-3) : 2002)
         table_6 = {3: 5.03, 3.5: 6.78, 4: 8.78, 5: 14.2, 6: 20.1, 7: 28.9, 8: 36.6, 10: 58,
                    12: 84.3, 14: 115, 16: 157, 18: 192, 20: 245, 22: 303, 24: 353, 27: 459,
-                   30: 561, 33: 694, 36: 817, 39: 976, 42: 1080, 48: 1411, 56: 1921, 64: 2508, 72: 3175}
+                   30: 561, 33: 694, 36: 817, 39: 976, 42: 1080, 45: 1240, 48: 1411, 52: 1656, 56: 1921, 60: 2205, 64: 2508, 72: 3175}
         try:
             return [shank_area, table_6[bolt_diameter]]
         except KeyError:
@@ -415,10 +415,11 @@ class IS6649(object):
         return washer_dimensions
 
 
-class IS1364(object):
-    """ Hexagon Head Bolts, Screws, and Nuts of Product Grade C, Part : Hexagon Nuts (Size Range M5 to M64)
+class IS1364Part3(object):
+    """ Hexagon Head Bolts, Screws, and Nuts of Product Grade A, and B, Part 3: Hexagon Nuts (Size Range M5 to M64)
 
     """
+
     @staticmethod
     def nut_thick(bot_dia):
         """ Returns the thickness of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
@@ -456,3 +457,43 @@ class IS1364(object):
         }[bot_dia]
 
         return nut_thickness
+
+    @staticmethod
+    def nut_size(bot_dia):
+        """ Returns the size of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
+
+        Args:
+            bot_dia: diameter of the bolt in mm (int)
+
+        Returns: size of the hexagon nut [maximum of s and e, refer fig. 1 of IS 1364-3:2002] (float)
+
+        Note: The nut size for 72 diameter is not available in IS code, however an approximated value is assumed.
+              72 mm dia bolt is used in the base plate module.
+        """
+        nut_size = {
+            5: max(8.0, 8.79),
+            6: max(10.0, 11.5),
+            8: max(16.0, 14.38),
+            10: max(16.0, 17.77),
+            12: max(18.0, 20.03),
+            14: max(21.0, 23.36),
+            16: max(24.0, 26.75),
+            18: max(27.0, 29.56),
+            20: max(30.0, 32.95),
+            22: max(34.0, 37.29),
+            24: max(36.0, 39.55),
+            27: max(41.0, 45.2),
+            30: max(46.0, 50.85),
+            33: max(50.0, 55.37),
+            36: max(55.0, 60.79),
+            39: max(60.0, 66.44),
+            42: max(65.0, 71.3),
+            45: max(70.0, 76.95),
+            48: max(75.0, 82.6),
+            52: max(80.0, 88.0),
+            56: max(85.0, 93.56),
+            60: max(90.0, 99.21),
+            64: max(95.0, 104.86),
+        }[bot_dia]
+
+        return nut_size

@@ -640,7 +640,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
 
-        # properties fro design preferences
+        self.warn_text(self)
+
+        # properties from design preferences
 
         # beam properties
         self.beam_properties = {
@@ -719,7 +721,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
 
+        # defining loads in appropriate units
         self.load.moment = round(self.load.moment * 1e-6, 2)  # kN-m
+        # TODO: check min loads for shear and axial
+        self.load_shear = round(max(self.load.shear_force, 1) * 1e-3, 2)  # kN
+        self.load_axial = round(max(self.load.axial_force, 1) * 1e-3, 2)  # kN
+
         # set minimum load (Cl. 10.7, IS 800:2007)
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
         self.beam_plastic_mom_capa_zz = round(((1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0) * 1e-6, 2)  # kN-m
@@ -746,10 +753,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
         else:
             self.minimum_load_status_moment = False
             self.load_moment = self.load.moment  # kN-m
-
-        # TODO: check min loads for shear and axial
-        self.load_shear = round(max(self.load.shear_force, 1) * 1e-3, 2)  # kN
-        self.load_axial = round(max(self.load.axial_force, 1) * 1e-3, 2)  # kN
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
         self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
@@ -839,17 +842,21 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.pitch_distance_provided = self.cl_10_2_2_min_spacing(self.bolt_diameter_provided)  # mm
                         # add nut size (half on each side)
                         self.pitch_distance_provided = self.pitch_distance_provided + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))
+                        self.pitch_distance_provided = round_up(self.pitch_distance_provided, 5)
                         self.gauge_distance_provided = self.pitch_distance_provided
 
                         # end/edge
-                        end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type, self.bolt.edge_type)
-                        end_distance = end_distance + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
+                        # end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type, self.bolt.edge_type)
+                        # end_distance = end_distance + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
 
-                        self.end_distance_provided = round_up(end_distance, 2)  # mm
+                        self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
+                                                                                        self.bolt.edge_type)
+                        self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
                         self.edge_distance_provided = self.end_distance_provided
 
                         # cross-centre gauge
-                        self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
+                        # self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
+                        self.gauge_cs_distance_provided = self.beam_tw + (2 * self.end_distance_provided)
                         self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
                         # Check 3: end plate dimensions (designed for groove weld at flange only)
@@ -896,16 +903,16 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         # Check 5: number of columns of bolt on each side (minimum is 1, maximum is 2)
 
                         # checking space available to accommodate two column of bolts on each side
-                        space_available_2col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (2 * self.edge_distance_provided)
+                        space_req_2col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (2 * self.edge_distance_provided)
 
-                        if self.ep_width_provided >= space_available_2col:
+                        if self.ep_width_provided >= space_req_2col:
                             self.bolt_column = 4  # two columns on each side
                             logger.info("The provided beam can accommodate two column of bolts on either side of the web [Ref. based on detailing "
                                         "requirement]")
                             logger.info("Performing the design with two column of bolts on each side")
                         else:
                             self.bolt_column = 2  # one column on each side
-                            logger.info("The provided beam can accommodate only a single column of bolt on either side of the web [Ref. based on "
+                            logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on "
                                         "detailing requirement]")
                             logger.info("Performing the design with a single column of bolt on each side")
 
@@ -1096,10 +1103,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             logger.info(": Overall beam to beam end plate splice connection design is unsafe")
             logger.info(": =========End Of design===========")
 
-
-
-
-
+    # create design report
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
 

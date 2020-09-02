@@ -291,7 +291,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = (None, DISP_TITLE_CRITICAL_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt_diameter_provided if flag else '', True)
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, int(self.bolt_diameter_provided) if flag else '', True)
         out_list.append(t2)
 
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt_grade_provided if flag else '', True)
@@ -360,7 +360,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate_thickness if flag else '', True)
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, int(self.plate_thickness) if flag else '', True)
         out_list.append(t19)
 
         t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.ep_height_provided if flag else '', True)
@@ -806,19 +806,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
         logger.info("If you wish to optimise the bolt diameter-grade combination, pass a higher value of plate thickness using the Input Dock")
 
         # loop starts
-        self.plate_design_status = False  # initialise plate status to False to activate the loop for first (and subsequent, if required) iteration(s)
+        self.overall_design_status = False  # initialise status to False to activate the loop for first (and subsequent, if required) iteration(s)
 
         for i in self.plate_thickness:
-            self.plate_thickness = i  # assigns plate thickness from the list
 
-            if not self.plate_design_status:
-
-                self.bolt_design_status = False  # initialize bolt status as False to activate the bolt design loop
+            if not self.overall_design_status:
+                self.plate_thickness = i  # assigns plate thickness from the list
 
                 # selecting a single dia-grade combination (from the list of a tuple) each time for performing all the checks
                 for j in self.bolt_list:
 
-                    if not self.bolt_design_status:
+                    if not self.overall_design_status:
 
                         test_list = j  # choose a tuple from the list of bolt dia and grade - (dia, grade)
                         self.bolt_diameter_provided = test_list[0]  # select trial diameter
@@ -990,7 +988,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.bolt_numbers = self.bolt_column * self.bolt_row
 
                         # End Plate
-                        self.ep_moment_capacity = self.call_helper.mp_plate
+                        self.ep_moment_capacity = round(self.call_helper.mp_plate * 1e-6, 2)
 
                         if self.endplate_type == 'Flushed - Reversible Moment':
                             self.ep_height_provided = self.beam_D + 25

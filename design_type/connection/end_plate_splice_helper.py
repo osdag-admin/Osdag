@@ -500,10 +500,10 @@ class EndPlateSpliceHelper(object):
         # Check 5: Reaction at bottom flange
         if self.r_c > self.flange_capacity:
             self.flange_capacity_status = False
-            self.bolt_design_status = False
+            self.overall_design_status = False
         else:
             self.flange_capacity_status = True
-            self.bolt_design_status = True
+            self.overall_design_status = True
 
         # Check 6: Prying force check in the critical bolt
         self.b_e = self.beam_B / self.bolt_column
@@ -532,10 +532,10 @@ class EndPlateSpliceHelper(object):
 
         if self.plate_thickness < self.plate_thickness_req:
             self.plate_design_status = False
-            self.bolt_design_status = False
+            self.overall_design_status = False
         else:
             self.plate_design_status = True
-            self.bolt_design_status = True
+            self.overall_design_status = True
 
         # Check 8: Tension capacity of bolt
         self.bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)
@@ -546,10 +546,10 @@ class EndPlateSpliceHelper(object):
 
         if self.bolt_tension_demand > self.bolt_tension_capacity:
             self.bolt_tension_design_status = False
-            self.bolt_design_status = False
+            self.overall_design_status = False
         else:
             self.bolt_tension_design_status = True
-            self.bolt_design_status = True
+            self.overall_design_status = True
 
         # Check 9: combined shear + tension check of bolts
         self.bolt_numbers_provided = self.bolt_column * self.bolt_row
@@ -578,14 +578,14 @@ class EndPlateSpliceHelper(object):
 
         if self.bolt_combined_check_UR > 1.0:
             self.bolt_design_combined_check_status = False
-            self.bolt_design_status = False
+            self.overall_design_status = False
         else:
             self.bolt_design_combined_check_status = True
-            self.bolt_design_status = True
+            self.overall_design_status = True
 
         # overall status
-        if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status \
-                and self.plate_design_status and self.flange_capacity_status is True:
-            self.overall_design_status = True
-        else:
-            self.overall_design_status = False
+        # if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status \
+        #         and self.plate_design_status and self.flange_capacity_status is True:
+        #     self.overall_design_status = True
+        # else:
+        #     self.overall_design_status = False

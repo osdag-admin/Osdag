@@ -43,7 +43,7 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.beam_end_plate import BeamBeamEndPlateSplice
+from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
@@ -619,6 +619,10 @@ class Window(QMainWindow):
                     combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right+8, item_width)
                 combo.view().setMinimumWidth(item_width + 25)
+
+                if len(option) == 7:
+                    for disabled in option[6]:
+                        combo.model().item(disabled).setEnabled(False)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -1273,7 +1277,7 @@ class Window(QMainWindow):
             disabled_values = []
             note = ""
             if updated_list != None:
-                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
+                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0] and item[2] == TYPE_COMBOBOX_CUSTOMIZED]
             else:
                 onchange_key_popup = []
             if onchange_key_popup != []:
@@ -1869,7 +1873,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_COLUMNCOVERPLATE,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,KEY_DISP_BEAMENDPLATE,KEY_DISP_BCENDPLATE]:
                 print(self.display, self.folder, main.module, main.mainmodule)
-                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 ##############trial##############
                 status = True
@@ -1878,7 +1882,7 @@ class Window(QMainWindow):
                 module_class = self.return_class(main.module)
                 # self.progress_bar.setValue(80)
 
-                self.commLogicObj.call_3DModel(status, module_class)
+                # self.commLogicObj.call_3DModel(status, module_class)
                 print("3D started")
                 self.display_x = 90
                 self.display_y = 90

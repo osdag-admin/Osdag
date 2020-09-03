@@ -820,14 +820,13 @@ class CommonDesignLogic(object):
 
         BBE = self.module_class()
 
-        beam_tw = float(BBE.supported_section.web_thickness)
-        print(beam_tw)
-        beam_T = float(BBE.supported_section.flange_thickness)
-        beam_d = float(BBE.supported_section.depth)
-        beam_B = float(BBE.supported_section.flange_width)
-        beam_R1 = float(BBE.supported_section.root_radius)
-        beam_R2 = float(BBE.supported_section.toe_radius)
-        beam_alpha = float(BBE.supported_section.flange_slope)
+        beam_tw = float(BBE.beam_tw)
+        beam_T = float(BBE.beam_tf)
+        beam_d = float(BBE.beam_D)
+        beam_B = float(BBE.beam_bf)
+        beam_R1 = 0.0
+        beam_R2 = 0.0
+        beam_alpha = 0.0
         beam_length = 500
 
 
@@ -839,9 +838,9 @@ class CommonDesignLogic(object):
 
         # outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
-        plate_Left = Plate(W=BBE.plate.width,
-                           L=BBE.plate.height,
-                           T=BBE.plate.thickness_provided)
+        plate_Left = Plate(W=BBE.ep_width_provided,
+                           L=BBE.ep_height_provided,
+                           T=BBE.plate_thickness)
         plate_Right = copy.copy(plate_Left)  # Since both the end plates are identical
 
         # Beam stiffeners 4 if extended both ways, only 1 and 3 if extended oneway and non for flus type
@@ -859,7 +858,7 @@ class CommonDesignLogic(object):
 
         # alist = self.designParameters()  # An object to save all input values entered by user
 
-        bolt_d = float(BBE.bolt.bolt_diameter_provided)  # Bolt diameter, entered by user
+        bolt_d = float(BBE.bolt_diameter_provided)  # Bolt diameter, entered by user
         bolt_r = bolt_d / 2
         print(bolt_d)
         bolt_T = self.boltHeadThick_Calculation(bolt_d)
@@ -871,9 +870,9 @@ class CommonDesignLogic(object):
         nut_Ht = nut_T
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        numberOfBolts = int(BBE.plate.bolts_required)
+        numberOfBolts = int(BBE.bolt_numbers)
 
-        nutSpace = 2 * float(BBE.plate.thickness_provided) + nut_T  # Space between bolt head and nut
+        nutSpace = 2 * float(BBE.plate_thickness) + nut_T  # Space between bolt head and nut
 
         bbNutBoltArray = BBENutBoltArray(BBE, nut, bolt, numberOfBolts, nutSpace)
 
@@ -922,11 +921,11 @@ class CommonDesignLogic(object):
         # # else:  # Groove Weld
         #
         # # Grove Weld for connecting end plate to beam
-        bbWeldFlang = GrooveWeld(b=BBE.flange_weld.size, h=float(BBE.supported_section.flange_thickness),
+        bbWeldFlang = GrooveWeld(b=BBE.flange_weld.size, h=float(beam_T),
                                  L=beam_B)  # outputobj["Weld"]["Size"]
         #
         # # Followings welds are welds placed aside of beam web, Qty = 4           # edited length value by Anand Swaroop
-        bbWeldWeb = GrooveWeld(b=BBE.web_weld.size, h=float(BBE.supported_section.web_thickness),
+        bbWeldWeb = GrooveWeld(b=BBE.web_weld.size, h=float(beam_tw),
                                L=beam_d - 2 * beam_T)  # outputobj["Weld"]["Size"]
 
 

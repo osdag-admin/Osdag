@@ -504,17 +504,18 @@ class IS800_2007(object):
         for i in conn_plates_t_fu_fy:
             t = i[0]
             f_y = i[2]
-            epsilon = math.sqrt(250 / f_y)
-            if t * epsilon <= t_epsilon_considered:
-                t_epsilon_considered = t * epsilon
-                t_considered = t
-            if t < t_min:
-                t_min = t
+            if f_y > 0:
+                epsilon = math.sqrt(250 / f_y)
+                if t * epsilon <= t_epsilon_considered:
+                    t_epsilon_considered = t * epsilon
+                    t_considered = t
+                if t < t_min:
+                    t_min = t
 
          # epsilon = math.sqrt(250 / f_y)
 
         if corrosive_influences is True:
-            return 40.0 + 4 * t_min
+            return 40.0 + (4 * t_min)
         else:
             return 12 * t_epsilon_considered
 
@@ -793,7 +794,7 @@ class IS800_2007(object):
         return (V_sf / V_df) ** 2 + (T_f / T_df) ** 2
 
     @staticmethod
-    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, eta=1.5):
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned='Pretensioned', eta=1.5):
         """Calculate prying force of friction grip bolt
                        Args:
                           2 * T_e - Force in 2 bolts on either sides of the web/plate
@@ -810,16 +811,22 @@ class IS800_2007(object):
                            Reference:
                            IS 800:2007,  cl 10.4.7
         """
-        beta = 2
         if pre_tensioned == 'Pretensioned':
             beta = 1
-        print(pre_tensioned)
-        l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
-        if (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2))) <= 0:
-            Q = 0.0
         else:
-            Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
-        return Q
+            beta = 2
+
+        le_1 = end_dist
+        le_2 = (1.1 * t) * math.sqrt((beta * f_o) / f_y)  # here f_o is taken as N/mm^2
+        l_e = min(le_1, le_2)
+
+        # Note: In the below equation of Q, f_o is taken as kN since the value of T_e is in kN
+        Q = (l_v / (2 / l_e)) * (T_e - ((beta * eta * f_o * b_e * 1e-3 * t ** 4) / (27 * l_e * l_v ** 2)))  # kN
+
+        if Q < 0:
+            Q = 0.0
+
+        return round(Q * 1e-3, 2)  # kN
 
     # -------------------------------------------------------------
     #   10.5 Welds and Welding

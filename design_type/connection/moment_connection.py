@@ -53,8 +53,6 @@ class MomentConnection(Connection, IS800_2007):
             torsion_const = ''
             warping_const = ''
             image = ''
-
-
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -409,7 +407,7 @@ class MomentConnection(Connection, IS800_2007):
 
     @staticmethod
     def endplate_thick_customized():
-        d = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED
+        d = PLATE_THICKNESS_SAIL
         return d
 
     def customized_input(self):

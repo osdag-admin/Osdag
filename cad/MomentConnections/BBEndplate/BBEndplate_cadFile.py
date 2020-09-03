@@ -920,7 +920,7 @@ class CADGroove(object):
         # self.beam_stiffener_F4 = copy.deepcopy(beam_stiffenerFlush)
         # self.alist = alist
         # self.outputobj = outputobj
-        # self.boltProjection = float(self.module.plate.projection)
+        self.boltProjection = 10
         # if self.module.connectivity == "Flush":
         #     self.loc = float(self.module.stiffener.location)
         #
@@ -1509,13 +1509,15 @@ class CADGroove(object):
         """
 
         if self.module.connectivity == "Extended one way":
-            connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
-                    self.beam_stiffener_3Model]
+            # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
+            #         self.beam_stiffener_3Model]
+            connector_plate = [self.plateLModel, self.plateRModel]
 
         elif self.module.connectivity == "Extended both ways":
-            connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
-                    self.beam_stiffener_2Model, self.beam_stiffener_3Model,
-                    self.beam_stiffener_4Model]
+            # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
+            #         self.beam_stiffener_2Model, self.beam_stiffener_3Model,
+            #         self.beam_stiffener_4Model]
+            connector_plate = [self.plateLModel, self.plateRModel]
 
         elif self.module.connectivity == "Flush":
             # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model,
@@ -1536,36 +1538,27 @@ class CADGroove(object):
         """
 
         if self.module.connectivity == "Extended one way":
-            welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
-                    self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
-                    self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model,
-                    self.bbWeldStiffHR_1Model,
-                    self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
-                    self.bbWeldStiffLR_3Model]
+            # welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
+            #         self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+            #         self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
+            #         self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model,
+            #         self.bbWeldStiffHR_1Model,
+            #         self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
+            #         self.bbWeldStiffLR_3Model]
+
+            welded_sec = [self.bbWeldFlang_R1Model,
+                          self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+                          self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
         elif self.module.connectivity == "Extended both ways":
-            welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
+            welded_sec = [ self.bbWeldFlang_R1Model,
                     self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
-                    self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model,
-                    self.bbWeldStiffHL_2Model, self.bbWeldStiffLL_2Model,
-                    self.bbWeldStiffHL_4Model, self.bbWeldStiffLL_4Model, self.bbWeldStiffHR_1Model,
-                    self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
-                    self.bbWeldStiffLR_3Model, self.bbWeldStiffHR_2Model, self.bbWeldStiffLR_2Model,
-                    self.bbWeldStiffHR_4Model, self.bbWeldStiffLR_4Model]
+                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
         elif self.module.connectivity == "Flush":
             welded_sec = [self.bbWeldFlang_R1Model,
                     self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
-                    self.bbWeldstiff1_u1Model, self.bbWeldstiff1_u2Model, self.bbWeldstiff1_l1Model,
-                    self.bbWeldstiff1_l2Model, self.bbWeldstiff2_u1Model,
-                    self.bbWeldstiff2_u2Model, self.bbWeldstiff2_l1Model, self.bbWeldstiff2_l2Model,
-                    self.bbWeldstiff3_u1Model, self.bbWeldstiff3_u2Model,
-                    self.bbWeldstiff3_l1Model, self.bbWeldstiff3_l2Model, self.bbWeldstiff4_u1Model,
-                    self.bbWeldstiff4_u2Model, self.bbWeldstiff4_l1Model,
-                    self.bbWeldstiff4_l2Model]
+                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
         welds = welded_sec[0]
         for comp in welded_sec[1:]:

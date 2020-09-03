@@ -310,27 +310,42 @@ class BeamColumnEndPlate(MomentConnection):
         return list1
 
     def output_values(self, flag):
-        '''
-        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
-        '''
 
-        # @author: Umair
+        ###################trial########################################todo darshan
 
         out_list = []
-        return []
+        t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
+        out_list.append(t4)
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
+        out_list.append(t1)
+
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
+              self.bolt.bolt_diameter_provided if flag else '', True)
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_GRD, TYPE_TEXTBOX,
+              self.bolt.bolt_grade_provided if flag else '', True)
+        out_list.append(t3)
+
+        return out_list
 
     def set_input_values(self, design_dictionary):
+        self.module = KEY_DISP_BCENDPLATE
         self.mainmodule = "Moment Connection"
         self.connectivity = design_dictionary[KEY_CONN]
         self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
-
         self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
 
+        # self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC],
+        #                                      material_grade=design_dictionary[KEY_SEC_MATERIAL])
         self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC],
-                                             material_grade=design_dictionary[KEY_SUPTNGSEC_MATERIAL])
+                                         material_grade=design_dictionary[KEY_SUPTNGSEC_MATERIAL])
 
-        self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],
-                                      material_grade=design_dictionary[KEY_SUPTDSEC_MATERIAL])
+        # self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],
+        #                               material_grade=design_dictionary[KEY_SEC_MATERIAL])
+        self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC], material_grade=design_dictionary[KEY_SUPTDSEC_MATERIAL])
+
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                          bolt_type=design_dictionary[KEY_TYP],
                          bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
@@ -339,9 +354,9 @@ class BeamColumnEndPlate(MomentConnection):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
-        self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
-                         axial_force=float(design_dictionary[KEY_AXIAL]),
-                         moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
+        # self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
+        #                  axial_force=float(design_dictionary[KEY_AXIAL]),
+        #                  moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
@@ -356,8 +371,77 @@ class BeamColumnEndPlate(MomentConnection):
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
-        self.warn_text()
+        # self.warn_text()
+        self.hard_input(self)
         # self.member_capacity()
+
+    #####################hard input for cad#######################################
+    def hard_input(self):
+        ################################Flush###################################
+        self.bolt.bolt_diameter_provided = 16
+        self.bolt.bolt_grade_provided = 8.8
+        self.plate.bolts_required = 4
+        self.bolt_column = 2
+        self.bolt_row = 2
+        self.plate.edge_dist_provided = 35
+        self.plate.end_dist_provided = 35
+        # self.out_bolt = 0
+        # self.outside_pitch = 0
+        self.plate.pitch_provided = 40
+        self.plate.gauge_provided = 40
+        self.top_flange_weld.size = 4.0
+        self.web_weld.size = 4.0
+        self.plate.height = 420.0
+        self.plate.width = 165.0
+        self.plate.thickness_provided = 12.0
+        ################################Flush###################################
+
+        ################################Oneway###################################
+        # self.bolt.bolt_diameter_provided = 24.0
+        # self.bolt.bolt_grade_provided = 8.8
+        # self.plate.bolts_required = 28
+        # self.plate.bolt_line = 2
+        # self.plate.bolts_one_line = 2
+        # self.plate.edge_dist_provided = 45
+        # self.plate.end_dist_provided = 45
+        # self.inner_dimension = 278
+        # self.out_bolt = 1
+        # self.outside_pitch = 60
+        # self.plate.pitch_provided = self.inner_dimension / (self.plate.bolt_line - 1)
+        # self.plate.gauge_provided = 60
+        # self.top_flange_weld.size = 4.0
+        # self.web_weld.size = 4.0
+        # self.plate.height = self.supported_section.depth + 10 + 2* self.plate.end_dist_provided + (self.out_bolt -1) * self.plate.pitch_provided
+        # self.plate.width = 4 * self.plate.edge_dist_provided + self.supported_section.web_thickness + (self.plate.bolts_one_line - 2) * self.plate.gauge_provided
+        # self.plate.thickness_provided = 12.0
+        ################################Oneway###################################
+
+        ################################bothway###################################
+        # self.bolt.bolt_diameter_provided = 24.0
+        # self.bolt.bolt_grade_provided = 8.8
+        # self.plate.bolts_required = 12
+        # self.plate.bolt_line = 4
+        # self.plate.bolts_one_line = 2
+        # self.plate.edge_dist_provided = 45
+        # self.plate.end_dist_provided = 45
+        # self.inner_dimension = 278
+        # self.out_bolt = 2
+        # self.outside_pitch = 60
+        # self.plate.pitch_provided = self.inner_dimension / (self.plate.bolt_line - 1)
+        # self.plate.gauge_provided = 60
+        # self.top_flange_weld.size = 4.0
+        # self.web_weld.size = 4.0
+        # self.plate.height = self.supported_section.depth + 10 + 4 * self.plate.end_dist_provided + (
+        #         self.out_bolt - 2) * self.plate.pitch_provided
+        # self.plate.width = 4 * self.plate.edge_dist_provided + self.supported_section.web_thickness + (
+        #         self.plate.bolts_one_line - 2) * self.plate.gauge_provided
+        # self.plate.thickness_provided = 12.0
+        ################################bothway###################################
+
+
+
+
+
     ############################################################################################
     # DESIGN STARTS
     ############################################################################################

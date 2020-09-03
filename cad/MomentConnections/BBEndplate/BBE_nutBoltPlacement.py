@@ -35,7 +35,7 @@ class BBENutBoltArray(object):
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
         # self.module = alist
-        self.boltProjection = 10.0
+        self.boltProjection = self.module.projection
 
         self.initBoltPlaceParams(module, numberOfBolts)
 
@@ -69,60 +69,19 @@ class BBENutBoltArray(object):
         self.Lv = boltPlaceObj.plate.edge_dist_provided
         self.endDist = boltPlaceObj.plate.end_dist_provided
         self.edgeDist = boltPlaceObj.plate.edge_dist_provided
-        self.crossCgauge = float(boltPlaceObj.plate.width) - 2 * float(self.edgeDist)
-        self.row = boltPlaceObj.plate.bolt_line
-        self.col = boltPlaceObj.plate.bolts_one_line
         self.pitch = boltPlaceObj.plate.pitch_provided
-        self.gauge = boltPlaceObj.plate.pitch_provided
+        self.gauge = boltPlaceObj.plate.gauge_provided
+        self.mid_bolt_row = boltPlaceObj.mid_bolt_row
+        self.row = boltPlaceObj.bolt_row
+        self.col = boltPlaceObj.bolt_column
+        self.crossCgauge =  2 * float(self.edgeDist) + boltPlaceObj.supported_section.web_thickness/2
 
-        # if self.module.connectivity == "Extended both ways":
-        #     if numberOfBolts == 8:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
-        #
-        #     elif numberOfBolts == 12:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-        #         self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-        #
-        #     elif numberOfBolts == 16:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-        #         self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-        #         self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
-        #         self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
-        #
-        #     elif numberOfBolts == 20:
-        #         self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
-        #         self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-        #         self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-        #         self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
-        #         self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
-        #         self.pitch78 = boltPlaceObj["Bolt"]["Pitch78"]
-        #         self.pitch910 = boltPlaceObj["Bolt"]["Pitch910"]
-        #
-        # elif self.module["Member"]["Connectivity"] == "Extended one way":
-        #     if numberOfBolts == 6:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #
-        #
-        #     elif numberOfBolts == 8:
-        #         self.pitch23 = boltPlaceObj['Bolt']['Pitch23']
-        #         self.pitch34 = boltPlaceObj['Bolt']['Pitch34']
-        #
-        #     elif numberOfBolts == 10:
-        #         self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
-        #         # self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-        #         self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-        #
-        # else:  # "Flush"
-        #     # self.Lv = boltPlaceObj["Bolt"]["Lv"]
-        #     if numberOfBolts == 4:
-        #         self.pitch12 = boltPlaceObj["Bolt"]["Pitch"]
-        #
-        #     elif numberOfBolts == 6:
-        #         self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+        # self.out_pitch = boltPlaceObj.outside_pitch
+        # self.out_bolt = boltPlaceObj.out_bolt
+
+        # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
+        self.endDist_flush = self.boltProjection + boltPlaceObj.supported_section.flange_thickness + self.endDist
+        self.endDist_ext = boltPlaceObj.supported_section.flange_thickness + 2 * self.endDist
 
     def calculatePositions(self, numberOfBolts):
         '''
@@ -134,414 +93,230 @@ class BBENutBoltArray(object):
 
         if self.module.connectivity == "Extended both ways":
             # if numberOfBolts == 8:
-            self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-            for rw in range(1, self.row + 1):
-                if rw == 1:
-                    for col in range(self.col):
-                        pos = self.boltOrigin
-                        pos = pos + col * self.crossCgauge * self.gaugeDir
-                        self.positions.append(pos)
-                if rw == 2:
-                    for col in range(self.col):
-                        pos = np.array([0.0, 0.0, 0.0])
-                        space12 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module["T"]
-                        pos = pos + self.boltOrigin + space12 * self.pitchDir
-                        pos = pos + col * self.crossCgauge * self.gaugeDir
-                        self.positions.append(pos)
-                if rw == 3:
-                    for col in range(self.col):
-                        pos = np.array([0.0, 0.0, 0.0])
-                        space23 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-                            "T"] + self.pitch23
-                        pos = pos + self.boltOrigin + space23 * self.pitchDir
-                        pos = pos + col * self.crossCgauge * self.gaugeDir
-                        self.positions.append(pos)
-                if rw == 4:
-                    for col in range(self.col):
-                        pos = np.array([0.0, 0.0, 0.0])
-                        space23 = 4 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + 2 * self.module[
-                            "T"] + self.pitch23
-                        pos = pos + self.boltOrigin + space23 * self.pitchDir
-                        pos = pos + col * self.crossCgauge * self.gaugeDir
-                        self.positions.append(pos)
-            #
-            # elif numberOfBolts == 12:
-            #     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            #     self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-            #     for rw in range(1, self.row + 1):
-            #         if rw == 1:
-            #             for col in range(self.col):
-            #                 pos = self.boltOrigin
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 2:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space12 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module["T"]
-            #                 pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 3:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space23 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23
-            #                 pos = pos + self.boltOrigin + space23 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 4:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space34 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34
-            #                 pos = pos + self.boltOrigin + space34 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 5:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space45 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34 \
-            #                           + self.pitch45
-            #                 pos = pos + self.boltOrigin + space45 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 6:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space45 = 4 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + 2 * self.module[
-            #                     "T"] + self.pitch23 + \
-            #                           self.pitch34 + self.pitch45
-            #                 pos = pos + self.boltOrigin + space45 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #
-            # elif numberOfBolts == 16:
-            #     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            #     self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-            #     for rw in range(1, self.row + 1):
-            #         if rw == 1:
-            #             for col in range(self.col):
-            #                 pos = self.boltOrigin
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 2:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space12 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module["T"]
-            #                 pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 3:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space32 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23
-            #                 pos = pos + self.boltOrigin + space32 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 4:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space34 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34
-            #                 pos = pos + self.boltOrigin + space34 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 5:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space45 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34 + \
-            #                           self.pitch45
-            #                 pos = pos + self.boltOrigin + space45 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 6:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space56 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34 + \
-            #                           self.pitch45 + self.pitch56
-            #                 pos = pos + self.boltOrigin + space56 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 7:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space67 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34 + \
-            #                           self.pitch45 + self.pitch56 + self.pitch67
-            #                 pos = pos + self.boltOrigin + space67 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 8:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space78 = 4 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + 2 * self.module[
-            #                     "T"] + self.pitch23 + \
-            #                           self.pitch34 + self.pitch45 + self.pitch56 + self.pitch67
-            #                 pos = pos + self.boltOrigin + space78 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #
-            # elif numberOfBolts == 20:
-            #     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            #     self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-            #     for rw in range(1, self.row + 1):
-            #         if rw == 1:
-            #             for col in range(self.col):
-            #                 pos = self.boltOrigin
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 2:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space12 = self.pitch12
-            #                 pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 3:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space23 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch12
-            #                 pos = pos + self.boltOrigin + space23 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 4:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space34 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34
-            #                 pos = pos + self.boltOrigin + space34 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 5:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space45 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34 + \
-            #                           self.pitch45
-            #                 pos = pos + self.boltOrigin + space45 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 6:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space56 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34 + \
-            #                           self.pitch45 + self.pitch56
-            #                 pos = pos + self.boltOrigin + space56 * self.pitchDir  #
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 7:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space67 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34 + \
-            #                           self.pitch45 + self.pitch56 + self.pitch67
-            #                 pos = pos + self.boltOrigin + space67 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 8:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space78 = 2 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34 + \
-            #                           self.pitch45 + self.pitch56 + self.pitch67 + self.pitch78
-            #                 pos = pos + self.boltOrigin + space78 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 9:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space89 = 4 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + 2 * self.module[
-            #                     "T"] + self.pitch12 + \
-            #                           self.pitch34 + self.pitch45 + self.pitch56 + self.pitch67 + self.pitch78
-            #                 pos = pos + self.boltOrigin + space89 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 10:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space910 = 4 * (self.Lv + float(self.module["Weld"]["Flange (mm)"])) + 2 * self.module[
-            #                     "T"] + self.pitch12 + \
-            #                            self.pitch34 + self.pitch45 + self.pitch56 + self.pitch67 + self.pitch78 + self.pitch910
-            #                 pos = pos + self.boltOrigin + space910 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
 
-        elif self.module.connectivity == "Extended one way":
-            if numberOfBolts == 6:
-                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-                for rw in range(1, self.row + 1):
-                    if rw == 1:
-                        for col in range(self.col):
-                            pos = self.boltOrigin
-                            pos = pos + col * self.crossCgauge * self.gaugeDir
-                            self.positions.append(pos)
-                    if rw == 2:
-                        for col in range(self.col):
-                            pos = np.array([0.0, 0.0, 0.0])
-                            space12 = 2 * (self.Lv) + self.module[
-                                "T"]  # space is the distance between 1st row and 2nd row
-                            pos = pos + self.boltOrigin + space12 * self.pitchDir
-                            pos = pos + col * self.crossCgauge * self.gaugeDir
-                            self.positions.append(pos)
-                    if rw == 3:
-                        for col in range(self.col):
-                            pos = np.array([0.0, 0.0, 0.0])
-                            space23 = 2 * (self.Lv) + self.module[
-                                "T"] + self.pitch23  # Distance between 1st row and 3rd row #TODO make better variable for space13
-                            pos = pos + self.boltOrigin + space23 * self.pitchDir
-                            pos = pos + col * self.crossCgauge * self.gaugeDir
-                            self.positions.append(pos)
-
-            # elif numberOfBolts == 8:
-            #     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            #     self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-            #     for rw in range(1, self.row + 1):
-            #         if rw == 1:
-            #             for col in range(self.col):
-            #                 pos = self.boltOrigin
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 2:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space12 = 2 * (self.Lv) + self.module["T"]
-            #                 pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 3:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space23 = 2 * (self.Lv) + self.module[
-            #                     "T"] + self.pitch23
-            #                 pos = pos + self.boltOrigin + space23 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 4:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space34 = 2 * (self.Lv) + self.module[
-            #                     "T"] + self.pitch23 + self.pitch34  # TODO may be different for Ajmal code (may not need to add pitch45)
-            #                 pos = pos + self.boltOrigin + space34 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #
-            # elif numberOfBolts == 10:
-            #     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            #     self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
-            #     for rw in range(1, self.row + 1):
-            #         if rw == 1:
-            #             for col in range(self.col):
-            #                 pos = self.boltOrigin
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 2:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space12 = self.pitch12
-            #                 pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 3:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space23 = 2 * (self.Lv) + self.module[
-            #                     "T"] + self.pitch12
-            #                 pos = pos + self.boltOrigin + space23 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 4:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space34 = 2 * (self.Lv) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34
-            #                 pos = pos + self.boltOrigin + space34 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 5:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space45 = 2 * (self.Lv) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch34 + self.pitch45
-            #                 pos = pos + self.boltOrigin + space45 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-
-        else:  # "Flush"
-            # if numberOfBolts == 4:
-            self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
             for rw in np.arange(self.row):
                 for col in np.arange(self.col):
                     pos = self.origin
-                    pos = pos + (self.edgeDist) * self.gaugeDir
-                    pos = pos + col * self.gauge * self.gaugeDir
+
+                    pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+
+                    if col == 0:
+                        pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir
+                    elif col < self.col / 2:
+                        pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (col) * self.gauge * self.gaugeDir
+                    else:
+                        pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                          col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
+
+
+                    # if rw > 0:
+                    if self.row <=6:
+                        pos = pos + self.endDist * self.pitchDir
+                        if rw == 1:
+                            pos = pos + (self.endDist_ext) * self.pitchDir
+                        elif rw == 2:
+                            pos = pos + (self.module.plate.height - 2*self.endDist  - self.endDist_ext) * self.pitchDir
+                        elif rw == 3:
+                            pos = pos + (self.module.plate.height - 2*self.endDist ) * self.pitchDir
+                        elif rw == 4:
+                            pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
+                        elif rw>4:
+                            pos = pos + (self.module.plate.height - 2*self.endDist  - self.endDist_ext) * self.pitchDir - self.pitch * self.pitchDir
+                        else:
+                            pass
+                    else:
+                        pos = pos + self.endDist * self.pitchDir+ self.pitch * self.pitchDir
+                        if rw == 1:
+                            pos = pos + (self.endDist_ext) * self.pitchDir
+                        elif rw == 2:
+                            pos = pos + (self.module.plate.height - 2 * self.endDist - self.endDist_ext -2* self.pitch) * self.pitchDir
+                        elif rw == 3:
+                            pos = pos + (self.module.plate.height - 2 * self.endDist-2* self.pitch) * self.pitchDir
+                        elif rw == 4:
+                            pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
+                        elif rw == 5:
+                            pos = pos + (self.module.plate.height - 2 * self.endDist-2* self.pitch - self.endDist_ext) * self.pitchDir - self.pitch * self.pitchDir
+                        elif rw == 6:
+                            pos = pos - self.pitch * self.pitchDir
+                        elif rw == 7:
+                            pos = pos + (self.module.plate.height - 2 * self.endDist - self.pitch) * self.pitchDir
+                        elif rw >7 and rw%2==0:
+                            pos = pos + (self.endDist_ext)*self.pitchDir + (rw/2-2)* self.pitch*self.pitchDir
+                        elif rw > 7 and rw % 2 != 0:
+                            pos = pos + (self.module.plate.height - 2 * self.endDist - self.endDist_ext - 2 * self.pitch) * self.pitchDir - (rw/2-2.5)* self.pitch*self.pitchDir
+                        else:
+                            pass
+                    self.positions.append(pos)
+
+            if self.mid_bolt_row > 0:
+                for rw in np.arange(self.mid_bolt_row):
+                    for col in np.arange(self.col):
+                        pos = self.origin
+
+                        pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+
+                        if col == 0:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir
+                        elif col < self.col / 2:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                      col) * self.gauge * self.gaugeDir
+                        else:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                          col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
+
+                        if self.mid_bolt_row % 2 != 0:
+                            if rw == 0:
+                                pos = pos + self.module.plate.height / 2 * self.pitchDir - int(
+                                    self.mid_bolt_row / 2) * self.pitch * self.pitchDir
+                            else:
+                                pos = pos + self.module.plate.height / 2 * self.pitchDir - int(
+                                    self.mid_bolt_row / 2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
+                        else:
+                            if rw == 0:
+                                pos = pos + self.module.plate.height / 2 * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                            self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir
+                            else:
+                                pos = pos + self.module.plate.height / 2 * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                            self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir + (
+                                          rw) * self.pitch * self.pitchDir
+                        self.positions.append(pos)
+
+
+        elif self.module.connectivity == "Extended one way":
+
+            for rw in np.arange(self.row):
+                for col in np.arange(self.col):
+                    pos = self.origin
+
+                    pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+
+                    if col == 0:
+                        pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir
+                    elif col < self.col / 2:
+                        pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (col) * self.gauge * self.gaugeDir
+                    else:
+                        pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                          col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
+
                     pos = pos + self.endDist * self.pitchDir
-                    pos = pos + rw * self.pitch * self.pitchDir
+                    if rw>0:
+                        if self.row < 5:
+                            if rw == 1:
+                                pos = pos + (self.endDist_ext ) * self.pitchDir
+                            elif rw == 2:
+                                pos = pos + (self.module.plate.height-self.endDist_flush-self.endDist) * self.pitchDir
+                            else:
+                                pos = pos + (self.endDist_ext ) * self.pitchDir + self.pitch * self.pitchDir
+
+                        else:
+                            if rw == 1:
+                                pos = pos + (self.pitch) * self.pitchDir
+                            elif rw == (self.row -1):
+                                pos = pos + (self.module.plate.height-self.endDist_flush-self.endDist) * self.pitchDir
+                            else:
+                                pos = pos + (self.endDist_ext) * self.pitchDir + (rw-1)*self.pitch * self.pitchDir
 
                     self.positions.append(pos)
 
+            if self.mid_bolt_row > 0:
+                for rw in np.arange(self.mid_bolt_row):
+                    for col in np.arange(self.col):
+                        pos = self.origin
+
+                        pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+
+                        if col == 0:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir
+                        elif col < self.col / 2:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                      col) * self.gauge * self.gaugeDir
+                        else:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                    self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                          col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
+
+                        if self.mid_bolt_row % 2 != 0:
+                            if rw == 0:
+                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - int(
+                                    self.mid_bolt_row / 2) * self.pitch * self.pitchDir
+                            else:
+                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - int(
+                                    self.mid_bolt_row / 2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
+                        else:
+                            if rw == 0:
+                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                            self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir
+                            else:
+                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                            self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir + (
+                                          rw) * self.pitch * self.pitchDir
+                        self.positions.append(pos)
+
+        else:
+            for rw in np.arange(self.row):
+                for col in np.arange(self.col):
+                    pos = self.origin
+
+                    pos = pos + (self.module.plate.width/2) * self.gaugeDir
+
+                    if col==0:
+                        pos = pos - self.crossCgauge/2 * self.gaugeDir - (self.col/2-1) * self.gauge * self.gaugeDir
+                    elif col<self.col/2:
+                        pos = pos - self.crossCgauge/2 * self.gaugeDir - (self.col/2-1) * self.gauge * self.gaugeDir + (col) * self.gauge * self.gaugeDir
+                    else:
+                        pos = pos - self.crossCgauge/2 * self.gaugeDir - (self.col/2-1) * self.gauge * self.gaugeDir + (col-1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
+
+                    pos = pos + self.endDist_flush * self.pitchDir
+                    if rw>0:
+                        if rw%2==0:
+                            pos = pos + ((rw/2) * self.pitch) * self.pitchDir
+                        else:
+                            pos = pos + (self.module.plate.height - 2*self.endDist_flush - int(rw/2)*self.pitch) * self.pitchDir
+                    self.positions.append(pos)
+
+            if self.mid_bolt_row>0:
+                for rw in np.arange(self.mid_bolt_row):
+                    for col in np.arange(self.col):
+                        pos = self.origin
+
+                        pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+
+                        if col == 0:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                        self.col / 2 - 1) * self.gauge * self.gaugeDir
+                        elif col < self.col / 2:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                        self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                      col) * self.gauge * self.gaugeDir
+                        else:
+                            pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
+                                        self.col / 2 - 1) * self.gauge * self.gaugeDir + (
+                                              col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
+
+                        if self.mid_bolt_row%2!=0:
+                            if rw == 0:
+                                pos = pos + self.module.plate.height/2 * self.pitchDir - int(self.mid_bolt_row/2) * self.pitch * self.pitchDir
+                            else:
+                                pos = pos + self.module.plate.height / 2 * self.pitchDir - int(self.mid_bolt_row/2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
+                        else:
+                            if rw == 0:
+                                pos = pos + self.module.plate.height/2 * self.pitchDir- 0.5 * self.pitch * self.pitchDir - (self.mid_bolt_row/2-1) * self.pitch * self.pitchDir
+                            else:
+                                pos = pos + self.module.plate.height/2* self.pitchDir - 0.5 * self.pitch * self.pitchDir- (self.mid_bolt_row/2-1) * self.pitch * self.pitchDir + (rw) * self.pitch * self.pitchDir
+                        self.positions.append(pos)
 
 
-
-
-            #
-            # for rw in range(1, self.row + 1):
-            #
-            #     # TODO remove this lines
-            #
-            #     if rw == 1:
-            #         for col in range(self.col):
-            #             pos = np.array([0.0, 0.0, 0.0])
-            #             space12 = (self.Lv) + self.module[
-            #                 "T"] + self.boltProjection  ##+ 2*float(self.module["Weld"]["Flange (mm)"]) # TODO  check if this formula is right, changed this formula
-            #             pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #             pos = pos + col * self.crossCgauge * self.gaugeDir
-            #             self.positions.append(pos)
-            #     if rw == 2:
-            #         for col in range(self.col):
-            #             pos = np.array([0.0, 0.0, 0.0])
-            #             space23 = (self.Lv) + self.module["T"] + self.pitch12 + self.boltProjection
-            #             pos = pos + self.boltOrigin + space23 * self.pitchDir
-            #             pos = pos + col * self.crossCgauge * self.gaugeDir
-            #             self.positions.append(pos)
-
-            # elif numberOfBolts == 6:
-            #     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
-            #     self.boltOrigin = self.boltOrigin  # + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
-            #     for rw in range(1, self.row + 1):
-            #
-            #         # TODO have to modefy this formulas according to appropriate rows
-            #         if rw == 1:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space12 = (self.Lv) + self.module[
-            #                     "T"] + self.boltProjection  # + 2*float(self.module['Weld']['Flange (mm)'])
-            #                 pos = pos + self.boltOrigin + space12 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 2:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space23 = (self.Lv) + self.module["T"] + self.pitch12 + self.boltProjection
-            #                 pos = pos + self.boltOrigin + space23 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
-            #         if rw == 3:
-            #             for col in range(self.col):
-            #                 pos = np.array([0.0, 0.0, 0.0])
-            #                 space34 = (self.Lv) + self.module[
-            #                     "T"] + self.pitch12 + self.pitch23 + self.boltProjection  # + self.pitch34
-            #                 pos = pos + self.boltOrigin + space34 * self.pitchDir
-            #                 pos = pos + col * self.crossCgauge * self.gaugeDir
-            #                 self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
         """
@@ -558,7 +333,7 @@ class BBENutBoltArray(object):
         self.boltDir = boltDir
 
         self.calculatePositions(self.numOfBolts)
-
+        print(self.positions)
         for index, pos in enumerate(self.positions):
             self.bolts[index].place(pos, gaugeDir, boltDir)
             self.nuts[index].place((pos + self.gap * boltDir), gaugeDir,
@@ -569,8 +344,8 @@ class BBENutBoltArray(object):
 
         :return: cad model of nut bolt arrangement
         """
-        print(self.bolts)
-        print(self.nuts)
+        print(self.bolts,"hgjghj")
+        print(self.nuts,"jhjhjv")
         for bolt in self.bolts:
             self.models.append(bolt.create_model())
 

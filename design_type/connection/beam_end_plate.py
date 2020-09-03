@@ -391,10 +391,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.module = KEY_DISP_BEAMENDPLATE
         self.connectivity = "Flush"
         self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
-        self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
+        self.material = Material(material_grade=design_dictionary[KEY_SEC_MATERIAL])
 
         # self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC],
-        #                                      material_grade=design_dictionary[KEY_SUPTNGSEC_MATERIAL])
+        #                                      material_grade=design_dictionary[KEY_SEC_MATERIAL])
         self.supported_section = Beam(designation=design_dictionary[KEY_SECSIZE],
                                       material_grade=design_dictionary[KEY_SEC_MATERIAL])
 
@@ -433,18 +433,98 @@ class BeamBeamEndPlateSplice(MomentConnection):
         #                                fabrication=design_dictionary[KEY_DP_WELD_FAB])
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
+        self.hard_inputs(self)
 
-
-        self.plate.height = 420.0
-        self.plate.width = 265.0
-        self.plate.thickness_provided = 12.0
-        self.bolt.bolt_diameter_provided = 24.0
+    def hard_inputs(self):
+        ################################Flush###################################
+        self.bolt.bolt_diameter_provided = 16
         self.bolt.bolt_grade_provided = 8.8
-        self.plate.bolts_required = 4
-        self.plate.edge_dist_provided = self.bolt.min_edge_dist_round
-        self.plate.pitch_provided = self.bolt.min_pitch_round
+        self.plate.bolts_required = 48
+        self.bolt_column = 4
+        self.bolt_row = 8
+        self.mid_bolt_row = 4
+        self.plate.edge_dist_provided = 35
+        self.plate.end_dist_provided = 35
+        # self.out_bolt = 0
+        # self.outside_pitch = 0
+        self.plate.pitch_provided = 40
+        self.plate.gauge_provided = 40
         self.flange_weld.size = 4.0
         self.web_weld.size = 4.0
+        self.plate.height = self.supported_section.depth +25
+        self.plate.width = self.supported_section.flange_width +25
+        self.plate.thickness_provided = 12.0
+        self.projection = 12.5
+        ################################Flush###################################
+
+        ################################Oneway###################################
+        # self.bolt.bolt_diameter_provided = 16
+        # self.bolt.bolt_grade_provided = 8.8
+        # self.plate.bolts_required =44
+        # self.bolt_column = 4
+        # self.bolt_row = 7
+        # self.mid_bolt_row = 4
+        # self.plate.edge_dist_provided = 35
+        # self.plate.end_dist_provided = 35
+        # # self.out_bolt = 0
+        # # self.outside_pitch = 0
+        # self.projection = 12.5
+        # self.plate.pitch_provided = 40
+        # self.plate.gauge_provided = 40
+        # self.flange_weld.size = 4.0
+        # self.web_weld.size = 4.0
+        # if self.bolt_row <5:
+        #     self.plate.height = self.supported_section.depth + self.projection+2*self.plate.end_dist_provided
+        # else:
+        #     self.plate.height = self.supported_section.depth + self.projection+2*self.plate.end_dist_provided + self.plate.pitch_provided
+        #
+        # self.plate.width = self.supported_section.flange_width + 25
+        # self.plate.thickness_provided = 12.0
+        # self.projection = 12.5
+
+    ################################Oneway###################################
+
+        ################################bothway###################################
+        # self.bolt.bolt_diameter_provided = 16
+        # self.bolt.bolt_grade_provided = 8.8
+        # self.plate.bolts_required = 36
+        # self.bolt_column = 2
+        # self.bolt_row = 14
+        # self.mid_bolt_row = 4
+        # self.plate.edge_dist_provided = 35
+        # self.plate.end_dist_provided = 35
+        # # self.out_bolt = 0
+        # # self.outside_pitch = 0
+        # self.projection = 12.5
+        # self.plate.pitch_provided = 40
+        # self.plate.gauge_provided = 40
+        # self.flange_weld.size = 4.0
+        # self.web_weld.size = 4.0
+        # if self.bolt_row <=6:
+        #     self.plate.height = self.supported_section.depth + 4 * self.plate.end_dist_provided
+        # else:
+        #     self.plate.height = self.supported_section.depth + 4 * self.plate.end_dist_provided + 2 * self.plate.pitch_provided
+        #
+        # self.plate.width = self.supported_section.flange_width + 25
+        # self.plate.thickness_provided = 12.0
+        # self.projection = 12.5
+        ################################bothway###################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         # self.stiffener.height
         #

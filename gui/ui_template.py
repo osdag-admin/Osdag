@@ -49,6 +49,7 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
+from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -1640,6 +1641,8 @@ class Window(QMainWindow):
             return BeamBeamEndPlateSplice
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate
+        elif name == KEY_DISP_BCENDPLATE:
+            return BeamColumnEndPlate
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
         elif name == KEY_DISP_TENSION_BOLTED:
@@ -1864,7 +1867,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
                                                   KEY_DISP_COLUMNCOVERPLATE,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,KEY_DISP_BEAMENDPLATE]:
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,KEY_DISP_BEAMENDPLATE,KEY_DISP_BCENDPLATE]:
                 print(self.display, self.folder, main.module, main.mainmodule)
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status

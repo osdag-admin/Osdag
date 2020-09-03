@@ -808,13 +808,13 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
-    print(multiprocessing.cpu_count())
-    pool = Pool()
-    try:
-        result = pool.apply_async(OsdagMainWindow())
-    finally:
-        pool.terminate()
-    # window = OsdagMainWindow()
+    # print(multiprocessing.cpu_count())
+    # pool = Pool()
+    # try:
+    #     result = pool.apply_async(OsdagMainWindow())
+    # finally:
+    #     pool.terminate()
+    window = OsdagMainWindow()
 
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 

@@ -1198,10 +1198,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
              KEY_DISP_MATERIAL: self.plate.material,
              KEY_DISP_FU: self.plate.fu,
              KEY_DISP_FY: self.plate.fy,
+
              "Weld Details": "TITLE",
-             # KEY_DISP_DP_WELD_TYPE: "Fillet",
-             # KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-             # KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu
+             KEY_DISP_DP_WELD_TYPE: "Fillet",
+             KEY_DISP_DP_WELD_FAB: self.web_weld.fabrication,
+             KEY_DISP_DP_WELD_MATERIAL_G_O: self.web_weld.fu
              }
 
         self.report_check = []
@@ -1251,63 +1252,66 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.report_check.append(t4)
 
         t1 = (KEY_OUT_BOLT_TENSION_CAPACITY,
-              tension_in_bolt_due_to_axial_load_n_moment(P=round(self. self.load_axial / 1000, 2),
-                                                         n=self.no_bolts,
-                                                         M=round(self.load_moment / 1000, 2),
-                                                         y_max=self.y_max,
-                                                         y_sqr=round(self.y_sqr, 2), T_b=round(self.t_b / 1000, 2)),
-              cl_10_3_5_bearing_bolt_tension_resistance(self.bolt.bolt_fu, self.bolt.bolt_fy, self.bolt.bolt_shank_area,
+              tension_in_bolt_due_to_axial_load_n_moment(P=round(self.load_axial / 1000, 2),
+                                                         n=0,
+                                                         M=0,
+                                                         y_max=0,
+                                                         y_sqr=0, T_b=round(self.call_helper.bolt_tension_demand / 1000, 2)),
+              cl_10_3_5_bearing_bolt_tension_resistance(self.bolt_fu, self.dp_bolt_fy, self.bolt.bolt_shank_area,
                                                         self.bolt.bolt_net_area,
-                                                        round(self.bolt.bolt_tension_capacity / 1000, 2)),
-              get_pass_fail(self.t_b, self.bolt.bolt_tension_capacity, relation='leq'))
-        self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_BOLT_SHEAR,
-              shear_force_in_bolts_near_web(V=round(self.fact_shear_load / 1000, 2), n_wb=self.n_bw * 2,
-                                            V_sb=round(self.v_sb / 1000, 2)),
-              round(self.bolt.bolt_capacity / 1000, 2),
-              get_pass_fail(round(self.v_sb / 1000, 2), round(self.bolt.bolt_capacity / 1000, 2), relation='leq'))
+                                                        round(self.tension_capacity_critical_bolt / 1000, 2)),
+              get_pass_fail(round(self.call_helper.bolt_tension_demand / 1000, 2),  round(self.tension_capacity_critical_bolt / 1000, 2), relation='lesser'))
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_NO_BOLTS_WEB,
-              no_of_bolts_along_web(D=self.section.depth, T_f=self.section.flange_thickness, e=self.end_dist,
-                                    p=self.pitch, n_bw=2 * self.n_bw),
-              self.n_bw * 2,
+        ## self.call_helper.bolt_combined_check_UR #todo function
+        #todo no of bolts
 
-              get_pass_fail(self.n_bw, self.n_bw, relation='leq'))
-        self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_NO_BOLTS_FLANGE,
-              no_of_bolts_along_flange(b=self.section.flange_width, T_w=self.section.web_thickness, e=self.end_dist,
-                                       p=self.pitch, n_bf=2 * self.n_bf),
-              self.n_bf * 2,
-
-              get_pass_fail(self.n_bf, self.n_bf, relation='leq'))
-        self.report_check.append(t1)
-
-        t1 = (KEY_OUT_DISP_NO_BOLTS, '', self.no_bolts, '')
-        self.report_check.append(t1)
-
-        t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
-              self.pitch,
-              get_pass_fail(self.bolt.min_pitch, self.pitch, relation='leq'))
+        t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt_diameter_provided),
+              self.pitch_distance_provided,
+              get_pass_fail(self.bolt.min_pitch, self.pitch_distance_provided, relation='leq'))
         self.report_check.append(t1)
         t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(self.plate_thickness),
-              self.pitch,
-              get_pass_fail(self.bolt.max_spacing, self.pitch, relation='greater'))
+              self.pitch_distance_provided,
+              get_pass_fail(self.bolt.max_spacing, self.pitch_distance_provided, relation='greater'))
         self.report_check.append(t1)
         t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.dia_hole, self.bolt.edge_type),
-              self.end_dist,
-              get_pass_fail(self.bolt.min_end_dist, self.end_dist,
+              self.end_distance_provided,
+              get_pass_fail(self.bolt.min_end_dist, self.end_distance_provided,
                             relation='lesser'))
         self.report_check.append(t3)
         t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
                                                           corrosive_influences=self.bolt.corrosive_influences,
                                                           parameter='end_dist'),
-              self.end_dist,
-              get_pass_fail(self.bolt.max_end_dist, self.end_dist,
+              self.end_distance_provided,
+              get_pass_fail(self.bolt.max_end_dist, self.end_distance_provided,
                             relation='greater'))
         self.report_check.append(t4)
+
         t1 = ('SubSection', '  End Plate Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
+        if self.connectivity == "Flush End Plate":
+
+            t1 = (DISP_MIN_PLATE_LENGTH, self.supported_section.depth,
+                  self.ep_height_provided,
+                  get_pass_fail(self.supported_section.depth, self.ep_height_provided, relation="leq"))
+            self.report_check.append(t1)
+        else:
+
+            t1 = (DISP_MIN_PLATE_LENGTH, end_plate_ht_req(D=self.supported_section.depth, e=self.end_distance_provided, h_p=self.ep_height_provided),
+                  self.ep_height_provided,
+                  get_pass_fail(self.ep_height_provided, self.ep_height_provided, relation="leq"))
+            self.report_check.append(t1)
+
+        t1 = (DISP_MIN_PLATE_THICK,
+              end_plate_thk_req(M_ep=0, b_eff=0, f_y=self.plate.fy, gamma_m0=self.gamma_m0,
+                                t_p=self.plate_thickness),
+              self.plate_thickness,
+              get_pass_fail(self.plate.thickness, self.plate_thickness, relation="leq"))
+        self.report_check.append(t1)
+        #round(self.call_helper.mp_plate * 1e-6, 2) #todo moment capacity
+
+
+
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])

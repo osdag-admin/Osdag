@@ -27,15 +27,13 @@ import math
 
 class EndPlateSpliceHelper(object):
 
-    def __init__(self, supported_section, load, bolt, ep_type="", bolt_design_status="False", plate_design_status="False",
-                 helper_file_design_status="False"):
+    def __init__(self, supported_section, load, bolt, ep_type="", plate_design_status="False", helper_file_design_status="False"):
         """ helper file to run simulation for bolt design, plate design etc. """
 
         self.supported_section = supported_section
         self.load = load
         self.bolt = bolt
         self.ep_type = ep_type
-        self.bolt_design_status = bolt_design_status
         self.plate_design_status = plate_design_status
         self.helper_file_design_status = helper_file_design_status
         self.bolt_tension_design_status = False

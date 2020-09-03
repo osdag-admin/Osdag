@@ -117,7 +117,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.minimum_load_status_shear = False
         self.minimum_load_status_moment = False
         self.plate_design_status = False
-        self.bolt_design_status = False
         self.helper_file_design_status = False
         self.deep_beam_status = False
         self.design_status = False
@@ -676,14 +675,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"]["Field weld"]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
 
         # initialize design status
-        self.bolt_design_status = False
         self.plate_design_status = False
         self.helper_file_design_status = False
         self.design_status = False
 
         # helper function
         self.call_helper = EndPlateSpliceHelper(supported_section=self.supported_section, load=self.load, bolt=self.bolt, ep_type=self.endplate_type,
-                                                bolt_design_status=False, plate_design_status=False, helper_file_design_status=False)
+                                                plate_design_status=False, helper_file_design_status=False)
 
         self.set_parameters(self)
         self.design_connection(self)
@@ -821,15 +819,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.helper_file_design_status = False  # initialise status to False to activate the loop for first (and subsequent, if required) iteration(s)
 
         for i in self.plate_thickness:
-
             if self.helper_file_design_status is False:
+
                 self.plate_thickness = i  # assigns plate thickness from the list
 
-                self.helper_file_design_status = False  # initialize helper file status as False to activate the bolt design loop
+                # self.helper_file_design_status = False  # initialize helper file status as False to activate the bolt design loop
 
                 # selecting a single dia-grade combination (from the list of a tuple) each time for performing all the checks
                 for j in self.bolt_list:
-
                     if self.helper_file_design_status is False:
 
                         test_list = j  # choose a tuple from the list of bolt dia and grade - (dia, grade)
@@ -1072,14 +1069,21 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                     logger.info(
                                         "The Interaction Ratio (IR) of the critical bolt is {} ".format(self.call_helper.bolt_combined_check_UR))
 
-                        # checker for the bolt design loop
+                                # checker for the bolt design (helper file) loop
+                                if self.call_helper.helper_file_design_status is True:
+                                    self.design_status = True
+                                    break
+                                else:
+                                    self.design_status = False
+
+                        # checker for the bolt selection loop
                         if self.call_helper.helper_file_design_status is True:
                             self.design_status = True
                             break
                         else:
                             self.design_status = False
 
-            # checker for the plate thickness loop
+            # checker for the plate thickness selection loop
             if self.call_helper.helper_file_design_status is True:
                 self.design_status = True
                 break

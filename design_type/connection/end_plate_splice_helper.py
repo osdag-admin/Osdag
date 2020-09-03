@@ -27,15 +27,15 @@ import math
 
 class EndPlateSpliceHelper(object):
 
-    def __init__(self, load, bolt, ep_type="", bolt_design_status="False", plate_design_status="False", overall_design_status="False"):
+    def __init__(self, supported_section, load, bolt, ep_type="", plate_design_status="False", helper_file_design_status="False"):
         """ helper file to run simulation for bolt design, plate design etc. """
 
+        self.supported_section = supported_section
         self.load = load
         self.bolt = bolt
         self.ep_type = ep_type
-        self.bolt_design_status = bolt_design_status
         self.plate_design_status = plate_design_status
-        self.overall_design_status = overall_design_status
+        self.helper_file_design_status = helper_file_design_status
         self.bolt_tension_design_status = False
         self.flange_capacity_status = False
         self.bolt_design_combined_check_status = False
@@ -51,8 +51,8 @@ class EndPlateSpliceHelper(object):
         self.bolt_diameter_provided = 0
         self.bolt_grade_provided = 0.0
         self.beam_D = 0.0
-        self.beam_B = 0.0
-        self.beam_T = 0.0
+        self.beam_bf = 0.0
+        self.beam_tf = 0.0
         self.beam_r1 = 0.0
         self.beam_fy = 0.0
         self.gamma_m0 = 0.0
@@ -84,14 +84,14 @@ class EndPlateSpliceHelper(object):
         self.bolt_capacity = 0.0
         self.bolt_combined_check_UR = 0.0
 
-    def perform_bolt_design(self, endplate_type, beam_properties, safety_factors, bolt_column, bolt_row, bolt_diameter_provided, bolt_grade_provided,
+    def perform_bolt_design(self, endplate_type, supported_section, gamma_m0, bolt_column, bolt_row, bolt_diameter_provided, bolt_grade_provided,
                             load_moment_effective, end_distance_provided, pitch_distance_provided, beta, proof_stress, dp_plate_fy, plate_thickness,
                             dp_plate_fu):
         """ perform bolt design """
 
         self.endplate_type = endplate_type
-        self.beam_properties = beam_properties
-        self.safety_factors = safety_factors
+        self.supported_section = supported_section
+        self.gamma_m0 = gamma_m0
         self.bolt_column = bolt_column
         self.bolt_row = bolt_row
         self.bolt_diameter_provided = bolt_diameter_provided
@@ -105,18 +105,17 @@ class EndPlateSpliceHelper(object):
         self.dp_plate_fu = dp_plate_fu
         self.plate_thickness = plate_thickness
 
-        self.beam_D = self.beam_properties["beam_D"]
-        self.beam_B = self.beam_properties["beam_B"]
-        self.beam_T = self.beam_properties["beam_T"]
-        self.beam_r1 = self.beam_properties["beam_r1"]
-        self.beam_fy = self.beam_properties["beam_fy"]
-
-        self.gamma_m0 = self.safety_factors["gamma_m0"]
+        # beam properties
+        self.beam_D = self.supported_section.depth
+        self.beam_bf = self.supported_section.flange_width
+        self.beam_tf = self.supported_section.flange_thickness
+        self.beam_r1 = self.supported_section.root_radius
+        self.beam_fy = float(self.supported_section.fy)
 
         # start of checks
 
         # Check 1: Capacity of the flange under compression [A_g*f_y / gamma_m0]
-        self.flange_capacity = round(((self.beam_B * self.beam_T * self.beam_fy) / self.gamma_m0) * 1e-3, 2)  # kN
+        self.flange_capacity = round(((self.beam_bf * self.beam_tf * self.beam_fy) / self.gamma_m0) * 1e-3, 2)  # kN
 
         # Check 2: Find lever arm of each bolt under tension
         # Assumption: NA passes through the centre of the bottom/compression flange
@@ -129,14 +128,14 @@ class EndPlateSpliceHelper(object):
             for a in row_list:
                 if (a % 2) != 0:  # odd row
                     if a == 1:
-                        r_1 = self.beam_D - (self.beam_T / 2) - self.beam_T - self.end_distance_provided  # mm, lever arm of row 1
+                        r_1 = self.beam_D - (self.beam_tf / 2) - self.beam_tf - self.end_distance_provided  # mm, lever arm of row 1
                         self.lever_arm.append(r_1)
                     else:
                         r_a = r_1 - (round_up(((a / 2) - 1), 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 3, 5, 7,...
                         self.lever_arm.append(r_a)
                 else:  # even row
                     if a == 2:
-                        r_2 = (self.beam_T / 2) + self.end_distance_provided  # mm, lever arm of row 2
+                        r_2 = (self.beam_tf / 2) + self.end_distance_provided  # mm, lever arm of row 2
                         self.lever_arm.append(r_2)
                     else:
                         r_a = r_2 + (((a / 2) - 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 4, 6, 8,...
@@ -151,26 +150,26 @@ class EndPlateSpliceHelper(object):
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
                 # top flange
-                r_1 = self.beam_D - self.beam_T
+                r_1 = self.beam_D - self.beam_tf
                 self.lever_arm.append(r_1)
                 r_2 = r_1
                 self.lever_arm.append(r_2)
 
                 # compression flange
-                r_3 = (self.beam_T / 2) + self.end_distance_provided
+                r_3 = (self.beam_tf / 2) + self.end_distance_provided
                 self.lever_arm.append(r_3)
 
             elif self.bolt_row == 4:  # 4 bolt rows model (3 rows at tension flange and 1 at compression flange)
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
                 # top flange
-                r_1 = self.beam_D - self.beam_T
+                r_1 = self.beam_D - self.beam_tf
                 self.lever_arm.append(r_1)
                 r_2 = r_1
                 self.lever_arm.append(r_2)
 
                 # compression flange
-                r_3 = (self.beam_T / 2) + self.end_distance_provided
+                r_3 = (self.beam_tf / 2) + self.end_distance_provided
                 self.lever_arm.append(r_3)
 
                 r_4 = r_2 - self.pitch_distance_provided  # top flange
@@ -180,13 +179,13 @@ class EndPlateSpliceHelper(object):
                 # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
                 # top flange
-                r_1 = self.beam_D - self.beam_T
+                r_1 = self.beam_D - self.beam_tf
                 self.lever_arm.append(r_1)
                 r_2 = r_1
                 self.lever_arm.append(r_2)
 
                 # compression flange
-                r_3 = (self.beam_T / 2) + self.end_distance_provided
+                r_3 = (self.beam_tf / 2) + self.end_distance_provided
                 self.lever_arm.append(r_3)
 
                 r_4 = r_1  # top flange
@@ -198,13 +197,13 @@ class EndPlateSpliceHelper(object):
                 # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
                 # top flange
-                r_1 = self.beam_D - self.beam_T
+                r_1 = self.beam_D - self.beam_tf
                 self.lever_arm.append(r_1)
                 r_2 = r_1
                 self.lever_arm.append(r_2)
 
                 # compression flange
-                r_3 = (self.beam_T / 2) + self.end_distance_provided
+                r_3 = (self.beam_tf / 2) + self.end_distance_provided
                 self.lever_arm.append(r_3)
 
                 r_4 = r_1  # top flange
@@ -217,7 +216,7 @@ class EndPlateSpliceHelper(object):
 
                 pitch_counter = 0  # subtracting (pitch_counter times pitch distance) after the first iteration in the below loop to find lever arm
                 for a in row_list:
-                    r_a = r_1 - (self.beam_T / 2) - self.end_distance_provided - ((2 + pitch_counter) * self.pitch_distance_provided)
+                    r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((2 + pitch_counter) * self.pitch_distance_provided)
                     pitch_counter += 1
 
                     self.lever_arm.append(r_a)
@@ -225,17 +224,17 @@ class EndPlateSpliceHelper(object):
         elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
             row_list = np.arange(1, self.bolt_row + 1, 1).tolist()
 
-            r_1 = self.beam_D - self.beam_T
+            r_1 = self.beam_D - self.beam_tf
             self.lever_arm.append(r_1)
             r_2 = r_1
             self.lever_arm.append(r_2)
             r_3 = 0
             self.lever_arm.append(r_3)
-            r_4 = (self.beam_T / self.end_distance_provided) + self.end_distance_provided
+            r_4 = (self.beam_tf / self.end_distance_provided) + self.end_distance_provided
             self.lever_arm.append(r_4)
 
             if len(row_list) > 4:  # if number of rows are more than 4
-                r_5 = r_1 - (self.beam_T / 2) - self.end_distance_provided - self.pitch_distance_provided
+                r_5 = r_1 - (self.beam_tf / 2) - self.end_distance_provided - self.pitch_distance_provided
                 self.lever_arm.append(r_5)
                 r_6 = r_4 + self.pitch_distance_provided
                 self.lever_arm.append(r_6)
@@ -249,7 +248,7 @@ class EndPlateSpliceHelper(object):
             if len(row_list) >= 10:  # if number of rows are more or equal than 10
                 r_9 = r_8 + self.pitch_distance_provided
                 self.lever_arm.append(r_9)
-                r_10 = r_1 - (self.beam_T / 2) - self.end_distance_provided - (2 * self.pitch_distance_provided)
+                r_10 = r_1 - (self.beam_tf / 2) - self.end_distance_provided - (2 * self.pitch_distance_provided)
                 self.lever_arm.append(r_10)
 
             if len(row_list) >= 12:  # if number of rows are more or equal than 12
@@ -375,7 +374,7 @@ class EndPlateSpliceHelper(object):
 
                     pitch_counter = 0  # subtracting (pitch_counter times pitch distance) to find lever arm
                     for a in row_list:
-                        r_a = r_1 - (self.beam_T / 2) - self.end_distance_provided - ((3 + pitch_counter) * self.pitch_distance_provided)
+                        r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((3 + pitch_counter) * self.pitch_distance_provided)
                         pitch_counter += 1
 
                         self.lever_arm.append(r_a)
@@ -500,13 +499,11 @@ class EndPlateSpliceHelper(object):
         # Check 5: Reaction at bottom flange
         if self.r_c > self.flange_capacity:
             self.flange_capacity_status = False
-            self.overall_design_status = False
         else:
             self.flange_capacity_status = True
-            self.overall_design_status = True
 
         # Check 6: Prying force check in the critical bolt
-        self.b_e = self.beam_B / self.bolt_column
+        self.b_e = self.beam_bf / self.bolt_column
         self.lv = self.end_distance_provided - (self.beam_r1 / 2)
         self.le_1 = self.end_distance_provided
         self.le_2 = (1.1 * self.plate_thickness) * math.sqrt((self.beta * self.proof_stress) / self.dp_plate_fy)
@@ -532,10 +529,8 @@ class EndPlateSpliceHelper(object):
 
         if self.plate_thickness < self.plate_thickness_req:
             self.plate_design_status = False
-            self.overall_design_status = False
         else:
             self.plate_design_status = True
-            self.overall_design_status = True
 
         # Check 8: Tension capacity of bolt
         self.bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)
@@ -546,10 +541,8 @@ class EndPlateSpliceHelper(object):
 
         if self.bolt_tension_demand > self.bolt_tension_capacity:
             self.bolt_tension_design_status = False
-            self.overall_design_status = False
         else:
             self.bolt_tension_design_status = True
-            self.overall_design_status = True
 
         # Check 9: combined shear + tension check of bolts
         self.bolt_numbers_provided = self.bolt_column * self.bolt_row
@@ -578,14 +571,14 @@ class EndPlateSpliceHelper(object):
 
         if self.bolt_combined_check_UR > 1.0:
             self.bolt_design_combined_check_status = False
-            self.overall_design_status = False
         else:
             self.bolt_design_combined_check_status = True
-            self.overall_design_status = True
 
-        # overall status
-        # if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status \
-        #         and self.plate_design_status and self.flange_capacity_status is True:
-        #     self.overall_design_status = True
-        # else:
-        #     self.overall_design_status = False
+        # overall status of the helper file
+        status = [self.flange_capacity_status, self.plate_design_status, self.bolt_tension_design_status, self.bolt_design_combined_check_status]
+        for check in status:
+            if check is False:
+                self.helper_file_design_status = False
+                break
+            else:
+                self.helper_file_design_status = True

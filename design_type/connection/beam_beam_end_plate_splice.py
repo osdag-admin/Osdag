@@ -967,13 +967,90 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                 self.bolt_column = select_list[0]
                                 self.bolt_row = select_list[1]
 
-                                # run the bolt check function from the helper class
+                                # run the bolt and end plate check function from the helper class
                                 self.design_bolt = self.call_helper.perform_bolt_design(self.endplate_type, self.supported_section, self.gamma_m0,
                                                                                         self.bolt_column, self.bolt_row, self.bolt_diameter_provided,
                                                                                         self.bolt_grade_provided, self.load_moment_effective,
                                                                                         self.end_distance_provided, self.pitch_distance_provided,
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
                                                                                         self.plate_thickness, self.dp_plate_fu)
+
+                                # TODO: check the round down value in the below loops
+                                # checking for the maximum pitch distance of the bolts for a safe design
+                                # if space is available then add rows
+                                if self.call_helper.helper_file_design_status is True:
+                                    # max pitch
+                                    self.pitch_distance_max = self.cl_10_2_3_1_max_spacing([self.plate_thickness])
+
+                                    # flushed or both way
+                                    if self.endplate_type is VALUES_ENDPLATE_TYPE[0] or VALUES_ENDPLATE_TYPE[2]:
+
+                                        # checking space availability
+                                        if self.endplate_type is VALUES_ENDPLATE_TYPE[0]:
+                                            space_available_web = self.beam_D - (2 * self.end_distance_provided) - ((self.bolt_row - 2) *
+                                                                                                                self.pitch_distance_provided)
+                                        else:
+                                            if (self.bolt_row / 2) <= 3:
+                                                rows_inside_D = self.bolt_row - 2  # one row each outside top and bottom flange
+                                            else:
+                                                rows_inside_D = self.bolt_row - 4  # two rows each outside top and bottom flange
+
+                                            space_available_web = self.beam_D - (2 * self.end_distance_provided) - ((rows_inside_D - 2) *
+                                                                                                                    self.pitch_distance_provided)
+
+                                        # adding rows
+                                        if space_available_web > self.pitch_distance_max:
+                                            # provide the first bolt row at the centre of the beam (NA)
+                                            self.bolt_row_web = 1
+
+                                            if (space_available_web / 2) > self.pitch_distance_max:
+                                                self.bolt_row_web += 2 * round_down((space_available_web / 2) / self.pitch_distance_max, 1)
+                                        else:
+                                            self.bolt_row_web = 0
+
+                                    # one way connection
+                                    # checking space availability
+                                    elif self.endplate_type is VALUES_ENDPLATE_TYPE[1]:
+                                        if self.bolt_row is 3:
+                                            rows_inside_D = 2
+                                        elif self.bolt_row is 4:
+                                            rows_inside_D = 3
+                                        else:
+                                            rows_inside_D = self.bolt_row - 2
+
+                                        space_available_web = self.beam_D - (2 * self.end_distance_provided) - ((rows_inside_D - 2) *
+                                                                                                                self.pitch_distance_provided)
+                                        space_available_below_na = (self.beam_D / 2) - self.beam_tf - self.end_distance_provided
+
+                                        # adding rows
+                                        if space_available_web >= space_available_below_na:
+                                            # last row of tension bolts is above NA of the beam
+                                            space_available_above_na = space_available_web - space_available_below_na
+                                            if (space_available_above_na + space_available_below_na) >= self.pitch_distance_max:
+                                                self.bolt_row_web = 1  # first row at NA
+
+                                            # rows below NA
+                                            if space_available_below_na > self.pitch_distance_max:
+                                                self.bolt_row_web += round_down(space_available_below_na / self.pitch_distance_max, 1)
+                                            else:
+                                                self.bolt_row_web += 0
+
+                                            # rows above NA
+                                            if space_available_above_na > self.pitch_distance_max:
+                                                self.bolt_row_web += round_down(space_available_above_na / self.pitch_distance_max, 1)
+                                            else:
+                                                self.bolt_row_web += 0
+
+                                        else:  # space is available only below the NA
+                                            if space_available_below_na > self.pitch_distance_max:
+                                                self.bolt_row_web = round_down(space_available_below_na / self.pitch_distance_max, 1)
+                                            else:
+                                                self.bolt_row_web = 0
+
+                                    # final number of rows
+                                    self.bolt_row += self.bolt_row_web
+                                else:
+                                    self.design_status = False
 
                                 # calling bolt design results
 

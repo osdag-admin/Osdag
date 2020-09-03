@@ -1076,19 +1076,19 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                 else:
                                     self.design_status = False
 
-                        # checker for the bolt selection loop
+                        # checker for the bolt dia-grade selection loop
                         if self.call_helper.helper_file_design_status is True:
                             self.design_status = True
                             break
                         else:
                             self.design_status = False
 
-            # checker for the plate thickness selection loop
-            if self.call_helper.helper_file_design_status is True:
-                self.design_status = True
-                break
-            else:
-                self.design_status = False
+                # checker for the plate thickness selection loop
+                if self.call_helper.helper_file_design_status is True:
+                    self.design_status = True
+                    break
+                else:
+                    self.design_status = False
 
     def design_stiffener(self):
         """ design stiffener for the connection """

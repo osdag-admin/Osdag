@@ -27,7 +27,7 @@ import math
 
 class EndPlateSpliceHelper(object):
 
-    def __init__(self, load, bolt, ep_type="", bolt_design_status="False", plate_design_status="False", overall_design_status="False"):
+    def __init__(self, load, bolt, ep_type="", bolt_design_status="False", plate_design_status="False", helper_file_design_status="False"):
         """ helper file to run simulation for bolt design, plate design etc. """
 
         self.load = load
@@ -35,7 +35,7 @@ class EndPlateSpliceHelper(object):
         self.ep_type = ep_type
         self.bolt_design_status = bolt_design_status
         self.plate_design_status = plate_design_status
-        self.overall_design_status = overall_design_status
+        self.helper_file_design_status = helper_file_design_status
         self.bolt_tension_design_status = False
         self.flange_capacity_status = False
         self.bolt_design_combined_check_status = False
@@ -500,10 +500,8 @@ class EndPlateSpliceHelper(object):
         # Check 5: Reaction at bottom flange
         if self.r_c > self.flange_capacity:
             self.flange_capacity_status = False
-            self.overall_design_status = False
         else:
             self.flange_capacity_status = True
-            self.overall_design_status = True
 
         # Check 6: Prying force check in the critical bolt
         self.b_e = self.beam_B / self.bolt_column
@@ -532,10 +530,8 @@ class EndPlateSpliceHelper(object):
 
         if self.plate_thickness < self.plate_thickness_req:
             self.plate_design_status = False
-            self.overall_design_status = False
         else:
             self.plate_design_status = True
-            self.overall_design_status = True
 
         # Check 8: Tension capacity of bolt
         self.bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)
@@ -546,10 +542,8 @@ class EndPlateSpliceHelper(object):
 
         if self.bolt_tension_demand > self.bolt_tension_capacity:
             self.bolt_tension_design_status = False
-            self.overall_design_status = False
         else:
             self.bolt_tension_design_status = True
-            self.overall_design_status = True
 
         # Check 9: combined shear + tension check of bolts
         self.bolt_numbers_provided = self.bolt_column * self.bolt_row
@@ -578,14 +572,15 @@ class EndPlateSpliceHelper(object):
 
         if self.bolt_combined_check_UR > 1.0:
             self.bolt_design_combined_check_status = False
-            self.overall_design_status = False
         else:
             self.bolt_design_combined_check_status = True
-            self.overall_design_status = True
 
-        # overall status
-        # if self.bolt_design_status and self.bolt_design_combined_check_status and self.bolt_tension_design_status \
-        #         and self.plate_design_status and self.flange_capacity_status is True:
-        #     self.overall_design_status = True
-        # else:
-        #     self.overall_design_status = False
+        # overall status of the helper file
+        status = [self.flange_capacity_status, self.bolt_design_status, self.plate_design_status, self.bolt_tension_design_status,
+                  self.bolt_design_combined_check_status]
+        for check in status:
+            if check is False:
+                self.helper_file_design_status = False
+                break
+            else:
+                self.helper_file_design_status = True

@@ -62,6 +62,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.bolt_type = ""
         self.plate_thickness = []
 
+        self.beam_shear_capa = 0.0
         self.beam_plastic_mom_capa_zz = 0.0
         self.tension_due_to_moment = 0.0
         self.tension_due_to_axial_force = 0.0
@@ -113,10 +114,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.dp_plate_fy = 0.0
         self.dp_plate_fu = 0.0
 
+        self.minimum_load_status_shear = False
         self.minimum_load_status_moment = False
         self.plate_design_status = False
         self.bolt_design_status = False
-        self.overall_design_status = False
+        self.helper_file_design_status = False
         self.deep_beam_status = False
         self.design_status = False
 
@@ -694,11 +696,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # initialize design status
         self.bolt_design_status = False
         self.plate_design_status = False
-        self.overall_design_status = False
+        self.helper_file_design_status = False
+        self.design_status = False
 
         # helper function
         self.call_helper = EndPlateSpliceHelper(load=self.load, bolt=self.bolt, ep_type=self.endplate_type, bolt_design_status=False,
-                                                plate_design_status=False, overall_design_status=False)
+                                                plate_design_status=False, helper_file_design_status=False)
 
         self.set_parameters(self)
         self.design_connection(self)
@@ -728,6 +731,22 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.load_axial = round(max(self.load.axial_force, 1) * 1e-3, 2)  # kN
 
         # set minimum load (Cl. 10.7, IS 800:2007)
+
+        # minimum shear load
+        # Note: Shear force is transferred to the column through the web, hence Cl.10.7 point 2 is considered for minimum shear load
+        self.beam_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.dp_beam_fy) / self.gamma_m0
+        self.beam_shear_capa = round(self.beam_shear_capa * 1e-3, 2)  # kN
+
+        if self.load_shear < min((0.15 * self.beam_shear_capa), 40):
+            self.minimum_load_status_shear = True
+            self.load_shear = min((0.15 * self.beam_shear_capa), 40)
+            logger.warning("[Minimum Factored Load] The external factored shear force ({} kN) is less than the minimum recommended design action on "
+                           "the member".format(self.load_shear))
+            logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam) or 40 kN whichever is "
+                        "less [Ref. Cl. 10.7, IS 800:2007]".format(0.15 * self.beam_shear_capa))
+            logger.info("Designing the connection for a factored shear load of {} kN-m".format(self.load_shear))
+
+        # minimum moment (major axis)
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
         self.beam_plastic_mom_capa_zz = round(((1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0) * 1e-6, 2)  # kN-m
 
@@ -751,6 +770,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             logger.warning("The maximum capacity of the connection is {} kN-m".format(self.beam_plastic_mom_capa_zz))
             logger.info("Define the value of factored bending moment as {} kN-m or less".format(self.beam_plastic_mom_capa_zz))
         else:
+            self.design_status = True
             self.minimum_load_status_moment = False
             self.load_moment = self.load.moment  # kN-m
 
@@ -806,17 +826,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
         logger.info("If you wish to optimise the bolt diameter-grade combination, pass a higher value of plate thickness using the Input Dock")
 
         # loop starts
-        self.overall_design_status = False  # initialise status to False to activate the loop for first (and subsequent, if required) iteration(s)
+        self.helper_file_design_status = False  # initialise status to False to activate the loop for first (and subsequent, if required) iteration(s)
 
         for i in self.plate_thickness:
 
-            if not self.overall_design_status:
+            if not self.helper_file_design_status:
                 self.plate_thickness = i  # assigns plate thickness from the list
 
                 # selecting a single dia-grade combination (from the list of a tuple) each time for performing all the checks
                 for j in self.bolt_list:
 
-                    if not self.overall_design_status:
+                    if not self.helper_file_design_status:
 
                         test_list = j  # choose a tuple from the list of bolt dia and grade - (dia, grade)
                         self.bolt_diameter_provided = test_list[0]  # select trial diameter
@@ -950,7 +970,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         # selecting each possible combination of column and row iteratively to perform design checks
                         # starting from minimum column and row to maximum until overall bolt design status is True
                         for item in combined_list:
-                            if not self.overall_design_status:
+                            if not self.helper_file_design_status:
                                 select_list = item  # selected tuple from the list
 
                                 self.bolt_column = select_list[0]
@@ -963,11 +983,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                         self.end_distance_provided, self.pitch_distance_provided,
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
                                                                                         self.plate_thickness, self.dp_plate_fu)
-
-                        if self.call_helper.overall_design_status is True:
-                            self.design_status = True
-                        else:
-                            self.design_status = False
 
                         # calling bolt design results
 
@@ -1052,6 +1067,18 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                          format(self.bolt_diameter_provided, self.bolt_grade_provided))
                             logger.info("The Interaction Ratio (IR) of the critical bolt is {} ".format(self.call_helper.bolt_combined_check_UR))
 
+            #         if self.call_helper.helper_file_design_status is True:
+            #             self.design_status = True
+            #             break
+            #         else:
+            #             self.design_status = False
+            #
+            # if self.call_helper.helper_file_design_status is True:
+            #     self.design_status = True
+            #     break
+            # else:
+            #     self.design_status = False
+
     def design_stiffener(self):
         """ design stiffener for the connection """
 
@@ -1095,11 +1122,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # end of calculation
         if self.design_status:
-            logger.info(": Overall beam to beam end plate splice connection design is safe")
-            logger.info(": =========End Of design===========")
+            logger.info(": =========================Design Status===========================")
+            logger.info(": Overall beam to beam end plate splice connection design is SAFE")
+            logger.info(": =========================End Of design===========================")
         else:
-            logger.info(": Overall beam to beam end plate splice connection design is unsafe")
-            logger.info(": =========End Of design===========")
+            logger.info(": =========================Design Status===========================")
+            logger.info(": Overall beam to beam end plate splice connection design is UNSAFE")
+            logger.info(": =========================End Of design===========================")
 
     # create design report
     def save_design(self, popup_summary):

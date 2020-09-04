@@ -59,7 +59,7 @@ class CADFillet(object):
         self.plateRModel = None
 
 
-        if self.module.connectivity == "Flush":
+        if self.module.endplate_type == 'Flushed - Reversible Moment':
             self.loc = float(outputobj['Stiffener']['Location'])
 
         else:
@@ -281,7 +281,7 @@ class CADFillet(object):
         :return: Geometric Orientation of this component
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])    #TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -299,7 +299,7 @@ class CADFillet(object):
         :return: Geometric Orientation of this component
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             gap = 1.5 * self.plateRight.T + self.beamLeft.length
             plateOriginR = numpy.array([-self.plateRight.W/2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -746,16 +746,16 @@ class CADFillet(object):
         :return: CAD model of extended end plate and stiffeners
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
                     self.beam_stiffener_3Model]
 
-        elif self.module.connectivity == "Extended both ways":
+        elif self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
             connector_plate = [self.plateLModel, self.plateRModel,  self.beam_stiffener_1Model,
                     self.beam_stiffener_2Model, self.beam_stiffener_3Model,
                     self.beam_stiffener_4Model]
 
-        elif self.module.connectivity == "Flush":
+        elif self.module.endplate_type == 'Flushed - Reversible Moment':
             connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model,
                     self.beam_stiffener_F3Model,self.beam_stiffener_F4Model]
 
@@ -771,7 +771,7 @@ class CADFillet(object):
         :return: CAD model for all the fillet welds
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             welded_sec = [self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
                     self.bbWeldAbvFlang_21Model,
                     self.bbWeldAbvFlang_22Model,
@@ -785,7 +785,7 @@ class CADFillet(object):
                     self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
                     self.bbWeldStiffLR_3Model]
 
-        elif self.module.connectivity == "Extended both ways":
+        elif self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
             welded_sec = [self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
                     self.bbWeldAbvFlang_21Model,
                     self.bbWeldAbvFlang_22Model,
@@ -801,7 +801,7 @@ class CADFillet(object):
                     self.bbWeldStiffLR_3Model, self.bbWeldStiffHR_2Model, self.bbWeldStiffLR_2Model,
                     self.bbWeldStiffHR_4Model, self.bbWeldStiffLR_4Model]
 
-        elif self.module.connectivity == "Flush":
+        elif self.module.endplate_type == 'Flushed - Reversible Moment':
             welded_sec = [self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
                     self.bbWeldAbvFlang_21Model,
                     self.bbWeldAbvFlang_22Model,
@@ -921,7 +921,7 @@ class CADGroove(object):
         # self.alist = alist
         # self.outputobj = outputobj
         self.boltProjection = 10
-        # if self.module.connectivity == "Flush":
+        # if self.module.endplate_type == 'Flushed - Reversible Moment':
         #     self.loc = float(self.module.stiffener.location)
         #
         # else:
@@ -1100,7 +1100,7 @@ class CADGroove(object):
         :return: Geometric Orientation of this component
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T + self.bbWeldWeb_L3.b,
                                         (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])  # TODO: self.boltProjection
@@ -1119,7 +1119,7 @@ class CADGroove(object):
         :return: Geometric Orientation of this component
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             gap = 1.5 * self.plateRight.T + self.beamLeft.length + self.bbWeldWeb_L3.b
             plateOriginR = numpy.array(
                 [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
@@ -1508,18 +1508,18 @@ class CADGroove(object):
         :return: CAD model of extended end plate and stiffeners
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
             #         self.beam_stiffener_3Model]
             connector_plate = [self.plateLModel, self.plateRModel]
 
-        elif self.module.connectivity == "Extended both ways":
+        elif self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
             # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
             #         self.beam_stiffener_2Model, self.beam_stiffener_3Model,
             #         self.beam_stiffener_4Model]
             connector_plate = [self.plateLModel, self.plateRModel]
 
-        elif self.module.connectivity == "Flush":
+        elif self.module.endplate_type == 'Flushed - Reversible Moment':
             # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model,
             #         self.beam_stiffener_F3Model,
             #         self.beam_stiffener_F4Model]
@@ -1537,7 +1537,7 @@ class CADGroove(object):
         :return: CAD model for all the fillet welds
         """
 
-        if self.module.connectivity == "Extended one way":
+        if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             # welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
             #         self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
             #         self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
@@ -1550,12 +1550,12 @@ class CADGroove(object):
                           self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
                           self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
-        elif self.module.connectivity == "Extended both ways":
+        elif self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
             welded_sec = [ self.bbWeldFlang_R1Model,
                     self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
                     self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
-        elif self.module.connectivity == "Flush":
+        elif self.module.endplate_type == 'Flushed - Reversible Moment':
             welded_sec = [self.bbWeldFlang_R1Model,
                     self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
                     self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]

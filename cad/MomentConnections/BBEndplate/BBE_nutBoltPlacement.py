@@ -67,23 +67,23 @@ class BBENutBoltArray(object):
         '''
         # self.Lv = boltPlaceObj["Bolt"]["Lv"]
         self.Lv = boltPlaceObj.plate.edge_dist_provided
-        self.endDist = boltPlaceObj.plate.end_dist_provided
-        self.edgeDist = boltPlaceObj.plate.edge_dist_provided
-        self.pitch = boltPlaceObj.plate.pitch_provided
-        self.gauge = boltPlaceObj.plate.gauge_provided
-        self.mid_bolt_row = boltPlaceObj.mid_bolt_row
+        self.endDist = boltPlaceObj.end_distance_provided
+        self.edgeDist = boltPlaceObj.edge_distance_provided
+        self.pitch = boltPlaceObj.pitch_distance_provided
+        self.gauge = boltPlaceObj.gauge_distance_provided
+        self.mid_bolt_row = boltPlaceObj.bolt_row_web
         print(self.mid_bolt_row,"ppppp")
-        print(self.boltProjection, "ppppp")
+        # print(self.boltProjection, "ppppp")
         self.row = boltPlaceObj.bolt_row
         self.col = boltPlaceObj.bolt_column
-        self.crossCgauge =  2 * float(self.edgeDist) + boltPlaceObj.supported_section.web_thickness/2
-
+        # self.crossCgauge =  2 * float(self.edgeDist) + boltPlaceObj.beam_tw/2
+        self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         # self.out_pitch = boltPlaceObj.outside_pitch
         # self.out_bolt = boltPlaceObj.out_bolt
 
         # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
-        self.endDist_flush = self.boltProjection + boltPlaceObj.supported_section.flange_thickness + self.endDist
-        self.endDist_ext = boltPlaceObj.supported_section.flange_thickness + 2 * self.endDist
+        self.endDist_flush = self.boltProjection + boltPlaceObj.beam_tf + self.endDist
+        self.endDist_ext = boltPlaceObj.beam_tf + 2 * self.endDist
 
     def calculatePositions(self, numberOfBolts):
         '''
@@ -93,14 +93,14 @@ class BBENutBoltArray(object):
         '''
         self.positions = []
 
-        if self.module.connectivity == "Extended both ways":
+        if self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
             # if numberOfBolts == 8:
 
             for rw in np.arange(self.row):
                 for col in np.arange(self.col):
                     pos = self.origin
 
-                    pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+                    pos = pos + (self.module.ep_width_provided / 2) * self.gaugeDir
 
                     if col == 0:
                         pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
@@ -120,13 +120,13 @@ class BBENutBoltArray(object):
                         if rw == 1:
                             pos = pos + (self.endDist_ext) * self.pitchDir
                         elif rw == 2:
-                            pos = pos + (self.module.plate.height - 2*self.endDist  - self.endDist_ext) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2*self.endDist  - self.endDist_ext) * self.pitchDir
                         elif rw == 3:
-                            pos = pos + (self.module.plate.height - 2*self.endDist ) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2*self.endDist ) * self.pitchDir
                         elif rw == 4:
                             pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
                         elif rw>4:
-                            pos = pos + (self.module.plate.height - 2*self.endDist  - self.endDist_ext) * self.pitchDir - self.pitch * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2*self.endDist  - self.endDist_ext) * self.pitchDir - self.pitch * self.pitchDir
                         else:
                             pass
                     else:
@@ -134,21 +134,21 @@ class BBENutBoltArray(object):
                         if rw == 1:
                             pos = pos + (self.endDist_ext) * self.pitchDir
                         elif rw == 2:
-                            pos = pos + (self.module.plate.height - 2 * self.endDist - self.endDist_ext -2* self.pitch) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2 * self.endDist - self.endDist_ext -2* self.pitch) * self.pitchDir
                         elif rw == 3:
-                            pos = pos + (self.module.plate.height - 2 * self.endDist-2* self.pitch) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2 * self.endDist-2* self.pitch) * self.pitchDir
                         elif rw == 4:
                             pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
                         elif rw == 5:
-                            pos = pos + (self.module.plate.height - 2 * self.endDist-2* self.pitch - self.endDist_ext) * self.pitchDir - self.pitch * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2 * self.endDist-2* self.pitch - self.endDist_ext) * self.pitchDir - self.pitch * self.pitchDir
                         elif rw == 6:
                             pos = pos - self.pitch * self.pitchDir
                         elif rw == 7:
-                            pos = pos + (self.module.plate.height - 2 * self.endDist - self.pitch) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2 * self.endDist - self.pitch) * self.pitchDir
                         elif rw >7 and rw%2==0:
                             pos = pos + (self.endDist_ext)*self.pitchDir + (rw/2-2)* self.pitch*self.pitchDir
                         elif rw > 7 and rw % 2 != 0:
-                            pos = pos + (self.module.plate.height - 2 * self.endDist - self.endDist_ext - 2 * self.pitch) * self.pitchDir - (rw/2-2.5)* self.pitch*self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2 * self.endDist - self.endDist_ext - 2 * self.pitch) * self.pitchDir - (rw/2-2.5)* self.pitch*self.pitchDir
                         else:
                             pass
                     self.positions.append(pos)
@@ -158,7 +158,7 @@ class BBENutBoltArray(object):
                     for col in np.arange(self.col):
                         pos = self.origin
 
-                        pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+                        pos = pos + (self.module.ep_width_provided / 2) * self.gaugeDir
 
                         if col == 0:
                             pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
@@ -174,29 +174,29 @@ class BBENutBoltArray(object):
 
                         if self.mid_bolt_row % 2 != 0:
                             if rw == 0:
-                                pos = pos + self.module.plate.height / 2 * self.pitchDir - int(
+                                pos = pos + self.module.ep_height_provided / 2 * self.pitchDir - int(
                                     self.mid_bolt_row / 2) * self.pitch * self.pitchDir
                             else:
-                                pos = pos + self.module.plate.height / 2 * self.pitchDir - int(
+                                pos = pos + self.module.ep_height_provided / 2 * self.pitchDir - int(
                                     self.mid_bolt_row / 2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
                         else:
                             if rw == 0:
-                                pos = pos + self.module.plate.height / 2 * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                pos = pos + self.module.ep_height_provided / 2 * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
                                             self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir
                             else:
-                                pos = pos + self.module.plate.height / 2 * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                pos = pos + self.module.ep_height_provided / 2 * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
                                             self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir + (
                                           rw) * self.pitch * self.pitchDir
                         self.positions.append(pos)
 
 
-        elif self.module.connectivity == "Extended one way":
+        elif self.module.endplate_type =='Extended One Way - Irreversible Moment':
 
             for rw in np.arange(self.row):
                 for col in np.arange(self.col):
                     pos = self.origin
 
-                    pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+                    pos = pos + (self.module.ep_width_provided / 2) * self.gaugeDir
 
                     if col == 0:
                         pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
@@ -215,7 +215,7 @@ class BBENutBoltArray(object):
                             if rw == 1:
                                 pos = pos + (self.endDist_ext ) * self.pitchDir
                             elif rw == 2:
-                                pos = pos + (self.module.plate.height-self.endDist_flush-self.endDist) * self.pitchDir
+                                pos = pos + (self.module.ep_height_provided-self.endDist_flush-self.endDist) * self.pitchDir
                             else:
                                 pos = pos + (self.endDist_ext ) * self.pitchDir + self.pitch * self.pitchDir
 
@@ -223,7 +223,7 @@ class BBENutBoltArray(object):
                             if rw == 1:
                                 pos = pos + (self.pitch) * self.pitchDir
                             elif rw == (self.row -1):
-                                pos = pos + (self.module.plate.height-self.endDist_flush-self.endDist) * self.pitchDir
+                                pos = pos + (self.module.ep_height_provided-self.endDist_flush-self.endDist) * self.pitchDir
                             else:
                                 pos = pos + (self.endDist_ext) * self.pitchDir + (rw-1)*self.pitch * self.pitchDir
 
@@ -234,7 +234,7 @@ class BBENutBoltArray(object):
                     for col in np.arange(self.col):
                         pos = self.origin
 
-                        pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+                        pos = pos + (self.module.ep_width_provided / 2) * self.gaugeDir
 
                         if col == 0:
                             pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
@@ -250,17 +250,17 @@ class BBENutBoltArray(object):
 
                         if self.mid_bolt_row % 2 != 0:
                             if rw == 0:
-                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - int(
+                                pos = pos + (self.module.ep_height_provided - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - int(
                                     self.mid_bolt_row / 2) * self.pitch * self.pitchDir
                             else:
-                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - int(
+                                pos = pos + (self.module.ep_height_provided - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - int(
                                     self.mid_bolt_row / 2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
                         else:
                             if rw == 0:
-                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                pos = pos + (self.module.ep_height_provided - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
                                             self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir
                             else:
-                                pos = pos + (self.module.plate.height - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
+                                pos = pos + (self.module.ep_height_provided - self.module.supported_section.depth/2-self.boltProjection) * self.pitchDir - 0.5 * self.pitch * self.pitchDir - (
                                             self.mid_bolt_row / 2 - 1) * self.pitch * self.pitchDir + (
                                           rw) * self.pitch * self.pitchDir
                         self.positions.append(pos)
@@ -270,7 +270,7 @@ class BBENutBoltArray(object):
                 for col in np.arange(self.col):
                     pos = self.origin
 
-                    pos = pos + (self.module.plate.width/2) * self.gaugeDir
+                    pos = pos + (self.module.ep_width_provided/2) * self.gaugeDir
 
                     if col==0:
                         pos = pos - self.crossCgauge/2 * self.gaugeDir - (self.col/2-1) * self.gauge * self.gaugeDir
@@ -284,7 +284,7 @@ class BBENutBoltArray(object):
                         if rw%2==0:
                             pos = pos + ((rw/2) * self.pitch) * self.pitchDir
                         else:
-                            pos = pos + (self.module.plate.height - 2*self.endDist_flush - int(rw/2)*self.pitch) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2*self.endDist_flush - (rw/2-0.5)*self.pitch) * self.pitchDir
                     self.positions.append(pos)
 
             if self.mid_bolt_row>0:
@@ -292,7 +292,7 @@ class BBENutBoltArray(object):
                     for col in np.arange(self.col):
                         pos = self.origin
 
-                        pos = pos + (self.module.plate.width / 2) * self.gaugeDir
+                        pos = pos + (self.module.ep_width_provided / 2) * self.gaugeDir
 
                         if col == 0:
                             pos = pos - self.crossCgauge / 2 * self.gaugeDir - (
@@ -308,14 +308,14 @@ class BBENutBoltArray(object):
 
                         if self.mid_bolt_row%2!=0:
                             if rw == 0:
-                                pos = pos + self.module.plate.height/2 * self.pitchDir - int(self.mid_bolt_row/2) * self.pitch * self.pitchDir
+                                pos = pos + self.module.ep_height_provided/2 * self.pitchDir - int(self.mid_bolt_row/2) * self.pitch * self.pitchDir
                             else:
-                                pos = pos + self.module.plate.height / 2 * self.pitchDir - int(self.mid_bolt_row/2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
+                                pos = pos + self.module.ep_height_provided / 2 * self.pitchDir - int(self.mid_bolt_row/2) * self.pitch * self.pitchDir + rw * self.pitch * self.pitchDir
                         else:
                             if rw == 0:
-                                pos = pos + self.module.plate.height/2 * self.pitchDir- 0.5 * self.pitch * self.pitchDir - (self.mid_bolt_row/2-1) * self.pitch * self.pitchDir
+                                pos = pos + self.module.ep_height_provided/2 * self.pitchDir- 0.5 * self.pitch * self.pitchDir - (self.mid_bolt_row/2-1) * self.pitch * self.pitchDir
                             else:
-                                pos = pos + self.module.plate.height/2* self.pitchDir - 0.5 * self.pitch * self.pitchDir- (self.mid_bolt_row/2-1) * self.pitch * self.pitchDir + (rw) * self.pitch * self.pitchDir
+                                pos = pos + self.module.ep_height_provided/2* self.pitchDir - 0.5 * self.pitch * self.pitchDir- (self.mid_bolt_row/2-1) * self.pitch * self.pitchDir + (rw) * self.pitch * self.pitchDir
                         self.positions.append(pos)
 
 

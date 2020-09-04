@@ -821,7 +821,6 @@ class CommonDesignLogic(object):
         BBE = self.module_class
 
         beam_tw = float(BBE.beam_tw)
-        print(beam_tw,"hghghghh")
         beam_T = float(BBE.beam_tf)
         beam_d = float(BBE.beam_D)
         beam_B = float(BBE.beam_bf)
@@ -926,7 +925,9 @@ class CommonDesignLogic(object):
                                  L=beam_B)  # outputobj["Weld"]["Size"]
         #
         # # Followings welds are welds placed aside of beam web, Qty = 4           # edited length value by Anand Swaroop
-        bbWeldWeb = GrooveWeld(b=BBE.web_weld.size, h=float(beam_tw),
+        bbWeldSideWeb = FilletWeld(b=float(BBE.web_weld.size), h=float(BBE.web_weld.size),
+                                                              L=beam_d - 2 * (beam_T + beam_R1) - (2 * 5))
+        bbWeldWeb = GrooveWeld(b=float(beam_tw), h=float(beam_tw),
                                L=beam_d - 2 * beam_T)  # outputobj["Weld"]["Size"]
 
 

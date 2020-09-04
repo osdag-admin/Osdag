@@ -149,7 +149,7 @@ from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 
-from design_type.connection.beam_end_plate import BeamBeamEndPlateSplice
+from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate

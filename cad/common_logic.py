@@ -818,9 +818,10 @@ class CommonDesignLogic(object):
         :return: creates CAD model
         """
 
-        BBE = self.module_class()
+        BBE = self.module_class
 
         beam_tw = float(BBE.beam_tw)
+        print(beam_tw,"hghghghh")
         beam_T = float(BBE.beam_tf)
         beam_d = float(BBE.beam_D)
         beam_B = float(BBE.beam_bf)
@@ -921,7 +922,7 @@ class CommonDesignLogic(object):
         # # else:  # Groove Weld
         #
         # # Grove Weld for connecting end plate to beam
-        bbWeldFlang = GrooveWeld(b=BBE.flange_weld.size, h=float(beam_T),
+        bbWeldFlang = GrooveWeld(b=float(beam_T), h=float(beam_T),
                                  L=beam_B)  # outputobj["Weld"]["Size"]
         #
         # # Followings welds are welds placed aside of beam web, Qty = 4           # edited length value by Anand Swaroop

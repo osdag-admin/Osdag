@@ -208,7 +208,7 @@ class Window(QMainWindow):
             self.commLogicObj.display = off_display
             current_component = self.commLogicObj.component
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            off_display.set_bg_gradient_color([255,255,255], [255,255,255])
+            off_display.set_bg_gradient_color([255,255,255],[255,255,255])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()
@@ -1863,27 +1863,29 @@ class Window(QMainWindow):
             #                                       KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
             #                                       KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
 
-            ##############trial##############
-            status = True
-            ##############trial##############
+            # ##############trial##############
+            # status = True
+            # ##############trial##############
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
                                                   KEY_DISP_COLUMNCOVERPLATE,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,KEY_DISP_BEAMENDPLATE,KEY_DISP_BCENDPLATE]:
-                print(self.display, self.folder, main.module, main.mainmodule)
-                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                # print(self.display, self.folder, main.module, main.mainmodule)
+                print("common start")
+                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                print("common start")
                 status = main.design_status
-                ##############trial##############
-                status = True
-                ##############trial##############
+                # ##############trial##############
+                # status = True
+                # ##############trial##############
 
                 module_class = self.return_class(main.module)
                 # self.progress_bar.setValue(80)
-
-                # self.commLogicObj.call_3DModel(status, module_class)
-                print("3D started")
+                print("3D start")
+                self.commLogicObj.call_3DModel(status, module_class)
+                print("3D end")
                 self.display_x = 90
                 self.display_y = 90
                 for chkbox in main.get_3d_components(main):

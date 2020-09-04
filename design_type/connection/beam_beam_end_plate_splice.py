@@ -91,10 +91,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.rows_near_web_max = 0
         self.bolt_numbers_tension_flange = 0
         self.bolt_numbers_web = 0
-
+        self.mid_bolt_row =0
         self.bolt_column = 0
         self.bolt_row = 0
-        self.bolt_numbers = self.bolt_column * self.bolt_row
+        self.bolt_numbers = 0
 
         self.ep_width_provided = 0.0
         self.ep_height_provided = 0.0
@@ -145,6 +145,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.f_a = 0.0
         self.q = 0.0
         self.f_e = 0.0
+
+        # self.func_for_validation(self, design_dictionary)
 
     # Set logger
     def set_osdaglogger(key):
@@ -601,6 +603,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # section details
         self.mainmodule = "Moment Connection"
+        self.module = KEY_DISP_BEAMENDPLATE
         self.connectivity = design_dictionary[KEY_CONN]
         self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
         self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
@@ -660,7 +663,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.beam_D = self.supported_section.depth
         self.beam_bf = self.supported_section.flange_width
         self.beam_tf = self.supported_section.flange_thickness
-        # self.beam_tw = self.supported_section.web_thickness
+        self.beam_tw = self.supported_section.web_thickness
         self.beam_r1 = self.supported_section.root_radius
         self.beam_r2 = self.supported_section.toe_radius
         self.beam_zp_zz = self.supported_section.plast_sec_mod_z
@@ -699,34 +702,36 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # helper function
         self.call_helper = EndPlateSpliceHelper(load=self.load, bolt=self.bolt, ep_type=self.endplate_type, bolt_design_status=False,
                                                 plate_design_status=False, overall_design_status=False)
-
-        # self.set_parameters(self)
-        # self.design_connection(self)
-        # self.design_stiffener(self)
-        # self.design_weld(self)
-        self.hard_inputs(self)
-
-    def hard_inputs(self):
-        ################################Flush###################################
-
-        self.bolt_diameter_provided = 16
-        self.bolt_grade_provided = 8.8
-        self.plate.bolts_required = 48
-        self.bolt_column = 4
-        self.bolt_row = 8
         self.mid_bolt_row = 4
-        self.plate.edge_dist_provided = 35
-        self.plate.end_dist_provided = 35
-        # self.out_bolt = 0
-        # self.outside_pitch = 0
-        self.plate.pitch_provided = 40
-        self.plate.gauge_provided = 40
-        self.flange_weld.size = 4.0
-        self.web_weld.size = 4.0
-        self.plate.height = self.supported_section.depth + 25
-        self.plate.width = self.supported_section.flange_width + 25
-        self.plate.thickness_provided = 12.0
+
+        self.set_parameters(self)
+        self.design_connection(self)
+        self.design_stiffener(self)
+        self.design_weld(self)
+        # self.hard_inputs(self)
         self.projection = 12.5
+
+    # def hard_inputs(self):
+    #     ################################Flush###################################
+    #
+    #     self.bolt_diameter_provided = 16
+    #     self.bolt_grade_provided = 8.8
+    #     self.plate.bolts_required = 48
+    #     self.bolt_column = 4
+    #     self.bolt_row = 8
+    #     self.mid_bolt_row = 4
+    #     self.plate.edge_dist_provided = 35
+    #     self.plate.end_dist_provided = 35
+    #     # self.out_bolt = 0
+    #     # self.outside_pitch = 0
+    #     self.plate.pitch_provided = 40
+    #     self.plate.gauge_provided = 40
+    #     # self.flange_weld.size = 4.0
+    #     self.web_weld.size = 4.0
+    #     self.plate.height = self.supported_section.depth + 25
+    #     self.plate.width = self.supported_section.flange_width + 25
+    #     self.plate.thickness_provided = 12.0
+    #     self.projection = 12.5
         ################################Flush###################################
 
         ################################Oneway###################################
@@ -1062,7 +1067,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
 
                         # number of bolts
-                        self.bolt_numbers = self.bolt_column * self.bolt_row
+                        self.bolt_numbers = self.bolt_column * (self.bolt_row + self.mid_bolt_row)
 
                         # End Plate
                         self.ep_moment_capacity = round(self.call_helper.mp_plate * 1e-6, 2)
@@ -1242,3 +1247,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
              }
 
         self.report_check = []
+
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
+
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3D_image)

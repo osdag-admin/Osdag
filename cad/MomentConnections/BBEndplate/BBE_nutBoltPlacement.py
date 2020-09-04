@@ -72,6 +72,8 @@ class BBENutBoltArray(object):
         self.pitch = boltPlaceObj.plate.pitch_provided
         self.gauge = boltPlaceObj.plate.gauge_provided
         self.mid_bolt_row = boltPlaceObj.mid_bolt_row
+        print(self.mid_bolt_row,"ppppp")
+        print(self.boltProjection, "ppppp")
         self.row = boltPlaceObj.bolt_row
         self.col = boltPlaceObj.bolt_column
         self.crossCgauge =  2 * float(self.edgeDist) + boltPlaceObj.supported_section.web_thickness/2
@@ -333,7 +335,7 @@ class BBENutBoltArray(object):
         self.boltDir = boltDir
 
         self.calculatePositions(self.numOfBolts)
-        print(self.positions)
+        print(self.numOfBolts)
         for index, pos in enumerate(self.positions):
             self.bolts[index].place(pos, gaugeDir, boltDir)
             self.nuts[index].place((pos + self.gap * boltDir), gaugeDir,

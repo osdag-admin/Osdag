@@ -47,6 +47,7 @@ class EndPlateSpliceHelper(object):
         self.lever_arm = []
         self.bolt_column = 0
         self.bolt_row = 0
+        self.bolt_row_web = 0
         self.bolt_numbers = 0
         self.bolt_diameter_provided = 0
         self.bolt_grade_provided = 0.0
@@ -59,6 +60,7 @@ class EndPlateSpliceHelper(object):
         self.load_moment_effective = 0.0
         self.end_distance_provided = 0.0
         self.pitch_distance_provided = 0.0
+        self.pitch_distance_web = 0.0
         self.r_c = 0.0
         self.beta = 2
         self.proof_stress = 0.0
@@ -84,9 +86,9 @@ class EndPlateSpliceHelper(object):
         self.bolt_capacity = 0.0
         self.bolt_combined_check_UR = 0.0
 
-    def perform_bolt_design(self, endplate_type, supported_section, gamma_m0, bolt_column, bolt_row, bolt_diameter_provided, bolt_grade_provided,
-                            load_moment_effective, end_distance_provided, pitch_distance_provided, beta, proof_stress, dp_plate_fy, plate_thickness,
-                            dp_plate_fu):
+    def perform_bolt_design(self, endplate_type, supported_section, gamma_m0, bolt_column, bolt_row, bolt_row_web, bolt_diameter_provided,
+                            bolt_grade_provided, load_moment_effective, end_distance_provided, pitch_distance_provided, pitch_distance_web, beta,
+                            proof_stress, dp_plate_fy, plate_thickness, dp_plate_fu):
         """ perform bolt design """
 
         self.endplate_type = endplate_type
@@ -94,11 +96,13 @@ class EndPlateSpliceHelper(object):
         self.gamma_m0 = gamma_m0
         self.bolt_column = bolt_column
         self.bolt_row = bolt_row
+        self.bolt_row_web = bolt_row_web
         self.bolt_diameter_provided = bolt_diameter_provided
         self.bolt_grade_provided = bolt_grade_provided
         self.load_moment_effective = load_moment_effective
         self.end_distance_provided = end_distance_provided
         self.pitch_distance_provided = pitch_distance_provided
+        self.pitch_distance_web = pitch_distance_web
         self.beta = beta
         self.proof_stress = proof_stress
         self.dp_plate_fy = dp_plate_fy
@@ -582,3 +586,4 @@ class EndPlateSpliceHelper(object):
                 break
             else:
                 self.helper_file_design_status = True
+

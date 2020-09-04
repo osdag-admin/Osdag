@@ -819,7 +819,7 @@ class BeamColumnEndPlate(MomentConnection):
             self.minimum_load_status_moment = False
             self.load_moment = self.load.moment  # kN-m
 
-        # Note: Shear force is transferred to the column through the web, hence Cl.10.7 - 2 is considered for minimum shear load
+        # Note: Shear force is transferred to the column through the web, hence Cl.10.7 point 2 is considered for minimum shear load
         self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / self.gamma_m0
         self.supported_section_shear_capa = round(self.supported_section_shear_capa * 1e-3, 2)  # kN
 

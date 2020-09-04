@@ -319,7 +319,7 @@ class CreateLatex(Document):
                     continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
-            doc.generate_pdf(filename, compiler='/home/danish/texlive/2020/bin/x86_64-linux/pdflatex', clean_tex=False)
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:
             pass
 

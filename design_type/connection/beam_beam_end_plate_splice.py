@@ -1066,6 +1066,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                 self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
 
                                 # number of bolts
+                                self.bolt_row = self.call_helper.bolt_row
                                 self.bolt_numbers = self.bolt_column * self.bolt_row
 
                                 # End Plate

@@ -44,7 +44,9 @@ class EndPlateSpliceHelper(object):
         self.beam_properties = {}
         self.safety_factors = {}
         self.tension = []
+        self.tension_web_bolts = []
         self.lever_arm = []
+        self.lever_arm_web_bolts = []
         self.bolt_column = 0
         self.bolt_row = 0
         self.bolt_row_web = 0
@@ -126,24 +128,32 @@ class EndPlateSpliceHelper(object):
         self.lever_arm = []
 
         if self.endplate_type == 'Flushed - Reversible Moment':
-            row_list = np.arange(1, self.bolt_row + 1, 1).tolist()
+            row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
 
             # Note: In this connection all the odd rows will be near top flange and even rows near the bottom flange
             for a in row_list:
-                if (a % 2) != 0:  # odd row
-                    if a == 1:
-                        r_1 = self.beam_D - (self.beam_tf / 2) - self.beam_tf - self.end_distance_provided  # mm, lever arm of row 1
-                        self.lever_arm.append(r_1)
-                    else:
-                        r_a = r_1 - (round_up(((a / 2) - 1), 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 3, 5, 7,...
+                if a <= self.bolt_row:
+                    if (a % 2) != 0:  # odd row
+                        if a == 1:
+                            r_1 = self.beam_D - (self.beam_tf / 2) - self.beam_tf - self.end_distance_provided  # mm, lever arm of row 1
+                            self.lever_arm.append(r_1)
+                        else:
+                            r_a = r_1 - (round_up(((a / 2) - 1), 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 3, 5, 7,...
+                            self.lever_arm.append(r_a)
+                    else:  # even row
+                        if a == 2:
+                            r_2 = (self.beam_tf / 2) + self.end_distance_provided  # mm, lever arm of row 2
+                            self.lever_arm.append(r_2)
+                        else:
+                            r_a = r_2 + (((a / 2) - 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 4, 6, 8,...
+                            self.lever_arm.append(r_a)
+                else:  # for bolts at web
+                    # taking the last row inside flange on the bottom side as reference
+                    row_web_counter = 1
+                    for a in row_list:
+                        r_a = self.lever_arm[-1] + (row_web_counter * self.pitch_distance_web)
                         self.lever_arm.append(r_a)
-                else:  # even row
-                    if a == 2:
-                        r_2 = (self.beam_tf / 2) + self.end_distance_provided  # mm, lever arm of row 2
-                        self.lever_arm.append(r_2)
-                    else:
-                        r_a = r_2 + (((a / 2) - 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 4, 6, 8,...
-                        self.lever_arm.append(r_a)
+                        row_web_counter += 1
 
         elif self.endplate_type == 'Extended One Way - Irreversible Moment':
             # Note: defining bolt models for this connection due to its un-symmetric nature of bolt placement, hence the equation cannot be
@@ -215,8 +225,8 @@ class EndPlateSpliceHelper(object):
                 r_5 = r_1
                 self.lever_arm.append(r_5)
 
-                # remaining new rows
-                row_list = np.arange(5, self.bolt_row + 1, 1).tolist()
+                # remaining new rows, 6th and beyond
+                row_list = np.arange(6, self.bolt_row + 1, 1).tolist()
 
                 pitch_counter = 0  # subtracting (pitch_counter times pitch distance) after the first iteration in the below loop to find lever arm
                 for a in row_list:
@@ -270,6 +280,27 @@ class EndPlateSpliceHelper(object):
 
         # final list with all the lever arm distances calculated
         self.lever_arm = self.lever_arm
+
+        # calculating lever arm for bolts near web (if required)
+        if self.bolt_row_web >= 1:
+
+            # rows provided at the web
+            row_web_list = np.arange(len(self.bolt_row) + 1, (len(self.bolt_row) + len(self.bolt_row_web)) + 1, 1).tolist()
+
+            self.lever_arm_web_bolts = []  # initialize
+
+            row_web_counter = 1
+            for b in row_web_list:
+                if self.endplate_type is 'Extended One Way - Irreversible Moment':
+                    rw_b = r_3 + (row_web_counter * self.pitch_distance_web)  # taking row 3 as a reference to calculate the other lever arm distances
+                else:
+                    rw_b = self.lever_arm[-1] + (row_web_counter * self.pitch_distance_web)  # taking the last row inside flange on the bottom side as reference
+
+                self.lever_arm_web_bolts.append(rw_b)
+                row_web_counter += 1
+
+            # final list of lever arm distances for the bolts at web
+            self.lever_arm_web_bolts = self.lever_arm_web_bolts
 
         # Check 3: Find force on each bolt under tension
         self.tension = []
@@ -370,18 +401,15 @@ class EndPlateSpliceHelper(object):
                 t_5 = self.t_1
                 self.tension.append(t_5)
                 t_6 = 4 * self.t_1 * (r_6 / r_1)
-                self.tension.append(t_5)
+                self.tension.append(t_6)
 
                 # remaining new rows
                 if self.bolt_row > 6:
                     row_list = np.arange(7, self.bolt_row + 1, 1).tolist()
 
-                    pitch_counter = 0  # subtracting (pitch_counter times pitch distance) to find lever arm
                     for a in row_list:
-                        r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((3 + pitch_counter) * self.pitch_distance_provided)
-                        pitch_counter += 1
-
-                        self.lever_arm.append(r_a)
+                        t_a = 4 * self.t_1 * (r_a / r_1)
+                        self.tension.append(t_a)
 
         elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
             if self.bolt_row == 4:
@@ -490,6 +518,33 @@ class EndPlateSpliceHelper(object):
 
         # final list with all the tension values calculated
         self.tension = self.tension
+
+        # calculating tension in bolts near web (if required)
+        if self.bolt_row_web >= 1:
+            b = 0
+            self.tension_web_bolts = []
+
+            if self.endplate_type is 'Extended One Way - Irreversible Moment':
+                for b in row_web_list:
+                    t_b = 4 * self.t_1 * (rw_b / r_1)
+                    self.tension_web_bolts.append(t_b)
+
+            elif self.endplate_type is 'Extended Both Ways - Reversible Moment':
+                for b in row_web_list:
+                    t_b = 4 * self.t_1 * (rw_b / r_1)
+                    self.tension_web_bolts.append(t_b)
+
+            if self.endplate_type is 'Flushed - Reversible Moment':
+                for b in row_web_list:
+                    t_b = self.t_1 * (rw_b / r_1)  # kN
+                    self.tension_web_bolts.append(t_b)
+
+            # final list of lever arm distances for the bolts at web
+            self.tension_web_bolts = self.tension_web_bolts
+
+        # adding the lists of bolt row and tension
+        self.bolt_row += self.bolt_row_web
+        self.tension += self.tension_web_bolts
 
         # Check 4: Total tension
         # r_c = reaction due to tension in all the bolts

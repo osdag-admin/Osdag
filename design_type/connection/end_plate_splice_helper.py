@@ -131,6 +131,7 @@ class EndPlateSpliceHelper(object):
             row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
 
             # Note: In this connection all the odd rows will be near top flange and even rows near the bottom flange
+            a = 0
             for a in row_list:
                 if a <= self.bolt_row:
 
@@ -264,28 +265,32 @@ class EndPlateSpliceHelper(object):
             self.lever_arm.append(r_2)
             r_3 = 0
             self.lever_arm.append(r_3)
-            r_4 = (self.beam_tf / self.end_distance_provided) + self.end_distance_provided
+            r_4 = (self.beam_tf / 2) + self.end_distance_provided
             self.lever_arm.append(r_4)
 
-            if len(row_list) > 4:  # if number of rows are more than 4
+            if self.bolt_row == 6:  # if number of rows are 6
                 r_5 = r_1 - (self.beam_tf / 2) - self.end_distance_provided - self.pitch_distance_provided
                 self.lever_arm.append(r_5)
                 r_6 = r_4 + self.pitch_distance_provided
                 self.lever_arm.append(r_6)
 
-            if len(row_list) >= 8:  # if number of rows are more or equal than 8
+            if self.bolt_row >= 8:  # if number of rows are 8
+                r_5 = r_1
+                self.lever_arm.append(r_5)
+                r_6 = r_1
+                self.lever_arm.append(r_6)
                 r_7 = 0
                 self.lever_arm.append(r_7)
                 r_8 = r_4 + self.pitch_distance_provided
                 self.lever_arm.append(r_8)
 
-            if len(row_list) >= 10:  # if number of rows are more or equal than 10
+            if self.bolt_row >= 10:  # if number of rows are 10
                 r_9 = r_8 + self.pitch_distance_provided
                 self.lever_arm.append(r_9)
                 r_10 = r_1 - (self.beam_tf / 2) - self.end_distance_provided - (2 * self.pitch_distance_provided)
                 self.lever_arm.append(r_10)
 
-            if len(row_list) >= 12:  # if number of rows are more or equal than 12
+            if self.bolt_row >= 12:  # if number of rows are more or equal than 12
                 update_row_list = row_list[10:]
 
                 for a in update_row_list:
@@ -298,7 +303,7 @@ class EndPlateSpliceHelper(object):
                         r_a = self.lever_arm[p] - self.pitch_distance_provided
                         self.lever_arm.append(r_a)
 
-        elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
+        if self.endplate_type == 'Extended Both Ways - Reversible Moment':
             if self.bolt_row_web > 0:
 
                 row_list = np.arange(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
@@ -335,6 +340,7 @@ class EndPlateSpliceHelper(object):
 
                     summation = r_1
                     for p in range(1, len(row_list)):
+                        print(p)
                         summation += self.lever_arm[p] ** 2 / r_1
 
                     self.t_1 = self.load_moment_effective / (self.bolt_column * summation)  # kN, tension in row 1
@@ -342,10 +348,9 @@ class EndPlateSpliceHelper(object):
 
                 else:  # all the rows following after the first row
                     t_a = self.t_1 * (self.lever_arm[a - 1] / r_1)  # kN, tension in the remaining rows (both odd and even after 1)
-                    # t_a = self.t_1 * (r_a / r_1)  # kN, tension in the remaining rows (both odd and even after 1)
                     self.tension.append(t_a)
 
-        elif self.endplate_type == 'Extended One Way - Irreversible Moment':
+        if self.endplate_type == 'Extended One Way - Irreversible Moment':
 
             if self.bolt_row == 3:
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
@@ -433,7 +438,7 @@ class EndPlateSpliceHelper(object):
                         self.tension.append(t_a)
 
         # calculate tension in additional rows near web
-        elif self.endplate_type is 'Extended One Way - Irreversible Moment':
+        if self.endplate_type == 'Extended One Way - Irreversible Moment':
             if self.bolt_row_web > 0:
 
                 if self.bolt_row <= 4:
@@ -446,7 +451,7 @@ class EndPlateSpliceHelper(object):
                     t_a = factor * self.t_1 * (r_a / r_1)
                     self.tension.append(t_a)
 
-        elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
+        if self.endplate_type == 'Extended Both Ways - Reversible Moment':
             if self.bolt_row == 4:
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
@@ -552,7 +557,7 @@ class EndPlateSpliceHelper(object):
                         self.tension.append(t_a)
 
         # calculate tension in additional rows near web
-        elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
+        if self.endplate_type == 'Extended Both Ways - Reversible Moment':
             if self.bolt_row_web > 0:
 
                 if self.bolt_row <= 6:
@@ -570,9 +575,10 @@ class EndPlateSpliceHelper(object):
         print("TENSION is {}".format(self.tension))
 
         # adding the lists of bolt row and tension
+        print("ROWS BEFORE ADDING {}".format(self.bolt_row))
         self.bolt_row += self.bolt_row_web
-        print("rows {}".format(self.bolt_row))
-        print("rows {}".format(self.bolt_row_web))
+        print("ROWS AFTER ADDING {}".format(self.bolt_row))
+        print("ROWS AT WEB {}".format(self.bolt_row_web))
 
         # Check 4: Total tension
         # r_c = reaction due to tension in all the bolts

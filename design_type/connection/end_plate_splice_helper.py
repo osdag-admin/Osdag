@@ -79,7 +79,7 @@ class EndPlateSpliceHelper(object):
         self.t_1 = 0.0
         self.prying_force = 0.0
         self.bolt_tension_demand = 0.0
-        self.prying = 0.0
+        self.flange_capacity = 0.0
         self.bolt_tension_capacity = 0.0
         self.bolt_numbers_provided = 0
         self.bolt_shear_demand = 0.0

@@ -5471,7 +5471,7 @@ def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='fla
 
     return moment_capacity
 
-
+##  #todo:New Function Required for Beam-Beam endplate connection
 def bolt_shear_demand(V, n_bolts, V_d):
 
 
@@ -5494,4 +5494,140 @@ def bolt_shear_demand(V, n_bolts, V_d):
     bolt_shear_demand.append(NoEscape(r'&= ' + V_d + r'\end{aligned}'))
     return bolt_shear_demand
 
+def bb_endplate_height_prov(beam_D,end_distance_provided,pitch_distance_provided, height_plate, bolt_row = None,type = None):
+    beam_D =str(beam_D)
+    height_plate = str(height_plate)
+    end_distance_provided =str(end_distance_provided)
+    pitch_distance_provided =str(pitch_distance_provided)
+    bb_endplate_height_prov = Math(inline=True)
+
+    if type == 'Flushed - Reversible Moment':
+        bb_endplate_height_prov.append(NoEscape(r'\begin{aligned} h_{ep} &= D + 25 \\'))
+        bb_endplate_height_prov.append(NoEscape(r' &= '+ beam_D+r'+ 25 \\'))
+    elif type == 'Extended One Way - Irreversible Moment':
+        if bolt_row <= 4:
+            bb_endplate_height_prov.append(NoEscape(r'\begin{aligned} h_{ep} &= D + 12.5 + (2 \times e)\\'))
+            bb_endplate_height_prov.append(NoEscape(r' &= '+ beam_D+r'+ 12.5 + (2 \times '+end_distance_provided+r')\\'))
+        else:  # 2 rows above tension flange which is maximum allowable
+            bb_endplate_height_prov.append(NoEscape(r'\begin{aligned} h_{ep} &= D + 12.5 + (2 \times e)+ p\\'))
+            bb_endplate_height_prov.append(NoEscape(r' &= '+ beam_D+r' + 12.5 + (2 \times '+end_distance_provided+ r')+ '+pitch_distance_provided+r'\\'))
+    else:
+        if bolt_row < 8:  # 1 row outside tension and compressionflange
+            bb_endplate_height_prov.append(NoEscape(r'\begin{aligned} h_{ep} &= D + (2 \times (2 \times e))\\'))
+            bb_endplate_height_prov.append(NoEscape(r' &= '+ beam_D+r' + (2 \times (2 \times '+end_distance_provided+ r'))\\'))
+        else:  # 2 rows outside tension and compression flange which is maximum allowable
+            bb_endplate_height_prov.append(NoEscape(r'\begin{aligned} h_{ep} &= D + (2 \times (2 \times e))+(2 \times p)\\'))
+            bb_endplate_height_prov.append(
+                NoEscape(r'&= '+ beam_D+r' + (2 \times (2 \times '+end_distance_provided+ r'))+(2 \times '+pitch_distance_provided+r'\\'))
+    bb_endplate_height_prov.append(NoEscape(r'&= ' + height_plate + r'\end{aligned}'))
+    return bb_endplate_height_prov
+
+def bb_endplate_width_prov(B_ep,B):
+    B = str(B)
+    B_ep= str(B_ep)
+    bb_endplate_width_prov = Math(inline=True)
+    bb_endplate_width_prov.append(NoEscape(r'\begin{aligned} b_{ep} &= B + 25 \\'))
+    bb_endplate_width_prov.append(NoEscape(r' &= ' + B + r' + 25 \\'))
+    bb_endplate_width_prov.append(NoEscape(r' &= ' + B_ep + r'\end{aligned}'))
+    return bb_endplate_width_prov
+
+def stiffener_height_prov(b_ep, t_w, h_ep,D,  h_sp, type=None):
+    h_ep = str(h_ep)
+    b_ep = str(b_ep)
+    t_w = str(t_w)
+    D = str(D)
+    h_sp = str(h_sp)
+    stiffener_height_prov = Math(inline=True)
+    if type == 'Flushed - Reversible Moment':
+        stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{sp} &= b_{ep} - \frac{t}{2} \\'))
+        stiffener_height_prov.append(NoEscape(r' &= '+b_ep+r' - \frac{'+t_w+r'}{2}\\'))
+    else:
+        if type == 'Extended Both Ways - Reversible Moment':
+            stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{sp} &= h_{ep} - \frac{D}{2} \\'))
+            stiffener_height_prov.append(NoEscape(r' &= ' + h_ep + r' - \frac{' + D + r'}{2}\\'))
+        else:
+            stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{sp} &= h_{ep} - D -12.5 \\'))
+            stiffener_height_prov.append(NoEscape(r' &= '+h_ep+r' - '+D +r'-12.5 \\'))
+
+    stiffener_height_prov.append(NoEscape(r' &= ' + h_sp  + r'\end{aligned}'))
+    return stiffener_height_prov
+
+def stiffener_length_prov(h_sp, l_sp, type = None):
+    h_sp = str(h_sp)
+    l_sp= str(l_sp)
+    stiffener_length_prov = Math(inline=True)
+    if type == 'Flushed - Reversible Moment':
+        stiffener_length_prov.append(NoEscape(r'\begin{aligned} l_{sp} &= 2 * h_{sp}  \\'))
+        stiffener_length_prov.append(NoEscape(r'&= 2 * '+ h_sp +r' \\'))
+    else:
+        if type == 'Extended Both Ways - Reversible Moment':
+            stiffener_length_prov.append(NoEscape(r'\begin{aligned} l_{sp} &= h_{sp}/tan(30)  \\'))
+            stiffener_length_prov.append(NoEscape(r'&= \frac{'+h_sp+'} {tan(30)}  \\'))
+    stiffener_length_prov.append(NoEscape(r' &= ' + l_sp + r'\end{aligned}'))
+
+    return stiffener_length_prov
+
+def f_a_stress_due_to_axial_force(A_f,t_w,L_weld,f_a):
+    """
+    t_w = weld size of the weld (mm)
+    A_f = Factored Axial load (N-mm)
+    L_weld = weld_length_web (mm)
+    :return:
+    """
+    A_f =str(A_f)
+    t_w =str(t_w)
+    L_weld =str(L_weld)
+    f_a = str(f_a)
+    f_a_stress_due_to_axial_force = Math(inline=True)
+    f_a_stress_due_to_axial_force.append(NoEscape(r'\begin{aligned} f_a &= \frac{A_f* 10^3}{0.7 *t_w * L_{weld}}\\'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r' &= \frac{'+A_f+'*10^3}{0.7 *'+t_w+' * '+L_weld+r'}\\'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r' &= '+f_a+r'\end{aligned}'))
+    return f_a_stress_due_to_axial_force
+
+
+def q_stress_due_to_shear_force(V,t_w,L_weld,q):
+    """
+    t_w = weld size of the weld (mm)
+    V = Factored Shear load (N-mm)
+    L_weld = weld_length_web (mm)
+    :return:
+    """
+    V = str(V)
+    t_w = str(t_w)
+    L_weld = str(L_weld)
+    q = str(q)
+    q_stress_due_to_shear_force = Math(inline=True)
+    q_stress_due_to_shear_force.append(NoEscape(r'\begin{aligned} q &= \frac{V * 10^3}{0.7 *t_w * L_{weld}}\\'))
+    q_stress_due_to_shear_force.append(NoEscape(r'&= \frac{'+V+' * 10^3}{0.7 *'+t_w+' * '+L_weld+r'}\\'))
+    q_stress_due_to_shear_force.append(NoEscape(r' &= ' + q + r'\end{aligned}'))
+    return q_stress_due_to_shear_force
+
+
+def f_e_weld_stress_due_to_combined_load( f_a ,f_e,q):
+    """
+    t_w = weld size of the weld (mm)
+    V = Factored Shear load (N-mm)
+    L_weld = weld_length_web (mm)
+    :return:
+    """
+    f_a = str(f_a)
+    f_e = str(f_e)
+    q = str(q)
+
+    f_e_weld_stress_due_to_combined_load = Math(inline=True)
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r'\begin{aligned} f_e  &= \sqrt{f_a + (3 q ^ 2)}\\'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= \sqrt{('+f_a+')  + (3 *'+ q+r' ^ 2)}\\'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= ' + f_e+ r'\end{aligned}'))
+    return f_e_weld_stress_due_to_combined_load
+
+def weld_length_web_prov(beam_D,beam_tf ,beam_r1,L_weld):
+    beam_D= str(beam_D)
+    beam_r1= str(beam_r1)
+    beam_tf =str(beam_tf)
+    L_weld =str(L_weld)
+    weld_length_web_prov = Math(inline=True)
+    weld_length_web_prov.append(NoEscape(r'\begin{aligned} L_{weld} &= 2 * (D - (2 * T) - (2 * R1) - 20)\\'))
+    weld_length_web_prov.append(NoEscape(r'&= 2 * ('+beam_D+' - (2 * '+beam_tf+') - (2 *'+beam_r1+r') - 20)\\'))
+    weld_length_web_prov.append(NoEscape(r' &= ' + L_weld+ r'\end{aligned}'))
+    return weld_length_web_prov
 

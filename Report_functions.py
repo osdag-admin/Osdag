@@ -5472,3 +5472,26 @@ def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='fla
     return moment_capacity
 
 
+def bolt_shear_demand(V, n_bolts, V_d):
+
+
+    """
+    Calculate bolt shear demand in each bolts
+
+    Args:
+           V: factored shear load in KN (float)
+           n_bolts: no. of bolts (int)
+           V_d:bolt shear demand in KN (float)
+    Returns:
+        shear demand in bolts
+    """
+    V = str(V)
+    n_bolts = str(n_bolts)
+    V_d = str(V_d)
+    bolt_shear_demand = Math(inline=True)
+    bolt_shear_demand.append(NoEscape(r'\begin{aligned} V_d &= \frac{V}{\ n} \\'))
+    bolt_shear_demand.append(NoEscape(r'&=\frac{' + V + '}{' + n_bolts + r'} \\'))
+    bolt_shear_demand.append(NoEscape(r'&= ' + V_d + r'\end{aligned}'))
+    return bolt_shear_demand
+
+

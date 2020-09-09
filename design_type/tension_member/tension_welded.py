@@ -1831,7 +1831,7 @@ class Tension_welded(Member):
              "Weld Details": "TITLE",
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-             KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu,
+             "Material grade overwrite, $f_u$ (MPa)": self.weld.fu,
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              KEY_DISP_GAMMA_M0: cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
              KEY_DISP_GAMMA_M1: cl_5_4_1_table_4_5_gamma_value(1.25, "m1"),

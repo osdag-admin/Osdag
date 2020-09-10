@@ -96,11 +96,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.rows_near_web_max = 0
         self.bolt_numbers_tension_flange = 0
         self.bolt_numbers_web = 0
-
+        self.mid_bolt_row =0
         self.bolt_column = 0
         self.bolt_row = 0
+
         self.bolt_row_web = 0
         self.bolt_numbers = self.bolt_column * self.bolt_row
+
 
         self.ep_width_provided = 0.0
         self.ep_height_provided = 0.0
@@ -151,6 +153,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.f_a = 0.0
         self.q = 0.0
         self.f_e = 0.0
+
+        # self.func_for_validation(self, design_dictionary)
 
     # Set logger
     def set_osdaglogger(key):
@@ -607,6 +611,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # section details
         self.mainmodule = "Moment Connection"
+        self.module = KEY_DISP_BEAMENDPLATE
         self.connectivity = design_dictionary[KEY_CONN]
         self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
         self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
@@ -653,7 +658,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
 
-        self.warn_text(self)
+        # self.warn_text(self)
 
         # properties from design preferences
 
@@ -692,13 +697,94 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.design_status = False
 
         # helper function
-        self.call_helper = EndPlateSpliceHelper(supported_section=self.supported_section, load=self.load, bolt=self.bolt, ep_type=self.endplate_type,
+
+        self.call_helper = EndPlateSpliceHelper(supported_section=self.supported_section, load=self.load,
+                                                bolt=self.bolt, ep_type=self.endplate_type,
                                                 plate_design_status=False, helper_file_design_status=False)
+        self.bolt_row_web = 4
 
         self.set_parameters(self)
         self.design_connection(self)
         self.design_stiffener(self)
         self.design_weld(self)
+        # self.hard_inputs(self)
+        self.projection = 12.5
+
+    # def hard_inputs(self):
+    #     ################################Flush###################################
+    #
+    #     self.bolt_diameter_provided = 16
+    #     self.bolt_grade_provided = 8.8
+    #     self.plate.bolts_required = 48
+    #     self.bolt_column = 4
+    #     self.bolt_row = 8
+    #     self.mid_bolt_row = 4
+    #     self.plate.edge_dist_provided = 35
+    #     self.plate.end_dist_provided = 35
+    #     # self.out_bolt = 0
+    #     # self.outside_pitch = 0
+    #     self.plate.pitch_provided = 40
+    #     self.plate.gauge_provided = 40
+    #     # self.flange_weld.size = 4.0
+    #     self.web_weld.size = 4.0
+    #     self.plate.height = self.supported_section.depth + 25
+    #     self.plate.width = self.supported_section.flange_width + 25
+    #     self.plate.thickness_provided = 12.0
+    #     self.projection = 12.5
+        ################################Flush###################################
+
+        ################################Oneway###################################
+        # self.bolt.bolt_diameter_provided = 16
+        # self.bolt.bolt_grade_provided = 8.8
+        # self.plate.bolts_required =44
+        # self.bolt_column = 4
+        # self.bolt_row = 7
+        # self.mid_bolt_row = 4
+        # self.plate.edge_dist_provided = 35
+        # self.plate.end_dist_provided = 35
+        # # self.out_bolt = 0
+        # # self.outside_pitch = 0
+        # self.projection = 12.5
+        # self.plate.pitch_provided = 40
+        # self.plate.gauge_provided = 40
+        # self.flange_weld.size = 4.0
+        # self.web_weld.size = 4.0
+        # if self.bolt_row <5:
+        #     self.plate.height = self.supported_section.depth + self.projection+2*self.plate.end_dist_provided
+        # else:
+        #     self.plate.height = self.supported_section.depth + self.projection+2*self.plate.end_dist_provided + self.plate.pitch_provided
+        #
+        # self.plate.width = self.supported_section.flange_width + 25
+        # self.plate.thickness_provided = 12.0
+        # self.projection = 12.5
+
+    ################################Oneway###################################
+
+    ################################bothway###################################
+    # self.bolt.bolt_diameter_provided = 16
+    # self.bolt.bolt_grade_provided = 8.8
+    # self.plate.bolts_required = 36
+    # self.bolt_column = 2
+    # self.bolt_row = 14
+    # self.mid_bolt_row = 4
+    # self.plate.edge_dist_provided = 35
+    # self.plate.end_dist_provided = 35
+    # # self.out_bolt = 0
+    # # self.outside_pitch = 0
+    # self.projection = 12.5
+    # self.plate.pitch_provided = 40
+    # self.plate.gauge_provided = 40
+    # self.flange_weld.size = 4.0
+    # self.web_weld.size = 4.0
+    # if self.bolt_row <=6:
+    #     self.plate.height = self.supported_section.depth + 4 * self.plate.end_dist_provided
+    # else:
+    #     self.plate.height = self.supported_section.depth + 4 * self.plate.end_dist_provided + 2 * self.plate.pitch_provided
+    #
+    # self.plate.width = self.supported_section.flange_width + 25
+    # self.plate.thickness_provided = 12.0
+    # self.projection = 12.5
+    ################################bothway###################################
 
     # warn if a beam of older version of IS 808 is selected
     def warn_text(self):
@@ -997,6 +1083,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
                                                                                         self.plate_thickness, self.dp_plate_fu)
 
+
                                 # checking for the maximum pitch distance of the bolts for a safe design
                                 # if space is available then add rows
                                 if self.call_helper.helper_file_design_status == True:
@@ -1085,8 +1172,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                 self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
 
                                 # number of bolts
+
+                                # self.bolt_row_web = 2#added for 3D
+                                # self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)#added for 3D
+
                                 self.bolt_row = self.call_helper.bolt_row
                                 self.bolt_numbers = self.bolt_column * self.bolt_row
+                                # self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)#added for 3D
 
                                 # End Plate
                                 self.ep_moment_capacity = round(self.call_helper.mp_plate * 1e-6, 2)
@@ -1118,6 +1210,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                     logger.warning("The beam flange can have local buckling")
                                     logger.info(
                                         "Select a different beam with more flange area or provide stiffening at the flange to increase the beam "
+ 
                                         "flange thickness. Re-design connection using the effective flange thickness after stiffening")
                                     logger.info("Custom beams can be defined through the Osdag Design Preferences tab")
                                 else:
@@ -1222,6 +1315,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
             else:  # 2 rows outside tension and compression flange which is maximum allowable
                 self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (
                         2 * self.pitch_distance_provided)
+
+        print(self.bolt_row_web, self.bolt_row, self.bolt_column, self.bolt_numbers, "kkk")
 
     def design_stiffener(self):
         """ design stiffener for the connection """
@@ -1342,7 +1437,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
              }
 
         self.report_check = []
-
 
         # Assiging parameters
 
@@ -1583,6 +1677,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_check.append(t1)
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"
+
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
@@ -1591,3 +1686,4 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3d_image)
+

@@ -72,10 +72,13 @@ class BBENutBoltArray(object):
         self.pitch = boltPlaceObj.pitch_distance_provided
         self.gauge = boltPlaceObj.gauge_distance_provided
         self.mid_bolt_row = boltPlaceObj.bolt_row_web
-        print(self.mid_bolt_row,"ppppp")
+        print(self.mid_bolt_row,"mid")
         # print(self.boltProjection, "ppppp")
-        self.row = boltPlaceObj.bolt_row
+        self.row = (boltPlaceObj.bolt_row - boltPlaceObj.bolt_row_web)
+        print(self.row, "row")
         self.col = boltPlaceObj.bolt_column
+        print(self.col, "col")
+        print(self.numOfBolts, "no")
         # self.crossCgauge =  2 * float(self.edgeDist) + boltPlaceObj.beam_tw/2
         self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         # self.out_pitch = boltPlaceObj.outside_pitch

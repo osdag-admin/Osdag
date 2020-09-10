@@ -44,7 +44,9 @@ class EndPlateSpliceHelper(object):
         self.beam_properties = {}
         self.safety_factors = {}
         self.tension = []
+        self.tension_web_bolts = []
         self.lever_arm = []
+        self.lever_arm_web_bolts = []
         self.bolt_column = 0
         self.bolt_row = 0
         self.bolt_row_web = 0
@@ -126,104 +128,133 @@ class EndPlateSpliceHelper(object):
         self.lever_arm = []
 
         if self.endplate_type == 'Flushed - Reversible Moment':
-            row_list = np.arange(1, self.bolt_row + 1, 1).tolist()
+            row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
 
             # Note: In this connection all the odd rows will be near top flange and even rows near the bottom flange
+            a = 0
             for a in row_list:
-                if (a % 2) != 0:  # odd row
-                    if a == 1:
-                        r_1 = self.beam_D - (self.beam_tf / 2) - self.beam_tf - self.end_distance_provided  # mm, lever arm of row 1
-                        self.lever_arm.append(r_1)
-                    else:
-                        r_a = r_1 - (round_up(((a / 2) - 1), 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 3, 5, 7,...
+                if a <= self.bolt_row:
+
+                    if (a % 2) != 0:  # odd row
+                        if a == 1:
+                            r_1 = self.beam_D - (self.beam_tf / 2) - self.beam_tf - self.end_distance_provided  # mm, lever arm of row 1
+                            self.lever_arm.append(r_1)
+                        else:
+                            r_a = r_1 - (round_up(((a / 2) - 1), 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 3, 5, 7,...
+                            self.lever_arm.append(r_a)
+                    else:  # even row
+                        if a == 2:
+                            r_2 = (self.beam_tf / 2) + self.end_distance_provided  # mm, lever arm of row 2
+                            self.lever_arm.append(r_2)
+                        else:
+                            r_a = r_2 + (((a / 2) - 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 4, 6, 8,...
+                            self.lever_arm.append(r_a)
+                else:  # for bolts at web, taking the last row inside flange on the bottom side as reference
+                    # updating the row list to begin the iteration from the rows provided at web with different pitch distance
+                    row_list = row_list[a - 1:]
+
+                    row_web_counter = 1
+                    for a in row_list:
+                        r_a = self.lever_arm[- row_web_counter] + (row_web_counter * self.pitch_distance_web)
                         self.lever_arm.append(r_a)
-                else:  # even row
-                    if a == 2:
-                        r_2 = (self.beam_tf / 2) + self.end_distance_provided  # mm, lever arm of row 2
-                        self.lever_arm.append(r_2)
-                    else:
-                        r_a = r_2 + (((a / 2) - 1) * self.pitch_distance_provided)  # mm, lever arm for remaining rows i.e. 4, 6, 8,...
-                        self.lever_arm.append(r_a)
+                        row_web_counter += 1
+
+                    print("CASE TRUE")
 
         elif self.endplate_type == 'Extended One Way - Irreversible Moment':
             # Note: defining bolt models for this connection due to its un-symmetric nature of bolt placement, hence the equation cannot be
             # generalised up-to 5 rows (total)
             # From 6th and beyond rows, the equation is generalised since the bolts will be added inside flange only in an iterative manner
 
-            if self.bolt_row == 3:  # 3 bolt rows model (2 rows at tension flange and 1 at compression flange)
-                # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
+            row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
 
-                # top flange
-                r_1 = self.beam_D - self.beam_tf
-                self.lever_arm.append(r_1)
-                r_2 = r_1
-                self.lever_arm.append(r_2)
+            for a in row_list:
+                if a <= self.bolt_row:
 
-                # compression flange
-                r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                self.lever_arm.append(r_3)
+                    if self.bolt_row == 3:  # 3 bolt rows model (2 rows at tension flange and 1 at compression flange)
+                        # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
-            elif self.bolt_row == 4:  # 4 bolt rows model (3 rows at tension flange and 1 at compression flange)
-                # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
+                        # top flange
+                        r_1 = self.beam_D - self.beam_tf
+                        self.lever_arm.append(r_1)
+                        r_2 = r_1
+                        self.lever_arm.append(r_2)
 
-                # top flange
-                r_1 = self.beam_D - self.beam_tf
-                self.lever_arm.append(r_1)
-                r_2 = r_1
-                self.lever_arm.append(r_2)
+                        # compression flange
+                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                        self.lever_arm.append(r_3)
 
-                # compression flange
-                r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                self.lever_arm.append(r_3)
+                    elif self.bolt_row == 4:  # 4 bolt rows model (3 rows at tension flange and 1 at compression flange)
+                        # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
-                r_4 = r_2 - self.pitch_distance_provided  # top flange
-                self.lever_arm.append(r_4)
+                        # top flange
+                        r_1 = self.beam_D - self.beam_tf
+                        self.lever_arm.append(r_1)
+                        r_2 = r_1
+                        self.lever_arm.append(r_2)
 
-            elif self.bolt_row == 5:  # 5 bolt rows model (4 rows at tension flange and 1 at compression flange)
-                # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
+                        # compression flange
+                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                        self.lever_arm.append(r_3)
 
-                # top flange
-                r_1 = self.beam_D - self.beam_tf
-                self.lever_arm.append(r_1)
-                r_2 = r_1
-                self.lever_arm.append(r_2)
+                        r_4 = r_2 - self.pitch_distance_provided  # top flange
+                        self.lever_arm.append(r_4)
 
-                # compression flange
-                r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                self.lever_arm.append(r_3)
+                    elif self.bolt_row == 5:  # 5 bolt rows model (4 rows at tension flange and 1 at compression flange)
+                        # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
-                r_4 = r_1  # top flange
-                self.lever_arm.append(r_4)
-                r_5 = r_1
-                self.lever_arm.append(r_5)
+                        # top flange
+                        r_1 = self.beam_D - self.beam_tf
+                        self.lever_arm.append(r_1)
+                        r_2 = r_1
+                        self.lever_arm.append(r_2)
 
-            else:  # model for 6 rows and beyond
-                # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
+                        # compression flange
+                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                        self.lever_arm.append(r_3)
 
-                # top flange
-                r_1 = self.beam_D - self.beam_tf
-                self.lever_arm.append(r_1)
-                r_2 = r_1
-                self.lever_arm.append(r_2)
+                        r_4 = r_1  # top flange
+                        self.lever_arm.append(r_4)
+                        r_5 = r_1
+                        self.lever_arm.append(r_5)
 
-                # compression flange
-                r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                self.lever_arm.append(r_3)
+                    else:  # model for 6 rows and beyond
+                        # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
-                r_4 = r_1  # top flange
-                self.lever_arm.append(r_4)
-                r_5 = r_1
-                self.lever_arm.append(r_5)
+                        # top flange
+                        r_1 = self.beam_D - self.beam_tf
+                        self.lever_arm.append(r_1)
+                        r_2 = r_1
+                        self.lever_arm.append(r_2)
 
-                # remaining new rows
-                row_list = np.arange(5, self.bolt_row + 1, 1).tolist()
+                        # compression flange
+                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                        self.lever_arm.append(r_3)
 
-                pitch_counter = 0  # subtracting (pitch_counter times pitch distance) after the first iteration in the below loop to find lever arm
-                for a in row_list:
-                    r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((2 + pitch_counter) * self.pitch_distance_provided)
-                    pitch_counter += 1
+                        r_4 = r_1  # top flange
+                        self.lever_arm.append(r_4)
+                        r_5 = r_1
+                        self.lever_arm.append(r_5)
 
-                    self.lever_arm.append(r_a)
+                        # remaining new rows, 6th and beyond
+                        row_list = np.arange(6, self.bolt_row + 1, 1).tolist()
+
+                        pitch_counter = 0  # subtracting (pitch_counter times pitch distance) after the first iteration in the below loop to find lever arm
+                        for a in row_list:
+                            r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((2 + pitch_counter) * self.pitch_distance_provided)
+                            pitch_counter += 1
+
+                            self.lever_arm.append(r_a)
+
+                else:  # bolts near the web
+                    # updating the row list to begin the iteration from the rows provided at web with different pitch distance
+                    row_list = row_list[a - 1:]
+
+                    pitch_counter = 1
+                    for a in row_list:
+                        r_a = r_3 + (pitch_counter * self.pitch_distance_web)
+                        self.lever_arm.append(r_a)
+                        pitch_counter += 1
 
         elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
             row_list = np.arange(1, self.bolt_row + 1, 1).tolist()
@@ -234,42 +265,66 @@ class EndPlateSpliceHelper(object):
             self.lever_arm.append(r_2)
             r_3 = 0
             self.lever_arm.append(r_3)
-            r_4 = (self.beam_tf / self.end_distance_provided) + self.end_distance_provided
+            r_4 = (self.beam_tf / 2) + self.end_distance_provided
             self.lever_arm.append(r_4)
 
-            if len(row_list) > 4:  # if number of rows are more than 4
+            if self.bolt_row == 6:  # if number of rows are 6
                 r_5 = r_1 - (self.beam_tf / 2) - self.end_distance_provided - self.pitch_distance_provided
                 self.lever_arm.append(r_5)
                 r_6 = r_4 + self.pitch_distance_provided
                 self.lever_arm.append(r_6)
 
-            if len(row_list) >= 8:  # if number of rows are more or equal than 8
+            if self.bolt_row >= 8:  # if number of rows are 8
+                r_5 = r_1
+                self.lever_arm.append(r_5)
+                r_6 = r_1
+                self.lever_arm.append(r_6)
                 r_7 = 0
                 self.lever_arm.append(r_7)
                 r_8 = r_4 + self.pitch_distance_provided
                 self.lever_arm.append(r_8)
 
-            if len(row_list) >= 10:  # if number of rows are more or equal than 10
+            if self.bolt_row >= 10:  # if number of rows are 10
                 r_9 = r_8 + self.pitch_distance_provided
                 self.lever_arm.append(r_9)
                 r_10 = r_1 - (self.beam_tf / 2) - self.end_distance_provided - (2 * self.pitch_distance_provided)
                 self.lever_arm.append(r_10)
 
-            if len(row_list) >= 12:  # if number of rows are more or equal than 12
+            if self.bolt_row >= 12:  # if number of rows are more or equal than 12
                 update_row_list = row_list[10:]
 
                 for a in update_row_list:
                     p = a - 3  # previous odd and even row for r_a
 
                     if (a % 2) != 0:  # for odd rows beyond 10, r11, r13, ...
-                        r_i = row_list[p] + self.pitch_distance_provided
-                        self.lever_arm.append(r_i)
+                        r_a = self.lever_arm[p] + self.pitch_distance_provided
+                        self.lever_arm.append(r_a)
                     else:  # for even rows beyond 10, r12, r14, ...
-                        r_i = row_list[p] - self.pitch_distance_provided
-                        self.lever_arm.append(r_i)
+                        r_a = self.lever_arm[p] - self.pitch_distance_provided
+                        self.lever_arm.append(r_a)
+
+        if self.endplate_type == 'Extended Both Ways - Reversible Moment':
+            if self.bolt_row_web > 0:
+
+                row_list = np.arange(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
+
+                if self.bolt_row <= 8:
+                    pitch_counter = 1
+                    for a in row_list:
+                        r_a = self.lever_arm[-pitch_counter] + (pitch_counter * self.pitch_distance_web)
+                        self.lever_arm.append(r_a)
+                        pitch_counter += 1
+                else:
+                    pitch_counter = 2
+                    for a in row_list:
+                        r_a = self.lever_arm[-pitch_counter] + ((pitch_counter - 1) * self.pitch_distance_web)
+                        self.lever_arm.append(r_a)
+                        pitch_counter += 1
 
         # final list with all the lever arm distances calculated
         self.lever_arm = self.lever_arm
+        print("LEVER ARM is {}".format(self.lever_arm))
+        print("PITCH IS {}".format(self.pitch_distance_web))
 
         # Check 3: Find force on each bolt under tension
         self.tension = []
@@ -277,6 +332,7 @@ class EndPlateSpliceHelper(object):
 
         a = 0
         if self.endplate_type == 'Flushed - Reversible Moment':
+            row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
 
             # Note: In this connection all the odd rows will be near top flange and even rows near the bottom flange
             for a in row_list:
@@ -284,16 +340,17 @@ class EndPlateSpliceHelper(object):
 
                     summation = r_1
                     for p in range(1, len(row_list)):
+                        print(p)
                         summation += self.lever_arm[p] ** 2 / r_1
 
                     self.t_1 = self.load_moment_effective / (self.bolt_column * summation)  # kN, tension in row 1
                     self.tension.append(self.t_1)
 
-                if a > 1:
+                else:  # all the rows following after the first row
                     t_a = self.t_1 * (self.lever_arm[a - 1] / r_1)  # kN, tension in the remaining rows (both odd and even after 1)
                     self.tension.append(t_a)
 
-        elif self.endplate_type == 'Extended One Way - Irreversible Moment':
+        if self.endplate_type == 'Extended One Way - Irreversible Moment':
 
             if self.bolt_row == 3:
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
@@ -370,20 +427,31 @@ class EndPlateSpliceHelper(object):
                 t_5 = self.t_1
                 self.tension.append(t_5)
                 t_6 = 4 * self.t_1 * (r_6 / r_1)
-                self.tension.append(t_5)
+                self.tension.append(t_6)
 
                 # remaining new rows
                 if self.bolt_row > 6:
                     row_list = np.arange(7, self.bolt_row + 1, 1).tolist()
 
-                    pitch_counter = 0  # subtracting (pitch_counter times pitch distance) to find lever arm
                     for a in row_list:
-                        r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((3 + pitch_counter) * self.pitch_distance_provided)
-                        pitch_counter += 1
+                        t_a = 4 * self.t_1 * (r_a / r_1)
+                        self.tension.append(t_a)
 
-                        self.lever_arm.append(r_a)
+        # calculate tension in additional rows near web
+        if self.endplate_type == 'Extended One Way - Irreversible Moment':
+            if self.bolt_row_web > 0:
 
-        elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
+                if self.bolt_row <= 4:
+                    factor = 2
+                else:
+                    factor = 4
+
+                row_list = np.arange(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
+                for a in row_list:
+                    t_a = factor * self.t_1 * (r_a / r_1)
+                    self.tension.append(t_a)
+
+        if self.endplate_type == 'Extended Both Ways - Reversible Moment':
             if self.bolt_row == 4:
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
@@ -488,8 +556,29 @@ class EndPlateSpliceHelper(object):
                         t_a = 4 * self.t_1 * (r_a / r_1)
                         self.tension.append(t_a)
 
+        # calculate tension in additional rows near web
+        if self.endplate_type == 'Extended Both Ways - Reversible Moment':
+            if self.bolt_row_web > 0:
+
+                if self.bolt_row <= 6:
+                    factor = 2
+                else:
+                    factor = 4
+
+                row_list = np.arange(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
+                for a in row_list:
+                    t_a = factor * self.t_1 * (r_a / r_1)
+                    self.tension.append(t_a)
+
         # final list with all the tension values calculated
         self.tension = self.tension
+        print("TENSION is {}".format(self.tension))
+
+        # adding the lists of bolt row and tension
+        print("ROWS BEFORE ADDING {}".format(self.bolt_row))
+        self.bolt_row += self.bolt_row_web
+        print("ROWS AFTER ADDING {}".format(self.bolt_row))
+        print("ROWS AT WEB {}".format(self.bolt_row_web))
 
         # Check 4: Total tension
         # r_c = reaction due to tension in all the bolts

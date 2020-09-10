@@ -174,77 +174,82 @@ class EndPlateSpliceHelper(object):
                     if self.bolt_row == 3:  # 3 bolt rows model (2 rows at tension flange and 1 at compression flange)
                         # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
-                        # top flange
-                        r_1 = self.beam_D - self.beam_tf
-                        self.lever_arm.append(r_1)
-                        r_2 = r_1
-                        self.lever_arm.append(r_2)
+                        if len(self.lever_arm) <= 0:
+                            # top flange
+                            r_1 = self.beam_D - self.beam_tf
+                            self.lever_arm.append(r_1)
+                            r_2 = r_1
+                            self.lever_arm.append(r_2)
 
-                        # compression flange
-                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                        self.lever_arm.append(r_3)
+                            # compression flange
+                            r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                            self.lever_arm.append(r_3)
 
                     elif self.bolt_row == 4:  # 4 bolt rows model (3 rows at tension flange and 1 at compression flange)
                         # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
-                        # top flange
-                        r_1 = self.beam_D - self.beam_tf
-                        self.lever_arm.append(r_1)
-                        r_2 = r_1
-                        self.lever_arm.append(r_2)
+                        if len(self.lever_arm) <= 0:
+                            # top flange
+                            r_1 = self.beam_D - self.beam_tf
+                            self.lever_arm.append(r_1)
+                            r_2 = r_1
+                            self.lever_arm.append(r_2)
 
-                        # compression flange
-                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                        self.lever_arm.append(r_3)
+                            # compression flange
+                            r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                            self.lever_arm.append(r_3)
 
-                        r_4 = r_2 - self.pitch_distance_provided  # top flange
-                        self.lever_arm.append(r_4)
+                            r_4 = r_2 - self.pitch_distance_provided  # top flange
+                            self.lever_arm.append(r_4)
 
                     elif self.bolt_row == 5:  # 5 bolt rows model (4 rows at tension flange and 1 at compression flange)
                         # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
-                        # top flange
-                        r_1 = self.beam_D - self.beam_tf
-                        self.lever_arm.append(r_1)
-                        r_2 = r_1
-                        self.lever_arm.append(r_2)
+                        if len(self.lever_arm) <= 0:
+                            # top flange
+                            r_1 = self.beam_D - self.beam_tf
+                            self.lever_arm.append(r_1)
+                            r_2 = r_1
+                            self.lever_arm.append(r_2)
 
-                        # compression flange
-                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                        self.lever_arm.append(r_3)
+                            # compression flange
+                            r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                            self.lever_arm.append(r_3)
 
-                        r_4 = r_1  # top flange
-                        self.lever_arm.append(r_4)
-                        r_5 = r_1
-                        self.lever_arm.append(r_5)
+                            r_4 = r_1  # top flange
+                            self.lever_arm.append(r_4)
+                            r_5 = r_1
+                            self.lever_arm.append(r_5)
 
                     else:  # model for 6 rows and beyond
                         # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
-                        # top flange
-                        r_1 = self.beam_D - self.beam_tf
-                        self.lever_arm.append(r_1)
-                        r_2 = r_1
-                        self.lever_arm.append(r_2)
+                        if len(self.lever_arm) <= 0:
+                            # top flange
+                            r_1 = self.beam_D - self.beam_tf
+                            self.lever_arm.append(r_1)
+                            r_2 = r_1
+                            self.lever_arm.append(r_2)
 
-                        # compression flange
-                        r_3 = (self.beam_tf / 2) + self.end_distance_provided
-                        self.lever_arm.append(r_3)
+                            # compression flange
+                            r_3 = (self.beam_tf / 2) + self.end_distance_provided
+                            self.lever_arm.append(r_3)
 
-                        r_4 = r_1  # top flange
-                        self.lever_arm.append(r_4)
-                        r_5 = r_1
-                        self.lever_arm.append(r_5)
+                            r_4 = r_1  # top flange
+                            self.lever_arm.append(r_4)
+                            r_5 = r_1
+                            self.lever_arm.append(r_5)
 
-                        # remaining new rows, 6th and beyond
-                        row_list = np.arange(6, self.bolt_row + 1, 1).tolist()
+                            # remaining new rows, 6th and beyond
+                            row_list = np.arange(6, self.bolt_row + 1, 1).tolist()
 
-                        pitch_counter = 0  # subtracting (pitch_counter times pitch distance) after the first iteration in the below loop to find lever arm
-                        for a in row_list:
-                            r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((2 + pitch_counter) * self.pitch_distance_provided)
-                            pitch_counter += 1
+                            # subtracting (pitch_counter times pitch distance) after the first iteration in the below loop to find lever arm
+                            pitch_counter = 0
+                            for a in row_list:
+                                r_a = r_1 - (self.beam_tf / 2) - self.end_distance_provided - ((2 + pitch_counter) * self.pitch_distance_provided)
+                                pitch_counter += 1
 
-                            self.lever_arm.append(r_a)
+                                self.lever_arm.append(r_a)
 
                 else:  # bolts near the web
                     # updating the row list to begin the iteration from the rows provided at web with different pitch distance
@@ -255,6 +260,9 @@ class EndPlateSpliceHelper(object):
                         r_a = r_3 + (pitch_counter * self.pitch_distance_web)
                         self.lever_arm.append(r_a)
                         pitch_counter += 1
+
+                    if a == row_list[-1]:
+                        break
 
         elif self.endplate_type == 'Extended Both Ways - Reversible Moment':
             row_list = np.arange(1, self.bolt_row + 1, 1).tolist()
@@ -323,6 +331,8 @@ class EndPlateSpliceHelper(object):
 
         # final list with all the lever arm distances calculated
         self.lever_arm = self.lever_arm
+        self.lever_arm = [round(value_lever_arm, 2) for value_lever_arm in self.lever_arm]
+
         print("LEVER ARM is {}".format(self.lever_arm))
         print("PITCH IS {}".format(self.pitch_distance_web))
 
@@ -339,7 +349,7 @@ class EndPlateSpliceHelper(object):
                 if a == 1:  # for 1st row only
 
                     summation = r_1
-                    for p in range(1, len(row_list)):
+                    for p in range(1, len(row_list), 1):
                         print(p)
                         summation += self.lever_arm[p] ** 2 / r_1
 
@@ -357,7 +367,11 @@ class EndPlateSpliceHelper(object):
 
                 # top flange
                 summation = r_1 + (r_3 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
+                # tension values
                 self.t_1 = self.load_moment_effective / (2 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
                 t_2 = self.t_1
@@ -372,6 +386,9 @@ class EndPlateSpliceHelper(object):
 
                 # top flange
                 summation = r_1 + (r_3 ** 2 / r_1) + (r_4 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (2 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -390,6 +407,9 @@ class EndPlateSpliceHelper(object):
 
                 # top flange
                 summation = r_1 + (r_3 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (4 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -410,7 +430,11 @@ class EndPlateSpliceHelper(object):
                 # Assumption: row r1, r2, r4 and r5 (at tension flange) carry equal force to act like a T-stub
 
                 # top flange
-                summation = r_1 + (r_3 ** 2 / r_1) + (r_6 ** 2 / r_1)
+                # summation = r_1 + (r_3 ** 2 / r_1) + (r_6 ** 2 / r_1)
+                summation = r_1 + (r_3 ** 2 / r_1) + (self.lever_arm[5] ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (4 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -426,7 +450,8 @@ class EndPlateSpliceHelper(object):
                 self.tension.append(t_4)
                 t_5 = self.t_1
                 self.tension.append(t_5)
-                t_6 = 4 * self.t_1 * (r_6 / r_1)
+                # t_6 = 4 * self.t_1 * (r_6 / r_1)
+                t_6 = 4 * self.t_1 * (self.lever_arm[5] / r_1)
                 self.tension.append(t_6)
 
                 # remaining new rows
@@ -447,16 +472,21 @@ class EndPlateSpliceHelper(object):
                     factor = 4
 
                 row_list = np.arange(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
+                a = 0
                 for a in row_list:
                     t_a = factor * self.t_1 * (r_a / r_1)
                     self.tension.append(t_a)
 
         if self.endplate_type == 'Extended Both Ways - Reversible Moment':
+            p = 0
             if self.bolt_row == 4:
                 # Assumption: row r1 and r2 (at tension flange) carry equal force to act like a T-stub
 
                 # top flange
                 summation = r_1 + (r_4 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (2 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -474,6 +504,9 @@ class EndPlateSpliceHelper(object):
 
                 # top flange
                 summation = r_1 + (r_4 ** 2 / r_1) + (r_5 ** 2 / r_1) + (r_6 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (2 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -496,6 +529,9 @@ class EndPlateSpliceHelper(object):
 
                 # top flange
                 summation = r_1 + (r_4 ** 2 / r_1) + (r_8 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (4 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -521,6 +557,9 @@ class EndPlateSpliceHelper(object):
 
                 # top flange
                 summation = r_1 + (r_4 ** 2 / r_1) + (r_8 ** 2 / r_1) + (r_9 ** 2 / r_1) + (r_10 ** 2 / r_1)
+                if self.bolt_row_web > 0:
+                    for p in range(self.bolt_row + 1, self.bolt_row + self.bolt_row_web + 1, 1):
+                        summation += self.lever_arm[p - 1] ** 2 / r_1
 
                 self.t_1 = self.load_moment_effective / (4 * self.bolt_column * summation)  # kN, tension in row 1 and 2
                 self.tension.append(self.t_1)
@@ -572,6 +611,8 @@ class EndPlateSpliceHelper(object):
 
         # final list with all the tension values calculated
         self.tension = self.tension
+        self.tension = [round(value_tension, 2) for value_tension in self.tension]
+
         print("TENSION is {}".format(self.tension))
 
         # adding the lists of bolt row and tension

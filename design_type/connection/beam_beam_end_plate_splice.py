@@ -1272,7 +1272,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             logger.info(": =========================End Of design===========================")
         else:
             logger.info(": =========================Design Status===========================")
-            logger.info(": Overall beam to beam end plate splice connection design is UNSAFE")
+            logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
             logger.info(": =========================End Of design===========================")
 
         # create design report

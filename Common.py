@@ -446,9 +446,9 @@ KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 ###################
 
 RED_LIST = [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]
-VALUES_CONN_SPLICE = ['Coplanar tension-compression flange', 'Coplanar tension flange', 'Coplanar compression flange']
+VALUES_CONN_SPLICE = ['Coplanar Tension-Compression Flange', 'Coplanar Tension Flange', 'Coplanar Compression Flange']
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
-VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
+VALUES_CONN_1 = ['Column Flange - Beam Web', 'Column Web - Beam Web']
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate', 'Extended Both Ways']
 VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irreversible Moment', 'Extended Both Ways - Reversible Moment']
@@ -1336,7 +1336,7 @@ KEY_OUT_DISP_RED_WELD_STRENGTH = 'Weld Strength (N/mm)'
 DISP_TITLE_ENDPLATE = 'End Plate'
 
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
-KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
+KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)'
 
 
 

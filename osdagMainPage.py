@@ -544,9 +544,10 @@ class OsdagMainWindow(QMainWindow):
     def show_moment_connection_bc(self):
         if self.findChild(QRadioButton,'BC_End_Plate').isChecked():
             self.hide()
-            self.ui2 = Ui_ModuleWindow( BeamColumnEndPlate, ' ')
+            self.ui2 = Ui_ModuleWindow(BeamColumnEndPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+
     def show_base_plate(self):
         if self.findChild(QRadioButton, 'Base_Plate').isChecked():
             self.hide()

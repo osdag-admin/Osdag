@@ -252,6 +252,7 @@ class EndPlateSpliceHelper(object):
                                 self.lever_arm.append(r_a)
 
                 else:  # bolts near the web
+                    row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
                     # updating the row list to begin the iteration from the rows provided at web with different pitch distance
                     row_list = row_list[a - 1:]
 

@@ -197,7 +197,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN_SPLICE, True, 'No Validator', [1, 2])
+        t2 = (KEY_CONN, KEY_CONN, TYPE_COMBOBOX, VALUES_CONN_SPLICE, True, 'No Validator', [1, 2])
         options_list.append(t2)
 
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
@@ -265,13 +265,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def fn_conn_image(self):
         """ display representative images of end plate type """
-        # conn = self[0]
-        ep_type = self[1]
-        if ep_type == 'Flushed - Reversible Moment':
+        ep_type = self[0]
+        if ep_type == VALUES_ENDPLATE_TYPE[0]:
             return './ResourceFiles/images/flush_ep.png'
-        elif ep_type == 'Extended One Way - Irreversible Moment':
+        elif ep_type == VALUES_ENDPLATE_TYPE[1]:
             return './ResourceFiles/images/owe_ep.png'
-        elif ep_type == 'Extended Both Ways - Reversible Moment':
+        elif ep_type == VALUES_ENDPLATE_TYPE[2]:
             return './ResourceFiles/images/extended.png'
         else:
             return ''
@@ -741,12 +740,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         if self.load_shear < min((0.15 * self.beam_shear_capa), 40):
             self.minimum_load_status_shear = True
-            self.load_shear = min((0.15 * self.beam_shear_capa), 40)
+            self.load_shear = min(round(0.15 * self.beam_shear_capa, 2), 40)
             logger.warning("[Minimum Factored Load] The external factored shear force ({} kN) is less than the minimum recommended design action on "
-                           "the member".format(self.load_shear))
+                           "the member".format(round(self.load.shear_force * 1e-3, 2)))
             logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam) or 40 kN whichever is "
-                        "less [Ref. Cl. 10.7, IS 800:2007]".format(0.15 * self.beam_shear_capa))
-            logger.info("Designing the connection for a factored shear load of {} kN-m".format(self.load_shear))
+                        "less [Ref. Cl. 10.7, IS 800:2007]".format(round(0.15 * self.beam_shear_capa, 2)))
+            logger.info("Designing the connection for a factored shear load of {} kN".format(self.load_shear))
 
         # minimum moment (major axis)
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
@@ -762,7 +761,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                            "capacity of the beam ({} kN-m)".format(self.load.moment, self.load_moment))
             logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
                         "connection as rigid and transfer full moment from the spliced beam (Cl. 10.7, IS 800:2007)")
-            logger.info("Designing the connection for a load of {} kN-m".format(self.load_moment))
+            logger.info("Designing the connection for a moment of {} kN-m".format(self.load_moment))
 
         elif self.load.moment > self.beam_plastic_mom_capa_zz:
             self.load_moment = self.beam_plastic_mom_capa_zz  # kN
@@ -901,8 +900,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         if self.endplate_type == 'Flushed - Reversible Moment':
                             self.ep_height_max = self.beam_D + 25  # mm, 12.5 mm beyond either flanges
                         else:  # assuming two rows
-                            space_available_above_flange = (
-                                                                       2 * self.end_distance_provided) + self.pitch_distance_provided  # mm, extension on each side
+                            space_available_above_flange = (2 * self.end_distance_provided) + self.pitch_distance_provided  # mm, extension on each side
 
                             if self.endplate_type == 'Extended One Way - Irreversible Moment':
                                 self.ep_height_max = self.beam_D + space_available_above_flange  # mm
@@ -941,26 +939,28 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                         # Check 5: number of columns of bolt on each side (minimum is 1, maximum is 2)
 
-                        # checking space available to accommodate two column of bolts on each side
-                        space_req_2col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (2 * self.edge_distance_provided)
+                        # checking space available to accommodate one or two column of bolts (2 or 4 total) on each side
+                        space_req_2col = self.gauge_cs_distance_provided + (2 * self.edge_distance_provided)
+                        space_req_4col = self.gauge_cs_distance_provided + (2 * self.gauge_distance_provided) + (2 * self.edge_distance_provided)
 
-                        if self.ep_width_provided >= space_req_2col:
+                        if self.ep_width_provided >= space_req_4col:
                             self.bolt_column = 4  # two columns on each side
                             logger.info("The provided beam can accommodate two column of bolts on either side of the web [Ref. based on detailing "
                                         "requirement]")
                             logger.info("Performing the design with two column of bolts on each side")
-                        else:
+
+                        if self.ep_width_provided >= space_req_2col:
                             self.bolt_column = 2  # one column on each side
                             logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on "
                                         "detailing requirement]")
                             logger.info("Performing the design with a single column of bolt on each side")
 
-                        if (self.gauge_cs_distance_provided + (2 * self.edge_distance_provided)) > self.ep_width_provided:
+                        if self.ep_width_provided < space_req_2col:
+                            self.bolt_column = 0
                             self.design_status = False
                             logger.error("[Detailing] The beam is not wide enough to accommodate a single column of bolt on either side")
-                            logger.error("The defined beam is not suitable for this connection design")
-                            logger.info("Please provide another beam which has sufficient width (minimum, {} mm)"
-                                        .format(self.gauge_cs_distance_provided + (2 * self.edge_distance_provided)))
+                            logger.error("The defined beam is not suitable for performing connection design")
+                            logger.info("Please define another beam which has sufficient width (minimum, {} mm) and re-design".format(space_req_2col))
 
                         # Check 6: bolt design
 

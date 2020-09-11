@@ -5631,3 +5631,60 @@ def weld_length_web_prov(beam_D,beam_tf ,beam_r1,L_weld):
     weld_length_web_prov.append(NoEscape(r' &= ' + L_weld+ r'\end{aligned}'))
     return weld_length_web_prov
 
+
+def tension_critical_bolt_prov(M,t_ba, n_c,r_1,n_r, r_i ,n,type,r_3= None):
+    M= str(M)
+    t_ba = str(t_ba)
+    n_c =str(n_c)
+    r_1 =str(r_1)
+    n_r=str(n_r)
+    r_i =str(r_i)
+    r_3 = str(r_3)
+    tension_critical_bolt_prov = Math(inline=True)
+    if type =="flush" :
+        tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i = 2} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+        tension_critical_bolt_prov.append(NoEscape(r'&= \frac{'+M+'}{'+n_c+ '* ('+r_1+' + \sum_{i=2} ^ {'+n_r+r'} \frac{'+r_i+' ^2}{'+r_1+r'}) }\end{aligned}'))
+    else:
+        if n==3 :
+            multi = 2
+            i=3
+            i= str(i)
+            multi = str(multi)
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+        elif n==4:
+            multi = 2
+            i = 3
+            i = str(i)
+            multi = str(multi)
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+        elif n==5:
+            multi = 4
+            i = 3
+            i = str(i)
+            multi = str(multi)
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+
+        elif n >= 6:
+            multi = 4
+            i=6
+            i = str(i)
+            multi = str(multi)
+            r_3 =str(r_3)
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \frac{r_3^2}{r_1} + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + r' + \frac{'+r_3+'^2}{'+r_1+'} +\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+        else:
+            multi = 4
+            i = 6
+            i = str(i)
+            multi = str(multi)
+            r_3 = str(r_3)
+            tension_critical_bolt_prov.append(NoEscape(
+                r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \frac{r_3^2}{r_1} + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(
+                r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + r' + \frac{' + r_3 + '^2}{' + r_1 + '} +\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+    tension_critical_bolt_prov.append(NoEscape(r' &= ' + t_ba + r'\end{aligned}'))
+
+    return tension_critical_bolt_prov

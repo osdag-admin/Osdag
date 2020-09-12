@@ -420,13 +420,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         stiffener = []
 
-        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX, self.stiffener_length if flag else '', True)
+        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX, float(self.stiffener_length) if flag else '', True)
         stiffener.append(t28)
 
-        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiffener_height if flag else '', True)
+        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, float(self.stiffener_height) if flag else '', True)
         stiffener.append(t29)
 
-        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.stiffener_thickness if flag else '', True)
+        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, str(self.stiffener_thickness) if flag else '', True)
         stiffener.append(t30)
 
         return stiffener
@@ -1254,7 +1254,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             else:
                 self.stiffener_height = self.ep_height_provided - self.beam_D - 12.5  # mm
 
-            self.stiffener_length = round_up((self.stiffener_height / math.tan(30)), 2)  # mm
+            self.stiffener_length = round_up((self.stiffener_height / math.tan(math.radians(30))), 2)  # mm
 
         self.stiffener_thickness = round_up(self.beam_tw, 2)  # mm
 

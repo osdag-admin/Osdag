@@ -1509,7 +1509,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
                       round(self.tension_capacity_critical_bolt, 2), relation='lesser'))
         self.report_check.append(t1)
 
-
         t1 = (KEY_DISP_IR, required_IR_or_utilisation_ratio(IR=1),
               cl_10_3_6_bearing_bolt_combined_shear_and_tension( self.bolt_shear_demand ,
                                                                 self.bolt_capacity,
@@ -1519,7 +1518,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
               get_pass_fail(1, self.combined_capacity_critical_bolt , relation="greater"))
         self.report_check.append(t1)
 
-
+        # CHECK 2: END PLATE CHECKS #
         # CHECK 2: END PLATE CHECKS #
         t1 = ('SubSection', '  End Plate Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)

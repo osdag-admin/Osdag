@@ -501,11 +501,9 @@ class MomentConnection(Connection, IS800_2007):
         r_1 = roots[0]
         r_2 = roots[1]
         r = max(r_1, r_2)  # picking the highest positive value from the roots
-        r = r.real  # separating the imaginary part
+        r = r.real  # separating the imaginary part (r in mm)
 
-        projection = common_calculation.round_up(r + anchor_hole_dia, 5)  # mm
-
-        return projection
+        return r
 
     @staticmethod
     def calc_weld_size_from_strength_per_unit_len(strength_unit_len, ultimate_stresses, elements_welded, fabrication=KEY_DP_FAB_SHOP):

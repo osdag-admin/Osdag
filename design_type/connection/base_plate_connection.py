@@ -2973,10 +2973,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)  # kN
 
-        # information message to the user
-        if self.load_shear_major > 0:
-            # TODO
-            logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")
+        # # information message to the user
+        # if self.load_shear_major > 0:
+        #     logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")
 
         # design for shear acting along any axis
         if (self.load_shear_major or self.load_shear_minor) > 0:
@@ -3003,16 +3002,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # Only Check 2 and 3 are applicable to these cases
                     # Check 2: Friction between base plate and the grout material [Reference: AISC Design Guide, section 3.5]
-                    # The coefficient of friction between steel and the grout is 0.55, whereas between steel and concrete is 0.7
-                    self.shear_resistance = 0.55 * self.load_axial_compression  # N
+                    # The coefficient of friction between steel and the grout is 0.45, whereas between steel and concrete is 0.7
+                    self.shear_resistance = 0.45 * self.load_axial_compression  # N
                     self.shear_resistance = min(self.shear_resistance, 0.2 * (self.bearing_strength_concrete / 0.45) * self.bp_area_provided)  # N
 
                     self.shear_resistance = min(self.shear_resistance, (self.anchor_nos_provided * self.anchor_capacity * 1000))
 
                     if self.shear_resistance < min(self.load_shear_major, self.load_shear_minor):
                         self.shear_key_required = 'Yes'
+                        logger.warning("[Shear Resistance] The shear resistance due to the friction between the base plate and the grout material "
+                                       "({} kN) is less than the applied horizontal shear force".format(round(self.shear_resistance * 1e-3, 2)))
+                        logger.info("Providing shear key")
                     else:
                         self.shear_key_required = 'No'
+                        logger.warning("[Shear Resistance] The shear resistance due to the friction between the base plate and the grout material "
+                                       "({} kN) is greater than the applied horizontal shear force".format(round(self.shear_resistance * 1e-3, 2)))
+                        logger.info("Shear key is not required")
 
             if self.connectivity == 'Moment Base Plate':
 
@@ -3027,9 +3032,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db)
                     self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
 
-                    # Providing shear key if the UR exceeds 0.7, the value is purely adopted based on experience for a conservative design
-                    if self.combined_capacity_anchor > 0.7:
+                    #TODO: calculate shear resistance for moment case
+                    # Providing shear key if the UR exceeds 0.5, the value is purely adopted based on experience for a conservative design
+                    if self.combined_capacity_anchor > 0.5:
                         self.shear_key_required = 'Yes'
+                        logger.warning("[Shear Resistance] The shear resistance due to the friction between the base plate and the grout material "
+                                       "({} kN) is less than the applied horizontal shear force".format(round(self.shear_resistance * 1e-3, 2)))
+                        logger.info("Providing shear key")
+
                     else:
                         self.shear_key_required = 'No'
 
@@ -3121,9 +3131,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         else:
             self.combined_capacity_anchor = 'N/A'
-            logger.info("There is no shear force acting on the anchor bolts")
-            logger.info("No combined shear-tension check is required")
-
             self.shear_key_required = 'No'
             self.weld_size_shear_key = 'N/A'
 
@@ -3173,9 +3180,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.edge_distance_in = self.end_distance_in
 
                     if self.end_distance_in > end_available:
+                        logger.warning("[Detailing Check] The detailing checks are not satisfied with 2 anchor bolts of {} mm diameter".
+                                       format(self.anchor_dia_inside_flange))
+                        logger.info("Re-designing the connection with anchor bolts of higher diameter and grade combination")
                         self.anchors_inside_flange = 4
-                        logger.error("Fails detailing check with 2 bolts")
-                        logger.error("Trying with 4 bolts of smaller dia")
 
                 # tension demand
                 self.tension_demand_anchor_uplift = self.load_axial_tension / self.anchors_inside_flange
@@ -3234,7 +3242,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.anchor_length_provided_in = round_up(self.anchor_length_provided_in, 5)
                 self.anchor_length_provided_in = max(self.anchor_length_provided_in, self.anchor_length_min_in)
 
-            logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"
+            logger.info("[Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"
                         " during the erection of the column.")
 
         # updating anchor length (adding the length above the concrete pedestal)
@@ -3275,41 +3283,41 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # length check
         if self.anchor_len_below_footing_out < self.anchor_length_min_out:
-            logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
-            logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
-            logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+            logger.error("[Anchor Bolt Length] The length of the anchor bolt computed is less than the minimum recommended value")
+            logger.info("[Anchor Bolt Length] The minimum length of the anchor recommended is {}".format(self.anchor_length_min_out))
+            logger.info("[Anchor Bolt Length] Updating length of anchor bolt to minimum required value")
         elif self.anchor_len_below_footing_out > self.anchor_length_max_out:
-            logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
-            logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
-            logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+            logger.error("[Anchor Bolt Length] The length of the anchor bolt computed is greater than the maximum recommended value")
+            logger.info("[Anchor Bolt Length] The maximum length of the anchor recommended is {}".format(self.anchor_length_max_out))
+            logger.info("[Anchor Bolt Length] Restricting the length of the anchor bolt within the maximum allowed value")
         else:
-            logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
+            logger.info("[Anchor Bolt Length] The recommended range for the length of the anchor bolt of thread size {} mm is as follows:"
                         .format(self.anchor_dia_outside_flange))
-            logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
+            logger.info("[Anchor Bolt Length] Minimum length = {} mm, Maximum length = {} mm."
                         .format(self.anchor_length_min_out, self.anchor_length_max_out))
-            logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided_out))
-            logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
-                        "of standard lengths and sizes, satisfying the suggested range.")
-            logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
+            logger.info("[Anchor Bolt Length] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided_out))
+            logger.info("[Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
+                        "of standard lengths and sizes, satisfying the recommended range")
+            logger.info("[Anchor Bolt Length] Reference: IS 5624:1993, Table 1")
 
         if self.load_axial_tension > 0:
             if self.anchor_len_below_footing_in < self.anchor_length_min_in:
-                logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
-                logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
-                logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+                logger.error("[Anchor Bolt Length] The length of the anchor bolt computed is less than the minimum recommended value")
+                logger.info("[Anchor Bolt Length] The minimum length of the anchor recommended is {}".format(self.anchor_length_min_in))
+                logger.info("[Anchor Bolt Length] Updating length of anchor bolt to minimum required value")
             elif self.anchor_len_below_footing_in > self.anchor_length_max_in:
-                logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
-                logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
-                logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+                logger.error("[Anchor Bolt Length] The length of the anchor bolt computed is greater than the maximum recommended value")
+                logger.info("[Anchor Bolt Length] The maximum length of the anchor recommended is {}".format(self.anchor_length_max_in))
+                logger.info("[Anchor Bolt Length] Restricting the length of the anchor bolt within the maximum allowed value")
             else:
-                logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
+                logger.info("[Anchor Bolt Length] The recommended range for the length of the anchor bolt of thread size {} mm is as follows:"
                             .format(self.anchor_dia_inside_flange))
-                logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
+                logger.info("[Anchor Bolt Length] Minimum length = {} mm, Maximum length = {} mm."
                             .format(self.anchor_length_min_in, self.anchor_length_max_in))
-                logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided_in))
-                logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
-                            "of standard lengths and sizes, satisfying the suggested range.")
-                logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
+                logger.info("[Anchor Bolt Length] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided_in))
+                logger.info("[Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
+                            "of standard lengths and sizes, satisfying the recommended range")
+                logger.info("[Anchor Bolt Length] Reference: IS 5624:1993, Table 1")
 
     def design_weld(self):
         """ design weld for the base plate and stiffeners
@@ -3716,8 +3724,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # checks
                     if self.shear_on_stiffener_along_flange > (0.6 * self.shear_capa_stiffener_along_flange):
-                        logger.warning("Fails in shear")
-                        logger.info("Improvising thk")
+                        logger.warning("[Shear Check - Stiffener] The stiffener along the flange fails the shear check")
+                        logger.warning(" The shear demand on the stiffener ({} kN) exceeds 60% of it's capacity ({} kN)".
+                                       format(round(self.shear_on_stiffener_along_flange, 2), round(0.6 * self.shear_capa_stiffener_along_flange, 2)))
+                        logger.info("Increasing the thickness of the stiffener and re-checking against shear demand")
 
                         n = 1
                         while self.shear_on_stiffener_along_flange > (0.6 * self.shear_capa_stiffener_along_flange):
@@ -3741,8 +3751,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         pass
 
                     if self.moment_on_stiffener_along_flange > self.moment_capa_stiffener_along_flange:
-                        logger.warning("Fails in moment")
-                        logger.info("Improvising thk")
+                        logger.warning("[Moment Check - Stiffener] The stiffener along the flange fails the moment check")
+                        logger.warning("The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                                       format(round(self.moment_on_stiffener_along_flange, 2), round(self.moment_capa_stiffener_along_flange, 2)))
+                        logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
                         n = 1
                         while self.moment_on_stiffener_along_flange > self.moment_capa_stiffener_along_flange:
@@ -3750,8 +3762,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                             # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
 
-                            self.z_e_stiffener_along_flange = (
-                                                                          self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
+                            self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
                             self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                                    self.stiffener_fy,
@@ -3831,8 +3842,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # checks
                     if self.shear_on_stiffener_along_web > (0.6 * self.shear_capa_stiffener_along_web):
-                        logger.warning("Fails in shear")
-                        logger.info("Improvising thk")
+                        logger.warning("[Shear Check - Stiffener] The stiffener along the web fails the shear check")
+                        logger.warning("The shear demand on the stiffener ({} kN) exceeds 60% of it's capacity ({} kN)".
+                                       format(round(self.shear_on_stiffener_along_web, 2), round(0.6 * self.shear_capa_stiffener_along_web, 2)))
+                        logger.info("Increasing the thickness of the stiffener and re-checking against shear demand")
 
                         n = 1
                         while self.shear_on_stiffener_along_web > (0.6 * self.shear_capa_stiffener_along_web):
@@ -3856,8 +3869,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         pass
 
                     if self.moment_on_stiffener_along_web > self.moment_capa_stiffener_along_web:
-                        logger.warning("Fails in moment")
-                        logger.info("Improvising thk")
+                        logger.warning("[Moment Check - Stiffener] The stiffener along the flange fails the moment check")
+                        logger.warning("[Moment Check - Stiffener] The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                                       format(round(self.moment_on_stiffener_along_web, 2), round(self.moment_capa_stiffener_along_web, 2)))
+                        logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
                         n = 1
                         while self.moment_on_stiffener_along_web > self.moment_capa_stiffener_along_web:
@@ -3904,8 +3919,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # checks
                     if self.shear_on_stiffener_across_web > (0.6 * self.shear_capa_stiffener_across_web):
-                        logger.warning("Fails in shear")
-                        logger.info("Improvising thk")
+                        logger.warning("[Shear Check - Stiffener] The stiffener across the web fails the shear check")
+                        logger.warning("The shear demand on the stiffener ({} kN) exceeds 60% of it's capacity ({} kN)".
+                                       format(round(self.shear_on_stiffener_across_web, 2), round(0.6 * self.shear_capa_stiffener_across_web, 2)))
+                        logger.info("Increasing the thickness of the stiffener and re-checking against shear demand")
 
                         n = 1
                         while self.shear_on_stiffener_across_web > (0.6 * self.shear_capa_stiffener_across_web):
@@ -3931,8 +3948,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         pass
 
                     if self.moment_on_stiffener_across_web > self.moment_capa_stiffener_across_web:
-                        logger.warning("Fails in moment")
-                        logger.info("Improvising thk")
+                        logger.warning("[Moment Check - Stiffener] The stiffener across the web fails the moment check")
+                        logger.warning("The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                                       format(round(self.moment_on_stiffener_across_web, 2), round(self.moment_capa_stiffener_across_web, 2)))
+                        logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
                         n = 1
                         while self.moment_on_stiffener_across_web > self.moment_capa_stiffener_across_web:
@@ -4102,8 +4121,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             # checks
             if self.shear_on_stiffener > (0.6 * self.shear_capa_stiffener):
-                logger.warning("Fails in shear")
-                logger.info("Improvising thk")
+                logger.warning("[Shear Check - Stiffener] The stiffener fails the shear check")
+                logger.warning("The shear demand on the stiffener ({} kN) exceeds 60% of it's capacity ({} kN)".
+                               format(round(self.shear_on_stiffener, 2), round(0.6 * self.shear_capa_stiffener, 2)))
+                logger.info("Increasing the thickness of the stiffener and re-checking against shear demand")
 
                 n = 1
                 while self.shear_on_stiffener > (0.6 * self.shear_capa_stiffener):
@@ -4124,8 +4145,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 pass
 
             if self.moment_on_stiffener > self.moment_capa_stiffener:
-                logger.warning("Fails in moment")
-                logger.info("Improvising thk")
+                logger.warning("[Moment Check - Stiffener] The stiffener fails the moment check")
+                logger.warning("The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                               format(round(self.moment_on_stiffener, 2), round(self.moment_capa_stiffener, 2)))
+                logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
                 n = 1
                 while self.moment_on_stiffener > self.moment_capa_stiffener:
@@ -4209,8 +4232,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             if n == itr:  # if 4 bolts with highest diameter is not sufficient
                                 # self.safe = False
                                 # TODO: give log errors
-                                logger.error("Cannot compute anchor bolt for resisting the uplift force with 4 bolts")
-                                logger.error("Trying with 8 bolts")
+                                logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts with the highest "
+                                             "trial diameter and grade")
+                                logger.error("Re-designing the connection with 8 anchor bolts")
                                 break
 
                     # detailing checks for the above case
@@ -4230,8 +4254,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.edge_distance_in = self.end_distance_in
 
                     if (self.anchors_inside_flange > 4) or (self.end_distance_in > end_available):
-                        logger.error("Fails in detailing or exceeds 4 bolts")
-                        logger.error("Trying with 8 bolts of smaller dia")
+                        logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts with the highest "
+                                     "trial diameter and grade or fails to satisfy the detailing criteria")
+                        logger.error("Re-designing the connection with 8 anchor bolts")
 
                         self.anchors_inside_flange = 8  # minimum 8 bolts with a smaller diameter
                         self.anchor_dia_inside_flange = 20  # trying with (least) 20mm anchor dia
@@ -4275,8 +4300,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                 if n == itr:  # if 8 bolts with highest diameter is not sufficient
                                     self.safe = False
-                                    # TODO: give log errors
-                                    logger.error("Cannot compute anchor bolt for resisting the uplift force")
+                                    logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 8 anchor bolts with the "
+                                        "highest trial diameter and grade or fails to satisfy the detailing criteria")
+                                    logger.error("Design for anchor bolts greater than 8 in numbers is not available in this version of Osdag")
+                                    logger.error("Cannot compute")
                                     break
 
                         # detailing checks
@@ -4295,13 +4322,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                         if self.end_distance_in > end_available:
                             self.safe = False
-                            logger.error("Fails detailing check with 8 bolts, Uplift force too high")
+                            logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 8 anchor bolts with the "
+                                         "highest trial diameter and grade or fails to satisfy the detailing criteria")
+                            logger.error("Design for anchor bolts greater than 8 in numbers is not available in this version of Osdag")
+                            logger.error("Cannot compute")
 
                 # case where stiffeners are not required across the column web, try with 2 bolts
                 else:
                     if self.anchors_inside_flange > 2:
-                        logger.error("Exceeds 2 bolts")
-                        logger.info("Trying with higher dia bolt")
+                        logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 2 anchor bolts")
+                        logger.error("Re-designing the connection with 2 anchor bolts of higher diameter or grade combination")
 
                         # if the number of bolts exceeds 2 in number, provide a higher diameter of bolt from the given list of anchor diameters
                         n = 1
@@ -4339,15 +4369,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                             if self.end_distance_in > end_available:
                                 self.anchors_inside_flange = 4
-                                logger.error("Fails detailing check with 2 bolts")
-                                logger.error("Trying with 4 bolts of smaller dia")
+                                logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 2 anchor bolts of highest diameter"
+                                             "and grade combination")
+                                logger.error("Re-designing the connection with 4 anchor bolts")
 
                             # if ((n - 1) >= len(bolt_list)) and (self.anchors_inside_flange > 2):
                             # if (self.anchor_dia_inside_flange == 72) and (self.anchors_inside_flange > 2):
                             if (n == itr) and (self.anchors_inside_flange > 2):
                                 # try with 4 bolts if 2 is not sufficient with the highest diameter
-                                logger.error("Exceeds 2 bolts")
-                                logger.info("Trying with 4 bolts")
+                                logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 2 anchor bolts of highest diameter"
+                                             "and grade combination")
+                                logger.error("Re-designing the connection with 4 anchor bolts")
 
                                 self.anchor_dia_inside_flange = 20
                                 self.anchor_area_inside_flange = self.bolt_area(self.anchor_dia_inside_flange)
@@ -4380,12 +4412,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                 if (self.end_distance_in > end_available) or (self.pitch_distance_in > pitch_available):
                                     # self.safe = False
-                                    logger.error("Fails detailing check with 4 bolts with 20 dia, checking with larger dia bolt")
+                                    logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts or fails to "
+                                                 "satisfy the detailing criteria")
+                                    logger.error("Re-designing the connection with 4 anchor bolts of higher diameter and grade combination")
 
                                 if self.anchors_inside_flange > 4:
                                     # if the number of bolts exceeds 4, provide a higher diameter of bolt from the given list of anchor diameters
-                                    logger.error("Exceeds 4 bolts with 20mm dia")
-                                    logger.info("Trying with 4 bolts and dia higher than 20")
+                                    logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts of 20 mm diameter "
+                                                 "or fails to satisfy the detailing criteria")
+                                    logger.error("Re-designing the connection with 4 anchor bolts of higher diameter and grade combination")
 
                                     n = 1
                                     while self.anchors_inside_flange > 4:  # trying for 4 bolts with higher diameter
@@ -4430,8 +4465,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                         pitch_available = self.column_D - (2 * self.column_tf) - (2 * self.end_distance_in)
 
                                         if (self.end_distance_in > end_available) or (self.pitch_distance_in > pitch_available):
+                                            logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts or "
+                                                "fails to satisfy the detailing criteria")
+                                            logger.error("Re-designing the connection with 8 anchor bolts")
                                             self.anchors_inside_flange = 8  # trying with 8 bolts as detailing check fails
-                                            logger.error("Fails detailing check with 4 bolts")
                                             itr = n
 
                                         if (self.anchor_dia_inside_flange <= 72) and (self.anchors_inside_flange == 4):
@@ -4442,8 +4479,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                             # if 4 bolts with highest diameter is not sufficient
                                             # self.safe = False
                                             # TODO: give log errors
-                                            logger.error("Cannot compute anchor bolt for resisting the uplift force with 4 bolts")
-                                            logger.info("Trying with 8 bolts")
+                                            logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts of"
+                                                         " highest diameter or fails to satisfy the detailing criteria")
+                                            logger.error("Re-designing the connection with 8 anchor bolts")
 
                                             self.anchors_inside_flange = 8  # minimum 8 bolts with a smaller diameter
                                             self.anchor_dia_inside_flange = 20  # trying with (least) 20mm anchor dia
@@ -4493,8 +4531,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                     # if n > len(bolt_list):  # if 8 bolts with highest diameter is not sufficient
                                                     if n > itr:
                                                         self.safe = False
-                                                        # TODO: give log errors
-                                                        logger.error("Cannot compute anchor bolt for resisting the uplift force with 8 bolts")
+                                                        logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 8 anchor "
+                                                            "bolts with the highest diameter and grade or fails to satisfy the detailing criteria")
+                                                        logger.error("Design for anchor bolts greater than 8 in numbers is not available in this "
+                                                                     "version of Osdag")
+                                                        logger.error("Cannot compute")
                                                         break
 
                                                 # detailing check - 8 bolts with larger dia
@@ -4517,9 +4558,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                 pitch_available = self.column_D - (2 * self.column_tf) - (2 * self.end_distance_in)
 
                                                 if (self.end_distance_in > end_available) or (self.pitch_distance_in > pitch_available):
-                                                    logger.error("Fails detailing check with 8 bolts")
-                                                    self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
                                                     self.safe = False
+                                                    self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
+                                                    logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 8 anchor "
+                                                                 "bolts with the highest diameter and grade or fails to satisfy the detailing "
+                                                                 "criteria")
+                                                    logger.error("Design for anchor bolts greater than 8 in numbers is not available in this "
+                                                                 "version of Osdag")
                                                     logger.error("Cannot compute anchor bolt for resisting the uplift force")
                                                     break
                                                 else:
@@ -4530,6 +4575,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                     break
                                                 else:
                                                     self.safe = False
+                                                    logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 8 anchor "
+                                                                 "bolts with the highest diameter and grade or fails to satisfy the detailing "
+                                                                 "criteria")
+                                                    logger.error("Design for anchor bolts greater than 8 in numbers is not available in this "
+                                                                 "version of Osdag")
                                                     logger.error("Cannot compute anchor bolt for resisting the uplift force")
                                                     break
 
@@ -4537,7 +4587,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 if (self.anchors_inside_flange == 2) or (self.anchors_inside_flange == 4) or (self.anchors_inside_flange == 8):
                                     break
                                 else:
-                                    logger.error("Cannot compute")
+                                    logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 8 anchor "
+                                                 "bolts with the highest diameter and grade or fails to satisfy the detailing "
+                                                 "criteria")
+                                    logger.error("Design for anchor bolts greater than 8 in numbers is not available in this "
+                                                 "version of Osdag")
+                                    logger.error("Cannot compute anchor bolt for resisting the uplift force")
 
                             if (self.anchor_dia_inside_flange >= 72) and (self.anchors_inside_flange > 4):
                                 # self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
@@ -4563,11 +4618,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # end of calculation
         if self.safe:
             self.design_status = True
-            logger.info(": Overall base plate connection design is safe")
-            logger.info(": =========End Of design===========")
+            logger.info(": =========================Design Status===========================")
+            logger.info(":         Overall base plate connection design is SAFE")
+            logger.info(": =========================End Of design===========================")
         else:
-            logger.info(": Overall base plate connection design is unsafe")
-            logger.info(": =========End Of design===========")
+            self.design_status = False
+            logger.info(": =========================Design Status===========================")
+            logger.info(":         Overall base plate connection design is UNSAFE")
+            logger.info(": =========================End Of design===========================")
 
         # printing values for output dock
 

@@ -252,6 +252,7 @@ class EndPlateSpliceHelper(object):
                                 self.lever_arm.append(r_a)
 
                 else:  # bolts near the web
+                    row_list = np.arange(1, self.bolt_row + self.bolt_row_web + 1, 1).tolist()
                     # updating the row list to begin the iteration from the rows provided at web with different pitch distance
                     row_list = row_list[a - 1:]
 
@@ -625,7 +626,7 @@ class EndPlateSpliceHelper(object):
         # r_c = reaction due to tension in all the bolts
         self.r_c = 0
         for val in range(0, len(self.tension)):
-            self.r_c = self.r_c + self.tension[val]  # adding all the values of tension
+            self.r_c += self.tension[val]  # adding all the values of tension
 
         # total tension considering the bolt columns
         self.r_c = round(self.r_c * self.bolt_column, 2)  # kN

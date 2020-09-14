@@ -77,6 +77,7 @@ class BBENutBoltArray(object):
         self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         self.pitch_web = boltPlaceObj.pitch_distance_web
         # self.out_bolt = boltPlaceObj.out_bolt
+        print(self.pitch_web)
 
         # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
         self.endDist_flush = self.boltProjection + boltPlaceObj.beam_tf + self.endDist
@@ -176,7 +177,7 @@ class BBENutBoltArray(object):
                             pos = pos + (self.endDist + self.endDist_ext + self.pitch) * self.pitchDir
                             pos = pos + (rw + 1) * self.pitch_web * self.pitchDir
                         else:
-                            pos = pos + (self.endDist + self.endDist_ext + 2 * self.pitch) * self.pitchDir
+                            pos = pos + (self.endDist + self.endDist_ext + 2 * self.pitch + ((self.row-8)/2)*self.pitch) * self.pitchDir
                             pos = pos + (rw + 1) * self.pitch_web * self.pitchDir
 
                         self.positions.append(pos)
@@ -248,7 +249,7 @@ class BBENutBoltArray(object):
                             pos = pos + (self.endDist + self.endDist_ext + self.pitch) * self.pitchDir
                             pos = pos + (rw + 1) * self.pitch_web * self.pitchDir
                         else:
-                            pos = pos + (self.endDist + self.endDist_ext + 2 * self.pitch) * self.pitchDir
+                            pos = pos + (self.endDist + self.endDist_ext + 2 * self.pitch + (self.row -5) * self.pitch) * self.pitchDir
                             pos = pos + (rw + 1) * self.pitch_web * self.pitchDir
 
                         self.positions.append(pos)

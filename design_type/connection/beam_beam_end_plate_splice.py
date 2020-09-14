@@ -266,7 +266,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def fn_conn_image(self):
         """ display representative images of end plate type """
         # conn = self[0]
-        ep_type = self[1]
+        ep_type = self[0]
         if ep_type == 'Flushed - Reversible Moment':
             return './ResourceFiles/images/flush_ep.png'
         elif ep_type == 'Extended One Way - Irreversible Moment':

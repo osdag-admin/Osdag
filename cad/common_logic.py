@@ -2039,7 +2039,6 @@ class CommonDesignLogic(object):
                     self.CPObj = self.createBBCoverPlateCAD()
 
                     self.display_3DModel("Model", "gradient_bg")
-
                 else:
                     self.display.EraseAll()
 

@@ -265,6 +265,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def fn_conn_image(self):
         """ display representative images of end plate type """
+
         ep_type = self[0]
         if ep_type == VALUES_ENDPLATE_TYPE[0]:
             return './ResourceFiles/images/flush_ep.png'

@@ -1054,7 +1054,7 @@ def cl_10_3_4_calculate_kb(e, p, d, fub, fu):
     return kb_eqn
 
 
-def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_bearing_capacity):
+def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_bearing_capacity, hole_type):
     """
     Calculate bolt bearing capacity of bolt
 
@@ -1065,6 +1065,7 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
         conn_plates_t_fu_fy: Ultimate tensile strength of the plate in MPa (float)
         gamma_mb:Partial safety factor =1.25 [Ref: Table 5, cl.5.4.1,IS 800:2007]
         bolt_bearing_capacity: Bolt bearing capacity in KN (float)
+        hole_type: type of bolt hole (str)
     Returns:
             Bearing capacity of bolt(provided ) in KN  (float)
     Note:
@@ -1088,12 +1089,26 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
     t = str(t)
     f_u = str(f_u)
     gamma_mb = str(gamma_mb)
-    bolt_bearing_capacity = str(bolt_bearing_capacity)
+
     bolt_bearing_eqn = Math(inline=True)
     bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{1000\times\gamma_{mb}}\\'))
-    bolt_bearing_eqn.append(NoEscape(
-        r'&= \frac{2.5 \times ' + k_b + r'\times' + d + r'\times' + t + r'\times' + f_u + r'}{1000\times' + gamma_mb + r'}\\'))
-    bolt_bearing_eqn.append(NoEscape(r'&=' + bolt_bearing_capacity + r'\\ \\'))
+    bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5 \times ' + k_b + r'\times' + d + r'\times' + t + r'\times' + f_u + r'}{1000\times' + gamma_mb + r'}\\'))
+
+    if str(hole_type) == 'Over-sized' or str(hole_type) == 'short_slot':
+        bolt_bearing_eqn.append(NoEscape(r'&=' + str(round(bolt_bearing_capacity / 0.7, 2)) + r'\\'))
+        bolt_bearing_eqn.append(NoEscape(r'&= 0.7 \times' + str(round(bolt_bearing_capacity / 0.7, 2)) + r'\\'))
+        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r'\\ \\'))
+        bolt_bearing_eqn.append(NoEscape(r' Note:~& The~bearing~capacity~is~reduced \\'))
+        bolt_bearing_eqn.append(NoEscape(r' & since~the~hole~type~is~Over-sized \\'))
+        bolt_bearing_eqn.append(NoEscape(r' & ~or~Short-slotted \\ \\'))
+
+    elif str(hole_type) == 'long_slot':
+        bolt_bearing_eqn.append(NoEscape(r'&=' + str(round(bolt_bearing_capacity / 0.5, 2)) + r'\\'))
+        bolt_bearing_eqn.append(NoEscape(r'&= 0.5 \times' + str(round(bolt_bearing_capacity / 0.5, 2)) + r'\\'))
+        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r'\\ \\'))
+        bolt_bearing_eqn.append(NoEscape(r' Note:& The~bearing~capacity~is~reduced \\'))
+        bolt_bearing_eqn.append(NoEscape(r' & since~the~hole~type~is~Long-slotted \\ \\'))
+
     bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4]\end{aligned}'))
 
     return bolt_bearing_eqn
@@ -1117,17 +1132,17 @@ def tension_demand_per_bolt(total_tension_demand, no_of_bolts):
     tension_per_bolt = round((total_tension_demand / no_of_bolts), 2)
     tension_per_bolt = str(tension_per_bolt)
     total_tension_demand = str(total_tension_demand)
-    no_of_bolts = str(no_of_bolts)
 
     tension_demand = Math(inline=True)
-    tension_demand.append(NoEscape(r'\begin{aligned} T_{b} &= \frac{P_{t}}{n_{out}} \\'))
-    tension_demand.append(NoEscape(r' &= \frac{' + total_tension_demand + r'}{' + no_of_bolts + r'} \\'))
+    tension_demand.append(NoEscape(r'\begin{aligned} T_{b} &= \frac{P_{t}}{n_{out} / 2} \\'))
+    tension_demand.append(NoEscape(r' &= \frac{' + total_tension_demand + r'}{' + str(2 * no_of_bolts) + r'/ 2} \\'))
+    tension_demand.append(NoEscape(r' &= \frac{' + total_tension_demand + r'}{' + str(no_of_bolts) + r'} \\'))
     tension_demand.append(NoEscape(r' &= ' + tension_per_bolt + r' \end{aligned}'))
 
     return tension_demand
 
 
-def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_capacity):
+def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_capacity, fabrication=KEY_DP_FAB_FIELD):
     """
     Calculate design tensile strength of bearing bolt
     Args:
@@ -1142,10 +1157,10 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_cap
         Reference:
         IS 800:2007,  cl 10.3.5
     """
-    gamma_mb = 1.5
+    gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][fabrication]
     gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
 
-    tension_capacity_1 = round(0.9 * f_ub * A_n * 10 ** -3, 2)
+    tension_capacity_1 = round((0.9 * f_ub * A_n * 10 ** -3) / gamma_mb, 2)
     tension_capacity_1 = str(tension_capacity_1)
     tension_capacity_2 = round(f_yb * A_sb * (gamma_mb / gamma_m0) * 10 ** -3, 2)
     tension_capacity_2 = str(tension_capacity_2)
@@ -1153,17 +1168,17 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_cap
     f_yb = str(f_yb)
     A_sb = str(A_sb)
     A_n = str(A_n)
-    gamma_mb = str(1.5)
-    gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+    gamma_mb = str(gamma_mb)
     gamma_m0 = str(gamma_m0)
+
     tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n~/~\gamma_{mb} \\'))
     tension_resistance.append(NoEscape(r'&  ~<~ f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))
     tension_resistance.append(NoEscape(r'&= min \Big(0.90~' + r'\times' + f_ub + r'\times' + A_n + r'~/~' + gamma_mb + r',~ \\'))
     tension_resistance.append(NoEscape(r'& ~~~~~~~~~~' + f_yb + r'\times' + A_sb + r'\times(' + gamma_mb + '/' + gamma_m0 + r') \Big) \\'))
-    tension_resistance.append(NoEscape(r'&= (' + tension_capacity_1 + r',~ ' + tension_capacity_2 + r') \\'))
-    tension_resistance.append(NoEscape(r'&= ' + tension_capacity + r'\\'))
+    tension_resistance.append(NoEscape(r'&= min (' + tension_capacity_1 + r',~ ' + tension_capacity_2 + r') \\'))
+    tension_resistance.append(NoEscape(r'&= ' + tension_capacity + r'\\ \\'))
     tension_resistance.append(NoEscape(r'& [Ref.~IS~800:2007,~Cl.~10.3.5]\end{aligned}'))
 
     return tension_resistance
@@ -4799,9 +4814,11 @@ def eff_projection(col_depth, col_flange_width, col_flange_thk, col_web_thk, min
                       r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\ '))
     c.append(NoEscape(r'& = ' + min_area + r' \times 10^{3} \\ '))
     c.append(NoEscape(r'              c &  = ' + projection + r' \\ \\'))
-    c.append(NoEscape(r' projection &= max(' + projection + r',~' + end_distance + r') \\'))
+
+    c.append(NoEscape(r' projection &= max(c,~e) \\'))
+    c.append(NoEscape(r'            &= max(' + projection + r',~' + end_distance + r') \\'))
     c.append(NoEscape(r'&            = ' + projection_val + r' \\ \\'))
-    c.append(NoEscape(r'& [Reference:~Design~of~Steel~Structures \\'))
+    c.append(NoEscape(r' [Reference: &~Design~of~Steel~Structures \\'))
     c.append(NoEscape(r'& -~N.Subramanian,~(2019~edition)~Chapter~15,] \end{aligned} '))
     # c.append(NoEscape(r'& Chapter~15,] \end{aligned}'))
 

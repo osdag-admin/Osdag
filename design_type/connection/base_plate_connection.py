@@ -1365,6 +1365,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return fu_fy_list
 
+    # define design preferences
     def tab_list(self):
 
         # self.design_button_status = False
@@ -1411,6 +1412,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             designation_ocf = str(input_dictionary[KEY_DIA_ANCHOR_OCF][0]) + "X" + length + " IS5624 GALV"
             designation_icf = str(input_dictionary[KEY_DIA_ANCHOR_ICF][0]) + "X" + length + " IS5624 GALV"
             anchor_type = input_dictionary[KEY_TYP_ANCHOR]
+            # fu = float(self.anchor_fu_fy_outside_flange[0]) if self.design_button_status else 0
             fu = Material(input_dictionary[KEY_MATERIAL]).fu
             values[KEY_DP_ANCHOR_BOLT_LENGTH_OCF] = length
             values[KEY_DP_ANCHOR_BOLT_LENGTH_ICF] = length
@@ -1418,8 +1420,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             values[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF] = designation_icf
             values[KEY_DP_ANCHOR_BOLT_TYPE_OCF] = anchor_type
             values[KEY_DP_ANCHOR_BOLT_TYPE_ICF] = anchor_type
-            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF] = fu
-            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF] = fu
+            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF] = float(self.anchor_fu_fy_outside_flange[0]) if self.design_button_status else 0
+            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF] = float(self.anchor_fu_fy_inside_flange[0]) if self.design_button_status else 0
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -1489,18 +1491,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
             material_grade = ''
             fu = ''
-            fy = ''
+            fy_20 = ''
+            fy_20_40 = ''
+            fy_40 = ''
         else:
             material_grade = input_dictionary[KEY_MATERIAL]
             material_attributes = Material(material_grade)
             fu = material_attributes.fu
-            fy = material_attributes.fy
+            fy_20 = material_attributes.fy_20
+            fy_20_40 = material_attributes.fy_20_40
+            fy_40 = material_attributes.fy_40
 
         if KEY_BASE_PLATE_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_BASE_PLATE_MATERIAL]
             material_attributes = Material(material_grade)
             fu = material_attributes.fu
-            fy = material_attributes.fy
+            fy_20 = material_attributes.fy_20
+            fy_20_40 = material_attributes.fy_20_40
+            fy_40 = material_attributes.fy_40
 
         tab_bp = []
         material = connectdb("Material", call_type="popup")
@@ -1510,7 +1518,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = (KEY_BASE_PLATE_FU, KEY_DISP_BASE_PLATE_FU, TYPE_TEXTBOX, None, fu)
         tab_bp.append(t2)
 
-        t3 = (KEY_BASE_PLATE_FY, KEY_DSIP_BASE_PLATE_FY, TYPE_TEXTBOX, None, fy)
+        t3 = (KEY_CONNECTOR_FY_20, KEY_DISP_FY_20, TYPE_TEXTBOX, None, fy_20)
+        tab_bp.append(t3)
+
+        t3 = (KEY_CONNECTOR_FY_20_40, KEY_DISP_FY_20_40, TYPE_TEXTBOX, None, fy_20_40)
+        tab_bp.append(t3)
+
+        t3 = (KEY_CONNECTOR_FY_40, KEY_DISP_FY_40, TYPE_TEXTBOX, None, fy_40)
         tab_bp.append(t3)
 
         return tab_bp
@@ -1654,8 +1668,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # base plate
         self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
-        self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])
-        self.dp_bp_fy = float(design_dictionary[KEY_BASE_PLATE_FY])
+        self.base_plate = Material(material_grade=self.dp_bp_material, thickness=0)  # thk is initialised to 0
+        self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, 0)
+
+        self.dp_bp_fu = self.base_plate.fu
+        self.dp_bp_fy = self.base_plate.fy
+
+        # self.base_plate.fu = float(design_dictionary[KEY_BASE_PLATE_FU])
+        # self.base_plate.fy = float(design_dictionary[KEY_BASE_PLATE_FY])
 
         # anchor bolt
 
@@ -1862,8 +1882,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_grade_out = i  # outside flange
             break
 
-        self.anchor_fu_fy_outside_flange = self.get_bolt_fu_fy(self.anchor_grade_out,
-                                                               self.anchor_dia_provided_outside_flange)  # strength values - [bolt_fu, bolt_fy] (list)
+        # strength values - [bolt_fu, bolt_fy] (list)
+        self.anchor_fu_fy_outside_flange = self.get_bolt_fu_fy(self.anchor_grade_out, self.anchor_dia_provided_outside_flange)
 
         # 3.2: Anchor inside flange (Note: Grade - '3.6' is ignored due to its non availability)
         # self.anchor_grade_in = list(reversed(self.anchor_grade_in))
@@ -1948,10 +1968,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bp_width_min = 0.85 * self.column_bf + (2 * (2 * self.edge_distance_out))  # mm
 
         # 7: Design Parameters
-
-        # define parameters for the stiffener plates
-        self.stiffener_fy = self.dp_bp_fy  # MPa
-        self.epsilon = round(math.sqrt(250 / self.stiffener_fy), 2)
 
         # grout thickness fixed at 50 mm
         self.grout_thk = 50  # mm
@@ -2043,8 +2059,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             # design of plate thickness
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
-            self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy))  # mm
+            self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.base_plate.fy))  # mm
             self.plate_thk = round(self.plate_thk, 2)
+
+            # plate fy check
+            if self.plate_thk >= 20:
+                self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, self.plate_thk)  # update fy
+                self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.base_plate.fy))  # mm, update thk
+                self.plate_thk = round(self.plate_thk, 2)
 
             self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
             # calculating tension capacity of the anchor bolt
@@ -2131,8 +2153,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
                 # Assumption: Z_e of the plate is = b*tp^2 / 6, where b = 1 for a cantilever strip of unit dimension
 
-                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy * self.bp_width_provided))  # mm
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.base_plate.fy * self.bp_width_provided))  # mm
                 self.plate_thk = round(self.plate_thk, 2)
+
+                # plate fy check
+                if self.plate_thk >= 20:
+                    self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, self.plate_thk)  # update fy
+                    # update plate thk
+                    self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.base_plate.fy * self.bp_width_provided))  # mm
+                    self.plate_thk = round(self.plate_thk, 2)
 
                 self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
                 # calculating tension capacity of the anchor bolt
@@ -2926,8 +2955,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
                 # Assumption: Z_e of the plate is = b*tp^2 / 6, where b = 1 for a cantilever strip of unit dimension
 
-                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy * self.bp_width_provided))  # mm
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.base_plate.fy * self.bp_width_provided))  # mm
                 self.plate_thk = round(self.plate_thk, 2)
+
+                # plate fy check
+                if self.plate_thk >= 20:
+                    self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, self.plate_thk)  # update fy
+                    # update plate thk
+                    self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.base_plate.fy * self.bp_width_provided))  # mm
+                    self.plate_thk = round(self.plate_thk, 2)
 
             self.anchor_dia_outside_flange = self.anchor_dia_provided_outside_flange
 
@@ -2983,11 +3019,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Design strength of the anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
         # Assumption: number of shear planes passing through - the thread is 1 (n_n) and through the shank is 0 (n_s)
 
-        self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite_out, self.anchor_area_outside_flange[1],
+        self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.anchor_fu_fy_outside_flange[0], self.anchor_area_outside_flange[1],
                                                                         self.anchor_area_outside_flange[0], 1, 0, self.dp_weld_fab)
         self.shear_capacity_anchor = round(self.shear_capacity_anchor / 1000, 2)  # kN
 
-        self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite_out, self.plate_thk_provided,
+        self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.base_plate.fu, self.anchor_fu_fy_outside_flange[0], self.plate_thk_provided,
                                                                             self.anchor_dia_provided_outside_flange, self.end_distance_out,
                                                                             self.pitch_distance_out, self.dp_anchor_hole_out, self.dp_weld_fab)
         self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
@@ -3347,6 +3383,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns:
         """
+        # define parameters for the stiffener plates
+        self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, self.plate_thk_provided)  # update fy
+        self.stiffener_fy = self.base_plate.fy  # MPa
+        self.epsilon = round(math.sqrt(250 / self.stiffener_fy), 2)
+
         # design the weld connecting the column and the stiffeners to the base plate
         self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
 
@@ -4624,7 +4665,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.edge_distance_out = self.end_distance_out  # mm
 
         # check for max end/edge distance
-        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy], self.dp_detail_is_corrosive)
+        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy], self.dp_detail_is_corrosive)
 
         # end of calculation
         if self.safe:
@@ -4891,7 +4932,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # defining additional attributes
         if self.pitch_distance_out > 0:
             k_b_out = min((self.end_distance_out / (3.0 * self.anchor_hole_dia_out)), ((self.pitch_distance_out / (3.0 * self.anchor_hole_dia_out)) -
-                                                                                       0.25), (self.dp_anchor_fu_overwrite_out / self.dp_column_fu),
+                                                                                       0.25), (self.anchor_fu_fy_outside_flange[0] / self.dp_column_fu),
                           1.0)
         else:
             k_b_out = 1
@@ -5001,9 +5042,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
               get_pass_fail(min_end_out, self.end_distance_out, relation='leq'))
         self.report_check.append(t2)
 
-        max_end_out = self.cl_10_2_4_3_max_edge_dist([(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
+        max_end_out = self.cl_10_2_4_3_max_edge_dist([(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy), (0, 0, 0)],
                                                      corrosive_influences=self.dp_detail_is_corrosive)
-        t3 = ('Max. End Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
+        t3 = ('Max. End Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy), (0, 0, 0)],
                                                                       corrosive_influences=self.dp_detail_is_corrosive, parameter='end_dist'),
               self.end_distance_out,
               get_pass_fail(max_end_out, self.end_distance_out, relation='geq'))
@@ -5016,7 +5057,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.report_check.append(t4)
 
         max_edge_out = max_end_out
-        t5 = ('Max. Edge Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
+        t5 = ('Max. Edge Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy), (0, 0, 0)],
                                                                        corrosive_influences=self.dp_detail_is_corrosive, parameter='edge_dist'),
               self.end_distance_out,
               get_pass_fail(max_edge_out, self.edge_distance_out, relation='geq'))
@@ -5053,9 +5094,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 relation='leq'))
             self.report_check.append(t2)
 
-            max_end_in = self.cl_10_2_4_3_max_edge_dist([(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
+            max_end_in = self.cl_10_2_4_3_max_edge_dist([(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy), (0, 0, 0)],
                                                         corrosive_influences=self.dp_detail_is_corrosive)
-            t3 = ('Max. End Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
+            t3 = ('Max. End Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy), (0, 0, 0)],
                                                                           corrosive_influences=self.dp_detail_is_corrosive, parameter='end_dist'),
                   self.end_distance_in,
                   get_pass_fail(max_end_in, self.end_distance_in, relation='geq'))
@@ -5069,7 +5110,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t4)
 
             max_edge_in = max_end_in
-            t5 = ('Max. Edge Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
+            t5 = ('Max. Edge Distance (mm)', cl_10_2_4_3_max_edge_end_dist([(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy), (0, 0, 0)],
                                                                            corrosive_influences=self.dp_detail_is_corrosive, parameter='edge_dist'),
                   self.end_distance_in,
                   get_pass_fail(max_edge_in, self.edge_distance_in, relation='geq'))
@@ -5098,8 +5139,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t2)
 
             # width_min = 2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete)
-            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
-                                         bp_type='hollow_bp', mom_bp_case='None'),
+            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation,
+                                         self.connectivity, bp_type='hollow_bp', mom_bp_case='None'),
                   self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
             self.report_check.append(t3)
         else:
@@ -5136,8 +5177,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.report_check.append(t3)
 
             else:
-                t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, self.connectivity,
-                                             bp_type='welded_moment_bp', mom_bp_case='None'),
+                t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, round(self.bp_width_min, 2), self.dp_column_designation,
+                                             self.connectivity, bp_type='welded_moment_bp', mom_bp_case='None'),
                       self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
                 self.report_check.append(t3)
 
@@ -5167,7 +5208,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             t6 = ('Plate Thickness (mm)', '> (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')', bp_thk_1(self.plate_thk,
                                                                                                                        self.plate_thk_provided,
                                                                                                                        self.projection, self.w,
-                                                                                                                       self.gamma_m0, self.dp_bp_fy),
+                                                                                                                       self.gamma_m0, self.base_plate.fy),
                   get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq'))
             self.report_check.append(t6)
 
@@ -5237,7 +5278,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t8)
 
                 t9 = ('Thickness of Base Plate (mm)', 'max(T, t) = max (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')',
-                      plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.dp_bp_fy, self.bp_width_provided, case='Case1'),
+                      plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.base_plate.fy, self.bp_width_provided, case='Case1'),
                       get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq'))
                 self.report_check.append(t9)
 
@@ -5297,7 +5338,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t16)
 
                 t17 = ('Thickness of Base Plate (mm)', 'max(T, t) = max (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')',
-                       plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.dp_bp_fy, self.bp_width_provided, case='Case2&3'),
+                       plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.base_plate.fy, self.bp_width_provided, case='Case2&3'),
                        get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq'))
                 self.report_check.append(t17)
 
@@ -5311,47 +5352,62 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = ('SubSection', 'Anchor Bolt Design - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t2 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite_out, 1, self.anchor_area_outside_flange[1],
+        t2 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.anchor_fu_fy_outside_flange[0], 1, self.anchor_area_outside_flange[1],
                                                                          self.gamma_mb, self.shear_capacity_anchor), 'N/A')
         self.report_check.append(t2)
 
         if self.pitch_distance_out > 0:
             k_b_out = min(self.end_distance_out / (3.0 * self.anchor_hole_dia_out), self.pitch_distance_out / (3.0 * self.anchor_hole_dia_out) - 0.25,
-                          self.dp_anchor_fu_overwrite_out / self.dp_column_fu, 1.0)
+                          self.anchor_fu_fy_outside_flange[0] / self.dp_column_fu, 1.0)
         else:
-            k_b_out = min(self.end_distance_out / (3.0 * self.anchor_hole_dia_out), self.dp_anchor_fu_overwrite_out / self.dp_column_fu, 1.0)
+            k_b_out = min(self.end_distance_out / (3.0 * self.anchor_hole_dia_out), self.anchor_fu_fy_outside_flange[0] / self.dp_column_fu, 1.0)
 
         t3 = (KEY_DISP_KB, '', cl_10_3_4_calculate_kb(self.end_distance_out, self.pitch_distance_out, self.anchor_hole_dia_out,
-                                                      self.dp_anchor_fu_overwrite_out, self.dp_column_fu), 'N/A')
+                                                      self.anchor_fu_fy_outside_flange[0], self.dp_column_fu), 'N/A')
         self.report_check.append(t3)
 
         t4 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(k_b_out, self.anchor_dia_provided_outside_flange,
-                                                                             [(self.plate_thk_provided, self.dp_bp_fu, self.dp_bp_fy), (0, 0, 0)],
-                                                                             self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
+                                                                             [(self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy),
+                                                                              (0, 0, 0)], self.gamma_mb, self.bearing_capacity_anchor,
+                                                                             self.dp_anchor_hole_out), 'N/A')
         self.report_check.append(t4)
 
-        t5 = (
-        KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
+        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
         self.report_check.append(t5)
 
-        if self.connectivity == 'Moment Base Plate':
+        t6 = ('Tension Demand (per anchor bolt) (kN)', tension_demand_per_bolt(self.tension_demand_anchor, self.anchors_outside_flange),
+              cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_outside_flange[0], self.anchor_fu_fy_outside_flange[1],
+                                                        self.anchor_area_outside_flange[0], self.anchor_area_outside_flange[1],
+                                                        self.tension_capacity_anchor, fabrication=KEY_DP_FAB_FIELD),
+              get_pass_fail(self.tension_demand_anchor / self.anchors_outside_flange, self.tension_capacity_anchor, relation='leq'))
+        self.report_check.append(t6)
 
-            if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
-                t6 = ('Tension Demand (per anchor bolt) (kN)', tension_demand_per_bolt(self.tension_demand_anchor, self.anchors_outside_flange),
-                      cl_10_3_5_bearing_bolt_tension_resistance(self.dp_anchor_fu_overwrite_out, self.dp_anchor_fu_overwrite_out * 0.80,
-                                                                self.anchor_area_outside_flange[0], self.anchor_area_outside_flange[1],
-                                                                self.tension_capacity_anchor),
-                      get_pass_fail(self.tension_demand_anchor / self.anchors_outside_flange, self.tension_capacity_anchor, relation='leq'))
-                self.report_check.append(t6)
-            else:
-                t6 = ('Tension Demand (per anchor bolt) (kN)', '0', self.tension_capacity_anchor,
-                      get_pass_fail(0, self.tension_capacity_anchor, relation='leq'))
-                self.report_check.append(t6)
-
-        else:
-            t6 = ('Tension Demand (per anchor bolt) (kN)', '0', self.tension_capacity_anchor,
-                  get_pass_fail(0, self.tension_capacity_anchor, relation='leq'))
-            self.report_check.append(t6)
+        # if self.connectivity == 'Moment Base Plate':
+        #
+        #     if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
+        #         t6 = ('Tension Demand (per anchor bolt) (kN)', tension_demand_per_bolt(self.tension_demand_anchor, self.anchors_outside_flange),
+        #               cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_outside_flange[0], self.anchor_fu_fy_outside_flange[1],
+        #                                                         self.anchor_area_outside_flange[0], self.anchor_area_outside_flange[1],
+        #                                                         self.tension_capacity_anchor),
+        #               get_pass_fail(self.tension_demand_anchor / self.anchors_outside_flange, self.tension_capacity_anchor, relation='leq'))
+        #         self.report_check.append(t6)
+        #     else:
+        #         t6 = ('Tension Demand (per anchor bolt) (kN)', '0', cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_outside_flange[0],
+        #                                                                                                       self.anchor_fu_fy_outside_flange[1],
+        #                                                                                                       self.anchor_area_outside_flange[0],
+        #                                                                                                       self.anchor_area_outside_flange[1],
+        #                                                                                                       self.tension_capacity_anchor),
+        #               get_pass_fail(0, self.tension_capacity_anchor, relation='leq'))
+        #         self.report_check.append(t6)
+        #
+        # else:
+        #     t6 = ('Tension Demand (per anchor bolt) (kN)', '0', cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_outside_flange[0],
+        #                                                                                                   self.anchor_fu_fy_outside_flange[1],
+        #                                                                                                   self.anchor_area_outside_flange[0],
+        #                                                                                                   self.anchor_area_outside_flange[1],
+        #                                                                                                   self.tension_capacity_anchor),
+        #           get_pass_fail(0, self.tension_capacity_anchor, relation='leq'))
+        #     self.report_check.append(t6)
 
         t7 = ('Anchor Length - above concrete footing (mm)', '', anchor_len_above(self.grout_thk, self.plate_thk_provided, self.plate_washer_thk_out,
                                                                                   self.nut_thk_out, self.anchor_len_above_footing_out), 'Pass')

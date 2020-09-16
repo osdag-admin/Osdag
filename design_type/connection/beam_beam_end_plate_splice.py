@@ -879,9 +879,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.gauge_distance_provided = self.pitch_distance_provided
 
                         # end/edge
-                        # end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type, self.bolt.edge_type)
-                        # end_distance = end_distance + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
-
                         self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                         self.bolt.edge_type)
                         self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm

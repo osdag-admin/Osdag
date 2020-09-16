@@ -4504,6 +4504,19 @@ def actual_bearing_pressure(axial_load, bp_area_provided, bearing_pressure):
     return bp_bearing_pressure
 
 
+def bp_allowable_thk(connecting_thk1, connecting_thk2, maximum_thk):
+    """ """
+    connecting_thk1 = str(connecting_thk1)
+    connecting_thk2 = str(connecting_thk2)
+    maximum_thk = str(maximum_thk)
+
+    thk_allowable = Math(inline=True)
+    thk_allowable.append(NoEscape(r'\begin{aligned} (T, ~t) &< t_p \leq ' + maximum_thk + r' \\'))
+    thk_allowable.append(NoEscape(r' (' + connecting_thk1 + r', ~' + connecting_thk2 + r') &< t_p \leq ' + maximum_thk + r' \end{aligned}'))
+
+    return thk_allowable
+
+
 def bp_thk_1(plate_thk, plate_thk_provided, projection, actual_bearing_stress, gamma_m0, fy_plate):
     """ """
     plate_thk = str(plate_thk)
@@ -5338,8 +5351,9 @@ def stiff_height_across_web(stiff_length_across_web, stiff_height):
     return height
 
 
-def stiff_thk_across_web(stiff_thk, stiff_length_across_web, epsilon, col_web_thk):
+def stiff_thk_across_web(stiff_thk, stiff_length_across_web, epsilon, col_web_thk, max_thk):
     """ """
+    max_thk = str(max_thk)
     stiff_thk = str(stiff_thk)
     stiff_length_across_web = str(stiff_length_across_web)
     epsilon = str(epsilon)
@@ -5349,7 +5363,8 @@ def stiff_thk_across_web(stiff_thk, stiff_length_across_web, epsilon, col_web_th
     thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{aw} &= \bigg(\frac{{L_{st}}_{aw}}{8.4\times \epsilon_{st}}\bigg) \geq t \\'))
     thickness.append(NoEscape(r'&        = max \Bigg(\bigg(\frac{' + stiff_length_across_web + r'}{8.4\times ' + epsilon + r'}\bigg) ,~ '
                               + col_web_thk + r'\Bigg) \\'))
-    thickness.append(NoEscape(r'&        = max(' + stiff_thk + r' , ' + col_web_thk + r') \\'))
+    thickness.append(NoEscape(r'&        = max(' + stiff_thk + r' , ' + col_web_thk + r');~~but, \\'))
+    thickness.append(NoEscape(r'&        \leq ' + max_thk + r' \\ \\'))
     thickness.append(NoEscape(r'& [Ref.~IS~800:2007,~Table~2] \end{aligned}'))
 
     return thickness

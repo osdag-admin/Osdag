@@ -2010,22 +2010,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                            section_type='CHS')  # mm
                         self.projection_dr = round(self.projection, 2)  # for design report
                         self.projection = round_up(self.projection_dr, 5)
-                    else:
-                        logger.error("Cannot find section type")
-            else:
-                pass
+
+            if self.projection <= 0 or self.end_distance_out:
+                logger.warning(": [Analysis Error] The value of the projection (c) as per the Effective Area Method is {} mm [Reference:"
+                             " Clause 7.4.1.1, IS 800: 2007]".format(self.projection))
+                logger.warning(": [Analysis Error] The computed value of c should at least be equal to the end/edge distance")
+                logger.info(": [Analysis Error] Setting the value of c equal to end/edge distance")
 
             self.projection = max(self.projection, self.end_distance_out)  # projection should at-least be equal to the end distance
-
-            if self.projection <= 0:
-                self.safe = False
-                logger.error(": [Analysis Error] The value of the projection (c) as per the Effective Area Method is {} mm [Reference:"
-                             " Clause 7.4.1.1, IS 800: 2007]".format(self.projection))
-                logger.warning(": [Analysis Error] The computed value of the projection should at least be equal to the end/edge distance")
-                logger.info(": [Analysis Error] Check the column section and its properties")
-                logger.info(": Re-design the connection")
-            else:
-                pass
 
             # updating the length and the width by incorporating the value of projection
             self.bp_length_provided = self.column_D + (2 * self.projection) + (2 * self.end_distance_out)  # mm
@@ -2987,23 +2979,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # assigning plate thickness according to the available standard sizes
         # the thicknesses of the flats (in mm) listed below is obtained from SAIL's product brochure
 
-        standard_plt_thk = []
+        self.standard_plate_thk = []
         for plt in PLATE_THICKNESS_SAIL:
             plt = int(plt)
-            standard_plt_thk.append(plt)
+            self.standard_plate_thk.append(plt)
 
-        sort_plate = filter(lambda x: self.plate_thk_provided <= x <= standard_plt_thk[-1], standard_plt_thk)
+        sort_plate = filter(lambda x: self.plate_thk_provided <= x <= self.standard_plate_thk[-1], self.standard_plate_thk)
 
         for i in sort_plate:
             self.plate_thk_provided = i  # plate thickness provided (mm)
             break
 
         # check for maximum plate thickness
-        if self.plate_thk_provided > standard_plt_thk[-1]:
+        if self.plate_thk_provided > self.standard_plate_thk[-1]:
             self.safe = False
-            logger.error("[Plate Thickness] The thickness of the base plate exceeds the maximum possible available thickness of {} mm".
-                         format(standard_plt_thk[-1]))
-            logger.info("Cannot compute")
+            logger.error("[Plate Thickness] The thickness of the base plate exceeds the maximum available/allowable thickness of {} mm".
+                         format(self.standard_plate_thk[-1]))
             logger.info("If a plate of higher thickness(es) is available, update it into the Osdag data base and re-design the connection")
 
     def anchor_bolt_design(self):
@@ -4669,12 +4660,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # end of calculation
         if self.safe:
-            self.design_status = True
-            logger.info(": Overall base plate connection design is safe")
-            logger.info(": =========End Of design===========")
+            logger.info(": =====================Design Status=======================")
+            logger.info(":      Overall base plate connection design is SAFE")
+            logger.info(": =====================End Of design=======================")
         else:
-            logger.info(": Overall base plate connection design is unsafe")
-            logger.info(": =========End Of design===========")
+            logger.info(": =====================Design Status=======================")
+            logger.error(":     Overall base plate connection design is UNSAFE")
+            logger.info(": =====================End Of design=======================")
 
         # printing values for output dock
 
@@ -5205,11 +5197,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                   get_pass_fail(self.bearing_strength_concrete, self.w, relation='geq'))
             self.report_check.append(t5)
 
-            t6 = ('Plate Thickness (mm)', '> (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')', bp_thk_1(self.plate_thk,
+            t6 = ('Plate Thickness (mm)', bp_allowable_thk(self.column_tf, self.column_tw, self.standard_plate_thk[-1]), bp_thk_1(self.plate_thk,
                                                                                                                        self.plate_thk_provided,
                                                                                                                        self.projection, self.w,
                                                                                                                        self.gamma_m0, self.base_plate.fy),
-                  get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq'))
+                  get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq') and
+                  get_pass_fail(self.standard_plate_thk[-1], self.plate_thk_provided, relation='geq'))
             self.report_check.append(t6)
 
         elif self.connectivity == 'Moment Base Plate':
@@ -5606,9 +5599,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t3)
 
                 stiff_thk = round(self.stiffener_plt_len_across_web / (13.6 * self.epsilon), 2)
-                t4 = ('Thickness of Stiffener (mm)', stiff_thk_across_web(stiff_thk, self.stiffener_plt_len_across_web, self.epsilon, self.column_tw),
-                      self.stiffener_plt_thick_across_web,
-                      get_pass_fail(max(stiff_thk, self.column_tw), self.stiffener_plt_thick_across_web, relation='leq'))
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_across_web(stiff_thk, self.stiffener_plt_len_across_web, self.epsilon, self.column_tw,
+                                                                          self.standard_plate_thk[-1]), self.stiffener_plt_thick_across_web,
+                      get_pass_fail(max(stiff_thk, self.column_tw), self.stiffener_plt_thick_across_web, relation='leq') and
+                      get_pass_fail(self.standard_plate_thk[-1], self.stiffener_plt_thick_across_web, relation='geq'))
                 self.report_check.append(t4)
 
                 if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):

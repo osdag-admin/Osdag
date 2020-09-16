@@ -3004,7 +3004,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.error("[Plate Thickness] The thickness of the base plate exceeds the maximum possible available thickness of {} mm".
                          format(standard_plt_thk[-1]))
             logger.info("Cannot compute")
-            logger.info("If a plate of higher thickness(es) is available, update them into the Osdag data base and re-design the connection")
+            logger.info("If a plate of higher thickness(es) is available, update it into the Osdag data base and re-design the connection")
 
     def anchor_bolt_design(self):
         """ Perform design checks for the anchor bolt

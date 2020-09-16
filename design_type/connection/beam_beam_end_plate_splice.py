@@ -865,7 +865,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.proof_stress = round(0.7 * self.bolt_fu, 2)  # N/mm^2
 
                         # assign plate mechanical properties
-                        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material, thickness=self.plate.thickness_provided)
+                        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material, thickness=self.plate_thickness)
                         self.dp_plate_fu = self.plate.fu
                         self.dp_plate_fy = self.plate.fy
 
@@ -921,6 +921,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                             self.rows_inside_D_max = 0
                         else:
                             self.rows_inside_D_max = 2 + round_down(self.space_available_inside_D / self.pitch_distance_provided, 1)
+
+                        if (((self.rows_inside_D_max - 2) + 1) * self.pitch_distance_provided) > self.space_available_inside_D:
+                            self.rows_inside_D_max -= 1
 
                         if self.endplate_type == 'Extended One Way - Irreversible Moment':
                             self.rows_outside_D_max = 2
@@ -1287,13 +1290,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # end of calculation
         if self.design_status:
-            logger.info(": =========================Design Status===========================")
+            logger.info(": =====================Design Status=======================")
             logger.info(": Overall beam to beam end plate splice connection design is SAFE")
-            logger.info(": =========================End Of design===========================")
+            logger.info(": =====================End Of design=======================")
         else:
-            logger.info(": =========================Design Status===========================")
+            logger.info(": =====================Design Status=======================")
             logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
-            logger.info(": =========================End Of design===========================")
+            logger.info(": =====================End Of design=======================")
 
         # create design report
 

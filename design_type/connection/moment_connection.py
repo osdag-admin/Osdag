@@ -490,7 +490,7 @@ class MomentConnection(Connection, IS800_2007):
                 - min_area_req
 
         elif section_type == 'SHS' or 'RHS':
-            b = 2 * (depth * flange_width)  # for SHS & RHS, depth = D and flange_width = B
+            b = 2 * (depth + flange_width)  # for SHS & RHS, depth = D and flange_width = B
             c = (depth * flange_width) - min_area_req
 
         else:

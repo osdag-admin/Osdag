@@ -871,10 +871,11 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
 
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'&= 40 + (4 \times ' + min_t + r') \\'))
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&=' + max_edge_dist + r' \\ '))
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=' + max_edge_dist + r' \\\\ '))
         else:  # 'edge_dist'
             max_end_edge_eqn.append(NoEscape(r'&= 40 + (4 \times ' + min_t + r') \\'))
             max_end_edge_eqn.append(NoEscape(r'e`_{max}&=' + max_edge_dist + r'\\ \\'))
+
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3] \end{aligned}'))
 
     return max_end_edge_eqn
@@ -4408,7 +4409,7 @@ def bp_length(col_depth, end_distance, length):
     length = str(length)
 
     bp_length_min = Math(inline=True)
-    bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2 \times (e~+~e) \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2 ~ (e~+~e) \\'))
     bp_length_min.append(NoEscape(r'   &= ' + col_depth + r' ~+~2 \times (' + end_distance + r'~+~' + end_distance + r') \\'))
     bp_length_min.append(NoEscape(r'   &= ' + length + r' \\ \\'))
     bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement] \end{aligned}'))
@@ -4416,7 +4417,7 @@ def bp_length(col_depth, end_distance, length):
     return bp_length_min
 
 
-def bp_length_sb(col_depth, end_distance, length, projection):
+def bp_length_sb(col_depth, end_distance, length, projection, col_type=''):
     """ equation for the min length of the welded slab base/base plate for hollow/tubular sections"""
     col_depth = str(col_depth)
     end_distance = str(end_distance)
@@ -4424,7 +4425,10 @@ def bp_length_sb(col_depth, end_distance, length, projection):
     projection = str(projection)
 
     bp_length_min = Math(inline=True)
-    bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2~(c~+~e) \\'))
+    if col_type == 'CHS':
+        bp_length_min.append(NoEscape(r'\begin{aligned} L &= OD ~+~2~(c~+~e) \\'))
+    else:
+        bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2~(c~+~e) \\'))
     bp_length_min.append(NoEscape(r'   &= ' + col_depth + r' ~+~2 \times ~(' + projection + r'~+~' + end_distance + r') \\'))
     bp_length_min.append(NoEscape(r'   &= ' + length + r' \\ \\'))
     bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement] \end{aligned}'))
@@ -4448,7 +4452,7 @@ def bp_width_case1(load_axial, bp_length_min, bearing_strength, bp_width):
     return bp_length_min
 
 
-def bp_width(flange_width, edge_distance, width, designation, connectivity, bp_type='welded_moment_bp', mom_bp_case='None'):
+def bp_width(flange_width, edge_distance, width, designation, projection, bp_type='welded_moment_bp', mom_bp_case='None'):
     """ equation for the min length of the base plate"""
     flange_width = str(flange_width)
     edge_distance = str(edge_distance)
@@ -4462,12 +4466,14 @@ def bp_width(flange_width, edge_distance, width, designation, connectivity, bp_t
             bp_width_min.append(NoEscape(r'    &= (0.85 \times' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
         else:
             bp_width_min.append(NoEscape(r'\begin{aligned} W &= (0.85 B) ~+~2 ~(e`~+~e`) \\'))
-            bp_width_min.append(NoEscape(r'    &= (0.85 \times' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
+            bp_width_min.append(NoEscape(r'    &= (0.85 \times ' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
     else:
         if designation[1:4] == 'CHS':
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= D ~+~2 \times (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r' &= ' + flange_width + r' ~+~2 \times (' + str(projection) + r'~+~' + edge_distance + r') \\'))
         else:
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2 \times (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2~ (c~+~e`) \\'))
+            bp_width_min.append(NoEscape(r' &= ' + flange_width + r' ~+~2 \times (' + str(projection) + r'~+~' + edge_distance + r') \\'))
 
     bp_width_min.append(NoEscape(r'    &= ' + width + r' \\ \\'))
     bp_width_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement] \end{aligned}'))
@@ -4787,7 +4793,7 @@ def tension_demand_each_anchor(total_tension_demand, anchor_nos, tension_each_an
     return tension_total
 
 
-def eff_bearing_area(col_depth, col_flange_width, col_flange_thk, col_web_thk):
+def eff_bearing_area(col_depth, col_flange_width, col_flange_thk, col_web_thk, col_type='I-section'):
     """ calculate min area req for base plate (only for axial loads)"""
     col_depth = str(col_depth)
     col_flange_width = str(col_flange_width)
@@ -4795,19 +4801,27 @@ def eff_bearing_area(col_depth, col_flange_width, col_flange_thk, col_web_thk):
     col_web_thk = str(col_web_thk)
 
     area = Math(inline=True)
-    area.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} &= (D~+~2 c) (B~+~2 c) - \Big[ \big(D - 2(T~+~c)\big) \big(B - t\big) \Big] \\'))
-    area.append(NoEscape(r'&                = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c)~ - \\'))
-    area.append(NoEscape(r'& \Big[ \big(' + col_depth + r' - 2 \times (' + col_flange_thk + r'~+~c)\big) \big(' + col_flange_width + r' - '
-                                                                                                                             r'' + col_web_thk + r'\big) \Big] \\ \\'))
+
+    if col_type == 'I-section':
+        area.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} &= (D~+~2 c) (B~+~2 c) - \Big[ \big(D - 2(T~+~c)\big) \big(B - t\big) \Big] \\'))
+        area.append(NoEscape(r'&                = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c)~ - \\'))
+        area.append(NoEscape(r'& \Big[ \big(' + col_depth + r' - 2 \times (' + col_flange_thk + r'~+~c)\big) \big(' + col_flange_width + r' - '
+                                                                                                                                 r'' + col_web_thk + r'\big) \Big] \\ \\'))
+    if col_type == 'SHS&RHS':
+        area.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} &= (D~+~2 c) (B~+~2 c) \\'))
+        area.append(NoEscape(r'&                = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c) \\ \\'))
+    if col_type == 'CHS':
+        area.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} &= \frac{\pi}{4} \times (OD~+~2 c)^{2} \\'))
+        area.append(NoEscape(r'&                = \frac{\pi}{4} \times (' + col_depth + r' ~+~2 c)^{2} \\ \\'))
+
     area.append(NoEscape(r' Note:&~ c~ is~ the~ projection~ beyond~ the~ face~ of~ the~ column \\ \\'))
     area.append(NoEscape(r'& [Reference:~Design~of~Steel~Structures \\'))
     area.append(NoEscape(r'& -~N.Subramanian,~(2019~edition)~Chapter~15,] \end{aligned} '))
-    # area.append(NoEscape(r'& Chapter~15,] \end{aligned}'))
 
     return area
 
 
-def eff_projection(col_depth, col_flange_width, col_flange_thk, col_web_thk, min_area, projection, end_distance):
+def eff_projection(col_depth, col_flange_width, col_flange_thk, col_web_thk, min_area, projection, end_distance, col_type='I-section'):
     """ calculate min area req for base plate (only for axial loads)"""
     col_depth = str(col_depth)
     col_flange_width = str(col_flange_width)
@@ -4822,18 +4836,27 @@ def eff_projection(col_depth, col_flange_width, col_flange_thk, col_web_thk, min
     c = Math(inline=True)
     c.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} &= {A_{req}}_{min} \\'))
     c.append(NoEscape(r'&                = ' + min_area + r' \times 10^{3} \\ \\'))
-    c.append(NoEscape(r' Therefore,&~(' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c)~- \\'))
-    c.append(NoEscape(r'& \Big[ \big(' + col_depth + r' - 2(' + col_flange_thk +
-                      r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\ '))
-    c.append(NoEscape(r'& = ' + min_area + r' \times 10^{3} \\ '))
+
+    if col_type == 'I-section':
+        c.append(NoEscape(r' Therefore,&~(' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c)~- \\'))
+        c.append(NoEscape(r'& \Big[ \big(' + col_depth + r' - 2(' + col_flange_thk +
+                          r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\ '))
+        c.append(NoEscape(r'& = ' + min_area + r' \times 10^{3} \\ '))
+
+    if col_type == 'SHS&RHS':
+        c.append(NoEscape(r' Therefore,&~(' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c)~ =~ ' + min_area + r' \times 10^{3} \\'))
+
+    if col_type == 'CHS':
+        c.append(NoEscape(r'Therefore,&~ \frac{\pi}{4} \times (' + col_depth + r'~+~2 c)^{2}~=~ ' + min_area + r' \times 10^{3} \\'))
+
     c.append(NoEscape(r'              c &  = ' + projection + r' \\ \\'))
 
     c.append(NoEscape(r' projection &= max(c,~e) \\'))
     c.append(NoEscape(r'            &= max(' + projection + r',~' + end_distance + r') \\'))
     c.append(NoEscape(r'&            = ' + projection_val + r' \\ \\'))
-    c.append(NoEscape(r' [Reference: &~Design~of~Steel~Structures \\'))
+
+    c.append(NoEscape(r'& [Reference:~Design~of~Steel~Structures \\'))
     c.append(NoEscape(r'& -~N.Subramanian,~(2019~edition)~Chapter~15,] \end{aligned} '))
-    # c.append(NoEscape(r'& Chapter~15,] \end{aligned}'))
 
     return c
 

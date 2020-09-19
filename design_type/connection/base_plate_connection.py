@@ -601,13 +601,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t101)
 
         t101 = (KEY_OUT_DIA_ANCHOR_UPLIFT, KEY_DISP_OUT_DIA_ANCHOR_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_dia_inside_flange if
-                flag and self.connectivity == 'Moment Base Plate' else '', True)
+                self.anchor_dia_inside_flange if flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_GRD_ANCHOR_UPLIFT, KEY_DISP_OUT_GRD_ANCHOR_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_grade_in if
-                flag and self.connectivity == 'Moment Base Plate' else '', True)
+                self.anchor_grade_in if flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t101)
 
         t4 = (KEY_OUT_ANCHOR_UPLIFT_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX,
@@ -619,13 +617,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t4)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_TEXTBOX,
-                self.tension_capacity_anchor_uplift if
-                flag and self.connectivity == 'Moment Base Plate' else '', True)
+                self.tension_capacity_anchor_uplift if flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_length_provided_in if
-                flag and self.connectivity == 'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
+                self.anchor_length_provided_in if flag and self.connectivity == 'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
         out_list.append(t101)
 
         t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None, True)
@@ -693,6 +689,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_BUTTON,
                ['Stiffener Details', self.stiffener_across_web_details], True)
+        out_list.append(t30)
+
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE, TYPE_TITLE, None, True)
+        out_list.append(t29)
+
+        t30 = (DISP_OUT_TITLE_STIFFENER_PLATE, DISP_TITLE_STIFFENER_PLATE, TYPE_OUT_BUTTON,
+               ['Stiffener Details', self.stiffener_hollow_details], True)
         out_list.append(t30)
 
         t29 = (None, DISP_TITLE_SHEAR_KEY, TYPE_TITLE, None, True)
@@ -826,6 +829,108 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return sw
 
+    def stiffener_hollow_details(self, flag):
+
+        st = []
+
+        # attached to D
+        t99 = (None, 'Stiffener Plate Attached to D', TYPE_SECTION, '')
+        st.append(t99)
+
+        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX,
+               self.stiffener_plt_len_along_D if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t28)
+
+        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX,
+               self.stiffener_plt_height if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t29)
+
+        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX,
+               self.stiffener_plt_thk if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t30)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX,
+               self.shear_on_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_CAPACITY, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR, TYPE_TEXTBOX,
+               self.shear_capa_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+               self.moment_on_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_MOMENT_CAPACITY, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT, TYPE_TEXTBOX,
+               self.moment_capa_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        # attached to B
+        t99 = (None, 'Stiffener Plate Attached to B', TYPE_SECTION, '')
+        st.append(t99)
+
+        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX,
+               self.stiffener_plt_len_along_B if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t28)
+
+        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX,
+               self.stiffener_plt_height if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t29)
+
+        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX,
+               self.stiffener_plt_thk if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t30)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX,
+               self.shear_on_stiffener if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_CAPACITY, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR, TYPE_TEXTBOX,
+               self.shear_capa_stiffener if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+               self.moment_on_stiffener if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_MOMENT_CAPACITY, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT, TYPE_TEXTBOX,
+               self.moment_capa_stiffener if flag and self.stiffener_along_B == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        # CHS
+        t99 = (None, 'Stiffener Plate Attached to CHS', TYPE_SECTION, '')
+        st.append(t99)
+
+        t28 = (KEY_OUT_STIFFENER_LENGTH_CHS, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX,
+               self.stiffener_plt_len_across_D if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t28)
+
+        t29 = (KEY_OUT_STIFFENER_HEIGHT_CHS, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX,
+               self.stiffener_plt_height if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t29)
+
+        t30 = (KEY_OUT_STIFFENER_THICKNESS_CHS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX,
+               self.stiffener_plt_thk if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t30)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND_CHS, KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX,
+               self.shear_on_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_CAPACITY_CHS, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR, TYPE_TEXTBOX,
+               self.shear_capa_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND_CHS, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+               self.moment_on_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_MOMENT_CAPACITY_CHS, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT, TYPE_TEXTBOX,
+               self.moment_capa_stiffener if flag and self.stiffener_along_D == 'Yes' else VALUE_NOT_APPLICABLE)
+        st.append(t31)
+
+        return st
+
     def shear_key_details(self, flag):
 
         sk = []
@@ -883,10 +988,77 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         return weld
 
     def major_minor(self):
-        if self[0] in ['Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']:
+        # if self[0] in ['Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']:
+        if self[0] in ['Moment Base Plate']:
             return True
         else:
             return False
+
+    def stiffener_flange(self):
+        if self[0] in ['Moment Base Plate']:
+            return False
+        else:
+            return True
+
+    def stiffener_alongweb(self):
+        if self[0] in ['Moment Base Plate']:
+            return False
+        else:
+            return True
+
+    def stiffener_acrossweb(self):
+        if self[0] in ['Moment Base Plate', 'Welded Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_hollow_cs(self):
+        if self[0] in ['Moment Base Plate', 'Welded Column Base']:
+            return True
+        else:
+            return False
+
+    def stiffener_chs_len(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_chs_height(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_chs_thk(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_chs_shear_demand(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_chs_shear_capa(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_chs_moment_demand(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
+
+    def stiffener_chs_moment_capa(self):
+        if self[0] in ['Hollow/Tubular Column Base']:
+            return False
+        else:
+            return True
 
     def conn_axial_tension(self):
         if self[0] == 'Moment Base Plate':
@@ -1050,6 +1222,51 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t20 = ([KEY_CONN], KEY_GRD_ANCHOR_ICF, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
         lst.append(t20)
+
+        t21 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_FLANGE, TYPE_OUT_DOCK, self.stiffener_flange)
+        lst.append(t21)
+
+        t22 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_FLANGE, TYPE_OUT_LABEL, self.stiffener_flange)
+        lst.append(t22)
+
+        t23 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_ALONG_WEB, TYPE_OUT_DOCK, self.stiffener_alongweb)
+        lst.append(t23)
+
+        t24 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_ALONG_WEB, TYPE_OUT_LABEL, self.stiffener_alongweb)
+        lst.append(t24)
+
+        t25 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_DOCK, self.stiffener_acrossweb)
+        lst.append(t25)
+
+        t26 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_LABEL, self.stiffener_acrossweb)
+        lst.append(t26)
+
+        t27 = ([KEY_CONN], DISP_OUT_TITLE_STIFFENER_PLATE, TYPE_OUT_DOCK, self.stiffener_hollow_cs)
+        lst.append(t27)
+
+        t28 = ([KEY_CONN], DISP_OUT_TITLE_STIFFENER_PLATE, TYPE_OUT_LABEL, self.stiffener_hollow_cs)
+        lst.append(t28)
+
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_LENGTH_CHS, TYPE_TEXTBOX, self.stiffener_chs_len)
+        # lst.append(t29)
+        #
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_HEIGHT_CHS, TYPE_TEXTBOX, self.stiffener_chs_height)
+        # lst.append(t29)
+        #
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_THICKNESS_CHS, TYPE_TEXTBOX, self.stiffener_chs_thk)
+        # lst.append(t29)
+        #
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND_CHS, TYPE_TEXTBOX, self.stiffener_chs_shear_demand)
+        # lst.append(t29)
+        #
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_SHEAR_CAPACITY_CHS, TYPE_TEXTBOX, self.stiffener_chs_shear_capa)
+        # lst.append(t29)
+        #
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND_CHS, TYPE_TEXTBOX, self.stiffener_chs_moment_demand)
+        # lst.append(t29)
+        #
+        # t29 = ([KEY_CONN], KEY_OUT_STIFFENER_PLATE_MOMENT_CAPACITY_CHS, TYPE_TEXTBOX, self.stiffener_chs_moment_capa)
+        # lst.append(t29)
 
         return lst
 
@@ -3635,20 +3852,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
                 check = self.Table2_web_OfI_H_box_section((min(self.column_D, self.column_bf) - self.column_tf), self.column_tw, self.dp_column_fy,
                                                           self.load_axial_compression, load_type='Compression', section_class='Plastic')
-                if check[0] or check[1] or check[2] == 'Fail':
+                if (check[0] == 'Fail') or (check[1] == 'Fail') or (check[2] == 'Fail'):
                     self.stiffener_along_D = 'Yes'
                     self.stiffener_along_B = 'Yes'
                 else:
-                    pass
+                    self.stiffener_along_D = 'No'
+                    self.stiffener_along_B = 'No'
 
             else:
                 check = self.Table2_hollow_tube(self.column_D, self.column_tf, self.dp_column_fy, load='Axial Compression', section_class='Plastic')
                 if check == 'Fail':
                     self.stiffener_along_D = 'Yes'
                 else:
-                    pass
-        else:
-            pass
+                    self.stiffener_along_D = 'No'
 
         # design of stiffener
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
@@ -4192,8 +4408,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
                                                                                           section_class='semi-compact')
                 self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
-            else:
-                pass
 
             if self.moment_on_stiffener > self.moment_capa_stiffener:
                 logger.warning("[Moment Check - Stiffener] The stiffener fails the moment check")
@@ -4211,12 +4425,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
 
                     n += 1
-
-            else:
-                pass
-
-        else:
-            pass
 
         # # update detailing parameters
         # self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole, self.dp_detail_edge_type)

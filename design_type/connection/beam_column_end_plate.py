@@ -1093,7 +1093,7 @@ class BeamColumnEndPlate(MomentConnection):
                         self.proof_stress = round(0.7 * self.bolt_fu, 2)  # N/mm^2
 
                         # assign plate mechanical properties
-                        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material, thickness=self.plate.thickness_provided)
+                        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material, thickness=self.plate_thickness)
                         self.dp_plate_fu = self.plate.fu
                         self.dp_plate_fy = self.plate.fy
 
@@ -1107,19 +1107,14 @@ class BeamColumnEndPlate(MomentConnection):
                         self.gauge_distance_provided = self.pitch_distance_provided
 
                         # end/edge
-                        # end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type, self.bolt.edge_type)
-                        # end_distance = end_distance + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
-
                         self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                         self.bolt.edge_type)
                         self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
                         self.edge_distance_provided = self.end_distance_provided
 
                         # cross-centre gauge
-                        if self.connectivity == VALUES_CONN_1[1]:  # 'Column flange-Beam web'
-                            self.gauge_cs_distance_provided = max(self.beam_tw, self.column_tw) + (2 * self.end_distance_provided)
-                        else:
-                            self.gauge_cs_distance_provided = self.beam_tw + (2 * self.end_distance_provided)
+                        # self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
+                        self.gauge_cs_distance_provided = self.beam_tw + (2 * self.end_distance_provided)
                         self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
                         # Check 3: end plate dimensions (designed for groove weld at flange only)
@@ -1151,6 +1146,9 @@ class BeamColumnEndPlate(MomentConnection):
                             self.rows_inside_D_max = 0
                         else:
                             self.rows_inside_D_max = 2 + round_down(self.space_available_inside_D / self.pitch_distance_provided, 1)
+
+                        if (((self.rows_inside_D_max - 2) + 1) * self.pitch_distance_provided) > self.space_available_inside_D:
+                            self.rows_inside_D_max -= 1
 
                         if self.endplate_type == 'Extended One Way - Irreversible Moment':
                             self.rows_outside_D_max = 2
@@ -1470,7 +1468,8 @@ class BeamColumnEndPlate(MomentConnection):
             if self.bolt_row < 8:  # 1 row outside tension and compression flange
                 self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided))
             else:  # 2 rows outside tension and compression flange which is maximum allowable
-                self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (2 * self.pitch_distance_provided)
+                self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (
+                        2 * self.pitch_distance_provided)
 
     def design_continuity_plate(self):
         """ design the continuity plate for the column flange - beam web connection """

@@ -44,7 +44,7 @@ class IS800_2007(object):
 
         """
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        epsilon = math.sqrt(f_y / 250)
+        epsilon = math.sqrt(250 / f_y)
 
         ratio = depth / web_thickness  # ratio of the web/component
 

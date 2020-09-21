@@ -126,7 +126,7 @@ class IS800_2007(object):
         Reference: Table 2 and Cl.3.7.2, IS 800:2007
 
         """
-        epsilon = math.sqrt(f_y / 250)
+        epsilon = math.sqrt(250 / f_y)
 
         ratio = diameter / thickness  # ratio of the web/component
 

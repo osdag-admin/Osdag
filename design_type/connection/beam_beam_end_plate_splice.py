@@ -1329,7 +1329,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_input = \
             {KEY_MODULE: self.module,
              KEY_MAIN_MODULE: self.mainmodule,
-             # KEY_CONN: self.connectivity,
+             KEY_CONN: self.connectivity,
+             KEY_ENDPLATE_TYPE:self.endplate_type,
              KEY_DISP_MOMENT: self.input_moment,
              KEY_DISP_SHEAR: self.input_shear_force,
              KEY_DISP_AXIAL: self.input_axial_force,
@@ -1354,7 +1355,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
              KEY_DISP_FY: self.plate.fy,
 
              "Weld Details": "TITLE",
-             KEY_DISP_DP_WELD_TYPE: "Groove",
+             KEY_DISP_BEAM_FLANGE_WELD_TYPE: "Groove Weld",
+             KEY_DISP_BEAM_WEB_WELD_TYPE: "Fillet Weld",
+             KEY_DISP_STIFFENER_WELD_TYPE: "Fillet Weld",
              KEY_DISP_DP_WELD_FAB: self.web_weld.fabrication,
              KEY_DISP_DP_WELD_MATERIAL_G_O: self.web_weld.fu
              }
@@ -1376,7 +1379,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # TODO MEMBER CAPACITY - AND CLASS OF SECTION,axial, beta, min criteria of plastic moment 0.5
         # t1 = (SECTION_CLASSIFICATION, "", cl_3_7_2_section_classification(class_of_section=self.class_of_section), "")
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, self.input_shear_force,
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY_M, self.input_shear_force,
               cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness,
                                                     f_y=self.supported_section.fy, gamma_m0=self.gamma_m0,
                                                     V_dg=round(self.beam_shear_capa, 2)),
@@ -1387,6 +1390,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             percent = 0.5
         else:
             percent = 1
+        #todo PMC- MP_ZZ & MP_YY  REM & If you dont want pmc as a text in design report please dont del from design report write it separately
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, self.input_moment,
               cl_8_2_1_2_plastic_moment_capacity_member(beta_b=1,
                                                         Z_p=self.supported_section.plast_sec_mod_z,
@@ -1395,14 +1399,30 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                         Pmc=round(self.beam_plastic_mom_capa_zz , 2)), '')
         self.report_check.append(t1)
 
+        t1 = ('SubSection', ' Minimum Load Consideration', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        #############################
+        self.load_shear_min = min((0.15 * self.beam_shear_capa), 40)
+        self.load_moment_min = (0.5 * self.beam_plastic_mom_capa_zz)
+        # V_dy = round(self.shear_capacity1 / 0.6 / 1000, 2)
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, display_prov(self.input_shear_force, "V"),
+              prov_shear_load(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
+                              app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.beam_shear_capa), "")
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, display_prov(self.input_moment, "M"),
+              prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
+                               app_moment_load=round(self.load_moment, 2),
+                               moment_capacity=round(self.beam_plastic_mom_capa_zz, 2)), "")
+
+        self.report_check.append(t1)
         # CHECK 2: BOLT CHECKS #
 
-        t1 = ('SubSection', ' Bolt Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', ' Bolt Optimisation', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt_diameter_provided, "d"), '')
+        t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Diameter Optimisation", display_prov(int(self.bolt_diameter_provided), "d"), '')
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt_grade_provided, '')
+        t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Property Class Optimisation", self.bolt_grade_provided, '')
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt.dia_hole, "d_0"), '')
@@ -1413,7 +1433,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_check.append(t6)
         t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), '')
         self.report_check.append(t7)
-        t1 = (KEY_OUT_DISP_NO_BOLTS, '', self.bolt_numbers, '')
+        t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n_r ~X~ n_c "), '')
         self.report_check.append(t1)
         t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt_diameter_provided),
               self.pitch_distance_provided,
@@ -1438,7 +1458,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         #                     relation='greater'))
         # self.report_check.append(t4)
 
-
+        t1 = ('SubSection', 'Critical Bolt Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
         if self.bolt.bolt_type == TYP_BEARING:
             bolt_bearing_capacity_kn = round(self.bolt_bearing_capacity, 2)
 
@@ -1453,12 +1474,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                  self.gamma_mb,
                                                                                  bolt_bearing_capacity_kn), '')
             self.report_check.append(t2)
-            t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn,
+            #TODO AS PER SHEAR DEMAND IN HELPER FILE
+            t3 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers, V_sb=self.bolt_shear_demand), cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn,
                                                                           bolt_bearing_capacity_kn,
                                                                           bolt_capacity_kn), '')
             self.report_check.append(t3)
         else:
-
             t4 = (KEY_OUT_DISP_BOLT_SLIP, '', cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=1,
                                                                            K_h=1,
                                                                            fub=self.bolt_fu,
@@ -1466,90 +1487,102 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                            gamma_mf=self.bolt.gamma_mf,
                                                                            capacity=bolt_capacity_kn), '')
             self.report_check.append(t4)
-        # # TODO VALUES ASSIGNING REMAINING
-        r_3 =0
-        if r_3 != 0:
-            t6 = (KEY_OUT_DISP_CRITICAL_BOLT_TENSION,tension_critical_bolt_prov(M=self.load_moment_effective,
-                                                                                t_ba =self.tension_critical_bolt,
-                                                                                n_c=self.bolt_column,r_1=0,
-                                                                                n_r=self.bolt_row, r_i=0,
-                                                                                n=self.bolt_row,
-                                                                                type=self.endplate_type,r_3=0),"", "")
-            self.report_check.append(t6)
-        else:
-            t6 = (KEY_OUT_DISP_CRITICAL_BOLT_TENSION,
-                  tension_critical_bolt_prov(M=self.load_moment_effective, t_ba=self.tension_critical_bolt,
-                                             n_c=self.bolt_column,r_1=0, n_r=self.bolt_row,
-                                             r_i=0, n=self.bolt_row, type=self.endplate_type,r_3=0),"", "")
-            self.report_check.append(t6)
+        # # TODO VALUES ASSIGNING REMAINING .
+
+        t6 = (KEY_DISP_LEVER_ARM, self.call_helper.lever_arm,"","")
+        leverarm = self.call_helper.lever_arm#[r1,r2,r3,r4] aisa list hoga
+
+        r1 = leverarm[0]
+        r_sum =0
+        for j in leverarm:
+            r_sum +=j**2/r1
+        print(" leverarm" ,r_sum)
+        print(" leverarm", leverarm[0])
+        print(" leverarm", leverarm[2])
 
 
+
+        # leverarm_values#{r1:20,r2:30}
+
+
+        self.report_check.append(t6)
+
+        ##
+        t6 = (KEY_OUT_DISP_CRITICAL_BOLT_TENSION,tension_critical_bolt_prov(M=self.load_moment_effective,
+                                                                            t_ba =round(self.tension_critical_bolt,2),
+                                                                            n_c=self.bolt_column,r_1=int(leverarm[0]) ,
+                                                                            n_r = self.bolt_row, r_i =  round(r_sum,2),
+                                                                             n=self.bolt_row,
+                                                                            type=self.endplate_type,r_3=int(leverarm[2])),"", "")
+        self.report_check.append(t6)
+
+
+        # TODO: please call bolt tension, already assigned in component file as pretensioned
         if self.bolt.bolt_tensioning == 'Pretensioned':
             beta = 1
         else:
             beta = 2
 
-        t1 = (KEY_OUT_DISP_BOLT_PRYING_FORCE_EP, cl_10_4_7_tension_in_bolt_due_to_prying(self.call_helper.t_1, self.call_helper.lv,
+        t1 = (KEY_OUT_DISP_BOLT_PRYING_FORCE_EP, cl_10_4_7_tension_in_bolt_due_to_prying(round(self.call_helper.t_1,2), round(self.call_helper.lv,2),
                                                                                 self.proof_stress,
-                                                                                self.call_helper.b_e,
+                                                                                round(self.call_helper.b_e,2),
                                                                                 self.call_helper.plate_thickness,
                                                                                 self.dp_plate_fy,
                                                                                 self.end_distance_provided,
                                                                                 self.bolt.bolt_tensioning,
-                                                                                beta, self.prying_critical_bolt,
-                                                                                self.call_helper.le , eta=1.5), '', '')
+                                                                                beta, round(self.prying_critical_bolt,2),
+                                                                                round(self.call_helper.le,2) , eta=1.5), '', '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_BOLT_TENSION_DEMAND, total_bolt_tension_force(T_ba=  self.call_helper.t_1 ,
-                                                                        Q=self.prying_critical_bolt,
-                                                                        T_b=self.tension_demand_critical_bolt),
+        t1 = (KEY_OUT_DISP_BOLT_TENSION_DEMAND, total_bolt_tension_force(T_ba=  round(self.call_helper.t_1,2),
+                                                                        Q=round(self.prying_critical_bolt,2),
+                                                                        T_b=round(self.tension_demand_critical_bolt,2)),
               cl_10_3_5_bearing_bolt_tension_resistance(self.bolt_fu, self.dp_bolt_fy,
                                                         self.bolt.bolt_shank_area, self.bolt.bolt_net_area,
-                                                            self.tension_capacity_critical_bolt ),
+                                                            round(self.tension_capacity_critical_bolt,2) ),
         get_pass_fail(round(self.tension_demand_critical_bolt , 2),
                       round(self.tension_capacity_critical_bolt, 2), relation='lesser'))
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_IR, required_IR_or_utilisation_ratio(IR=1),
-              cl_10_3_6_bearing_bolt_combined_shear_and_tension( self.bolt_shear_demand ,
-                                                                self.bolt_capacity,
-                                                                 self.tension_demand_critical_bolt,
-                                                                 self.tension_capacity_critical_bolt,
-                                                                 self.combined_capacity_critical_bolt),
-              get_pass_fail(1, self.combined_capacity_critical_bolt , relation="greater"))
+              cl_10_3_6_bearing_bolt_combined_shear_and_tension( round(self.bolt_shear_demand,2) ,
+                                                                round(self.bolt_capacity,2),
+                                                                 round(self.tension_demand_critical_bolt,2),
+                                                                 round(self.tension_capacity_critical_bolt,2),
+                                                                 round(self.combined_capacity_critical_bolt,2)),
+              get_pass_fail(1, round(self.combined_capacity_critical_bolt,2) , relation="greater"))
         self.report_check.append(t1)
 
-        # CHECK 2: END PLATE CHECKS #
         # CHECK 2: END PLATE CHECKS #
         t1 = ('SubSection', '  End Plate Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_PLATE_HEIGHT, '', bb_endplate_height_prov(beam_D=self.supported_section.depth,
                                                                      end_distance_provided=self.end_distance_provided,
                                                                      pitch_distance_provided=self.pitch_distance_provided,
-                                                                     height_plate=self.ep_height_provided,
+                                                                     height_plate=round(self.ep_height_provided,2),
                                                                      bolt_row=self.bolt_row,
                                                                      type=self.endplate_type),
-              get_pass_fail(self.supported_section.depth, self.ep_height_provided, relation="leq"))
+              get_pass_fail(self.supported_section.depth, round(self.ep_height_provided,2), relation="leq"))
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_PLATE_WIDTH, "", bb_endplate_width_prov(B_ep=self.ep_width_provided,
+        t1 = (KEY_OUT_DISP_PLATE_WIDTH, "", bb_endplate_width_prov(B_ep= round(self.ep_width_provided,2),
                                                                    B=self.supported_section.flange_width),
-              get_pass_fail(self.supported_section.flange_width, self.ep_width_provided, relation="leq"))
+              get_pass_fail(self.supported_section.flange_width, round(self.ep_width_provided,2), relation="leq"))
         self.report_check.append(t1)
 
         # # TODO VALUES ASSIGNING REMAINING
-        self.plate_thickness_req = round(math.sqrt(
+        self.plate_thickness_req = int(round(math.sqrt(
             (4 * self.gamma_m0 * self.ep_moment_capacity) / (self.dp_plate_fy * round(self.call_helper.b_e, 2))),
-            2)  # mm
+            2) ) # mm
         t1 = (DISP_MIN_PLATE_THICK,
-              end_plate_thk_req(M_ep=self.ep_moment_capacity, b_eff=round(self.call_helper.b_e, 2),
+              end_plate_thk_req(M_ep=round(self.ep_moment_capacity,2), b_eff=round(self.call_helper.b_e, 2),
                                 f_y=self.dp_plate_fy, gamma_m0=self.gamma_m0,
                                 t_p=self.plate_thickness_req),
               self.plate_thickness,
               get_pass_fail(self.plate_thickness_req, self.plate_thickness, relation="leq"))
         self.report_check.append(t1)
         #
-        # # TODO MOMENT CAPACITY REQ-PROV FUNCTION -rem
-        t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, '', self.ep_moment_capacity,
-              get_pass_fail(0, self.ep_moment_capacity, relation="leq"))
+        # #
+        t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, '', round(self.ep_moment_capacity,2),
+              get_pass_fail(0, round(self.ep_moment_capacity,2), relation="leq"))
         self.report_check.append(t1)
 
         # CHECK 2: STIFFENER CHECKS #
@@ -1569,17 +1602,22 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                         type=self.endplate_type), '')
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_STIFFENER_THICKNESS, display_prov(self.beam_tw, "t"), self.stiffener_thickness, '')
+        t1 = (KEY_OUT_DISP_STIFFENER_THICKNESS, display_prov(self.beam_tw, "t"), display_prov(self.stiffener_thickness, "tst"), '')
         self.report_check.append(t1)
         #
         # ##################
         # # Weld Checks
         # ##################
         # if self.design_status_bolt is True and plate_status is True:
+        #todo please check..is there  no conn plates???? is direct plate taken??
         weld_conn_plates_fu = [self.dp_plate_fu, self.supported_section.fu, self.web_weld.fu]
         weld_conn_plates_tk = [self.plate_thickness, self.supported_section.web_thickness]
 
         t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        image = r"E:\officeanjali\New_Osdag\ResourceFiles\images\3d"
+        t1 = ("WELDImage",  image,"","")
         self.report_check.append(t1)
 
         t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(weld_conn_plates_tk, self.web_weld.min_size),
@@ -1602,7 +1640,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         t1 = (KEY_OUT_DISP_WELD_STRESS_AXIAL, "", f_a_stress_due_to_axial_force(A_f=self.load_axial,
                                                                                 t_w=self.weld_size_web,
-                                                                                L_weld=self.weld_length_web, f_a=self.f_a), "")
+                                                                                L_weld=self.weld_length_web, f_a=round(self.f_a,2)), "")
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_WELD_STRESS_SHEAR, "", q_stress_due_to_shear_force(V=self.load_shear,
                                                                               t_w=self.weld_size_web,
@@ -1617,11 +1655,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # todo before running remove N/mm^2  to N/mm2 in common file
         ## todo: check this function throat thickness, weld fu (plate,section)
         self.conn_plates_weld_fu1 = [0, 0]  # todo trial
-        t1 = (KEY_OUT_DISP_WELD_STRENGTH, self.f_e, cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=self.conn_plates_weld_fu1,
+        t1 = (KEY_OUT_DISP_WELD_STRENGTH, round(self.f_e,2), cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=self.conn_plates_weld_fu1,
                                                                                 gamma_mw=self.gamma_mw,
                                                                                 t_t=1,
-                                                                                f_w=self.allowable_stress),
-              get_pass_fail(self.f_e, self.allowable_stress, relation="lesser"))
+                                                                                f_w=round(self.allowable_stress,2)),
+              get_pass_fail(round(self.f_e,2), round(self.allowable_stress,2), relation="lesser"))
         self.report_check.append(t1)
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"

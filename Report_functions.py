@@ -5472,7 +5472,7 @@ def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='fla
     return moment_capacity
 
 ##  #todo:New Function Required for Beam-Beam endplate connection
-def bolt_shear_demand(V, n_bolts, V_d):
+def bolt_shear_demand(V, n_bolts, V_sb):
 
 
     """
@@ -5487,11 +5487,11 @@ def bolt_shear_demand(V, n_bolts, V_d):
     """
     V = str(V)
     n_bolts = str(n_bolts)
-    V_d = str(V_d)
+    V_sb = str(V_sb)
     bolt_shear_demand = Math(inline=True)
-    bolt_shear_demand.append(NoEscape(r'\begin{aligned} V_d &= \frac{V}{\ n} \\'))
+    bolt_shear_demand.append(NoEscape(r'\begin{aligned} V_sb &= \frac{V}{\ n} \\'))
     bolt_shear_demand.append(NoEscape(r'&=\frac{' + V + '}{' + n_bolts + r'} \\'))
-    bolt_shear_demand.append(NoEscape(r'&= ' + V_d + r'\end{aligned}'))
+    bolt_shear_demand.append(NoEscape(r'&= ' + V_sb + r'\end{aligned}'))
     return bolt_shear_demand
 
 def bb_endplate_height_prov(beam_D,end_distance_provided,pitch_distance_provided, height_plate, bolt_row = None,type = None):
@@ -5539,14 +5539,14 @@ def stiffener_height_prov(b_ep, t_w, h_ep,D,  h_sp, type=None):
     h_sp = str(h_sp)
     stiffener_height_prov = Math(inline=True)
     if type == 'Flushed - Reversible Moment':
-        stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{sp} &= b_{ep} - \frac{t}{2} \\'))
+        stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{st} &= b_{ep} - \frac{t}{2} \\'))
         stiffener_height_prov.append(NoEscape(r' &= '+b_ep+r' - \frac{'+t_w+r'}{2}\\'))
     else:
         if type == 'Extended Both Ways - Reversible Moment':
-            stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{sp} &= h_{ep} - \frac{D}{2} \\'))
+            stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{st} &= h_{ep} - \frac{D}{2} \\'))
             stiffener_height_prov.append(NoEscape(r' &= ' + h_ep + r' - \frac{' + D + r'}{2}\\'))
         else:
-            stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{sp} &= h_{ep} - D -12.5 \\'))
+            stiffener_height_prov.append(NoEscape(r'\begin{aligned} h_{st} &= h_{ep} - D -12.5 \\'))
             stiffener_height_prov.append(NoEscape(r' &= '+h_ep+r' - '+D +r'-12.5 \\'))
 
     stiffener_height_prov.append(NoEscape(r' &= ' + h_sp  + r'\end{aligned}'))
@@ -5557,12 +5557,12 @@ def stiffener_length_prov(h_sp, l_sp, type = None):
     l_sp= str(l_sp)
     stiffener_length_prov = Math(inline=True)
     if type == 'Flushed - Reversible Moment':
-        stiffener_length_prov.append(NoEscape(r'\begin{aligned} l_{sp} &= 2 * h_{sp}  \\'))
+        stiffener_length_prov.append(NoEscape(r'\begin{aligned} l_{st} &= 2 * h_{st}  \\'))
         stiffener_length_prov.append(NoEscape(r'&= 2 * '+ h_sp +r' \\'))
     else:
         if type == 'Extended Both Ways - Reversible Moment':
-            stiffener_length_prov.append(NoEscape(r'\begin{aligned} l_{sp} &= h_{sp}/tan(30)  \\'))
-            stiffener_length_prov.append(NoEscape(r'&= \frac{'+h_sp+'} {tan(30)}  \\'))
+            stiffener_length_prov.append(NoEscape(r'\begin{aligned} l_{st} &= \frac{h_{st}}{tan(30)}  \\'))
+            stiffener_length_prov.append(NoEscape(r'&= \frac{'+h_sp+r'} {tan(30)}  \\'))
     stiffener_length_prov.append(NoEscape(r' &= ' + l_sp + r'\end{aligned}'))
 
     return stiffener_length_prov
@@ -5579,8 +5579,8 @@ def f_a_stress_due_to_axial_force(A_f,t_w,L_weld,f_a):
     L_weld =str(L_weld)
     f_a = str(f_a)
     f_a_stress_due_to_axial_force = Math(inline=True)
-    f_a_stress_due_to_axial_force.append(NoEscape(r'\begin{aligned} f_a &= \frac{A_f* 10^3}{0.7 *t_w * L_{weld}}\\'))
-    f_a_stress_due_to_axial_force.append(NoEscape(r' &= \frac{'+A_f+'*10^3}{0.7 *'+t_w+' * '+L_weld+r'}\\'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r'\begin{aligned} f_a &= \frac{A_f \times 10^3}{0.7 \times t_w \times L_{weld}}\\'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r' &= \frac{'+A_f+r'\times 10^3}{0.7 \times '+t_w+r' \times '+L_weld+r'}\\'))
     f_a_stress_due_to_axial_force.append(NoEscape(r' &= '+f_a+r'\end{aligned}'))
     return f_a_stress_due_to_axial_force
 
@@ -5597,8 +5597,8 @@ def q_stress_due_to_shear_force(V,t_w,L_weld,q):
     L_weld = str(L_weld)
     q = str(q)
     q_stress_due_to_shear_force = Math(inline=True)
-    q_stress_due_to_shear_force.append(NoEscape(r'\begin{aligned} q &= \frac{V * 10^3}{0.7 *t_w * L_{weld}}\\'))
-    q_stress_due_to_shear_force.append(NoEscape(r'&= \frac{'+V+' * 10^3}{0.7 *'+t_w+' * '+L_weld+r'}\\'))
+    q_stress_due_to_shear_force.append(NoEscape(r'\begin{aligned} q &= \frac{V \times 10^3}{0.7 \times t_w \times L_{weld}}\\'))
+    q_stress_due_to_shear_force.append(NoEscape(r'&= \frac{'+V+ r' \times  10^3}{0.7 \times'+t_w+r' \times '+L_weld+r'}\\'))
     q_stress_due_to_shear_force.append(NoEscape(r' &= ' + q + r'\end{aligned}'))
     return q_stress_due_to_shear_force
 
@@ -5616,7 +5616,7 @@ def f_e_weld_stress_due_to_combined_load( f_a ,f_e,q):
 
     f_e_weld_stress_due_to_combined_load = Math(inline=True)
     f_e_weld_stress_due_to_combined_load.append(NoEscape(r'\begin{aligned} f_e  &= \sqrt{f_a + (3 q ^ 2)}\\'))
-    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= \sqrt{('+f_a+')  + (3 *'+ q+r' ^ 2)}\\'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= \sqrt{('+f_a+r')  + (3 \times'+ q+r' ^ 2)}\\'))
     f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= ' + f_e+ r'\end{aligned}'))
     return f_e_weld_stress_due_to_combined_load
 
@@ -5626,13 +5626,13 @@ def weld_length_web_prov(beam_D,beam_tf ,beam_r1,L_weld):
     beam_tf =str(beam_tf)
     L_weld =str(L_weld)
     weld_length_web_prov = Math(inline=True)
-    weld_length_web_prov.append(NoEscape(r'\begin{aligned} L_{weld} &= 2 * (D - (2 * T) - (2 * R1) - 20)\\'))
-    weld_length_web_prov.append(NoEscape(r'&= 2 * ('+beam_D+' - (2 * '+beam_tf+') - (2 *'+beam_r1+r') - 20)\\'))
+    weld_length_web_prov.append(NoEscape(r'\begin{aligned} L_{weld} &= 2 \times (D - (2 \times T) - (2 \times R1) - 20)\\'))
+    weld_length_web_prov.append(NoEscape(r'&= 2 * ('+beam_D+r' - (2 \times '+beam_tf+r') - (2 \times'+beam_r1+r') - 20)\\'))
     weld_length_web_prov.append(NoEscape(r' &= ' + L_weld+ r'\end{aligned}'))
     return weld_length_web_prov
 
 
-def tension_critical_bolt_prov(M,t_ba, n_c,r_1,n_r, r_i ,n,type,r_3= None):
+def tension_critical_bolt_prov(M,t_ba, n_c,r_1,n_r, r_i ,n,type,r_3= 0):
     M= str(M)
     t_ba = str(t_ba)
     n_c =str(n_c)
@@ -5642,49 +5642,49 @@ def tension_critical_bolt_prov(M,t_ba, n_c,r_1,n_r, r_i ,n,type,r_3= None):
     r_3 = str(r_3)
     tension_critical_bolt_prov = Math(inline=True)
     if type =="flush" :
-        tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i = 2} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
-        tension_critical_bolt_prov.append(NoEscape(r'&= \frac{'+M+'}{'+n_c+ '* ('+r_1+' + \sum_{i=2} ^ {'+n_r+r'} \frac{'+r_i+' ^2}{'+r_1+r'}) }\end{aligned}'))
+        tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c \times (r_1 + \displaystyle\sum_{i = 2} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+        tension_critical_bolt_prov.append(NoEscape(r'&= \frac{'+M+'}{'+n_c+ r'\times ('+r_1+' + \displaystyle\sum_{i=2} ^ {'+n_r+r'} \frac{'+r_i+' ^2}{'+r_1+r'}) }\end{aligned}'))
     else:
-        if n==3 :
-            multi = 2
+        if n_r==3 :
+            # multi = 2
             i=3
             i= str(i)
-            multi = str(multi)
-            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
-            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
-        elif n==4:
-            multi = 2
+            # multi = str(multi)
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{2 \times n_c \times (r_1 + \displaystyle\sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + M + r'}{2 \times' + n_c + r'\times (' + r_1 + ' + \displaystyle\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }\\'))
+        elif n_r==4:
+            # multi = 2
             i = 3
             i = str(i)
-            multi = str(multi)
-            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
-            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+            # multi = str(multi)
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{2 \times n_c \times (r_1 + \displaystyle\sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + M + r'}{2 \times' + n_c + r'\times(' + r_1 + ' + \displaystyle\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }\\'))
         elif n==5:
             multi = 4
             i = 3
             i = str(i)
             multi = str(multi)
-            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
-            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{4 \times n_c \times (r_1 + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + M + r'}{4 \times' + n_c + r'\times (' + r_1 + ' + \sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }\\'))
 
         elif n >= 6:
-            multi = 4
+            # multi = 4
             i=6
             i = str(i)
-            multi = str(multi)
+            # multi = str(multi)
             r_3 =str(r_3)
-            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \frac{r_3^2}{r_1} + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
-            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + r' + \frac{'+r_3+'^2}{'+r_1+'} +\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+            tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} t_{ba} &= \frac{M}{4 \times n_c \times (r_1 + \frac{r_3^2}{r_1} + \displaystyle\sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+            tension_critical_bolt_prov.append(NoEscape(r'&= \frac{' + M + r'}{4 \times' + n_c + r'\times (' + r_1 + r' + \frac{'+r_3+'^2}{'+r_1+'} +\displaystyle\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }\\'))
         else:
-            multi = 4
+            # multi = 4
             i = 6
             i = str(i)
-            multi = str(multi)
+            # multi = str(multi)
             r_3 = str(r_3)
             tension_critical_bolt_prov.append(NoEscape(
-                r'\begin{aligned} t_{ba} &= \frac{M}{n_c * (r_1 + \frac{r_3^2}{r_1} + \sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
+                r'\begin{aligned} t_{ba} &= \frac{M}{4 \times n_c \times(r_1 + \frac{r_3^2}{r_1} + \displaystyle\sum_{i} ^ {n_r} \frac{r_i ^2}{r_1}) }\\'))
             tension_critical_bolt_prov.append(NoEscape(
-                r'&= \frac{' + multi + '*' + M + '}{' + n_c + '* (' + r_1 + r' + \frac{' + r_3 + '^2}{' + r_1 + '} +\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }'))
+                r'&= \frac{' + M + r'}{4 \times' + n_c + r'\times(' + r_1 + r' + \frac{' + r_3 + '^2}{' + r_1 + '} +\displaystyle\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{' + r_i + ' ^2}{' + r_1 + r'}) }\\'))
     tension_critical_bolt_prov.append(NoEscape(r' &= ' + t_ba + r'\end{aligned}'))
 
     return tension_critical_bolt_prov

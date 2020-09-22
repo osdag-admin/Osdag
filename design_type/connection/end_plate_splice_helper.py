@@ -626,7 +626,7 @@ class EndPlateSpliceHelper(object):
         # r_c = reaction due to tension in all the bolts
         self.r_c = 0
         for val in range(0, len(self.tension)):
-            self.r_c = self.r_c + self.tension[val]  # adding all the values of tension
+            self.r_c += self.tension[val]  # adding all the values of tension
 
         # total tension considering the bolt columns
         self.r_c = round(self.r_c * self.bolt_column, 2)  # kN

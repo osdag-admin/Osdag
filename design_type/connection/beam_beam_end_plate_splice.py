@@ -265,6 +265,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def fn_conn_image(self):
         """ display representative images of end plate type """
+
         ep_type = self[0]
         if ep_type == VALUES_ENDPLATE_TYPE[0]:
             return './ResourceFiles/images/flush_ep.png'
@@ -420,13 +421,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         stiffener = []
 
-        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX, self.stiffener_length if flag else '', True)
+        t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX, float(self.stiffener_length) if flag else '', True)
         stiffener.append(t28)
 
-        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiffener_height if flag else '', True)
+        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, float(self.stiffener_height) if flag else '', True)
         stiffener.append(t29)
 
-        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.stiffener_thickness if flag else '', True)
+        t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, str(self.stiffener_thickness) if flag else '', True)
         stiffener.append(t30)
 
         return stiffener
@@ -864,7 +865,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.proof_stress = round(0.7 * self.bolt_fu, 2)  # N/mm^2
 
                         # assign plate mechanical properties
-                        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material, thickness=self.plate.thickness_provided)
+                        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material, thickness=self.plate_thickness)
                         self.dp_plate_fu = self.plate.fu
                         self.dp_plate_fy = self.plate.fy
 
@@ -878,9 +879,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         self.gauge_distance_provided = self.pitch_distance_provided
 
                         # end/edge
-                        # end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type, self.bolt.edge_type)
-                        # end_distance = end_distance + ((1 / 2) * IS1364Part3.nut_size(self.bolt_diameter_provided))  # add nut size (half on each side)
-
                         self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                         self.bolt.edge_type)
                         self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
@@ -920,6 +918,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                             self.rows_inside_D_max = 0
                         else:
                             self.rows_inside_D_max = 2 + round_down(self.space_available_inside_D / self.pitch_distance_provided, 1)
+
+                        if (((self.rows_inside_D_max - 2) + 1) * self.pitch_distance_provided) > self.space_available_inside_D:
+                            self.rows_inside_D_max -= 1
 
                         if self.endplate_type == 'Extended One Way - Irreversible Moment':
                             self.rows_outside_D_max = 2
@@ -1254,7 +1255,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             else:
                 self.stiffener_height = self.ep_height_provided - self.beam_D - 12.5  # mm
 
-            self.stiffener_length = round_up((self.stiffener_height / math.tan(30)), 2)  # mm
+            self.stiffener_length = round_up((self.stiffener_height / math.tan(math.radians(30))), 2)  # mm
 
         self.stiffener_thickness = round_up(self.beam_tw, 2)  # mm
 
@@ -1286,13 +1287,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # end of calculation
         if self.design_status:
-            logger.info(": =========================Design Status===========================")
+            logger.info(": =====================Design Status=======================")
             logger.info(": Overall beam to beam end plate splice connection design is SAFE")
-            logger.info(": =========================End Of design===========================")
+            logger.info(": =====================End Of design=======================")
         else:
-            logger.info(": =========================Design Status===========================")
+            logger.info(": =====================Design Status=======================")
             logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
-            logger.info(": =========================End Of design===========================")
+            logger.info(": =====================End Of design=======================")
 
         # create design report
 
@@ -1517,7 +1518,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_check.append(t6)
 
 
-        # TODO: please call bolt tension, already assigned in component file as pretensioned
+
         if self.bolt.bolt_tensioning == 'Pretensioned':
             beta = 1
         else:

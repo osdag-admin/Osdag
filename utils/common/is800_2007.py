@@ -44,7 +44,7 @@ class IS800_2007(object):
 
         """
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        epsilon = math.sqrt(f_y / 250)
+        epsilon = math.sqrt(250 / f_y)
 
         ratio = depth / web_thickness  # ratio of the web/component
 
@@ -126,7 +126,7 @@ class IS800_2007(object):
         Reference: Table 2 and Cl.3.7.2, IS 800:2007
 
         """
-        epsilon = math.sqrt(f_y / 250)
+        epsilon = math.sqrt(250 / f_y)
 
         ratio = diameter / thickness  # ratio of the web/component
 
@@ -882,7 +882,7 @@ class IS800_2007(object):
             return 0.7 * min(part1_thickness, part2_thickness)
 
     @staticmethod
-    def cl_10_5_3_2_factor_for_throat_thickness (fusion_face_angle = 90):
+    def cl_10_5_3_2_factor_for_throat_thickness(fusion_face_angle=90):
 
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
         fusion_face_angle = int(round(fusion_face_angle))
@@ -928,7 +928,7 @@ class IS800_2007(object):
         return throat
 
     @staticmethod
-    def cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant( fusion_face_angle=90):
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant(fusion_face_angle=90):
 
         """Calculate effective throat thickness of fillet weld for stress calculation
 

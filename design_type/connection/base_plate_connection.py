@@ -165,7 +165,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_column_fu = 0.0
         self.dp_column_fy = 0.0
         self.stiffener_fy = 0.0
-        self.shear_key_fy = 0.0
 
         self.dp_bp_material = ""  # dp for base plate
         self.dp_bp_fu = 0.0
@@ -1369,6 +1368,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def input_dictionary_design_pref(self):
 
         design_input = []
+
         t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SEC_MATERIAL])
         design_input.append(t1)
 
@@ -1378,8 +1378,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = ("Base Plate", TYPE_COMBOBOX, [KEY_BASE_PLATE_MATERIAL])
         design_input.append(t2)
 
-        t2 = ("Base Plate", TYPE_TEXTBOX, [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY])
-        design_input.append(t2)
+        # t2 = ("Base Plate", TYPE_TEXTBOX, [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY])
+        # design_input.append(t2)
+
+        t7 = ("Stiffener/Shear Key", TYPE_COMBOBOX, [KEY_ST_KEY_MATERIAL])
+        design_input.append(t7)
+
+        # t7 = ("Stiffener/Shear Key", TYPE_TEXTBOX, [KEY_ST_KEY_FU, KEY_ST_KEY_FY])
+        # design_input.append(t7)
 
         t3 = ("Anchor bolt", TYPE_TEXTBOX,
               [KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
@@ -1412,43 +1418,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
+        # t4 = (KEY_MATERIAL_ST_SK, [KEY_SEC_MATERIAL, KEY_ST_KEY_MATERIAL], 'Input Dock')
+        # design_input.append(t4)
+
         t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE_OCF, KEY_DP_ANCHOR_BOLT_TYPE_ICF], 'Input Dock')
         design_input.append(t2)
 
         t3 = (None, [KEY_BASE_PLATE_FU, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
-                     KEY_BASE_PLATE_FY, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+                     KEY_BASE_PLATE_FY, KEY_ST_KEY_FU, KEY_ST_KEY_FY, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
                      KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
                      KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB,
                      KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-                     KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE, KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF], '')
+                     KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE, KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF],
+              KEY_BASE_PLATE_MATERIAL, KEY_ST_KEY_MATERIAL, '')
         design_input.append(t3)
 
         return design_input
 
     def get_values_for_design_pref(self, key, design_dictionary):
-
-        # section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-
-        # if (design_dictionary[KEY_SECSIZE])[1:4] == 'SHS':
-        #     section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        # elif (design_dictionary[KEY_SECSIZE])[1:4] == 'RHS':
-        #     section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        # elif (design_dictionary[KEY_SECSIZE])[1:4] == 'CHS':
-        #     section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        # else:
-        #     section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-
-        # if self.connectivity == 'Hollow/Tubular Column Base':
-        #     if self.dp_column_designation[1:4] == 'SHS':
-        #         section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        #     elif self.dp_column_designation[1:4] == 'RHS':
-        #         section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        #     elif self.dp_column_designation[1:4] == 'CHS':
-        #         section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        #     else:
-        #         pass
-        # else:
-        #     section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
 
         if design_dictionary[KEY_MATERIAL] != 'Select Material':
             material = Material(design_dictionary[KEY_MATERIAL], 41)
@@ -1458,12 +1445,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             fu = ''
             fy = ''
 
+        if design_dictionary[KEY_MATERIAL_ST_SK] != 'Select Material':
+            material = Material(design_dictionary[KEY_MATERIAL_ST_SK], 41)
+            fu_st_sk = material.fu
+            fy_st_sk = material.fy
+        else:
+            fu_st_sk = ''
+            fy_st_sk = ''
+
         length = str(self.anchor_length_provided_out if self.design_button_status else 0)
 
         val = {KEY_BASE_PLATE_FU: str(fu),
+               KEY_BASE_PLATE_FY: str(fy),
+               KEY_ST_KEY_FU: str(fu_st_sk),
+               KEY_ST_KEY_FY: str(fy_st_sk),
                KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: str(fu),
                KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: str(fu),
-               KEY_BASE_PLATE_FY: str(fy),
                KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF:
                    str(str(design_dictionary[KEY_DIA_ANCHOR_OCF][0]) + "X" + length + " IS5624 GALV"),
                KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF:
@@ -1505,8 +1502,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
               self.get_fu_fy_I_section)
         change_tab.append(t1)
 
-        t2 = ("Base Plate", [KEY_BASE_PLATE_MATERIAL], [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY], TYPE_TEXTBOX,
-              self.get_fu_fy)
+        t2 = ("Base Plate", [KEY_BASE_PLATE_MATERIAL], [KEY_BASE_PLATE_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40, KEY_CONNECTOR_FY_40, ],
+              TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t2)
+
+        t2 = ("Stiffener/Shear Key", [KEY_ST_KEY_MATERIAL], [KEY_ST_KEY_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40, KEY_CONNECTOR_FY_40, ],
+              TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t2)
 
         t3 = ("Anchor bolt", [KEY_DP_ANCHOR_BOLT_LENGTH_OCF], [KEY_DP_ANCHOR_BOLT_LENGTH_OCF], TYPE_OVERWRITE_VALIDATION,
@@ -1604,6 +1605,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = (KEY_BASE_PLATE_MATERIAL, KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY)
         fu_fy_list.append(t2)
 
+        t3 = (KEY_ST_KEY_MATERIAL, KEY_ST_KEY_FU, KEY_ST_KEY_FY)
+        fu_fy_list.append(t3)
+
         return fu_fy_list
 
     # define design preferences
@@ -1618,6 +1622,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t5 = ("Base Plate", TYPE_TAB_2, self.tab_bp)
         tabs.append(t5)
+
+        t6 = ("Stiffener/Shear Key", TYPE_TAB_2, self.tab_st_sk)
+        tabs.append(t6)
 
         t1 = ("Anchor bolt", TYPE_TAB_2, self.anchor_bolt_values)
         tabs.append(t1)
@@ -1770,6 +1777,50 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return tab_bp
 
+    def tab_st_sk(self, input_dictionary):
+
+        if not input_dictionary or input_dictionary[KEY_MATERIAL_ST_SK] == 'Select Material':
+            material_grade = ''
+            fu = ''
+            fy_20 = ''
+            fy_20_40 = ''
+            fy_40 = ''
+        else:
+            material_grade = input_dictionary[KEY_MATERIAL_ST_SK]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy_20 = material_attributes.fy_20
+            fy_20_40 = material_attributes.fy_20_40
+            fy_40 = material_attributes.fy_40
+
+        if KEY_ST_KEY_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_ST_KEY_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy_20 = material_attributes.fy_20
+            fy_20_40 = material_attributes.fy_20_40
+            fy_40 = material_attributes.fy_40
+
+        tab_st_sk = []
+
+        material = connectdb("Material", call_type="popup")
+        t1 = (KEY_ST_KEY_MATERIAL, KEY_DISP_ST_SK_MATERIAL, TYPE_COMBOBOX, material, material_grade)
+        tab_st_sk.append(t1)
+
+        t2 = (KEY_ST_KEY_FU, KEY_DISP_ST_SK_FU, TYPE_TEXTBOX, None, fu)
+        tab_st_sk.append(t2)
+
+        t3 = (KEY_CONNECTOR_FY_20, KEY_DISP_FY_20, TYPE_TEXTBOX, None, fy_20)
+        tab_st_sk.append(t3)
+
+        t3 = (KEY_CONNECTOR_FY_20_40, KEY_DISP_FY_20_40, TYPE_TEXTBOX, None, fy_20_40)
+        tab_st_sk.append(t3)
+
+        t3 = (KEY_CONNECTOR_FY_40, KEY_DISP_FY_40, TYPE_TEXTBOX, None, fy_40)
+        tab_st_sk.append(t3)
+
+        return tab_st_sk
+
     def detailing_values(self, input_dictionary):
 
         values = {KEY_DP_DETAILING_EDGE_TYPE: 'a - Sheared or hand flame cut',
@@ -1912,11 +1963,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.base_plate = Material(material_grade=self.dp_bp_material, thickness=0)  # thk is initialised to 0
         self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, 0)
 
-        self.dp_bp_fu = self.base_plate.fu
-        self.dp_bp_fy = self.base_plate.fy
-
-        # self.base_plate.fu = float(design_dictionary[KEY_BASE_PLATE_FU])
-        # self.base_plate.fy = float(design_dictionary[KEY_BASE_PLATE_FY])
+        # stiffener plate/ shear key
+        self.dp_stif_key_material = str(design_dictionary[KEY_ST_KEY_MATERIAL])
+        self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=0)  # thk is initialised to 0
+        self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, 0)
 
         # anchor bolt
 
@@ -1971,10 +2021,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.dp_column_type = str(self.column_properties.type)
 
         self.dp_column_source = str(self.column_properties.source)
-        # self.dp_column_fu = float(self.column_properties.fu)
-        # self.dp_column_fy = float(self.column_properties.fy)
-        self.dp_column_fu = 410
-        self.dp_column_fy = 250
+        self.dp_column_fu = float(self.column_properties.fu)
+        self.dp_column_fy = float(self.column_properties.fy)
 
         self.column_D = self.column_properties.depth  # mm
         self.column_bf = self.column_properties.flange_width  # mm
@@ -3334,7 +3382,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # Check 3: Provide shear key
                 # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
                 self.shear_key_thk = self.plate_thk_provided  # mm
-                self.shear_key_fy = self.stiffener_fy
+
+                self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
+                self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
 
                 if self.load_shear_major > 0:
                     self.shear_key_along_ColDepth = 'Yes'
@@ -3392,10 +3442,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # improvising the thk
                             self.shear_key_w = (self.shear_key_stress_ColDepth - self.bearing_strength_concrete) / self.shear_key_len_ColDepth
                             self.shear_key_moment = self.shear_key_w * (self.shear_key_depth_ColDepth ** 2 / 2)
-                            self.shear_key_thk = math.sqrt((6 * self.shear_key_moment * self.gamma_m0) / (1 * self.shear_key_fy))  # b = 1
+                            self.shear_key_thk = math.sqrt((6 * self.shear_key_moment * self.gamma_m0) / (1 * 1.5 * self.stiff_key.fy))  # b = 1
                             self.shear_key_thk = round_up(self.shear_key_thk, 2)
 
                             self.shear_key_thk = max(self.shear_key_thk, self.plate_thk_provided)
+
+                            self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
+                            self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
                         else:
                             self.shear_key_bending_status = False
                     else:

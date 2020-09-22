@@ -357,6 +357,7 @@ KEY_CONN = 'Connectivity'
 KEY_LOCATION = 'Conn_Location'
 KEY_ENDPLATE_TYPE = 'EndPlateType'
 KEY_MATERIAL = 'Material'
+KEY_MATERIAL_ST_SK = 'Material'
 KEY_MATERIAL_FU = 'Material.Fu'
 KEY_MATERIAL_FY = 'Material.Fy'
 
@@ -1006,8 +1007,11 @@ KEY_DISP_A= 'Long Leg, A (mm)*'
 KEY_DISP_B= 'Short Leg, B (mm)*'
 KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
+KEY_DISP_ST_SK_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield strength , fy (MPa)'
+KEY_DISP_ST_SK_FU = 'Ultimate strength, fu (MPa)'
+KEY_DSIP_ST_SK_FY = 'Yield strength , fy (MPa)'
 
 
 ########################
@@ -1351,15 +1355,12 @@ DISP_TITLE_ENDPLATE = 'End Plate'
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
 KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)'
 
-
-
 KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
-
+KEY_ST_KEY_MATERIAL = 'Stiffener_Key.Material'
 KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
-
-
-
 KEY_BASE_PLATE_FY = 'Base_Plate.Fy'
+KEY_ST_KEY_FU = 'Stiffener_Key.Fu'
+KEY_ST_KEY_FY = 'Stiffener_Key.Fy'
 
 
 

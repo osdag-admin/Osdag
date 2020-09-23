@@ -683,7 +683,7 @@ KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
 KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
-
+KEY_OUT_DISP_SHEAR_CAPACITY_M ="Shear Capacity(kN)"
 
 
 KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
@@ -927,6 +927,9 @@ KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
 KEY_DISP_DP_WELD_TYPE = 'Weld type'
+KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam Flange to Endplate Weld type'
+KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam Web to Endplate Weld type'
+KEY_DISP_STIFFENER_WELD_TYPE= "Stiffener Weld Type"
 KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
 KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
@@ -1362,11 +1365,7 @@ KEY_BASE_PLATE_FY = 'Base_Plate.Fy'
 KEY_ST_KEY_FU = 'Stiffener_Key.Fu'
 KEY_ST_KEY_FY = 'Stiffener_Key.Fy'
 
-
-
-
-
-
+KEY_DISP_LEVER_ARM = "Lever Arm"
 
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
@@ -1379,7 +1378,7 @@ KEY_OUT_DISP_INTER_D_PROVIDED = 'Diameter (mm)'
 
 
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade_Provided'
-KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_DISP_GRD_PROVIDED = 'Property class'
 KEY_OUT_INTER_GRD_PROVIDED = 'Bolt.InterGrade'
 KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
 

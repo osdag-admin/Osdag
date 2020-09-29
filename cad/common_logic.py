@@ -1537,7 +1537,7 @@ class CommonDesignLogic(object):
             bolthight = washer.T + nut.T + 50
 
             if BP.shear_key_required == 'Yes':
-                shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T= float(BP.shear_key_depth_ColDepth))
+                shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T=float(BP.shear_key_depth_ColDepth))
                 shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_depth_ColWidth), T=float(BP.shear_key_len_ColWidth))
             else:
                 shearkey_1 = Plate(L=float(0), W=float(0), T=float(0))

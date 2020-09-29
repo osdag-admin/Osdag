@@ -456,7 +456,10 @@ class Connection(Main):
              KEY_CONNECTOR_FY_20_40: fy_20_40,
              KEY_CONNECTOR_FY_40: fy_40,
              KEY_BASE_PLATE_FU: fu,
-             KEY_BASE_PLATE_FY: fy}
+             KEY_BASE_PLATE_FY: fy,
+             KEY_ST_KEY_FU: fu,
+             KEY_ST_KEY_FY: fy,
+             }
 
         return d
 

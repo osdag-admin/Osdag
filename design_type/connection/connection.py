@@ -763,8 +763,8 @@ class Connection(Main):
                 # base plate
                 "Base Plate - Design Preference": "TITLE",
                 KEY_DISP_MATERIAL: self.dp_bp_material,
-                'Ultimate strength, ($f_{u}$)': self.dp_bp_fu,
-                'Yield strength, ($f_{y}$)': self.dp_bp_fy,
+                'Ultimate strength, ($f_{u}$)': self.base_plate.fu,
+                'Yield strength, ($f_{y}$)': self.base_plate.fy,
 
                 # anchor bolt outside column flange
                 "Anchor Bolt Outside Column Flange - Details and Design Preference": "TITLE",

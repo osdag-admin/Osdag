@@ -3474,11 +3474,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # load distribution along the depth of the key
                     self.shear_key_w_1 = (self.load_shear_major - self.shear_resistance) / self.shear_key_len_ColDepth  # N/mm
+                    self.shear_key_w_1 = round(self.shear_key_w_1, 2)
                     self.shear_key_moment_1 = self.shear_key_w_1 * (self.shear_key_depth_ColDepth ** 2 / 2)  # N-mm, max moment
                     self.shear_key_thk_1 = math.sqrt((4 * self.shear_key_moment_1 * self.gamma_m0) / (self.stiff_key.fy *
                                                                                                       self.shear_key_len_ColDepth))
-                    self.shear_key_thk_1 = round_up(self.shear_key_thk_1, 2)
-                    self.shear_key_thk = max(self.shear_key_thk_1, self.plate_thk_provided)
+                    self.shear_key_thk = max(round_up(self.shear_key_thk_1, 2), self.plate_thk_provided)
 
                     self.moment_capacity_key1 = (((self.shear_key_len_ColDepth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
                     self.moment_capacity_key1 = round(self.moment_capacity_key1 * 1e-6, 2)
@@ -3495,10 +3495,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 if self.load_shear_minor <= self.load_shear_major:
                     self.shear_key_depth_ColWidth = self.shear_key_depth_ColDepth
                     self.shear_key_len_ColWidth = self.shear_key_len_ColDepth
+                    self.shear_key_thk_2 = self.shear_key_thk_1
                     self.shear_key_thk = self.shear_key_thk
                     self.shear_key_stress_ColWidth = self.shear_key_stress_ColDepth
 
                     self.shear_key_w_2 = (self.load_shear_minor - self.shear_resistance) / self.shear_key_len_ColWidth  # N/mm
+                    self.shear_key_w_2 = round(self.shear_key_w_2, 2)
                     self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
                     self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
                     self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
@@ -3565,6 +3567,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                         # load distribution along the depth of the key
                         self.shear_key_w_2 = (self.load_shear_minor - self.shear_resistance) / self.shear_key_len_ColWidth  # N/mm
+                        self.shear_key_w_2 = round(self.shear_key_w_2, 2)
                         self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
                         self.shear_key_thk_2 = math.sqrt((4 * self.shear_key_moment_2 * self.gamma_m0) / (self.stiff_key.fy *
                                                                                                           self.shear_key_len_ColWidth))
@@ -6231,7 +6234,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 remark_1 = 'Shear key required'
             else:
                 remark_1 = 'Shear key not required'
-            t2 = ('Shear Key Requirement - Along Column Depth', self.load_shear_major * 1e-3, self.shear_resistance * 1e-3, remark_1)
+
+            t2 = ('Shear Key Requirement - Along Column Depth', shear_load(self.load_shear_major * 1e-3, location='L1'),
+                  shear_resistance_check(self.load_shear_major * 1e-3, self.shear_resistance * 1e-3, remark_1, location='L1'), remark_1)
             self.report_check.append(t2)
 
             if self.shear_key_along_ColDepth == 'Yes':
@@ -6241,28 +6246,67 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t3 = ('Depth of Key (mm)', '', key_depth(self.shear_key_depth_ColDepth, location='L1'), 'Pass')
                 self.report_check.append(t3)
 
-                t3 = ('Moment Demand (kN-m)', '', key_moment_demand(self.load_shear_major, self.shear_resistance, self.shear_key_len_ColDepth,
-                                                                    self.shear_key_w_1, self.shear_key_depth_ColDepth, self.shear_key_moment_1,
-                                                                    location='L1'), 'N/A')
+                t3 = ('Bearing Stress (N/mm^2)', self.bearing_strength_concrete, key_bearing_stress(self.load_shear_major, self.shear_resistance,
+                                                                                                    self.shear_key_len_ColDepth,
+                                                                                                    self.shear_key_depth_ColDepth,
+                                                                                                    self.shear_key_stress_ColDepth, location='L1'),
+                      get_pass_fail(self.bearing_strength_concrete, self.shear_key_stress_ColDepth, relation='geq'))
                 self.report_check.append(t3)
 
-                t4 = ('Thickness of Key (mm)', stiff_thk_across_web(stiff_thk, self.stiffener_plt_len_across_web, self.epsilon, self.column_tw,
-                                                                          self.standard_plate_thk[-1]), self.stiffener_plt_thick_across_web,
-                      get_pass_fail(max(stiff_thk, self.column_tw), self.stiffener_plt_thick_across_web, relation='leq') and
-                      get_pass_fail(self.standard_plate_thk[-1], self.stiffener_plt_thick_across_web, relation='geq'))
+                t3 = ('Moment Demand (kN-m)', key_moment_demand(self.load_shear_major, self.shear_resistance, self.shear_key_len_ColDepth,
+                                                                    self.shear_key_w_1, self.shear_key_depth_ColDepth,
+                                                                    round(self.shear_key_moment_1 * 1e-3, 2), location='L1'), '', 'N/A')
+                self.report_check.append(t3)
+
+                t4 = ('Thickness of Key (mm)', '', key_thk(self.shear_key_moment_1, self.gamma_m0, self.stiff_key.fy, self.shear_key_len_ColDepth,
+                                                           self.shear_key_thk_1, location='L1'), '')
                 self.report_check.append(t4)
+
+                t3 = ('Moment Capacity (kN-m)', round(self.shear_key_moment_1 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColDepth,
+                                                                                                              self.shear_key_thk, self.stiff_key.fy,
+                                                                                                              self.gamma_m0, self.moment_capacity_key1,
+                                                                                                              beta_b=1, location='L1'),
+                      get_pass_fail(self.shear_key_moment_1 * 1e-6, self.moment_capacity_key1, relation='leq'))
+                self.report_check.append(t3)
 
             # key along column width
             if self.shear_key_along_ColWidth == 'Yes':
                 remark_2 = 'Shear key required'
             else:
                 remark_2 = 'Shear key not required'
-            t2 = ('Shear Key Requirement - Along Column Width', self.load_shear_major * 1e-3, self.shear_resistance * 1e-3, remark_2)
+
+            t2 = ('Shear Key Requirement - Along Column Width', shear_load(self.load_shear_minor * 1e-3, location='L2'),
+                  shear_resistance_check(self.load_shear_minor * 1e-3, self.shear_resistance * 1e-3, remark_2, location='L2'), remark_2)
             self.report_check.append(t2)
 
             if self.shear_key_along_ColWidth == 'Yes':
-                t1 = ('SubSubSection', 'Shear Key Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-                self.report_check.append(t1)
+                t2 = ('Length of Key (mm)', '', key_length(self.shear_key_len_ColWidth, location='L2'), 'Pass')
+                self.report_check.append(t2)
+
+                t3 = ('Depth of Key (mm)', '', key_depth(self.shear_key_depth_ColWidth, location='L2'), 'Pass')
+                self.report_check.append(t3)
+
+                t3 = ('Bearing Stress (N/mm^2)', self.bearing_strength_concrete, key_bearing_stress(self.load_shear_minor, self.shear_resistance,
+                                                                                                    self.shear_key_len_ColWidth,
+                                                                                                    self.shear_key_depth_ColWidth,
+                                                                                                    self.shear_key_stress_ColWidth, location='L2'),
+                      get_pass_fail(self.bearing_strength_concrete, self.shear_key_stress_ColWidth, relation='geq'))
+                self.report_check.append(t3)
+
+                t3 = ('Moment Demand (kN-m)', key_moment_demand(self.load_shear_minor, self.shear_resistance, self.shear_key_len_ColWidth,
+                                                                    self.shear_key_w_2, self.shear_key_depth_ColWidth,
+                                                                    round(self.shear_key_moment_2 * 1e-3, 2), location='L2'), '', 'N/A')
+                self.report_check.append(t3)
+
+                t4 = ('Thickness of Key (mm)', '', key_thk(self.shear_key_moment_2, self.gamma_m0, self.stiff_key.fy, self.shear_key_len_ColWidth,
+                                                           self.shear_key_thk_2, location='L2'), '')
+                self.report_check.append(t4)
+
+                t3 = ('Moment Capacity (kN-m)', self.shear_key_moment_2 * 1e-6, key_moment_capacity(self.shear_key_len_ColWidth, self.shear_key_thk,
+                                                                                                    self.stiff_key.fy, self.gamma_m0,
+                                                                                                    self.shear_key_moment_2, beta_b=1, location='L2'),
+                      get_pass_fail(self.shear_key_moment_2 * 1e-6, self.moment_capacity_key2, relation='geq'))
+                self.report_check.append(t3)
 
         # End of checks
 

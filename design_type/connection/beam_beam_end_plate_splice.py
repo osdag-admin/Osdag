@@ -152,6 +152,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.f_a = 0.0
         self.q = 0.0
         self.f_e = 0.0
+        self.weld_size_stiffener = 0.0
 
         # self.func_for_validation(self, design_dictionary)
 
@@ -658,6 +659,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         #                                type=design_dictionary[KEY_DP_WELD_TYPE],
         #                                fabrication=design_dictionary[KEY_DP_WELD_FAB])
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                             type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
+
+        self.stiffener_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
 
         self.warn_text(self)
@@ -1262,7 +1266,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def design_weld(self):
         """ design fillet weld at web for the connection """
 
-        # weld size calculation
+        # 1: Weld design for web to end plate connection
         self.weld_length_web = 2 * (self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - 20)  # mm, on either side of the web
         self.weld_size_web = (self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.web_weld.fu)  # mm
         self.weld_size_web = round_up(self.weld_size_web, 2)
@@ -1284,6 +1288,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.design_status = False
             logger.error("[Weld Design] The weld at web fails in the combined axial and shear design check")
             logger.info("Provide groove weld at the web")
+
+        # 2: Weld design for stiffeners
+        self.stiffener_weld.set_min_max_sizes(self.stiffener_thickness, max(self.beam_tf, self.beam_tw), special_circumstance=False,
+                                              fusion_face_angle=90)
+        self.weld_size_stiffener = self.stiffener_weld.min_size  # mm
 
         # end of calculation
         if self.design_status:

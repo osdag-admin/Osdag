@@ -5660,6 +5660,67 @@ def high_shear_req(shear_capa_stiffener):
     return shear_req
 
 
+def shear_resistance(axial_load, mu, shear_resistance_val):
+    """ """
+    resistance = Math(inline=True)
+    resistance.append(NoEscape(r'\begin{aligned} V_{r} &= P_{c} \times \mu  \\'))
+    resistance.append(NoEscape(r'&                      = ' + str(axial_load) + r' \times ' + str(mu) + r' \\'))
+    resistance.append(NoEscape(r'&                      = ' + str(shear_resistance_val) + r' \end{aligned}'))
+
+    return resistance
+
+def key_length(length, location='L1'):
+    """ """
+    length_eqn = Math(inline=True)
+
+    if location == 'L1':
+        length_eqn.append(NoEscape(r'\begin{aligned} L_{1} &= ' + str(length) + r' \end{aligned}'))
+    else:
+        length_eqn.append(NoEscape(r'\begin{aligned} L_{2} &= ' + str(length) + r' \end{aligned}'))
+
+    return length_eqn
+
+
+def key_depth(depth, location='L1'):
+    """ """
+    depth_eqn = Math(inline=True)
+
+    if location == 'L1':
+        depth_eqn.append(NoEscape(r'\begin{aligned} H_{1} &= ' + str(depth) + r' \end{aligned}'))
+    else:
+        depth_eqn.append(NoEscape(r'\begin{aligned} H_{2} &= ' + str(depth) + r' \end{aligned}'))
+
+    return depth_eqn
+
+
+def key_moment_demand(load_shear, shear_resistance, key_len, load_unit_len, key_depth, moment_demand, location='L1'):
+    """ """
+    key_md = Math(inline=True)
+
+    if location == 'L1':
+        key_md.append(NoEscape(r' \begin{aligned} w_{1} &= \frac{P_{c} - V_{r}}{L_{1}}~~~~(kN/mm) \\'))
+        key_md.append(NoEscape(r'                       &= \frac{' + str(load_shear * 1e-3) + r' - ' + str(shear_resistance * 1e-3) + r'}'
+                                                                                                        r'{' + str(key_len) + r'} \\'))
+        key_md.append(NoEscape(r'                       &= ' + str(load_unit_len * 1e-3) + r' \\ \\'))
+
+        key_md.append(NoEscape(r'                {M_{d}}_{1} &= w_{1} \times \frac{{H_{1}}^{2}} {2} \\'))
+        key_md.append(NoEscape(r'                            &= ' + str(load_unit_len * 1e-3) + r' \times \frac{{' + str(key_depth) + r'}^{2}} {2} \\'))
+        key_md.append(NoEscape(r'                            &= ' + str(moment_demand) + r' \\'))
+    else:
+        key_md.append(NoEscape(r' \begin{aligned} w_{2} &= \frac{P_{c} - V_{r}}{L_{2}}~~~~(kN/mm) \\'))
+        key_md.append(NoEscape(r'                       &= \frac{' + str(load_shear * 1e-3) + r' - ' + str(shear_resistance * 1e-3) + r'}'
+                                                                                                                                      r'{' + str(
+            key_len) + r'} \\'))
+        key_md.append(NoEscape(r'                       &= ' + str(load_unit_len * 1e-3) + r' \\ \\'))
+
+        key_md.append(NoEscape(r'                {M_{d}}_{2} &= w_{2} \times \frac{{H_{2}}^{2}} {2} \\'))
+        key_md.append(
+            NoEscape(r'                            &= ' + str(load_unit_len * 1e-3) + r' \times \frac{{' + str(key_depth) + r'}^{2}} {2} \\'))
+        key_md.append(NoEscape(r'                            &= ' + str(moment_demand) + r' \\'))
+
+    return key_md
+
+
 def high_shear_provided(shear_on_stiffener):
     """ """
     shear_provided = Math(inline=True)

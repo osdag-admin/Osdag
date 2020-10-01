@@ -296,6 +296,7 @@ class BCE_NutBoltArray(object):
                     pos = pos + self.endDist * self.pitchDir
                     if rw > 0:
                         if self.row < 5:
+                            print ("right")
                             if rw == 1:
                                 pos = pos + (self.endDist_ext) * self.pitchDir
                             elif rw == 2:
@@ -304,6 +305,7 @@ class BCE_NutBoltArray(object):
                                 pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
 
                         else:
+                            print("wrong")
                             if rw == 1:
                                 pos = pos + (self.pitch) * self.pitchDir
                             elif rw == (self.row - 1):

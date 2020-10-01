@@ -1543,11 +1543,14 @@ class CommonDesignLogic(object):
             nutSpace = bolt.c + baseplate.T
             bolthight = washer.T + nut.T + 50
 
-            if BP.shear_key_required == 'Yes':
-                shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T= float(BP.shear_key_depth_ColDepth))
-                shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_depth_ColWidth), T=float(BP.shear_key_len_ColWidth))
+            if BP.shear_key_along_ColDepth == 'Yes':
+                shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T=float(BP.shear_key_depth_ColDepth))
             else:
                 shearkey_1 = Plate(L=float(0), W=float(0), T=float(0))
+
+            if BP.shear_key_along_ColWidth == 'Yes':
+                shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_len_ColWidth), T=float(BP.shear_key_depth_ColWidth))
+            else:
                 shearkey_2 = Plate(L=float(0), W=float(0), T=float(0))
 
             nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace, washer, washer_in)

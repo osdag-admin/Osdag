@@ -128,7 +128,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.load_moment_minor_report = 0.0
 
         self.shear_resistance = 0.0
-        self.shear_key_required = 'No'
+        self.shear_key_along_ColDepth = 'No'
+        self.shear_key_along_ColWidth = 'No'
         self.weld_size_shear_key = 0
         self.shear_key_stress_ColDepth = 'N/A'
         self.shear_key_stress_ColWidth = 'N/A'
@@ -137,9 +138,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.shear_key_along_ColDepth = 'No'
         self.shear_key_depth_ColDepth = 0.0
-        self.shear_key_w = 0.0
-        self.shear_key_moment = 0.0
-        self.shear_key_thk = 0.0
+        self.shear_key_w_1 = 0.0
+        self.shear_key_moment_1 = 0.0
+        self.moment_capacity_key1 = 0.0
+        self.shear_key_thk_1 = 0.0
+        self.shear_key_w_2 = 0.0
+        self.shear_key_moment_2 = 0.0
+        self.moment_capacity_key2 = 0.0
+        self.shear_key_thk_2 = 0.0
         self.shear_key_design_status = False
 
         self.shear_key_along_ColWidth = 'No'
@@ -172,6 +178,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_bp_material = ""  # dp for base plate
         self.dp_bp_fu = 0.0
         self.dp_bp_fy = 0.0
+        self.dp_stif_key_material = ''
 
         self.dp_anchor_designation_out = ""  # dp for anchor bolt
         self.dp_anchor_type_out = ""
@@ -713,8 +720,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t29 = (None, DISP_TITLE_SHEAR_KEY, TYPE_TITLE, None, True)
         out_list.append(t29)
 
-        t30 = (KEY_OUT_SHEAR_KEY, KEY_DISP_OUT_SHEAR_KEY, TYPE_OUT_BUTTON,
-               ['Key Details', self.shear_key_details], True)
+        t31 = (KEY_OUT_SHEAR_RESISTANCE, KEY_OUT_DISP_SHEAR_RESISTANCE, TYPE_TEXTBOX,
+               round(self.shear_resistance * 1e-3, 2) if flag and (self.load_shear_major > 0 or self.load_shear_minor > 0) else 'N/A', True)
+        out_list.append(t31)
+
+        t32 = (KEY_OUT_SHEAR_KEY_REQ, KEY_OUT_DISP_SHEAR_KEY_REQ, TYPE_TEXTBOX,
+               'Yes' if flag and (self.shear_key_along_ColDepth == 'Yes' or self.shear_key_along_ColWidth == 'Yes') else 'No', True)
+        out_list.append(t32)
+
+        t30 = (KEY_OUT_SHEAR_KEY, KEY_DISP_OUT_SHEAR_KEY, TYPE_OUT_BUTTON, ['Key Details', self.shear_key_details], True)
         out_list.append(t30)
 
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
@@ -965,39 +979,55 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         sk.append(t99)
 
         t28 = (KEY_OUT_SHEAR_KEY_LENGTH, KEY_OUT_DISP_SHEAR_KEY_LENGTH, TYPE_TEXTBOX,
-               self.shear_key_len_ColDepth if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_len_ColDepth if flag and self.shear_key_along_ColDepth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t28)
 
         t29 = (KEY_OUT_SHEAR_KEY_DEPTH, KEY_OUT_DISP_SHEAR_KEY_DEPTH, TYPE_TEXTBOX,
-               self.shear_key_depth_ColDepth if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_depth_ColDepth if flag and self.shear_key_along_ColDepth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t29)
 
         t30 = (KEY_OUT_SHEAR_KEY_THICKNESS, KEY_OUT_DISP_SHEAR_KEY_THICKNESS, TYPE_TEXTBOX,
-               self.shear_key_thk if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_thk if flag and self.shear_key_along_ColDepth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t30)
 
         t31 = (KEY_OUT_SHEAR_KEY_STRESS, KEY_OUT_DISP_SHEAR_KEY_STRESS, TYPE_TEXTBOX,
-               self.shear_key_stress_ColDepth if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_stress_ColDepth if flag and self.shear_key_along_ColDepth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t31)
+
+        t32 = (KEY_OUT_SHEAR_KEY_MOM_DEMAND, KEY_OUT_DISP_SHEAR_KEY_MOM_DEMAND, TYPE_TEXTBOX, round(self.shear_key_moment_1 * 1e-6, 2)
+               if flag and self.shear_key_along_ColDepth == 'Yes' else VALUE_NOT_APPLICABLE)
+        sk.append(t32)
+
+        t33 = (KEY_OUT_SHEAR_KEY_MOM_CAPACITY, KEY_OUT_DISP_SHEAR_KEY_MOM_CAPACITY, TYPE_TEXTBOX, self.moment_capacity_key1
+               if flag and self.shear_key_along_ColDepth == 'Yes' else VALUE_NOT_APPLICABLE)
+        sk.append(t33)
 
         t99 = (None, 'Shear Key Along Column Width', TYPE_SECTION, '')
         sk.append(t99)
 
         t28 = (KEY_OUT_SHEAR_KEY_LENGTH, KEY_OUT_DISP_SHEAR_KEY_LENGTH, TYPE_TEXTBOX,
-               self.shear_key_len_ColWidth if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_len_ColWidth if flag and self.shear_key_along_ColWidth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t28)
 
         t29 = (KEY_OUT_SHEAR_KEY_DEPTH, KEY_OUT_DISP_SHEAR_KEY_DEPTH, TYPE_TEXTBOX,
-               self.shear_key_depth_ColWidth if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_depth_ColWidth if flag and self.shear_key_along_ColWidth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t29)
 
         t30 = (KEY_OUT_SHEAR_KEY_THICKNESS, KEY_OUT_DISP_SHEAR_KEY_THICKNESS, TYPE_TEXTBOX,
-               self.shear_key_thk if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_thk if flag and self.shear_key_along_ColWidth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t30)
 
         t31 = (KEY_OUT_SHEAR_KEY_STRESS, KEY_OUT_DISP_SHEAR_KEY_STRESS, TYPE_TEXTBOX,
-               self.shear_key_stress_ColWidth if flag and self.shear_key_required == 'Yes' else VALUE_NOT_APPLICABLE)
+               self.shear_key_stress_ColWidth if flag and self.shear_key_along_ColWidth == 'Yes' else VALUE_NOT_APPLICABLE)
         sk.append(t31)
+
+        t32 = (KEY_OUT_SHEAR_KEY_MOM_DEMAND, KEY_OUT_DISP_SHEAR_KEY_MOM_DEMAND, TYPE_TEXTBOX, round(self.shear_key_moment_2 * 1e-6, 2)
+        if flag and self.shear_key_along_ColWidth == 'Yes' else VALUE_NOT_APPLICABLE)
+        sk.append(t32)
+
+        t33 = (KEY_OUT_SHEAR_KEY_MOM_CAPACITY, KEY_OUT_DISP_SHEAR_KEY_MOM_CAPACITY, TYPE_TEXTBOX, self.moment_capacity_key2
+        if flag and self.shear_key_along_ColWidth == 'Yes' else VALUE_NOT_APPLICABLE)
+        sk.append(t33)
 
         return sk
 
@@ -1924,10 +1954,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis (i.e. width of the column)
         self.load_shear_minor = self.load_shear_minor * 10 ** 3  # N
 
-        # shear load for shear key (designed in both directions)
-        self.load_shear_major = max(self.load_shear_major, self.load_shear_minor)
-        self.load_shear_minor = self.load_shear_major
-
         self.load_moment_major = float(design_dictionary[KEY_MOMENT_MAJOR]
                                        if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)  # bending moment acting about the major axis
         self.load_moment_major_report = round(self.load_moment_major, 2)  # for design report (actual input)
@@ -1970,6 +1996,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, 0)
 
         # stiffener plate/ shear key
+        print(design_dictionary[KEY_ST_KEY_MATERIAL])
         self.dp_stif_key_material = str(design_dictionary[KEY_ST_KEY_MATERIAL])
         self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=0)  # thk is initialised to 0
         self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, 0)
@@ -3314,56 +3341,21 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)  # kN
 
-        # # information message to the user
-        # if self.load_shear_major > 0:
-        #     logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")
-
         # design for shear acting along any axis
         if (self.load_shear_major or self.load_shear_minor) > 0:
 
-            # The shear transfer follows the following load transfer mechanism:
-            # Check 1: The shear is transferred from column to anchor bolts (for critical condition, assume bolts only on one side) then to end plate.
-            # There will be a small slip of the base plate under shear and will bear against the bolts, this will cause small bending
-            # in the anchor bolts which can be neglected.
-            # However, the anchor bolts are checked for combined shear + tension, to decide if shear is high enough to provide shear key
-            # Check 2: The shear is also resisted by the friction between the base plate and the grout material
-            # If the shear load is greater of (Check 1, Check2), then a shear key is provided.
-            # Note: Check2 is not applicable to base plates with moment
-            # Check 3: If the shear is still high, then a shear key is provided. The shear key resists shear by bearing
-            # on the concrete surface
-
-            if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-                self.moment_bp_case = 'None'
-            else:
-                self.moment_bp_case = self.moment_bp_case
-
-            if self.connectivity == 'Welded Column Base' or 'Moment Base Plate' or 'Hollow/Tubular Column Base':
-                if (self.moment_bp_case == 'None') or (self.moment_bp_case == 'Case1'):
-                    self.combined_capacity_anchor = 'N/A'
-
-                    # Only Check 2 and 3 are applicable to these cases
-                    # Check 2: Friction between base plate and the grout material [Reference: AISC Design Guide, section 3.5]
-                    # The coefficient of friction between steel and the grout is 0.45, whereas between steel and concrete is 0.7
-                    self.shear_resistance = 0.45 * self.load_axial_compression  # N
-                    self.shear_resistance = min(self.shear_resistance, 0.2 * (self.bearing_strength_concrete / 0.45) * self.bp_area_provided)  # N
-
-                    self.shear_resistance = min(self.shear_resistance, (self.anchor_nos_provided * self.anchor_capacity * 1000))
-
-                    if self.shear_resistance < min(self.load_shear_major, self.load_shear_minor):
-                        self.shear_key_required = 'Yes'
-                        logger.warning("[Shear Resistance] The shear resistance due to the friction between the base plate and the grout material "
-                                       "({} kN) is less than the applied horizontal shear force".format(round(self.shear_resistance * 1e-3, 2)))
-                        logger.info("Providing shear key")
-                    else:
-                        self.shear_key_required = 'No'
-                        logger.warning("[Shear Resistance] The shear resistance due to the friction between the base plate and the grout material "
-                                       "({} kN) is greater than the applied horizontal shear force".format(round(self.shear_resistance * 1e-3, 2)))
-                        logger.info("Shear key is not required")
+            # if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+            #     self.moment_bp_case = 'None'
+            # else:
+            #     self.moment_bp_case = self.moment_bp_case
+            #
+            # if self.connectivity == 'Welded Column Base' or 'Moment Base Plate' or 'Hollow/Tubular Column Base':
+            #     if (self.moment_bp_case == 'None') or (self.moment_bp_case == 'Case1'):
+            #         self.combined_capacity_anchor = 'N/A'
 
             if self.connectivity == 'Moment Base Plate':
-
                 if self.moment_bp_case == 'Case2' or 'Case3':
-                    # Check 1: Combined shear + Tension [Reference: cl.10.3.6, IS 800:2007]
+                    # Check: Combined shear + Tension [Reference: cl.10.3.6, IS 800:2007]
                     # v_sb is calculated considering shear distribution in bolts only on the tension side (outside flange), this is the critical case
                     self.v_sb = (max(self.load_shear_major, self.load_shear_minor) * 10 ** -3) / \
                                 ((self.anchor_nos_provided - self.anchors_inside_flange) / 2)  # kN
@@ -3372,154 +3364,230 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.t_db = self.tension_capacity_anchor  # kN
                     self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db)
                     self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
-                    
-                    #TODO: calculate shear resistance for moment case
-                    # Providing shear key if the UR exceeds 0.5, the value is purely adopted based on experience for a conservative design
-                    if self.combined_capacity_anchor > 0.5:
-                        self.shear_key_required = 'Yes'
-                        logger.warning("[Shear Resistance] The shear resistance due to the friction between the base plate and the grout material "
-                                       "({} kN) is less than the applied horizontal shear force".format(round(self.shear_resistance * 1e-3, 2)))
-                        logger.info("Providing shear key")
+                else:
+                    self.combined_capacity_anchor = 'N/A'
+            else:
+                self.combined_capacity_anchor = 'N/A'
 
-                    else:
-                        self.shear_key_required = 'No'
+            # Check: shear resistance of the base plate
+            self.shear_resistance = 0.45 * self.load_axial_compression  # N
 
-            if self.shear_key_required == 'Yes':
-                # Check 3: Provide shear key
+            if self.load_shear_major > self.shear_resistance:
+                self.shear_key_along_ColDepth = 'Yes'
+
+                logger.warning("[Design for Shear] The shear resistance of the base plate assembly due to the friction between the base plate and "
+                               "the grout/concrete material is {} kN".format(self.shear_resistance * 1e-3))
+                logger.warning("The horizontal shear force - {} kN, exceeds the shear resistance of the base plate".
+                               format(self.load_shear_major * 1e-3))
+                logger.info("Providing shear key to resist additional shear")
+            else:
+                self.shear_key_along_ColDepth = 'No'
+
+                logger.info("[Design for Shear] The shear resistance of the base plate assembly due to the friction between the base plate and "
+                               "the grout/concrete material is {} kN".format(self.shear_resistance * 1e-3))
+                logger.info("The horizontal shear force - {} kN, is less than the shear resistance of the base plate".
+                               format(self.load_shear_major * 1e-3))
+                logger.info("Shear key is not required")
+
+            if self.load_shear_minor > self.shear_resistance:
+                self.shear_key_along_ColWidth = 'Yes'
+
+                logger.warning("[Design for Shear] The shear resistance of the base plate assembly due to the friction between the base plate and "
+                               "the grout/concrete material is {} kN".format(self.shear_resistance * 1e-3))
+                logger.warning("The horizontal shear force - {} kN, exceeds the shear resistance of the base plate".
+                               format(self.load_shear_major * 1e-3))
+                logger.info("Providing shear key to resist additional shear")
+            else:
+                self.shear_key_along_ColWidth = 'No'
+
+                logger.info("[Design for Shear] The shear resistance of the base plate assembly due to the friction between the base plate and "
+                               "the grout/concrete material is {} kN".format(self.shear_resistance * 1e-3))
+                logger.info("The horizontal shear force - {} kN, is less than the shear resistance of the base plate".
+                               format(self.load_shear_major * 1e-3))
+                logger.info("Shear key is not required")
+
+            # shear key design
+
+            # key along major axis
+            if self.shear_key_along_ColDepth == 'Yes':
                 # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
                 self.shear_key_thk = self.plate_thk_provided  # mm
 
                 self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
                 self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
 
-                if self.load_shear_major > 0:
-                    self.shear_key_along_ColDepth = 'Yes'
+                # initialize key with minimum dimensions
+                self.shear_key_depth_ColDepth = self.grout_thk + 100  # mm
+                self.shear_key_len_ColDepth = round_up(self.column_D, 5)  # mm
 
-                    # initialize key with minimum dimensions
-                    self.shear_key_depth_ColDepth = self.grout_thk + 150  # mm, total depth
-                    if self.bp_length_provided >= self.shear_key_depth_ColDepth:
-                        self.shear_key_len_ColDepth = self.shear_key_depth_ColDepth  # mm
-                    else:
-                        self.shear_key_len_ColDepth = self.column_D  # mm
+                # check for bearing of the shear key on concrete (along major axis)
+                self.shear_key_stress_ColDepth = (self.load_shear_major - self.shear_resistance) / (self.shear_key_len_ColDepth *
+                                                                                                    self.shear_key_depth_ColDepth)  # N/mm^2
 
-                    # check for bearing of the shear key on concrete (along major axis)
-                    self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm^2
+                # bearing check
 
-                    # updating the length of key, if the stress demand is more
-                    if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
-                        key_dimensions = [self.shear_key_len_ColDepth]
+                # step 1: updating the length of key, if the stress demand is more
+                if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                    key_dimensions = [self.shear_key_len_ColDepth]
 
-                        n = 1
-                        while (self.shear_key_stress_ColDepth > self.bearing_strength_concrete) and (key_dimensions[-1] <= self.bp_length_provided):
-                            key_update_dimensions = [key_dimensions[-1]]
+                    n = 1
+                    while (self.shear_key_stress_ColDepth > self.bearing_strength_concrete) and (key_dimensions[-1] <= self.bp_length_provided):
+                        key_update_dimensions = [key_dimensions[-1]]
 
-                            for i in key_update_dimensions:
-                                i += 5
-                                key_dimensions.append(i)
-                                i += 1
+                        for i in key_update_dimensions:
+                            i += 5
+                            key_dimensions.append(i)
+                            i += 1
 
-                            self.shear_key_len_ColDepth = key_dimensions[-1]
-                            self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)
+                        self.shear_key_len_ColDepth = key_dimensions[-1]
+                        self.shear_key_stress_ColDepth = (self.load_shear_major - self.shear_resistance) / (self.shear_key_len_ColDepth *
+                                                                                                            self.shear_key_depth_ColDepth)
 
-                    # updating the depth of key, if the stress demand is more
-                    if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
-                        key_dimensions = [self.shear_key_depth_ColDepth]
+                # check 2: updating the depth of key, if the stress demand is more and max length allowed is reached
+                if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                    key_dimensions = [self.shear_key_depth_ColDepth]
 
-                        n = 1
-                        while (self.shear_key_stress_ColDepth > self.bearing_strength_concrete) and (self.shear_key_depth_ColDepth <=
-                                                                                                     (2 * self.shear_key_len_ColDepth)):
-                            key_update_dimensions = [key_dimensions[-1]]
+                    n = 1
+                    while (self.shear_key_stress_ColDepth > self.bearing_strength_concrete) and (self.shear_key_depth_ColDepth <=
+                                                                                                 (2 * self.shear_key_len_ColDepth)):
+                        key_update_dimensions = [key_dimensions[-1]]
 
-                            for i in key_update_dimensions:
-                                i += 5
-                                key_dimensions.append(i)
-                                i += 1
+                        for i in key_update_dimensions:
+                            i += 5
+                            key_dimensions.append(i)
+                            i += 1
 
-                            self.shear_key_depth_ColDepth = key_dimensions[-1]
-                            self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)
+                        self.shear_key_depth_ColDepth = key_dimensions[-1]
+                        self.shear_key_stress_ColDepth = (self.load_shear_major - self.shear_resistance) / (self.shear_key_len_ColDepth *
+                                                                                                            self.shear_key_depth_ColDepth)
 
-                    if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
-                        if self.shear_key_depth_ColDepth >= (2 * self.shear_key_len_ColDepth):  # limiting the key aspect ratio to 1:2
-                            self.shear_key_design_status = False
-                            logger.warning("[Shear Key] The aspect ratio of the shear key (length/depth) exceeds 2, horizontal shear force is very "
-                                           "high")
-                            logger.warning("The aspect ratio of the key is restricted to keep a check on it's thickness and prevent failure of the "
-                                           "plate due to bending")
-                    else:
-                        # checking shear key thk
-                        self.shear_key_w = self.load_shear_major / self.shear_key_len_ColDepth  # N/mm, load distribution along the depth of the key
-                        self.shear_key_moment = self.shear_key_w * (self.shear_key_depth_ColDepth ** 2 / 2)  # N-mm, max moment
-                        self.shear_key_thk = math.sqrt((4 * self.shear_key_moment * self.gamma_m0) / self.stiff_key.fy)  # b = 1
-                        self.shear_key_thk = round_up(self.shear_key_thk, 2)
-                        self.shear_key_thk = max(self.shear_key_thk, self.plate_thk_provided)
+                if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                    if self.shear_key_depth_ColDepth >= (2 * self.shear_key_len_ColDepth):  # limiting the key aspect ratio to 1:2
+                        self.shear_key_design_status = False
+                        logger.warning("[Shear Key] The aspect ratio of the shear key (length/depth) exceeds 2, horizontal shear force (along the "
+                                       "major axis) is very high")
+                        logger.warning("The aspect ratio of the key is restricted to keep a check on it's thickness and prevent failure of the "
+                                       "plate due to bending")
+                        logger.info("Osdag suggets to design the connection with embedded base plate")
+                else:
+                    # checking shear key thk
 
-                    self.shear_key_stress_ColDepth = round(self.shear_key_stress_ColDepth, 2)
+                    # load distribution along the depth of the key
+                    self.shear_key_w_1 = (self.load_shear_major - self.shear_resistance) / self.shear_key_len_ColDepth  # N/mm
+                    self.shear_key_w_1 = round(self.shear_key_w_1, 2)
+                    self.shear_key_moment_1 = self.shear_key_w_1 * (self.shear_key_depth_ColDepth ** 2 / 2)  # N-mm, max moment
+                    self.shear_key_thk_1 = math.sqrt((4 * self.shear_key_moment_1 * self.gamma_m0) / (self.stiff_key.fy *
+                                                                                                      self.shear_key_len_ColDepth))
+                    self.shear_key_thk = max(round_up(self.shear_key_thk_1, 2), self.plate_thk_provided)
 
-                if self.load_shear_minor > 0:
-                    self.shear_key_along_ColWidth = 'Yes'
+                    self.moment_capacity_key1 = (((self.shear_key_len_ColDepth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
+                    self.moment_capacity_key1 = round(self.moment_capacity_key1 * 1e-6, 2)
 
-                    self.shear_key_depth_ColWidth = self.shear_key_depth_ColDepth  # mm
-
-                    if self.shear_key_len_ColDepth <= self.bp_width_provided:
-                        self.shear_key_len_ColWidth = self.shear_key_len_ColDepth  # mm
-                        self.shear_key_stress_ColWidth = self.shear_key_stress_ColDepth
-                    else:
-                        # updating the length of key
-
-                        # initialize the length
-                        if self.bp_width_provided >= self.shear_key_depth_ColWidth:
-                            self.shear_key_len_ColWidth = self.shear_key_depth_ColWidth  # mm
-                        else:
-                            self.shear_key_len_ColWidth = self.column_bf  # mm
-
-                        # check for bearing of the shear key on concrete (along minor axis)
-                        self.shear_key_stress_ColWidth = self.load_shear_minor / (self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth)  # N/mm^2
-
-                        if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
-                            key_dimensions = [self.shear_key_len_ColWidth]
-
-                            n = 1
-                            while (self.shear_key_stress_ColWidth > self.bearing_strength_concrete) and \
-                                    (key_dimensions[-1] <= self.bp_width_provided):
-                                key_update_dimensions = [key_dimensions[-1]]
-
-                                for i in key_update_dimensions:
-                                    i += 5
-                                    key_dimensions.append(i)
-                                    i += 1
-
-                                self.shear_key_len_ColWidth = key_dimensions[-1]
-                                self.shear_key_stress_ColWidth = self.load_shear_minor / (self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth)
-
-                        if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
-                            if self.shear_key_depth_ColWidth >= (2 * self.shear_key_len_ColWidth):  # limiting the key aspect ratio to 1:2
-                                self.shear_key_design_status = False
-                                logger.warning(
-                                    "[Shear Key] The aspect ratio of the shear key (length/depth) exceeds 2, horizontal shear force is very "
-                                    "high")
-                                logger.warning(
-                                    "The aspect ratio of the key is restricted to keep a check on it's thickness and prevent failure of the "
-                                    "plate due to bending")
-
-                    self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
+                self.shear_key_stress_ColDepth = round(self.shear_key_stress_ColDepth, 2)
             else:
-                self.weld_size_shear_key = 'N/A'
-
-                self.shear_key_along_ColDepth = 'No'
                 self.shear_key_len_ColDepth = 'N/A'
                 self.shear_key_depth_ColDepth = 'N/A'
                 self.shear_key_stress_ColDepth = 'N/A'
 
-                self.shear_key_along_ColWidth = 'No'
+            # key along minor axis
+            if self.shear_key_along_ColWidth == 'Yes':
+
+                if self.load_shear_minor <= self.load_shear_major:
+                    self.shear_key_depth_ColWidth = self.shear_key_depth_ColDepth
+                    self.shear_key_len_ColWidth = self.shear_key_len_ColDepth
+                    self.shear_key_thk_2 = self.shear_key_thk_1
+                    self.shear_key_thk = self.shear_key_thk
+                    self.shear_key_stress_ColWidth = self.shear_key_stress_ColDepth
+
+                    self.shear_key_w_2 = (self.load_shear_minor - self.shear_resistance) / self.shear_key_len_ColWidth  # N/mm
+                    self.shear_key_w_2 = round(self.shear_key_w_2, 2)
+                    self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
+                    self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
+                    self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
+
+                else:
+                    self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
+                    self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
+
+                    # initialize key with minimum dimensions
+                    self.shear_key_depth_ColWidth = self.grout_thk + 100  # mm
+                    self.shear_key_len_ColWidth = self.column_bf  # mm
+
+                    # check for bearing of the shear key on concrete (along major axis)
+                    self.shear_key_stress_ColWidth = (self.load_shear_minor - self.shear_resistance) / (self.shear_key_len_ColWidth *
+                                                                                                        self.shear_key_depth_ColWidth)  # N/mm^2
+
+                    # bearing check
+
+                    # step 1: updating the length of key, if the stress demand is more
+                    if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+                        key_dimensions = [self.shear_key_len_ColWidth]
+
+                        n = 1
+                        while (self.shear_key_stress_ColWidth > self.bearing_strength_concrete) and (key_dimensions[-1] <= self.bp_width_provided):
+                            key_update_dimensions = [key_dimensions[-1]]
+
+                            for i in key_update_dimensions:
+                                i += 5
+                                key_dimensions.append(i)
+                                i += 1
+
+                            self.shear_key_len_ColWidth = key_dimensions[-1]
+                            self.shear_key_stress_ColWidth = (self.load_shear_minor - self.shear_resistance) / (self.shear_key_len_ColWidth *
+                                                                                                                self.shear_key_depth_ColWidth)
+
+                    # check 2: updating the depth of key, if the stress demand is more and max length allowed is reached
+                    if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+                        key_dimensions = [self.shear_key_depth_ColWidth]
+
+                        n = 1
+                        while (self.shear_key_stress_ColWidth > self.bearing_strength_concrete) and (self.shear_key_depth_ColWidth <=
+                                                                                                     (2 * self.shear_key_len_ColWidth)):
+                            key_update_dimensions = [key_dimensions[-1]]
+
+                            for i in key_update_dimensions:
+                                i += 5
+                                key_dimensions.append(i)
+                                i += 1
+
+                            self.shear_key_depth_ColWidth = key_dimensions[-1]
+                            self.shear_key_stress_ColWidth = (self.load_shear_minor - self.shear_resistance) / (self.shear_key_len_ColWidth *
+                                                                                                                self.shear_key_depth_ColWidth)
+
+                    if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+                        if self.shear_key_depth_ColWidth >= (2 * self.shear_key_len_ColWidth):  # limiting the key aspect ratio to 1:2
+                            self.shear_key_design_status = False
+                            logger.warning("[Shear Key] The aspect ratio of the shear key (length/depth) exceeds 2, horizontal shear force (along "
+                                           "the minor axis) is very high")
+                            logger.warning("The aspect ratio of the key is restricted to keep a check on it's thickness and prevent failure of the "
+                                           "plate due to bending")
+                            logger.info("Osdag suggets to design the connection with embedded base plate")
+                    else:
+                        # checking shear key thk
+
+                        # load distribution along the depth of the key
+                        self.shear_key_w_2 = (self.load_shear_minor - self.shear_resistance) / self.shear_key_len_ColWidth  # N/mm
+                        self.shear_key_w_2 = round(self.shear_key_w_2, 2)
+                        self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
+                        self.shear_key_thk_2 = math.sqrt((4 * self.shear_key_moment_2 * self.gamma_m0) / (self.stiff_key.fy *
+                                                                                                          self.shear_key_len_ColWidth))
+                        self.shear_key_thk_2 = round_up(self.shear_key_thk_2, 2)
+                        self.shear_key_thk = max(self.shear_key_thk_2, self.plate_thk_provided)
+
+                        self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
+                        self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
+
+                    self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
+            else:
                 self.shear_key_len_ColWidth = 'N/A'
                 self.shear_key_depth_ColWidth = 'N/A'
                 self.shear_key_stress_ColWidth = 'N/A'
 
                 self.shear_key_design_status = True
                 self.shear_key_thk = 'N/A'
+                self.weld_size_shear_key = 'N/A'
         else:
             self.combined_capacity_anchor = 'N/A'
-            self.shear_key_required = 'No'
             self.weld_size_shear_key = 'N/A'
 
             self.shear_key_along_ColDepth = 'No'
@@ -3553,7 +3621,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.anchors_inside_flange = self.load_axial_tension / (self.tension_capacity_anchor_uplift * 1000)
 
-                if self.shear_key_required == 'Yes':
+                if self.shear_key_along_ColWidth == 'Yes':
                     self.anchors_inside_flange = round_up(self.anchors_inside_flange, 4)  # provide minimum 4 bolts in this case
                     # detailing check for this case is done in additional_calculations method
                 else:
@@ -3963,7 +4031,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # design of weld for the shear key (shear key will be groove welded)
         if (self.load_shear_major or self.load_shear_minor) > 0:
-            if self.shear_key_required == 'Yes':
+            if self.shear_key_along_ColDepth or self.shear_key_along_ColWidth == 'Yes':
                 self.weld_size_shear_key = self.shear_key_thk
             else:
                 self.weld_size_shear_key = 'N/A'
@@ -4645,7 +4713,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if (self.load_axial_tension > 0) and (self.anchor_inside_flange == 'Yes'):
 
                 # case where stiffeners are required across the column web or shear key is provided, provide min 4 bolts
-                if (self.stiffener_across_web == 'Yes') or (self.shear_key_required == 'Yes'):
+                if (self.stiffener_across_web == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
                     self.anchors_inside_flange = 4  # minimum 4 bolts provided in this case
 
                     anchors_inside_req = self.load_axial_tension / (self.tension_capacity_anchor_uplift * 1000)
@@ -4689,7 +4757,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     # end distance available (along web)
                     if self.stiffener_across_web == 'Yes':
                         end_available = (self.column_D - (2 * self.column_tf) - self.stiffener_plt_thick_across_web) / 4  # mm
-                    if self.shear_key_required == 'Yes':
+                    if self.shear_key_along_ColWidth == 'Yes':
                         end_available = (self.column_D - (2 * self.column_tf) - self.shear_key_thk) / 4  # mm
 
                     self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
@@ -5111,7 +5179,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Moment Base Plate':
             if self.load_axial_tension > 0:
 
-                if (self.stiffener_across_web == 'Yes') or (self.shear_key_required == 'Yes'):
+                if (self.stiffener_across_web == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
 
                     if self.anchors_inside_flange == 4:
                         print(self.end_distance_in)
@@ -5240,45 +5308,27 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Shear Key Details
         print("Shear key details start")
 
-        if self.shear_key_required == 'Yes':
-
-            # Shear Key Along Column Depth
-            if self.load_shear_major > 0:
-                print(self.shear_key_along_ColDepth)
-                print(self.shear_key_len_ColDepth)
-                print(self.shear_key_depth_ColDepth)
-                print(self.shear_key_thk)
-                print(self.shear_key_stress_ColDepth)
-
-            # Shear Key Along Column Width
-            if self.load_shear_minor > 0:
-                print(self.shear_key_along_ColWidth)
-                print(self.shear_key_len_ColWidth)
-                print(self.shear_key_depth_ColWidth)
-                print(self.shear_key_thk)
-                print(self.shear_key_stress_ColWidth)
-
-            print(self.weld_size_shear_key)
+        if self.shear_key_along_ColDepth == 'Yes':
+            print(self.shear_key_len_ColDepth)
+            print(self.shear_key_depth_ColDepth)
+            print(self.shear_key_thk)
+            print(self.shear_key_stress_ColDepth)
         else:
-            print(self.shear_key_along_ColDepth)
-            # self.shear_key_len_ColDepth = 'N/A'
-            # self.shear_key_depth_ColDepth = 'N/A'
-            # self.shear_key_stress_ColDepth = 'N/A'
-            #
-            # print(self.shear_key_along_ColWidth)
-            # self.shear_key_len_ColWidth = 'N/A'
-            # self.shear_key_depth_ColWidth = 'N/A'
-            # self.shear_key_stress_ColWidth = 'N/A'
-            # print(self.weld_size_shear_key)
             self.shear_key_len_ColDepth = 0
             self.shear_key_depth_ColDepth = 0
+            self.shear_key_thk = 0
             self.shear_key_stress_ColDepth = 0
 
-            print(self.shear_key_along_ColWidth)
+        if self.shear_key_along_ColWidth == 'Yes':
+            print(self.shear_key_len_ColWidth)
+            print(self.shear_key_depth_ColWidth)
+            print(self.shear_key_thk)
+            print(self.shear_key_stress_ColWidth)
+        else:
             self.shear_key_len_ColWidth = 0
             self.shear_key_depth_ColWidth = 0
+            self.shear_key_thk = 0
             self.shear_key_stress_ColWidth = 0
-            # print(self.weld_size_shear_key)
 
         print("Shear key details end")
 
@@ -6170,68 +6220,93 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.report_check.append(t8)
 
-        #     else:
-        #         t1 = ('SubSection', 'Stiffener Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        #         self.report_check.append(t1)
-        #
-        #
-        #     if self.dp_column_designation[1:4] == 'CHS':
-        #         t2 = ('Length (mm)', bp_length_sb(self.column_D, self.end_distance_out, self.bp_length_provided, self.projection, col_type='CHS'),
-        #               self.bp_length_provided,
-        #               get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
-        #         self.report_check.append(t2)
-        #     else:
-        #         t2 = (
-        #         'Length (mm)', bp_length_sb(self.column_D, self.end_distance_out, self.bp_length_provided, self.projection, col_type='SHS&RHS'),
-        #         self.bp_length_provided,
-        #         get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
-        #         self.report_check.append(t2)
-        #
-        #     # width_min = 2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete)
-        #     t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_provided, self.dp_column_designation,
-        #                                  self.projection, bp_type='hollow_bp', mom_bp_case='None'),
-        #           self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
-        #     self.report_check.append(t3)
-        # else:
-        #     if self.connectivity == 'Moment Base Plate':
-        #         t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6.5cm}|p{4cm}|p{1.5cm}|')
-        #         self.report_check.append(t1)
-        #     else:
-        #         t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|')
-        #         self.report_check.append(t1)
-        #
-        #     t2 = ('Length (mm)', bp_length(self.column_D, self.end_distance_out, self.bp_length_min), self.bp_length_provided,
-        #           get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
-        #     self.report_check.append(t2)
-        #
-        #     if self.connectivity == 'Moment Base Plate':
-        #         if self.moment_bp_case == 'Case1':
-        #             if self.min_width_check_Case1:
-        #
-        #                 t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation,
-        #                                              projection=0, bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
-        #                       bp_width_case1(self.load_axial_compression, self.bp_length_min, self.bearing_strength_concrete,
-        #                                      self.bp_width_provided),
-        #                       get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
-        #                 self.report_check.append(t3)
-        #             else:
-        #                 t3 = ('Width (mm)',
-        #                       bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, projection=0,
-        #                                bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
-        #                       self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
-        #                 self.report_check.append(t3)
-        #         else:
-        #             t3 = (
-        #             'Width (mm)', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, projection=0,
-        #                                    bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
-        #             self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
-        #             self.report_check.append(t3)
-        #
-        #     else:
-        #         t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance_out, round(self.bp_width_min, 2), self.dp_column_designation,
-        #                                      projection=0, bp_type='welded_moment_bp', mom_bp_case='None'),
-        #               self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
-        #         self.report_check.append(t3)
+        # Check 9: Shear Design
+        if self.load_shear_major or self.load_shear_minor > 0:
+
+            t1 = ('SubSection', 'Shear Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t2 = ('Shear Resistance (kN)', '', shear_resistance(self.load_axial_compression * 1e-3, 0.45, self.shear_resistance * 1e-3), 'N/A')
+            self.report_check.append(t2)
+
+            # key along column depth
+            if self.shear_key_along_ColDepth == 'Yes':
+                remark_1 = 'Shear key required'
+            else:
+                remark_1 = 'Shear key not required'
+
+            t2 = ('Shear Key Requirement - Along Column Depth', shear_load(self.load_shear_major * 1e-3, location='L1'),
+                  shear_resistance_check(self.load_shear_major * 1e-3, self.shear_resistance * 1e-3, remark_1, location='L1'), remark_1)
+            self.report_check.append(t2)
+
+            if self.shear_key_along_ColDepth == 'Yes':
+                t2 = ('Length of Key (mm)', '', key_length(self.shear_key_len_ColDepth, location='L1'), 'Pass')
+                self.report_check.append(t2)
+
+                t3 = ('Depth of Key (mm)', '', key_depth(self.shear_key_depth_ColDepth, location='L1'), 'Pass')
+                self.report_check.append(t3)
+
+                t3 = ('Bearing Stress (N/mm^2)', self.bearing_strength_concrete, key_bearing_stress(self.load_shear_major, self.shear_resistance,
+                                                                                                    self.shear_key_len_ColDepth,
+                                                                                                    self.shear_key_depth_ColDepth,
+                                                                                                    self.shear_key_stress_ColDepth, location='L1'),
+                      get_pass_fail(self.bearing_strength_concrete, self.shear_key_stress_ColDepth, relation='geq'))
+                self.report_check.append(t3)
+
+                t3 = ('Moment Demand (kN-m)', key_moment_demand(self.load_shear_major, self.shear_resistance, self.shear_key_len_ColDepth,
+                                                                    self.shear_key_w_1, self.shear_key_depth_ColDepth,
+                                                                    round(self.shear_key_moment_1 * 1e-3, 2), location='L1'), '', 'N/A')
+                self.report_check.append(t3)
+
+                t4 = ('Thickness of Key (mm)', '', key_thk(self.shear_key_moment_1, self.gamma_m0, self.stiff_key.fy, self.shear_key_len_ColDepth,
+                                                           self.shear_key_thk_1, location='L1'), '')
+                self.report_check.append(t4)
+
+                t3 = ('Moment Capacity (kN-m)', round(self.shear_key_moment_1 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColDepth,
+                                                                                                              self.shear_key_thk, self.stiff_key.fy,
+                                                                                                              self.gamma_m0, self.moment_capacity_key1,
+                                                                                                              beta_b=1, location='L1'),
+                      get_pass_fail(self.shear_key_moment_1 * 1e-6, self.moment_capacity_key1, relation='leq'))
+                self.report_check.append(t3)
+
+            # key along column width
+            if self.shear_key_along_ColWidth == 'Yes':
+                remark_2 = 'Shear key required'
+            else:
+                remark_2 = 'Shear key not required'
+
+            t2 = ('Shear Key Requirement - Along Column Width', shear_load(self.load_shear_minor * 1e-3, location='L2'),
+                  shear_resistance_check(self.load_shear_minor * 1e-3, self.shear_resistance * 1e-3, remark_2, location='L2'), remark_2)
+            self.report_check.append(t2)
+
+            if self.shear_key_along_ColWidth == 'Yes':
+                t2 = ('Length of Key (mm)', '', key_length(self.shear_key_len_ColWidth, location='L2'), 'Pass')
+                self.report_check.append(t2)
+
+                t3 = ('Depth of Key (mm)', '', key_depth(self.shear_key_depth_ColWidth, location='L2'), 'Pass')
+                self.report_check.append(t3)
+
+                t3 = ('Bearing Stress (N/mm^2)', self.bearing_strength_concrete, key_bearing_stress(self.load_shear_minor, self.shear_resistance,
+                                                                                                    self.shear_key_len_ColWidth,
+                                                                                                    self.shear_key_depth_ColWidth,
+                                                                                                    self.shear_key_stress_ColWidth, location='L2'),
+                      get_pass_fail(self.bearing_strength_concrete, self.shear_key_stress_ColWidth, relation='geq'))
+                self.report_check.append(t3)
+
+                t3 = ('Moment Demand (kN-m)', key_moment_demand(self.load_shear_minor, self.shear_resistance, self.shear_key_len_ColWidth,
+                                                                    self.shear_key_w_2, self.shear_key_depth_ColWidth,
+                                                                    round(self.shear_key_moment_2 * 1e-3, 2), location='L2'), '', 'N/A')
+                self.report_check.append(t3)
+
+                t4 = ('Thickness of Key (mm)', '', key_thk(self.shear_key_moment_2, self.gamma_m0, self.stiff_key.fy, self.shear_key_len_ColWidth,
+                                                           self.shear_key_thk_2, location='L2'), '')
+                self.report_check.append(t4)
+
+                t3 = ('Moment Capacity (kN-m)', self.shear_key_moment_2 * 1e-6, key_moment_capacity(self.shear_key_len_ColWidth, self.shear_key_thk,
+                                                                                                    self.stiff_key.fy, self.gamma_m0,
+                                                                                                    self.shear_key_moment_2, beta_b=1, location='L2'),
+                      get_pass_fail(self.shear_key_moment_2 * 1e-6, self.moment_capacity_key2, relation='geq'))
+                self.report_check.append(t3)
 
         # End of checks
 

@@ -38,13 +38,13 @@ class BCE_NutBoltArray(object):
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
         self.endplate_type = endplate_type
-
+        self.boltProjection = self.module.projection
         self.initBoltPlaceParams(self.module, numberOfBolts)
 
         self.bolts = []
         self.nuts = []
         self.initialiseNutBolts()
-        self.boltProjection = 10.0
+
         self.positions = []
 
         self.models = []
@@ -81,7 +81,7 @@ class BCE_NutBoltArray(object):
         self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         self.pitch_web = boltPlaceObj.pitch_distance_web
         # self.out_bolt = boltPlaceObj.out_bolt
-        print(self.pitch_web)
+        print(self.boltProjection,self.row,self.col,self.numOfBolts)
 
         # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
         self.endDist_flush = self.boltProjection + boltPlaceObj.beam_tf + self.endDist

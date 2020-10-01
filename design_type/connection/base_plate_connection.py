@@ -140,10 +140,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.shear_key_depth_ColDepth = 0.0
         self.shear_key_w_1 = 0.0
         self.shear_key_moment_1 = 0.0
+        self.fy_key_1 = 0.0
         self.moment_capacity_key1 = 0.0
         self.shear_key_thk_1 = 0.0
         self.shear_key_w_2 = 0.0
         self.shear_key_moment_2 = 0.0
+        self.fy_key_2 = 0.0
         self.moment_capacity_key2 = 0.0
         self.shear_key_thk_2 = 0.0
         self.shear_key_design_status = False
@@ -3410,11 +3412,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             # key along major axis
             if self.shear_key_along_ColDepth == 'Yes':
-                # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
-                self.shear_key_thk = self.plate_thk_provided  # mm
 
-                self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
-                self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
+                # self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=0)
+                self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, 0)
 
                 # initialize key with minimum dimensions
                 self.shear_key_depth_ColDepth = self.grout_thk + 100  # mm
@@ -3478,9 +3478,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.shear_key_moment_1 = self.shear_key_w_1 * (self.shear_key_depth_ColDepth ** 2 / 2)  # N-mm, max moment
                     self.shear_key_thk_1 = math.sqrt((4 * self.shear_key_moment_1 * self.gamma_m0) / (self.stiff_key.fy *
                                                                                                       self.shear_key_len_ColDepth))
-                    self.shear_key_thk = max(round_up(self.shear_key_thk_1, 2), self.plate_thk_provided)
+                    self.shear_key_thk = max(self.shear_key_thk_1, self.column_tw)
+                    self.shear_key_thk = round_up(self.shear_key_thk, 2)
 
-                    self.moment_capacity_key1 = (((self.shear_key_len_ColDepth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
+                    self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
+                    self.fy_key_1 = self.stiff_key.fy
+
+                    self.moment_capacity_key1 = (((self.shear_key_len_ColDepth * self.shear_key_thk ** 2) / 4) * self.fy_key_1) / self.gamma_m0
                     self.moment_capacity_key1 = round(self.moment_capacity_key1 * 1e-6, 2)
 
                 self.shear_key_stress_ColDepth = round(self.shear_key_stress_ColDepth, 2)
@@ -3492,7 +3496,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # key along minor axis
             if self.shear_key_along_ColWidth == 'Yes':
 
-                if self.load_shear_minor <= self.load_shear_major:
+                if (self.load_shear_minor <= self.load_shear_major) and (self.shear_key_along_ColDepth == 'Yes'):
                     self.shear_key_depth_ColWidth = self.shear_key_depth_ColDepth
                     self.shear_key_len_ColWidth = self.shear_key_len_ColDepth
                     self.shear_key_thk_2 = self.shear_key_thk_1
@@ -3502,12 +3506,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.shear_key_w_2 = (self.load_shear_minor - self.shear_resistance) / self.shear_key_len_ColWidth  # N/mm
                     self.shear_key_w_2 = round(self.shear_key_w_2, 2)
                     self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
+                    self.fy_key_2 = self.fy_key_1
                     self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
                     self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
 
                 else:
-                    self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
-                    self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
+                    # self.stiff_key = Material(material_grade=self.dp_stif_key_material, thickness=self.shear_key_thk)
+                    self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, 0)
 
                     # initialize key with minimum dimensions
                     self.shear_key_depth_ColWidth = self.grout_thk + 100  # mm
@@ -3571,10 +3576,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
                         self.shear_key_thk_2 = math.sqrt((4 * self.shear_key_moment_2 * self.gamma_m0) / (self.stiff_key.fy *
                                                                                                           self.shear_key_len_ColWidth))
-                        self.shear_key_thk_2 = round_up(self.shear_key_thk_2, 2)
-                        self.shear_key_thk = max(self.shear_key_thk_2, self.plate_thk_provided)
+                        self.shear_key_thk = max(self.shear_key_thk_2, self.column_tw)
+                        self.shear_key_thk = round_up(self.shear_key_thk, 2)
 
-                        self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
+                        self.stiff_key.connect_to_database_to_get_fy_fu(self.dp_stif_key_material, self.shear_key_thk)
+                        self.fy_key_2 = self.stiff_key.fy
+
+                        self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.fy_key_2) / self.gamma_m0
                         self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
 
                     self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
@@ -5687,11 +5695,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                   get_pass_fail(self.bearing_strength_concrete, self.w, relation='geq'))
             self.report_check.append(t5)
 
-            t6 = ('Plate Thickness (mm)', bp_allowable_thk(self.column_tf, self.column_tw, self.standard_plate_thk[-1]), bp_thk_1(self.plate_thk,
-                                                                                                                       self.plate_thk_provided,
-                                                                                                                       self.projection, self.w,
-                                                                                                                       self.gamma_m0, self.base_plate.fy),
-                  get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq') and
+            if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+                plate_thk_check = max(self.column_tf, self.column_tw, self.shear_key_thk)
+            else:
+                plate_thk_check = max(self.column_tf, self.column_tw)
+
+            t6 = ('Thickness of Base Plate (mm)', plate_thk_required(self.column_tf, self.column_tw, self.shear_key_along_ColDepth,
+                                                                     self.shear_key_thk, self.shear_key_along_ColWidth, self.shear_key_thk,
+                                                                     self.standard_plate_thk[-1]),
+                  bp_thk_1(self.plate_thk, self.plate_thk_provided, self.projection, self.w, self.gamma_m0, self.base_plate.fy),
+                  get_pass_fail(plate_thk_check, self.plate_thk_provided, relation='leq') and
                   get_pass_fail(self.standard_plate_thk[-1], self.plate_thk_provided, relation='geq'))
             self.report_check.append(t6)
 
@@ -5760,9 +5773,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t8 = ('Moment Capacity of Base Plate', md_plate(), '', 'N/A')
                 self.report_check.append(t8)
 
-                t9 = ('Thickness of Base Plate (mm)', 'max(T, t) = max (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')',
-                      plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.base_plate.fy, self.bp_width_provided, case='Case1'),
-                      get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq'))
+                if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+                    plate_thk_check = max(self.column_tf, self.column_tw, self.shear_key_thk)
+                else:
+                    plate_thk_check = max(self.column_tf, self.column_tw)
+
+                t9 = ('Thickness of Base Plate (mm)', plate_thk_required(self.column_tf, self.column_tw, self.shear_key_along_ColDepth,
+                                                                         self.shear_key_thk, self.shear_key_along_ColWidth, self.shear_key_thk,
+                                                                         self.standard_plate_thk[-1]),
+                      plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.base_plate.fy, self.bp_width_provided,
+                                 case='Case1'),
+                      get_pass_fail(plate_thk_check, self.plate_thk_provided, relation='leq') and
+                      get_pass_fail(self.standard_plate_thk[-1], self.plate_thk_provided, relation='geq'))
                 self.report_check.append(t9)
 
             if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
@@ -5820,9 +5842,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t16 = ('Moment Capacity of Base Plate', md_plate(), '', 'N/A')
                 self.report_check.append(t16)
 
-                t17 = ('Thickness of Base Plate (mm)', 'max(T, t) = max (' + str(self.column_tf) + r', ' + str(self.column_tw) + r')',
-                       plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.base_plate.fy, self.bp_width_provided, case='Case2&3'),
-                       get_pass_fail(max(self.column_tf, self.column_tw), self.plate_thk_provided, relation='leq'))
+                if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+                    plate_thk_check = max(self.column_tf, self.column_tw, self.shear_key_thk)
+                else:
+                    plate_thk_check = max(self.column_tf, self.column_tw)
+
+                t17 = ('Thickness of Base Plate (mm)', plate_thk_required(self.column_tf, self.column_tw, self.shear_key_along_ColDepth,
+                                                                         self.shear_key_thk, self.shear_key_along_ColWidth, self.shear_key_thk,
+                                                                         self.standard_plate_thk[-1]),
+                      plate_thk1(self.critical_M_xx, self.plate_thk_provided, self.gamma_m0, self.base_plate.fy, self.bp_width_provided,
+                                 case='Case2&3'),
+                      get_pass_fail(plate_thk_check, self.plate_thk_provided, relation='leq') and
+                      get_pass_fail(self.standard_plate_thk[-1], self.plate_thk_provided, relation='geq'))
                 self.report_check.append(t17)
 
                 t18 = ('Maximum Bearing Stress on Footing (N/mm^2)', sigma_allowalbe(self.bearing_strength_concrete),
@@ -6259,11 +6290,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t3)
 
                 t4 = ('Thickness of Key (mm)', '', key_thk(self.shear_key_moment_1, self.gamma_m0, self.stiff_key.fy, self.shear_key_len_ColDepth,
-                                                           self.shear_key_thk_1, location='L1'), '')
+                                                           self.shear_key_thk_1, self.column_tw, self.shear_key_thk, location='L1'), '')
                 self.report_check.append(t4)
 
                 t3 = ('Moment Capacity (kN-m)', round(self.shear_key_moment_1 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColDepth,
-                                                                                                              self.shear_key_thk, self.stiff_key.fy,
+                                                                                                              self.shear_key_thk, self.fy_key_1,
                                                                                                               self.gamma_m0, self.moment_capacity_key1,
                                                                                                               beta_b=1, location='L1'),
                       get_pass_fail(self.shear_key_moment_1 * 1e-6, self.moment_capacity_key1, relation='leq'))
@@ -6299,13 +6330,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t3)
 
                 t4 = ('Thickness of Key (mm)', '', key_thk(self.shear_key_moment_2, self.gamma_m0, self.stiff_key.fy, self.shear_key_len_ColWidth,
-                                                           self.shear_key_thk_2, location='L2'), '')
+                                                           self.shear_key_thk_2, self.column_tw, self.shear_key_thk, location='L2'), '')
                 self.report_check.append(t4)
 
-                t3 = ('Moment Capacity (kN-m)', self.shear_key_moment_2 * 1e-6, key_moment_capacity(self.shear_key_len_ColWidth, self.shear_key_thk,
-                                                                                                    self.stiff_key.fy, self.gamma_m0,
-                                                                                                    self.shear_key_moment_2, beta_b=1, location='L2'),
-                      get_pass_fail(self.shear_key_moment_2 * 1e-6, self.moment_capacity_key2, relation='geq'))
+                t3 = ('Moment Capacity (kN-m)', round(self.shear_key_moment_2 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColWidth,
+                                                                                                              self.shear_key_thk, self.fy_key_2,
+                                                                                                              self.gamma_m0, self.moment_capacity_key2,
+                                                                                                              beta_b=1, location='L2'),
+                      get_pass_fail(self.shear_key_moment_2 * 1e-6, self.moment_capacity_key2, relation='leq'))
                 self.report_check.append(t3)
 
         # End of checks

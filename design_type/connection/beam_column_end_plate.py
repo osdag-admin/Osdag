@@ -810,7 +810,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.call_helper = EndPlateSpliceHelper(supported_section=self.supported_section, load=self.load,
                                                 bolt=self.bolt, ep_type=self.endplate_type,
                                                 plate_design_status=False, helper_file_design_status=False)
-
+        self.projection = 12.5
         # call functions for design
         self.check_compatibility(self)
         self.check_minimum_design_action(self)
@@ -832,7 +832,7 @@ class BeamColumnEndPlate(MomentConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
         ######################
-        self.hard_input(self)
+        # self.hard_input(self)
     #####################hard input for cad#######################################
     def hard_input(self):
         ################################Flush###################################

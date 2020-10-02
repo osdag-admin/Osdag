@@ -1110,7 +1110,10 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
         bolt_bearing_eqn.append(NoEscape(r' Note:& The~bearing~capacity~is~reduced \\'))
         bolt_bearing_eqn.append(NoEscape(r' & since~the~hole~type~is~Long-slotted \\ \\'))
 
-    bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4]\end{aligned}'))
+    else:
+        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
+
+    bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4] \end{aligned}'))
 
     return bolt_bearing_eqn
 
@@ -5116,17 +5119,17 @@ def plate_thk_required(flange_thk, web_thk, key1, key1_thk, key2, key2_thk, maxi
     if (key1 == 'Yes') and (key2 == 'Yes'):
         thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
         thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r',~'
-                                     + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\'))
+                                     + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\ \\'))
         thk_required.append(NoEscape(r' [Note: ~t_1~and~t_2~ & is~the~thickness~of~shear~key] \end{aligned}'))
     elif key1 == 'Yes':
         thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1) &< t_p \leq ' + str(maximum_thk) + r' \\'))
         thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r') &< t_p \leq '
-                                     + str(maximum_thk) + r' \\'))
+                                     + str(maximum_thk) + r' \\ \\'))
         thk_required.append(NoEscape(r' [Note: ~t_1~ & is~the~thickness~of~shear~key] \end{aligned}'))
     elif key2 == 'Yes':
         thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
         thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key2_thk) + r') &< t_p \leq '
-                                     + str(maximum_thk) + r' \\'))
+                                     + str(maximum_thk) + r' \\ \\'))
         thk_required.append(NoEscape(r' [Note: ~t_2~ & is~the~thickness~of~shear~key] \end{aligned}'))
     else:
         thk_required.append(NoEscape(r'\begin{aligned} (T,~t) &< t_p \leq ' + str(maximum_thk) + r' \\'))
@@ -5701,9 +5704,9 @@ def shear_load(shear_load, location='L1'):
     shear = Math(inline=True)
 
     if location == 'L1':
-        shear.append(NoEscape(r'\begin{aligned} V_{1} &= ' + str(shear_load) + r' kN \end{aligned}'))
+        shear.append(NoEscape(r'\begin{aligned} V_{1} &= ' + str(shear_load) + r' ~~kN \end{aligned}'))
     else:
-        shear.append(NoEscape(r'\begin{aligned} V_{2} &= ' + str(shear_load) + r' kN \end{aligned}'))
+        shear.append(NoEscape(r'\begin{aligned} V_{2} &= ' + str(shear_load) + r' ~~kN \end{aligned}'))
 
     return shear
 

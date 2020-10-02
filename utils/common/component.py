@@ -1242,7 +1242,6 @@ class Plate(Material):
         return repr
 
 
-
 class ISection(Material):
 
     def __init__(self, designation, material_grade="", table=""):
@@ -1573,6 +1572,7 @@ class Column(ISection):
     def max_plate_height(self):
         clear_depth = self.depth - 2 * self.flange_thickness - 2 * self.root_radius
         return clear_depth
+
 
 class Channel(Material):
 

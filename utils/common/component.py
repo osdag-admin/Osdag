@@ -2094,7 +2094,7 @@ class HollowSection(Material):
 
     def __init__(self, designation, material_grade, table):
         self.connect_to_database_update_other_attributes(table, designation, material_grade)
-        super(HollowSection, self).__init__(designation, material_grade)
+        # super(HollowSection, self).__init__(designation, material_grade)
 
     def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
         conn = sqlite3.connect(PATH_TO_DATABASE)

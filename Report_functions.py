@@ -4472,7 +4472,7 @@ def bp_width(flange_width, edge_distance, width, designation, projection, bp_typ
             bp_width_min.append(NoEscape(r'    &= (0.85 \times ' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
     else:
         if designation[1:4] == 'CHS':
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (c~+~e`) \\'))
             bp_width_min.append(NoEscape(r' &= ' + flange_width + r' ~+~2 \times (' + str(projection) + r'~+~' + edge_distance + r') \\'))
         else:
             bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2~ (c~+~e`) \\'))
@@ -5117,23 +5117,45 @@ def plate_thk_required(flange_thk, web_thk, key1, key1_thk, key2, key2_thk, maxi
     thk_required = Math(inline=True)
 
     if (key1 == 'Yes') and (key2 == 'Yes'):
-        thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
-        thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r',~'
-                                     + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\ \\'))
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} (t,~t_1,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(key1_thk) + r',~'
+                                         + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\ \\'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r',~'
+                                         + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\ \\'))
         thk_required.append(NoEscape(r' [Note: ~t_1~and~t_2~ & is~the~thickness~of~shear~key] \end{aligned}'))
+
     elif key1 == 'Yes':
-        thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1) &< t_p \leq ' + str(maximum_thk) + r' \\'))
-        thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r') &< t_p \leq '
-                                     + str(maximum_thk) + r' \\ \\'))
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} (t,~t_1) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(key1_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
         thk_required.append(NoEscape(r' [Note: ~t_1~ & is~the~thickness~of~shear~key] \end{aligned}'))
+
     elif key2 == 'Yes':
-        thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
-        thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key2_thk) + r') &< t_p \leq '
-                                     + str(maximum_thk) + r' \\ \\'))
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} (t,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(key2_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key2_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
         thk_required.append(NoEscape(r' [Note: ~t_2~ & is~the~thickness~of~shear~key] \end{aligned}'))
+
     else:
-        thk_required.append(NoEscape(r'\begin{aligned} (T,~t) &< t_p \leq ' + str(maximum_thk) + r' \\'))
-        thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \end{aligned}'))
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} t &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' ' + str(flange_thk) + r' &< t_p \leq ' + str(maximum_thk) + r' \end{aligned}'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \end{aligned}'))
 
     return thk_required
 

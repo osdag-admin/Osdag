@@ -584,6 +584,7 @@ KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
+DISP_WEB_WELD_SIZE_REQ = 'Web Weld Size Required (mm)'
 
 DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
 KEY_DISP_FY_20 = 'Yield strength , fy (MPa) (0-20mm)'
@@ -915,7 +916,7 @@ KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 
 
-KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor $\mu_f$'
+KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor, $\mu_f$'
 
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield strength (N/mm2)'
@@ -959,7 +960,7 @@ KEY_DISP_CORR_INFLUENCES = 'Are the members exposed to corrosive influences'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
-KEY_DISP_GAP = 'Gap between Members'
+KEY_DISP_GAP = 'Gap between Members (mm)'
 
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
 KEY_DISP_DIMENSIONS = 'Dimensions'
@@ -1366,7 +1367,7 @@ KEY_ST_KEY_FU = 'Stiffener_Key.Fu'
 KEY_ST_KEY_FY = 'Stiffener_Key.Fy'
 
 KEY_DISP_LEVER_ARM = "Lever Arm"
-
+KEY_DISP_REQ_PARA= "Required Parameter"
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'

@@ -943,25 +943,25 @@ class CommonDesignLogic(object):
         Calls the CAD components like beam, plate, stiffeners, fillet and grove weld, nut and bolt. Also calls CAD file
         :return: creates CAD model
         """
-        BCE = self.module_class()
+        BCE = self.module_class
 
-        column_tw = float(BCE.supporting_section.web_thickness)
-        column_T = float(BCE.supporting_section.flange_thickness)
-        column_d = float(BCE.supporting_section.depth)
-        column_B = float(BCE.supporting_section.flange_width)
-        column_R1 = float(BCE.supporting_section.root_radius)
-        column_R2 = float(BCE.supporting_section.toe_radius)
-        column_alpha = float(BCE.supporting_section.flange_slope)
-        column_length = float(BCE.plate.height + 1000)
+        column_tw = float(BCE.column_tw)
+        column_T = float(BCE.column_tf)
+        column_d = float(BCE.column_D)
+        column_B = float(BCE.column_bf)
+        column_R1 = float(BCE.column_r1)
+        column_R2 = float(BCE.column_r2)
+        column_alpha = 0.0
+        column_length = float(BCE.ep_height_provided + 1000)
+        # print(column_T,column_B,column_d,column_tw,column_R1,column_R2)
 
-
-        beam_tw = float(BCE.supported_section.web_thickness)
-        beam_T = float(BCE.supported_section.flange_thickness)
-        beam_d = float(BCE.supported_section.depth)
-        beam_B = float(BCE.supported_section.flange_width)
-        beam_R1 = float(BCE.supported_section.root_radius)
-        beam_R2 = float(BCE.supported_section.toe_radius)
-        beam_alpha = float(BCE.supported_section.flange_slope)
+        beam_tw = float(BCE.beam_tw)
+        beam_T = float(BCE.beam_tf)
+        beam_d = float(BCE.beam_D)
+        beam_B = float(BCE.beam_bf)
+        beam_R1 = float(BCE.beam_r1)
+        beam_R2 = float(BCE.beam_r2)
+        beam_alpha = 0.0
         beam_length = 500
 
         beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
@@ -974,9 +974,10 @@ class CommonDesignLogic(object):
 
         # outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
-        plate_Right = Plate(W=BCE.plate.width,
-                            L=BCE.plate.height,
-                            T=BCE.plate.thickness_provided)
+        plate_Right = Plate(W=BCE.ep_width_provided,
+                            L=BCE.ep_height_provided,
+                            T=BCE.plate_thickness)
+
 
         # alist = self.designParameters()  # An object to save all input values entered by user
 
@@ -994,16 +995,16 @@ class CommonDesignLogic(object):
             conn_type = 'col_flange_connectivity'
 
         # endplate_type = alist['Member']['EndPlate_type']
-        if BCE.endplate_type == "Extended one way":
+        if BCE.endplate_type == 'Extended One Way - Irreversible Moment':
             endplate_type = "one_way"
-        elif BCE.endplate_type == "Flush end plate":
+        elif BCE.endplate_type == 'Flushed - Reversible Moment':
             endplate_type = "flush"
         else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
             endplate_type = "both_way"
 
         contPlates = StiffenerPlate(W=(float( column_B) - float(column_tw)) / 2,
                                     L=float(column_d) - 2 * float(column_T),
-                                    T=BCE.plate.thickness_provided)
+                                    T=12.0)
 
         # contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
         # 							  L=float(column_data["D"]) - 2 * float(column_data["T"]),
@@ -1030,16 +1031,16 @@ class CommonDesignLogic(object):
         nut_Ht = nut_T
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        numberOfBolts = int(BCE.plate.bolts_required)
+        numberOfBolts = int(BCE.bolt_numbers)
 
 
         # TODO remove all the clutter later
 
         # nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
         if conn_type == 'col_flange_connectivity':
-            nutSpace = float(column_T) + float(BCE.plate.thickness_provided) + nut_T  # / 2 + bolt_T / 2  # Space between bolt head and nut
+            nutSpace = float(column_T) + float(BCE.plate_thickness) + nut_T  # / 2 + bolt_T / 2  # Space between bolt head and nut
         else:
-            nutSpace = float(column_tw) + float(BCE.plate.thickness_provided) + nut_T  # / 2 + bolt_T / 2  # Space between bolt head and nut
+            nutSpace = float(column_tw) + float(BCE.plate_thickness) + nut_T  # / 2 + bolt_T / 2  # Space between bolt head and nut
 
         bbNutBoltArray = BCE_NutBoltArray(BCE, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 
@@ -1088,12 +1089,12 @@ class CommonDesignLogic(object):
         #
         # else:
         #
-        bcWeldFlang = GrooveWeld(b=BCE.top_flange_weld.size, h=float(beam_T),
+        bcWeldFlang = GrooveWeld(b=1.0, h=float(beam_T),
                                  L=beam_B)
         #     # bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
         #
         #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-        bcWeldWeb = GrooveWeld(b=BCE.web_weld.size, h=float(beam_tw),
+        bcWeldWeb = GrooveWeld(b=1.0, h=float(beam_tw),
                                L=beam_d - 2 * beam_T)
 
         if conn_type == 'col_flange_connectivity':
@@ -1536,11 +1537,14 @@ class CommonDesignLogic(object):
             nutSpace = bolt.c + baseplate.T
             bolthight = washer.T + nut.T + 50
 
-            if BP.shear_key_required == 'Yes':
+            if BP.shear_key_along_ColDepth == 'Yes':
                 shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T=float(BP.shear_key_depth_ColDepth))
-                shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_depth_ColWidth), T=float(BP.shear_key_len_ColWidth))
             else:
                 shearkey_1 = Plate(L=float(0), W=float(0), T=float(0))
+
+            if BP.shear_key_along_ColWidth == 'Yes':
+                shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_len_ColWidth), T=float(BP.shear_key_depth_ColWidth))
+            else:
                 shearkey_2 = Plate(L=float(0), W=float(0), T=float(0))
 
             nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace, washer, washer_in)
@@ -2242,20 +2246,53 @@ class CommonDesignLogic(object):
                     cadlist = self.CPObj.get_models()
 
             elif self.connection == KEY_DISP_BEAMENDPLATE:
+                # if self.component == "Beam":
+                #     if self.connection == KEY_DISP_BEAMCOVERPLATE:
+                #         final_model = self.CPObj.get_only_beams_Models()
+                #     else:
+                #         final_model = self.CPObj.get_beam_models()
+                # elif self.component == "Connector":
+                #     if self.connection == KEY_DISP_BEAMCOVERPLATE:
+                #         cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
+                #         if self.B.preference != 'Outside':
+                #             cadlist.insert(1, self.CPObj.get_innetplatesModels())
+                #     else:
+                #         cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+                # else:
+                #     cadlist = self.CPObj.get_models()
+
+
+                # self.ExtObj = self.create_CadModel()
                 if self.component == "Beam":
-                    if self.connection == KEY_DISP_BEAMCOVERPLATE:
-                        final_model = self.CPObj.get_only_beams_Models()
-                    else:
-                        final_model = self.CPObj.get_beam_models()
+                    final_model = self.CPObj.get_beam_models()
+
                 elif self.component == "Connector":
-                    if self.connection == KEY_DISP_BEAMCOVERPLATE:
-                        cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
-                        if self.B.preference != 'Outside':
-                            cadlist.insert(1, self.CPObj.get_innetplatesModels())
-                    else:
-                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+
+                    final_model = self.CPObj.get_connector_models()
+
                 else:
-                    cadlist = self.CPObj.get_models()
+                    final_model = self.CPObj.get_models()
+
+            elif self.connection == KEY_DISP_BCENDPLATE:
+
+                self.ExtObj = self.create_extended_both_ways()
+                if self.component == "Column":
+                    final_model = self.ExtObj.get_column_models()
+
+                elif self.component == "Beam":
+                    final_model = self.ExtObj.get_beam_models()
+
+                elif self.component == "Connector":
+                    cadlist = self.ExtObj.get_connector_models()
+                    final_model = cadlist[0]
+                    for model in cadlist[1:]:
+                        final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+                else:
+                    cadlist = self.ExtObj.get_models()
+                    final_model = cadlist[0]
+                    for model in cadlist[1:]:
+                        final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 if self.component == "Column":

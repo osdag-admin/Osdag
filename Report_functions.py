@@ -1113,7 +1113,10 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
         bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r'\\ \\'))
 
 
-    bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4]\end{aligned}'))
+    else:
+        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
+
+    bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4] \end{aligned}'))
 
     return bolt_bearing_eqn
 
@@ -4489,7 +4492,7 @@ def bp_width(flange_width, edge_distance, width, designation, projection, bp_typ
             bp_width_min.append(NoEscape(r'    &= (0.85 \times ' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
     else:
         if designation[1:4] == 'CHS':
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (c~+~e`) \\'))
             bp_width_min.append(NoEscape(r' &= ' + flange_width + r' ~+~2 \times (' + str(projection) + r'~+~' + edge_distance + r') \\'))
         else:
             bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2~ (c~+~e`) \\'))
@@ -4554,7 +4557,7 @@ def bp_thk_1(plate_thk, plate_thk_provided, projection, actual_bearing_stress, g
 
     thk = Math(inline=True)
     thk.append(NoEscape(r'\begin{aligned} t_p &= c~\Bigg[\frac{2.5~{\sigma_{br}}_{actual}~\gamma_{m0}}{{f_{y}}_{plate}}\Bigg]^{0.5} \\'))
-    thk.append(NoEscape(r'      &= ' + projection + r'~\Bigg[\frac{2.5~\times ' + actual_bearing_stress + r'\times ~' + gamma_m0 + r' }{'
+    thk.append(NoEscape(r'      &= ' + projection + r' \times \Bigg[\frac{2.5~\times ' + actual_bearing_stress + r'\times ~' + gamma_m0 + r' }{'
                         + fy_plate + r'}\Bigg]^{0.5} \\'))
     thk.append(NoEscape(r'     &= ' + plate_thk + r' \\ '))
     thk.append(NoEscape(r'     &= ' + plate_thk_provided + r' \\ \\'))
@@ -5124,9 +5127,57 @@ def md_plate():
     moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} &= \frac{b{t_{p}}^{2}}{6} ,~where~(b = 1) \\'))
     moment_demand.append(NoEscape(r' {M_{d}}_{plate} &= \frac{1.5~{f_{y}}_{p}~{z_{e}}_{plate}}{\gamma_{m0}} \\'))
     moment_demand.append(NoEscape(r'                 &= \frac{1.5~{f_{y}}_{p}~\bigg(\frac{b\times t_p^{2}}{6}\bigg)}{\gamma_{m0}} \\'))
-    moment_demand.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.8.2.1.2]\end{aligned}'))
+    moment_demand.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.8.2.1.2] \end{aligned}'))
 
     return moment_demand
+
+
+def plate_thk_required(flange_thk, web_thk, key1, key1_thk, key2, key2_thk, maximum_thk):
+    """ """
+    thk_required = Math(inline=True)
+
+    if (key1 == 'Yes') and (key2 == 'Yes'):
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} (t,~t_1,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(key1_thk) + r',~'
+                                         + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\ \\'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r',~'
+                                         + str(key2_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \\ \\'))
+        thk_required.append(NoEscape(r' [Note: ~t_1~and~t_2~ & is~the~thickness~of~shear~key] \end{aligned}'))
+
+    elif key1 == 'Yes':
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} (t,~t_1) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(key1_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_1) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key1_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
+        thk_required.append(NoEscape(r' [Note: ~t_1~ & is~the~thickness~of~shear~key] \end{aligned}'))
+
+    elif key2 == 'Yes':
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} (t,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(key2_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t,~t_2) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r',~' + str(key2_thk) + r') &< t_p \leq '
+                                         + str(maximum_thk) + r' \\ \\'))
+        thk_required.append(NoEscape(r' [Note: ~t_2~ & is~the~thickness~of~shear~key] \end{aligned}'))
+
+    else:
+        if flange_thk == web_thk:
+            thk_required.append(NoEscape(r'\begin{aligned} t &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' ' + str(flange_thk) + r' &< t_p \leq ' + str(maximum_thk) + r' \end{aligned}'))
+        else:
+            thk_required.append(NoEscape(r'\begin{aligned} (T,~t) &< t_p \leq ' + str(maximum_thk) + r' \\'))
+            thk_required.append(NoEscape(r' (' + str(flange_thk) + r',~' + str(web_thk) + r') &< t_p \leq ' + str(maximum_thk) + r' \end{aligned}'))
+
+    return thk_required
 
 
 def plate_thk1(critical_mom, plate_thk, gamma_m0, f_y_plate, bp_width, case='Case1'):
@@ -5572,9 +5623,9 @@ def section_modulus_stiffener(z_val, modulus='plastic'):
 
     z = Math(inline=True)
     if modulus == 'plastic':
-        z.append(NoEscape(r'\begin{aligned} {z_{p}}_{st} = ' + z_val + r'\times 10^{3} \end{aligned}'))
+        z.append(NoEscape(r'\begin{aligned} {z_{p}}_{st} = ' + z_val + r' \times 10^{3} \end{aligned}'))
     else:
-        z.append(NoEscape(r'\begin{aligned} {z_{e}}_{st} = ' + z_val + r'\times 10^{3} \end{aligned}'))
+        z.append(NoEscape(r'\begin{aligned} {z_{e}}_{st} = ' + z_val + r' \times 10^{3} \end{aligned}'))
 
     return z
 
@@ -5678,6 +5729,156 @@ def high_shear_req(shear_capa_stiffener):
     shear_req.append(NoEscape(r'                       &\leq  ' + str(round(0.6 * shear_capa_stiffener, 2)) + r' \end{aligned}'))
 
     return shear_req
+
+
+def shear_resistance(axial_load, mu, shear_resistance_val):
+    """ """
+    resistance = Math(inline=True)
+    resistance.append(NoEscape(r'\begin{aligned} V_{r} &= P_{c} \times \mu  \\'))
+    resistance.append(NoEscape(r'&                      = ' + str(axial_load) + r' \times ' + str(mu) + r' \\'))
+    resistance.append(NoEscape(r'&                      = ' + str(shear_resistance_val) + r' \end{aligned}'))
+
+    return resistance
+
+
+def shear_load(shear_load, location='L1'):
+    """ """
+    shear = Math(inline=True)
+
+    if location == 'L1':
+        shear.append(NoEscape(r'\begin{aligned} V_{1} &= ' + str(shear_load) + r' ~~kN \end{aligned}'))
+    else:
+        shear.append(NoEscape(r'\begin{aligned} V_{2} &= ' + str(shear_load) + r' ~~kN \end{aligned}'))
+
+    return shear
+
+
+def shear_resistance_check(shear_load, shear_resistance_val, remark='', location='L1'):
+    """ """
+    resistance_check = Math(inline=True)
+
+    if location == 'L1':
+        if remark == 'Shear key required':
+            resistance_check.append(NoEscape(r'\begin{aligned} V_{1} &> V_{r}  \\'))
+            resistance_check.append(NoEscape(r'  ' + str(shear_load) + r' &> ' + str(shear_resistance_val) + r'  \end{aligned}'))
+        else:
+            resistance_check.append(NoEscape(r'\begin{aligned} V_{1} &\leq V_{r}  \\'))
+            resistance_check.append(NoEscape(r'  ' + str(shear_load) + r' &\leq ' + str(shear_resistance_val) + r'  \end{aligned}'))
+    else:
+        if remark == 'Shear key required':
+            resistance_check.append(NoEscape(r'\begin{aligned} V_{2} &> V_{r}  \\'))
+            resistance_check.append(NoEscape(r'  ' + str(shear_load) + r' &> ' + str(shear_resistance_val) + r'  \end{aligned}'))
+        else:
+            resistance_check.append(NoEscape(r'\begin{aligned} V_{2} &\leq V_{r}  \\'))
+            resistance_check.append(NoEscape(r'  ' + str(shear_load) + r' &\leq ' + str(shear_resistance_val) + r'  \end{aligned}'))
+
+    return resistance_check
+
+
+def key_length(length, location='L1'):
+    """ """
+    length_eqn = Math(inline=True)
+
+    if location == 'L1':
+        length_eqn.append(NoEscape(r'\begin{aligned} L_{1} &= ' + str(length) + r' \end{aligned}'))
+    else:
+        length_eqn.append(NoEscape(r'\begin{aligned} L_{2} &= ' + str(length) + r' \end{aligned}'))
+
+    return length_eqn
+
+
+def key_depth(depth, location='L1'):
+    """ """
+    depth_eqn = Math(inline=True)
+
+    if location == 'L1':
+        depth_eqn.append(NoEscape(r'\begin{aligned} H_{1} &= ' + str(depth) + r' \end{aligned}'))
+    else:
+        depth_eqn.append(NoEscape(r'\begin{aligned} H_{2} &= ' + str(depth) + r' \end{aligned}'))
+
+    return depth_eqn
+
+
+def key_bearing_stress(load_shear, shear_resistance, key_length, key_depth, key_bearing_stress, location='L1'):
+    """ """
+    bearing_stress = Math(inline=True)
+
+    if location == 'L1':
+        bearing_stress.append(NoEscape(r'\begin{aligned} \sigma_{1} &= \frac{V_{1} - V_{r}} {L_{1} \times H_{1}} \\'))
+    else:
+        bearing_stress.append(NoEscape(r'\begin{aligned} \sigma_{2} &= \frac{V_{2} - V_{r}} {L_{2} \times H_{2}} \\'))
+
+    bearing_stress.append(NoEscape(r' &= \frac{(' + str(load_shear * 1e-3) + r' - ' + str(shear_resistance * 1e-3) + r') \times 10^{3} } {'
+                                   + str(key_length) + r' \times ' + str(key_depth) + r'} \\'))
+    bearing_stress.append(NoEscape(r' &= ' + str(key_bearing_stress) + r' \end{aligned}'))
+
+    return bearing_stress
+
+
+def key_moment_demand(load_shear, shear_resistance, key_len, load_unit_len, key_depth, moment_demand, location='L1'):
+    """ """
+    key_md = Math(inline=True)
+
+    if location == 'L1':
+        key_md.append(NoEscape(r' \begin{aligned} w_{1} &= \frac{V_{1} - V_{r}}{L_{1}}~~~~(kN/mm) \\'))
+    else:
+        key_md.append(NoEscape(r' \begin{aligned} w_{2} &= \frac{V_{2} - V_{r}}{L_{2}}~~~~(kN/mm) \\'))
+
+    key_md.append(NoEscape(r' &= \frac{' + str(load_shear * 1e-3) + r' - ' + str(shear_resistance * 1e-3) + r'}'r'{' + str(key_len) + r'} \\'))
+    key_md.append(NoEscape(r'                       &= ' + str(round(load_unit_len * 1e-3, 2)) + r' \\ \\'))
+
+    if location == 'L1':
+        key_md.append(NoEscape(r'                {M_{d}}_{1} &= w_{1} \times \frac{{H_{1}}^{2}} {2} \\'))
+    else:
+        key_md.append(NoEscape(r'                {M_{d}}_{2} &= w_{2} \times \frac{{H_{2}}^{2}} {2} \\'))
+
+    key_md.append(NoEscape(r'                            &= ' + str(round(load_unit_len * 1e-3, 2)) + r' \times \frac{{' + str(key_depth) + r'}^{2}} {2} '
+                                                                                                                                  r'\times 10^{-3} \\'))
+    key_md.append(NoEscape(r'                            &= ' + str(round(moment_demand * 1e-3, 2)) + r' \end{aligned}'))
+
+    return key_md
+
+
+def key_moment_capacity(key_len, key_thk, key_fy, gamma_m0, moment_capacity, beta_b=1, location='L1'):
+    """ """
+    key_capacity = Math(inline=True)
+
+    if location == 'L1':
+        key_capacity.append(NoEscape(r' \begin{aligned} {M_{p}}_{1} &= \beta_{b} Z_{p} f_{y} / \gamma_{m0} \\'))
+        key_capacity.append(NoEscape(r'&                           = \frac{\beta_{b} \bigg(\frac{L_{1}t_{1}^{2}} {4} \bigg) f_{y} } {\gamma_{m0}} \\'))
+    else:
+        key_capacity.append(NoEscape(r' \begin{aligned} {M_{p}}_{2} &= \beta_{b} Z_{p} f_{y} / \gamma_{m0} \\'))
+        key_capacity.append(NoEscape(r'&                            = \frac{\beta_{b} \bigg(\frac{L_{2}t_{2}^{2}} {4} \bigg) f_{y} } {\gamma_{m0}} \\'))
+
+    key_capacity.append(NoEscape(r'&                            = \frac{' + str(beta_b) + r' \times \bigg(\frac{' + str(key_len) + r' \times '
+                           + str(key_thk) + r'^{2}} {4} \bigg) \times ' + str(key_fy) + r' } {' + str(gamma_m0) + r' \times 10^{6} } \\'))
+    key_capacity.append(NoEscape(r'&  = ' + str(moment_capacity) + r' \end{aligned}'))
+
+    return key_capacity
+
+
+def key_thk(moment_demand, gamma_m0, key_fy, key_len, key_thk_val, column_tw, key_thk, location='L1'):
+    """ """
+    key_thk_eqn = Math(inline=True)
+
+    if location == 'L1':
+        key_thk_eqn.append(NoEscape(r' \begin{aligned} t_{1} &= \sqrt{\frac{4 M_{d}}{L_{1}~ (f_{y}/\gamma_{m0})}} \\'))
+    else:
+        key_thk_eqn.append(NoEscape(r' \begin{aligned} t_{2} &= \sqrt{\frac{4 M_{d}}{L_{2}~ (f_{y}/\gamma_{m0})}} \\'))
+
+    key_thk_eqn.append(NoEscape(r'& = \sqrt{\frac{4 \times ' + str(round(moment_demand * 1e-6, 2)) + r' \times 10^{6}} {' + str(key_len) + r' \times ('
+                                + str(key_fy) + r'/ '+ str(gamma_m0) + r')}} \\'))
+    key_thk_eqn.append(NoEscape(r'& = ' + str(round(key_thk_val, 2)) + r' \\'))
+
+    if location == 'L1':
+        key_thk_eqn.append(NoEscape(r'& = max(t_{1},~t) \\'))
+    else:
+        key_thk_eqn.append(NoEscape(r'& = max(t_{2},~t) \\'))
+
+    key_thk_eqn.append(NoEscape(r'& = max(' + str(round(key_thk_val, 2)) + r',~'+ str(column_tw) + r') \\'))
+    key_thk_eqn.append(NoEscape(r'& = ' + str(key_thk) + r' \end{aligned}'))
+
+    return key_thk_eqn
 
 
 def high_shear_provided(shear_on_stiffener):

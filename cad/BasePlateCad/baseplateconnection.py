@@ -215,7 +215,7 @@ class BasePlateCad(object):
 
         self.baseplateModel = self.baseplate.create_model()
 
-        if self.BP.shear_key_required == 'Yes':
+        if self.BP.shear_key_along_ColDepth == 'Yes':
 
             shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 -self.baseplate.T])
             shearkey_1L_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -224,6 +224,7 @@ class BasePlateCad(object):
 
             self.shearkey_1Model = self.shearkey_1.create_model()
 
+        if self.BP.shear_key_along_ColWidth == 'Yes':
             shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 -self.baseplate.T])
             shearkey_2L_uDir = numpy.array([0.0, 0.0, 1.0])
             shearkey_2L_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -1081,9 +1082,14 @@ class BasePlateCad(object):
         #               self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
 
         plate_list = [self.baseplateModel]
-        if self.BP.shear_key_required == 'Yes':
-            list = [self.shearkey_1Model, self.shearkey_2Model]
+        if self.BP.shear_key_along_ColDepth == 'Yes':
+            list = [self.shearkey_1Model]
             plate_list.extend(list)
+
+        if self.BP.shear_key_along_ColWidth == 'Yes':
+            list = [self.shearkey_2Model]
+            plate_list.extend(list)
+
         if self.BP.stiffener_along_flange == 'Yes':
             list = [self.stiffener_algflangeL1Model, self.stiffener_algflangeR1Model, self.stiffener_algflangeL2Model,
                           self.stiffener_algflangeR2Model]

@@ -3464,15 +3464,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.shear_key_depth_ColDepth = key_dimensions[-1]
                         self.shear_key_stress_ColDepth = (self.load_shear_major - self.shear_resistance) / (self.shear_key_len_ColDepth *
                                                                                                             self.shear_key_depth_ColDepth)
-
                 if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
-                    if self.shear_key_depth_ColDepth >= (2 * self.shear_key_len_ColDepth):  # limiting the key aspect ratio to 1:2
-                        self.shear_key_design_status = False
-                        logger.warning("[Shear Key] The aspect ratio of the shear key (length/depth) exceeds 2, horizontal shear force (along the "
-                                       "major axis) is very high")
-                        logger.warning("The aspect ratio of the key is restricted to keep a check on it's thickness and prevent failure of the "
-                                       "plate due to bending")
-                        logger.info("Osdag suggets to design the connection with embedded base plate")
+                    self.shear_key_stress_ColDepth = round(self.shear_key_stress_ColDepth, 2)
+                    self.shear_key_design_status = False
+                    self.safe = False
+                    logger.warning("[Shear Key] The aspect ratio of the shear key (depth/length) exceeds 1/2, horizontal shear force (along the "
+                                   "major axis) is very high")
+                    logger.warning("The aspect ratio of the key is restricted to keep a check on the thickness of the key and prevent failure of the "
+                                   "base plate due to bending")
+                    logger.info("Osdag suggests to design the connection with embedded base plate")
                 else:
                     # checking shear key thk
 
@@ -3568,19 +3568,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                                 self.shear_key_depth_ColWidth)
 
                     if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
-                        if self.shear_key_depth_ColWidth >= (0.5 * self.shear_key_len_ColWidth):  # limiting the key aspect ratio to 1:2
-                            self.shear_key_design_status = False
-                            self.shear_key_len_ColWidth = 'Fail'
-                            self.shear_key_depth_ColWidth = 'Fail'
-                            self.shear_key_stress_ColWidth = 'Fail'
-                            if self.shear_key_along_ColDepth == 'No':
-                                self.shear_key_thk = 'Fail'
+                        self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
+                        self.shear_key_design_status = False
+                        self.safe = False
 
-                            logger.warning("[Shear Key] The aspect ratio of the shear key (length/depth) exceeds 2, horizontal shear force (along "
-                                           "the minor axis) is very high")
-                            logger.warning("The aspect ratio of the key is restricted to keep a check on it's thickness and prevent failure of the "
-                                           "plate due to bending")
-                            logger.info("Osdag suggets to design the connection with embedded base plate")
+                        logger.warning("[Shear Key] The aspect ratio of the shear key (depth/length) exceeds 1/2, horizontal shear force (along "
+                                       "the minor axis) is very high")
+                        logger.warning(
+                            "The aspect ratio of the key is restricted to keep a check on the thickness of the key and prevent failure of the "
+                            "base plate due to bending")
+                        logger.info("Osdag suggets to design the connection with embedded base plate")
                     else:
                         # checking shear key thk
 
@@ -3602,8 +3599,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.fy_key_2) / self.gamma_m0
                         self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
 
-                    if self.shear_key_design_status != False:
-                        self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
+                    # if self.shear_key_design_status != False:
+                    #     self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
             else:
                 self.shear_key_len_ColWidth = 'N/A'
                 self.shear_key_depth_ColWidth = 'N/A'
@@ -3629,6 +3626,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             self.shear_key_design_status = True
             self.shear_key_thk = 'N/A'
+
+        if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+            self.shear_key_len_ColDepth = max(self.shear_key_len_ColDepth, self.shear_key_len_ColWidth)
+            self.shear_key_depth_ColDepth = max(self.shear_key_depth_ColDepth, self.shear_key_depth_ColWidth)
+            self.shear_key_stress_ColDepth = (self.load_shear_major - self.shear_resistance) / (self.shear_key_len_ColDepth *
+                                                                                                self.shear_key_depth_ColDepth)
+            self.shear_key_stress_ColDepth = round(self.shear_key_stress_ColDepth, 2)
+
+            self.shear_key_len_ColWidth = self.shear_key_len_ColDepth
+            self.shear_key_depth_ColWidth = self.shear_key_depth_ColDepth
+            self.shear_key_stress_ColWidth = (self.load_shear_minor - self.shear_resistance) / (self.shear_key_len_ColWidth *
+                                                                                                self.shear_key_depth_ColWidth)
+            self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 2)
 
         # design of anchor bolts to resist axial tension/uplift force - initial iteration
         if self.connectivity == 'Moment Base Plate':
@@ -5213,14 +5223,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # check for plate thickness
         if self.shear_key_thk != 'N/A':
-            if self.shear_key_design_status != False:
-                if self.plate_thk_provided < self.shear_key_thk:
+            if self.plate_thk_provided < self.shear_key_thk:
 
-                    self.plate_thk_provided = self.shear_key_thk
-                    logger.warning("[Plate Thickness] Thickness of the base plate is less than the thickness of the shear key")
-                    logger.info("Thickness of the base plate should be at-least equal to the thickness of the shear key to avoid bending of the "
-                                "base plate in case of high horizontal shear force")
-                    logger.info("Updating the thickness of the base plate")
+                self.plate_thk_provided = self.shear_key_thk
+                logger.warning("[Plate Thickness] Thickness of the base plate is less than the thickness of the shear key")
+                logger.info("Thickness of the base plate should be at-least equal to the thickness of the shear key to avoid bending of the "
+                            "base plate in case of high horizontal shear force")
+                logger.info("Updating the thickness of the base plate")
 
         # check for max end/edge distance
         # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy], self.dp_detail_is_corrosive)

@@ -1045,7 +1045,7 @@ class CADGroove(object):
     #                            bcWeldStiffLength, contWeldD, contWeldB, endplate_type)
 
     def __init__(self, module, column, beam, plate, nut_bolt_array, bolt, bcWeldFlang, bcWeldWeb,
-                 contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB, endplate_type):
+                 contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, endplate_type):
         """
 
         :param column: Column
@@ -1072,6 +1072,8 @@ class CADGroove(object):
         self.nut_bolt_array = nut_bolt_array
         self.bolt = bolt
         self.contPlate_L1 = contPlates
+        self.diagplate_L1 = diagplate
+        self.diagplate_R1= copy.deepcopy(diagplate)
         self.contPlate_L2 = copy.deepcopy(contPlates)
         self.contPlate_R1 = copy.deepcopy(contPlates)
         self.contPlate_R2 = copy.deepcopy(contPlates)
@@ -1137,7 +1139,7 @@ class CADGroove(object):
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
         self.create_contPlatesGeometry()
-
+        self.create_diagplateGeometry()
         self.create_beam_stiffenersGeometry()
 
         self.create_bcWelds()
@@ -1151,6 +1153,8 @@ class CADGroove(object):
         self.beamModel = self.beam.create_model()
         self.plateModel = self.plate.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
+        self.diagplate_L1Model = self.diagplate_L1.create_model()
+        self.diagplate_R1Model = self.diagplate_R1.create_model()
         self.contPlate_L1Model = self.contPlate_L1.create_model()
         self.contPlate_L2Model = self.contPlate_L2.create_model()
         self.contPlate_R1Model = self.contPlate_R1.create_model()
@@ -1304,6 +1308,26 @@ class CADGroove(object):
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.contPlate_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    ##############################################  Adding diagPlates ########################################
+
+    def create_diagplateGeometry(self):
+        """
+
+        :return: Geometric Orientation of this components
+        """
+        beamOriginL = numpy.array([self.column.B / 2 - self.diagplate_L1.W / 2, 0.0,
+                                   self.column.length / 2  - self.beam.T / 2 + self.diagplate_L1.T / 2])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
+        self.diagplate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+
+        beamOriginL = numpy.array([-self.column.B / 2 + self.diagplate_R1.W / 2, 0.0,
+                                   self.column.length / 2 - self.beam.T / 2 - self.diagplate_R1.T / 2])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.diagplate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     ##############################################  Adding beam stiffeners #############################################
     def create_beam_stiffenersGeometry(self):
@@ -1602,7 +1626,7 @@ class CADGroove(object):
         if self.endplate_type == "one_way":
             # if self.numberOfBolts == 12:
             connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model,
-                               self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                               self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,self.diagplate_L1Model,self.diagplate_R1Model]
             # else:
             # connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model,
             #                    self.contPlate_R1Model, self.contPlate_R2Model]
@@ -1610,14 +1634,14 @@ class CADGroove(object):
             # if self.numberOfBolts == 20:
             connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model,
                                self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model,
-                               self.contPlate_R2Model]
+                               self.contPlate_R2Model,self.diagplate_L1Model,self.diagplate_R1Model]
             # else:
             # connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model,
             #                    self.contPlate_R1Model, self.contPlate_R2Model]
         elif self.endplate_type == "flush":
             connector_plate = [self.plateModel,
                                self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model,
-                               self.contPlate_R2Model, ]
+                               self.contPlate_R2Model,self.diagplate_L1Model,self.diagplate_R1Model]
 
         plates = connector_plate[0]
         for comp in connector_plate[1:]:

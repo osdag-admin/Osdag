@@ -123,6 +123,7 @@ import OCC.Core.V3d
 from OCC.Core.Quantity import *
 from OCC.Core.Graphic3d import *
 from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
+from OCC.Core.TNaming import tnaming
 import multiprocessing
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
@@ -878,20 +879,20 @@ class CommonDesignLogic(object):
 
         # Following welds are for to weld stiffeners for extended bothways and ext4ended oneway
         # bbWeld for stiffener hight on left side
-        bbWeldStiffHeight = FilletWeld(b=BBE.stiffener_thickness/2, h=BBE.stiffener_thickness/2,
+        bbWeldStiffHeight = FilletWeld(b=BBE.weld_size_stiffener, h=BBE.weld_size_stiffener,
 
-                                       L=BBE.stiffener_height - 10.0)  # outputobj['Stiffener']['Length'] - 25
+                                       L=BBE.stiffener_height - 5.0)  # outputobj['Stiffener']['Length'] - 25
 
         # bbWeld for stiffener length on left side
-        bbWeldStiffLength = FilletWeld(b=BBE.stiffener_thickness/2, h=BBE.stiffener_thickness/2,
-                                       L=BBE.stiffener_length - 10.0)
+        bbWeldStiffLength = FilletWeld(b=BBE.weld_size_stiffener, h=BBE.weld_size_stiffener,
+                                       L=BBE.stiffener_length-5.0)
         #
         # # following welds are fillet welds for the flush endplate stiffeners
-        bbWeldFlushstiffHeight = FilletWeld(b=BBE.stiffener_thickness/2, h=BBE.stiffener_thickness/2,
-                                       L=BBE.stiffener_height - 10.0)
+        bbWeldFlushstiffHeight = FilletWeld(b=BBE.weld_size_stiffener, h=BBE.weld_size_stiffener,
+                                       L=BBE.stiffener_height-5.0)
 
-        bbWeldFlushstiffLength = FilletWeld(b=BBE.stiffener_thickness/2, h=BBE.stiffener_thickness/2,
-                                       L=BBE.stiffener_length - 10.0)
+        bbWeldFlushstiffLength = FilletWeld(b=BBE.weld_size_stiffener, h=BBE.weld_size_stiffener,
+                                       L=BBE.stiffener_length-5.0)
         #
         # # if BBE.weld.type == "Fillet Weld":
         # #
@@ -1007,6 +1008,10 @@ class CommonDesignLogic(object):
                                     L=float(column_d) - 2 * float(column_T),
                                     T=BCE.cont_plate_thk_provided )
 
+        diagplate = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
+                                    L=float(column_d) - 2 * float(column_T),
+                                    T=BCE.cont_plate_thk_provided)
+
         # contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
         # 							  L=float(column_data["D"]) - 2 * float(column_data["T"]),
         # 							  T=outputobj['ContPlateTens']['Thickness'])
@@ -1059,19 +1064,19 @@ class CommonDesignLogic(object):
         ############################### Weld for the beam stiffeners ################################################
 
         # bcWeld for stiffener hight on left side
-        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length,"jjjj")
-        bcWeldStiffHeight = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
-                                       L=BCE.stiffener_height)
+        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,"jjjj")
+        bcWeldStiffHeight = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                       L=BCE.stiffener_height-5.0)
 
         #
-        bcWeldStiffLength = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
-                                       L=2*BCE.stiffener_height)
+        bcWeldStiffLength = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                       L=2*BCE.stiffener_height-5.0)
 
 
-        contWeldD = FilletWeld(b=BCE.cont_plate_thk_provided/2, h=BCE.cont_plate_thk_provided/2,
+        contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                L=float(column_d) - 2 * float(column_T))
 
-        contWeldB = FilletWeld(b=BCE.cont_plate_thk_provided/2, h=BCE.cont_plate_thk_provided/2,
+        contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                L=float(column_B)/2 - float(column_tw) / 2)
         #
 
@@ -1142,7 +1147,7 @@ class CommonDesignLogic(object):
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
             extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                    bcWeldFlang, bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,endplate_type)
+                                    bcWeldFlang, bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, endplate_type)
 
             extbothWays.create_3DModel()
 
@@ -1197,7 +1202,7 @@ class CommonDesignLogic(object):
             #                                        outputobj)
 
             col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                                   bcWeldFlang, bcWeldWeb,contPlates,  endplate_type)
+                                                   bcWeldFlang, bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  endplate_type)
 
             col_web_connectivity.create_3DModel()
 

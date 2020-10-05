@@ -384,6 +384,39 @@ def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc): 
     return Pmc_eqn
 
 
+def cl_8_2_1_2_plastic_moment_capacity(beta_b, Z_p, f_y, gamma_m0, Pmc):
+    """
+    Calculate member design moment capacity
+    Args:
+
+          beta_b:1 for plastic and compact sections & Ze/Zp for semi compact section (int)
+          Z_p:Plastic section modulus of cross section mm^3 (float)
+          f_y:Yield stress of the material in N/mm square  (float)
+          gamma_m0:partial safety factor (float)
+          Pmc:Plastic moment capacity in  N-mm (float)
+    Returns:
+        Plastic moment capacity in  N-mm (float)
+
+    Note:
+              Reference:
+              IS 800:2007,  cl 8.2.1.2
+
+    """
+
+    beta_b = str(beta_b)
+    Z_p = str(Z_p)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    Pmc = str(Pmc)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{z-z} &= \frac{\beta_b \times Z_{pz} \times fy}{\gamma_{mo} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r' \\ \\'))
+    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+    return Pmc_eqn
+
+
 def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
     """
     Calculate moment deformation capacity
@@ -499,6 +532,44 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
             NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\'))
     shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl. 10.4.3]\end{aligned}'))
+    return shear_yield_eqn
+
+
+def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
+    """
+    Calculate shear yielding capacity of  plate (provided)
+    Args:
+        h:  Plate ht in mm (float)
+        t:  Plate thickness in mm (float)
+        f_y:Yeild strength of  plate material in N/mm square (float)
+        gamma: IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  (float)
+        V_dg: Shear yeilding capacity of  plate in N (float)
+        multiple:2 (int)
+    Returns:
+         Shear yielding capacity of  plate
+     Note:
+            Reference:
+            IS 800:2007,  cl 10.4.3
+    """
+
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+
+    V_dg = str(V_dg)
+
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{p} &= \frac{A_v~f_{yw}}{\sqrt{3}~\gamma_{mo}} \\'))
+    if multiple == 1:
+        shear_yield_eqn.append(NoEscape(r'&=\frac{' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
+    else:
+        multiple = str(multiple)
+        shear_yield_eqn.append(
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
+
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
+    shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,~Cl. 8.4.1] \end{aligned}'))
     return shear_yield_eqn
 
 
@@ -1111,10 +1182,6 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
         bolt_bearing_eqn.append(NoEscape(r' & since~the~hole~type~is~Long-slotted \\ \\'))
     else:
         bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r'\\ \\'))
-
-
-    else:
-        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
 
     bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4] \end{aligned}'))
 
@@ -5875,8 +5942,14 @@ def key_thk(moment_demand, gamma_m0, key_fy, key_len, key_thk_val, column_tw, ke
     else:
         key_thk_eqn.append(NoEscape(r'& = max(t_{2},~t) \\'))
 
-    key_thk_eqn.append(NoEscape(r'& = max(' + str(round(key_thk_val, 2)) + r',~'+ str(column_tw) + r') \\'))
-    key_thk_eqn.append(NoEscape(r'& = ' + str(key_thk) + r' \end{aligned}'))
+    key_thk_eqn.append(NoEscape(r'& = max(' + str(round(key_thk_val, 2)) + r',~' + str(column_tw) + r') \\'))
+
+    if location == 'L1':
+        key_thk_eqn.append(NoEscape(r'& = ' + str(key_thk) + r' \end{aligned}'))
+    else:
+        key_thk_eqn.append(NoEscape(r'& = ' + str(key_thk) + r' \\ \\'))
+        key_thk_eqn.append(NoEscape(r' [Note: If~t_{1} & ~is~provided,~ t_{2}~is~at-least \\'))
+        key_thk_eqn.append(NoEscape(r' equal~to~t_{1}] \end{aligned}'))
 
     return key_thk_eqn
 

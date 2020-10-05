@@ -3507,13 +3507,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 if (self.load_shear_minor <= self.load_shear_major) and (self.shear_key_along_ColDepth == 'Yes'):
                     self.shear_key_depth_ColWidth = self.shear_key_depth_ColDepth
                     self.shear_key_len_ColWidth = self.shear_key_len_ColDepth
-                    self.shear_key_thk_2 = self.shear_key_thk_1
                     self.shear_key_thk = self.shear_key_thk
                     self.shear_key_stress_ColWidth = self.shear_key_stress_ColDepth
 
                     self.shear_key_w_2 = (self.load_shear_minor - self.shear_resistance) / self.shear_key_len_ColWidth  # N/mm
                     self.shear_key_w_2 = round(self.shear_key_w_2, 2)
                     self.shear_key_moment_2 = self.shear_key_w_2 * (self.shear_key_depth_ColWidth ** 2 / 2)  # N-mm, max moment
+                    self.shear_key_thk_2 = math.sqrt((4 * self.shear_key_moment_2 * self.gamma_m0) / (self.stiff_key.fy *
+                                                                                                      self.shear_key_len_ColWidth))
                     self.fy_key_2 = self.fy_key_1
                     self.moment_capacity_key2 = (((self.shear_key_len_ColWidth * self.shear_key_thk ** 2) / 4) * self.stiff_key.fy) / self.gamma_m0
                     self.moment_capacity_key2 = round(self.moment_capacity_key2 * 1e-6, 2)
@@ -6652,7 +6653,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # End of checks
 
-        display_3D_image = "/ResourceFiles/images/BasePlate.jpeg"
+        display_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']

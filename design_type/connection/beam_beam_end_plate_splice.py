@@ -740,8 +740,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # minimum shear load
         # Note: Shear force is assumed to be transferred through the web, hence Cl.10.7 point 2 is considered for minimum shear load
-        self.beam_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.dp_beam_fy) / self.gamma_m0
+        self.beam_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.supported_section.fy) / (math.sqrt(3) * self.gamma_m0)
         self.beam_shear_capa = round(self.beam_shear_capa * 1e-3, 2)  # kN
+
+        if self.load_shear > self.beam_shear_capa:
+            logger.warning("[High Shear] The external factored shear force ({} kN) is greater than 0.6 times the plastic shear capacity of the "
+                           "beam ({} kN)".format(self.load_shear, self.beam_shear_capa))
+            logger.info("Design of beam with high shear is not recommended by Osdag")
+            logger.info("Restricting the shear capacity of the beam to {} kN ".format(self.beam_shear_capa))
 
         if self.load_shear < min((0.15 * self.beam_shear_capa), 40):
             self.minimum_load_status_shear = True
@@ -1337,10 +1343,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                   'Zpy(mm3)': self.supported_section.elast_sec_mod_y}
 
         self.report_input = \
-            {KEY_MODULE: self.module,
-             KEY_MAIN_MODULE: self.mainmodule,
+            {KEY_MAIN_MODULE: self.mainmodule,
+             KEY_MODULE: KEY_DISP_BB_EP_SPLICE,
              KEY_CONN: self.connectivity,
-             KEY_ENDPLATE_TYPE:self.endplate_type,
+             KEY_DISP_ENDPLATE_TYPE: self.endplate_type,
              KEY_DISP_MOMENT: self.input_moment,
              KEY_DISP_SHEAR: self.input_shear_force,
              KEY_DISP_AXIAL: self.input_axial_force,
@@ -1348,28 +1354,31 @@ class BeamBeamEndPlateSplice(MomentConnection):
              "Section": "TITLE",
              "Section Details": self.report_supporting,
 
-             "Bolt Details": "TITLE",
-             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
-             KEY_DISP_GRD: str(self.bolt.bolt_grade),
-             KEY_DISP_TYP: self.bolt.bolt_type,
-
-             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-             KEY_DISP_GAP: self.plate.gap,
-             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
              "Plate Details": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
              KEY_DISP_MATERIAL: self.plate.material,
              KEY_DISP_FU: self.plate.fu,
              KEY_DISP_FY: self.plate.fy,
 
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+             KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+
              "Weld Details": "TITLE",
+             KEY_DISP_DP_WELD_FAB: self.web_weld.fabrication,
+             KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT: self.web_weld.fu,
              KEY_DISP_BEAM_FLANGE_WELD_TYPE: "Groove Weld",
              KEY_DISP_BEAM_WEB_WELD_TYPE: "Fillet Weld",
              KEY_DISP_STIFFENER_WELD_TYPE: "Fillet Weld",
-             KEY_DISP_DP_WELD_FAB: self.web_weld.fabrication,
-             KEY_DISP_DP_WELD_MATERIAL_G_O: self.web_weld.fu
+
+             "Detailing": "TITLE",
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_GAP: self.plate.gap,
+             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
              }
 
         self.report_check = []
@@ -1384,38 +1393,35 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.bolt_conn_plates_t_fu_fy.append((self.plate_thickness, 0, 0))
         bolt_capacity_kn = round(self.bolt_capacity, 2)
 
-        # CHECK 1: MEMBER CAPACITY #
+        # CHECK 1: MEMBER CAPACITY
         t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
-        # TODO MEMBER CAPACITY - AND CLASS OF SECTION,axial, beta, min criteria of plastic moment 0.5
-        # t1 = (SECTION_CLASSIFICATION, "", cl_3_7_2_section_classification(class_of_section=self.class_of_section), "")
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY_M, '',
-              cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness,
+        t1 = ("(Plastic) Shear Capacity(kN)", '',
+              cl_8_4_1_plastic_shear_resistance(h=self.h, t=self.supported_section.web_thickness,
                                                     f_y=self.supported_section.fy, gamma_m0=self.gamma_m0,
                                                     V_dg=round(self.beam_shear_capa, 2)),
               'Restricted to low shear')
 
         self.report_check.append(t1)
-        initial_shear_capacity = round(self.beam_shear_capa, 2)
-        reduced_shear_capacity = round(self.beam_shear_capa * 0.6, 2)
-        t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.input_shear_force, "V"),
-              allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
-              get_pass_fail(self.input_shear_force, reduced_shear_capacity, relation="lesser"))
-        self.report_check.append(t1)
 
+        # initial_shear_capacity = round(self.beam_shear_capa, 2)
+        # reduced_shear_capacity = round(self.beam_shear_capa * 0.6, 2)
+        # t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.input_shear_force, "V"),
+        #       allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
+        #       get_pass_fail(self.input_shear_force, reduced_shear_capacity, relation="lesser"))
+        # self.report_check.append(t1)
 
         # percent = 1
         if self.input_moment < self.beam_plastic_mom_capa_zz:
             percent = 0.5
         else:
             percent = 1
-        #todo PMC- MP_ZZ & MP_YY  REM & If you dont want pmc as a text in design report please dont del from design report write it separately
-        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, self.input_moment,
-              cl_8_2_1_2_plastic_moment_capacity_member(beta_b=1,
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '',
+              cl_8_2_1_2_plastic_moment_capacity(beta_b=1,
                                                         Z_p=self.supported_section.plast_sec_mod_z,
                                                         f_y=self.supported_section.fy,
                                                         gamma_m0=self.gamma_m0,
-                                                        Pmc=round(self.beam_plastic_mom_capa_zz , 2)), '')
+                                                        Pmc=round(self.beam_plastic_mom_capa_zz, 2)), '')
         self.report_check.append(t1)
 
         t1 = ('SubSection', 'Load Consideration', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')

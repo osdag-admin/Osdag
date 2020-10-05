@@ -603,7 +603,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_MATERIAL = 'Plate Material'
+KEY_DISP_MATERIAL = 'Plate material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 KEY_DISP_PRIBM = 'Primary beam *'
@@ -664,7 +664,8 @@ KEY_DISP_TYP = 'Type'
 KEY_DISP_TYP_ANCHOR = 'Anchor Type'
 KEY_DISP_GRD_ANCHOR = 'Property Class'
 KEY_DISP_GRD_FOOTING = 'Grade*'
-KEY_DISP_GRD = 'Property Class'
+KEY_DISP_GRD = 'Property class'
+KEY_DISP_BOLT_PRE_TENSIONING = 'Bolt tension'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
@@ -684,7 +685,7 @@ KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
 KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
-KEY_OUT_DISP_SHEAR_CAPACITY_M ="Shear Capacity(kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY_M = "Shear Capacity(kN)"
 
 
 KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
@@ -936,9 +937,9 @@ KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
 KEY_DISP_DP_WELD_TYPE = 'Weld type'
-KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam Flange to Endplate Weld type'
-KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam Web to Endplate Weld type'
-KEY_DISP_STIFFENER_WELD_TYPE= "Stiffener Weld Type"
+KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam flange to end plate weld type'
+KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam web to end plate weld type'
+KEY_DISP_STIFFENER_WELD_TYPE = "Stiffener weld type"
 KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
 KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
@@ -949,6 +950,7 @@ KEY_DP_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD]
 
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite, Fu (MPa)'
+KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT = 'Material grade overwrite, $f_{u}$ (MPa)'
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
@@ -964,11 +966,11 @@ KEY_DISP_DP_DETAILING_GAP_BEAM = 'Gap between beam and beam (mm)'
 KEY_DISP_DP_DETAILING_GAP_COL = 'Gap between column and column (mm)'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the members exposed to corrosive influences'
-KEY_DISP_CORR_INFLUENCES = 'Are the members exposed to corrosive influences'
+KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design method'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
-KEY_DISP_GAP = 'Gap between Members (mm)'
+KEY_DISP_GAP = 'Gap between members (mm)'
 
 
 KEY_DISP_MECH_PROP = 'Mechanical Properties'

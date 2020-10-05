@@ -1553,7 +1553,7 @@ class Window(QMainWindow):
 
             des_pref_input_list = main.input_dictionary_design_pref(main)
             edit_tabs_list = main.edit_tabs(main)
-            edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB,edit_tabs_list))
+            edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB, edit_tabs_list))
             remove_tab_name = [x[0] for x in edit_tabs_remove]
             # remove_tabs = list(filter(lambda x: x[0] in remove_tab_name, des_pref_input_list))
             #
@@ -1561,7 +1561,7 @@ class Window(QMainWindow):
             result = None
             for edit in main.edit_tabs(main):
                 (tab_name, input_dock_key_name, change_typ, f) = edit
-                remove_tabs = list(filter(lambda x: x[0] in remove_tab_name,des_pref_input_list))
+                remove_tabs = list(filter(lambda x: x[0] in remove_tab_name, des_pref_input_list))
 
                 input_dock_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, input_dock_key_name)
                 result = list(filter(lambda get_tab:
@@ -1586,7 +1586,6 @@ class Window(QMainWindow):
                     elif input_type == TYPE_COMBOBOX:
                         val = key.currentText()
                         design_dictionary.update({key_name: val})
-
         else:
             print('flag false')
 

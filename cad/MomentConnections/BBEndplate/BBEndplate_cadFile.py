@@ -879,7 +879,10 @@ class CADGroove(object):
     # def __init__(self,module,beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array, bbWeldFlang, bbWeldWeb,
     #                              bbWeldStiffHeight,bbWeldStiffLength,bbWeldFlushstiffHeight, bbWeldFlushstiffLength,
     #                        beam_stiffeners, beam_stiffenerFlush):
-    def __init__(self, module, beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array,bbWeldFlang, bbWeldWeb):
+
+
+
+    def __init__(self, module, beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array,bbWeldFlang, bbWeldWeb,beam_stiffeners,beam_stiffenerFlush, bbWeldStiffHeight,bbWeldStiffLength,bbWeldFlushstiffHeight, bbWeldFlushstiffLength):
         """
 
         :param beamLeft: Left beam
@@ -908,24 +911,24 @@ class CADGroove(object):
         self.beamRModel = None
         self.plateLModel = None
         self.plateRModel = None
-        # self.beam_stiffener_1 = beam_stiffeners
-        # self.beam_stiffener_2 = copy.deepcopy(beam_stiffeners)
-        # self.beam_stiffener_3 = copy.deepcopy(beam_stiffeners)
-        # self.beam_stiffener_4 = copy.deepcopy(beam_stiffeners)
+        self.beam_stiffener_1 = beam_stiffeners
+        self.beam_stiffener_2 = copy.deepcopy(beam_stiffeners)
+        self.beam_stiffener_3 = copy.deepcopy(beam_stiffeners)
+        self.beam_stiffener_4 = copy.deepcopy(beam_stiffeners)
         self.module = module
         #
-        # self.beam_stiffener_F1 = beam_stiffenerFlush
-        # self.beam_stiffener_F2 = copy.deepcopy(beam_stiffenerFlush)
-        # self.beam_stiffener_F3 = copy.deepcopy(beam_stiffenerFlush)
-        # self.beam_stiffener_F4 = copy.deepcopy(beam_stiffenerFlush)
+        self.beam_stiffener_F1 = beam_stiffenerFlush
+        self.beam_stiffener_F2 = copy.deepcopy(beam_stiffenerFlush)
+        self.beam_stiffener_F3 = copy.deepcopy(beam_stiffenerFlush)
+        self.beam_stiffener_F4 = copy.deepcopy(beam_stiffenerFlush)
         # self.alist = alist
         # self.outputobj = outputobj
         self.boltProjection = 10
-        # if self.module.endplate_type == 'Flushed - Reversible Moment':
-        #     self.loc = float(self.module.stiffener.location)
-        #
-        # else:
-        #     self.loc = 0
+        if self.module.endplate_type == 'Flushed - Reversible Moment':
+            self.loc = float(self.module.beam_D/2 - self.module.stiffener_thickness/2)
+            pass
+        else:
+            self.loc = 0
 
         self.bbWeldFlang_R1 = bbWeldFlang
         self.bbWeldFlang_R2 = copy.deepcopy(bbWeldFlang)
@@ -938,41 +941,41 @@ class CADGroove(object):
 
         #Fillet weld
 
-        # self.bbWeldStiffHL_1 = bbWeldStiffHeight
-        # self.bbWeldStiffHL_2 = copy.deepcopy(bbWeldStiffHeight)
-        # self.bbWeldStiffHL_3 = copy.deepcopy(bbWeldStiffHeight)
-        # self.bbWeldStiffHL_4 = copy.deepcopy(bbWeldStiffHeight)
-        # self.bbWeldStiffHR_1 = copy.deepcopy(bbWeldStiffHeight)
-        # self.bbWeldStiffHR_2 = copy.deepcopy(bbWeldStiffHeight)
-        # self.bbWeldStiffHR_3 = copy.deepcopy(bbWeldStiffHeight)
-        # self.bbWeldStiffHR_4 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHL_1 = bbWeldStiffHeight
+        self.bbWeldStiffHL_2 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHL_3 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHL_4 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHR_1 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHR_2 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHR_3 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHR_4 = copy.deepcopy(bbWeldStiffHeight)
 
-        # self.bbWeldStiffLL_1 = bbWeldStiffLength
-        # self.bbWeldStiffLL_2 = copy.deepcopy(bbWeldStiffLength)
-        # self.bbWeldStiffLL_3 = copy.deepcopy(bbWeldStiffLength)
-        # self.bbWeldStiffLL_4 = copy.deepcopy(bbWeldStiffLength)
-        # self.bbWeldStiffLR_1 = copy.deepcopy(bbWeldStiffLength)
-        # self.bbWeldStiffLR_2 = copy.deepcopy(bbWeldStiffLength)
-        # self.bbWeldStiffLR_3 = copy.deepcopy(bbWeldStiffLength)
-        # self.bbWeldStiffLR_4 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLL_1 = bbWeldStiffLength
+        self.bbWeldStiffLL_2 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLL_3 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLL_4 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLR_1 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLR_2 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLR_3 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLR_4 = copy.deepcopy(bbWeldStiffLength)
         #
-        # self.bbWeldstiff1_u1 = bbWeldFlushstiffHeight
-        # self.bbWeldstiff1_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        # self.bbWeldstiff2_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        # self.bbWeldstiff2_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        # self.bbWeldstiff3_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        # self.bbWeldstiff3_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        # self.bbWeldstiff4_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        # self.bbWeldstiff4_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff1_u1 = bbWeldFlushstiffHeight
+        self.bbWeldstiff1_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff2_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff2_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff3_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff3_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff4_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff4_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
         #
-        # self.bbWeldstiff1_u2 = bbWeldFlushstiffLength
-        # self.bbWeldstiff1_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        # self.bbWeldstiff2_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        # self.bbWeldstiff2_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        # self.bbWeldstiff3_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        # self.bbWeldstiff3_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        # self.bbWeldstiff4_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        # self.bbWeldstiff4_l2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff1_u2 = bbWeldFlushstiffLength
+        self.bbWeldstiff1_l2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff2_u2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff2_l2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff3_u2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff3_l2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff4_u2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff4_l2 = copy.deepcopy(bbWeldFlushstiffLength)
 
     def create_3DModel(self):
         """
@@ -984,19 +987,19 @@ class CADGroove(object):
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
 
-        # self.createbeam_stiffenersGeometry()
+        self.createbeam_stiffenersGeometry()
         #
-        # self.createbeam_stiffenerFlushGeometry()
+        self.createbeam_stiffenerFlushGeometry()
         #
         self.create_bbWeldFlangGeometry()
         self.create_bbWeldWebGeometry()
         #
         # #Fillet weld
-        # self.create_bbWeldStiffHeight()
-        # self.create_bbWeldStiffLength()
-        #
-        # self.create_bbWeldFlushstiffHeight()
-        # self.create_bbWeldFlushstiffLength()
+        self.create_bbWeldStiffHeight()
+        self.create_bbWeldStiffLength()
+
+        self.create_bbWeldFlushstiffHeight()
+        self.create_bbWeldFlushstiffLength()
 
 
         # call for create_model of filletweld from Components directory
@@ -1006,15 +1009,15 @@ class CADGroove(object):
         self.plateRModel = self.plateRight.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
 
-        # self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
-        # self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
-        # self.beam_stiffener_3Model = self.beam_stiffener_3.create_model()
-        # self.beam_stiffener_4Model = self.beam_stiffener_4.create_model()
-        #
-        # self.beam_stiffener_F1Model = self.beam_stiffener_F1.create_model()
-        # self.beam_stiffener_F2Model = self.beam_stiffener_F2.create_model()
-        # self.beam_stiffener_F3Model = self.beam_stiffener_F3.create_model()
-        # self.beam_stiffener_F4Model = self.beam_stiffener_F4.create_model()
+        self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
+        self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
+        self.beam_stiffener_3Model = self.beam_stiffener_3.create_model()
+        self.beam_stiffener_4Model = self.beam_stiffener_4.create_model()
+
+        self.beam_stiffener_F1Model = self.beam_stiffener_F1.create_model()
+        self.beam_stiffener_F2Model = self.beam_stiffener_F2.create_model()
+        self.beam_stiffener_F3Model = self.beam_stiffener_F3.create_model()
+        self.beam_stiffener_F4Model = self.beam_stiffener_F4.create_model()
         #
         self.bbWeldFlang_R1Model = self.bbWeldFlang_R1.create_model()
         self.bbWeldFlang_R2Model = self.bbWeldFlang_R2.create_model()
@@ -1024,46 +1027,46 @@ class CADGroove(object):
         self.bbWeldWeb_L3Model = self.bbWeldWeb_L3.create_model()
         #
         # #Fillet weld
-        # self.bbWeldStiffHL_1Model = self.bbWeldStiffHL_1.create_model()
-        # self.bbWeldStiffHL_2Model = self.bbWeldStiffHL_2.create_model()
-        # self.bbWeldStiffHL_3Model = self.bbWeldStiffHL_3.create_model()
-        # self.bbWeldStiffHL_4Model = self.bbWeldStiffHL_4.create_model()
+        self.bbWeldStiffHL_1Model = self.bbWeldStiffHL_1.create_model()
+        self.bbWeldStiffHL_2Model = self.bbWeldStiffHL_2.create_model()
+        self.bbWeldStiffHL_3Model = self.bbWeldStiffHL_3.create_model()
+        self.bbWeldStiffHL_4Model = self.bbWeldStiffHL_4.create_model()
         #
-        # self.bbWeldStiffLL_1Model = self.bbWeldStiffLL_1.create_model()
-        # self.bbWeldStiffLL_2Model = self.bbWeldStiffLL_2.create_model()
-        # self.bbWeldStiffLL_3Model = self.bbWeldStiffLL_3.create_model()
-        # self.bbWeldStiffLL_4Model = self.bbWeldStiffLL_4.create_model()
-        # self.bbWeldStiffHR_1Model = self.bbWeldStiffHR_1.create_model()
-        # self.bbWeldStiffHR_2Model = self.bbWeldStiffHR_2.create_model()
-        # self.bbWeldStiffHR_3Model = self.bbWeldStiffHR_3.create_model()
-        # self.bbWeldStiffHR_4Model = self.bbWeldStiffHR_4.create_model()
+        self.bbWeldStiffLL_1Model = self.bbWeldStiffLL_1.create_model()
+        self.bbWeldStiffLL_2Model = self.bbWeldStiffLL_2.create_model()
+        self.bbWeldStiffLL_3Model = self.bbWeldStiffLL_3.create_model()
+        self.bbWeldStiffLL_4Model = self.bbWeldStiffLL_4.create_model()
+        self.bbWeldStiffHR_1Model = self.bbWeldStiffHR_1.create_model()
+        self.bbWeldStiffHR_2Model = self.bbWeldStiffHR_2.create_model()
+        self.bbWeldStiffHR_3Model = self.bbWeldStiffHR_3.create_model()
+        self.bbWeldStiffHR_4Model = self.bbWeldStiffHR_4.create_model()
         #
-        # self.bbWeldStiffLR_1Model = self.bbWeldStiffLR_1.create_model()
-        # self.bbWeldStiffLR_2Model = self.bbWeldStiffLR_2.create_model()
-        # self.bbWeldStiffLR_3Model = self.bbWeldStiffLR_3.create_model()
-        # self.bbWeldStiffLR_4Model = self.bbWeldStiffLR_4.create_model()
+        self.bbWeldStiffLR_1Model = self.bbWeldStiffLR_1.create_model()
+        self.bbWeldStiffLR_2Model = self.bbWeldStiffLR_2.create_model()
+        self.bbWeldStiffLR_3Model = self.bbWeldStiffLR_3.create_model()
+        self.bbWeldStiffLR_4Model = self.bbWeldStiffLR_4.create_model()
         #
         #
         #
-        # self.bbWeldstiff1_u1Model = self.bbWeldstiff1_u1.create_model()
-        # self.bbWeldstiff1_u2Model = self.bbWeldstiff1_u2.create_model()
-        # self.bbWeldstiff1_l1Model = self.bbWeldstiff1_l1.create_model()
-        # self.bbWeldstiff1_l2Model = self.bbWeldstiff1_l2.create_model()
+        self.bbWeldstiff1_u1Model = self.bbWeldstiff1_u1.create_model()
+        self.bbWeldstiff1_u2Model = self.bbWeldstiff1_u2.create_model()
+        self.bbWeldstiff1_l1Model = self.bbWeldstiff1_l1.create_model()
+        self.bbWeldstiff1_l2Model = self.bbWeldstiff1_l2.create_model()
         #
-        # self.bbWeldstiff2_u1Model = self.bbWeldstiff2_u1.create_model()
-        # self.bbWeldstiff2_u2Model = self.bbWeldstiff2_u2.create_model()
-        # self.bbWeldstiff2_l1Model = self.bbWeldstiff2_l1.create_model()
-        # self.bbWeldstiff2_l2Model = self.bbWeldstiff2_l2.create_model()
+        self.bbWeldstiff2_u1Model = self.bbWeldstiff2_u1.create_model()
+        self.bbWeldstiff2_u2Model = self.bbWeldstiff2_u2.create_model()
+        self.bbWeldstiff2_l1Model = self.bbWeldstiff2_l1.create_model()
+        self.bbWeldstiff2_l2Model = self.bbWeldstiff2_l2.create_model()
         #
-        # self.bbWeldstiff3_u1Model = self.bbWeldstiff3_u1.create_model()
-        # self.bbWeldstiff3_u2Model = self.bbWeldstiff3_u2.create_model()
-        # self.bbWeldstiff3_l1Model = self.bbWeldstiff3_l1.create_model()
-        # self.bbWeldstiff3_l2Model = self.bbWeldstiff3_l2.create_model()
+        self.bbWeldstiff3_u1Model = self.bbWeldstiff3_u1.create_model()
+        self.bbWeldstiff3_u2Model = self.bbWeldstiff3_u2.create_model()
+        self.bbWeldstiff3_l1Model = self.bbWeldstiff3_l1.create_model()
+        self.bbWeldstiff3_l2Model = self.bbWeldstiff3_l2.create_model()
         #
-        # self.bbWeldstiff4_u1Model = self.bbWeldstiff4_u1.create_model()
-        # self.bbWeldstiff4_u2Model = self.bbWeldstiff4_u2.create_model()
-        # self.bbWeldstiff4_l1Model = self.bbWeldstiff4_l1.create_model()
-        # self.bbWeldstiff4_l2Model = self.bbWeldstiff4_l2.create_model()
+        self.bbWeldstiff4_u1Model = self.bbWeldstiff4_u1.create_model()
+        self.bbWeldstiff4_u2Model = self.bbWeldstiff4_u2.create_model()
+        self.bbWeldstiff4_l1Model = self.bbWeldstiff4_l1.create_model()
+        self.bbWeldstiff4_l2Model = self.bbWeldstiff4_l2.create_model()
         #
 
 
@@ -1509,21 +1512,21 @@ class CADGroove(object):
         """
 
         if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
-            # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
-            #         self.beam_stiffener_3Model]
-            connector_plate = [self.plateLModel, self.plateRModel]
+            connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
+                    self.beam_stiffener_3Model]
+            # connector_plate = [self.plateLModel, self.plateRModel]
 
         elif self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
-            # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
-            #         self.beam_stiffener_2Model, self.beam_stiffener_3Model,
-            #         self.beam_stiffener_4Model]
-            connector_plate = [self.plateLModel, self.plateRModel]
+            connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
+                    self.beam_stiffener_2Model, self.beam_stiffener_3Model,
+                    self.beam_stiffener_4Model]
+            # connector_plate = [self.plateLModel, self.plateRModel]
 
         elif self.module.endplate_type == 'Flushed - Reversible Moment':
-            # connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model,
-            #         self.beam_stiffener_F3Model,
-            #         self.beam_stiffener_F4Model]
-            connector_plate = [self.plateLModel, self.plateRModel]
+            connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model,
+                    self.beam_stiffener_F3Model,
+                    self.beam_stiffener_F4Model]
+            # connector_plate = [self.plateLModel, self.plateRModel]
 
         plates = connector_plate[0]
         for comp in connector_plate[1:]:
@@ -1538,27 +1541,46 @@ class CADGroove(object):
         """
 
         if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
-            # welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
-            #         self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-            #         self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
-            #         self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model,
-            #         self.bbWeldStiffHR_1Model,
-            #         self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
-            #         self.bbWeldStiffLR_3Model]
+            welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
+                    self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
+                    self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model,
+                    self.bbWeldStiffHR_1Model,
+                    self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
+                    self.bbWeldStiffLR_3Model]
 
-            welded_sec = [self.bbWeldFlang_R1Model,
-                          self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-                          self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
+            # welded_sec = [self.bbWeldFlang_R1Model,
+            #               self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+            #               self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
         elif self.module.endplate_type == 'Extended Both Ways - Reversible Moment':
-            welded_sec = [ self.bbWeldFlang_R1Model,
-                    self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
+            welded_sec = [self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model,
+                          self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+                          self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
+                          self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model,
+                          self.bbWeldStiffHL_2Model, self.bbWeldStiffLL_2Model,
+                          self.bbWeldStiffHL_4Model, self.bbWeldStiffLL_4Model, self.bbWeldStiffHR_1Model,
+                          self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
+                          self.bbWeldStiffLR_3Model, self.bbWeldStiffHR_2Model, self.bbWeldStiffLR_2Model,
+                          self.bbWeldStiffHR_4Model, self.bbWeldStiffLR_4Model]
+            # welded_sec = [ self.bbWeldFlang_R1Model,
+            #         self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+            #         self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
         elif self.module.endplate_type == 'Flushed - Reversible Moment':
             welded_sec = [self.bbWeldFlang_R1Model,
-                    self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
-                    self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
+                          self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+                          self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
+                          self.bbWeldstiff1_u1Model, self.bbWeldstiff1_u2Model, self.bbWeldstiff1_l1Model,
+                          self.bbWeldstiff1_l2Model, self.bbWeldstiff2_u1Model,
+                          self.bbWeldstiff2_u2Model, self.bbWeldstiff2_l1Model, self.bbWeldstiff2_l2Model,
+                          self.bbWeldstiff3_u1Model, self.bbWeldstiff3_u2Model,
+                          self.bbWeldstiff3_l1Model, self.bbWeldstiff3_l2Model, self.bbWeldstiff4_u1Model,
+                          self.bbWeldstiff4_u2Model, self.bbWeldstiff4_l1Model,
+                          self.bbWeldstiff4_l2Model]
+            # welded_sec = [self.bbWeldFlang_R1Model,
+            #         self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+            #         self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model]
 
         welds = welded_sec[0]
         for comp in welded_sec[1:]:

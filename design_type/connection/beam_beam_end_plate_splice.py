@@ -1032,20 +1032,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                     print("PITCH MAX {}".format(self.pitch_distance_max))
 
                                     # step 2: checking space availability to accommodate extra rows based on maximum pitch criteria
-                                    if self.endplate_type == VALUES_ENDPLATE_TYPE[0] or VALUES_ENDPLATE_TYPE[2]:  # flushed or both way
-
-                                        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:
-                                            self.space_available_web = self.call_helper.lever_arm[-2] - self.call_helper.lever_arm[-1]
-
-                                        else:
-                                            if (self.bolt_row / 2) <= 3:
-                                                rows_inside_D = self.bolt_row - 2  # one row each outside top and bottom flange
-                                            else:
-                                                rows_inside_D = self.bolt_row - 4  # two rows each outside top and bottom flange
-
-                                            self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
-                                                                       ((rows_inside_D - 2) * self.pitch_distance_provided)
-                                    else:  # one way connection
+                                    if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one-way
                                         if self.bolt_row <= 4:
                                             rows_inside_D = self.bolt_row - 1
                                         else:
@@ -1053,6 +1040,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                                         self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
                                                                    ((rows_inside_D - 2) * self.pitch_distance_provided)
+                                    else:  # flushed or both way
+                                        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # flushed
+                                            self.space_available_web = self.call_helper.lever_arm[-2] - self.call_helper.lever_arm[-1]
+                                        else:  # both-way extended
+                                            if (self.bolt_row / 2) <= 3:
+                                                rows_inside_D = self.bolt_row - 2  # one row each outside top and bottom flange
+                                            else:
+                                                rows_inside_D = self.bolt_row - 4  # two rows each outside top and bottom flange
+
+                                            self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
+                                                                       ((rows_inside_D - 2) * self.pitch_distance_provided)
 
                                     print("SPACE AVAILABLE IS {}".format(self.space_available_web))
 
@@ -1116,7 +1114,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                 # self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)#added for 3D
 
                                 self.bolt_row = self.call_helper.bolt_row
-                                self.bolt_numbers = self.bolt_column * self.bolt_row
+                                self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)
                                 # self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)#added for 3D
 
                                 # End Plate
@@ -1232,13 +1230,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.tension_capacity_critical_bolt = self.call_helper.bolt_tension_capacity
         self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
 
-        # number of bolts
-        self.bolt_row = self.call_helper.bolt_row
-        self.bolt_numbers = self.bolt_column * self.bolt_row
-
         # End Plate
         self.ep_moment_capacity = round(self.call_helper.mp_plate * 1e-6, 2)
-        # print(self.plate_thickness_req,'plate_thickness_req')
+
         if self.endplate_type == 'Flushed - Reversible Moment':
             self.ep_height_provided = self.beam_D + 25
 
@@ -1254,6 +1248,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
             else:  # 2 rows outside tension and compression flange which is maximum allowable
                 self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (
                         2 * self.pitch_distance_provided)
+
+        # number of bolts
+        self.bolt_row += self.bolt_row_web
+        self.bolt_numbers = self.bolt_column * self.bolt_row
 
     def design_stiffener(self):
         """ design stiffener for the connection """

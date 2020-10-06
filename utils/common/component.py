@@ -245,7 +245,7 @@ class Bolt:
 
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy, n=1):
         self.single_conn_plates_t_fu_fy = []
-        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
+        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n, conn_plates_t_fu_fy[0][1], conn_plates_t_fu_fy[0][2]]))
         self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])
         self.connecting_plates_tk = [i[0] for i in self.single_conn_plates_t_fu_fy]
 

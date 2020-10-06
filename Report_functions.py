@@ -529,9 +529,9 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
     else:
         multiple = str(multiple)
         shear_yield_eqn.append(
-            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
-    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\'))
-    shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl. 10.4.3]\end{aligned}'))
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'} \\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r' \\'))
+    shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl. 10.4.3] \end{aligned}'))
     return shear_yield_eqn
 
 
@@ -703,7 +703,9 @@ def cl_10_2_3_1_max_spacing(t, parameter=None):  # TODO:write condition for pitc
     else:
         max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
 
-    max_pitch_eqn.append(NoEscape(r'&=\min(32\times' + t + r',~ 300 ~mm)\\&=' + max_pitch + r'\\'))
+    max_pitch_eqn.append(NoEscape(r'&=\min(32\times' + t + r',~ 300 ~mm) \\'))
+    max_pitch_eqn.append(NoEscape(r'&=\min(' + str(max_pitch_1) + r',~ 300 ~mm) \\'))
+    max_pitch_eqn.append(NoEscape(r'&=' + max_pitch + r' \\ \\'))
 
     max_pitch_eqn.append(NoEscape(r'Where,~t &= min(' + t1 + ',' + t2 + r')\\'))
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
@@ -914,8 +916,8 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
         else:  # 'edge_dist'
             max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max} &= 12~ t~ \varepsilon ;~\varepsilon = \sqrt{\frac{250}{f_y}}\\'))
         # max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}} = ' + max_edge_dist + r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}} = ' + max_edge_dist + r'\\'))
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)=' + max_edge_dist + r' \\ \\'))
         else:  # 'edge_dist'
@@ -1321,7 +1323,8 @@ def cl_10_4_3_HSFG_bolt_capacity(mu_f, n_e, K_h, fub, Anb, gamma_mf, capacity):
     HSFG_bolt_capacity_eqn = Math(inline=True)
     HSFG_bolt_capacity_eqn.append(NoEscape(r'\begin{aligned}V_{dsf} & = \frac{\mu_f~ n_e~  K_h~ F_o}{\gamma_{mf}}\\'))
     HSFG_bolt_capacity_eqn.append(NoEscape(r' Where&, F_o = 0.7f_{ub} A_{nb}\\'))
-    HSFG_bolt_capacity_eqn.append(NoEscape(r'V_{dsf} & = \frac{' + mu_f + r'\times' + n_e + r'\times' + K_h + r'\times 0.7 \times' + fub + r'\times' + Anb + r'}{' + gamma_mf + r'}\\'))
+    HSFG_bolt_capacity_eqn.append(NoEscape(r'V_{dsf} & = \frac{' + mu_f + r'\times' + n_e + r'\times' + K_h + r'\times 0.7 \times' + fub + r'\times'
+                                           + Anb + r'}{' + gamma_mf + r' \times 10^{3}}\\'))
     HSFG_bolt_capacity_eqn.append(NoEscape(r'& =' + capacity + r'\\'))
     HSFG_bolt_capacity_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.4.3]\end{aligned}'))
 
@@ -2377,7 +2380,6 @@ def prov_shear_load(shear_input, min_sc, app_shear_load, shear_capacity_1):
 
 
     """
-
     min_sc = str(min_sc)
     shear_input = str(shear_input)
     app_shear_load = str(app_shear_load)
@@ -2385,12 +2387,50 @@ def prov_shear_load(shear_input, min_sc, app_shear_load, shear_capacity_1):
     app_shear_load_eqn = Math(inline=True)
     app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vc_{min} &=  min(0.15 \times V_{dy}, 40.0)\\'))
     app_shear_load_eqn.append(NoEscape(r'& =  min(0.15 \times' + shear_capacity_1 + r', 40.0)\\'))
-    app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\'))
-    app_shear_load_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~10.7]\\'))
+    app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\ \\'))
+
     app_shear_load_eqn.append(NoEscape(r' Vu~~ &= max(V,Vc_{min})\\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
-    app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\end{aligned}'))
-    # app_shear_load_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~8.4]&\end{aligned}'))
+    app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\\ \\'))
+
+    app_shear_load_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~10.7] \end{aligned}'))
+
+    return app_shear_load_eqn
+
+
+def prov_shear_force(shear_input, min_sc, app_shear_load, shear_capacity_1):
+    """
+    Calculate maximum shear force
+    Args:
+
+        shear_input factored input shear force
+        min_sc:Minimum shear force
+        app_shear_load:Maximum of factored input shear force and minimum shear force
+    Returns:
+        maximum shear force
+    Note:
+              Reference:
+              IS 800:2007,  cl 10.7
+
+
+    """
+    min_sc_1 = str(round(0.15 * shear_capacity_1, 2))
+    min_sc = str(min_sc)
+    shear_input = str(shear_input)
+    app_shear_load = str(app_shear_load)
+    shear_capacity_1 = str(shear_capacity_1)
+
+    app_shear_load_eqn = Math(inline=True)
+    app_shear_load_eqn.append(NoEscape(r'\begin{aligned} V_{min} &=  min(0.15 \times V_{dy}, 40.0) \\'))
+    app_shear_load_eqn.append(NoEscape(r'& =  min(0.15 \times' + shear_capacity_1 + r',~ 40.0) \\'))
+    app_shear_load_eqn.append(NoEscape(r'& =  min(' + min_sc_1 + r',~ 40.0) \\'))
+    app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r' \\ \\'))
+
+    app_shear_load_eqn.append(NoEscape(r' V_{u} &= max(V,~V_{min}) \\'))
+    app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',~' + min_sc + r') \\'))
+    app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r' \\ \\'))
+
+    app_shear_load_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~10.7] \end{aligned}'))
 
     return app_shear_load_eqn
 
@@ -2426,14 +2466,16 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, typ
     moment_input = str(moment_input)
     app_moment_load = str(app_moment_load)
     moment_capacity = str(moment_capacity)
+
     app_moment_load_eqn = Math(inline=True)
     if type == 'EndPlateType':
-        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
-        app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r'\\'))
-        app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r'\\'))
-        app_moment_load_eqn.append(NoEscape(r'Mu &= max(M,Mc_{min} )\\'))
-        app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r')\\'))
-        app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\\'))
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
+        app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r' \\'))
+        app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r' \\ \\'))
+
+        app_moment_load_eqn.append(NoEscape(r'Mu &= max(M,~M_{min}) \\'))
+        app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r') \\'))
+        app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
 
     else:
@@ -5963,7 +6005,6 @@ def high_shear_provided(shear_on_stiffener):
     return shear_provided
 
 
-##  #todo:New Function Required for Beam-Beam endplate connection
 def bolt_shear_demand(V, n_bolts, V_sb, type = None):
 
     """
@@ -5982,7 +6023,7 @@ def bolt_shear_demand(V, n_bolts, V_sb, type = None):
     type = str(type)
     bolt_shear_demand = Math(inline=True)
     if type == 'Bearing Bolt':
-        bolt_shear_demand.append(NoEscape(r'\begin{aligned} V_{sb} &= \frac{V}{\ n} \\'))
+        bolt_shear_demand.append(NoEscape(r'\begin{aligned} V_{sb} &= \frac{V_{u}}{\ n} \\'))
     else:
         bolt_shear_demand.append(NoEscape(r'\begin{aligned} V_{sf} &= \frac{V}{\ n} \\'))
     bolt_shear_demand.append(NoEscape(r'&=\frac{' + V + '}{' + n_bolts + r'} \\'))

@@ -1113,8 +1113,8 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
         bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r'\\ \\'))
 
 
-    else:
-        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
+    # else:
+    #     bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
 
     bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4] \end{aligned}'))
 
@@ -6215,3 +6215,28 @@ def weld_size_ep_web_prov(weld_size_web1,weld_size_web,min_size):
     weld_size_ep_web_prov_eqn.append(NoEscape(r'&= max('+weld_size_web1+','+min_size+r')\\'))
     weld_size_ep_web_prov_eqn.append(NoEscape(r'&= ' + weld_size_web + r'\end{aligned}'))
     return weld_size_ep_web_prov_eqn
+
+def local_web_yielding(f_wc,k,t_fb,gamma_mo,column_tf , column_r1,column_fy,column_tw,P_bf):
+    f_wc = str(f_wc)
+    k = str(k)
+    t_fb = str(t_fb)
+    gamma_mo = str(gamma_mo)
+    column_tf = str(column_tf)
+    column_r1 = str(column_r1)
+    column_fy = str(column_fy)
+    column_tw = str(column_tw)
+    P_bf = str(P_bf)
+
+    local_web_yielding_eqn = Math(inline=True)
+    local_web_yielding_eqn.append(NoEscape(r'\begin{aligned} P_{bf} &= \frac{f_{wc}(5k +t_{fb})}{\gamma_mo}\\'))
+
+    local_web_yielding_eqn.append(NoEscape(r'k &= ('+column_tf+' +' +column_r1+r')\\'))
+    local_web_yielding_eqn.append(NoEscape(r'k &= (' + k+ r')\\'))
+
+    local_web_yielding_eqn.append(NoEscape(r' f_{wc} &= fy_c * t_c \\'))
+    local_web_yielding_eqn.append(NoEscape(r' &= ('+column_fy +'*' +column_tw+r') \\'))
+    local_web_yielding_eqn.append(NoEscape(r' &= (' + f_wc+ r') \\'))
+
+    local_web_yielding_eqn.append(NoEscape(r' P_{bf}&= \frac{'+f_wc+'(5'+k+' +'+t_fb+')}{'+gamma_mo+r'}\\'))
+    local_web_yielding_eqn.append(NoEscape(r' &= (' + P_bf+ r'\end{aligned}'))
+    return local_web_yielding_eqn

@@ -1716,6 +1716,11 @@ KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.Thickness'
 KEY_OUT_STIFFENER_THICKNESS_CHS = 'Stiffener.Thickness'
 KEY_OUT_DISP_STIFFENER_THICKNESS = 'Thickness (mm)'
 
+KEY_OUT_DISP_LOCAL_WEB_YIELDING='Local Web Yielding'
+KEY_OUT_DISP_COMP_BUCKLING_WEB='Compression Buckling of Web'
+KEY_OUT_DISP_WEB_CRIPPLING=' Web Crippling'
+KEY_OUT_DISP_COMP_STRENGTH='Compression Strength'
+
 KEY_OUT_WELD_DETAILS = 'Weld.Details'
 DISP_TITLE_WELD = 'Weld'
 DISP_TITLE_WELD_FLANGE = 'Weld at Flange'

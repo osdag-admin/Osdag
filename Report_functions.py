@@ -1113,8 +1113,8 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
         bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r'\\ \\'))
 
 
-    else:
-        bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
+    # else:
+    #     bolt_bearing_eqn.append(NoEscape(r'&=' + str(bolt_bearing_capacity) + r' \\ \\'))
 
     bolt_bearing_eqn.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.3.4] \end{aligned}'))
 

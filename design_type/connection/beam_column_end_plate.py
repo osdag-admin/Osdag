@@ -62,6 +62,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.bolt_diameter_provided = 0
         self.bolt_grade = []
         self.bolt_grade_provided = 0.0
+        self.bolt_hole_diameter = 0.0
         self.bolt_type = ""
         self.plate_thickness = []
 
@@ -433,7 +434,7 @@ class BeamColumnEndPlate(MomentConnection):
         t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, 0 if flag else '', True)
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate_thickness if flag else '', True)
         out_list.append(t19)
 
         t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.ep_height_provided if flag else '', True)
@@ -1007,21 +1008,25 @@ class BeamColumnEndPlate(MomentConnection):
         # set plate thickness list [minimum to maximum]
         # Note: minimum plate thk is at-least equal to the thk of thicker connecting element (flange thk or web thk)
         self.plate_thickness = []
-        for i in self.plate.thickness:
-            if self.connectivity is VALUES_CONN_1[1]:  # 'Column flange-Beam web'
 
-                if i > max(self.beam_tf, self.beam_tw, self.column_tf):
-                    self.plate_thickness.append(i)
+        for i in self.plate.thickness:
+            if self.connectivity == VALUES_CONN_1[0]:  # 'Column flange-Beam web'
+
+                if i < max(self.beam_tf, self.beam_tw, self.column_tf):
                     logger.warning("[End Plate] The end plate of {} mm is thinner than the thickest of the elements being connected".format(i))
-                    logger.info("Selecting a plate of higher thickness which is at least {} mm thick".format(max(self.beam_tf, self.beam_tw,
-                                                                                                                 self.column_tf)))
+                    logger.info("Selecting a plate of higher thickness which is at least {} mm thick".format(round(max(self.beam_tf, self.beam_tw,
+                                                                                                                 self.column_tf)), 2))
+                else:
+                    self.plate_thickness.append(i)
 
             else:  # 'Column web-Beam web'
-                if i > max(self.beam_tf, self.beam_tw, self.column_tw):
+                if i < max(self.beam_tf, self.beam_tw, self.column_tw):
                     self.plate_thickness.append(i)
                     logger.warning("[End Plate] The end plate of {} mm is thinner than the thickest of the elements being connected".format(i))
-                    logger.info("Selecting a plate of higher thickness which is at least {} mm thick".format(max(self.beam_tf, self.beam_tw,
-                                                                                                                 self.column_tw)))
+                    logger.info("Selecting a plate of higher thickness which is at least {} mm thick".format(round(max(self.beam_tf, self.beam_tw,
+                                                                                                                 self.column_tw)), 2))
+                else:
+                    self.plate_thickness.append(i)
 
         self.plate_thickness = self.plate_thickness  # final list of plate thicknesses considered for simulation
 
@@ -1084,6 +1089,7 @@ class BeamColumnEndPlate(MomentConnection):
                         test_list = j  # choose a tuple from the list of bolt dia and grade - (dia, grade)
                         self.bolt_diameter_provided = test_list[0]  # select trial diameter
                         self.bolt_grade_provided = test_list[1]  # select trial grade
+                        self.bolt_hole_diameter = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_provided, self.bolt.bolt_hole_type)
 
                         # assign bolt mechanical properties
                         bolt_fu_fy = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided, self.bolt_diameter_provided)
@@ -1248,20 +1254,7 @@ class BeamColumnEndPlate(MomentConnection):
                                     print("PITCH MAX {}".format(self.pitch_distance_max))
 
                                     # step 2: checking space availability to accommodate extra rows based on maximum pitch criteria
-                                    if self.endplate_type == VALUES_ENDPLATE_TYPE[0] or VALUES_ENDPLATE_TYPE[2]:  # flushed or both way
-
-                                        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:
-                                            self.space_available_web = self.call_helper.lever_arm[-2] - self.call_helper.lever_arm[-1]
-
-                                        else:
-                                            if (self.bolt_row / 2) <= 3:
-                                                rows_inside_D = self.bolt_row - 2  # one row each outside top and bottom flange
-                                            else:
-                                                rows_inside_D = self.bolt_row - 4  # two rows each outside top and bottom flange
-
-                                            self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
-                                                                       ((rows_inside_D - 2) * self.pitch_distance_provided)
-                                    else:  # one way connection
+                                    if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one-way
                                         if self.bolt_row <= 4:
                                             rows_inside_D = self.bolt_row - 1
                                         else:
@@ -1269,6 +1262,17 @@ class BeamColumnEndPlate(MomentConnection):
 
                                         self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
                                                                    ((rows_inside_D - 2) * self.pitch_distance_provided)
+                                    else:  # flushed or both way
+                                        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # flushed
+                                            self.space_available_web = self.call_helper.lever_arm[-2] - self.call_helper.lever_arm[-1]
+                                        else:  # both-way extended
+                                            if (self.bolt_row / 2) <= 3:
+                                                rows_inside_D = self.bolt_row - 2  # one row each outside top and bottom flange
+                                            else:
+                                                rows_inside_D = self.bolt_row - 4  # two rows each outside top and bottom flange
+
+                                            self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
+                                                                       ((rows_inside_D - 2) * self.pitch_distance_provided)
 
                                     print("SPACE AVAILABLE IS {}".format(self.space_available_web))
 
@@ -1332,7 +1336,7 @@ class BeamColumnEndPlate(MomentConnection):
                                 # self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)#added for 3D
 
                                 self.bolt_row = self.call_helper.bolt_row
-                                self.bolt_numbers = self.bolt_column * self.bolt_row
+                                self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)
                                 # self.bolt_numbers = self.bolt_column * (self.bolt_row + self.bolt_row_web)#added for 3D
 
                                 # End Plate
@@ -1448,10 +1452,6 @@ class BeamColumnEndPlate(MomentConnection):
         self.tension_capacity_critical_bolt = self.call_helper.bolt_tension_capacity
         self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
 
-        # number of bolts
-        self.bolt_row = self.call_helper.bolt_row
-        self.bolt_numbers = self.bolt_column * self.bolt_row
-
         # End Plate
         self.ep_moment_capacity = round(self.call_helper.mp_plate * 1e-6, 2)
 
@@ -1470,6 +1470,10 @@ class BeamColumnEndPlate(MomentConnection):
             else:  # 2 rows outside tension and compression flange which is maximum allowable
                 self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (
                         2 * self.pitch_distance_provided)
+
+        # number of bolts
+        self.bolt_row += self.bolt_row_web
+        self.bolt_numbers = self.bolt_column * self.bolt_row
 
     def design_continuity_plate(self):
         """ design the continuity plate for the column flange - beam web connection """
@@ -1739,11 +1743,11 @@ class BeamColumnEndPlate(MomentConnection):
 
         # end of the design simulation
         if self.design_status:
-            logger.info(": =========================Design Status===========================")
+            logger.info(": =====================Design Status=======================")
             logger.info(": Overall beam to beam end plate splice connection design is SAFE")
-            logger.info(": =========================End Of design===========================")
+            logger.info(": =====================End Of design=======================")
         else:
-            logger.info(": =========================Design Status===========================")
+            logger.info(": =====================Design Status=======================")
             logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
             logger.info(": =========================End Of design===========================")
 
@@ -2171,3 +2175,4 @@ class BeamColumnEndPlate(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3d_image)
+

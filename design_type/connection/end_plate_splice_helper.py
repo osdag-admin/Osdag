@@ -618,8 +618,7 @@ class EndPlateSpliceHelper(object):
 
         # adding the lists of bolt row and tension
         print("ROWS BEFORE ADDING {}".format(self.bolt_row))
-        self.bolt_row += self.bolt_row_web
-        print("ROWS AFTER ADDING {}".format(self.bolt_row))
+        print("ROWS AFTER ADDING {}".format(self.bolt_row + self.bolt_row_web))
         print("ROWS AT WEB {}".format(self.bolt_row_web))
 
         # Check 4: Total tension
@@ -680,7 +679,7 @@ class EndPlateSpliceHelper(object):
             self.bolt_tension_design_status = True
 
         # Check 9: combined shear + tension check of bolts
-        self.bolt_numbers_provided = self.bolt_column * self.bolt_row
+        self.bolt_numbers_provided = self.bolt_column * (self.bolt_row + self.bolt_row_web)
 
         # Check 9.1: shear demand
         self.bolt_shear_demand = round((self.load.shear_force * 1e-3) / self.bolt_numbers_provided, 2)  # kN, shear on each bolt

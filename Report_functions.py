@@ -4997,7 +4997,7 @@ def k1(ecc_zz, bp_length, k1_value):
     k1 = Math(inline=True)
     k1.append(NoEscape(r'\begin{aligned} k_{1} &= 3~\Big(e_{zz} ~-~\frac{L}{2}\Big) \\'))
     k1.append(NoEscape(r'       &= 3~\Big(' + ecc_zz + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
-    k1.append(NoEscape(r'       &= ' + k1_value + r' \\'))
+    k1.append(NoEscape(r'       &= ' + k1_value + r' \\ \\'))
     k1.append(NoEscape(r'& [Ref.~Design~of~Welded~Structures \\ '))
     k1.append(NoEscape(r'& -~Omer~W~Blodgett~,section~3.3] \end{aligned}'))
 
@@ -5052,7 +5052,7 @@ def total_anchor_area_tension(anchor_dia, anchor_nos_tension, anchor_area_tensio
 
     total_anchor_area = Math(inline=True)
     total_anchor_area.append(NoEscape(r'\begin{aligned} A_{s} &= n \times~\Big(\frac{\pi}{4}\Big)~d^{2} \\'))
-    total_anchor_area.append(NoEscape(r'&       = ' + anchor_nos_tension + r' \times~\Big(\frac{\pi}{4}\Big)~ '
+    total_anchor_area.append(NoEscape(r'&       = ' + anchor_nos_tension + r' \times~\Big(\frac{\pi}{4}\Big)~ \times'
                                       + anchor_dia + r'^{2} \\'))
     total_anchor_area.append(NoEscape(r'& = ' + anchor_area_tension + r'\end{aligned}'))
 
@@ -5070,7 +5070,7 @@ def calc_f(end_distance, bp_length, f):
     dist_f = Math(inline=True)
     dist_f.append(NoEscape(r'\begin{aligned} f &= \Big(\frac{L}{2} - e\Big) \\'))
     dist_f.append(NoEscape(r'&   = \Big(\frac{' + bp_length + r'}{2} - ' + end_distance + r'\Big) \\'))
-    dist_f.append(NoEscape(r'&   = ' + f + r' \\'))
+    dist_f.append(NoEscape(r'&   = ' + f + r' \\ \\'))
     dist_f.append(NoEscape(r'& [Ref.~Design~of~Welded~Structures \\ '))
     dist_f.append(NoEscape(r'& -~Omer~W~Blodgett~,section~3.3] \end{aligned}'))
 
@@ -5101,8 +5101,10 @@ def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
     k2 = Math(inline=True)
     k2.append(NoEscape(r'\begin{aligned} k_2 &= \frac{6~n~A_s}{W}~\Big(f~+~e_{zz}\Big) \\'))
     k2.append(
-        NoEscape(r'&     = \frac{6~ \times' + n + r'~\times' + anchor_area_tension + r'}{' + bp_width + r'}~\Big(' + f + r'~+~' + e + r'\Big) \\'))
-    k2.append(NoEscape(r'&     = ' + k2_value + r' \\'))
+        NoEscape(r'&     = \frac{6~ \times' + n + r'~\times' + anchor_area_tension + r'}{' + bp_width + r'}~\times \Big(' + f + r'~+~' + e + r'\Big) \\'))
+    k2.append(NoEscape(r'&     = ' + k2_value + r' \\ \\'))
+
+    k2.append(NoEscape(r'& Note:~n ~is~ the~ modular~ ratio \\ \\ '))
     k2.append(NoEscape(r'& [Ref.~Design~of~Welded~Structures \\ '))
     k2.append(NoEscape(r'& -~Omer~W~Blodgett~,section~3.3] \end{aligned}'))
 
@@ -5119,7 +5121,7 @@ def k3(k2_value, bp_length, f, k3_value):
     k3 = Math(inline=True)
     k3.append(NoEscape(r'\begin{aligned} k_3 &= - ~k_2~\Big(\frac{L}{2}~+~f\Big) \\'))
     k3.append(NoEscape(r'&     = - ~' + k2_value + r'~\Big(\frac{' + bp_length + r'}{2}~+~' + f + r'\Big) \\'))
-    k3.append(NoEscape(r'&     = ' + k3_value + r' \\'))
+    k3.append(NoEscape(r'&     = ' + k3_value + r' \\ \\'))
     k3.append(NoEscape(r'& [Ref.~Design~of~Welded~Structures \\ '))
     k3.append(NoEscape(r'& -~Omer~W~Blodgett~,section~3.3] \end{aligned}'))
 
@@ -5151,7 +5153,7 @@ def y(k1_value, k2_value, k3_value, y_value):
     y = Math(inline=True)
     y.append(NoEscape(r'\begin{aligned} & y^{3}~+~k_{1}~y^{2}~+~k_{2}~y~+~k_{3} = 0 \\'))
     y.append(NoEscape(r' & y^{3}~' + k1_value + r'\times y^{2}~' + k2_value + r'\times y~' + k3_value + r' = 0 \\'))
-    y.append(NoEscape(r'& y = ' + y_value + r' \\'))
+    y.append(NoEscape(r'& y = ' + y_value + r' \\ \\'))
     y.append(NoEscape(r'& [Ref.~Design~of~Welded~Structures \\ '))
     y.append(NoEscape(r'& -~Omer~W~Blodgett~,section~3.3] \end{aligned}'))
 
@@ -5172,7 +5174,7 @@ def tension_demand_anchor(axial_load, bp_length, dist_y, ecc_zz, f, anchor_tensi
     tension_total.append(
         NoEscape(r'&     = -~' + axial_load + r'\times ~\Bigg[\frac{\frac{' + bp_length + r'}{2}-\frac{' + dist_y + r'}{3}-' + ecc_zz + r'}'
                                                                                                                                         r'{\frac{' + bp_length + r'}{2}-\frac{' + dist_y + r'}{3}+' + f + r'}\Bigg] \\'))
-    tension_total.append(NoEscape(r'&     = ' + anchor_tension + r' \\'))
+    tension_total.append(NoEscape(r'&     = ' + anchor_tension + r' \\ \\'))
     tension_total.append(NoEscape(r'& [Ref.~Design~of~Welded~Structures \\ '))
     tension_total.append(NoEscape(r'& -~Omer~W~Blodgett~,section~3.3] \end{aligned}'))
 
@@ -5387,19 +5389,23 @@ def critical_section(bp_length, col_depth, critical_len):
     return length
 
 
-def critical_section_case_2_3(critical_xx, y):
+def critical_section_case_2_3(critical_xx, y, bp_length, column_D):
     """ """
     critical_len = Math(inline=True)
+
+    critical_len.append(NoEscape(r'\begin{aligned} y_{critical} &= \frac{L - 0.95D}{2} \\'))
+    critical_len.append(NoEscape(r'                             &= \frac{' + str(bp_length) + r' - (0.95 \times ' + str(column_D) + r')}{2} \\'))
+    critical_len.append(NoEscape(r'                             &= ' + str(critical_xx) + r' \\ \\'))
 
     if y > critical_xx:
         critical_xx = str(critical_xx)
         y = str(y)
-        critical_len.append(NoEscape(r'\begin{aligned} &y~ > ~y_{critical}~~~ (' + y + r'~ > ~' + critical_xx + r') \\'))
+        critical_len.append(NoEscape(r' y~ &> ~y_{critical}~~~ (' + y + r'~ > ~' + critical_xx + r') \\'))
         critical_len.append(NoEscape(r'& Therefore,~ y_{critical} = ' + critical_xx + r'\end{aligned}'))
     else:
         critical_xx = str(critical_xx)
         y = str(y)
-        critical_len.append(NoEscape(r'\begin{aligned} &y~ < ~y_{critical}~~~ (' + y + r'~ < ~' + critical_xx + r') \\'))
+        critical_len.append(NoEscape(r' y~ &< ~y_{critical}~~~ (' + y + r'~ < ~' + critical_xx + r') \\'))
         critical_len.append(NoEscape(r'& Therefore,~ y_{critical} = ' + y + r'\end{aligned}'))
 
     return critical_len
@@ -5444,7 +5450,7 @@ def moment_critical_section(sigma_x, sigma_max, critical_len, moment, concrete_b
         moment = str(round(moment * 10 ** -6, 2))
         critical_moment.append(
             NoEscape(r'\begin{aligned} {M_{critical}}_{1} &= 0.45f_{ck} W y_{critical}\times\bigg(\frac{y_{critical}}{2}\bigg) \\'))
-        critical_moment.append(NoEscape(r' {M_{critical}}_{1} &= 0.45 \times ' + concrete_bearing_stress + r'\times' + bp_width + r'\times'
+        critical_moment.append(NoEscape(r'  &= 0.45 \times ' + concrete_bearing_stress + r'\times' + bp_width + r'\times'
                                         + critical_len + r'\times\bigg(\frac{' + critical_len + r'}{2}\bigg) \\'))
         critical_moment.append(NoEscape(r'&                    = ' + moment + r'\times 10 ^ {6} \end{aligned}'))
 
@@ -5475,7 +5481,7 @@ def lever_arm_moment(tension_demand, lever_arm, moment):
     moment = str(round(moment * 10 ** -6, 2))
 
     moment_critical = Math(inline=True)
-    moment_critical.append(NoEscape(r'\begin{aligned} {M_{critical}}_{2} &= T_{d}~l \\'))
+    moment_critical.append(NoEscape(r'\begin{aligned} {M_{critical}}_{2} &= P_{t}~l \\'))
     moment_critical.append(NoEscape(r'&   = ' + tension_demand + r'\times 1000 \times ' + lever_arm + r' \\'))
     moment_critical.append(NoEscape(r'&  = ' + moment + r'\times 10 ^ {6} \end{aligned}'))
 
@@ -5501,10 +5507,11 @@ def max_moment(critical_mom_1, critical_mom_2):
 def md_plate():
     """ """
     moment_demand = Math(inline=True)
-    moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} &= \frac{b{t_{p}}^{2}}{6} ,~where~(b = 1) \\'))
-    moment_demand.append(NoEscape(r' {M_{d}}_{plate} &= \frac{1.5~{f_{y}}_{p}~{z_{e}}_{plate}}{\gamma_{m0}} \\'))
-    moment_demand.append(NoEscape(r'                 &= \frac{1.5~{f_{y}}_{p}~\bigg(\frac{b\times t_p^{2}}{6}\bigg)}{\gamma_{m0}} \\'))
-    moment_demand.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.8.2.1.2] \end{aligned}'))
+    moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} &= \frac{b {t_{p}}^{2}} {6} ,~where~(b = 1) \\ \\'))
+
+    moment_demand.append(NoEscape(r' {M_{d}}_{plate} &= 1.5 {z_{e}}_{plate} {f_{y}}_{p}~ / ~ \gamma_{m0} \\'))
+    moment_demand.append(NoEscape(r'                 &= \frac{ 1.5~ \bigg( \frac{b\times t_p^{2}} {6} \bigg) ~{f_{y}}_{p} } {\gamma_{m0}} \\ \\'))
+    moment_demand.append(NoEscape(r' [Ref.&~IS~800:2007,~Cl.8.2.1.2] \end{aligned}'))
 
     return moment_demand
 
@@ -5557,26 +5564,28 @@ def plate_thk_required(flange_thk, web_thk, key1, key1_thk, key2, key2_thk, maxi
     return thk_required
 
 
-def plate_thk1(critical_mom, plate_thk, gamma_m0, f_y_plate, bp_width, case='Case1'):
+def plate_thk1(critical_mom, plate_thk, plate_thk_provided, gamma_m0, f_y_plate, bp_width, case='Case1'):
     """ """
     plate_thk = str(plate_thk)
+    plate_thk_provided = str(plate_thk_provided)
     gamma_m0 = str(gamma_m0)
     f_y_plate = str(f_y_plate)
     bp_width = str(bp_width)
 
     thk = Math(inline=True)
     thk.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} &= M_{critical} \\'))
-    thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4~M_{critical}~ \gamma_{m0}} { {f_{y}}_{p}~W }\bigg]^{0.5}  \\'))
+    thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4~M_{critical}} { W~ ({f_{y}}_{p} / \gamma_{m0}) }\bigg]^{0.5}  \\'))
     if case == 'Case1':
         critical_mom = str(round(critical_mom * 10 ** -3, 2))
-        thk.append(NoEscape(r'       &= \bigg[\frac{4 \times' + critical_mom + r'\times 10 ^{3} \times' + gamma_m0 + r'}{' + f_y_plate + r'\times'
-                            + bp_width + r'}\bigg]^{0.5}  \\'))
+        thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4 \times~' + critical_mom + r'\times 10 ^{3}} { ' + bp_width + r' \times~ ('
+                            + f_y_plate + r' / ' + gamma_m0 + r') }\bigg]^{0.5}  \\'))
     else:  # 'Case2&3'
         critical_mom = str(round(critical_mom * 10 ** -6, 2))
-        thk.append(NoEscape(r'       &= \bigg[\frac{4 \times' + critical_mom + r'\times 10 ^{6} \times' + gamma_m0 + r'}{' + f_y_plate + r'\times'
-                            + bp_width + r'}\bigg]^{0.5}  \\'))
+        thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4~ \times' + critical_mom + r'\times 10 ^{6}} { ' + bp_width + r' \times ~ ('
+                            + f_y_plate + r' / ' + gamma_m0 + r') }\bigg]^{0.5}  \\'))
 
-    thk.append(NoEscape(r'&       = ' + plate_thk + r'\end{aligned}'))
+    thk.append(NoEscape(r'&       = ' + plate_thk + r' \\'))
+    thk.append(NoEscape(r'&       = ' + plate_thk_provided + r'\end{aligned}'))
 
     return thk
 

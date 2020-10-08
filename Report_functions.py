@@ -1564,17 +1564,19 @@ def cl_10_5_2_3_table_21_min_fillet_weld_size_required(conn_plates_thk, min_weld
     thinner_plate = min(conn_plates_thk)
 
     min_weld_size_eqn = Math(inline=True)
-    min_weld_size_eqn.append(NoEscape(r'\begin{aligned}  {t_{w}}_{min} & ~based~on~thickness~of~the~thicker~part \\'))
+    min_weld_size_eqn.append(NoEscape(r'\begin{aligned}  {t_{w}}_{min} - & ~based~on~thickness~of~the \\'))
+    min_weld_size_eqn.append(NoEscape(r' & thicker~part \\ \\'))
     min_weld_size_eqn.append(NoEscape(r' t_{thicker} & =~ max(' + str(conn_plates_thk[0]) + r',~ ' + str(conn_plates_thk[1]) + r') \\'))
     min_weld_size_eqn.append(NoEscape(r'             & =' + str(thicker_plate) + r' \\'))
     min_weld_size_eqn.append(NoEscape(r' {t_{w}}_{min} & =' + str(min_weld_size) + r' \\ \\'))
 
-    min_weld_size_eqn.append(NoEscape(r'& {t_{w}}_{min} & ~based~on~thickness~of~the~thinner~part \\'))
+    min_weld_size_eqn.append(NoEscape(r' {t_{w}}_{min} - & ~based~on~thickness~of~the \\'))
+    min_weld_size_eqn.append(NoEscape(r' & thinner~part \\ \\'))
     min_weld_size_eqn.append(NoEscape(r' t_{thinner} & =~ min(' + str(conn_plates_thk[0]) + r',~ ' + str(conn_plates_thk[1]) + r') \\'))
     min_weld_size_eqn.append(NoEscape(r'             & =' + str(thinner_plate) + r' \\'))
-    min_weld_size_eqn.append(NoEscape(r' {t_{w}}_{min} & =~ min(' + str(min_weld_size) + r',~ ' + str(thinner_plate) + r') \\ \\'))
+    min_weld_size_eqn.append(NoEscape(r' {t_{w}}_{min} & \leq ~ min(' + str(min_weld_size) + r',~ ' + str(thinner_plate) + r') \\ \\'))
 
-    min_weld_size_eqn.append(NoEscape(r'& [Ref~IS~800:2007,Table ~21 ~(Cl 10.5.2.3)] \end{aligned}'))
+    min_weld_size_eqn.append(NoEscape(r' [Ref~IS~&800:2007,Table ~21 ~,~Cl 10.5.2.3] \end{aligned}'))
 
     return min_weld_size_eqn
 
@@ -1666,10 +1668,11 @@ def cl_10_5_3_1_max_weld_size_v2(conn_plates_thk, max_weld_size):
     thinner_plate = min(conn_plates_thk)
 
     max_weld_size_eqn = Math(inline=True)
-    max_weld_size_eqn.append(NoEscape(r'\begin{aligned}  {t_{w}}_{max} & ~based~on~thickness~of~the~thinner~part \\'))
+    max_weld_size_eqn.append(NoEscape(r'\begin{aligned}  {t_{w}}_{max} & ~based~on~thickness~of~the \\'))
+    max_weld_size_eqn.append(NoEscape(r' & thinner~part \\ \\'))
     max_weld_size_eqn.append(NoEscape(r' t_{thinner} & =~ min(' + str(conn_plates_thk[0]) + r',~ ' + str(conn_plates_thk[1]) + r') \\'))
     max_weld_size_eqn.append(NoEscape(r'             & =' + str(thinner_plate) + r' \\'))
-    max_weld_size_eqn.append(NoEscape(r' {t_{w}}_{max} & \leq ' + str(max_weld_size) + r' \\ \\'))
+    max_weld_size_eqn.append(NoEscape(r' {t_{w}}_{max} & = ' + str(max_weld_size) + r' \\ \\'))
     max_weld_size_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.5.3.1] \end{aligned}'))
 
     return max_weld_size_eqn
@@ -1717,7 +1720,7 @@ def cl_10_5_3_1_throat_thickness_weld(tw, f):
     return throat_eqn
 
 
-def cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu, gamma_mw, t_t, f_w,type=None):
+def cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu, gamma_mw, t_t, f_w, type=None):
     """
     Calculate the design strength of fillet weld
     Args:
@@ -1744,7 +1747,7 @@ def cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu, gamma_mw, t_t, f_w,type=Non
     else:
         weld_strength_eqn.append(NoEscape(r'\begin{aligned} f_w &=\frac{t_t~f_u}{\sqrt{3}~\gamma_{mw}}\\'))
         weld_strength_eqn.append(NoEscape(r'&=\frac{' + t_t + r'\times' + f_u + r'}{\sqrt{3}\times' + gamma_mw + r'}\\'))
-    weld_strength_eqn.append(NoEscape(r'&=' + f_w + r'\\'))
+    weld_strength_eqn.append(NoEscape(r'&=' + f_w + r'\\ \\'))
     weld_strength_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]\end{aligned}'))
     return weld_strength_eqn
 
@@ -6391,9 +6394,10 @@ def f_a_stress_due_to_axial_force(A_f, t_w, L_weld, f_a):
     f_a = str(f_a)
     f_a_stress_due_to_axial_force = Math(inline=True)
 
-    f_a_stress_due_to_axial_force.append(NoEscape(r'\begin{aligned} f_a &= \frac{A_f \times 10^3}{0.7 \times t_w \times L_{w}}\\'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r'\begin{aligned} f_a &= \frac{H}{0.7 \times t_w \times L_{w}}\\'))
     f_a_stress_due_to_axial_force.append(NoEscape(r' &= \frac{'+A_f+r'\times 10^3}{0.7 \times '+t_w+r' \times '+L_weld+r'}\\'))
-    f_a_stress_due_to_axial_force.append(NoEscape(r' &= '+f_a+r'\end{aligned}'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r' &= '+f_a+r'\\ \\'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.9]\end{aligned}'))
 
     return f_a_stress_due_to_axial_force
 
@@ -6411,10 +6415,10 @@ def q_stress_due_to_shear_force(V, t_w, L_weld, q):
     q = str(q)
     q_stress_due_to_shear_force = Math(inline=True)
 
-    q_stress_due_to_shear_force.append(NoEscape(r'\begin{aligned} q &= \frac{V \times 10^3}{0.7 \times t_w \times L_{w}}\\'))
+    q_stress_due_to_shear_force.append(NoEscape(r'\begin{aligned} q &= \frac{V}{0.7 \times t_w \times L_{w}}\\'))
     q_stress_due_to_shear_force.append(NoEscape(r'&= \frac{'+V+ r' \times  10^3}{0.7 \times'+t_w+r' \times '+L_weld+r'}\\'))
-
-    q_stress_due_to_shear_force.append(NoEscape(r' &= ' + q + r'\end{aligned}'))
+    q_stress_due_to_shear_force.append(NoEscape(r' &= ' + q + r'\\ \\'))
+    q_stress_due_to_shear_force.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.9] \end{aligned}'))
     return q_stress_due_to_shear_force
 
 
@@ -6430,12 +6434,30 @@ def f_e_weld_stress_due_to_combined_load(f_a, f_e, q):
     q = str(q)
 
     f_e_weld_stress_due_to_combined_load = Math(inline=True)
-    f_e_weld_stress_due_to_combined_load.append(NoEscape(r'\begin{aligned} f_e  &= \sqrt{f_a + (3 q ^ 2)}\\'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r'\begin{aligned} f_e  &= \sqrt{f_a^{2} + 3 q^{2}}\\'))
 
-    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= \sqrt{('+f_a+r')  + (3 \times'+ q+r' ^ 2)}\\'))
-    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= ' + f_e+ r'\end{aligned}'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= \sqrt{'+f_a+r'^{2}  + (3 \times'+ q+r' ^ 2)}\\'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= ' + f_e+ r' \\ \\'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.10.1.1] \end{aligned}'))
 
     return f_e_weld_stress_due_to_combined_load
+
+
+def weld_fu(weld_material_fu, plate_material_fu):
+    weld_fu_eqn = Math(inline=True)
+
+    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{uw} &= min(f_{w}, ~f_{u}) \\'))
+    weld_fu_eqn.append(NoEscape(r'  &= min(' + str(weld_material_fu) + r', ~' + str(plate_material_fu) + r') \\ \\'))
+    weld_fu_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1] \end{aligned}'))
+
+    return weld_fu_eqn
+
+
+def weld_fu_provided(weld_fu):
+    weld_fu_eqn = Math(inline=True)
+
+    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{uw} &= ' + str(weld_fu) + r' \end{aligned}'))
+    return weld_fu_eqn
 
 
 def weld_length_web_prov(beam_D, beam_tf, beam_r1, L_weld):
@@ -6447,7 +6469,7 @@ def weld_length_web_prov(beam_D, beam_tf, beam_r1, L_weld):
 
     weld_length_web_prov.append(NoEscape(r'\begin{aligned} L_{w} &= 2 \times \big[D - (2 \times T) - (2 \times R1) - 20 \big] \\'))
     weld_length_web_prov.append(NoEscape(r'&= 2 \times \big['+beam_D+r' - (2 \times '+beam_tf+r') - (2 \times'+beam_r1+r') - 20 \big] \\'))
-    weld_length_web_prov.append(NoEscape(r' &= ' + L_weld+ r'\\'))
+    weld_length_web_prov.append(NoEscape(r' &= ' + L_weld+ r' \\ \\'))
     weld_length_web_prov.append(NoEscape(r' Note:~ & Weld~ is~ provided~ on~ both~ sides~ of~ the~ web \end{aligned}'))
 
     return weld_length_web_prov
@@ -6616,12 +6638,21 @@ def weld_size_ep_web_req(load_shear, gamma_mw, weld_length_web, fu, weld_size_we
     return weld_size_ep_web_req_eqn
 
 
-def weld_size_ep_web_prov(weld_size_web1,weld_size_web,min_size):
+def max_weld_size_ep_web_prov(weld_size_web, max_size):
     weld_size_web = str(weld_size_web)
-    weld_size_web1 = str(weld_size_web1)
-    min_size = str(min_size)
+    max_size = str(max_size)
+
     weld_size_ep_web_prov_eqn = Math(inline=True)
-    weld_size_ep_web_prov_eqn.append(NoEscape(r'\begin{aligned} t_w &= max(t_{w},~{t_{w}}_{min}) \\'))
-    weld_size_ep_web_prov_eqn.append(NoEscape(r'&= max('+weld_size_web1+','+min_size+r')\\'))
-    weld_size_ep_web_prov_eqn.append(NoEscape(r'&= ' + weld_size_web + r'\end{aligned}'))
+    weld_size_ep_web_prov_eqn.append(NoEscape(r'\begin{aligned} t_w & \leq {t_{w}}_{max} \\'))
+    weld_size_ep_web_prov_eqn.append(NoEscape(r' ' + weld_size_web + r' & \leq ' + max_size + r' \end{aligned}'))
+
+    return weld_size_ep_web_prov_eqn
+
+
+def min_weld_size_ep_web_prov(weld_size_web, weld_size_web_provided, min_size):
+    weld_size_ep_web_prov_eqn = Math(inline=True)
+    weld_size_ep_web_prov_eqn.append(NoEscape(r'\begin{aligned} t_w & = max(t_{w}, ~{t_{w}}_{min}) \\'))
+    weld_size_ep_web_prov_eqn.append(NoEscape(r' & = max(' + str(weld_size_web) + r', ~' + str(min_size) + r') \\'))
+    weld_size_ep_web_prov_eqn.append(NoEscape(r' & = ' + str(weld_size_web_provided) + r' \end{aligned}'))
+
     return weld_size_ep_web_prov_eqn

@@ -147,6 +147,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.stiffener_height = 0.0
         self.stiffener_length = 0.0
         self.stiffener_thickness = 0.0
+        self.weld_fu = 0.0
         self.weld_length_web = 0.0
         self.weld_size_web = 0.0
         self.weld_size_web1 = 0.0
@@ -697,7 +698,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
         self.gamma_m1 = self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]  # gamma_m1 = 1.25
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
-        self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"]["Field weld"]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
+        self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
 
         # initialize design status
         self.plate_design_status = False
@@ -1272,10 +1273,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def design_weld(self):
         """ design fillet weld at web for the connection """
+        # weld strength
+        self.weld_fu = min(self.web_weld.fu, self.plate.fu)
 
         # 1: Weld design for web to end plate connection
         self.weld_length_web = 2 * (self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - 20)  # mm, on either side of the web
-        self.weld_size_web = (self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.web_weld.fu)  # mm
+        self.weld_size_web = (self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.weld_fu)  # mm
         self.weld_size_web = round_up(self.weld_size_web, 2)
 
         self.web_weld.set_min_max_sizes(self.plate_thickness, self.beam_tw, special_circumstance=False, fusion_face_angle=90)
@@ -1288,7 +1291,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         self.f_e = round(math.sqrt(self.f_a + (3 * self.q ** 2)), 2)  # N/mm^2, stress due to combined load
 
-        self.allowable_stress = round(self.web_weld.fu / (math.sqrt(3) * self.gamma_mw), 2)  # N/mm^2, allowable stress in the weld
+        self.allowable_stress = round(self.weld_fu / (math.sqrt(3) * self.gamma_mw), 2)  # N/mm^2, allowable stress in the weld
 
         # allowable stress check
         if self.f_e > self.allowable_stress:
@@ -1695,66 +1698,60 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # ##################
         # # Weld Checks
         # ##################
-        # if self.design_status_bolt is True and plate_status is True:
-        #todo please check..is there  no conn plates???? is direct plate taken??
         weld_conn_plates_fu = [self.dp_plate_fu, self.supported_section.fu, self.web_weld.fu]
         weld_conn_plates_tk = [self.plate_thickness, self.supported_section.web_thickness]
 
         t1 = ('SubSection', 'Weld Design - Beam Web to End Plate Connection', '|p{3.5cm}|p{5.3cm}|p{6.5cm}|p{1.2cm}|')
         self.report_check.append(t1)
 
-        t1 = ('Total weld length (mm)', "", weld_length_web_prov(beam_D=self.supported_section.depth,
-                                                                     beam_tf=self.supported_section.flange_thickness,
-                                                                     beam_r1=self.supported_section.root_radius,
-                                                                     L_weld=self.weld_length_web), "")
-
+        t1 = ('Weld strength $(N/mm^2)$', weld_fu(self.web_weld.fu, self.plate.fu), weld_fu_provided(self.weld_fu),
+              get_pass_fail(max(self.web_weld.fu, self.plate.fu), self.weld_fu, relation="geq"))
         self.report_check.append(t1)
 
-        self.weld_size_web1 = round((self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.web_weld.fu), 2)  # mm
+        t1 = ('Total weld length (mm)', "", weld_length_web_prov(beam_D=self.supported_section.depth, beam_tf=self.supported_section.flange_thickness,
+                                                                 beam_r1=self.supported_section.root_radius, L_weld=self.weld_length_web), "")
+        self.report_check.append(t1)
+
+        self.weld_size_web1 = round((self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.weld_fu), 2)  # mm
 
         t1 = ('Weld size (mm)', weld_size_ep_web_req(load_shear=self.load_shear, gamma_mw=self.gamma_mb, weld_length_web=self.weld_length_web,
-                                                     fu=self.web_weld.fu, weld_size_web=self.weld_size_web1), self.weld_size_web,
+                                                     fu=self.weld_fu, weld_size_web=self.weld_size_web1), self.weld_size_web,
               get_pass_fail(self.weld_size_web1, self.weld_size_web, relation="leq"))
         self.report_check.append(t1)
 
         t1 = ('Min. weld size (mm)', cl_10_5_2_3_table_21_min_fillet_weld_size_required([self.plate_thickness, self.beam_tw], self.web_weld.min_size),
-              weld_size_ep_web_prov(weld_size_web1=self.weld_size_web1, weld_size_web=self.weld_size_web, min_size=self.web_weld.min_size),
-              get_pass_fail(self.web_weld.min_size, self.weld_size_web, relation="leq"))
+              min_weld_size_ep_web_prov(weld_size_web=self.weld_size_web1, weld_size_web_provided=self.weld_size_web, min_size=self.web_weld.min_size),
+              get_pass_fail(max(self.weld_size_web1, self.web_weld.min_size), self.weld_size_web, relation="leq"))
         self.report_check.append(t1)
 
         t1 = ('Max. weld size (mm)',  cl_10_5_3_1_max_weld_size_v2([self.plate_thickness, self.beam_tw], self.web_weld.max_size),
-              weld_size_ep_web_prov(weld_size_web1=self.weld_size_web1, weld_size_web=self.weld_size_web, min_size=self.web_weld.min_size),
+              max_weld_size_ep_web_prov(weld_size_web=self.weld_size_web, max_size=self.web_weld.max_size),
               get_pass_fail(self.web_weld.max_size, self.weld_size_web, relation="geq"))
         self.report_check.append(t1)
 
-        # Here t_w is size of weld #
-
-        t1 = (KEY_OUT_DISP_WELD_STRESS_AXIAL, "", f_a_stress_due_to_axial_force(A_f=self.load_axial,
-                                                                                t_w=self.weld_size_web,
-                                                                                L_weld=self.weld_length_web, f_a=round(self.f_a,2)), "")
-        self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_WELD_STRESS_SHEAR, "", q_stress_due_to_shear_force(V=self.load_shear,
-                                                                              t_w=self.weld_size_web,
-                                                                              L_weld=self.weld_length_web, q=self.q), "")
-        self.report_check.append(t1)
-        # todo before running remove N/mm^2  to N/mm2 in common file
-        t1 = (KEY_OUT_DISP_WELD_STRESS_COMBINED, '', f_e_weld_stress_due_to_combined_load(f_a=self.f_a,
-                                                                                          f_e=self.f_e, q=self.q), "")
-
+        t1 = ('Normal stress $(N/mm^2)$', "", f_a_stress_due_to_axial_force(A_f=self.load_axial, t_w=self.weld_size_web, L_weld=self.weld_length_web,
+                                                                            f_a=round(self.f_a, 2)), "")
         self.report_check.append(t1)
 
-        # todo before running remove N/mm^2  to N/mm2 in common file
-        ## todo: check this function weld fu (plate,section)
-        self.conn_plates_weld_fu1 = [self.web_weld.fu, self.web_weld.fu]  # todo trial
-        t1 = (KEY_OUT_DISP_WELD_STRENGTH, round(self.f_e,2), cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=self.conn_plates_weld_fu1,
-                                                                                gamma_mw=self.gamma_mb,
-                                                                                t_t=1,
-                                                                                f_w=round(self.allowable_stress,2),type="end_plate"),
-              get_pass_fail(round(self.f_e,2), round(self.allowable_stress,2), relation="lesser"))
+        t1 = ('Shear stress $(N/mm^2)$', "", q_stress_due_to_shear_force(V=self.load_shear, t_w=self.weld_size_web, L_weld=self.weld_length_web,
+                                                                         q=self.q), "")
         self.report_check.append(t1)
+
+        # self.conn_plates_weld_fu1 = [self.web_weld.fu, self.web_weld.fu]  # todo trial
+        t1 = ('Equivalent stress $(N/mm^2)$', f_e_weld_stress_due_to_combined_load(f_a=self.f_a, f_e=self.f_e, q=self.q),
+              cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=[self.weld_fu], gamma_mw=self.gamma_mb, t_t=1, f_w=round(self.allowable_stress, 2),
+                                          type="end_plate"),
+              get_pass_fail(self.f_e, self.allowable_stress, relation="leq"))
+        self.report_check.append(t1)
+
+        # t1 = (KEY_OUT_DISP_WELD_STRENGTH, round(self.f_e,2), cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=self.conn_plates_weld_fu1,
+        #                                                                         gamma_mw=self.gamma_mb,
+        #                                                                         t_t=1,
+        #                                                                         f_w=round(self.allowable_stress,2),type="end_plate"),
+        #       get_pass_fail(round(self.f_e,2), round(self.allowable_stress,2), relation="lesser"))
+        # self.report_check.append(t1)
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"
-
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

@@ -5401,12 +5401,15 @@ def critical_section_case_2_3(critical_xx, y, bp_length, column_D):
         critical_xx = str(critical_xx)
         y = str(y)
         critical_len.append(NoEscape(r' y~ &> ~y_{critical}~~~ (' + y + r'~ > ~' + critical_xx + r') \\'))
-        critical_len.append(NoEscape(r'& Therefore,~ y_{critical} = ' + critical_xx + r'\end{aligned}'))
+        critical_len.append(NoEscape(r'& Therefore,~ y_{critical} = ' + critical_xx + r'\\ \\'))
     else:
         critical_xx = str(critical_xx)
         y = str(y)
         critical_len.append(NoEscape(r' y~ &< ~y_{critical}~~~ (' + y + r'~ < ~' + critical_xx + r') \\'))
-        critical_len.append(NoEscape(r'& Therefore,~ y_{critical} = ' + y + r'\end{aligned}'))
+        critical_len.append(NoEscape(r' Therefore,&~ y_{critical} = ' + y + r'\\ \\'))
+
+    critical_len.append(NoEscape(r' Note:&~ The~ critical~ section~ lies~ at \\'))
+    critical_len.append(NoEscape(r' & 0.95D ~ of ~ the ~column~section \end{aligned}'))
 
     return critical_len
 
@@ -5651,7 +5654,8 @@ def anchor_len_below(bolt_tension, bearing_strength, len, anchor_len_calculated_
         length.append(NoEscape(r' &= \Bigg[\frac{' + bolt_tension + r' \times 10^{3}}{15.5 \times \sqrt{' + bearing_strength + r'}}\Bigg]^{0.67} \\'))
         length.append(NoEscape(r' &= ' + str(anchor_len_calculated_out) + r' \\'))
         length.append(NoEscape(r' &= ' + str(anchor_provided_out) + r' \\'))
-        length.append(NoEscape(r' &= max(' + str(anchor_provided_out) + r',~' + str(anchor_len_min_out) + r') \\ \\'))
+        length.append(NoEscape(r' &= max(' + str(anchor_provided_out) + r',~' + str(anchor_len_min_out) + r') \\'))
+        length.append(NoEscape(r' &= ' + str(anchor_provided_out) + r' \\ \\'))
 
         length.append(NoEscape(r' &= ' + str(anchor_provided_out) + r' + t_{n} + 20 \\'))
         length.append(NoEscape(r' &= ' + str(anchor_provided_out) + r' + ' + str(nut_thk) + r' + 20 \\'))
@@ -5860,27 +5864,44 @@ def stiff_thk_across_web(stiff_thk, stiff_length_across_web, epsilon, col_web_th
     return thickness
 
 
-def stiffener_stress_flange(sigma_crit, max_bearing_stress, bp_len, col_D, y, criticall_xx, sigma_avg):
+def stiffener_stress_flange(sigma_crit, max_bearing_stress, sigma_min, bp_len, col_D, y, criticall_xx, sigma_avg, sigma_lby2, connectivity, bp_case):
     """ """
 
     stress_along_flange = Math(inline=True)
 
-    if y > criticall_xx:
-        stress_along_flange.append(NoEscape(r'\begin{aligned} \sigma_{crt} &= \frac{y - \Big(\frac{L - 0.95D} {2}\Big)} {y} \times '
-                                            r'{\sigma_{c}}_{max} \\'))
-        stress_along_flange.append(NoEscape(r' &= \frac{' + str(y) + r' - \Big(\frac{' + str(bp_len) + r' - (0.95 \times '
-                                            + str(col_D) + r')} {2}\Big)} {' + str(y) + r'} \times 'r'' + str(max_bearing_stress) + r' \\'))
-        stress_along_flange.append(NoEscape(r' &= ' + str(sigma_crit) + r' \\ \\'))
-
-        stress_along_flange.append(NoEscape(r' {\sigma_{st}}_{f} &= \frac{{\sigma_{c}}_{max} + \sigma_{crt}} {2} \\'))
-        stress_along_flange.append(NoEscape(r'  &= \frac{' + str(max_bearing_stress) + r' + ' + str(sigma_crit) + r'} {2} \\'))
-        stress_along_flange.append(NoEscape(r'&                   = ' + str(sigma_avg) + r' \\ \\'))
+    if connectivity == 'Welded Column Base':
+        stress_along_flange.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{f} &= \frac{{\sigma_{c}}_{max} + \sigma_{crt}} {2} \end{aligned}'))
     else:
-        stress_along_flange.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{f} &= {\sigma_{c}}_{max} \\'))
-        stress_along_flange.append(NoEscape(r' &= ' + str(max_bearing_stress) + r' \\ \\'))
+        if bp_case == 'Case1':
+            stress_along_flange.append(NoEscape(r'\begin{aligned} \sigma_{L/2} &= {\sigma_{c}}_{min} + \Big(\frac{{\sigma_{c}}_{max} - '
+                                                r'{\sigma_{c}}_{min}}{2} \Big) \\ \\'))
+            stress_along_flange.append(NoEscape(r' &= ' + str(sigma_min) + r' + \Big(\frac{' + str(max_bearing_stress) + r' - '
+                                                r'' + str(sigma_min) + r'}{2} \Big) \\ \\'))
+            stress_along_flange.append(NoEscape(r'  &= ' + str(sigma_lby2) + r' \\ \\'))
 
-    stress_along_flange.append(NoEscape(r' Note:&~ The~ critical~ section~ lies~ at \\'))
-    stress_along_flange.append(NoEscape(r' & 0.95D ~ of ~ the ~column~section \end{aligned}'))
+            stress_along_flange.append(NoEscape(r' {\sigma_{st}}_{f} &= \frac{' + str(max_bearing_stress) + r' + '
+                                                + str(sigma_lby2) + r'} {2} \\ \\'))
+            stress_along_flange.append(NoEscape(r' &= \frac{' + str(sigma_avg) + r' \end{aligned}'))
+        else:
+            if y > criticall_xx:
+                stress_along_flange.append(NoEscape(r'\begin{aligned} Since,~ y & > y_{critical} ~~~ (' + str(y) + r' > '
+                                                    + str(criticall_xx) + r') \\ \\'))
+
+                stress_along_flange.append(NoEscape(r' {\sigma_{st}}_{f} &= \frac{{\sigma_{c}}_{max}} {2} \\'))
+                stress_along_flange.append(NoEscape(r'  &= \frac{' + str(max_bearing_stress) + r'} {2} \\'))
+                stress_along_flange.append(NoEscape(r'&                   = ' + str(sigma_avg) + r' \end{aligned}'))
+            else:
+                stress_along_flange.append(NoEscape(r'\begin{aligned} Since,~ y & \leq y_{critical} ~~~ (' + str(y) + r' > '
+                                                    + str(criticall_xx) + r') \\ \\'))
+
+                stress_along_flange.append(NoEscape(r' \sigma_{crt} &= \frac{y - y_{critical}}{y} \times {\sigma_{c}}_{max} \\'))
+                stress_along_flange.append(NoEscape(r'  &= \frac{' + str(y) + r' - ' + str(criticall_xx) + r'}{' + str(y) + r'} \times '
+                                                    + str(max_bearing_stress) + r' \\'))
+                stress_along_flange.append(NoEscape(r' &= ' + str(sigma_crit) + r' \\ \\'))
+
+                stress_along_flange.append(NoEscape(r' {\sigma_{st}}_{f} &= \frac{{\sigma_{c}}_{max} + \sigma_{crt}} {2} \\'))
+                stress_along_flange.append(NoEscape(r'  &= \frac{' + str(max_bearing_stress) + r' + ' + str(sigma_crit) + r'} {2} \\'))
+                stress_along_flange.append(NoEscape(r' &= ' + str(sigma_avg) + r' \end{aligned}'))
 
     return stress_along_flange
 
@@ -5947,26 +5968,73 @@ def stiffener_stress_allowable(sigma_allowable):
     return stress_allowable
 
 
-def shear_demand_stiffener(sigma, stiff_length, stiff_height, shear, location='flange'):
+def shear_demand_stiffener(sigma_avg, y, y_critical, bp_len, bp_width, col_B, shear, connectivity, moment_bp_case, anchors_outside_flange,
+                           location='flange'):
     """ """
-    sigma = str(round(sigma, 2))
-    stiff_length = str(stiff_length)
-    stiff_height = str(stiff_height)
-    shear = str(shear)
 
     shear_demand = Math(inline=True)
 
     if location == 'flange':
-        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} &=  {\sigma_{st}}_{f} \times ({L_{st}}_{f}~{H_{st}}_{f}) \\'))
+
+        if connectivity == 'Moment Base Plate':
+            if moment_bp_case == 'Case1':
+                shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} &=  {\sigma_{st}}_{f}~ \Bigg( \frac{L}{2} \times '
+                                             r'\frac{W - (0.85B)}{2} \Bigg) \\'))
+                shear_demand.append(NoEscape(r' &=  ' + str(sigma_avg) + r' \times \Bigg( \frac{' + str(bp_len) + r'}{2} \times '
+                                             r'\frac{' + str(bp_width) + r' - (0.85 \times ' + str(col_B) + r')}{2} \Bigg) \times 10^{-3} \\'))
+                shear_demand.append(NoEscape(r' &=  ' + str(shear) + r' \end{aligned}'))
+
+            else:
+                if anchors_outside_flange == 2 or anchors_outside_flange == 4:
+                    shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} &=  {\sigma_{st}}_{f}~ '
+                                                 r'\Bigg(y \times \frac{W - (0.85B)}{2} \Bigg) \\'))
+                    shear_demand.append(NoEscape(r' &=  ' + str(sigma_avg) + r'\times 'r'\Bigg(' + str(y) + r' \times \frac{'
+                                                 + str(bp_width) + r' - (0.85 \times ' + str(col_B) + r')}{2} \Bigg) \times 10^{-3}\\'))
+                    shear_demand.append(NoEscape(r' &=  ' + str(shear) + r' \end{aligned}'))
+
+                else:
+                    if y > y_critical:
+                        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} &=  {\sigma_{st}}_{f} \times \\'))
+                        shear_demand.append(NoEscape(r' \Bigg(\frac{W - (0.85B)}{2} '
+                                                     r' & \times \Big(y - \frac{y_{critical}}{2} \Big) \Bigg) \\ \\'))
+
+                        shear_demand.append(NoEscape(r' &=  ' + str(sigma_avg) + r' \times \\'))
+                        shear_demand.append(NoEscape(r' \Bigg(\frac{' + str(bp_width) + r' - (0.85 \times '
+                                                     + str(col_B) + r')}{2} '
+                                                     r' & \times \Big(' + str(y) + r' - \frac{' + str(y_critical) + r'}{2} \Big) \Bigg) 'r' \\'))
+                        shear_demand.append(NoEscape(r' & \times 10^{-3} \\ '))
+                        shear_demand.append(NoEscape(r' &=  ' + str(shear) + r' \end{aligned}'))
+
+                    else:
+                        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} &=  {\sigma_{st}}_{f} \times \\'))
+                        shear_demand.append(NoEscape(r'  \Bigg(\frac{1}{2} \times y '
+                                                     r' & \times \frac{W - (0.85B)}{2} \Bigg) \\ \\'))
+
+                        shear_demand.append(NoEscape(r' &=  ' + str(sigma_avg) + r' \times \\'))
+                        shear_demand.append(NoEscape(r' \Bigg(\frac{1}{2} \times ' + str(y) + r' '
+                                                     r' & \times \frac{' + str(bp_width) + r' - (0.85 \times ' + str(col_B) + r')}{2} \Bigg) '
+                                                                                                                           r'\\'))
+                        shear_demand.append(NoEscape(r' & \times 10^{-3} \\'))
+                        shear_demand.append(NoEscape(r' &=  ' + str(shear) + r' \end{aligned}'))
+        else:
+            shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} &=  {\sigma_{st}}_{f} \times \Bigg(\frac{L}{2} \times '
+                                         r'\frac{W - (0.85B)}{2} \Bigg) \\'))
+            shear_demand.append(NoEscape(r' &=  ' + str(sigma_avg) + r' \times \Bigg(\frac{' + str(bp_len) + r'}{2} \times '
+                                         r'\frac{' + str(bp_width) + r' - (0.85 \times ' + str(col_B) + r')}{2} \Bigg) \times 10^{-3} \\'))
+            shear_demand.append(NoEscape(r' &=  ' + str(shear) + r' \end{aligned}'))
+
     elif location == 'web':
         shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{w} &=  {\sigma_{st}}_{w} \times ({L_{st}}_{w}~{H_{st}}_{w}) \\'))
+
     elif location == 'across_web':
         shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{aw} &=  {\sigma_{st}}_{aw} \times ({L_{st}}_{aw}~{H_{st}}_{aw}) \\'))
+
     else:
         shear_demand.append(NoEscape(r'\begin{aligned} V_{st} &=  \sigma_{st} \times (L_{st}~H_{st}) \\'))
 
-    shear_demand.append(NoEscape(r'&              =  \frac{' + sigma + r' \times (' + stiff_length + r'\times' + stiff_height + r')}{1000} \\'))
-    shear_demand.append(NoEscape(r'&              =  ' + shear + r' \end{aligned}'))
+    # shear_demand.append(NoEscape(r'&              =  \frac{' + str(sigma) + r' \times (' + str(stiff_length) + r'\times'
+    #                              + str(stiff_height) + r')}{1000} \\'))
+    # shear_demand.append(NoEscape(r'&              =  ' + str(shear) + r' \end{aligned}'))
 
     return shear_demand
 
@@ -5998,6 +6066,8 @@ def shear_capacity_stiffener(stiff_thk, stiff_height, stiff_fy, shear_capa, gamm
                                                                                 r'{\sqrt{3} \times ' + gamma_m0 + r' \times 1000} \\'))
 
     shear_capacity.append(NoEscape(r'&              =  ' + shear_capa + r' \\ \\'))
+
+    shear_capacity.append(NoEscape(r' Note:~& Stiffener ~is~restricted ~to~low~shear \\'))
     shear_capacity.append(NoEscape(r'&[Ref.~IS~800:2007~(Cl.~8.4.1) \end{aligned}'))
 
     return shear_capacity
@@ -6059,9 +6129,12 @@ def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='fla
             moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{aw} &=  \frac{\beta_{b}~ {z_{p}}_{st}~{f_{y}}_{st}}{\gamma_{m0}} \\'))
         else:
             moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{st} &=  \frac{\beta_{b}~ {z_{e}}_{st}~{f_{y}}_{st}}{\gamma_{m0}} \\'))
+
+        moment_capacity.append(NoEscape(r'&             =  \frac{1\times~ {z_{p}}_{st}~{f_{y}}_{st}}{\gamma_{m0}}~~~~(\beta_{b} = 1) \\'))
     else:
         if location == 'flange':
             moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{f} &=  \frac{\beta_{b}~ {z_{e}}_{st}~{f_{y}}_{st}}{\gamma_{m0}} \\'))
+
         elif location == 'web':
             moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{w} &=  \frac{\beta_{b}~ {z_{e}}_{st}~{f_{y}}_{st}}{\gamma_{m0}} \\'))
         elif location == 'across_web':
@@ -6069,7 +6142,8 @@ def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='fla
         else:
             moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{st} &=  \frac{\beta_{b}~ {z_{e}}_{st}~{f_{y}}_{st}}{\gamma_{m0}} \\'))
 
-    moment_capacity.append(NoEscape(r'&             =  \frac{1\times~ {z_{p}}_{st}~{f_{y}}_{st}}{\gamma_{m0}}~~~~(\beta_{b} = 1) \\'))
+        moment_capacity.append(NoEscape(r'&             =  \frac{1\times~ {z_{e}}_{st}~{f_{y}}_{st}}{\gamma_{m0}}~~~~(\beta_{b} = 1) \\'))
+
     moment_capacity.append(
         NoEscape(r'&             =  \frac{1\times~' + zp + r'\times 10^{3} \times' + stiff_fy + r'}{' + gamma_m0 + r' \times 10^{6}} \\'))
     moment_capacity.append(NoEscape(r'&              =  ' + moment_capa + r' \\ \\'))

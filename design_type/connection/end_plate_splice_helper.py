@@ -72,6 +72,7 @@ class EndPlateSpliceHelper(object):
         self.plate_thickness_req = 0.0
         self.b_e = 0.0
         self.mp_plate = 0.0
+        self.plate_moment_capacity = 0.0
         self.lv = 0.0
         self.le_1 = 0.0
         self.le_2 = 0.0
@@ -649,7 +650,7 @@ class EndPlateSpliceHelper(object):
 
         # Check 7: Moment capacity of the end plate and plate thickness check
 
-        # taking moment about the toe of weld or edge of the flange from bolt center-line to find the actual prying force (Q) in the critical bolt
+        # taking moment about the toe of weld or edge of the flange from bolt center-line
         # Mp_plate = T*l_v - Q.l_e
         self.mp_plate = round((self.t_1 * 1e3 * self.lv) - (self.prying_force * 1e3 * self.le))  # N-mm
 
@@ -665,6 +666,10 @@ class EndPlateSpliceHelper(object):
             self.plate_design_status = False
         else:
             self.plate_design_status = True
+
+        # moment capacity of plate
+        self.plate_moment_capacity = ((self.b_e * self.plate_thickness ** 2) / 4) * (self.dp_plate_fy / self.gamma_m0)
+        self.plate_moment_capacity = round(self.plate_moment_capacity * 1e-6, 2)  # kN-m
 
         # Check 8: Tension capacity of bolt
         self.bolt.calculate_bolt_tension_capacity(self.bolt_diameter_provided, self.bolt_grade_provided)

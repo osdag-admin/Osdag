@@ -799,7 +799,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
         self.gamma_m1 = self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]  # gamma_m1 = 1.25
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
-        self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"]["Field weld"]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
+        self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
 
         # initialize design status
         self.plate_design_status = False
@@ -1659,6 +1659,8 @@ class BeamColumnEndPlate(MomentConnection):
 
     def design_weld(self):
         """ design fillet weld at web for the connection and continuity/stiffener plates """
+        # weld strength
+        self.weld_fu = min(self.web_weld.fu, self.plate.fu)
 
         # design of weld at beam web and connecting face of the column
         # weld size calculation
@@ -1667,7 +1669,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.weld_length_web = 2 * (self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - 20)  # mm, available on either side of the web
         self.weld_length_web = self.weld_length_web - self.web_weld.max_size  # mm, available effective length on either side of the web
 
-        self.weld_size_web = (self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.web_weld.fu)  # mm
+        self.weld_size_web = (self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.weld_fu)  # mm
         self.weld_size_web = round_up(self.weld_size_web, 2)
         self.weld_size_web = max(self.weld_size_web, self.web_weld.min_size)  # mm
 
@@ -1677,7 +1679,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.f_e = round(math.sqrt(self.f_a + (3 * self.q ** 2)), 2)  # N/mm^2, stress due to combined load
 
-        self.allowable_stress = round(self.web_weld.fu / (math.sqrt(3) * self.gamma_mw), 2)  # N/mm^2, allowable stress in the weld
+        self.allowable_stress = round(self.weld_fu / (math.sqrt(3) * self.gamma_mw), 2)  # N/mm^2, allowable stress in the weld
         # allowable stress check
         if self.f_e > self.allowable_stress:
             self.web_weld_groove_status = True
@@ -1699,7 +1701,7 @@ class BeamColumnEndPlate(MomentConnection):
 
             # weld on one side of the continuity plate
             self.weld_size_continuity_plate = ((self.p_c / 2) * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_cont_plate *
-                                                                                                 self.stiffener_weld.fu)  # mm
+                                                                                                       self.weld_fu)  # mm
             self.weld_size_continuity_plate = round_up(self.weld_size_continuity_plate, 2)
             self.weld_size_continuity_plate = max(self.weld_size_continuity_plate, self.stiffener_weld.min_size)  # mm
 
@@ -1711,7 +1713,7 @@ class BeamColumnEndPlate(MomentConnection):
                 self.weld_length_cont_plate = 2 * self.weld_length_cont_plate
 
                 self.weld_size_continuity_plate = ((self.p_c / 2) * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_cont_plate *
-                                                                                                           self.stiffener_weld.fu)  # mm
+                                                                                                           self.weld_fu)  # mm
                 self.weld_size_continuity_plate = round_up(self.weld_size_continuity_plate, 2)
                 self.weld_size_continuity_plate = max(self.weld_size_continuity_plate, self.stiffener_weld.min_size)  # mm
 
@@ -1728,8 +1730,8 @@ class BeamColumnEndPlate(MomentConnection):
             self.force_diag_stiffener = (self.diag_stiffener_area_req / 2) * self.cont_plate_fy * 1e-3  # kN
 
             # weld at the ends of the stiffener and through its length
-            self.weld_size_diag_stiffener = (self.force_diag_stiffener * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * (2 * self.diag_stiffener_width) *
-                                                                                                       self.stiffener_weld.fu)  # mm
+            self.weld_size_diag_stiffener = (self.force_diag_stiffener * 1e3 * math.sqrt(3) * self.gamma_mw) / \
+                                            (0.7 * (2 * self.diag_stiffener_width) * self.weld_fu)  # mm
             self.weld_size_diag_stiffener = round_up(self.weld_size_diag_stiffener, 2)
             self.weld_size_diag_stiffener = max(self.weld_size_diag_stiffener, self.stiffener_weld.min_size)  # mm
 

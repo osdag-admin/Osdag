@@ -537,10 +537,11 @@ DISP_LOWSHEAR = 'Limited to low shear capacity'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity (kN)'
 KEY_DISP_MOM_DEMAND = 'Moment Demand (kN-m)'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity (kN-m)'
-DISP_MIN_PITCH = 'Min. pitch (mm)'
-DISP_MAX_PITCH = 'Max. pitch (mm)'
-DISP_MIN_GAUGE = 'Min. gauge (mm)'
-DISP_MAX_GAUGE = 'Max. gauge (mm)'
+DISP_MIN_PITCH = 'Min. pitch distance (mm)'
+DISP_MAX_PITCH = 'Max. pitch distance (mm)'
+DISP_MIN_GAUGE = 'Min. gauge distance (mm)'
+DISP_MAX_GAUGE = 'Max. gauge distance (mm)'
+DISP_CS_GAUGE = 'Cross-centre gauge distance (mm)'
 DISP_MIN_EDGE = 'Min. edge distance (mm)'
 KEY_SPACING = "Spacing Check"
 DISP_MAX_EDGE = 'Max. edge distance (mm)'
@@ -603,7 +604,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_MATERIAL = 'Plate Material'
+KEY_DISP_MATERIAL = 'Plate material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 KEY_DISP_PRIBM = 'Primary beam *'
@@ -664,7 +665,8 @@ KEY_DISP_TYP = 'Type'
 KEY_DISP_TYP_ANCHOR = 'Anchor Type'
 KEY_DISP_GRD_ANCHOR = 'Property Class'
 KEY_DISP_GRD_FOOTING = 'Grade*'
-KEY_DISP_GRD = 'Property Class'
+KEY_DISP_GRD = 'Property class'
+KEY_DISP_BOLT_PRE_TENSIONING = 'Bolt tension'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
@@ -682,9 +684,9 @@ KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member (kN)"
 KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
 KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic moment capacity (kN-m)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
-KEY_OUT_DISP_SHEAR_CAPACITY_M ="Shear Capacity(kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY_M = "Shear Capacity(kN)"
 
 
 KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
@@ -936,9 +938,9 @@ KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
 KEY_DISP_DP_WELD_TYPE = 'Weld type'
-KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam Flange to Endplate Weld type'
-KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam Web to Endplate Weld type'
-KEY_DISP_STIFFENER_WELD_TYPE= "Stiffener Weld Type"
+KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam flange to end plate weld type'
+KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam web to end plate weld type'
+KEY_DISP_STIFFENER_WELD_TYPE = "Stiffener weld type"
 KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
 KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
@@ -949,6 +951,7 @@ KEY_DP_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD]
 
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite, Fu (MPa)'
+KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT = 'Material grade overwrite, $f_{u}$ (MPa)'
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
@@ -964,11 +967,11 @@ KEY_DISP_DP_DETAILING_GAP_BEAM = 'Gap between beam and beam (mm)'
 KEY_DISP_DP_DETAILING_GAP_COL = 'Gap between column and column (mm)'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the members exposed to corrosive influences'
-KEY_DISP_CORR_INFLUENCES = 'Are the members exposed to corrosive influences'
+KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design method'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
-KEY_DISP_GAP = 'Gap between Members (mm)'
+KEY_DISP_GAP = 'Gap between members (mm)'
 
 
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
@@ -1404,7 +1407,7 @@ KEY_OUT_TOT_NO_BOLTS = 'Bolt.number'
 KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
-KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
+KEY_DISP_BOLT_HOLE = 'Hole diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
@@ -1415,9 +1418,9 @@ KEY_OUT_BOLT_IR_DETAILS_SPTD = 'Bolt.IRDetails_sptd'
 KEY_OUT_BOLT_IR_DETAILS_SPTING = 'Bolt.IRDetails_spting'
 KEY_OUT_DISP_BOLT_IR_DETAILS = 'Capacity Details'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
-KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_DISP_BOLT_SHEAR = 'Shear capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
-KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_DISP_BOLT_BEARING = 'Bearing capacity (kN)'
 KEY_OUT_BETA_LJ = 'Bolt.Betalj'
 KEY_OUT_DISP_BETA_LJ = 'β<sub>lj</sub>'
 KEY_OUT_BETA_LG = 'Bolt.Betalg'
@@ -1657,7 +1660,7 @@ KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along One Side of Web (n)'
 KEY_OUT_DISP_NO_BOLTS_WEB_TOTAL = 'No. of bolts along Web'
 
 KEY_OUT_NO_BOLTS = 'ColumnEndPlate.nb'
-KEY_OUT_DISP_NO_BOLTS = 'Total no. of Bolts'
+KEY_OUT_DISP_NO_BOLTS = 'Total no. of bolts'
 KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
 KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
 KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'

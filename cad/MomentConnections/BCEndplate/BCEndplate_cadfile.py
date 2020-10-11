@@ -1356,25 +1356,38 @@ class CADGroove(object):
 
         :return: Geometric Orientation of this components
         """
-        weldFlangOrigin_1 = numpy.array(
-            [-self.beam.B / 2, self.column.D / 2 + self.plate.T + self.bcWeldWeb_3.b / 2,
-             self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2])
+        # weldFlangOrigin_1 = numpy.array(
+        #     [-self.beam.B / 2, self.column.D / 2 + self.plate.T + self.bcWeldWeb_3.b / 2,
+        #      self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2])
+        # weldFlangOrigin_1 = numpy.array(
+        #     [0, 0,
+        #      0])
+        gap = self.column.D + self.bcWeldFlang_1.b + self.plate.T + self.column.T + self.bcWeldFlang_1.b / 2
+        weldFlangOrigin_1 = numpy.array([- self.beam.B / 2, gap, self.beam.D / 2 - self.beam.T / 2])
+
         uDir_1 = numpy.array([0, 1.0, 0])
         wDir_1 = numpy.array([1.0, 0, 0])
         self.bcWeldFlang_1.place(weldFlangOrigin_1, uDir_1, wDir_1)
 
+        # weldFlangOrigin_2 = numpy.array(
+        #     [self.beam.B / 2, self.column.D / 2 + self.plate.T + self.bcWeldWeb_3.b / 2,
+        #      self.column.length / 2 - self.beam.D / 2 + self.beam.T / 2])
+
         weldFlangOrigin_2 = numpy.array(
-            [self.beam.B / 2, self.column.D / 2 + self.plate.T + self.bcWeldWeb_3.b / 2,
-             self.column.length / 2 - self.beam.D / 2 + self.beam.T / 2])
+            [0, 0, 0])
         uDir_2 = numpy.array([0, 1.0, 0])
         wDir_2 = numpy.array([-1.0, 0, 0])
         self.bcWeldFlang_2.place(weldFlangOrigin_2, uDir_2, wDir_2)
 
-        weldWebOrigin_3 = numpy.array([0.0, self.column.D / 2 + self.plate.T + self.bcWeldWeb_3.b / 2,
-                                       self.column.length / 2 - self.bcWeldWeb_3.L / 2])
+        # weldWebOrigin_3 = numpy.array([0.0, self.column.D / 2 + self.plate.T + self.bcWeldWeb_3.b / 2,
+        #                                self.column.length / 2 - self.bcWeldWeb_3.L / 2])
+        weldWebOrigin_3 = numpy.array([0.0, 0.0,
+                                       0.0])
         uDirWeb_3 = numpy.array([0, 1.0, 0])
         wDirWeb_3 = numpy.array([0, 0, 1.0])
         self.bcWeldWeb_3.place(weldWebOrigin_3, uDirWeb_3, wDirWeb_3)
+
+
 
     def create_bcWeldStiff(self):
         """
@@ -1656,7 +1669,8 @@ class CADGroove(object):
         """
         if self.endplate_type == "one_way":
             # if self.numberOfBolts == 12:
-            welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+            welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                           # self.bcWeldFlang_1, self.bcWeldFlang_2, self.bcWeldWeb_3,
                           self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
                           self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                           self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
@@ -1684,7 +1698,8 @@ class CADGroove(object):
 
         elif self.endplate_type == "both_way":
             # if self.numberOfBolts == 20:
-            welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
+            welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
+                           # self.bcWeldFlang_1, self.bcWeldFlang_2, self.bcWeldWeb_3,
                           self.bcWeldStiffHR_2Model,
                           self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
                           self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
@@ -1714,6 +1729,7 @@ class CADGroove(object):
 
         elif self.endplate_type == "flush":
             welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                          # self.bcWeldFlang_1, self.bcWeldFlang_2, self.bcWeldWeb_3,
                           self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
                           self.contWeldL2_L2Model,
                           self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
@@ -1900,6 +1916,10 @@ class CADcolwebGroove(CADGroove):
         wDircontWeldL2_L1 = numpy.array([0.0, 1.0, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
 
+        # CADGroove.create_bcWelds(self)
+
+
+
     def get_plate_connector_models(self):
         if self.endplate_type == "one_way":
             # if self.numberOfBolts == 12:
@@ -1922,6 +1942,7 @@ class CADcolwebGroove(CADGroove):
             plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
 
         return plates
+
 
     def get_welded_models(self):
         """

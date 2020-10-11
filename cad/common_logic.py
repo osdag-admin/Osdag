@@ -123,6 +123,7 @@ import OCC.Core.V3d
 from OCC.Core.Quantity import *
 from OCC.Core.Graphic3d import *
 from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
+# from OCC.Display.OCCViewer import V3d_XposYnegZneg
 from OCC.Core.TNaming import tnaming
 import multiprocessing
 
@@ -1100,12 +1101,12 @@ class CommonDesignLogic(object):
         #
         # else:
         #
-        bcWeldFlang = GrooveWeld(b=1.0, h=float(beam_T),
+        bcWeldFlang = GrooveWeld(b=float(beam_tw), h=float(beam_T),
                                  L=beam_B)
         #     # bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
         #
         #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-        bcWeldWeb = GrooveWeld(b=1.0, h=float(beam_tw),
+        bcWeldWeb = GrooveWeld(b=float(beam_tw), h=float(beam_tw),
                                L=beam_d - 2 * beam_T)
 
         if conn_type == 'col_flange_connectivity':
@@ -1865,7 +1866,7 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BCENDPLATE:
                 self.Bc = self.module_class()
                 self.ExtObj = self.createBCEndPlateCAD()
-
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()
@@ -1874,7 +1875,8 @@ class CommonDesignLogic(object):
                 elif component == "Beam":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.beamModel, update=True,
-                                        material=Graphic3d_NOT_2D_ALUMINUM)  # , color = 'Dark Gray'
+                                        material=Graphic3d_NOT_2D_ALUMINUM)
+                    # , color = 'Dark Gray'
 
                 elif component == "Connector":
                     osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
@@ -1894,6 +1896,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
                                         color=Quantity_NOC_SADDLEBROWN)
+
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()
                 self.CPObj = self.createCCCoverPlateCAD()
@@ -2286,24 +2289,24 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_BCENDPLATE:
 
-                self.ExtObj = self.create_extended_both_ways()
+                # self.ExtObj = self.create_extended_both_ways()
                 if self.component == "Column":
-                    final_model = self.ExtObj.get_column_models()
+                    final_model = self.CPObj.get_column_models()
 
                 elif self.component == "Beam":
-                    final_model = self.ExtObj.get_beam_models()
+                    final_model = self.CPObj.get_beam_models()
 
                 elif self.component == "Connector":
-                    cadlist = self.ExtObj.get_connector_models()
-                    final_model = cadlist[0]
-                    for model in cadlist[1:]:
-                        final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+                    final_model = self.CPObj.get_connector_models()
+                    # final_model = cadlist[0]
+                    # for model in cadlist[1:]:
+                    #     final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
                 else:
-                    cadlist = self.ExtObj.get_models()
-                    final_model = cadlist[0]
-                    for model in cadlist[1:]:
-                        final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-
+                    final_model = self.CPObj.get_models()
+                    # final_model = cadlist[0]
+                    # for model in cadlist[1:]:
+                    #     final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+                    #
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 if self.component == "Column":

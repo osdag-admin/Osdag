@@ -2293,7 +2293,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check.append(t1)
 
         ##Todo  if Yes- Give design status check- Danish
-        t1 = ('SubSection', 'Continuity Plate Design ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Continuity Plate Design- Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_NOTCH_SIZE,self.notch_size,'','')
         self.report_check.append(t1)
@@ -2303,6 +2303,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK,self.cont_plate_thk_provided,'','')
         self.report_check.append(t1)
+
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])
         rel_path = str(sys.path[0])

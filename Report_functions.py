@@ -6850,3 +6850,11 @@ def compressioncheck(P_cw_1,P_cw_3,P_cw_2,P_bf):
     compressioncheck_eqn.append(NoEscape(r'  &= min(' + P_cw_1 + r', ~' + P_cw_2 + r', ~' + P_cw_3+ r') \\'))
     compressioncheck_eqn.append(NoEscape(r' &= (' + P_bf + r'\end{aligned}'))
     return compressioncheck_eqn
+
+# def comp_plate_length(l_cp1,l_cp2,D_c,T_c):
+#     l_cp1 = str(l_cp1)
+#     l_cp2 = str(l_cp2)
+#     D_c = str(D_c)
+#     T_c = str(T_c)
+#     compressioncheck_eqn = Math(inline=True)
+#     compressioncheck_eqn.append(NoEscape(r'\begin{aligned} l_{cp1} &= min(P_{cw_1},P_{cw_2},P_{cw_3}) \\'))

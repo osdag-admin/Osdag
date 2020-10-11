@@ -2297,8 +2297,10 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_NOTCH_SIZE,self.notch_size,'','')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH,self.cont_plate_length_in,'','')
-        self.report_check.append(t1)
+        # t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH,'',comp_plate_length(l_cp1=self.cont_plate_length_out,
+        #                                                                 l_cp2=self.cont_plate_length_in,
+        #                                                                 D_c,T_c),'')
+        # self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH,self.cont_plate_width ,'','')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK,self.cont_plate_thk_provided,'','')

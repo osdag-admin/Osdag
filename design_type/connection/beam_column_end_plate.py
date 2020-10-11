@@ -2255,7 +2255,7 @@ class BeamColumnEndPlate(MomentConnection):
         t1 = (KEY_OUT_DISP_LOCAL_WEB_YIELDING, local_web_yielding(f_wc=self.f_wc, k=self.k, t_fb=self.beam_tf,
                                                                   gamma_mo=self.gamma_m0, column_tf=self.column_tf,
                                                                   column_r1=self.column_r1, column_fy=self.column_fy,
-                                                                  column_tw=self.column_tw, P_bf=self.p_bf_1), '', '',)
+                                                                  column_tw=self.column_tw, P_bf_1=self.p_bf_1), '', '',)
         self.report_check.append(t1)
 
         # self.p_bf_2 = 10710 * (self.column_tw ** 2 / self.h_c) * math.sqrt(self.column_fy / self.gamma_m0) * 1e-3  # kN
@@ -2282,9 +2282,27 @@ class BeamColumnEndPlate(MomentConnection):
                                                        P_cw_3 =self.p_bf_3,
                                                        T_c=self.column_tf), '', '', '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_COMP_STRENGTH, '', '', '', '')
+        t1 = (KEY_OUT_DISP_COMP_STRENGTH, compressioncheck(P_cw_1=self.p_bf_1,
+                                                           P_cw_3=self.p_bf_3,
+                                                           P_cw_2=self.p_bf_2,
+                                                           P_bf=  self.p_bf ), '', '', '')
         self.report_check.append(t1)
 
+        t1 = (KEY_OUT_DISP_CONT_PLATE_REQ,self.call_helper.r_c, self.p_bf,
+              get_pass_fail(self.call_helper.r_c, self.p_bf, relation="greater"))
+        self.report_check.append(t1)
+
+        ##Todo  if Yes- Give design status check- Danish
+        t1 = ('SubSection', 'Continuity Plate Design ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_NOTCH_SIZE,self.notch_size,'','')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH,self.cont_plate_length_in,'','')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH,self.cont_plate_width ,'','')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK,self.cont_plate_thk_provided,'','')
+        self.report_check.append(t1)
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])
         rel_path = str(sys.path[0])

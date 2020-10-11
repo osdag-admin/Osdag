@@ -6783,7 +6783,7 @@ def min_weld_size_ep_web_prov(weld_size_web, weld_size_web_provided, min_size):
     return weld_size_ep_web_prov_eqn
 # >>>>>>> 1a4f41f957c3004664005ff81dea375296b3a6fd
 
-def local_web_yielding(f_wc,k,t_fb,gamma_mo,column_tf , column_r1,column_fy,column_tw,P_bf):
+def local_web_yielding(f_wc,k,t_fb,gamma_mo,column_tf , column_r1,column_fy,column_tw,P_bf_1):
     f_wc = str(f_wc)
     k = str(k)
     t_fb = str(t_fb)
@@ -6792,7 +6792,7 @@ def local_web_yielding(f_wc,k,t_fb,gamma_mo,column_tf , column_r1,column_fy,colu
     column_r1 = str(column_r1)
     column_fy = str(column_fy)
     column_tw = str(column_tw)
-    P_bf = str(P_bf)
+    P_bf_1 = str(P_bf_1)
 
     local_web_yielding_eqn = Math(inline=True)
     local_web_yielding_eqn.append(NoEscape(r'\begin{aligned} P_{cw_1} &= \frac{f_{wc}(5k +T_b)}{\gamma_mo}\\'))
@@ -6806,7 +6806,7 @@ def local_web_yielding(f_wc,k,t_fb,gamma_mo,column_tf , column_r1,column_fy,colu
     local_web_yielding_eqn.append(NoEscape(r' &= (' + f_wc+ r') \\'))
 
     local_web_yielding_eqn.append(NoEscape(r' P_{cw_1}&= \frac{'+f_wc+'(5'+k+' +'+t_fb+')}{'+gamma_mo+r'}\\'))
-    local_web_yielding_eqn.append(NoEscape(r' &= (' + P_bf+ r'\end{aligned}'))
+    local_web_yielding_eqn.append(NoEscape(r' &= (' + P_bf_1+ r'\end{aligned}'))
     return local_web_yielding_eqn
 
 def compression_buckling_of_web(t_c,fy_c, h_c,k, gamma_mo, D_c , P_cw_2):
@@ -6839,3 +6839,14 @@ def web_cripling(t_c,fy_c,T_b, gamma_m1, D_c , P_cw_3,T_c):
     web_cripling_eqn.append(NoEscape(r'&= (\frac{300 '+t_c+'^2}{'+gamma_m1+r'}) \times (1+ 3(\frac{'+T_b+'}{'+D_c+r'}) (\frac{'+t_c+'}{'+T_c+r'})**1.5)  \times \sqrt('+fy_c+r' (\frac{'+T_c+'}{'+t_c+r'}))  \\'))
     web_cripling_eqn.append(NoEscape(r' &= (' + P_cw_3 + r'\end{aligned}'))
     return web_cripling_eqn
+
+def compressioncheck(P_cw_1,P_cw_3,P_cw_2,P_bf):
+    P_cw_1 = str(P_cw_1)
+    P_cw_2 = str(P_cw_2)
+    P_cw_3 = str(P_cw_3)
+    P_bf = str(P_bf)
+    compressioncheck_eqn = Math(inline=True)
+    compressioncheck_eqn.append(NoEscape(r'\begin{aligned} P_{bf} &= min(P_{cw_1},P_{cw_2},P_{cw_3}) \\'))
+    compressioncheck_eqn.append(NoEscape(r'  &= min(' + P_cw_1 + r', ~' + P_cw_2 + r', ~' + P_cw_3+ r') \\'))
+    compressioncheck_eqn.append(NoEscape(r' &= (' + P_bf + r'\end{aligned}'))
+    return compressioncheck_eqn

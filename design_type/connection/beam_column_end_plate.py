@@ -1498,7 +1498,7 @@ class BeamColumnEndPlate(MomentConnection):
             self.p_bf_2 = round(self.p_bf_2, 2)
 
             # check 3: column web crippling capacity (as per american code)
-            self.p_bf_3 = ((300 * self.column_tw ** 2) / self.gamma_m1) * (1 + (3 * (self.beam_tf / self.column_D) *
+            self.p_bf_3 = ((300 * self.column_tw ** 3) / self.gamma_m1) * (1 + (3 * (self.beam_tf / self.column_D) *
                                                                                 (self.column_tw / self.column_tf) ** 1.5)) * \
                           math.sqrt((self.column_fy * self.column_tf) / self.column_tw) * 1e-3  # kN
             self.p_bf_3 = round(self.p_bf_3, 2)

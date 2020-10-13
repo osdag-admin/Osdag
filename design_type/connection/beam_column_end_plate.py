@@ -1115,7 +1115,9 @@ class BeamColumnEndPlate(MomentConnection):
                         # end/edge
                         self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                         self.bolt.edge_type)
-                        self.end_distance_provided = round_up(2 * self.end_distance_provided, 5)  # mm
+                        self.end_distance_provided = round(2 * self.end_distance_provided)  # mm
+                        # self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
+
                         # self.edge_distance_provided = self.end_distance_provided
                         self.edge_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                         self.bolt.edge_type)

@@ -274,6 +274,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_hole_dia_in = 0.0
         self.bp_length_min = 0.0
         self.bp_width_min = 0.0
+        self.width_min_req = 0.0
         self.bp_length_provided = 0.0
         self.bp_width_provided = 0.0
         self.end_distance_out = 0.0
@@ -2451,15 +2452,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             "bolts outside column flange on either side")
 
                 # fixing length and width of the base plate
-                width_min = 2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete)  # mm
-                if width_min < self.bp_width_min:
+                self.width_min_req = round(2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete), 2)  # mm
+                if self.width_min_req > self.bp_width_min:
                     self.min_width_check_Case1 = True
-                    width_min = self.bp_width_min
                 else:
-                    pass
+                    self.min_width_check_Case1 = False
 
-                self.bp_length_provided = max(self.bp_length_min, width_min)  # mm, assigning maximum dimension to length
-                self.bp_width_provided = min(self.bp_length_min, width_min)  # mm, assigning minimum dimension to width
+                self.bp_length_provided = max(self.bp_length_min, round_up(self.width_min_req, 5))  # mm, assigning maximum dimension to length
+                self.bp_width_provided = min(self.bp_length_min, round_up(self.width_min_req, 5))  # mm, assigning minimum dimension to width
                 self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
 
                 # elastic section modulus of plate (BL^2/6)
@@ -2469,10 +2469,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.sigma_max_zz = (self.load_axial_compression / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
                 self.sigma_min_zz = (self.load_axial_compression / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
 
+                self.max_bearing_stress = round(self.sigma_max_zz, 2)
+
                 # calculating moment at the critical section
 
                 # Assumption: the critical section (critical_xx) acts at a distance of 0.95 times the column depth, along the depth
-                self.critical_xx = (self.bp_length_provided - 0.95 * self.column_D) / 2  # mm
+                self.critical_xx = round((self.bp_length_provided - 0.95 * self.column_D) / 2, 2)  # mm
                 self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - self.critical_xx) / self.bp_length_provided
                 self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
 
@@ -3336,6 +3338,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 #     self.anchor_dia_provided_outside_flange = i  # optimised anchor dia provided (mm)
                 #     break
 
+                # updating the end/edge and pitch/gauge distance (if the anchor diameter or numbers is improvised in the above loop(s))
+                self.end_distance_out = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole_out,
+                                                                           self.dp_detail_edge_type)
+                self.end_distance_out = round_up(1.5 * self.end_distance_out, 5)
+
+                self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_provided_outside_flange)  # outside flange
+                self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
+
+                if self.end_distance_out < self.plate_washer_dim_out:
+                    self.end_distance_out = self.plate_washer_dim_out
+
+                self.edge_distance_out = self.end_distance_out
+
                 # fixing bp size and parameters calculations after the iteration checks
                 if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
                     self.bolt_columns_outside_flange = 1
@@ -3397,6 +3412,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                               self.anchor_area_outside_flange[1],
                                                                                               safety_factor_parameter=self.dp_weld_fab)  # N
                 self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                # update bearing stress
+                self.max_bearing_stress = (self.tension_demand_anchor * 1000 * self.y) / ((self.anchor_area_tension * self.n) *
+                                                                                          ((self.bp_length_provided / 2) - self.y + self.f))  # N/mm^2
 
                 # designing the plate thickness
 
@@ -3934,8 +3953,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.dp_anchor_length_out < self.anchor_length_provided_out:
             self.dp_anchor_length_out = self.anchor_length_provided_out
 
-        if self.dp_anchor_length_in < self.anchor_length_provided_in:
-            self.dp_anchor_length_in = self.anchor_length_provided_in
+        if self.load_axial_tension > 0:
+            if self.dp_anchor_length_in < self.anchor_length_provided_in:
+                self.dp_anchor_length_in = self.anchor_length_provided_in
 
         # length check
         if self.anchor_len_below_footing_out < self.anchor_length_min_out:
@@ -4373,15 +4393,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.critical_xx = 0.0
                 else:
                     if self.moment_bp_case == 'Case1':
-                        self.sigma_max_zz = self.sigma_max_zz
-                        self.sigma_xx = self.sigma_xx
-                        self.sigma_web = self.sigma_min_zz + ((self.sigma_max_zz - self.sigma_min_zz) / 2)
-                        self.sigma_lby2 = self.sigma_min_zz + ((self.sigma_max_zz - self.sigma_min_zz) / 2)
-                        self.sigma_avg = (self.sigma_max_zz + self.sigma_lby2) / 2  # for stiffener along flange
+                        self.sigma_max_zz = round(self.sigma_max_zz, 2)
+                        self.sigma_min_zz = round(self.sigma_min_zz, 2)
+                        self.sigma_xx = round(self.sigma_xx, 2)
+                        self.sigma_web = round(self.sigma_min_zz + ((self.sigma_max_zz - self.sigma_min_zz) / 2), 2)
+                        self.sigma_lby2 = round(self.sigma_min_zz + ((self.sigma_max_zz - self.sigma_min_zz) / 2), 2)
+                        self.sigma_avg = round((self.sigma_max_zz + self.sigma_lby2) / 2, 2)  # for stiffener along flange
                         self.sigma_avg_2 = round((self.sigma_max_zz + self.sigma_xx) / 2, 2)  # for stiffener along web
 
                         self.y = 0.0
-                        self.critical_xx = 0.0
                     else:
                         self.sigma_max_zz = round(self.max_bearing_stress, 2)
                         self.sigma_min_zz = 0.0
@@ -6033,7 +6053,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                         t3 = ('Width $(mm)$', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation,
                                                      projection=0, bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
-                              bp_width_case1(self.load_axial_compression, self.bp_length_min, self.bearing_strength_concrete, self.bp_width_provided),
+                              bp_width_case1(self.load_axial_compression, self.bp_length_min, self.bearing_strength_concrete, self.bp_width_provided,
+                                             self.width_min_req),
                               get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
                         self.report_check.append(t3)
                     else:
@@ -6150,14 +6171,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t2)
 
             if self.moment_bp_case == 'Case1':
-                t10 = ('Total tension demand $(kN)$', 'P_t = 0 ', '', 'N/A')
+                t10 = ('Total tension demand $(kN)$', 'P_t = 0 ', '', 'OK')
                 self.report_check.append(t10)
 
                 t3 = ('Elastic section modulus of the base plate $(mm^3)$', '', bp_section_modulus(self.bp_length_provided, self.bp_width_provided,
-                                                                                                 self.ze_zz), 'Pass')
+                                                                                                 self.ze_zz), 'OK')
                 self.report_check.append(t3)
 
-                t5 = ('Critical section $(mm)$', critical_section(self.bp_length_provided, self.column_D, self.critical_xx), '', 'Pass')
+                t5 = ('Critical section $(mm)$', critical_section(self.bp_length_provided, self.column_D, self.critical_xx), '', 'OK')
                 self.report_check.append(t5)
 
                 t4 = ('Bending stress $(N/mm^2)$', self.bearing_strength_concrete,
@@ -6166,14 +6187,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       get_pass_fail(self.sigma_max_zz, self.bearing_strength_concrete, relation='leq'))
                 self.report_check.append(t4)
 
-                t6 = ('Bending stress - at critical section $(N/mm^2)$', self.bearing_strength_concrete, bending_stress_critical_sec(self.sigma_xx), '')
+                t6 = ('Bending stress - at critical section $(N/mm^2)$', self.bearing_strength_concrete, bending_stress_critical_sec(self.sigma_xx),
+                      'OK')
                 self.report_check.append(t6)
 
                 t7 = ('Bending moment - at critical section $(N-mm)$', moment_critical_section(self.sigma_xx, self.sigma_max_zz, self.critical_xx,
-                                                                                             self.critical_M_xx, 0, 0, case='Case1'), '', 'N/A')
+                                                                                             self.critical_M_xx, 0, 0, case='Case1'), '', 'OK')
                 self.report_check.append(t7)
 
-                t8 = ('Moment capacity of base plate', md_plate(), '', 'N/A')
+                t8 = ('Moment capacity of base plate', md_plate(), '', 'OK')
                 self.report_check.append(t8)
 
                 if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
@@ -6293,14 +6315,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                              self.dp_anchor_hole_out), 'OK')
         self.report_check.append(t4)
 
-        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
+        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, '', cl_10_3_2_bolt_capacity(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity),
+              'OK')
         self.report_check.append(t5)
 
         t6 = ('Tension demand - per anchor bolt $(kN)$', tension_demand_per_bolt(self.tension_demand_anchor, self.anchors_outside_flange),
               cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_outside_flange[0], self.anchor_fu_fy_outside_flange[1],
                                                         self.anchor_area_outside_flange[0], self.anchor_area_outside_flange[1],
                                                         self.tension_capacity_anchor, fabrication=KEY_DP_FAB_FIELD),
-              get_pass_fail(self.tension_demand_anchor / self.anchors_outside_flange, self.tension_capacity_anchor, relation='leq'))
+              get_pass_fail((self.tension_demand_anchor / self.anchors_outside_flange), self.tension_capacity_anchor, relation='leq'))
         self.report_check.append(t6)
 
         # if self.connectivity == 'Moment Base Plate':
@@ -6411,7 +6434,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                            'Pass')
                     self.report_check.append(t10)
                 else:
-                    t10 = ('Anchor length - below concrete footing $(mm)$', '', 'l_{2} = ' + str(self.anchor_length_provided_in) + '', 'Pass')
+                    t10 = ('Anchor length - below concrete footing $(mm)$', '', anchor_len_below(0, 0, self.anchor_len_below_footing_in, 0, 0, 0, 0,
+                                                                                                connectivity='Moment Base Plate', case='Case1'),
+                          'Pass')
                     self.report_check.append(t10)
 
                 t11 = ('Anchor length - total $(mm)$', anchor_range(self.anchor_length_min_in, self.anchor_length_max_in),
@@ -6434,8 +6459,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       'OK')
                 self.report_check.append(t2)
 
-                t3 = ('Height of Stiffener $(mm)$', '', stiff_height_flange(self.stiffener_plt_len_along_flange, self.stiffener_plt_height_along_flange),
-                'OK')
+                t3 = ('Height of Stiffener $(mm)$', '', stiff_height_flange(self.stiffener_plt_len_along_flange,
+                                                                            self.stiffener_plt_height_along_flange), 'OK')
                 self.report_check.append(t3)
 
                 t4 = ('Thickness of stiffener $(mm)$', stiff_thk_flange(self.thk_req_stiffener_along_flange, self.stiffener_plt_len_along_flange,
@@ -6445,8 +6470,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t4)
 
                 t5 = ('Stress (average) at stiffener $(N/mm^2)$', stiffener_stress_allowable(self.bearing_strength_concrete),
+
                       stiffener_stress_flange(self.sigma_xx, self.sigma_max_zz, self.sigma_min_zz, self.bp_length_provided, self.column_D, self.y,
                                               self.critical_xx, self.sigma_avg, self.sigma_lby2, self.connectivity, self.moment_bp_case),
+
                       get_pass_fail(self.bearing_strength_concrete, self.sigma_avg, relation='geq'))
                 self.report_check.append(t5)
 
@@ -6801,9 +6828,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t4)
 
                 t3 = ('Moment Capacity $(kN-m)$', round(self.shear_key_moment_2 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColWidth,
-                                                                                                              self.shear_key_thk, self.fy_key_2,
-                                                                                                              self.gamma_m0, self.moment_capacity_key2,
-                                                                                                              beta_b=1, location='L2'),
+                                                                                                                self.shear_key_thk, self.fy_key_2,
+                                                                                                                self.gamma_m0,
+                                                                                                                self.moment_capacity_key2,
+                                                                                                                beta_b=1, location='L2'),
                       get_pass_fail(self.shear_key_moment_2 * 1e-6, self.moment_capacity_key2, relation='leq'))
                 self.report_check.append(t3)
 

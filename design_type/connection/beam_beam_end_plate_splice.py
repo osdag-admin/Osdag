@@ -1324,7 +1324,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         else:
             image = "Slope_Beam"
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
-                                  KEY_DISP_BEAMSEC: self.supported_section.designation,
+                                  'Beam section': self.supported_section.designation,
                                   KEY_DISP_MATERIAL: self.supported_section.material,
                                   KEY_DISP_FU: self.supported_section.fu,
                                   KEY_DISP_FY: self.supported_section.fy,
@@ -1334,7 +1334,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                   'B(mm)': self.supported_section.flange_width,
                                   't(mm)': self.supported_section.web_thickness,
                                   'T(mm)': self.supported_section.flange_thickness,
-                                  'FlangeSlope': self.supported_section.flange_slope,
+                                  'Flange slope': self.supported_section.flange_slope,
                                   'R1(mm)': self.supported_section.root_radius,
                                   'R2(mm)': self.supported_section.toe_radius,
                                   'Iz(mm4)': self.supported_section.mom_inertia_z,
@@ -1542,11 +1542,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.bolt_fu, 1,
                                                                              self.bolt.bolt_net_area,
                                                                              self.gamma_mb,
-                                                                             bolt_shear_capacity_kn), '')
+                                                                             bolt_shear_capacity_kn), 'OK')
             self.report_check.append(t1)
 
             t3 = (KEY_DISP_KB, '', cl_10_3_4_calculate_kb(self.end_distance_provided, self.pitch_distance_provided, self.bolt_hole_diameter,
-                                                          self.bolt_fu, self.supported_section.fu), 'N/A')
+                                                          self.bolt_fu, self.supported_section.fu), 'OK')
             self.report_check.append(t3)
 
             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(kb_disp,
@@ -1554,7 +1554,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                  [(self.plate_thickness, self.plate.fu, self.plate.fy),
                                                                                   (self.plate_thickness, self.plate.fu, self.plate.fy)],
                                                                                  self.gamma_mb,
-                                                                                 bolt_bearing_capacity_kn), '')
+                                                                                 bolt_bearing_capacity_kn), 'OK')
             self.report_check.append(t2)
 
             t3 = ('Bolt capacity (kN)', bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers,
@@ -1585,7 +1585,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t6 = ("Tension due to moment (kN)", tension_critical_bolt_prov(M=self.load_moment_effective, t_ba=round(self.tension_critical_bolt, 2),
                                                                           n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
                                                                           r_i=round(r_sum, 2), n=self.bolt_row, type=self.endplate_type,
-                                                                          r_3=float(leverarm[2])), "", "")
+                                                                          r_3=float(leverarm[2])), "", "OK")
         self.report_check.append(t6)
 
         if self.bolt.bolt_tensioning == 'Pretensioned':
@@ -1602,7 +1602,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         t1 = ("Prying force (kN)", cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, self.beta, self.proof_stress, b_e, t, self.end_distance_provided,
                                                           self.beam_r1, self.dp_plate_fy, self.bolt_fu, self.proof_stress, self.beam_bf,
-                                                          self.bolt_column, self.prying_critical_bolt, eta=1.5), '', '')
+                                                          self.bolt_column, self.prying_critical_bolt, eta=1.5), '', 'OK')
         self.report_check.append(t1)
 
         if self.bolt.bolt_type == "Bearing Bolt":
@@ -1658,7 +1658,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         t1 = ('Moment at critical section (kN-m)', '', moment_ep(t_1=round(self.call_helper.t_1, 2), lv=round(self.call_helper.lv, 2),
                                                       Q=round(self.call_helper.prying_force, 2), le=round(self.call_helper.le, 2),
-                                                      mp_plate=round(self.ep_moment_capacity, 2)), "")
+                                                      mp_plate=round(self.ep_moment_capacity, 2)), "OK")
 
         self.report_check.append(t1)
 
@@ -1683,8 +1683,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                         h_ep=self.ep_height_provided,
                                                                         D=self.supported_section.depth,
                                                                         h_sp=self.stiffener_height,
-                                                                        type=self.endplate_type),
-              self.stiffener_height, 'Pass')
+                                                                        type=self.endplate_type), 'Pass')
         self.report_check.append(t1)
 
         t1 = (KEY_OUT_DISP_STIFFENER_LENGTH, ' ', stiffener_length_prov(h_sp=self.stiffener_height,
@@ -1714,7 +1713,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         self.weld_size_web1 = round((self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.weld_fu), 2)  # mm
 
-        t1 = ('Weld size (mm)', weld_size_ep_web_req(load_shear=self.load_shear, gamma_mw=self.gamma_mb, weld_length_web=self.weld_length_web,
+        t1 = ('Weld size (mm)', weld_size_ep_web_req(load_shear=self.load_shear, gamma_mw=self.gamma_mw, weld_length_web=self.weld_length_web,
                                                      fu=self.weld_fu, weld_size_web=self.weld_size_web1), self.weld_size_web,
               get_pass_fail(self.weld_size_web1, self.weld_size_web, relation="leq"))
         self.report_check.append(t1)
@@ -1730,11 +1729,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_check.append(t1)
 
         t1 = ('Normal stress $(N/mm^2)$', "", f_a_stress_due_to_axial_force(A_f=self.load_axial, t_w=self.weld_size_web, L_weld=self.weld_length_web,
-                                                                            f_a=round(self.f_a, 2)), "")
+                                                                            f_a=round(self.f_a, 2)), "OK")
         self.report_check.append(t1)
 
         t1 = ('Shear stress $(N/mm^2)$', "", q_stress_due_to_shear_force(V=self.load_shear, t_w=self.weld_size_web, L_weld=self.weld_length_web,
-                                                                         q=self.q), "")
+                                                                         q=self.q), "OK")
         self.report_check.append(t1)
 
         # self.conn_plates_weld_fu1 = [self.web_weld.fu, self.web_weld.fu]  # todo trial

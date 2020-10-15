@@ -1625,9 +1625,12 @@ class BeamColumnEndPlate(MomentConnection):
 
             else:
                 self.diagonal_stiffener_status = False
-                self.diag_stiffener_length = 'N/A'
-                self.diag_stiffener_width = 'N/A'
-                self.diag_stiffener_thk_provided = 'N/A'
+                # self.diag_stiffener_length = 'N/A'
+                # self.diag_stiffener_width = 'N/A'
+                # self.diag_stiffener_thk_provided = 'N/A'
+                self.diag_stiffener_length = 438
+                self.diag_stiffener_width = 164
+                self.diag_stiffener_thk_provided = 14
 
         else:  # column web to beam web connectivity
             self.continuity_plate_compression_flange_status = False
@@ -1740,7 +1743,9 @@ class BeamColumnEndPlate(MomentConnection):
             else:
                 self.diag_stiffener_groove_weld_status = False
         else:
-            self.weld_size_diag_stiffener = 'N/A'
+            # self.weld_size_diag_stiffener = 'N/A'
+            self.weld_size_diag_stiffener = 10
+
             self.diag_stiffener_groove_weld_status = False
 
         # end of the design simulation

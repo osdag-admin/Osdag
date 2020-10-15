@@ -1392,7 +1392,6 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-
             ex_length_out = BP.anchor_len_above_footing_out
             if BP.anchor_type == 'IS 5624-Type A':
                 bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
@@ -1417,11 +1416,21 @@ class CommonDesignLogic(object):
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
+            if BP.shear_key_along_ColDepth == 'Yes':
+                shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T=float(BP.shear_key_depth_ColDepth))
+            else:
+                shearkey_1 = Plate(L=float(0), W=float(0), T=float(0))
+
+            if BP.shear_key_along_ColWidth == 'Yes':
+                shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_len_ColWidth), T=float(BP.shear_key_depth_ColWidth))
+            else:
+                shearkey_2 = Plate(L=float(0), W=float(0), T=float(0))
+
             nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace,  washer, washer_in)
 
             basePlate = HollowBasePlateCad(BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
-                                           weld_stiff_b_h)
+                                           weld_stiff_b_h, shearkey_1, shearkey_2)
         else:
             column_tw = float(BP.column_tw)
             column_T = float(BP.column_tf)
@@ -1455,7 +1464,7 @@ class CommonDesignLogic(object):
                                        T=float(BP.stiffener_plt_thick_along_web),
                                        L11=float(BP.stiffener_plt_len_along_web - 50), L12=float(BP.stiffener_plt_height_along_web - 100), R21=15, R22=15)
 
-            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=float(BP.anchor_len_below_footing_out)* 1.3)
+            concrete = Plate(L=baseplate.L * 2, W=baseplate.W * 2, T=float(BP.anchor_len_below_footing_out) * 1.5)
             grout = Grout(L=concrete.L, W=concrete.W, T=50)
 
             stiffener_acrsWeb = StiffenerPlate(L=float(BP.stiffener_plt_len_across_web) - float(BP.weld_size_stiffener), W=float(BP.stiffener_plt_height_across_web), T=float(BP.stiffener_plt_thick_across_web),
@@ -1507,7 +1516,6 @@ class CommonDesignLogic(object):
                 BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_out
                 BP.plate_washer_thk_in = BP.plate_washer_thk_out
 
-
             bolt_d = float(BP.anchor_dia_outside_flange)
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
             bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
@@ -1521,7 +1529,6 @@ class CommonDesignLogic(object):
             # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
             nut_T_in = self.nutThick_Calculation(bolt_d_in)  # Nut thickness, usually nut thickness = nut height
             nut_HT_in = nut_T_in
-
 
             ex_length_out = BP.anchor_len_above_footing_out
             ex_length_in = BP.anchor_len_above_footing_in

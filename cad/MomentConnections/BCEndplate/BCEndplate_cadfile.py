@@ -1042,12 +1042,9 @@ class CADColWebFillet(CADFillet):
 
 
 class CADGroove(object):
-    # extbothWays = BCECADGroove(BCE, beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt, bcWeldFlang,
-    #                            bcWeldWeb, contPlates, beam_stiffeners, bcWeldStiffHeight, bcWeldStiffLength, contWeldD,
-    #                            contWeldB, diagplate, endplate_type)
 
     def __init__(self, module, column, beam, plate, nut_bolt_array, bolt,bcWeldFlang,bcWeldWeb,
-                 contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate,diagWeldD,endplate_type):
+                 contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate,diagWeldD,diagWeldB,endplate_type):
         """
 
         :param column: Column
@@ -1146,6 +1143,10 @@ class CADGroove(object):
         self.diagWeldR1_L = copy.deepcopy(diagWeldD)
         self.diagWeldR1_U = copy.deepcopy(diagWeldD)
 
+        self.diagWeldS1_U = diagWeldB
+        self.diagWeldS1_L = copy.deepcopy(diagWeldB)
+        self.diagWeldS2_U = copy.deepcopy(diagWeldB)
+        self.diagWeldS2_L = copy.deepcopy(diagWeldB)
 
 
     def create_3DModel(self):
@@ -1238,7 +1239,15 @@ class CADGroove(object):
         self.diagWeldL1_UModel = self.diagWeldL1_U.create_model(-45)
         self.diagWeldR1_LModel = self.diagWeldR1_L.create_model(-45)
         self.diagWeldR1_UModel = self.diagWeldR1_U.create_model(-45)
+        
+        # self.diagWeldS1_UModel = self.diagWeldS1_U.create_model()
+        # self.diagWeldS1_LModel = self.diagWeldS1_L.create_model()
 
+        self.diagWeldS1_UModel = self.diagWeldS1_U.create_model(45)
+        self.diagWeldS1_LModel = self.diagWeldS1_L.create_model(-135)
+        self.diagWeldS2_UModel = self.diagWeldS2_U.create_model(45)
+        self.diagWeldS2_LModel = self.diagWeldS2_L.create_model(-135)
+        
     #############################################################################################################
     #   Following functions takes inputs as origin, u direction and w direction of concerned component to place #
     #   same component at appropriate place                                                                     #
@@ -1685,6 +1694,41 @@ class CADGroove(object):
         diagWeldL1_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.diagWeldL1_U.place(diagWeldL1_U2OriginL, diagWeldL1_U2_uDir, diagWeldL1_U2_wDir)
 
+        # diagWeldS1_U3OriginL = numpy.array([0.0,-self.column.D/2 + self.column.T +self.diagWeldS1_L.h,self.column.length/2+self.diagplate_L1.L/2*sin(radians(45))])
+        diagWeldS1_U3OriginL = numpy.array([self.column.t/2,((self.column.length/2)*cos(radians(45))+self.diagWeldS1_U.h/2),
+                                            ((self.column.length/2+self.diagplate_L1.L*sin(radians(45)))*sin(radians(45)))])
+
+        uDirdiagWeldS1_U3 = numpy.array([0, 0.0, 1.0])
+        wDirdiagWeldS1_U3 = numpy.array([1.0, 0, 0])
+        self.diagWeldS1_U.place(diagWeldS1_U3OriginL, uDirdiagWeldS1_U3, wDirdiagWeldS1_U3)
+
+        # diagWeldS1_L3OriginL = numpy.array(
+        #     [self.column.t / 2, -((self.column.length/2-(self.diagplate_L1.L*cos(radians(45))))*cos(radians(45))-self.diagWeldS1_U.h/2),
+        #      ((self.column.length/2))*sin(radians(45))])
+
+        diagWeldS1_L3OriginL = numpy.array(
+            [self.column.t / 2, -(self.column.length/2)*sin(radians(45))+self.diagplate_L1.T/2,-((self.column.length/2-(self.diagplate_L1.L*cos(radians(45))))*cos(radians(45)))])
+
+        uDirdiagWeldS1_L3 = numpy.array([0, 0.0, 1.0])
+        wDirdiagWeldS1_L3 = numpy.array([1.0, 0, 0])
+        self.diagWeldS1_L.place(diagWeldS1_L3OriginL, uDirdiagWeldS1_L3, wDirdiagWeldS1_L3)
+
+        diagWeldS2_U3OriginL = numpy.array(
+            [-self.column.t / 2-self.diagplate_L1.W, ((self.column.length / 2) * cos(radians(45)) + self.diagWeldS1_U.h / 2),
+             ((self.column.length / 2 + self.diagplate_L1.L * sin(radians(45))) * sin(radians(45)))])
+
+        uDirdiagWeldS2_U3 = numpy.array([0, 0.0, 1.0])
+        wDirdiagWeldS2_U3 = numpy.array([1.0, 0, 0])
+        self.diagWeldS2_U.place(diagWeldS2_U3OriginL, uDirdiagWeldS2_U3, wDirdiagWeldS2_U3)
+
+        diagWeldS2_L3OriginL = numpy.array(
+            [-self.column.t / 2-self.diagplate_L1.W, -(self.column.length / 2) * sin(radians(45)) + self.diagplate_L1.T / 2,
+             -((self.column.length / 2 - (self.diagplate_L1.L * cos(radians(45)))) * cos(radians(45)))])
+
+        uDirdiagWeldS2_L3 = numpy.array([0, 0.0, 1.0])
+        wDirdiagWeldS2_L3 = numpy.array([1.0, 0, 0])
+        self.diagWeldS2_L.place(diagWeldS2_L3OriginL, uDirdiagWeldS2_L3, wDirdiagWeldS2_L3)
+
         # contWeldL2_U2OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2, self.column.length / 2
         #                                     - self.beam.D / 2 + self.beam.T / 2 + self.contPlate_L1.T / 2])
         # contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -1904,6 +1948,7 @@ class CADGroove(object):
             welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
                         self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
                            self.diagWeldL1_LModel,self.diagWeldL1_UModel,self.diagWeldR1_LModel,self.diagWeldR1_UModel,
+                           self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
                           self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
                           self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                           self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
@@ -1934,6 +1979,7 @@ class CADGroove(object):
             welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
                            self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
                            self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
+                           self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
                            self.bcWeldStiffHR_2Model,
                           self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
                           self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
@@ -1966,6 +2012,7 @@ class CADGroove(object):
                           self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
                           self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
                           self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
+                          self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
                           self.contWeldL2_L2Model,
                           self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                           self.contWeldR2_L2Model,

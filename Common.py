@@ -601,7 +601,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_MATERIAL = 'Plate material'
+KEY_DISP_MATERIAL = 'Material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 KEY_DISP_PRIBM = 'Primary beam *'

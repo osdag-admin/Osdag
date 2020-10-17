@@ -315,6 +315,7 @@ class Window(QMainWindow):
 
     def get_validator(self, validator):
         if validator == 'Int Validator':
+            # return QRegExpValidator(QRegExp("^[1-9]+\d * (\.\d+)?$"))
             return QIntValidator()
         elif validator == 'Double Validator':
             return QDoubleValidator()
@@ -1739,6 +1740,15 @@ class Window(QMainWindow):
                                 str(key_str) + ": (" + str(uiObj[key_str]) + ") - Default Value Considered! \n"
             elif op[2] == TYPE_TEXTBOX:
                 if key_str in uiObj.keys():
+                    if key_str == KEY_SHEAR or key_str==KEY_AXIAL or key_str == KEY_MOMENT:
+                        try:
+                            if uiObj[key_str] > 0:
+                                pass
+                        except:
+                            self.load_input_error_message += \
+                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Load should be positive integer! \n"
+                            uiObj[key_str] = ""
+
                     key.setText(uiObj[key_str] if uiObj[key_str] != 'Disabled' else "")
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():

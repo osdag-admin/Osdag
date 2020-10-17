@@ -148,8 +148,9 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
-from design_type.connection.beam_end_plate import BeamEndPlate
+
 from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
@@ -531,7 +532,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
             self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamEndPlate,' ')
+            self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice,' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton, 'B2B_End_Plate_Splice').isChecked():
@@ -543,9 +544,10 @@ class OsdagMainWindow(QMainWindow):
     def show_moment_connection_bc(self):
         if self.findChild(QRadioButton,'BC_End_Plate').isChecked():
             self.hide()
-            self.ui2 = Ui_ModuleWindow( BeamColumnEndPlate, ' ')
+            self.ui2 = Ui_ModuleWindow(BeamColumnEndPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+
     def show_base_plate(self):
         if self.findChild(QRadioButton, 'Base_Plate').isChecked():
             self.hide()
@@ -815,16 +817,6 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
-
-    # #######add darshan#################
-    # print(multiprocessing.cpu_count())
-    # pool = Pool()
-    # try:
-    #     result = pool.apply_async(OsdagMainWindow())
-    # finally:
-    #     pool.terminate()
-    # ####################################
-
     window = OsdagMainWindow()
 
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)

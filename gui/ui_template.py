@@ -43,12 +43,13 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
+from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -207,7 +208,7 @@ class Window(QMainWindow):
             self.commLogicObj.display = off_display
             current_component = self.commLogicObj.component
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            off_display.set_bg_gradient_color([255,255,255], [255,255,255])
+            off_display.set_bg_gradient_color([255,255,255],[255,255,255])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()
@@ -1552,7 +1553,7 @@ class Window(QMainWindow):
 
             des_pref_input_list = main.input_dictionary_design_pref(main)
             edit_tabs_list = main.edit_tabs(main)
-            edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB,edit_tabs_list))
+            edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB, edit_tabs_list))
             remove_tab_name = [x[0] for x in edit_tabs_remove]
             # remove_tabs = list(filter(lambda x: x[0] in remove_tab_name, des_pref_input_list))
             #
@@ -1560,7 +1561,7 @@ class Window(QMainWindow):
             result = None
             for edit in main.edit_tabs(main):
                 (tab_name, input_dock_key_name, change_typ, f) = edit
-                remove_tabs = list(filter(lambda x: x[0] in remove_tab_name,des_pref_input_list))
+                remove_tabs = list(filter(lambda x: x[0] in remove_tab_name, des_pref_input_list))
 
                 input_dock_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, input_dock_key_name)
                 result = list(filter(lambda get_tab:
@@ -1585,7 +1586,6 @@ class Window(QMainWindow):
                     elif input_type == TYPE_COMBOBOX:
                         val = key.currentText()
                         design_dictionary.update({key_name: val})
-
         else:
             print('flag false')
 
@@ -1641,9 +1641,11 @@ class Window(QMainWindow):
         elif name == KEY_DISP_BEAMCOVERPLATEWELD:
             return BeamCoverPlateWeld
         elif name == KEY_DISP_BEAMENDPLATE:
-            return BeamEndPlate
+            return BeamBeamEndPlateSplice
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate
+        elif name == KEY_DISP_BCENDPLATE:
+            return BeamColumnEndPlate
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
         elif name == KEY_DISP_TENSION_BOLTED:
@@ -1854,17 +1856,35 @@ class Window(QMainWindow):
             self.design_inputs.pop("out_titles_status")
             # self.progress_bar.setValue(60)
 
+            # if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
+            #                                       KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
+            #                                       KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
+            #                                       KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
+            #                                       KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
+
+            # ##############trial##############
+            # status = True
+            # ##############trial##############
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
-
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
+                                                  KEY_DISP_COLUMNCOVERPLATE,
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,KEY_DISP_BEAMENDPLATE,KEY_DISP_BCENDPLATE]:
+                # print(self.display, self.folder, main.module, main.mainmodule)
+                print("common start")
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                print("common start")
                 status = main.design_status
+                # ##############trial##############
+                # status = True
+                # ##############trial##############
+
                 module_class = self.return_class(main.module)
                 # self.progress_bar.setValue(80)
+                print("3D start")
                 self.commLogicObj.call_3DModel(status, module_class)
+                print("3D end")
                 self.display_x = 90
                 self.display_y = 90
                 for chkbox in main.get_3d_components(main):

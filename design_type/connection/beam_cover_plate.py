@@ -181,7 +181,6 @@ class BeamCoverPlate(MomentConnection):
 
         return add_buttons
 
-
     def get_values_for_design_pref(self, key, design_dictionary):
 
         if design_dictionary[KEY_MATERIAL] != 'Select Material':

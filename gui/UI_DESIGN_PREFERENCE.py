@@ -453,7 +453,7 @@ class Window(QDialog):
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
             pushButton_Download_Beam.clicked.connect(lambda: self.download_Database(table="Beams", call_type="header"))
 
-            if module== KEY_DISP_CLEATANGLE:
+            if module == KEY_DISP_CLEATANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
                 pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CLEAT))
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
@@ -483,6 +483,16 @@ class Window(QDialog):
             pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
 
         if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD or module == KEY_DISP_BEAMENDPLATE:
+            pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
+            pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
+            pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
+            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
+            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database(table="Beams", call_type="header"))
+
+        if module == KEY_DISP_BB_EP_SPLICE:
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
@@ -537,9 +547,6 @@ class Window(QDialog):
             pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
             pushButton_Download_Channel.clicked.connect(lambda: self.download_Database(table="Channels", call_type="header"))
-
-
-
 
     def manage_designation_size(self,line_edit):
         def change_size():

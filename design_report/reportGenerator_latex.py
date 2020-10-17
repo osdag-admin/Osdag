@@ -192,6 +192,8 @@ class CreateLatex(Document):
                 table.add_hline()
                 # Fail = TextColor("FailColor", bold("Fail"))
                 # Pass = TextColor("PassColor", bold("Pass"))
+
+
                 if does_design_exist != True:
                     table.add_row(bold('Design Status'),color_cell("Red",bold("Fail")))
                 else:
@@ -207,6 +209,13 @@ class CreateLatex(Document):
                         # doc.append(NewPage())
                         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                     with doc.create(Subsection(check[1])):
+#########################
+                        # if uiObj== "WELDImage":
+                        #     table.add_hline()
+                        #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+                        #     table.add_hline()
+                        # else:
+#########################
                         with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
@@ -319,7 +328,7 @@ class CreateLatex(Document):
                     continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
-            doc.generate_pdf(filename, compiler='/home/danish/texlive/2020/bin/x86_64-linux/pdflatex', clean_tex=False)
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:
             pass
 

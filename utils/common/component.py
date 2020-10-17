@@ -245,7 +245,7 @@ class Bolt:
 
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy, n=1):
         self.single_conn_plates_t_fu_fy = []
-        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
+        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n, conn_plates_t_fu_fy[0][1], conn_plates_t_fu_fy[0][2]]))
         self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])
         self.connecting_plates_tk = [i[0] for i in self.single_conn_plates_t_fu_fy]
 
@@ -1242,7 +1242,6 @@ class Plate(Material):
         return repr
 
 
-
 class ISection(Material):
 
     def __init__(self, designation, material_grade="", table=""):
@@ -1573,6 +1572,7 @@ class Column(ISection):
     def max_plate_height(self):
         clear_depth = self.depth - 2 * self.flange_thickness - 2 * self.root_radius
         return clear_depth
+
 
 class Channel(Material):
 
@@ -2094,7 +2094,7 @@ class HollowSection(Material):
 
     def __init__(self, designation, material_grade, table):
         self.connect_to_database_update_other_attributes(table, designation, material_grade)
-        super(HollowSection, self).__init__(designation, material_grade)
+        # super(HollowSection, self).__init__(designation, material_grade)
 
     def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
         conn = sqlite3.connect(PATH_TO_DATABASE)

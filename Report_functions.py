@@ -4845,7 +4845,7 @@ def bp_width_case1(load_axial, bp_min_len, bearing_strength, bp_width, min_req_w
     bp_width = str(bp_width)
 
     bp_length_min = Math(inline=True)
-    bp_length_min.append(NoEscape(r'\begin{aligned} W &= \frac{2P} {\sigma_{br} ~ L_{min}} \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned} W &= \frac{2P} {\sigma_{br} ~ L} \\'))
     bp_length_min.append(
         NoEscape(r'   &= \frac{2 \times ' + load_axial + r' \times 10^{3}} {' + bearing_strength + r' \times ' + bp_min_len + r'} \\'))
     bp_length_min.append(NoEscape(r'   &= ' + str(min_req_width) + r' \\'))
@@ -5438,20 +5438,20 @@ def moment_critical_section(sigma_x, sigma_max, critical_len, moment, concrete_b
     critical_moment = Math(inline=True)
 
     if case == 'Case1':
-        moment = str(round(moment * 10 ** -3, 2))
-        critical_moment.append(NoEscape(r'\begin{aligned} M_{critical} &=  \bigg( {\sigma_{b}}_{critical} \times y_{critical} \times '
+        moment = str(round(moment * 10 ** -6, 2))
+        critical_moment.append(NoEscape(r'\begin{aligned} M_{critical} &= \Bigg[ \bigg( {\sigma_{b}}_{critical} \times y_{critical} \times '
                                         r'\frac{y_{critical}} {2} \bigg)~ + \\ '))
         critical_moment.append(NoEscape(r' & \bigg( \frac{1}{2} \times y_{critical} \times '
                                         r'\big({\sigma_{b}}_{max} - {\sigma_{b}}_{critical} \big) \times \\'))
-        critical_moment.append(NoEscape(r' & \frac{2}{3} \times y_{critical} \bigg) \\ \\'))
+        critical_moment.append(NoEscape(r' & \frac{2}{3} \times y_{critical} \bigg) \Bigg] \times W \\ \\'))
 
-        critical_moment.append(NoEscape(r' &=  \bigg( ' + sigma_x + r' \times ' + critical_len + r' \times '
+        critical_moment.append(NoEscape(r' &= \Bigg[ \bigg( ' + sigma_x + r' \times ' + critical_len + r' \times '
                                         r'\frac{' + critical_len + r'} {2} \bigg)~ + \\ '))
         critical_moment.append(NoEscape(r' & \bigg( \frac{1}{2} \times ' + critical_len + r' \times '
                                         r'\big(' + sigma_max + r' - ' + sigma_x + r' \big) \times \\'))
-        critical_moment.append(NoEscape(r' & \frac{2}{3} \times ' + critical_len + r' \bigg) \\ \\'))
+        critical_moment.append(NoEscape(r' & \frac{2}{3} \times ' + critical_len + r' \bigg) \Bigg] \times ' + bp_width + r' \\ \\'))
 
-        critical_moment.append(NoEscape(r'&              = ' + moment + r'\times 10 ^ {3} \end{aligned}'))
+        critical_moment.append(NoEscape(r'&              = ' + moment + r'\times 10 ^ {6} \end{aligned}'))
     else:
         moment = str(round(moment * 10 ** -6, 2))
         critical_moment.append(
@@ -5524,10 +5524,11 @@ def max_moment(critical_mom_1, critical_mom_2):
 def md_plate():
     """ """
     moment_demand = Math(inline=True)
-    moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} &= \frac{b {t_{p}}^{2}} {6} ,~where~(b = 1) \\ \\'))
+    moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} &= \frac{W {t_{p}}^{2}} {6} \\ \\'))
 
     moment_demand.append(NoEscape(r' {M_{d}}_{plate} &= 1.5 {z_{e}}_{plate} {f_{y}}_{p}~ / ~ \gamma_{m0} \\'))
-    moment_demand.append(NoEscape(r'                 &= \frac{ 1.5~ \bigg( \frac{b\times t_p^{2}} {6} \bigg) ~{f_{y}}_{p} } {\gamma_{m0}} \\ \\'))
+    moment_demand.append(NoEscape(r'                 &= \frac{ 1.5~ \bigg( \frac{W\times t_p^{2}} {6} \bigg) ~{f_{y}}_{p} } {\gamma_{m0}} \\ \\'))
+
     moment_demand.append(NoEscape(r' [Ref.&~IS~800:2007,~Cl.8.2.1.2] \end{aligned}'))
 
     return moment_demand
@@ -5593,8 +5594,8 @@ def plate_thk1(critical_mom, plate_thk, plate_thk_provided, gamma_m0, f_y_plate,
     thk.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} &= M_{critical} \\'))
     thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4~M_{critical}} { W~ ({f_{y}}_{p} / \gamma_{m0}) }\bigg]^{0.5}  \\'))
     if case == 'Case1':
-        critical_mom = str(round(critical_mom * 10 ** -3, 2))
-        thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4 \times~' + critical_mom + r'\times 10 ^{3}} { ' + bp_width + r' \times~ ('
+        critical_mom = str(round(critical_mom * 10 ** -6, 2))
+        thk.append(NoEscape(r' t_{p} &= \bigg[\frac{4 \times~' + critical_mom + r'\times 10 ^{6}} { ' + bp_width + r' \times~ ('
                             + f_y_plate + r' / ' + gamma_m0 + r') }\bigg]^{0.5}  \\'))
     else:  # 'Case2&3'
         critical_mom = str(round(critical_mom * 10 ** -6, 2))

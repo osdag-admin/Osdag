@@ -12,6 +12,7 @@ import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
+
 class BasePlateCad(object):
     def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                  concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v, stiffener_algflangeL,
@@ -66,7 +67,6 @@ class BasePlateCad(object):
 
         self.stiffener_algflangeL1 = stiffener_algflangeL
         self.stiffener_algflangeR1 = stiffener_algflangeR
-
 
         self.stiffener_algflangeL2 = copy.deepcopy(stiffener_algflangeL)
         self.stiffener_algflangeR2 = copy.deepcopy(stiffener_algflangeR)
@@ -215,16 +215,17 @@ class BasePlateCad(object):
 
         self.baseplateModel = self.baseplate.create_model()
 
-        if self.BP.shear_key_required == 'Yes':
+        if self.BP.shear_key_along_ColDepth == 'Yes':
 
-            shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 -self.baseplate.T])
+            shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 - self.baseplate.T])
             shearkey_1L_uDir = numpy.array([0.0, 0.0, 1.0])
             shearkey_1L_wDir = numpy.array([1.0, 0.0, 0.0])
             self.shearkey_1.place(shearkey_1OriginL, shearkey_1L_uDir, shearkey_1L_wDir)
 
             self.shearkey_1Model = self.shearkey_1.create_model()
 
-            shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 -self.baseplate.T])
+        if self.BP.shear_key_along_ColWidth == 'Yes':
+            shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 - self.baseplate.T])
             shearkey_2L_uDir = numpy.array([0.0, 0.0, 1.0])
             shearkey_2L_wDir = numpy.array([1.0, 0.0, 0.0])
             self.shearkey_2.place(shearkey_2OriginL, shearkey_2L_uDir, shearkey_2L_wDir)
@@ -293,7 +294,6 @@ class BasePlateCad(object):
                 self.stiffener4.place(stiffener4OriginL, stiffener4L_uDir, stiffener4L_wDir)
 
                 self.stiffener4Model = self.stiffener4.create_model()
-
 
         if self.BP.stiffener_along_flange == 'Yes':
 
@@ -1081,9 +1081,14 @@ class BasePlateCad(object):
         #               self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
 
         plate_list = [self.baseplateModel]
-        if self.BP.shear_key_required == 'Yes':
-            list = [self.shearkey_1Model, self.shearkey_2Model]
+        if self.BP.shear_key_along_ColDepth == 'Yes':
+            list = [self.shearkey_1Model]
             plate_list.extend(list)
+
+        if self.BP.shear_key_along_ColWidth == 'Yes':
+            list = [self.shearkey_2Model]
+            plate_list.extend(list)
+
         if self.BP.stiffener_along_flange == 'Yes':
             list = [self.stiffener_algflangeL1Model, self.stiffener_algflangeR1Model, self.stiffener_algflangeL2Model,
                           self.stiffener_algflangeR2Model]
@@ -1150,8 +1155,10 @@ class BasePlateCad(object):
 
         return CAD
 
+
 class HollowBasePlateCad(object):
-    def __init__(self, BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout, stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v, weld_stiff_b_h):
+    def __init__(self, BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout, stiff_alg_l, stiff_alg_b, weld_stiff_l_v,
+                 weld_stiff_l_h, weld_stiff_b_v, weld_stiff_b_h, shearkey_1, shearkey_2):
         """
 
         """
@@ -1188,6 +1195,9 @@ class HollowBasePlateCad(object):
         self.weld_stiff_b_h1 = copy.deepcopy(self.weld_stiff_b_h)
         self.weld_stiff_b_h2 = copy.deepcopy(self.weld_stiff_b_h)
 
+        self.shearkey_1 = shearkey_1
+        self.shearkey_2 = shearkey_2
+
     def create_3DModel(self):
         """
 
@@ -1218,6 +1228,24 @@ class HollowBasePlateCad(object):
         self.baseplate.place(baseplateOriginL, baseplateL_uDir, baseplateL_wDir)
 
         self.baseplateModel = self.baseplate.create_model()
+
+        if self.BP.shear_key_along_ColDepth == 'Yes':
+
+            shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 - self.baseplate.T])
+            shearkey_1L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_1L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_1.place(shearkey_1OriginL, shearkey_1L_uDir, shearkey_1L_wDir)
+
+            self.shearkey_1Model = self.shearkey_1.create_model()
+
+        if self.BP.shear_key_along_ColWidth == 'Yes':
+            shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 - self.baseplate.T])
+            shearkey_2L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_2L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_2.place(shearkey_2OriginL, shearkey_2L_uDir, shearkey_2L_wDir)
+
+            self.shearkey_2Model = self.shearkey_2.create_model()
+
 
         if self.stiffener_l == True:
 
@@ -1443,12 +1471,20 @@ class HollowBasePlateCad(object):
 
     def get_plate_connector_models(self):
         plate = self.baseplateModel
+
         if self.stiffener_l == True:
             plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_l1Model).Shape()
             plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_l2Model).Shape()
+
         if self.stiffener_b == True:
             plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_b1Model).Shape()
             plate = BRepAlgoAPI_Fuse(plate, self.stiff_alg_b2Model).Shape()
+
+        if self.shearkey_1 == True:
+            plate = BRepAlgoAPI_Fuse(plate, self.shearkey_1Model).Shape()
+
+        if self.shearkey_2 == True:
+            plate = BRepAlgoAPI_Fuse(plate, self.shearkey_2Model).Shape()
 
         return plate
 

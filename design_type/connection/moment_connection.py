@@ -356,7 +356,6 @@ class MomentConnection(Connection, IS800_2007):
 
         return section
 
-
     def get_fu_fy_I_section(self):
         material_grade = self[0]
         designation = self[1][KEY_SECSIZE]
@@ -489,23 +488,23 @@ class MomentConnection(Connection, IS800_2007):
             c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness) \
                 - min_area_req
 
-        elif section_type == 'SHS' or 'RHS':
-            b = 2 * (depth * flange_width)  # for SHS & RHS, depth = D and flange_width = B
-            c = (depth * flange_width) - min_area_req
-
-        else:
+        if section_type == 'CHS':
             b = 4 * depth  # for CHS, depth = OD (outside diameter)
             c = depth ** 2 - ((4 * min_area_req) / math.pi)
+        else:
+            b = 2 * (depth + flange_width)  # for SHS & RHS, depth = D and flange_width = B
+            c = (depth * flange_width) - min_area_req
 
         roots = np.roots([a, b, c])  # finding roots of the equation
         r_1 = roots[0]
         r_2 = roots[1]
         r = max(r_1, r_2)  # picking the highest positive value from the roots
-        r = r.real  # separating the imaginary part
+        r = r.real  # separating the imaginary part (r in mm)
 
-        projection = common_calculation.round_up(r + anchor_hole_dia, 5)  # mm
-
-        return projection
+        if r < 0:
+            return -r
+        else:
+            return r
 
     @staticmethod
     def calc_weld_size_from_strength_per_unit_len(strength_unit_len, ultimate_stresses, elements_welded, fabrication=KEY_DP_FAB_SHOP):

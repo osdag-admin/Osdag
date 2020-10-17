@@ -87,6 +87,7 @@ from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from cad.MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
 from cad.MomentConnections.BCEndplate.BCE_nutBoltPlacement import BCE_NutBoltArray
 from Common import *
+from math import *
 
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 # from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
@@ -1086,6 +1087,9 @@ class CommonDesignLogic(object):
         contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                L=float(column_B)/2 - float(column_tw) / 2)
 
+        diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
+                                L=float(column_B)/2 - float(column_tw)/2)
+
 
         #
 
@@ -1156,7 +1160,7 @@ class CommonDesignLogic(object):
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
             extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,bcWeldFlang,
-                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD,endplate_type)
+                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, endplate_type)
 
             extbothWays.create_3DModel()
 
@@ -1883,6 +1887,9 @@ class CommonDesignLogic(object):
                 self.Bc = self.module_class()
                 self.ExtObj = self.createBCEndPlateCAD()
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+                # self.display.View.SetAxis(0,1,0,1,1,1)
+
+
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()

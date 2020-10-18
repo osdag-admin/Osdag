@@ -7,6 +7,7 @@ class Load(object):
         if unit_kNm is True:
             force_multiplier = 1e3
             moment_multiplier = 1e6
+        print(force_multiplier, "is force multiplier")
         if axial_force is not "":
             self.axial_force = force_multiplier * float(axial_force)
         else:

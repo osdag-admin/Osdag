@@ -2039,7 +2039,6 @@ class CommonDesignLogic(object):
     def call_3DModel(self, flag, module_class):  # Done
 
         self.module_class = module_class
-        print(self.module_class,flag,"hghghh")
 
         if self.mainmodule == "Shear Connection":
 
@@ -2056,10 +2055,10 @@ class CommonDesignLogic(object):
 
             if flag is True:
 
-                if self.loc == "Column web-Beam web" or self.loc == "Column web-Beam flange":
+                if self.loc == CONN_CWBW:
                     self.connectivityObj = self.create3DColWebBeamWeb()
 
-                elif self.loc == "Column flange-Beam web" or self.loc == "Column flange-Beam flange":
+                elif self.loc == CONN_CFBW:
                     self.connectivityObj = self.create3DColFlangeBeamWeb()
 
                 else:

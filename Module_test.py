@@ -84,11 +84,15 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
-                    KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
+# available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
+#                     KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
+#                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
+#                     KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, KEY_DISP_ENDPLATE:EndPlateConnection,
+#                     KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
+
+available_module = {KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
-                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, KEY_DISP_ENDPLATE:EndPlateConnection,
-                    KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
+                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate}
 
 
 #predefined pop-up summary.
@@ -182,12 +186,23 @@ class Modules:
                 commLogicObj.call_3DModel(status, main)
 
                 fName = os.path.join(os.path.dirname(__file__),'ResourceFiles','images','3d.png')
-
+                fName_front = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'front.png')
+                fName_side = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'side.png')
+                fName_top = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'top.png')
                 file_extension = fName.split(".")[-1]
 
                 if file_extension == 'png':
 
                     display.ExportToImage(fName)
+                    display.View_Front()
+                    display.FitAll()
+                    display.ExportToImage(fName_front)
+                    display.View_Top()
+                    display.FitAll()
+                    display.ExportToImage(fName_side)
+                    display.View_Right()
+                    display.FitAll()
+                    display.ExportToImage(fName_top)
 
                 display.EraseAll()
 

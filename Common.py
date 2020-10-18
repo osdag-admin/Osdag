@@ -448,8 +448,8 @@ KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 
 RED_LIST = [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]
 VALUES_CONN_SPLICE = ['Coplanar Tension-Compression Flange', 'Coplanar Tension Flange', 'Coplanar Compression Flange']
-CONN_CFBW = 'Column Flange - Beam Web'
-CONN_CWBW = 'Column Web - Beam Web'
+CONN_CFBW = 'Column Flange-Beam Web'
+CONN_CWBW = 'Column Web-Beam Web'
 VALUES_CONN_1 = [CONN_CFBW,CONN_CWBW]
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate', 'Extended Both Ways']

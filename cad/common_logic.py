@@ -1068,7 +1068,7 @@ class CommonDesignLogic(object):
         ############################### Weld for the beam stiffeners ################################################
 
         # bcWeld for stiffener hight on left side
-        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,"jjjj")
+        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,"jjjj")
         bcWeldStiffHeight = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                        L=BCE.stiffener_height-5.0)
 

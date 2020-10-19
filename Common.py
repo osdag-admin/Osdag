@@ -448,10 +448,12 @@ KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 
 RED_LIST = [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]
 VALUES_CONN_SPLICE = ['Coplanar Tension-Compression Flange', 'Coplanar Tension Flange', 'Coplanar Compression Flange']
-VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
-VALUES_CONN_1 = ['Column Flange - Beam Web', 'Column Web - Beam Web']
+CONN_CFBW = 'Column Flange-Beam Web'
+CONN_CWBW = 'Column Web-Beam Web'
+VALUES_CONN_1 = [CONN_CFBW,CONN_CWBW]
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate', 'Extended Both Ways']
+VALUES_CONN = VALUES_CONN_1 + VALUES_CONN_2
 VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irreversible Moment', 'Extended Both Ways - Reversible Moment']
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
@@ -605,7 +607,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_MATERIAL = 'Plate material'
+KEY_DISP_MATERIAL = 'Material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 KEY_DISP_PRIBM = 'Primary beam *'

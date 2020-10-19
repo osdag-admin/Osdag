@@ -1378,7 +1378,7 @@ def cl_10_4_3_HSFG_bolt_capacity(mu_f, n_e, K_h, fub, Anb, gamma_mf, capacity):
     return HSFG_bolt_capacity_eqn
 
 
-def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, beta, Q, l_e,le_2, eta=1.5):
+def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, beta, Q, l_e, eta=1.5):
     """Calculate prying force of friction grip bolt
                    Args:
                       2 * T_e - Tension Force in 2 bolts on either sides of the web/plate
@@ -1411,7 +1411,7 @@ def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist
     pre_tensioned = str(pre_tensioned)
     beta = str(beta)
     eta = str(eta)
-    le_2 = str(le_2)
+    # le_2 = str(le_2)
     tension_in_bolt_due_to_prying = Math(inline=True)
     tension_in_bolt_due_to_prying.append(NoEscape(
         r'\begin{aligned} Q &= \frac{l_v}{2\times l_e} \Bigg[T_e - \frac{\beta \times  \eta \times f_o \times b_e \times t^4}'
@@ -1426,7 +1426,7 @@ def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist
     tension_in_bolt_due_to_prying.append(NoEscape(r' &= min\Bigg(' + end_dist + r', 1.1\times' + t + r'\times\sqrt{\frac{' + beta + r'\times'
                                                   + f_o + r'}{' + f_y + r'}}\Bigg) \\'))
 
-    tension_in_bolt_due_to_prying.append(NoEscape(r' &= min(' + end_dist + ',' + le_2 + r') \\')) #todo please add  le2 as a parameter  whoever is using this function
+    tension_in_bolt_due_to_prying.append(NoEscape(r' &= min(' + end_dist + ',' + l_e + r') \\')) #todo please add  le2 as a parameter  whoever is using this function
 
     tension_in_bolt_due_to_prying.append(NoEscape(r' &= ' + l_e + r' \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_v &= ' + l_v + r' \\'))

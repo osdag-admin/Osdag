@@ -8,7 +8,7 @@ Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
-Connectivity: Column flange-Beam web
+Connectivity: Column Flange-Beam Web
 Connector.Material: E 250 (Fe 410 W)A
 Connector.Plate.Thickness_List:
 - '10'

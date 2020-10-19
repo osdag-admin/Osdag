@@ -1026,8 +1026,8 @@ class BeamCoverPlate(MomentConnection):
             self.min_axial_load = 0.3 * self.axial_capacity
             self.load_moment_min = 0.5 * self.section.moment_capacity
             logger.info(
-                "Loads defined by the user are less than minimun recommendations as per IS 800:2007, Cl.10.7")
-            logger.info("Load values are set at minimun recommendations as per IS 800:2007, Cl.10.7")
+                "Loads defined by the user are less than minimum recommendations as per IS 800:2007, Cl.10.7")
+            logger.info("Load values are set at minimum recommendations as per IS 800:2007, Cl.10.7")
 
         elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
 

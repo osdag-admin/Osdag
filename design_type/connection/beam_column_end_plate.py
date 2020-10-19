@@ -2197,8 +2197,6 @@ class BeamColumnEndPlate(MomentConnection):
               get_pass_fail(self.ep_moment_capacity, self.call_helper.plate_moment_capacity, relation="leq"))
         self.report_check.append(t1)
 
-
-
         # CHECK 2: STIFFENER CHECKS #
         t1 = ('SubSection', 'Stiffener Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)

@@ -590,6 +590,11 @@ class Connection(Main):
                     flag2 = False
                 else:
                     flag2=True
+            # if str(design_dictionary[KEY_AXIAL]).isdecimal() and str(design_dictionary[KEY_SHEAR]).isdecimal() \
+            #         and str(design_dictionary[KEY_MOMENT]).isdecimal():
+            #     flag2 = True
+            # else:
+            #     flag2 = False
             if flag1 and flag2:
                 self.set_input_values(self, design_dictionary)
             else:

@@ -4156,7 +4156,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     logger.warning("[Concrete Bearing Check] The compressive stress on the concrete footing/pedestal ({} N/mm2) is greater "
                                    "than the allowable bearing strength of the concrete ({} N/mm2)".format(round(self.max_bearing_stress, 3),
                                                                                                            round(self.bearing_strength_concrete, 3)))
-                    logger.info("The check fails with {} numbers of anchors".format(2 * self.anchors_outside_flange))
+                    # logger.info("The check fails with {} numbers of anchors".format(2 * self.anchors_outside_flange))
                     logger.info("Provide a higher grade of concrete and re-design")
 
                 # optimise bolt diameter based on passed bearing check

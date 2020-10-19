@@ -143,6 +143,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.helper_file_design_status = False
         self.deep_beam_status = False
         self.design_status = False
+        self.design_status_list = []
 
         self.beam_properties = {}
         self.safety_factors = {}
@@ -804,6 +805,7 @@ class BeamColumnEndPlate(MomentConnection):
         # initialize design status
         self.plate_design_status = False
         self.helper_file_design_status = False
+        self.design_status_list = []
         self.design_status = False
 
         # helper function
@@ -911,6 +913,7 @@ class BeamColumnEndPlate(MomentConnection):
             if (self.beam_bf + 25) > column_clear_d:  # 25 mm is the total extension of the end plate along its width
                 self.bc_compatibility_status = False
                 self.design_status = False
+                self.design_status_list.append(self.design_status)
                 logger.error(": The selected supporting column {} cannot accommodate the selected supported beam {}".
                              format(self.supporting_section.designation, self.supported_section.designation))
                 logger.warning(": Width of the supported beam by considering the maximum end plate width (B + 25 mm), is more than the clear depth "
@@ -924,6 +927,7 @@ class BeamColumnEndPlate(MomentConnection):
             if (self.beam_bf + 25) > self.column_bf:
                 self.bc_compatibility_status = False
                 self.design_status = False
+                self.design_status_list.append(self.design_status)
                 logger.error(": The selected supporting column {} cannot accommodate the selected supported beam {}".
                              format(self.supporting_section.designation, self.supported_section.designation))
                 logger.warning(": Width of the supported beam by considering the maximum end plate width (B + 25 mm), is more than the width "
@@ -958,6 +962,7 @@ class BeamColumnEndPlate(MomentConnection):
             self.load_moment = self.supported_section_mom_capa_m_zz  # kN
             self.minimum_load_status_moment = True
             self.design_status = False
+            self.design_status_list.append(self.design_status)
             logger.error("[Maximum Factored Load] The external factored bending moment ({} kN-m) is greater than the plastic moment capacity of the "
                          "beam ({} kN-m)".format(self.load.moment, self.supported_section_mom_capa_m_zz))
             logger.warning("The maximum capacity of the connection is {} kN-m".format(self.supported_section_mom_capa_m_zz))
@@ -985,6 +990,7 @@ class BeamColumnEndPlate(MomentConnection):
             self.load_shear = self.supported_section_shear_capa  # kN
             self.minimum_load_status_moment = True
             self.design_status = False
+            self.design_status_list.append(self.design_status)
             logger.error("[Maximum Factored Load] The external factored shear force ({} kN) is greater than the shear capacity of the "
                          "beam ({} kN)".format(self.load_shear, self.supported_section_shear_capa))
             logger.warning("The maximum capacity of the connection is {} kN".format(self.supported_section_shear_capa))
@@ -995,7 +1001,7 @@ class BeamColumnEndPlate(MomentConnection):
         # effective moment is the moment due to external factored moment plus moment due to axial force
         self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
 
-        # TODO: check if the moment from the beam can be taken by the defined column (beam-column presizing check)
+        # TODO: check if the moment from the beam can be taken by the defined column (beam-column pre-sizing check)
 
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
@@ -1033,6 +1039,7 @@ class BeamColumnEndPlate(MomentConnection):
         # checking if the list contains at least one plate of thk higher than the minimum required
         if len(self.plate_thickness) == 0:
             self.design_status = False
+            self.design_status_list.append(self.design_status)
             logger.error("[End Plate] The list of plate thicknesses passed into the solver is insufficient to perform end plate design")
             logger.warning("The end plate should at least be thicker than the maximum thickness of the connecting element(s)")
             logger.info("Provide a plate/list of plates with a minimum thickness of {} mm".format(max(self.beam_tf, self.beam_tw, self.column_tf,
@@ -1151,6 +1158,7 @@ class BeamColumnEndPlate(MomentConnection):
 
                         if self.space_available_inside_D < self.space_min_req_inside_D:
                             self.design_status = False
+                            self.design_status_list.append(self.design_status)
                             logger.error("[Compatibility Error]: The given beam cannot accommodate at least a single row of bolt (inside top and "
                                          "bottom flange) with a trial diameter of {} mm ".format(self.bolt_diameter_provided))
                             logger.info("Re-design the connection by defining a bolt of smaller diameter or beam of a suitable depth ")
@@ -1198,6 +1206,7 @@ class BeamColumnEndPlate(MomentConnection):
                         if self.ep_width_provided < space_req_2col:
                             self.bolt_column = 0
                             self.design_status = False
+                            self.design_status_list.append(self.design_status)
                             logger.error("[Detailing] The beam is not wide enough to accommodate a single column of bolt on either side")
                             logger.error("The defined beam is not suitable for performing connection design")
                             logger.info("Please define another beam which has sufficient width (minimum, {} mm) and re-design".format(space_req_2col))
@@ -1442,6 +1451,9 @@ class BeamColumnEndPlate(MomentConnection):
                 else:
                     self.design_status = False
 
+        # design status associated with the helper status
+        self.design_status_list.append(self.design_status)
+
         # results of overall safe design
 
         # shear design
@@ -1594,7 +1606,6 @@ class BeamColumnEndPlate(MomentConnection):
                         for thk in sort_plate:
                             self.cont_plate_thk_provided = thk  # plate thickness provided (mm)
                             break
-
                 else:
                     self.continuity_plate_tension_flange_status = False
 
@@ -1754,6 +1765,15 @@ class BeamColumnEndPlate(MomentConnection):
             self.diag_stiffener_groove_weld_status = False
 
         # end of the design simulation
+
+        # overall design status
+        for status in self.design_status_list:
+            if status is False:
+                self.design_status = False
+                break
+            else:
+                self.design_status = True
+
         if self.design_status:
             logger.info(": =====================Design Status=======================")
             logger.info(": Overall beam to beam end plate splice connection design is SAFE")

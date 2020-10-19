@@ -737,15 +737,13 @@ class BeamColumnEndPlate(MomentConnection):
         self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
                          axial_force=float(design_dictionary[KEY_AXIAL]),
                          moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
-
+        self.input_shear_force = float(design_dictionary[KEY_SHEAR])
+        self.input_axial_force = float(design_dictionary[KEY_AXIAL])
+        self.input_moment = float(design_dictionary[KEY_MOMENT])
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                            gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_capacity = False
-
-        self.input_shear_force = float(design_dictionary[KEY_SHEAR])
-        self.input_axial_force = float(design_dictionary[KEY_AXIAL])
-        self.input_moment = float(design_dictionary[KEY_MOMENT])
 
         self.top_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                                     type=design_dictionary[KEY_DP_WELD_TYPE],
@@ -1498,8 +1496,8 @@ class BeamColumnEndPlate(MomentConnection):
 
             # check 2: compression buckling capacity of the column web
             self.h_c = self.column_D - (2 * (self.column_tf + self.column_r1))  # mm, clear space available between the column depth
-            self.p_bf_2 = 10710 * (self.column_tw ** 3 / self.h_c) * math.sqrt(self.column_fy / self.gamma_m0) * 1e-3  # kN
-            self.p_bf_2 = round(self.p_bf_2, 2) ### Todo Changed tw**2 to tw**3
+            self.p_bf_2 = 10710 * (self.column_tw ** 2 / self.h_c) * math.sqrt(self.column_fy / self.gamma_m0) * 1e-3  # kN
+            self.p_bf_2 = round(self.p_bf_2, 2) #todo tw2 changed to tw3-anjali
 
             # check 3: column web crippling capacity (as per american code)
             self.p_bf_3 = ((300 * self.column_tw ** 2) / self.gamma_m1) * (1 + (3 * (self.beam_tf / self.column_D) *
@@ -1560,7 +1558,7 @@ class BeamColumnEndPlate(MomentConnection):
             # Design 2: Continuity Plates on tension side for one way connection
             if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one way
                 self.t_bf = 0.4 * math.sqrt((self.beam_bf * self.beam_tf) / self.gamma_m0)  # mm
-
+                print("t_bf",self.t_bf )
                 if self.t_bf > self.column_tf:
                     self.continuity_plate_tension_flange_status = True
 
@@ -1755,7 +1753,7 @@ class BeamColumnEndPlate(MomentConnection):
         else:
             logger.info(": =====================Design Status=======================")
             logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
-            logger.info(": =========================End Of design===========================")
+            logger.info(": =====================End Of design=======================")
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
@@ -1789,7 +1787,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.report_input = \
             {KEY_MAIN_MODULE: self.mainmodule,
-             KEY_MODULE: KEY_DISP_BB_EP_SPLICE,
+             KEY_MODULE: KEY_DISP_BCENDPLATE,
              KEY_CONN: self.connectivity,
              KEY_DISP_ENDPLATE_TYPE: self.endplate_type,
              KEY_DISP_MOMENT: self.input_moment,
@@ -1829,7 +1827,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check = []
 
         # Assiging parameters
-
+        self.beam_shear_capa =0 # todo danish
         bolt_shear_capacity_kn = round(self.bolt_shear_capacity, 2)
         self.h = (self.beam_D - (2 * self.beam_tf))
 
@@ -1855,7 +1853,7 @@ class BeamColumnEndPlate(MomentConnection):
         #       allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
         #       get_pass_fail(self.input_shear_force, reduced_shear_capacity, relation="lesser"))
         # self.report_check.append(t1)
-
+        self.beam_plastic_mom_capa_zz = 20 # todo Danish
         # percent = 1
         if self.input_moment < self.beam_plastic_mom_capa_zz:
             percent = 0.5
@@ -2238,73 +2236,120 @@ class BeamColumnEndPlate(MomentConnection):
         get_pass_fail(self.f_e, self.allowable_stress, relation="leq"))
         self.report_check.append(t1)
 
-        # t1 = (KEY_OUT_DISP_WELD_STRENGTH, round(self.f_e,2), cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu=self.conn_plates_weld_fu1,
-        #                                                                         gamma_mw=self.gamma_mb,
-        #                                                                         t_t=1,
-        #                                                                         f_w=round(self.allowable_stress,2),type="end_plate"),
-        #       get_pass_fail(round(self.f_e,2), round(self.allowable_stress,2), relation="lesser"))
-        # self.report_check.append(t1)
-
         # CHECK 3: Continuity Plate - Compression Flange CHECKS #
+        if self.continuity_plate_tension_flange_status == True or self.continuity_plate_compression_flange_status == True:
+            t1 = ('SubSection', 'Continuity Plate - Compression Flange', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
 
-        t1 = ('SubSection', 'Continuity Plate - Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
+            self.k = (self.column_tf + self.column_r1)
+            self.f_wc = (self.column_fy * self.column_tw)
+            t1 = (KEY_OUT_DISP_LOCAL_WEB_YIELDING, local_web_yielding(f_wc=self.f_wc, k=self.k, t_fb=self.beam_tf,
+                                                                      gamma_mo=self.gamma_m0, column_tf=self.column_tf,
+                                                                      column_r1=self.column_r1, column_fy=self.column_fy,
+                                                                      column_tw=self.column_tw, P_bf_1=self.p_bf_1), '', '',)
+            self.report_check.append(t1)
 
-        self.k = (self.column_tf + self.column_r1)
-        self.f_wc = (self.column_fy * self.column_tw)
-        t1 = (KEY_OUT_DISP_LOCAL_WEB_YIELDING, local_web_yielding(f_wc=self.f_wc, k=self.k, t_fb=self.beam_tf,
-                                                                  gamma_mo=self.gamma_m0, column_tf=self.column_tf,
-                                                                  column_r1=self.column_r1, column_fy=self.column_fy,
-                                                                  column_tw=self.column_tw, P_bf_1=self.p_bf_1), '', '',)
-        self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_COMP_BUCKLING_WEB, compression_buckling_of_web(t_c=self.column_tw,
+                                                                              fy_c=self.column_fy,
+                                                                              h_c= self.h_c,
+                                                                              k = self.k, gamma_mo= self.gamma_m0,
+                                                                              D_c =self.column_D ,
+                                                                              P_cw_2= self.p_bf_2), '', '', '')
+            self.report_check.append(t1)
 
-        # self.p_bf_2 = 10710 * (self.column_tw ** 2 / self.h_c) * math.sqrt(self.column_fy / self.gamma_m0) * 1e-3  # kN
-        # self.p_bf_2 = round(self.p_bf_2, 2)
+            t1 = (KEY_OUT_DISP_WEB_CRIPPLING, web_cripling(t_c=self.column_tw,
+                                                           fy_c=self.column_fy,
+                                                           T_b= self.beam_tf,
+                                                           gamma_m1= self.gamma_m1,
+                                                           D_c=self.column_D,
+                                                           P_cw_3 =self.p_bf_3,
+                                                           T_c=self.column_tf), '', '', '')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_COMP_STRENGTH, compressioncheck(P_cw_1=self.p_bf_1,
+                                                               P_cw_3=self.p_bf_3,
+                                                               P_cw_2=self.p_bf_2,
+                                                               P_bf=  self.p_bf ), '', '', '')
+            self.report_check.append(t1)
+            #
+            t1 = (KEY_OUT_DISP_CONT_PLATE_REQ,self.call_helper.r_c, self.p_bf,
+                  get_pass_fail(self.call_helper.r_c, self.p_bf, relation="greater"))
+            self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_COMP_BUCKLING_WEB, compression_buckling_of_web(t_c=self.column_tw,
-                                                                          fy_c=self.column_fy,
-                                                                          h_c= self.h_c,
-                                                                          k = self.k, gamma_mo= self.gamma_m0,
-                                                                          D_c =self.column_D ,
-                                                                          P_cw_2= self.p_bf_2), '', '', '')
-        self.report_check.append(t1)
-
-        # self.p_bf_3 = ((300 * self.column_tw ** 2) / self.gamma_m1) * (1 + (3 * (self.beam_tf / self.column_D) *
-        #                                                                     (self.column_tw / self.column_tf) ** 1.5)) * \
-        #               math.sqrt((self.column_fy * self.column_tf) / self.column_tw) * 1e-3
+            ##Todo  if Yes- Give design status check- Danish
+            t1 = ('SubSection', 'Continuity Plate Design- Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_AREA_REQ,Area_req_cont_plate(A_cp=round(self.cont_plate_area_req,2),
+                                                            R_c= round(self.call_helper.r_c,2),
+                                                            p_cw= round(self.p_bf,2),
+                                                            f_ycp=self.cont_plate_fy,
+                                                            gamma_m0= self.gamma_m0),'','')
+            self.report_check.append(t1)
 
 
-        t1 = (KEY_OUT_DISP_WEB_CRIPPLING, web_cripling(t_c=self.column_tw,
-                                                       fy_c=self.column_fy,
-                                                       T_b= self.beam_tf,
-                                                       gamma_m1= self.gamma_m1,
-                                                       D_c=self.column_D,
-                                                       P_cw_3 =self.p_bf_3,
-                                                       T_c=self.column_tf), '', '', '')
-        self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_COMP_STRENGTH, compressioncheck(P_cw_1=self.p_bf_1,
-                                                           P_cw_3=self.p_bf_3,
-                                                           P_cw_2=self.p_bf_2,
-                                                           P_bf=  self.p_bf ), '', '', '')
-        self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_NOTCH_SIZE,'',display_prov(self.notch_size, "n"),'')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH,'',comp_plate_length(l_cp1=self.cont_plate_length_out,
+                                                                            l_cp2=self.cont_plate_length_in,
+                                                                            D_c=self.column_D ,
+                                                                            T_c=self.column_tf,n =self.notch_size),'')
+            self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_CONT_PLATE_REQ,self.call_helper.r_c, self.p_bf,
-              get_pass_fail(self.call_helper.r_c, self.p_bf, relation="greater"))
-        self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH,'' ,comp_plate_width(column_bf=self.column_bf,
+                                                                           column_tw= self.column_tw,
+                                                                           notch_size= self.notch_size,
+                                                                           w_cp=self.cont_plate_width),'')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK,comp_plate_thk_p(A_cp=round(self.cont_plate_area_req,2),
+                                                                        w_cp= self.cont_plate_width,
+                                                                        t_cp1=round(self.cont_plate_thk_req_1,2),
+                                                                        f_ycp= self.cont_plate_fy,
+                                                                        t_cp2= round(self.cont_plate_thk_req_2,2),
+                                                                        t_cp3=round(self.cont_plate_thk_req_3,2),
+                                                                        epsilon_cp=round(self.cont_plate_epsilon,2),
+                                                                        t_cp=round(self.cont_plate_thk_req,2),
+                                                                        beam_tf= self.beam_tf),self.cont_plate_thk_provided ,'')
+            self.report_check.append(t1)
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:
+                t1 = ('SubSection', 'Continuity Plate - Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+                self.report_check.append(t1)
 
-        ##Todo  if Yes- Give design status check- Danish
-        t1 = ('SubSection', 'Continuity Plate Design- Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_NOTCH_SIZE,self.notch_size,'','')
-        self.report_check.append(t1)
-        # t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH,'',comp_plate_length(l_cp1=self.cont_plate_length_out,
-        #                                                                 l_cp2=self.cont_plate_length_in,
-        #                                                                 D_c,T_c),'')
+                ##todo
+                t1 = (KEY_OUT_DISP_CONT_PLATE_REQ, check_tension_flange(beam_bf=self.beam_bf, beam_tf=self.beam_tf,
+                                                                        gamma_m0= self.gamma_m0,t_bf = self.t_bf),
+                      display_prov(self.column_tf, "T_c"),
+                      get_pass_fail(self.t_bf, self.column_tf, relation="lesser"))
+                self.report_check.append(t1)
+
+            t1 = ('SubSection', 'Continuity Plate Design- Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_NOTCH_SIZE,'',display_prov(self.notch_size, "n"),'')
+            self.report_check.append(t1)
+
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
+                                                                              l_cp2=self.cont_plate_length_in,
+                                                                              D_c=self.column_D,
+                                                                              T_c=self.column_tf, n=self.notch_size), '')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
+                                                                            column_tw=self.column_tw,
+                                                                            notch_size=self.notch_size,
+                                                                            w_cp=self.cont_plate_width), '')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK,ten_plate_thk_p(A_cp=round(self.cont_plate_area_req,2),
+                                                                        w_cp= self.cont_plate_width,
+                                                                        t_cp1=round(self.cont_plate_thk_req_1,2),
+                                                                        t_cp2= self.column_tw,
+                                                                        t_cp=round(self.cont_plate_thk_req,2))
+                                                                       ,self.cont_plate_thk_provided ,'')
+            self.report_check.append(t1)
+        # t1 = ('SubSection', 'Column Web Shear', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         # self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH,self.cont_plate_width ,'','')
-        self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK,self.cont_plate_thk_provided,'','')
-        self.report_check.append(t1)
+        #
+        # t1 = (KEY_OUT_DISP_DIAG_PLATE_REQ, check_tension_flange(beam_bf=self.beam_bf, beam_tf=self.beam_tf,
+        #                                                         gamma_m0= self.gamma_m0,t_bf = self.t_bf),
+        #       display_prov(self.column_tf, "T_c"),
+        #       get_pass_fail(self.t_bf, self.column_tf, relation="greater"))
+        # self.report_check.append(t1)
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])
@@ -2315,4 +2360,3 @@ class BeamColumnEndPlate(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3d_image)
-

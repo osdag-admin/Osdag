@@ -1725,11 +1725,12 @@ KEY_OUT_DISP_COMP_BUCKLING_WEB='Compression Buckling of Web'
 KEY_OUT_DISP_WEB_CRIPPLING=' Web Crippling'
 KEY_OUT_DISP_COMP_STRENGTH='Compression Strength'
 #Continuity Plate
-KEY_OUT_DISP_CONT_PLATE_REQ='Check whether Continuity plate is required or not'
+KEY_OUT_DISP_CONT_PLATE_REQ='Check whether Continuity Plate is required or not'
+KEY_OUT_DISP_DIAG_PLATE_REQ='Check whether diagonal Plate is required or not'
 KEY_OUT_DISP_AREA_REQ= "Area Required (mm2)"
 KEY_OUT_DISP_NOTCH_SIZE ="Notch Size (mm)"
 
-
+# KEY_OUT_DISP_WEB_PLATE_CONT_T
 
 
 

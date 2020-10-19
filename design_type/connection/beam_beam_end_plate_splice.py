@@ -1481,16 +1481,16 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), '')
+        t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), 'OK')
         self.report_check.append(t1)
 
         # t1 = (KEY_DISP_PLTHICK, '', int(self.plate_thickness), 'Pass')
         # self.report_check.append(t1)
 
-        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), '')
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass')
         self.report_check.append(t6)
 
-        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), '')
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass')
         self.report_check.append(t7)
 
         t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass')

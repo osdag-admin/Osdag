@@ -492,7 +492,7 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
             shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_db + r')\\'))
 
-    shear_capacity_eqn.append(NoEscape(r'&=' + V_d + r'\\'))
+    shear_capacity_eqn.append(NoEscape(r'&=' + V_d + r'\\ \\'))
     shear_capacity_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.1]\end{aligned}'))
 
     return shear_capacity_eqn
@@ -530,7 +530,7 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
         multiple = str(multiple)
         shear_yield_eqn.append(
             NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'} \\'))
-    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r' \\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r' \\ \\'))
     shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl. 10.4.3] \end{aligned}'))
     return shear_yield_eqn
 
@@ -1508,8 +1508,8 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
     tension_in_bolt_due_to_prying.append(
         NoEscape(r'Q &=\frac{' + str(l_v) + r'}{2\times' + str(l_e) + r'}\times\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(
-        r'&\Bigg[' + str(T_e) + r'- \frac{' + str(beta) + r' \times' + str(eta) + r'\times' + str(f_o) + r'\times' + str(b_e) + r'\times' + str(t) + r'^4}{27 \times'
-        + str(l_e) + r'\times' + str(l_v) + r'^2}\Bigg]\\'))
+        r'&\Bigg[' + str(T_e) + r'- \Bigg( \frac{' + str(beta) + r' \times' + str(eta) + r'\times' + str(f_o) + r'\times' + str(b_e) + r'\times'
+        + str(t) + r'^4}{27 \times' + str(l_e) + r'\times' + str(l_v) + r'^2} \Bigg) \times 10^{-3} \Bigg]\\'))
 
     if Q <= 0.0:
         tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \\'))
@@ -3426,7 +3426,7 @@ def end_plate_moment_capacity(M_ep, b_eff, f_y, gamma_m0, t_p):
 
     moment_capacity = Math(inline=True)
 
-    moment_capacity.append(NoEscape(r'\begin{aligned} M_{p} &=  \frac{b_{e} t_{p}^{2}} {4} \times \frac{f_{y}}{\gamma_{m0}} \\'))
+    moment_capacity.append(NoEscape(r'\begin{aligned} M_{p} &=  \Big( \frac{b_{e} t_{p}^{2}} {4} \Big) \times \frac{f_{y}}{\gamma_{m0}} \\'))
     moment_capacity.append(NoEscape(r'&=  \frac{' + b_eff + r' \times ' + t_p + r'^{2}} {4} \times \frac{' + f_y + r'}{'
                                     + gamma_m0 + r'} \times 10^{-6} \\'))
     moment_capacity.append(NoEscape(r'&=' + M_ep + ' \end{aligned}'))

@@ -67,7 +67,6 @@ class BeamColumnEndPlate(MomentConnection):
         self.plate_thickness = []
 
         self.beam_shear_capa = 0.0
-        self.beam_plastic_mom_capa_zz = 0.0
         self.tension_due_to_moment = 0.0
         self.tension_due_to_axial_force = 0.0
         self.load_tension_flange = 0.0
@@ -975,9 +974,10 @@ class BeamColumnEndPlate(MomentConnection):
 
         # Note: Shear force is transferred to the column through the web, hence Cl.10.7 point 2 is considered for minimum shear load
         if self.supported_section.type == 'Rolled':
-            self.supported_section_shear_capa = ((self.beam_D * self.beam_tw) * self.beam_fy) / self.gamma_m0
+            # self.supported_section_shear_capa = ((self.beam_D * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
+            self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
         else:  # built-up sections
-            self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / self.gamma_m0
+            self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
         self.supported_section_shear_capa = round(self.supported_section_shear_capa * 1e-3, 2)  # kN
 
         if self.load_shear < min((0.15 * self.supported_section_shear_capa), 40):
@@ -985,8 +985,8 @@ class BeamColumnEndPlate(MomentConnection):
             self.load_shear = min((0.15 * self.supported_section_shear_capa), 40)
             logger.warning("[Minimum Factored Load] The external factored shear force ({} kN) is less than the minimum recommended design action on "
                            "the member".format(self.load_shear))
-            logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam) or 40 kN whichever is "
-                        "less [Ref. Cl. 10.7, IS 800:2007]".format(0.15 * self.supported_section_shear_capa))
+            logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam in low shear) or 40 kN "
+                        "whichever is less [Ref. Cl. 10.7, IS 800:2007]".format(0.15 * self.supported_section_shear_capa))
             logger.info("Designing the connection for a factored shear load of {} kN-m".format(self.load_shear))
         elif self.load_shear > self.supported_section_shear_capa:
             self.load_shear = self.supported_section_shear_capa  # kN
@@ -1792,8 +1792,8 @@ class BeamColumnEndPlate(MomentConnection):
             image = "Parallel_Beam"
         else:
             image = "Slope_Beam"
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
-                                  KEY_DISP_BEAMSEC: self.supported_section.designation,
+        self.report_supported = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  'Beam section': self.supported_section.designation,
                                   KEY_DISP_MATERIAL: self.supported_section.material,
                                   KEY_DISP_FU: self.supported_section.fu,
                                   KEY_DISP_FY: self.supported_section.fy,
@@ -1803,7 +1803,7 @@ class BeamColumnEndPlate(MomentConnection):
                                   'B(mm)': self.supported_section.flange_width,
                                   't(mm)': self.supported_section.web_thickness,
                                   'T(mm)': self.supported_section.flange_thickness,
-                                  'FlangeSlope': self.supported_section.flange_slope,
+                                  'Flange slope': self.supported_section.flange_slope,
                                   'R1(mm)': self.supported_section.root_radius,
                                   'R2(mm)': self.supported_section.toe_radius,
                                   'Iz(mm4)': self.supported_section.mom_inertia_z,
@@ -1815,6 +1815,34 @@ class BeamColumnEndPlate(MomentConnection):
                                   'Zpz(mm3)': self.supported_section.plast_sec_mod_z,
                                   'Zpy(mm3)': self.supported_section.elast_sec_mod_y}
 
+        if self.supporting_section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  'Column section': self.supporting_section.designation,
+                                  KEY_DISP_MATERIAL: self.supporting_section.material,
+                                  KEY_DISP_FU: self.supporting_section.fu,
+                                  KEY_DISP_FY: self.supporting_section.fy,
+                                  'Mass': self.supporting_section.mass,
+                                  'Area(mm2) - A': round(self.supporting_section.area, 2),
+                                  'D(mm)': self.supporting_section.depth,
+                                  'B(mm)': self.supporting_section.flange_width,
+                                  't(mm)': self.supporting_section.web_thickness,
+                                  'T(mm)': self.supporting_section.flange_thickness,
+                                  'Flange slope': self.supporting_section.flange_slope,
+                                  'R1(mm)': self.supporting_section.root_radius,
+                                  'R2(mm)': self.supporting_section.toe_radius,
+                                  'Iz(mm4)': self.supporting_section.mom_inertia_z,
+                                  'Iy(mm4)': self.supporting_section.mom_inertia_y,
+                                  'rz(mm)': self.supporting_section.rad_of_gy_z,
+                                  'ry(mm)': self.supporting_section.rad_of_gy_y,
+                                  'Zz(mm3)': self.supporting_section.elast_sec_mod_z,
+                                  'Zy(mm3)': self.supporting_section.elast_sec_mod_y,
+                                  'Zpz(mm3)': self.supporting_section.plast_sec_mod_z,
+                                  'Zpy(mm3)': self.supporting_section.elast_sec_mod_y}
+
         self.report_input = \
             {KEY_MAIN_MODULE: self.mainmodule,
              KEY_MODULE: KEY_DISP_BCENDPLATE,
@@ -1824,8 +1852,11 @@ class BeamColumnEndPlate(MomentConnection):
              KEY_DISP_SHEAR: self.input_shear_force,
              KEY_DISP_AXIAL: self.input_axial_force,
 
-             "Section": "TITLE",
-             "Section Details": self.report_supporting,
+             "Supporting Section": "TITLE",
+             "Supporting Section Details": self.report_supporting,
+
+             "Supported Section": "TITLE",
+             "Supported Section Details": self.report_supported,
 
              "Plate Details": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
@@ -1857,7 +1888,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check = []
 
         # Assiging parameters
-        self.beam_shear_capa =0 # todo danish
+        self.beam_shear_capa = 0 # todo danish
         bolt_shear_capacity_kn = round(self.bolt_shear_capacity, 2)
         self.h = (self.beam_D - (2 * self.beam_tf))
 
@@ -1867,58 +1898,46 @@ class BeamColumnEndPlate(MomentConnection):
         bolt_capacity_kn = round(self.bolt_capacity, 2)
 
         # CHECK 1: MEMBER CAPACITY
-        t1 = ('SubSection', 'Member Capacity', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Capacity - Supported Section', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
+
         t1 = ("Shear capacity (kN)", '',
-              cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness,
-                                                    f_y=self.supported_section.fy, gamma_m0=self.gamma_m0,
-                                                    V_dg=round(self.beam_shear_capa, 2)),
+              cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness, f_y=self.supported_section.fy,
+                                                    gamma_m0=self.gamma_m0, V_dg=round(self.supported_section_shear_capa, 2)),
               'Restricted to low shear')
-
         self.report_check.append(t1)
 
-        # initial_shear_capacity = round(self.beam_shear_capa, 2)
-        # reduced_shear_capacity = round(self.beam_shear_capa * 0.6, 2)
-        # t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.input_shear_force, "V"),
-        #       allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
-        #       get_pass_fail(self.input_shear_force, reduced_shear_capacity, relation="lesser"))
-        # self.report_check.append(t1)
-        self.beam_plastic_mom_capa_zz = 20 # todo Danish
-        # percent = 1
-        if self.input_moment < self.beam_plastic_mom_capa_zz:
-            percent = 0.5
-        else:
-            percent = 1
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '',
               cl_8_2_1_2_plastic_moment_capacity(beta_b=1,
                                                  Z_p=self.supported_section.plast_sec_mod_z,
                                                  f_y=self.supported_section.fy,
                                                  gamma_m0=self.gamma_m0,
-                                                 Pmc=round(self.beam_plastic_mom_capa_zz, 2)), 'V < 0.6 Vdy')
+                                                 Pmc=round(self.supported_section_mom_capa_m_zz, 2)), 'V < 0.6 Vdy')
         self.report_check.append(t1)
 
         t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
-        self.load_shear_min = min((0.15 * self.beam_shear_capa), 40)
-        self.load_moment_min = (0.5 * self.beam_plastic_mom_capa_zz)
+
+        self.load_shear_min = min(round(0.15 * self.supported_section_shear_capa, 2), 40.0)
+        self.load_moment_min = (0.5 * self.supported_section_mom_capa_m_zz)
 
         t1 = ("Shear force (kN)", display_prov(self.input_shear_force, "V"),
               prov_shear_force(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
-                               app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.beam_shear_capa),
+                               app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.supported_section_shear_capa),
               "OK")
         self.report_check.append(t1)
 
         t1 = ("Axial force (kN)", '', 'H = ' + str(self.load_axial), "OK")
         self.report_check.append(t1)
 
-        t1 = ("Bending moment (kN-m)", display_prov(self.input_moment, "M"),
+        t1 = ("Bending moment (major axis) (kN-m)", display_prov(self.input_moment, "M"),
               prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                app_moment_load=round(self.load_moment, 2),
-                               moment_capacity=round(self.beam_plastic_mom_capa_zz, 2), type='EndPlateType'), "OK")
+                               moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), type='EndPlateType'), "OK")
 
         self.report_check.append(t1)
 
-        t1 = ("Effective bending moment (kN-m)", display_prov(self.load_moment, "M_u"),
+        t1 = ("Effective bending moment (major axis) (kN-m)", display_prov(self.load_moment, "M_u"),
               effective_bending_moment_ep(self.load_moment, self.load_axial, self.load_moment_effective,
                                           self.beam_D, self.beam_tf), "OK")
 
@@ -1936,16 +1955,16 @@ class BeamColumnEndPlate(MomentConnection):
         t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), '')
+        t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), 'OK')
         self.report_check.append(t1)
 
         # t1 = (KEY_DISP_PLTHICK, '', int(self.plate_thickness), 'Pass')
         # self.report_check.append(t1)
 
-        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), '')
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass')
         self.report_check.append(t6)
 
-        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), '')
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass')
         self.report_check.append(t7)
 
         t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass')

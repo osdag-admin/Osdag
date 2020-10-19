@@ -87,6 +87,7 @@ from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from cad.MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
 from cad.MomentConnections.BCEndplate.BCE_nutBoltPlacement import BCE_NutBoltArray
 from Common import *
+from math import *
 
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 # from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
@@ -1008,10 +1009,12 @@ class CommonDesignLogic(object):
         contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
                                     L=float(column_d) - 2 * float(column_T),
                                     T=BCE.cont_plate_thk_provided )
-
-        diagplate = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
-                                    L=float(column_d) - 2 * float(column_T),
-                                    T=BCE.cont_plate_thk_provided)
+        if type(BCE.diag_stiffener_thk_provided) == int or type(BCE.diag_stiffener_thk_provided) == float:
+            diagplate = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
+                                        L=BCE.diag_stiffener_length,
+                                        T=BCE.diag_stiffener_thk_provided)
+        else:
+            diagplate =None
 
         # contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
         # 							  L=float(column_data["D"]) - 2 * float(column_data["T"]),
@@ -1073,39 +1076,48 @@ class CommonDesignLogic(object):
         bcWeldStiffLength = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                        L=2*BCE.stiffener_height-5.0)
 
+        # self.weld_size_diag_stiffener = 'N/A'
+
+        diagWeldD = FilletWeld(b=BCE.weld_size_diag_stiffener, h=BCE.weld_size_diag_stiffener,
+                               L=BCE.diag_stiffener_length)
 
         contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                L=float(column_d) - 2 * float(column_T))
 
         contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                L=float(column_B)/2 - float(column_tw) / 2)
+
+        diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
+                                L=float(column_B)/2 - float(column_tw)/2)
+
+
         #
 
         # if alist["Weld"]["Method"] == "Fillet Weld":
         #     # Followings welds are welds above beam flange, Qty = 4
-        #     bcWeldAbvFlang = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
-        #                                 h=float(alist["Weld"]["Flange (mm)"]),
-        #                                 L=beam_B)
+        # bcWeldAbvFlang = FilletWeld(b=float(beam_tw),
+        #                             h=float(beam_T),
+        #                             L=beam_B)
         #
-        #     # Followings welds are welds below beam flange, Qty = 8
-        #     bcWeldBelwFlang = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
-        #                                  h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
-        #     # bcWeldBelwFlang_22 = copy.copy(bcWeldBelwFlang_21)
-        #     # bcWeldBelwFlang_23 = copy.copy(bcWeldBelwFlang_21)
-        #     # bcWeldBelwFlang_24 = copy.copy(bcWeldBelwFlang_21)
-        #
-        #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-        #     bcWeldSideWeb = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-        #                                L=beam_d - 2 * beam_T - 40)
-        # # bcWeldSideWeb_22 = copy.copy(bcWeldSideWeb_21)
-        #
+        # #     # Followings welds are welds below beam flange, Qty = 8
+        # bcWeldBelwFlang = FilletWeld(b=float(beam_tw),
+        #                              h=float(beam_T), L=(beam_B - beam_tw) / 2)
+        # #     # bcWeldBelwFlang_22 = copy.copy(bcWeldBelwFlang_21)
+        # #     # bcWeldBelwFlang_23 = copy.copy(bcWeldBelwFlang_21)
+        # #     # bcWeldBelwFlang_24 = copy.copy(bcWeldBelwFlang_21)
+        # #
+        # #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+        # bcWeldSideWeb = FilletWeld(b=float(beam_tw), h=float(beam_tw),
+        #                            L=beam_d - 2 * beam_T - 40)
+        # # # bcWeldSideWeb_22 = copy.copy(bcWeldSideWeb_21)
+        # #
         # else:
         #
         bcWeldFlang = GrooveWeld(b=float(beam_tw), h=float(beam_T),
                                  L=beam_B)
-        #     # bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
-        #
-        #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+        # #     # bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
+        # #
+        # #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
         bcWeldWeb = GrooveWeld(b=float(beam_tw), h=float(beam_tw),
                                L=beam_d - 2 * beam_T)
 
@@ -1147,8 +1159,8 @@ class CommonDesignLogic(object):
             #                         bcWeldFlang, bcWeldWeb,
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
-            extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                    bcWeldFlang, bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, endplate_type)
+            extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,bcWeldFlang,
+                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, endplate_type)
 
             extbothWays.create_3DModel()
 
@@ -1203,7 +1215,8 @@ class CommonDesignLogic(object):
             #                                        outputobj)
 
             col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                                   bcWeldFlang, bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  endplate_type)
+                                                   bcWeldAbvFlang, bcWeldBelwFlang,
+                                                   bcWeldSideWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  endplate_type)
 
             col_web_connectivity.create_3DModel()
 
@@ -1393,7 +1406,6 @@ class CommonDesignLogic(object):
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-
             ex_length_out = BP.anchor_len_above_footing_out
             if BP.anchor_type == 'IS 5624-Type A':
                 bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
@@ -1418,11 +1430,21 @@ class CommonDesignLogic(object):
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
+            if BP.shear_key_along_ColDepth == 'Yes':
+                shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T=float(BP.shear_key_depth_ColDepth))
+            else:
+                shearkey_1 = Plate(L=float(0), W=float(0), T=float(0))
+
+            if BP.shear_key_along_ColWidth == 'Yes':
+                shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_len_ColWidth), T=float(BP.shear_key_depth_ColWidth))
+            else:
+                shearkey_2 = Plate(L=float(0), W=float(0), T=float(0))
+
             nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace,  washer, washer_in)
 
             basePlate = HollowBasePlateCad(BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
-                                           weld_stiff_b_h)
+                                           weld_stiff_b_h, shearkey_1, shearkey_2)
         else:
             column_tw = float(BP.column_tw)
             column_T = float(BP.column_tf)
@@ -1456,7 +1478,7 @@ class CommonDesignLogic(object):
                                        T=float(BP.stiffener_plt_thick_along_web),
                                        L11=float(BP.stiffener_plt_len_along_web - 50), L12=float(BP.stiffener_plt_height_along_web - 100), R21=15, R22=15)
 
-            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=float(BP.anchor_len_below_footing_out)* 1.3)
+            concrete = Plate(L=baseplate.L * 2, W=baseplate.W * 2, T=float(BP.anchor_len_below_footing_out) * 1.5)
             grout = Grout(L=concrete.L, W=concrete.W, T=50)
 
             stiffener_acrsWeb = StiffenerPlate(L=float(BP.stiffener_plt_len_across_web) - float(BP.weld_size_stiffener), W=float(BP.stiffener_plt_height_across_web), T=float(BP.stiffener_plt_thick_across_web),
@@ -1508,7 +1530,6 @@ class CommonDesignLogic(object):
                 BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_out
                 BP.plate_washer_thk_in = BP.plate_washer_thk_out
 
-
             bolt_d = float(BP.anchor_dia_outside_flange)
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
             bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
@@ -1522,7 +1543,6 @@ class CommonDesignLogic(object):
             # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
             nut_T_in = self.nutThick_Calculation(bolt_d_in)  # Nut thickness, usually nut thickness = nut height
             nut_HT_in = nut_T_in
-
 
             ex_length_out = BP.anchor_len_above_footing_out
             ex_length_in = BP.anchor_len_above_footing_in
@@ -1867,6 +1887,9 @@ class CommonDesignLogic(object):
                 self.Bc = self.module_class()
                 self.ExtObj = self.createBCEndPlateCAD()
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+                # self.display.View.SetAxis(0,1,0,1,1,1)
+
+
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()

@@ -1117,12 +1117,17 @@ class BeamColumnEndPlate(MomentConnection):
                         # end/edge
                         self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                         self.bolt.edge_type)
-                        self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
-                        self.edge_distance_provided = self.end_distance_provided
+                        self.end_distance_provided = round(2 * self.end_distance_provided)  # mm
+                        # self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
+
+                        # self.edge_distance_provided = self.end_distance_provided
+                        self.edge_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
+                                                                                        self.bolt.edge_type)
+                        self.edge_distance_provided = round_up(self.edge_distance_provided, 5)  # mm
 
                         # cross-centre gauge
                         # self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
-                        self.gauge_cs_distance_provided = self.beam_tw + (2 * self.end_distance_provided)
+                        self.gauge_cs_distance_provided = self.beam_tw + (2 * self.edge_distance_provided)
                         self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
                         # Check 3: end plate dimensions (designed for groove weld at flange only)
@@ -1500,7 +1505,7 @@ class BeamColumnEndPlate(MomentConnection):
             self.p_bf_2 = round(self.p_bf_2, 2) #todo tw2 changed to tw3-anjali
 
             # check 3: column web crippling capacity (as per american code)
-            self.p_bf_3 = ((300 * self.column_tw ** 2) / self.gamma_m1) * (1 + (3 * (self.beam_tf / self.column_D) *
+            self.p_bf_3 = ((300 * self.column_tw ** 3) / self.gamma_m1) * (1 + (3 * (self.beam_tf / self.column_D) *
                                                                                 (self.column_tw / self.column_tf) ** 1.5)) * \
                           math.sqrt((self.column_fy * self.column_tf) / self.column_tw) * 1e-3  # kN
             self.p_bf_3 = round(self.p_bf_3, 2)
@@ -1595,7 +1600,7 @@ class BeamColumnEndPlate(MomentConnection):
                 else:
                     self.continuity_plate_tension_flange_status = False
 
-            # Design 3: Stiffener at the column web (design for shear)
+            # Design 3: Stiffener at the column web - diagonal stiffener (design for shear)
             self.t_wc = (1.9 * self.load_moment * 1e6) / (self.column_D * self.beam_D * self.column_fy)  # mm
 
             if self.t_wc > self.column_tw:
@@ -1627,9 +1632,12 @@ class BeamColumnEndPlate(MomentConnection):
 
             else:
                 self.diagonal_stiffener_status = False
-                self.diag_stiffener_length = 'N/A'
-                self.diag_stiffener_width = 'N/A'
-                self.diag_stiffener_thk_provided = 'N/A'
+                # self.diag_stiffener_length = 'N/A'
+                # self.diag_stiffener_width = 'N/A'
+                # self.diag_stiffener_thk_provided = 'N/A'
+                self.diag_stiffener_length = 438
+                self.diag_stiffener_width = 164
+                self.diag_stiffener_thk_provided = 14
 
         else:  # column web to beam web connectivity
             self.continuity_plate_compression_flange_status = False
@@ -1742,7 +1750,9 @@ class BeamColumnEndPlate(MomentConnection):
             else:
                 self.diag_stiffener_groove_weld_status = False
         else:
-            self.weld_size_diag_stiffener = 'N/A'
+            # self.weld_size_diag_stiffener = 'N/A'
+            self.weld_size_diag_stiffener = 10
+
             self.diag_stiffener_groove_weld_status = False
 
         # end of the design simulation

@@ -52,6 +52,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.load_moment_effective = 0.0
         self.load_shear = 0.0
         self.load_axial = 0.0
+        self.input_shear_force = 0.0
+        self.input_axial_force = 0.0
+        self.input_moment = 0.0
 
         # self.supported_section = Beam
         self.bolt_diameter = []
@@ -640,20 +643,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
-        # force details
-        self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
-                         axial_force=float(design_dictionary[KEY_AXIAL]),
-                         moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
-
         # plate details
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                            gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_capacity = False
-
-        self.input_shear_force = float(design_dictionary[KEY_SHEAR])
-        self.input_axial_force = float(design_dictionary[KEY_AXIAL])
-        self.input_moment = float(design_dictionary[KEY_MOMENT])
 
         # weld details
         # self.top_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
@@ -740,6 +734,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.load.moment = round(self.load.moment * 1e-6, 2)  # kN-m
         self.load_shear = round(self.load.shear_force * 1e-3, 2)  # kN
         self.load_axial = round(self.load.axial_force * 1e-3, 2)  # kN
+
+        self.input_shear_force = self.load.shear_force
+        self.input_axial_force = self.load.axial_force
+        self.input_moment = self.load.moment
 
         # set minimum load (Cl. 10.7, IS 800:2007)
 
@@ -1030,7 +1028,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                         self.load_moment_effective, self.end_distance_provided,
                                                                                         self.pitch_distance_provided, self.pitch_distance_web,
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
-                                                                                        self.plate_thickness, self.dp_plate_fu)
+                                                                                        self.plate_thickness, self.dp_plate_fu, self.load_shear)
 
                                 # checking for the maximum pitch distance of the bolts for a safe design
                                 # if space is available then add rows
@@ -1084,7 +1082,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                                 self.end_distance_provided,
                                                                                                 self.pitch_distance_provided, self.pitch_distance_web,
                                                                                                 self.beta, self.proof_stress, self.dp_plate_fy,
-                                                                                                self.plate_thickness, self.dp_plate_fu)
+                                                                                                self.plate_thickness, self.dp_plate_fu,
+                                                                                                self.load_shear)
 
                                         # status of the helper file - bolt design check, with web bolts
                                         if self.call_helper.helper_file_design_status == True:
@@ -1591,7 +1590,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   get_pass_fail(self.bolt_shear_demand, bolt_capacity_kn, relation='leq'))
             self.report_check.append(t4)
 
-        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, ep_type=self.endplate_type), '', 'Pass')
+        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, self.bolt_row, ep_type=self.endplate_type), '', 'Pass')
         self.report_check.append(t6)
 
         leverarm = self.call_helper.lever_arm
@@ -1600,10 +1599,20 @@ class BeamBeamEndPlateSplice(MomentConnection):
         for j in leverarm:
             r_sum += j**2 / r1
 
+        if len(leverarm) >= 3:
+            r_3 = leverarm[2]
+        else:
+            r_3 = 0.0
+        if len(leverarm) >= 4:
+            r_4 = leverarm[3]
+        else:
+            r_4 = 0.0
+
         t6 = ("Tension due to moment (kN)", tension_critical_bolt_prov(M=self.load_moment_effective, t_ba=round(self.tension_critical_bolt, 2),
-                                                                          n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
-                                                                          r_i=round(r_sum, 2), n=self.bolt_row, type=self.endplate_type,
-                                                                          r_3=float(leverarm[2])), "", "OK")
+                                                                       n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
+                                                                       r_i=round(r_sum, 2), n=self.bolt_row, r_3=r_3, r_4=r_4,
+                                                                       type=self.endplate_type),
+              "", "OK")
         self.report_check.append(t6)
 
         if self.bolt.bolt_tensioning == 'Pretensioned':

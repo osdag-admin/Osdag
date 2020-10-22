@@ -2849,6 +2849,13 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
             display_eqn.append(NoEscape(r' & r_{4}~ is ~the~ second~ row ~inside~ tension/top~ flange  \\'))
             display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second ~row ~outside~ tension/top~ flange  \\'))
             display_eqn.append(NoEscape(r' & row(s)~ r_{6} ~and~ beyond~ are~ rows ~inside~ the~ flange.  \\ \\'))
+        else:
+            display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the~ first~ row~ outside~ tension/top~ flange  \\'))
+            display_eqn.append(NoEscape(r' & r_{2} ~is~ the ~first~ row ~inside ~tension/top ~flange  \\'))
+            display_eqn.append(NoEscape(r' & r_{3}~ is ~the ~first ~row ~inside ~compression/bottom ~flange  \\'))
+            display_eqn.append(NoEscape(r' & r_{4}~ is ~the~ second~ row ~inside~ tension/top~ flange  \\'))
+            display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second ~row ~outside~ tension/top~ flange  \\'))
+            display_eqn.append(NoEscape(r' & row(s)~ r_{6} ~and~ beyond~ are~ rows ~inside~ the~ flange.  \\ \\'))
 
     elif ep_type == 'Extended Both Ways - Reversible Moment':
         display_eqn.append(NoEscape(r' Note:~ & r_{1}~ and~ r_{2}~ are~ the ~first~ rows~ outside \\'))
@@ -2866,15 +2873,13 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
             display_eqn.append(NoEscape(r' & row(s)~ r_{7}~ and~ beyond~ are~ rows~ inside~ the~ flange, \\'))
             display_eqn.append(NoEscape(r' & placed~ in~ a~ symmetrical~ manner. \\ \\'))
 
-        elif bolt_row == 8:
+        elif bolt_row >= 8:
             display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second~ row~ outside~ tension/top~ flange\\'))
             display_eqn.append(NoEscape(r' & and ~r_{6}~ is~ the~ second~ row~ inside~ the~ tension/top~ flange \\'))
             display_eqn.append(NoEscape(r' & r_{7}~ is~ the~ second~ row~ outside~ compression/bottom~ flange\\'))
             display_eqn.append(NoEscape(r' & and~ r_{8}~ is~ the~ second~ row~ inside~ the~ compression/bottom ~flange \\'))
             display_eqn.append(NoEscape(r' & row(s)~ r_{9}~ and~ beyond~ are~ rows~ inside~ the~ flange, \\'))
             display_eqn.append(NoEscape(r' & placed~ in~ a~ symmetrical~ manner. \\ \\'))
-    else:
-        pass
 
     display_eqn.append(NoEscape(r' Note:~ & The~ lever~ arm~ is~ computed~ by~ considering \\'))
     display_eqn.append(NoEscape(r' & the~ NA~ at~ the~ centre~of~ the~ bottom~ flange. \\'))
@@ -2885,7 +2890,7 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
     return display_eqn
 
 
-def get_pass_fail(required, provided, relation='greater'):
+def get_pass_fail(required, provided, relation=''):
     if provided == 0 or required == 'N/A' or provided == 'N/A' or required == 0:
         return ''
     else:
@@ -6726,7 +6731,7 @@ def stiffener_height_prov(b_ep, t_w, h_ep, D, h_sp, type=None):
     stiffener_height_prov = Math(inline=True)
     if type == 'Flushed - Reversible Moment':
 
-        stiffener_height_prov.append(NoEscape(r'\begin{aligned} H_{st} &= B_{p} - \frac{t}{2} \\'))
+        stiffener_height_prov.append(NoEscape(r'\begin{aligned} W_{st} &= B_{p} - \frac{t}{2} \\'))
         stiffener_height_prov.append(NoEscape(r' &= '+b_ep+r' - \frac{'+t_w+r'}{2}\\'))
 
     else:
@@ -6737,8 +6742,8 @@ def stiffener_height_prov(b_ep, t_w, h_ep, D, h_sp, type=None):
             stiffener_height_prov.append(NoEscape(r'\begin{aligned} H_{st} &= H_{p} - D - 12.5 \\'))
             stiffener_height_prov.append(NoEscape(r' &= '+h_ep+r' - '+D +r'- 12.5 \\'))
 
-
     stiffener_height_prov.append(NoEscape(r' &= ' + h_sp + r'\end{aligned}'))
+
     return stiffener_height_prov
 
 
@@ -6746,9 +6751,9 @@ def stiffener_length_prov(h_sp, l_sp, type=None):
     h_sp = str(h_sp)
     l_sp = str(l_sp)
     stiffener_length_prov = Math(inline=True)
-    if type == 'Flushed - Reversible Moment':
 
-        stiffener_length_prov.append(NoEscape(r'\begin{aligned} L_{st} &= 2 * H_{st}  \\'))
+    if type == 'Flushed - Reversible Moment':
+        stiffener_length_prov.append(NoEscape(r'\begin{aligned} L_{st} &= 2 * W_{st}  \\'))
         stiffener_length_prov.append(NoEscape(r'&= 2 * '+ h_sp +r' \\'))
     else:
         stiffener_length_prov.append(NoEscape(r'\begin{aligned} L_{st} &= \frac{H_{st}}{tan(30)}  \\'))
@@ -6829,6 +6834,44 @@ def weld_fu(weld_material_fu, plate_material_fu):
     weld_fu_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1] \end{aligned}'))
 
     return weld_fu_eqn
+
+
+def weld_fu_cp(weld_material_fu, cp_material_fu):
+    weld_fu_eqn = Math(inline=True)
+
+    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{uw} &= min(f_{w}, ~{f_{u}}_{cp}) \\'))
+    weld_fu_eqn.append(NoEscape(r'  &= min(' + str(weld_material_fu) + r', ~' + str(cp_material_fu) + r') \\ \\'))
+    weld_fu_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1] \end{aligned}'))
+
+    return weld_fu_eqn
+
+
+def weld_length_cp(weld_length, weld_both_side):
+    weld_fu_eqn = Math(inline=True)
+
+    weld_fu_eqn.append(NoEscape(r'\begin{aligned} {L_{w}}_{cp} &= ' + str(weld_length) + r' \\ \\'))
+
+    if weld_both_side == True:
+        weld_fu_eqn.append(NoEscape(r'Note:&~ Provide ~weld~ on~ both~ the~ sides  \\'))
+        weld_fu_eqn.append(NoEscape(r' & of~ the~ continuity~ plate  \end{aligned}'))
+    else:
+        weld_fu_eqn.append(NoEscape(r'Note:&~ Provide ~weld~ on~ one~ side  \\'))
+        weld_fu_eqn.append(NoEscape(r' & of~ the ~continuity~ plate  \end{aligned}'))
+
+    return weld_fu_eqn
+
+
+def weld_size_cp_req(r_c, p_cw, gamma_mw, weld_length_cp, fu, weld_size_cp):
+
+    weld_cp = Math(inline=True)
+    weld_cp.append(NoEscape(r'\begin{aligned} {t_{w}}_{cp} &= \frac{ V_{cp} / 2 }{ f_{uw}~ k ~{L_{w}}_{cp} } \times \sqrt{3}~ \gamma_{mw} \\'))
+    weld_cp.append(NoEscape(r' &= \frac{R_{c} - P_{cw}}{2 \times f_{uw}~ k ~{L_{w}}_{cp}} \times \sqrt{3}~ \gamma_{mw} \\'))
+    weld_cp.append(NoEscape(r' &= \frac{('+str(r_c) +r' - '+str(p_cw)+r') \times 10^{3}}{2 \times '+str(fu)+r' \times 0.7 \times '
+                            +str(weld_length_cp)+r'} \times \sqrt{3} \times '+str(gamma_mw)+r' \\'))
+    weld_cp.append(NoEscape(r'&= ' + str(weld_size_cp) + r' \\ \\'))
+    weld_cp.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7]\end{aligned}'))
+
+    return weld_cp
 
 
 def weld_fu_provided(weld_fu):

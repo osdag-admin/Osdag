@@ -729,12 +729,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
-
-        # defining loads in appropriate units
-        self.load.moment = round(self.load.moment * 1e-6, 2)  # kN-m
-        self.load_shear = round(self.load.shear_force * 1e-3, 2)  # kN
-        self.load_axial = round(self.load.axial_force * 1e-3, 2)  # kN
-
         self.input_shear_force = self.load.shear_force
         self.input_axial_force = self.load.axial_force
         self.input_moment = self.load.moment
@@ -746,13 +740,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.beam_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.supported_section.fy) / (math.sqrt(3) * self.gamma_m0)
         self.beam_shear_capa = round(self.beam_shear_capa * 1e-3, 2)  # kN
 
-        if self.load_shear > self.beam_shear_capa:
+        if self.load.shear_force > self.beam_shear_capa:
             logger.warning("[High Shear] The external factored shear force ({} kN) is greater than 0.6 times the plastic shear capacity of the "
-                           "beam ({} kN)".format(self.load_shear, self.beam_shear_capa))
+                           "beam ({} kN)".format(self.load.shear_force, self.beam_shear_capa))
             logger.info("Design of beam with high shear is not recommended by Osdag")
             logger.info("Restricting the shear capacity of the beam to {} kN ".format(self.beam_shear_capa))
 
-        if self.load_shear < min((0.15 * self.beam_shear_capa), 40):
+        elif self.load.shear_force < min((0.15 * self.beam_shear_capa), 40):
             self.minimum_load_status_shear = True
             self.load_shear = min(round(0.15 * self.beam_shear_capa, 2), 40)
             logger.warning("[Minimum Factored Load] The external factored shear force ({} kN) is less than the minimum recommended design action on "
@@ -760,6 +754,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
             logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam) or 40 kN whichever is "
                         "less [Ref. Cl. 10.7, IS 800:2007]".format(round(0.15 * self.beam_shear_capa, 2)))
             logger.info("Designing the connection for a factored shear load of {} kN".format(self.load_shear))
+        else:
+            self.minimum_load_status_shear = False
+            self.load_shear = self.load.shear_force
 
         # minimum moment (major axis)
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
@@ -791,6 +788,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.design_status_list.append(self.design_status)
             self.minimum_load_status_moment = False
             self.load_moment = self.load.moment  # kN-m
+
+        self.load_axial = self.load.axial_force
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
         self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
@@ -1237,12 +1236,27 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # tension design
         self.tension_critical_bolt = round(self.call_helper.t_1, 2)
         self.prying_critical_bolt = self.call_helper.prying_force
+        if math.isnan(self.prying_critical_bolt):
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
+
         self.tension_demand_critical_bolt = round(self.call_helper.bolt_tension_demand, 2)
+        if math.isnan(self.tension_demand_critical_bolt):
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
+
         self.tension_capacity_critical_bolt = self.call_helper.bolt_tension_capacity
+
         self.combined_capacity_critical_bolt = self.call_helper.bolt_combined_check_UR
+        if math.isnan(self.combined_capacity_critical_bolt):
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
 
         # End Plate
         self.ep_moment_capacity = round(self.call_helper.mp_plate * 1e-6, 2)
+        if math.isnan(self.ep_moment_capacity):
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
 
         if self.endplate_type == 'Flushed - Reversible Moment':
             self.ep_height_provided = self.beam_D + 25
@@ -1310,7 +1324,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # 2: Weld design for stiffeners
         self.stiffener_weld.set_min_max_sizes(self.stiffener_thickness, max(self.beam_tf, self.beam_tw), special_circumstance=False,
                                               fusion_face_angle=90)
-        self.weld_size_stiffener = self.stiffener_weld.min_size  # mm
+        self.weld_size_stiffener = round(self.stiffener_weld.min_size, 2)  # mm
 
         # end of calculation
 
@@ -1474,10 +1488,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = ('SubSection', ' Bolt Optimization', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt diameter optimization", display_prov(int(self.bolt_diameter_provided), "d"), 'Pass')
+        t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt diameter optimization", display_prov(int(self.bolt_diameter_provided), "d"),
+              'Pass' if self.design_status else 'Fail' )
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass')
+        t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), 'OK')
@@ -1486,13 +1501,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # t1 = (KEY_DISP_PLTHICK, '', int(self.plate_thickness), 'Pass')
         # self.report_check.append(t1)
 
-        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass')
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t6)
 
-        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass')
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t7)
 
-        t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass')
+        t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
         # CHECK: Detailing
@@ -1590,7 +1605,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   get_pass_fail(self.bolt_shear_demand, bolt_capacity_kn, relation='leq'))
             self.report_check.append(t4)
 
-        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, self.bolt_row, ep_type=self.endplate_type), '', 'Pass')
+        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, self.bolt_row, ep_type=self.endplate_type), '',
+              'Pass' if self.design_status else 'Fail')
         self.report_check.append(t6)
 
         leverarm = self.call_helper.lever_arm
@@ -1609,7 +1625,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             r_4 = 0.0
 
         t6 = ("Tension due to moment (kN)", tension_critical_bolt_prov(M=self.load_moment_effective, t_ba=round(self.tension_critical_bolt, 2),
-                                                                       n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
+                                                                       n_c=self.bolt_column, r_1=round(r1, 2), n_r=self.bolt_row,
                                                                        r_i=round(r_sum, 2), n=self.bolt_row, r_3=r_3, r_4=r_4,
                                                                        type=self.endplate_type),
               "", "OK")
@@ -1629,7 +1645,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         t1 = ("Prying force (kN)", cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, self.beta, self.proof_stress, b_e, t, self.end_distance_provided,
                                                           self.beam_r1, self.dp_plate_fy, self.bolt_fu, self.proof_stress, self.beam_bf,
-                                                          self.bolt_column, self.prying_critical_bolt, eta=1.5), '', 'OK')
+                                                          self.bolt_column, self.prying_critical_bolt, eta=1.5), '',
+              'OK' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
         if self.bolt.bolt_type == "Bearing Bolt":
@@ -1665,6 +1682,20 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                               round(self.combined_capacity_critical_bolt, 2)),
             get_pass_fail(1, round(self.combined_capacity_critical_bolt, 2), relation="greater"))
             self.report_check.append(t1)
+
+        # Check: Reaction at compression flange
+        t1 = ('SubSection', 'Compression Flange Check', '|p{3.5cm}|p{4cm}|p{7.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = ('Tension in bolt rows (kN)', '', tension_list(self.call_helper.tension), 'OK')
+        self.report_check.append(t1)
+
+        tension_sum = sum(self.call_helper.tension)
+        t1 = ('Reaction at compression flange (kN)', compression_flange_capacity(self.beam_bf, self.beam_tf, self.supported_section.fy, self.gamma_m0,
+                                                                                 self.call_helper.flange_capacity),
+              reaction_compression_flange(self.call_helper.r_c, self.bolt_column, self.bolt_row, round(tension_sum, 2)),
+              get_pass_fail(self.call_helper.flange_capacity, self.call_helper.r_c, relation="geq"))
+        self.report_check.append(t1)
 
         # CHECK 2: END PLATE CHECKS #
         t1 = ('SubSection', '  End Plate Checks', '|p{3.5cm}|p{4cm}|p{7.5cm}|p{1.5cm}|')
@@ -1703,9 +1734,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_check.append(t1)
 
         # CHECK 2: STIFFENER CHECKS #
-        t1 = ('SubSection', 'Stiffener Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Longitudinal Stiffener Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT, ' ', stiffener_height_prov(b_ep=self.ep_width_provided,
+        t1 = (KEY_OUT_DISP_STIFFENER_WIDTH, ' ', stiffener_height_prov(b_ep=self.ep_width_provided,
                                                                         t_w=self.supported_section.web_thickness,
                                                                         h_ep=self.ep_height_provided,
                                                                         D=self.supported_section.depth,
@@ -1720,7 +1752,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         t1 = (KEY_OUT_DISP_STIFFENER_THICKNESS, display_prov(self.beam_tw, "t"), display_prov(self.stiffener_thickness, "tst"), 'Pass')
         self.report_check.append(t1)
-        #
+
+        t1 = ('Weld size (mm)', '', 'tw = ' + str(self.weld_size_stiffener) + '', 'Pass')
+        self.report_check.append(t1)
+
         # ##################
         # # Weld Checks
         # ##################
@@ -1745,13 +1780,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
               get_pass_fail(self.weld_size_web1, self.weld_size_web, relation="leq"))
         self.report_check.append(t1)
 
-        t1 = ('Min. weld size (mm)', cl_10_5_2_3_table_21_min_fillet_weld_size_required([self.plate_thickness, self.beam_tw], self.web_weld.min_size),
-              min_weld_size_ep_web_prov(weld_size_web=self.weld_size_web1, weld_size_web_provided=self.weld_size_web, min_size=self.web_weld.min_size),
+        t1 = ('Min. weld size (mm)', cl_10_5_2_3_table_21_min_fillet_weld_size_required([self.plate_thickness, self.beam_tw],
+                                                                                        round(self.web_weld.min_size, 2)),
+              min_weld_size_ep_web_prov(weld_size_web=self.weld_size_web1, weld_size_web_provided=self.weld_size_web,
+                                        min_size=round(self.web_weld.min_size, 2)),
               get_pass_fail(max(self.weld_size_web1, self.web_weld.min_size), self.weld_size_web, relation="leq"))
         self.report_check.append(t1)
 
-        t1 = ('Max. weld size (mm)',  cl_10_5_3_1_max_weld_size_v2([self.plate_thickness, self.beam_tw], self.web_weld.max_size),
-              max_weld_size_ep_web_prov(weld_size_web=self.weld_size_web, max_size=self.web_weld.max_size),
+        t1 = ('Max. weld size (mm)',  cl_10_5_3_1_max_weld_size_v2([self.plate_thickness, self.beam_tw], round(self.web_weld.max_size, 2)),
+              max_weld_size_ep_web_prov(weld_size_web=self.weld_size_web, max_size=round(self.web_weld.max_size, 2)),
               get_pass_fail(self.web_weld.max_size, self.weld_size_web, relation="geq"))
         self.report_check.append(t1)
 

@@ -949,10 +949,6 @@ class BeamColumnEndPlate(MomentConnection):
     # Check for minimum Design Action (Cl. 10.7, IS 800:2007)
     def check_minimum_design_action(self):
         """ """
-        self.load.moment = round(self.load.moment * 1e-6, 2)  # kN-m
-        self.load.shear_force = self.load.shear_force * 1e-3  # kN
-        self.load.axial_force = round(max(self.load.axial_force, 1) * 1e-3, 2)  # kN
-
         self.input_shear_force = self.load.shear_force
         self.input_axial_force = self.load.axial_force
         self.input_moment = self.load.moment
@@ -1594,7 +1590,7 @@ class BeamColumnEndPlate(MomentConnection):
 
             # Design 2: Continuity Plates on tension side for one way connection
             if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one way
-                self.t_bf = 0.4 * math.sqrt((self.beam_bf * self.beam_tf) / self.gamma_m0)  # mm
+                self.t_bf = round(0.4 * math.sqrt((self.beam_bf * self.beam_tf) / self.gamma_m0), 2)  # mm
                 print("t_bf",self.t_bf )
                 if self.t_bf > self.column_tf:
                     self.continuity_plate_tension_flange_status = True
@@ -1983,10 +1979,10 @@ class BeamColumnEndPlate(MomentConnection):
 
         t1 = (
         KEY_OUT_DISP_D_PROVIDED, "Bolt diameter optimization", display_prov(int(self.bolt_diameter_provided), "d"),
-        'Pass')
+        'Pass' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass')
+        t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), 'OK')
@@ -1995,13 +1991,13 @@ class BeamColumnEndPlate(MomentConnection):
         # t1 = (KEY_DISP_PLTHICK, '', int(self.plate_thickness), 'Pass')
         # self.report_check.append(t1)
 
-        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass')
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t6)
 
-        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass')
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t7)
 
-        t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass')
+        t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
         # CHECK: Detailing
@@ -2076,12 +2072,12 @@ class BeamColumnEndPlate(MomentConnection):
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.bolt_fu, 1,
                                                                              self.bolt.bolt_net_area,
                                                                              self.gamma_mb,
-                                                                             bolt_shear_capacity_kn), '')
+                                                                             bolt_shear_capacity_kn), 'OK')
             self.report_check.append(t1)
 
             t3 = (KEY_DISP_KB, '', cl_10_3_4_calculate_kb(self.end_distance_provided, self.pitch_distance_provided,
                                                           self.bolt_hole_diameter,
-                                                          self.bolt_fu, self.supported_section.fu), 'N/A')
+                                                          self.bolt_fu, self.supported_section.fu), 'OK')
             self.report_check.append(t3)
 
             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', cl_10_3_4_bolt_bearing_capacity(kb_disp,
@@ -2091,7 +2087,7 @@ class BeamColumnEndPlate(MomentConnection):
                                                                                   (self.plate_thickness,
                                                                                    self.plate.fu, self.plate.fy)],
                                                                                  self.gamma_mb,
-                                                                                 bolt_bearing_capacity_kn), '')
+                                                                                 bolt_bearing_capacity_kn), 'OK')
             self.report_check.append(t2)
 
             t3 = ('Bolt capacity (kN)', bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers,
@@ -2110,7 +2106,8 @@ class BeamColumnEndPlate(MomentConnection):
                   get_pass_fail(self.bolt_shear_demand, bolt_capacity_kn, relation='leq'))
             self.report_check.append(t4)
 
-        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, self.bolt_row, ep_type=self.endplate_type), '', 'Pass')
+        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, self.bolt_row, ep_type=self.endplate_type), '',
+              'Pass' if self.design_status else 'Fail')
         self.report_check.append(t6)
 
         leverarm = self.call_helper.lever_arm
@@ -2130,7 +2127,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         t6 = ("Tension due to moment (kN)",
               tension_critical_bolt_prov(M=self.load_moment_effective, t_ba=round(self.tension_critical_bolt, 2),
-                                         n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
+                                         n_c=self.bolt_column, r_1=round(r1, 2), n_r=self.bolt_row,
                                          r_i=round(r_sum, 2), n=self.bolt_row, r_3=r_3, r_4=r_4, type=self.endplate_type),
               "", "OK")
         self.report_check.append(t6)
@@ -2151,8 +2148,8 @@ class BeamColumnEndPlate(MomentConnection):
                                                           self.end_distance_provided,
                                                           self.beam_r1, self.dp_plate_fy, self.bolt_fu,
                                                           self.proof_stress, self.beam_bf,
-                                                          self.bolt_column, self.prying_critical_bolt, eta=1.5), '',
-              '')
+                                                          self.bolt_column, self.prying_critical_bolt, eta=1.5),
+              '', 'OK' if self.design_status else 'Fail')
         self.report_check.append(t1)
 
         if self.bolt.bolt_type == "Bearing Bolt":
@@ -2187,7 +2184,7 @@ class BeamColumnEndPlate(MomentConnection):
                                                                     round(self.tension_demand_critical_bolt, 2),
                                                                     round(self.tension_capacity_critical_bolt, 2),
                                                                     round(self.combined_capacity_critical_bolt, 2)),
-                  get_pass_fail(1, round(self.combined_capacity_critical_bolt, 2), relation="greater"))
+                  get_pass_fail(1, round(self.combined_capacity_critical_bolt, 2), relation="geq"))
             self.report_check.append(t1)
         else:
             t1 = ('Combined capacity (IR)', required_IR_or_utilisation_ratio(IR=1),
@@ -2197,7 +2194,7 @@ class BeamColumnEndPlate(MomentConnection):
                                                                      round(self.tension_capacity_critical_bolt, 2),
                                                                      round(self.combined_capacity_critical_bolt,
                                                                            2)),
-                  get_pass_fail(1, round(self.combined_capacity_critical_bolt, 2), relation="greater"))
+                  get_pass_fail(1, round(self.combined_capacity_critical_bolt, 2), relation="geq"))
             self.report_check.append(t1)
 
         # Check: Reaction at compression flange
@@ -2210,7 +2207,7 @@ class BeamColumnEndPlate(MomentConnection):
         tension_sum = sum(self.call_helper.tension)
         t1 = ('Reaction at compression flange (kN)', compression_flange_capacity(self.beam_bf, self.beam_tf, self.supported_section.fy, self.gamma_m0,
                                                                                  self.call_helper.flange_capacity),
-              reaction_compression_flange(self.call_helper.r_c, self.bolt_column, self.bolt_row, tension_sum),
+              reaction_compression_flange(self.call_helper.r_c, self.bolt_column, self.bolt_row, round(tension_sum, 2)),
               get_pass_fail(self.call_helper.flange_capacity, self.call_helper.r_c, relation="geq"))
         self.report_check.append(t1)
 
@@ -2314,8 +2311,8 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check.append(t1)
 
         t1 = ('Max. weld size (mm)',
-              cl_10_5_3_1_max_weld_size_v2([self.plate_thickness, self.beam_tw], self.web_weld.max_size),
-              max_weld_size_ep_web_prov(weld_size_web=self.weld_size_web, max_size=self.web_weld.max_size),
+              cl_10_5_3_1_max_weld_size_v2([self.plate_thickness, self.beam_tw], round(self.web_weld.max_size, 2)),
+              max_weld_size_ep_web_prov(weld_size_web=self.weld_size_web, max_size=round(self.web_weld.max_size, 2)),
               get_pass_fail(self.web_weld.max_size, self.weld_size_web, relation="geq"))
         self.report_check.append(t1)
 
@@ -2473,6 +2470,43 @@ class BeamColumnEndPlate(MomentConnection):
             #       get_pass_fail(self.t_bf, self.column_tf, relation="greater"))
             # self.report_check.append(t1)
 
+            # Continuity plate weld design
+            if (self.continuity_plate_compression_flange_status == True) or (self.continuity_plate_tension_flange_status == True):
+
+                t1 = ('SubSection', 'Weld Design - Continuity Plate', '|p{3.5cm}|p{6.3cm}|p{5.5cm}|p{1.2cm}|')
+                self.report_check.append(t1)
+
+                t1 = ('Weld strength $(N/mm^2)$', weld_fu_cp(self.web_weld.fu, self.plate.fu), weld_fu_provided(self.weld_fu),
+                      get_pass_fail(max(self.web_weld.fu, self.plate.fu), self.weld_fu, relation="geq"))
+                self.report_check.append(t1)
+
+                t1 = ('Total (effective) weld length (mm)', "", weld_length_cp(self.weld_length_cont_plate, self.weld_both_side_cont_plate_status),
+                      "OK")
+                self.report_check.append(t1)
+
+                weld_size_cp = ((self.p_c / 2) * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_cont_plate * self.weld_fu)  # mm
+
+                t1 = ('Weld size (mm)', weld_size_cp_req(self.call_helper.r_c, self.p_bf, self.gamma_mw, self.weld_length_cont_plate, self.weld_fu,
+                                                         round(weld_size_cp, 2)),
+                      self.weld_size_continuity_plate,
+                      get_pass_fail(weld_size_cp, self.weld_size_continuity_plate, relation="leq"))
+                self.report_check.append(t1)
+
+                t1 = ('Min. weld size (mm)',
+                      cl_10_5_2_3_table_21_min_fillet_weld_size_required([self.cont_plate_thk_provided, self.column_tw],
+                                                                         self.stiffener_weld.min_size),
+                      min_weld_size_ep_web_prov(weld_size_web=round(weld_size_cp, 2),
+                                                weld_size_web_provided=self.weld_size_continuity_plate, min_size=self.stiffener_weld.min_size),
+                      get_pass_fail(max(weld_size_cp, self.stiffener_weld.min_size), self.weld_size_continuity_plate, relation="leq"))
+                self.report_check.append(t1)
+
+                t1 = ('Max. weld size (mm)',
+                      cl_10_5_3_1_max_weld_size_v2([self.cont_plate_thk_provided, self.column_tw], self.stiffener_weld.max_size),
+                      max_weld_size_ep_web_prov(weld_size_web=self.weld_size_continuity_plate, max_size=self.stiffener_weld.max_size),
+                      get_pass_fail(self.stiffener_weld.max_size, weld_size_cp, relation="geq"))
+                self.report_check.append(t1)
+
+        # End of design report
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])
         rel_path = str(sys.path[0])

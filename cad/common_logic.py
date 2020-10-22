@@ -1896,7 +1896,9 @@ class CommonDesignLogic(object):
                 self.ExtObj = self.createBCEndPlateCAD()
                 # aTrsf = gp_Trsf()
                 # aTrsf.SetMirror(gp_OX())
-                self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+                # self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
+
                 # self.display.View.SetProj(OCC.Core.V3d.V3d_Ypos)
                 # Set up the mirror
 
@@ -1907,6 +1909,8 @@ class CommonDesignLogic(object):
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
+                    Point = gp_Pnt(0.0, 0.0, 0.0)
+                    self.display.DisplayMessage(Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()
@@ -1932,6 +1936,10 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
                                         color=Quantity_NOC_SADDLEBROWN)
+                    # cl= gp_Pnt(0, -self.Bc.supporting_section.depth/2, 0)
+                    # self.display.DisplayMessage(cl, self.Bc.supporting_section.designation, update = True)
+                    # cl = gp_Pnt(0, -self.Bc.supporting_section.depth / 2, 0)
+                    # self.display.DisplayMessage(cl, self.Bc.supported_section.designation, update=True)
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()

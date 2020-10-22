@@ -421,9 +421,9 @@ KEY_DISP_TOPANGLE_LIST = 'Top Angle List'
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
 KEY_ANCHOR_OCF = 'Anchor Bolt.OCF'
-KEY_DISP_ANCHOR_OCF = 'Outside Column Flange'
+KEY_DISP_ANCHOR_OCF = 'Anchor Bolt Outside Column Flange'
 KEY_ANCHOR_ICF = 'Anchor Bolt.ICF'
-KEY_DISP_ANCHOR_ICF = 'Inside Column Flange'
+KEY_DISP_ANCHOR_ICF = 'Anchor Bolt Inside Column Flange'
 KEY_DIA_ANCHOR_OCF = 'Anchor Bolt.OCF.Diameter'
 KEY_DIA_ANCHOR_ICF = 'Anchor Bolt.ICF.Diameter'
 KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
@@ -448,10 +448,12 @@ KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 
 RED_LIST = [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]
 VALUES_CONN_SPLICE = ['Coplanar Tension-Compression Flange', 'Coplanar Tension Flange', 'Coplanar Compression Flange']
-VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
-VALUES_CONN_1 = ['Column Flange - Beam Web', 'Column Web - Beam Web']
+CONN_CFBW = 'Column Flange-Beam Web'
+CONN_CWBW = 'Column Web-Beam Web'
+VALUES_CONN_1 = [CONN_CFBW,CONN_CWBW]
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate', 'Extended Both Ways']
+VALUES_CONN = VALUES_CONN_1 + VALUES_CONN_2
 VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irreversible Moment', 'Extended Both Ways - Reversible Moment']
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
@@ -593,6 +595,7 @@ KEY_DISP_FY_20_40 = 'Yield strength , fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield strength , fy (MPa) (>40mm)'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
+DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_FOOTING = 'Pedestal/Footing'
 
 KEY_DISP_CONN = 'Connectivity'
@@ -604,7 +607,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_MATERIAL = 'Plate material'
+KEY_DISP_MATERIAL = 'Material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 KEY_DISP_PRIBM = 'Primary beam *'
@@ -729,18 +732,25 @@ KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (mm)'
 KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
 KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'
 DISP_TITLE_DETAILING = 'Detailing'
+DISP_TITLE_DETAILING_OCF = 'Detailing - Outside Column Flange'
+DISP_TITLE_DETAILING_ICF = 'Detailing - Inside Column Flange'
 
 KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'Total No. of Anchor Bolts'
 
 KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
+KEY_IN_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
 
 KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
+KEY_IN_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
 KEY_OUT_DISP_DETAILING_CS_GAUGE_DISTANCE = 'Cross-centre Gauge (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
+KEY_IN_DETAILING_END_DISTANCE = 'Detailing.End Distance'
 
 KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (mm)'
+KEY_IN_DISP_DETAILING_END_DISTANCE = 'End Distance (mm)'
 
 KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (mm)"
+KEY_IN_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (mm)"
 
 KEY_OUT_DISP_DETAILING_PROJECTION = 'Effective Projection (mm)'
 DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
@@ -877,10 +887,10 @@ KEY_DP_ANCHOR_BOLT_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Type'
 KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor bolt type'
 KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type'
 KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type'
-KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor Bolt hole type'
+KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor bolt hole type'
 KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite'
 KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite'
-KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade, fu (MPa)'
 KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
 KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
@@ -889,7 +899,7 @@ KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Galvanize
 KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Anchor bolt galvanized?'
 KEY_DP_ANCHOR_BOLT_LENGTH_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Length'
 KEY_DP_ANCHOR_BOLT_LENGTH_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Length'
-KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
+KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Total length (mm)'
 KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
@@ -965,7 +975,7 @@ DISP_TITLE_PLATED = 'Plate Details'
 KEY_DISP_DP_DETAILING_GAP = 'Gap between beam and <br>support (mm)'
 KEY_DISP_DP_DETAILING_GAP_BEAM = 'Gap between beam and beam (mm)'
 KEY_DISP_DP_DETAILING_GAP_COL = 'Gap between column and column (mm)'
-KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
+KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences?'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the members exposed to corrosive influences'
 KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design method'
@@ -1047,14 +1057,21 @@ KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
 KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
 KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
 KEY_OUT_BASEPLATE_BEARING_STRESS = 'Baseplate.BearingStress'
+KEY_OUT_BASEPLATE_MOMENT_DEMAND = 'Baseplate.MomentDemand'
+KEY_OUT_DISP_BASEPLATE_MOMENT_DEMAND = 'Moment demand (kN-m)'
+KEY_OUT_BASEPLATE_MOMENT_CAPACITY = 'Baseplate.MomentCapacity'
+KEY_OUT_DISP_BASEPLATE_MOMENT_CAPACITY = 'Moment capacity (kN-m)'
 # KEY_OUT_DISP_BASEPLATE_BEARING_STRESS = 'Bearing Stress (N/mm<sup>2</sup>)'
 KEY_OUT_DISP_BASEPLATE_BEARING_STRESS = 'Bearing Stress (MPa)'
 KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
 KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Detailing.No of Anchor bolts'
 KEY_OUT_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
+KEY_IN_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
 KEY_OUT_DETAILING_GAUGE_DISTANCE = 'Detailing.Gauge Distance'
+KEY_IN_DETAILING_GAUGE_DISTANCE = 'Detailing.Gauge Distance'
 KEY_OUT_DETAILING_CS_GAUGE_DISTANCE = 'Detailing.Cross-centre Gauge Distance'
 KEY_OUT_DETAILING_PITCH_DISTANCE = 'Detailing.Pitch Distance'
+KEY_IN_DETAILING_PITCH_DISTANCE = 'Detailing.Pitch Distance'
 KEY_BOLT_FU = 'Bolt.fu'
 KEY_BOLT_FY = 'Bolt.fy'
 
@@ -1720,6 +1737,20 @@ KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.Thickness'
 KEY_OUT_STIFFENER_THICKNESS_CHS = 'Stiffener.Thickness'
 KEY_OUT_DISP_STIFFENER_THICKNESS = 'Thickness (mm)'
 
+KEY_OUT_DISP_LOCAL_WEB_YIELDING = 'Local Web Yielding'
+KEY_OUT_DISP_COMP_BUCKLING_WEB = 'Compression Buckling of Web'
+KEY_OUT_DISP_WEB_CRIPPLING = 'Web Crippling'
+KEY_OUT_DISP_COMP_STRENGTH = 'Compression strength (kN)'
+#Continuity Plate
+KEY_OUT_DISP_CONT_PLATE_REQ = 'Continuity plate required?'
+KEY_OUT_DISP_DIAG_PLATE_REQ='Check whether diagonal Plate is required or not'
+KEY_OUT_DISP_AREA_REQ= "Area required (mm2)"
+KEY_OUT_DISP_NOTCH_SIZE ="Notch size (mm)"
+
+# KEY_OUT_DISP_WEB_PLATE_CONT_T
+
+
+
 KEY_OUT_WELD_DETAILS = 'Weld.Details'
 DISP_TITLE_WELD = 'Weld'
 DISP_TITLE_WELD_FLANGE = 'Weld at Flange'
@@ -1733,9 +1764,14 @@ KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm2)'
 
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_WELD_STRESS_NORMAL = 'Weld.NormalStress'
+KEY_OUT_WELD_STRESS_SHEAR = 'Weld.ShearStress'
 KEY_OUT_WELD_STRESS_COMBINED = 'Weld.StressCombined'
 KEY_OUT_DISP_WELD_STRESS_COMBINED = 'Combined Stress (N/mm2)'
+KEY_OUT_DISP_WELD_STRESS_EQUIVALENT = 'Equivalent Stress (N/mm2)'
 KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
+KEY_OUT_DISP_WELD_NORMAL_STRESS = 'Normal Stress (N/mm2)'
+KEY_OUT_DISP_WELD_SHEAR_STRESS = 'Shear Stress (N/mm2)'
 KEY_OUT_DISP_WELD_STRESS_AXIAL = 'Weld.Stress due to axial force'
 KEY_OUT_DISP_WELD_STRESS_SHEAR = 'Weld.Stress due to shear force'
 KEY_OUT_DISP_WEB_WELD_LENGTH = 'Web Weld Length (mm)'

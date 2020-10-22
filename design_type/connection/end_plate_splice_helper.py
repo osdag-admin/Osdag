@@ -60,6 +60,7 @@ class EndPlateSpliceHelper(object):
         self.beam_fy = 0.0
         self.gamma_m0 = 0.0
         self.load_moment_effective = 0.0
+        self.load_shear = 0.0
         self.end_distance_provided = 0.0
         self.pitch_distance_provided = 0.0
         self.pitch_distance_web = 0.0
@@ -91,7 +92,7 @@ class EndPlateSpliceHelper(object):
 
     def perform_bolt_design(self, endplate_type, supported_section, gamma_m0, bolt_column, bolt_row, bolt_row_web, bolt_diameter_provided,
                             bolt_grade_provided, load_moment_effective, end_distance_provided, pitch_distance_provided, pitch_distance_web, beta,
-                            proof_stress, dp_plate_fy, plate_thickness, dp_plate_fu):
+                            proof_stress, dp_plate_fy, plate_thickness, dp_plate_fu, load_shear):
         """ perform bolt design """
 
         self.endplate_type = endplate_type
@@ -103,6 +104,7 @@ class EndPlateSpliceHelper(object):
         self.bolt_diameter_provided = bolt_diameter_provided
         self.bolt_grade_provided = bolt_grade_provided
         self.load_moment_effective = load_moment_effective
+        self.load_shear = load_shear
         self.end_distance_provided = end_distance_provided
         self.pitch_distance_provided = pitch_distance_provided
         self.pitch_distance_web = pitch_distance_web
@@ -687,7 +689,7 @@ class EndPlateSpliceHelper(object):
         self.bolt_numbers_provided = self.bolt_column * (self.bolt_row + self.bolt_row_web)
 
         # Check 9.1: shear demand
-        self.bolt_shear_demand = round((self.load.shear_force * 1e-3) / self.bolt_numbers_provided, 2)  # kN, shear on each bolt
+        self.bolt_shear_demand = round(self.load_shear / self.bolt_numbers_provided, 2)  # kN, shear on each bolt
 
         # Check 9.2: bolt capacity - shear design
         self.bolt.calculate_bolt_capacity(self.bolt_diameter_provided, self.bolt_grade_provided,

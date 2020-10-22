@@ -1026,8 +1026,8 @@ class BeamCoverPlate(MomentConnection):
             self.min_axial_load = 0.3 * self.axial_capacity
             self.load_moment_min = 0.5 * self.section.moment_capacity
             logger.info(
-                "Loads defined by the user are less than minimun recommendations as per IS 800:2007, Cl.10.7")
-            logger.info("Load values are set at minimun recommendations as per IS 800:2007, Cl.10.7")
+                "Loads defined by the user are less than minimum recommendations as per IS 800:2007, Cl.10.7")
+            logger.info("Load values are set at minimum recommendations as per IS 800:2007, Cl.10.7")
 
         elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
 
@@ -1038,7 +1038,7 @@ class BeamCoverPlate(MomentConnection):
                             (1 - self.sum_IR) * self.section.moment_capacity)
             self.min_axial_load = self.load.axial_force * 1000
             logger.info("Moment defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
-            logger.info("Moment value is set at {} kN-m".format(self.load_moment_min))
+            logger.info("Moment value is set at {} kN-m".format(round(self.load_moment_min / 1000000, 2)))
 
         elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
 
@@ -1048,7 +1048,7 @@ class BeamCoverPlate(MomentConnection):
                 self.min_axial_load = self.load.axial_force * 1000 + ((1 - self.sum_IR) * self.axial_capacity)
             self.load_moment_min = self.load.moment * 1000000
             logger.info("Axial force defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
-            logger.info("Axial force is set at {} kN".format(self.min_axial_load))
+            logger.info("Axial force is set at {} kN".format(round(self.min_axial_load / 1000, 2)))
         else:
             self.min_axial_load = self.load.axial_force * 1000
             self.load_moment_min = self.load.moment * 1000000

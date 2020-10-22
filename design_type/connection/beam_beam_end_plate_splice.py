@@ -52,6 +52,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.load_moment_effective = 0.0
         self.load_shear = 0.0
         self.load_axial = 0.0
+        self.input_shear_force = 0.0
+        self.input_axial_force = 0.0
+        self.input_moment = 0.0
 
         # self.supported_section = Beam
         self.bolt_diameter = []
@@ -126,6 +129,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.plate_design_status = False
         self.helper_file_design_status = False
         self.deep_beam_status = False
+        self.design_status_list = []
         self.design_status = False
 
         self.beam_properties = {}
@@ -639,20 +643,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
-        # force details
-        self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
-                         axial_force=float(design_dictionary[KEY_AXIAL]),
-                         moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
-
         # plate details
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                            gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_capacity = False
-
-        self.input_shear_force = float(design_dictionary[KEY_SHEAR])
-        self.input_axial_force = float(design_dictionary[KEY_AXIAL])
-        self.input_moment = float(design_dictionary[KEY_MOMENT])
 
         # weld details
         # self.top_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
@@ -703,6 +698,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # initialize design status
         self.plate_design_status = False
         self.helper_file_design_status = False
+        self.design_status_list = []
         self.design_status = False
 
         # helper function
@@ -738,6 +734,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.load.moment = round(self.load.moment * 1e-6, 2)  # kN-m
         self.load_shear = round(self.load.shear_force * 1e-3, 2)  # kN
         self.load_axial = round(self.load.axial_force * 1e-3, 2)  # kN
+
+        self.input_shear_force = self.load.shear_force
+        self.input_axial_force = self.load.axial_force
+        self.input_moment = self.load.moment
 
         # set minimum load (Cl. 10.7, IS 800:2007)
 
@@ -781,12 +781,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.load_moment = self.beam_plastic_mom_capa_zz  # kN
             self.minimum_load_status_moment = True
             self.design_status = False
+            self.design_status_list.append(self.design_status)
             logger.error("[Maximum Factored Load] The external factored bending moment ({} kN-m) is greater than the plastic moment capacity of the "
                          "beam ({} kN-m)".format(self.load.moment, self.beam_plastic_mom_capa_zz))
             logger.warning("The maximum capacity of the connection is {} kN-m".format(self.beam_plastic_mom_capa_zz))
             logger.info("Define the value of factored bending moment as {} kN-m or less".format(self.beam_plastic_mom_capa_zz))
         else:
             self.design_status = True
+            self.design_status_list.append(self.design_status)
             self.minimum_load_status_moment = False
             self.load_moment = self.load.moment  # kN-m
 
@@ -814,6 +816,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # checking if the list contains at least one plate of thk higher than the minimum required
         if len(self.plate_thickness) == 0:
             self.design_status = False
+            self.design_status_list.append(self.design_status)
             logger.error("[End Plate] The list of plate thicknesses passed into the solver is insufficient to perform end plate design")
             logger.warning("The end plate should at least be thicker than the maximum thickness of the connecting element(s)")
             logger.info("Provide a plate/list of plates with a minimum thickness of {} mm".format(max(self.beam_tf, self.beam_tw)))
@@ -926,6 +929,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                         if self.space_available_inside_D < self.space_min_req_inside_D:
                             self.design_status = False
+                            self.design_status_list.append(self.design_status)
                             logger.error("[Compatibility Error]: The given beam cannot accommodate at least a single row of bolt (inside top and "
                                          "bottom flange) with a trial diameter of {} mm ".format(self.bolt_diameter_provided))
                             logger.info("Re-design the connection by defining a bolt of smaller diameter or beam of a suitable depth ")
@@ -973,6 +977,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                         if self.ep_width_provided < space_req_2col:
                             self.bolt_column = 0
                             self.design_status = False
+                            self.design_status_list.append(self.design_status)
                             logger.error("[Detailing] The beam is not wide enough to accommodate a single column of bolt on either side")
                             logger.error("The defined beam is not suitable for performing connection design")
                             logger.info("Please define another beam which has sufficient width (minimum, {} mm) and re-design".format(space_req_2col))
@@ -1023,7 +1028,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                         self.load_moment_effective, self.end_distance_provided,
                                                                                         self.pitch_distance_provided, self.pitch_distance_web,
                                                                                         self.beta, self.proof_stress, self.dp_plate_fy,
-                                                                                        self.plate_thickness, self.dp_plate_fu)
+                                                                                        self.plate_thickness, self.dp_plate_fu, self.load_shear)
 
                                 # checking for the maximum pitch distance of the bolts for a safe design
                                 # if space is available then add rows
@@ -1077,7 +1082,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                                                 self.end_distance_provided,
                                                                                                 self.pitch_distance_provided, self.pitch_distance_web,
                                                                                                 self.beta, self.proof_stress, self.dp_plate_fy,
-                                                                                                self.plate_thickness, self.dp_plate_fu)
+                                                                                                self.plate_thickness, self.dp_plate_fu,
+                                                                                                self.load_shear)
 
                                         # status of the helper file - bolt design check, with web bolts
                                         if self.call_helper.helper_file_design_status == True:
@@ -1217,6 +1223,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                 else:
                     self.design_status = False
 
+        # design status associated with the helper status
+        self.design_status_list.append(self.design_status)
+
         # results of overall safe design
 
         # shear design
@@ -1295,7 +1304,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # allowable stress check
         if self.f_e > self.allowable_stress:
-            self.design_status = False
             logger.error("[Weld Design] The weld at web fails in the combined axial and shear design check")
             logger.info("Provide groove weld at the web")
 
@@ -1305,6 +1313,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.weld_size_stiffener = self.stiffener_weld.min_size  # mm
 
         # end of calculation
+
+        # overall design status
+        for status in self.design_status_list:
+            if status is False:
+                self.design_status = False
+                break
+            else:
+                self.design_status = True
+
         if self.design_status:
             logger.info(": =====================Design Status=======================")
             logger.info(": Overall beam to beam end plate splice connection design is SAFE")
@@ -1463,16 +1480,16 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt property class optimization", self.bolt_grade_provided, 'Pass')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), '')
+        t1 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt_hole_diameter, "d_0"), 'OK')
         self.report_check.append(t1)
 
         # t1 = (KEY_DISP_PLTHICK, '', int(self.plate_thickness), 'Pass')
         # self.report_check.append(t1)
 
-        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), '')
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.bolt_column, "n_c"), 'Pass')
         self.report_check.append(t6)
 
-        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), '')
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.bolt_row, "n_r"), 'Pass')
         self.report_check.append(t7)
 
         t1 = (KEY_OUT_DISP_NO_BOLTS, '', display_prov(self.bolt_numbers, "n = n_r X n_c"), 'Pass')
@@ -1573,7 +1590,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   get_pass_fail(self.bolt_shear_demand, bolt_capacity_kn, relation='leq'))
             self.report_check.append(t4)
 
-        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, ep_type=self.endplate_type), '', 'Pass')
+        t6 = (KEY_DISP_LEVER_ARM, lever_arm_end_plate(self.call_helper.lever_arm, self.bolt_row, ep_type=self.endplate_type), '', 'Pass')
         self.report_check.append(t6)
 
         leverarm = self.call_helper.lever_arm
@@ -1582,10 +1599,20 @@ class BeamBeamEndPlateSplice(MomentConnection):
         for j in leverarm:
             r_sum += j**2 / r1
 
+        if len(leverarm) >= 3:
+            r_3 = leverarm[2]
+        else:
+            r_3 = 0.0
+        if len(leverarm) >= 4:
+            r_4 = leverarm[3]
+        else:
+            r_4 = 0.0
+
         t6 = ("Tension due to moment (kN)", tension_critical_bolt_prov(M=self.load_moment_effective, t_ba=round(self.tension_critical_bolt, 2),
-                                                                          n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
-                                                                          r_i=round(r_sum, 2), n=self.bolt_row, type=self.endplate_type,
-                                                                          r_3=float(leverarm[2])), "", "OK")
+                                                                       n_c=self.bolt_column, r_1=int(leverarm[0]), n_r=self.bolt_row,
+                                                                       r_i=round(r_sum, 2), n=self.bolt_row, r_3=r_3, r_4=r_4,
+                                                                       type=self.endplate_type),
+              "", "OK")
         self.report_check.append(t6)
 
         if self.bolt.bolt_tensioning == 'Pretensioned':

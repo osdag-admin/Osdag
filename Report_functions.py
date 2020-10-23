@@ -2828,7 +2828,11 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
 
     if ep_type == 'Flushed - Reversible Moment':
         display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the ~first ~row~ inside~ tension/top ~flange  \\'))
-        display_eqn.append(NoEscape(r'  & r_{2}~ is~ the~ first~ row~ inside~ compression/bottom~ flange,~ and~ so~ on.  \\ \\'))
+        display_eqn.append(NoEscape(r'  & r_{2}~ is~ the~ first~ row~ inside~ compression/bottom~ flange  \\'))
+        display_eqn.append(NoEscape(r'  & Further~ row(s)~ are~ added~ in~ a~ symmetrical~ manner~with  \\'))
+        display_eqn.append(NoEscape(r'  & odd~ row~ placed~ near~the~ tension/top~ flange~ and  \\'))
+        display_eqn.append(NoEscape(r'  & even~ row~ placed~ near~the~ compression/bottom  \\'))
+        display_eqn.append(NoEscape(r'  & flange~ respectively  \\ \\'))
 
     elif ep_type == 'Extended One Way - Irreversible Moment':
         if bolt_row == 3:

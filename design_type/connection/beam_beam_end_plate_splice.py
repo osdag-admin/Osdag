@@ -65,6 +65,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.bolt_hole_diameter = 0.0
         self.bolt_type = ""
         self.plate_thickness = []
+        self.plate_thickness_list = []
 
         self.beam_shear_capa = 0.0
         self.beam_plastic_mom_capa_zz = 0.0
@@ -811,6 +812,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # final sorted list as per compatibility check
         self.plate_thickness = self.plate_thickness  # final list of plate thicknesses considered for simulation
+        self.plate_thickness_list = self.plate_thickness
 
         # checking if the list contains at least one plate of thk higher than the minimum required
         if len(self.plate_thickness) == 0:
@@ -1223,7 +1225,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                     self.design_status = False
 
         # design status associated with the helper status
-        self.design_status_list.append(self.design_status)
+        # self.design_status_list.append(self.design_status)
+        if (i == self.plate_thickness_list[-1]) and (self.design_status == False):
+            self.design_status_list.append(self.design_status)
 
         # results of overall safe design
 

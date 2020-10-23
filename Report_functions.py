@@ -7184,9 +7184,15 @@ def continuity_plate_req_1(R_c):
     return check_1
 
 
-def continuity_plate_req_2(p_cw):
+def continuity_plate_req_2(r_c, p_cw):
     check_2 = Math(inline=True)
-    check_2.append(NoEscape(r'\begin{aligned} P_{cw} &= ' + str(p_cw) + r'\end{aligned}'))
+
+    if p_cw < r_c:
+        check_2.append(NoEscape(r'\begin{aligned} P_{cw} &= ' + str(p_cw) + r'\end{aligned}'))
+    else:
+        check_2.append(NoEscape(r'\begin{aligned} P_{cw} &= ' + str(p_cw) + r' \\ \\'))
+        check_2.append(NoEscape(r' Note:& ~The~ continuity~plate~ is~however ~provided~ as \\'))
+        check_2.append(NoEscape(r' & the~ diagonal~ stiffener~ is~ required \end{aligned}'))
 
     return check_2
 

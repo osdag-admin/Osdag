@@ -1269,9 +1269,9 @@ class CADGroove(object):
         :return: Geometric Orientation of this component
         """
         gap = self.column.D / 2 + self.plate.T + self.bcWeldWeb_R3.b
-        beamOriginR = numpy.array([0.0, gap, self.column.length / 2])
+        beamOriginR = numpy.array([0.0, -gap, self.column.length / 2])
         beamR_uDir = numpy.array([1.0, 0.0, 0.0])
-        beamR_wDir = numpy.array([0.0, 1.0, 0.0])
+        beamR_wDir = numpy.array([0.0, -1.0, 0.0])
         self.beam.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateRGeometry(self):
@@ -1282,16 +1282,16 @@ class CADGroove(object):
 
         if self.endplate_type == "one_way":
             gap = 0.5 * self.plate.T + self.column.D / 2
-            plateOriginR = numpy.array([-self.plate.W / 2, gap, self.column.length / 2 + (
+            plateOriginR = numpy.array([-self.plate.W / 2, -gap, self.column.length / 2 + (
                     self.plate.L / 2 - self.boltProjection - self.beam.D / 2)])  # TODO #Add weld thickness here
-            plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateR_uDir = numpy.array([0.0, -1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plate.place(plateOriginR, plateR_uDir, plateR_wDir)
 
         else:  # self.endplate_type == "both_way" and flushed
             gap = 0.5 * self.plate.T + self.column.D / 2
-            plateOriginR = numpy.array([-self.plate.W / 2, gap, self.column.length / 2])
-            plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateOriginR = numpy.array([-self.plate.W / 2, -gap, self.column.length / 2])
+            plateR_uDir = numpy.array([0.0, -1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plate.place(plateOriginR, plateR_uDir, plateR_wDir)
 
@@ -1302,27 +1302,27 @@ class CADGroove(object):
         """
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plate.sec_origin + numpy.array([0.0, self.plate.T / 2, + (
+            nutboltArrayOrigin = self.plate.sec_origin + numpy.array([0.0, -self.plate.T / 2, + (
                     self.plate.L / 2)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
-            boltDir = numpy.array([0, -1.0, 0])
+            boltDir = numpy.array([0, 1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
             nutboltArrayOrigin = self.plate.sec_origin + numpy.array(
-                [0.0, self.plate.T / 2, self.plate.L / 2])
+                [0.0, -self.plate.T / 2, self.plate.L / 2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
-            boltDir = numpy.array([0, -1.0, 0])
+            boltDir = numpy.array([0, 1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
             nutboltArrayOrigin = self.plate.sec_origin + numpy.array(
-                [0.0, self.plate.T / 2, self.beam.D / 2])  # TODO Add self.Lv instead of 25
+                [0.0, -self.plate.T / 2, self.beam.D / 2])  # TODO Add self.Lv instead of 25
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
-            boltDir = numpy.array([0, -1.0, 0])
+            boltDir = numpy.array([0, 1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
     ##############################################  Adding contPlates ########################################
@@ -1364,33 +1364,19 @@ class CADGroove(object):
         :return: Geometric Orientation of this components
         """
         beamOriginL = numpy.array([self.diagplate_L1.W/2 +self.column.t/2,-self.column.length/2*cos(radians(45)),(((self.column.length / 2 )*sin(radians(45)))+self.diagplate_L1.T/2)])
-        # beamOriginL = numpy.array([0.0, 0.0,0.0])
         print(beamOriginL,"1")
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.diagplate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
-        # trns = gp_Trsf()
-        # # axis = numpy.array([1.0, 0.0, 0.0])
-        # angle = radians(45)
-        # trns.SetRotation(gp_OX(), angle)
-        # brep_trns = BRepBuilderAPI_Transform(self.diagplate_L1Model, trns, False)
-        # self.diagplate_L1Model = brep_trns.Build()
-        # # prism1 = brep_trns.Shape()
+
 
         beamOriginL = numpy.array([-self.diagplate_R1.W / 2 - self.column.t/2, -self.column.length / 2 * cos(radians(45)),
                                    ((self.column.length / 2 )* sin(radians(45))) +self.diagplate_R1.T/2])
-        # print(beamOriginL, "2")
-        # beamOriginL = numpy.array([0.0, 0.0, 0.0])
+
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.diagplate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
-        # # self.diagplate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
-        # trns = gp_Trsf()
-        # # axis = numpy.array([1.0, 0.0, 0.0])
-        # angle = radians(45)
-        # trns.SetRotation(gp_OX(), angle)
-        # self.diagplate_R1Model = BRepBuilderAPI_Transform(self.diagplate_R1Model, trns, False)
-        # # self.diagplate_1Model = brep_trns.Build()
+
 
     ##############################################  Adding beam stiffeners #############################################
     def create_beam_stiffenersGeometry(self):
@@ -1399,16 +1385,16 @@ class CADGroove(object):
         :return: Geometric Orientation of this components
         """
         gap = self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L / 2
-        stiffenerOrigin1 = numpy.array([-self.beam_stiffener_1.T / 2, gap,
-                                        self.column.length / 2 + self.beam.D / 2 + self.beam_stiffener_1.W / 2])
-        stiffener1_uDir = numpy.array([0.0, 1.0, 0.0])
+        stiffenerOrigin1 = numpy.array([-self.beam_stiffener_1.T / 2, -gap,
+                                        self.column.length / 2 - self.beam.D / 2 - self.beam_stiffener_1.W / 2])
+        stiffener1_uDir = numpy.array([0.0, -1.0, 0.0])
         stiffener1_wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam_stiffener_1.place(stiffenerOrigin1, stiffener1_uDir, stiffener1_wDir)
 
         gap = self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L / 2
-        stiffenerOrigin2 = numpy.array([self.beam_stiffener_1.T / 2, gap,
-                                        self.column.length / 2 - self.beam.D / 2 - self.beam_stiffener_1.W / 2])
-        stiffener2_uDir = numpy.array([0.0, 1.0, 0.0])
+        stiffenerOrigin2 = numpy.array([self.beam_stiffener_1.T / 2, -gap,
+                                        self.column.length / 2 + self.beam.D / 2 + self.beam_stiffener_1.W / 2])
+        stiffener2_uDir = numpy.array([0.0, -1.0, 0.0])
         stiffener2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.beam_stiffener_2.place(stiffenerOrigin2, stiffener2_uDir, stiffener2_wDir)
 
@@ -1420,28 +1406,18 @@ class CADGroove(object):
         :return: Geometric Orientation of this component
         """
         gap = self.column.D/2 + self.plate.T + self.bcWeldWeb_R3.b/2
-        weldFlangOrigin_R1 = numpy.array([- self.beam.B / 2, gap, self.column.length/2+self.beam.D / 2 - self.beam.T / 2])
-        uDir_1 = numpy.array([0, 1.0, 0])
+        weldFlangOrigin_R1 = numpy.array([- self.beam.B / 2, -gap, self.column.length/2+self.beam.D / 2 - self.beam.T / 2])
+        uDir_1 = numpy.array([0, -1.0, 0])
         wDir_1 = numpy.array([1.0, 0, 0])
         self.bcWeldFlang_R1.place(weldFlangOrigin_R1, uDir_1, wDir_1)
 
         gap = self.column.D/2 + self.plate.T+ self.bcWeldWeb_R3.b/2
-        weldFlangOrigin_R2 = numpy.array([self.beam.B / 2, gap, self.column.length/2-(self.beam.D / 2 - self.beam.T / 2)])
-        uDir_2 = numpy.array([0, 1.0, 0])
+        weldFlangOrigin_R2 = numpy.array([self.beam.B / 2, -gap, self.column.length/2-(self.beam.D / 2 - self.beam.T / 2)])
+        uDir_2 = numpy.array([0, -1.0, 0])
         wDir_2 = numpy.array([-1.0, 0, 0])
         self.bcWeldFlang_R2.place(weldFlangOrigin_R2, uDir_2, wDir_2)
 
-        # weldFlangOrigin_L1 = numpy.array([- self.beamLeft.B / 2, self.beamLeft.length + self.bbWeldWeb_L3.b / 2,
-        #                                   self.beamLeft.D / 2 - self.beamLeft.T / 2])
-        # uDir_1 = numpy.array([0, 1.0, 0])
-        # wDir_1 = numpy.array([1.0, 0, 0])
-        # self.bbWeldFlang_L1.place(weldFlangOrigin_L1, uDir_1, wDir_1)
-        #
-        # weldFlangOrigin_L2 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length + self.bbWeldWeb_L3.b / 2,
-        #                                   -(self.beamLeft.D / 2 - self.beamLeft.T / 2)])
-        # uDir_2 = numpy.array([0, 1.0, 0])
-        # wDir_2 = numpy.array([-1.0, 0, 0])
-        # self.bbWeldFlang_L2.place(weldFlangOrigin_L2, uDir_2, wDir_2)
+
 
     def create_bcWeldWebGeometry(self):
         """
@@ -1449,15 +1425,10 @@ class CADGroove(object):
         :return: Geometric Orientation of this component
         """
         gap = self.column.D/2 + self.plate.T + self.bcWeldWeb_R3.b/2
-        weldWebOrigin_R3 = numpy.array([0.0, gap,self.column.length/2-self.beam.D/2 + self.beam.T])
-        uDirWeb_3 = numpy.array([0, 1.0, 0])
+        weldWebOrigin_R3 = numpy.array([0.0, -gap,self.column.length/2-self.beam.D/2 + self.beam.T])
+        uDirWeb_3 = numpy.array([0, -1.0, 0])
         wDirWeb_3 = numpy.array([0, 0, 1.0])
         self.bcWeldWeb_R3.place(weldWebOrigin_R3, uDirWeb_3, wDirWeb_3)
-
-        # weldWebOrigin_L3 = numpy.array([0.0, self.beamLeft.length + self.bbWeldWeb_L3.b / 2, -self.bbWeldWeb_L3.L / 2])
-        # uDirWeb_3 = numpy.array([0, 1.0, 0])
-        # wDirWeb_3 = numpy.array([0, 0, 1.0])
-        # self.bbWeldWeb_L3.place(weldWebOrigin_L3, uDirWeb_3, wDirWeb_3)
 
 
 
@@ -1466,57 +1437,57 @@ class CADGroove(object):
 
         :return: Geometric Orientation of this components
         """
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T,
-                                              self.column.length / 2 + self.beam.D / 2 + self.beam_stiffener_1.W])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
-        self.bcWeldStiffHL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
-
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T,
-                                              self.column.length / 2 - self.beam.D / 2 - self.beam_stiffener_1.L22])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
-        self.bcWeldStiffHL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
-
-        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T,
-                                              self.column.length / 2 + self.beam.D / 2 + self.beam_stiffener_1.L22])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T),
+                                              self.column.length / 2 + self.beam.D / 2+5 ])
+        uDirStiffHL_1 = numpy.array([0, -1.0, 0])
         wDirStiffHL_1 = numpy.array([0, 0, 1.0])
-        self.bcWeldStiffHR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+        self.bcWeldStiffHL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)####
 
-        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T,
-                                              self.column.length / 2 - self.beam.D / 2 - self.beam_stiffener_1.W])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T),
+                                              self.column.length / 2 - self.beam.D / 2- self.beam_stiffener_1.W ])
+        uDirStiffHL_1 = numpy.array([0, -1.0, 0])
         wDirStiffHL_1 = numpy.array([0, 0, 1.0])
-        self.bcWeldStiffHR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+        self.bcWeldStiffHL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)#####
+
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T),
+                                              self.column.length / 2 + self.beam.D / 2+ self.beam_stiffener_1.W])
+        uDirStiffHL_1 = numpy.array([0, -1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)#######
+
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T),
+                                              self.column.length / 2 - self.beam.D / 2 -5])
+        uDirStiffHL_1 = numpy.array([0, -1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)######
 
         weldStiffWebOriginHL_1 = numpy.array(
-            [self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L,
+            [self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T+5),
              self.column.length / 2 + self.beam.D / 2])
         uDirStiffHL_1 = numpy.array([1, 0.0, 0])
         wDirStiffHL_1 = numpy.array([0, -1.0, 0.0])
-        self.bcWeldStiffLL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+        self.bcWeldStiffLL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)####
 
         weldStiffWebOriginHL_1 = numpy.array(
-            [self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L22,
+            [self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L),
              self.column.length / 2 - self.beam.D / 2])
         uDirStiffHL_1 = numpy.array([1.0, 0.0, 0.0])
         wDirStiffHL_1 = numpy.array([0.0, 1.0, 0.0])
         self.bcWeldStiffLL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
         weldStiffWebOriginHL_1 = numpy.array(
-            [-self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L22,
+            [-self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L),
              self.column.length / 2 + self.beam.D / 2])
         uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
         wDirStiffHL_1 = numpy.array([0.0, 1.0, 0.0])
         self.bcWeldStiffLR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
         weldStiffWebOriginHL_1 = numpy.array(
-            [-self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L,
+            [-self.beam_stiffener_1.T / 2, -(self.column.D / 2 + self.plate.T+5),
              self.column.length / 2 - self.beam.D / 2])
         uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
         wDirStiffHL_1 = numpy.array([0.0, -1.0, 0.0])
-        self.bcWeldStiffLR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+        self.bcWeldStiffLR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)#####
 
     ####################################### welding continuity plates with fillet weld##################################
 
@@ -1694,21 +1665,15 @@ class CADGroove(object):
         diagWeldL1_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.diagWeldL1_U.place(diagWeldL1_U2OriginL, diagWeldL1_U2_uDir, diagWeldL1_U2_wDir)
 
-        # diagWeldS1_U3OriginL = numpy.array([0.0,-self.column.D/2 + self.column.T +self.diagWeldS1_L.h,self.column.length/2+self.diagplate_L1.L/2*sin(radians(45))])
         diagWeldS1_U3OriginL = numpy.array([self.column.t/2,((self.column.length/2)*cos(radians(45))+self.diagWeldS1_U.h/2),
                                             ((self.column.length/2+self.diagplate_L1.L*sin(radians(45)))*sin(radians(45)))])
-
         uDirdiagWeldS1_U3 = numpy.array([0, 0.0, 1.0])
         wDirdiagWeldS1_U3 = numpy.array([1.0, 0, 0])
         self.diagWeldS1_U.place(diagWeldS1_U3OriginL, uDirdiagWeldS1_U3, wDirdiagWeldS1_U3)
 
-        # diagWeldS1_L3OriginL = numpy.array(
-        #     [self.column.t / 2, -((self.column.length/2-(self.diagplate_L1.L*cos(radians(45))))*cos(radians(45))-self.diagWeldS1_U.h/2),
-        #      ((self.column.length/2))*sin(radians(45))])
 
         diagWeldS1_L3OriginL = numpy.array(
             [self.column.t / 2, -(self.column.length/2)*sin(radians(45))+self.diagplate_L1.T/2,-((self.column.length/2-(self.diagplate_L1.L*cos(radians(45))))*cos(radians(45)))])
-
         uDirdiagWeldS1_L3 = numpy.array([0, 0.0, 1.0])
         wDirdiagWeldS1_L3 = numpy.array([1.0, 0, 0])
         self.diagWeldS1_L.place(diagWeldS1_L3OriginL, uDirdiagWeldS1_L3, wDirdiagWeldS1_L3)
@@ -1716,7 +1681,6 @@ class CADGroove(object):
         diagWeldS2_U3OriginL = numpy.array(
             [-self.column.t / 2-self.diagplate_L1.W, ((self.column.length / 2) * cos(radians(45)) + self.diagWeldS1_U.h / 2),
              ((self.column.length / 2 + self.diagplate_L1.L * sin(radians(45))) * sin(radians(45)))])
-
         uDirdiagWeldS2_U3 = numpy.array([0, 0.0, 1.0])
         wDirdiagWeldS2_U3 = numpy.array([1.0, 0, 0])
         self.diagWeldS2_U.place(diagWeldS2_U3OriginL, uDirdiagWeldS2_U3, wDirdiagWeldS2_U3)
@@ -1724,27 +1688,14 @@ class CADGroove(object):
         diagWeldS2_L3OriginL = numpy.array(
             [-self.column.t / 2-self.diagplate_L1.W, -(self.column.length / 2) * sin(radians(45)) + self.diagplate_L1.T / 2,
              -((self.column.length / 2 - (self.diagplate_L1.L * cos(radians(45)))) * cos(radians(45)))])
-
         uDirdiagWeldS2_L3 = numpy.array([0, 0.0, 1.0])
         wDirdiagWeldS2_L3 = numpy.array([1.0, 0, 0])
         self.diagWeldS2_L.place(diagWeldS2_L3OriginL, uDirdiagWeldS2_L3, wDirdiagWeldS2_L3)
-
-        # contWeldL2_U2OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2, self.column.length / 2
-        #                                     - self.beam.D / 2 + self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
-        # contWeldL2_U2_wDir = numpy.array([0.0, 1.0, 0.0])
-        # self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
         diagWeldL1_L2OriginL = numpy.array([self.column.t/2,-self.column.length/2*cos(radians(45))-self.diagplate_L1.L/2,(((self.column.length / 2 )*sin(radians(45)))-self.diagplate_L1.T/2)])
         diagWeldL1_L2_uDir = numpy.array([1.0, 0.0, 0.0])
         diagWeldL1_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.diagWeldL1_L.place(diagWeldL1_L2OriginL, diagWeldL1_L2_uDir, diagWeldL1_L2_wDir)
-
-        # contWeldL2_L2OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2, self.column.length / 2
-        #                                     - self.beam.D / 2 - self.contPlate_L1.T / 2 + self.beam.T / 2])
-        # contWeldL2_L2_uDir = numpy.array([1.0, 0.0, 0.0])
-        # contWeldL2_L2_wDir = numpy.array([0.0, 1.0, 0.0])
-        # self.contWeldL2_L2.place(contWeldL2_L2OriginL, contWeldL2_L2_uDir, contWeldL2_L2_wDir)
 
         diagWeldR1_U2OriginL = numpy.array([-self.column.t/2, -self.column.length / 2 * cos(radians(45))-self.diagplate_L1.L/2,
                                    ((self.column.length / 2 )* sin(radians(45))) + self.diagplate_R1.T/2])
@@ -1752,134 +1703,12 @@ class CADGroove(object):
         diagWeldR1_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.diagWeldR1_U.place(diagWeldR1_U2OriginL, diagWeldR1_U2_uDir, diagWeldR1_U2_wDir)
 
-        # contWeldR2_U2OriginL = numpy.array([-self.column.t / 2, -self.contPlate_L1.L / 2, self.column.length / 2
-        #                                     - self.beam.D / 2 + self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # contWeldR2_U2_uDir = numpy.array([-1.0, 0.0, 0.0])
-        # contWeldR2_U2_wDir = numpy.array([0.0, 1.0, 0.0])
-        # self.contWeldR2_U2.place(contWeldR2_U2OriginL, contWeldR2_U2_uDir, contWeldR2_U2_wDir)
-
         diagWeldR1_L2OriginL = numpy.array([-self.column.t/2, -self.column.length / 2 * cos(radians(45))-self.diagplate_R1.L/2,
                                    ((self.column.length / 2 )* sin(radians(45))) - self.diagplate_R1.T/2])
         diagWeldR1_L2_uDir = numpy.array([0.0, 0.0, -1.0])
         diagWeldR1_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.diagWeldR1_L.place(diagWeldR1_L2OriginL, diagWeldR1_L2_uDir, diagWeldR1_L2_wDir)
 
-        # contWeldR2_L2OriginL = numpy.array([-self.column.t / 2, -self.contPlate_L1.L / 2, self.column.length / 2
-        #                                     - self.beam.D / 2 + self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # contWeldR2_L2_uDir = numpy.array([0.0, 0.0, -1.0])
-        # contWeldR2_L2_wDir = numpy.array([0.0, 1.0, 0.0])
-        # self.contWeldR2_L2.place(contWeldR2_L2OriginL, contWeldR2_L2_uDir, contWeldR2_L2_wDir)
-
-        # contWeldL1_U3OriginL = numpy.array([self.column.t / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldL1_U3 = numpy.array([0, 0.0, 1.0])
-        # wDircontWeldL1_U3 = numpy.array([1.0, 0, 0])
-        # self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
-        #
-        # contWeldL1_L3OriginL = numpy.array([self.column.t / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldL1_L3 = numpy.array([0, -1.0, 0.0])
-        # wDircontWeldL1_L3 = numpy.array([1.0, 0, 0])
-        # self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
-        #
-        # contWeldR2_U3OriginL = numpy.array([-self.column.B / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 + self.contPlate_L1.T / 2])  # TODO: shuffel it with R2_U3
-        # uDircontWeldR2_U3 = numpy.array([0, 0.0, 1.0])
-        # wDircontWeldR2_U3 = numpy.array([1.0, 0, 0])
-        # self.contWeldR2_U3.place(contWeldR2_U3OriginL, uDircontWeldR2_U3, wDircontWeldR2_U3)
-        #
-        # contWeldL2_L3OriginL = numpy.array([self.column.t / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldL2_L3 = numpy.array([0, -1.0, 0.0])
-        # wDircontWeldL2_L3 = numpy.array([1.0, 0, 0])
-        # self.contWeldL2_L3.place(contWeldL2_L3OriginL, uDircontWeldL2_L3, wDircontWeldL2_L3)
-        #
-        # contWeldR1_U3OriginL = numpy.array([-self.column.B / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldR1_U3 = numpy.array([0, 0.0, 1.0])
-        # wDircontWeldR1_U3 = numpy.array([1.0, 0, 0])
-        # self.contWeldR1_U3.place(contWeldR1_U3OriginL, uDircontWeldR1_U3, wDircontWeldR1_U3)
-        #
-        # contWeldR1_L3OriginL = numpy.array([-self.column.B / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldR1_L3 = numpy.array([0, -1.0, 0.0])
-        # wDircontWeldR1_L3 = numpy.array([1.0, 0, 0])
-        # self.contWeldR1_L3.place(contWeldR1_L3OriginL, uDircontWeldR1_L3, wDircontWeldR1_L3)
-        #
-        # contWeldL2_U3OriginL = numpy.array([self.column.t / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
-        # wDircontWeldL2_U3 = numpy.array([1.0, 0, 0])
-        # self.contWeldL2_U3.place(contWeldL2_U3OriginL, uDircontWeldL2_U3, wDircontWeldL2_U3)
-        #
-        # contWeldR2_L3OriginL = numpy.array([-self.column.B / 2, self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldR2_L3 = numpy.array([0, -1.0, 0.0])
-        # wDircontWeldR2_L3 = numpy.array([1.0, 0, 0])
-        # self.contWeldR2_L3.place(contWeldR2_L3OriginL, uDircontWeldR2_L3, wDircontWeldR2_L3)
-        #
-        # contWeldL1_U1OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldL1_U1 = numpy.array([0, 1.0, 0.0])
-        # wDircontWeldL1_U1 = numpy.array([1.0, 0, 0])
-        # self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
-        #
-        # contWeldL1_L1OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
-        # wDircontWeldL1_L1 = numpy.array([1.0, 0, 0])
-        # self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
-        #
-        # contWeldL2_U1OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldL2_U1 = numpy.array([0, 1.0, 0.0])
-        # wDircontWeldL2_U1 = numpy.array([1.0, 0, 0])
-        # self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
-        #
-        # contWeldR2_L1OriginL = numpy.array([-self.column.B / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldR2_L1 = numpy.array([0, 0.0, -1.0])
-        # wDircontWeldR2_L1 = numpy.array([1.0, 0, 0])
-        # self.contWeldR2_L1.place(contWeldR2_L1OriginL, uDircontWeldR2_L1, wDircontWeldR2_L1)
-        #
-        # contWeldR1_U1OriginL = numpy.array([- self.column.B / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldR1_U1 = numpy.array([0, 1.0, 0])
-        # wDircontWeldR1_U1 = numpy.array([1.0, 0, 0])
-        # self.contWeldR1_U1.place(contWeldR1_U1OriginL, uDircontWeldR1_U1, wDircontWeldR1_U1)
-        #
-        # contWeldR1_L1OriginL = numpy.array([-self.column.B / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 + (
-        #                                             self.beam.D / 2) - self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldR1_L1 = numpy.array([0, 0, -1.0])
-        # wDircontWeldR1_L1 = numpy.array([1.0, 0, 0])
-        # self.contWeldR1_L1.place(contWeldR1_L1OriginL, uDircontWeldR1_L1, wDircontWeldR1_L1)
-        #
-        # contWeldR2_U1OriginL = numpy.array([-self.column.B / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 + self.contPlate_L1.T / 2])
-        # uDircontWeldR2_U1 = numpy.array([0, 1.0, 0])
-        # wDircontWeldR2_U1 = numpy.array([1.0, 0, 0])
-        # self.contWeldR2_U1.place(contWeldR2_U1OriginL, uDircontWeldR2_U1, wDircontWeldR2_U1)
-        #
-        # contWeldL2_L1OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2,
-        #                                     self.column.length / 2 - (
-        #                                             self.beam.D / 2) + self.beam.T / 2 - self.contPlate_L1.T / 2])
-        # uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
-        # wDircontWeldL2_L1 = numpy.array([1.0, 0, 0])
-        # self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
 
     #############################################################################################################
     #   Following functions returns the CAD model to the function display_3DModel of main file                  #
@@ -1945,85 +1774,113 @@ class CADGroove(object):
         """
         if self.endplate_type == "one_way":
             # if self.numberOfBolts == 12:
-            welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
-                        self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                           self.diagWeldL1_LModel,self.diagWeldL1_UModel,self.diagWeldR1_LModel,self.diagWeldR1_UModel,
-                           self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
-                          self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
-                          self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                          self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                          self.contWeldL2_L2Model,
-                          self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                          self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-                          self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-                          self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-                          self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                          self.contWeldL2_U1Model, self.contWeldL2_L1Model,
-                          self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                          self.contWeldR2_L1Model]
-            # else:
-            #     welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-            #                   self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-            #                   self.contWeldL2_L2Model,
-            #                   self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-            #                   self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-            #                   self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-            #                   self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-            #                   self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-            #                   self.contWeldL2_U1Model, self.contWeldL2_L1Model,
-            #                   self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-            #                   self.contWeldR2_L1Model]
+            if self.diagplate != None:
+                welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                            self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                               self.diagWeldL1_LModel,self.diagWeldL1_UModel,self.diagWeldR1_LModel,self.diagWeldR1_UModel,
+                               self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
+                              self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
+                              self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+            else:
+                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
+                              self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
+                              self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
 
         elif self.endplate_type == "both_way":
             # if self.numberOfBolts == 20:
-            welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
-                           self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                           self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
-                           self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
-                           self.bcWeldStiffHR_2Model,
-                          self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
-                          self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
-                          self.contWeldR1_L2Model,
-                          self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                          self.contWeldL2_L2Model,
-                          self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                          self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-                          self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-                          self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-                          self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                          self.contWeldL2_U1Model, self.contWeldL2_L1Model,
-                          self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                          self.contWeldR2_L1Model]
-            # else:
-            #     welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-            #                   self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-            #                   self.contWeldL2_L2Model,
-            #                   self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-            #                   self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-            #                   self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-            #                   self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-            #                   self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-            #                   self.contWeldL2_U1Model, self.contWeldL2_L1Model,
-            #                   self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-            #                   self.contWeldR2_L1Model]
+            if self.diagplate != None:
+                welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
+                               self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                               self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
+                               self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
+                               self.bcWeldStiffHR_2Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
+                              self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
+                              self.contWeldR1_L2Model,
+                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
+                              self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+            else:
+
+                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.bcWeldStiffHR_2Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
+                              self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
+                              self.contWeldR1_L2Model,
+                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
+                              self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
 
         elif self.endplate_type == "flush":
-            welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                          self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                          self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                          self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
-                          self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
-                          self.contWeldL2_L2Model,
-                          self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                          self.contWeldR2_L2Model,
-                          self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-                          self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-                          self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-                          self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                          self.contWeldL2_U1Model,
-                          self.contWeldL2_L1Model,
-                          self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                          self.contWeldR2_L1Model]
+            if self.diagplate != None:
+                welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
+                              self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
+                              self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
+                              self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model,
+                              self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model,
+                              self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+            else:
+                welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
+                              self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model,
+                              self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model,
+                              self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+
 
         welds = welded_sec[0]
         for comp in welded_sec[1:]:

@@ -120,6 +120,14 @@ from math import *
 # from Connections.Shear.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
 # from utilities import osdag_display_shape
 
+from OCC.Core.gp import (gp_Vec, gp_Pnt, gp_Trsf, gp_OX, gp_OY,
+                         gp_OZ, gp_XYZ, gp_Ax2, gp_Dir, gp_GTrsf, gp_Mat)
+from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
+                                     BRepBuilderAPI_MakeVertex,
+                                     BRepBuilderAPI_MakeWire,
+                                     BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakeEdge2d,
+                                     BRepBuilderAPI_Transform)
+
 import OCC.Core.V3d
 from OCC.Core.Quantity import *
 from OCC.Core.Graphic3d import *
@@ -1886,7 +1894,14 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BCENDPLATE:
                 self.Bc = self.module_class()
                 self.ExtObj = self.createBCEndPlateCAD()
-                self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+                # aTrsf = gp_Trsf()
+                # aTrsf.SetMirror(gp_OX())
+                # self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
+
+                # self.display.View.SetProj(OCC.Core.V3d.V3d_Ypos)
+                # Set up the mirror
+
                 # self.display.View.SetAxis(0,1,0,1,1,1)
 
 
@@ -1894,6 +1909,8 @@ class CommonDesignLogic(object):
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
+                    Point = gp_Pnt(0.0, 0.0, 0.0)
+                    self.display.DisplayMessage(Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()
@@ -1919,6 +1936,10 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
                                         color=Quantity_NOC_SADDLEBROWN)
+                    # cl= gp_Pnt(0, -self.Bc.supporting_section.depth/2, 0)
+                    # self.display.DisplayMessage(cl, self.Bc.supporting_section.designation, update = True)
+                    # cl = gp_Pnt(0, -self.Bc.supporting_section.depth / 2, 0)
+                    # self.display.DisplayMessage(cl, self.Bc.supported_section.designation, update=True)
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()

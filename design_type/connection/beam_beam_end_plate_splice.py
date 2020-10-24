@@ -905,7 +905,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                             # cross-centre gauge
                             # self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
-                            self.gauge_cs_distance_provided = self.beam_tw + (2 * self.end_distance_provided)
+                            self.gauge_cs_distance_provided = self.beam_tw + self.beam_r1 + (2 * self.end_distance_provided)
                             self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
                             # Check 3: end plate dimensions (designed for groove weld at flange only)

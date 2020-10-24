@@ -263,8 +263,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'Beam to Beam' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
-                                                                ('End Plate Splice', 'ResourceFiles/images/extended.png', 'B2B_End_Plate_Splice'),
+                                                                ('End Plate Splice', 'ResourceFiles/images/bb_splice.png', 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam to Column': [
@@ -530,11 +529,11 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(BeamCoverPlateWeld, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice,' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        # elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
+        #     self.hide()
+        #     self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice,' ')
+        #     self.ui2.show()
+        #     self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton, 'B2B_End_Plate_Splice').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice, ' ')

@@ -135,6 +135,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.dp_plate_fy = 0.0
         self.dp_plate_fu = 0.0
 
+        self.column_clear_d = 0.0
         self.bc_compatibility_status = False
         self.minimum_load_status_shear = False
         self.minimum_load_status_moment = False
@@ -260,7 +261,7 @@ class BeamColumnEndPlate(MomentConnection):
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/webflush.png", True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/cf_bw_ebw.png", True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
@@ -315,18 +316,21 @@ class BeamColumnEndPlate(MomentConnection):
         """ """
         lst = []
 
-        t1 = ([KEY_ENDPLATE_TYPE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
-        lst.append(t1)
+        # t1 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        # lst.append(t1)
 
-        t2 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        t2 = ([KEY_CONN, KEY_ENDPLATE_TYPE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t2)
+
+        t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t3)
 
         return lst
 
     def fn_conn_image(self):
         """ display representative images of end plate type """
         conn = self[0]
-        ep_type = self[0]
+        ep_type = self[1]
 
         if conn == CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[0]:  # Flushed - Reversible Moment
             return './ResourceFiles/images/cf_bw_flush.png'
@@ -920,10 +924,11 @@ class BeamColumnEndPlate(MomentConnection):
     def check_compatibility(self):
         """ """
         # Beam to Column web connectivity
-        if self.connectivity is VALUES_CONN_1[1]:  # Column Web - Beam Web
-            column_clear_d = self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - 10  # 10 mm is the erection tolerance, 5 mm on each side
+        if self.connectivity == VALUES_CONN_1[1]:  # Column Web - Beam Web
+            # 10 mm is the erection tolerance, 5 mm on each side
+            self.column_clear_d = round(self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - 10, 2)
 
-            if (self.beam_bf + 25) > column_clear_d:  # 25 mm is the total extension of the end plate along its width
+            if (self.beam_bf + 25) > self.column_clear_d:  # 25 mm is the total extension of the end plate along its width
                 self.bc_compatibility_status = False
                 self.design_status = False
                 self.design_status_list.append(self.design_status)
@@ -931,7 +936,7 @@ class BeamColumnEndPlate(MomentConnection):
                              format(self.supporting_section.designation, self.supported_section.designation))
                 logger.warning(": Width of the supported beam by considering the maximum end plate width (B + 25 mm), is more than the clear depth "
                                "available at the supporting column")
-                logger.warning(": Width of supported beam should be less than or equal to {} mm".format(column_clear_d))
+                logger.warning(": Width of supported beam should be less than or equal to {} mm".format(self.column_clear_d))
                 logger.info(": Define a beam or a column of suitable compatibility and re-design")
             else:
                 self.bc_compatibility_status = True
@@ -2020,6 +2025,22 @@ class BeamColumnEndPlate(MomentConnection):
             self.bolt_conn_plates_t_fu_fy.append((self.plate_thickness, 0, 0))
 
         self.h = (self.beam_D - (2 * self.beam_tf))
+
+        # CHECK: Beam to Column Compatibility Check
+        t1 = ('SubSection', 'Beam to Column - Compatibility Check', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{2cm}|')
+        self.report_check.append(t1)
+
+        if self.connectivity == CONN_CFBW:  # Column Flange - Beam Web
+
+            t1 = ("Beam section compatibility", bc_ep_compatibility_req(self.beam_bf, self.beam_bf + 25),
+                  bc_ep_compatibility_available(0, self.column_bf, 0, 0, 0, CONN_CFBW),
+                  'Compatible' if self.bc_compatibility_status is True else 'Not compatible')
+            self.report_check.append(t1)
+        else:
+            t1 = ("Beam section compatibility", bc_ep_compatibility_req(self.beam_bf, self.beam_bf + 25),
+                  bc_ep_compatibility_available(self.column_D, self.column_bf, self.column_tf, self.column_r1, self.column_clear_d, CONN_CWBW),
+                  'Compatible' if self.bc_compatibility_status is True else 'Not compatible')
+            self.report_check.append(t1)
 
         # CHECK 1: MEMBER CAPACITY
         t1 = ('SubSection', 'Member Capacity - Supported Section', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')

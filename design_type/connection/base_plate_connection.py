@@ -116,11 +116,21 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.material = ""
 
         self.load_axial_compression = 0.0
+        self.load_axial_input = 0.0
         self.load_axial_tension = 0.0
         # self.load_shear = 0.0
         self.load_shear_major = 0.0
         self.load_shear_minor = 0.0
         self.load_moment_major = 0.0
+        self.column_axial_capacity = 0.0
+        self.epsilon_col = 0.0
+        self.col_classification = ''
+        self.beta_b_z = 1
+        self.beta_b_y = 1
+        self.M_dz = 0.0
+        self.M_dz = 0.0
+        self.M_dy = 0.0
+        self.M_dy = 0.0
         self.moment_capacity_column_major = 0.0
         self.moment_capacity_column_minor = 0.0
         self.load_moment_major_report = 0.0
@@ -224,6 +234,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_r1 = 0.0
         self.column_r2 = 0.0
         self.column_t = 0.0
+        self.column_area = 0.0
 
         self.bearing_strength_concrete = 0.0
         self.w = 0.0
@@ -2124,11 +2135,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             elif self.dp_column_designation[1:4] == 'CHS':
                 self.column_properties = CHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
                 self.dp_column_type = "Rolled"
+                self.column_Z_pz = self.column_properties.elast_sec_mod  # mm^3
+                self.column_Z_py = self.column_properties.elast_sec_mod  # mm^3
+                self.column_Z_ez = self.column_properties.elast_sec_mod  # mm^3
+                self.column_Z_ey = self.column_properties.elast_sec_mod  # mm^3
         else:
             self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
-            self.column_Z_pz = self.column_properties.plast_sec_mod_z  # mm^3
-            self.column_Z_py = self.column_properties.plast_sec_mod_y  # mm^3
             self.dp_column_type = str(self.column_properties.type)
+
+        if self.connectivity != 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] != 'CHS':
+                self.column_Z_pz = self.column_properties.plast_sec_mod_z  # mm^3
+                self.column_Z_py = self.column_properties.plast_sec_mod_y  # mm^3
+                self.column_Z_ez = self.column_properties.elast_sec_mod_z  # mm^3
+                self.column_Z_ey = self.column_properties.elast_sec_mod_y  # mm^3
 
         self.dp_column_source = str(self.column_properties.source)
         self.dp_column_fu = float(self.column_properties.fu)
@@ -2140,6 +2160,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_tw = self.column_properties.web_thickness  # mm
         self.column_r1 = self.column_properties.root_radius  # mm
         self.column_r2 = self.column_properties.toe_radius  # mm
+        self.column_area = self.column_properties.area  # mm2
 
         # other attributes
 
@@ -2366,7 +2387,103 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bp_length_min = self.column_D + (2 * (2 * self.end_distance_out))  # mm
             self.bp_width_min = 0.85 * self.column_bf + (2 * (2 * self.edge_distance_out))  # mm
 
-        # 7: Design Parameters
+        # 7: Minimum Design Action
+
+        # 7.1: Axial capacity
+        self.column_axial_capacity = round(((self.column_area * self.dp_column_fy) / self.gamma_m0) * 1e-3, 2)  # kN
+        self.load_axial_input = round(self.load_axial_compression * 1e-3, 2)
+
+        if self.load_axial_compression * 1e-3 < (0.3 * self.column_axial_capacity):
+            logger.warning("[Minimum Design Action] The defined value of axial compression ({} kN) is less than 0.3 times the capacity of the column "
+                           "section ({} kN) [Ref. Cl. 10.7, IS 800:2007]".format(self.load_axial_compression * 1e-3, 0.3 * self.column_axial_capacity))
+            logger.info("Setting the value of axial compression equal to the minimum recommended value")
+
+            self.load_axial_compression = (0.3 * self.column_axial_capacity * 1e3)  # N
+
+        if self.load_axial_compression * 1e-3 > self.column_axial_capacity:
+            logger.warning("[Maximum Design Action] The defined value of axial compression ({} kN) is greater than the capacity of the column "
+                           "section ({} kN)".format(self.load_axial_compression * 1e-3, self.column_axial_capacity))
+            logger.info("Setting the value of axial compression equal to the maximum capacity of the column section")
+
+            self.load_axial_compression = self.column_axial_capacity * 1e3  # N
+
+        # 7.2: Section classification
+        self.epsilon_col = round(math.sqrt(250 / self.dp_column_fy), 2)
+
+        # flange b/t check
+        if self.column_bf / self.column_tf > (42 * self.epsilon_col):
+            self.col_classification = 'Semi-compact'
+        else:
+            self.col_classification = 'Compact'
+
+        # web b/t check
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            web_axial_load = self.column_area
+        else:
+            web_axial_load = ((((self.column_D - (2 * self.column_tf)) * self.column_tw) / self.column_area) * self.dp_column_fy) / self.gamma_m0  # N
+
+        check = self.Table2_web_OfI_H_box_section((self.column_D - (2 * self.column_tf)), self.column_tw, self.dp_column_fy, web_axial_load,
+                                                  load_type='Compression', section_class='Semi-compact')
+        if (check[0] == 'Fail') or (check[1] == 'Fail') or (check[2] == 'Fail'):
+            self.col_classification = 'Semi-compact'
+        else:
+            self.col_classification = 'Compact'
+
+        # 7.3: Bending capacity
+        if self.col_classification == 'Semi-compact':
+            self.beta_b_z = self.column_Z_ez / self.column_Z_pz
+            self.beta_b_y = self.column_Z_ey / self.column_Z_py
+
+            self.M_dz = self.cl_8_2_1_2_design_moment_strength(self.column_Z_ez, self.column_Z_pz, self.dp_column_fy, section_class='semi-compact')
+            self.M_dz = round(self.M_dz, 2)  # Nmm
+            self.M_dy = self.cl_8_2_1_2_design_moment_strength(self.column_Z_ey, self.column_Z_py, self.dp_column_fy, section_class='semi-compact')
+            self.M_dy = round(self.M_dy, 2)  # Nmm
+        else:
+            self.beta_b_z = 1.0
+            self.beta_b_y = 1.0
+
+            self.M_dz = self.cl_8_2_1_2_design_moment_strength(self.column_Z_ez, self.column_Z_pz, self.dp_column_fy, section_class='Compact')
+            self.M_dz = round(self.M_dz, 2)  # Nmm
+            self.M_dy = self.cl_8_2_1_2_design_moment_strength(self.column_Z_ey, self.column_Z_py, self.dp_column_fy, section_class='Compact')
+            self.M_dy = round(self.M_dy, 2)  # Nmm
+
+        # 7.4: Moment check
+
+        # major axis moment
+        if self.load_moment_major < (0.5 * self.M_dz):
+            logger.warning("[Minimum Moment] The external factored bending moment (acting along the major axis) is less than the minimum "
+                           "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
+            logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
+                        "(i.e. 0.5 X {}, kNm)".format(round(self.M_dz * 1e-6, 2)))
+            logger.info("Note: The design action check is based on full capacity of the column for a conservative approach")
+            self.load_moment_major = round(0.5 * self.M_dz, 2)
+            logger.info("The value of factored bending moment is set to {} kNm".format(round(self.load_moment_major * 1e-6, 2)))
+
+        if self.load_moment_major > self.M_dz:
+            logger.warning("[Maximum Moment] The external factored bending moment (acting along the major (z-z) axis) is greater than the "
+                           "capacity of the column section")
+            logger.info("Note: The maximum moment check is based on full capacity of the column")
+            logger.info("The value of factored bending moment (M z-z) is set to be equal to the maximum capacity of the column {} kNm".
+                        format(round(self.M_dz * 1e-6, 2)))
+
+        # minor axis moment
+        if self.load_moment_minor < (0.5 * self.M_dy):
+            logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the minimum "
+                           "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
+            logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
+                        "(i.e. 0.5 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
+            logger.info("Note: The minimum design action is based on full capacity of the column for a conservative approach")
+            self.load_moment_minor = round(0.5 * self.M_dy, 2)
+            logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
+
+        if self.load_moment_minor > self.M_dy:
+            logger.warning("[Maximum Moment] The external factored bending moment (acting along the major axis) is greater than the capacity of  "
+                           "the column section")
+            logger.info("The maximum moment is based on full capacity of the column")
+            logger.info("The value of factored bending moment is set to be equal to the maximum capacity of the column {} kNm".
+                        format(round(self.M_dy * 1e-6, 2)))
+
+        # 8: Design Parameters
 
         # grout thickness fixed at 50 mm
         self.grout_thk = 50  # mm
@@ -2463,31 +2580,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
 
         elif self.connectivity == 'Moment Base Plate':
-
-            # minimum design action effect on the column [Reference: clause 10.7, IS 800:2007]
-            # the moment base plate shall be designed considering the bending moment acting on column as maximum of;
-            # 1. external factored bending moment acting about the major axis of the column
-            # 2. 50% of the moment capacity of the column
-
-            self.moment_capacity_column_major = round((1 * self.column_Z_pz * self.dp_column_fy) / self.gamma_m0, 2)  # N-mm
-            self.moment_capacity_column_minor = round((1 * self.column_Z_py * self.dp_column_fy) / self.gamma_m0, 2)  # N-mm
-
-            if self.load_moment_major < (0.50 * self.moment_capacity_column_major):
-                self.minimum_load_status_Mzz = True
-                self.load_moment_major = 0.50 * self.moment_capacity_column_major
-
-                logger.warning("[Minimum Moment] The external factored bending moment (acting along the major axis) is less than the minimum "
-                               "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-                logger.info("The minimum recommended design action effect for factored bending moment is {} kN-m".format(self.load_moment_major))
-                logger.info("The value of factored bending moment is set to {} kN-m".format(self.load_moment_major))
-
-            if self.load_moment_minor < (0.50 * self.moment_capacity_column_minor):
-                self.minimum_load_status_Myy = True
-                self.load_moment_minor = 0.50 * self.moment_capacity_column_minor
-                logger.warning("[Minimum Moment] The external factored bending moment (acting along the major axis) is less than the minimum "
-                               "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-                logger.info("The minimum recommended design action effect for factored bending moment is {} kN-m".format(self.load_moment_minor))
-                logger.info("The value of factored bending moment is set to {} kN-m".format(self.load_moment_minor))
 
             # calculate eccentricity
             self.eccentricity_zz = round((self.load_moment_major / self.load_axial_compression), 2)  # mm, eccentricity about major (z-z) axis
@@ -4353,7 +4445,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.base_plate.connect_to_database_to_get_fy_fu(self.dp_bp_material, self.plate_thk_provided)  # update fy
 
             self.plate_moment_capacity = ((self.bp_width_provided * self.plate_thk_provided ** 2) / 4) * (self.base_plate.fy / self.gamma_m0)
-            self.plate_moment_capacity = round(self.plate_moment_capacity * 1e-6, 2)  # kN-m
+            self.plate_moment_capacity = round(self.plate_moment_capacity * 1e-6, 2)  # kNm
 
     def anchor_bolt_design(self):
         """ Perform design checks for the anchor bolt
@@ -5339,7 +5431,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                     self.moment_on_stiffener_along_flange = self.sigma_avg * self.y * self.stiffener_plt_len_along_flange * (1/2) * \
                                                                             (self.stiffener_plt_len_along_flange / 2)
 
-                    self.moment_on_stiffener_along_flange = round((self.moment_on_stiffener_along_flange * 10 ** -6), 3)  # kN-m
+                    self.moment_on_stiffener_along_flange = round((self.moment_on_stiffener_along_flange * 10 ** -6), 3)  # kNm
 
                     # shear and moment capacity calculations
                     self.shear_capa_stiffener_along_flange = IS800_2007.cl_8_4_design_shear_strength((self.stiffener_plt_height_along_flange *
@@ -5352,7 +5444,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                            self.stiffener_fy_along_flange,
                                                                                                            section_class='semi-compact')
-                    self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
+                    self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kNm
 
                     # checks
                     if self.shear_on_stiffener_along_flange > (0.6 * self.shear_capa_stiffener_along_flange):
@@ -5383,11 +5475,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                                self.stiffener_fy_along_flange,
                                                                                                                section_class='semi-compact')
-                        self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
+                        self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kNm
 
                     if self.moment_on_stiffener_along_flange > self.moment_capa_stiffener_along_flange:
                         logger.warning("[Moment Check - Stiffener] The stiffener along the flange fails the moment check")
-                        logger.warning("The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                        logger.warning("The moment demand on the stiffener ({} kNm) exceeds it's capacity ({} kNm)".
                                        format(round(self.moment_on_stiffener_along_flange, 2), round(self.moment_capa_stiffener_along_flange, 2)))
                         logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
@@ -5407,7 +5499,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 1,
                                                                                                                    self.stiffener_fy_along_flange,
                                                                                                                    section_class='semi-compact')
-                            self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
+                            self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kNm
                             n += 1
 
                         # re-calculating the shear capacity by incorporating the improvised stiffener thickness along flange
@@ -5470,7 +5562,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                self.stiffener_plt_len_along_flange)) * \
                                                                          (self.stiffener_plt_len_along_web / 2)
 
-                    self.moment_on_stiffener_along_web = round((self.moment_on_stiffener_along_web * 10 ** -6), 3)  # kN-m
+                    self.moment_on_stiffener_along_web = round((self.moment_on_stiffener_along_web * 10 ** -6), 3)  # kNm
 
                     # shear and moment capacity calculations
                     self.shear_capa_stiffener_along_web = IS800_2007.cl_8_4_design_shear_strength(self.stiffener_plt_height_along_web *
@@ -5483,7 +5575,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 1,
                                                                                                         self.stiffener_fy_along_web,
                                                                                                         section_class='semi-compact')
-                    self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
+                    self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kNm
 
                     # checks
                     if self.shear_on_stiffener_along_web > (0.6 * self.shear_capa_stiffener_along_web):
@@ -5513,11 +5605,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 1,
                                                                                                             self.stiffener_fy_along_web,
                                                                                                             section_class='semi-compact')
-                        self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
+                        self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kNm
 
                     if self.moment_on_stiffener_along_web > self.moment_capa_stiffener_along_web:
                         logger.warning("[Moment Check - Stiffener] The stiffener along the flange fails the moment check")
-                        logger.warning("[Moment Check - Stiffener] The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                        logger.warning("[Moment Check - Stiffener] The moment demand on the stiffener ({} kNm) exceeds it's capacity ({} kNm)".
                                        format(round(self.moment_on_stiffener_along_web, 2), round(self.moment_capa_stiffener_along_web, 2)))
                         logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
@@ -5535,7 +5627,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 1,
                                                                                                                 self.stiffener_fy_along_web,
                                                                                                                 section_class='semi-compact')
-                            self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
+                            self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kNm
                             n += 1
 
                 if self.stiffener_across_web == 'Yes':
@@ -5707,16 +5799,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # moment demand and capcaity calculations
                 if self.dp_column_designation[1:4] == 'CHS':
                     self.moment_on_stiffener = self.shear_on_stiffener * (self.stiffener_plt_len_across_D / 2)
-                    self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kN-m
+                    self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kNm
                 else:
                     self.moment_on_stiffener = self.shear_on_stiffener * (self.stiffener_plt_len_along_D / 2)
-                    self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kN-m
+                    self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kNm
 
                 self.z_e_stiffener = (self.stiffener_plt_thk * self.stiffener_plt_height ** 2) / 6  # mm^3
 
                 self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
                                                                                           section_class='semi-compact')
-                self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
+                self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kNm
 
                 # checks
                 if self.shear_on_stiffener > (0.6 * self.shear_capa_stiffener):
@@ -5745,18 +5837,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     if self.dp_column_designation[1:4] == 'CHS':
                         self.moment_on_stiffener = self.shear_on_stiffener * (self.stiffener_plt_len_across_D / 2)
-                        self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kN-m
+                        self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kNm
                     else:
                         self.moment_on_stiffener = self.shear_on_stiffener * (self.stiffener_plt_len_along_D / 2)
-                        self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kN-m
+                        self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -3), 3)  # kNm
 
                     self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
                                                                                               section_class='semi-compact')
-                    self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
+                    self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kNm
 
                 if self.moment_on_stiffener > self.moment_capa_stiffener:
                     logger.warning("[Moment Check - Stiffener] The stiffener fails the moment check")
-                    logger.warning("The moment demand on the stiffener ({} kN-m) exceeds it's capacity ({} kN-m)".
+                    logger.warning("The moment demand on the stiffener ({} kNm) exceeds it's capacity ({} kNm)".
                                    format(round(self.moment_on_stiffener, 2), round(self.moment_capa_stiffener, 2)))
                     logger.info("Increasing the thickness of the stiffener and re-checking against moment demand")
 
@@ -5772,7 +5864,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.z_e_stiffener = (self.stiffener_plt_thk * self.stiffener_plt_height ** 2) / 6  # mm^3
                         self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
                                                                                                   section_class='semi-compact')
-                        self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
+                        self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kNm
 
                         self.shear_capa_stiffener = IS800_2007.cl_8_4_design_shear_strength((self.stiffener_plt_height * self.stiffener_plt_thk),
                                                                                             self.stiffener_fy)
@@ -6603,7 +6695,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             KEY_MODULE: self.module,
             KEY_CONN: self.connectivity,
             KEY_END_CONDITION: self.end_condition,
-            KEY_DISP_AXIAL_BP: round(self.load_axial_compression * 10 ** -3, 2),
+            KEY_DISP_AXIAL_BP: round(self.load_axial_input * 10 ** -3, 2),
             KEY_DISP_AXIAL_TENSION_BP: round(self.load_axial_tension * 10 ** -3, 2),
             KEY_DISP_SHEAR_BP: None,
             KEY_DISP_SHEAR_MAJOR: round(self.load_shear_major * 10 ** -3, 2),
@@ -6727,6 +6819,39 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t1 = ('Epsilon - stiffener plate', '', epsilon(self.stiffener_fy, round(self.epsilon, 2)), 'OK')
         self.report_check.append(t1)
+
+        # Load Consideration Check
+        t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = ("Axial compression (kN)", display_prov(self.load_axial_input, "P`"),
+              axial_compression_prov(self.load_axial_input, self.column_axial_capacity, round(self.load_axial_compression * 1e-3, 2)),
+              "OK")
+        self.report_check.append(t1)
+
+        if self.connectivity == 'Moment Base Plate':
+            t1 = ("Axial tension/uplift (kN)", '', display_load_bp(round(self.load_axial_tension * 1e-3, 2), 'P_{up}'), "OK")
+            self.report_check.append(t1)
+
+        t1 = ("Shear force, along major (z-z) axis (kN)", '', display_load_bp(round(self.load_shear_major * 1e-3, 2), 'V_1'), "OK")
+        self.report_check.append(t1)
+
+        t1 = ("Shear force, along minor (y-y) axis (kN)", '', display_load_bp(round(self.load_shear_minor * 1e-3, 2), 'V_2'), "OK")
+        self.report_check.append(t1)
+
+        if self.connectivity == 'Moment Base Plate':
+
+            t1 = ("Bending moment, major axis (z-z)  (kNm)", display_load_bp(round(self.load_moment_major_report * 1e-6, 2), 'M'),
+                  prov_moment_load_bp(moment_input=round(self.load_moment_major_report * 1e-6, 2), min_mc=round(0.5 * self.M_dz * 1e-6, 2),
+                                      app_moment_load=round(self.load_moment_major * 1e-6, 2),
+                                      moment_capacity=round(self.M_dz * 1e-6, 2), axis='Major', classification=self.col_classification), "OK")
+            self.report_check.append(t1)
+
+            t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
+                  prov_moment_load_bp(moment_input=round(self.load_moment_minor_report * 1e-6, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
+                                      app_moment_load=round(self.load_moment_minor * 1e-6, 2),
+                                      moment_capacity=round(self.M_dy * 1e-6, 2), axis='Minor', classification=self.col_classification), "OK")
+            self.report_check.append(t1)
 
         # Check 1.2: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
         if self.connectivity == 'Hollow/Tubular Column Base':
@@ -7045,14 +7170,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t1)
 
             # if self.minimum_load_status_Mzz == True:
-            #     t1 = ('Minimum Load - moment about major axis $(Kn-m)$', 'The external factored bending moment is less than the minimum design '
+            #     t1 = ('Minimum Load - moment about major axis $(kNm)$', 'The external factored bending moment is less than the minimum design '
             #                                                        'action as per clause 10.7, IS 800:2007. Improvising the minimum design moment ',
             #           minimum_load(self.moment_capacity_column_major * 10 ** -6 * 0.5, self.column_Z_pz * 10 ** -3, self.dp_column_fy, self.gamma_m0,
             #                        axis='major'), 'Pass')
             #     self.report_check.append(t1)
             #
             # if self.minimum_load_status_Myy == True:
-            #     t1 = ('Minimum Load - moment about minor axis $(Kn-m)$', 'The external factored bending moment is less than the minimum design '
+            #     t1 = ('Minimum Load - moment about minor axis $(kNm)$', 'The external factored bending moment is less than the minimum design '
             #                                                        'action as per clause 10.7, IS 800:2007. Improvising the minimum design moment ',
             #           minimum_load(self.moment_capacity_column_minor * 10 ** -6 * 0.5, self.column_Z_py * 10 ** -3, self.dp_column_fy, self.gamma_m0,
             #                        axis='minor'), 'Pass')
@@ -7409,7 +7534,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                    modulus='elastic'), 'OK')
                 self.report_check.append(t7)
 
-                t8 = ('Moment on stiffener $(kN-m)$', moment_demand_stiffener(self.sigma_max_zz, self.sigma_xx, self.sigma_avg, self.y,
+                t8 = ('Moment on stiffener $(kNm)$', moment_demand_stiffener(self.sigma_max_zz, self.sigma_xx, self.sigma_avg, self.y,
                                                                               self.critical_xx, self.bp_length_provided, self.column_bf,
                                                                               self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web,
                                                                               self.moment_on_stiffener_along_flange, self.anchors_outside_flange,
@@ -7469,7 +7594,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                    modulus='elastic'), 'OK')
                 self.report_check.append(t7)
 
-                t8 = ('Moment on stiffener $(kN-m)$', moment_demand_stiffener(self.sigma_max_zz, self.sigma_xx, self.sigma_avg, self.y,
+                t8 = ('Moment on stiffener $(kNm)$', moment_demand_stiffener(self.sigma_max_zz, self.sigma_xx, self.sigma_avg, self.y,
                                                                               self.critical_xx, self.bp_length_provided, self.column_bf,
                                                                               self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web,
                                                                               self.moment_on_stiffener_along_web, self.anchors_outside_flange,
@@ -7541,7 +7666,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 #                                                                                    modulus='plastic'), 'N/A')
                 # self.report_check.append(t7)
                 #
-                # t8 = ('Moment on Stiffener $(kN-m)$', moment_demand_stiffener(((self.sigma_max_zz + self.sigma_xx) / 2),
+                # t8 = ('Moment on Stiffener $(kNm)$', moment_demand_stiffener(((self.sigma_max_zz + self.sigma_xx) / 2),
                 #                                                             self.stiffener_plt_thick_across_web, self.stiffener_plt_len_across_web,
                 #                                                             self.moment_on_stiffener_across_web, location='across_web'),
                 #       moment_capacity_stiffener(self.z_p_stiffener_across_web, self.stiffener_fy, self.gamma_m0,
@@ -7581,7 +7706,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                           get_pass_fail(self.shear_on_stiffener, self.shear_capa_stiffener, relation='leq'))
 
-                    t8 = ('Max. moment on stiffener $(kN-m)$', moment_demand_stiffener(self.shear_on_stiffener, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    t8 = ('Max. moment on stiffener $(kNm)$', moment_demand_stiffener(self.shear_on_stiffener, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                                                                        self.stiffener_plt_len_across_D, self.moment_on_stiffener,
                                                                                        0.0, 'N/A', 'N/A-CHS', location='hollow_cs'),
                           moment_capacity_stiffener(self.z_e_stiffener, self.stiffener_fy, self.gamma_m0, self.moment_capa_stiffener,
@@ -7610,7 +7735,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                    self.gamma_m0, location='hollow_cs'),
                           get_pass_fail(self.shear_on_stiffener, self.shear_capa_stiffener, relation='leq'))
 
-                    t8 = ('Max. moment on stiffener $(kN-m)$', moment_demand_stiffener(self.shear_on_stiffener, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    t8 = ('Max. moment on stiffener $(kNm)$', moment_demand_stiffener(self.shear_on_stiffener, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                                                                        self.stiffener_plt_len_along_D, self.moment_on_stiffener,
                                                                                        0.0, 'N/A', 'N/A-CHS', location='hollow_cs'),
                           moment_capacity_stiffener(self.z_e_stiffener, self.stiffener_fy, self.gamma_m0, self.moment_capa_stiffener,
@@ -7694,7 +7819,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       get_pass_fail(self.bearing_strength_concrete, self.shear_key_stress_ColDepth, relation='geq'))
                 self.report_check.append(t3)
 
-                t3 = ('Moment demand $(kN-m)$', key_moment_demand(self.load_shear_major, self.shear_resistance, self.shear_key_len_ColDepth,
+                t3 = ('Moment demand $(kNm)$', key_moment_demand(self.load_shear_major, self.shear_resistance, self.shear_key_len_ColDepth,
                                                                     self.shear_key_w_1, self.shear_key_depth_ColDepth,
                                                                     round(self.shear_key_moment_1 * 1e-3, 2), location='L1'), '', 'OK')
                 self.report_check.append(t3)
@@ -7703,7 +7828,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                            self.shear_key_thk_1, self.column_tw, self.shear_key_thk, location='L1'), 'OK')
                 self.report_check.append(t4)
 
-                t3 = ('Moment capacity $(kN-m)$', round(self.shear_key_moment_1 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColDepth,
+                t3 = ('Moment capacity $(kNm)$', round(self.shear_key_moment_1 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColDepth,
                                                                                                               self.shear_key_thk, self.fy_key_1,
                                                                                                               self.gamma_m0, self.moment_capacity_key1,
                                                                                                               beta_b=1, location='L1'),
@@ -7734,7 +7859,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       get_pass_fail(self.bearing_strength_concrete, self.shear_key_stress_ColWidth, relation='geq'))
                 self.report_check.append(t3)
 
-                t3 = ('Moment demand $(kN-m)$', key_moment_demand(self.load_shear_minor, self.shear_resistance, self.shear_key_len_ColWidth,
+                t3 = ('Moment demand $(kNm)$', key_moment_demand(self.load_shear_minor, self.shear_resistance, self.shear_key_len_ColWidth,
                                                                     self.shear_key_w_2, self.shear_key_depth_ColWidth,
                                                                     round(self.shear_key_moment_2 * 1e-3, 2), location='L2'), '', 'OK')
                 self.report_check.append(t3)
@@ -7743,7 +7868,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                            self.shear_key_thk_2, self.column_tw, self.shear_key_thk, location='L2'), 'OK')
                 self.report_check.append(t4)
 
-                t3 = ('Moment capacity $(kN-m)$', round(self.shear_key_moment_2 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColWidth,
+                t3 = ('Moment capacity $(kNm)$', round(self.shear_key_moment_2 * 1e-6, 2), key_moment_capacity(self.shear_key_len_ColWidth,
                                                                                                                 self.shear_key_thk, self.fy_key_2,
                                                                                                                 self.gamma_m0,
                                                                                                                 self.moment_capacity_key2,

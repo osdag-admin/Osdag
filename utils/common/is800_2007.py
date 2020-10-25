@@ -313,7 +313,7 @@ class IS800_2007(object):
 
     # cl 8.2.1.2 design bending strength of the cross-section
     @staticmethod
-    def cl_8_2_1_2_design_moment_strength(Z_e, Z_p, f_y, section_class='semi-compact'):
+    def cl_8_2_1_2_design_moment_strength(Z_e, Z_p, f_y, section_class=''):
         """ Calculate the design bending strength as per cl. 8.2.1.2
         Args:
             Z_e: Elastic section modulus of the cross-section in cubic mm (float)

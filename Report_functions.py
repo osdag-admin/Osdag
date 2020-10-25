@@ -2666,8 +2666,8 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, typ
         # app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
         # app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r'\\'))
         # app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r'\\'))
-        app_moment_load_eqn.append(NoEscape(r' \begin{aligned} Mu &= max(M,Mc_{min} )\\'))
-        app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r')\\'))
+        app_moment_load_eqn.append(NoEscape(r' \begin{aligned} Mu &= max(M,~Mc_{min} )\\'))
+        app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',~' + min_mc + r')\\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\\'))
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
     return app_moment_load_eqn
@@ -7338,3 +7338,78 @@ def checkdiagonal_plate(M,D_c,D_b,fyc,t_req):
     checkdiagonal_plate_eqn.append(NoEscape(r'= \frac{1.9 \times'+ M+'}{'+D_c +r'\times '+D_b+r' \times'+ fyc+r'}\\'))
     checkdiagonal_plate_eqn.append(NoEscape(r' &= ' + t_req + r'\end{aligned}'))
     return checkdiagonal_plate_eqn
+
+
+def bc_ep_compatibility_req(beam_B, B_req):
+
+    compatibility_eqn = Math(inline=True)
+    compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{req} &= B_{b} + 25 \\'))
+    compatibility_eqn.append(NoEscape(r'                         &= ' + str(beam_B) + r' + 25 \\'))
+    compatibility_eqn.append(NoEscape(r'                         &= ' + str(B_req) + r' \end{aligned}'))
+
+    return compatibility_eqn
+
+
+def bc_ep_compatibility_available(col_D, col_B, col_T, col_R1, space_available, connectivity):
+
+    compatibility_eqn = Math(inline=True)
+
+    if connectivity == CONN_CFBW:
+        compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{available} &= B_{c} \\'))
+        compatibility_eqn.append(NoEscape(r'                         &= ' + str(col_B) + r' \end{aligned}'))
+    else:
+        compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{available} &= D_{c} - (2 T_{c}) - (2 {R_{1}}_{c}) - 10 \\'))
+        compatibility_eqn.append(NoEscape(r'                               &= ' + str(col_D) + r' - (2 \times ' + str(col_T) + r') - (2 \times '
+                                          + str(col_R1) + r') - 10 \\'))
+        compatibility_eqn.append(NoEscape(r'                         &= ' + str(space_available) + r' \end{aligned}'))
+
+    return compatibility_eqn
+
+
+def axial_compression_prov(P, col_capa, provided_capa):
+
+    axial_compression_prov_eqn = Math(inline=True)
+    axial_compression_prov_eqn.append(NoEscape(r'\begin{aligned}  P &= max(P`,~0.3 P_{c}) \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'                   &= max(' + str(P) + r',~0.3 \times ' + str(col_capa) + r') \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'                   &= ' + str(provided_capa) + r' \\ \\'))
+
+    axial_compression_prov_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl.~10.7] \\ \\'))
+
+    axial_compression_prov_eqn.append(NoEscape(r'Note:~& P_{c}~ is~ the~ capacity~ of~ the~ column \end{aligned}'))
+
+    return axial_compression_prov_eqn
+
+
+def display_load_bp(load_val, notation=''):
+
+    display_eqn = Math(inline=True)
+    display_eqn.append(NoEscape(r'\begin{aligned} ' + str(notation) + ' &= ' + str(load_val) + r' \end{aligned}'))
+
+    return display_eqn
+
+
+def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, axis='', classification=''):
+
+    app_moment_load_eqn = Math(inline=True)
+
+    if axis == 'Major':
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
+    else:
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{y-y} \\'))
+
+    app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + str(moment_capacity) + r' \\'))
+    app_moment_load_eqn.append(NoEscape(r'&=' + str(min_mc) + r' \\ \\'))
+
+    app_moment_load_eqn.append(NoEscape(r'M_{zz} &= max(M,~M_{min}) \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= max(' + str(moment_input) + r',~' + str(min_mc) + r') \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= ' + str(app_moment_load) + r' \\ \\'))
+
+    if classification == 'Semi-compact':
+        app_moment_load_eqn.append(NoEscape(r'Note:& ~The~ column ~is~ classified~ as~ semi-compact \\ \\'))
+    else:
+        app_moment_load_eqn.append(NoEscape(r'Note:& ~The~ column ~is~ classified~ as~ compact \\ \\'))
+
+    app_moment_load_eqn.append(NoEscape(r'[Ref.& ~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
+
+    return app_moment_load_eqn
+

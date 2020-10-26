@@ -131,6 +131,12 @@ class BeamColumnEndPlate(MomentConnection):
         self.column_zp_zz = 0.0
         self.column_fu = 0.0
         self.column_fy = 0.0
+        self.epsilon_col = 0.0
+        self.col_classification = ''
+        self.beta_b_z = 1.0
+        self.beta_b_y = 1.0
+        self.M_dz = 0.0
+        self.M_dy = 0.0
 
         self.dp_plate_fy = 0.0
         self.dp_plate_fu = 0.0
@@ -196,13 +202,15 @@ class BeamColumnEndPlate(MomentConnection):
         self.cont_plate_thk_provided = 0.0
         self.t_bf = 0.0
         self.t_wc = 0.0
-        self.diagonal_stiffener_status = True
+        self.web_stiffener_status = True
         self.load_diag_stiffener = 0.0
         self.diag_stiffener_area_req = 0.0
         self.diag_stiffener_length = 0.0
         self.diag_stiffener_width = 0.0
-        self.diag_stiffener_thk_req = 0.0
-        self.diag_stiffener_thk_provided = 0.0
+        self.web_stiffener_thk_req = 0.0
+        self.web_stiffener_depth = 0.0
+        self.web_stiffener_width = 0.0
+        self.web_stiffener_thk_provided = 0.0
         self.p_c = 0.0
         self.web_weld_groove_status = False
         self.weld_both_side_cont_plate_status = False
@@ -962,7 +970,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.input_axial_force = self.load.axial_force
         self.input_moment = self.load.moment
 
-        # moment capacity of the beam
+        # Beam check: moment capacity of the beam
         self.supported_section_mom_capa_m_zz = round(((1 * self.beam_zp_zz * self.beam_fy) / self.gamma_m0) * 1e-6, 2)  # kN-m
 
         if self.load.moment < (0.5 * self.supported_section_mom_capa_m_zz):
@@ -988,6 +996,65 @@ class BeamColumnEndPlate(MomentConnection):
         else:
             self.minimum_load_status_moment = False
             self.load_moment = self.load.moment  # kN-m
+
+        # Column check: check for input moment against the column capacity
+
+        # 1: Section classification of the column
+        self.epsilon_col = round(math.sqrt(250 / self.column_fy), 2)
+
+        # flange b/t check
+        if (self.column_bf / self.column_tf) > (10.5 * self.epsilon_col):
+            self.col_classification = 'Semi-compact'
+        else:
+            self.col_classification = 'Compact'
+
+        # web b/t check
+        if self.col_classification == 'Compact':
+            if ((self.column_D - (2 * self.column_tf)) / self.column_tw) > (42 * self.epsilon_col):
+                self.col_classification = 'Semi-compact'
+            else:
+                self.col_classification = 'Compact'
+
+        # 2: Bending capacity
+        if self.col_classification == 'Semi-compact':
+            self.beta_b_z = self.supporting_section.elast_sec_mod_z / self.supporting_section.plast_sec_mod_z
+            self.beta_b_y = self.supporting_section.elast_sec_mod_y / self.supporting_section.plast_sec_mod_y
+            section_class = 'semi-compact'
+        else:
+            self.beta_b_z = 1.0
+            self.beta_b_y = 1.0
+            section_class = 'Compact'
+
+        self.M_dz = self.cl_8_2_1_2_design_moment_strength(self.supporting_section.elast_sec_mod_z, self.supporting_section.plast_sec_mod_z,
+                                                           self.column_fy, section_class=section_class)
+        self.M_dz = round(self.M_dz * 1e-6, 2)  # kNm
+
+        self.M_dy = self.cl_8_2_1_2_design_moment_strength(self.supporting_section.elast_sec_mod_y, self.supporting_section.plast_sec_mod_y,
+                                                           self.column_fy, section_class=section_class)
+        self.M_dy = round(self.M_dy * 1e-6, 2)  # kNm
+
+        # 3: Beam-Column compatibility check
+        if self.connectivity == VALUES_CONN_1[0]:  # Column Flange - Beam Web, major axis capacity for the column
+            if self.load_moment > self.M_dz:
+                logger.warning("[Beam-Column Compatibility] The design factored bending moment ({} kNm) being transferred from the beam to the "
+                               "column exceeds the maximum capacity of the column section ({} kNm) (acting along the major (z-z) axis)".
+                               format(self.load_moment, self.M_dz))
+                logger.info("Note: The maximum moment check is based on full capacity of the column section classified as {}, as per Table 2 of "
+                            "IS 800:2007".format(self.col_classification))
+                logger.info("The value of design bending moment is set to be equal to the maximum capacity of the column, i.e. {} kNm".
+                            format(self.M_dz))
+                self.load_moment = self.M_dz  # kNm
+
+        else:  # Column Web - Beam Web, minor axis capacity for the column
+            if self.load_moment > self.M_dy:
+                logger.warning("[Beam-Column Compatibility] The design factored bending moment ({} kNm) being transferred from the beam to the "
+                               "column exceeds the maximum capacity of the column section ({} kNm) (acting along the minor (y-y) axis)".
+                               format(self.load_moment, self.M_dy))
+                logger.info("Note: The maximum moment check is based on full capacity of the column section classified as {}, as per Table 2 of "
+                            "IS 800:2007".format(self.col_classification))
+                logger.info("The value of design bending moment is set to be equal to the maximum capacity of the column, i.e. {} kNm".
+                            format(self.M_dy))
+                self.load_moment = self.M_dy  # kNm
 
         # Note: Shear force is transferred to the column through the web, hence Cl.10.7 point 2 is considered for minimum shear load
         if self.supported_section.type == 'Rolled':
@@ -1022,8 +1089,6 @@ class BeamColumnEndPlate(MomentConnection):
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
         self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
-
-        # TODO: check if the moment from the beam can be taken by the defined column (beam-column pre-sizing check)
 
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
@@ -1090,13 +1155,59 @@ class BeamColumnEndPlate(MomentConnection):
     def design_connection(self):
         """ perform analysis and design of bolt and end plate """
 
-        # Check: Stiffener at the column web - diagonal stiffener (design for shear)
-        self.t_wc = round((1.9 * self.load_moment_effective * 1e6) / (self.column_D * self.beam_D * self.column_fy), 2)  # mm
+        if self.connectivity == VALUES_CONN_1[0]:
 
-        if self.t_wc > self.column_tw:
-            self.diagonal_stiffener_status = True
-        else:
-            self.diagonal_stiffener_status = True
+            # Stiffener requirement at the column web (design for shear)
+            self.t_wc = round((1.9 * self.load_moment_effective * 1e6) / (self.column_D * self.beam_D * self.column_fy), 2)  # mm
+
+            if self.t_wc > self.column_tw:
+                self.web_stiffener_status = True
+                logger.warning("[Column Web] The web of the column is susceptible to shear bucking due to the reaction transferred by the beam to "
+                               "the column")
+                logger.info("The minimum required thickness of the web is {} mm".format(self.t_wc))
+                logger.info("Providing stiffening to the column web")
+            else:
+                self.web_stiffener_status = False
+                logger.warning("[Column Web] The web of the column is not susceptible to shear bucking due to the reaction transferred by the beam "
+                               "to the column")
+                logger.info("The minimum required thickness of the web i.e. {} mm is satisfied".format(self.t_wc))
+                logger.info("Additional stiffening of the column web is not required")
+
+            if self.web_stiffener_status is True:
+
+                self.web_stiffener_depth = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * 10)
+                self.web_stiffener_depth = round_down(self.web_stiffener_depth, 2)
+
+                self.web_stiffener_width = self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - (2 * 10)
+                self.web_stiffener_width = round_down(self.web_stiffener_width, 2)
+
+                self.web_stiffener_thk_req = round((self.t_wc - self.column_tw) / 2, 2)
+
+                # choosing a suitable plate from the standard available list of plate thicknesses
+                standard_plt_thk = []
+                for plt in PLATE_THICKNESS_SAIL:
+                    plt = int(plt)
+                    standard_plt_thk.append(plt)
+
+                sort_plate = filter(lambda x: max(standard_plt_thk[0], self.web_stiffener_thk_req) <= x <= standard_plt_thk[-1], standard_plt_thk)
+                for thk in sort_plate:
+                    self.web_stiffener_thk_provided = thk  # stiffener thickness provided (mm)
+                    break
+            else:
+                # self.web_stiffener_depth = 'N/A'
+                # self.web_stiffener_width = 'N/A'
+                # self.web_stiffener_thk_provided = 'N/A'
+                self.diag_stiffener_length = 438
+                self.diag_stiffener_width = 164
+                self.web_stiffener_thk_provided = 14
+
+        else:  # web stiffening is not provided in col-web beam-web connectivity, the web thickness along with the plate should suffice
+            # self.web_stiffener_depth = 'N/A'
+            # self.web_stiffener_width = 'N/A'
+            # self.web_stiffener_thk_provided = 'N/A'
+            self.diag_stiffener_length = 438
+            self.diag_stiffener_width = 164
+            self.web_stiffener_thk_provided = 14
 
         # performing the check with minimum plate thickness and a suitable bolt dia-grade combination (thin plate - large dia approach)
         logger.info("[Optimisation] Performing the design by optimising the plate thickness, using the thin plate and large (suitable) bolt diameter "
@@ -1148,21 +1259,18 @@ class BeamColumnEndPlate(MomentConnection):
                             # end/edge
                             self.end_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                                                             self.bolt.edge_type)
-
-                            if self.diagonal_stiffener_status:
-                                self.end_distance_provided = round(2 * self.end_distance_provided)  # mm
-                                self.edge_distance_provided = self.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided,
-                                                                                                 self.bolt.bolt_hole_type,
-                                                                                                 self.bolt.edge_type)
-                                self.edge_distance_provided = round_up(self.edge_distance_provided, 5)  # mm
-                            else:
-                                self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
-                                self.edge_distance_provided = self.end_distance_provided
+                            self.end_distance_provided = round_up(self.end_distance_provided, 5)  # mm
+                            self.edge_distance_provided = self.end_distance_provided
 
                             # cross-centre gauge
-                            # self.gauge_cs_distance_provided = self.beam_tw + (2 * self.beam_r1) + (2 * self.end_distance_provided)
-                            self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw + self.column_r1) + \
-                                                              (2 * self.edge_distance_provided)
+                            if self.web_stiffener_status is True:
+                                self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw +
+                                                                      (2 * self.web_stiffener_thk_provided) + self.column_r1) + \
+                                                                  (2 * self.edge_distance_provided)
+                            else:
+                                self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw + self.column_r1) + \
+                                                                  (2 * self.edge_distance_provided)
+
                             self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
                             # Check 3: end plate dimensions (designed for groove weld at flange only)
@@ -1553,40 +1661,6 @@ class BeamColumnEndPlate(MomentConnection):
         # column flange to beam web connectivity
         if self.connectivity == VALUES_CONN_1[0]:
 
-            # Design 1: Design of diagonal stiffener
-            if self.diagonal_stiffener_status is True:
-
-                # load taken by the stiffener
-                self.load_diag_stiffener = ((self.load_moment_effective * 1e6 / self.beam_D) - ((self.column_fy * self.column_tw * self.column_D) /
-                                                                                                (math.sqrt(3) * self.gamma_m0))) * 1e-3  # kN
-
-                # the diagonal stiffener is inclined at 45 degree
-                self.diag_stiffener_area_req = (self.gamma_m0 / (self.cont_plate_fy * math.cos(45))) * self.load_diag_stiffener  # mm^2
-
-                self.diag_stiffener_length = round_down(self.column_D - (2 * self.column_tf), 2)  # mm
-                self.diag_stiffener_width = round_down((self.column_bf - self.column_tw - (2 * self.column_r1)) / 2, 2)  # mm
-
-                self.diag_stiffener_thk_req = self.diag_stiffener_area_req / self.diag_stiffener_width
-                self.diag_stiffener_thk_req = max(self.diag_stiffener_thk_req, self.column_tw)
-
-                # choosing a suitable plate from the standard available list of plate thicknesses
-                standard_plt_thk = []
-                for plt in PLATE_THICKNESS_SAIL:
-                    plt = int(plt)
-                    standard_plt_thk.append(plt)
-
-                sort_plate = filter(lambda x: self.diag_stiffener_thk_req <= x <= standard_plt_thk[-1], standard_plt_thk)
-                for thk in sort_plate:
-                    self.diag_stiffener_thk_provided = thk  # stiffener thickness provided (mm)
-                    break
-            else:
-                # self.diag_stiffener_length = 'N/A'
-                # self.diag_stiffener_width = 'N/A'
-                # self.diag_stiffener_thk_provided = 'N/A'
-                self.diag_stiffener_length = 438
-                self.diag_stiffener_width = 164
-                self.diag_stiffener_thk_provided = 14
-
             # Design 2: Continuity Plates on compression side (for all 3 types of end plate)
 
             # check 1: local column web yielding capacity
@@ -1607,12 +1681,8 @@ class BeamColumnEndPlate(MomentConnection):
             # capacity of the web
             self.p_bf = min(self.p_bf_1, self.p_bf_2, self.p_bf_3)  # taking the lowest of the capacities
 
-            ############# TEST ##################
-            self.p_bf = 0.5 * self.call_helper.r_c
-            ############ TEST ###################
-
             # checking if the continuity plate is required
-            if (self.p_bf < self.call_helper.r_c) or (self.diagonal_stiffener_status is True):
+            if self.p_bf < self.call_helper.r_c:
 
                 self.continuity_plate_compression_flange_status = True
                 # the design of the continuity plate is same for compression and tension side for reversible moment connections
@@ -1698,6 +1768,9 @@ class BeamColumnEndPlate(MomentConnection):
                     self.continuity_plate_tension_flange_status = False
 
         else:  # column web to beam web connectivity
+            self.continuity_plate_tension_flange_status = True
+            self.continuity_plate_compression_flange_status = True
+
             if self.column_r1 > 0:
                 self.notch_size = round_up(self.column_r1 + (self.column_r1 / 2), 2)  # mm
                 self.cont_plate_width = round_down((self.column_bf - self.column_tw - (2 * self.notch_size)), 2) / 2  # mm
@@ -1720,26 +1793,6 @@ class BeamColumnEndPlate(MomentConnection):
             sort_plate = filter(lambda x: self.cont_plate_thk_req <= x <= standard_plt_thk[-1], standard_plt_thk)
             for thk in sort_plate:
                 self.cont_plate_thk_provided = thk  # plate thickness provided (mm)
-                break
-
-            self.continuity_plate_tension_flange_status = True
-            self.continuity_plate_compression_flange_status = True
-
-            # design of diagonal stiffener
-            self.diagonal_stiffener_status = True
-            self.diag_stiffener_length = round_down(self.column_D - (2 * self.column_tf), 2)  # mm
-            self.diag_stiffener_width = round_down((self.column_bf - self.column_tw - (2 * self.column_r1)) / 2, 2)  # mm
-
-            self.diag_stiffener_thk_req = self.column_tw
-            # choosing a suitable plate from the standard available list of plate thicknesses
-            standard_plt_thk = []
-            for plt in PLATE_THICKNESS_SAIL:
-                plt = int(plt)
-                standard_plt_thk.append(plt)
-
-            sort_plate = filter(lambda x: self.diag_stiffener_thk_req <= x <= standard_plt_thk[-1], standard_plt_thk)
-            for thk in sort_plate:
-                self.diag_stiffener_thk_provided = thk  # stiffener thickness provided (mm)
                 break
 
     def design_stiffener(self):
@@ -1846,8 +1899,8 @@ class BeamColumnEndPlate(MomentConnection):
                     self.cont_plate_groove_weld_status = False
 
                 # 2. Diagonal stiffener plates
-                if self.diagonal_stiffener_status == True:
-                    self.stiffener_weld.set_min_max_sizes(self.diag_stiffener_thk_provided, self.column_tw, special_circumstance=False,
+                if self.web_stiffener_status == True:
+                    self.stiffener_weld.set_min_max_sizes(self.web_stiffener_thk_provided, self.column_tw, special_circumstance=False,
                                                           fusion_face_angle=90)
                     self.force_diag_stiffener = (self.diag_stiffener_area_req / 2) * self.cont_plate_fy * 1e-3  # kN
 
@@ -1889,8 +1942,8 @@ class BeamColumnEndPlate(MomentConnection):
                     self.cont_plate_groove_weld_status = False
 
                 # 2. Diagonal stiffener plates
-                if self.diagonal_stiffener_status == True:
-                    self.stiffener_weld.set_min_max_sizes(self.diag_stiffener_thk_provided, self.column_tw, special_circumstance=False,
+                if self.web_stiffener_status == True:
+                    self.stiffener_weld.set_min_max_sizes(self.web_stiffener_thk_provided, self.column_tw, special_circumstance=False,
                                                           fusion_face_angle=90)
                     self.weld_size_diag_stiffener = round(self.stiffener_weld.min_size, 2)  # mm
                     self.diag_stiffener_groove_weld_status = False

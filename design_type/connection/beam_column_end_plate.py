@@ -2677,6 +2677,51 @@ class BeamColumnEndPlate(MomentConnection):
                           get_pass_fail(self.stiffener_weld.max_size, self.weld_size_continuity_plate, relation="geq"))
                     self.report_check.append(t1)
 
+        # CHECK DIAGONAL PLATE
+        t1 = ('SubSection', 'Diagonal Plate Check', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        if self.t_wc  > self.column_tw:
+            remark_1 = 'Yes'
+        else:
+            remark_1 = 'No'
+        t1 = (KEY_OUT_DISP_DIAG_PLATE_REQ,
+              checkdiagonal_plate(M=self.load_moment_effective,
+                                  D_c=self.column_D,
+                                  D_b=self.beam_D,
+                                  fyc=self.column_fy,
+                                  t_req=self.t_wc),
+              display_prov(self.column_tw, "t_c"), remark_1)
+        self.report_check.append(t1)
+        if self.t_wc > self.column_tw:
+            t1 = ('SubSection', 'Diagonal Plate Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t1 = (KEY_OUT_DISP_DIAG_LOAD_STIFF,' ' ,load_diag_stiffener(M= self.load_moment_effective ,
+                                                                    D_c =self.column_D,D_b=self.beam_D,
+                                                                    fyc=self.column_fy,p_st=round(self.load_diag_stiffener,2),
+                                                                    tc=self.column_tw,gamma= self.gamma_m0),' '
+                 )
+            self.report_check.append(t1)
+
+            t1 = ("Area required $(mm^2)$", Area_req_dia_plate(A_st=round(self.diag_stiffener_area_req,2),
+                                                               fy_st=self.cont_plate_fy ,
+                                                               p_st=round(self.load_diag_stiffener,2)
+                                                               ,gamma=self.gamma_m0), '', 'OK')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_LENGTH, '', diag_plate_length(Lst =round(self.diag_stiffener_length,2),
+                                                                            D_c =self.column_D,
+                                                                            T_c=self.column_tf), 'OK')
+            self.report_check.append(t1)
+
+            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH, '', diag_plate_width(Wst=self.diag_stiffener_width,
+                                                                            B_c=self.column_bf,
+                                                                            t_c=self.column_tw,R_1=self.column_r1), 'OK')
+            self.report_check.append(t1)
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, 't_c = ' + str(self.column_tw), self.diag_stiffener_thk_provided,
+                  get_pass_fail(self.column_tw, self.diag_stiffener_thk_provided, relation="leq"))
+            self.report_check.append(t1)
+
         # End of design report
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])

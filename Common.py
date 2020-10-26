@@ -1743,10 +1743,12 @@ KEY_OUT_DISP_WEB_CRIPPLING = 'Web Crippling'
 KEY_OUT_DISP_COMP_STRENGTH = 'Compression strength (kN)'
 #Continuity Plate
 KEY_OUT_DISP_CONT_PLATE_REQ = 'Continuity plate required?'
-KEY_OUT_DISP_DIAG_PLATE_REQ='Check whether diagonal Plate is required or not'
+KEY_OUT_DISP_DIAG_PLATE_REQ='Diagonal plate required?'
 KEY_OUT_DISP_AREA_REQ= "Area required (mm2)"
 KEY_OUT_DISP_NOTCH_SIZE ="Notch size (mm)"
-
+KEY_OUT_DISP_DIAG_LOAD_STIFF="Load taken by Stiffener"
+KEY_OUT_DISP_DIAGONAL_PLATE_LENGTH ='Length'
+KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH ='Width'
 # KEY_OUT_DISP_WEB_PLATE_CONT_T
 
 

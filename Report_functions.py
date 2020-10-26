@@ -7334,11 +7334,51 @@ def checkdiagonal_plate(M,D_c,D_b,fyc,t_req):
     fyc = str(fyc)
     t_req = str(t_req)
     checkdiagonal_plate_eqn = Math(inline=True)
-    checkdiagonal_plate_eqn.append(NoEscape(r'\begin{aligned}  t_{bf} &= \frac{1.9 \times M}{D_c \times D_b \times fyc}\\'))
-    checkdiagonal_plate_eqn.append(NoEscape(r'= \frac{1.9 \times'+ M+'}{'+D_c +r'\times '+D_b+r' \times'+ fyc+r'}\\'))
+    checkdiagonal_plate_eqn.append(NoEscape(r'\begin{aligned}  t_{wc} &= \frac{1.9 \times M}{D_c \times D_b \times fyc}\\'))
+    checkdiagonal_plate_eqn.append(NoEscape(r'&= \frac{1.9 \times'+ M+'}{'+D_c +r'\times '+D_b+r' \times'+ fyc+r'}\\'))
     checkdiagonal_plate_eqn.append(NoEscape(r' &= ' + t_req + r'\end{aligned}'))
     return checkdiagonal_plate_eqn
 
+def load_diag_stiffener(M,D_c,D_b,fyc,p_st,tc,gamma):
+    M = str(M)
+    D_c = str(D_c)
+    D_b = str(D_b)
+    fyc = str(fyc)
+    p_st = str(p_st)
+    tc = str(tc)
+    gamma = str(gamma)
+    # p_st = str(p_st)
+ # self.load_diag_stiffener = ((self.load_moment_effective * 1e6 / self.beam_D) - (
+ #                        (self.column_fy * self.column_tw * self.column_D) /
+ #                        (math.sqrt(3) * self.gamma_m0))) * 1e-3
+
+    load_diag_stiffener_eqn = Math(inline=True)
+    load_diag_stiffener_eqn.append(NoEscape(r'\begin{aligned}  p_{st} &= \frac{M \times 10^6}{D_b} - \frac{fyc \times t_c \times  D_c }{\sqrt(3) \times  \gamma_{m0}}  \times 10^{-3} \\'))
+    load_diag_stiffener_eqn.append(NoEscape(r'&= \frac{'+M+ r'\times 10^6}{'+D_b+r'} - \frac{'+fyc+r' \times' +tc+ r'\times'  +D_c+r'}{\sqrt(3) \times  '+gamma+r'}  \times 10^{-3} \\'))
+    load_diag_stiffener_eqn.append(NoEscape(r' &= ' +  p_st + r'\end{aligned}'))
+    return load_diag_stiffener_eqn
+
+def Area_req_dia_plate(A_st,fy_st,p_st,gamma):
+    A_st = str(A_st)
+    fy_st = str(fy_st)
+    p_st = str(p_st)
+
+    gamma = str(gamma)
+    Area_req_dia_plate_eqn = Math(inline=True)
+    Area_req_dia_plate_eqn.append(NoEscape(r'\begin{aligned}  A_{st} &= p_{st} \Big( \frac{\gamma_{m0}}{f_{yst} \times cos(45)} \Big)\\'))
+    Area_req_dia_plate_eqn.append(NoEscape(r'&= '+p_st+ r'\Big( \frac{'+gamma+'}{'+fy_st+r'\times cos(45)} \Big)\\'))
+    Area_req_dia_plate_eqn.append(NoEscape(r' &= ' +  A_st + r'\end{aligned}'))
+    return Area_req_dia_plate_eqn
+
+def diag_plate_length(Lst,D_c,T_c):
+    Lst = str(Lst)
+    D_c = str(D_c)
+    T_c = str(T_c)
+    diag_plate_length_eqn = Math(inline=True)
+    diag_plate_length_eqn.append(NoEscape(r'\begin{aligned}  L_{st} &= D_c - (2 ~ T_c)\\'))
+    diag_plate_length_eqn.append(NoEscape(r'&= '+D_c+r' - (2 \times '+T_c+r')\\'))
+    diag_plate_length_eqn.append(NoEscape(r' &= ' +Lst+ r'\end{aligned}'))
+    return diag_plate_length_eqn
 
 def bc_ep_compatibility_req(beam_B, B_req):
 
@@ -7348,6 +7388,18 @@ def bc_ep_compatibility_req(beam_B, B_req):
     compatibility_eqn.append(NoEscape(r'                         &= ' + str(B_req) + r' \end{aligned}'))
 
     return compatibility_eqn
+
+def diag_plate_width(Wst,B_c,t_c,R_1):
+    Wst = str(Wst)
+    B_c = str(B_c)
+    t_c = str(t_c)
+    R_1 = str(R_1)
+    # self.diag_stiffener_width = round_down((self.column_bf - self.column_tw - (2 * self.column_r1)) / 2, 2)  # mm
+    diag_plate_width_eqn = Math(inline=True)
+    diag_plate_width_eqn.append(NoEscape(r'\begin{aligned}  W_{st} &= \frac{B_c - t_c - (2~R1)}{2}\\'))
+    diag_plate_width_eqn.append(NoEscape(r'&= \frac{'+B_c+' - '+t_c+r' - (2 \times '+R_1+r')}{2}\\'))
+    diag_plate_width_eqn.append(NoEscape(r' &= ' + Wst + r'\end{aligned}'))
+    return diag_plate_width_eqn
 
 
 def bc_ep_compatibility_available(col_D, col_B, col_T, col_R1, space_available, connectivity):
@@ -7412,4 +7464,6 @@ def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, 
     app_moment_load_eqn.append(NoEscape(r'[Ref.& ~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     return app_moment_load_eqn
-
+# def dia_plate_thk_provided(t_wc,)
+#     t_wc
+# t_wc = round((1.9 * self.load_moment_effective * 1e6) / (self.column_D * self.beam_D * self.column_fy), 2)

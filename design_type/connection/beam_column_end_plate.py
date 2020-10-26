@@ -971,31 +971,31 @@ class BeamColumnEndPlate(MomentConnection):
         self.input_moment = self.load.moment
 
         # Beam check: moment capacity of the beam
-        self.supported_section_mom_capa_m_zz = round(((1 * self.beam_zp_zz * self.beam_fy) / self.gamma_m0) * 1e-6, 2)  # kN-m
+        self.supported_section_mom_capa_m_zz = round(((1 * self.beam_zp_zz * self.beam_fy) / self.gamma_m0) * 1e-6, 2)  # kNm
 
         if self.load.moment < (0.5 * self.supported_section_mom_capa_m_zz):
             self.minimum_load_status_moment = True
             # update moment value
             self.load_moment = round(0.5 * self.supported_section_mom_capa_m_zz, 2)  # kN
 
-            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kN-m) is less than 0.5 times the plastic moment "
-                           "capacity of the beam ({} kN-m)".format(self.load.moment, self.load_moment))
+            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
+                           "capacity of the beam ({} kNm)".format(self.load.moment, self.load_moment))
             logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
                         "connection as rigid and transfer full moment from the beam to the column (Cl. 10.7, IS 800:2007)")
-            logger.info("Designing the connection for a load of {} kN-m".format(self.load_moment))
+            logger.info("Designing the connection for a load of {} kNm".format(self.load_moment))
 
         elif self.load.moment > self.supported_section_mom_capa_m_zz:
             self.load_moment = self.supported_section_mom_capa_m_zz  # kN
             self.minimum_load_status_moment = True
             self.design_status = False
             self.design_status_list.append(self.design_status)
-            logger.error("[Maximum Factored Load] The external factored bending moment ({} kN-m) is greater than the plastic moment capacity of the "
-                         "beam ({} kN-m)".format(self.load.moment, self.supported_section_mom_capa_m_zz))
-            logger.warning("The maximum capacity of the connection is {} kN-m".format(self.supported_section_mom_capa_m_zz))
-            logger.info("Define the value of factored bending moment as {} kN-m or less".format(self.supported_section_mom_capa_m_zz))
+            logger.error("[Maximum Factored Load] The external factored bending moment ({} kNm) is greater than the plastic moment capacity of the "
+                         "beam ({} kNm)".format(self.load.moment, self.supported_section_mom_capa_m_zz))
+            logger.warning("The maximum capacity of the connection is {} kNm".format(self.supported_section_mom_capa_m_zz))
+            logger.info("Define the value of factored bending moment as {} kNm or less".format(self.supported_section_mom_capa_m_zz))
         else:
             self.minimum_load_status_moment = False
-            self.load_moment = self.load.moment  # kN-m
+            self.load_moment = self.load.moment  # kNm
 
         # Column check: check for input moment against the column capacity
 
@@ -1071,7 +1071,7 @@ class BeamColumnEndPlate(MomentConnection):
                            "the member".format(self.load_shear))
             logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam in low shear) or 40 kN "
                         "whichever is less [Ref. Cl. 10.7, IS 800:2007]".format(0.15 * self.supported_section_shear_capa))
-            logger.info("Designing the connection for a factored shear load of {} kN-m".format(self.load_shear))
+            logger.info("Designing the connection for a factored shear load of {} kNm".format(self.load_shear))
         elif self.load.shear_force > self.supported_section_shear_capa:
             self.load_shear = self.supported_section_shear_capa  # kN
             self.minimum_load_status_moment = True
@@ -1088,7 +1088,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.load_axial = self.load.axial_force
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
-        self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
+        self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kNm
 
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
@@ -1176,10 +1176,10 @@ class BeamColumnEndPlate(MomentConnection):
             if self.web_stiffener_status is True:
 
                 self.web_stiffener_depth = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * 10)
-                self.web_stiffener_depth = round_down(self.web_stiffener_depth, 2)
+                self.web_stiffener_depth = round(self.web_stiffener_depth)
 
                 self.web_stiffener_width = self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - (2 * 10)
-                self.web_stiffener_width = round_down(self.web_stiffener_width, 2)
+                self.web_stiffener_width = round(self.web_stiffener_width)
 
                 self.web_stiffener_thk_req = round((self.t_wc - self.column_tw) / 2, 2)
 
@@ -2113,6 +2113,21 @@ class BeamColumnEndPlate(MomentConnection):
                                                  Pmc=round(self.supported_section_mom_capa_m_zz, 2)), 'V < 0.6 Vdy')
         self.report_check.append(t1)
 
+        t1 = ('SubSection', 'Member Capacity - Supporting Section', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '',
+              cl_8_2_1_2_plastic_moment_capacity(beta_b=round(self.beta_b_z, 2), Z_p=self.supporting_section.plast_sec_mod_z,
+                                                    f_y=self.supporting_section.fy, gamma_m0=self.gamma_m0, Pmc=round(self.M_dz, 2)),
+              self.col_classification)
+        self.report_check.append(t1)
+
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '',
+              cl_8_2_1_2_plastic_moment_capacity_yy(beta_b=round(self.beta_b_y, 2), Z_py=self.supporting_section.plast_sec_mod_y,
+                                                    f_y=self.supporting_section.fy, gamma_m0=self.gamma_m0, Pmc=round(self.M_dy, 2)),
+              self.col_classification)
+        self.report_check.append(t1)
+
         t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
@@ -2128,14 +2143,22 @@ class BeamColumnEndPlate(MomentConnection):
         t1 = ("Axial force (kN)", '', 'H = ' + str(self.load_axial), "OK")
         self.report_check.append(t1)
 
-        t1 = ("Bending moment (major axis) (kN-m)", display_prov(self.input_moment, "M"),
-              prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
-                               app_moment_load=round(self.load_moment, 2),
-                               moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), type='EndPlateType'), "OK")
+        if self.connectivity == VALUES_CONN_1[0]:
+            t1 = ("Bending moment (major axis) (kNm)", display_prov(self.input_moment, "M"),
+                  prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
+                                   app_moment_load=round(self.load_moment, 2),
+                                   moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=self.M_dz,
+                                   type='EndPlateType-BC-zz'), "OK")
+        else:
+            t1 = ("Bending moment (major axis) (kNm)", display_prov(self.input_moment, "M"),
+                  prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
+                                   app_moment_load=round(self.load_moment, 2),
+                                   moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=self.M_dy,
+                                   type='EndPlateType-BC-yy'), "OK")
 
         self.report_check.append(t1)
 
-        t1 = ("Effective bending moment (major axis) (kN-m)", display_prov(self.load_moment, "M_u"),
+        t1 = ("Effective bending moment (major axis) (kNm)", display_prov(self.load_moment, "M_u"),
               effective_bending_moment_ep(self.load_moment, self.load_axial, self.load_moment_effective,
                                           self.beam_D, self.beam_tf), "OK")
 
@@ -2399,7 +2422,7 @@ class BeamColumnEndPlate(MomentConnection):
                   get_pass_fail(self.supported_section.flange_width, round(self.ep_width_provided, 2), relation="leq"))
             self.report_check.append(t1)
 
-            t1 = ('Moment at critical section (kN-m)', '',
+            t1 = ('Moment at critical section (kNm)', '',
                   moment_ep(t_1=round(self.call_helper.t_1, 2), lv=round(self.call_helper.lv, 2),
                             Q=round(self.call_helper.prying_force, 2), le=round(self.call_helper.le, 2),
                             mp_plate=round(self.ep_moment_capacity, 2)), "OK")
@@ -2414,7 +2437,7 @@ class BeamColumnEndPlate(MomentConnection):
                   get_pass_fail(self.call_helper.plate_thickness_req, self.plate_thickness, relation="leq"))
             self.report_check.append(t1)
 
-            t1 = ('Moment capacity (kN-m)', round(self.ep_moment_capacity, 2),
+            t1 = ('Moment capacity (kNm)', round(self.ep_moment_capacity, 2),
                   end_plate_moment_capacity(M_ep=round(self.call_helper.plate_moment_capacity, 2),
                                             b_eff=round(self.call_helper.b_e, 2),
                                             f_y=self.dp_plate_fy, gamma_m0=self.gamma_m0, t_p=self.plate_thickness),
@@ -2731,13 +2754,14 @@ class BeamColumnEndPlate(MomentConnection):
                     self.report_check.append(t1)
 
         # CHECK DIAGONAL PLATE
-        t1 = ('SubSection', 'Diagonal Plate Check', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Column Web Shear Check', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        if self.t_wc  > self.column_tw:
+        if self.web_stiffener_status == True:
             remark_1 = 'Yes'
         else:
             remark_1 = 'No'
+
         t1 = (KEY_OUT_DISP_DIAG_PLATE_REQ,
               checkdiagonal_plate(M=self.load_moment_effective,
                                   D_c=self.column_D,
@@ -2746,33 +2770,23 @@ class BeamColumnEndPlate(MomentConnection):
                                   t_req=self.t_wc),
               display_prov(self.column_tw, "t_c"), remark_1)
         self.report_check.append(t1)
-        if self.t_wc > self.column_tw:
-            t1 = ('SubSection', 'Diagonal Plate Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+
+        if self.web_stiffener_status == True:
+
+            t1 = ('SubSection', 'Column Web Stiffener Plate Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_DIAG_LOAD_STIFF,' ' ,load_diag_stiffener(M= self.load_moment_effective ,
-                                                                    D_c =self.column_D,D_b=self.beam_D,
-                                                                    fyc=self.column_fy,p_st=round(self.load_diag_stiffener,2),
-                                                                    tc=self.column_tw,gamma= self.gamma_m0),' '
-                 )
+            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_DEPTH, '', web_stiffener_plate_depth(depth=self.web_stiffener_depth, D_b=self.beam_D,
+                                                                          T_b=self.beam_tf, r1_b=self.beam_r1), 'OK')
             self.report_check.append(t1)
 
-            t1 = ("Area required $(mm^2)$", Area_req_dia_plate(A_st=round(self.diag_stiffener_area_req,2),
-                                                               fy_st=self.cont_plate_fy ,
-                                                               p_st=round(self.load_diag_stiffener,2)
-                                                               ,gamma=self.gamma_m0), '', 'OK')
-            self.report_check.append(t1)
-            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_LENGTH, '', diag_plate_length(Lst =round(self.diag_stiffener_length,2),
-                                                                            D_c =self.column_D,
-                                                                            T_c=self.column_tf), 'OK')
+            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH, '', web_stiffener_plate_width(width=self.web_stiffener_width, D_c=self.column_D,
+                                                                                   T_c=self.column_tf, r1_c=self.column_r1), 'OK')
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH, '', diag_plate_width(Wst=self.diag_stiffener_width,
-                                                                            B_c=self.column_bf,
-                                                                            t_c=self.column_tw,R_1=self.column_r1), 'OK')
-            self.report_check.append(t1)
-            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, 't_c = ' + str(self.column_tw), self.diag_stiffener_thk_provided,
-                  get_pass_fail(self.column_tw, self.diag_stiffener_thk_provided, relation="leq"))
+            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, web_stiffener_plate_thk(self.t_wc, self.column_tw, self.web_stiffener_thk_req),
+                  self.web_stiffener_thk_provided,
+                  get_pass_fail(self.web_stiffener_thk_req, self.web_stiffener_thk_provided, relation="leq"))
             self.report_check.append(t1)
 
         # End of design report

@@ -762,38 +762,38 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # minimum moment (major axis)
         # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
         self.beam_plastic_mom_capa_zz = round(((1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0) * 1e-6,
-                                              2)  # kN-m
+                                              2)  # kNm
 
         if self.load.moment < (0.5 * self.beam_plastic_mom_capa_zz):
             self.minimum_load_status_moment = True
             # update moment value
             self.load_moment = round(0.5 * self.beam_plastic_mom_capa_zz, 2)  # kN
 
-            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kN-m) is less than 0.5 times the plastic moment "
-                           "capacity of the beam ({} kN-m)".format(self.load.moment, self.load_moment))
+            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
+                           "capacity of the beam ({} kNm)".format(self.load.moment, self.load_moment))
             logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
                         "connection as rigid and transfer full moment from the spliced beam (Cl. 10.7, IS 800:2007)")
-            logger.info("Designing the connection for a moment of {} kN-m".format(self.load_moment))
+            logger.info("Designing the connection for a moment of {} kNm".format(self.load_moment))
 
         elif self.load.moment > self.beam_plastic_mom_capa_zz:
             self.load_moment = self.beam_plastic_mom_capa_zz  # kN
             self.minimum_load_status_moment = True
             self.design_status = False
             self.design_status_list.append(self.design_status)
-            logger.error("[Maximum Factored Load] The external factored bending moment ({} kN-m) is greater than the plastic moment capacity of the "
-                         "beam ({} kN-m)".format(self.load.moment, self.beam_plastic_mom_capa_zz))
-            logger.warning("The maximum capacity of the connection is {} kN-m".format(self.beam_plastic_mom_capa_zz))
-            logger.info("Define the value of factored bending moment as {} kN-m or less".format(self.beam_plastic_mom_capa_zz))
+            logger.error("[Maximum Factored Load] The external factored bending moment ({} kNm) is greater than the plastic moment capacity of the "
+                         "beam ({} kNm)".format(self.load.moment, self.beam_plastic_mom_capa_zz))
+            logger.warning("The maximum capacity of the connection is {} kNm".format(self.beam_plastic_mom_capa_zz))
+            logger.info("Define the value of factored bending moment as {} kNm or less".format(self.beam_plastic_mom_capa_zz))
         else:
             self.design_status = True
             self.design_status_list.append(self.design_status)
             self.minimum_load_status_moment = False
-            self.load_moment = self.load.moment  # kN-m
+            self.load_moment = self.load.moment  # kNm
 
         self.load_axial = self.load.axial_force
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
-        self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kN-m
+        self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kNm
 
         # setting bolt ist
         self.bolt_diameter = self.bolt.bolt_diameter
@@ -1482,14 +1482,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = ("Axial force (kN)", '', 'H = ' + str(self.load_axial), "OK")
         self.report_check.append(t1)
 
-        t1 = ("Bending moment (kN-m)", display_prov(self.input_moment, "M"),
+        t1 = ("Bending moment (kNm)", display_prov(self.input_moment, "M"),
               prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                app_moment_load=round(self.load_moment, 2),
-                               moment_capacity=round(self.beam_plastic_mom_capa_zz, 2), type='EndPlateType'), "OK")
+                               moment_capacity=round(self.beam_plastic_mom_capa_zz, 2), moment_capacity_supporting=0.0, type='EndPlateType'), "OK")
 
         self.report_check.append(t1)
 
-        t1 = ("Effective bending moment (kN-m)", display_prov(self.load_moment, "M_u"),
+        t1 = ("Effective bending moment (kNm)", display_prov(self.load_moment, "M_u"),
               effective_bending_moment_ep(self.load_moment, self.load_axial, self.load_moment_effective, self.beam_D, self.beam_tf), "OK")
 
         self.report_check.append(t1)
@@ -1740,7 +1740,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   get_pass_fail(self.supported_section.flange_width, round(self.ep_width_provided,2), relation="leq"))
             self.report_check.append(t1)
 
-            t1 = ('Moment at critical section (kN-m)', '', moment_ep(t_1=round(self.call_helper.t_1, 2), lv=round(self.call_helper.lv, 2),
+            t1 = ('Moment at critical section (kNm)', '', moment_ep(t_1=round(self.call_helper.t_1, 2), lv=round(self.call_helper.lv, 2),
                                                           Q=round(self.call_helper.prying_force, 2), le=round(self.call_helper.le, 2),
                                                           mp_plate=round(self.ep_moment_capacity, 2)), "OK")
 
@@ -1753,7 +1753,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   get_pass_fail(self.call_helper.plate_thickness_req, self.plate_thickness, relation="leq"))
             self.report_check.append(t1)
 
-            t1 = ('Moment capacity (kN-m)', round(self.ep_moment_capacity, 2),
+            t1 = ('Moment capacity (kNm)', round(self.ep_moment_capacity, 2),
                   end_plate_moment_capacity(M_ep=round(self.call_helper.plate_moment_capacity, 2), b_eff=round(self.call_helper.b_e, 2),
                                             f_y=self.dp_plate_fy, gamma_m0=self.gamma_m0, t_p=self.plate_thickness),
                   get_pass_fail(self.ep_moment_capacity, self.call_helper.plate_moment_capacity, relation="leq"))

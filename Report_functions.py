@@ -417,6 +417,18 @@ def cl_8_2_1_2_plastic_moment_capacity(beta_b, Z_p, f_y, gamma_m0, Pmc):
     return Pmc_eqn
 
 
+def cl_8_2_1_2_plastic_moment_capacity_yy(beta_b, Z_py, f_y, gamma_m0, Pmc):
+
+    Pmc_eqn = Math(inline=True)
+
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{y-y} &= \frac{\beta_b \times Z_{py} \times fy}{\gamma_{mo} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + str(beta_b) + r'\times' + str(Z_py) + r'\times' + str(f_y) + r'}{' + str(gamma_m0) + r' \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + str(Pmc) + r' \\ \\'))
+    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+    return Pmc_eqn
+
+
 def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
     """
     Calculate moment deformation capacity
@@ -2629,7 +2641,7 @@ def allow_shear_capacity(V_d, S_c):
     return allow_shear_capacity_eqn
 
 
-def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, type=None):
+def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, moment_capacity_supporting, type=None):
     """
     Calculate max moment load of input moment and min moment of the section
     Args:
@@ -2651,15 +2663,25 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, typ
     moment_capacity = str(moment_capacity)
 
     app_moment_load_eqn = Math(inline=True)
-    if type == 'EndPlateType':
+
+    if type == 'EndPlateType' or 'EndPlateType-BC-zz' or 'EndPlateType-BC-yy':
         app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
         app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r' \\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r' \\ \\'))
 
         app_moment_load_eqn.append(NoEscape(r'Mu &= max(M,~M_{min}) \\'))
+        if type == 'EndPlateType-BC-zz':
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
+        elif type == 'EndPlateType-BC-yy':
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{y-y} ~of~the~column~section \\'))
+        else:
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
+
         app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r') \\'))
+        app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
-        app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+        app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     else:
         # app_moment_load_eqn = Math(inline=True)
@@ -7334,10 +7356,11 @@ def checkdiagonal_plate(M,D_c,D_b,fyc,t_req):
     fyc = str(fyc)
     t_req = str(t_req)
     checkdiagonal_plate_eqn = Math(inline=True)
-    checkdiagonal_plate_eqn.append(NoEscape(r'\begin{aligned}  t_{wc} &= \frac{1.9 \times M}{D_c \times D_b \times fyc}\\'))
-    checkdiagonal_plate_eqn.append(NoEscape(r'&= \frac{1.9 \times'+ M+'}{'+D_c +r'\times '+D_b+r' \times'+ fyc+r'}\\'))
+    checkdiagonal_plate_eqn.append(NoEscape(r'\begin{aligned}  t_{wc} &= \frac{1.9 M_{ue}}{D_c~ D_b~ f_{yc}} \\'))
+    checkdiagonal_plate_eqn.append(NoEscape(r'&= \frac{1.9 \times'+ M+'}{'+D_c +r' \times '+D_b+r' \times' + fyc+r'}\\'))
     checkdiagonal_plate_eqn.append(NoEscape(r' &= ' + t_req + r'\end{aligned}'))
     return checkdiagonal_plate_eqn
+
 
 def load_diag_stiffener(M,D_c,D_b,fyc,p_st,tc,gamma):
     M = str(M)
@@ -7370,15 +7393,15 @@ def Area_req_dia_plate(A_st,fy_st,p_st,gamma):
     Area_req_dia_plate_eqn.append(NoEscape(r' &= ' +  A_st + r'\end{aligned}'))
     return Area_req_dia_plate_eqn
 
-def diag_plate_length(Lst,D_c,T_c):
-    Lst = str(Lst)
-    D_c = str(D_c)
-    T_c = str(T_c)
-    diag_plate_length_eqn = Math(inline=True)
-    diag_plate_length_eqn.append(NoEscape(r'\begin{aligned}  L_{st} &= D_c - (2 ~ T_c)\\'))
-    diag_plate_length_eqn.append(NoEscape(r'&= '+D_c+r' - (2 \times '+T_c+r')\\'))
-    diag_plate_length_eqn.append(NoEscape(r' &= ' +Lst+ r'\end{aligned}'))
-    return diag_plate_length_eqn
+
+def web_stiffener_plate_depth(depth, D_b, T_b, r1_b):
+
+    web_stiffener_plate_depth_eqn = Math(inline=True)
+    web_stiffener_plate_depth_eqn.append(NoEscape(r'\begin{aligned}  D_{st} &= D_{b} - (2 T_{b}) - (2 {R_{1}}_{b}) - 20 \\'))
+    web_stiffener_plate_depth_eqn.append(NoEscape(r'  &= ' + str(D_b) + r' - (2 \times ' + str(T_b) + r') - (2 \times ' + str(r1_b) + r') - 20 \\'))
+    web_stiffener_plate_depth_eqn.append(NoEscape(r'  &= ' + str(depth) + r' \end{aligned}'))
+    return web_stiffener_plate_depth_eqn
+
 
 def bc_ep_compatibility_req(beam_B, B_req):
 
@@ -7389,17 +7412,27 @@ def bc_ep_compatibility_req(beam_B, B_req):
 
     return compatibility_eqn
 
-def diag_plate_width(Wst,B_c,t_c,R_1):
-    Wst = str(Wst)
-    B_c = str(B_c)
-    t_c = str(t_c)
-    R_1 = str(R_1)
-    # self.diag_stiffener_width = round_down((self.column_bf - self.column_tw - (2 * self.column_r1)) / 2, 2)  # mm
-    diag_plate_width_eqn = Math(inline=True)
-    diag_plate_width_eqn.append(NoEscape(r'\begin{aligned}  W_{st} &= \frac{B_c - t_c - (2~R1)}{2}\\'))
-    diag_plate_width_eqn.append(NoEscape(r'&= \frac{'+B_c+' - '+t_c+r' - (2 \times '+R_1+r')}{2}\\'))
-    diag_plate_width_eqn.append(NoEscape(r' &= ' + Wst + r'\end{aligned}'))
-    return diag_plate_width_eqn
+
+def web_stiffener_plate_width(width, D_c, T_c, r1_c):
+
+    web_stiffener_plate_width_eqn = Math(inline=True)
+
+    web_stiffener_plate_width_eqn.append(NoEscape(r'\begin{aligned}  W_{st} &= D_{c} - (2 T_{c}) - (2 {R_{1}}_{c}) - 20 \\'))
+    web_stiffener_plate_width_eqn.append(NoEscape(r'  &= ' + str(D_c) + r' - (2 \times ' + str(T_c) + r') - (2 \times ' + str(r1_c) + r') - 20 \\'))
+    web_stiffener_plate_width_eqn.append(NoEscape(r'  &= ' + str(width) + r' \end{aligned}'))
+
+    return web_stiffener_plate_width_eqn
+
+
+def web_stiffener_plate_thk(t_wc, t_c, thk_req):
+    web_stiffener_plate_thk_eqn = Math(inline=True)
+
+    web_stiffener_plate_thk_eqn.append(NoEscape(r'\begin{aligned}  t_{st} &= \frac{t_{wc} - t_{c}} {2} \\'))
+    web_stiffener_plate_thk_eqn.append(NoEscape(r'  &= \frac{' + str(t_wc) + r' - ' + str(t_c) + r'} {2} \\'))
+    web_stiffener_plate_thk_eqn.append(NoEscape(r'  &= ' + str(thk_req) + r' \end{aligned}'))
+
+    return web_stiffener_plate_thk_eqn
+
 
 
 def bc_ep_compatibility_available(col_D, col_B, col_T, col_R1, space_available, connectivity):

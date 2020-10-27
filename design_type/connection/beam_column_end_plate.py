@@ -1559,12 +1559,12 @@ class BeamColumnEndPlate(MomentConnection):
                     break
             else:
                 self.diagonal_stiffener_status = False
-                # self.diag_stiffener_length = 'N/A'
-                # self.diag_stiffener_width = 'N/A'
-                # self.diag_stiffener_thk_provided = 'N/A'
-                self.diag_stiffener_length = 438
-                self.diag_stiffener_width = 164
-                self.diag_stiffener_thk_provided = 14
+                self.diag_stiffener_length = 'N/A'
+                self.diag_stiffener_width = 'N/A'
+                self.diag_stiffener_thk_provided = 'N/A'
+                # self.diag_stiffener_length = 438
+                # self.diag_stiffener_width = 164
+                # self.diag_stiffener_thk_provided = 14
 
             # Design 2: Continuity Plates on compression side (for all 3 types of end plate)
 
@@ -1813,10 +1813,10 @@ class BeamColumnEndPlate(MomentConnection):
                 else:
                     self.cont_plate_groove_weld_status = False
             else:
-                # self.weld_size_continuity_plate = 'N/A'
-                # self.weld_length_cont_plate = 'N/A'
-                self.weld_size_continuity_plate = 6
-                self.weld_length_cont_plate = 6
+                self.weld_size_continuity_plate = 'N/A'
+                self.weld_length_cont_plate = 'N/A'
+                # self.weld_size_continuity_plate = 6
+                # self.weld_length_cont_plate = 6
                 self.weld_both_side_cont_plate_status = False
                 self.cont_plate_groove_weld_status = False
 
@@ -1837,8 +1837,8 @@ class BeamColumnEndPlate(MomentConnection):
                 else:
                     self.diag_stiffener_groove_weld_status = False
             else:
-                # self.weld_size_diag_stiffener = 'N/A'
-                self.weld_size_diag_stiffener = 10
+                self.weld_size_diag_stiffener = 'N/A'
+                # self.weld_size_diag_stiffener = 10
                 self.diag_stiffener_groove_weld_status = False
 
         else:
@@ -1855,10 +1855,10 @@ class BeamColumnEndPlate(MomentConnection):
                 self.cont_plate_groove_weld_status = False
 
             else:
-                # self.weld_size_continuity_plate = 'N/A'
-                # self.weld_length_cont_plate = 'N/A'
-                self.weld_size_continuity_plate = 6
-                self.weld_length_cont_plate = 6
+                self.weld_size_continuity_plate = 'N/A'
+                self.weld_length_cont_plate = 'N/A'
+                # self.weld_size_continuity_plate = 6
+                # self.weld_length_cont_plate = 6
                 self.weld_both_side_cont_plate_status = False
                 self.cont_plate_groove_weld_status = False
 

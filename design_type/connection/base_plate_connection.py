@@ -420,6 +420,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_size_stiffener = 0.0
 
         self.eccentricity_zz = 0.0
+        self.eccentricity_yy = 0.0
+        self.moment_bp_case_yy = ''
         self.sigma_max_zz = 0.0
         self.sigma_min_zz = 0.0
         self.critical_xx = 0.0
@@ -734,11 +736,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t16)
 
         t21 = (KEY_IN_DETAILING_PITCH_DISTANCE, KEY_IN_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
-               self.pitch_distance_in if flag and (self.load_axial_tension > 0 and self.connectivity == 'Moment Base Plate') else 'N/A', True)
+               self.pitch_distance_in if flag and (self.load_axial_tension > 0 and self.anchors_inside_flange > 2 and
+                                                   self.connectivity == 'Moment Base Plate') else 'N/A', True)
         out_list.append(t21)
 
         t22 = (KEY_IN_DETAILING_GAUGE_DISTANCE, KEY_IN_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
-               self.gauge_distance_in if flag and (self.load_axial_tension > 0 and self.connectivity == 'Moment Base Plate') else 'N/A', True)
+               self.gauge_distance_in if flag and (self.load_axial_tension > 0 and self.anchors_inside_flange > 2
+                                                   and self.connectivity == 'Moment Base Plate') else 'N/A', True)
         out_list.append(t22)
 
         t23 = (None, DISP_TITLE_STIFFENER_PLATE_FLANGE, TYPE_TITLE, None, True)
@@ -2398,7 +2402,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                            "section ({} kN) [Ref. Cl. 10.7, IS 800:2007]".format(self.load_axial_compression * 1e-3, 0.3 * self.column_axial_capacity))
             logger.info("Setting the value of axial compression equal to the minimum recommended value")
 
-            self.load_axial_compression = (0.3 * self.column_axial_capacity * 1e3)  # N
+            self.load_axial_compression = round(0.3 * self.column_axial_capacity * 1e3, 2)  # N
 
         if self.load_axial_compression * 1e-3 > self.column_axial_capacity:
             logger.warning("[Maximum Design Action] The defined value of axial compression ({} kN) is greater than the capacity of the column "
@@ -2450,13 +2454,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # 7.4: Moment check
 
         # major axis moment
-        if self.load_moment_major < (0.5 * self.M_dz):
+        if self.load_moment_major < (0.3 * self.M_dz):
             logger.warning("[Minimum Moment] The external factored bending moment (acting along the major axis) is less than the minimum "
                            "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-            logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
-                        "(i.e. 0.5 X {}, kNm)".format(round(self.M_dz * 1e-6, 2)))
-            logger.info("Note: The design action check is based on full capacity of the column for a conservative approach")
-            self.load_moment_major = round(0.5 * self.M_dz, 2)
+            logger.info("The minimum recommended design action effect for factored bending moment is 0.3 times the capacity of the column "
+                        "(i.e. 0.3 X {}, kNm)".format(round(self.M_dz * 1e-6, 2)))
+            logger.info("Note: The design action check is based on full capacity of the column")
+            self.load_moment_major = round(0.3 * self.M_dz, 2)
             logger.info("The value of factored bending moment is set to {} kNm".format(round(self.load_moment_major * 1e-6, 2)))
 
         if self.load_moment_major > self.M_dz:
@@ -2467,14 +2471,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         format(round(self.M_dz * 1e-6, 2)))
 
         # minor axis moment
-        if self.load_moment_minor < (0.5 * self.M_dy):
-            logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the minimum "
-                           "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-            logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
-                        "(i.e. 0.5 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
-            logger.info("Note: The minimum design action is based on full capacity of the column for a conservative approach")
-            self.load_moment_minor = round(0.5 * self.M_dy, 2)
-            logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
+        # if self.load_moment_minor < (0.5 * self.M_dy):
+        #     logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the minimum "
+        #                    "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
+        #     logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
+        #                 "(i.e. 0.5 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
+        #     logger.info("Note: The minimum design action is based on full capacity of the column for a conservative approach")
+        #     self.load_moment_minor = round(0.5 * self.M_dy, 2)
+        #     logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
 
         if self.load_moment_minor > self.M_dy:
             logger.warning("[Maximum Moment] The external factored bending moment (acting along the major axis) is greater than the capacity of  "
@@ -2584,6 +2588,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # calculate eccentricity
             self.eccentricity_zz = round((self.load_moment_major / self.load_axial_compression), 2)  # mm, eccentricity about major (z-z) axis
 
+            # Major axis
             # Defining cases: Case 1: e <= L/6        (compression throughout the BP)
             #                 Case 2: L/6 < e < L/3   (compression throughout + moderate tension/uplift in the anchor bolts)
             #                 Case 3: e >= L/3        (compression + high tension/uplift in the anchor bolts)
@@ -4414,6 +4419,38 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchors_inside_flange = 0
             self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
 
+        # Minor axis
+        if self.load_moment_minor > 0:
+            self.eccentricity_yy = round((self.load_moment_minor / self.load_axial_compression), 2)  # mm, eccentricity about minor (y-y) axis
+            # Defining cases: Case 1: e <= W/6        (compression throughout the BP)
+            #                 Case 2: W/6 < e < W/3   (compression throughout + moderate tension/uplift in the anchor bolts)
+            #                 Case 3: e >= W/3        (compression + high tension/uplift in the anchor bolts)
+
+            if self.eccentricity_yy <= (self.bp_width_provided / 6):  # Case 1
+                self.moment_bp_case_yy = 'Case1'
+
+                logger.info("[Minor Axis Moment] The value of eccentricity about the minor axis is {} mm".format(round_down(self.eccentricity_yy, 2)))
+                logger.info("Eccentricity is less than {} mm (W/6)".format(round(self.bp_width_provided / 6, 2)))
+                logger.info("Case 1: The base plate is purely under compression/bearing over it's width, thus there is no requirement of anchor "
+                            "bolts along the width of the column section")
+            else:
+                if self.eccentricity_yy >= (self.bp_width_provided / 3):  # Case 3
+                    self.moment_bp_case_yy = 'Case3'
+                    logger.info("[Minor Axis Moment] The value of eccentricity about the minor axis is {} mm".format(round_down(self.eccentricity_yy, 2)))
+                    logger.info("Eccentricity is greater than {} (W/3) mm".format(round(self.bp_width_provided / 3, 2)))
+                    logger.info("Case 3: A smaller part of the base plate is under pure compression/bearing with a large tension/uplift force being "
+                                "transferred through the anchor bolts required to be placed along the minor axis of the column section")
+                else:
+                    self.moment_bp_case_yy = 'Case2'
+                    logger.info("[Minor Axis Moment] The value of eccentricity about the minor axis is {} mm".format(round_down(self.eccentricity_yy, 2)))
+                    logger.info("Eccentricity is greater than {} (W/6) mm but less than {} (W/3) mm".format(round(self.bp_width_provided / 6, 2),
+                                                                                                            round(self.bp_width_provided / 3, 2)))
+                    logger.info("Case 2: A larger part of the base plate is under compression/bearing with a small to moderate tension/uplift force "
+                                "being transferred through the anchor bolts required to be placed along the minor axis of the column section")
+
+            # updating the minor axis moment as uplift load for anchor design along minor axis
+            self.load_axial_tension = self.load_moment_minor / self.eccentricity_yy  # N
+
         # assign appropriate plate thickness according to available sizes in the marked
         self.plate_thk_provided = max(self.plate_thk, self.column_tf)  # base plate thickness should be larger than the flange thickness
 
@@ -6196,7 +6233,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                         if (n == itr) and (self.anchors_inside_flange > 4):
                                             # if 4 bolts with highest diameter is not sufficient
                                             # self.safe = False
-                                            # TODO: give log errors
                                             logger.error("[Anchor Bolt Design] The required uplift demand is not satisfied by 4 anchor bolts of"
                                                          " highest diameter or fails to satisfy the detailing criteria")
                                             logger.error("Re-designing the connection with 8 anchor bolts")
@@ -6302,7 +6338,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 if (self.anchors_inside_flange == 2) or (self.anchors_inside_flange == 4) or (self.anchors_inside_flange == 8):
                                     break
                                 else:
-                                    logger.error("Cannot compute")
+                                    logger.error("Design of anchor bolt with {} mm is unsafe. Running the next iteration with a higer diameter or "
+                                                 "grade of anchor bolt".format(self.anchor_dia_inside_flange))
 
                             if (self.anchor_dia_inside_flange >= 72) and (self.anchors_inside_flange > 4):
                                 # self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
@@ -6842,16 +6879,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Moment Base Plate':
 
             t1 = ("Bending moment, major axis (z-z)  (kNm)", display_load_bp(round(self.load_moment_major_report * 1e-6, 2), 'M'),
-                  prov_moment_load_bp(moment_input=round(self.load_moment_major_report * 1e-6, 2), min_mc=round(0.5 * self.M_dz * 1e-6, 2),
+                  prov_moment_load_bp(moment_input=round(self.load_moment_major_report * 1e-6, 2), min_mc=round(0.3 * self.M_dz * 1e-6, 2),
                                       app_moment_load=round(self.load_moment_major * 1e-6, 2),
                                       moment_capacity=round(self.M_dz * 1e-6, 2), axis='Major', classification=self.col_classification), "OK")
             self.report_check.append(t1)
 
-            t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
-                  prov_moment_load_bp(moment_input=round(self.load_moment_minor_report * 1e-6, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
-                                      app_moment_load=round(self.load_moment_minor * 1e-6, 2),
-                                      moment_capacity=round(self.M_dy * 1e-6, 2), axis='Minor', classification=self.col_classification), "OK")
-            self.report_check.append(t1)
+            # t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
+            #       prov_moment_load_bp(moment_input=round(self.load_moment_minor_report * 1e-6, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
+            #                           app_moment_load=round(self.load_moment_minor * 1e-6, 2),
+            #                           moment_capacity=round(self.M_dy * 1e-6, 2), axis='Minor', classification=self.col_classification), "OK")
+            # self.report_check.append(t1)
 
         # Check 1.2: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
         if self.connectivity == 'Hollow/Tubular Column Base':

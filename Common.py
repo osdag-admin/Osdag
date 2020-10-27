@@ -685,8 +685,8 @@ KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 # capacity
 
 KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member (kN)"
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
+KEY_OUT_DISP_SHEAR_CAPACITY = "Shear Capacity Member (kN)"
+KEY_OUT_DISP_MOMENT_CAPACITY = "Moment Capacity Member (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY = 'Plastic moment capacity (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 KEY_OUT_DISP_SHEAR_CAPACITY_M = "Shear Capacity(kN)"

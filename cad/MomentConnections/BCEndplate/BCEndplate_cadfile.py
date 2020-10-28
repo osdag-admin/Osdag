@@ -1072,6 +1072,9 @@ class CADGroove(object):
         self.bolt = bolt
         self.contPlates = contPlates
         self.diagplate =diagplate
+        self.diagWeldD = diagWeldD
+        self.diagWeldB = diagWeldB
+
         if self.diagplate!= None:
             self.diagplate_L1 = self.diagplate
             self.diagplate_R1= copy.deepcopy(self.diagplate)
@@ -1163,7 +1166,8 @@ class CADGroove(object):
         self.createBeamGeometry()
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
-        self.create_contPlatesGeometry()
+        if self.contPlates != None:
+            self.create_contPlatesGeometry()
 
         self.create_beam_stiffenersGeometry()
         self.create_bcWeldFlangGeometry()
@@ -1174,9 +1178,10 @@ class CADGroove(object):
         # self.create_bcWelds()
 
         self.create_bcWeldStiff()
-
-        self.create_contWelds()
-        self.create_diagWelds()
+        if self.contWeldD != None and self.contWeldB != None:
+            self.create_contWelds()
+        if self.diagplate != None:
+            self.create_diagWelds()
 
         # call for create_model of filletweld from Components directory
         self.columnModel = self.column.create_model()
@@ -1186,10 +1191,11 @@ class CADGroove(object):
         if self.diagplate!= None:
             self.diagplate_L1Model = self.diagplate_L1.create_model(-45)
             self.diagplate_R1Model = self.diagplate_R1.create_model(-45)
-        self.contPlate_L1Model = self.contPlate_L1.create_model()
-        self.contPlate_L2Model = self.contPlate_L2.create_model()
-        self.contPlate_R1Model = self.contPlate_R1.create_model()
-        self.contPlate_R2Model = self.contPlate_R2.create_model()
+        if self.contPlates != None:
+            self.contPlate_L1Model = self.contPlate_L1.create_model()
+            self.contPlate_L2Model = self.contPlate_L2.create_model()
+            self.contPlate_R1Model = self.contPlate_R1.create_model()
+            self.contPlate_R2Model = self.contPlate_R2.create_model()
         self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
         self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
 
@@ -1216,43 +1222,47 @@ class CADGroove(object):
         self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
         self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
 
-        self.contWeldL1_U2Model = self.contWeldL1_U2.create_model()
-        self.contWeldL2_U2Model = self.contWeldL2_U2.create_model()
-        self.contWeldL1_L2Model = self.contWeldL1_L2.create_model()
-        self.contWeldL2_L2Model = self.contWeldL2_L2.create_model()
-        self.contWeldR1_U2Model = self.contWeldR1_U2.create_model()
-        self.contWeldR2_U2Model = self.contWeldR2_U2.create_model()
-        self.contWeldR1_L2Model = self.contWeldR1_L2.create_model()
-        self.contWeldR2_L2Model = self.contWeldR2_L2.create_model()
-        self.contWeldL1_U3Model = self.contWeldL1_U3.create_model()
-        self.contWeldL1_L3Model = self.contWeldL1_L3.create_model()
-        self.contWeldL2_U3Model = self.contWeldL2_U3.create_model()
-        self.contWeldL2_L3Model = self.contWeldL2_L3.create_model()
-        self.contWeldR1_U3Model = self.contWeldR1_U3.create_model()
-        self.contWeldR1_L3Model = self.contWeldR1_L3.create_model()
-        self.contWeldR2_U3Model = self.contWeldR2_U3.create_model()
-        self.contWeldR2_L3Model = self.contWeldR2_L3.create_model()
-        self.contWeldL1_U1Model = self.contWeldL1_U1.create_model()
-        self.contWeldL1_L1Model = self.contWeldL1_L1.create_model()
-        self.contWeldL2_U1Model = self.contWeldL2_U1.create_model()
-        self.contWeldL2_L1Model = self.contWeldL2_L1.create_model()
-        self.contWeldR1_U1Model = self.contWeldR1_U1.create_model()
-        self.contWeldR1_L1Model = self.contWeldR1_L1.create_model()
-        self.contWeldR2_U1Model = self.contWeldR2_U1.create_model()
-        self.contWeldR2_L1Model = self.contWeldR2_L1.create_model()
+        if self.contPlates != None:
 
-        self.diagWeldL1_LModel = self.diagWeldL1_L.create_model(-45)
-        self.diagWeldL1_UModel = self.diagWeldL1_U.create_model(-45)
-        self.diagWeldR1_LModel = self.diagWeldR1_L.create_model(-45)
-        self.diagWeldR1_UModel = self.diagWeldR1_U.create_model(-45)
-        
-        # self.diagWeldS1_UModel = self.diagWeldS1_U.create_model()
-        # self.diagWeldS1_LModel = self.diagWeldS1_L.create_model()
+            self.contWeldL1_U2Model = self.contWeldL1_U2.create_model()
+            self.contWeldL2_U2Model = self.contWeldL2_U2.create_model()
+            self.contWeldL1_L2Model = self.contWeldL1_L2.create_model()
+            self.contWeldL2_L2Model = self.contWeldL2_L2.create_model()
+            self.contWeldR1_U2Model = self.contWeldR1_U2.create_model()
+            self.contWeldR2_U2Model = self.contWeldR2_U2.create_model()
+            self.contWeldR1_L2Model = self.contWeldR1_L2.create_model()
+            self.contWeldR2_L2Model = self.contWeldR2_L2.create_model()
+            self.contWeldL1_U3Model = self.contWeldL1_U3.create_model()
+            self.contWeldL1_L3Model = self.contWeldL1_L3.create_model()
+            self.contWeldL2_U3Model = self.contWeldL2_U3.create_model()
+            self.contWeldL2_L3Model = self.contWeldL2_L3.create_model()
+            self.contWeldR1_U3Model = self.contWeldR1_U3.create_model()
+            self.contWeldR1_L3Model = self.contWeldR1_L3.create_model()
+            self.contWeldR2_U3Model = self.contWeldR2_U3.create_model()
+            self.contWeldR2_L3Model = self.contWeldR2_L3.create_model()
+            self.contWeldL1_U1Model = self.contWeldL1_U1.create_model()
+            self.contWeldL1_L1Model = self.contWeldL1_L1.create_model()
+            self.contWeldL2_U1Model = self.contWeldL2_U1.create_model()
+            self.contWeldL2_L1Model = self.contWeldL2_L1.create_model()
+            self.contWeldR1_U1Model = self.contWeldR1_U1.create_model()
+            self.contWeldR1_L1Model = self.contWeldR1_L1.create_model()
+            self.contWeldR2_U1Model = self.contWeldR2_U1.create_model()
+            self.contWeldR2_L1Model = self.contWeldR2_L1.create_model()
 
-        self.diagWeldS1_UModel = self.diagWeldS1_U.create_model(45)
-        self.diagWeldS1_LModel = self.diagWeldS1_L.create_model(-135)
-        self.diagWeldS2_UModel = self.diagWeldS2_U.create_model(45)
-        self.diagWeldS2_LModel = self.diagWeldS2_L.create_model(-135)
+        if self.diagplate != None:
+
+            self.diagWeldL1_LModel = self.diagWeldL1_L.create_model(-45)
+            self.diagWeldL1_UModel = self.diagWeldL1_U.create_model(-45)
+            self.diagWeldR1_LModel = self.diagWeldR1_L.create_model(-45)
+            self.diagWeldR1_UModel = self.diagWeldR1_U.create_model(-45)
+
+            # self.diagWeldS1_UModel = self.diagWeldS1_U.create_model()
+            # self.diagWeldS1_LModel = self.diagWeldS1_L.create_model()
+
+            self.diagWeldS1_UModel = self.diagWeldS1_U.create_model(45)
+            self.diagWeldS1_LModel = self.diagWeldS1_L.create_model(-135)
+            self.diagWeldS2_UModel = self.diagWeldS2_U.create_model(45)
+            self.diagWeldS2_LModel = self.diagWeldS2_L.create_model(-135)
         
     #############################################################################################################
     #   Following functions takes inputs as origin, u direction and w direction of concerned component to place #
@@ -1742,29 +1752,41 @@ class CADGroove(object):
     def get_plate_connector_models(self):
         if self.endplate_type == "one_way":
             # if self.numberOfBolts == 12:
-            if self.diagplate != None:
-                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model,
-                               self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,self.diagplate_L1Model,self.diagplate_R1Model]
-            else:
-                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model,
+            if self.diagplate != None and self.contPlates != None:
+                connector_plate = [self.plateModel,  self.beam_stiffener_2Model,self.contPlate_L1Model,
+                               self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                                   self.diagplate_L1Model,self.diagplate_R1Model]
+            elif self.diagplate == None and self.contPlates != None:
+                connector_plate = [self.plateModel,  self.beam_stiffener_2Model,self.contPlate_L1Model,
                                    self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+            else:
+                connector_plate = [self.plateModel,  self.beam_stiffener_2Model]
 
         elif self.endplate_type == "both_way":
-            if self.diagplate != None:
+            if self.diagplate != None and self.contPlates != None:
                 connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model,
-                               self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model,
-                               self.contPlate_R2Model,self.diagplate_L1Model,self.diagplate_R1Model]
-            else:
-                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model,
-                               self.contPlate_R1Model, self.contPlate_R2Model]
-        elif self.endplate_type == "flush":
-            if self.diagplate != None:
-                connector_plate = [self.plateModel,
-                               self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model,
-                               self.contPlate_R2Model,self.diagplate_L1Model,self.diagplate_R1Model]
-            else:
-                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model,
+                                   self.contPlate_L1Model,
+                                   self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                                   self.diagplate_L1Model, self.diagplate_R1Model]
+            elif self.diagplate == None and self.contPlates != None:
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model,
+                                   self.contPlate_L1Model,
                                    self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+            else:
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model]
+
+        elif self.endplate_type == "flush":
+            if self.diagplate != None and self.contPlates != None:
+                connector_plate = [self.plateModel,
+                                   self.contPlate_L1Model,
+                                   self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                                   self.diagplate_L1Model, self.diagplate_R1Model]
+            elif self.diagplate == None and self.contPlates != None:
+                connector_plate = [self.plateModel,
+                                   self.contPlate_L1Model,
+                                   self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+            else:
+                connector_plate = [self.plateModel]
 
 
         plates = connector_plate[0]
@@ -1780,15 +1802,29 @@ class CADGroove(object):
         """
         if self.endplate_type == "one_way":
             # if self.numberOfBolts == 12:
-            if self.diagplate != None:
+            if self.diagplate != None and self.contPlates != None:
                 welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
-                            self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
                                self.diagWeldL1_LModel,self.diagWeldL1_UModel,self.diagWeldR1_LModel,self.diagWeldR1_UModel,
                                self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
-                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
-                              self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                             self.contWeldR1_U2Model,self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                               self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
                               self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+            elif self.diagplate == None and self.contPlates != None:
+                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.contWeldR2_U2Model, self.contWeldR1_L2Model,self.contWeldL1_U2Model,
+                              self.contWeldL2_U2Model, self.contWeldL1_L2Model,self.contWeldL2_L2Model,
                               self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                               self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
                               self.contWeldL2_U3Model, self.contWeldL2_L3Model,
@@ -1799,33 +1835,38 @@ class CADGroove(object):
                               self.contWeldR2_L1Model]
             else:
                 welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
-                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.contWeldR1_U2Model,
-                              self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                              self.contWeldL2_L2Model,
-                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
-                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                              self.contWeldR2_L1Model]
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model]
 
         elif self.endplate_type == "both_way":
             # if self.numberOfBolts == 20:
-            if self.diagplate != None:
-                welded_sec = [ self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
-                               self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                               self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
-                               self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
-                               self.bcWeldStiffHR_2Model,
-                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
-                              self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
-                              self.contWeldR1_L2Model,
+            if self.diagplate != None and self.contPlates != None:
+                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.bcWeldStiffHL_2Model,
+                              self.bcWeldStiffHR_2Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_2Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,
+                              self.diagWeldR1_UModel,
+                              self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,
+                              self.diagWeldS2_UModel,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                               self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
                               self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+            elif self.diagplate == None and self.contPlates != None:
+                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.bcWeldStiffHL_2Model,
+                              self.bcWeldStiffHR_2Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_2Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.contWeldR2_U2Model, self.contWeldR1_L2Model, self.contWeldL1_U2Model,
+                              self.contWeldL2_U2Model, self.contWeldL1_L2Model, self.contWeldL2_L2Model,
                               self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                               self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
                               self.contWeldL2_U3Model, self.contWeldL2_L3Model,
@@ -1835,57 +1876,43 @@ class CADGroove(object):
                               self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
                               self.contWeldR2_L1Model]
             else:
-
-                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHL_2Model, self.bcWeldStiffHR_1Model,
-                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                              self.bcWeldStiffHR_2Model,
-                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_1Model,
-                              self.bcWeldStiffLR_2Model, self.contWeldR1_U2Model, self.contWeldR2_U2Model,
-                              self.contWeldR1_L2Model,
-                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                              self.contWeldL2_L2Model,
-                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
-                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                              self.contWeldR2_L1Model]
+                welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
+                              self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model, self.bcWeldStiffHL_2Model,
+                              self.bcWeldStiffHR_2Model, self.bcWeldStiffLL_2Model, self.bcWeldStiffLR_2Model,
+                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model]
 
         elif self.endplate_type == "flush":
-            if self.diagplate != None:
-                welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+            if self.diagplate != None and self.contPlates != None:
+                welded_sec = [self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,
+                              self.diagWeldR1_UModel,
+                              self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,
+                              self.diagWeldS2_UModel,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
                               self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                              self.diagWeldL1_LModel, self.diagWeldL1_UModel, self.diagWeldR1_LModel,self.diagWeldR1_UModel,
-                              self.diagWeldS1_UModel, self.diagWeldS1_LModel, self.diagWeldS2_LModel,self.diagWeldS2_UModel,
                               self.contWeldL2_L2Model,
                               self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.contWeldR2_L2Model,
-                              self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
                               self.contWeldL2_U3Model, self.contWeldL2_L3Model,
                               self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
                               self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                              self.contWeldL2_U1Model,
-                              self.contWeldL2_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
+                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
+                              self.contWeldR2_L1Model]
+            elif self.diagplate == None and self.contPlates != None:
+                welded_sec = [self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.contWeldR2_U2Model, self.contWeldR1_L2Model, self.contWeldL1_U2Model,
+                              self.contWeldL2_U2Model, self.contWeldL1_L2Model, self.contWeldL2_L2Model,
+                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
+                              self.contWeldR2_L2Model, self.contWeldL1_U3Model, self.contWeldL1_L3Model,
+                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
+                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
+                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
+                              self.contWeldL2_U1Model, self.contWeldL2_L1Model,
                               self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
                               self.contWeldR2_L1Model]
             else:
-                welded_sec = [self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
-                              self.contWeldL1_U2Model, self.contWeldL2_U2Model, self.contWeldL1_L2Model,
-                              self.contWeldL2_L2Model,
-                              self.contWeldR1_U2Model, self.contWeldR2_U2Model, self.contWeldR1_L2Model,
-                              self.contWeldR2_L2Model,
-                              self.contWeldL1_U3Model, self.contWeldL1_L3Model,
-                              self.contWeldL2_U3Model, self.contWeldL2_L3Model,
-                              self.contWeldR1_U3Model, self.contWeldR1_L3Model, self.contWeldR2_U3Model,
-                              self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
-                              self.contWeldL2_U1Model,
-                              self.contWeldL2_L1Model,
-                              self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                              self.contWeldR2_L1Model]
+                welded_sec = [self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model]
 
 
         welds = welded_sec[0]

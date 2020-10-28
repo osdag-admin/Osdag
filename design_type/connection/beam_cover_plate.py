@@ -3042,7 +3042,8 @@ class BeamCoverPlate(MomentConnection):
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,display_prov(self.load.moment, "M"),
               prov_moment_load(moment_input=self.load.moment,min_mc=round(self.load_moment_min / 1000000, 2),
-                               app_moment_load=round(self.load_moment / 1000000, 2),moment_capacity=round(self.section.moment_capacity / 1000000, 2)),"")
+                               app_moment_load=round(self.load_moment / 1000000, 2),moment_capacity=round(self.section.moment_capacity / 1000000, 2),
+                               moment_capacity_supporting=0.0),"")
 
         self.report_check.append(t1)
         t23 = (KEY_OUT_DISP_FORCES_WEB, '', forces_in_web(Au=round(self.factored_axial_load / 1000, 2),

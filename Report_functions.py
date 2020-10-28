@@ -417,6 +417,18 @@ def cl_8_2_1_2_plastic_moment_capacity(beta_b, Z_p, f_y, gamma_m0, Pmc):
     return Pmc_eqn
 
 
+def cl_8_2_1_2_plastic_moment_capacity_yy(beta_b, Z_py, f_y, gamma_m0, Pmc):
+
+    Pmc_eqn = Math(inline=True)
+
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{y-y} &= \frac{\beta_b \times Z_{py} \times fy}{\gamma_{mo} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + str(beta_b) + r'\times' + str(Z_py) + r'\times' + str(f_y) + r'}{' + str(gamma_m0) + r' \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + str(Pmc) + r' \\ \\'))
+    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+    return Pmc_eqn
+
+
 def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
     """
     Calculate moment deformation capacity
@@ -2629,7 +2641,7 @@ def allow_shear_capacity(V_d, S_c):
     return allow_shear_capacity_eqn
 
 
-def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, type=None):
+def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, moment_capacity_supporting, type=None):
     """
     Calculate max moment load of input moment and min moment of the section
     Args:
@@ -2651,23 +2663,33 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, typ
     moment_capacity = str(moment_capacity)
 
     app_moment_load_eqn = Math(inline=True)
-    if type == 'EndPlateType':
+
+    if type == 'EndPlateType' or 'EndPlateType-BC-zz' or 'EndPlateType-BC-yy':
         app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
         app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r' \\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r' \\ \\'))
 
         app_moment_load_eqn.append(NoEscape(r'Mu &= max(M,~M_{min}) \\'))
+        if type == 'EndPlateType-BC-zz':
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
+        elif type == 'EndPlateType-BC-yy':
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{y-y} ~of~the~column~section \\'))
+        else:
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
+
         app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r') \\'))
+        app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
-        app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+        app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     else:
         # app_moment_load_eqn = Math(inline=True)
         # app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
         # app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r'\\'))
         # app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r'\\'))
-        app_moment_load_eqn.append(NoEscape(r' \begin{aligned} Mu &= max(M,Mc_{min} )\\'))
-        app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r')\\'))
+        app_moment_load_eqn.append(NoEscape(r' \begin{aligned} Mu &= max(M,~Mc_{min} )\\'))
+        app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',~' + min_mc + r')\\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\\'))
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
     return app_moment_load_eqn
@@ -2828,7 +2850,11 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
 
     if ep_type == 'Flushed - Reversible Moment':
         display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the ~first ~row~ inside~ tension/top ~flange  \\'))
-        display_eqn.append(NoEscape(r'  & r_{2}~ is~ the~ first~ row~ inside~ compression/bottom~ flange,~ and~ so~ on.  \\ \\'))
+        display_eqn.append(NoEscape(r'  & r_{2}~ is~ the~ first~ row~ inside~ compression/bottom~ flange  \\'))
+        display_eqn.append(NoEscape(r'  & Further~ row(s)~ are~ added~ in~ a~ symmetrical~ manner~with  \\'))
+        display_eqn.append(NoEscape(r'  & odd~ row~ placed~ near~the~ tension/top~ flange~ and  \\'))
+        display_eqn.append(NoEscape(r'  & even~ row~ placed~ near~the~ compression/bottom  \\'))
+        display_eqn.append(NoEscape(r'  & flange~ respectively  \\ \\'))
 
     elif ep_type == 'Extended One Way - Irreversible Moment':
         if bolt_row == 3:
@@ -7330,7 +7356,147 @@ def checkdiagonal_plate(M,D_c,D_b,fyc,t_req):
     fyc = str(fyc)
     t_req = str(t_req)
     checkdiagonal_plate_eqn = Math(inline=True)
-    checkdiagonal_plate_eqn.append(NoEscape(r'\begin{aligned}  t_{bf} &= \frac{1.9 \times M}{D_c \times D_b \times fyc}\\'))
-    checkdiagonal_plate_eqn.append(NoEscape(r'= \frac{1.9 \times'+ M+'}{'+D_c +r'\times '+D_b+r' \times'+ fyc+r'}\\'))
+    checkdiagonal_plate_eqn.append(NoEscape(r'\begin{aligned}  t_{wc} &= \frac{1.9 M_{ue}}{D_c~ D_b~ f_{yc}} \\'))
+    checkdiagonal_plate_eqn.append(NoEscape(r'&= \frac{1.9 \times'+ M+'}{'+D_c +r' \times '+D_b+r' \times' + fyc+r'}\\'))
     checkdiagonal_plate_eqn.append(NoEscape(r' &= ' + t_req + r'\end{aligned}'))
     return checkdiagonal_plate_eqn
+
+
+def load_diag_stiffener(M,D_c,D_b,fyc,p_st,tc,gamma):
+    M = str(M)
+    D_c = str(D_c)
+    D_b = str(D_b)
+    fyc = str(fyc)
+    p_st = str(p_st)
+    tc = str(tc)
+    gamma = str(gamma)
+    # p_st = str(p_st)
+ # self.load_diag_stiffener = ((self.load_moment_effective * 1e6 / self.beam_D) - (
+ #                        (self.column_fy * self.column_tw * self.column_D) /
+ #                        (math.sqrt(3) * self.gamma_m0))) * 1e-3
+
+    load_diag_stiffener_eqn = Math(inline=True)
+    load_diag_stiffener_eqn.append(NoEscape(r'\begin{aligned}  p_{st} &= \frac{M \times 10^6}{D_b} - \frac{fyc \times t_c \times  D_c }{\sqrt(3) \times  \gamma_{m0}}  \times 10^{-3} \\'))
+    load_diag_stiffener_eqn.append(NoEscape(r'&= \frac{'+M+ r'\times 10^6}{'+D_b+r'} - \frac{'+fyc+r' \times' +tc+ r'\times'  +D_c+r'}{\sqrt(3) \times  '+gamma+r'}  \times 10^{-3} \\'))
+    load_diag_stiffener_eqn.append(NoEscape(r' &= ' +  p_st + r'\end{aligned}'))
+    return load_diag_stiffener_eqn
+
+def Area_req_dia_plate(A_st,fy_st,p_st,gamma):
+    A_st = str(A_st)
+    fy_st = str(fy_st)
+    p_st = str(p_st)
+
+    gamma = str(gamma)
+    Area_req_dia_plate_eqn = Math(inline=True)
+    Area_req_dia_plate_eqn.append(NoEscape(r'\begin{aligned}  A_{st} &= p_{st} \Big( \frac{\gamma_{m0}}{f_{yst} \times cos(45)} \Big)\\'))
+    Area_req_dia_plate_eqn.append(NoEscape(r'&= '+p_st+ r'\Big( \frac{'+gamma+'}{'+fy_st+r'\times cos(45)} \Big)\\'))
+    Area_req_dia_plate_eqn.append(NoEscape(r' &= ' +  A_st + r'\end{aligned}'))
+    return Area_req_dia_plate_eqn
+
+
+def web_stiffener_plate_depth(depth, D_b, T_b, r1_b):
+
+    web_stiffener_plate_depth_eqn = Math(inline=True)
+    web_stiffener_plate_depth_eqn.append(NoEscape(r'\begin{aligned}  D_{st} &= D_{b} - (2 T_{b}) - (2 {R_{1}}_{b}) - 20 \\'))
+    web_stiffener_plate_depth_eqn.append(NoEscape(r'  &= ' + str(D_b) + r' - (2 \times ' + str(T_b) + r') - (2 \times ' + str(r1_b) + r') - 20 \\'))
+    web_stiffener_plate_depth_eqn.append(NoEscape(r'  &= ' + str(depth) + r' \end{aligned}'))
+    return web_stiffener_plate_depth_eqn
+
+
+def bc_ep_compatibility_req(beam_B, B_req):
+
+    compatibility_eqn = Math(inline=True)
+    compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{req} &= B_{b} + 25 \\'))
+    compatibility_eqn.append(NoEscape(r'                         &= ' + str(beam_B) + r' + 25 \\'))
+    compatibility_eqn.append(NoEscape(r'                         &= ' + str(B_req) + r' \end{aligned}'))
+
+    return compatibility_eqn
+
+
+def web_stiffener_plate_width(width, D_c, T_c, r1_c):
+
+    web_stiffener_plate_width_eqn = Math(inline=True)
+
+    web_stiffener_plate_width_eqn.append(NoEscape(r'\begin{aligned}  W_{st} &= D_{c} - (2 T_{c}) - (2 {R_{1}}_{c}) - 20 \\'))
+    web_stiffener_plate_width_eqn.append(NoEscape(r'  &= ' + str(D_c) + r' - (2 \times ' + str(T_c) + r') - (2 \times ' + str(r1_c) + r') - 20 \\'))
+    web_stiffener_plate_width_eqn.append(NoEscape(r'  &= ' + str(width) + r' \end{aligned}'))
+
+    return web_stiffener_plate_width_eqn
+
+
+def web_stiffener_plate_thk(t_wc, t_c, thk_req):
+    web_stiffener_plate_thk_eqn = Math(inline=True)
+
+    web_stiffener_plate_thk_eqn.append(NoEscape(r'\begin{aligned}  t_{st} &= \frac{t_{wc} - t_{c}} {2} \\'))
+    web_stiffener_plate_thk_eqn.append(NoEscape(r'  &= \frac{' + str(t_wc) + r' - ' + str(t_c) + r'} {2} \\'))
+    web_stiffener_plate_thk_eqn.append(NoEscape(r'  &= ' + str(thk_req) + r' \end{aligned}'))
+
+    return web_stiffener_plate_thk_eqn
+
+
+
+def bc_ep_compatibility_available(col_D, col_B, col_T, col_R1, space_available, connectivity):
+
+    compatibility_eqn = Math(inline=True)
+
+    if connectivity == CONN_CFBW:
+        compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{available} &= B_{c} \\'))
+        compatibility_eqn.append(NoEscape(r'                         &= ' + str(col_B) + r' \end{aligned}'))
+    else:
+        compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{available} &= D_{c} - (2 T_{c}) - (2 {R_{1}}_{c}) - 10 \\'))
+        compatibility_eqn.append(NoEscape(r'                               &= ' + str(col_D) + r' - (2 \times ' + str(col_T) + r') - (2 \times '
+                                          + str(col_R1) + r') - 10 \\'))
+        compatibility_eqn.append(NoEscape(r'                         &= ' + str(space_available) + r' \end{aligned}'))
+
+    return compatibility_eqn
+
+
+def axial_compression_prov(P, col_capa, provided_capa):
+
+    axial_compression_prov_eqn = Math(inline=True)
+    axial_compression_prov_eqn.append(NoEscape(r'\begin{aligned}  P &= max(P`,~0.3 P_{c}) \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'                   &= max(' + str(P) + r',~0.3 \times ' + str(col_capa) + r') \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'                   &= ' + str(provided_capa) + r' \\ \\'))
+
+    axial_compression_prov_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl.~10.7] \\ \\'))
+
+    axial_compression_prov_eqn.append(NoEscape(r'Note:~& P_{c}~ is~ the~ capacity~ of~ the~ column \end{aligned}'))
+
+    return axial_compression_prov_eqn
+
+
+def display_load_bp(load_val, notation=''):
+
+    display_eqn = Math(inline=True)
+    display_eqn.append(NoEscape(r'\begin{aligned} ' + str(notation) + ' &= ' + str(load_val) + r' \end{aligned}'))
+
+    return display_eqn
+
+
+def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, axis='', classification=''):
+
+    app_moment_load_eqn = Math(inline=True)
+
+    if axis == 'Major':
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
+    else:
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{y-y} \\'))
+
+    app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + str(moment_capacity) + r' \\'))
+    app_moment_load_eqn.append(NoEscape(r'&=' + str(min_mc) + r' \\ \\'))
+
+    app_moment_load_eqn.append(NoEscape(r'M_{zz} &= max(M,~M_{min}) \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= max(' + str(moment_input) + r',~' + str(min_mc) + r') \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= ' + str(app_moment_load) + r' \\ \\'))
+
+    if classification == 'Semi-compact':
+        app_moment_load_eqn.append(NoEscape(r'Note:& ~The~ column ~is~ classified~ as~ semi-compact \\ \\'))
+    else:
+        app_moment_load_eqn.append(NoEscape(r'Note:& ~The~ column ~is~ classified~ as~ compact \\ \\'))
+
+    app_moment_load_eqn.append(NoEscape(r'[Ref.& ~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
+
+    return app_moment_load_eqn
+# def dia_plate_thk_provided(t_wc,)
+#     t_wc
+# t_wc = round((1.9 * self.load_moment_effective * 1e6) / (self.column_D * self.beam_D * self.column_fy), 2)

@@ -2007,7 +2007,7 @@ class ColumnEndPlate(MomentConnection):
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, self.load.moment,
               prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),
                                app_moment_load=round(self.load_moment / 1000000, 2),
-                               moment_capacity=round(self.section.moment_capacity / 1000000, 2)), "")
+                               moment_capacity=round(self.section.moment_capacity / 1000000, 2), moment_capacity_supporting=0.0), "")
         self.report_check.append(t1)
 
         self.bolt_conn_plates_t_fu_fy = []

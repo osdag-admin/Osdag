@@ -7478,11 +7478,11 @@ def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, 
     app_moment_load_eqn = Math(inline=True)
 
     if axis == 'Major':
-        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.3 * {M_{d}}_{z-z} \\'))
     else:
-        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{y-y} \\'))
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.3 * {M_{d}}_{y-y} \\'))
 
-    app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + str(moment_capacity) + r' \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= 0.3 \times' + str(moment_capacity) + r' \\'))
     app_moment_load_eqn.append(NoEscape(r'&=' + str(min_mc) + r' \\ \\'))
 
     app_moment_load_eqn.append(NoEscape(r'M_{zz} &= max(M,~M_{min}) \\'))

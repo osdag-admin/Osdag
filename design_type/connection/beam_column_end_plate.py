@@ -1263,13 +1263,17 @@ class BeamColumnEndPlate(MomentConnection):
                             self.edge_distance_provided = self.end_distance_provided
 
                             # cross-centre gauge
-                            if self.web_stiffener_status is True:
-                                self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw +
-                                                                      (2 * self.web_stiffener_thk_provided) + self.column_r1) + \
-                                                                  (2 * self.edge_distance_provided)
+                            if self.connectivity == VALUES_CONN_1[0]: #added by darshan
+                                if self.web_stiffener_status is True:
+                                    self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw +
+                                                                          (2 * self.web_stiffener_thk_provided) + self.column_r1) + \
+                                                                      (2 * self.edge_distance_provided)
+                                else:
+                                    self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw + self.column_r1) + \
+                                                                      (2 * self.edge_distance_provided)
+
                             else:
-                                self.gauge_cs_distance_provided = max(self.beam_tw + self.beam_r1, self.column_tw + self.column_r1) + \
-                                                                  (2 * self.edge_distance_provided)
+                                self.gauge_cs_distance_provided = self.beam_tw + self.beam_r1 + (2 * self.edge_distance_provided)
 
                             self.gauge_cs_distance_provided = round_up(self.gauge_cs_distance_provided, 2)  # mm
 
@@ -1985,6 +1989,7 @@ class BeamColumnEndPlate(MomentConnection):
                     self.cont_plate_groove_weld_status = False
 
        # 2. Diagonal stiffener plates
+            if self.connectivity == VALUES_CONN_1[0]: #added by darshan
                 if self.web_stiffener_status == True:
                     self.stiffener_weld.set_min_max_sizes(self.web_stiffener_thk_provided, self.column_tw, special_circumstance=False,
                                                           fusion_face_angle=90)

@@ -974,7 +974,7 @@ class CommonDesignLogic(object):
         beam_R1 = float(BCE.beam_r1)
         beam_R2 = float(BCE.beam_r2)
         beam_alpha = 0.0
-        beam_length = 500
+        beam_length = BCE.stiffener_length +500
 
         beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
                              R1=column_R1, R2=column_R2, alpha=column_alpha,
@@ -1052,9 +1052,9 @@ class CommonDesignLogic(object):
 
 
 
-        beam_stiffeners = StiffenerPlate(W=BCE.stiffener_height, L=2*BCE.stiffener_height,
+        beam_stiffeners = StiffenerPlate(W=BCE.stiffener_height, L=BCE.stiffener_length,
                                          T=BCE.stiffener_thickness,
-                                         R11=2*BCE.stiffener_height- 25,
+                                         R11=BCE.stiffener_length- 25,
                                          R12=BCE.stiffener_height - 25,
                                          L21=5.0, L22=5.0)  # TODO: given hard inputs to L21 and L22
 
@@ -1102,7 +1102,7 @@ class CommonDesignLogic(object):
 
         #
         bcWeldStiffLength = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
-                                       L=2*BCE.stiffener_height-5.0)
+                                       L=BCE.stiffener_length-5.0)
 
 
 

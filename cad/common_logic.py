@@ -1029,6 +1029,21 @@ class CommonDesignLogic(object):
             contWeldD = None
             contWeldB = None
 
+        if BCE.web_stiffener_status == True:
+
+
+            webplate = StiffenerPlate(W=BCE.web_stiffener_width,
+                                       L=BCE.web_stiffener_depth,
+                                       T=BCE.web_stiffener_thk_provided)
+            webWeldD = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+                                   L=BCE.web_stiffener_depth)
+            webWeldB = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+                                   L=BCE.web_stiffener_width)
+        else:
+            webplate = None
+            webWeldD = None
+            webWeldB = None
+
 
 
 
@@ -1153,7 +1168,7 @@ class CommonDesignLogic(object):
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
             extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,bcWeldFlang,
-                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, endplate_type)
+                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
 
             extbothWays.create_3DModel()
 

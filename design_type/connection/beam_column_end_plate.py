@@ -1194,20 +1194,23 @@ class BeamColumnEndPlate(MomentConnection):
                     self.web_stiffener_thk_provided = thk  # stiffener thickness provided (mm)
                     break
             else:
-                # self.web_stiffener_depth = 'N/A'
-                # self.web_stiffener_width = 'N/A'
-                # self.web_stiffener_thk_provided = 'N/A'
-                self.diag_stiffener_length = 438
-                self.diag_stiffener_width = 164
-                self.web_stiffener_thk_provided = 14
+                self.web_stiffener_depth = 'N/A'
+                self.web_stiffener_width = 'N/A'
+                self.web_stiffener_thk_provided = 'N/A'
+                self.web_stiffener_depth = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * 10)
+                self.web_stiffener_width = self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - (2 * 10)
+                self.web_stiffener_thk_provided = 12
+                # self.diag_stiffener_length = 438
+                # self.diag_stiffener_width = 164
+                # self.web_stiffener_thk_provided = 14
 
         else:  # web stiffening is not provided in col-web beam-web connectivity, the web thickness along with the plate should suffice
-            # self.web_stiffener_depth = 'N/A'
-            # self.web_stiffener_width = 'N/A'
-            # self.web_stiffener_thk_provided = 'N/A'
-            self.diag_stiffener_length = 438
-            self.diag_stiffener_width = 164
-            self.web_stiffener_thk_provided = 14
+            self.web_stiffener_depth = 'N/A'
+            self.web_stiffener_width = 'N/A'
+            self.web_stiffener_thk_provided = 'N/A'
+            # self.diag_stiffener_length = 438
+            # self.diag_stiffener_width = 164
+            # self.web_stiffener_thk_provided = 14
 
         # performing the check with minimum plate thickness and a suitable bolt dia-grade combination (thin plate - large dia approach)
         logger.info("[Optimisation] Performing the design by optimising the plate thickness, using the thin plate and large (suitable) bolt diameter "

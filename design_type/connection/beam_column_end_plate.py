@@ -1197,9 +1197,6 @@ class BeamColumnEndPlate(MomentConnection):
                 self.web_stiffener_depth = 'N/A'
                 self.web_stiffener_width = 'N/A'
                 self.web_stiffener_thk_provided = 'N/A'
-                self.web_stiffener_depth = self.beam_D - (2 * self.beam_tf) - (2 * self.beam_r1) - (2 * 10)
-                self.web_stiffener_width = self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - (2 * 10)
-                self.web_stiffener_thk_provided = 12
                 # self.diag_stiffener_length = 438
                 # self.diag_stiffener_width = 164
                 # self.web_stiffener_thk_provided = 14

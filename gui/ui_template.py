@@ -1886,9 +1886,9 @@ class Window(QMainWindow):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
                 status = main.design_status
-                # ##############trial##############
+                ##############trial##############
                 # status = True
-                # ##############trial##############
+                ##############trial##############
 
                 module_class = self.return_class(main.module)
                 # self.progress_bar.setValue(80)

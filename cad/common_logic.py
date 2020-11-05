@@ -974,7 +974,7 @@ class CommonDesignLogic(object):
         beam_R1 = float(BCE.beam_r1)
         beam_R2 = float(BCE.beam_r2)
         beam_alpha = 0.0
-        beam_length = 500
+        beam_length = BCE.stiffener_length +500
 
         beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
                              R1=column_R1, R2=column_R2, alpha=column_alpha,
@@ -1014,16 +1014,51 @@ class CommonDesignLogic(object):
         else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
             endplate_type = "both_way"
 
-        contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
-                                    L=float(column_d) - 2 * float(column_T),
-                                    T=BCE.cont_plate_thk_provided )
-        if type(BCE.diag_stiffener_thk_provided) == int or type(BCE.diag_stiffener_thk_provided) == float:
+        if BCE.continuity_plate_tension_flange_status == True or BCE.continuity_plate_tension_flange_status == True:
+
+            contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
+                                        L=float(column_d) - 2 * float(column_T),
+                                        T=BCE.cont_plate_thk_provided )
+            contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                   L=float(column_d) - 2 * float(column_T))
+
+            contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                   L=float(column_B) / 2 - float(column_tw) / 2)
+        else:
+            contPlates = None
+            contWeldD = None
+            contWeldB = None
+
+        if BCE.web_stiffener_status == True:
+
+
+            webplate = StiffenerPlate(W=BCE.web_stiffener_width,
+                                       L=BCE.web_stiffener_depth,
+                                       T=BCE.web_stiffener_thk_provided)
+            webWeldD = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+                                   L=BCE.web_stiffener_depth)
+            webWeldB = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+                                   L=BCE.web_stiffener_width)
+        else:
+            webplate = None
+            webWeldD = None
+            webWeldB = None
+
+
+
+
+        if BCE.diagonal_stiffener_status == True:
             diagplate = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
                                         L=BCE.diag_stiffener_length,
                                         T=BCE.diag_stiffener_thk_provided)
+            diagWeldD = FilletWeld(b=BCE.weld_size_diag_stiffener, h=BCE.weld_size_diag_stiffener,
+                                   L=BCE.diag_stiffener_length)
+            diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
+                                   L=float(column_B) / 2 - float(column_tw) / 2)
         else:
-            diagplate =None
-
+            diagplate = None
+            diagWeldD = None
+            diagWeldB = None
         # contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
         # 							  L=float(column_data["D"]) - 2 * float(column_data["T"]),
         # 							  T=outputobj['ContPlateTens']['Thickness'])
@@ -1032,9 +1067,9 @@ class CommonDesignLogic(object):
 
 
 
-        beam_stiffeners = StiffenerPlate(W=BCE.stiffener_height, L=2*BCE.stiffener_height,
+        beam_stiffeners = StiffenerPlate(W=BCE.stiffener_height, L=BCE.stiffener_length,
                                          T=BCE.stiffener_thickness,
-                                         R11=2*BCE.stiffener_height- 25,
+                                         R11=BCE.stiffener_length- 25,
                                          R12=BCE.stiffener_height - 25,
                                          L21=5.0, L22=5.0)  # TODO: given hard inputs to L21 and L22
 
@@ -1077,50 +1112,15 @@ class CommonDesignLogic(object):
 
         # bcWeld for stiffener hight on left side
         print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,"jjjj")
-        bcWeldStiffHeight = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+        bcWeldStiffHeight = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
                                        L=BCE.stiffener_height-5.0)
 
         #
-        bcWeldStiffLength = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                       L=2*BCE.stiffener_height-5.0)
-
-        # self.weld_size_diag_stiffener = 'N/A'
-
-        diagWeldD = FilletWeld(b=BCE.weld_size_diag_stiffener, h=BCE.weld_size_diag_stiffener,
-                               L=BCE.diag_stiffener_length)
-
-        contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                               L=float(column_d) - 2 * float(column_T))
-
-        contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                               L=float(column_B)/2 - float(column_tw) / 2)
-
-        diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
-                                L=float(column_B)/2 - float(column_tw)/2)
+        bcWeldStiffLength = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
+                                       L=BCE.stiffener_length-5.0)
 
 
-        #
 
-        # if alist["Weld"]["Method"] == "Fillet Weld":
-        #     # Followings welds are welds above beam flange, Qty = 4
-        # bcWeldAbvFlang = FilletWeld(b=float(beam_tw),
-        #                             h=float(beam_T),
-        #                             L=beam_B)
-        #
-        # #     # Followings welds are welds below beam flange, Qty = 8
-        # bcWeldBelwFlang = FilletWeld(b=float(beam_tw),
-        #                              h=float(beam_T), L=(beam_B - beam_tw) / 2)
-        # #     # bcWeldBelwFlang_22 = copy.copy(bcWeldBelwFlang_21)
-        # #     # bcWeldBelwFlang_23 = copy.copy(bcWeldBelwFlang_21)
-        # #     # bcWeldBelwFlang_24 = copy.copy(bcWeldBelwFlang_21)
-        # #
-        # #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-        # bcWeldSideWeb = FilletWeld(b=float(beam_tw), h=float(beam_tw),
-        #                            L=beam_d - 2 * beam_T - 40)
-        # # # bcWeldSideWeb_22 = copy.copy(bcWeldSideWeb_21)
-        # #
-        # else:
-        #
         bcWeldFlang = GrooveWeld(b=float(beam_tw), h=float(beam_T),
                                  L=beam_B)
         # #     # bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
@@ -1168,7 +1168,7 @@ class CommonDesignLogic(object):
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
             extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,bcWeldFlang,
-                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, endplate_type)
+                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
 
             extbothWays.create_3DModel()
 

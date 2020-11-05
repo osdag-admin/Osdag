@@ -650,19 +650,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t101)
 
         t101 = (KEY_OUT_DIA_ANCHOR_UPLIFT, KEY_DISP_OUT_DIA_ANCHOR_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_dia_inside_flange if flag and self.connectivity == 'Moment Base Plate' else '', True)
+                self.anchor_dia_inside_flange if flag and self.connectivity == 'Moment Base Plate' else 'N/A', True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_GRD_ANCHOR_UPLIFT, KEY_DISP_OUT_GRD_ANCHOR_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_grade_in if flag and self.connectivity == 'Moment Base Plate' else '', True)
+                self.anchor_grade_in if flag and self.connectivity == 'Moment Base Plate' else 'N/A', True)
         out_list.append(t101)
 
         t4 = (KEY_OUT_ANCHOR_UPLIFT_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX,
-              self.anchors_inside_flange if flag and self.connectivity == 'Moment Base Plate' else '', True)
+              self.anchors_inside_flange if flag and self.connectivity == 'Moment Base Plate' else 'N/A', True)
         out_list.append(t4)
 
         t4 = (KEY_OUT_ANCHOR_BOLT_TENSION_DEMAND_UPLIFT, KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND_UPLIFT, TYPE_TEXTBOX,
-              self.tension_demand_anchor_uplift if flag and self.connectivity == 'Moment Base Plate' else '', True)
+              self.tension_demand_anchor_uplift if flag and self.connectivity == 'Moment Base Plate' and
+                                                   ((self.load_axial_tension > 0) or (self.load_moment_minor > 0)) else 'N/A', True)
         out_list.append(t4)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_TEXTBOX,
@@ -670,7 +671,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_TEXTBOX,
-                self.anchor_length_provided_in if flag and self.connectivity == 'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
+                self.anchor_length_provided_in if flag and self.connectivity == 'Moment Base Plate' and
+                                                  ((self.load_axial_tension > 0) or (self.load_moment_minor > 0)) else 'N/A', True)
         out_list.append(t101)
 
         t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None, True)
@@ -2335,7 +2337,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.plate_washer_dim_out = self.plate_washer_details_out['side']  # outside flange, mm
 
         # 5.2: Washer plate inside flange
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
             self.plate_washer_dim_in = self.plate_washer_details_in['side']  # inside flange, mm
 
@@ -2366,7 +2368,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # 6.2: Inside flange
 
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             # 6.2.1: end distance [Reference: Clause 10.2.4.2 and 10.2.4.3, IS 800:2007]
             self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_inside_flange, self.dp_anchor_hole_in,
                                                                       self.dp_detail_edge_type)
@@ -2471,14 +2473,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         format(round(self.M_dz * 1e-6, 2)))
 
         # minor axis moment
-        # if self.load_moment_minor < (0.5 * self.M_dy):
-        #     logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the minimum "
-        #                    "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-        #     logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
-        #                 "(i.e. 0.5 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
-        #     logger.info("Note: The minimum design action is based on full capacity of the column for a conservative approach")
-        #     self.load_moment_minor = round(0.5 * self.M_dy, 2)
-        #     logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
+        if self.load_moment_minor > 0:
+            if self.load_moment_minor < (0.3 * self.M_dy):
+                logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the minimum "
+                               "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
+                logger.info("The minimum recommended design action effect for factored bending moment is 0.3 times the capacity of the column "
+                            "(i.e. 0.3 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
+                logger.info("Note: The minimum design action is based on full capacity of the column for a conservative approach")
+                self.load_moment_minor = round(0.3 * self.M_dy, 2)
+                logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
 
         if self.load_moment_minor > self.M_dy:
             logger.warning("[Maximum Moment] The external factored bending moment (acting along the major axis) is greater than the capacity of  "
@@ -4448,9 +4451,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     logger.info("Case 2: A larger part of the base plate is under compression/bearing with a small to moderate tension/uplift force "
                                 "being transferred through the anchor bolts required to be placed along the minor axis of the column section")
 
-            # updating the minor axis moment as uplift load for anchor design along minor axis
-            self.load_axial_tension = self.load_moment_minor / self.eccentricity_yy  # N
-
         # assign appropriate plate thickness according to available sizes in the marked
         self.plate_thk_provided = max(self.plate_thk, self.column_tf)  # base plate thickness should be larger than the flange thickness
 
@@ -4510,15 +4510,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # design for shear acting along any axis
         if (self.load_shear_major or self.load_shear_minor) > 0:
-
-            # if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            #     self.moment_bp_case = 'None'
-            # else:
-            #     self.moment_bp_case = self.moment_bp_case
-            #
-            # if self.connectivity == 'Welded Column Base' or 'Moment Base Plate' or 'Hollow/Tubular Column Base':
-            #     if (self.moment_bp_case == 'None') or (self.moment_bp_case == 'Case1'):
-            #         self.combined_capacity_anchor = 'N/A'
 
             if self.connectivity == 'Moment Base Plate':
                 if self.moment_bp_case == 'Case2' or 'Case3':
@@ -4850,12 +4841,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
             else:
-                self.anchor_inside_flange = 'No'
-                self.tension_demand_anchor_uplift = 0
-                self.anchors_inside_flange = 0
-                self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
-                self.anchor_dia_inside_flange = 'N/A'
-                self.tension_capacity_anchor_uplift = 'N/A'
+                if self.load_moment_minor <= 0:
+                    self.anchor_inside_flange = 'No'
+                    self.tension_demand_anchor_uplift = 0
+                    self.anchors_inside_flange = 0
+                    self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
+                    self.anchor_dia_inside_flange = 'N/A'
+                    self.tension_capacity_anchor_uplift = 'N/A'
 
         # anchor columns outside flange
         if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
@@ -4865,14 +4857,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # update washer details after bolt checks- dictionary {inner diameter, side dimension, washer thickness}
         self.plate_washer_details_out = IS6649.square_washer_dimensions(self.anchor_dia_outside_flange)  # outside flange
-        if self.load_axial_tension > 0:  # inside flange
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):  # inside flange
             self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)
 
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min_out = self.table1('M' + str(self.anchor_dia_outside_flange))[1]
         self.anchor_length_max_out = self.table1('M' + str(self.anchor_dia_outside_flange))[2]
 
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             self.anchor_length_min_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[1]
             self.anchor_length_max_in = self.table1(('M' + str(self.anchor_dia_inside_flange)))[2]
 
@@ -4885,7 +4877,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.moment_bp_case == 'Case1':
                 self.anchor_length_provided_out = round(self.anchor_length_min_out, 2)  # mm
-                if self.load_axial_tension > 0:
+                if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
                     self.anchor_length_provided_in = round(self.anchor_length_min_in, 2)  # mm
 
             else:
@@ -4903,6 +4895,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.anchor_length_provided_in = round_up(self.anchor_length_provided_in, 5)
                 self.anchor_length_provided_in = max(self.anchor_length_provided_in, self.anchor_length_min_in)
 
+            if self.load_moment_minor > 0:
+                self.anchor_length_provided_in = self.anchor_length_min_in  # mm
+                self.anchor_length_provided_in_report = self.anchor_length_min_in
+
             logger.info("[Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"
                         " during the erection of the column.")
 
@@ -4910,7 +4906,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # nut thickness
         self.nut_thk_out = IS1364Part3.nut_thick(self.anchor_dia_outside_flange)  # nut thickness, mm
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             self.nut_thk_in = IS1364Part3.nut_thick(self.anchor_dia_inside_flange)  # nut thickness, mm
 
         # square plate washer details
@@ -4918,7 +4914,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.plate_washer_inner_dia_out = self.plate_washer_details_out['dia_in']  # inner dia, mm
         self.plate_washer_dim_out = self.plate_washer_details_out['side']  # dimensions of the square washer plate, mm
 
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             self.plate_washer_thk_in = self.plate_washer_details_in['washer_thk']  # washer thickness, mm
             self.plate_washer_inner_dia_in = self.plate_washer_details_in['dia_in']  # inner dia, mm
             self.plate_washer_dim_in = self.plate_washer_details_in['side']  # dimensions of the square washer plate, mm
@@ -4931,7 +4927,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_length_provided_out = round(self.anchor_length_provided_out, 2)
 
         # anchor length - inside flange bolts
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             self.anchor_len_below_footing_in = self.anchor_length_provided_in + self.nut_thk_in + 20  # mm
             self.anchor_len_above_footing_in = self.grout_thk + self.plate_thk_provided + self.plate_washer_thk_in + self.nut_thk_in + 20  # mm, 20 mm is extra len
 
@@ -4944,7 +4940,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.dp_anchor_length_out < self.anchor_length_provided_out:
             self.dp_anchor_length_out = self.anchor_length_provided_out
 
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             if self.dp_anchor_length_in < self.anchor_length_provided_in:
                 self.dp_anchor_length_in = self.anchor_length_provided_in
 
@@ -4967,7 +4963,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         "of standard lengths and sizes, satisfying the recommended range")
             logger.info("[Anchor Bolt Length] Reference: IS 5624:1993, Table 1")
 
-        if self.load_axial_tension > 0:
+        if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
             if self.anchor_len_below_footing_in < self.anchor_length_min_in:
                 logger.error("[Anchor Bolt Length] The length of the anchor bolt computed is less than the minimum recommended value")
                 logger.info("[Anchor Bolt Length] The minimum length of the anchor recommended is {}".format(self.anchor_length_min_in))
@@ -5289,6 +5285,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 "[Ref. Table 2, IS 800:2007]")
                     logger.info("The column does not require additional stiffening")
                     logger.info("Providing stiffeners to resist the bending of the base plate due to the bearing stress")
+
+        if (self.connectivity == 'Moment Base Plate') and (self.load_moment_minor > 0):
+            self.stiffener_across_web = 'Yes'
 
         # design of stiffener
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
@@ -5939,6 +5938,38 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         Returns:
 
         """
+        # design for minor axis moment
+        if (self.connectivity == 'Moment Base Plate') and (self.load_moment_minor > 0):
+            if self.stiffener_across_web == 'Yes':
+                end_available = (self.column_D - (2 * self.column_tf) - self.stiffener_plt_thick_across_web) / 4  # mm
+            if self.shear_key_along_ColWidth == 'Yes':
+                end_available = (self.column_D - (2 * self.column_tf) - self.shear_key_thk) / 4  # mm
+            if (self.stiffener_across_web == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                end_available = (self.column_D - (2 * self.column_tf) - max(self.stiffener_plt_thick_across_web, self.shear_key_thk)) / 4  # mm
+            round(end_available, 2)
+
+            self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
+            self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
+
+            self.end_distance_in = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_inside_flange, self.dp_anchor_hole_in,
+                                                                      self.dp_detail_edge_type)
+            self.end_distance_in = max(self.end_distance_in, self.plate_washer_dim_in, end_available)
+            self.edge_distance_in = self.end_distance_in
+
+            self.anchors_inside_flange = 4
+            self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
+
+            if self.moment_bp_case_yy == 'Case1':
+                self.tension_demand_anchor_uplift = 0
+            else:
+                self.tension_demand_anchor_uplift = 'N/A'
+            self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy_inside_flange[0],
+                                                                                                 self.anchor_fu_fy_inside_flange[1],
+                                                                                                 self.anchor_area_inside_flange[0],
+                                                                                                 self.anchor_area_inside_flange[1],
+                                                                                                 safety_factor_parameter=self.dp_weld_fab)  # N
+            self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
+
         # design of anchor bolts to resist axial tension/uplift force - final iteration considering stiffeners, shear key etc.
         # calculate bolt and stiffener arrangement when stiffener is provided across the web and there is uplift force acting on the column
         # the configuration has 2 or 4 bolts, with or without stiffeners
@@ -5991,6 +6022,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         end_available = (self.column_D - (2 * self.column_tf) - self.stiffener_plt_thick_across_web) / 4  # mm
                     if self.shear_key_along_ColWidth == 'Yes':
                         end_available = (self.column_D - (2 * self.column_tf) - self.shear_key_thk) / 4  # mm
+                    if (self.stiffener_across_web == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                        end_available = (self.column_D - (2 * self.column_tf) - max(self.stiffener_plt_thick_across_web,
+                                                                                    self.shear_key_thk)) / 4  # mm
 
                     self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                     self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
@@ -6058,6 +6092,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             end_available = (self.column_D - (2 * self.column_tf) - self.stiffener_plt_thick_across_web) / 4  # mm
                         else:  # for shear key
                             end_available = (self.column_D - (2 * self.column_tf) - self.shear_key_thk) / 4  # mm
+                        if (self.stiffener_across_web == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                            end_available = (self.column_D - (2 * self.column_tf) - max(self.stiffener_plt_thick_across_web,
+                                                                                        self.shear_key_thk)) / 4  # mm
 
                         self.plate_washer_details_in = IS6649.square_washer_dimensions(self.anchor_dia_inside_flange)  # inside flange
                         self.plate_washer_dim_in = self.plate_washer_details_in['side']  # washer dimension - inside flange, mm
@@ -6414,7 +6451,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Anchor Bolt - Inside Column Flange
         if self.connectivity == 'Moment Base Plate':
-            if self.load_axial_tension > 0:
+            if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
 
                 print(self.anchor_dia_inside_flange)  # Diameter (mm)
                 print(self.anchor_grade_in)  # Property Class
@@ -6434,7 +6471,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Detailing for anchor bolts inside flange
         if self.connectivity == 'Moment Base Plate':
-            if self.load_axial_tension > 0:
+            if (self.load_axial_tension > 0) or (self.load_moment_minor > 0):
 
                 if (self.stiffener_across_web == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
 
@@ -6884,11 +6921,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                       moment_capacity=round(self.M_dz * 1e-6, 2), axis='Major', classification=self.col_classification), "OK")
             self.report_check.append(t1)
 
-            # t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
-            #       prov_moment_load_bp(moment_input=round(self.load_moment_minor_report * 1e-6, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
-            #                           app_moment_load=round(self.load_moment_minor * 1e-6, 2),
-            #                           moment_capacity=round(self.M_dy * 1e-6, 2), axis='Minor', classification=self.col_classification), "OK")
-            # self.report_check.append(t1)
+            if self.load_moment_minor > 0:
+                if self.load_moment_minor < (0.3 * self.M_dy):
+                    t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
+                          prov_moment_load_bp(moment_input=round(self.load_moment_minor_report * 1e-6, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
+                                              app_moment_load=round(self.load_moment_minor * 1e-6, 2),
+                                              moment_capacity=round(self.M_dy * 1e-6, 2), axis='Minor', classification=self.col_classification), "OK")
+                else:
+                    t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
+                          display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M_{yy}'), "OK")
+
+                self.report_check.append(t1)
 
         # Check 1.2: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
         if self.connectivity == 'Hollow/Tubular Column Base':

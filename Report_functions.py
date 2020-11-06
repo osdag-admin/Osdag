@@ -384,7 +384,7 @@ def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc): 
     return Pmc_eqn
 
 
-def cl_8_2_1_2_plastic_moment_capacity(beta_b, Z_p, f_y, gamma_m0, Pmc):
+def cl_8_2_1_2_plastic_moment_capacity(beta_b, Z_p, f_y, gamma_m0, Pmc, supporting_or_supported=''):
     """
     Calculate member design moment capacity
     Args:
@@ -409,10 +409,16 @@ def cl_8_2_1_2_plastic_moment_capacity(beta_b, Z_p, f_y, gamma_m0, Pmc):
     gamma_m0 = str(gamma_m0)
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{z-z} &= \frac{\beta_b \times Z_{pz} \times fy}{\gamma_{mo} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{z-z} &= \frac{ \beta_b Z_{pz} fy } { \gamma_{mo} }\\'))
     Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
     Pmc_eqn.append(NoEscape(r'&=' + Pmc + r' \\ \\'))
-    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+    if supporting_or_supported == 'Supporting':
+        Pmc_eqn.append(NoEscape(r' Note: &~ The~capacity~of~the~section~is~not~based \\'))
+        Pmc_eqn.append(NoEscape(r' & on~the~beam-colum~or~column~ design. \\'))
+        Pmc_eqn.append(NoEscape(r' & The~actual~capacity~might~vary. \\ \\'))
+
+    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     return Pmc_eqn
 
@@ -421,10 +427,15 @@ def cl_8_2_1_2_plastic_moment_capacity_yy(beta_b, Z_py, f_y, gamma_m0, Pmc):
 
     Pmc_eqn = Math(inline=True)
 
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{y-y} &= \frac{\beta_b \times Z_{py} \times fy}{\gamma_{mo} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{y-y} &= \frac{ \beta_b Z_{py} fy } { \gamma_{mo} } \\'))
     Pmc_eqn.append(NoEscape(r'&=\frac{' + str(beta_b) + r'\times' + str(Z_py) + r'\times' + str(f_y) + r'}{' + str(gamma_m0) + r' \times 10^6}\\'))
     Pmc_eqn.append(NoEscape(r'&=' + str(Pmc) + r' \\ \\'))
-    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
+
+    Pmc_eqn.append(NoEscape(r' Note: &~ The~capacity~of~the~section~is~not~based \\'))
+    Pmc_eqn.append(NoEscape(r' & on~the~beam-colum~or~column~ design. \\'))
+    Pmc_eqn.append(NoEscape(r' & The~actual~capacity~might~vary. \\ \\'))
+
+    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     return Pmc_eqn
 
@@ -1504,9 +1515,9 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
 
     # beta
     if beta == 1:
-        tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 1 ~(pre-tensioned~ bolt) \\ \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 1 ~(pre-tensioned~ bolt) \\'))
     else:
-        tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 2 ~(non~ pre-tensioned~bolt) \\ \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 2 ~(non~ pre-tensioned~bolt) \\'))
 
     # eta
     tension_in_bolt_due_to_prying.append(NoEscape(r'\eta &= 1.5 \\ \\'))
@@ -1525,6 +1536,8 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
 
     if Q <= 0.0:
         tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r' Note:&~ The~ end~ plate~ is~ sufficiently~ thick~ to \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r' & prevent~ yielding~of~ the~ plate.~Thus,~ Q~=~0 \\'))
     else:
         tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= ' + str(Q) + r'\\'))
 

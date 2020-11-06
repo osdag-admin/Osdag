@@ -807,7 +807,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
             if i > max(self.beam_tf, self.beam_tw):
                 self.plate_thickness.append(i)
             else:
-                logger.warning("[End Plate] The end plate of {} mm is thinner than the thickest of the elements being connected".format(i))
+                logger.warning("[End Plate] The end plate of {} mm is thinner than the thickest part of the elements being connected".
+                               format(round(i, 2)))
                 logger.info("Selecting a plate of higher thickness which is at least {} mm thick".format(max(self.beam_tf, self.beam_tw)))
 
         # final sorted list as per compatibility check
@@ -1466,7 +1467,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                         Z_p=self.supported_section.plast_sec_mod_z,
                                                         f_y=self.supported_section.fy,
                                                         gamma_m0=self.gamma_m0,
-                                                        Pmc=round(self.beam_plastic_mom_capa_zz, 2)), 'V < 0.6 Vdy')
+                                                        Pmc=round(self.beam_plastic_mom_capa_zz, 2), supporting_or_supported='NA'), 'V < 0.6 Vdy')
         self.report_check.append(t1)
 
         t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')

@@ -1001,10 +1001,14 @@ class CommonDesignLogic(object):
         # TODO adding enpplate type and check if code is working
         # TODO added connectivity type here
 
-        if  BCE.connectivity == "Column web-Beam web":
+
+
+        if  BCE.connectivity == "Column Web-Beam Web":
             conn_type = 'col_web_connectivity'
         else:  # "Column flange-Beam web"
             conn_type = 'col_flange_connectivity'
+
+        print(conn_type,"hfhfh")
 
         # endplate_type = alist['Member']['EndPlate_type']
         if BCE.endplate_type == 'Extended One Way - Irreversible Moment':
@@ -1047,18 +1051,18 @@ class CommonDesignLogic(object):
 
 
 
-        if BCE.diagonal_stiffener_status == True:
-            diagplate = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
-                                        L=BCE.diag_stiffener_length,
-                                        T=BCE.diag_stiffener_thk_provided)
-            diagWeldD = FilletWeld(b=BCE.weld_size_diag_stiffener, h=BCE.weld_size_diag_stiffener,
-                                   L=BCE.diag_stiffener_length)
-            diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
-                                   L=float(column_B) / 2 - float(column_tw) / 2)
-        else:
-            diagplate = None
-            diagWeldD = None
-            diagWeldB = None
+        # if BCE.web_stiffener_status == True:
+        #     diagplate = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
+        #                                 L=BCE.diag_stiffener_length,
+        #                                 T=BCE.diag_stiffener_thk_provided)
+        #     diagWeldD = FilletWeld(b=BCE.weld_size_diag_stiffener, h=BCE.weld_size_diag_stiffener,
+        #                            L=BCE.diag_stiffener_length)
+        #     diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
+        #                            L=float(column_B) / 2 - float(column_tw) / 2)
+        # else:
+        diagplate = None
+        diagWeldD = None
+        diagWeldB = None
         # contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
         # 							  L=float(column_data["D"]) - 2 * float(column_data["T"]),
         # 							  T=outputobj['ContPlateTens']['Thickness'])
@@ -1175,6 +1179,21 @@ class CommonDesignLogic(object):
             return extbothWays
 
         else:  # conn_type = 'col_web_connectivity'
+            bcWeldFlang = GrooveWeld(b=float(beam_tw), h=float(beam_T),
+                                     L=beam_B)
+            # #     # bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
+            # #
+            # #     # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+            bcWeldWeb = GrooveWeld(b=float(beam_tw), h=float(beam_tw),
+                                   L=beam_d - 2 * beam_T)
+
+            diagplate = None
+            diagWeldD = None
+            diagWeldB = None
+
+            webplate = None
+            webWeldD = None
+            webWeldB = None
             # if alist["Weld"]["Method"] == "Fillet Weld":
             #     # # Followings welds are welds above beam flange, Qty = 4
             #     # bcWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
@@ -1222,9 +1241,9 @@ class CommonDesignLogic(object):
             #                                        contPlates, beam_stiffeners, endplate_type,
             #                                        outputobj)
 
-            col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                                   bcWeldAbvFlang, bcWeldBelwFlang,
-                                                   bcWeldSideWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  endplate_type)
+            col_web_connectivity = CADcolwebGroove(BCE, beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
+                                                   bcWeldFlang,bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
+
 
             col_web_connectivity.create_3DModel()
 

@@ -1019,15 +1019,20 @@ class CommonDesignLogic(object):
             endplate_type = "both_way"
 
         if BCE.continuity_plate_tension_flange_status == True or BCE.continuity_plate_tension_flange_status == True:
-
             contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
                                         L=float(column_d) - 2 * float(column_T),
-                                        T=BCE.cont_plate_thk_provided )
-            contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                   L=float(column_d) - 2 * float(column_T))
+                                        T=BCE.cont_plate_thk_provided)
+            if BCE.connectivity != "Column Web-Beam Web":
+                contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                       L=float(column_d) - 2 * float(column_T))
+                contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                       L=float(column_B) / 2 - float(column_tw) / 2)
+            else:
+                contWeldD = FilletWeld(b=10, h=10,
+                                       L=100)
 
-            contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                   L=float(column_B) / 2 - float(column_tw) / 2)
+                contWeldB = FilletWeld(b=10, h=10,
+                                       L=100)
         else:
             contPlates = None
             contWeldD = None
@@ -1099,10 +1104,11 @@ class CommonDesignLogic(object):
 
         # nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
         if conn_type == 'col_flange_connectivity':
-            nutSpace = float(column_T) + float(BCE.plate_thickness) + nut_T  # / 2 + bolt_T / 2  # Space between bolt head and nut
+            nutSpace = float(column_T) + float(BCE.plate_thickness) + nut_T # / 2 + bolt_T / 2  # Space between bolt head and nut
+
         else:
             nutSpace = float(column_tw) + float(BCE.plate_thickness) + nut_T  # / 2 + bolt_T / 2  # Space between bolt head and nut
-
+            print(nutSpace,column_tw,BCE.plate_thickness,nut_T,"121")
         bbNutBoltArray = BCE_NutBoltArray(BCE, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 
         ###########################
@@ -1115,7 +1121,7 @@ class CommonDesignLogic(object):
         ############################### Weld for the beam stiffeners ################################################
 
         # bcWeld for stiffener hight on left side
-        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,"jjjj")
+        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,BCE.weld_size_continuity_plate,"jjjj")
         bcWeldStiffHeight = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
                                        L=BCE.stiffener_height-5.0)
 

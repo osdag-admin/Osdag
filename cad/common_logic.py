@@ -1028,11 +1028,10 @@ class CommonDesignLogic(object):
                 contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
                                        L=float(column_B) / 2 - float(column_tw) / 2)
             else:
-                contWeldD = FilletWeld(b=10, h=10,
-                                       L=100)
-
-                contWeldB = FilletWeld(b=10, h=10,
-                                       L=100)
+                contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                       L=float(column_d) - 2 * float(column_T))
+                contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
+                                       L=float(column_B) / 2 - float(column_tw) / 2)
         else:
             contPlates = None
             contWeldD = None
@@ -1935,7 +1934,7 @@ class CommonDesignLogic(object):
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
                     Point = gp_Pnt(0.0, 0.0, 0.0)
-                    self.display.DisplayMessage(Point, "Column")
+                    self.display.DisplayShape(Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()

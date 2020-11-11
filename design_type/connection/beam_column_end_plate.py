@@ -448,6 +448,9 @@ class BeamColumnEndPlate(MomentConnection):
         t17 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.edge_distance_provided if flag else '', True)
         out_list.append(t17)
 
+        t31 = (DISP_TITLE_DETAILING, DISP_TITLE_TYPICAL_DETAILING, TYPE_OUT_BUTTON, ['Details', self.detailing], True)
+        out_list.append(t31)
+
         # End Plate
         t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
@@ -468,7 +471,7 @@ class BeamColumnEndPlate(MomentConnection):
         t34 = (None, DISP_TITLE_CONTINUITY_PLATE, TYPE_TITLE, None, True)
         out_list.append(t34)
 
-        t35 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_CONTINUITY_PLATE_DETAILS, TYPE_OUT_BUTTON,
+        t35 = (KEY_OUT_CONTINUITY_DETAILS, KEY_OUT_DISP_CONTINUITY_PLATE_DETAILS, TYPE_OUT_BUTTON,
                ['Continuity Plate Details', self.continuity_plate_details], True)
         out_list.append(t35)
 
@@ -476,8 +479,11 @@ class BeamColumnEndPlate(MomentConnection):
         t32 = (None, DISP_TITLE_STIFFENER_PLATE, TYPE_TITLE, None, True)
         out_list.append(t32)
 
-        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_OUT_BUTTON, ['Stiffener Details', self.stiffener_details], True)
+        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DIMENSIONS, TYPE_OUT_BUTTON, ['Details', self.stiffener_details], True)
         out_list.append(t33)
+
+        t34 = (KEY_OUT_STIFFENER_SKETCH, KEY_OUT_DISP_STIFFENER_SKETCH, TYPE_OUT_BUTTON, ['Details', self.stiffener_detailing], True)
+        out_list.append(t34)
 
         # Weld
         t23 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
@@ -507,7 +513,10 @@ class BeamColumnEndPlate(MomentConnection):
         t30 = (None, DISP_TITLE_WELD_FLANGE, TYPE_TITLE, None, True)
         out_list.append(t30)
 
-        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_FLANGE, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
+        t26 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, 'Groove Weld' if flag else '', True)
+        out_list.append(t26)
+
+        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_TYPICAL_DETAIL, TYPE_OUT_BUTTON, ['Details', self.weld_details], True)
         out_list.append(t31)
 
         return out_list
@@ -516,13 +525,13 @@ class BeamColumnEndPlate(MomentConnection):
     def continuity_plate_details(self, flag):
         continuity_plate = []
 
-        t31 = (KEY_OUT_CONTINUITY_PLATE_LENGTH, KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, TYPE_TEXTBOX, self.cont_plate_length_in if flag else '', True)
+        t31 = (KEY_OUT_CONTINUITY_PLATE_LENGTH, KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, TYPE_TEXTBOX, self.cont_plate_length_in if flag else 'NA', True)
         continuity_plate.append(t31)
 
-        t32 = (KEY_OUT_CONTINUITY_PLATE_WIDTH, KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, TYPE_TEXTBOX, self.cont_plate_width if flag else '', True)
+        t32 = (KEY_OUT_CONTINUITY_PLATE_WIDTH, KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, TYPE_TEXTBOX, self.cont_plate_width if flag else 'NA', True)
         continuity_plate.append(t32)
 
-        t33 = (KEY_OUT_CONTINUITY_PLATE_THK, KEY_OUT_DISP_CONTINUITY_PLATE_THK, TYPE_TEXTBOX, self.cont_plate_thk_provided if flag else '', True)
+        t33 = (KEY_OUT_CONTINUITY_PLATE_THK, KEY_OUT_DISP_CONTINUITY_PLATE_THK, TYPE_TEXTBOX, self.cont_plate_thk_provided if flag else 'NA', True)
         continuity_plate.append(t33)
 
         return continuity_plate
@@ -543,18 +552,62 @@ class BeamColumnEndPlate(MomentConnection):
 
         return stiffener
 
+    # stiffener detailing
+    def stiffener_detailing(self, status):
+
+        detailing = []
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            detailing_path = './ResourceFiles/images/Stiffener_FP.png'
+            width = 1030
+            height = 382
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            detailing_path = './ResourceFiles/images/Stiffener_OWE.png'
+            width = 668.75
+            height = 591.5
+        else:  # Both-way
+            detailing_path = './ResourceFiles/images/Stiffener_BWE.png'
+            width = 616.5
+            height = 608.5
+
+        t1 = (None, 'Typical Stiffener Details', TYPE_IMAGE, [detailing_path, width, height, 'Typical stiffener details'])
+        detailing.append(t1)
+
+        return detailing
+
     # display weld details image
-    def weld_details(self):
+    def weld_details(self, status):
 
         weld = []
 
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_flange.png')
-        weld.append(t99)
-
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_web.png')
+        t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
+               ['./ResourceFiles/images/BB-BC-single_bevel_groove.png', 575.75, 519.4,
+                'Weld Detail - beam flange to end plate connection'])
         weld.append(t99)
 
         return weld
+
+    def detailing(self, status):
+
+        detailing = []
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            path = './ResourceFiles/images/Detailing-Flush.png'
+            width = 528.3
+            height = 580.5
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            path = './ResourceFiles/images/Detailing-OWE.png'
+            width = 459.621
+            height = 580.203
+        else:  # Both-way
+            path = './ResourceFiles/images/Detailing-BWE.png'
+            width = 407.16
+            height = 580.203
+
+        t99 = (None, 'Typical Connection Detailing', TYPE_IMAGE, [path, width, height, 'Typical connection detailing'])
+        detailing.append(t99)
+
+        return detailing
 
     # create UI for DP
     def tab_list(self):
@@ -1723,7 +1776,8 @@ class BeamColumnEndPlate(MomentConnection):
                 if self.endplate_type == VALUES_ENDPLATE_TYPE[0] or VALUES_ENDPLATE_TYPE[2]:  # flush and both way
                     self.continuity_plate_compression_flange_status = False
                     self.continuity_plate_tension_flange_status = False
-                    self.cont_plate_length = 'N/A'
+                    self.cont_plate_length_out = 'N/A'
+                    self.cont_plate_length_in = 'N/A'
                     self.cont_plate_width = 'N/A'
                     self.cont_plate_thk_provided = 'N/A'
 
@@ -2514,168 +2568,168 @@ class BeamColumnEndPlate(MomentConnection):
 
             if self.connectivity == VALUES_CONN_1[0]:
 
-                if (self.continuity_plate_tension_flange_status == True) or (self.continuity_plate_compression_flange_status == True):
-                    t1 = ('SubSection', 'Continuity Plate Check - Compression Flange', '|p{3.5cm}|p{4cm}|p{7.8cm}|p{1.2cm}|')
+                # if (self.continuity_plate_tension_flange_status == True) or (self.continuity_plate_compression_flange_status == True):
+                t1 = ('SubSection', 'Continuity Plate Check - Compression Flange', '|p{3.5cm}|p{4cm}|p{7.8cm}|p{1.2cm}|')
+                self.report_check.append(t1)
+
+                self.k = round(self.column_tf + self.column_r1, 2)
+                self.f_wc = round(self.column_fy * self.column_tw, 2)
+
+                t1 = ('Local web yielding capacity (kN)', '', local_web_yielding(f_wc=self.f_wc, k=self.k, t_fb=self.beam_tf,
+                                                                                 gamma_mo=self.gamma_m0, column_tf=self.column_tf,
+                                                                                 column_r1=self.column_r1, column_fy=self.column_fy,
+                                                                                 column_tw=self.column_tw, P_bf_1=self.p_bf_1), 'OK',)
+                self.report_check.append(t1)
+
+                t1 = ('Web capacity against compression buckling (kN)', '', compression_buckling_of_web(t_c=self.column_tw,
+                                                                                                        fy_c=self.column_fy,
+                                                                                                        h_c=self.h_c,
+                                                                                                        k=self.k, gamma_mo=self.gamma_m0,
+                                                                                                        D_c=self.column_D,
+                                                                                                        P_cw_2=self.p_bf_2), 'OK')
+                self.report_check.append(t1)
+
+                t1 = ('Web crippling capacity (kN)', '', web_cripling(t_c=self.column_tw,
+                                                                      fy_c=self.column_fy,
+                                                                      T_b=self.beam_tf,
+                                                                      gamma_m1=self.gamma_m1,
+                                                                      D_c=self.column_D,
+                                                                      P_cw_3=self.p_bf_3,
+                                                                      T_c=self.column_tf), 'OK')
+                self.report_check.append(t1)
+
+                t1 = (KEY_OUT_DISP_COMP_STRENGTH, '', compressioncheck(P_cw_1=self.p_bf_1,
+                                                                       P_cw_3=self.p_bf_3,
+                                                                       P_cw_2=self.p_bf_2,
+                                                                       P_bf=self.p_bf), 'OK')
+                self.report_check.append(t1)
+
+                if self.call_helper.r_c > self.p_bf:
+                    remark = 'Yes'
+                else:
+                    remark = 'No'
+                t1 = (KEY_OUT_DISP_CONT_PLATE_REQ, continuity_plate_req_1(self.call_helper.r_c),
+                      continuity_plate_req_2(self.call_helper.r_c, self.p_bf), remark)
+                self.report_check.append(t1)
+
+                if self.continuity_plate_compression_flange_status == True:
+                    t1 = ('SubSection', 'Continuity Plate Design- Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                     self.report_check.append(t1)
 
-                    self.k = round(self.column_tf + self.column_r1, 2)
-                    self.f_wc = round(self.column_fy * self.column_tw, 2)
-
-                    t1 = ('Local web yielding capacity (kN)', '', local_web_yielding(f_wc=self.f_wc, k=self.k, t_fb=self.beam_tf,
-                                                                                     gamma_mo=self.gamma_m0, column_tf=self.column_tf,
-                                                                                     column_r1=self.column_r1, column_fy=self.column_fy,
-                                                                                     column_tw=self.column_tw, P_bf_1=self.p_bf_1), 'OK',)
+                    t1 = ("Area required $(mm^2)$", Area_req_cont_plate(A_cp=round(self.cont_plate_area_req, 2),
+                                                                        R_c=round(self.call_helper.r_c, 2),
+                                                                        p_cw=round(self.p_bf, 2),
+                                                                        f_ycp=self.cont_plate_fy,
+                                                                        gamma_m0=self.gamma_m0), '', 'OK')
                     self.report_check.append(t1)
 
-                    t1 = ('Web capacity against compression buckling (kN)', '', compression_buckling_of_web(t_c=self.column_tw,
-                                                                                                            fy_c=self.column_fy,
-                                                                                                            h_c=self.h_c,
-                                                                                                            k=self.k, gamma_mo=self.gamma_m0,
-                                                                                                            D_c=self.column_D,
-                                                                                                            P_cw_2=self.p_bf_2), 'OK')
+                    t1 = (KEY_OUT_DISP_NOTCH_SIZE, '', display_prov(self.notch_size, "n"), 'OK')
                     self.report_check.append(t1)
 
-                    t1 = ('Web crippling capacity (kN)', '', web_cripling(t_c=self.column_tw,
-                                                                          fy_c=self.column_fy,
-                                                                          T_b=self.beam_tf,
-                                                                          gamma_m1=self.gamma_m1,
-                                                                          D_c=self.column_D,
-                                                                          P_cw_3=self.p_bf_3,
-                                                                          T_c=self.column_tf), 'OK')
+                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
+                                                                                      l_cp2=self.cont_plate_length_in,
+                                                                                      D_c=self.column_D,
+                                                                                      T_c=self.column_tf, n=self.notch_size), 'OK')
                     self.report_check.append(t1)
 
-                    t1 = (KEY_OUT_DISP_COMP_STRENGTH, '', compressioncheck(P_cw_1=self.p_bf_1,
-                                                                           P_cw_3=self.p_bf_3,
-                                                                           P_cw_2=self.p_bf_2,
-                                                                           P_bf=self.p_bf), 'OK')
+                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
+                                                                                    column_tw=self.column_tw,
+                                                                                    notch_size=self.notch_size,
+                                                                                    w_cp=self.cont_plate_width), 'OK')
                     self.report_check.append(t1)
 
-                    if self.call_helper.r_c > self.p_bf:
-                        remark = 'Yes'
+                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, comp_plate_thk_p(A_cp=round(self.cont_plate_area_req, 2), w_cp=self.cont_plate_width,
+                                                                              l_cp=self.cont_plate_length_out,
+                                                                              t_cp1=round(self.cont_plate_thk_req_1, 2),
+                                                                              f_ycp=self.cont_plate_fy, t_cp2=round(self.cont_plate_thk_req_2, 2),
+                                                                              t_cp3=round(self.cont_plate_thk_req_3, 2),
+                                                                              epsilon_cp=round(self.cont_plate_epsilon, 2),
+                                                                              t_cp=round(self.cont_plate_thk_req, 2), beam_tf=self.beam_tf),
+                          self.cont_plate_thk_provided,
+                          get_pass_fail(max(self.cont_plate_thk_req_1, self.cont_plate_thk_req_2, self.cont_plate_thk_req_3),
+                                        self.cont_plate_thk_provided, relation="leq"))
+                    self.report_check.append(t1)
+
+                if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:
+                    t1 = ('SubSection', 'Continuity Plate Check - Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+                    self.report_check.append(t1)
+
+                    if self.t_bf > self.column_tf:
+                        remark_1 = 'Yes'
                     else:
-                        remark = 'No'
-                    t1 = (KEY_OUT_DISP_CONT_PLATE_REQ, continuity_plate_req_1(self.call_helper.r_c),
-                          continuity_plate_req_2(self.call_helper.r_c, self.p_bf), remark)
+                        remark_1 = 'No'
+                    t1 = (KEY_OUT_DISP_CONT_PLATE_REQ, check_tension_flange(beam_bf=self.beam_bf, beam_tf=self.beam_tf, gamma_m0=self.gamma_m0,
+                                                                            t_bf=self.t_bf),
+                          display_prov(self.column_tf, "T_c"), remark_1)
                     self.report_check.append(t1)
 
-                    if self.continuity_plate_compression_flange_status == True:
-                        t1 = ('SubSection', 'Continuity Plate Design- Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-                        self.report_check.append(t1)
+                if self.continuity_plate_tension_flange_status == True:
+                    t1 = ('SubSection', 'Continuity Plate Design- Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+                    self.report_check.append(t1)
 
-                        t1 = ("Area required $(mm^2)$", Area_req_cont_plate(A_cp=round(self.cont_plate_area_req, 2),
-                                                                            R_c=round(self.call_helper.r_c, 2),
-                                                                            p_cw=round(self.p_bf, 2),
-                                                                            f_ycp=self.cont_plate_fy,
-                                                                            gamma_m0=self.gamma_m0), '', 'OK')
-                        self.report_check.append(t1)
+                    t1 = (KEY_OUT_DISP_NOTCH_SIZE, '', display_prov(self.notch_size, "n"), 'OK')
+                    self.report_check.append(t1)
 
-                        t1 = (KEY_OUT_DISP_NOTCH_SIZE, '', display_prov(self.notch_size, "n"), 'OK')
-                        self.report_check.append(t1)
+                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
+                                                                                      l_cp2=self.cont_plate_length_in,
+                                                                                      D_c=self.column_D,
+                                                                                      T_c=self.column_tf, n=self.notch_size), 'OK')
+                    self.report_check.append(t1)
+                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
+                                                                                    column_tw=self.column_tw,
+                                                                                    notch_size=self.notch_size,
+                                                                                    w_cp=self.cont_plate_width), 'OK')
+                    self.report_check.append(t1)
 
-                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
-                                                                                          l_cp2=self.cont_plate_length_in,
-                                                                                          D_c=self.column_D,
-                                                                                          T_c=self.column_tf, n=self.notch_size), 'OK')
-                        self.report_check.append(t1)
+                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, ten_plate_thk_p(A_cp=round(self.cont_plate_area_req, 2),
+                                                                             w_cp=self.cont_plate_width,
+                                                                             t_cp1=round(self.cont_plate_thk_req_1, 2),
+                                                                             t_cp2=self.beam_tf,
+                                                                             t_cp=round(self.cont_plate_thk_req, 2)),
+                          self.cont_plate_thk_provided,
+                          get_pass_fail(max(self.cont_plate_thk_req_1, self.cont_plate_thk_req_3), self.cont_plate_thk_provided, relation="leq"))
+                    self.report_check.append(t1)
 
-                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
-                                                                                        column_tw=self.column_tw,
-                                                                                        notch_size=self.notch_size,
-                                                                                        w_cp=self.cont_plate_width), 'OK')
-                        self.report_check.append(t1)
+                # Continuity plate weld design
+                if (self.continuity_plate_compression_flange_status == True) or (self.continuity_plate_tension_flange_status == True):
+                    t1 = ('SubSection', 'Weld Design - Continuity Plate', '|p{3.5cm}|p{6.3cm}|p{5.5cm}|p{1.2cm}|')
+                    self.report_check.append(t1)
 
-                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, comp_plate_thk_p(A_cp=round(self.cont_plate_area_req, 2), w_cp=self.cont_plate_width,
-                                                                                  l_cp=self.cont_plate_length_out,
-                                                                                  t_cp1=round(self.cont_plate_thk_req_1, 2),
-                                                                                  f_ycp=self.cont_plate_fy, t_cp2=round(self.cont_plate_thk_req_2, 2),
-                                                                                  t_cp3=round(self.cont_plate_thk_req_3, 2),
-                                                                                  epsilon_cp=round(self.cont_plate_epsilon, 2),
-                                                                                  t_cp=round(self.cont_plate_thk_req, 2), beam_tf=self.beam_tf),
-                              self.cont_plate_thk_provided,
-                              get_pass_fail(max(self.cont_plate_thk_req_1, self.cont_plate_thk_req_2, self.cont_plate_thk_req_3),
-                                            self.cont_plate_thk_provided, relation="leq"))
-                        self.report_check.append(t1)
+                    t1 = ('Weld strength $(N/mm^2)$', weld_fu_cp(self.web_weld.fu, self.plate.fu), weld_fu_provided(self.weld_fu),
+                          get_pass_fail(max(self.web_weld.fu, self.plate.fu), self.weld_fu, relation="geq"))
+                    self.report_check.append(t1)
 
-                    if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:
-                        t1 = ('SubSection', 'Continuity Plate Check - Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-                        self.report_check.append(t1)
+                    t1 = (
+                        'Total (effective) weld length (mm)', "",
+                        weld_length_cp(self.weld_length_cont_plate, self.weld_both_side_cont_plate_status),
+                        "OK")
+                    self.report_check.append(t1)
 
-                        if self.t_bf > self.column_tf:
-                            remark_1 = 'Yes'
-                        else:
-                            remark_1 = 'No'
-                        t1 = (KEY_OUT_DISP_CONT_PLATE_REQ, check_tension_flange(beam_bf=self.beam_bf, beam_tf=self.beam_tf, gamma_m0=self.gamma_m0,
-                                                                                t_bf=self.t_bf),
-                              display_prov(self.column_tf, "T_c"), remark_1)
-                        self.report_check.append(t1)
+                    weld_size_cp = ((self.p_c / 2) * 1e3 * math.sqrt(3) * self.gamma_mw) / (
+                                0.7 * self.weld_length_cont_plate * self.weld_fu)  # mm
 
-                    if self.continuity_plate_tension_flange_status == True:
-                        t1 = ('SubSection', 'Continuity Plate Design- Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-                        self.report_check.append(t1)
+                    t1 = (
+                        'Weld size (mm)',
+                        weld_size_cp_req(self.call_helper.r_c, self.p_bf, self.gamma_mw, self.weld_length_cont_plate, self.weld_fu,
+                                         round(weld_size_cp, 2)),
+                        self.weld_size_continuity_plate,
+                        get_pass_fail(weld_size_cp, self.weld_size_continuity_plate, relation="leq"))
+                    self.report_check.append(t1)
 
-                        t1 = (KEY_OUT_DISP_NOTCH_SIZE, '', display_prov(self.notch_size, "n"), 'OK')
-                        self.report_check.append(t1)
+                    t1 = ('Min. weld size (mm)',
+                          cl_10_5_2_3_table_21_min_fillet_weld_size_required([self.cont_plate_thk_provided, self.column_tw],
+                                                                             self.stiffener_weld.min_size),
+                          min_weld_size_ep_web_prov(weld_size_web=round(weld_size_cp, 2),
+                                                    weld_size_web_provided=self.weld_size_continuity_plate,
+                                                    min_size=self.stiffener_weld.min_size),
+                          get_pass_fail(max(weld_size_cp, self.stiffener_weld.min_size), self.weld_size_continuity_plate, relation="leq"))
+                    self.report_check.append(t1)
 
-                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
-                                                                                          l_cp2=self.cont_plate_length_in,
-                                                                                          D_c=self.column_D,
-                                                                                          T_c=self.column_tf, n=self.notch_size), 'OK')
-                        self.report_check.append(t1)
-                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
-                                                                                        column_tw=self.column_tw,
-                                                                                        notch_size=self.notch_size,
-                                                                                        w_cp=self.cont_plate_width), 'OK')
-                        self.report_check.append(t1)
-
-                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, ten_plate_thk_p(A_cp=round(self.cont_plate_area_req, 2),
-                                                                                 w_cp=self.cont_plate_width,
-                                                                                 t_cp1=round(self.cont_plate_thk_req_1, 2),
-                                                                                 t_cp2=self.beam_tf,
-                                                                                 t_cp=round(self.cont_plate_thk_req, 2)),
-                              self.cont_plate_thk_provided,
-                              get_pass_fail(max(self.cont_plate_thk_req_1, self.cont_plate_thk_req_3), self.cont_plate_thk_provided, relation="leq"))
-                        self.report_check.append(t1)
-
-                    # Continuity plate weld design
-                    if (self.continuity_plate_compression_flange_status == True) or (self.continuity_plate_tension_flange_status == True):
-                        t1 = ('SubSection', 'Weld Design - Continuity Plate', '|p{3.5cm}|p{6.3cm}|p{5.5cm}|p{1.2cm}|')
-                        self.report_check.append(t1)
-
-                        t1 = ('Weld strength $(N/mm^2)$', weld_fu_cp(self.web_weld.fu, self.plate.fu), weld_fu_provided(self.weld_fu),
-                              get_pass_fail(max(self.web_weld.fu, self.plate.fu), self.weld_fu, relation="geq"))
-                        self.report_check.append(t1)
-
-                        t1 = (
-                            'Total (effective) weld length (mm)', "",
-                            weld_length_cp(self.weld_length_cont_plate, self.weld_both_side_cont_plate_status),
-                            "OK")
-                        self.report_check.append(t1)
-
-                        weld_size_cp = ((self.p_c / 2) * 1e3 * math.sqrt(3) * self.gamma_mw) / (
-                                    0.7 * self.weld_length_cont_plate * self.weld_fu)  # mm
-
-                        t1 = (
-                            'Weld size (mm)',
-                            weld_size_cp_req(self.call_helper.r_c, self.p_bf, self.gamma_mw, self.weld_length_cont_plate, self.weld_fu,
-                                             round(weld_size_cp, 2)),
-                            self.weld_size_continuity_plate,
-                            get_pass_fail(weld_size_cp, self.weld_size_continuity_plate, relation="leq"))
-                        self.report_check.append(t1)
-
-                        t1 = ('Min. weld size (mm)',
-                              cl_10_5_2_3_table_21_min_fillet_weld_size_required([self.cont_plate_thk_provided, self.column_tw],
-                                                                                 self.stiffener_weld.min_size),
-                              min_weld_size_ep_web_prov(weld_size_web=round(weld_size_cp, 2),
-                                                        weld_size_web_provided=self.weld_size_continuity_plate,
-                                                        min_size=self.stiffener_weld.min_size),
-                              get_pass_fail(max(weld_size_cp, self.stiffener_weld.min_size), self.weld_size_continuity_plate, relation="leq"))
-                        self.report_check.append(t1)
-
-                        t1 = ('Max. weld size (mm)',
-                              cl_10_5_3_1_max_weld_size_v2([self.cont_plate_thk_provided, self.column_tw], self.stiffener_weld.max_size),
-                              max_weld_size_ep_web_prov(weld_size_web=self.weld_size_continuity_plate, max_size=self.stiffener_weld.max_size),
-                              get_pass_fail(self.stiffener_weld.max_size, weld_size_cp, relation="geq"))
-                        self.report_check.append(t1)
+                    t1 = ('Max. weld size (mm)',
+                          cl_10_5_3_1_max_weld_size_v2([self.cont_plate_thk_provided, self.column_tw], self.stiffener_weld.max_size),
+                          max_weld_size_ep_web_prov(weld_size_web=self.weld_size_continuity_plate, max_size=self.stiffener_weld.max_size),
+                          get_pass_fail(self.stiffener_weld.max_size, weld_size_cp, relation="geq"))
+                    self.report_check.append(t1)
 
             else:
                 if (self.continuity_plate_compression_flange_status == True) or (self.continuity_plate_tension_flange_status == True):
@@ -2732,7 +2786,7 @@ class BeamColumnEndPlate(MomentConnection):
                           get_pass_fail(self.stiffener_weld.max_size, self.weld_size_continuity_plate, relation="geq"))
                     self.report_check.append(t1)
 
-        # CHECK DIAGONAL PLATE
+        # CHECK WEB STIFFENER
         t1 = ('SubSection', 'Column Web Shear Check', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 

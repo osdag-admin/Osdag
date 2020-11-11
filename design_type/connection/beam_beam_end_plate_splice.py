@@ -372,6 +372,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t17 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.edge_distance_provided if flag else '', True)
         out_list.append(t17)
 
+        t31 = (DISP_TITLE_DETAILING, DISP_TITLE_TYPICAL_DETAILING, TYPE_OUT_BUTTON, ['Details', self.detailing], True)
+        out_list.append(t31)
+
         # End Plate
         t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
@@ -392,8 +395,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t32 = (None, DISP_TITLE_STIFFENER_PLATE, TYPE_TITLE, None, True)
         out_list.append(t32)
 
-        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_OUT_BUTTON, ['Stiffener Details', self.stiffener_details], True)
+        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DIMENSIONS, TYPE_OUT_BUTTON, ['Details', self.stiffener_details], True)
         out_list.append(t33)
+
+        t34 = (KEY_OUT_STIFFENER_SKETCH, KEY_OUT_DISP_STIFFENER_SKETCH, TYPE_OUT_BUTTON, ['Details', self.stiffener_detailing], True)
+        out_list.append(t34)
 
         # Weld
         t23 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
@@ -420,7 +426,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t30 = (None, DISP_TITLE_WELD_FLANGE, TYPE_TITLE, None, True)
         out_list.append(t30)
 
-        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_FLANGE, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
+        t26 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, 'Groove Weld' if flag else '', True)
+        out_list.append(t26)
+
+        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_TYPICAL_DETAIL, TYPE_OUT_BUTTON, ['Details', self.weld_details], True)
         out_list.append(t31)
 
         return out_list
@@ -441,18 +450,62 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         return stiffener
 
+    # stiffener detailing
+    def stiffener_detailing(self, status):
+
+        detailing = []
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            detailing_path = './ResourceFiles/images/Stiffener_FP.png'
+            width = 1030
+            height = 382
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            detailing_path = './ResourceFiles/images/Stiffener_OWE.png'
+            width = 668.75
+            height = 591.5
+        else:  # Both-way
+            detailing_path = './ResourceFiles/images/Stiffener_BWE.png'
+            width = 616.5
+            height = 608.5
+
+        t1 = (None, 'Typical Stiffener Details', TYPE_IMAGE, [detailing_path, width, height, 'Typical stiffener details'])
+        detailing.append(t1)
+
+        return detailing
+
     # display weld details image
-    def weld_details(self):
+    def weld_details(self, status):
 
         weld = []
 
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_flange.png')
-        weld.append(t99)
-
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_web.png')
+        t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
+               ['./ResourceFiles/images/BB-BC-single_bevel_groove.png', 575.75, 519.4,
+                'Weld Detail - beam flange to end plate connection'])
         weld.append(t99)
 
         return weld
+
+    def detailing(self, status):
+
+        detailing = []
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            path = './ResourceFiles/images/Detailing-Flush.png'
+            width = 528.3
+            height = 580.5
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            path = './ResourceFiles/images/Detailing-OWE.png'
+            width = 459.621
+            height = 580.203
+        else:  # Both-way
+            path = './ResourceFiles/images/Detailing-BWE.png'
+            width = 407.16
+            height = 580.203
+
+        t99 = (None, 'Typical Connection Detailing', TYPE_IMAGE, [path, width, height, 'Typical connection detailing'])
+        detailing.append(t99)
+
+        return detailing
 
     # create UI for DP
     def tab_list(self):

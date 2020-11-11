@@ -923,7 +923,7 @@ class CADGroove(object):
         self.beam_stiffener_F4 = copy.deepcopy(beam_stiffenerFlush)
         # self.alist = alist
         # self.outputobj = outputobj
-        self.boltProjection = 10
+        self.plateProjection = self.module.projection
         if self.module.endplate_type == 'Flushed - Reversible Moment':
             self.loc = float(self.module.beam_D/2 - self.module.stiffener_thickness/2)
             pass
@@ -1105,8 +1105,8 @@ class CADGroove(object):
 
         if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T + self.bbWeldWeb_L3.b,
-                                        (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
-            plateL_uDir = numpy.array([0.0, 1.0, 0.0])  # TODO: self.boltProjection
+                                        (self.plateRight.L / 2 - self.plateProjection - self.beamRight.D / 2)])
+            plateL_uDir = numpy.array([0.0, 1.0, 0.0])  # TODO: self.plateProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
@@ -1125,7 +1125,7 @@ class CADGroove(object):
         if self.module.endplate_type == 'Extended One Way - Irreversible Moment':
             gap = 1.5 * self.plateRight.T + self.beamLeft.length + self.bbWeldWeb_L3.b
             plateOriginR = numpy.array(
-                [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
+                [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - self.plateProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)

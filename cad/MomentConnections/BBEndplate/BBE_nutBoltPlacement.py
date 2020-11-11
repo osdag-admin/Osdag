@@ -35,7 +35,7 @@ class BBENutBoltArray(object):
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
         # self.module = alist
-        self.boltProjection = self.module.projection
+        self.plateProjection = self.module.projection
 
         self.initBoltPlaceParams(module, numberOfBolts)
 
@@ -80,7 +80,7 @@ class BBENutBoltArray(object):
         print(self.pitch_web)
 
         # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
-        self.endDist_flush = self.boltProjection + boltPlaceObj.beam_tf + self.endDist
+        self.endDist_flush = self.plateProjection + boltPlaceObj.beam_tf + self.endDist
         self.endDist_ext = boltPlaceObj.beam_tf + 2 * self.endDist
 
     def calculatePositions(self, numberOfBolts):

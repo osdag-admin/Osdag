@@ -39,7 +39,7 @@ class BCE_NutBoltArray(object):
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
         self.endplate_type = endplate_type
-        self.boltProjection = self.module.projection
+        self.plateProjection = self.module.projection
         self.initBoltPlaceParams(self.module, numberOfBolts)
 
         self.bolts = []
@@ -82,10 +82,10 @@ class BCE_NutBoltArray(object):
         self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         self.pitch_web = boltPlaceObj.pitch_distance_web
         # self.out_bolt = boltPlaceObj.out_bolt
-        print(self.boltProjection,self.row,self.col,self.numOfBolts,boltPlaceObj.beam_tf)
+        print(self.plateProjection,self.row,self.col,self.numOfBolts,boltPlaceObj.beam_tf)
 
         # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
-        self.endDist_flush = self.boltProjection + boltPlaceObj.beam_tf + self.endDist
+        self.endDist_flush = self.plateProjection + boltPlaceObj.beam_tf + self.endDist
         self.endDist_ext = boltPlaceObj.beam_tf + 2 * self.endDist
 
         # if self.endplate_type == "both_way":
@@ -295,6 +295,8 @@ class BCE_NutBoltArray(object):
                                       col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
 
                     pos = pos + self.endDist * self.pitchDir
+                    # pos = pos
+
                     if rw > 0:
                         if self.row < 5:
                             print ("right")
@@ -306,13 +308,13 @@ class BCE_NutBoltArray(object):
                                 pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
 
                         else:
-                            print("wrong")
                             if rw == 1:
                                 pos = pos + (self.pitch) * self.pitchDir
                             elif rw == (self.row - 1):
                                 pos = pos + (self.module.ep_height_provided - self.endDist_flush - self.endDist) * self.pitchDir
                             else:
                                 pos = pos + (self.endDist_ext) * self.pitchDir + (rw - 1) * self.pitch * self.pitchDir
+
 
                     self.positions.append(pos)
 

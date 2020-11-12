@@ -1676,12 +1676,13 @@ class EndPlateConnection(ShearConnection):
                     get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
                 self.report_check.append(t5)
 
+        Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image)
 
     def get_plate_status(self):
         if self.plate.plate_moment < self.plate.plate_moment_capacity \

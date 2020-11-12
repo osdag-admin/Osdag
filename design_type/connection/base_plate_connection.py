@@ -7958,9 +7958,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # End of checks
 
+        Disp_2d_image = []
         display_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
 
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, display_3D_image)
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, display_3D_image)

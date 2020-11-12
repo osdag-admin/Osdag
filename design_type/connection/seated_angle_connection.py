@@ -1634,12 +1634,13 @@ class SeatedAngleConnection(ShearConnection):
                   get_pass_fail(self.plate.moment_demand, self.plate.moment_capacity, relation='lesser'))
             self.report_check.append(t2)
 
+        Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image)
 
     def get_3d_components(self):
         components = []

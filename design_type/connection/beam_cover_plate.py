@@ -4019,6 +4019,7 @@ class BeamCoverPlate(MomentConnection):
             #                     round(self.web_plate.shear_capacity_web_plate / 1000, 2),relation="lesser"))
             # self.report_check.append(t1)
 
+        Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         #config = configparser.ConfigParser()
@@ -4033,6 +4034,6 @@ class BeamCoverPlate(MomentConnection):
 
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image)
 
 # def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):

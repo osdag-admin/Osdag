@@ -104,6 +104,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.mid_bolt_row = 0
         self.bolt_column = 0
         self.bolt_row = 0
+        self.last_column = 0
 
         self.bolt_row_web = 0
         self.bolt_numbers = self.bolt_column * self.bolt_row
@@ -372,6 +373,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t17 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.edge_distance_provided if flag else '', True)
         out_list.append(t17)
 
+        t31 = (DISP_TITLE_DETAILING, DISP_TITLE_TYPICAL_DETAILING, TYPE_OUT_BUTTON, ['Details', self.detailing], True)
+        out_list.append(t31)
+
         # End Plate
         t18 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
@@ -392,8 +396,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t32 = (None, DISP_TITLE_STIFFENER_PLATE, TYPE_TITLE, None, True)
         out_list.append(t32)
 
-        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_OUT_BUTTON, ['Stiffener Details', self.stiffener_details], True)
+        t33 = (KEY_OUT_STIFFENER_DETAILS, KEY_OUT_DISP_STIFFENER_DIMENSIONS, TYPE_OUT_BUTTON, ['Details', self.stiffener_details], True)
         out_list.append(t33)
+
+        t34 = (KEY_OUT_STIFFENER_SKETCH, KEY_OUT_DISP_STIFFENER_SKETCH, TYPE_OUT_BUTTON, ['Details', self.stiffener_detailing], True)
+        out_list.append(t34)
 
         # Weld
         t23 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
@@ -420,7 +427,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t30 = (None, DISP_TITLE_WELD_FLANGE, TYPE_TITLE, None, True)
         out_list.append(t30)
 
-        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_FLANGE, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
+        t26 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, 'Groove Weld' if flag else '', True)
+        out_list.append(t26)
+
+        t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_TYPICAL_DETAIL, TYPE_OUT_BUTTON, ['Details', self.weld_details], True)
         out_list.append(t31)
 
         return out_list
@@ -433,7 +443,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t28 = (KEY_OUT_STIFFENER_LENGTH, KEY_OUT_DISP_STIFFENER_LENGTH, TYPE_TEXTBOX, float(self.stiffener_length) if flag else '', True)
         stiffener.append(t28)
 
-        t29 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, float(self.stiffener_height) if flag else '', True)
+        t29 = (KEY_OUT_STIFFENER_HEIGHT if self.endplate_type != VALUES_ENDPLATE_TYPE[0] else KEY_OUT_STIFFENER_WIDTH,
+               KEY_OUT_DISP_STIFFENER_HEIGHT if self.endplate_type != VALUES_ENDPLATE_TYPE[0] else KEY_OUT_DISP_STIFFENER_WIDTH,
+               TYPE_TEXTBOX, float(self.stiffener_height) if flag else '', True)
         stiffener.append(t29)
 
         t30 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, str(self.stiffener_thickness) if flag else '', True)
@@ -441,18 +453,62 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         return stiffener
 
+    # stiffener detailing
+    def stiffener_detailing(self, status):
+
+        detailing = []
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            detailing_path = './ResourceFiles/images/BB_Stiffener_FP.png'
+            width = 979
+            height = 363
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            detailing_path = './ResourceFiles/images/BB_Stiffener_OWE.png'
+            width = 636
+            height = 562
+        else:  # Both-way
+            detailing_path = './ResourceFiles/images/BB_Stiffener_BWE.png'
+            width = 586
+            height = 579
+
+        t1 = (None, 'Typical Stiffener Details', TYPE_IMAGE, [detailing_path, width, height, 'Typical stiffener details'])
+        detailing.append(t1)
+
+        return detailing
+
     # display weld details image
-    def weld_details(self):
+    def weld_details(self, status):
 
         weld = []
 
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_flange.png')
-        weld.append(t99)
-
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_web.png')
+        t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
+               ['./ResourceFiles/images/BB-BC-single_bevel_groove.png', 575, 520,
+                'Weld Detail - beam to end plate connection'])
         weld.append(t99)
 
         return weld
+
+    def detailing(self, status):
+
+        detailing = []
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            path = './ResourceFiles/images/Detailing-Flush.png'
+            width = 502
+            height = 551
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            path = './ResourceFiles/images/Detailing-OWE.png'
+            width = 437
+            height = 552
+        else:  # Both-way
+            path = './ResourceFiles/images/Detailing-BWE.png'
+            width = 387
+            height = 551
+
+        t99 = (None, 'Typical Connection Detailing', TYPE_IMAGE, [path, width, height, 'Typical connection detailing'])
+        detailing.append(t99)
+
+        return detailing
 
     # create UI for DP
     def tab_list(self):
@@ -1026,6 +1082,9 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                     self.bolt_column = select_list[0]
                                     self.bolt_row = select_list[1]
 
+                                    # for design report
+                                    self.last_column = self.bolt_column
+
                                     # initialise bolt requirement near web
                                     self.bolt_row_web = 0
                                     self.pitch_distance_web = 0.0
@@ -1294,6 +1353,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
             # number of bolts
             self.bolt_row += self.bolt_row_web
             self.bolt_numbers = self.bolt_column * self.bolt_row
+
+            # for failed design report
+            if not self.design_status:
+                if self.bolt_column == 0:
+                    self.bolt_column = self.last_column
+                    self.bolt_numbers = self.bolt_column * self.bolt_row
 
     def design_stiffener(self):
         """ design stiffener for the connection """
@@ -1761,15 +1826,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.report_check.append(t1)
 
             # CHECK 2: STIFFENER CHECKS #
-            t1 = ('SubSection', 'Longitudinal Stiffener Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:
+                t1 = ('SubSection', 'Longitudinal Stiffener Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            else:
+                t1 = ('SubSection', 'Stiffener Design', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
-            t1 = (KEY_OUT_DISP_STIFFENER_WIDTH, ' ', stiffener_height_prov(b_ep=self.ep_width_provided,
-                                                                            t_w=self.supported_section.web_thickness,
-                                                                            h_ep=self.ep_height_provided,
-                                                                            D=self.supported_section.depth,
-                                                                            h_sp=self.stiffener_height,
-                                                                            type=self.endplate_type), 'Pass')
+
+            t1 = (KEY_OUT_DISP_STIFFENER_WIDTH if self.endplate_type == VALUES_ENDPLATE_TYPE[0] else KEY_OUT_DISP_STIFFENER_HEIGHT, ' ',
+                  stiffener_height_prov(b_ep=self.ep_width_provided, t_w=self.supported_section.web_thickness, h_ep=self.ep_height_provided,
+                                        D=self.supported_section.depth, h_sp=self.stiffener_height, type=self.endplate_type), 'Pass')
             self.report_check.append(t1)
 
             t1 = (KEY_OUT_DISP_STIFFENER_LENGTH, ' ', stiffener_length_prov(h_sp=self.stiffener_height,
@@ -1834,7 +1899,24 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.report_check.append(t1)
 
         # End of design report functions
-        
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            path_detailing = '/ResourceFiles/images/Detailing-Flush.png'
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            path_detailing = '/ResourceFiles/images/Detailing-OWE.png'
+        else:  # Both-way
+            path_detailing = '/ResourceFiles/images/Detailing-BWE.png'
+
+        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+            path_stiffener = '/ResourceFiles/images/BB_Stiffener_FP.png'
+        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+            path_stiffener = '/ResourceFiles/images/BB_Stiffener_OWE.png'
+        else:  # Both-way
+            path_stiffener = '/ResourceFiles/images/BB_Stiffener_BWE.png'
+
+        path_weld = "/ResourceFiles/images/BB-BC-single_bevel_groove.png"
+
+        Disp_2d_image = [path_weld, path_detailing, path_stiffener]
         Disp_3d_image = "/ResourceFiles/images/3d.png"
         print(sys.path[0])
         rel_path = str(sys.path[0])
@@ -1842,6 +1924,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         fname_no_ext = popup_summary['filename']
 
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3d_image)
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
+                               Disp_3d_image)
 
         # End of design report

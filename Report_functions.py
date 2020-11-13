@@ -1535,7 +1535,7 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
         + str(t) + r'^4}{27 \times' + str(l_e) + r'\times' + str(l_v) + r'^2} \Bigg) \times 10^{-3} \Bigg]\\'))
 
     if Q <= 0.0:
-        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \\ \\'))
         tension_in_bolt_due_to_prying.append(NoEscape(r' Note:&~ The~ end~ plate~ is~ sufficiently~ thick~ to \\'))
         tension_in_bolt_due_to_prying.append(NoEscape(r' & prevent~ yielding~of~ the~ plate.~Thus,~ Q~=~0 \\'))
     else:
@@ -7225,13 +7225,7 @@ def continuity_plate_req_1(R_c):
 
 def continuity_plate_req_2(r_c, p_cw):
     check_2 = Math(inline=True)
-
-    if p_cw < r_c:
-        check_2.append(NoEscape(r'\begin{aligned} P_{cw} &= ' + str(p_cw) + r'\end{aligned}'))
-    else:
-        check_2.append(NoEscape(r'\begin{aligned} P_{cw} &= ' + str(p_cw) + r' \\ \\'))
-        check_2.append(NoEscape(r' Note:& ~The~ continuity~plate~ is~however ~provided~ as \\'))
-        check_2.append(NoEscape(r' & the~ diagonal~ stiffener~ is~ required \end{aligned}'))
+    check_2.append(NoEscape(r'\begin{aligned} P_{cw} &= ' + str(p_cw) + r' \end{aligned}'))
 
     return check_2
 

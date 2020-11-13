@@ -2189,6 +2189,7 @@ class ColumnEndPlate(MomentConnection):
         else:
                pass
 
+        Disp_2d_image = []
         Disp_3d_image = "/ResourceFiles/images/3d.png"
 
         # config = configparser.ConfigParser()
@@ -2202,7 +2203,7 @@ class ColumnEndPlate(MomentConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                                   rel_path, Disp_3d_image)
+                                   rel_path, Disp_2d_image, Disp_3d_image)
 
 
 # def save_latex(self, uiObj, Desigxn_Check, reportsummary, filename, rel_path, Disp_3d_image):

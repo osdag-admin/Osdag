@@ -2721,6 +2721,7 @@ class Tension_bolted(Member):
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "",int(self.inter_plate_length),"")
             self.report_check.append(t4)
 
+        Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
 
 
@@ -2732,6 +2733,6 @@ class Tension_bolted(Member):
 
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image)
 
 

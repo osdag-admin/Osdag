@@ -1,7 +1,8 @@
 """
 created on 25-02-2018
-
 @author: Siddhesh Chavan
+
+modified: Darshan Vishwakarma (10-1-2020)
 
 AF abbreviation used here is for Above Flange for bolting.
 BF abbreviation used here is for Below Flange for bolting.
@@ -33,8 +34,6 @@ class NutBoltArray_BF():
         self.pitchDirBF = None
         self.boltDirBF = None
 
-        #self.uiObj = alist
-        #self.beamDim = beam_data
         self.bolt = bolt
         self.nut = nut
         self.outputobj = outputobj
@@ -75,7 +74,6 @@ class NutBoltArray_BF():
         self.pitch_BF = outputobj.flange_plate.pitch_provided
         self.gauge_BF = outputobj.flange_plate.midgauge
         self.gauge = outputobj.flange_plate.gauge_provided
-        #outputobj.flange_plate.gauge_provided  # Revised gauge distance
         self.row_BF = outputobj.flange_plate.bolt_line
         self.col_BF = outputobj.flange_plate.bolts_one_line
         self.gap = outputobj.flange_plate.gap
@@ -109,19 +107,10 @@ class NutBoltArray_BF():
                                     cl_BF - 1) * self.gauge * self.gaugeDirBF + 1 * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)
 
-
-                # pos_BF = self.boltOrigin_BF
-        #                 # if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
-        #                 #     self.pitch_new_BF = 2 * self.edge_gauge_BF + self.gap
-        #                 #     pos_BF = pos_BF + ((rw_BF - 1) * self.pitch_BF + self.pitch_new_BF) * self.pitchDirBF
-        #                 #     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
-        #                 #     self.positions_BF.append(pos_BF)
-        #                 # else:
-        #                 #     pos_BF = pos_BF + rw_BF * self.pitch_BF * self.pitchDirBF
-        #                 #     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
-        #                 #     self.positions_BF.append(pos_BF)
-
     def placeBF(self, originBF, gaugeDirBF, pitchDirBF, boltDirBF, plateBelwFlangeL):
+        '''
+        places the bolts and nuts based on the defined bolt arrangement
+        '''
         self.originBF = originBF
         self.gaugeDirBF = gaugeDirBF
         self.pitchDirBF = pitchDirBF

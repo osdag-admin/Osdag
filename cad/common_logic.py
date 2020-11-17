@@ -77,7 +77,7 @@ from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 # from design_type.connection.base_plate_connection import BasePlateConnection
-from utilities import osdag_display_shape
+from utilities import osdag_display_shape, DisplayMsg
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import copy
 
@@ -1880,8 +1880,8 @@ class CommonDesignLogic(object):
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
-                    Point = gp_Pnt(0.0, 0.0, 0.0)
-                    self.display.DisplayShape(Point, "Column")
+                    Point = gp_Pnt(0.0, 0.0, 10)
+                    DisplayMsg(self.display,Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()
@@ -1986,6 +1986,10 @@ class CommonDesignLogic(object):
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
                 onlymember = self.TObj.get_only_members_models()
+
+                Point = gp_Pnt(0.0, 0.0, 1000)
+                DisplayMsg(self.display, Point, "Column")
+
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, onlymember, update=True)
                 elif self.component == "Plate":

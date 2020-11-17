@@ -267,7 +267,7 @@ class OsdagMainWindow(QMainWindow):
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam to Column': [
-                                                                ('Beam Column End Plate', 'ResourceFiles/images/extendedbothways.png','BC_End_Plate'),
+                                                                ('End Plate', 'ResourceFiles/images/BC-EBW_GUI.png','BC_End_Plate'),
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column to Column' :[

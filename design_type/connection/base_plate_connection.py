@@ -702,6 +702,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t12)
 
+        t12 = (KEY_OUT_BP_TYPICAL_SKETCH, KEY_OUT_DISP_STIFFENER_SKETCH, TYPE_OUT_BUTTON, ['Typical Sketch', self.base_plate_sketch], True)
+        out_list.append(t12)
+
         t13 = (None, DISP_TITLE_DETAILING_OCF, TYPE_TITLE, None, True)
         out_list.append(t13)
 
@@ -747,6 +750,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                    and self.connectivity == 'Moment Base Plate') else 'N/A', True)
         out_list.append(t22)
 
+        t12 = (KEY_OUT_BP_TYPICAL_DETAILING, KEY_OUT_DISP_BP_DETAILING, TYPE_OUT_BUTTON, ['Typical Detailing', self.base_plate_detailing], True)
+        out_list.append(t12)
+
         t23 = (None, DISP_TITLE_STIFFENER_PLATE_FLANGE, TYPE_TITLE, None, True)
         out_list.append(t23)
 
@@ -789,6 +795,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t30 = (KEY_OUT_SHEAR_KEY, KEY_DISP_OUT_SHEAR_KEY, TYPE_OUT_BUTTON, ['Key Details', self.shear_key_details], True)
         out_list.append(t30)
 
+        t30 = (KEY_OUT_SHEAR_KEY_TYPICAL_DETAILS, KEY_DISP_OUT_SHEAR_KEY_TYPICAL_DETAILS, TYPE_OUT_BUTTON, ['Sketch', self.shear_key_sketch], True)
+        out_list.append(t30)
+
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t18)
 
@@ -804,7 +813,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                self.weld_size_stiffener if flag and self.weld_type != 'Groove Weld' else '', True)
         out_list.append(t22)
 
-        t19 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
+        t19 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Typical Details', self.weld_details], True)
         out_list.append(t19)
 
         return out_list
@@ -1029,6 +1038,97 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return st
 
+    # base_plate_sketch
+    def base_plate_sketch(self, status):
+
+        sketch = []
+
+        if self.connectivity == 'Moment Base Plate':
+            if self.moment_bp_case == 'Case1':
+                sketch_path = './ResourceFiles/images/Moment_BP.png'
+                width = 870
+                height = 525
+            elif self.moment_bp_case == 'Case2':
+                sketch_path = './ResourceFiles/images/Moment_BP_C2.png'
+                width = 852
+                height = 541
+            elif self.moment_bp_case == 'Case3':
+                sketch_path = './ResourceFiles/images/Moment_BP_C3.png'
+                width = 852
+                height = 541
+            else:
+                sketch_path = ''
+                width = 852
+                height = 541
+
+        elif self.connectivity == 'Welded Column Base':
+            sketch_path = './ResourceFiles/images/Welded_BP.png'
+            width = 852
+            height = 541
+
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                sketch_path = './ResourceFiles/images/SHS_BP.png'
+            elif self.dp_column_designation[1:4] == 'RHS':
+                sketch_path = './ResourceFiles/images/RHS_BP.png'
+            elif self.dp_column_designation[1:4] == 'CHS':
+                sketch_path = './ResourceFiles/images/CHS_BP.png'
+            else:
+                sketch_path = ''
+            width = 854
+            height = 545
+        else:
+            sketch_path = ''
+            width = 854
+            height = 545
+
+        t1 = (None, 'Typical Base Plate Sketch', TYPE_IMAGE, [sketch_path, width, height, 'Typical base plate details'])
+        sketch.append(t1)
+
+        return sketch
+
+    # base plate detailing
+    def base_plate_detailing(self, status):
+
+        detailing = []
+
+        if self.connectivity == 'Moment Base Plate':
+            detailing_path = './ResourceFiles/images/Moment_BP_Detailing.png'
+            width = 702
+            height = 518
+
+        elif self.connectivity == 'Welded Column Base':
+            detailing_path = './ResourceFiles/images/Welded_BP_Detailing.png'
+            width = 747
+            height = 552
+
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                detailing_path = './ResourceFiles/images/SHS_BP_Detailing.png'
+                width = 670
+                height = 600
+            elif self.dp_column_designation[1:4] == 'RHS':
+                detailing_path = './ResourceFiles/images/RHS_BP_Detailing.png'
+                width = 771
+                height = 570
+            elif self.dp_column_designation[1:4] == 'CHS':
+                detailing_path = './ResourceFiles/images/CHS_BP_Detailing.png'
+                width = 644
+                height = 577
+            else:
+                detailing_path = ''
+                width = 594
+                height = 380
+        else:
+            detailing_path = ''
+            width = 594
+            height = 380
+
+        t1 = (None, 'Typical Detailing', TYPE_IMAGE, [detailing_path, width, height, 'Typical detailing'])
+        detailing.append(t1)
+
+        return detailing
+
     def shear_key_details(self, flag):
 
         sk = []
@@ -1089,15 +1189,77 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return sk
 
+    def shear_key_sketch(self, flag):
+
+        key = []
+
+        if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+            key_path = './ResourceFiles/images/shear_key.png'
+        elif self.shear_key_along_ColDepth == 'Yes':
+            key_path = './ResourceFiles/images/shear_key_colD.png'
+        elif self.shear_key_along_ColWidth == 'Yes':
+            key_path = './ResourceFiles/images/shear_key_colB.png'
+        else:
+            key_path = ''
+
+        width = 972
+        height = 570
+
+        t1 = (None, 'Typical Shear Key Details', TYPE_IMAGE, [key_path, width, height, 'Typical shear key details'])
+        key.append(t1)
+
+        return key
+
     def weld_details(self, flag):
 
         weld = []
 
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_flange.png')
-        weld.append(t99)
+        if self.connectivity == 'Moment Base Plate':
 
-        t99 = (None, '', TYPE_IMAGE, './ResourceFiles/images/Butt_weld_double_bevel_web.png')
-        weld.append(t99)
+            if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+                web_groove_weld = 'Yes'
+            else:
+                web_groove_weld = 'No'
+
+            if (self.column_tf < 40.0) and (web_groove_weld == 'No'):
+                weld_path = './ResourceFiles/images/Moment_BP_weld_details_1-1.png'
+            elif (self.column_tf < 40.0) and (web_groove_weld == 'Yes'):
+                weld_path = './ResourceFiles/images/Moment_BP_weld_details_1-2.png'
+            elif self.column_tf > 40.0:
+                weld_path = './ResourceFiles/images/Moment_BP_weld_details_2.png'
+
+            width = 878
+            height = 565
+
+        elif self.connectivity == 'Welded Column Base':
+            weld_path = './ResourceFiles/images/BP_welded_weld_details.png'
+            width = 915
+            height = 545
+
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                weld_path = './ResourceFiles/images/SHS_BP_weld_details.png'
+                width = 890
+                height = 590
+            elif self.dp_column_designation[1:4] == 'RHS':
+                weld_path = './ResourceFiles/images/RHS_BP_weld_details.png'
+                width = 1093
+                height = 580
+            elif self.dp_column_designation[1:4] == 'CHS':
+                weld_path = './ResourceFiles/images/CHS_BP_weld_details.png'
+                width = 785
+                height = 602
+            else:
+                weld_path = ''
+                width = 594
+                height = 380
+        else:
+            weld_path = ''
+            width = 594
+            height = 380
+
+        t1 = (None, 'Typical Weld Details', TYPE_IMAGE, [weld_path, width, height, 'Typical weld details'])
+        weld.append(t1)
 
         return weld
 
@@ -1580,8 +1742,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             fu_st_sk = ''
             fy_st_sk = ''
 
-        length_out = str(self.anchor_length_provided_out if self.design_button_status else 0)
-        length_in = str(self.anchor_length_provided_in if self.design_button_status and self.load_axial_tension> 0 else 0)
+        length_out = str(self.anchor_length_provided_out) if self.design_button_status else str(0)
+        length_in = str(self.anchor_length_provided_in) if self.design_button_status and self.load_axial_tension > 0 else str(0)
 
         val = {KEY_BASE_PLATE_FU: str(fu),
                KEY_BASE_PLATE_FY: str(fy),
@@ -2148,8 +2310,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
             self.dp_column_type = str(self.column_properties.type)
+            self.column_Z_pz = self.column_properties.plast_sec_mod_z  # mm^3
+            self.column_Z_py = self.column_properties.plast_sec_mod_y  # mm^3
+            self.column_Z_ez = self.column_properties.elast_sec_mod_z  # mm^3
+            self.column_Z_ey = self.column_properties.elast_sec_mod_y  # mm^3
 
-        if self.connectivity != 'Hollow/Tubular Column Base':
+        if self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] != 'CHS':
                 self.column_Z_pz = self.column_properties.plast_sec_mod_z  # mm^3
                 self.column_Z_py = self.column_properties.plast_sec_mod_y  # mm^3

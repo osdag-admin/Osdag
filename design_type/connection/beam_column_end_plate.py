@@ -343,17 +343,17 @@ class BeamColumnEndPlate(MomentConnection):
         ep_type = self[1]
 
         if conn == CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[0]:  # Flushed - Reversible Moment
-            return './ResourceFiles/images/cf_bw_flush.png'
+            return './ResourceFiles/images/BC_CF-BW-Flush.png'
         elif conn == CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[1]:  # Extended One Way - Irreversible Moment
-            return './ResourceFiles/images/cf_bw_eow.png'
+            return './ResourceFiles/images/BC_CF-BW-EOW.png'
         elif conn in CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[2]:  # Extended Both Ways - Reversible Moment
-            return './ResourceFiles/images/cf_bw_ebw.png'
+            return './ResourceFiles/images/BC_CF-BW-EBW.png'
         elif conn == CONN_CWBW and ep_type == VALUES_ENDPLATE_TYPE[0]:
-            return './ResourceFiles/images/cw_bw_flush.png'
+            return './ResourceFiles/images/BC_CW-BW-Flush.png'
         elif conn == CONN_CWBW and ep_type == VALUES_ENDPLATE_TYPE[1]:
-            return './ResourceFiles/images/cw_bw_eow.png'
+            return './ResourceFiles/images/BC_CW-BW-EOW.png'
         elif conn in CONN_CWBW and ep_type == VALUES_ENDPLATE_TYPE[2]:
-            return './ResourceFiles/images/cw_bw_ebw.png'
+            return './ResourceFiles/images/BC_CW-BW-EBW.png'
         else:
             return ''
 
@@ -534,14 +534,17 @@ class BeamColumnEndPlate(MomentConnection):
     def continuity_plate_details(self, flag):
         continuity_plate = []
 
-        if self.continuity_plate_tension_flange_status == True and self.continuity_plate_compression_flange_status == True:
-            continuity_plate_nos = '4'
-        elif self.continuity_plate_tension_flange_status == True:
+        if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
             continuity_plate_nos = '2'
-        elif self.continuity_plate_compression_flange_status == True:
-            continuity_plate_nos = '2'
-        else:
-            continuity_plate_nos = 'N/A'
+        else:  # CF-BW
+            if self.continuity_plate_tension_flange_status == True and self.continuity_plate_compression_flange_status == True:
+                continuity_plate_nos = '4'
+            elif self.continuity_plate_tension_flange_status == True:
+                continuity_plate_nos = '2'
+            elif self.continuity_plate_compression_flange_status == True:
+                continuity_plate_nos = '2'
+            else:
+                continuity_plate_nos = 'N/A'
 
         t31 = (KEY_OUT_CONTINUITY_PLATE_NOS, KEY_OUT_DISP_CONTINUITY_PLATE_NUMBER, TYPE_TEXTBOX, continuity_plate_nos if flag else 'NA', True)
         continuity_plate.append(t31)
@@ -600,18 +603,32 @@ class BeamColumnEndPlate(MomentConnection):
 
         detailing = []
 
-        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            detailing_path = './ResourceFiles/images/BC_Stiffener_Flush.png'
-            width = 938
-            height = 478
-        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            detailing_path = './ResourceFiles/images/BC_Stiffener_OWE.png'
-            width = 636
-            height = 562
-        else:  # Both-way
-            detailing_path = './ResourceFiles/images/BC_Stiffener_BWE.png'
-            width = 586
-            height = 579
+        if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+                detailing_path = './ResourceFiles/images/BC-CW-BW_Flush.png'
+                width = 880
+                height = 493
+            elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+                detailing_path = './ResourceFiles/images/BC-CW-BW_EOW.png'
+                width = 612
+                height = 568
+            else:  # Both-way
+                detailing_path = './ResourceFiles/images/BC-CW-BW_EBW.png'
+                width = 620
+                height = 592
+        else:  # CF-BW
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+                detailing_path = './ResourceFiles/images/BC_Stiffener_Flush.png'
+                width = 938
+                height = 478
+            elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+                detailing_path = './ResourceFiles/images/BC_Stiffener_OWE.png'
+                width = 636
+                height = 562
+            else:  # Both-way
+                detailing_path = './ResourceFiles/images/BC_Stiffener_BWE.png'
+                width = 586
+                height = 579
 
         t1 = (None, 'Typical Stiffener Details', TYPE_IMAGE, [detailing_path, width, height, 'Typical stiffener details'])
         detailing.append(t1)
@@ -2798,8 +2815,8 @@ class BeamColumnEndPlate(MomentConnection):
                     self.report_check.append(t1)
 
                     t1 = ('Max. weld size (mm)',
-                          cl_10_5_3_1_max_weld_size_v2([self.cont_plate_thk_provided, self.column_tw], self.stiffener_weld.max_size),
-                          max_weld_size_ep_web_prov(weld_size_web=self.weld_size_continuity_plate, max_size=self.stiffener_weld.max_size),
+                          cl_10_5_3_1_max_weld_size_v2([self.cont_plate_thk_provided, self.column_tw], round(self.stiffener_weld.max_size)),
+                          max_weld_size_ep_web_prov(weld_size_web=self.weld_size_continuity_plate, max_size=round(self.stiffener_weld.max_size)),
                           get_pass_fail(self.stiffener_weld.max_size, weld_size_cp, relation="geq"))
                     self.report_check.append(t1)
 
@@ -2859,43 +2876,44 @@ class BeamColumnEndPlate(MomentConnection):
                     self.report_check.append(t1)
 
         # CHECK WEB STIFFENER
-        t1 = ('SubSection', 'Column Web Shear Check', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        if self.web_stiffener_status == True:
-            remark_1 = 'Yes'
-        else:
-            remark_1 = 'No'
-
-        t1 = (KEY_OUT_DISP_DIAG_PLATE_REQ,
-              checkdiagonal_plate(M=self.load_moment_effective,
-                                  D_c=self.column_D,
-                                  D_b=self.beam_D,
-                                  fyc=self.column_fy,
-                                  t_req=self.t_wc),
-              display_prov(self.column_tw, "t_c"), remark_1)
-        self.report_check.append(t1)
-
-        if self.web_stiffener_status == True:
-
-            t1 = ('SubSection', 'Column Web Stiffener Plate Design', '|p{3.5cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+        if self.connectivity == VALUES_CONN_1[0]:  # Column Flange - Beam Web
+            t1 = ('SubSection', 'Column Web Shear Check', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_DEPTH, '', web_stiffener_plate_depth(depth=self.web_stiffener_depth, D_b=self.beam_D,
-                                                                          T_b=self.beam_tf, r1_b=self.beam_r1), 'OK')
+            if self.web_stiffener_status == True:
+                remark_1 = 'Yes'
+            else:
+                remark_1 = 'No'
+
+            t1 = (KEY_OUT_DISP_DIAG_PLATE_REQ,
+                  checkdiagonal_plate(M=self.load_moment_effective,
+                                      D_c=self.column_D,
+                                      D_b=self.beam_D,
+                                      fyc=self.column_fy,
+                                      t_req=self.t_wc),
+                  display_prov(self.column_tw, "t_c"), remark_1)
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH, '', web_stiffener_plate_width(width=self.web_stiffener_width, D_c=self.column_D,
-                                                                                   T_c=self.column_tf, r1_c=self.column_r1), 'OK')
-            self.report_check.append(t1)
+            if self.web_stiffener_status == True:
 
-            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, web_stiffener_plate_thk(self.t_wc, self.column_tw, self.web_stiffener_thk_req),
-                  self.web_stiffener_thk_provided,
-                  get_pass_fail(self.web_stiffener_thk_req, self.web_stiffener_thk_provided, relation="leq"))
-            self.report_check.append(t1)
+                t1 = ('SubSection', 'Column Web Stiffener Plate Design', '|p{3.5cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+                self.report_check.append(t1)
 
-            t1 = ('Weld size (mm)', self.web_stiffener_weld.min_size, self.weld_size_diag_stiffener, 'Pass')
-            self.report_check.append(t1)
+                t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_DEPTH, '', web_stiffener_plate_depth(depth=self.web_stiffener_depth, D_b=self.beam_D,
+                                                                              T_b=self.beam_tf, r1_b=self.beam_r1), 'OK')
+                self.report_check.append(t1)
+
+                t1 = (KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH, '', web_stiffener_plate_width(width=self.web_stiffener_width, D_c=self.column_D,
+                                                                                       T_c=self.column_tf, r1_c=self.column_r1), 'OK')
+                self.report_check.append(t1)
+
+                t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, web_stiffener_plate_thk(self.t_wc, self.column_tw, self.web_stiffener_thk_req),
+                      self.web_stiffener_thk_provided,
+                      get_pass_fail(self.web_stiffener_thk_req, self.web_stiffener_thk_provided, relation="leq"))
+                self.report_check.append(t1)
+
+                t1 = ('Weld size (mm)', self.web_stiffener_weld.min_size, self.weld_size_diag_stiffener, 'Pass')
+                self.report_check.append(t1)
 
         # End of design report
 
@@ -2906,12 +2924,20 @@ class BeamColumnEndPlate(MomentConnection):
         else:  # Both-way
             path_detailing = '/ResourceFiles/images/Detailing-BWE.png'
 
-        if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path_stiffener = '/ResourceFiles/images/BC_Stiffener_Flush.png'
-        elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path_stiffener = '/ResourceFiles/images/BC_Stiffener_OWE.png'
-        else:  # Both-way
-            path_stiffener = '/ResourceFiles/images/BC_Stiffener_BWE.png'
+        if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+                path_stiffener = './ResourceFiles/images/BC-CW-BW_Flush.png'
+            elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+                path_stiffener = './ResourceFiles/images/BC-CW-BW_EOW.png'
+            else:  # Both-way
+                path_stiffener = './ResourceFiles/images/BC-CW-BW_EBW.png'
+        else:  # CF-BW
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
+                path_stiffener = './ResourceFiles/images/BC_Stiffener_Flush.png'
+            elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
+                path_stiffener = './ResourceFiles/images/BC_Stiffener_OWE.png'
+            else:  # Both-way
+                path_stiffener = './ResourceFiles/images/BC_Stiffener_BWE.png'
 
         path_weld = "/ResourceFiles/images/BB-BC-single_bevel_groove.png"
 

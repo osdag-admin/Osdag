@@ -7453,7 +7453,8 @@ def bc_ep_compatibility_available(col_D, col_B, col_T, col_R1, space_available, 
         compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{available} &= D_{c} - (2 T_{c}) - (2 {R_{1}}_{c}) - 10 \\'))
         compatibility_eqn.append(NoEscape(r'                               &= ' + str(col_D) + r' - (2 \times ' + str(col_T) + r') - (2 \times '
                                           + str(col_R1) + r') - 10 \\'))
-        compatibility_eqn.append(NoEscape(r'                         &= ' + str(space_available) + r' \end{aligned}'))
+        compatibility_eqn.append(NoEscape(r'                         &= ' + str(space_available) + r' \\ \\'))
+        compatibility_eqn.append(NoEscape(r'                         & \end{aligned}'))  # line left blank purposely
 
     return compatibility_eqn
 

@@ -1880,8 +1880,8 @@ class CommonDesignLogic(object):
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
-                    Point = gp_Pnt(0.0, 0.0, 10)
-                    DisplayMsg(self.display,Point, "Column")
+                    # Point = gp_Pnt(0.0, 0.0, 10)
+                    # DisplayMsg(self.display,Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()
@@ -1986,9 +1986,9 @@ class CommonDesignLogic(object):
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
                 onlymember = self.TObj.get_only_members_models()
-
-                Point = gp_Pnt(0.0, 0.0, 1000)
-                DisplayMsg(self.display, Point, "Column")
+                distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
+                Point = gp_Pnt(distance, 0.0, 300)
+                DisplayMsg(self.display, Point, self.T.section_size_1.designation)
 
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, onlymember, update=True)

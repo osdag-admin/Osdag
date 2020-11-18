@@ -326,6 +326,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_size_web_max = 0.0
         self.weld_size_hollow = 0.0
 
+        self.weld_len_flange = 0.0
+        self.weld_len_web = 0.0
+        self.weld_bp_groove = 'No'
+        self.weld_size_bp = 0.0
+
         self.weld_size_flange = 0.0
         self.weld_size_web = 0.0
         self.gusset_along_flange = 'No'
@@ -381,6 +386,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_plt_thk = 0.0
         self.stiffener_plt_height = 0.0
         self.stiffener_nos = 0
+        self.weld_length_stiffener_plt = 0.0
+        self.weld_size_stiffener_plt = 0.0
 
         self.shear_on_gusset = 0.0
         self.moment_on_gusset = 0.0
@@ -394,7 +401,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.moment_capa_stiffener_along_flange = 0.0
         self.z_e_stiffener_along_flange = 0.0
         self.z_p_stiffener_along_flange = 0.0
+        self.weld_size_stiffener_along_flange = 0.0
 
+        self.weld_size_stiffener_along_web = 0.0
         self.shear_on_stiffener_along_web = 0.0
         self.shear_capa_stiffener_along_web = 0.0
         self.moment_on_stiffener_along_web = 0.0
@@ -402,6 +411,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.z_e_stiffener_along_web = 0.0
         self.z_p_stiffener_along_web = 0.0
 
+        self.weld_size_stiffener_across_web = 0.0
         self.shear_on_stiffener_across_web = 0.0
         self.shear_capa_stiffener_across_web = 0.0
         self.moment_on_stiffener_across_web = 0.0
@@ -1263,10 +1273,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if self.connectivity == 'Moment Base Plate':
 
-            if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+            if self.weld_bp_groove == 'Yes':
                 web_groove_weld = 'Yes'
             else:
                 web_groove_weld = 'No'
+
+            if web_groove_weld == 'No':
+                if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+                    web_groove_weld = 'Yes'
+                else:
+                    web_groove_weld = 'No'
 
             if (self.column_tf < 40.0) and (web_groove_weld == 'No'):
                 weld_path = './ResourceFiles/images/Moment_BP_weld_details_1-1.png'
@@ -1279,7 +1295,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             height = 565
 
         elif self.connectivity == 'Welded Column Base':
-            weld_path = './ResourceFiles/images/BP_welded_weld_details.png'
+            if self.weld_bp_groove == 'No':
+                weld_path = './ResourceFiles/images/BP_welded_weld_details.png'
+            else:
+                if self.column_tf < 40.0:
+                    weld_path = './ResourceFiles/images/Welded_BP_single_bevel.png'
+                if self.column_tf >= 40.0:
+                    weld_path = './ResourceFiles/images/Welded_BP_double_J.png'
+                else:
+                    weld_path = './ResourceFiles/images/BP_welded_weld_details.png'
+
             width = 915
             height = 545
 
@@ -1290,8 +1315,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 height = 590
             elif self.dp_column_designation[1:4] == 'RHS':
                 weld_path = './ResourceFiles/images/RHS_BP_weld_details.png'
-                width = 1093
-                height = 580
+                width = 880
+                height = 470
             elif self.dp_column_designation[1:4] == 'CHS':
                 weld_path = './ResourceFiles/images/CHS_BP_weld_details.png'
                 width = 785
@@ -2328,6 +2353,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # weld
         self.dp_weld_fab = str(design_dictionary[KEY_DP_WELD_FAB])
         self.dp_weld_fu_overwrite = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
+
+        self.weld_bp = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], type=design_dictionary[KEY_DP_WELD_TYPE],
+                                          fabrication=design_dictionary[KEY_DP_WELD_FAB])
+
+        self.weld_stiffener_flange = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], type=design_dictionary[KEY_DP_WELD_TYPE],
+                                          fabrication=design_dictionary[KEY_DP_WELD_FAB])
+        self.weld_stiffener_web = self.weld_stiffener_flange
+        self.weld_stiffener_across_web = self.weld_stiffener_flange
+
+        self.weld_stiffener_SHS = self.weld_stiffener_flange
+        self.weld_stiffener_RHS = self.weld_stiffener_flange
+        self.weld_stiffener_CHS = self.weld_stiffener_flange
 
         # detailing
         self.dp_detail_edge_type = str(design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
@@ -5446,7 +5483,41 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.weld_size_flange = self.column_tf  # mm
                 self.weld_size_web = self.column_tw  # mm
 
-        # design of weld for the shear key (shear key will be groove welded)
+        # design of weld - column to base plate connection
+        if self.connectivity == 'Welded Column Base':
+            self.weld_len_flange = 2 * (self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1) - (2 * self.column_r2)) - 10)  # mm
+            self.weld_len_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - (2 * 10))  # mm
+
+            self.weld_bp.set_min_max_sizes(max(self.column_tf, self.column_tw), self.plate_thk_provided, special_circumstance=False,
+                                           fusion_face_angle=90)
+
+            if self.weld_bp.min_size < self.weld_bp.max_size:
+                self.weld_bp_groove = 'No'
+                self.weld_size_bp = (max(self.load_axial_compression, self.load_shear_major, self.load_shear_minor) * math.sqrt(3) * self.gamma_mw) / \
+                                    (0.7 * (self.weld_len_flange + self.weld_len_web) * self.weld_fu)
+                self.weld_size_bp = max(self.weld_size_bp + 2, self.weld_bp.min_size)
+                self.weld_size_bp = round_up(self.weld_size_bp, 2)
+                if self.weld_size_bp > self.weld_bp.max_size:
+                    self.weld_bp_groove = 'Yes'
+            else:
+                self.weld_bp_groove = 'Yes'
+
+        elif self.connectivity == 'Moment Base Plate':
+            self.weld_len_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1) - (2 * 10))  # mm
+
+            self.weld_bp.set_min_max_sizes(self.column_tw, self.plate_thk_provided, special_circumstance=False, fusion_face_angle=90)
+
+            if self.weld_bp.min_size < self.weld_bp.max_size:
+                self.weld_bp_groove = 'No'
+                self.weld_size_bp = (self.load_axial_compression * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_len_web * self.weld_fu)
+                self.weld_size_bp = max(self.weld_size_bp, self.weld_bp.min_size)
+                self.weld_size_bp = round_up(self.weld_size_bp, 2)
+                if self.weld_size_bp > self.weld_bp.max_size:
+                    self.weld_bp_groove = 'Yes'
+            else:
+                self.weld_bp_groove = 'Yes'
+
+        # design of weld for the shear key (shear key will be groove welded - single bevel)
         if (self.load_shear_major or self.load_shear_minor) > 0:
             if self.shear_key_along_ColDepth or self.shear_key_along_ColWidth == 'Yes':
                 self.weld_size_shear_key = self.shear_key_thk
@@ -6127,21 +6198,51 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.moment_on_stiffener = 'N/A'
                 self.moment_capa_stiffener = 'N/A'
 
-        # # update detailing parameters
-        # self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided_outside_flange, self.dp_anchor_hole, self.dp_detail_edge_type)
-        # self.end_distance = round_up(1.5 * self.end_distance, 5)  # mm, adding 50% extra to end distance to incorporate weld etc.
-        # self.edge_distance_out = self.end_distance
-        #
-        # # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
-        # self.bp_length_provided = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
-        #
-        # if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
-        #     # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
-        #     self.bp_width_provided = round_up(self.column_bf + (1.5 * self.edge_distance_out) + (1.5 * self.edge_distance_out), 5)  # mm
-        # elif self.connectivity == 'Hollow/Tubular Column Base':
-        #     self.bp_width_provided = round_up(self.column_bf + (2 * (2 * self.end_distance)), 5)  # mm
-        # else:
-        #     pass
+        # weld design for stiffeners
+
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
+
+            if self.stiffener_across_web == 'Yes':
+                self.weld_stiffener_across_web.set_min_max_sizes(self.stiffener_plt_thick_across_web, self.column_tw, special_circumstance=False,
+                                                                 fusion_face_angle=90)
+                self.weld_size_stiffener_across_web = min(self.weld_stiffener_across_web.min_size + 2, self.weld_stiffener_across_web.max_size)
+                self.weld_size_stiffener_across_web = round_up(self.weld_size_stiffener_across_web, 2)
+
+            if self.stiffener_along_flange == 'Yes':
+                self.weld_stiffener_flange.set_min_max_sizes(self.stiffener_plt_thick_along_flange, self.plate_thk_provided,
+                                                                   special_circumstance=False, fusion_face_angle=90)
+                self.weld_size_stiffener_along_flange = min(self.weld_stiffener_flange.min_size + 2, self.weld_stiffener_flange.max_size)
+                self.weld_size_stiffener_along_flange = round_up(self.weld_size_stiffener_along_flange, 2)
+
+            if self.stiffener_along_web == 'Yes':
+                self.weld_stiffener_web.set_min_max_sizes(self.stiffener_plt_thick_along_web, self.plate_thk_provided,
+                                                                   special_circumstance=False, fusion_face_angle=90)
+                self.weld_size_stiffener_along_web = min(self.weld_stiffener_web.min_size + 2, self.weld_stiffener_web.max_size)
+                self.weld_size_stiffener_along_web = round_up(self.weld_size_stiffener_along_web, 2)
+
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
+                if (self.stiffener_along_D == 'Yes') or (self.stiffener_along_B == 'Yes'):
+                    self.weld_stiffener_SHS.set_min_max_sizes(self.stiffener_plt_thk, self.plate_thk_provided, special_circumstance=False,
+                                                              fusion_face_angle=90)
+
+                    end_return_reduction = 2 * self.weld_stiffener_SHS.min_size
+                    self.weld_length_stiffener_plt = (2 * (self.stiffener_plt_height - 25)) - end_return_reduction
+                    self.weld_size_stiffener_plt = (self.shear_on_stiffener * 1e3 * math.sqrt(3) * self.gamma_mw) / \
+                                                   (0.7 * self.weld_length_stiffener_plt * self.dp_weld_fu_overwrite)
+                    self.weld_size_stiffener_plt = max(self.weld_size_stiffener_plt, self.weld_stiffener_SHS.min_size)
+                    self.weld_size_stiffener_plt = round_up(self.weld_size_stiffener_plt, 2)
+            else:
+                if self.stiffener_along_D == 'Yes':
+                    self.weld_stiffener_CHS.set_min_max_sizes(self.stiffener_plt_thk, self.plate_thk_provided, special_circumstance=False,
+                                                              fusion_face_angle=90)
+
+                    end_return_reduction = 2 * self.weld_stiffener_CHS.min_size
+                    self.weld_length_stiffener_plt = (2 * (self.stiffener_plt_height - 25)) - end_return_reduction
+                    self.weld_size_stiffener_plt = (self.shear_on_stiffener * 1e3 * math.sqrt(3) * self.gamma_mw) / \
+                                                   (0.7 * self.weld_length_stiffener_plt * self.dp_weld_fu_overwrite)
+                    self.weld_size_stiffener_plt = max(self.weld_size_stiffener_plt, self.weld_stiffener_CHS.min_size)
+                    self.weld_size_stiffener_plt = round_up(self.weld_size_stiffener_plt, 2)
 
     def additional_calculations(self):
         """ Perform additional and common checks
@@ -7839,6 +7940,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       get_pass_fail(self.moment_on_stiffener_along_flange, self.moment_capa_stiffener_along_flange, relation='leq'))
                 self.report_check.append(t8)
 
+                t5 = ('Weld size $(mm)$', self.weld_stiffener_flange.min_size, self.weld_size_stiffener_along_flange, 'Pass')
+                self.report_check.append(t5)
+
             if self.stiffener_along_web == 'Yes':
 
                 t1 = ('SubSection', 'Stiffener Design - Along Column Web', '|p{3.5cm}|p{6cm}|p{5.5cm}|p{1cm}|')
@@ -7899,6 +8003,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       get_pass_fail(self.moment_on_stiffener_along_web, self.moment_capa_stiffener_along_web, relation='leq'))
                 self.report_check.append(t8)
 
+                t5 = ('Weld size $(mm)$', self.weld_stiffener_web.min_size, self.weld_size_stiffener_along_web, 'Pass')
+                self.report_check.append(t5)
+
             if self.stiffener_across_web == 'Yes':
 
                 t1 = ('SubSection', 'Stiffener Design - Across Column Web', '|p{3.5cm}|p{6cm}|p{5.5cm}|p{1cm}|')
@@ -7918,6 +8025,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                       get_pass_fail(max(self.thk_req_stiffener_across_web, self.column_tw), self.stiffener_plt_thick_across_web, relation='leq') and
                       get_pass_fail(self.standard_plate_thk[-1], self.stiffener_plt_thick_across_web, relation='geq'))
                 self.report_check.append(t4)
+
+                t5 = ('Weld size $(mm)$', self.weld_stiffener_across_web.min_size, self.weld_size_stiffener_across_web, 'Pass')
+                self.report_check.append(t5)
 
                 # if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
                 #     t5 = ('Max. stress at Stiffener $(mm)$', self.bearing_strength_concrete, stiffener_stress_across_web(self.sigma_web, 0, 0,
@@ -8056,6 +8166,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.report_check.append(t8)
 
+                if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
+                    t1 = ('Weld size (mm)', self.weld_stiffener_SHS.min_size, self.weld_size_stiffener_plt, "Pass")
+                else:
+                    t1 = ('Weld size (mm)', self.weld_stiffener_CHS.min_size, self.weld_size_stiffener_plt, "Pass")
+                self.report_check.append(t1)
+
         # Check 9: Continuity Plate Design
         if self.connectivity == 'Moment Base Plate':
             if self.stiffener_inside_flange == 'Yes':
@@ -8168,6 +8284,44 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                                 beta_b=1, location='L2'),
                       get_pass_fail(self.shear_key_moment_2 * 1e-6, self.moment_capacity_key2, relation='leq'))
                 self.report_check.append(t3)
+
+        # Check 11: Weld checks
+
+        if self.connectivity == 'Welded Column Base':
+
+            t1 = ('SubSection', 'Weld Design - Column to Base Plate Connection', '|p{3.5cm}|p{5.3cm}|p{6.5cm}|p{1.2cm}|')
+            self.report_check.append(t1)
+
+            t1 = ('Weld strength $(N/mm^2)$', weld_fu(self.dp_weld_fu_overwrite, self.dp_column_fu), weld_fu_provided(self.weld_fu),
+                  get_pass_fail(max(self.dp_weld_fu_overwrite, self.dp_column_fu), self.weld_fu, relation="geq"))
+            self.report_check.append(t1)
+
+            t1 = ('Total weld length at flange (mm)', "", round(self.weld_len_flange), "Pass")
+            self.report_check.append(t1)
+
+            t1 = ('Total weld length at web (mm)', "", round(self.weld_len_web), "Pass")
+            self.report_check.append(t1)
+
+            t1 = ('Weld size (mm)', self.weld_bp.min_size, self.weld_size_bp, "Pass")
+            self.report_check.append(t1)
+
+        if self.connectivity == 'Moment Base Plate':
+
+            if (self.shear_key_along_ColDepth == 'No') and (self.shear_key_along_ColWidth == 'No'):
+                if self.weld_bp_groove == 'No':
+
+                    t1 = ('SubSection', 'Weld Design - Column Web to Base Plate Connection', '|p{3.5cm}|p{5.3cm}|p{6.5cm}|p{1.2cm}|')
+                    self.report_check.append(t1)
+
+                    t1 = ('Weld strength $(N/mm^2)$', weld_fu(self.dp_weld_fu_overwrite, self.dp_column_fu), weld_fu_provided(self.weld_fu),
+                          get_pass_fail(max(self.dp_weld_fu_overwrite, self.dp_column_fu), self.weld_fu, relation="geq"))
+                    self.report_check.append(t1)
+
+                    t1 = ('Total weld length at web (mm)', "", round(self.weld_len_web), "Pass")
+                    self.report_check.append(t1)
+
+                    t1 = ('Weld size (mm)', self.weld_bp.min_size, self.weld_size_bp, "Pass")
+                    self.report_check.append(t1)
 
         # End of checks
 

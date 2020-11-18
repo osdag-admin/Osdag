@@ -100,6 +100,8 @@ if __name__ == '__main__':
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
 
+
+
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()

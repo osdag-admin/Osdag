@@ -27,6 +27,7 @@ class BCE_NutBoltArray(object):
         :param nut_space: Gap between bolt head and nut
         """
         self.origin = None
+        print(self.origin,"ggggg")
         self.gaugeDir = None
         self.pitchDir = None
         self.boltDir = None
@@ -38,7 +39,7 @@ class BCE_NutBoltArray(object):
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
         self.endplate_type = endplate_type
-        self.boltProjection = self.module.projection
+        self.plateProjection = self.module.projection
         self.initBoltPlaceParams(self.module, numberOfBolts)
 
         self.bolts = []
@@ -81,10 +82,10 @@ class BCE_NutBoltArray(object):
         self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         self.pitch_web = boltPlaceObj.pitch_distance_web
         # self.out_bolt = boltPlaceObj.out_bolt
-        print(self.boltProjection,self.row,self.col,self.numOfBolts)
+        print(self.plateProjection,self.row,self.col,self.numOfBolts,boltPlaceObj.beam_tf)
 
         # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
-        self.endDist_flush = self.boltProjection + boltPlaceObj.beam_tf + self.endDist
+        self.endDist_flush = self.plateProjection + boltPlaceObj.beam_tf + self.endDist
         self.endDist_ext = boltPlaceObj.beam_tf + 2 * self.endDist
 
         # if self.endplate_type == "both_way":
@@ -294,6 +295,8 @@ class BCE_NutBoltArray(object):
                                       col - 1) * self.gauge * self.gaugeDir + self.crossCgauge * self.gaugeDir
 
                     pos = pos + self.endDist * self.pitchDir
+                    # pos = pos
+
                     if rw > 0:
                         if self.row < 5:
                             print ("right")
@@ -305,13 +308,13 @@ class BCE_NutBoltArray(object):
                                 pos = pos + (self.endDist_ext) * self.pitchDir + self.pitch * self.pitchDir
 
                         else:
-                            print("wrong")
                             if rw == 1:
                                 pos = pos + (self.pitch) * self.pitchDir
                             elif rw == (self.row - 1):
                                 pos = pos + (self.module.ep_height_provided - self.endDist_flush - self.endDist) * self.pitchDir
                             else:
                                 pos = pos + (self.endDist_ext) * self.pitchDir + (rw - 1) * self.pitch * self.pitchDir
+
 
                     self.positions.append(pos)
 
@@ -351,6 +354,7 @@ class BCE_NutBoltArray(object):
             for rw in np.arange(self.row):
                 for col in np.arange(self.col):
                     pos = self.origin
+                    print(self.origin,"hhgh")
 
                     pos = pos + (self.module.ep_width_provided / 2) * self.gaugeDir
 
@@ -370,8 +374,7 @@ class BCE_NutBoltArray(object):
                         if rw % 2 == 0:
                             pos = pos + ((rw / 2) * self.pitch) * self.pitchDir
                         else:
-                            pos = pos + (self.module.ep_height_provided - 2 * self.endDist_flush - (
-                                        rw / 2 - 0.5) * self.pitch) * self.pitchDir
+                            pos = pos + (self.module.ep_height_provided - 2*self.endDist_flush - (rw/2-0.5)*self.pitch) * self.pitchDir
                     self.positions.append(pos)
 
             if self.mid_bolt_row > 0:

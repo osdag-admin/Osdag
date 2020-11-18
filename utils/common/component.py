@@ -352,8 +352,7 @@ class Weld:
     def set_min_max_sizes(self, part1_thickness, part2_thickness, special_circumstance=False, fusion_face_angle=90):
         self.min_size = IS800_2007.cl_10_5_2_3_min_weld_size(part1_thickness, part2_thickness)
         k = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(fusion_face_angle)
-        self.max_size = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(
-            part1_thickness, part2_thickness, special_circumstance) / k
+        self.max_size = (IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(part1_thickness, part2_thickness, special_circumstance)) / k
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         # connecting_fu.append(self.fu)

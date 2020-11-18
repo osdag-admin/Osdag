@@ -18,7 +18,7 @@ from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
                                      BRepBuilderAPI_Transform)
 from math import *
 
-class CADFillet(object):
+class CADFillet(object):# not used in the current version as groove weld is preferred best practice.
     def __init__(self, column, beam, plate, nut_bolt_array, bolt, bcWeldAbvFlang,
                  bcWeldBelwFlang, bcWeldSideWeb, contWeldD, contWeldB, bcWeldStiffHeight, bcWeldStiffLength,
                  contPlates, beam_stiffeners, endplate_type, conn_type, outputobj):
@@ -49,7 +49,7 @@ class CADFillet(object):
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
         self.bolt = bolt
-        # self.beamRight.length = 100.0
+
         self.contPlate_L1 = contPlates
         self.contPlate_L2 = copy.deepcopy(contPlates)
         self.contPlate_R1 = copy.deepcopy(contPlates)
@@ -121,7 +121,7 @@ class CADFillet(object):
         self.create_nut_bolt_array()
         self.create_contPlatesGeometry()
         self.create_beam_stiffenersGeometry()
-        # self.create_beam_stiffener_2Geometry()
+
 
         self.create_bcWelds()  # left beam above flange weld
 
@@ -193,21 +193,19 @@ class CADFillet(object):
     #############################################################################################################
 
     def createColumnGeometry(self):
-        """
+        '''
+        initialise the location of the column by defining the local origin of the component with respect to global origin
+        '''
 
-        :return: Geometric Orientation of this component
-        """
-        # if self.conn_type == 'col_flange_connectivity':
         beamOriginL = numpy.array([0.0, 0.0, 0.0])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.column.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the beam by defining the local origin of the component with respect to global origin
+        '''
 
         gap = self.column.D / 2 + self.plate.T
         beamOriginR = numpy.array([0.0, gap, self.column.length / 2])
@@ -216,10 +214,9 @@ class CADFillet(object):
         self.beam.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateRGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the plate by defining the local origin of the component with respect to global origin
+        '''
 
         if self.endplate_type == "one_way":
             gap = 0.5 * self.plate.T + self.column.D / 2
@@ -237,10 +234,9 @@ class CADFillet(object):
             self.plate.place(plateOriginR, plateR_uDir, plateR_wDir)
 
     def create_nut_bolt_array(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the bolt group (top flange) by defining the local origin of the component with respect to global origin
+        '''
 
         if self.endplate_type == "one_way":
             nutboltArrayOrigin = self.plate.sec_origin + numpy.array(
@@ -269,10 +265,9 @@ class CADFillet(object):
     ##############################################  Adding contPlates ########################################
 
     def create_contPlatesGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the continuity plate by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array([self.column.B / 2 - self.contPlate_L1.W / 2, 0.0,
                                    self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -299,10 +294,9 @@ class CADFillet(object):
 
     ##############################################  Adding beam stiffeners #############################################
     def create_beam_stiffenersGeometry(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the stiffener by defining the local origin of the component with respect to global origin
+        '''
         gap = self.column.D / 2 + self.plate.T + self.beam_stiffener_1.L / 2
         stiffenerOrigin1 = numpy.array([-self.beam_stiffener_1.T / 2, gap,
                                         self.column.length / 2 + self.beam.D / 2 + self.beam_stiffener_1.W / 2])
@@ -319,10 +313,9 @@ class CADFillet(object):
 
     ##############################################  creating weld sections ########################################
     def create_bcWelds(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the flange weld by defining the local origin of the component with respect to global origin
+        '''
         weldAbvFlangOrigin_21 = numpy.array([-self.beam.B / 2, self.column.D / 2 + self.plate.T,
                                              self.column.length / 2 + self.beam.D / 2])
         uDirAbv_21 = numpy.array([0, 1.0, 0])
@@ -378,11 +371,9 @@ class CADFillet(object):
     ################################################ welds for continutiy plates #########################################3
 
     def create_contWelds(self):
-
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the continuity plate weld by defining the local origin of the component with respect to global origin
+        '''
         contWeldL1_U2OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2,
                                             self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
         contWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -544,10 +535,9 @@ class CADFillet(object):
 
     ############### Weld for the beam stiffeners ##################################
     def create_bcWeldStiff(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the web weld by defining the local origin of the component with respect to global origin
+        '''
         weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.column.D / 2 + self.plate.T,
                                               self.column.length / 2 + self.beam.D / 2 + self.beam_stiffener_1.W])
         uDirStiffHL_1 = numpy.array([0, 1.0, 0])
@@ -1096,10 +1086,8 @@ class CADGroove(object):
         self.beam_stiffener_1 = beam_stiffeners
         self.beam_stiffener_2 = copy.deepcopy(beam_stiffeners)
         self.endplate_type = endplate_type
-        # self.outputobj = outputobj
         self.module= module
         self.numberOfBolts = int(self.module.plate.bolts_required)
-        # self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection
         self.plateProjection = self.module.projection # gives the bolt projection
 
 
@@ -1190,8 +1178,6 @@ class CADGroove(object):
         self.create_bcWeldWebGeometry()
         if self.diagplate != None:
             self.create_diagplateGeometry()
-
-        # self.create_bcWelds()
 
         self.create_bcWeldStiff()
         if self.contWeldD != None and self.contWeldB != None:
@@ -1296,15 +1282,12 @@ class CADGroove(object):
                 self.contWeldR2_U1Model = self.contWeldR2_U1.create_model()
                 self.contWeldR2_L1Model = self.contWeldR2_L1.create_model()
 
-        if self.diagplate != None:
+        if self.diagplate != None: # omitted due to detailing issues
 
             self.diagWeldL1_LModel = self.diagWeldL1_L.create_model(-45)
             self.diagWeldL1_UModel = self.diagWeldL1_U.create_model(-45)
             self.diagWeldR1_LModel = self.diagWeldR1_L.create_model(-45)
             self.diagWeldR1_UModel = self.diagWeldR1_U.create_model(-45)
-
-            # self.diagWeldS1_UModel = self.diagWeldS1_U.create_model()
-            # self.diagWeldS1_LModel = self.diagWeldS1_L.create_model()
 
             self.diagWeldS1_UModel = self.diagWeldS1_U.create_model(45)
             self.diagWeldS1_LModel = self.diagWeldS1_L.create_model(-135)
@@ -1317,20 +1300,18 @@ class CADGroove(object):
     #############################################################################################################
 
     def createBeamLGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the left beam by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array([0.0, 0.0, 0.0])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.column.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the right beam by defining the local origin of the component with respect to global origin
+        '''
         if self.module.connectivity == "Column Web-Beam Web":
             offset = self.column.B / 2
         else:
@@ -1342,10 +1323,9 @@ class CADGroove(object):
         self.beam.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateRGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the plate by defining the local origin of the component with respect to global origin
+        '''
         if self.module.connectivity == "Column Web-Beam Web":
             offset = self.column.B / 2
         else:
@@ -1367,10 +1347,9 @@ class CADGroove(object):
             self.plate.place(plateOriginR, plateR_uDir, plateR_wDir)
 
     def create_nut_bolt_array(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the bolt group (top flange) by defining the local origin of the component with respect to global origin
+        '''
 
         if self.endplate_type == "one_way":
             nutboltArrayOrigin = self.plate.sec_origin + numpy.array([0.0, -self.plate.T / 2, + (
@@ -1399,10 +1378,9 @@ class CADGroove(object):
     ##############################################  Adding contPlates ########################################
 
     def create_contPlatesGeometry(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the continuity plate by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array([self.column.B / 2 - self.contPlate_L1.W / 2, 0.0,
                                    self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -1428,10 +1406,9 @@ class CADGroove(object):
         self.contPlate_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_webPlatesGeometry(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the column web stiffener by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array([self.column.t / 2 + self.webplate_L.T, 0.0,
                                    self.column.length / 2 ])
         beamL_uDir = numpy.array([0.0, 0.0,1.0])
@@ -1444,14 +1421,10 @@ class CADGroove(object):
         beamL_wDir = numpy.array([1.0, 0.0, 0.0])
         self.webplate_R.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-
-    ##############################################  Adding diagPlates ########################################
-
-    def create_diagplateGeometry(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+    def create_diagplateGeometry(self): #omitted due to dettailing issue
+        '''
+        initialise the location of the diagonal stiffener by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array([self.diagplate_L1.W/2 +self.column.t/2,-self.column.length/2*cos(radians(45)),(((self.column.length / 2 )*sin(radians(45)))+self.diagplate_L1.T/2)])
         print(beamOriginL,"1")
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -1469,10 +1442,9 @@ class CADGroove(object):
 
     ##############################################  Adding beam stiffeners #############################################
     def create_beam_stiffenersGeometry(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the stiffener by defining the local origin of the component with respect to global origin
+        '''
 
         if self.module.connectivity == "Column Web-Beam Web":
             offset = self.column.B / 2
@@ -1496,10 +1468,9 @@ class CADGroove(object):
     ##############################################  creating weld sections ########################################
 
     def create_bcWeldFlangGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the flange weld by defining the local origin of the component with respect to global origin
+        '''
 
         if self.module.connectivity == "Column Web-Beam Web":
             offset = self.column.B / 2
@@ -1521,10 +1492,9 @@ class CADGroove(object):
 
 
     def create_bcWeldWebGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the web weld by defining the local origin of the component with respect to global origin
+        '''
 
         if self.module.connectivity == "Column Web-Beam Web":
             offset = self.column.B / 2
@@ -1539,10 +1509,9 @@ class CADGroove(object):
 
 
     def create_bcWeldStiff(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the stiffener weld by defining the local origin of the component with respect to global origin
+        '''
         if self.module.connectivity == "Column Web-Beam Web":
             offset = self.column.B / 2
         else:
@@ -1604,10 +1573,9 @@ class CADGroove(object):
     ####################################### welding continuity plates with fillet weld##################################
 
     def create_contWelds(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the continuity weld by defining the local origin of the component with respect to global origin
+        '''
         contWeldL1_U2OriginL = numpy.array([self.column.t / 2, -self.contPlate_L1.L / 2,
                                             self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
         contWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -1768,10 +1736,9 @@ class CADGroove(object):
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
 
     def create_diagWelds(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the diagonal plate weld by defining the local origin of the component with respect to global origin
+        '''
         diagWeldL1_U2OriginL = numpy.array([self.column.t/2,-self.column.length/2*cos(radians(45))-self.diagplate_L1.L/2,(((self.column.length / 2 )*sin(radians(45)))+self.diagplate_L1.T/2)])
         diagWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         diagWeldL1_U2_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -1822,10 +1789,9 @@ class CADGroove(object):
         self.diagWeldR1_L.place(diagWeldR1_L2OriginL, diagWeldR1_L2_uDir, diagWeldR1_L2_wDir)
 
     def create_webWelds(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the web stiffener plate weld by defining the local origin of the component with respect to global origin
+        '''
 
         webWeldLTOriginL = numpy.array([self.column.t / 2 , -self.webplate_L.W/2,
                                    self.column.length / 2 + self.webplate_L.L/2])
@@ -2094,7 +2060,7 @@ class CADGroove(object):
         nut_bolt_array = self.get_nut_bolt_array_models()
 
         CAD_list = [plate_connectors, welds, nut_bolt_array]
-        # CAD_list = [plate_connectors, nut_bolt_array]
+
         CAD = CAD_list[0]
 
         for model in CAD_list[1:]:
@@ -2126,22 +2092,12 @@ class CADGroove(object):
 
 class CADcolwebGroove(CADGroove):
 
-    # def __init__(self,module, column, beam, plate, nut_bolt_array, bolt,bcWeldFlang,bcWeldWeb,
-    #              contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate,diagWeldD,diagWeldB,webplate, webWeldB, webWeldD,endplate_type):
-    #     pass
-    #     # super(CADcolwebGroove, self).__init__(module, column, beam, plate, nut_bolt_array, bolt,bcWeldFlang,bcWeldWeb,
-    #     #          contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate,diagWeldD,
-    #     #                                       diagWeldB,webplate, webWeldB, webWeldD,endplate_type)
-
-
 
     def createBeamLGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the left beam by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array([0.0, -self.column.B / 2 +self.column.t / 2, 0.0])
-        # beamOriginL = numpy.array([0.0, 0.0, 0.0])
 
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
@@ -2150,10 +2106,9 @@ class CADcolwebGroove(CADGroove):
         ##############################################  Adding contPlates ########################################
 
     def create_contPlatesGeometry(self):
-        """
-
-        :return: Geometric Orientation of this component
-        """
+        '''
+        initialise the location of the continuity plate by defining the local origin of the component with respect to global origin
+        '''
         beamOriginL = numpy.array(
             [0.0,   self.column.t/2 - self.contPlate_L1.W / 2,
              self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
@@ -2169,10 +2124,9 @@ class CADcolwebGroove(CADGroove):
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contWelds(self):
-        """
-
-        :return: Geometric Orientation of this components
-        """
+        '''
+        initialise the location of the continuity plate weld by defining the local origin of the component with respect to global origin
+        '''
         contWeldL1_U2OriginL = numpy.array([self.column.D / 2 -self.column.T,  -self.column.B / 2  +self.column.t   ,
                                             self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
         contWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -2260,6 +2214,9 @@ class CADcolwebGroove(CADGroove):
 
 
     def get_plate_connector_models(self):
+        """
+        :return: CAD model for all the plates and stiffener
+        """
         if self.endplate_type == "one_way":
              connector_plate = [self.plateModel, self.beam_stiffener_2Model, self.contPlate_L1Model,
                                self.contPlate_L2Model]

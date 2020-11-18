@@ -1027,18 +1027,19 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
                             if self.ep_width_provided >= space_req_4col:
                                 self.bolt_column = 4  # two columns on each side
-                                logger.info("The provided beam can accommodate two column of bolts on either side of the web [Ref. based on detailing "
-                                            "requirement]")
+                                logger.info("The provided beam can accommodate two columns of bolts on either side of the web [Ref. based on the "
+                                            "detailing requirement]")
                                 logger.info("Performing the design with two column of bolts on each side")
 
-                            if self.ep_width_provided >= space_req_2col:
+                            if (self.ep_width_provided >= space_req_2col) and (self.ep_width_provided < space_req_4col):
                                 self.bolt_column = 2  # one column on each side
-                                logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on "
+                                logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on the "
                                             "detailing requirement]")
                                 logger.info("Performing the design with a single column of bolt on each side")
 
                             if self.ep_width_provided < space_req_2col:
                                 self.bolt_column = 0
+                                self.last_column = self.bolt_column
                                 self.design_status = False
                                 if (self.plate_thickness == self.plate_thickness_list[-1]) and (self.design_status is False):
                                     self.design_status_list.append(self.design_status)

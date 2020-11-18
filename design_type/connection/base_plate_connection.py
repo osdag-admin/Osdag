@@ -1193,17 +1193,64 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         key = []
 
-        if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-            key_path = './ResourceFiles/images/shear_key.png'
-        elif self.shear_key_along_ColDepth == 'Yes':
-            key_path = './ResourceFiles/images/shear_key_colD.png'
-        elif self.shear_key_along_ColWidth == 'Yes':
-            key_path = './ResourceFiles/images/shear_key_colB.png'
-        else:
-            key_path = ''
+        if self.connectivity == 'Hollow/Tubular Column Base':
 
-        width = 972
-        height = 570
+            if self.dp_column_designation[1:4] == 'SHS':
+                if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                    key_path = './ResourceFiles/images/Key_SHS.png'
+                elif self.shear_key_along_ColDepth == 'Yes':
+                    key_path = './ResourceFiles/images/Key_SHS_D.png'
+                elif self.shear_key_along_ColWidth == 'Yes':
+                    key_path = './ResourceFiles/images/Key_SHS_B.png'
+                else:
+                    key_path = ''
+
+                width = 700
+                height = 520
+
+            elif self.dp_column_designation[1:4] == 'RHS':
+                if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                    key_path = './ResourceFiles/images/Key_RHS.png'
+                elif self.shear_key_along_ColDepth == 'Yes':
+                    key_path = './ResourceFiles/images/Key_RHS_D.png'
+                elif self.shear_key_along_ColWidth == 'Yes':
+                    key_path = './ResourceFiles/images/Key_RHS_B.png'
+                else:
+                    key_path = ''
+
+                width = 920
+                height = 532
+
+            elif self.dp_column_designation[1:4] == 'CHS':
+                if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                    key_path = './ResourceFiles/images/Key_CHS.png'
+                elif self.shear_key_along_ColDepth == 'Yes':
+                    key_path = './ResourceFiles/images/Key_CHS_key1.png'
+                elif self.shear_key_along_ColWidth == 'Yes':
+                    key_path = './ResourceFiles/images/Key_CHS_key2.png'
+                else:
+                    key_path = ''
+
+                width = 650
+                height = 525
+
+            else:
+                key_path = ''
+                width = 594
+                height = 380
+
+        else:
+            if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                key_path = './ResourceFiles/images/shear_key.png'
+            elif self.shear_key_along_ColDepth == 'Yes':
+                key_path = './ResourceFiles/images/shear_key_colD.png'
+            elif self.shear_key_along_ColWidth == 'Yes':
+                key_path = './ResourceFiles/images/shear_key_colB.png'
+            else:
+                key_path = ''
+
+            width = 972
+            height = 570
 
         t1 = (None, 'Typical Shear Key Details', TYPE_IMAGE, [key_path, width, height, 'Typical shear key details'])
         key.append(t1)

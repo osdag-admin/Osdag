@@ -1,6 +1,6 @@
 """created on 19-01-2018
-
 @author: Siddhesh C.
+modified: Darshan Vishwakarma (12-09-2020)
 """
 import numpy as np
 
@@ -27,14 +27,10 @@ class BBENutBoltArray(object):
         self.pitchDir = None
         self.boltDir = None
         self.module = module
-
-        # self.uiObjW = uiObjWeld
-        # self.beamDim = beamDim
         self.bolt = bolt
         self.nut = nut
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
-        # self.module = alist
         self.plateProjection = self.module.projection
 
         self.initBoltPlaceParams(module, numberOfBolts)
@@ -76,10 +72,9 @@ class BBENutBoltArray(object):
         self.col = boltPlaceObj.bolt_column
         self.crossCgauge = boltPlaceObj.gauge_cs_distance_provided
         self.pitch_web = boltPlaceObj.pitch_distance_web
-        # self.out_bolt = boltPlaceObj.out_bolt
-        print(self.pitch_web)
 
-        # self.midgauge = 2 * boltPlaceObj.plate.edge_dist_provided + boltPlaceObj.supported_section.web_thickness
+
+
         self.endDist_flush = self.plateProjection + boltPlaceObj.beam_tf + self.endDist
         self.endDist_ext = boltPlaceObj.beam_tf + 2 * self.endDist
 
@@ -307,7 +302,7 @@ class BBENutBoltArray(object):
         :param gaugeDir: gauge distance direction
         :param pitchDir: pitch distance direction
         :param boltDir: bolts screwing direction
-        :return: 
+        :return: places the bolts and nuts based on the defined bolt arrangement
         """
 
         self.origin = origin
@@ -327,15 +322,13 @@ class BBENutBoltArray(object):
 
         :return: cad model of nut bolt arrangement
         """
-        print(self.bolts,"hgjghj")
-        print(self.nuts,"jhjhjv")
         for bolt in self.bolts:
             self.models.append(bolt.create_model())
 
         for nut in self.nuts:
             self.models.append(nut.create_model())
 
-        dbg = self.dbgSphere(self.origin)                           #TODO : know why sphere is appended to the model (by Anand Swaroop)
+        dbg = self.dbgSphere(self.origin) #TODO : know why sphere is appended to the model (by Anand Swaroop)
         self.models.append(dbg)
 
     def dbgSphere(self, pt):

@@ -2,6 +2,7 @@
 Created on 27-May-2015
 
 @author: deepa
+modified : Darshan Vishwakarma (12-10-2020)
 '''
 import numpy
 from cad.items.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
@@ -68,7 +69,6 @@ class FilletWeld(object):
         else:
             prism = makePrismFromFace(aFace, extrudeDir)
             trns = gp_Trsf()
-            # axis = numpy.array([1.0, 0.0, 0.0])
             angle = radians(rotate_angle)
             trns.SetRotation(gp_OX(), angle)
             brep_trns = BRepBuilderAPI_Transform(prism, trns, False)

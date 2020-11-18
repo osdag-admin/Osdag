@@ -1,7 +1,8 @@
 '''
 Created on 18-Nov-2016
 
-@author: deepa, Sourabh Das
+@author: deepa,
+modified : Sourabh Das, Darshan Vishwakarma
 '''
 
 # from utils.common.component import Bolt,Beam,Section,Angle,Plate,Nut,Column,Weld
@@ -76,7 +77,7 @@ from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 # from design_type.connection.base_plate_connection import BasePlateConnection
-from utilities import osdag_display_shape
+from utilities import osdag_display_shape, DisplayMsg
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import copy
 
@@ -164,43 +165,17 @@ class CommonDesignLogic(object):
     # ------------------------------------------- self.connectivityObj = None
 
 
-    # def __init__(self, uiObj, dictbeamdata, dictcoldata, dictangledata,
-    #              dicttopangledata, loc, component, bolt_R, bolt_T,
-    #              bolt_Ht, nut_T, display, folder, connection):
     def __init__(self, display, folder, connection, mainmodule):
-
-        # self.bolt = Bolt
-        # self.beam = Beam
-        # # self.section = Section
-        # self.angle = Angle
-        # self.plate = Plate
-        # self.nut = Nut
-        # self.column = Column
-        # self.weld = Weld
 
         self.display = display
         self.mainmodule = mainmodule
         self.connection = connection
         print(self.connection)
-        # self.resultObj = self.call_calculation()
+
 
         self.connectivityObj = None
         self.folder = folder
 
-    # ============================= FinCalculation ===========================================
-    # def call_calculation(self):  # Done
-    #     if self.connection == "Fin Plate":
-    #         outputs = finConn(self.uiObj)
-    #     # elif self.connection == "Endplate":
-    #     #     outputs = end_connection(self.uiObj)
-    #     # elif self.connection == "cleatAngle":
-    #     #     outputs = cleat_connection(self.uiObj)
-    #     # elif self.connection == "SeatedAngle":
-    #     #     self.sa_calc_obj = SeatAngleCalculation()
-    #     #     outputs = self.sa_calc_obj.seat_angle_connection(self.uiObj)
-    #     else:
-    #         pass
-    #     return outputs
 
     def get_notch_ht(self, PB_T, PB_R1, SB_T, SB_R1):
         """
@@ -724,8 +699,7 @@ class CommonDesignLogic(object):
                                  R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                                  length=beam_length, notchObj=None)  # Call to ISection in Component repository
             beam_Right = copy.copy(beam_Left)  # Since both the beams are same
-            # outputobj = self.outputs  # Output dictionary from calculation file
-            # alist = self.designParameters()  # An object to save all input values entered by user
+
 
             plateAbvFlange = Plate(L=B.flange_plate.height,
                                    W=B.flange_plate.length,
@@ -847,7 +821,6 @@ class CommonDesignLogic(object):
                              length=beam_length, notchObj=None)
         beam_Right = copy.copy(beam_Left)  # Since both the beams are same
 
-        # outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
         plate_Left = Plate(W=BBE.ep_width_provided,
                            L=BBE.ep_height_provided,
@@ -991,12 +964,6 @@ class CommonDesignLogic(object):
                             T=BCE.plate_thickness)
 
 
-        # alist = self.designParameters()  # An object to save all input values entered by user
-
-        # if alist["Weld"]["Web (mm)"] == "Select weld thickness":
-        #     alist["Weld"]["Web (mm)"] = 3
-        # if alist["Weld"]["Flange (mm)"] == "Select weld thickness":
-        #     alist["Weld"]["Flange (mm)"] = 3
 
         # TODO adding enpplate type and check if code is working
         # TODO added connectivity type here
@@ -1064,9 +1031,12 @@ class CommonDesignLogic(object):
         #     diagWeldB = FilletWeld(b=BCE.diag_stiffener_thk_provided, h=BCE.diag_stiffener_thk_provided,
         #                            L=float(column_B) / 2 - float(column_tw) / 2)
         # else:
+        ########## diagplate is omitted due to detailing issues ###########
         diagplate = None
         diagWeldD = None
         diagWeldB = None
+        ########## diagplate is omitted due to detailing issues ###########
+
         # contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
         # 							  L=float(column_data["D"]) - 2 * float(column_data["T"]),
         # 							  T=outputobj['ContPlateTens']['Thickness'])
@@ -1080,8 +1050,6 @@ class CommonDesignLogic(object):
                                          R11=BCE.stiffener_length- 25,
                                          R12=BCE.stiffener_height - 25,
                                          L21=5.0, L22=5.0)  # TODO: given hard inputs to L21 and L22
-
-
 
         # beam_stiffener_2 = copy.copy(beam_stiffener_1)
 
@@ -1192,9 +1160,11 @@ class CommonDesignLogic(object):
             bcWeldWeb = GrooveWeld(b=float(beam_tw), h=float(beam_tw),
                                    L=beam_d - 2 * beam_T)
 
+            ########## diagplate is omitted due to detailing issues ###########
             diagplate = None
             diagWeldD = None
             diagWeldB = None
+            ########## diagplate is omitted due to detailing issues ###########
 
             webplate = None
             webWeldD = None
@@ -1717,14 +1687,7 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
-        # if self.view == 'Front View':
-        #     self.display.View_Front()
-        # elif self.view = 'Side View':
-        #     self.display.View_Right()
-        # elif self.view = 'Top View':
-        #     self.display.View_Top()
-        # else:
-        #     self.display.View_Iso()createCCEndPlateCAD
+
         self.display.View_Iso()
 
         self.display.FitAll()
@@ -1740,14 +1703,6 @@ class CommonDesignLogic(object):
         if self.mainmodule  == "Shear Connection":
 
             A = self.module_class()
-
-            # if self.connection == KEY_DISP_FINPLATE:
-            #     A = self.module_class()
-            #     # A = FinPlateConnection()
-            # elif self.connection == KEY_DISP_CLEATANGLE:
-            #     A = CleatAngleConnection()
-            # else:
-            #     pass
 
             self.loc = A.connectivity
 
@@ -1918,23 +1873,15 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BCENDPLATE:
                 self.Bc = self.module_class()
                 self.ExtObj = self.createBCEndPlateCAD()
-                # aTrsf = gp_Trsf()
-                # aTrsf.SetMirror(gp_OX())
-                # self.display.View.SetProj(OCC.Core.V3d.V3d_XposYposZpos)
+
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
-
-                # self.display.View.SetProj(OCC.Core.V3d.V3d_Ypos)
-                # Set up the mirror
-
-                # self.display.View.SetAxis(0,1,0,1,1,1)
-
 
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
-                    Point = gp_Pnt(0.0, 0.0, 0.0)
-                    self.display.DisplayShape(Point, "Column")
+                    # Point = gp_Pnt(0.0, 0.0, 10)
+                    # DisplayMsg(self.display,Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()
@@ -1960,10 +1907,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
                                         color=Quantity_NOC_SADDLEBROWN)
-                    # cl= gp_Pnt(0, -self.Bc.supporting_section.depth/2, 0)
-                    # self.display.DisplayMessage(cl, self.Bc.supporting_section.designation, update = True)
-                    # cl = gp_Pnt(0, -self.Bc.supporting_section.depth / 2, 0)
-                    # self.display.DisplayMessage(cl, self.Bc.supported_section.designation, update=True)
+
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()
@@ -2042,6 +1986,10 @@ class CommonDesignLogic(object):
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
                 onlymember = self.TObj.get_only_members_models()
+                distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
+                Point = gp_Pnt(distance, 0.0, 300)
+                DisplayMsg(self.display, Point, self.T.section_size_1.designation)
+
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, onlymember, update=True)
                 elif self.component == "Plate":
@@ -2055,12 +2003,6 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
 
-
-
-                # elif self.component == "end bolt":
-                #     pass
-                # elif self.component == "intermediate bolt":
-                #     pass
 
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_class()
@@ -2082,11 +2024,6 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
 
-                # elif self.component == "end bolt":
-                #     pass
-                # elif self.component == "intermediate bolt":
-                #     pass
-
 
     def call_3DModel(self, flag, module_class):  # Done
 
@@ -2095,13 +2032,6 @@ class CommonDesignLogic(object):
         if self.mainmodule == "Shear Connection":
 
             A = self.module_class()
-
-            # if self.connection == "Fin Plate":
-            #     # A = FinPlateConnection()
-            #     A = self.module_class()
-            # elif self.connection == KEY_DISP_CLEATANGLE:
-            #     A = CleatAngleConnection()
-            # pass
 
             self.loc = A.connectivity
 
@@ -2327,23 +2257,7 @@ class CommonDesignLogic(object):
                     cadlist = self.CPObj.get_models()
 
             elif self.connection == KEY_DISP_BEAMENDPLATE:
-                # if self.component == "Beam":
-                #     if self.connection == KEY_DISP_BEAMCOVERPLATE:
-                #         final_model = self.CPObj.get_only_beams_Models()
-                #     else:
-                #         final_model = self.CPObj.get_beam_models()
-                # elif self.component == "Connector":
-                #     if self.connection == KEY_DISP_BEAMCOVERPLATE:
-                #         cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
-                #         if self.B.preference != 'Outside':
-                #             cadlist.insert(1, self.CPObj.get_innetplatesModels())
-                #     else:
-                #         cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
-                # else:
-                #     cadlist = self.CPObj.get_models()
 
-
-                # self.ExtObj = self.create_CadModel()
                 if self.component == "Beam":
                     final_model = self.CPObj.get_beam_models()
 
@@ -2365,15 +2279,10 @@ class CommonDesignLogic(object):
 
                 elif self.component == "Connector":
                     final_model = self.CPObj.get_connector_models()
-                    # final_model = cadlist[0]
-                    # for model in cadlist[1:]:
-                    #     final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
                 else:
                     final_model = self.CPObj.get_models()
-                    # final_model = cadlist[0]
-                    # for model in cadlist[1:]:
-                    #     final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-                    #
+
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 if self.component == "Column":

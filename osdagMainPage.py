@@ -279,7 +279,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'PEB' : self.Under_Development,
                                                     },
                                 'Base Plate':[
-                                        ('Base Plate', 'ResourceFiles/images/BasePlate.jpeg', 'Base_Plate'),
+                                        ('Base Plate', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
                                 'Truss Connection' : self.Under_Development,

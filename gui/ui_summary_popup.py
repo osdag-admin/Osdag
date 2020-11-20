@@ -5,28 +5,44 @@
 # Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QDialogButtonBox
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
 import configparser
 import os
 import re
+import time
 import pickle
 # from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from design_report.reportGenerator_latex import CreateLatex
 # from design_type.connection.fin_plate_connection import sa
 from get_DPI_scale import scale
+
+
+class DummyThread(QtCore.QThread):
+    finished = QtCore.pyqtSignal()
+
+    def __init__(self, sec, parent):
+        self.sec = sec
+        super().__init__(parent=parent)
+
+    def run(self):
+        time.sleep(self.sec)
+        self.finished.emit()
+
+
 class Ui_Dialog1(object):
 
-    def __init__(self,design_exist,loggermsg):
+    def __init__(self, design_exist, loggermsg):
         self.design_exist = design_exist
-        self.loggermsg=loggermsg
+        self.loggermsg = loggermsg
 
-    def setupUi(self, Dialog,main):
+    def setupUi(self, Dialog, main, module_window):
         self.Dialog = Dialog
+        self.module_window = module_window
         self.Dialog.setObjectName("Dialog")
-        self.Dialog.resize(scale*600, scale*550)
+        self.Dialog.resize(scale * 600, scale * 550)
         self.Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
         self.gridLayout = QtWidgets.QGridLayout(self.Dialog)
         self.gridLayout.setObjectName("gridLayout")
@@ -131,8 +147,8 @@ class Ui_Dialog1(object):
         self.txt_additionalComments = QtWidgets.QTextEdit(self.Dialog)
         self.txt_additionalComments.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.txt_additionalComments.setStyleSheet("  QTextCursor textCursor;\n"
-"  textCursor.setPosistion(0, QTextCursor::MoveAnchor); \n"
-"  textedit->setTextCursor( textCursor );")
+                                                  "  textCursor.setPosistion(0, QTextCursor::MoveAnchor); \n"
+                                                  "  textedit->setTextCursor( textCursor );")
         self.txt_additionalComments.setInputMethodHints(QtCore.Qt.ImhNone)
         self.txt_additionalComments.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.txt_additionalComments.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -142,13 +158,13 @@ class Ui_Dialog1(object):
         self.gridLayout.addWidget(self.txt_additionalComments, 9, 1, 1, 1)
         self.buttonBox = QtWidgets.QDialogButtonBox(self.Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 10, 1, 1, 1)
 
         self.retranslateUi()
 
-        #self.buttonBox.accepted.connect(self.Dialog.accept)
+        # self.buttonBox.accepted.connect(self.Dialog.accept)
         self.buttonBox.accepted.connect(lambda: self.save_inputSummary(main))
         self.buttonBox.rejected.connect(self.Dialog.reject)
         self.btn_browse.clicked.connect(self.lbl_browse.clear)
@@ -165,11 +181,12 @@ class Ui_Dialog1(object):
         self.Dialog.setTabOrder(self.lineEdit_client, self.txt_additionalComments)
         self.Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
 
-    def save_inputSummary(self,main):
+    def save_inputSummary(self, main):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
-        filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
-        # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
+        # filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
+        #                                           file_type)
+        filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
         # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
         '''
         Uncomment the third QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
@@ -182,24 +199,64 @@ class Ui_Dialog1(object):
 
         if filename == '':
             return
+        # else:
+        #     self.create_pdf_file(filename,main, input_summary)
+        #     self.pdf_file_message(filename)
+
+        loading_widget = QDialog(self.module_window)
+        window_width = self.module_window.width() / 2
+        window_height = self.module_window.height() / 10
+        loading_widget.setFixedSize(window_width, 1.5 * window_height)
+        loading_widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+
+        self.progress_bar = QtWidgets.QProgressBar(loading_widget)
+        self.progress_bar.setMaximum(100)
+        self.progress_bar.setGeometry(QtCore.QRect(0, 0, window_width, window_height / 2))
+        loading_label = QtWidgets.QLabel(loading_widget)
+        loading_label.setGeometry(QtCore.QRect(0, window_height / 2, window_width, window_height))
+        loading_label.setFixedSize(window_width, window_height)
+        loading_label.setAlignment(QtCore.Qt.AlignCenter)
+        loading_label.setText("<p style='font-weight:500'>Please Wait...</p>")
+        self.thread_1 = DummyThread(0.00001, self.module_window)
+        self.thread_1.start()
+        self.thread_2 = DummyThread(0.00001, self.module_window)
+        self.thread_1.finished.connect(lambda: loading_widget.exec())
+        self.thread_1.finished.connect(lambda: self.progress_bar.setValue(20))
+        self.thread_1.finished.connect(lambda: self.thread_2.start())
+        self.thread_2.finished.connect(lambda: self.create_pdf_file(filename, main, input_summary))
+        self.thread_2.finished.connect(lambda: loading_widget.close())
+        self.thread_2.finished.connect(lambda: self.progress_bar.setValue(90))
+        self.thread_2.finished.connect(lambda: self.pdf_file_message(filename))
+
+    def create_pdf_file(self, filename, main, input_summary):
         fname_no_ext = filename.split(".")[0]
         input_summary['filename'] = fname_no_ext
         input_summary['does_design_exist'] = self.design_exist
-        input_summary['logger_messages']=self.loggermsg
-        main.save_design(main,input_summary)
+        input_summary['logger_messages'] = self.loggermsg
+        # self.progress_bar.setValue(30)
+        main.save_design(main, input_summary)
+        # self.progress_bar.setValue(80)
+
+    def pdf_file_message(self, filename):
+        fname_no_ext = filename.split(".")[0]
         # if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
-        if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
+        if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext + '.log'):
             self.Dialog.accept()
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
-        elif not os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
+        elif not os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(
+                fname_no_ext + '.log'):
+            self.Dialog.reject()
             QMessageBox.critical(QMessageBox(), 'Error',
                                  'Latex Creation Error. Please run <latex> in command prompt to check if latex is installed.')
         else:
-            logfile=open(fname_no_ext+'.log','r')
-            #TODO: This logic can be improved so that log is not read twice.
-            logs=logfile.read()
-            if(r'! I can\'t write on file' in logs):
-                QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+            logfile = open(fname_no_ext + '.log', 'r')
+            # TODO: This logic can be improved so that log is not read twice.
+            logs = logfile.read()
+            logfile.close()
+            self.Dialog.reject()
+            if (r'! I can\'t write on file' in logs):
+                QMessageBox.critical(QMessageBox(), 'Error',
+                                     'Please make sure no PDF is open with same name and try again.')
             else:
                 missing_package = None
                 log_lines = logs.split('\n')
@@ -207,12 +264,12 @@ class Ui_Dialog1(object):
                     if '! LaTeX Error: File' in line:
                         missing_package = line
                 if missing_package != None:
-                    QMessageBox.critical(QMessageBox(), 'Error',missing_package +' Please install missing package')
+                    QMessageBox.critical(QMessageBox(), 'Error', missing_package + ' Please install missing package')
                 else:
-                    QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. Please send us the log file created in the same folder choosen for the Design Report.')
-            logfile.close()
+                    QMessageBox.critical(QMessageBox(), 'Error',
+                                         'Latex Creation Error. Please send us the log file created in the same folder choosen for the Design Report.')
 
-    def call_designreport(self, main,fileName, report_summary, folder):
+    def call_designreport(self, main, fileName, report_summary, folder):
         self.alist = main.report_input
         self.column_details = main.report_supporting
         self.beam_details = main.report_supported
@@ -255,15 +312,17 @@ class Ui_Dialog1(object):
         self.lbl_jobNumber.setText(_translate("Dialog", "Job Number :"))
         self.lbl_client.setText(_translate("Dialog", "Client :"))
         self.lbl_addComment.setText(_translate("Dialog", "Additional Comments :"))
-        self.txt_additionalComments.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:11pt;\"><br /></p></body></html>"))
+        self.txt_additionalComments.setHtml(_translate("Dialog",
+                                                       "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                                       "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                                       "p, li { white-space: pre-wrap; }\n"
+                                                       "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
+                                                       "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:11pt;\"><br /></p></body></html>"))
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog1()

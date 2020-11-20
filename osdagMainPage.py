@@ -149,6 +149,7 @@ from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
@@ -210,6 +211,7 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.setLayout(layout)
         label=QLabel(Module_Name)
         layout.addWidget(label)
+        label.setObjectName('module_name_label')
         self.rdbtn=QRadioButton()
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
@@ -217,19 +219,10 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn.setIconSize(QSize(scale*300, scale*300))
 
         layout.addWidget(self.rdbtn)
-        self.setStyleSheet(
-                    '''
-                        QLabel{
-                            font-family: "Arial", Helvetica, sans-serif;
-                            font-size: 12pt;
-                            font-weight: bold;
-                              }
-                    '''
-                )
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
 
 class ModulePage(QWidget):              # Empty Page with a layout
-    def __init__(self):
+    def __init__(self,margin=0):
         super().__init__()
         self.layout=QGridLayout()
         self.setLayout(self.layout)
@@ -270,6 +263,7 @@ class OsdagMainWindow(QMainWindow):
                                                                 ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
+                                                                ('End Plate Splice', 'ResourceFiles/images/extended.png', 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam to Column': [
@@ -424,6 +418,7 @@ class OsdagMainWindow(QMainWindow):
     def current_changed(self, index):
         l = list(self.Modules.keys())
         items = list(self.ui.verticalLayout.itemAt(i) for i in range(self.ui.verticalLayout.count()))
+        # print(items,"hfhh")
         for item in range(len(items)):
             if item == index-1:
                 items[item].widget().ui.LP_Button.setStyleSheet('''
@@ -490,14 +485,7 @@ class OsdagMainWindow(QMainWindow):
         label=QLabel('This Module is Currently Under Development')
         Page.layout.addWidget(label)
         label.setAlignment(Qt.AlignCenter)
-        Page.setStyleSheet(
-            '''
-                QLabel{
-                    font-family: "Times New Roman", Times, serif;
-                    font-size: 30px;
-                }
-            '''
-        )
+        label.setObjectName('under_development_label')
         return Page
 
     def ButtonConnection(self,Button,Modules,ModuleName):
@@ -544,6 +532,11 @@ class OsdagMainWindow(QMainWindow):
         elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(BeamEndPlate,' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton, 'B2B_End_Plate_Splice').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
@@ -803,6 +796,9 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
 if __name__ == '__main__':
+    # from cad.common_logic import CommonDesignLogic
+    from multiprocessing import Pool
+    import multiprocessing
 
     # app = QApplication(sys.argv)
     # screen = app.screens()[0]
@@ -819,7 +815,18 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
+
+    # #######add darshan#################
+    # print(multiprocessing.cpu_count())
+    # pool = Pool()
+    # try:
+    #     result = pool.apply_async(OsdagMainWindow())
+    # finally:
+    #     pool.terminate()
+    # ####################################
+
     window = OsdagMainWindow()
+
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
     ############################     Exception Dialog and Error Reporting  ###################

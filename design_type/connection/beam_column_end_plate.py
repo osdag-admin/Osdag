@@ -144,7 +144,7 @@ class BeamColumnEndPlate(MomentConnection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '0',
@@ -1234,20 +1234,20 @@ class BeamColumnEndPlate(MomentConnection):
         print(self.bolt)
         print(self.plate)
 
-    def get_3d_components(self):
-        components = []
+        def get_3d_components(self):
+            components = []
 
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
+            t1 = ('Model', self.call_3DModel)
+            components.append(t1)
 
-        t2 = ('Beam', self.call_3DBeam)
-        components.append(t2)
+            t2 = ('Beam', self.call_3DBeam)
+            components.append(t2)
 
-        t3 = ('Column', self.call_3DColumn)
-        components.append(t3)
+            t3 = ('Column', self.call_3DColumn)
+            components.append(t3)
 
-        # t4 = ('End Plate', self.call_3DPlate)
-        # components.append(t4)
+            # t4 = ('End Plate', self.call_3DPlate)
+            # components.append(t4)
 
-        return components
+            return components
 

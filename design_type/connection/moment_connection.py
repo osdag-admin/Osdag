@@ -53,8 +53,6 @@ class MomentConnection(Connection, IS800_2007):
             torsion_const = ''
             warping_const = ''
             image = ''
-
-
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -409,7 +407,7 @@ class MomentConnection(Connection, IS800_2007):
 
     @staticmethod
     def endplate_thick_customized():
-        d = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED
+        d = PLATE_THICKNESS_SAIL
         return d
 
     def customized_input(self):
@@ -510,7 +508,7 @@ class MomentConnection(Connection, IS800_2007):
         return projection
 
     @staticmethod
-    def calc_weld_size_from_strength_per_unit_len(strength_unit_len, ultimate_stresses, elements_welded, fabrication=KEY_DP_WELD_FAB_SHOP):
+    def calc_weld_size_from_strength_per_unit_len(strength_unit_len, ultimate_stresses, elements_welded, fabrication=KEY_DP_FAB_SHOP):
 
         """Calculate the size of fillet weld
 

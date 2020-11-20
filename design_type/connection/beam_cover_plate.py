@@ -192,7 +192,7 @@ class BeamCoverPlate(MomentConnection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '3',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
@@ -523,8 +523,10 @@ class BeamCoverPlate(MomentConnection):
         else:
             self.flange_plate.beta_lj = 1
 
-
-        t5 = (KEY_REDUCTION_FACTOR_FLANGE,KEY_DISP_REDUCTION_FACTOR_FLANGE,TYPE_TEXTBOX,
+        t5 = (KEY_REDUCTION_LARGE_GRIP_FLANGE, KEY_DISP_REDUCTION_LARGE_GRIP_FLANGE, TYPE_TEXTBOX,
+              round(self.flange_plate.beta_lg, 2) if flag else '', True)
+        flange_bolt_capacity.append(t5)
+        t5 = (KEY_REDUCTION_FACTOR_LONG_FLANGE, KEY_DISP_REDUCTION_FACTOR_FLANGE, TYPE_TEXTBOX,
               round(self.flange_plate.beta_lj, 2) if flag else '', True)
         flange_bolt_capacity.append(t5)
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
@@ -1078,14 +1080,14 @@ class BeamCoverPlate(MomentConnection):
             logger.warning(' : Factored axial load is exceeding axial capacity,  {} kN.'.format(
                 round(self.axial_capacity / 1000, 2)))
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
                 logger.warning(' : Factored shear load is exceeding 0.6 times shear capacity,  {} kN.'.format(
                     round(self.shear_capacity1 / 1000, 2)))
                 logger.error(" : High shear cases cannot be designed using Osdag, Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
@@ -1094,7 +1096,7 @@ class BeamCoverPlate(MomentConnection):
                     logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(
                         round(self.section.moment_capacity / 1000000), 2))
                     logger.error(" : Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
                 else:
                     self.member_capacity_status = True
                     self.initial_pt_thk(self)
@@ -1313,7 +1315,7 @@ class BeamCoverPlate(MomentConnection):
                     self.design_status = False
                     # logger.warning(" : Plate is not possible")
                     logger.error(" : Design is not safe. \n ")
-                    logger.debug(" : =========End Of design===========")
+                    logger.info(" : =========End Of design===========")
 
             else:
                 self.initial_pt_thk_status = False
@@ -1321,14 +1323,14 @@ class BeamCoverPlate(MomentConnection):
                 logger.warning(" : Tension capacity of flange is less than required flange force {} kN.".format(round(self.flange_force/1000 ,2)))
                 logger.info(" : Select the larger beam section or decrease the applied loads")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
         else:
             self.initial_pt_thk_status_web = False
             self.design_status = False
             logger.warning( " : Tension capacity of web is less than required axial_force_w {} kN.".format(round(self.axial_force_w/1000,2)))
             logger.info(" : Select the larger beam section or decrease the applied axial load")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
 
     def select_bolt_dia(self):
 
@@ -1371,17 +1373,17 @@ class BeamCoverPlate(MomentConnection):
         # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS
         # FOR FLANGE
         if self.preference == "Outside":
-            t_sum1 = self.flange_plate.thickness_provided + self.section.flange_thickness
+            self.t_sum1 = self.flange_plate.thickness_provided + self.section.flange_thickness
         else:
-            t_sum1 = (2 * self.flange_plate.thickness_provided) + self.section.flange_thickness
+            self.t_sum1 = (2 * self.flange_plate.thickness_provided) + self.section.flange_thickness
 
         # FOR WEB
-        t_sum2 = (2 * self.web_plate.thickness_provided) + self.section.web_thickness
-        t_sum_max = max(t_sum1,t_sum2)
+        self.t_sum2 = (2 * self.web_plate.thickness_provided) + self.section.web_thickness
+        self.t_sum_max = max(self.t_sum1,self.t_sum2)
         self.large_grip_status = False
         self.bolt.bolt_diameter_possible = []
         for d in self.bolt.bolt_diameter:
-            if 8 * d >= t_sum_max:
+            if 8 * d >= self.t_sum_max:
                 self.bolt.bolt_diameter_possible.append(d)
             else:
                 pass
@@ -1394,7 +1396,7 @@ class BeamCoverPlate(MomentConnection):
             self.design_status = False
             logger.error(" : Connected plate thickness should not be greater than 8 times diameter ")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
 
         else:
             self.large_grip_status = True
@@ -1528,13 +1530,13 @@ class BeamCoverPlate(MomentConnection):
                 self.design_status = False
                 logger.error(" : Bolt design not possible")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
             # else:
             #     self.large_grip_status = False
             #     self.design_status = False
             #     logger.error(" : Connected plate thickness should not be greater than 8 times diameter")
             #     logger.error(" : Design is not safe. \n ")
-            #     logger.debug(" : =========End Of design===========")
+            #     logger.info(" : =========End Of design===========")
     def get_bolt_grade(self):
         print(self.design_status, "Getting bolt grade")
         bolt_grade_previous = self.bolt.bolt_grade[-1]
@@ -1674,24 +1676,45 @@ class BeamCoverPlate(MomentConnection):
         #                                                                ((self.flange_plate.bolts_one_line/2) -1)))/2
         #
         # self.web_spacing_status = True
-        if self.flange_plate.design_status is False or self.flange_plate.design_status is False :
+        if self.flange_plate.design_status is False or self.web_plate.design_status is False :
             self.design_status = False
             self.get_plate_details_status = False
             logger.error(" : Bolt connection is not possible")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
         else:
-            self.max_possible_tk = int(self.flange_plate.edge_dist_provided / 2 + self.section.root_radius)
-            if self.web_plate.thickness_provided >= (self.flange_plate.edge_dist_provided / 2 + self.section.root_radius):
-                self.design_status = False
-                logger.error(" : Maximum web plate thickness exceeded. ")
-                logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates" .format(self.max_possible_tk))
-                logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
-            else:
+            if self.preference == "Outside":
                 self.design_status = True
                 self.get_plate_details_status = True
                 self.flange_check_axial(self)
+
+            else:
+                self.max_possible_tk = int(self.flange_plate.edge_dist_provided / 2 + self.section.root_radius)
+                if self.web_plate.thickness_provided >= (
+                        self.flange_plate.edge_dist_provided / 2 + self.section.root_radius):
+                    self.design_status = False
+                    logger.error(" : Maximum web plate thickness exceeded. ")
+                    logger.warning(
+                        " : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates".format(
+                            self.max_possible_tk))
+                    logger.error(" : Design is not safe. \n ")
+                    logger.info(" : =========End Of design===========")
+                else:
+                    self.design_status = True
+                    self.get_plate_details_status = True
+                    self.flange_check_axial(self)
+
+            # self.max_possible_tk = int(self.flange_plate.edge_dist_provided / 2 + self.section.root_radius)
+            # if self.web_plate.thickness_provided >= (self.flange_plate.edge_dist_provided / 2 + self.section.root_radius):
+            #     self.design_status = False
+            #     logger.error(" : Maximum web plate thickness exceeded. ")
+            #     logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates" .format(self.max_possible_tk))
+            #     logger.error(" : Design is not safe. \n ")
+            #     logger.info(" : =========End Of design===========")
+            # else:
+            #     self.design_status = True
+            #     self.get_plate_details_status = True
+            #     self.flange_check_axial(self)
 
 
         ################################################################
@@ -1766,7 +1789,7 @@ class BeamCoverPlate(MomentConnection):
                 logger.warning(": Tension capacity of flange is less than required flange force {} kN.".format(  round(self.flange_force/1000 ,2)))
                 logger.info(": Select the larger beam section or decrease the applied loads")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
             else:
                 self.flange_check_axial_status = True
                 self.design_status = True
@@ -1777,7 +1800,7 @@ class BeamCoverPlate(MomentConnection):
             logger.warning(": Block Shear of flange is less than required flange force {} kN.".format( round(self.flange_force/1000 ,2)))
             logger.info(": Select the larger beam section or decrease the applied loads")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
 
     def flange_plate_check(self):
         # capacity Check for flange_outside_plate =min(block, yielding, rupture)
@@ -1876,7 +1899,7 @@ class BeamCoverPlate(MomentConnection):
                         logger.warning(": Tension capacity of flange plate is less than required flange force {} kN.".format( round(self.flange_force/1000 ,2)))
                         logger.info(": Increase the thickness of the flange plate or decrease the applied loads")
                         logger.error(" : Design is not safe. \n ")
-                        logger.debug(" : =========End Of design===========")
+                        logger.info(" : =========End Of design===========")
                 else:
                     self.flange_plate_check_status =True
                     self.design_status = True
@@ -1887,7 +1910,7 @@ class BeamCoverPlate(MomentConnection):
                 logger.warning(": Block Shear of flange plate is less than required flange force {} kN.".format(round(self.flange_force/1000 ,2)))
                 logger.info(": Increase the thickness of the flange plate or decrease the applied loads")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
 
         else:
             # capacity Check for flange_outsite_plate =min(block, yielding, rupture)
@@ -2012,7 +2035,7 @@ class BeamCoverPlate(MomentConnection):
                         logger.warning(": Tension capacity of flange plate  is less than required flange force {} kN.".format( round(self.flange_force/1000 ,2)))
                         logger.info(": Increase the thickness of the flange plate or decrease the applied loads")
                         logger.error(" : Design is not safe. \n ")
-                        logger.debug(" : =========End Of design===========")
+                        logger.info(" : =========End Of design===========")
                 else:
                     self.flange_plate_check_status = True
                     self.design_status = True
@@ -2023,7 +2046,7 @@ class BeamCoverPlate(MomentConnection):
                 logger.warning(": Block Shear of flange plate is less than required flange force {} kN.".format(round(self.flange_force/1000 ,2)))
                 logger.info(": Increase the thickness of the flange plate or decrease the applied loads")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
 
         ######################################################################### ##
                     # Design of web splice plate
@@ -2089,7 +2112,7 @@ class BeamCoverPlate(MomentConnection):
                 logger.warning(" : Tension capacity of web is less than required axial_force_w {} kN.".format(round(self.axial_force_w/1000 ,2)))
                 logger.info(" : Select the larger beam section or decrease the applied axial load")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
             else:
                 self.web_axial_check_status =True
                 self.design_status = True
@@ -2100,7 +2123,7 @@ class BeamCoverPlate(MomentConnection):
             logger.warning(" : Block Shear of web is less than required axial_force_w {} kN.".format(round(self.axial_force_w/1000 ,2)))
             logger.info(" : Select the larger beam section or decrease the applied axial load")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
 
 #         ###### # capacity Check for web plate in axial = min(block, yielding, rupture)
     def web_plate_axial_check(self):
@@ -2177,7 +2200,7 @@ class BeamCoverPlate(MomentConnection):
                     logger.warning(": Tension capacity of web plate is less than required axial_force_w {} kN.".format(round(self.axial_force_w/1000 ,2)))
                     logger.info(": Increase the thickness of the web plate or decrease the applied axial load")
                     logger.error(" : Design is not safe. \n ")
-                    logger.debug(" : =========End Of design===========")
+                    logger.info(" : =========End Of design===========")
             else:
                 self.web_plate_axial_check_status = True
                 self.design_status = True
@@ -2188,7 +2211,7 @@ class BeamCoverPlate(MomentConnection):
             logger.warning(": Block Shear of web plate is less than required axial_force_w {} kN.".format( round(self.axial_force_w/1000 ,2)))
             logger.info(" : Increase the thickness of the web plate or decrease the applied axial load")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
     def web_shear_plate_check(self):
         ###### # capacity Check for web plate  in shear = min(block, yielding, rupture)
         self.web_shear_plate_check_status = False
@@ -2210,7 +2233,7 @@ class BeamCoverPlate(MomentConnection):
                     round(self.fact_shear_load / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate or decrease the applied shear loads")
                 logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
         else:
             self.shear_yielding_status = True
             self.design_status = True
@@ -2272,19 +2295,19 @@ class BeamCoverPlate(MomentConnection):
                     logger.warning(": Shear capacity of web plate is less than required factored shear load {} kN.".format( round(self.fact_shear_load/1000 ,2)))
                     logger.info(": Increase the thickness of the web plate or decrease the applied shear loads")
                     logger.error(" : Design is not safe. \n ")
-                    logger.debug(" : =========End Of design===========")
+                    logger.info(" : =========End Of design===========")
             else:
                 self.web_shear_plate_check_status = True
                 self.design_status = True
                 logger.info(": Overall bolted cover plate splice connection design is safe \n")
-                logger.debug(" : =========End Of design===========")
+                logger.info(" : =========End Of design===========")
         else:
             self.web_shear_plate_check_status = False
             self.design_status = False
             logger.warning(" : Block Shear of web plate is less than required factored shear load {} kN.".format( round(self.fact_shear_load/1000 ,2)))
             logger.info(" : Increase the thickness of the web plate or  decrease the applied shear loads")
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" : =========End Of design===========")
+            logger.info(" : =========End Of design===========")
 
         ####todo comment out
 
@@ -2351,10 +2374,10 @@ class BeamCoverPlate(MomentConnection):
         # if self.design_status == True:
         #
         #     logger.info(": Overall bolted cover plate splice connection design is safe \n")
-        #     logger.debug(" :=========End Of design===========")
+        #     logger.info(" :=========End Of design===========")
         # else:
         #     logger.error(": Design is not safe \n ")
-        #     logger.debug(" :=========End Of design===========")
+        #     logger.info(" :=========End Of design===========")
 ################################ Design Report #####################################################################################
 
  ################################ CAPACITY CHECK Functions#####################################################################################
@@ -3394,21 +3417,38 @@ class BeamCoverPlate(MomentConnection):
                                           self.section.web_thickness,self.section.root_radius,conn="beam_beam"), "")
             self.report_check.append(t10)
 
-            t5 = (KEY_OUT_DISP_BOLT_CAPACITY, vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
-                                                                  bolt_capacity=round(
-                                                                      self.flange_plate.bolt_force / 1000, 2),
-                                                                  bolt_req=self.flange_plate.bolts_required, multiple=2,
-                                                                  conn="flange_web"), flange_bolt_capacity_red_kn,
-                  get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
-                                relation="lesser"))
-            self.report_check.append(t5)
+            t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
+                   cl_10_3_3_2_large_grip_bolted_prov(self.t_sum1, self.flange_bolt.bolt_diameter_provided,
+                                   self.flange_plate.beta_lj), "")
+            self.report_check.append(t10)
 
-
-            # t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
-            #       get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
-            #                     relation="lesser"))
-            # self.report_check.append(t5)
-
+            if self.flange_bolt.bolt_type == TYP_BEARING:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
+                                                                      bolt_capacity=round(
+                                                                          self.flange_plate.bolt_force / 1000, 2),
+                                                                      bolt_req=self.flange_plate.bolts_required, multiple=2,
+                                                                      conn="flange_web"),
+                      bolt_red_capacity_prov(self.flange_plate.beta_lj,
+                                             self.flange_plate.beta_lg,
+                                             flange_bolt_capacity_kn,
+                                             flange_bolt_capacity_red_kn,"b"),
+                      get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
+            else:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
+                                                                      bolt_capacity=round(
+                                                                          self.flange_plate.bolt_force / 1000, 2),
+                                                                      bolt_req=self.flange_plate.bolts_required,
+                                                                      multiple=2,
+                                                                      conn="flange_web"),
+                      bolt_red_capacity_prov(self.flange_plate.beta_lj,
+                                             self.flange_plate.beta_lg,
+                                             flange_bolt_capacity_kn,
+                                             flange_bolt_capacity_red_kn, "f"),
+                      get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
 
         if self.web_plate.spacing_status == True and self.flange_plate.spacing_status == True:
 
@@ -3425,7 +3465,7 @@ class BeamCoverPlate(MomentConnection):
             res_force = self.web_plate.bolt_force * self.web_plate.bolt_line * self.web_plate.bolts_one_line
             print("res_focce", res_force)
 
-            t1 = ('SubSection', 'Web Bolt Checks', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Bolt Checks', '|p{2.5cm}|p{6cm}|p{6cm}|p{1.5cm}|')
 
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"),
@@ -3486,7 +3526,7 @@ class BeamCoverPlate(MomentConnection):
                                 relation="geq"))
             self.report_check.append(t4)
 
-            if self.flange_bolt.bolt_type == TYP_BEARING:
+            if self.web_bolt.bolt_type == TYP_BEARING:
                 web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
                 t1 = (KEY_OUT_DISP_WEB_BOLT_SHEAR, '', cl_10_3_3_bolt_shear_capacity(self.web_bolt.bolt_fu, 2,
                                                                                      self.web_bolt.bolt_net_area,
@@ -3564,10 +3604,28 @@ class BeamCoverPlate(MomentConnection):
                                           self.section.web_thickness,self.section.root_radius,conn="beam_beam"), "")
             self.report_check.append(t10)
 
-            t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
-                  get_pass_fail(round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn, relation="lesser"))
-            self.report_check.append(t5)
-
+            t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
+                   cl_10_3_3_2_large_grip_bolted_prov(self.t_sum2, self.web_bolt.bolt_diameter_provided,
+                                          self.web_plate.beta_lj), "")
+            self.report_check.append(t10)
+            if self.web_bolt.bolt_type == TYP_BEARING:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000, 2),
+                      bolt_red_capacity_prov(self.web_plate.beta_lj,
+                                             self.web_plate.beta_lg,
+                                             web_bolt_capacity_kn,
+                                             web_bolt_capacity_red_kn,"b"),
+                      get_pass_fail(round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
+            else:
+                t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000, 2),
+                      bolt_red_capacity_prov(self.web_plate.beta_lj,
+                                             self.web_plate.beta_lg,
+                                             web_bolt_capacity_kn,
+                                             web_bolt_capacity_red_kn,"f"),
+                      get_pass_fail(round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
+                                    relation="lesser"))
+                self.report_check.append(t5)
         ######Flange plate check####
         if self.select_bolt_dia_status == True:
             if self.preference == "Outside":
@@ -3727,12 +3785,12 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', cl_6_3_tension_rupture_capacity_member(w_p=self.section.flange_width,
-                                                                                                t_p=self.section.flange_thickness,
-                                                                                                n_c=self.flange_plate.bolts_one_line,
-                                                                                                d_o=self.flange_bolt.dia_hole,
-                                                                                                fu=self.section.fu, gamma_m1=gamma_m1,
-                                                                                                T_dn=round(
+            t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', cl_6_3_1_tension_rupture_plate(w_p=self.section.flange_width,
+                                                                                        t_p=self.section.flange_thickness,
+                                                                                        n_c=self.flange_plate.bolts_one_line,
+                                                                                        d_o=self.flange_bolt.dia_hole,
+                                                                                        fu=self.section.fu, gamma_m1=gamma_m1,
+                                                                                        T_dn=round(
                                                                                          self.section.tension_rupture_capacity / 1000,
                                                                                          2)), '')
 
@@ -3764,12 +3822,12 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', cl_6_3_tension_rupture_capacity_member(w_p=webheight,
-                                                                                             t_p=self.section.web_thickness,
-                                                                                             n_c=self.web_plate.bolts_one_line,
-                                                                                             d_o=self.web_bolt.dia_hole,
-                                                                                             fu=self.section.fu, gamma_m1=gamma_m1,
-                                                                                             T_dn=round(
+            t1 = (KEY_DISP_TENSIONRUPTURECAP_WEB, '', cl_6_3_1_tension_rupture_plate(w_p=webheight,
+                                                                                     t_p=self.section.web_thickness,
+                                                                                     n_c=self.web_plate.bolts_one_line,
+                                                                                     d_o=self.web_bolt.dia_hole,
+                                                                                     fu=self.section.fu, gamma_m1=gamma_m1,
+                                                                                     T_dn=round(
                                                                                       self.section.tension_rupture_capacity_web / 1000,
                                                                                       2)), '')
             self.report_check.append(t1)
@@ -3806,13 +3864,13 @@ class BeamCoverPlate(MomentConnection):
                 self.report_check.append(t1)
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_tension_rupture_capacity_member(w_p=self.flange_plate.height,
-                                                                                                          t_p=self.flange_plate.thickness_provided,
-                                                                                                          n_c=self.flange_plate.bolts_one_line,
-                                                                                                          d_o=self.flange_bolt.dia_hole,
-                                                                                                          fu=self.flange_plate.fu,
-                                                                                                          gamma_m1=gamma_m1,
-                                                                                                          T_dn=round(
+                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_1_tension_rupture_plate(w_p=self.flange_plate.height,
+                                                                                                  t_p=self.flange_plate.thickness_provided,
+                                                                                                  n_c=self.flange_plate.bolts_one_line,
+                                                                                                  d_o=self.flange_bolt.dia_hole,
+                                                                                                  fu=self.flange_plate.fu,
+                                                                                                  gamma_m1=gamma_m1,
+                                                                                                  T_dn=round(
                                                                                             self.flange_plate.tension_rupture_capacity / 1000,
                                                                                             2)), '')
                 self.report_check.append(t1)
@@ -3847,13 +3905,13 @@ class BeamCoverPlate(MomentConnection):
 
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_tension_rupture_capacity_member(w_p=total_height,
-                                                                                                          t_p=self.flange_plate.thickness_provided,
-                                                                                                          n_c=self.flange_plate.bolts_one_line,
-                                                                                                          d_o=self.flange_bolt.dia_hole,
-                                                                                                          fu=self.flange_plate.fu,
-                                                                                                          gamma_m1=gamma_m1,
-                                                                                                          T_dn=round(
+                t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE, '', cl_6_3_1_tension_rupture_plate(w_p=total_height,
+                                                                                                  t_p=self.flange_plate.thickness_provided,
+                                                                                                  n_c=self.flange_plate.bolts_one_line,
+                                                                                                  d_o=self.flange_bolt.dia_hole,
+                                                                                                  fu=self.flange_plate.fu,
+                                                                                                  gamma_m1=gamma_m1,
+                                                                                                  T_dn=round(
                                                                                             self.flange_plate.tension_rupture_capacity / 1000,
                                                                                             2)), '')
                 self.report_check.append(t1)
@@ -3890,12 +3948,12 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', cl_6_3_tension_rupture_capacity_member(self.web_plate.height,
-                                                                                                         self.web_plate.thickness_provided,
-                                                                                                         self.web_plate.bolts_one_line,
-                                                                                                         self.web_bolt.dia_hole,
-                                                                                                         self.web_plate.fu, gamma_m1,
-                                                                                                         round(
+            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE, '', cl_6_3_1_tension_rupture_plate(self.web_plate.height,
+                                                                                                 self.web_plate.thickness_provided,
+                                                                                                 self.web_plate.bolts_one_line,
+                                                                                                 self.web_bolt.dia_hole,
+                                                                                                 self.web_plate.fu, gamma_m1,
+                                                                                                 round(
                                                                                         self.web_plate.tension_rupture_capacity / 1000,
                                                                                         2), 2), '')
 

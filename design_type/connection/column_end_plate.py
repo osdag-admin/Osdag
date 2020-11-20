@@ -203,7 +203,7 @@ class ColumnEndPlate(MomentConnection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '0',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
@@ -793,14 +793,14 @@ class ColumnEndPlate(MomentConnection):
             logger.warning(' : Factored axial load is exceeding axial capacity,  {} kN.'.format(
                 round(self.axial_capacity / 1000, 2)))
             logger.error(" : Design is not safe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity:
                 logger.warning(' : Factored shear load is exceeding 0.6 times shear capacity,  {} kN.'.format(
                     round(self.shear_capacity / 1000, 2)))
                 logger.error(" : High shear cases cannot be designed using Osdag, Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
@@ -809,7 +809,7 @@ class ColumnEndPlate(MomentConnection):
                     logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(
                         round(self.section.moment_capacity / 1000000), 2))
                     logger.error(" : Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
                 else:
                     self.member_capacity_status = True
                     print("axial load", self.factored_axial_load)
@@ -1545,10 +1545,10 @@ class ColumnEndPlate(MomentConnection):
                     self.bolt_tension = self.bolt.bolt_tension_capacity
                     self.bolt_cap = self.bolt.bolt_capacity
                     logger.info(": Overall Column end plate connection design is safe \n")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
                 else:
                     logger.error(": Design is not safe \n ")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
             else:
                 # if 2 * self.end_dist >= 50:
                 self.stiffener_details(self)
@@ -1651,10 +1651,10 @@ class ColumnEndPlate(MomentConnection):
             self.bolt_tension = self.bolt.bolt_tension_capacity
             self.bolt_cap = self.bolt.bolt_capacity
             logger.info(": Overall Column end plate connection design is safe \n")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
         else:
             logger.error(": Design is not safe \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
 ########################################################
     def get_3d_components(self):

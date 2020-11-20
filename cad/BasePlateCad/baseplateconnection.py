@@ -13,10 +13,10 @@ import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
-    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                  concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v, stiffener_algflangeL,
                  stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh, weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh,
-                 stiffener_insideflange, weld_stiffener_inflange):
+                  stiffener_insideflange, weld_stiffener_inflange, weld_stiffener_inflange_d):
 
         """
 
@@ -42,6 +42,8 @@ class BasePlateCad(object):
         self.nut_bolt_array = nut_bolt_array
         self.bolthight = bolthight
         self.baseplate = baseplate
+        self.shearkey_1 = shearkey_1
+        self.shearkey_2 = shearkey_2
         self.weldAbvFlang = weldAbvFlang
         self.weldBelwFlang = weldBelwFlang
         self.weldSideWeb = weldSideWeb
@@ -60,6 +62,7 @@ class BasePlateCad(object):
         self.weld_stiffener_acrsWeb_gh = weld_stiffener_acrsWeb_gh
         self.stiffener_insideflange = stiffener_insideflange
         self.weld_stiffener_inflange = weld_stiffener_inflange
+        self.weld_stiffener_inflange_d = weld_stiffener_inflange_d
 
         self.stiffener_algflangeL1 = stiffener_algflangeL
         self.stiffener_algflangeR1 = stiffener_algflangeR
@@ -162,6 +165,9 @@ class BasePlateCad(object):
         self.weld_stiffener_inflange12 = copy.deepcopy(self.weld_stiffener_inflange)
         self.weld_stiffener_inflange21 = copy.deepcopy(self.weld_stiffener_inflange)
         self.weld_stiffener_inflange22 = copy.deepcopy(self.weld_stiffener_inflange)
+
+        self.weld_stiffener_inflange_d11 = copy.deepcopy(self.weld_stiffener_inflange_d)
+        self.weld_stiffener_inflange_d22 = copy.deepcopy(self.weld_stiffener_inflange_d)
         # self.weld_stiffener_inflange5 = copy.deepcopy(self.weld_stiffener_inflange)
         # self.weld_stiffener_inflange6 = copy.deepcopy(self.weld_stiffener_inflange)
         # self.weld_stiffener_inflange7 = copy.deepcopy(self.weld_stiffener_inflange)
@@ -209,9 +215,25 @@ class BasePlateCad(object):
 
         self.baseplateModel = self.baseplate.create_model()
 
+        if self.BP.shear_key_required == 'Yes':
+
+            shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 -self.baseplate.T])
+            shearkey_1L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_1L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_1.place(shearkey_1OriginL, shearkey_1L_uDir, shearkey_1L_wDir)
+
+            self.shearkey_1Model = self.shearkey_1.create_model()
+
+            shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 -self.baseplate.T])
+            shearkey_2L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_2L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_2.place(shearkey_2OriginL, shearkey_2L_uDir, shearkey_2L_wDir)
+
+            self.shearkey_2Model = self.shearkey_2.create_model()
+
         if self.BP.stiffener_along_web == 'Yes':
 
-            if self.BP.anchors_outside_flange == 4 or self.BP.anchors_outside_flange == 8:
+            if 2 * self.BP.anchors_outside_flange == 4 or 2 * self.BP.anchors_outside_flange == 8:
                 stiffener_gap = 0  # self.column.B * 0.4
                 y_axis = self.column.D / 2 + self.stiffener.L / 2 + self.weld_stiffener_alongWeb_v.h
                 if self.BP.weld_type == "Fillet":
@@ -234,7 +256,7 @@ class BasePlateCad(object):
 
                 self.stiffener3Model = self.stiffener3.create_model()
 
-            if self.BP.anchors_outside_flange == 6 or self.BP.anchors_outside_flange == 12:
+            if 2 * self.BP.anchors_outside_flange == 6 or 2 * self.BP.anchors_outside_flange == 12:
                 stiffener_gap =  self.column.B * 0.4
                 y_axis = self.column.D / 2 + self.stiffener.L / 2 + self.weld_stiffener_alongWeb_v.h
                 if self.BP.weld_type == "Fillet":
@@ -334,13 +356,13 @@ class BasePlateCad(object):
             self.stiffener_acrsWeb2Model = self.stiffener_acrsWeb2.create_model()
 
         if self.BP.stiffener_inside_flange == 'Yes':
-            x_axis = self.stiffener_insideflange.W/2 + self.column.t/2 + self.column.R1 + self.extraspace
+            x_axis = self.stiffener_insideflange.W/2 + self.column.t/2 + self.weld_stiffener_inflange_d.h #+ self.column.R1 + self.extraspace
             y_axis = 0.0        #self.stiffener_acrsWeb.T/2 + self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h
             z_axis = self.stiffener_acrsWeb.W + self.stiffener_insideflange.T/2
 
-            stiffener_insideflange1OriginL = numpy.array([x_axis, y_axis, z_axis])
+            stiffener_insideflange1OriginL = numpy.array([x_axis, y_axis, z_axis + self.stiffener_insideflange.T])
             stiffener_insideflange1L_uDir = numpy.array([0.0, 1.0, 0.0])
-            stiffener_insideflange1L_wDir = numpy.array([0.0, 0.0, 1.0])
+            stiffener_insideflange1L_wDir = numpy.array([0.0, 0.0, -1.0])
             self.stiffener_insideflange1.place(stiffener_insideflange1OriginL, stiffener_insideflange1L_uDir, stiffener_insideflange1L_wDir)
 
             self.stiffener_insideflange1Model = self.stiffener_insideflange1.create_model()
@@ -438,7 +460,7 @@ class BasePlateCad(object):
 
 
         if self.BP.stiffener_along_web == 'Yes':
-            if self.BP.anchors_outside_flange == 4 or self.BP.anchors_outside_flange == 8:
+            if 2 * self.BP.anchors_outside_flange == 4 or 2 * self.BP.anchors_outside_flange == 8:
                 if self.BP.weld_type == "Fillet":
                     x_axis =  self.stiffener.T/2
                     y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
@@ -513,7 +535,7 @@ class BasePlateCad(object):
 
                 self.weld_stiffener_alongWeb_v_2Model = self.weld_stiffener_alongWeb_v_2.create_model()
 
-            if self.BP.anchors_outside_flange == 6 or self.BP.anchors_outside_flange == 12:
+            if 2 * self.BP.anchors_outside_flange == 6 or 2 * self.BP.anchors_outside_flange == 12:
                 if self.BP.weld_type == "Fillet":
                     stiffener_gap = self.column.B * 0.4
                     x_axis = self.stiffener.T / 2
@@ -877,7 +899,7 @@ class BasePlateCad(object):
 
 
         if self.BP.stiffener_inside_flange == 'Yes':
-            x_axis =  self.column.t/2 + self.column.R1 + self.extraspace
+            x_axis =  self.column.t/2 + self.stiffener_insideflange.R22 + self.weld_stiffener_inflange_d.h #self.column.R1 + self.extraspace
             y_axis = self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h/2        #self.stiffener_acrsWeb.T/2 + self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h
             z_axis = self.stiffener_acrsWeb.W + self.weld_stiffener_inflange.b
 
@@ -908,6 +930,25 @@ class BasePlateCad(object):
             self.weld_stiffener_inflange22.place(weld_stiffener_inflange22OriginL, weld_stiffener_inflange22L_uDir, weld_stiffener_inflange22L_wDir)
 
             self.weld_stiffener_inflange22Model = self.weld_stiffener_inflange22.create_model()
+
+
+            x_axis = self.column.t/2 + self.weld_stiffener_inflange_d.h/2
+            y_axis = -self.weld_stiffener_inflange_d.L/2        #self.stiffener_acrsWeb.T/2 + self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h
+            z_axis = self.stiffener_acrsWeb.W + self.weld_stiffener_inflange.b
+
+            weld_stiffener_inflange_d11OriginL = numpy.array([x_axis, y_axis, z_axis])
+            weld_stiffener_inflange_d11L_uDir = numpy.array([0.0, 0.0, 1.0])
+            weld_stiffener_inflange_d11L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.weld_stiffener_inflange_d11.place(weld_stiffener_inflange_d11OriginL, weld_stiffener_inflange_d11L_uDir, weld_stiffener_inflange_d11L_wDir)
+
+            self.weld_stiffener_inflange_d11Model = self.weld_stiffener_inflange_d11.create_model()
+
+            weld_stiffener_inflange_d22OriginL = numpy.array([-x_axis, y_axis, z_axis])
+            weld_stiffener_inflange_d22L_uDir = numpy.array([0.0, 0.0, 1.0])
+            weld_stiffener_inflange_d22L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.weld_stiffener_inflange_d22.place(weld_stiffener_inflange_d22OriginL, weld_stiffener_inflange_d22L_uDir, weld_stiffener_inflange_d22L_wDir)
+
+            self.weld_stiffener_inflange_d22Model = self.weld_stiffener_inflange_d22.create_model()
 
     def create_nut_bolt_array(self):
         """
@@ -988,7 +1029,7 @@ class BasePlateCad(object):
                        self.weld_stiffener_algflag_gh3Model, self.weld_stiffener_algflag_gh4Model]
             welded_sec.extend(sec)
         if self.BP.stiffener_along_web == 'Yes':
-            if self.BP.anchors_outside_flange == 4 or self.BP.anchors_outside_flange == 8:
+            if 2 * self.BP.anchors_outside_flange == 4 or 2 * self.BP.anchors_outside_flange == 8:
                 if self.BP.weld_type == "Fillet":
                     sec = [self.weld_stiffener_alongWeb_v_1Model, self.weld_stiffener_alongWeb_v_2Model,
                                   self.weld_stiffener_alongWeb_h_11Model, self.weld_stiffener_alongWeb_h_21Model,
@@ -997,7 +1038,7 @@ class BasePlateCad(object):
                     sec = [self.weld_stiffener_alongWeb_v_1Model, self.weld_stiffener_alongWeb_v_2Model,
                                   self.weld_stiffener_alongWeb_gh1Model, self.weld_stiffener_alongWeb_gh2Model]
 
-            if self.BP.anchors_outside_flange == 6 or self.BP.anchors_outside_flange == 12:
+            if 2 * self.BP.anchors_outside_flange == 6 or 2 * self.BP.anchors_outside_flange == 12:
                 if self.BP.weld_type == "Fillet":
                     sec = [self.weld_stiffener_alongWeb_v_1Model, self.weld_stiffener_alongWeb_v_2Model,
                                   self.weld_stiffener_alongWeb_h_11Model, self.weld_stiffener_alongWeb_h_21Model,
@@ -1023,7 +1064,7 @@ class BasePlateCad(object):
             welded_sec.extend(sec)
 
         if self.BP.stiffener_inside_flange == 'Yes':
-            sec = [self.weld_stiffener_inflange11Model, self.weld_stiffener_inflange12Model, self.weld_stiffener_inflange21Model, self.weld_stiffener_inflange22Model]
+            sec = [self.weld_stiffener_inflange11Model, self.weld_stiffener_inflange12Model, self.weld_stiffener_inflange21Model, self.weld_stiffener_inflange22Model, self.weld_stiffener_inflange_d11Model, self.weld_stiffener_inflange_d22Model]
             welded_sec.extend(sec)
 
         welds = welded_sec[0]
@@ -1040,15 +1081,18 @@ class BasePlateCad(object):
         #               self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
 
         plate_list = [self.baseplateModel]
+        if self.BP.shear_key_required == 'Yes':
+            list = [self.shearkey_1Model, self.shearkey_2Model]
+            plate_list.extend(list)
         if self.BP.stiffener_along_flange == 'Yes':
             list = [self.stiffener_algflangeL1Model, self.stiffener_algflangeR1Model, self.stiffener_algflangeL2Model,
                           self.stiffener_algflangeR2Model]
             plate_list.extend(list)
         if self.BP.stiffener_along_web == 'Yes':
-            if self.BP.anchors_outside_flange == 4 or self.BP.anchors_outside_flange == 8:
+            if 2 * self.BP.anchors_outside_flange == 4 or 2 * self.BP.anchors_outside_flange == 8:
                 list = [self.stiffener1Model, self.stiffener3Model]
                 plate_list.extend(list)
-            if self.BP.anchors_outside_flange == 6 or self.BP.anchors_outside_flange == 12:
+            if 2 * self.BP.anchors_outside_flange == 6 or 2 * self.BP.anchors_outside_flange == 12:
                 list = [self.stiffener1Model, self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
                 plate_list.extend(list)
         if self.BP.stiffener_across_web == 'Yes':
@@ -1513,7 +1557,7 @@ if __name__ == '__main__':
                                                t_f=column.T, L_h=50, L_v=100, to_left=False)
         stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
 
-        stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  #self.extraspace=5
+        stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12, R21 = column.R1 + 5, R22= column.R1 + 5, L21 = column.R1 + 5, L22= column.R1 + 5)  #self.extraspace=5
 
         weld_stiffener_algflng_v = GrooveWeld(b= column.T, h = 10, L = stiffener_algflangeL.H)
         weld_stiffener_algflng_h = FilletWeld(b= 10, h= 10, L= stiffener_algflangeL.L)    #Todo: create another weld for inner side of the stiffener
@@ -1528,7 +1572,8 @@ if __name__ == '__main__':
         weld_stiffener_alongWeb_v = GrooveWeld(b= stiffener.T, h=10, L=stiffener.W - stiffener.R22)
         weld_stiffener_alongWeb_gh = GrooveWeld(b= stiffener.T, h=10, L=stiffener.L - stiffener.R22)
 
-        weld_stiffener_inflange = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.W)
+        weld_stiffener_inflange = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.W - stiffener_insideflange.R22)
+        weld_stiffener_inflange_d = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.L - stiffener_insideflange.R22 - 2*weld_stiffener_inflange.h)
 
         type = 'gusset'  # 'no_gusset'
 

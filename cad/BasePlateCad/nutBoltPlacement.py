@@ -16,17 +16,23 @@ class NutBoltArray():
     add a diagram here
     """
 
-    def __init__(self, BP, nut, bolt, nutSpace):
+    def __init__(self, BP, nut, nut_in, bolt, bolt_in, nutSpace, washer, washer_in):
+
+
         self.BP = BP
         self.nut = nut
+        self.nut_in = nut_in
         self.bolt = bolt
+        self.bolt_in = bolt_in
         self.gap = nutSpace
+        self.washer = washer
+        self.washer_in = washer_in
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
         self.boltDir = None
 
-        self.noOfBolts_outFlange =self.BP.anchors_outside_flange
+        self.noOfBolts_outFlange = self.BP.anchors_outside_flange
         self.noofBolts_inFlange = self.BP.anchors_inside_flange
 
         self.ab1 = copy.deepcopy(self.bolt)
@@ -45,16 +51,38 @@ class NutBoltArray():
         self.ab12 = copy.deepcopy(self.bolt)
 
 
-        self.ab_inflg1 = copy.deepcopy(self.bolt)
-        self.ab_inflg2 = copy.deepcopy(self.bolt)
+        self.ab_inflg1 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg2 = copy.deepcopy(self.bolt_in)
 
-        self.ab_inflg3 = copy.deepcopy(self.bolt)
-        self.ab_inflg4 = copy.deepcopy(self.bolt)
+        self.ab_inflg3 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg4 = copy.deepcopy(self.bolt_in)
 
-        self.ab_inflg5 = copy.deepcopy(self.bolt)
-        self.ab_inflg6 = copy.deepcopy(self.bolt)
-        self.ab_inflg7 = copy.deepcopy(self.bolt)
-        self.ab_inflg8 = copy.deepcopy(self.bolt)
+        self.ab_inflg5 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg6 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg7 = copy.deepcopy(self.bolt_in)
+        self.ab_inflg8 = copy.deepcopy(self.bolt_in)
+        
+        self.w1 = copy.deepcopy(self.washer)
+        self.w2 = copy.deepcopy(self.washer)
+        self.w3 = copy.deepcopy(self.washer)
+        self.w4 = copy.deepcopy(self.washer)
+        self.w5 = copy.deepcopy(self.washer)
+        self.w6 = copy.deepcopy(self.washer)
+        self.w7 = copy.deepcopy(self.washer)
+        self.w8 = copy.deepcopy(self.washer)
+        self.w9 = copy.deepcopy(self.washer)
+        self.w10 = copy.deepcopy(self.washer)
+        self.w11 = copy.deepcopy(self.washer)
+        self.w12 = copy.deepcopy(self.washer)
+
+        self.w_in1 = copy.deepcopy(self.washer_in)
+        self.w_in2 = copy.deepcopy(self.washer_in)
+        self.w_in3 = copy.deepcopy(self.washer_in)
+        self.w_in4 = copy.deepcopy(self.washer_in)
+        self.w_in5 = copy.deepcopy(self.washer_in)
+        self.w_in6 = copy.deepcopy(self.washer_in)
+        self.w_in7 = copy.deepcopy(self.washer_in)
+        self.w_in8 = copy.deepcopy(self.washer_in)
 
         self.nt1 = copy.deepcopy(self.nut)
         self.nt2 = copy.deepcopy(self.nut)
@@ -71,16 +99,16 @@ class NutBoltArray():
         self.nt11 = copy.deepcopy(self.nut)
         self.nt12 = copy.deepcopy(self.nut)
 
-        self.nt_inflg1 = copy.deepcopy(self.nut)
-        self.nt_inflg2 = copy.deepcopy(self.nut)
+        self.nt_inflg1 = copy.deepcopy(self.nut_in)
+        self.nt_inflg2 = copy.deepcopy(self.nut_in)
 
-        self.nt_inflg3 = copy.deepcopy(self.nut)
-        self.nt_inflg4 = copy.deepcopy(self.nut)
+        self.nt_inflg3 = copy.deepcopy(self.nut_in)
+        self.nt_inflg4 = copy.deepcopy(self.nut_in)
 
-        self.nt_inflg5 = copy.deepcopy(self.nut)
-        self.nt_inflg6 = copy.deepcopy(self.nut)
-        self.nt_inflg7 = copy.deepcopy(self.nut)
-        self.nt_inflg8 = copy.deepcopy(self.nut)
+        self.nt_inflg5 = copy.deepcopy(self.nut_in)
+        self.nt_inflg6 = copy.deepcopy(self.nut_in)
+        self.nt_inflg7 = copy.deepcopy(self.nut_in)
+        self.nt_inflg8 = copy.deepcopy(self.nut_in)
         # self.initBoltPlaceParam(plateObj)
         self.initBoltPlaceParam()
 
@@ -102,16 +130,26 @@ class NutBoltArray():
 
 
     def initBoltPlaceParam(self):
-        self.enddist = self.BP.end_distance
-        self.edgedist = self.BP.edge_distance
+        self.enddist = self.BP.end_distance_out
+        self.edgedist = self.BP.edge_distance_out
         # self.clearence = 50
 
         self.pitch = self.BP.bp_length_provided - 2 * self.enddist
         self.gauge = self.BP.bp_width_provided - 2 * self.edgedist
 
-        self.pitch1 = self.BP.pitch_distance
-        self.gauge1 = self.BP.gauge_distance
+        self.pitch1 = self.BP.pitch_distance_out
+        self.gauge1 = self.BP.gauge_distance_out
+
+        if self.BP.load_axial_tension > 0:
+            self.enddist_in = self.BP.end_distance_in
+            self.edgedist_in = self.BP.edge_distance_in
+            if self.BP.anchors_inside_flange == 8:
+                self.pitch_in = self.BP.pitch_distance_in
+                self.gauge_in = self.BP.gauge_distance_in
+
         if self.BP.connectivity != 'Hollow/Tubular Column Base':
+            if self.BP.stiffener_across_web != 'Yes':
+                self.BP.stiffener_plt_thick_across_web = 0
             self.stiffener_inflg_thickness = self.BP.stiffener_plt_thick_across_web
             self.pitch_inflg = (self.BP.column_D - (2*self.BP.column_tf + 2*self.BP.column_r1 + self.stiffener_inflg_thickness))/4
             self.web_thick = self.BP.column_tw/2
@@ -146,7 +184,12 @@ class NutBoltArray():
         self.nt3.place(pos3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
         self.nt4.place(pos4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
-        if self.BP.anchors_outside_flange == 6 :
+        self.w1.place(pos1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.w2.place(pos2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.w3.place(pos3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.w4.place(pos4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if 2*self.BP.anchors_outside_flange == 6 :
             pos5 = pos2 - self.gauge/2 * self.gaugeDir
             pos6 = pos4 + self.gauge/2 * self.gaugeDir
 
@@ -156,7 +199,10 @@ class NutBoltArray():
             self.nt5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
-        if self.BP.anchors_outside_flange == 8:
+            self.w5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if 2*self.BP.anchors_outside_flange == 8:
             pos5 = pos1 + self.pitch1 * self.pitchDir
             pos6 = pos2 + self.pitch1 * self.pitchDir
             pos7 = pos3 - self.pitch1 * self.pitchDir
@@ -172,7 +218,12 @@ class NutBoltArray():
             self.nt7.place(pos7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt8.place(pos8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
-        if self.BP.anchors_outside_flange == 12:
+            self.w5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w7.place(pos7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w8.place(pos8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if 2*self.BP.anchors_outside_flange == 12:
             pos5 = pos1 + self.pitch1 * self.pitchDir
             pos6 = pos2 + self.pitch1 * self.pitchDir
             pos7 = pos3 - self.pitch1 * self.pitchDir
@@ -203,10 +254,20 @@ class NutBoltArray():
             self.nt11.place(pos11 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt12.place(pos12 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
+            self.w5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w7.place(pos7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w8.place(pos8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.w9.place(pos9 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w10.place(pos10 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w11.place(pos11 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w12.place(pos12 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
         if self.BP.anchors_inside_flange == 2:
 
-            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir + (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
 
             self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -214,12 +275,15 @@ class NutBoltArray():
             self.nt_inflg1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
+            self.w_in1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
         if self.BP.anchors_inside_flange == 4:
 
-            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
 
             self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -228,20 +292,25 @@ class NutBoltArray():
 
             self.nt_inflg1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-            self.nt_inflg3 .place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg3.place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg4.place(pos_inflg_4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.w_in1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in3 .place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in4.place(pos_inflg_4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
         if self.BP.anchors_inside_flange == 8:
 
-            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
-            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist_in-self.gauge / 2 + self.web_thick) * self.gaugeDir
 
-            pos_inflg_5 = pos2 + self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
-            pos_inflg_6 = pos4 - self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
-            pos_inflg_7 = pos2 + self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
-            pos_inflg_8 = pos4 - self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_5 = pos2 + self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist_in - self.gauge / 2 + self.web_thick + self.gauge_in) * self.gaugeDir
+            pos_inflg_6 = pos4 - self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist_in - self.gauge / 2 + self.web_thick + self.gauge_in) * self.gaugeDir
+            pos_inflg_7 = pos2 + self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist_in - self.gauge / 2 + self.web_thick + self.gauge_in) * self.gaugeDir
+            pos_inflg_8 = pos4 - self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist_in - self.gauge / 2 + self.web_thick + self.gauge_in) * self.gaugeDir
 
             self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -255,13 +324,23 @@ class NutBoltArray():
 
             self.nt_inflg1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-            self.nt_inflg3 .place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg3.place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg4.place(pos_inflg_4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
             self.nt_inflg5.place(pos_inflg_5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg6.place(pos_inflg_6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg7.place(pos_inflg_7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.nt_inflg8.place(pos_inflg_8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.w_in1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in3 .place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in4.place(pos_inflg_4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.w_in5.place(pos_inflg_5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in6.place(pos_inflg_6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in7.place(pos_inflg_7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.w_in8.place(pos_inflg_8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
 
 
@@ -279,18 +358,27 @@ class NutBoltArray():
         self.nt3Model = self.nt3.create_model()
         self.nt4Model = self.nt4.create_model()
 
-        self.models = [self.ab1Model, self.ab2Model, self.ab3Model, self.ab4Model, self.nt1Model, self.nt2Model, self.nt3Model, self.nt4Model]
+        self.w1Model = self.w1.create_model()
+        self.w2Model = self.w2.create_model()
+        self.w3Model = self.w3.create_model()
+        self.w4Model = self.w4.create_model()
 
-        if self.BP.anchors_outside_flange == 6:
+        self.models = [self.ab1Model, self.ab2Model, self.ab3Model, self.ab4Model, self.nt1Model, self.nt2Model, self.nt3Model, self.nt4Model, self.w1Model, self.w2Model, self.w3Model, self.w4Model]
+
+        if 2* self.BP.anchors_outside_flange == 6:
             self.ab5Model = self.ab5.create_model()
             self.ab6Model = self.ab6.create_model()
 
             self.nt5Model = self.nt5.create_model()
             self.nt6Model = self.nt6.create_model()
-            models = [self.ab5Model, self.ab6Model,self.nt5Model, self.nt6Model]
+
+            self.w5Model = self.w5.create_model()
+            self.w6Model = self.w6.create_model()
+
+            models = [self.ab5Model, self.ab6Model,self.w5Model, self.w6Model, self.nt5Model, self.nt6Model]
             self.models.extend(models)
 
-        if self.BP.anchors_outside_flange == 8:
+        if 2* self.BP.anchors_outside_flange == 8:
             self.ab5Model = self.ab5.create_model()
             self.ab6Model = self.ab6.create_model()
             self.ab7Model = self.ab7.create_model()
@@ -300,10 +388,16 @@ class NutBoltArray():
             self.nt6Model = self.nt6.create_model()
             self.nt7Model = self.nt7.create_model()
             self.nt8Model = self.nt8.create_model()
-            models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model]
+
+            self.w5Model = self.w5.create_model()
+            self.w6Model = self.w6.create_model()
+            self.w7Model = self.w7.create_model()
+            self.w8Model = self.w8.create_model()
+
+            models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.w5Model, self.w6Model, self.w7Model, self.w8Model, self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model]
             self.models.extend(models)
 
-        if self.BP.anchors_outside_flange == 12:
+        if 2* self.BP.anchors_outside_flange == 12:
             self.ab5Model = self.ab5.create_model()
             self.ab6Model = self.ab6.create_model()
             self.ab7Model = self.ab7.create_model()
@@ -324,8 +418,19 @@ class NutBoltArray():
             self.nt11Model = self.nt11.create_model()
             self.nt12Model = self.nt12.create_model()
 
+            self.w5Model = self.w5.create_model()
+            self.w6Model = self.w6.create_model()
+            self.w7Model = self.w7.create_model()
+            self.w8Model = self.w8.create_model()
+
+            self.w9Model = self.w9.create_model()
+            self.w10Model = self.w10.create_model()
+            self.w11Model = self.w11.create_model()
+            self.w12Model = self.w12.create_model()
+
             models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.ab9Model, self.ab10Model, self.ab11Model, self.ab12Model,
-                      self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model, self.nt9Model, self.nt10Model, self.nt11Model, self.nt12Model]
+                      self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model, self.nt9Model, self.nt10Model, self.nt11Model, self.nt12Model,
+                      self.w5Model, self.w6Model, self.w7Model, self.w8Model, self.w9Model, self.w10Model, self.w11Model, self.w12Model]
             self.models.extend(models)
 
         if self.BP.anchors_inside_flange == 2:
@@ -334,7 +439,10 @@ class NutBoltArray():
             self.nt_inflg1Model = self.nt_inflg1.create_model()
             self.nt_inflg2Model = self.nt_inflg2.create_model()
 
-            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.nt_inflg1Model, self.nt_inflg2Model]
+            self.w_in1Model = self.w_in1.create_model()
+            self.w_in2Model = self.w_in2.create_model()
+
+            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.w_in1Model, self.w_in2Model, self.nt_inflg1Model, self.nt_inflg2Model]
             self.models.extend(models)
 
         if self.BP.anchors_inside_flange == 4:
@@ -342,13 +450,19 @@ class NutBoltArray():
             self.ab_inflg2Model = self.ab_inflg2.create_model()
             self.nt_inflg1Model = self.nt_inflg1.create_model()
             self.nt_inflg2Model = self.nt_inflg2.create_model()
+            self.w_in1Model = self.w_in1.create_model()
+            self.w_in2Model = self.w_in2.create_model()
 
             self.ab_inflg3Model = self.ab_inflg3.create_model()
             self.ab_inflg4Model = self.ab_inflg4.create_model()
             self.nt_inflg3Model = self.nt_inflg3.create_model()
             self.nt_inflg4Model = self.nt_inflg4.create_model()
+            self.w_in3Model = self.w_in3.create_model()
+            self.w_in4Model = self.w_in4.create_model()
 
-            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.ab_inflg3Model, self.ab_inflg4Model, self.nt_inflg1Model, self.nt_inflg2Model, self.nt_inflg3Model, self.nt_inflg4Model]
+            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.ab_inflg3Model, self.ab_inflg4Model,
+                       self.nt_inflg1Model, self.nt_inflg2Model, self.nt_inflg3Model, self.nt_inflg4Model,
+                       self.w_in1Model, self.w_in2Model, self.w_in3Model, self.w_in4Model]
             self.models.extend(models)
 
         if self.BP.anchors_inside_flange == 8:
@@ -356,26 +470,37 @@ class NutBoltArray():
             self.ab_inflg2Model = self.ab_inflg2.create_model()
             self.nt_inflg1Model = self.nt_inflg1.create_model()
             self.nt_inflg2Model = self.nt_inflg2.create_model()
+            self.w_in1Model = self.w_in1.create_model()
+            self.w_in2Model = self.w_in2.create_model()
 
             self.ab_inflg5Model = self.ab_inflg5.create_model()
             self.ab_inflg6Model = self.ab_inflg6.create_model()
             self.nt_inflg5Model = self.nt_inflg5.create_model()
             self.nt_inflg6Model = self.nt_inflg6.create_model()
+            self.w_in5Model = self.w_in5.create_model()
+            self.w_in6Model = self.w_in6.create_model()
 
             self.ab_inflg3Model = self.ab_inflg3.create_model()
             self.ab_inflg4Model = self.ab_inflg4.create_model()
             self.nt_inflg3Model = self.nt_inflg3.create_model()
             self.nt_inflg4Model = self.nt_inflg4.create_model()
+            self.w_in3Model = self.w_in3.create_model()
+            self.w_in4Model = self.w_in4.create_model()
 
             self.ab_inflg7Model = self.ab_inflg7.create_model()
             self.ab_inflg8Model = self.ab_inflg8.create_model()
             self.nt_inflg7Model = self.nt_inflg7.create_model()
             self.nt_inflg8Model = self.nt_inflg8.create_model()
+            self.w_in7Model = self.w_in7.create_model()
+            self.w_in8Model = self.w_in8.create_model()
 
             models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.ab_inflg3Model, self.ab_inflg4Model,
                        self.ab_inflg5Model, self.ab_inflg6Model, self.ab_inflg7Model, self.ab_inflg8Model,
                        self.nt_inflg1Model, self.nt_inflg2Model, self.nt_inflg3Model, self.nt_inflg4Model,
-                       self.nt_inflg5Model, self.nt_inflg6Model, self.nt_inflg7Model, self.nt_inflg8Model]
+                       self.nt_inflg5Model, self.nt_inflg6Model, self.nt_inflg7Model, self.nt_inflg8Model,
+                       self.w_in1Model, self.w_in2Model, self.w_in3Model, self.w_in4Model,
+                       self.w_in5Model, self.w_in6Model, self.w_in7Model, self.w_in8Model
+                       ]
             self.models.extend(models)
 
 

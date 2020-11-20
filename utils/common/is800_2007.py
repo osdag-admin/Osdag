@@ -6,7 +6,7 @@ Started on 01 - Nov - 2018
 """
 import math
 from Common import *
-# from Common import KEY_DP_WELD_FAB_SHOP
+# from Common import KEY_DP_FAB_SHOP
 
 
 class IS800_2007(object):
@@ -179,10 +179,10 @@ class IS800_2007(object):
     # Table 5 Partial Safety Factors for Materials, gamma_m (dict)
     cl_5_4_1_Table_5 = {"gamma_m0": {'yielding': 1.10, 'buckling': 1.10},
                         "gamma_m1": {'ultimate_stress': 1.25},
-                        "gamma_mf": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.25},
-                        "gamma_mb": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.25},
-                        "gamma_mr": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.25},
-                        "gamma_mw": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.50}
+                        "gamma_mf": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.25},
+                        "gamma_mb": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.25},
+                        "gamma_mr": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.25},
+                        "gamma_mw": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.50}
                         }
 
     # ==========================================================================
@@ -504,17 +504,18 @@ class IS800_2007(object):
         for i in conn_plates_t_fu_fy:
             t = i[0]
             f_y = i[2]
-            epsilon = math.sqrt(250 / f_y)
-            if t * epsilon <= t_epsilon_considered:
-                t_epsilon_considered = t * epsilon
-                t_considered = t
-            if t < t_min:
-                t_min = t
+            if f_y > 0:
+                epsilon = math.sqrt(250 / f_y)
+                if t * epsilon <= t_epsilon_considered:
+                    t_epsilon_considered = t * epsilon
+                    t_considered = t
+                if t < t_min:
+                    t_min = t
 
          # epsilon = math.sqrt(250 / f_y)
 
         if corrosive_influences is True:
-            return 40.0 + 4 * t_min
+            return 40.0 + (4 * t_min)
         else:
             return 12 * t_epsilon_considered
 
@@ -541,7 +542,7 @@ class IS800_2007(object):
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
 
     @staticmethod
-    def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+    def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=None):
         """Calculate design shear strength of bearing bolt
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
@@ -557,7 +558,7 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.3
         """
         V_nsb = f_ub / math.sqrt(3) * (n_n * A_nb + n_s * A_sb)
-        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
+        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][KEY_DP_FAB_SHOP]
         V_dsb = V_nsb / gamma_mb
         return V_dsb
 
@@ -631,7 +632,7 @@ class IS800_2007(object):
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
     def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='Standard',
-                                        safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+                                        safety_factor_parameter=KEY_DP_FAB_FIELD):
 
         """Calculate design bearing strength of a bolt on any plate.
         Args:
@@ -669,7 +670,7 @@ class IS800_2007(object):
         return V_dpb
 
     @staticmethod
-    def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+    def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_FAB_FIELD):
         """Calculate design tensile strength of bearing bolt
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
@@ -754,7 +755,7 @@ class IS800_2007(object):
     # cl. 10.4.5 Tension Resistance
     @staticmethod
     def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n,
-                                                   safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+                                                   safety_factor_parameter=KEY_DP_FAB_FIELD):
         """Calculate design tensile strength of friction grip bolt
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
@@ -793,7 +794,7 @@ class IS800_2007(object):
         return (V_sf / V_df) ** 2 + (T_f / T_df) ** 2
 
     @staticmethod
-    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, eta=1.5):
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned='Pretensioned', eta=1.5):
         """Calculate prying force of friction grip bolt
                        Args:
                           2 * T_e - Force in 2 bolts on either sides of the web/plate
@@ -810,16 +811,22 @@ class IS800_2007(object):
                            Reference:
                            IS 800:2007,  cl 10.4.7
         """
-        beta = 2
         if pre_tensioned == 'Pretensioned':
             beta = 1
-        print(pre_tensioned)
-        l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
-        if (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2))) <= 0:
-            Q = 0.0
         else:
-            Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
-        return Q
+            beta = 2
+
+        le_1 = end_dist
+        le_2 = (1.1 * t) * math.sqrt((beta * f_o) / f_y)  # here f_o is taken as N/mm^2
+        l_e = min(le_1, le_2)
+
+        # Note: In the below equation of Q, f_o is taken as kN since the value of T_e is in kN
+        Q = (l_v / (2 / l_e)) * (T_e - ((beta * eta * f_o * b_e * 1e-3 * t ** 4) / (27 * l_e * l_v ** 2)))  # kN
+
+        if Q < 0:
+            Q = 0.0
+
+        return round(Q * 1e-3, 2)  # kN
 
     # -------------------------------------------------------------
     #   10.5 Welds and Welding
@@ -994,7 +1001,7 @@ class IS800_2007(object):
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
     @staticmethod
-    def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_WELD_FAB_SHOP):
+    def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_FAB_SHOP):
 
         """Calculate the design strength of fillet weld
         Args:

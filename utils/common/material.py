@@ -4,10 +4,9 @@ import logging
 from utils.common.is800_2007 import IS800_2007
 
 
-
 class Material(object):
 
-    def __init__(self, material_grade='', thickness = 41):
+    def __init__(self, material_grade='', thickness=41):
 
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
@@ -16,7 +15,7 @@ class Material(object):
         self.fy = 0.0
         # if material_grade not in ["Select Material", "Custom"] and "Custom" not in material_grade:
         self.connect_to_database_to_get_fy_fu(grade=material_grade, thickness=thickness)
-        self.material=material_grade
+        self.material = material_grade
         # if material_grade.split(" ")[0] == "Custom":
         #     material = material_grade.split(" ")
         #     if len(material) == 3:
@@ -36,7 +35,7 @@ class Material(object):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM Material WHERE Grade = ?"
         cur = conn.cursor()
-        cur.execute(db_query,(grade,))
+        cur.execute(db_query, (grade,))
         row = cur.fetchone()
         if row:
             self.fy_20 = row[1]
@@ -45,12 +44,12 @@ class Material(object):
             if thickness != '':
                 if thickness < 20:
                     self.fy = self.fy_20
-                elif 20 <= thickness <=40:
+                elif 20 <= thickness <= 40:
                     self.fy = self.fy_20_40
                 else:
                     self.fy = self.fy_40
             else:
-                self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
+                self.fy = min(self.fy_20, self.fy_20_40, self.fy_40)
             self.fu = row[4]
         conn.close()
 

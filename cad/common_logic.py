@@ -9,6 +9,7 @@ from cad.items.notch import Notch
 from cad.items.bolt import Bolt
 from cad.items.nut import Nut
 from cad.items.plate import Plate
+from cad.items.washer import Washer
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.groove_weld import GrooveWeld
@@ -116,6 +117,7 @@ import OCC.Core.V3d
 from OCC.Core.Quantity import *
 from OCC.Core.Graphic3d import *
 from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
+import multiprocessing
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData
@@ -655,7 +657,7 @@ class CommonDesignLogic(object):
             # nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
             # colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array,gap)
             nut_space = A.supported_section.web_thickness + 2 * A.cleat.thickness + nut_T
-            cnut_space = A.supporting_section.web_thickness + A.cleat.thickness + nut_T
+            cnut_space = A.supporting_section.flange_thickness + A.cleat.thickness + nut_T
             nut_bolt_array = cleatNutBoltArray(A.cleat, nut, bolt, nut_space, cnut_space)
             colflangeconn = cleatColFlangeBeamWeb(supporting, supported, angle, nut_bolt_array, gap)
 
@@ -840,7 +842,7 @@ class CommonDesignLogic(object):
                 nut_spaceW = 2 * webPlate.T + column.t
             else:
                 nut_space = flangePlate.T + column.T
-                nut_spaceW = webPlate.T + column.t
+                nut_spaceW = 2*webPlate.T + column.t
 
             numOfboltsF = C.flange_plate.bolts_required
             numOfboltsW = C.web_plate.bolts_required
@@ -978,33 +980,39 @@ class CommonDesignLogic(object):
 
             baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
 
-            bolt_d = float(BP.anchor_dia_provided)
+            bolt_d = float(BP.anchor_dia_outside_flange)
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
             bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
             # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-            ex_length = BP.anchor_len_above_footing
-            if BP.dp_anchor_type == 'IS 5624-Type A':
-                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing), c=125, a=75,
-                                    r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
-            elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
-            else:  # BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2,
-                                           ex=ex_length)
+
+            ex_length_out = BP.anchor_len_above_footing_out
+            if BP.anchor_type == 'IS 5624-Type A':
+                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75,
+                                    r=float(BP.anchor_dia_outside_flange) / 2,
+                                    ex=ex_length_out)
+            elif BP.anchor_type == 'IS 5624-Type B':
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2,
+                                    ex=ex_length_out)
+            else:  # BP.anchor_type == 'End Plate Type':
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2,  a= BP.plate_washer_dim_out*1.5,
+                                           ex=ex_length_out)
+
+            bolt_in = bolt
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
+            nut_in = nut
+            washer = Washer(a=BP.plate_washer_dim_out , d=BP.plate_washer_inner_dia_out , t=BP.plate_washer_thk_out)
+            washer_in = washer
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = washer.T + nut.T + 50
 
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace,  washer, washer_in)
 
             basePlate = HollowBasePlateCad(BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
@@ -1036,16 +1044,13 @@ class CommonDesignLogic(object):
                 weldBelwFlang = GrooveWeld(b= column.T, h=float(BP.weld_size_flange), L=column.B)
                 weldSideWeb = GrooveWeld(b=column.t, h=float(BP.weld_size_web), L=column.D)
 
-            # gusset = StiffenerPlate(L=BP.stiffener_plt_len_along_flange, W=BP.stiffener_plt_height_along_flange,
-            #                         T=BP.stiffener_plt_thick_along_flange,
-            #                         L11=(BP.stiffener_plt_len_along_flange - (column.B + 100)) / 2, L12=BP.stiffener_plt_height_along_flange - 100,
-            #                         R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
+
             BP.weld_size_stiffener = max(BP.stiffener_plt_thick_along_web, BP.stiffener_plt_thick_across_web, column.T) / 2
             stiffener = StiffenerPlate(L=float(BP.stiffener_plt_len_along_web) - float(BP.weld_size_stiffener), W=float(BP.stiffener_plt_height_along_web),
                                        T=float(BP.stiffener_plt_thick_along_web),
                                        L11=float(BP.stiffener_plt_len_along_web - 50), L12=float(BP.stiffener_plt_height_along_web - 100), R21=15, R22=15)
 
-            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
+            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=float(BP.anchor_len_below_footing_out)* 1.3)
             grout = Grout(L=concrete.L, W=concrete.W, T=50)
 
             stiffener_acrsWeb = StiffenerPlate(L=float(BP.stiffener_plt_len_across_web) - float(BP.weld_size_stiffener), W=float(BP.stiffener_plt_height_across_web), T=float(BP.stiffener_plt_thick_across_web),
@@ -1058,8 +1063,7 @@ class CommonDesignLogic(object):
                                                     t_f=column.T, L_h=50, L_v=100, to_left=False)
             stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
 
-            #TODO: add varaiable names to this
-            stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  # self.extraspace=5
+            stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * float(BP.weld_size_stiffener)), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12,  R21 = column.R1 + 5, R22= column.R1 + 5, L21 = column.R1 + 5, L22= column.R1 + 5)  # self.extraspace=5
 
 
             weld_stiffener_algflng_v = GrooveWeld(b=column.T, h=float(BP.weld_size_stiffener), L=stiffener_algflangeL.H)
@@ -1079,35 +1083,75 @@ class CommonDesignLogic(object):
             weld_stiffener_alongWeb_v = GrooveWeld(b=stiffener.T, h=float(BP.weld_size_stiffener), L=stiffener.W - stiffener.R22)
             weld_stiffener_alongWeb_gh = GrooveWeld(b=stiffener.T, h=float(BP.weld_size_stiffener), L=stiffener.L - stiffener.R22)
 
-            weld_stiffener_inflange = GrooveWeld(b=stiffener_insideflange.T, h=float(BP.weld_size_stiffener), L=stiffener_insideflange.W)
+            weld_stiffener_inflange = GrooveWeld(b=stiffener_insideflange.T, h=float(BP.weld_size_stiffener), L=stiffener_insideflange.W - stiffener_insideflange.R22)
+            weld_stiffener_inflange_d = GrooveWeld(b=stiffener_insideflange.T, h=float(BP.weld_size_stiffener),
+                                                   L=stiffener_insideflange.L - stiffener_insideflange.R22 - 2 * weld_stiffener_inflange.h)
 
-            bolt_d = float(BP.anchor_dia_provided)
+            if BP.load_axial_tension > 0:
+                BP.anchor_len_above_footing_in = BP.anchor_len_above_footing_in
+                BP.anchor_len_below_footing_in = BP.anchor_len_below_footing_in
+                BP.anchor_dia_inside_flange = BP.anchor_dia_inside_flange
+                BP.plate_washer_dim_in = BP.plate_washer_dim_in
+                BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_in
+                BP.plate_washer_thk_in = BP.plate_washer_thk_in
+            else:
+                BP.anchor_len_above_footing_in = BP.anchor_len_above_footing_out
+                BP.anchor_len_below_footing_in = BP.anchor_len_below_footing_out
+                BP.anchor_dia_inside_flange = BP.anchor_dia_outside_flange
+                BP.plate_washer_dim_in = BP.plate_washer_dim_out
+                BP.plate_washer_inner_dia_in = BP.plate_washer_inner_dia_out
+                BP.plate_washer_thk_in = BP.plate_washer_thk_out
+
+
+            bolt_d = float(BP.anchor_dia_outside_flange)
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
             bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
             # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
             nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
             nut_HT = nut_T
 
-            ex_length = BP.anchor_len_above_footing
-            if BP.dp_anchor_type == 'IS 5624-Type A':
-                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
-            elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
-            else: #BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing), r=float(BP.anchor_dia_provided) / 2,
-                                           ex=ex_length)
+            bolt_d_in = float(BP.anchor_dia_inside_flange)
+            bolt_r_in = bolt_d_in / 2  # Bolt radius (Shank part)
+            bolt_R_in = self.boltHeadDia_Calculation(bolt_d_in) / 2  # Bolt head diameter (Hexagon)
+            # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
+            nut_T_in = self.nutThick_Calculation(bolt_d_in)  # Nut thickness, usually nut thickness = nut height
+            nut_HT_in = nut_T_in
+
+
+            ex_length_out = BP.anchor_len_above_footing_out
+            ex_length_in = BP.anchor_len_above_footing_in
+            if BP.anchor_type == 'IS 5624-Type A':
+                bolt = AnchorBolt_A(l=float(BP.anchor_len_below_footing_out), c=125, a=75, r=float(BP.anchor_dia_outside_flange) / 2,
+                                    ex=ex_length_out)
+                bolt_in = AnchorBolt_A(l=float(BP.anchor_len_below_footing_in), c=125, a=75, r=float(BP.anchor_dia_inside_flange) / 2,
+                                    ex=ex_length_in)
+            elif BP.anchor_type == 'IS 5624-Type B':
+                bolt = AnchorBolt_B(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2, ex=ex_length_out)
+                bolt_in = AnchorBolt_B(l=float(BP.anchor_len_below_footing_in), r=float(BP.anchor_dia_inside_flange) / 2,
+                                    ex=ex_length_in)
+            else: #BP.anchor_type == 'End Plate Type':
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_out), r=float(BP.anchor_dia_outside_flange) / 2,  a= BP.plate_washer_dim_out * 1.5,
+                                           ex=ex_length_out)
+                bolt_in = AnchorBolt_Endplate(l=float(BP.anchor_len_below_footing_in),
+                                           r=float(BP.anchor_dia_inside_flange) / 2, a= BP.plate_washer_inner_dia_in * 1.5,
+                                           ex=ex_length_in)
 
             nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
+            nut_in = Nut(R=bolt_R_in, T=nut_T_in, H=nut_HT_in, innerR1=bolt_r_in)
+            washer = Washer(a=BP.plate_washer_dim_out , d=BP.plate_washer_inner_dia_out , t=BP.plate_washer_thk_out)
+            washer_in = Washer(a=BP.plate_washer_dim_in, d=BP.plate_washer_inner_dia_in, t=BP.plate_washer_thk_out)
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = washer.T + nut.T + 50
 
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
+            shearkey_1 = Plate(L=float(BP.shear_key_len_ColDepth), W=float(BP.shear_key_thk), T= float(BP.shear_key_depth_ColDepth))
+            shearkey_2 = Plate(L=float(BP.shear_key_thk), W=float(BP.shear_key_depth_ColWidth), T=float(BP.shear_key_len_ColWidth))
 
-            basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+            nut_bolt_array = bpNutBoltArray(BP, nut, nut_in, bolt, bolt_in, nutSpace, washer, washer_in)
+
+            basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                      concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
                                      stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
-                                     weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
+                                     weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange, weld_stiffener_inflange_d)
 
         basePlate.create_3DModel()
 
@@ -1326,7 +1370,7 @@ class CommonDesignLogic(object):
                                             color=Quantity_NOC_BLUE1)
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
-                                        color='black')
+                                        color=Quantity_NOC_YELLOW)
 
                 elif self.component == "Model":
                     osdag_display_shape(self.display, self.CPObj.get_beamsModel(), update=True)
@@ -1340,7 +1384,7 @@ class CommonDesignLogic(object):
                                             color=Quantity_NOC_BLUE1)
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
-                                        color='black')
+                                        color=Quantity_NOC_YELLOW)
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 self.B = self.module_class()
@@ -1469,6 +1513,8 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
 
+
+
                 # elif self.component == "end bolt":
                 #     pass
                 # elif self.component == "intermediate bolt":
@@ -1498,6 +1544,7 @@ class CommonDesignLogic(object):
                 #     pass
                 # elif self.component == "intermediate bolt":
                 #     pass
+
 
     def call_3DModel(self, flag, module_class):  # Done
 
@@ -1801,3 +1848,10 @@ class CommonDesignLogic(object):
         #     final_model = cadlist[0]
         #     for model in cadlist[1:]:
         #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+# if __name__!= "__main__":
+#
+#     CommonDesignLogic()
+
+
+

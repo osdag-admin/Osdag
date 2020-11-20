@@ -8,7 +8,6 @@ from utils.common.common_calculation import *
 from utils.common.is800_2007 import IS800_2007
 
 
-
 class ShearConnection(Connection):
     def __init__(self):
         super(ShearConnection, self).__init__()
@@ -394,7 +393,7 @@ class ShearConnection(Connection):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '10',
@@ -580,3 +579,6 @@ class ShearConnection(Connection):
 
         print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
               self.supported_section.tension_yielding_capacity, self.load.axial_force)
+
+        self.supporting_section.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(self.supporting_section.area,
+                                                                                                       self.supporting_section.fy)

@@ -60,6 +60,8 @@ class CreateLatex(Document):
 
         doc.add_color('OsdagGreen', 'RGB', '153,169,36')
         doc.add_color('PassColor','RGB', '153,169,36')
+        doc.add_color('Red', 'RGB', '255,0,0')
+        doc.add_color('Green', 'RGB', '0,200,0')
         doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
@@ -102,7 +104,7 @@ class CreateLatex(Document):
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST:
+                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     # if type(uiObj[i]) == list:
                         continue
                     if type(uiObj[i]) == dict:
@@ -159,10 +161,10 @@ class CreateLatex(Document):
                         table.add_hline()
                     else:
                         table.add_hline()
-                        table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
+                        table.add_row((MultiColumn(3, align='|c|', data=NoEscape(i)), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
             for i in uiObj:
-                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST:
+                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
@@ -186,7 +188,20 @@ class CreateLatex(Document):
         doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
+            with doc.create(Tabularx(r'|>{\centering}p{12.5cm}|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+                table.add_hline()
+                # Fail = TextColor("FailColor", bold("Fail"))
+                # Pass = TextColor("PassColor", bold("Pass"))
+                if does_design_exist != True:
+                    table.add_row(bold('Design Status'),color_cell("Red",bold("Fail")))
+                else:
+                    table.add_row(bold('Design Status'),color_cell("Green",bold("Pass")))
+                table.add_hline()
+
+
+
             for check in Design_Check:
+
                 if check[0] == 'SubSection':
                     if count >=1:
                         # doc.append(NewPage())
@@ -210,7 +225,7 @@ class CreateLatex(Document):
                                 # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
 
                                 print(i)
-                                if type(uiObj[i]) == dict:
+                                if type(uiObj[i]) == dict and i == 'Selected Section Details':
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
                                     image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
@@ -233,23 +248,25 @@ class CreateLatex(Document):
                                                 (MultiRow(merge_rows,
                                                           data=StandAloneGraphic(image_options="width=5cm,height=5cm",
                                                                                  filename=rel_path + Img_path)),
-                                                 MultiColumn(2, align='|c|', data=a[x]),
-                                                 MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                                 MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                                 MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
                                         elif x <= 4:
-                                            table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
+                                            table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+
                                                            MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                                         else:
-                                            table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
+                                            table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
                                                            sectiondetails[a[merge_rows + x - 4]],))
+
                                         table.add_hline(2, 5)
                             table.add_hline()
                         count = count + 1
                 else:
 
                     if check[3] == 'Fail':
-                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("FailColor", bold(check[3])))
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
                     else:
-                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("PassColor", bold(check[3])))
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Green", bold(check[3])))
                     table.add_hline()
 
 
@@ -266,7 +283,7 @@ class CreateLatex(Document):
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
             with doc.create(Section('3D View')):
-                with doc.create(Tabular(r'|>{\centering}m{7.75cm}|>{\centering\arraybackslash}m{7.75cm}|', row_height=1.2)) as table:
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
                     view_topimg_path = rel_path + Disp_top_image
                     view_sideimg_path = rel_path + Disp_side_image
@@ -299,10 +316,10 @@ class CreateLatex(Document):
                 elif('ERROR' in msg):
                     colour='red'
                 else:
-                    colour = 'black'
+                    continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
-            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+            doc.generate_pdf(filename, compiler='/home/danish/texlive/2020/bin/x86_64-linux/pdflatex', clean_tex=False)
         except:
             pass
 

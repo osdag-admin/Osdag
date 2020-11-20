@@ -13,10 +13,10 @@ import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
-    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                  concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v, stiffener_algflangeL,
                  stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh, weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh,
-                 stiffener_insideflange, weld_stiffener_inflange):
+                 weld_stiffener_inflange_d, stiffener_insideflange, weld_stiffener_inflange):
 
         """
 
@@ -33,16 +33,19 @@ class BasePlateCad(object):
         self.weld_type = "Groove" # "Fillet"  #
         self.extraspace = 5 #for stiffener inside flange
         self.filletWeldcolm = False
-        self.stif_algFlg = True
-        self.stif_algWeb = True
+        self.stif_algFlg = False
+        self.stif_algWeb = False
         self.stif_acrWeb = False
-        self.stif_inFlg = False
+        self.stif_inFlg = True
+        self.shear_key_required = False
 
         self.BP = BP
         self.column = column
         self.nut_bolt_array = nut_bolt_array
         self.bolthight = bolthight
         self.baseplate = baseplate
+        self.shearkey_1 = shearkey_1
+        self.shearkey_2 = shearkey_2
         self.weldAbvFlang = weldAbvFlang
         self.weldBelwFlang = weldBelwFlang
         self.weldSideWeb = weldSideWeb
@@ -63,6 +66,7 @@ class BasePlateCad(object):
         self.weld_stiffener_acrsWeb_gh = weld_stiffener_acrsWeb_gh
         self.stiffener_insideflange = stiffener_insideflange
         self.weld_stiffener_inflange = weld_stiffener_inflange
+        self.weld_stiffener_inflange_d = weld_stiffener_inflange_d
 
         self.stiffener_algflangeL1 = stiffener_algflangeL
         self.stiffener_algflangeR1 = stiffener_algflangeR
@@ -171,6 +175,9 @@ class BasePlateCad(object):
         self.weld_stiffener_inflange12 = copy.deepcopy(self.weld_stiffener_inflange)
         self.weld_stiffener_inflange21 = copy.deepcopy(self.weld_stiffener_inflange)
         self.weld_stiffener_inflange22 = copy.deepcopy(self.weld_stiffener_inflange)
+
+        self.weld_stiffener_inflange_d11 = copy.deepcopy(self.weld_stiffener_inflange_d)
+        self.weld_stiffener_inflange_d22 = copy.deepcopy(self.weld_stiffener_inflange_d)
         # self.weld_stiffener_inflange5 = copy.deepcopy(self.weld_stiffener_inflange)
         # self.weld_stiffener_inflange6 = copy.deepcopy(self.weld_stiffener_inflange)
         # self.weld_stiffener_inflange7 = copy.deepcopy(self.weld_stiffener_inflange)
@@ -209,6 +216,22 @@ class BasePlateCad(object):
         self.baseplate.place(baseplateOriginL, baseplateL_uDir, baseplateL_wDir)
 
         self.baseplateModel = self.baseplate.create_model()
+
+        if self.shear_key_required == True:
+
+            shearkey_1OriginL = numpy.array([-self.shearkey_1.W / 2, 0.0, -self.shearkey_1.T / 2 -self.baseplate.T])
+            shearkey_1L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_1L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_1.place(shearkey_1OriginL, shearkey_1L_uDir, shearkey_1L_wDir)
+
+            self.shearkey_1Model = self.shearkey_1.create_model()
+
+            shearkey_2OriginL = numpy.array([-self.shearkey_2.W / 2, 0.0, -self.shearkey_2.T / 2 -self.baseplate.T])
+            shearkey_2L_uDir = numpy.array([0.0, 0.0, 1.0])
+            shearkey_2L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.shearkey_2.place(shearkey_2OriginL, shearkey_2L_uDir, shearkey_2L_wDir)
+
+            self.shearkey_2Model = self.shearkey_2.create_model()
 
         if self.stif_algWeb == True:
 
@@ -335,13 +358,13 @@ class BasePlateCad(object):
             self.stiffener_acrsWeb2Model = self.stiffener_acrsWeb2.create_model()
 
         if self.stif_inFlg == True:
-            x_axis = self.stiffener_insideflange.W/2 + self.column.t/2 + self.column.R1 + self.extraspace
+            x_axis = self.stiffener_insideflange.W/2 + self.column.t/2 + self.weld_stiffener_inflange_d.h #+ self.column.R1 + self.extraspace
             y_axis = 0.0        #self.stiffener_acrsWeb.T/2 + self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h
             z_axis = self.stiffener_acrsWeb.W + self.stiffener_insideflange.T/2
 
-            stiffener_insideflange1OriginL = numpy.array([x_axis, y_axis, z_axis])
+            stiffener_insideflange1OriginL = numpy.array([x_axis, y_axis, z_axis + self.stiffener_insideflange.T])
             stiffener_insideflange1L_uDir = numpy.array([0.0, 1.0, 0.0])
-            stiffener_insideflange1L_wDir = numpy.array([0.0, 0.0, 1.0])
+            stiffener_insideflange1L_wDir = numpy.array([0.0, 0.0, -1.0])
             self.stiffener_insideflange1.place(stiffener_insideflange1OriginL, stiffener_insideflange1L_uDir, stiffener_insideflange1L_wDir)
 
             self.stiffener_insideflange1Model = self.stiffener_insideflange1.create_model()
@@ -878,7 +901,7 @@ class BasePlateCad(object):
 
 
         if self.stif_inFlg == True:
-            x_axis =  self.column.t/2 + self.column.R1 + self.extraspace
+            x_axis =  self.column.t/2 + self.stiffener_insideflange.R22 + self.weld_stiffener_inflange_d.h #self.column.R1 + self.extraspace
             y_axis = self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h/2        #self.stiffener_acrsWeb.T/2 + self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h
             z_axis = self.stiffener_acrsWeb.W + self.weld_stiffener_inflange.b
 
@@ -909,6 +932,25 @@ class BasePlateCad(object):
             self.weld_stiffener_inflange22.place(weld_stiffener_inflange22OriginL, weld_stiffener_inflange22L_uDir, weld_stiffener_inflange22L_wDir)
 
             self.weld_stiffener_inflange22Model = self.weld_stiffener_inflange22.create_model()
+
+
+            x_axis = self.column.t/2 + self.weld_stiffener_inflange_d.h/2
+            y_axis = -self.weld_stiffener_inflange_d.L/2        #self.stiffener_acrsWeb.T/2 + self.stiffener_insideflange.L/2 + self.weld_stiffener_inflange.h
+            z_axis = self.stiffener_acrsWeb.W + self.weld_stiffener_inflange.b
+
+            weld_stiffener_inflange_d11OriginL = numpy.array([x_axis, y_axis, z_axis])
+            weld_stiffener_inflange_d11L_uDir = numpy.array([0.0, 0.0, 1.0])
+            weld_stiffener_inflange_d11L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.weld_stiffener_inflange_d11.place(weld_stiffener_inflange_d11OriginL, weld_stiffener_inflange_d11L_uDir, weld_stiffener_inflange_d11L_wDir)
+
+            self.weld_stiffener_inflange_d11Model = self.weld_stiffener_inflange_d11.create_model()
+
+            weld_stiffener_inflange_d22OriginL = numpy.array([-x_axis, y_axis, z_axis])
+            weld_stiffener_inflange_d22L_uDir = numpy.array([0.0, 0.0, 1.0])
+            weld_stiffener_inflange_d22L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.weld_stiffener_inflange_d22.place(weld_stiffener_inflange_d22OriginL, weld_stiffener_inflange_d22L_uDir, weld_stiffener_inflange_d22L_wDir)
+
+            self.weld_stiffener_inflange_d22Model = self.weld_stiffener_inflange_d22.create_model()
 
     def create_nut_bolt_array(self):
         """
@@ -1022,7 +1064,7 @@ class BasePlateCad(object):
             welded_sec.extend(sec)
 
         if self.stif_inFlg == True:
-            sec = [self.weld_stiffener_inflange11Model, self.weld_stiffener_inflange12Model, self.weld_stiffener_inflange21Model, self.weld_stiffener_inflange22Model]
+            sec = [self.weld_stiffener_inflange11Model, self.weld_stiffener_inflange12Model, self.weld_stiffener_inflange21Model, self.weld_stiffener_inflange22Model, self.weld_stiffener_inflange_d11Model, self.weld_stiffener_inflange_d22Model]
             welded_sec.extend(sec)
 
         welds = welded_sec[0]
@@ -1039,6 +1081,9 @@ class BasePlateCad(object):
         #               self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
 
         plate_list = [self.baseplateModel]
+        if self.shear_key_required == True:
+            list = [self.shearkey_1Model, self.shearkey_2Model]
+            plate_list.extend(list)
         if self.stif_algFlg == True:
             list = [self.stiffener_algflangeL1Model, self.stiffener_algflangeR1Model, self.stiffener_algflangeL2Model,
                           self.stiffener_algflangeR2Model]
@@ -1461,6 +1506,7 @@ if __name__ == '__main__':
     from cad.items.grout import Grout
     from cad.items.rect_hollow import RectHollow
     from cad.items.circular_hollow import CircularHollow
+    from cad.items.washer import Washer
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -1477,12 +1523,15 @@ if __name__ == '__main__':
 
     filletWeldcolm = False
     numberOfBolts = 4
-    hollow_sec = True
-    Isec = False
+    hollow_sec = False
+    Isec = True
 
     if Isec == True:
         column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
         baseplate = Plate(L=700, W=500, T=45)
+
+        shearkey_1 = Plate(L= 700, W = 10, T= baseplate.T*10)
+        shearkey_2 = Plate(L= 10, W= 500, T= baseplate.T*10)
 
         if filletWeldcolm ==  True:
             weldAbvFlang = FilletWeld(b=10, h=10, L=250)
@@ -1511,7 +1560,7 @@ if __name__ == '__main__':
                                                t_f=column.T, L_h=50, L_v=100, to_left=False)
         stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
 
-        stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  #self.extraspace=5
+        stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12, R21 = column.R1 + 5, R22= column.R1 + 5, L21 = column.R1 + 5, L22= column.R1 + 5)  #self.extraspace=5
 
         weld_stiffener_algflng_v = GrooveWeld(b= column.T, h = 10, L = stiffener_algflangeL.H)
         weld_stiffener_algflng_h = FilletWeld(b= 10, h= 10, L= stiffener_algflangeL.L)    #Todo: create another weld for inner side of the stiffener
@@ -1526,7 +1575,8 @@ if __name__ == '__main__':
         weld_stiffener_alongWeb_v = GrooveWeld(b= stiffener.T, h=10, L=stiffener.W - stiffener.R22)
         weld_stiffener_alongWeb_gh = GrooveWeld(b= stiffener.T, h=10, L=stiffener.L - stiffener.R22)
 
-        weld_stiffener_inflange = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.W)
+        weld_stiffener_inflange = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.W - stiffener_insideflange.R22)
+        weld_stiffener_inflange_d = GrooveWeld(b= stiffener_insideflange.T, h = 6, L = stiffener_insideflange.L - stiffener_insideflange.R22 - 2*weld_stiffener_inflange.h)
 
         type = 'gusset'  # 'no_gusset'
 
@@ -1537,15 +1587,17 @@ if __name__ == '__main__':
         # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
         bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
         nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+        washer = Washer(a=8 * bolt.r, d=2 * bolt.r, t=2)
         nutSpace = bolt.c + baseplate.T
-        bolthight = nut.T + 50
+        bolthight = nut.T + washer.T + 50
 
-        nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
 
-        basePlate = BasePlateCad(type, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+        nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace, washer)
+
+        basePlate = BasePlateCad(type, column, nut_bolt_array, bolthight, baseplate, shearkey_1, shearkey_2, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                  concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
                                  stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
-                                 weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
+                                 weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, weld_stiffener_inflange_d, stiffener_insideflange, weld_stiffener_inflange)
 
     if hollow_sec == True:
         rect_hollow = True
@@ -1568,9 +1620,11 @@ if __name__ == '__main__':
             # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
             bolt = AnchorBolt_Endplate(l=314.5, c=125, a=75, r=10, ex=ex_length)
             nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+            washer = Washer(a=8 * bolt.r, d=2 * bolt.r, t=2)
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = nut.T + washer.T + 50
             type = 'rect'
+
 
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
@@ -1593,16 +1647,19 @@ if __name__ == '__main__':
             # bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
             # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12, ex=ex_length)
             bolt = AnchorBolt_Endplate(l= 314.5, c= 125, a= 75, r= 10, ex=ex_length)
+            bolt_in = bolt
             nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+            washer = Washer(a=8 * bolt.r, d=2 * bolt.r, t=2)
             nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
+            bolthight = nut.T + washer.T + 50
             type = 'rect'
+
 
             concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
             grout = Grout(L=baseplate.L * 1.5, W=baseplate.W *1.5, T=50)
 
             column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
-        nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
+        nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace, washer)
 
         basePlate = HollowBasePlateCad(type, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout, stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v, weld_stiff_b_h)
 

@@ -10,7 +10,7 @@ import yaml
 import shutil
 import time
 from update_version_check import Update
-# import pandas as pd
+import pandas as pd
 
 
 

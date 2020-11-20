@@ -9,7 +9,7 @@ from texlive.Design_wrapper import init_display as init_display_off_screen
 import yaml
 import shutil
 from update_version_check import Update
-import pandas as pd
+# import pandas as pd
 
 
 

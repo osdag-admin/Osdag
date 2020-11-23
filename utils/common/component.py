@@ -245,7 +245,7 @@ class Bolt:
 
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy, n=1):
         self.single_conn_plates_t_fu_fy = []
-        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n,conn_plates_t_fu_fy[0][1],conn_plates_t_fu_fy[0][2]]))
+        self.single_conn_plates_t_fu_fy.append(tuple([list(conn_plates_t_fu_fy[0])[0]/n, conn_plates_t_fu_fy[0][1], conn_plates_t_fu_fy[0][2]]))
         self.single_conn_plates_t_fu_fy.append(conn_plates_t_fu_fy[1])
         self.connecting_plates_tk = [i[0] for i in self.single_conn_plates_t_fu_fy]
 
@@ -352,8 +352,7 @@ class Weld:
     def set_min_max_sizes(self, part1_thickness, part2_thickness, special_circumstance=False, fusion_face_angle=90):
         self.min_size = IS800_2007.cl_10_5_2_3_min_weld_size(part1_thickness, part2_thickness)
         k = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(fusion_face_angle)
-        self.max_size = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(
-            part1_thickness, part2_thickness, special_circumstance) / k
+        self.max_size = (IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(part1_thickness, part2_thickness, special_circumstance)) / k
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         # connecting_fu.append(self.fu)
@@ -1242,7 +1241,6 @@ class Plate(Material):
         return repr
 
 
-
 class ISection(Material):
 
     def __init__(self, designation, material_grade="", table=""):
@@ -1573,6 +1571,7 @@ class Column(ISection):
     def max_plate_height(self):
         clear_depth = self.depth - 2 * self.flange_thickness - 2 * self.root_radius
         return clear_depth
+
 
 class Channel(Material):
 
@@ -2094,7 +2093,7 @@ class HollowSection(Material):
 
     def __init__(self, designation, material_grade, table):
         self.connect_to_database_update_other_attributes(table, designation, material_grade)
-        super(HollowSection, self).__init__(designation, material_grade)
+        # super(HollowSection, self).__init__(designation, material_grade)
 
     def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
         conn = sqlite3.connect(PATH_TO_DATABASE)

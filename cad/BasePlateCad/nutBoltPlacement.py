@@ -140,7 +140,7 @@ class NutBoltArray():
         self.pitch1 = self.BP.pitch_distance_out
         self.gauge1 = self.BP.gauge_distance_out
 
-        if self.BP.load_axial_tension > 0:
+        if self.BP.load_axial_tension > 0 or self.BP.load_moment_minor > 0:
             self.enddist_in = self.BP.end_distance_in
             self.edgedist_in = self.BP.edge_distance_in
             if self.BP.anchors_inside_flange == 8:

@@ -181,7 +181,6 @@ class BeamCoverPlate(MomentConnection):
 
         return add_buttons
 
-
     def get_values_for_design_pref(self, key, design_dictionary):
 
         if design_dictionary[KEY_MATERIAL] != 'Select Material':
@@ -1028,8 +1027,8 @@ class BeamCoverPlate(MomentConnection):
             self.min_axial_load = 0.3 * self.axial_capacity
             self.load_moment_min = 0.5 * self.section.moment_capacity
             logger.info(
-                "Loads defined by the user are less than minimun recommendations as per IS 800:2007, Cl.10.7")
-            logger.info("Load values are set at minimun recommendations as per IS 800:2007, Cl.10.7")
+                "Loads defined by the user are less than minimum recommendations as per IS 800:2007, Cl.10.7")
+            logger.info("Load values are set at minimum recommendations as per IS 800:2007, Cl.10.7")
 
         elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
 
@@ -1040,7 +1039,7 @@ class BeamCoverPlate(MomentConnection):
                             (1 - self.sum_IR) * self.section.moment_capacity)
             self.min_axial_load = self.load.axial_force * 1000
             logger.info("Moment defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
-            logger.info("Moment value is set at {} kN-m".format(self.load_moment_min))
+            logger.info("Moment value is set at {} kN-m".format(round(self.load_moment_min / 1000000, 2)))
 
         elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
 
@@ -1050,7 +1049,7 @@ class BeamCoverPlate(MomentConnection):
                 self.min_axial_load = self.load.axial_force * 1000 + ((1 - self.sum_IR) * self.axial_capacity)
             self.load_moment_min = self.load.moment * 1000000
             logger.info("Axial force defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
-            logger.info("Axial force is set at {} kN".format(self.min_axial_load))
+            logger.info("Axial force is set at {} kN".format(round(self.min_axial_load / 1000, 2)))
         else:
             self.min_axial_load = self.load.axial_force * 1000
             self.load_moment_min = self.load.moment * 1000000
@@ -3044,7 +3043,8 @@ class BeamCoverPlate(MomentConnection):
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,display_prov(self.load.moment, "M"),
               prov_moment_load(moment_input=self.load.moment,min_mc=round(self.load_moment_min / 1000000, 2),
-                               app_moment_load=round(self.load_moment / 1000000, 2),moment_capacity=round(self.section.moment_capacity / 1000000, 2)),"")
+                               app_moment_load=round(self.load_moment / 1000000, 2),moment_capacity=round(self.section.moment_capacity / 1000000, 2),
+                               moment_capacity_supporting=0.0),"")
 
         self.report_check.append(t1)
         t23 = (KEY_OUT_DISP_FORCES_WEB, '', forces_in_web(Au=round(self.factored_axial_load / 1000, 2),
@@ -4020,6 +4020,7 @@ class BeamCoverPlate(MomentConnection):
             #                     round(self.web_plate.shear_capacity_web_plate / 1000, 2),relation="lesser"))
             # self.report_check.append(t1)
 
+        Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         #config = configparser.ConfigParser()
@@ -4034,6 +4035,6 @@ class BeamCoverPlate(MomentConnection):
 
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image)
 
 # def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):

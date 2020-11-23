@@ -36,7 +36,7 @@ class CreateLatex(Document):
         super().__init__()
 
 
-    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
+    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_2d_image, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -192,6 +192,8 @@ class CreateLatex(Document):
                 table.add_hline()
                 # Fail = TextColor("FailColor", bold("Fail"))
                 # Pass = TextColor("PassColor", bold("Pass"))
+
+
                 if does_design_exist != True:
                     table.add_row(bold('Design Status'),color_cell("Red",bold("Fail")))
                 else:
@@ -207,6 +209,13 @@ class CreateLatex(Document):
                         # doc.append(NewPage())
                         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                     with doc.create(Subsection(check[1])):
+#########################
+                        # if uiObj== "WELDImage":
+                        #     table.add_hline()
+                        #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+                        #     table.add_hline()
+                        # else:
+#########################
                         with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
@@ -269,9 +278,31 @@ class CreateLatex(Document):
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Green", bold(check[3])))
                     table.add_hline()
 
+        # 2D images
+        if len(Disp_2d_image) != 0:
 
+            if does_design_exist and sys.platform != 'darwin':
+                doc.append(NewPage())
+                weld_details = rel_path + Disp_2d_image[0]
+                detailing_details = rel_path + Disp_2d_image[1]
+                stiffener_details = rel_path + Disp_2d_image[2]
 
+                with doc.create(Section('2D Drawings (Typical)')):
 
+                    with doc.create(Figure()) as image:
+                        image.add_image(weld_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
+                        image.add_caption('Typical Weld Details - Beam to End Plate Connection')
+                        # doc.append(NewPage())
+
+                    with doc.create(Figure()) as image_2:
+                        image_2.add_image(detailing_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
+                        image_2.add_caption('Typical Detailing')
+                        # doc.append(NewPage())
+
+                    with doc.create(Figure()) as image_3:
+                        image_3.add_image(stiffener_details, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
+                        image_3.add_caption('Typical Stiffener Details')
+                        # doc.append(NewPage())
 
         if does_design_exist and sys.platform != 'darwin':
             doc.append(NewPage())
@@ -282,7 +313,7 @@ class CreateLatex(Document):
             view_topimg_path = rel_path + Disp_top_image
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
-            with doc.create(Section('3D View')):
+            with doc.create(Section('3D Views')):
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
                     view_topimg_path = rel_path + Disp_top_image
@@ -319,7 +350,7 @@ class CreateLatex(Document):
                     continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
-            doc.generate_pdf(filename, compiler='/home/danish/texlive/2020/bin/x86_64-linux/pdflatex', clean_tex=False)
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:
             pass
 

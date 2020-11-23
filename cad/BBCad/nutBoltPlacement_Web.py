@@ -1,7 +1,8 @@
 """
 created on 25-02-2018
-
 @author: Siddhesh Chavan
+
+modified: Darshan Vishwakarma (10-1-2020)
 
 AF abbreviation used here is for Above Flange for bolting.
 BF abbreviation used here is for Below Flange for bolting.
@@ -32,8 +33,6 @@ class NutBoltArray_Web():
         self.pitchDirW = None
         self.boltDirW = None
 
-        #self.uiObj = alist
-        #self.beamDim = beam_data
         self.bolt = bolt
         self.nut = nut
         self.outputobj = outputobj
@@ -71,8 +70,6 @@ class NutBoltArray_Web():
         '''
         self.edge_W = outputobj.web_plate.edge_dist_provided    #33
         self.end_W = outputobj.web_plate.end_dist_provided      #33
-        # self.pitch_W = 150     #70
-        # self.gauge_W = outputobj.web_plate.length - 2* self.edge_W
         self.pitch_W = outputobj.web_plate.pitch_provided
         self.pitch_MW = outputobj.web_plate.midpitch # todo for gap
         self.gauge_W = outputobj.web_plate.gauge_provided
@@ -97,30 +94,16 @@ class NutBoltArray_Web():
                 else:
                     pos_W = pos_W + (cl_W - 1) * self.pitch_W * self.gaugeDirW + 1 * self.pitch_MW * self.gaugeDirW
                 self.positions_W.append(pos_W)
-                # else:
-                #     pos_AF = pos_AF + rw_W * self.pitch_AF * self.pitchDirAF
-                #     if self.col_AF / 2 > cl_AF:
-                #         pos_AF = pos_AF + cl_AF * self.gauge * self.gaugeDirAF
-                #     else:
-                #         pos_AF = pos_AF + (
-                #                     cl_AF - 1) * self.gauge * self.gaugeDirAF + 1 * self.gauge_AF * self.gaugeDirAF
-                #     self.positions_AF.append(pos_AF)
 
-                # pos_W = pos_W + rw_W * self.pitch_W * self.pitchDirW
-                # pos_W = pos_W + cl_W * self.gauge_W * self.gaugeDirW
-                # pos_W = pos_W + rw_W * self.gauge_W * self.pitchDirW
-                # pos_W = pos_W + cl_W * self.pitch_W * self.gaugeDirW
-                #
-                #
-                # self.positions_W.append(pos_W)
 
     def placeW(self, originW, gaugeDirW, pitchDirW, boltDirW):
         """
-        :param originW: Origin for bolt placement 
+        :param originW: Origin for bolt placement
         :param gaugeDirW: Gauge direction for gauge distance
         :param pitchDirW: Pitch direction for pitch distance
         :param boltDirW: Bolt screwing direction
-        :return: 
+        :return: places the bolts and nuts based on the defined bolt arrangement
+
         """
         self.originW = originW
         self.gaugeDirW = gaugeDirW

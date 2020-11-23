@@ -12,12 +12,13 @@ Started on 15 - Nov - 2018
 
 @author: ajmalbabums, Danish Ansari, Sourabh Das
 """
+import sqlite3
+import math
 import os
 import sys
 PATH_TO_DATABASE = os.path.join(sys.path[0],'ResourceFiles','Database','Intg_osdag.sqlite')
 
-import sqlite3
-import math
+
 
 
 # IS 1363 - Part 1 : 2002

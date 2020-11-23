@@ -16,7 +16,7 @@ Bolt.Material_Grade_OverWrite: '570'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Friction Grip Bolt
-Connectivity: Column flange-Beam web
+Connectivity: Column Flange-Beam Web
 Connector.Material: E 450 (Fe 570)D
 Connector.Plate.Thickness_List:
 - '3'

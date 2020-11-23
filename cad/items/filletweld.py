@@ -2,9 +2,18 @@
 Created on 27-May-2015
 
 @author: deepa
+modified : Darshan Vishwakarma (12-10-2020)
 '''
 import numpy
 from cad.items.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
+from OCC.Core.gp import (gp_Vec, gp_Pnt, gp_Trsf, gp_OX, gp_OY,
+                         gp_OZ, gp_XYZ, gp_Ax2, gp_Dir, gp_GTrsf, gp_Mat)
+from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
+                                     BRepBuilderAPI_MakeVertex,
+                                     BRepBuilderAPI_MakeWire,
+                                     BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakeEdge2d,
+                                     BRepBuilderAPI_Transform)
+from math import radians
 
 '''
 
@@ -49,14 +58,24 @@ class FilletWeld(object):
         self.a3 = self.sec_origin + self.h * self.vDir
         self.points = [self.a1, self.a2, self.a3]
 
-    def create_model(self):
+    def create_model(self,rotate_angle=None):
         Pnt = getGpPt(self.sec_origin)
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
         extrudeDir = self.L * (self.wDir)  # extrudeDir is a numpy array
-        prism = makePrismFromFace(aFace, extrudeDir)
-        return prism
+        if rotate_angle == None:
+            prism1 = makePrismFromFace(aFace, extrudeDir)
+        else:
+            prism = makePrismFromFace(aFace, extrudeDir)
+            trns = gp_Trsf()
+            angle = radians(rotate_angle)
+            trns.SetRotation(gp_OX(), angle)
+            brep_trns = BRepBuilderAPI_Transform(prism, trns, False)
+            brep_trns.Build()
+            prism1 = brep_trns.Shape()
+
+        return prism1
 
 
 if __name__ == '__main__':
@@ -76,10 +95,12 @@ if __name__ == '__main__':
     FWeld = FilletWeld(b, h, L)
     _place = FWeld.place(origin, uDir, shaftDir)
     point = FWeld.compute_params()
-    prism = FWeld.create_model()
+    prism = FWeld.create_model(45)
 
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
+
+
 
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()

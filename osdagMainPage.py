@@ -148,8 +148,9 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
-from design_type.connection.beam_end_plate import BeamEndPlate
+
 from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
@@ -262,12 +263,11 @@ class OsdagMainWindow(QMainWindow):
                                                     'Beam to Beam' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
-                                                                ('End Plate Splice', 'ResourceFiles/images/extended.png', 'B2B_End_Plate_Splice'),
+                                                                ('End Plate Splice', 'ResourceFiles/images/bb_splice.png', 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam to Column': [
-                                                                ('Beam Column End Plate', 'ResourceFiles/images/extendedbothways.png','BC_End_Plate'),
+                                                                ('End Plate', 'ResourceFiles/images/BC-EBW_GUI.png','BC_End_Plate'),
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column to Column' :[
@@ -279,7 +279,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'PEB' : self.Under_Development,
                                                     },
                                 'Base Plate':[
-                                        ('Base Plate', 'ResourceFiles/images/BasePlate.jpeg', 'Base_Plate'),
+                                        ('Base Plate', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
                                 'Truss Connection' : self.Under_Development,
@@ -529,11 +529,11 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(BeamCoverPlateWeld, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamEndPlate,' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        # elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
+        #     self.hide()
+        #     self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice,' ')
+        #     self.ui2.show()
+        #     self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton, 'B2B_End_Plate_Splice').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice, ' ')
@@ -543,9 +543,10 @@ class OsdagMainWindow(QMainWindow):
     def show_moment_connection_bc(self):
         if self.findChild(QRadioButton,'BC_End_Plate').isChecked():
             self.hide()
-            self.ui2 = Ui_ModuleWindow( BeamColumnEndPlate, ' ')
+            self.ui2 = Ui_ModuleWindow(BeamColumnEndPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+
     def show_base_plate(self):
         if self.findChild(QRadioButton, 'Base_Plate').isChecked():
             self.hide()
@@ -815,16 +816,6 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
-
-    # #######add darshan#################
-    # print(multiprocessing.cpu_count())
-    # pool = Pool()
-    # try:
-    #     result = pool.apply_async(OsdagMainWindow())
-    # finally:
-    #     pool.terminate()
-    # ####################################
-
     window = OsdagMainWindow()
 
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)

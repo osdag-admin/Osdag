@@ -2007,7 +2007,7 @@ class ColumnEndPlate(MomentConnection):
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, self.load.moment,
               prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),
                                app_moment_load=round(self.load_moment / 1000000, 2),
-                               moment_capacity=round(self.section.moment_capacity / 1000000, 2)), "")
+                               moment_capacity=round(self.section.moment_capacity / 1000000, 2), moment_capacity_supporting=0.0), "")
         self.report_check.append(t1)
 
         self.bolt_conn_plates_t_fu_fy = []
@@ -2189,6 +2189,7 @@ class ColumnEndPlate(MomentConnection):
         else:
                pass
 
+        Disp_2d_image = []
         Disp_3d_image = "/ResourceFiles/images/3d.png"
 
         # config = configparser.ConfigParser()
@@ -2202,7 +2203,7 @@ class ColumnEndPlate(MomentConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                                   rel_path, Disp_3d_image)
+                                   rel_path, Disp_2d_image, Disp_3d_image)
 
 
 # def save_latex(self, uiObj, Desigxn_Check, reportsummary, filename, rel_path, Disp_3d_image):

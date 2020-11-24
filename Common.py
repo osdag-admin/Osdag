@@ -394,7 +394,7 @@ KEY_D = 'Bolt.Diameter'
 KEY_TYP = 'Bolt.Type'
 KEY_GRD = 'Bolt.Grade'
 
-KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
+# KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
 KEY_DP_BOLT_HOLE_TYPE = 'Bolt.Bolt_Hole_Type'
 KEY_DP_BOLT_TYPE = 'Bolt.TensionType'
 KEY_DP_BOLT_SLIP_FACTOR = 'Bolt.Slip_Factor'
@@ -487,14 +487,17 @@ PLATE_THICKNESS_IS_1730_1989 = ['5', '6', '7', '8', '10', '12', '14', '16', '18'
 PLATE_THICKNESS_SAIL = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
                         '110', '120']
 
+VALUES_PLATETHICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_PLATETHK_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+
 # TODO: delete the below list (commented) after verification
 # VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24','25', '26', '28', '30','32','36','40','45','50','56','63','80']
 # VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 # VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
 
-VALUES_PLATETHK_CUSTOMIZED = PLATE_THICKNESS_SAIL
-VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
-VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
+
 
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
@@ -1300,8 +1303,7 @@ DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)*'
 
-VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '25', '26', '28', '30','32',
-                                    '36','40','45','50','56','63','80']
+
 
 
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'

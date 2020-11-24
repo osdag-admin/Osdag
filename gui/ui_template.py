@@ -316,8 +316,8 @@ class Window(QMainWindow):
 
     def get_validator(self, validator):
         if validator == 'Int Validator':
-            # return QRegExpValidator(QRegExp("^[1-9]+\d * (\.\d+)?$"))
-            return QIntValidator()
+            return QRegExpValidator(QRegExp("^(0|[1-9]\d*)(\.\d+)?$"))
+            # return QIntValidator()
         elif validator == 'Double Validator':
             return QDoubleValidator()
         else:
@@ -1743,10 +1743,11 @@ class Window(QMainWindow):
             elif op[2] == TYPE_TEXTBOX:
                 if key_str in uiObj.keys():
                     if key_str == KEY_SHEAR or key_str==KEY_AXIAL or key_str == KEY_MOMENT:
-                        try:
-                            if uiObj[key_str] > 0:
-                                pass
-                        except:
+                        if uiObj[key_str] == "":
+                            pass
+                        elif float(uiObj[key_str]) >= 0:
+                            pass
+                        else:
                             self.load_input_error_message += \
                                 str(key_str) + ": (" + str(uiObj[key_str]) + ") - Load should be positive integer! \n"
                             uiObj[key_str] = ""

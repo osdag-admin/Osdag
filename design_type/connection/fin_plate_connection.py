@@ -610,7 +610,7 @@ class FinPlateConnection(ShearConnection):
         for self.plate.thickness_provided in self.thickness_possible:
             self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
                                                         thickness=self.plate.thickness_provided)
-            print('plate_t_fy_fu', self.plate.thickness_provided,self.plate.fy,self.plate.fu)
+
             self.plate.height = initial_plate_height
             self.plate.gauge_provided = initial_gauge
             self.plate.edge_dist_provided = initial_edge_dist
@@ -625,7 +625,7 @@ class FinPlateConnection(ShearConnection):
                                              self.load.shear_force * 1000, self.load.axial_force * 1000, 0,
                                              self.plate.gap, True, 2,
                                              self.plate.bolts_one_line, self.plate.bolt_line, None, self.plate.pitch_provided)
-            print("2. plate deisign status is ", self.plate.design_status)
+
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
             else:

@@ -133,6 +133,7 @@ import OCC.Core.V3d
 from OCC.Core.Quantity import *
 from OCC.Core.Graphic3d import *
 from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
+# from OCC.Core.AIS import Erase
 # from OCC.Display.OCCViewer import V3d_XposYnegZneg
 from OCC.Core.TNaming import tnaming
 import multiprocessing
@@ -1708,7 +1709,8 @@ class CommonDesignLogic(object):
 
 
             if self.loc == "Column flange-Beam web" and self.connection == "Fin Plate":
-                self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
+                pass
+                # self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYposZpos)
             elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
             elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
@@ -1920,6 +1922,7 @@ class CommonDesignLogic(object):
                     DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                     Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
                     DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
+                    # Erase(DisplayMsg(self.display, Point2, self.Bc.supported_section.designation))
 
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:

@@ -937,7 +937,7 @@ class CommonDesignLogic(object):
         column_R1 = float(BCE.column_r1)
         column_R2 = float(BCE.column_r2)
         column_alpha = 0.0
-        column_length = float(BCE.ep_height_provided + 1000)
+        self.column_length = float(BCE.ep_height_provided + 1000)
         # print(column_T,column_B,column_d,column_tw,column_R1,column_R2)
 
         beam_tw = float(BCE.beam_tw)
@@ -947,15 +947,15 @@ class CommonDesignLogic(object):
         beam_R1 = float(BCE.beam_r1)
         beam_R2 = float(BCE.beam_r2)
         beam_alpha = 0.0
-        beam_length = BCE.stiffener_length +500
+        self.beam_length = BCE.stiffener_length +500
 
         beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
                              R1=column_R1, R2=column_R2, alpha=column_alpha,
-                             length=column_length, notchObj=None)
+                             length=self.column_length, notchObj=None)
 
         beam_Right = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                               R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-                              length=beam_length, notchObj=None)  # Since both the beams are same
+                              length=self.beam_length, notchObj=None)  # Since both the beams are same
 
         # outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
@@ -1875,11 +1875,18 @@ class CommonDesignLogic(object):
                 self.ExtObj = self.createBCEndPlateCAD()
 
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
-
+                c_length = self.column_length
+                # Point1 = gp_Pnt(0.0, 0.0, c_length)
+                # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
+                b_length = self.beam_length + self.Bc.supporting_section.depth/2+100
+                # Point2 = gp_Pnt(0.0,-b_length, c_length/2)
+                # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
+                    Point1 = gp_Pnt(-self.Bc.supporting_section.flange_width/2, 0, c_length)
+                    DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                     # Point = gp_Pnt(0.0, 0.0, 10)
                     # DisplayMsg(self.display,Point, "Column")
 
@@ -1887,6 +1894,8 @@ class CommonDesignLogic(object):
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.beamModel, update=True,
                                         material=Graphic3d_NOT_2D_ALUMINUM)
+                    Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
+                    DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                     # , color = 'Dark Gray'
 
                 elif component == "Connector":
@@ -1907,6 +1916,10 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
                                         color=Quantity_NOC_SADDLEBROWN)
+                    Point1 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -self.Bc.supporting_section.depth/2, c_length)
+                    DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
+                    Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
+                    DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
 
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:

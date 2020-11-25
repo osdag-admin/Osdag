@@ -67,7 +67,7 @@ def osdag_display_shape(display, shapes, material=None, texture=None, color=None
     display.DisplayShape(shapes, material, texture, color, transparency, update=update)
 
 def rgb_color(r, g, b):
-    return Quantity_Color(r, g, b, Quantity_TOC_RGB)
+    return Quantity_Color(r, g, b, Quantity_NOC_BLACK)
 
 def to_string(_string):
     return TCollection_ExtendedString(_string)

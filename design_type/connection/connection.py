@@ -463,6 +463,16 @@ class Connection(Main):
 
         return d
 
+    def get_bolt_tension_type_for_prying(self):
+        bolt_type = self[0]
+
+        if bolt_type == "Bearing Bolt":
+            bolt_tension_type = 'Non pre-tensioned'
+        else:
+            bolt_tension_type = 'Pre-tensioned'
+
+        return bolt_tension_type
+
     def edit_tabs(self):
 
         edit_list = []

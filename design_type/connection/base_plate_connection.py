@@ -2337,6 +2337,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
+    def warn_text(self):
+
+        """
+        Function to give logger warning when any old value is selected from beams and Beams table.
+        """
+        global logger
+        red_list = red_list_function()
+        if self.dp_column_designation in red_list or self.dp_column_designation in red_list:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.info(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+
     # set input values to perform design
     def bp_parameters(self, design_dictionary):
         """ Initialize variables to use in calculation from input dock and design preference UI.
@@ -7167,7 +7180,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             KEY_MODULE: self.module,
             KEY_CONN: self.connectivity,
             KEY_END_CONDITION: self.end_condition,
-            KEY_DISP_AXIAL_BP: round(self.load_axial_input * 10 ** -3, 2),
+            KEY_DISP_AXIAL_BP: round(self.load_axial_input, 2),
             KEY_DISP_AXIAL_TENSION_BP: round(self.load_axial_tension * 10 ** -3, 2),
             KEY_DISP_SHEAR_BP: None,
             KEY_DISP_SHEAR_MAJOR: round(self.load_shear_major * 10 ** -3, 2),
@@ -7463,7 +7476,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t6)
 
             max_pitch_out = self.cl_10_2_3_1_max_spacing([self.plate_thk_provided])
-            t7 = ('Max. pitch distance $(mm)$', cl_10_2_3_1_max_spacing([self.plate_thk_provided, 0], parameter=None), self.pitch_distance_out,
+            t7 = ('Max. pitch distance $(mm)$', cl_10_2_3_1_max_spacing([self.plate_thk_provided, self.plate_thk_provided], parameter=None),
+                  self.pitch_distance_out,
                   get_pass_fail(max_pitch_out, self.pitch_distance_out, relation='geq'))
             self.report_check.append(t7)
         else:
@@ -8409,10 +8423,137 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # End of checks
 
-        Disp_2d_image = []
+        # typical sketch
+        if self.connectivity == 'Moment Base Plate':
+            if self.moment_bp_case == 'Case1':
+                sketch_path = '/ResourceFiles/images/Moment_BP.png'
+            elif self.moment_bp_case == 'Case2':
+                sketch_path = '/ResourceFiles/images/Moment_BP_C2.png'
+            elif self.moment_bp_case == 'Case3':
+                sketch_path = '/ResourceFiles/images/Moment_BP_C3.png'
+            else:
+                sketch_path = ''
+        elif self.connectivity == 'Welded Column Base':
+            sketch_path = '/ResourceFiles/images/Welded_BP.png'
+
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                sketch_path = '/ResourceFiles/images/SHS_BP.png'
+            elif self.dp_column_designation[1:4] == 'RHS':
+                sketch_path = '/ResourceFiles/images/RHS_BP.png'
+            elif self.dp_column_designation[1:4] == 'CHS':
+                sketch_path = '/ResourceFiles/images/CHS_BP.png'
+            else:
+                sketch_path = ''
+        else:
+            sketch_path = ''
+
+        # typical detailing
+        if self.connectivity == 'Moment Base Plate':
+            detailing_path = '/ResourceFiles/images/Moment_BP_Detailing.png'
+        elif self.connectivity == 'Welded Column Base':
+            detailing_path = '/ResourceFiles/images/Welded_BP_Detailing.png'
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                detailing_path = '/ResourceFiles/images/SHS_BP_Detailing.png'
+            elif self.dp_column_designation[1:4] == 'RHS':
+                detailing_path = '/ResourceFiles/images/RHS_BP_Detailing.png'
+            elif self.dp_column_designation[1:4] == 'CHS':
+                detailing_path = '/ResourceFiles/images/CHS_BP_Detailing.png'
+            else:
+                detailing_path = ''
+        else:
+            detailing_path = ''
+
+        # shear key
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                    key_path = '/ResourceFiles/images/Key_SHS.png'
+                elif self.shear_key_along_ColDepth == 'Yes':
+                    key_path = '/ResourceFiles/images/Key_SHS_D.png'
+                elif self.shear_key_along_ColWidth == 'Yes':
+                    key_path = '/ResourceFiles/images/Key_SHS_B.png'
+                else:
+                    key_path = ''
+            elif self.dp_column_designation[1:4] == 'RHS':
+                if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                    key_path = '/ResourceFiles/images/Key_RHS.png'
+                elif self.shear_key_along_ColDepth == 'Yes':
+                    key_path = '/ResourceFiles/images/Key_RHS_D.png'
+                elif self.shear_key_along_ColWidth == 'Yes':
+                    key_path = '/ResourceFiles/images/Key_RHS_B.png'
+                else:
+                    key_path = ''
+            elif self.dp_column_designation[1:4] == 'CHS':
+                if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                    key_path = '/ResourceFiles/images/Key_CHS.png'
+                elif self.shear_key_along_ColDepth == 'Yes':
+                    key_path = '/ResourceFiles/images/Key_CHS_key1.png'
+                elif self.shear_key_along_ColWidth == 'Yes':
+                    key_path = '/ResourceFiles/images/Key_CHS_key2.png'
+                else:
+                    key_path = ''
+            else:
+                key_path = ''
+        else:
+            if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
+                key_path = '/ResourceFiles/images/shear_key.png'
+            elif self.shear_key_along_ColDepth == 'Yes':
+                key_path = '/ResourceFiles/images/shear_key_colD.png'
+            elif self.shear_key_along_ColWidth == 'Yes':
+                key_path = '/ResourceFiles/images/shear_key_colB.png'
+            else:
+                key_path = ''
+
+        # weld details
+        if self.connectivity == 'Moment Base Plate':
+            if self.weld_bp_groove == 'Yes':
+                web_groove_weld = 'Yes'
+            else:
+                web_groove_weld = 'No'
+
+            if web_groove_weld == 'No':
+                if (self.shear_key_along_ColDepth == 'Yes') or (self.shear_key_along_ColWidth == 'Yes'):
+                    web_groove_weld = 'Yes'
+                else:
+                    web_groove_weld = 'No'
+
+            if (self.column_tf < 40.0) and (web_groove_weld == 'No'):
+                weld_path = '/ResourceFiles/images/Moment_BP_weld_details_1-1.png'
+            elif (self.column_tf < 40.0) and (web_groove_weld == 'Yes'):
+                weld_path = '/ResourceFiles/images/Moment_BP_weld_details_1-2.png'
+            elif self.column_tf > 40.0:
+                weld_path = '/ResourceFiles/images/Moment_BP_weld_details_2.png'
+
+        elif self.connectivity == 'Welded Column Base':
+            if self.weld_bp_groove == 'No':
+                weld_path = '/ResourceFiles/images/BP_welded_weld_details.png'
+            else:
+                if self.column_tf < 40.0:
+                    weld_path = '/ResourceFiles/images/Welded_BP_single_bevel.png'
+                if self.column_tf >= 40.0:
+                    weld_path = '/ResourceFiles/images/Welded_BP_double_J.png'
+                else:
+                    weld_path = '/ResourceFiles/images/BP_welded_weld_details.png'
+
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                weld_path = '/ResourceFiles/images/SHS_BP_weld_details.png'
+            elif self.dp_column_designation[1:4] == 'RHS':
+                weld_path = '/ResourceFiles/images/RHS_BP_weld_details.png'
+            elif self.dp_column_designation[1:4] == 'CHS':
+                weld_path = '/ResourceFiles/images/CHS_BP_weld_details.png'
+            else:
+                weld_path = ''
+        else:
+            weld_path = ''
+
+        Disp_2d_image = [sketch_path, detailing_path, weld_path, key_path]
         display_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
 
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, display_3D_image)
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
+                               display_3D_image, module=self.module)

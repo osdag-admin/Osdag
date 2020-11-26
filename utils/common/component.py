@@ -19,7 +19,7 @@ class Bolt:
 
     def __init__(self, grade=None, diameter=None, bolt_type="", bolt_hole_type="Standard",
                  edge_type="Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True,
-                 bolt_tensioning="Pretensioned"):
+                 bolt_tensioning=""):
 
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
@@ -31,6 +31,12 @@ class Bolt:
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
         self.mu_f = float(mu_f)
+
+        if bolt_type == "Bearing Bolt":
+            bolt_tensioning = 'Non pre-tensioned'
+        else:
+            bolt_tensioning = 'Pre-tensioned'
+
         self.bolt_tensioning = bolt_tensioning
 
         self.d_0 = 0.0
@@ -285,6 +291,15 @@ class Bolt:
         else:  # "Friction Grip Bolt"
             self.bolt_combined_capacity = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(shear_demand, shear_capacity, tension_demand,
                                                                                                        tension_capacity)  # kN
+
+    def calculate_beta_for_prying(self, bolt_tensioning):
+        """ """
+        if bolt_tensioning == 'Pre-tensioned':
+            beta = 1
+        else:
+            beta = 2
+
+        return beta
 
 
 class Nut(Material):

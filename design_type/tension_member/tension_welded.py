@@ -631,7 +631,7 @@ class Tension_welded(Member):
                         # val = option[4]
                         # print(design_dictionary[option[0]], "jhvhj")
                         if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Value can't be equal or less than zero"
+                            error = "Input value(s) cannot be equal or less than zero."
                             all_errors.append(error)
                         else:
                             flag1 = True
@@ -639,12 +639,10 @@ class Tension_welded(Member):
                     if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
 
                         if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Value can't be equal or less than zero"
+                            error = "Input value(s) cannot be equal or less than zero."
                             all_errors.append(error)
                         else:
                             flag2 = True
-
-
             else:
                 pass
 
@@ -821,7 +819,6 @@ class Tension_welded(Member):
                                        B_b=self.section_size_max.b, T_t=self.section_size_max.thickness)
             self.max_length = 400 * self.min_radius_gyration
 
-
         elif self.sec_profile in ['Back to Back Angles', 'Star Angles']:
             self.section_size_max = Angle(designation=section, material_grade=self.material)
             self.section_size_max.tension_member_yielding(A_g=(2 * self.section_size_max.area),
@@ -831,9 +828,6 @@ class Tension_welded(Member):
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.a,
                                        B_b=self.section_size_max.b, T_t=self.section_size_max.thickness)
             self.max_length = 400 * self.min_radius_gyration
-
-
-
 
         elif self.sec_profile == 'Channels':
             self.section_size_max = Channel(designation=section, material_grade=self.material)
@@ -1026,9 +1020,9 @@ class Tension_welded(Member):
             elif (self.load.axial_force * 1000 > self.force1):
                 self.max_limit_status_1 = True
                 # self.design_status = False
-                logger.warning(":Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(
-                        round(self.load.axial_force, 2), round(self.force1 / 1000, 2), self.max_area))
-                logger.info(":Select Members with higher cross sectional area than the above mentioned Member.")
+                logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                               "member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
+                logger.info(" : Define member(s) with a higher cross sectional area.")
                 # logge r.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1039,21 +1033,17 @@ class Tension_welded(Member):
             elif self.length > self.len2:
                 self.max_limit_status_2 = True
                 # self.design_status = False
-                logger.warning(":Member Length {} mm exceeds maximum allowable length of {} mm for maximum available member size {}.".format(
-                        self.length, round(self.len2,2), self.max_gyr))
-                logger.info(":Select Members with higher radius of gyration value than the above mentioned Member.")
-                # logger.error(": Design is not safe. \n ")
-                # logger.info(" :=========End Of design===========")
+                logger.warning(" : The member length ({} mm) exceeds the maximum allowable length ({} mm) with respect to the maximum available "
+                               "member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
+                logger.info(" : Select member(s) with a higher radius of gyration value.")
                 break
-
             else:
                 pass
 
-
         if self.member_design_status == False and self.max_limit_status_1 != True and self.max_limit_status_2 != True:
-            logger.warning(":Member Depth can't accomodate minimum available bolt diameter of {} mm based on minimum spacing limit (IS 800:2007 - Clause 10.2).".format(
-                    self.bolt_diameter_min))
-            logger.info(":Reduce the bolt size or increase the Member Depth.")
+            logger.warning(" : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
+                           "minimum spacing limit [Ref. Cl. 10.2, IS 800:2007].".format(self.bolt_diameter_min))
+            logger.info(" : Reduce the bolt diameter or increase the member depth and re-design.")
             # logger.error(": Design is not safe. \n ")
             # logger.info(" :=========End Of design===========")
 
@@ -1062,9 +1052,8 @@ class Tension_welded(Member):
             self.design_status = True
             self.initial_plate_check(self, design_dictionary)
         else:
-            # print(self.member_design_status,"hxfv")
             self.design_status = False
-            logger.error(": Design is not safe. \n ")
+            logger.error(": Design is unsafe. \n ")
             logger.info(" :=========End Of design===========")
 
     def initial_plate_check(self, design_dictionary):
@@ -1144,12 +1133,10 @@ class Tension_welded(Member):
 
             else:
                 self.design_status = False
-                logger.warning(":Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
-                        round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2)))
-
-                logger.error(":Design is not safe. \n ")
+                logger.warning(": The tension force ({} kN) exceeds the tension capacity of {} kN for maximum available plate thickness of 80 mm."
+                    .format(round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2)))
+                logger.error(":Design is unsafe. \n ")
                 logger.debug(":=========End Of design===========")
-
 
     def select_weld(self,design_dictionary):
 
@@ -1170,7 +1157,7 @@ class Tension_welded(Member):
         self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.length)
         # print(self.plate.length, self.weld.throat, "xfsf")
         if self.plate.length > (150 * self.weld.throat) and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-            logger.info(" To avoid Long Joint Limit, weld is provided only on the flanges.")
+            logger.info(" To satisfy the long joint limit, weld is provided only on the flanges.")
             self.web_weld_status = False
             self.weld.weld_size(plate_thickness=self.plate.thickness_provided, member_thickness=self.thick_1,edge_type="Rolled")
             self.get_weld_strength(self, connecting_fu=[self.section_size_1.fu, self.plate.fu, self.weld.fu],
@@ -1211,8 +1198,8 @@ class Tension_welded(Member):
             self.member_check(self, design_dictionary)
         else:
             self.design_status = False
-            logger.warning(": The member fails in long joint \n ")
-            logger.error(": Design is not safe.\n ")
+            logger.warning(": The member fails in long joint. \n ")
+            logger.error(": Design is unsafe.\n ")
             logger.info(" :=========End Of design===========")
 
 
@@ -1301,7 +1288,6 @@ class Tension_welded(Member):
         else:
             self.plate.height = self.section_size_1.depth + max((4 * self.weld.size),30)
 
-
     def member_check(self,design_dictionary):
 
         "Checking selected section for rupture"
@@ -1378,13 +1364,12 @@ class Tension_welded(Member):
                 self.initial_member_capacity(self, design_dictionary, size)
             else:
                 self.design_status = False
-                logger.warning(":Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(
+                logger.warning(":The factored tension force ({} kN) exceeds the tension capacity of {} kN with respect to the maximum available "
+                               "member size {}.".format(
                         round(self.load.axial_force, 2), round(self.section_size_1.tension_rupture_capacity / 1000, 2), self.max_area))
-
-                logger.info(":Select Members with higher cross sectional area than the above mentioned Member.")
-                logger.error(":Design is not safe. \n ")
+                logger.info(":Select members with a higher cross sectional area.")
+                logger.error(":Design is unsafe. \n ")
                 logger.debug(":=========End Of design===========")
-
 
     def get_plate_thickness(self,design_dictionary):
 
@@ -1430,36 +1415,34 @@ class Tension_welded(Member):
 
             elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
-                logger.warning(":Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of {} mm.".format(
+                logger.warning(": The factored tension force ({} kN) exceeds the tension capacity of {} kN with respect to the maximum available "
+                               "plate thickness of {} mm.".format(
                         round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2),self.plate_last))
-                logger.error(":Design is not safe. \n ")
+                logger.error(":Design is unsafe. \n ")
                 logger.debug(":=========End Of design===========")
-
-
             else:
                 pass
         if self.plate_tension_capacity > self.res_force:
             if (2 * self.plate.length) > self.length:
                 self.design_status = False
-                logger.warning(":Plate length of {} mm is higher than Member length of {} mm".format(2 * self.plate.length,
-                                                                                                    self.length))
-
-                logger.info(":Try higher diameter of bolt or increase member length to get a safe design.")
-                logger.error(":Design is not safe. \n ")
+                logger.warning(":The plate length of {} mm is higher than the member length of {} mm".format(2 * self.plate.length, self.length))
+                logger.info(":Try a larger diameter of bolt and/or increase the member length.")
+                logger.error(":Design is unsafe. \n ")
                 logger.debug(":=========End Of design===========")
-
             else:
                 self.plate_design_status = True
                 self.design_status = True
                 self.intermittent_bolt(self, design_dictionary)
 
-                logger.info(":In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+                logger.info(":In the case of reverse loading, slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].")
                 if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
-                    logger.info(":In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+                    logger.info(":In the case of reverse loading for double sections, spacing of the intermittent connection shall be less than 600 "
+                                "[Ref. Cl. 10.2.5.5, IS 800:2007].")
                 else:
                     pass
                 if self.load.axial_force < (self.res_force/1000):
-                    logger.info(":Minimum Design Force based on Member Size is used for Connection Design,i.e. {} kN (IS 800:2007 - Clause 10.7)". format(round(self.res_force/1000,2)))
+                    logger.info(":The minimum design force based on the member size is used for performing the connection design, i.e. {} kN "
+                                "[Ref. Cl. 10.7, IS 800:2007].".format(round(self.res_force / 1000, 2)))
                 else:
                     pass
                 logger.info(self.weld.reason)
@@ -2157,6 +2140,6 @@ class Tension_welded(Member):
 
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 
 

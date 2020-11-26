@@ -621,7 +621,7 @@ KEY_DISP_TOP_ANGLE = 'Top Angle'
 
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)'
 DISP_TITLE_BOLT = 'Bolt'
-DISP_TITLE_CRITICAL_BOLT = 'Critical Bolt'
+DISP_TITLE_CRITICAL_BOLT = 'Critical Bolt Design'
 DISP_TITLE_CRITICAL_BOLT_SHEAR = 'Critical Bolt - Shear Design'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 

@@ -737,7 +737,7 @@ class Tension_bolted(Member):
                         # val = option[4]
                         # print(design_dictionary[option[0]], "jhvhj")
                         if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Value can't be equal or less than zero"
+                            error = "Input value(s) cannot be equal or less than zero."
                             all_errors.append(error)
                         else:
                             flag1 = True
@@ -745,12 +745,10 @@ class Tension_bolted(Member):
                     if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
 
                         if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Value can't be equal or less than zero"
+                            error = "Input value(s) cannot be equal or less than zero."
                             all_errors.append(error)
                         else:
                             flag2 = True
-
-
             else:
                 pass
 
@@ -820,7 +818,7 @@ class Tension_bolted(Member):
         # self.inter_status = False
         self.thk_count =0
 
-        print("input values are set. Doing preliminary member checks")
+        print("The input values are set. Performing preliminary member check(s).")
         # self.i = 0
 
         self.initial_member_capacity(self,design_dictionary)
@@ -1157,8 +1155,9 @@ class Tension_bolted(Member):
             elif (self.load.axial_force*1000 > self.force1) :
                 self.max_limit_status_1 = True
                 # self.design_status = False
-                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
-                logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
+                logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                               "member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
+                logger.info(" : Define member(s) with a higher cross sectional area.")
                 # logge r.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1168,8 +1167,9 @@ class Tension_bolted(Member):
             elif self.length > self.len2:
                 self.max_limit_status_2 = True
                 # self.design_status = False
-                logger.warning(" : Member Length {} mm exceeds maximum allowable length of {} mm for maximum available member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
-                logger.info(" : Select Members with higher radius of gyration value than the above mentioned Member.")
+                logger.warning(" : The member length ({} mm) exceeds the maximum allowable length ({} mm) with respect to the maximum available "
+                               "member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
+                logger.info(" : Select member(s) with a higher radius of gyration value.")
                 # logger.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1178,8 +1178,9 @@ class Tension_bolted(Member):
                 pass
 
         if self.member_design_status == False and self.max_limit_status_1!=True and self.max_limit_status_2!=True:
-            logger.warning(" : Member Depth can't accomodate minimum available bolt diameter of {} mm based on minimum spacing limit (IS 800:2007 - Clause 10.2).".format(self.bolt_diameter_min))
-            logger.info(" : Reduce the bolt size or increase the Member Depth.")
+            logger.warning(" : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
+                           "minimum spacing limit [Ref. Cl. 10.2, IS 800:2007].".format(self.bolt_diameter_min))
+            logger.info(" : Reduce the bolt diameter or increase the member depth and re-design.")
             # logger.error(": Design is not safe. \n ")
             # logger.info(" :=========End Of design===========")
 
@@ -1188,9 +1189,8 @@ class Tension_bolted(Member):
             self.design_status = True
             self.select_bolt_dia(self, design_dictionary)
         else:
-            # print(self.member_design_status,"hxfv")
             self.design_status = False
-            logger.error(": Design is not safe. \n ")
+            logger.error(": Design is unsafe. \n ")
             logger.info(" :=========End Of design===========")
 
     def select_bolt_dia(self,design_dictionary,dia_remove =None):
@@ -1290,7 +1290,9 @@ class Tension_bolted(Member):
 
         if len(self.bolt_diameter_possible) ==0.0:
             self.design_status = False
-            logger.warning(" :Combined thickness of {} mm exceeds Large grip limit of {} mm for bolt miniumum bolt diameter {} mm (IS 800:2007 - Cl.10.3.3.2)". format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
+            logger.warning(" : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
+                           "bolt diameter of {} mm [Ref. Cl.10.3.3.2, IS 800:2007]."
+                           .format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
             # logger.error(": Design is not safe. \n ")
             # logger.info(" :=========End Of design===========")
         else:
@@ -1384,10 +1386,8 @@ class Tension_bolted(Member):
             self.design_status = False
             if self.plate.reason != "":
                 logger.warning(self.plate.reason)
-            logger.error(": Design is not safe. \n ")
+            logger.error(": Design is unsafe. \n ")
             logger.info(" :=========End Of design===========")
-
-
 
     def get_bolt_grade(self,design_dictionary):
 
@@ -1665,9 +1665,11 @@ class Tension_bolted(Member):
                 self.initial_member_capacity(self, design_dictionary, size)
             else:
                 self.design_status = False
-                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area))
-                logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
-                logger.error(": Design is not safe. \n ")
+                logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                               "member size {}."
+                               .format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area))
+                logger.info(" : Select member(s) with a higher cross sectional area.")
+                logger.error(": Design is unsafe. \n ")
                 logger.info(" :=========End Of design===========")
 
     def get_plate_thickness(self,design_dictionary):
@@ -1852,9 +1854,9 @@ class Tension_bolted(Member):
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             if (2 * self.plate.length) > self.length:
                 self.design_status = False
-                logger.warning (":Plate length of {} mm is higher than Member length of {} mm". format(2*self.plate.length,self.length))
-                logger.info(":Try higher diameter of bolt or increase member length to get a safe design.")
-                logger.error(":Design is not safe. \n ")
+                logger.warning (":The plate length of {} mm is larger than the member length of {} mm.". format(2*self.plate.length,self.length))
+                logger.info(":Try a bolt of larger diameter and/or increase the member length.")
+                logger.error(":Design is unsafe. \n ")
                 logger.debug(":=========End Of design===========")
 
             elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
@@ -1892,15 +1894,11 @@ class Tension_bolted(Member):
 
                 else:
                     self.design_status = False
-                    logger.warning(":Design failed due to Long Joint or Large Grip Bolt Reduction")
-
-                    logger.error(":Design is not safe. \n ")
+                    logger.warning(":Design is unsuccessful due to long joint and/or large grip length, bolt reduction factors.")
+                    logger.error(":Design is unsafe. \n ")
                     logger.debug(":=========End Of design===========")
-
             else:
                 pass
-
-
         else:
             print(self.plate_tension_capacity, "hsdvdhsd")
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
@@ -1912,43 +1910,46 @@ class Tension_bolted(Member):
                     self.initial_member_capacity(self, design_dictionary, size)
                 else:
                     self.design_status = False
-
-                    logger.warning(":Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of {} mm.". format(round(self.res_force/1000,2),round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
-                    logger.error(":Design is not safe. \n ")
+                    logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
+                                   "thickness of {} mm."
+                                   . format(round(self.res_force/1000,2),round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
+                    logger.error(":Design is unsafe. \n ")
                     logger.debug(":=========End Of design===========")
             else:
                 self.design_status = False
-                logger.warning(":Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of {} mm.".format(
-                        round(self.res_force / 1000, 2), round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
-                logger.error(":Design is not safe. \n ")
+                logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
+                               "thickness of {} mm."
+                               .format(round(self.res_force / 1000, 2), round(self.plate_tension_capacity / 1000, 2), max(self.plate.thickness)))
+                logger.error(":Design is unsafe. \n ")
                 logger.debug(":=========End Of design===========")
-
                 print(self.design_status)
 
     def status_pass(self,design_dictionary):
         if (2 * self.plate.length) > self.length:
             self.design_status = False
-            logger.warning(":Plate length of {} mm is higher than Member length of {} mm".format(2 * self.plate.length,
+            logger.warning(":The plate length of {} mm is larger than the member length of {} mm.".format(2 * self.plate.length,
                                                                                                 self.length))
 
-            logger.info(":Try higher diameter of bolt or increase member length to get a safe design.")
-            logger.error(":Design is not safe. \n ")
+            logger.info(":Try a bolt of larger diameter and/or increase the member length.")
+            logger.error(":Design is unsafe. \n ")
             logger.debug(":=========End Of design===========")
 
         else:
             self.plate_design_status = True
             self.design_status = True
             self.intermittent_bolt(self, design_dictionary)
-            logger.info(":In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+            logger.info(":In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].")
             if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
-                logger.info(":In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+                logger.info(":In the case of reverse loading for double sections, spacing of the intermittent connection shall be less than 600 "
+                            "[Ref. Cl. 10.2.5.5, IS 800:2007].")
             else:
                 pass
-            logger.info(":To reduce quantity of bolts, select a list of diameter, plate thickness or member thickness higher than the current list.")
+            logger.info(":To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the "
+                        "one currently defined.")
 
             if self.load.axial_force < (self.res_force / 1000):
-                logger.info(":Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
-                        round(self.res_force / 1000, 2)))
+                logger.info(":The minimum design force based on the member size is used for performing the connection design, i.e. {} kN "
+                            "[Ref. Cl. 10.7, IS 800:2007].".format(round(self.res_force / 1000, 2)))
             else:
                 pass
 
@@ -2733,6 +2734,6 @@ class Tension_bolted(Member):
 
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 
 

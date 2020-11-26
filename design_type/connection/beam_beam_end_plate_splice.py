@@ -541,31 +541,21 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         change_tab = []
 
-        # t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY], TYPE_TEXTBOX,
-        # self.get_fu_fy_I_section_suptng)
-        # change_tab.append(t1)
-
         t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY], TYPE_TEXTBOX,
               self.get_fu_fy_I_section_suptd)
         change_tab.append(t2)
 
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
-
         change_tab.append(t3)
 
-        # t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
-        #       ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
-        # change_tab.append(t4)
+        t3 = ("Bolt", [KEY_TYP], [KEY_DP_BOLT_TYPE], TYPE_COMBOBOX, self.get_bolt_tension_type_for_prying)
+        change_tab.append(t3)
 
         t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
-
-        # t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
-        # change_tab.append(t6)
 
         t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t7)
@@ -575,9 +565,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def refresh_input_dock(self):
 
         add_buttons = []
-
-        # t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, None, None, "Columns")
-        # add_buttons.append(t1)
 
         t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
         add_buttons.append(t2)
@@ -633,7 +620,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         else:
             fu = ''
 
-        val = {KEY_DP_BOLT_TYPE: "Pre-tensioned",
+        val = {KEY_DP_BOLT_TYPE: "Non pre-tensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
                KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
@@ -737,7 +724,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # bolt
         # TODO: check if required
-        if self.bolt.bolt_tensioning == 'Pretensioned':
+        if self.bolt.bolt_tensioning == 'Pre-tensioned':
             self.beta = 1
         else:
             self.beta = 2
@@ -1926,6 +1913,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
-                               Disp_3d_image)
+                               Disp_3d_image, module=self.module)
 
         # End of design report

@@ -1504,7 +1504,7 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
     # f_o
     tension_in_bolt_due_to_prying.append(NoEscape(r' f_{o} &= 0.7 \times f_{ub} \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r' &= 0.7 \times '+ str(bolt_fu) + r' \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r' &= '+ str(bolt_proof_stress) + r' ~ N/mm^{2}\\ \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r' &= '+ str(bolt_proof_stress) + r' ~ N/mm^{2} \\ \\'))
 
     # l_e
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min\Bigg(e, 1.1~t~\sqrt{\frac{\beta~f_o}{f_y}}\Bigg) \\'))
@@ -1525,11 +1525,11 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
     # be
     tension_in_bolt_due_to_prying.append(NoEscape(r'b_e &= \frac{B}{n_c}\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'&= \frac{'+str(beam_B)+'}{'+str(bolt_column)+r'}\\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'&= '+ str(b_e) + r'~mm \\ \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'&= ' + str(b_e) + r'~mm \\ \\'))
 
     # Q
     tension_in_bolt_due_to_prying.append(
-        NoEscape(r'Q &=\frac{' + str(l_v) + r'}{2\times' + str(l_e) + r'}\times\\'))
+        NoEscape(r'Q &=\frac{' + str(l_v) + r'}{2\times' + str(l_e) + r'} \times \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(
         r'&\Bigg[' + str(T_e) + r'- \Bigg( \frac{' + str(beta) + r' \times' + str(eta) + r'\times' + str(f_o) + r'\times' + str(b_e) + r'\times'
         + str(t) + r'^4}{27 \times' + str(l_e) + r'\times' + str(l_v) + r'^2} \Bigg) \times 10^{-3} \Bigg]\\'))
@@ -2677,7 +2677,7 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, mom
 
     app_moment_load_eqn = Math(inline=True)
 
-    if type == 'EndPlateType' or 'EndPlateType-BC-zz' or 'EndPlateType-BC-yy':
+    if type == 'EndPlateType' or type == 'EndPlateType-BC-zz' or type == 'EndPlateType-BC-yy':
         app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
         app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r' \\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r' \\ \\'))
@@ -2687,11 +2687,10 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, mom
             app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
         elif type == 'EndPlateType-BC-yy':
             app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{y-y} ~of~the~column~section \\'))
-        else:
-            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
 
         app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r') \\'))
-        app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\'))
+        if type == 'EndPlateType-BC-zz' or type == 'EndPlateType-BC-yy':
+            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
 
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
@@ -6999,13 +6998,13 @@ def tension_critical_bolt_prov(M, t_ba, n_c, r_1, n_r, r_i, n, r_3, r_4, type=''
             r_3 = str(r_3)
             tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} T_{1} &= \frac{M_{ue}}{4 \times n_c \times '
                                                        r'\Bigg(r_1 + \frac{r_4^2}{r_1} + '
-                                                       r'\displaystyle\sum_{i = 8} ^ {n_r}\frac{r_i ^2}{r_1}\Bigg) }\\'))
+                                                       r'\displaystyle\sum_{i = 8} ^ {n_r}\frac{r_i ^2}{r_1}\Bigg) } \\'))
             tension_critical_bolt_prov.append(NoEscape(r' &= \frac{' + M + r'\times 10^{3}}{4 \times ' + n_c + r' \times '
                                                        r'\Bigg(' + r_1 + r' + \frac{' + r_4 + r'^2}{' + r_1 + r'} + '
                                                        r'\displaystyle\sum_{i = ' + i + r'} ^ {' + n_r + r'}\frac{r_i ^2}{' + r_1 + r'}\Bigg) }\\'))
 
     tension_critical_bolt_prov.append(NoEscape(r' &= ' + t_ba + r' \\ \\'))
-    tension_critical_bolt_prov.append(NoEscape(r' Note:~ & T_{1}~is~ the~ tension~ in~ the~ critical~ bolt~  \\'))
+    tension_critical_bolt_prov.append(NoEscape(r' Note:~ & T_{1}~is~ the~ tension~ in~ the~ critical~ bolt  \\'))
     tension_critical_bolt_prov.append(NoEscape(r' & The~ critical~ bolt~ is~ the~ bolt~ nearest~ to~ the~ tension \\'))
     tension_critical_bolt_prov.append(NoEscape(r' & flange  \end{aligned}'))
 

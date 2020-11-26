@@ -306,7 +306,7 @@ class EndPlateConnection(ShearConnection):
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
-        print("input values are set. Doing preliminary member checks")
+        print("Input values set to perform preliminary member check(s).")
         self.member_capacity(self)
 
     def member_capacity(self):
@@ -317,25 +317,26 @@ class EndPlateConnection(ShearConnection):
 
                 if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                                 40.0):
-                    logger.warning(" : User input for shear force is very less compared to section capacity. "
-                                   "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                    logger.warning(" : The value of factored shear force is less than the minimum recommended value. "
+                                   "Setting shear force value to 15% of supported beam shear capacity or 40 kN, whichever is lesser"
+                                   "[Ref. IS 800:2007, Cl.10.7].")
                     self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                                 40.0)
 
-                print("preliminary member check is satisfactory. Checking available Bolt Diameters")
+                print("Preliminary member check(s) have passed. Checking available bolt diameter(s).")
                 self.select_bolt_plate_arrangement(self)
 
             else:
                 self.design_status = False
                 if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
-                    logger.error(" : Shear yielding capacity of supported section, {} kN is less "
-                                 "than shear force, Please select larger sections or decrease loads"
+                    logger.error(" : The shear yielding capacity of the supported section, ({} kN) is less "
+                                 "than the factored shear force. Please select a larger section or decrease load."
                                  .format(round(self.supported_section.shear_yielding_capacity/1000, 2)))
                 else:  # self.supported_section.tension_yielding_capacity / 1000 < self.load.axial_force:
-                    logger.error(" : Tension yielding capacity of supported section, {} kN is less "
-                                 "than axial force, Please select larger sections or decrease loads"
+                    logger.error(" : The tension yielding capacity of the supported section, ({} kN) is less "
+                                 "than the factored axial force. Please select a larger section or decrease load."
                                  .format(round(self.supported_section.tension_yielding_capacity/1000, 2)))
-                print("failed in preliminary member checks. Select larger sections or decrease loads")
+                print("The preliminary member check(s) have failed. Select a large/larger section(s) or decrease load and re-design.")
         else:
             if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
                     self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force and \
@@ -343,29 +344,29 @@ class EndPlateConnection(ShearConnection):
 
                 if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                                 40.0):
-                    logger.warning(" : User input for shear force is very less compared to section capacity. "
-                                   "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                    logger.warning(" : The value of factored shear force is less than the minimum recommended value. "
+                                   "Setting the value of the shear force to 15% of the supported beam shear capacity or 40 kN, whichever is lesser "
+                                   "[Ref. IS 800:2007, Cl.10.7].")
                     self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                                 40.0)
-
-                print("preliminary member check is satisfactory. Checking available Bolt Diameters")
+                print("Preliminary member check(s) have passed. Checking available bolt diameter(s).")
                 self.select_bolt_plate_arrangement(self)
 
             else:
                 self.design_status = False
                 if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
-                    logger.error(" : Shear yielding capacity of supported section, {} kN is less "
-                                 "than shear force, Please select larger sections or decrease loads"
-                                 .format(round(self.supported_section.shear_yielding_capacity / 1000, 2)))
+                    logger.error(" : The shear yielding capacity of the supported section, ({} kN) is less "
+                                 "than the factored shear force. Please select a larger section or decrease load."
+                                 .format(round(self.supported_section.shear_yielding_capacity/1000, 2)))
                 if self.supported_section.tension_yielding_capacity / 1000 < self.load.axial_force:
-                    logger.error(" : Tension yielding capacity of supported section, {} kN is less "
-                                 "than axial force, Please select larger sections or decrease loads"
-                                 .format(round(self.supported_section.tension_yielding_capacity / 1000, 2)))
+                    logger.error(" : The tension yielding capacity of the supported section, ({} kN) is less "
+                                 "than the factored axial force. Please select a larger section or decrease load."
+                                 .format(round(self.supported_section.tension_yielding_capacity/1000, 2)))
                 if self.supporting_section.tension_yielding_capacity / 1000 < self.load.shear_force:
-                    logger.error(" : Axial yielding capacity of supporting section, {} kN is less "
-                                 "than shear force, Please select larger sections or decrease loads"
+                    logger.error(" : The axial yielding capacity of the supporting section, ({} kN) is less "
+                                 "than the factored shear force. Please select a larger section or decrease load."
                                  .format(round(self.supporting_section.tension_yielding_capacity / 1000, 2)))
-                print("failed in preliminary member checks. Select larger sections or decrease loads")
+                print("The preliminary member check(s) have failed. Select a large/larger section(s) or decrease load and re-design.")
 
     def select_bolt_plate_arrangement(self):
         self.output = []
@@ -399,7 +400,7 @@ class EndPlateConnection(ShearConnection):
             if self.plate.thickness_check > max(self.plate.thickness):
                 self.design_status_plate_tk = False
                 self.design_status = False
-                logger.error(" : Select plate of higher thickness")
+                logger.error(" : Select plate(s) of higher thickness and re-design.")
                 break
 
             for t in self.plate.thickness:
@@ -738,18 +739,19 @@ class EndPlateConnection(ShearConnection):
                             and self.plate.thickness_provided == sorted(self.plate.thickness)[-1]:
                         self.design_status = False
                         self.design_status_bolt = False
-                        logger.error(" : Select bolt of lower diameter, sufficient plate height/ width not available to arrange bolts")
+                        logger.error(" : Define bolt(s) of a smaller diameter, sufficient plate height/width not available to accommodate the "
+                                     "defined bolts.")
             if not self.bolt.bolt_diameter_possible:
                 self.design_status = False
                 self.design_status_bolt = False
-                logger.error(" : Checking plate thickness of {} mm and bolt diameter of {} mm".format(
+                logger.error(" : Checking plate thickness of {} mm and bolt diameter of {} mm.".format(
                     self.plate.thickness_provided, max(self.bolt.bolt_diameter_not_possible)))
-                logger.error(" : Total thickness of connecting elements, including packing plate in gap, is more than "
-                             "8 times bolt diameter, please select higher bolt diameter or lower plate thickness")
-                logger.error(" : It fails in bolt grip length check as per Cl. 10.3.3.2 of IS 800:2007")
+                logger.error(" : The total thickness of the connecting elements, including packing plate in gap, is more than "
+                             "8 times the bolt diameter. Define larger bolt diameter(s) and/or plate of lower thickness.")
+                logger.error(" : The connection fails in the bolt grip length check [Ref.Cl. 10.3.3.2, IS 800:2007].")
         if self.design_status_plate_tk is False:
             self.design_status = False
-            logger.error(" : Select plate of higher thickness")
+            logger.error(" : Select plate(s) of higher thickness")
         elif len(self.output) > 0:
             self.design_status = True
             self.design_status_bolt = True
@@ -760,11 +762,11 @@ class EndPlateConnection(ShearConnection):
             print("No of effective trials: ", count)
             print(self.output[0])
             if self.output[0][26] == self.output[0][27]:
-                logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than or equal to thickness "
-                            "of thinner connecting plate")
-                logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
+                logger.info("The minimum weld size is greater than or equal to the thickness of the thinner connecting plate [Ref. Table 21, "
+                            "IS800:2007].")
+                logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld.")
             if self.output[0][23] in (3,4):
-                logger.info(": Minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
+                logger.info(": The minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
                             "cl. 10.5.3.1. Weld throat thickness is not considered as per cl. 10.5.3.2. Please take " +
                             "necessary detailing precautions at site accordingly.")
             self.get_design_status(self)
@@ -774,18 +776,18 @@ class EndPlateConnection(ShearConnection):
             self.design_status_plate= False
             self.weld.design_status = False
             self.set_values_to_class(self)
-            logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade")
-            logger.error(" : (Or) Required plate width is greater than available width")
-            logger.error(": (Or) Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
+            logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade.")
+            logger.error(" : (Or) Required plate width is greater than available width.")
+            logger.error(": (Or) Weld thickness is not sufficient [Ref. Cl. 10.5.7, IS 800:2007].")
             # logger.warning(": Minimum weld thickness required is %2.2f mm " % self.weld.t_weld_req)
-            logger.info(": Should increase length of weld/End plate")
+            logger.info(": Increase the length of the weld/end plate.")
         elif len(self.failed_output_bolt) >0:
             self.design_status = False
             self.design_status_bolt = False
             self.design_status_plate = False
             self.weld.design_status = False
             self.set_values_to_class(self)
-            logger.error(" : Select bolt of higher capacity, sufficient plate width/ height is not available to arrange bolts")
+            logger.error(" : Select a bolt of higher capacity, sufficient plate width/height is not available to accommodate the defined bolts.")
         # elif count == 0:
         #     self.design_status = False
         #     # print(self.design_status)
@@ -1115,7 +1117,7 @@ class EndPlateConnection(ShearConnection):
                 if not available_welds_updated:
                     self.plate.height += 10
                     self.weld.size = available_welds[0]
-                    logger.warning('weld stress is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                    logger.warning('Weld stress is guiding plate height, trying with a length of %2.2f mm' % self.plate.height)
                 else:
                     self.weld.size = available_welds_updated[0]
         print(self.weld.size, self.weld.length)
@@ -1682,7 +1684,7 @@ class EndPlateConnection(ShearConnection):
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 
     def get_plate_status(self):
         if self.plate.plate_moment < self.plate.plate_moment_capacity \

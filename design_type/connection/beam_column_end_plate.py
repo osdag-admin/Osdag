@@ -713,7 +713,9 @@ class BeamColumnEndPlate(MomentConnection):
 
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t3)
 
+        t3 = ("Bolt", [KEY_TYP], [KEY_DP_BOLT_TYPE], TYPE_COMBOBOX, self.get_bolt_tension_type_for_prying)
         change_tab.append(t3)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
@@ -926,7 +928,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         # bolt
         # TODO: check if required
-        if self.bolt.bolt_tensioning == 'Pretensioned':
+        if self.bolt.bolt_tensioning == 'Pre-tensioned':
             self.beta = 1
         else:
             self.beta = 2
@@ -968,7 +970,14 @@ class BeamColumnEndPlate(MomentConnection):
         """ give logger warning when a beam from the older version of IS 808 is selected """
         global logger
         red_list = red_list_function()
+
         if self.supported_section.designation in red_list:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.info(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+
+        if self.supporting_section.designation in red_list:
             logger.warning(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
             logger.info(
@@ -2432,7 +2441,7 @@ class BeamColumnEndPlate(MomentConnection):
                   "", "OK")
             self.report_check.append(t6)
 
-            if self.bolt.bolt_tensioning == 'Pretensioned':
+            if self.bolt.bolt_tensioning == 'Pre-tensioned':
                 beta = 1
             else:
                 beta = 2
@@ -2927,18 +2936,18 @@ class BeamColumnEndPlate(MomentConnection):
 
         if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                path_stiffener = './ResourceFiles/images/BC-CW-BW_Flush.png'
+                path_stiffener = '/ResourceFiles/images/BC-CW-BW_Flush.png'
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                path_stiffener = './ResourceFiles/images/BC-CW-BW_EOW.png'
+                path_stiffener = '/ResourceFiles/images/BC-CW-BW_EOW.png'
             else:  # Both-way
-                path_stiffener = './ResourceFiles/images/BC-CW-BW_EBW.png'
+                path_stiffener = '/ResourceFiles/images/BC-CW-BW_EBW.png'
         else:  # CF-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                path_stiffener = './ResourceFiles/images/BC_Stiffener_Flush.png'
+                path_stiffener = '/ResourceFiles/images/BC_Stiffener_Flush.png'
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                path_stiffener = './ResourceFiles/images/BC_Stiffener_OWE.png'
+                path_stiffener = '/ResourceFiles/images/BC_Stiffener_OWE.png'
             else:  # Both-way
-                path_stiffener = './ResourceFiles/images/BC_Stiffener_BWE.png'
+                path_stiffener = '/ResourceFiles/images/BC_Stiffener_BWE.png'
 
         path_weld = "/ResourceFiles/images/BB-BC-single_bevel_groove.png"
 
@@ -2951,4 +2960,4 @@ class BeamColumnEndPlate(MomentConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3d_image)
+                               rel_path, Disp_2d_image, Disp_3d_image, module=self.module)

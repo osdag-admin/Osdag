@@ -627,8 +627,8 @@ class BeamColumnEndPlate(MomentConnection):
                 height = 562
             else:  # Both-way
                 detailing_path = './ResourceFiles/images/BC_Stiffener_BWE.png'
-                width = 586
-                height = 579
+                width = 710
+                height = 550
 
         t1 = (None, 'Typical Stiffener Details', TYPE_IMAGE, [detailing_path, width, height, 'Typical stiffener details'])
         detailing.append(t1)

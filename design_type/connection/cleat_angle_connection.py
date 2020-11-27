@@ -598,7 +598,7 @@ class CleatAngleConnection(ShearConnection):
         self.sptd_leg = Plate(material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.spting_leg = Plate(material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-        logger.info("Input values are set. Checking if angle of required thickness is available")
+        # logger.info("Input values are set. Checking if angle of required thickness is available")
 
         self.check_available_cleat_thk(self)
 
@@ -618,7 +618,7 @@ class CleatAngleConnection(ShearConnection):
                     print("added", designation, self.sptd_leg.thickness_list)
 
         if self.cleat_list_thk:
-            logger.info("Required cleat thickness available. Doing preliminary member checks")
+            # logger.info("Required cleat thickness available. Doing preliminary member checks")
             self.member_capacity(self)
         else:
             logger.error("Cleat Angle should have minimum thickness of %2.2f" % min_thickness)
@@ -1117,6 +1117,7 @@ class CleatAngleConnection(ShearConnection):
 
         self.cleat.height = max(self.spting_leg.height, self.sptd_leg.height)
         self.cleat.gap = self.sptd_leg.gap
+        logger.info("=== End Of Design ===")
 
     def save_design(self, popup_summary):
         super(CleatAngleConnection, self).save_design(self)

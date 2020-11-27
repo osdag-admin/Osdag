@@ -847,7 +847,7 @@ class Plate(Material):
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line > bolt_line_limit:
             self.design_status = False
-            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
+            self.reason = "Bolt line limit is reached. Select higher grade/diameter or choose different connection."
         elif min_edge_dist > max_edge_dist:
             self.design_status = False
             self.reason = "Minimum end/edge distance is greater than max end/edge distance."
@@ -940,7 +940,7 @@ class Plate(Material):
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia, end_dist, gap, beta_lg=beta_lg)
 
-            if vres > bolt_capacity_red:
+            if vres > bolt_capacity_red or bolt_line > bolt_line_limit:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
             else:

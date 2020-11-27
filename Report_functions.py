@@ -948,7 +948,7 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
         max_end_edge_eqn.append(NoEscape(r'e_1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}} = ' + e1 + r'\\'))
         max_end_edge_eqn.append(NoEscape(r'e_2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}} = ' + e2 + r'\\'))
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)=' + max_edge_dist + r' \\ \\'))
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e_1,e_2)=' + max_edge_dist + r' \\ \\'))
         else:  # 'edge_dist'
             max_end_edge_eqn.append(NoEscape(r'e\textquotesingle_{max}&=min(e_1,e_2)=' + max_edge_dist + r' \\ \\'))
         # max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
@@ -2395,8 +2395,8 @@ def long_joint_welded_beam_prov(plate_height, l_w, t_w, gap, t_t, Tc, Tr):
 
 
 def bolt_red_capacity_prov(blj, blg, V, Vrd, type):
-    blj = str(blj)
-    blg = str(blg)
+    blj = str(round(blj,2))
+    blg = str(round(blg,2))
     V = str(V)
     Vrd = str(Vrd)
     bolt_capacity_eqn = Math(inline=True)
@@ -2604,7 +2604,7 @@ def prov_shear_load(shear_input, min_sc, app_shear_load, shear_capacity_1):
     app_shear_load_eqn.append(NoEscape(r'& =  min(0.15 \times' + shear_capacity_1 + r', 40.0)\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\ \\'))
 
-    app_shear_load_eqn.append(NoEscape(r' Vu~~ &= max(V,Vc_{min})\\'))
+    app_shear_load_eqn.append(NoEscape(r' V_u~~ &= max(V,Vc_{min})\\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\\ \\'))
 
@@ -3141,8 +3141,8 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
     loads_req_bolt_force_eqn = Math(inline=True)
 
     loads_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned}  M_d &= (V_u \times ecc + M_w)\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r'ecc &= eccentricity\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r'M_w &= external~moment~acting~on~web\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r'&ecc = eccentricity\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r'&M_w = external~moment~acting~on~web\\'))
     loads_req_bolt_force_eqn.append(
         NoEscape(r' &= \frac{(' + shear_load + r' \times 10^3 \times' + ecc + ' + ' + web_moment + r'\times10^6)}{10^6}\\'))
     loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))

@@ -1442,14 +1442,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                   'Flange slope': self.supported_section.flange_slope,
                                   'R1(mm)': self.supported_section.root_radius,
                                   'R2(mm)': self.supported_section.toe_radius,
-                                  'Iz(mm4)': self.supported_section.mom_inertia_z,
-                                  'Iy(mm4)': self.supported_section.mom_inertia_y,
-                                  'rz(mm)': self.supported_section.rad_of_gy_z,
-                                  'ry(mm)': self.supported_section.rad_of_gy_y,
-                                  'Zz(mm3)': self.supported_section.elast_sec_mod_z,
-                                  'Zy(mm3)': self.supported_section.elast_sec_mod_y,
-                                  'Zpz(mm3)': self.supported_section.plast_sec_mod_z,
-                                  'Zpy(mm3)': self.supported_section.elast_sec_mod_y}
+                                  'Iz(cm4)': self.supported_section.mom_inertia_z * 1e-4,
+                                  'Iy(cm4)': self.supported_section.mom_inertia_y * 1e-4,
+                                  'rz(cm)': round(self.supported_section.rad_of_gy_z * 1e-1, 2),
+                                  'ry(cm)': round(self.supported_section.rad_of_gy_y * 1e-1, 2),
+                                  'Zz(cm3)': self.supported_section.elast_sec_mod_z * 1e-3,
+                                  'Zy(cm3)': self.supported_section.elast_sec_mod_y * 1e-3,
+                                  'Zpz(cm3)': self.supported_section.plast_sec_mod_z * 1e-3,
+                                  'Zpy(cm3)': self.supported_section.plast_sec_mod_y * 1e-3}
 
         self.report_input = \
             {KEY_MAIN_MODULE: self.mainmodule,

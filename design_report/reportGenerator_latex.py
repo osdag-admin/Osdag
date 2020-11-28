@@ -311,7 +311,8 @@ class CreateLatex(Document):
                     bp_sketch = rel_path + Disp_2d_image[0]
                     bp_detailing = rel_path + Disp_2d_image[1]
                     bp_weld = rel_path + Disp_2d_image[2]
-                    bp_key = rel_path + Disp_2d_image[3]
+                    bp_anchor = rel_path + Disp_2d_image[3]
+                    bp_key = rel_path + Disp_2d_image[4]
 
                     with doc.create(Section('2D Drawings (Typical)')):
                         with doc.create(Figure()) as image_1:
@@ -329,10 +330,15 @@ class CreateLatex(Document):
                             image_3.add_caption('Typical Weld Details')
                             # doc.append(NewPage())
 
+                        with doc.create(Figure()) as image_4:
+                            image_4.add_image(bp_anchor, width=NoEscape(r'0.5\textwidth'), placement=NoEscape(r'\centering'))
+                            image_4.add_caption('Typical Anchor Bolt Details')
+                            # doc.append(NewPage())
+
                         if len(Disp_2d_image[-1]) > 0:
-                            with doc.create(Figure()) as image_4:
-                                image_4.add_image(bp_key, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
-                                image_4.add_caption('Typical Shear Key Details')
+                            with doc.create(Figure()) as image_5:
+                                image_5.add_image(bp_key, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
+                                image_5.add_caption('Typical Shear Key Details')
                                 # doc.append(NewPage())
 
         if does_design_exist and sys.platform != 'darwin':

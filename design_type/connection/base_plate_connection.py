@@ -330,6 +330,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_len_web = 0.0
         self.weld_bp_groove = 'No'
         self.weld_size_bp = 0.0
+        self.weld_size_continuity_plate = 0.0
 
         self.weld_size_flange = 0.0
         self.weld_size_web = 0.0
@@ -2456,6 +2457,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                           fabrication=design_dictionary[KEY_DP_WELD_FAB])
         self.weld_stiffener_web = self.weld_stiffener_flange
         self.weld_stiffener_across_web = self.weld_stiffener_flange
+        self.weld_stiffener_key = self.weld_stiffener_flange
 
         self.weld_stiffener_SHS = self.weld_stiffener_flange
         self.weld_stiffener_RHS = self.weld_stiffener_flange
@@ -6822,8 +6824,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             "base plate in case of high horizontal shear force")
                 logger.info("Updating the thickness of the base plate")
 
-        # check for max end/edge distance
-        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk_provided, self.base_plate.fu, self.base_plate.fy], self.dp_detail_is_corrosive)
+        # design of weld for the continuity plate inside flange in case of 3 or 6 bolts on each side
+        if self.connectivity == 'Moment Base Plate':
+            if self.stiffener_inside_flange == 'Yes':
+                self.weld_stiffener_key.set_min_max_sizes(min(self.column_tf, self.column_tw), self.stiffener_plt_thick_btwn_D,
+                                                          special_circumstance=False, fusion_face_angle=90)
+
+                self.weld_size_continuity_plate = min(round_up(self.weld_stiffener_key.min_size + 2, 2),
+                                                      round_down(min(self.column_tf, self.column_tw), 2))
 
         # end of calculation
         if self.safe:
@@ -7364,7 +7372,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = ('Nut (hexagon) thickness $(mm)$', '', hexagon_nut_thickness(self.nut_thk_out), 'Pass')
         self.report_check.append(t1)
 
-        if self.load_axial_tension > 0:
+        t1 = ('End plate size $(mm)$', '', 'Square - ' + str(2 * self.plate_washer_dim_out) + ' X ' + str(2 * self.plate_washer_dim_out) + '', 'Pass')
+        self.report_check.append(t1)
+
+        t1 = ('End plate thickness $(mm)$', '', round_up(1.5 * self.plate_washer_thk_out, 2), 'Pass')
+        self.report_check.append(t1)
+
+        if self.load_axial_tension > 0 or self.load_moment_minor > 0:
             # Check 1.3: Plate Washer and Nut Details - Anchor Bolt Outside Column Flange
             t1 = ('SubSection', 'Plate Washer and Nut Details - Anchor Bolt Inside Column Flange', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
@@ -7379,6 +7393,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t1)
 
             t1 = ('Nut (hexagon) thickness $(mm)$', '', hexagon_nut_thickness(self.nut_thk_in), 'Pass')
+            self.report_check.append(t1)
+
+            t1 = ('End plate size $(mm)$', '', 'Square - ' + str(2 * self.plate_washer_dim_in) + ' X ' + str(2 * self.plate_washer_dim_in) + '', 'Pass')
+            self.report_check.append(t1)
+
+            t1 = ('End plate thickness $(mm)$', '', round_up(1.5 * self.plate_washer_thk_in, 2), 'Pass')
             self.report_check.append(t1)
 
         # Check 2-1: Anchor Bolt Summary - Outside Column Flange
@@ -7567,7 +7587,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t1 = ('SubSection', 'Base Plate Dimension (L X W)', '|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
-            t2 = ('Length $(mm)$', bp_length(self.column_D, self.end_distance_out, self.bp_length_min), self.bp_length_provided,
+            t2 = ('Length $(mm)$', bp_length(self.column_D, self.end_distance_out, round(self.bp_length_min, 2)), self.bp_length_provided,
                   get_pass_fail(self.bp_length_min, self.bp_length_provided, relation='leq'))
             self.report_check.append(t2)
 
@@ -7576,7 +7596,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.min_width_check_Case1:
 
                         width_req = round(((2 * self.load_axial_compression) / (self.bp_length_provided * self.bearing_strength_concrete)), 2)  # mm
-                        t3 = ('Width $(mm)$', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation,
+                        t3 = ('Width $(mm)$', bp_width(self.column_bf, self.edge_distance_out, round(self.bp_width_min, 2), self.dp_column_designation,
                                                      projection=0, bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
                               bp_width_case1(self.load_axial_compression, self.bp_length_provided, self.bearing_strength_concrete,
                                              self.bp_width_provided, width_req),
@@ -7584,12 +7604,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.report_check.append(t3)
                     else:
                         t3 = ('Width $(mm)$',
-                              bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, projection=0,
+                              bp_width(self.column_bf, self.edge_distance_out, round(self.bp_width_min, 2), self.dp_column_designation, projection=0,
                                        bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
                               self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
                         self.report_check.append(t3)
                 else:
-                    t3 = ('Width $(mm)$', bp_width(self.column_bf, self.edge_distance_out, self.bp_width_min, self.dp_column_designation, projection=0,
+                    t3 = ('Width $(mm)$', bp_width(self.column_bf, self.edge_distance_out, round(self.bp_width_min, 2), self.dp_column_designation, projection=0,
                                                  bp_type='welded_moment_bp', mom_bp_case=self.moment_bp_case),
                           self.bp_width_provided, get_pass_fail(self.bp_width_min, self.bp_width_provided, relation='leq'))
                     self.report_check.append(t3)
@@ -8293,6 +8313,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                     relation='leq'))
                 self.report_check.append(t4)
 
+                t3 = ('Weld size $(mm)$', round(self.weld_stiffener_key.min_size), self.weld_size_continuity_plate, 'Provide weld at top side')
+                self.report_check.append(t3)
+
         # Check 10: Shear Design
         if self.load_shear_major or self.load_shear_minor > 0:
 
@@ -8549,7 +8572,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             weld_path = ''
 
-        Disp_2d_image = [sketch_path, detailing_path, weld_path, key_path]
+        # anchor bolt
+        bolt_path = '/ResourceFiles/images/Anchor_bolt.png'
+
+        Disp_2d_image = [sketch_path, detailing_path, weld_path, bolt_path, key_path]
         display_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

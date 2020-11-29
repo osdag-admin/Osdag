@@ -1170,9 +1170,18 @@ class Window(QMainWindow):
         self.actionSave_Front_View.triggered.connect(lambda: self.display.View_Front())
         self.actionSave_Side_View.triggered.connect(lambda: self.display.View_Right())
 
+        # self.actionSave_Top_View.triggered.connect(lambda:self.commLogicObj.display_msg())
+        # self.actionSave_Front_View.triggered.connect(lambda: self.commLogicObj.display_msg())
+        # self.actionSave_Side_View.triggered.connect(lambda: self.commLogicObj.display_msg())
+
         self.btnTop.clicked.connect(lambda: self.display.View_Top())
         self.btnFront.clicked.connect(lambda: self.display.View_Front())
         self.btnSide.clicked.connect(lambda: self.display.View_Right())
+
+
+        # self.btnTop.clicked.connect(lambda:  self.commLogicObj.display_msg())
+        # self.btnFront.clicked.connect(lambda:  self.commLogicObj.display_msg())
+        # self.btnSide.clicked.connect(lambda:  self.commLogicObj.display_msg())
 
         self.actionSave_Top_View.triggered.connect(lambda: self.display.FitAll())
         self.actionSave_Front_View.triggered.connect(lambda: self.display.FitAll())

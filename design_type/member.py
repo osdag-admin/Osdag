@@ -1715,6 +1715,9 @@ class Member(Main):
         t2 = ('Plate', self.call_3DPlate)
         components.append(t2)
 
+        t3 = ('Endplate', self.call_3DEndplate)
+        components.append(t3)
+
         return components
 
     def call_3DPlate(self, ui, bgcolor):
@@ -1737,3 +1740,13 @@ class Member(Main):
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Member", bgcolor)
 
+
+    def call_3DEndplate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Endplate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Endplate", bgcolor)

@@ -1919,9 +1919,9 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
                                         color=Quantity_NOC_SADDLEBROWN)
-                    # Point1 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -self.Bc.supporting_section.depth/2, c_length)
+                    # Point1 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -self.Bc.supporting_section.depth/2, c_length*0.75)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
-                    # Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
+                    # Point2 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -b_length, c_length / 2)
                     # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                     # Erase(DisplayMsg(self.display, Point2, self.Bc.supported_section.designation))
 
@@ -2001,9 +2001,11 @@ class CommonDesignLogic(object):
 
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
+                endplate = self.TObj.get_end_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
+                end_nutbolt = self.TObj.get_end_nut_bolt_array_models()
                 onlymember = self.TObj.get_only_members_models()
-                distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
+                # distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
                 # Point = gp_Pnt(distance, 0.0, 300)
                 # DisplayMsg(self.display, Point, self.T.section_size_1.designation)
 
@@ -2013,6 +2015,9 @@ class CommonDesignLogic(object):
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
+                elif self.component == "Endplate":
+                    osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
+                    osdag_display_shape(self.display, end_nutbolt, color=Quantity_NOC_YELLOW, update=True)
                 else:
                     connector = BRepAlgoAPI_Fuse(nutbolt, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
@@ -2025,7 +2030,7 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_class()
                 self.TObj = self.createTensionCAD()
-
+                endplate = self.TObj.get_end_plates_models()
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
@@ -2034,6 +2039,8 @@ class CommonDesignLogic(object):
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
+                elif self.component == "Endplate":
+                    osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
                 else:
                     connector = BRepAlgoAPI_Fuse(welds, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
@@ -2041,6 +2048,16 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
+    #
+    # def display_msg(self):
+    #     if self.connection == KEY_DISP_TENSION_BOLTED:
+    #         self.T = self.module_class()
+    #         #
+    #         # distance = self.T.length / 2 - (
+    #         #             2 * self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1) * self.T.plate.pitch_provided)
+    #         # Point = gp_Pnt(distance, 0.0, 300)
+    #         self.display_msg()
+
 
 
     def call_3DModel(self, flag, module_class):  # Done

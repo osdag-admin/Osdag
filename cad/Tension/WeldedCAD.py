@@ -363,6 +363,13 @@ class TensionAngleWeldCAD(object):
             plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
+    def get_end_plates_models(self):
+        plate = self.plate1_Model
+        # if (self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles') and self.inter_length > 1000:
+        #     plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
+        return plate
+
+
     def get_welded_models(self):
 
         if self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels':

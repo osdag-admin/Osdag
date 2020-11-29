@@ -597,7 +597,7 @@ class Plate(Material):
             height = 0
             return bolt_line, bolts_one_line, height
 
-    def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,count=1):
+    def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,rounddown=False):
         """
 
         :param web_plate_l: height of plate
@@ -610,7 +610,7 @@ class Plate(Material):
         gauge = 0
 
         if bolts_one_line > 1:
-            if count ==0:
+            if rounddown is True:
                 gauge = round_down((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
             else:
                 gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
@@ -832,7 +832,7 @@ class Plate(Material):
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line > bolt_line_limit:
             self.design_status = False
-            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
+            self.reason = "Bolt line limit is reached. Select higher grade/diameter or choose different connection."
         elif min_edge_dist > max_edge_dist:
             self.design_status = False
             self.reason = "Minimum end/edge distance is greater than max end/edge distance."
@@ -841,7 +841,7 @@ class Plate(Material):
             self.reason = "Minimum pitch/gauge distance is greater than max pitch/gauge distance."
         else:
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
-                                                                       max_spacing, max_edge_dist,count=0)
+                                                                       max_spacing, max_edge_dist)
             if bolt_line == 1:
                 pitch = 0.0
             elif min_pitch != None:
@@ -925,7 +925,7 @@ class Plate(Material):
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia, end_dist, gap, beta_lg=beta_lg)
 
-            if vres > bolt_capacity_red:
+            if vres > bolt_capacity_red or bolt_line > bolt_line_limit:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
             else:

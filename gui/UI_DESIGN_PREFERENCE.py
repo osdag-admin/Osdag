@@ -319,7 +319,7 @@ class Window(QDialog):
                         if element[3]:
                             line.setText(element[3])
                         dbl_validator = QDoubleValidator()
-                        if element[0] in [KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_WELD_MATERIAL_G_O]:
+                        if element[0] in [KEY_DP_WELD_MATERIAL_G_O]:
                             line.setValidator(dbl_validator)
                             line.setMaxLength(7)
                         if element[0] in [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,

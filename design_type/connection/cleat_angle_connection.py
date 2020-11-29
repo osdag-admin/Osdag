@@ -598,7 +598,7 @@ class CleatAngleConnection(ShearConnection):
         self.sptd_leg = Plate(material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.spting_leg = Plate(material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-        logger.info("Input values are set. Checking if angle of required thickness is available")
+        # logger.info("Input values are set. Checking if angle of required thickness is available")
 
         self.check_available_cleat_thk(self)
 
@@ -618,7 +618,7 @@ class CleatAngleConnection(ShearConnection):
                     print("added", designation, self.sptd_leg.thickness_list)
 
         if self.cleat_list_thk:
-            logger.info("Required cleat thickness available. Doing preliminary member checks")
+            # logger.info("Required cleat thickness available. Doing preliminary member checks")
             self.member_capacity(self)
         else:
             logger.error("Cleat Angle should have minimum thickness of %2.2f" % min_thickness)
@@ -679,8 +679,9 @@ class CleatAngleConnection(ShearConnection):
         trial = 0
 
         self.min_plate_height = self.supported_section.min_plate_height()
-        self.max_plate_height = round(self.supported_section.max_plate_height(self.connectivity,
-                                                                              self.supported_section.notch_ht), 2)
+        print(self.min_plate_height, "is min height")
+        self.max_plate_height = self.supported_section.max_plate_height(self.connectivity,
+                                                                              self.supported_section.notch_ht)
 
         if self.connectivity == VALUES_CONN_1[0]:
             available_length = (self.supporting_section.flange_width - self.supported_section.web_thickness) / 2
@@ -732,6 +733,7 @@ class CleatAngleConnection(ShearConnection):
                 else:
                     self.beta_lj_sptd = 1.0
                     self.beta_lg_sptd = 1.0
+                print(self.min_plate_height,"is another min_height")
                 self.sptd_leg.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                                  web_plate_h_min=self.min_plate_height,
                                                  web_plate_h_max=self.max_plate_height,
@@ -816,7 +818,7 @@ class CleatAngleConnection(ShearConnection):
 
             if self.sptd_leg.design_status is False:
                 self.design_status = False
-                logger.error(self.sptd_leg.reason)
+                # logger.error(self.sptd_leg.reason)
                 supporting_leg_check = False
 
             else:
@@ -976,10 +978,10 @@ class CleatAngleConnection(ShearConnection):
                                               beta_lg=self.beta_lg_spting,
                                               min_end_dist=self.bolt.min_end_dist_round)
         if self.spting_leg.length > self.cleat.leg_a_length:
-            logger.info(": {}rows {}columns {}mm diameter bolts needs leg length of {}"
-                        .format(self.spting_leg.bolts_one_line, self.spting_leg.bolt_line,
-                                self.bolt2.bolt_diameter_provided, self.spting_leg.length))
-            logger.info(": Available width of selected cleat angle leg is {}".format(self.cleat.leg_a_length))
+            # logger.info(": {}rows {}columns {}mm diameter bolts needs leg length of {}"
+            #             .format(self.spting_leg.bolts_one_line, self.spting_leg.bolt_line,
+            #                     self.bolt2.bolt_diameter_provided, self.spting_leg.length))
+            # logger.info(": Available width of selected cleat angle leg is {}".format(self.cleat.leg_a_length))
             count = 0
             # continue
         print("Supporting leg side: ", self.spting_leg.design_status, self.spting_leg.bolt_force, self.bolt2.bolt_capacity,
@@ -1009,7 +1011,7 @@ class CleatAngleConnection(ShearConnection):
 
         if self.spting_leg.design_status is False:
             self.design_status = False
-            logger.error(self.spting_leg.reason)
+            # logger.error(self.spting_leg.reason)
 
         else:
             self.design_status = True
@@ -1115,6 +1117,7 @@ class CleatAngleConnection(ShearConnection):
 
         self.cleat.height = max(self.spting_leg.height, self.sptd_leg.height)
         self.cleat.gap = self.sptd_leg.gap
+        logger.info("=== End Of Design ===")
 
     def save_design(self, popup_summary):
         super(CleatAngleConnection, self).save_design(self)
@@ -1314,47 +1317,60 @@ class CleatAngleConnection(ShearConnection):
                               get_pass_fail(bolt.max_edge_dist, leg.end_dist_provided, relation="geq"))
                     self.report_check.append(t4)
 
+                    leg.get_vres(leg.bolts_one_line, leg.pitch_provided, leg.gauge_provided, leg.bolt_line,
+                                 self.load.shear_force, self.load.axial_force,
+                                 ecc=(self.sptd_leg.edge_dist_provided+self.sptd_leg.gap), web_moment=0.0)
+
                     if leg == self.sptd_leg:
-                        t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '', moment_demand_req_bolt_force(
-                            shear_load=round(self.load.shear_force, 2),
-                            web_moment=0.0, ecc=self.sptd_leg.edge_dist_provided+self.sptd_leg.gap,
-                            moment_demand=round(self.sptd_leg.moment_demand / 1000000, 2)), '')
-
-                        self.report_check.append(t10)
-
-                        t10 = (KEY_OUT_REQ_PARA_BOLT, parameter_req_bolt_force(bolts_one_line=leg.bolts_one_line
-                                                                               , gauge=leg.gauge_provided,
-                                                                               ymax=round(leg.ymax, 2),
-                                                                               xmax=round(leg.xmax, 2),
-                                                                               bolt_line=leg.bolt_line,
-                                                                               pitch=leg.pitch_provided,
-                                                                               length_avail=leg.length_avail,
-                                                                               conn='fin'), '', '')
-                        self.report_check.append(t10)
-
                         leg.get_vres(leg.bolts_one_line, leg.pitch_provided, leg.gauge_provided, leg.bolt_line,
                                      self.load.shear_force, self.load.axial_force,
-                                     ecc=(self.sptd_leg.edge_dist_provided+self.sptd_leg.gap), web_moment=0.0)
-                        t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=leg.bolts_one_line,
-                                                              ymax=round(leg.ymax, 2),
-                                                              xmax=round(leg.xmax, 2),
-                                                              bolt_line=leg.bolt_line,
-                                                              shear_load=round(self.load.shear_force, 2),
-                                                              axial_load=round(self.load.axial_force, 2),
-                                                              moment_demand=round(leg.moment_demand / 1000000, 2),
-                                                              r=round(leg.sigma_r_sq / 1000, 2),
-                                                              vbv=round(leg.vbv / 1000, 2),
-                                                              tmv=round(leg.tmv / 1000, 2),
-                                                              tmh=round(leg.tmh / 1000, 2),
-                                                              abh=round(leg.abh / 1000, 2),
-                                                              vres=round(leg.bolt_force / 1000, 2)), '', '')
-                        self.report_check.append(t10)
+                                     ecc=(self.sptd_leg.edge_dist_provided + self.sptd_leg.gap), web_moment=0.0)
+                        t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '', moment_demand_req_bolt_force(
+                            shear_load=round(self.load.shear_force, 2),
+                            web_moment=0.0, ecc=self.sptd_leg.end_dist_provided+self.sptd_leg.gap,
+                            moment_demand=round(leg.moment_demand, 2)), '')
                     else:
-                        t3 = (KEY_OUT_BOLT_FORCE, force_in_bolt_due_to_load(P=round(self.load.shear_force, 2),
-                                                                                    n=leg.bolts_one_line*leg.bolt_line,
-                                                                                    T_ba=round(leg.bolt_force / 1000, 2),
-                                                                                    load='shear'),'','')
-                        self.report_check.append(t3)
+                        print("ecc",self.spting_leg.end_dist_provided + self.cleat.thickness + self.cleat.root_radius)
+                        leg.get_vres(leg.bolts_one_line, leg.pitch_provided, leg.gauge_provided, leg.bolt_line,
+                                     self.load.shear_force/2, self.load.axial_force/2,
+                                     ecc=(self.spting_leg.end_dist_provided + self.cleat.thickness + self.cleat.root_radius), web_moment=0.0)
+                        t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '', moment_demand_req_bolt_force(
+                            shear_load=round(self.load.shear_force/2, 2),
+                            web_moment=0.0, ecc=self.spting_leg.end_dist_provided + self.cleat.thickness + self.cleat.root_radius,
+                            moment_demand=round(leg.moment_demand, 2)), '')
+
+                    self.report_check.append(t10)
+
+                    t10 = (KEY_OUT_REQ_PARA_BOLT, parameter_req_bolt_force(bolts_one_line=leg.bolts_one_line
+                                                                           , gauge=leg.gauge_provided,
+                                                                           ymax=round(leg.ymax, 2),
+                                                                           xmax=round(leg.xmax, 2),
+                                                                           bolt_line=leg.bolt_line,
+                                                                           pitch=leg.pitch_provided,
+                                                                           length_avail=leg.length_avail,
+                                                                           conn='fin'), '', '')
+                    self.report_check.append(t10)
+
+                    t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=leg.bolts_one_line,
+                                                          ymax=round(leg.ymax, 2),
+                                                          xmax=round(leg.xmax, 2),
+                                                          bolt_line=leg.bolt_line,
+                                                          shear_load=round(self.load.shear_force, 2),
+                                                          axial_load=round(self.load.axial_force, 2),
+                                                          moment_demand=round(leg.moment_demand, 2),
+                                                          r=round(leg.sigma_r_sq / 1000, 2),
+                                                          vbv=round(leg.vbv, 2),
+                                                          tmv=round(leg.tmv, 2),
+                                                          tmh=round(leg.tmh, 2),
+                                                          abh=round(leg.abh, 2),
+                                                          vres=round(leg.bolt_force / 1000, 2)), '', '')
+                    self.report_check.append(t10)
+                    # else:
+                    #     t3 = (KEY_OUT_BOLT_FORCE, force_in_bolt_due_to_load(P=round(self.load.shear_force, 2),
+                    #                                                                 n=leg.bolts_one_line*leg.bolt_line,
+                    #                                                                 T_ba=round(leg.bolt_force / 1000, 2),
+                    #                                                                 load='shear'),'','')
+                    #     self.report_check.append(t3)
                     if bolt.bolt_type == TYP_BEARING:
 
                         t1 = (KEY_OUT_DISP_BOLT_SHEAR, '',

@@ -805,9 +805,9 @@ def cl_10_2_4_2_min_edge_end_dist(d_0, edge_type='Sheared or hand flame cut', pa
     if parameter == 'end_dist':
         end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{min} &= ' + end_edge_multiplier + r'~d_0 \\'))
     elif parameter == 'edge_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{min} &= ' + end_edge_multiplier + r'~d_0 \\'))
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e\textquotesingle_{min} &= ' + end_edge_multiplier + r'~d_0 \\'))
     else:
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &= ' + end_edge_multiplier + r'~d_0 \\'))
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e\textquotesingle_{min} &= ' + end_edge_multiplier + r'~d_0 \\'))
 
     end_edge_eqn.append(NoEscape(r'&= ' + end_edge_multiplier + r'\times' + d_0 + r'\\'))
     end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\ \\'))
@@ -907,44 +907,50 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
             Reference:
             IS 800:2007, cl. 10.2.4.3
     """
-    t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
-    t_considered = t_fu_fy[0][0]
-    t_min = t_considered
-    for i in t_fu_fy:
-        t = i[0]
-        f_y = i[2]
-        if f_y > 0:
-            epsilon = math.sqrt(250 / f_y)
-            if t * epsilon <= t_epsilon_considered:
-                t_epsilon_considered = t * epsilon
-                t_considered = t
-            if t < t_min:
-                t_min = t
+    # t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
+    # t_considered = t_fu_fy[0][0]
+    # t_min = t_considered
+    # for i in t_fu_fy:
+    #     t = i[0]
+    #     f_y = i[2]
+    #     if f_y > 0:
+    #         epsilon = math.sqrt(250 / f_y)
+    #         if t * epsilon <= t_epsilon_considered:
+    #             t_epsilon_considered = t * epsilon
+    #             t_considered = t
+    #         if t < t_min:
+    #             t_min = t
+    #
+    # if corrosive_influences is True:
+    #     max_edge_dist = round(40.0 + 4 * t_min, 2)
+    # else:
+    #     max_edge_dist = round(12 * t_epsilon_considered, 2)
 
-    if corrosive_influences is True:
-        max_edge_dist = round(40.0 + 4 * t_min, 2)
-    else:
-        max_edge_dist = round(12 * t_epsilon_considered, 2)
-
-    max_edge_dist = str(max_edge_dist)
+    # max_edge_dist = str(max_edge_dist)
+    e1 = round(12*t_fu_fy[0][0]*math.sqrt(250/t_fu_fy[0][1]),2)
+    e2 = round(12 * t_fu_fy[1][0] * math.sqrt(250 / t_fu_fy[1][1]),2)
+    max_edge_dist = str(min(e1,e2))
+    e1 = str(e1)
+    e2 = str(e2)
     t1 = str(t_fu_fy[0][0])
     t2 = str(t_fu_fy[1][0])
     fy1 = str(t_fu_fy[0][2])
     fy2 = str(t_fu_fy[1][2])
+
     max_end_edge_eqn = Math(inline=True)
 
     if corrosive_influences is False:
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max} &= 12~ t~ \varepsilon ;~\varepsilon = \sqrt{\frac{250}{f_y}}\\'))
         else:  # 'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max} &= 12~ t~ \varepsilon ;~\varepsilon = \sqrt{\frac{250}{f_y}}\\'))
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e\textquotesingle_{max} &= 12~ t~ \varepsilon ;~\varepsilon = \sqrt{\frac{250}{f_y}}\\'))
         # max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}} = ' + max_edge_dist + r'\\'))
-        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}} = ' + max_edge_dist + r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'e_1 &= 12 \times ' + t1 + r'\times \sqrt{\frac{250}{' + fy1 + r'}} = ' + e1 + r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'e_2 &= 12 \times' + t2 + r'\times\sqrt{\frac{250}{' + fy2 + r'}} = ' + e2 + r'\\'))
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)=' + max_edge_dist + r' \\ \\'))
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e_1,e_2)=' + max_edge_dist + r' \\ \\'))
         else:  # 'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)=' + max_edge_dist + r' \\ \\'))
+            max_end_edge_eqn.append(NoEscape(r'e\textquotesingle_{max}&=min(e_1,e_2)=' + max_edge_dist + r' \\ \\'))
         # max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
@@ -952,7 +958,7 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max}&=40 + 4t\\'))
         else:  # 'edge_dist'
-            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max}&=40 + 4t\\'))
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e\textquotesingle_{max}&=40 + 4t\\'))
 
         if int(float(t2)) <= 0.0:  # for cases where only a single plate is present
             max_end_edge_eqn.append(NoEscape(r'Where,~ t&= ' + t1 + r'\\'))
@@ -963,14 +969,15 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
             min_t = t1
         else:
             min_t = min(int(float(t1)), int(float(t2)))
-            min_t = str(min_t)
 
+        max_edge_dist = str(round(40.0 + 4 * min_t, 2))
+        min_t = str(min_t)
         if parameter == 'end_dist':
             max_end_edge_eqn.append(NoEscape(r'&= 40 + (4 \times ' + min_t + r') \\'))
             max_end_edge_eqn.append(NoEscape(r'e_{max}&=' + max_edge_dist + r' \\\\ '))
         else:  # 'edge_dist'
             max_end_edge_eqn.append(NoEscape(r'&= 40 + (4 \times ' + min_t + r') \\'))
-            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=' + max_edge_dist + r'\\ \\'))
+            max_end_edge_eqn.append(NoEscape(r'e\textquotesingle_{max}&=' + max_edge_dist + r'\\ \\'))
 
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3] \end{aligned}'))
 
@@ -2388,8 +2395,8 @@ def long_joint_welded_beam_prov(plate_height, l_w, t_w, gap, t_t, Tc, Tr):
 
 
 def bolt_red_capacity_prov(blj, blg, V, Vrd, type):
-    blj = str(blj)
-    blg = str(blg)
+    blj = str(round(blj,2))
+    blg = str(round(blg,2))
     V = str(V)
     Vrd = str(Vrd)
     bolt_capacity_eqn = Math(inline=True)
@@ -2597,7 +2604,7 @@ def prov_shear_load(shear_input, min_sc, app_shear_load, shear_capacity_1):
     app_shear_load_eqn.append(NoEscape(r'& =  min(0.15 \times' + shear_capacity_1 + r', 40.0)\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\ \\'))
 
-    app_shear_load_eqn.append(NoEscape(r' Vu~~ &= max(V,Vc_{min})\\'))
+    app_shear_load_eqn.append(NoEscape(r' V_u~~ &= max(V,Vc_{min})\\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\\ \\'))
 
@@ -3134,8 +3141,8 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
     loads_req_bolt_force_eqn = Math(inline=True)
 
     loads_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned}  M_d &= (V_u \times ecc + M_w)\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r'ecc &= eccentricity\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r'M_w &= external~moment~acting~on~web\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r'&ecc = eccentricity\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r'&M_w = external~moment~acting~on~web\\'))
     loads_req_bolt_force_eqn.append(
         NoEscape(r' &= \frac{(' + shear_load + r' \times 10^3 \times' + ecc + ' + ' + web_moment + r'\times10^6)}{10^6}\\'))
     loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))

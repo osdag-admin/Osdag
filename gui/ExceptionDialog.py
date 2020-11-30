@@ -66,6 +66,7 @@ class Dialog(AbstractDialog):
 
         self.layout = QtWidgets.QVBoxLayout()
         self.titlebar = AbstractTitleBar(self, title=titlebar_name, icon=titlebar_icon)
+        self.titlebar.setFont(QFont('Helvetica', 9))
         self.dialog_frame = QtWidgets.QFrame(self)
 
         self.setup_ui()
@@ -132,10 +133,10 @@ class AbstractTitleBar(QtWidgets.QFrame):
         self.save_log = QtWidgets.QToolButton(self)
         self.report_issue = QtWidgets.QToolButton(self)
         self.close_button.setFixedSize(32, 32)
-        self.save_log.setFixedSize(64,32)
-        self.report_issue.setFixedSize(105,32)
-        self.report_issue.setText("REPORT ISSUE")
-        self.save_log.setText("SAVE")
+        self.save_log.setFixedSize(75,32)
+        self.report_issue.setFixedSize(115,32)
+        self.report_issue.setText("Report Issue")
+        self.save_log.setText("Save")
         self.close_button.setObjectName("close_button")
         self.save_log.setObjectName("save_log")
         self.report_issue.setObjectName("report_issue")

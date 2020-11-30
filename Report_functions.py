@@ -1505,20 +1505,17 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
 
     # l_v
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_v &= e~-~ \frac{R_1}{2} \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'&= '+str(end_dist)+r'~-~ \frac{'+str(beam_R1)+r'}{2} \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'&= ' + str(l_v) + r'~mm \\ \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'&= '+str(end_dist)+r'~-~ \frac{'+str(beam_R1)+r'}{2}'+' = ' + str(l_v) + r'~mm \\ \\'))
 
     # f_o
     tension_in_bolt_due_to_prying.append(NoEscape(r' f_{o} &= 0.7 \times f_{ub} \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r' &= 0.7 \times '+ str(bolt_fu) + r' \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r' &= '+ str(bolt_proof_stress) + r' ~ N/mm^{2}\\ \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r' &= 0.7 \times '+ str(bolt_fu) + r' = '+ str(bolt_proof_stress) + r' ~ N/mm^{2}\\ \\'))
 
     # l_e
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min\Bigg(e, 1.1~t~\sqrt{\frac{\beta~f_o}{f_y}}\Bigg) \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r' &= min\Bigg('+str(end_dist)+r', 1.1\times'+str(t)+r'\times\sqrt{\frac{'+str(beta)+r'\times'
                                                   +str(f_o)+r'}{'+str(plate_fy)+r'}}\Bigg) \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r' &= min('+str(end_dist)+r','+str(l_e2)+r') \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r' &= '+str(l_e)+r'~mm \\ \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r' &= min('+str(end_dist)+r','+str(l_e2)+r') = '+str(l_e)+r'~mm \\ \\'))
 
     # beta
     if beta == 1:
@@ -1531,8 +1528,7 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
 
     # be
     tension_in_bolt_due_to_prying.append(NoEscape(r'b_e &= \frac{B}{n_c}\\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'&= \frac{'+str(beam_B)+'}{'+str(bolt_column)+r'}\\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'&= '+ str(b_e) + r'~mm \\ \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'&= \frac{'+str(beam_B)+'}{'+str(bolt_column)+r'} = '+ str(b_e) + r'~mm \\ \\'))
 
     # Q
     tension_in_bolt_due_to_prying.append(
@@ -1548,7 +1544,7 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
     else:
         tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= ' + str(Q) + r'\\'))
 
-    tension_in_bolt_due_to_prying.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.4.7] \end{aligned}'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.4.7] \end{aligned}'))
 
     return tension_in_bolt_due_to_prying
 

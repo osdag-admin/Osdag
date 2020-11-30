@@ -1445,6 +1445,9 @@ class DesignPreferences():
                 if children.objectName() in bolt_values_dictionary.keys():
                     if type(children) == QLineEdit:
                         children.setText(bolt_values_dictionary[children.objectName()])
+                        # if bolt_values_dictionary[children.objectName()==0:
+                        #     children.textEdit.setDisabled(True)
+
                     elif type(children) == QComboBox:
                         children.setCurrentText(bolt_values_dictionary[children.objectName()])
                     else:

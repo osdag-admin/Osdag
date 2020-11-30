@@ -52,7 +52,7 @@ class MomentConnection(Connection, IS800_2007):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image = ''
+            image = VALUES_IMG_BEAM[0]
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])

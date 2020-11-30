@@ -168,6 +168,42 @@ class Main():
 
         return connector
 
+
+    # def get_def_I_sec_properties(self):
+    #
+    #     if 'default' in self:
+    #         mass = ''
+    #         area = ''
+    #         moa_z = ''
+    #         moa_y = ''
+    #         rog_z = ''
+    #         rog_y = ''
+    #         em_z = ''
+    #         em_y = ''
+    #         pm_z = ''
+    #         pm_y = ''
+    #         I_t = ''
+    #         I_w = ''
+    #         image = VALUES_IMG_BEAM[0]
+    #     d = {'Label_11': str(mass),
+    #          'Label_12': str(area),
+    #          'Label_13': str(moa_z),
+    #          'Label_14': str(moa_y),
+    #          'Label_15': str(rog_z),
+    #          'Label_16': str(rog_y),
+    #          'Label_17': str(em_z),
+    #          'Label_18': str(em_y),
+    #          'Label_19': str(pm_z),
+    #          'Label_20': str(pm_y),
+    #          'Label_21': str(I_t),
+    #          'Label_22': str(I_w),
+    #          KEY_IMAGE: image
+    #          }
+    #
+    #     return d
+
+
+
     def get_I_sec_properties(self):
 
         if '' in self:

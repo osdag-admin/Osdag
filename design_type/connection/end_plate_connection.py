@@ -737,18 +737,6 @@ class EndPlateConnection(ShearConnection):
                             and self.plate.thickness_provided == sorted(self.plate.thickness)[-1]:
                         self.design_status = False
                         self.design_status_bolt = False
-<<<<<<< HEAD
-                        logger.error(" : Define bolt(s) of a smaller diameter, sufficient plate height/width not available to accommodate the "
-                                     "defined bolts.")
-            if not self.bolt.bolt_diameter_possible:
-                self.design_status = False
-                self.design_status_bolt = False
-                logger.error(" : Checking plate thickness of {} mm and bolt diameter of {} mm.".format(
-                    self.plate.thickness_provided, max(self.bolt.bolt_diameter_not_possible)))
-                logger.error(" : The total thickness of the connecting elements, including packing plate in gap, is more than "
-                             "8 times the bolt diameter. Define larger bolt diameter(s) and/or plate of lower thickness.")
-                logger.error(" : The connection fails in the bolt grip length check [Ref.Cl. 10.3.3.2, IS 800:2007].")
-=======
                         # logger.error(" : Select bolt of lower diameter, sufficient plate height/ width not available to arrange bolts")
                     if not self.bolt.bolt_diameter_possible:
                         self.design_status = False
@@ -761,7 +749,6 @@ class EndPlateConnection(ShearConnection):
             logger.error(" : Total thickness of connecting elements, including packing plate in gap, is more than "
                          "8 times bolt diameter, please select higher bolt diameter or lower plate thickness")
             logger.error(" : It fails in bolt grip length check as per Cl. 10.3.3.2 of IS 800:2007")
->>>>>>> 5b195c63f834228d20c82fdf94b8d175b2661c52
         if self.design_status_plate_tk is False:
             self.design_status = False
             logger.error(" : Select plate(s) of higher thickness")

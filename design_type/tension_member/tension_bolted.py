@@ -2204,7 +2204,7 @@ class Tension_bolted(Member):
                                       '$Z_y$ (mm3)': round(section_size.elast_sec_mod_y,2),
                                       '$Zp_z$ (mm3)': round(section_size.plast_sec_mod_z,2),
                                       '$Zp_y$ (mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'r (mm)': round(gyration,2)}
+                                      '$r$ (mm)': round(gyration,2)}
 
             thickness = section_size.web_thickness
             text = "C"
@@ -2233,7 +2233,7 @@ class Tension_bolted(Member):
                                       '$Z_y$ (mm3)': round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
                                       '$Zp_z$ (mm3)': round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
                                       '$Zp_y$ (mm3)': round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
-                                      'r (mm)': round(gyration, 2)}
+                                      '$r$ (mm)': round(gyration, 2)}
             thickness = section_size.web_thickness
             text = "C"
 
@@ -2263,7 +2263,7 @@ class Tension_bolted(Member):
                                       '$Z_y$ (mm3)': round(section_size.elast_sec_mod_y,2),
                                       '$Zp_z$ (mm3)': round(section_size.plast_sec_mod_z,2),
                                       '$Zp_y$ (mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'r (mm)': round(gyration,2)}
+                                      '$r$ (mm)': round(gyration,2)}
             thickness = section_size.thickness
             text = "A"
 
@@ -2303,7 +2303,7 @@ class Tension_bolted(Member):
                                       '$Z_y$ (mm3)': round((Angle_attributes.calc_ElasticModulusZy(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
                                       '$Zp_z$ (mm3)': round((Angle_attributes.calc_PlasticModulusZpz(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
                                       '$Zp_y$ (mm3)': round((Angle_attributes.calc_PlasticModulusZpy(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
-                                      'r (mm)': round(gyration,2)}
+                                      '$r$ (mm)': round(gyration,2)}
             thickness = section_size.thickness
             text = "A"
         else:
@@ -2334,7 +2334,7 @@ class Tension_bolted(Member):
                                       '$Z_y$ (mm3)': round((Angle_attributes.calc_ElasticModulusZy(section_size.max_leg, section_size.min_leg, section_size.thickness, self.loc) * 1000), 2),
                                       '$Zp_z$ (mm3)': round((Angle_attributes.calc_PlasticModulusZpz(section_size.max_leg, section_size.min_leg, section_size.thickness, self.loc) * 1000), 2),
                                       '$Zp_y$ (mm3)': round((Angle_attributes.calc_PlasticModulusZpy(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc) * 1000), 2),
-                                      'r (mm)': round(gyration, 2)}
+                                      '$r$ (mm)': round(gyration, 2)}
             thickness = section_size.thickness
             text = "A"
 
@@ -2432,11 +2432,11 @@ class Tension_bolted(Member):
         else:
             t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
             self.report_check.append(t1)
-            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
+            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "$d$"), '')
             self.report_check.append(t6)
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
+            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "$d_0$"), '')
             self.report_check.append(t8)
-            t8 = (KEY_DISP_MIN_BOLT, " ", display_prov(int(row), "r_l"), '')
+            t8 = (KEY_DISP_MIN_BOLT, " ", display_prov(int(row), "$r_l$"), '')
             self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)

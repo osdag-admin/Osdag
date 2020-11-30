@@ -1474,16 +1474,16 @@ class SeatedAngleConnection(ShearConnection):
                   get_pass_fail(self.bolt.min_pitch, self.bolt.min_pitch_round, relation='leq'))
             self.report_check.append(t1)
             connecting_plates_tk = [self.plate.thickness_provided, self.supporting_section.flange_thickness]
-            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates_tk), self.bolt.min_pitch_round,
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates_tk,'pitch'), self.bolt.min_pitch_round,
                   get_pass_fail(self.bolt.max_spacing, self.bolt.min_pitch_round, relation='geq'))
             self.report_check.append(t1)
 
-            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type,'end_dist'),
                   self.bolt.seated_angle_end_column,
                   get_pass_fail(self.bolt.min_end_dist, self.bolt.seated_angle_end_column, relation='leq'))
             self.report_check.append(t3)
             t4 = (
-            DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+            DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences,'end_dist'),
             self.bolt.seated_angle_end_column,
             get_pass_fail(self.bolt.max_end_dist, self.bolt.seated_angle_end_column, relation='geq'))
             self.report_check.append(t4)

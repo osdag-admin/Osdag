@@ -612,7 +612,7 @@ class Plate(Material):
             height = 0
             return bolt_line, bolts_one_line, height
 
-    def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,count=1):
+    def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,rounddown=False):
         """
 
         :param web_plate_l: height of plate
@@ -625,7 +625,7 @@ class Plate(Material):
         gauge = 0
 
         if bolts_one_line > 1:
-            if count ==0:
+            if rounddown is True:
                 gauge = round_down((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
             else:
                 gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
@@ -856,7 +856,7 @@ class Plate(Material):
             self.reason = "Minimum pitch/gauge distance is greater than max pitch/gauge distance."
         else:
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
-                                                                       max_spacing, max_edge_dist,count=0)
+                                                                       max_spacing, max_edge_dist)
             if bolt_line == 1:
                 pitch = 0.0
             elif min_pitch != None:

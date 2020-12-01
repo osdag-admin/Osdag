@@ -34,8 +34,10 @@ class Bolt:
 
         if bolt_type == "Bearing Bolt":
             bolt_tensioning = 'Non pre-tensioned'
+            self.beta_prying = 2
         else:
             bolt_tensioning = 'Pre-tensioned'
+            self.beta_prying = 1
 
         self.bolt_tensioning = bolt_tensioning
 

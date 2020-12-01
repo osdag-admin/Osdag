@@ -794,7 +794,7 @@ class IS800_2007(object):
         return (V_sf / V_df) ** 2 + (T_f / T_df) ** 2
 
     @staticmethod
-    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned='Pretensioned', eta=1.5):
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned='', eta=1.5):
         """Calculate prying force of friction grip bolt
                        Args:
                           2 * T_e - Force in 2 bolts on either sides of the web/plate
@@ -811,7 +811,7 @@ class IS800_2007(object):
                            Reference:
                            IS 800:2007,  cl 10.4.7
         """
-        if pre_tensioned == 'Pretensioned':
+        if pre_tensioned == 'Pre-tensioned':
             beta = 1
         else:
             beta = 2

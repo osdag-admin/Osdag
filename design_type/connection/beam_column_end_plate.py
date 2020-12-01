@@ -927,11 +927,7 @@ class BeamColumnEndPlate(MomentConnection):
         # plate
 
         # bolt
-        # TODO: check if required
-        if self.bolt.bolt_tensioning == 'Pre-tensioned':
-            self.beta = 1
-        else:
-            self.beta = 2
+        self.beta = self.bolt.beta_prying
 
         # weld
         self.dp_weld_fab = str(design_dictionary[KEY_DP_WELD_FAB])

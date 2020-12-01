@@ -328,6 +328,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.weld_len_flange = 0.0
         self.weld_len_web = 0.0
+        self.weld_length = 0.0
         self.weld_bp_groove = 'No'
         self.weld_size_bp = 0.0
         self.weld_size_continuity_plate = 0.0
@@ -5616,6 +5617,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 self.weld_bp_groove = 'Yes'
 
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
+                self.weld_length = 2 * (self.column_D + self.column_bf)  # mm
+            else:
+                self.weld_length = math.pi * self.column_D  # mm
+
+            self.weld_bp.set_min_max_sizes(self.column_tf, self.plate_thk_provided, special_circumstance=False, fusion_face_angle=90)
+
+            if self.load_shear_major > 0 or self.load_shear_minor > 0:
+                self.weld_bp_groove = 'No'
+                self.weld_size_bp = (max(self.load_shear_major, self.load_shear_minor) * math.sqrt(3) * self.gamma_mw) / \
+                                    (0.7 * self.weld_length * self.weld_fu)
+                self.weld_size_bp = max(self.weld_size_bp, self.weld_bp.min_size)
+                self.weld_size_bp = round_up(self.weld_size_bp, 2)
+                if self.weld_size_bp > self.weld_bp.max_size:
+                    self.weld_bp_groove = 'Yes'
+            else:
+                self.weld_bp_groove = 'No'
+                self.weld_size_bp = min(round_up(self.weld_bp.min_size + 2, 2), round_down(self.weld_bp.max_size, 2))
+
         # design of weld for the shear key (shear key will be groove welded - single bevel)
         if (self.load_shear_major or self.load_shear_minor) > 0:
             if self.shear_key_along_ColDepth or self.shear_key_along_ColWidth == 'Yes':
@@ -5655,8 +5676,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_along_D = 'Yes'
                     self.stiffener_along_B = 'Yes'
                 else:
-                    self.stiffener_along_D = 'No'
-                    self.stiffener_along_B = 'No'
+                    self.stiffener_along_D = 'Yes'
+                    self.stiffener_along_B = 'Yes'
 
             else:
                 check = self.Table2_hollow_tube(self.column_D, self.column_tf, self.dp_column_fy, load='Axial Compression', section_class='Plastic')
@@ -8409,22 +8430,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Check 11: Weld checks
 
         if self.connectivity == 'Welded Column Base':
+            if self.weld_bp_groove == 'No':
 
-            t1 = ('SubSection', 'Weld Design - Column to Base Plate Connection', '|p{3.5cm}|p{5.3cm}|p{6.5cm}|p{1.2cm}|')
-            self.report_check.append(t1)
+                t1 = ('SubSection', 'Weld Design - Column to Base Plate Connection', '|p{3.5cm}|p{5.3cm}|p{6.5cm}|p{1.2cm}|')
+                self.report_check.append(t1)
 
-            t1 = ('Weld strength $(N/mm^2)$', weld_fu(self.dp_weld_fu_overwrite, self.dp_column_fu), weld_fu_provided(self.weld_fu),
-                  get_pass_fail(max(self.dp_weld_fu_overwrite, self.dp_column_fu), self.weld_fu, relation="geq"))
-            self.report_check.append(t1)
+                t1 = ('Weld strength $(N/mm^2)$', weld_fu(self.dp_weld_fu_overwrite, self.dp_column_fu), weld_fu_provided(self.weld_fu),
+                      get_pass_fail(max(self.dp_weld_fu_overwrite, self.dp_column_fu), self.weld_fu, relation="geq"))
+                self.report_check.append(t1)
 
-            t1 = ('Total weld length at flange (mm)', "", round(self.weld_len_flange), "Pass")
-            self.report_check.append(t1)
+                t1 = ('Total weld length at flange (mm)', "", round(self.weld_len_flange), "Pass")
+                self.report_check.append(t1)
 
-            t1 = ('Total weld length at web (mm)', "", round(self.weld_len_web), "Pass")
-            self.report_check.append(t1)
+                t1 = ('Total weld length at web (mm)', "", round(self.weld_len_web), "Pass")
+                self.report_check.append(t1)
 
-            t1 = ('Weld size (mm)', self.weld_bp.min_size, self.weld_size_bp, "Pass")
-            self.report_check.append(t1)
+                t1 = ('Weld size (mm)', self.weld_bp.min_size, self.weld_size_bp, "Pass")
+                self.report_check.append(t1)
 
         if self.connectivity == 'Moment Base Plate':
 
@@ -8443,6 +8465,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     t1 = ('Weld size (mm)', self.weld_bp.min_size, self.weld_size_bp, "Pass")
                     self.report_check.append(t1)
+
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            if self.weld_bp_groove == 'No':
+
+                t1 = ('SubSection', 'Weld Design - Hollow CS to Base Plate Connection', '|p{3.5cm}|p{5.3cm}|p{6.5cm}|p{1.2cm}|')
+                self.report_check.append(t1)
+
+                t1 = ('Weld strength $(N/mm^2)$', weld_fu(self.dp_weld_fu_overwrite, self.dp_column_fu), weld_fu_provided(self.weld_fu),
+                      get_pass_fail(max(self.dp_weld_fu_overwrite, self.dp_column_fu), self.weld_fu, relation="geq"))
+                self.report_check.append(t1)
+
+                t1 = ('Total weld length (mm)', "", round(self.weld_length), "Pass")
+                self.report_check.append(t1)
+
+                t1 = ('Weld size (mm)', self.weld_bp.min_size, self.weld_size_bp, "Pass")
+                self.report_check.append(t1)
 
         # End of checks
 

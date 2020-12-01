@@ -1593,8 +1593,9 @@ class Window(QMainWindow):
                 input_list = des_pref[2]
                 tab = self.designPrefDialog.ui.findChild(QtWidgets.QWidget, tab_name)
                 for key_name in input_list:
-                    print(key_name, "debugggging")
                     key = tab.findChild(QtWidgets.QWidget, key_name)
+                    if key is None:
+                        continue
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
                         design_dictionary.update({key_name: val})

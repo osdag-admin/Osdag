@@ -1475,7 +1475,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT: self.bolt.mu_f,
 
              "Weld Details": "TITLE",
              KEY_DISP_DP_WELD_FAB: self.web_weld.fabrication,

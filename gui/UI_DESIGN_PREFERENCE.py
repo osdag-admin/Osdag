@@ -322,6 +322,9 @@ class Window(QDialog):
                         if element[0] in [KEY_DP_WELD_MATERIAL_G_O]:
                             line.setValidator(dbl_validator)
                             line.setMaxLength(7)
+                        if element[0] in [KEY_DP_DETAILING_GAP] and main.module_name(main) in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+                            line.setReadOnly(True)
+                            self.do_not_clear_list.append(line)
                         if element[0] in [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
                                           KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
                                           KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, KEY_DP_ANCHOR_BOLT_TYPE_OCF,

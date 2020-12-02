@@ -83,7 +83,7 @@ def DisplayMsg(display, point, text_to_write, height=None, message_color=None, u
     text_aspect = Prs3d_TextAspect()
 
     if message_color is not None:
-        text_aspect.SetColor(rgb_color(*message_color))
+        text_aspect.SetColor(rgb_color("RED"))
     # if height is not None:
     text_aspect.Aspect()
     # if isinstance(point, None):

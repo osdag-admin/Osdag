@@ -1018,9 +1018,9 @@ class CommonDesignLogic(object):
             webplate = StiffenerPlate(W=BCE.web_stiffener_width,
                                        L=BCE.web_stiffener_depth,
                                        T=BCE.web_stiffener_thk_provided)
-            webWeldD = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+            webWeldD = FilletWeld(b=BCE.weld_size_web_stiffener, h=BCE.weld_size_web_stiffener,
                                    L=BCE.web_stiffener_depth)
-            webWeldB = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+            webWeldB = FilletWeld(b=BCE.weld_size_web_stiffener, h=BCE.weld_size_web_stiffener,
                                    L=BCE.web_stiffener_width)
         else:
             webplate = None
@@ -1062,6 +1062,12 @@ class CommonDesignLogic(object):
         beam_stiffenerFlush = StiffenerPlate(W=BCE.stiffener_height, L=BCE.stiffener_length,
                                              T=BCE.stiffener_thickness,
                                              L21=5.0, L22=5.0)
+
+        bcWeldFlushstiffHeight = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
+                                            L=BCE.stiffener_height - 5.0)
+
+        bcWeldFlushstiffLength = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
+                                            L=BCE.stiffener_length - 5.0)
 
         # beam_stiffener_2 = copy.copy(beam_stiffener_1)
 
@@ -1157,7 +1163,8 @@ class CommonDesignLogic(object):
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
             extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,bcWeldFlang,
-                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
+                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, beam_stiffenerFlush,bcWeldFlushstiffHeight, bcWeldFlushstiffLength,endplate_type)
+
 
             extbothWays.create_3DModel()
 

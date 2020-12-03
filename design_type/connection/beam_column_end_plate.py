@@ -99,7 +99,6 @@ class BeamColumnEndPlate(MomentConnection):
         self.rows_near_web_max = 0
         self.bolt_numbers_tension_flange = 0
         self.bolt_numbers_web = 0
-        self.mid_bolt_row = 0
         self.bolt_column = 0
         self.bolt_row = 0
         self.last_column = 0
@@ -220,7 +219,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.weld_size_continuity_plate = 0.0
         self.cont_plate_groove_weld_status = False
         self.force_diag_stiffener = 0.0
-        self.weld_size_diag_stiffener = 0.0
+        self.weld_size_web_stiffener = 0.0
         self.diag_stiffener_groove_weld_status = False
 
     # Set logger
@@ -2052,9 +2051,9 @@ class BeamColumnEndPlate(MomentConnection):
             if self.web_stiffener_status == True:
                 self.web_stiffener_weld.set_min_max_sizes(self.web_stiffener_thk_provided, self.column_tw, special_circumstance=False,
                                                       fusion_face_angle=90)
-                self.weld_size_diag_stiffener = round_up(self.web_stiffener_weld.min_size, 2)
+                self.weld_size_web_stiffener = round_up(self.web_stiffener_weld.min_size, 2)
             else:
-                self.weld_size_diag_stiffener = 'N/A'
+                self.weld_size_web_stiffener = 'N/A'
 
         # end of the design simulation
 
@@ -2913,7 +2912,7 @@ class BeamColumnEndPlate(MomentConnection):
                       get_pass_fail(self.web_stiffener_thk_req, self.web_stiffener_thk_provided, relation="leq"))
                 self.report_check.append(t1)
 
-                t1 = ('Weld size (mm)', self.web_stiffener_weld.min_size, self.weld_size_diag_stiffener, 'Pass')
+                t1 = ('Weld size (mm)', self.web_stiffener_weld.min_size, self.weld_size_web_stiffener, 'Pass')
                 self.report_check.append(t1)
 
         # End of design report

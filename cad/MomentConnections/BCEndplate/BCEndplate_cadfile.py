@@ -1033,12 +1033,10 @@ class CADColWebFillet(CADFillet):
 
 class CADGroove(object):
 
-    # def __init__(self, module, beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array, bbWeldAbvFlang,
-    #              bbWeldBelwFlang, bbWeldSideWeb, bbWeldFlushstiffHeight, bbWeldFlushstiffLength,
-    #              bbWeldStiffHeight, bbWeldStiffLength, beam_stiffeners, beam_stiffenerFlush, alist, outputobj):
+  
 
     def __init__(self, module, column, beam, plate, nut_bolt_array, bolt,bcWeldFlang,bcWeldWeb,
-                 contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate,diagWeldD,diagWeldB,webplate, webWeldB, webWeldD,endplate_type):
+                 contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate,diagWeldD,diagWeldB,webplate, webWeldB, webWeldD, beam_stiffenerFlush, bcWeldFlushstiffHeight, bcWeldFlushstiffLength,endplate_type):
         """
 
         :param column: Column
@@ -1090,10 +1088,10 @@ class CADGroove(object):
         self.beam_stiffener_1 = beam_stiffeners
         self.beam_stiffener_2 = copy.deepcopy(beam_stiffeners)
 
-        # self.beam_stiffener_F1 = beam_stiffenerFlush
-        # self.beam_stiffener_F2 = copy.deepcopy(beam_stiffenerFlush)
-
-
+        self.beam_stiffener_F1 = beam_stiffenerFlush
+        self.beam_stiffener_F2 = copy.deepcopy(beam_stiffenerFlush)
+        self.beam_stiffener_F3 = copy.deepcopy(beam_stiffenerFlush)
+        self.beam_stiffener_F4 = copy.deepcopy(beam_stiffenerFlush)
 
         self.endplate_type = endplate_type
         self.module= module
@@ -1106,6 +1104,14 @@ class CADGroove(object):
 
         self.bcWeldWeb_R3 = bcWeldWeb
 
+        if self.module.endplate_type == 'Flushed - Reversible Moment' and self.module.bolt_row_web == 0:
+            self.loc1 = float(self.module.beam_D / 2 - self.module.stiffener_thickness / 2)
+            self.loc2 = None
+        else:
+            self.loc1 = float(
+                self.module.beam_D / 2 - self.module.stiffener_thickness / 2 - self.module.pitch_distance_web / 2)
+            self.loc2 = float(
+                self.module.beam_D / 2 - self.module.stiffener_thickness / 2 + self.module.pitch_distance_web / 2)
 
         if self.webplate != None:
             self.webWeldB_LT = self.webWeldB
@@ -1168,6 +1174,26 @@ class CADGroove(object):
             self.diagWeldS2_U = copy.deepcopy(self.diagWeldB)
             self.diagWeldS2_L = copy.deepcopy(self.diagWeldB)
 
+        self.bcWeldstiff1_u1 = bcWeldFlushstiffHeight
+        self.bcWeldstiff1_l1 = copy.deepcopy(bcWeldFlushstiffHeight)
+        self.bcWeldstiff2_u1 = copy.deepcopy(bcWeldFlushstiffHeight)
+        self.bcWeldstiff2_l1 = copy.deepcopy(bcWeldFlushstiffHeight)
+        self.bcWeldstiff3_u1 = copy.deepcopy(bcWeldFlushstiffHeight)
+        self.bcWeldstiff3_l1 = copy.deepcopy(bcWeldFlushstiffHeight)
+        self.bcWeldstiff4_u1 = copy.deepcopy(bcWeldFlushstiffHeight)
+        self.bcWeldstiff4_l1 = copy.deepcopy(bcWeldFlushstiffHeight)
+       
+        #
+        self.bcWeldstiff1_u2 = bcWeldFlushstiffLength
+        self.bcWeldstiff1_l2 = copy.deepcopy(bcWeldFlushstiffLength)
+        self.bcWeldstiff2_u2 = copy.deepcopy(bcWeldFlushstiffLength)
+        self.bcWeldstiff2_l2 = copy.deepcopy(bcWeldFlushstiffLength)
+        self.bcWeldstiff3_u2 = copy.deepcopy(bcWeldFlushstiffLength)
+        self.bcWeldstiff3_l2 = copy.deepcopy(bcWeldFlushstiffLength)
+        self.bcWeldstiff4_u2 = copy.deepcopy(bcWeldFlushstiffLength)
+        self.bcWeldstiff4_l2 = copy.deepcopy(bcWeldFlushstiffLength)
+
+
 
     def create_3DModel(self):
         """
@@ -1184,9 +1210,11 @@ class CADGroove(object):
             self.create_webPlatesGeometry()
 
         self.create_beam_stiffenersGeometry()
-        # self.createbeam_stiffenerFlushGeometry()
+        self.createbeam_stiffenerFlushGeometry()
         self.create_bcWeldFlangGeometry()
         self.create_bcWeldWebGeometry()
+        self.create_bbWeldFlushstiffHeight()
+        self.create_bbWeldFlushstiffLength()
         if self.diagplate != None:
             self.create_diagplateGeometry()
 
@@ -1252,6 +1280,13 @@ class CADGroove(object):
         self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
         self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
 
+        self.beam_stiffener_F1Model = self.beam_stiffener_F1.create_model()
+        self.beam_stiffener_F2Model = self.beam_stiffener_F2.create_model()
+        if self.loc2 != None:
+            self.beam_stiffener_F3Model = self.beam_stiffener_F3.create_model()
+            self.beam_stiffener_F4Model = self.beam_stiffener_F4.create_model()
+
+
         if self.contPlates != None:
 
             if self.module.connectivity == "Column Web-Beam Web":
@@ -1304,6 +1339,30 @@ class CADGroove(object):
             self.diagWeldS1_LModel = self.diagWeldS1_L.create_model(-135)
             self.diagWeldS2_UModel = self.diagWeldS2_U.create_model(45)
             self.diagWeldS2_LModel = self.diagWeldS2_L.create_model(-135)
+
+        self.bcWeldstiff1_u1Model = self.bcWeldstiff1_u1.create_model()
+        self.bcWeldstiff1_u2Model = self.bcWeldstiff1_u2.create_model()
+        self.bcWeldstiff1_l1Model = self.bcWeldstiff1_l1.create_model()
+        self.bcWeldstiff1_l2Model = self.bcWeldstiff1_l2.create_model()
+        #
+        self.bcWeldstiff2_u1Model = self.bcWeldstiff2_u1.create_model()
+        self.bcWeldstiff2_u2Model = self.bcWeldstiff2_u2.create_model()
+        self.bcWeldstiff2_l1Model = self.bcWeldstiff2_l1.create_model()
+        self.bcWeldstiff2_l2Model = self.bcWeldstiff2_l2.create_model()
+        #
+        if self.loc2 != None:
+            self.bcWeldstiff3_u1Model = self.bcWeldstiff3_u1.create_model()
+            self.bcWeldstiff3_u2Model = self.bcWeldstiff3_u2.create_model()
+            self.bcWeldstiff3_l1Model = self.bcWeldstiff3_l1.create_model()
+            self.bcWeldstiff3_l2Model = self.bcWeldstiff3_l2.create_model()
+            #
+            self.bcWeldstiff4_u1Model = self.bcWeldstiff4_u1.create_model()
+            self.bcWeldstiff4_u2Model = self.bcWeldstiff4_u2.create_model()
+            self.bcWeldstiff4_l1Model = self.bcWeldstiff4_l1.create_model()
+            self.bcWeldstiff4_l2Model = self.bcWeldstiff4_l2.create_model()
+        #
+
+
         
     #############################################################################################################
     #   Following functions takes inputs as origin, u direction and w direction of concerned component to place #
@@ -1476,40 +1535,46 @@ class CADGroove(object):
         stiffener2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.beam_stiffener_2.place(stiffenerOrigin2, stiffener2_uDir, stiffener2_wDir)
 
-    ##############################################  creating weld sections ########################################
+    def createbeam_stiffenerFlushGeometry(self): #todo darshan
+        '''
+        initialise the location of the side stiffener by defining the local origin of the bolt group with respect to global origin
+        '''
+        if self.module.connectivity == "Column Web-Beam Web":
+            offset = self.column.B/2
+        else:
+            offset = self.column.D/2
 
-    def createbeam_stiffenerFlushGeometry(self):
-        '''
-        initialise the location of the side stiffeners by defining the local origin of the component with respect to global origin
-        '''
-        gap = self.beamLeft.length - self.beam_stiffener_F1.L / 2
-        stiffenerOriginF1 = numpy.array([-self.beam_stiffener_F1.W/2 - self.beamLeft.t/2, gap,
-                                         self.beamRight.D / 2 - self.loc])
+        gap = offset + self.plate.T + self.beam_stiffener_F1.L / 2 + self.bcWeldWeb_R3.b
+        stiffenerOriginF1 = numpy.array([-self.beam_stiffener_F1.W/2 - self.beam.t/2, gap,
+                                         self.beam.D / 2 - self.loc1])
         stiffenerF1_uDir = numpy.array([0.0, -1.0, 0.0])
         stiffenerF1_wDir = numpy.array([0.0, 0.0, -1.0])
         self.beam_stiffener_F1.place(stiffenerOriginF1, stiffenerF1_uDir, stiffenerF1_wDir)
 
-        gap = self.beamLeft.length - self.beam_stiffener_F2.L / 2
-        stiffenerOriginF2 = numpy.array([self.beam_stiffener_F2.W/2 + self.beamLeft.t/2 , gap,
-                                         self.beamRight.D / 2 -self.beam_stiffener_2.T - self.loc])
+        gap = offset + self.plate.T + self.beam_stiffener_F2.L / 2 + self.bcWeldWeb_R3.b
+        stiffenerOriginF2 = numpy.array([self.beam_stiffener_F2.W/2 + self.beam.t/2 , gap,
+                                         self.beam.D / 2 -self.beam_stiffener_2.T - self.loc1])
         stiffenerF2_uDir = numpy.array([0.0, -1.0, 0.0])
         stiffenerF2_wDir = numpy.array([0.0, 0.0, 1.0])
         self.beam_stiffener_F2.place(stiffenerOriginF2, stiffenerF2_uDir, stiffenerF2_wDir)
 
-        # gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L / 2
-        # stiffenerOriginF3 = numpy.array([-(self.beam_stiffener_F3.W/2 + self.beamRight.t/2), gap,
-        #                                  self.beamRight.D / 2 -self.beam_stiffener_F3.T- self.loc])
-        # stiffenerF3_uDir = numpy.array([0.0, 1.0, 0.0])
-        # stiffenerF3_wDir = numpy.array([0.0, 0.0, 1.0])
-        # self.beam_stiffener_F3.place(stiffenerOriginF3, stiffenerF3_uDir, stiffenerF3_wDir)
-        #
-        # gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F4.L / 2
-        # stiffenerOriginF4 = numpy.array([(self.beam_stiffener_F4.W/2 + self.beamRight.t/2), gap,
-        #                                  self.beamRight.D / 2 - self.loc])
-        # stiffenerF4_uDir = numpy.array([0.0, 1.0, 0.0])
-        # stiffenerF4_wDir = numpy.array([0.0, 0.0, -1.0])
-        # self.beam_stiffener_F4.place(stiffenerOriginF4, stiffenerF4_uDir, stiffenerF4_wDir)
+        # if self.loc2 != None:
+        # 
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L / 2 +  self.bbWeldWeb_L3.b
+        #     stiffenerOriginF3 = numpy.array([-(self.beam_stiffener_F3.W/2 + self.beamRight.t/2), gap,
+        #                                      self.beamRight.D / 2 -self.beam_stiffener_F3.T- self.loc1])
+        #     stiffenerF3_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     stiffenerF3_wDir = numpy.array([0.0, 0.0, 1.0])
+        #     self.beam_stiffener_F3.place(stiffenerOriginF3, stiffenerF3_uDir, stiffenerF3_wDir)
+        # 
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F4.L / 2 +  self.bbWeldWeb_L3.b
+        #     stiffenerOriginF4 = numpy.array([(self.beam_stiffener_F4.W/2 + self.beamRight.t/2), gap,
+        #                                      self.beamRight.D / 2 - self.loc1])
+        #     stiffenerF4_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     stiffenerF4_wDir = numpy.array([0.0, 0.0, -1.0])
+        #     self.beam_stiffener_F4.place(stiffenerOriginF4, stiffenerF4_uDir, stiffenerF4_wDir)
 
+    ##############################################  creating weld sections ########################################
 
     def create_bcWeldFlangGeometry(self):
         '''
@@ -1613,6 +1678,142 @@ class CADGroove(object):
         uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
         wDirStiffHL_1 = numpy.array([0.0, -1.0, 0.0])
         self.bcWeldStiffLR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)#####
+
+    def create_bbWeldFlushstiffHeight(self):#todo darshan
+        '''
+        initialise the location of the side stiffener weld along the height by defining the local origin of the bolt group with respect to global origin
+        '''
+
+        if self.module.connectivity == "Column Web-Beam Web":
+            offset = self.column.B / 2
+        else:
+            offset = self.column.D / 2
+
+        gap = offset + self.plate.T + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_u1 = numpy.array([-self.beam_stiffener_F1.L22 - self.beam.t / 2, gap,
+                                           self.beam.D / 2 - self.loc1])
+        stiffener1_u1_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener1_u1_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.bcWeldstiff1_u1.place(stiffenerOrigin1_u1, stiffener1_u1_uDir, stiffener1_u1_wDir)
+
+        gap = offset + self.plate.T + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_l1 = numpy.array([-self.beam_stiffener_F1.W - self.beam.t / 2, gap,
+                                           self.beam.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        stiffener1_l1_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener1_l1_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.bcWeldstiff1_l1.place(stiffenerOrigin1_l1, stiffener1_l1_uDir, stiffener1_l1_wDir)
+
+        gap = offset + self.plate.T + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_u1 = numpy.array([(self.beam_stiffener_F1.W + self.beam.t / 2), gap,
+                                           self.beam.D / 2 - self.loc1])
+        stiffener1_u1_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener1_u1_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.bcWeldstiff2_u1.place(stiffenerOrigin1_u1, stiffener1_u1_uDir, stiffener1_u1_wDir)
+
+        gap = offset + self.plate.T + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_l1 = numpy.array([(self.beam_stiffener_F1.L22 + self.beam.t / 2), gap,
+                                           self.beam.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        stiffener1_l1_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener1_l1_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.bcWeldstiff2_l1.place(stiffenerOrigin1_l1, stiffener1_l1_uDir, stiffener1_l1_wDir)
+
+        # if self.loc2 != None:
+        #
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b
+        #     stiffenerOrigin1_u1 = numpy.array([-self.beam_stiffener_F1.W - self.beamLeft.t / 2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1])
+        #     stiffener1_u1_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     stiffener1_u1_wDir = numpy.array([1.0, 0.0, 0.0])
+        #     self.bbWeldstiff3_u1.place(stiffenerOrigin1_u1, stiffener1_u1_uDir, stiffener1_u1_wDir)
+        #
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b
+        #     stiffenerOrigin1_l1 = numpy.array([-self.beam_stiffener_F1.L22 - self.beamLeft.t / 2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        #     stiffener1_l1_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     stiffener1_l1_wDir = numpy.array([-1.0, 0.0, 0.0])
+        #     self.bbWeldstiff3_l1.place(stiffenerOrigin1_l1, stiffener1_l1_uDir, stiffener1_l1_wDir)
+        #
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b
+        #     stiffenerOrigin1_u1 = numpy.array([self.beam_stiffener_F1.L22 + self.beamLeft.t / 2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1])
+        #     stiffener1_u1_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     stiffener1_u1_wDir = numpy.array([1.0, 0.0, 0.0])
+        #     self.bbWeldstiff4_u1.place(stiffenerOrigin1_u1, stiffener1_u1_uDir, stiffener1_u1_wDir)
+        #
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b
+        #     stiffenerOrigin1_l1 = numpy.array([self.beam_stiffener_F1.W + self.beamLeft.t / 2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        #     stiffener1_l1_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     stiffener1_l1_wDir = numpy.array([-1.0, 0.0, 0.0])
+        #     self.bbWeldstiff4_l1.place(stiffenerOrigin1_l1, stiffener1_l1_uDir, stiffener1_l1_wDir)
+
+    def create_bbWeldFlushstiffLength(self): #todo darshan
+        '''
+        initialise the location of the side stiffener weld along the length by defining the local origin of the bolt group with respect to global origin
+        '''
+
+        if self.module.connectivity == "Column Web-Beam Web":
+            offset = self.column.B / 2
+        else:
+            offset = self.column.D / 2
+
+        gap = offset + self.plate.T + self.beam_stiffener_F1.L + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_u2 = numpy.array([-self.beam.t / 2, gap,
+                                           self.beam.D / 2 - self.loc1])
+        stiffener1_u2_uDir = numpy.array([-1.0, 0.0, 0.0])
+        stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.bcWeldstiff1_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
+
+        gap = offset + self.plate.T + self.beam_stiffener_F1.L22 + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_l2 = numpy.array([-self.beam.t / 2, gap,
+                                           self.beamR.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        stiffener1_l2_uDir = numpy.array([-1.0, 0.0, 0.0])
+        stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
+        self.bcWeldstiff1_l2.place(stiffenerOrigin1_l2, stiffener1_l2_uDir, stiffener1_l2_wDir)
+
+        gap = offset + self.plate.T + self.beam_stiffener_F1.L + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_u2 = numpy.array([self.beam.t / 2, gap,
+                                           self.beam.D / 2 - self.loc1])
+        stiffener1_u2_uDir = numpy.array([0.0, 0.0, 1.0])
+        stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.bcWeldstiff2_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
+
+        gap = offset + self.plate.T + self.beam_stiffener_F1.L22 + self.bcWeldWeb_R3.b
+        stiffenerOrigin1_l2 = numpy.array([self.beam.t/2, gap,
+                                           self.beam.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
+        stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
+        self.bcWeldstiff2_l2.place(stiffenerOrigin1_l2, stiffener1_l2_uDir, stiffener1_l2_wDir)
+
+        # if self.loc2 != None:
+        # gap = self.beam.length + self.plate.T + self.beam_stiffener_F3.L22+ self.bcWeldWeb_R3.b
+        # stiffenerOrigin1_u2 = numpy.array([-self.beam.t / 2, gap,
+        #                                    self.beam.D / 2 - self.loc1])
+        # stiffener1_u2_uDir = numpy.array([-1.0, 0.0, 0.0])
+        # stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
+        # self.bcWeldstiff3_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
+        #
+
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L+ self.bbWeldWeb_L3.b
+        #     stiffenerOrigin3_l2 = numpy.array([-self.beamLeft.t / 2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        #     stiffener3_l2_uDir = numpy.array([-1.0, 0.0, 0.0])
+        #     stiffener3_l2_wDir = numpy.array([0.0, -1.0, 0.0])
+        #     self.bbWeldstiff3_l2.place(stiffenerOrigin3_l2, stiffener3_l2_uDir, stiffener3_l2_wDir)
+        #
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L22+ self.bbWeldWeb_L3.b
+        #     stiffenerOrigin1_u2 = numpy.array([self.beamLeft.t / 2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1])
+        #     stiffener1_u2_uDir = numpy.array([0.0, 0.0, 1.0])
+        #     stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
+        #     self.bbWeldstiff4_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
+        #
+        #     gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L+ self.bbWeldWeb_L3.b
+        #     stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
+        #                                        self.beamRight.D / 2 - self.loc1 - self.beam_stiffener_F1.T])
+        #     stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
+        #     stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
+        #     self.bbWeldstiff4_l2.place(stiffenerOrigin1_l2, stiffener1_l2_uDir, stiffener1_l2_wDir)
 
     ####################################### welding continuity plates with fillet weld##################################
 
@@ -1972,7 +2173,10 @@ class CADGroove(object):
                                    self.contPlate_L1Model,
                                    self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
             else:
-                connector_plate = [self.plateModel]
+                if self.loc2 == None:
+                    connector_plate = [self.plateModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model]
+                else:
+                    pass
 
 
         plates = connector_plate[0]
@@ -2026,6 +2230,8 @@ class CADGroove(object):
                 welded_sec = [self.bcWeldStiffHL_1Model, self.bcWeldStiffHR_1Model,
                               self.bcWeldStiffLL_1Model, self.bcWeldStiffLR_1Model,
                               self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model]
+
+
 
         elif self.endplate_type == "both_way":
             # if self.numberOfBolts == 20:
@@ -2087,7 +2293,8 @@ class CADGroove(object):
                               self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
                               self.contWeldL2_U1Model, self.contWeldL2_L1Model,
                               self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                              self.contWeldR2_L1Model]
+                              self.contWeldR2_L1Model,
+                              self.bcWeldstiff1_l1Model,self.bcWeldstiff1_u1Model,self.bcWeldstiff1_l2Model,self.bcWeldstiff1_u2Model]
             elif self.webplate == None and self.contPlates != None:
                 welded_sec = [self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
                               self.contWeldR2_U2Model, self.contWeldR1_L2Model, self.contWeldL1_U2Model,
@@ -2099,9 +2306,11 @@ class CADGroove(object):
                               self.contWeldR2_L3Model, self.contWeldL1_U1Model, self.contWeldL1_L1Model,
                               self.contWeldL2_U1Model, self.contWeldL2_L1Model,
                               self.contWeldR1_U1Model, self.contWeldR1_L1Model, self.contWeldR2_U1Model,
-                              self.contWeldR2_L1Model]
+                              self.contWeldR2_L1Model,
+                              self.bcWeldstiff1_l1Model,self.bcWeldstiff1_u1Model,self.bcWeldstiff1_l2Model,self.bcWeldstiff1_u2Model]
             else:
-                welded_sec = [self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model]
+                welded_sec = [self.bcWeldFlang_R1Model, self.bcWeldFlang_R2Model, self.bcWeldWeb_R3Model,
+                              self.bcWeldstiff1_l1Model,self.bcWeldstiff1_u1Model,self.bcWeldstiff1_l2Model,self.bcWeldstiff1_u2Model]
 
 
         welds = welded_sec[0]
@@ -2195,34 +2404,36 @@ class CADcolwebGroove(CADGroove):
         '''
         initialise the location of the continuity plate weld by defining the local origin of the component with respect to global origin
         '''
-        contWeldL1_U2OriginL = numpy.array([self.column.D / 2 -self.column.T,  -self.column.B / 2  +self.column.t   ,
+        ####top plate top depth weld######
+        contWeldL1_U2OriginL = numpy.array([self.column.D / 2 - self.column.T - self.contPlate_L1.L11,  -self.column.B / 2  +self.column.t,
                                             self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 + self.contPlate_L1.T / 2])
         contWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL1_U2_wDir = numpy.array([-1.0, 0, 0.0])
         self.contWeldL1_U2.place(contWeldL1_U2OriginL, contWeldL1_U2_uDir, contWeldL1_U2_wDir)
 
-
-        contWeldL2_U2OriginL = numpy.array(
-            [self.column.D / 2 -self.column.T,   -self.column.B / 2  +self.column.t  , self.column.length / 2
+        ####bottom plate top depth weld######
+        contWeldL2_U2OriginL = numpy.array([self.column.D / 2 - self.column.T - self.contPlate_L1.L11, -self.column.B / 2  +self.column.t, self.column.length / 2
              - self.beam.D / 2 + self.beam.T / 2 + self.contPlate_L1.T / 2])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
-        contWeldL1_L2OriginL = numpy.array([self.column.D / 2 -self.column.T,   -self.column.B / 2  +self.column.t ,
+        ####top plate bottom depth weld######
+        contWeldL1_L2OriginL = numpy.array([self.column.D / 2 -self.column.T - self.contPlate_L1.L11,   -self.column.B / 2  +self.column.t ,
                                             self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 - self.contPlate_L1.T / 2])
         contWeldL1_L2_uDir = numpy.array([0.0, 1.0, 0.0])
         contWeldL1_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
 
-
+        ####bottom plate bottom depth weld######
         contWeldL2_L2OriginL = numpy.array(
-            [self.column.D / 2 -self.column.T,   -self.column.B / 2  +self.column.t , self.column.length / 2
+            [self.column.D / 2 -self.column.T - self.contPlate_L1.L11,   -self.column.B / 2  +self.column.t , self.column.length / 2
              - self.beam.D / 2 + self.beam.T / 2 - self.contPlate_L1.T / 2])
         contWeldL2_L2_uDir = numpy.array([0.0, 1.0, 0.0])
         contWeldL2_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL2_L2.place(contWeldL2_L2OriginL, contWeldL2_L2_uDir, contWeldL2_L2_wDir)
 
+        ####top plate right top weld######
         contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.column.t/2,
                                             self.column.length / 2 + (
                                                     self.beam.D / 2) - self.beam.T / 2 + self.contPlate_L1.T / 2])
@@ -2230,6 +2441,7 @@ class CADcolwebGroove(CADGroove):
         wDircontWeldL1_U3 = numpy.array([0.0, -1, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
 
+        ####top plate right bottom weld######
         contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2,  self.column.t/2,
                                             self.column.length / 2 + (
                                                     self.beam.D / 2) - self.beam.T / 2 - self.contPlate_L1.T / 2])
@@ -2237,13 +2449,15 @@ class CADcolwebGroove(CADGroove):
         wDircontWeldL1_L3 = numpy.array([0.0, -1.0, 0])
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
 
-        contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.column.t/2,
+        ####bottom plate right top weld######
+        contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2 , self.column.t/2,
                                             self.column.length / 2 - (
                                                     self.beam.D / 2) + self.beam.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([0, -1, 0])
         self.contWeldL2_U3.place(contWeldL2_U3OriginL, uDircontWeldL2_U3, wDircontWeldL2_U3)
 
+        ####bottom plate right bottom weld######
         contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.column.t/2,
                                             self.column.length / 2 - (
                                                     self.beam.D / 2) + self.beam.T / 2 - self.contPlate_L1.T / 2])
@@ -2251,29 +2465,33 @@ class CADcolwebGroove(CADGroove):
         wDircontWeldL2_L3 = numpy.array([0.0, -1, 0])
         self.contWeldL2_L3.place(contWeldL2_L3OriginL, uDircontWeldL2_L3, wDircontWeldL2_L3)
 
+        ####top plate left top weld######
         contWeldL1_U1OriginL = numpy.array(
-            [-self.contPlate_L1.L / 2, -self.column.B/2 +self.column.t/2,
+            [-self.contPlate_L1.L / 2, -self.column.B/2 +self.column.t  + self.contPlate_L1.L11,
              self.column.length / 2 + (self.beam.D / 2) - self.beam.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL1_U1 = numpy.array([0.0, 1, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
 
+        ####top plate left bottom weld######
         contWeldL1_L1OriginL = numpy.array(
-            [-self.contPlate_L1.L / 2,  -self.column.B/2 +self.column.t/2,
+            [-self.contPlate_L1.L / 2,  -self.column.B/2 +self.column.t  + self.contPlate_L1.L11,
              self.column.length / 2 + self.beam.D / 2 - self.beam.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L1 = numpy.array([1.0, 0.0, 0.0])
         wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
 
+        ####bottom plate left top weld######
         contWeldL2_U1OriginL = numpy.array(
-            [-self.contPlate_L1.L / 2,  -self.column.B/2 +self.column.t/2,
+            [-self.contPlate_L1.L / 2,  -self.column.B/2 +self.column.t + self.contPlate_L1.L11,
              self.column.length / 2 - (self.beam.D / 2) + self.beam.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL2_U1 = numpy.array([0, 1, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
 
+        ####bottom plate left bottom weld######
         contWeldL2_L1OriginL = numpy.array(
-            [-self.contPlate_L1.L / 2,  -self.column.B/2 +self.column.t/2,
+            [-self.contPlate_L1.L / 2,  -self.column.B/2 +self.column.t  + self.contPlate_L1.L11,
              self.column.length / 2 - (self.beam.D / 2) + self.beam.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L1 = numpy.array([1.0, 0.0, 0.0])
         wDircontWeldL2_L1 = numpy.array([0.0, 1.0, 0])

@@ -7089,7 +7089,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             # column section
             "Column Section - Mechanical Properties": "TITLE",
-            "Column Section - Details and Design Preference": self.column_properties,
+            "Section Details": self.column_properties,
 
             # base plate
             "Base Plate - Design Preference": "TITLE",

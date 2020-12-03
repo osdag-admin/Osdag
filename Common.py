@@ -588,12 +588,14 @@ DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 KEY_DISP_FU = 'Ultimate Strength, Fu (MPa)'
 KEY_DISP_FY = 'Yield Strength, Fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
-DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
-DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
+DISP_WELD_SIZE = 'Weld Size (mm)'
+DISP_MIN_WELD_SIZE = 'Min. Weld Size (mm)'
+DISP_MAX_WELD_SIZE = 'Max. Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
 DISP_WEB_WELD_SIZE_REQ = 'Web Weld Size Required (mm)'
 
 DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
+DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm2)'
 KEY_DISP_FY_20 = 'Yield Strength, Fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength, Fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield Strength, Fy (MPa) (>40mm)'
@@ -675,7 +677,7 @@ KEY_DISP_TYP_ANCHOR = 'Anchor Type'
 KEY_DISP_GRD_ANCHOR = 'Property Class'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 KEY_DISP_GRD = 'Property Class'
-KEY_DISP_BOLT_PRE_TENSIONING = 'Bolt tension'
+KEY_DISP_BOLT_PRE_TENSIONING = 'Bolt Tension'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
@@ -695,7 +697,7 @@ KEY_OUT_DISP_SHEAR_CAPACITY = "Shear Capacity Member (kN)"
 KEY_OUT_DISP_MOMENT_CAPACITY = "Moment Capacity Member (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY = 'Plastic Moment Capacity (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
-KEY_OUT_DISP_SHEAR_CAPACITY_M = "Shear Capacity(kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY_M = "Shear Capacity (kN)"
 
 
 KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
@@ -955,9 +957,9 @@ KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
 KEY_DISP_DP_WELD_TYPE = 'Weld Type'
-KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam flange to end plate weld type'
-KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam web to end plate weld type'
-KEY_DISP_STIFFENER_WELD_TYPE = "Stiffener weld type"
+KEY_DISP_BEAM_FLANGE_WELD_TYPE = 'Beam Flange to End Plate'
+KEY_DISP_BEAM_WEB_WELD_TYPE = 'Beam Web to End Plate'
+KEY_DISP_STIFFENER_WELD_TYPE = "Stiffener"
 KEY_DISP_CONTINUITY_PLATE_WELD_TYPE = "Continuity plate weld type"
 KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
 KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
@@ -987,7 +989,7 @@ KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate Analysis'
-KEY_DISP_GAP = 'Gap between members (mm)'
+KEY_DISP_GAP = 'Gap Between Members (mm)'
 
 
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
@@ -1076,26 +1078,26 @@ KEY_REPORT_OD = 'Out diameter, OD (mm)'
 
 # Design cheks
 KEY_REPORT_DIAMETER = 'Diameter $(mm)$'
-KEY_REPORT_BOLT_NOS = 'Number of bolts'
-KEY_REPORT_PROPERTY_CLASS = 'Property class'
-KEY_REPORT_MIN_END = 'Min. end distance $(mm)$'
-KEY_REPORT_MAX_END = 'Max. end distance $(mm)$'
-KEY_REPORT_MIN_EDGE = 'Min. edge distance $(mm)$'
-KEY_REPORT_MAX_EDGE = 'Max. edge distance $(mm)$'
-KEY_REPORT_MIN_PITCH = 'Min. pitch distance $(mm)$'
-KEY_REPORT_MAX_PITCH = 'Max. pitch distance $(mm)$'
-KEY_REPORT_MIN_GAUGE = 'Min. gauge distance $(mm)$'
-KEY_REPORT_MAX_GAUGE = 'Max. pitch distance $(mm)$'
+KEY_REPORT_BOLT_NOS = 'Number of Bolts'
+KEY_REPORT_PROPERTY_CLASS = 'Property Class'
+KEY_REPORT_MIN_END = 'Min. End Distance $(mm)$'
+KEY_REPORT_MAX_END = 'Max. End Distance $(mm)$'
+KEY_REPORT_MIN_EDGE = 'Min. Edge Distance $(mm)$'
+KEY_REPORT_MAX_EDGE = 'Max. Edge Distance $(mm)$'
+KEY_REPORT_MIN_PITCH = 'Min. Pitch Distance $(mm)$'
+KEY_REPORT_MAX_PITCH = 'Max. Pitch Distance $(mm)$'
+KEY_REPORT_MIN_GAUGE = 'Min. Gauge Distance $(mm)$'
+KEY_REPORT_MAX_GAUGE = 'Max. Gauge Distance $(mm)$'
 
 KEY_REPORT_PLATE_LENGTH = 'Length $(mm)$'
 KEY_REPORT_PLATE_WIDTH = 'Width $(mm)$'
 KEY_REPORT_PLATE_HEIGHT = 'Height $(mm)$'
 
-KEY_REPORT_SHEAR_CAPA = 'Shear capacity $(kN)$'
-KEY_REPORT_BEARING_CAPA = 'Bearing capacity $(kN)$'
-KEY_REPORT_BOLT_CAPA = 'Bolt capacity $(kN)$'
-KEY_REPORT_TENSION_CAPA = 'Tension capacity $(kN)$'
-KEY_REPORT_TENSION_DEMAND = 'Tension demand $(kN)$'
+KEY_REPORT_SHEAR_CAPA = 'Shear Capacity $(kN)$'
+KEY_REPORT_BEARING_CAPA = 'Bearing Capacity $(kN)$'
+KEY_REPORT_BOLT_CAPA = 'Bolt Capacity $(kN)$'
+KEY_REPORT_TENSION_CAPA = 'Tension Capacity $(kN)$'
+KEY_REPORT_TENSION_DEMAND = 'Tension Demand $(kN)$'
 
 ########################
 # Output Keys
@@ -1443,7 +1445,7 @@ KEY_BASE_PLATE_FY = 'Base_Plate.Fy'
 KEY_ST_KEY_FU = 'Stiffener_Key.Fu'
 KEY_ST_KEY_FY = 'Stiffener_Key.Fy'
 
-KEY_DISP_LEVER_ARM = "Lever arm (mm)"
+KEY_DISP_LEVER_ARM = "Lever Arm (mm)"
 KEY_DISP_REQ_PARA= "Parameters"
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
@@ -1493,7 +1495,7 @@ KEY_OUT_DISP_BETA_LG = 'β<sub>lg</sub>'
 KEY_OUT_BETA_PK = 'Bolt.Betapk'
 KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
-KEY_OUT_DISP_BOLT_SLIP_DR = 'Slip resistance (kN)'
+KEY_OUT_DISP_BOLT_SLIP_DR = 'Slip Resistance (kN)'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_BOLT_CAPACITY_SPTD = 'Bolt.Capacity_sptd'
 KEY_OUT_BOLT_CAPACITY_SPTING = 'Bolt.Capacity_spting'
@@ -1726,7 +1728,7 @@ KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along One Side of Web (n)'
 KEY_OUT_DISP_NO_BOLTS_WEB_TOTAL = 'No. of bolts along Web'
 
 KEY_OUT_NO_BOLTS = 'ColumnEndPlate.nb'
-KEY_OUT_DISP_NO_BOLTS = 'Total no. of bolts'
+KEY_OUT_DISP_NO_BOLTS = 'Total No. of Bolts'
 KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
 KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
 KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
@@ -1805,12 +1807,12 @@ KEY_OUT_DISP_STIFFENER_THICKNESS = 'Thickness (mm)'
 KEY_OUT_DISP_LOCAL_WEB_YIELDING = 'Local Web Yielding'
 KEY_OUT_DISP_COMP_BUCKLING_WEB = 'Compression Buckling of Web'
 KEY_OUT_DISP_WEB_CRIPPLING = 'Web Crippling'
-KEY_OUT_DISP_COMP_STRENGTH = 'Compression strength (kN)'
+KEY_OUT_DISP_COMP_STRENGTH = 'Compression Strength (kN)'
 #Continuity Plate
-KEY_OUT_DISP_CONT_PLATE_REQ = 'Continuity plate required?'
-KEY_OUT_DISP_DIAG_PLATE_REQ = 'Web stiffener plate required ?'
-KEY_OUT_DISP_AREA_REQ= "Area required (mm2)"
-KEY_OUT_DISP_NOTCH_SIZE ="Notch size (mm)"
+KEY_OUT_DISP_CONT_PLATE_REQ = 'Continuity Plate Required?'
+KEY_OUT_DISP_DIAG_PLATE_REQ = 'Web Stiffener Plate Required ?'
+KEY_OUT_DISP_AREA_REQ= "Area Required (mm2)"
+KEY_OUT_DISP_NOTCH_SIZE ="Notch Size (mm)"
 KEY_OUT_DISP_DIAG_LOAD_STIFF="Load taken by Stiffener"
 KEY_OUT_DISP_DIAGONAL_PLATE_DEPTH = 'Depth (mm)'
 KEY_OUT_DISP_DIAGONAL_PLATE_WIDTH = 'Width (mm)'
@@ -1924,6 +1926,7 @@ KEY_PLTHK = 'Plate thk'
 KEY_DISP_PLTHK = 'Plate thk (mm)'
 KEY_PLTHICK = 'Plate thk'
 KEY_DISP_PLTHICK = 'Plate thickness (mm)'
+KEY_DISP_PLATE_THICK = 'Plate Thickness (mm)'
 KEY_DIAM = 'Diameter'
 KEY_DISP_DIAM = 'Diameter (mm)'
 KEY_NOROWS = 'No of Rows of Bolts'

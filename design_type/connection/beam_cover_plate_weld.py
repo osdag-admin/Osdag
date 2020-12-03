@@ -2070,8 +2070,8 @@ class BeamCoverPlateWeld(MomentConnection):
              KEY_DISP_SHEAR: self.load.shear_force ,
              KEY_DISP_AXIAL: self.load.axial_force,
 
-             "Section": "TITLE",
-             "Beam Section - Mechanical Properties": self.report_supporting,
+             "Beam Section - Mechanical Properties": "TITLE",
+             "Section Details": self.report_supporting,
 
              "Weld Details - Input and Design Preference": "TITLE",
 

@@ -2945,7 +2945,7 @@ class BeamCoverPlate(MomentConnection):
                                   KEY_REPORT_ZEZ: round(self.section.elast_sec_mod_z, 2),
                                   KEY_REPORT_ZEY: round(self.section.elast_sec_mod_y, 2),
                                   KEY_REPORT_ZPZ: round(self.section.plast_sec_mod_z, 2),
-                                  KEY_REPORT_ZPY: round(self.section.elast_sec_mod_y,2)}
+                                  KEY_REPORT_ZPY: round(self.section.elast_sec_mod_y, 2)}
 
         self.report_input = \
             {KEY_MODULE: self.module,
@@ -2955,8 +2955,8 @@ class BeamCoverPlate(MomentConnection):
              KEY_DISP_SHEAR: self.load.shear_force,
              KEY_DISP_AXIAL: self.load.axial_force,
 
-             "Section": "TITLE",
-             "Beam Section - Mechanical Properties": self.report_supporting,
+             "Beam Section - Mechanical Properties": "TITLE",
+             "Section Details": self.report_supporting,
 
              "Bolt Details - Input and Design Preference": "TITLE",
              # KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,

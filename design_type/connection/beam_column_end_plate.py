@@ -2108,7 +2108,7 @@ class BeamColumnEndPlate(MomentConnection):
                                  KEY_DISP_FU: self.supported_section.fu,
                                  KEY_DISP_FY: self.supported_section.fy,
                                  KEY_REPORT_MASS: self.supported_section.mass,
-                                  KEY_REPORT_AREA: round(self.supported_section.area, 2),
+                                  KEY_REPORT_AREA: round(self.supported_section.area * 1e-2, 2),
                                   KEY_REPORT_DEPTH: self.supported_section.depth,
                                   KEY_REPORT_WIDTH: self.supported_section.flange_width,
                                   KEY_REPORT_WEB_THK: self.supported_section.web_thickness,
@@ -2136,7 +2136,7 @@ class BeamColumnEndPlate(MomentConnection):
                                   KEY_DISP_FU: self.supporting_section.fu,
                                   KEY_DISP_FY: self.supporting_section.fy,
                                   KEY_REPORT_MASS: self.supporting_section.mass,
-                                  KEY_REPORT_AREA: round(self.supporting_section.area, 2),
+                                  KEY_REPORT_AREA: round(self.supporting_section.area * 1e-2, 2),
                                   KEY_REPORT_DEPTH: self.supporting_section.depth,
                                   KEY_REPORT_WIDTH: self.supporting_section.flange_width,
                                   KEY_REPORT_WEB_THK: self.supporting_section.web_thickness,
@@ -2166,7 +2166,7 @@ class BeamColumnEndPlate(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Beam Section - Mechanical Properties": "TITLE",
-             "Section Details": self.report_supporting,
+             "Section Details ": self.report_supported,
 
              "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
@@ -2180,7 +2180,7 @@ class BeamColumnEndPlate(MomentConnection):
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT: self.bolt.mu_f,
 
              "Weld Details - Input and Design Preference": "TITLE",
              KEY_DISP_DP_WELD_FAB: self.web_weld.fabrication,

@@ -1039,7 +1039,7 @@ def cl_10_3_3_bolt_shear_capacity(f_ub, n_n, a_nb, gamma_mb, bolt_shear_capacity
     gamma_mb = str(gamma_mb)
     bolt_shear_capacity = str(bolt_shear_capacity)
     bolt_shear_eqn = Math(inline=True)
-    bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{1000\times\sqrt{3} ~\gamma_{mb}}\\'))
+    bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= \frac{' + f_ub + r'\times' + n_n + r'\times' + a_nb + r'}{1000\times\sqrt{3}~\times~' + gamma_mb + r'}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= ' + bolt_shear_capacity + r'\\ \\'))
     bolt_shear_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.3]\end{aligned}'))
@@ -1158,7 +1158,7 @@ def cl_10_3_4_calculate_kb(e, p, d, fub, fu):
     return kb_eqn
 
 
-def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_bearing_capacity, hole_type =None):
+def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_bearing_capacity, hole_type =''):
     """
     Calculate bolt bearing capacity of bolt
 
@@ -1195,7 +1195,7 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
     gamma_mb = str(gamma_mb)
 
     bolt_bearing_eqn = Math(inline=True)
-    bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{1000\times\gamma_{mb}}\\'))
+    bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{\gamma_{mb}}\\'))
     bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5 \times ' + k_b + r'\times' + d + r'\times' + t + r'\times' + f_u + r'}{1000\times' + gamma_mb + r'}\\'))
 
     if str(hole_type) == 'Over-sized' or str(hole_type) == 'short_slot':

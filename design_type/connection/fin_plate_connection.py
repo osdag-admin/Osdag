@@ -397,13 +397,13 @@ class FinPlateConnection(ShearConnection):
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True)
         out_list.append(t13)
 
-        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '', True)
+        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, int(self.plate.thickness_provided) if flag else '', True)
         out_list.append(t14)
 
-        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '', True)
+        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, float(self.plate.height) if flag else '', True)
         out_list.append(t15)
 
-        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '', True)
+        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, float(self.plate.length) if flag else '', True)
         out_list.append(t16)
 
         t22 = ('button1', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
@@ -811,7 +811,7 @@ class FinPlateConnection(ShearConnection):
         self.supported_section.moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength\
             (self.supported_section.elast_sec_mod_z, self.supported_section.plast_sec_mod_z, self.supported_section.fy, 'plastic')
 
-        if self.supported_section.cl_8_2_moment_capacity_member < self.plate.moment_demand:
+        if self.supported_section.moment_capacity < self.plate.moment_demand:
             logger.warning(
                 'The moment capacity of the section is less than moment demand, choose a bigger section or increase the material strength of the '
                 'section.')
@@ -974,8 +974,7 @@ class FinPlateConnection(ShearConnection):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-
-        t1 = ('SubSection', 'Initial Section Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Initial Section Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         a = self.supported_section
@@ -997,7 +996,7 @@ class FinPlateConnection(ShearConnection):
         self.report_check.append(t1)
 
         if not self.thickness_possible and self.supported_section.design_status_initial is True:
-            t1 = ('SubSection', 'Minimum Plate thickness check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Minimum Plate Thickness Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness),
                   self.plate.thickness_provided,
@@ -1027,7 +1026,7 @@ class FinPlateConnection(ShearConnection):
             bolt_force_kn=round(self.plate.bolt_force/1000,2)
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)
 
-            t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Bolt Design','|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
@@ -1099,7 +1098,7 @@ class FinPlateConnection(ShearConnection):
 
 
 
-                t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=self.plate.bolts_one_line,
+                t10 = (KEY_OUT_DISP_BOLT_FORCE, Vres_bolts(bolts_one_line=self.plate.bolts_one_line,
                                                           ymax=round(self.plate.ymax, 2),
                                                           xmax=round(self.plate.xmax, 2),
                                                           bolt_line=self.plate.bolt_line,
@@ -1132,7 +1131,7 @@ class FinPlateConnection(ShearConnection):
                     self.report_check.append(t3)
                 else:
                     kh_disp = round(self.bolt.kh, 2)
-                    t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
+                    t4 = (KEY_OUT_DISP_BOLT_SLIP_DR, '',
                           cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub = self.bolt.bolt_fu,
                                                        Anb= self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
                                                        capacity=bolt_capacity_kn), '')
@@ -1149,8 +1148,7 @@ class FinPlateConnection(ShearConnection):
                     get_pass_fail(bolt_force_kn,bolt_capacity_red_kn,relation="lesser"))
                 self.report_check.append(t5)
 
-
-                t1 = ('SubSection','Plate Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection','Plate Design','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
@@ -1183,7 +1181,7 @@ class FinPlateConnection(ShearConnection):
                         h = a.height
                         t = a.thickness_provided
                     else:
-                        t1 = ('SubSection', 'Section Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                        t1 = ('SubSection', 'Section Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
                         self.report_check.append(t1)
                         h = a.web_height
                         t = a.web_thickness
@@ -1249,7 +1247,7 @@ class FinPlateConnection(ShearConnection):
                 # Weld Checks
                 ##################
 
-                t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Weld Design', '|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld_size_min), self.weld.size,

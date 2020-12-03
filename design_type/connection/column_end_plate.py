@@ -2068,7 +2068,7 @@ class ColumnEndPlate(MomentConnection):
             pass
 
         if self.member_capacity_status is True and self.bolt_dia_status is True:
-            t1 = ('SubSection', ' Bolt Checks', '|p{3cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', ' Bolt Checks', '|p{3cm}|p{6.3cm}|p{5.7cm}|p{1cm}|')
             self.report_check.append(t1)
             t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt_diam_provided, "d"), '')
             self.report_check.append(t1)
@@ -2136,7 +2136,7 @@ class ColumnEndPlate(MomentConnection):
                                      relation='leq'))
                  self.report_check.append(t5)
 
-            t1 = (KEY_OUT_BOLT_TENSION_CAPACITY, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
+            t1 = (KEY_OUT_DISP_BOLT_TENSION_AXIAL, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
                                                                                             n=self.no_bolts,
                                                                                             M=round(self.load_moment/1000,2),
                                                                                             y_max=self.y_max,
@@ -2147,7 +2147,7 @@ class ColumnEndPlate(MomentConnection):
             self.report_check.append(t1)
 
 
-            t1 = ("Prying force (kN)", cl_10_4_7_prying_force(self.lv, self.le, self.le2, round(self.t_b/1000 ,2), 1, self.f_o, self.b_e, self.plate_thickness_provided,
+            t1 = ("Prying force (kN)", cl_10_4_7_prying_force(self.lv, self.le, round(self.le2,2), round(self.t_b/1000 ,2), 1, self.f_o, self.b_e, self.plate_thickness_provided,
                                                               self.end_dist,
                                                               self.section.root_radius, self.plate.fy, self.bolt.bolt_fu,
                                                               self.f_o, self.section.flange_width,

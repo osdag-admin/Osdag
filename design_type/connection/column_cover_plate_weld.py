@@ -461,7 +461,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         pattern.append(t00)
 
-        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+        t99 = (None, 'Failure Pattern Due to Tension Force in the Member', TYPE_SECTION,
                ['./ResourceFiles/images/U_Vw.png', 202, 400, "Web Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
@@ -567,7 +567,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         out_list.append(t6)
 
         t7 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
-              self.web_plate.thickness_provided if flag else '', True)
+              int(self.web_plate.thickness_provided) if flag else '', True)
         out_list.append(t7)
 
         t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON, ['Web Capacity', self.webcapacity], True)
@@ -594,7 +594,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_out_plate_tk if flag else '', True)
+               int(self.flange_out_plate_tk) if flag else '', True)
         out_list.append(t20)
 
         t21 = (
@@ -2108,23 +2108,23 @@ class ColumnCoverPlateWeld(MomentConnection):
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
-                                  'Mass': self.section.mass,
-                                  'Area(mm2) - A': round(self.section.area, 2),
-                                  'D(mm)': self.section.depth,
-                                  'B(mm)': self.section.flange_width,
-                                  't(mm)': self.section.web_thickness,
-                                  'T(mm)': self.section.flange_thickness,
-                                  'FlangeSlope': self.section.flange_slope,
-                                  'R1(mm)': self.section.root_radius,
-                                  'R2(mm)': self.section.toe_radius,
-                                  'Iz(mm4)': round(self.section.mom_inertia_z, 2),
-                                  'Iy(mm4)': round(self.section.mom_inertia_y, 2),
-                                  'rz(mm)': round(self.section.rad_of_gy_z, 2),
-                                  'ry(mm)': round(self.section.rad_of_gy_y, 2),
-                                  'Zz(mm3)': round(self.section.elast_sec_mod_z, 2),
-                                  'Zy(mm3)': round(self.section.elast_sec_mod_y, 2),
-                                  'Zpz(mm3)': round(self.section.plast_sec_mod_z, 2),
-                                  'Zpy(mm3)': round(self.section.elast_sec_mod_y, 2)}
+                                  KEY_REPORT_MASS: self.section.mass,
+                                  KEY_REPORT_AREA: round(self.section.area * 1e-2, 2),
+                                  KEY_REPORT_DEPTH: self.section.depth,
+                                  KEY_REPORT_WIDTH: self.section.flange_width,
+                                  KEY_REPORT_WEB_THK: self.section.web_thickness,
+                                  KEY_REPORT_FLANGE_THK: self.section.flange_thickness,
+                                  KEY_DISP_FLANGE_S_REPORT: self.section.flange_slope,
+                                  KEY_REPORT_R1: self.section.root_radius,
+                                  KEY_REPORT_R2: self.section.toe_radius,
+                                  KEY_REPORT_IZ: self.section.mom_inertia_z * 1e-4,
+                                  KEY_REPORT_IY: self.section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_RZ: round(self.section.rad_of_gy_z * 1e-1, 2),
+                                  KEY_REPORT_RY: round(self.section.rad_of_gy_y * 1e-1, 2),
+                                  KEY_REPORT_ZEZ: self.section.elast_sec_mod_z * 1e-3,
+                                  KEY_REPORT_ZEY: self.section.elast_sec_mod_y * 1e-3,
+                                  KEY_REPORT_ZPZ: self.section.plast_sec_mod_z * 1e-3,
+                                  KEY_REPORT_ZPY: self.section.plast_sec_mod_y * 1e-3}
 
         self.report_input = \
             {KEY_MODULE: self.module,
@@ -2135,28 +2135,28 @@ class ColumnCoverPlateWeld(MomentConnection):
              KEY_DISP_SHEAR: self.load.shear_force,
              KEY_DISP_AXIAL: self.load.axial_force,
 
-             "Section": "TITLE",
+             "Column Section - Mechanical Properties": "TITLE",
              "Section Details": self.report_supporting,
 
-             "Weld Details": "TITLE",
-
-
+             "Weld Details - Input and Design Preference": "TITLE",
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.flange_weld.fabrication,
              KEY_DISP_DP_WELD_MATERIAL_G_O: self.flange_weld.fu,
              # KEY_WEBPLATE_THICKNESS:str(self.plate_thick_customized()),
              # KEY_FLANGEPLATE_THICKNESS:str(self.plate_thick_customized()),
-             "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
-             KEY_DISP_GAMMA_M0: cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
-             KEY_DISP_GAMMA_M1: cl_5_4_1_table_4_5_gamma_value(1.25, "m1"),
-             KEY_DISP_GAMMA_MW: cl_5_4_1_table_4_5_gamma_value(self.gamma_mw_flange, "mw"),
-             "Plate Details": "TITLE",
+
+             # "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
+             # KEY_DISP_GAMMA_M0: cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
+             # KEY_DISP_GAMMA_M1: cl_5_4_1_table_4_5_gamma_value(1.25, "m1"),
+             # KEY_DISP_GAMMA_MW: cl_5_4_1_table_4_5_gamma_value(self.gamma_mw_flange, "mw"),
+
+             "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
              KEY_DISP_FU: self.flange_plate.fu,
              KEY_DISP_FY: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
-             KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
-             KEY_DISP_WEBPLATE_THICKNESS: str(self.web_plate.thickness),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str(list(np.int_(self.flange_plate.thickness))),
+             KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
              }
 
         self.report_check = []

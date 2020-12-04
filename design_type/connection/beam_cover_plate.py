@@ -546,6 +546,7 @@ class BeamCoverPlate(MomentConnection):
                (self.web_plate.bolt_line) if flag else '')
         web_bolt_capacity.append(t16)
 
+
         t16 = (KEY_WEB_BOLTS_ONE_LINE, KEY_WEB_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
                (self.web_plate.bolts_one_line) if flag else '')
         web_bolt_capacity.append(t16)

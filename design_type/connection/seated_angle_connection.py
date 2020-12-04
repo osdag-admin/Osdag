@@ -689,7 +689,8 @@ class SeatedAngleConnection(ShearConnection):
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_angle_thickness(self):
-        self. plate.thickness = []
+        self.plate.thickness = []
+        self.bolt_dia_possible = []
         self.seated_angle.width = self.supported_section.flange_width + 20.0
 
         for designation in self.seated_list:
@@ -753,7 +754,7 @@ class SeatedAngleConnection(ShearConnection):
             self.get_plate_thk_bolt_bearing(self)
             bolts_required_previous = 2
             bolt_diameter_previous = self.bolt.bolt_diameter[-1]
-            self.bolt_dia_possible = []
+
             count = 0
 
             for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
@@ -1422,7 +1423,7 @@ class SeatedAngleConnection(ShearConnection):
                   get_pass_fail(self.seated_angle.leg_a_length_min, self.seated.leg_a_length, relation='leq'))
             self.report_check.append(t2)
 
-        if self.design_status is False and self.bolt.design_status is False:
+        if self.design_status is False and self.bolt.design_status is False and self.plate.thickness:
             t1 = ('SubSection', 'Initial Detailing Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             min_width_sptd = self.supported_section.flange_width

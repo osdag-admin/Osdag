@@ -3042,7 +3042,6 @@ class BeamCoverPlate(MomentConnection):
                                                                           conn = "beam_beam"),'')
         self.report_check.append(t2)
 
-
         #############################
         t1 = (KEY_DISP_APPLIED_AXIAL_FORCE,display_prov(self.load.axial_force, "Al"),
               prov_axial_load(axial_input=self.load.axial_force,min_ac=round(self.min_axial_load / 1000, 2),
@@ -3272,7 +3271,6 @@ class BeamCoverPlate(MomentConnection):
             min_plate_length = (((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) + (
                     2 * self.flange_bolt.min_end_dist) + (self.flange_plate.gap / 2))
 
-
             t1 = ('SubSection', 'Flange Bolt Check', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
@@ -3413,7 +3411,6 @@ class BeamCoverPlate(MomentConnection):
             #                                          bolt_capacity=flange_bolt_capacity_kn, multiple=2,conn ="flange_web"),
             #       self.flange_plate.bolts_required, '')
             # self.report_check.append(t6)
-
 
             t10 = (KEY_OUT_LONG_JOINT, cl_10_3_3_1_long_joint_bolted_req(),
                    long_joint_bolted_beam(self.flange_plate.bolt_line, self.flange_plate.bolts_one_line,

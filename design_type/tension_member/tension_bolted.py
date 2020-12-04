@@ -2517,7 +2517,6 @@ class Tension_bolted(Member):
             t8 = (KEY_DISP_DP_BOLT_FY, "", display_prov(round(self.bolt.bolt_fy, 2), "f_{yb}"), '')
             self.report_check.append(t8)
 
-
             t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," [Ref~IS~1367-3~(2002)]"), '')
             self.report_check.append(t8)
 

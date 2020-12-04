@@ -51,6 +51,8 @@ class BeamColumnEndPlate(MomentConnection):
     def __init__(self):
         super(BeamColumnEndPlate, self).__init__()
 
+        self.module = KEY_DISP_BCENDPLATE
+
         self.load_moment = 0.0
         self.load_moment_effective = 0.0
         self.load_shear = 0.0
@@ -395,6 +397,14 @@ class BeamColumnEndPlate(MomentConnection):
         out_list.append(t4)
 
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.bolt_bearing_capacity if flag else '', True)
+        out_list.append(t5)
+
+        if self.design_status:
+            t5 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.call_helper.beta_lg if flag and self.bolt.bolt_type == "Bearing Bolt"
+            else 'N/A', True)
+        else:
+            t5 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.call_helper.beta_lg if flag and self.bolt.bolt_type == "Bearing Bolt"
+            else '', True)
         out_list.append(t5)
 
         t6 = (KEY_OUT_BOLT_CAPACITY, DISP_TITLE_BOLT_CAPACITY, TYPE_TEXTBOX, self.bolt_capacity if flag else '', True)
@@ -951,9 +961,10 @@ class BeamColumnEndPlate(MomentConnection):
 
         # helper function
 
-        self.call_helper = EndPlateSpliceHelper(supported_section=self.supported_section, load=self.load,
-                                                bolt=self.bolt, ep_type=self.endplate_type,
-                                                plate_design_status=False, helper_file_design_status=False)
+        self.call_helper = EndPlateSpliceHelper(module=self.module, supporting_section=self.supporting_section,
+                                                supported_section=self.supported_section, load=self.load, bolt=self.bolt,
+                                                connectivity=self.connectivity, ep_type=self.endplate_type, plate_design_status=False,
+                                                helper_file_design_status=False)
         self.projection = 12.5
 
         # call functions for design
@@ -2410,9 +2421,30 @@ class BeamColumnEndPlate(MomentConnection):
                                                                                      bolt_bearing_capacity_kn), 'OK')
                 self.report_check.append(t2)
 
-                t3 = ('Bolt Capacity (kN)', bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers,
+                t3 = ('Bolt Capacity (kN)', '',
+                      cl_10_3_2_bolt_capacity(round(self.bolt_shear_capacity, 2), bolt_bearing_capacity_kn,
+                                              round(self.bolt_capacity / self.call_helper.beta_lg, 2)),
+                      '')
+                self.report_check.append(t3)
+
+                if self.connectivity == VALUES_CONN_1[0]:  # CF-BW
+                    member_thk = self.column_tf
+                else:  # CW-BW
+                    member_thk = self.column_tw
+
+                t3 = (KEY_OUT_LARGE_GRIP, '', large_grip_length(self.plate_thickness, member_thk, self.call_helper.grip_length,
+                                                                           self.bolt_diameter_provided, self.call_helper.beta_lg),
+                      get_pass_fail(self.call_helper.grip_length, 8 * self.bolt_diameter_provided, relation='leq'))
+                self.report_check.append(t3)
+
+                t3 = (KEY_OUT_BOLT_CAPACITY_REDUCED, '',
+                      shear_capa_post_large_grip_length_red(self.call_helper.beta_lg, self.bolt_capacity),
+                      'OK')
+                self.report_check.append(t3)
+
+                t3 = ('Shear Demand (kN)', bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers,
                                                               V_sb=self.bolt_shear_demand, type='Bearing Bolt'),
-                      cl_10_3_2_bolt_capacity(round(self.bolt_shear_capacity, 2), bolt_bearing_capacity_kn, round(self.bolt_capacity, 2)),
+                      'Vdb = ' + str(round(self.bolt_capacity, 2)) + '',
                       get_pass_fail(self.bolt_shear_demand, round(self.bolt_capacity, 2), relation='leq'))
                 self.report_check.append(t3)
             else:

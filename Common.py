@@ -687,10 +687,10 @@ KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 # Applied load
 KEY_INTERACTION_RATIO ="Interaction Ratio"
 MIN_LOADS_REQUIRED ="Minimun Required Load"
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Force (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Force (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment (kNm)'
-KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
+KEY_DISP_APPLIED_SHEAR_LOAD = 'Applied Shear Force (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE = 'Applied Axial Force (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD = 'Applied Moment (kNm)'
+KEY_DISP_AXIAL_FORCE_CON = 'Axial Load Considered (kN)'
 
 # capacity
 

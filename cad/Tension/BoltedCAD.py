@@ -244,6 +244,17 @@ class TensionAngleBoltCAD(object):
             plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
+
+    def get_end_plates_models(self):
+        if self.Obj.sec_profile == 'Star Angles':
+            plate = BRepAlgoAPI_Fuse(self.plate1_Model,self.nutboltArrayLModels,self.nutboltArrayL_SAModels).Shape()
+        else:
+            plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.nutboltArrayLModels).Shape()
+
+        # if (self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles') and self.inter_length > 1000:
+        #     plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
+        return plate
+
     def get_nut_bolt_array_models(self):
 
         if self.Obj.sec_profile == 'Star Angles':
@@ -260,6 +271,18 @@ class TensionAngleBoltCAD(object):
 
         if (self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles') and self.inter_length > 1000:
             array = BRepAlgoAPI_Fuse(array, self.inter_conc_bolts).Shape()
+
+        return array
+
+    def get_end_nut_bolt_array_models(self):
+
+        if self.Obj.sec_profile == 'Star Angles':
+            nut_bolts = [self.nutboltArrayLModels, self.nutboltArrayL_SAModels]
+            array = nut_bolts[0]
+            for comp in nut_bolts:
+                array = BRepAlgoAPI_Fuse(comp, array).Shape()
+        else:
+            array =  self.nutboltArrayLModels
 
         return array
 

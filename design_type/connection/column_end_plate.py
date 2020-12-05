@@ -1453,6 +1453,8 @@ class ColumnEndPlate(MomentConnection):
         if len(self.lst3) != 0:
             self.bolt_grade_provided = min(self.lst3)
             # return self.bolt_diam_provided
+            self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt_diam_provided,
+                                                      bolt_grade_provided=self.bolt_grade_provided)
             print("bolt grade", self.bolt_grade_provided)
             # self.get_bolt_grade(self)
             self.design_status = True
@@ -1522,6 +1524,7 @@ class ColumnEndPlate(MomentConnection):
         # self.bolt_conn_plates_t_fu_fy = []
         # self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
         for x in self.lst_pl:
+
             self.bolt_conn_plates_t_fu_fy = []
             self.bolt_conn_plates_t_fu_fy.append((x, self.plate.fu, self.plate.fy))
             self.bolt_conn_plates_t_fu_fy.append((x, self.plate.fu, self.plate.fy))
@@ -1547,6 +1550,7 @@ class ColumnEndPlate(MomentConnection):
 
         if len(self.lst_4) != 0:
             self.plate_thickness_provided = min(self.lst_4)
+            # self.pl_thk = round(math.sqrt((self.m_ep * 4 * gamma_m0) / (self.b_eff * self.plate.fy)), 2)
             self.le2 = ((1 * self.f_o / self.plate.fy) ** 0.5) * 1.1 * self.plate_thickness_provided
             self.m_dp_prov = self.b_eff * self.plate_thickness_provided ** 2 * self.plate.fy / (4 * gamma_m0)
             self.le = min(self.le1,self.le2)
@@ -1578,7 +1582,7 @@ class ColumnEndPlate(MomentConnection):
                                                                                self.plate_thickness_provided,
                                                                                self.section.fy, self.end_dist,
                                                                                self.bolt.bolt_tensioning, eta=1.5)
-                    self.tension_demand = round((self.t_b / 1000, 2)) + round(self.prying_force,2)
+                    self.tension_demand = (self.t_b / 1000) + round(self.prying_force,2)
                     logger.info(": Overall Column End Plate connection design is safe \n")
                     logger.info(" :=========End of design===========")
                 else:
@@ -2223,8 +2227,8 @@ class ColumnEndPlate(MomentConnection):
             self.report_check.append(t1)
 
             t1 = (DISP_MIN_PLATE_THICK,
-                  end_plate_thk_req(M_ep=round(self.m_ep, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
-                                    t_p=self.plate_thickness_provided),
+                  end_plate_thk_req(M_ep=round(self.m_ep/1000000, 2), b_eff=self.b_eff, f_y=self.section.fy, gamma_m0=gamma_m0,
+                                    t_p=self.plate_thickness_provided, t_b=self.t_b, q=self.prying_f,l_e=self.le, l_v=self.lv, f_o=self.f_o,b_e=self.b_e),
                   self.plate_thickness_provided,
                   get_pass_fail(self.plate.thickness_provided, self.plate_thickness_provided, relation="leq"))
             self.report_check.append(t1)

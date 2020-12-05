@@ -3450,7 +3450,7 @@ def end_plate_ht_req(D, e, h_p):
     return end_plate_ht_eqn
 
 
-def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p):
+def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_e):
     """
     Calculate end plate thickness
      Args:
@@ -3468,12 +3468,29 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p):
     b_eff = str(int(b_eff))
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)
+    t_b = str(t_b)
+    q = str(q)
+    l_e = str(l_e)
+    # l_v = str(l_v)
+    f_o = str(f_o)
+    b_e = str(b_e)
 
     end_plate_thk_eqn = Math(inline=True)
 
-    end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
-    end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
-                                      + gamma_m0 + r')} } \\'))
+    # end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
+    # end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
+    #                                   + gamma_m0 + r')} } \\'))
+    # end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
+    # return end_plate_thk_eqn
+
+    end_plate_thk_eqn.append(
+        NoEscape(r'\begin{aligned} t_p &=  max\Bigg(\sqrt{\frac{4 M_{cr}} {b_{eff} (f_{y} / \gamma_{m0})} },\\'))
+    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(T_1 - \frac{Q \times 2 \times  l_e}{l_v}\Bigg) \times \Bigg(\frac{27 \times l_e \times l_v^{2}}{\beta \times \eta \times f_o \times b_e}\Bigg) } \Bigg) \\'))
+    end_plate_thk_eqn.append(
+        NoEscape(r'&=  max\Bigg\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
+                 + gamma_m0 + r')} }, \\'))
+    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(' + t_b + r'- \frac{ '+ q + r'\times 2 \times '+  l_e + r'}{' + str(l_v) + r'}\Bigg) \times \Bigg(\frac{27 \times'+ l_e + r' \times' + str(l_v ** 2) + r'}{' + str(1) + r'\times' + str(1.5) + r'\times' + f_o + r'\times'+ b_e + r'}\Bigg) } \Bigg) \\'))
+
     end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
     return end_plate_thk_eqn
 

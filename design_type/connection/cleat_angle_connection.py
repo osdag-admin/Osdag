@@ -445,7 +445,8 @@ class CleatAngleConnection(ShearConnection):
 
         bolt_bearing_capacity_disp = ''
         if flag is True:
-            if self.bolt.bolt_bearing_capacity is not 'N/A':
+            print("wats this",self.bolt.bolt_bearing_capacity)
+            if self.bolt.bolt_bearing_capacity != 'N/A':
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity

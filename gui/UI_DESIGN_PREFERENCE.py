@@ -16,7 +16,7 @@ from drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
 import shutil
-# import openpyxl
+import openpyxl
 from get_DPI_scale import scale,width,height
 
 
@@ -888,11 +888,8 @@ class Window(QDialog):
         '''
         @author: Umair
         '''
+
         tab_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
-
-        if self.add_compound_section(tab_Angle):
-            return
-
         tab_name = DISP_TITLE_ANGLE
         if tab_Angle == None:
             tab_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
@@ -904,7 +901,9 @@ class Window(QDialog):
             tab_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_TOPANGLE)
             tab_name = KEY_DISP_TOPANGLE
         # tab_cleat_angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
-        name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Angle))
+        # name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Angle))
+        if self.add_compound_section(tab_Angle):
+            return
         for ch in tab_Angle.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
@@ -1109,10 +1108,14 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
     def add_compound_section(self, tab):
-        if tab.findChild(QWidget, KEY_SEC_PROFILE).text() in ['Back to Back Angles', 'Star Angles', 'Back to Back Channels']:
-            QMessageBox.information(QMessageBox(), "Information", "To create new compound section please add as single section")
-            return True
-        return False
+        if tab.findChild(QWidget, KEY_SEC_PROFILE):
+            if tab.findChild(QWidget, KEY_SEC_PROFILE).text() in ['Back to Back Angles', 'Star Angles', 'Back to Back Channels']:
+                QMessageBox.information(QMessageBox(), "Information", "To create new compound section please add as single section")
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def download_Database(self, table, call_type="database"):
 

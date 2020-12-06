@@ -1998,32 +1998,40 @@ def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
     #     B = beta_lj
     else:
         B = B
+    max_lg = 8 * d
     d5_str = str(5 * d)
+    d8_str = str(8*d)
     d_str = str(d)
     # B = str(round(B,3))
     Bi = str(Bi)
     lg_str = str(lg)
     t_sum_str = str(t_sum)
     beta_lj_str = str(round(beta_lj, 2))
+
     large_grip_bolted_eqn = Math(inline=True)
     # large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
     # large_grip_bolted_eqn.append(NoEscape(r'& where,\\'))
 
     large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} l_g &= \Sigma~ (t_{p}+t_{member}) \\'))
     # large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
-    large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\ \\'))
-    large_grip_bolted_eqn.append(NoEscape(r' 5d &= ' + d5_str + r'\\ \\'))
+    large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
+    large_grip_bolted_eqn.append(NoEscape(r' 5d &= ' + d5_str + r'\\'))
+    large_grip_bolted_eqn.append(NoEscape(r' 8d &= ' + d8_str + r'\\'))
     if lg <= 5 * d:
-        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g < 5d~then~\beta_{lg} = 1.0 \\ \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g < 5d~;~\beta_{lg} = 1.0 \\'))
+        # large_grip_bolted_eqn.append(NoEscape(r'& V_{rd} = V_{db} \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
+    elif lg > 8*d:
+        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g > 8d~;~exceeds~limit \\'))
         # large_grip_bolted_eqn.append(NoEscape(r'& V_{rd} = V_{db} \\'))
         large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
     else:
-        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g \geq 5d~then~V_{rd} = \beta_{lg}~V_{db} \\ \\'))
+        large_grip_bolted_eqn.append(NoEscape(r'& since,~l_g \geq 5d~;~V_{rd} = \beta_{lg}~V_{db} \\'))
         large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = 8d/(3d + l_g) \\'))
         large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = 8\times' + d_str + r'/(3\times' + d_str + ' + ' + lg_str + ') =' + Bi + r'\\ \\'))
         if B > beta_lj:
-            large_grip_bolted_eqn.append(NoEscape(r'& since,~\beta_{lg} \geq \beta_{lj}~then~\beta_{lg} = \beta_{lj} \\'))
-            large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = ' + beta_lj_str + r'\\ \\'))
+            large_grip_bolted_eqn.append(NoEscape(r'& since,~\beta_{lg} \geq \beta_{lj}~;~\beta_{lg} = \beta_{lj} \\'))
+            large_grip_bolted_eqn.append(NoEscape(r'& \beta_{lg} = ' + beta_lj_str + r'\\'))
         # large_grip_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
         large_grip_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.2]\end{aligned}'))
 
@@ -2845,7 +2853,7 @@ def tension_in_bolt_due_to_axial_load_n_moment(P, n, M, y_max, y_sqr, T_b):
     y_sqr = str(y_sqr)
     T_b = str(T_b)
     tension_in_bolt_due_to_axial_load_n_moment = Math(inline=True)
-    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_b &= \frac{P}{\ n} + \frac{M \times y_{max}}{\ y_{sqr}}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_1 &= \frac{P}{\ n} + \frac{M \times y_{max}}{\ y_{sqr}}\\'))
     tension_in_bolt_due_to_axial_load_n_moment.append(
         NoEscape(r'&=\frac{' + P + r'\times 10^3}{' + n + r'} + \frac{' + M + r'\times 10^6\times' + y_max + r'}{' + y_sqr + r'}\\'))
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
@@ -3519,7 +3527,7 @@ def end_plate_ht_req(D, e, h_p):
     return end_plate_ht_eqn
 
 
-def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p):
+def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_e):
     """
     Calculate end plate thickness
      Args:
@@ -3537,12 +3545,29 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p):
     b_eff = str(int(b_eff))
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)
+    t_b = str(t_b)
+    q = str(q)
+    l_e = str(l_e)
+    # l_v = str(l_v)
+    f_o = str(f_o)
+    b_e = str(b_e)
 
     end_plate_thk_eqn = Math(inline=True)
 
-    end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
-    end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
-                                      + gamma_m0 + r')} } \\'))
+    # end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
+    # end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
+    #                                   + gamma_m0 + r')} } \\'))
+    # end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
+    # return end_plate_thk_eqn
+
+    end_plate_thk_eqn.append(
+        NoEscape(r'\begin{aligned} t_p &=  max\Bigg(\sqrt{\frac{4 M_{cr}} {b_{eff} (f_{y} / \gamma_{m0})} },\\'))
+    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(T_1 - \frac{Q \times 2 \times  l_e}{l_v}\Bigg) \times \Bigg(\frac{27 \times l_e \times l_v^{2}}{\beta \times \eta \times f_o \times b_e}\Bigg) } \Bigg) \\'))
+    end_plate_thk_eqn.append(
+        NoEscape(r'&=  max\Bigg\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
+                 + gamma_m0 + r')} }, \\'))
+    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(' + t_b + r'- \frac{ '+ q + r'\times 2 \times '+  l_e + r'}{' + str(l_v) + r'}\Bigg) \times \Bigg(\frac{27 \times'+ l_e + r' \times' + str(l_v ** 2) + r'}{' + str(1) + r'\times' + str(1.5) + r'\times' + f_o + r'\times'+ b_e + r'}\Bigg) } \Bigg) \\'))
+
     end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
     return end_plate_thk_eqn
 
@@ -4390,8 +4415,8 @@ def moment_demand_SA(b_1, b_2, V, M):
         ecc = round((b_2 - b_1 / 2), 2)
 
     V = str(V)
-    b_1 = str(b_1)
-    b_2 = str(b_2)
+    b_1 = str(round(b_1,2))
+    b_2 = str(round(b_2,2))
     M = str(M)
     ecc = str(ecc)
 
@@ -4897,6 +4922,27 @@ def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     web_plate_area_prov.append(NoEscape(r'&= ' + wp_area + r'\end{aligned}'))
     return web_plate_area_prov
 
+def seated_width_req(width_req):
+    width_req = str(width_req)
+    seated_width_req = Math(inline=True)
+    seated_width_req.append(NoEscape(r'\begin{aligned}4 \times e\textquotesingle+ 2 \times R_1 + t = ' + str(width_req)
+                                         +r'\end{aligned}'))
+    return seated_width_req
+
+def seated_width_prov(width_prov):
+    width_prov = str(width_prov)
+    seated_width_prov = Math(inline=True)
+    seated_width_prov.append(NoEscape(r'\begin{aligned}B = ' + str(width_prov)
+                                         +r'\end{aligned}'))
+    return seated_width_prov
+
+def min_angle_leg_length_bearing(b1,gap):
+    min_leg = str(round(b1+gap,2))
+    b1 = str(b1)
+    gap = str(gap)
+    leg_req_bearing = Math(inline=True)
+    leg_req_bearing.append(NoEscape(r'\begin{aligned}b_1 + gap = ' + min_leg + r'\end{aligned}'))
+    return leg_req_bearing
 
 # functions for base plate
 

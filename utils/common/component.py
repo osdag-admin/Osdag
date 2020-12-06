@@ -109,6 +109,7 @@ class Bolt:
         self.max_end_dist_round = round_down(self.max_end_dist, 5)
 
         self.proof_load = 0.0
+        self.design_status = False
 
     def __repr__(self):
         repr = "Bolt\n"

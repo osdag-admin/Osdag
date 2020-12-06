@@ -1518,6 +1518,7 @@ KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
 KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
 KEY_OUT_DISP_CRITICAL_BOLT_TENSION = 'Tension Due to Moment (kN)'
+KEY_OUT_DISP_BOLT_TENSION_AXIAL = 'Tension due to Moment and Axial Force (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
 KEY_OUT_DISP_BOLT_PRYING_FORCE_EP = 'Prying Force (kN)'
@@ -2007,7 +2008,9 @@ def get_leg_lengths(designation):
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
-
+print(all_angles)
+print("customised")
+print(VALUES_CLEAT_CUSTOMIZED)
 
 BOLT_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

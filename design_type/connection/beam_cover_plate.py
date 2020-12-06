@@ -2991,7 +2991,7 @@ class BeamCoverPlate(MomentConnection):
         t1=(SECTION_CLASSIFICATION,"", cl_3_7_2_section_classification(class_of_section=self.class_of_section), "")
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, display_prov(self.load.axial_force, "Al"),
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, display_prov(self.load.axial_force, "A"),
               cl_6_2_tension_yield_capacity_member(l=None, t=None, f_y=self.section.fy, gamma=gamma_m0,
                                                    T_dg=round(self.axial_capacity / 1000, 2), multiple =None,
                                                    area=round(self.section.area, 2)), '')
@@ -3043,7 +3043,7 @@ class BeamCoverPlate(MomentConnection):
         self.report_check.append(t2)
 
         #############################
-        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE,display_prov(self.load.axial_force, "Al"),
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE,display_prov(self.load.axial_force, "A"),
               prov_axial_load(axial_input=self.load.axial_force,min_ac=round(self.min_axial_load / 1000, 2),
                               app_axial_load=round(self.factored_axial_load / 1000, 2),axial_capacity=round(self.axial_capacity/1000,2)),'' )
 

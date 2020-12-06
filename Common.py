@@ -686,7 +686,7 @@ KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 
 # Applied load
 KEY_INTERACTION_RATIO ="Interaction Ratio"
-MIN_LOADS_REQUIRED ="Minimun Required Load"
+MIN_LOADS_REQUIRED ="Minimum Required Load"
 KEY_DISP_APPLIED_SHEAR_LOAD = 'Applied Shear Force (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE = 'Applied Axial Force (kN)'
 KEY_DISP_APPLIED_MOMENT_LOAD = 'Applied Moment (kNm)'
@@ -1517,7 +1517,7 @@ KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force (kN)'
 KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
 KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
-KEY_OUT_DISP_CRITICAL_BOLT_TENSION = 'Tension due to Moment (kN)'
+KEY_OUT_DISP_CRITICAL_BOLT_TENSION = 'Tension Due to Moment (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
 KEY_OUT_DISP_BOLT_PRYING_FORCE_EP = 'Prying Force (kN)'

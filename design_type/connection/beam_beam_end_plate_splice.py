@@ -69,8 +69,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.plate_thickness = []
         self.plate_thickness_list = []
 
-        self.beam_shear_capa = 0.0
-        self.beam_plastic_mom_capa_zz = 0.0
         self.tension_due_to_moment = 0.0
         self.tension_due_to_axial_force = 0.0
         self.load_tension_flange = 0.0
@@ -143,6 +141,18 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.gamma_mb = 0.0
         self.gamma_mw = 0.0
 
+        self.epsilon_beam = 1.0
+        self.beam_classification = ''
+        self.beam_beta_b_z = 1.0
+        self.beam_beta_b_y = 1.0
+        self.supported_section_mom_capa_m_zz = 0.0
+        self.supported_section_mom_capa_m_yy = 0.0
+        self.supported_section_shear_capa = 0.0
+        self.supported_section_axial_capa = 0.0
+        self.IR_axial = 0.0
+        self.IR_shear = 0.0
+        self.IR_moment = 0.0
+        self.sum_IR = 0.0
         self.bolt_shear_demand = 0.0
         self.bolt_shear_capacity = 0.0
         self.bolt_bearing_capacity = 0.0
@@ -370,7 +380,12 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX, self.pitch_distance_provided if flag else '', True)
         out_list.append(t21)
 
-        t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX, self.gauge_distance_provided if flag else '', True)
+        if self.design_status:
+            t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
+                   self.gauge_distance_provided if flag and self.bolt_column == 4 else 'N/A', True)
+        else:
+            t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
+                   self.gauge_distance_provided if flag else '', True)
         out_list.append(t22)
 
         t22 = (KEY_OUT_DETAILING_CS_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_CS_GAUGE_DISTANCE, TYPE_TEXTBOX, self.gauge_cs_distance_provided if flag else '',
@@ -783,67 +798,171 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
     def set_parameters(self):
         """ set/initialize parameters for performing the analyses and design """
+        # Input loads
         self.input_shear_force = self.load.shear_force
         self.input_axial_force = self.load.axial_force
-        self.input_moment = self.load.moment
+        self.input_moment = self.load.moment  # about the major (z-z) axis of the beam
 
-        # set minimum load (Cl. 10.7, IS 800:2007)
+        # Capacities
 
-        # minimum shear load
-        # Note: Shear force is assumed to be transferred through the web, hence Cl.10.7 point 2 is considered for minimum shear load
-        self.beam_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.supported_section.fy) / (math.sqrt(3) * self.gamma_m0)
-        self.beam_shear_capa = round(self.beam_shear_capa * 1e-3, 2)  # kN
+        # 1: Moment capacity of the beam
 
-        if self.load.shear_force > self.beam_shear_capa:
-            logger.warning("[High Shear] The external factored shear force ({} kN) is greater than 0.6 times the plastic shear capacity of the "
-                           "beam ({} kN)".format(self.load.shear_force, self.beam_shear_capa))
-            logger.info("Design of beam with high shear is not recommended by Osdag")
-            logger.info("Restricting the shear capacity of the beam to {} kN ".format(self.beam_shear_capa))
+        # 1.1: Section classification of the beam (Table 2, IS 800:2007)
+        self.epsilon_beam = round(math.sqrt(250 / self.supported_section.fy), 2)
 
-        elif self.load.shear_force < min((0.15 * self.beam_shear_capa), 40):
-            self.minimum_load_status_shear = True
-            self.load_shear = min(round(0.15 * self.beam_shear_capa, 2), 40)
-            logger.warning("[Minimum Factored Load] The external factored shear force ({} kN) is less than the minimum recommended design action on "
-                           "the member".format(round(self.load.shear_force * 1e-3, 2)))
-            logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam) or 40 kN whichever is "
-                        "less [Ref. Cl. 10.7, IS 800:2007]".format(round(0.15 * self.beam_shear_capa, 2)))
-            logger.info("Designing the connection for a factored shear load of {} kN".format(self.load_shear))
+        # flange b/t check - outstanding element
+        if self.supported_section.type == 'Rolled':
+
+            if ((self.beam_bf / 2) / self.beam_tf) > (10.5 * self.epsilon_beam):
+                self.beam_classification = 'Semi-compact'
+            elif ((self.beam_bf / 2) / self.beam_tf) <= (9.4 * self.epsilon_beam):
+                self.beam_classification = 'Plastic'
+            else:
+                self.beam_classification = 'Compact'
         else:
-            self.minimum_load_status_shear = False
-            self.load_shear = self.load.shear_force
+            if (((self.beam_bf - self.beam_tw) / 2) / self.beam_tf) > (9.4 * self.epsilon_beam):
+                self.beam_classification = 'Semi-compact'
+            elif ((self.beam_bf / 2) / self.beam_tf) <= (8.4 * self.epsilon_beam):
+                self.beam_classification = 'Plastic'
+            else:
+                self.beam_classification = 'Compact'
 
-        # minimum moment (major axis)
-        # moment capacity of beam (cl 8.2.1.2, IS 800:2007)
-        self.beam_plastic_mom_capa_zz = round(((1 * self.supported_section.plast_sec_mod_z * self.supported_section.fy) / self.gamma_m0) * 1e-6,
-                                              2)  # kNm
+        # 1.2: Bending capacity
+        if self.beam_classification == 'Semi-compact':
+            self.beam_beta_b_z = self.supported_section.elast_sec_mod_z / self.supported_section.plast_sec_mod_z
+            self.beam_beta_b_y = self.supported_section.elast_sec_mod_y / self.supported_section.plast_sec_mod_y
+            section_class = 'semi-compact'
+        else:
+            self.beam_beta_b_z = 1.0
+            self.beam_beta_b_y = 1.0
+            section_class = 'Compact'
 
-        if self.load.moment < (0.5 * self.beam_plastic_mom_capa_zz):
-            self.minimum_load_status_moment = True
-            # update moment value
-            self.load_moment = round(0.5 * self.beam_plastic_mom_capa_zz, 2)  # kN
+        # Moment capacity about the major (z-z) axis
+        self.supported_section_mom_capa_m_zz = self.cl_8_2_1_2_design_moment_strength(self.supported_section.elast_sec_mod_z,
+                                                                                      self.supported_section.plast_sec_mod_z,
+                                                                                      self.supported_section.fy, section_class=section_class)
+        self.supported_section_mom_capa_m_zz = round(self.supported_section_mom_capa_m_zz * 1e-6, 2)  # kNm
 
-            logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
-                           "capacity of the beam ({} kNm)".format(self.load.moment, self.load_moment))
-            logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
-                        "connection as rigid and transfer full moment from the spliced beam (Cl. 10.7, IS 800:2007)")
-            logger.info("Designing the connection for a moment of {} kNm".format(self.load_moment))
+        # Moment capacity about the minor (y-y) axis
+        self.supported_section_mom_capa_m_yy = self.cl_8_2_1_2_design_moment_strength(self.supported_section.elast_sec_mod_y,
+                                                                                      self.supported_section.plast_sec_mod_y,
+                                                                                      self.supported_section.fy, section_class=section_class)
+        self.supported_section_mom_capa_m_yy = round(self.supported_section_mom_capa_m_yy * 1e-6, 2)  # kNm
 
-        elif self.load.moment > self.beam_plastic_mom_capa_zz:
-            self.load_moment = self.beam_plastic_mom_capa_zz  # kN
+        # 2: Shear capacity of the beam
+        if self.supported_section.type == 'Rolled':
+            # self.supported_section_shear_capa = ((self.beam_D * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
+            self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.supported_section.fy) / \
+                                                (math.sqrt(3) * self.gamma_m0)
+        else:  # built-up sections
+            self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.supported_section.fy) / \
+                                                (math.sqrt(3) * self.gamma_m0)
+        self.supported_section_shear_capa = round(self.supported_section_shear_capa * 1e-3, 2)  # kN
+
+        # 3: Axial capacity of the beam
+        self.supported_section_axial_capa = round((self.supported_section.area * self.supported_section.fy / self.gamma_m0) * 1e-3, 2)  # kN
+
+        # Interaction ratio check for loads
+        # loads are in kN
+        self.IR_axial = round(self.input_axial_force / self.supported_section_axial_capa, 3)
+        self.IR_shear = round(self.input_shear_force / self.supported_section_shear_capa, 3)
+        self.IR_moment = round(self.input_moment / self.supported_section_mom_capa_m_zz, 3)
+
+        self.sum_IR = round(self.IR_axial + self.IR_moment, 3)
+
+        # Minimum load consideration check
+        if self.sum_IR <= 1.0:
+
+            if self.IR_axial < 0.3 and self.IR_moment < 0.5:
+                self.load_moment = round(0.5 * self.supported_section_mom_capa_m_zz, 2)
+                self.load_axial = round(0.3 * self.supported_section_axial_capa, 2)
+
+                logger.warning("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+                logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
+                               "capacity of the beam ({} kNm)".format(self.load.moment, self.supported_section_mom_capa_m_zz))
+                logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
+                            "connection as rigid connection (Annex. F-4.3.1, IS 800:2007)")
+                logger.info("The value of load(s) is/are set at minimum recommended value as per Cl.10.7 and Annex. F, IS 800:2007")
+                logger.info("Designing the connection for a factored moment of {} kNm".format(self.load_moment))
+
+            elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
+
+                if (0.5 - self.IR_moment) < (1 - self.sum_IR):
+                    self.load_moment = round(0.5 * self.supported_section_mom_capa_m_zz, 2)
+                else:
+                    self.load_moment = round(self.load.moment + ((1 - self.sum_IR) * self.supported_section_mom_capa_m_zz), 2)
+                self.load_axial = self.load.axial_force
+
+                logger.warning("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+                logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
+                               "capacity of the beam ({} kNm)".format(self.load.moment, self.supported_section_mom_capa_m_zz))
+                logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to qualify the "
+                            "connection as rigid connection (Annex. F-4.3.1, IS 800:2007)")
+                logger.info("The value of load(s) is/are set at minimum recommended value as per Cl.10.7 and Annex. F, IS 800:2007")
+                logger.info("Designing the connection for a factored moment of {} kNm".format(self.load_moment))
+
+            elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
+
+                if (0.3 - self.IR_axial) < (1 - self.sum_IR):
+                    self.load_axial = round(0.3 * self.supported_section_axial_capa, 2)
+                else:
+                    self.load_axial = round(self.load.axial_force + ((1 - self.sum_IR) * self.supported_section_axial_capa), 2)
+
+                self.load_moment = round(self.supported_section_mom_capa_m_zz, 2)
+
+                logger.warning("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7]")
+                logger.info("The value of factored axial force ({} kN) is less than the minimum recommended value [Ref. Cl.10.7, IS 800:2007]".
+                            format(self.input_axial_force))
+                logger.info("The value of axial force is set at {} kN, as per the minimum recommended value by Cl.10.7".format(self.load_axial))
+            else:
+                self.load_axial = self.input_axial_force
+                self.load_moment = self.input_moment
+
+            self.load_axial = self.input_axial_force
+        else:
+            # Maximum moment check
+            if self.load.moment > self.supported_section_mom_capa_m_zz:
+                self.load_moment = self.supported_section_mom_capa_m_zz  # kNm
+                self.minimum_load_status_moment = True
+                self.design_status = False
+                self.design_status_list.append(self.design_status)
+                logger.error("[Maximum Factored Load] The external factored bending moment ({} kNm) is greater than the plastic moment capacity of "
+                             "the beam ({} kNm)".format(self.load.moment, self.supported_section_mom_capa_m_zz))
+                logger.warning("The maximum moment carrying capacity of the beam is {} kNm".format(self.supported_section_mom_capa_m_zz))
+                logger.info("Define the value of factored bending moment as {} kNm or less and re-design".
+                            format(self.supported_section_mom_capa_m_zz))
+
+            # Maximum axial force check
+            if self.load.axial_force > self.supported_section_axial_capa:
+                self.load_axial = self.supported_section_axial_capa  # kNm
+                self.design_status = False
+                self.design_status_list.append(self.design_status)
+                logger.error("[Maximum Factored Load] The external factored axial force ({} kN) is greater than the axial capacity of "
+                             "the beam ({} kN)".format(self.load.axial_force, self.supported_section_axial_capa))
+                logger.warning("The maximum axial capacity of the beam is {} kN".format(self.supported_section_axial_capa))
+                logger.info("Define the value of axial force as {} kN or less and re-design".format(self.supported_section_axial_capa))
+
+        # Shear force check
+        if self.load.shear_force < min((0.15 * self.supported_section_shear_capa), 40):
+            self.minimum_load_status_shear = True
+            self.load_shear = min((0.15 * self.supported_section_shear_capa), 40)
+            logger.warning("[Minimum Factored Load] The external factored shear force ({} kN) is less than the minimum recommended design action on "
+                           "the member".format(self.load_shear))
+            logger.info("The minimum factored shear force should be at least {} (0.15 times the shear capacity of the beam in low shear) or 40 kN "
+                        "whichever is less [Ref. Cl. 10.7, IS 800:2007]".format(0.15 * self.supported_section_shear_capa))
+            logger.info("Designing the connection for a factored shear load of {} kNm".format(self.load_shear))
+        elif self.load.shear_force > self.supported_section_shear_capa:
+            self.load_shear = self.supported_section_shear_capa  # kN
             self.minimum_load_status_moment = True
             self.design_status = False
             self.design_status_list.append(self.design_status)
-            logger.error("[Maximum Factored Load] The external factored bending moment ({} kNm) is greater than the plastic moment capacity of the "
-                         "beam ({} kNm)".format(self.load.moment, self.beam_plastic_mom_capa_zz))
-            logger.warning("The maximum capacity of the connection is {} kNm".format(self.beam_plastic_mom_capa_zz))
-            logger.info("Define the value of factored bending moment as {} kNm or less".format(self.beam_plastic_mom_capa_zz))
+            logger.error("[Maximum Factored Load] The external factored shear force ({} kN) is greater than the shear capacity of the "
+                         "beam ({} kN)".format(self.load_shear, self.supported_section_shear_capa))
+            logger.warning("The maximum shear capacity of the beam is {} kN".format(self.supported_section_shear_capa))
+            logger.info("Define the value of factored shear force as {} kN or less".format(self.supported_section_shear_capa))
         else:
-            self.design_status = True
-            self.design_status_list.append(self.design_status)
-            self.minimum_load_status_moment = False
-            self.load_moment = self.load.moment  # kNm
-
-        self.load_axial = self.load.axial_force
+            self.minimum_load_status_shear = False
+            self.load_shear = self.load.shear_force
 
         # effective moment is the moment due to external factored moment plus moment due to axial force
         self.load_moment_effective = round(self.load_moment + (self.load_axial * ((self.beam_D / 2) - (self.beam_tf / 2))) * 1e-3, 2)  # kNm
@@ -1521,13 +1640,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = (KEY_DISP_SHEAR_CAPACITY, '',
               cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness,
                                                     f_y=self.supported_section.fy, gamma_m0=self.gamma_m0,
-                                                    V_dg=round(self.beam_shear_capa, 2)),
+                                                    V_dg=round(self.supported_section_shear_capa, 2)),
               'Restricted to low shear')
 
         self.report_check.append(t1)
 
         # percent = 1
-        if self.input_moment < self.beam_plastic_mom_capa_zz:
+        if self.input_moment < self.supported_section_mom_capa_m_zz:
             percent = 0.5
         else:
             percent = 1
@@ -1536,17 +1655,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                         Z_p=self.supported_section.plast_sec_mod_z,
                                                         f_y=self.supported_section.fy,
                                                         gamma_m0=self.gamma_m0,
-                                                        Pmc=round(self.beam_plastic_mom_capa_zz, 2), supporting_or_supported='NA'), 'V < 0.6 Vdy')
+                                                        Pmc=round(self.supported_section_mom_capa_m_zz, 2), supporting_or_supported='NA'), 'V < 0.6 Vdy')
         self.report_check.append(t1)
 
         t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
-        self.load_shear_min = min((0.15 * self.beam_shear_capa), 40)
-        self.load_moment_min = (0.5 * self.beam_plastic_mom_capa_zz)
+        self.load_shear_min = min((0.15 * self.supported_section_shear_capa), 40)
+        self.load_moment_min = (0.5 * self.supported_section_mom_capa_m_zz)
 
         t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V"),
               prov_shear_force(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
-                              app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.beam_shear_capa), "OK")
+                              app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.supported_section_shear_capa), "OK")
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_AXIAL, '', 'H = ' + str(self.load_axial), "OK")
@@ -1555,11 +1674,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t1 = (KEY_DISP_MOMENT, display_prov(self.input_moment, "M"),
               prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                app_moment_load=round(self.load_moment, 2),
-                               moment_capacity=round(self.beam_plastic_mom_capa_zz, 2), moment_capacity_supporting=0.0, type='EndPlateType'), "OK")
+                               moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=0.0, type='EndPlateType'), "OK")
 
         self.report_check.append(t1)
 
-        t1 = ("Effective Bending Moment (kNm)", display_prov(self.load_moment, "M_u"),
+        t1 = ("Effective Bending Moment (kNm)", '',
               effective_bending_moment_ep(self.load_moment, self.load_axial, self.load_moment_effective, self.beam_D, self.beam_tf), "OK")
 
         self.report_check.append(t1)
@@ -1803,9 +1922,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
             else:
                 r_c = self.call_helper.r_c
 
-            t1 = ('Reaction at Compression Flange (kN)', compression_flange_capacity(self.beam_bf, self.beam_tf, self.supported_section.fy, self.gamma_m0,
-                                                                                     self.call_helper.flange_capacity),
-                  reaction_compression_flange(r_c, self.bolt_column, self.bolt_row, round(tension_sum, 2)),
+            t1 = ('Reaction at Compression Flange (kN)', reaction_compression_flange(r_c, self.bolt_column, self.bolt_row, round(tension_sum, 2)),
+                  compression_flange_capacity(self.beam_bf, self.beam_tf, self.supported_section.fy, self.gamma_m0, self.call_helper.flange_capacity),
                   get_pass_fail(self.call_helper.flange_capacity, r_c, relation="geq"))
             self.report_check.append(t1)
 

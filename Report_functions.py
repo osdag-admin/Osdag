@@ -345,7 +345,7 @@ def cl_8_2_moment_capacity_member(Pmc, Mdc, M_c):
     Mdc = str(Mdc)
     M_c = str(M_c)
     M_c_eqn = Math(inline=True)
-    M_c_eqn.append(NoEscape(r'\begin{aligned} M_c &= min(Pmc,Mdc)\\'))
+    M_c_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{zz} &= min({M_{d}}_{zz}, Mdc)\\'))
     M_c_eqn.append(NoEscape(r'&=min(' + Pmc + ',' + Mdc + r')\\'))
     M_c_eqn.append(NoEscape(r'&=' + M_c + r'\\ \\'))
     M_c_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2]\end{aligned}'))
@@ -377,7 +377,7 @@ def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc): 
     gamma_m0 = str(gamma_m0)
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} Pmc &= \frac{\beta_b \times Z_p \times fy}{\gamma_{mo} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{zz} &= \frac{\beta_b \times Z_p \times fy}{\gamma_{mo} \times 10^6}\\'))
     Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
     Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\\ \\'))
     Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
@@ -2498,11 +2498,11 @@ def ir_sum_bb_cc(Al, M, A_c, M_c, IR_axial, IR_moment, sum_IR):
     M_c = str(M_c)
     sum_IR = str(sum_IR)
     ir_sum_bb_cc_eqn = Math(inline=True)
-    ir_sum_bb_cc_eqn.append(NoEscape(r'\begin{aligned} IR ~axial~~~~&= A_l / A_c \\'))
+    ir_sum_bb_cc_eqn.append(NoEscape(r'\begin{aligned} IR ~axial~~~~&= A / T_{dg} \\'))
     ir_sum_bb_cc_eqn.append(NoEscape(r'& =' + Al + '/' + A_c + r' \\'))
     ir_sum_bb_cc_eqn.append(NoEscape(r'& =' + IR_axial + r' \\ \\'))
 
-    ir_sum_bb_cc_eqn.append(NoEscape(r'IR ~moment &= M / M_c \\'))
+    ir_sum_bb_cc_eqn.append(NoEscape(r'IR ~moment &= M / {M_{d}}_{zz} \\'))
     ir_sum_bb_cc_eqn.append(NoEscape(r'& =' + M + '/' + M_c + r' \\'))
     ir_sum_bb_cc_eqn.append(NoEscape(r'& =' + IR_moment + r' \\ \\'))
 
@@ -2521,14 +2521,14 @@ def min_loads_required(conn):
     min_loads_required_eqn = Math(inline=True)
     min_loads_required_eqn.append(NoEscape(r'\begin{aligned}  &if~~ IR ~axial < 0.3 ~and~ IR ~moment < 0.5 \\'))
     min_loads_required_eqn.append(NoEscape(r' &~~~Ac_{min} = 0.3 \times A_c\\'))
-    min_loads_required_eqn.append(NoEscape(r' &~~~Mc_{min}= 0.5 \times M_c\\ \\'))
+    min_loads_required_eqn.append(NoEscape(r' &~~~{M_{u}}_{min}= 0.5 \times {M_{d}}_{zz}\\ \\'))
 
     if conn == "beam_beam":
         min_loads_required_eqn.append(NoEscape(r' &elif~~ sum ~IR <= 1.0 ~and~ IR ~moment < 0.5\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~if~~ (0.5 - IR ~moment) < (1 - sum ~IR)\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = 0.5 \times M_c\\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~~~~{M_{u}}_{min} = 0.5 \times {M_{d}}_{zz}\\'))
         min_loads_required_eqn.append(NoEscape(r'& ~~~else\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = M + ((1 - sum ~IR) \times M_c)\\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~~~~{M_{u}}_{min} = M + ((1 - sum ~IR) \times {M_{d}}_{zz})\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = AL \\ \\'))
 
         min_loads_required_eqn.append(NoEscape(r'&elif~~ sum ~IR <= 1.0~ and~ IR ~axial < 0.3\\'))
@@ -2536,25 +2536,25 @@ def min_loads_required(conn):
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = 0.3 \times A_c\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~else~~\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = AL + ((1 - sum ~IR) \times A_c)\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \\ \\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~{M_{u}}_{min} = M \\ \\'))
     else:
         min_loads_required_eqn.append(NoEscape(r'&elif~~ sum ~IR <= 1.0~ and~ IR ~axial < 0.3\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~if~~ (0.3 - IR ~axial) < (1 -  sum ~IR)\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = 0.3 \times A_c\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~else~~\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = AL + ((1 - sum ~IR) \times A_c)\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \\ \\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~{M_{u}}_{min} = M \\ \\'))
 
         min_loads_required_eqn.append(NoEscape(r' &elif~~ sum ~IR <= 1.0 ~and~ IR ~moment < 0.5\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~if~~ (0.5 - IR ~moment) < (1 - sum ~IR)\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = 0.5 \times M_c\\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~~~~{M_{u}}_{min} = 0.5 \times {M_{d}}_{zz}\\'))
         min_loads_required_eqn.append(NoEscape(r'& ~~~else\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = M + ((1 - sum ~IR) \times M_c)\\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~~~~{M_{u}}_{min} = M + ((1 - sum ~IR) \times {M_{d}}_{zz})\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = AL \\ \\'))
 
     min_loads_required_eqn.append(NoEscape(r'&else~~\\'))
     min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = AL\\'))
-    min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \\ \\'))
+    min_loads_required_eqn.append(NoEscape(r'&~~~{M_{u}}_{min} = M \\ \\'))
     min_loads_required_eqn.append(NoEscape(r'&~Note:~AL=~User~Applied~Load\end{aligned}'))
     return min_loads_required_eqn
 
@@ -2574,13 +2574,13 @@ def min_loads_provided(min_ac, min_mc, conn):
 
     if conn == "beam_beam":
         min_loads_provided_eqn = Math(inline=True)
-        min_loads_provided_eqn.append(NoEscape(r'\begin{aligned} & Mc_{min} =' + min_mc + r'\\'))
+        min_loads_provided_eqn.append(NoEscape(r'\begin{aligned} & {M_{u}}_{min} =' + min_mc + r'\\'))
         min_loads_provided_eqn.append(NoEscape(r'& Ac_{min} =' + min_ac + r'\\ \\'))
         min_loads_provided_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.7]\end{aligned}'))
     else:
         min_loads_provided_eqn = Math(inline=True)
         min_loads_provided_eqn.append(NoEscape(r'\begin{aligned} & Ac_{min} =' + min_ac + r'\\'))
-        min_loads_provided_eqn.append(NoEscape(r'& Mc_{min} =' + min_mc + r'\\ \\'))
+        min_loads_provided_eqn.append(NoEscape(r'& {M_{u}}_{min} =' + min_mc + r'\\ \\'))
         min_loads_provided_eqn.append(NoEscape(r'& [Ref.~IS~800:2007,~Cl.~10.7]\end{aligned}'))
     return min_loads_provided_eqn
 
@@ -2715,7 +2715,7 @@ def allow_shear_capacity(V_d, S_c):
     V_d = str(V_d)
     S_c = str(S_c)
     allow_shear_capacity_eqn = Math(inline=True)
-    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} S_{c} &= 0.6~V_{dy}\\'))
+    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\\ \\'))
     allow_shear_capacity_eqn.append(NoEscape(r'[Limited~&to~low~shear]\end{aligned}'))
@@ -2765,14 +2765,15 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, mom
 
     else:
         # app_moment_load_eqn = Math(inline=True)
-        # app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
+        # app_moment_load_eqn.append(NoEscape(r'\begin{aligned} {M_{u}}_{min} &= 0.5 * {M_{d}}_{zz}\\'))
         # app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + moment_capacity + r'\\'))
         # app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r'\\'))
-        app_moment_load_eqn.append(NoEscape(r' \begin{aligned} Mu &= max(M,~Mc_{min} )\\'))
+        app_moment_load_eqn.append(NoEscape(r' \begin{aligned} Mu &= max(M,~{M_{u}}_{min} )\\'))
         app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',~' + min_mc + r')\\'))
         app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\\ \\'))
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2]\end{aligned}'))
     return app_moment_load_eqn
+
 
 def effective_bending_moment_ep(bending_moment, axial_load, effective_moment, beam_D, beam_T):
 
@@ -5016,17 +5017,17 @@ def bp_width(flange_width, edge_distance, width, designation, projection, bp_typ
 
     if bp_type == 'welded_moment_bp':
         if mom_bp_case == 'Case1':
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= (0.85 B) ~+~2~(e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= (0.85 B) ~+~2~(e\textquotesingle ~+~e\textquotesingle) \\'))
             bp_width_min.append(NoEscape(r'    &= (0.85 \times' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
         else:
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= (0.85 B) ~+~2 ~(e`~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= (0.85 B) ~+~2 ~(e\textquotesingle ~+~e\textquotesingle) \\'))
             bp_width_min.append(NoEscape(r'    &= (0.85 \times ' + flange_width + r') ~+~2 \times (' + edge_distance + r'~+~' + edge_distance + r') \\'))
     else:
         if designation[1:4] == 'CHS':
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (c~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= OD ~+~2~ (c~+~e\textquotesingle) \\'))
             bp_width_min.append(NoEscape(r' &= ' + flange_width + r' ~+~2 \times (' + str(projection) + r'~+~' + edge_distance + r') \\'))
         else:
-            bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2~ (c~+~e`) \\'))
+            bp_width_min.append(NoEscape(r'\begin{aligned} W &= B ~+~2~ (c~+~e\textquotesingle) \\'))
             bp_width_min.append(NoEscape(r' &= ' + flange_width + r' ~+~2 \times (' + str(projection) + r'~+~' + edge_distance + r') \\'))
 
     bp_width_min.append(NoEscape(r'    &= ' + width + r' \\ \\'))
@@ -7497,7 +7498,8 @@ def bc_ep_compatibility_req(beam_B, B_req):
     compatibility_eqn = Math(inline=True)
     compatibility_eqn.append(NoEscape(r'\begin{aligned}  B_{req} &= B_{b} + 25 \\'))
     compatibility_eqn.append(NoEscape(r'                         &= ' + str(beam_B) + r' + 25 \\'))
-    compatibility_eqn.append(NoEscape(r'                         &= ' + str(B_req) + r' \end{aligned}'))
+    compatibility_eqn.append(NoEscape(r'                         &= ' + str(B_req) + r' \\'))
+    compatibility_eqn.append(NoEscape(r'                          \end{aligned}'))
 
     return compatibility_eqn
 
@@ -7568,11 +7570,11 @@ def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, 
     app_moment_load_eqn = Math(inline=True)
 
     if axis == 'Major':
-        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.3 * {M_{d}}_{z-z} \\'))
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{z-z} \\'))
     else:
-        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.3 * {M_{d}}_{y-y} \\'))
+        app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{y-y} \\'))
 
-    app_moment_load_eqn.append(NoEscape(r'&= 0.3 \times' + str(moment_capacity) + r' \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + str(moment_capacity) + r' \\'))
     app_moment_load_eqn.append(NoEscape(r'&=' + str(min_mc) + r' \\ \\'))
 
     app_moment_load_eqn.append(NoEscape(r'M_{zz} &= max(M,~M_{min}) \\'))

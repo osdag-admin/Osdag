@@ -27,12 +27,16 @@ import math
 
 class EndPlateSpliceHelper(object):
 
-    def __init__(self, supported_section, load, bolt, ep_type="", plate_design_status="False", helper_file_design_status="False"):
+    def __init__(self, module, supporting_section, supported_section, load, bolt, connectivity="", ep_type="", plate_design_status="False",
+                 helper_file_design_status="False"):
         """ helper file to run simulation for bolt design, plate design etc. """
 
+        self.module = module
+        self.supporting_section = supporting_section
         self.supported_section = supported_section
         self.load = load
         self.bolt = bolt
+        self.connectivity = connectivity
         self.ep_type = ep_type
         self.plate_design_status = plate_design_status
         self.helper_file_design_status = helper_file_design_status
@@ -56,6 +60,8 @@ class EndPlateSpliceHelper(object):
         self.beam_D = 0.0
         self.beam_bf = 0.0
         self.beam_tf = 0.0
+        self.column_tf = 0.0
+        self.column_tw = 0.0
         self.beam_r1 = 0.0
         self.beam_fy = 0.0
         self.gamma_m0 = 0.0
@@ -88,6 +94,9 @@ class EndPlateSpliceHelper(object):
         self.bolt_shear_capacity = 0.0
         self.bolt_bearing_capacity = 0.0
         self.bolt_capacity = 0.0
+        self.grip_length = 0.0
+        self.beta_lg = 1.0
+        self.bolt_grip_length_status = True
         self.bolt_combined_check_UR = 0.0
 
     def perform_bolt_design(self, endplate_type, supported_section, gamma_m0, bolt_column, bolt_row, bolt_row_web, bolt_diameter_provided,
@@ -120,6 +129,10 @@ class EndPlateSpliceHelper(object):
         self.beam_tf = self.supported_section.flange_thickness
         self.beam_r1 = self.supported_section.root_radius
         self.beam_fy = float(self.supported_section.fy)
+
+        # column properties
+        self.column_tf = self.supporting_section.flange_thickness
+        self.column_tw = self.supporting_section.web_thickness
 
         # start of checks
 
@@ -161,8 +174,6 @@ class EndPlateSpliceHelper(object):
                         r_a = self.lever_arm[- row_web_counter] + (row_web_counter * self.pitch_distance_web)
                         self.lever_arm.append(r_a)
                         row_web_counter += 1
-
-                    print("CASE TRUE")
 
         elif self.endplate_type == 'Extended One Way - Irreversible Moment':
             # Note: defining bolt models for this connection due to its un-symmetric nature of bolt placement, hence the equation cannot be
@@ -336,9 +347,6 @@ class EndPlateSpliceHelper(object):
         # final list with all the lever arm distances calculated
         self.lever_arm = self.lever_arm
         self.lever_arm = [round(value_lever_arm, 2) for value_lever_arm in self.lever_arm]
-
-        print("LEVER ARM is {}".format(self.lever_arm))
-        print("PITCH IS {}".format(self.pitch_distance_web))
 
         # Check 3: Find force on each bolt under tension
         self.tension = []
@@ -617,8 +625,6 @@ class EndPlateSpliceHelper(object):
         self.tension = self.tension
         self.tension = [round(value_tension, 2) for value_tension in self.tension]
 
-        print("TENSION is {}".format(self.tension))
-
         # adding the lists of bolt row and tension
         print("ROWS BEFORE ADDING {}".format(self.bolt_row))
         print("ROWS AFTER ADDING {}".format(self.bolt_row + self.bolt_row_web))
@@ -640,21 +646,21 @@ class EndPlateSpliceHelper(object):
             self.flange_capacity_status = True
 
         # Check 6: Prying force check in the critical bolt
-        self.b_e = self.beam_bf / self.bolt_column
-        self.lv = self.end_distance_provided - (self.beam_r1 / 2)
-        self.le_1 = self.end_distance_provided
-        self.le_2 = (1.1 * self.plate_thickness) * math.sqrt((self.beta * self.proof_stress) / self.dp_plate_fy)
-        self.le = min(self.le_1, self.le_2)
+        self.b_e = self.beam_bf / self.bolt_column  # mm
+        self.lv = self.end_distance_provided - (self.beam_r1 / 2)  # mm
+        self.le_1 = self.end_distance_provided  # mm
+        self.le_2 = (1.1 * self.plate_thickness) * math.sqrt((self.beta * self.proof_stress) / self.dp_plate_fy)  # mm
+        self.le = min(self.le_1, self.le_2)  # mm
 
-        self.prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(self.t_1, self.lv, self.proof_stress, self.b_e, self.plate_thickness,
+        self.prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(self.t_1 * 1e3, self.lv, self.proof_stress, self.b_e, self.plate_thickness,
                                                                    self.dp_plate_fy, self.end_distance_provided, self.bolt.bolt_tensioning, eta=1.5)
-        self.prying_force = round(self.prying_force, 2)
+        self.prying_force = round(self.prying_force * 1e-3, 2)  # kN
 
         # Check 7: Moment capacity of the end plate and plate thickness check
 
         # taking moment about the toe of weld or edge of the flange from bolt center-line
         # Mp_plate = T*l_v - Q.l_e
-        self.mp_plate = round((self.t_1 * 1e3 * self.lv) - (self.prying_force * 1e3 * self.le))  # N-mm
+        self.mp_plate = round(((self.t_1 * self.lv) - (self.prying_force * self.le)) * 1e3, 2)  # N-mm
 
         # negative Mp means prying force is higher than the tension in bolt and the yielding location would be outside the bolts and not near the
         # root of the beam
@@ -698,13 +704,40 @@ class EndPlateSpliceHelper(object):
                                           self.end_distance_provided, self.pitch_distance_provided, seatedangle_e=0)  # kN
 
         self.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity * 1e-3, 2)  # kN
+
         if self.bolt.bolt_type == "Bearing Bolt":
             self.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity * 1e-3, 2)  # kN
         else:
             self.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity  # N/A
         self.bolt_capacity = round(self.bolt.bolt_capacity * 1e-3, 2)  # kN
 
-        # Check 9.3: combined shear + tension check
+        # Check 9.3: Large grip length check
+        if self.bolt.bolt_type == "Bearing Bolt":
+
+            if self.module == KEY_DISP_BCENDPLATE:  # BC-EP
+                if self.connectivity == VALUES_CONN_1[0]:  # CF-BW
+                    self.grip_length = self.plate_thickness + self.column_tf  # mm
+                else:  # CW-BW
+                    self.grip_length = self.plate_thickness + self.column_tw
+            else:  # BB-EP
+                self.grip_length = 2 * self.plate_thickness
+
+            if self.grip_length > 8 * self.bolt_diameter_provided:
+                self.bolt_grip_length_status = False
+                self.beta_lg = 1.0
+            else:
+                self.bolt_grip_length_status = True
+
+                # beta lg
+                if self.grip_length > (5 * self.bolt_diameter_provided):
+                    self.beta_lg = round(8 / (3 + (self.grip_length / self.bolt_diameter_provided)), 2)  # reduction factor
+                else:
+                    self.beta_lg = 1.0
+
+        # reduced capacity of bolt (post reduction factor)
+        self.bolt_capacity = round(self.bolt.bolt_capacity * self.beta_lg * 1e-3, 2)  # kN
+
+        # Check 9.4: combined shear + tension check
         self.bolt.calculate_combined_shear_tension_capacity(self.bolt_shear_demand, self.bolt_capacity, self.bolt_tension_demand,
                                                             self.bolt_tension_capacity, self.bolt.bolt_type)
 
@@ -716,7 +749,8 @@ class EndPlateSpliceHelper(object):
             self.bolt_design_combined_check_status = True
 
         # overall status of the helper file
-        status = [self.flange_capacity_status, self.plate_design_status, self.bolt_tension_design_status, self.bolt_design_combined_check_status]
+        status = [self.flange_capacity_status, self.plate_design_status, self.bolt_tension_design_status, self.bolt_design_combined_check_status,
+                  self.bolt_grip_length_status]
         for check in status:
             if check is False:
                 self.helper_file_design_status = False

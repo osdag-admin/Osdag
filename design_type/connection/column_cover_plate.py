@@ -643,7 +643,7 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t1)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
-              self.bolt.bolt_diameter_provided if flag else '', True)
+              int(self.bolt.bolt_diameter_provided) if flag else '', True)
         out_list.append(t2)
 
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_GRD, TYPE_TEXTBOX,
@@ -670,7 +670,7 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t4)
 
         t5 = (KEY_WEB_PLATE_HEIGHT, KEY_DISP_WEB_PLATE_HEIGHT, TYPE_TEXTBOX,
-              self.web_plate.height if flag else '', True)
+              float(self.web_plate.height) if flag else '', True)
         out_list.append(t5)
 
         t6 = (KEY_WEB_PLATE_LENGTH, KEY_DISP_WEB_PLATE_LENGTH, TYPE_TEXTBOX,
@@ -678,7 +678,7 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t6)
 
         t7 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
-              self.web_plate.thickness_provided if flag else '', True)
+              int(self.web_plate.thickness_provided) if flag else '', True)
         out_list.append(t7)
 
         t21 = (KEY_WEB_SPACING, KEY_DISP_WEB_SPACING, TYPE_OUT_BUTTON, ['Web Spacing Details', self.webspacing], True)
@@ -700,7 +700,7 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_out_plate_tk if flag else '', True)
+               int(self.flange_out_plate_tk) if flag else '', True)
         out_list.append(t20)
         t21 = (
         KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
@@ -2906,23 +2906,23 @@ class ColumnCoverPlate(MomentConnection):
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
-                                  'Mass': self.section.mass,
-                                  'Area(mm2) - A': round(self.section.area, 2),
-                                  'D(mm)': self.section.depth,
-                                  'B(mm)': self.section.flange_width,
-                                  't(mm)': self.section.web_thickness,
-                                  'T(mm)': self.section.flange_thickness,
-                                  'FlangeSlope': self.section.flange_slope,
-                                  'R1(mm)': self.section.root_radius,
-                                  'R2(mm)': self.section.toe_radius,
-                                  'Iz(mm4)': round(self.section.mom_inertia_z, 2),
-                                  'Iy(mm4)': round(self.section.mom_inertia_y, 2),
-                                  'rz(mm)': round(self.section.rad_of_gy_z, 2),
-                                  'ry(mm)': round(self.section.rad_of_gy_y, 2),
-                                  'Zz(mm3)': round(self.section.elast_sec_mod_z, 2),
-                                  'Zy(mm3)': round(self.section.elast_sec_mod_y, 2),
-                                  'Zpz(mm3)': round(self.section.plast_sec_mod_z, 2),
-                                  'Zpy(mm3)': round(self.section.elast_sec_mod_y, 2)}
+                                  KEY_REPORT_MASS: self.section.mass,
+                                  KEY_REPORT_AREA: round(self.section.area * 1e-2, 2),
+                                  KEY_REPORT_DEPTH: self.section.depth,
+                                  KEY_REPORT_WIDTH: self.section.flange_width,
+                                  KEY_REPORT_WEB_THK: self.section.web_thickness,
+                                  KEY_REPORT_FLANGE_THK: self.section.flange_thickness,
+                                  KEY_DISP_FLANGE_S_REPORT: self.section.flange_slope,
+                                  KEY_REPORT_R1: self.section.root_radius,
+                                  KEY_REPORT_R2: self.section.toe_radius,
+                                  KEY_REPORT_IZ: self.section.mom_inertia_z * 1e-4,
+                                  KEY_REPORT_IY: self.section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_RZ: round(self.section.rad_of_gy_z * 1e-1, 2),
+                                  KEY_REPORT_RY: round(self.section.rad_of_gy_y * 1e-1, 2),
+                                  KEY_REPORT_ZEZ: self.section.elast_sec_mod_z * 1e-3,
+                                  KEY_REPORT_ZEY: self.section.elast_sec_mod_y * 1e-3,
+                                  KEY_REPORT_ZPZ: self.section.plast_sec_mod_z * 1e-3,
+                                  KEY_REPORT_ZPY: self.section.plast_sec_mod_y * 1e-3}
 
         self.report_input = \
             {KEY_MODULE: self.module,
@@ -2932,28 +2932,29 @@ class ColumnCoverPlate(MomentConnection):
              KEY_DISP_SHEAR: self.load.shear_force,
              KEY_DISP_AXIAL: self.load.axial_force,
 
-             "Section": "TITLE",
+             "Column Section - Mechanical Properties": "TITLE",
              "Section Details": self.report_supporting,
 
-             "Bolt Details": "TITLE",
-
-
-             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             "Bolt Details - Input and Design Preference": "TITLE",
+             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
-
+             KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT: self.bolt.mu_f,
+
+             "Detailing - Design Preference": "TITLE",
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
              KEY_DISP_DP_DETAILING_GAP_COL: self.flange_plate.gap,
              KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM: self.bolt.corrosive_influences,
-             "Plate Details": "TITLE",
+
+             "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
+             KEY_DISP_MATERIAL: self.flange_plate.material,
              KEY_DISP_FU: self.flange_plate.fu,
              KEY_DISP_FY: self.flange_plate.fy,
-             KEY_DISP_MATERIAL: self.flange_plate.material,
-             KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
-             KEY_DISP_WEBPLATE_THICKNESS: str(self.web_plate.thickness),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str(list(np.int_(self.flange_plate.thickness))),
+             KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
              }
 
         self.report_check = []
@@ -3129,17 +3130,15 @@ class ColumnCoverPlate(MomentConnection):
 
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (
                     len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial flange plate height check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial Flange Plate Height Check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
-                    t1 = (KEY_FLANGE_PLATE_HEIGHT, 'Bfp >= 50',
+                    t1 = (KEY_OUT_DISP_PLATE_WIDTH, 'Bfp >= 50',
                           display_prov(round(self.outerwidth, 2), "B_{fp}"),
                           get_pass_fail(50, round(self.outerwidth, 2), relation="leq"))
                     self.report_check.append(t1)
-
-
                 else:
-                    t1 = (KEY_FLANGE_PLATE_HEIGHT, 'Bfp >= 50',
+                    t1 = (KEY_OUT_DISP_PLATE_WIDTH, 'Bfp >= 50',
                           display_prov(round(self.outerwidth, 2), "B_{fp}"),
                           get_pass_fail(50, round(self.outerwidth, 2), relation="leq"))
                     self.report_check.append(t1)
@@ -3158,7 +3157,7 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     self.thick_f = self.max_thick_f
                     self.thick_w = self.max_thick_w
-                t1 = ('SubSection', 'Flange plate thickness', '|p{2.5cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Flange Plate Thickness', '|p{2.5cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
                     t2 = (KEY_DISP_FLANGESPLATE_THICKNESS, display_prov(self.section.flange_thickness, "T"),
@@ -3197,12 +3196,12 @@ class ColumnCoverPlate(MomentConnection):
             if self.member_capacity_status == True and (
                     self.section.tension_yielding_capacity > self.flange_force) and (
                     len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial Web Plate Height Check', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
 
                     t1 = (
-                        KEY_WEB_PLATE_HEIGHT,
+                        KEY_DISP_WEB_PLATE_HEIGHT,
                         web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
                         web_width_chk_bolt(pref=self.preference, D=self.section.depth,
                                            tk=self.flange_plate.thickness_provided, T=self.section.flange_thickness,
@@ -3213,7 +3212,7 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     # self.min_web_plate_height = self.section.min_plate_height()
                     t1 = (
-                    KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
+                    KEY_DISP_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
                     web_width_chk_bolt(pref=self.preference, D=self.section.depth,
                                        tk=self.flange_plate.thickness_provided, T=self.section.flange_thickness,
                                        R_1=self.section.root_radius, webplatewidth=self.webplatewidth,
@@ -3225,7 +3224,7 @@ class ColumnCoverPlate(MomentConnection):
                     self.section.tension_yielding_capacity > self.flange_force) and self.webheight_status == True:
 
                 # if (self.flange_plate_crs_sec_area >= (1.05 * self.flange_crs_sec_area)) and len(self.flange_plate_thickness_possible) != 0 and len(self.web_plate_thickness_possible) != 0 :
-                t1 = ('SubSection', 'Web plate thickness', '|p{2.5cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Web Plate Thickness', '|p{2.5cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 t2 = (KEY_DISP_WEBPLATE_THICKNESS, display_prov(self.section.web_thickness / 2, "t"),
                       display_prov(self.thick_w, "t_{wp}"),
@@ -3242,7 +3241,7 @@ class ColumnCoverPlate(MomentConnection):
                           get_pass_fail(self.Wp, self.web_plate_crs_sec_area, relation="lesser"))
                     self.report_check.append(t2)
             if self.member_capacity_status == True and self.initial_pt_thk_status == True and self.initial_pt_thk_status_web == True:
-                t1 = ('SubSection', 'Web Spacing Checks', '|p{3.0cm}|p{6.5cm}|p{5 cm}|p{1cm}|')
+                t1 = ('SubSection', 'Web Spacing Check', '|p{3.0cm}|p{6.5cm}|p{5 cm}|p{1cm}|')
                 self.report_check.append(t1)
                 self.bolt_diameter_min = min(self.bolt.bolt_diameter)
                 min_gauge = self.web_bolt.min_gauge_round
@@ -3265,7 +3264,7 @@ class ColumnCoverPlate(MomentConnection):
                       get_pass_fail(depth, depth_max, relation="lesser"))
                 self.report_check.append(t3)
 
-                t1 = ('SubSection', 'Flange Spacing Checks', '|p{3.0cm}|p{6.5cm}|p{5cm}|p{1cm}|')
+                t1 = ('SubSection', 'Flange Spacing Check', '|p{3.0cm}|p{6.5cm}|p{5cm}|p{1cm}|')
                 self.bolt_diameter_min = min(self.bolt.bolt_diameter)
                 min_gauge = 0.0
                 self.d_0_min = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_min,
@@ -3289,7 +3288,7 @@ class ColumnCoverPlate(MomentConnection):
                 self.report_check.append(t3)
 
         if self.flange_plate.spacing_status == True:
-            t1 = ('SubSection', 'Flange Bolt Checks', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Flange Bolt Check', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"),'')
@@ -3316,7 +3315,6 @@ class ColumnCoverPlate(MomentConnection):
                       get_pass_fail(self.section.flange_thickness / 2, self.flange_plate.thickness_provided,
                                     relation="lesser"))
                 self.report_check.append(t1)
-
 
             t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.flange_plate.bolts_one_line, "n_c"), '')
 
@@ -3359,7 +3357,6 @@ class ColumnCoverPlate(MomentConnection):
                   self.flange_plate.edge_dist_provided,
                   get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided, relation="geq"))
             self.report_check.append(t4)
-
 
             if self.preference == "Outside":
                 if self.flange_bolt.bolt_type == TYP_BEARING:
@@ -3469,7 +3466,7 @@ class ColumnCoverPlate(MomentConnection):
                                     relation="lesser"))
                 self.report_check.append(t5)
         if self.web_plate.spacing_status == True and self.flange_plate.spacing_status == True:
-            t1 = ('SubSection', 'Web Bolt Checks', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Bolt Check', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"),'')
             self.report_check.append(t6)
@@ -3578,7 +3575,7 @@ class ColumnCoverPlate(MomentConnection):
 
             self.report_check.append(t10)
 
-            t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=self.web_plate.bolts_one_line,
+            t10 = (KEY_OUT_DISP_BOLT_FORCE, Vres_bolts(bolts_one_line=self.web_plate.bolts_one_line,
                                                       ymax=round(self.web_plate.ymax, 2),
                                                       xmax=round(self.web_plate.xmax, 2),
                                                       bolt_line=self.web_plate.bolt_line,
@@ -3629,7 +3626,7 @@ class ColumnCoverPlate(MomentConnection):
         ######Flange plate check####
         if self.select_bolt_dia_status == True:
             if self.preference == "Outside":
-                t1 = ('SubSection', 'Flange plate dimensions Checks- Outside', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Flange Plate Dimensions Check - Outside', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_PLATE_HEIGHT, min_flange_plate_ht_req(beam_width=self.section.flange_width,
@@ -3665,7 +3662,7 @@ class ColumnCoverPlate(MomentConnection):
                       get_pass_fail(self.Ap, self.Recheck_flange_pt_area_o, relation="leq"))
                 self.report_check.append(t2)
             else:
-                t1 = ('SubSection', 'Flange plates dimensions Checks-Outside/Inside', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Flange Plate Dimensions Check - Outside/Inside', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 ####OUTER PLATE####
                 t1 = (DISP_MIN_PLATE_HEIGHT, min_flange_plate_ht_req(beam_width=self.section.flange_width,
@@ -3734,7 +3731,7 @@ class ColumnCoverPlate(MomentConnection):
         ################
 
         if self.select_bolt_dia_status == True:
-            t1 = ('SubSection', 'Web Plate dimensions Checks', '|p{4cm}|p{4.5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate Dimensions Check', '|p{4cm}|p{4.5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = (DISP_MIN_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
@@ -3772,7 +3769,7 @@ class ColumnCoverPlate(MomentConnection):
         ###################
         ### Flange Check ###
         if self.get_plate_details_status == True:
-            t1 = ('SubSection', 'Member Checks', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Member Check', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -3856,7 +3853,7 @@ class ColumnCoverPlate(MomentConnection):
             if self.preference == "Outside":
 
                 t1 = (
-                'SubSection', 'Flange Plate Capacity Checks in Axial-Outside ', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
+                'SubSection', 'Flange Plate Capacity Check for Axial Load - Outside ', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -3896,7 +3893,7 @@ class ColumnCoverPlate(MomentConnection):
                 self.report_check.append(t1)
             else:
                 t1 = (
-                    'SubSection', 'Flange Plate Capacity Checks in axial-Outside/Inside ',
+                    'SubSection', 'Flange Plate Capacity Checks for Axial Load - Outside/Inside ',
                     '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
@@ -3941,7 +3938,7 @@ class ColumnCoverPlate(MomentConnection):
         # Web plate Capacities check axial
         ###################
         if self.flange_plate_check_status == True and self.web_axial_check_status == True:
-            t1 = ('SubSection', 'Web Plate Capacity Checks in Axial', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate Capacity Check for Axial Load', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -3986,7 +3983,7 @@ class ColumnCoverPlate(MomentConnection):
         # Web plate Capacities check Shear
         ###################
         if self.web_plate_axial_check_status == True:
-            t1 = ('SubSection', 'Web Plate Capacity Checks in Shear', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate Capacity Check for Shear Load', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = (KEY_DISP_SHEARYIELDINGCAP_WEB_PLATE, '',
@@ -4038,4 +4035,4 @@ class ColumnCoverPlate(MomentConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)

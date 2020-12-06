@@ -36,7 +36,7 @@ class CreateLatex(Document):
         super().__init__()
 
 
-    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_2d_image, Disp_3d_image):
+    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_2d_image, Disp_3d_image, module=''):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -281,28 +281,65 @@ class CreateLatex(Document):
         # 2D images
         if len(Disp_2d_image) != 0:
 
-            if does_design_exist and sys.platform != 'darwin':
-                doc.append(NewPage())
-                weld_details = rel_path + Disp_2d_image[0]
-                detailing_details = rel_path + Disp_2d_image[1]
-                stiffener_details = rel_path + Disp_2d_image[2]
+            if module == KEY_DISP_BCENDPLATE or module == KEY_DISP_BEAMENDPLATE:
+                if does_design_exist and sys.platform != 'darwin':
+                    doc.append(NewPage())
+                    weld_details = rel_path + Disp_2d_image[0]
+                    detailing_details = rel_path + Disp_2d_image[1]
+                    stiffener_details = rel_path + Disp_2d_image[2]
 
-                with doc.create(Section('2D Drawings (Typical)')):
+                    with doc.create(Section('2D Drawings (Typical)')):
 
-                    with doc.create(Figure()) as image:
-                        image.add_image(weld_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
-                        image.add_caption('Typical Weld Details - Beam to End Plate Connection')
-                        # doc.append(NewPage())
+                        with doc.create(Figure()) as image:
+                            image.add_image(weld_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
+                            image.add_caption('Typical Weld Details - Beam to End Plate Connection')
+                            # doc.append(NewPage())
 
-                    with doc.create(Figure()) as image_2:
-                        image_2.add_image(detailing_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
-                        image_2.add_caption('Typical Detailing')
-                        # doc.append(NewPage())
+                        with doc.create(Figure()) as image_2:
+                            image_2.add_image(detailing_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
+                            image_2.add_caption('Typical Detailing')
+                            # doc.append(NewPage())
 
-                    with doc.create(Figure()) as image_3:
-                        image_3.add_image(stiffener_details, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
-                        image_3.add_caption('Typical Stiffener Details')
-                        # doc.append(NewPage())
+                        with doc.create(Figure()) as image_3:
+                            image_3.add_image(stiffener_details, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
+                            image_3.add_caption('Typical Stiffener Details')
+                            # doc.append(NewPage())
+
+            elif module == KEY_DISP_BASE_PLATE:
+                if does_design_exist and sys.platform != 'darwin':
+                    doc.append(NewPage())
+                    bp_sketch = rel_path + Disp_2d_image[0]
+                    bp_detailing = rel_path + Disp_2d_image[1]
+                    bp_weld = rel_path + Disp_2d_image[2]
+                    bp_anchor = rel_path + Disp_2d_image[3]
+                    bp_key = rel_path + Disp_2d_image[4]
+
+                    with doc.create(Section('2D Drawings (Typical)')):
+                        with doc.create(Figure()) as image_1:
+                            image_1.add_image(bp_sketch, width=NoEscape(r'1.0\textwidth'), placement=NoEscape(r'\centering'))
+                            image_1.add_caption('Typical Base Plate Details')
+                            # doc.append(NewPage())
+
+                        with doc.create(Figure()) as image_2:
+                            image_2.add_image(bp_detailing, width=NoEscape(r'1.0\textwidth'), placement=NoEscape(r'\centering'))
+                            image_2.add_caption('Typical Base Plate Detailing')
+                            # doc.append(NewPage())
+
+                        with doc.create(Figure()) as image_3:
+                            image_3.add_image(bp_weld, width=NoEscape(r'1.0\textwidth'), placement=NoEscape(r'\centering'))
+                            image_3.add_caption('Typical Weld Details')
+                            # doc.append(NewPage())
+
+                        with doc.create(Figure()) as image_4:
+                            image_4.add_image(bp_anchor, width=NoEscape(r'0.5\textwidth'), placement=NoEscape(r'\centering'))
+                            image_4.add_caption('Typical Anchor Bolt Details')
+                            # doc.append(NewPage())
+
+                        if len(Disp_2d_image[-1]) > 0:
+                            with doc.create(Figure()) as image_5:
+                                image_5.add_image(bp_key, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
+                                image_5.add_caption('Typical Shear Key Details')
+                                # doc.append(NewPage())
 
         if does_design_exist and sys.platform != 'darwin':
             doc.append(NewPage())

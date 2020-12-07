@@ -463,6 +463,7 @@ class Plate(Material):
                  material_grade="", width=0.0):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
+        self.grip_status = True
         self.design_status_capacity = False
         self.reason = ""
         if thickness:
@@ -888,25 +889,26 @@ class Plate(Material):
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia, end_dist, gap, beta_lg=beta_lg)
 
-            while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
-                print("entered web plate details loop for bolt force:", vres, "bolt capaity reduced:",
-                      bolt_capacity_red)
-                [gauge, edge_dist, web_plate_h_recalc] = self.get_gauge_edge_dist(web_plate_h + 10, bolts_one_line,
-                                                                                  min_edge_dist,
-                                                                                  max_spacing, max_edge_dist)
-                if web_plate_h_recalc <= web_plate_h_max and shear_ecc is True and gauge != 0:
-                    # gauge is recalculated only if there is shear ecc or else increase in bolt is the only option
-                    web_plate_h += 10
+            while (bolt_line <= bolt_line_limit and vres > bolt_capacity_red) or web_plate_h == False:
+                if web_plate_h is not False:
+                    print("entered web plate details loop for bolt force:", vres, "bolt capaity reduced:",
+                          bolt_capacity_red)
+                    [gauge, edge_dist, web_plate_h_recalc] = self.get_gauge_edge_dist(web_plate_h + 10, bolts_one_line,
+                                                                                      min_edge_dist,
+                                                                                      max_spacing, max_edge_dist)
+                    if web_plate_h_recalc <= web_plate_h_max and shear_ecc is True and gauge != 0:
+                        # gauge is recalculated only if there is shear ecc or else increase in bolt is the only option
+                        web_plate_h += 10
 
-                # If height cannot be increased number of bolts is increased by 1 and loop is repeated
-                else:
-                    bolts_required = bolt_line * bolts_one_line
-                    bolts_required += 1
-                    [bolt_line, bolts_one_line, web_plate_h] = \
-                        self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
-                                                            min_edge_dist, min_gauge, min_bolts_one_line)
-                [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
-                                                                           max_spacing, max_edge_dist)
+                    # If height cannot be increased number of bolts is increased by 1 and loop is repeated
+                    else:
+                        bolts_required = bolt_line * bolts_one_line
+                        bolts_required += 1
+                        [bolt_line, bolts_one_line, web_plate_h] = \
+                            self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+                                                                min_edge_dist, min_gauge, min_bolts_one_line)
+                    [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
+                                                                               max_spacing, max_edge_dist)
 
                 while web_plate_h is False:
                     bolts_required += 1

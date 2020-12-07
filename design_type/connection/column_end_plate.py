@@ -740,8 +740,8 @@ class ColumnEndPlate(MomentConnection):
         if self.IR_axial < 0.3 and self.IR_moment < 0.5:
             self.min_axial_load = 0.3 * self.axial_capacity
             self.load_moment_min = 0.5 * self.section.moment_capacity
-            logger.info("Loads defined by the user are less than minimun recommendations as per IS 800:2007, Cl.10.7")
-            logger.info("Load values are set at minimun recommendations as per IS 800:2007, Cl.10.7")
+            logger.info("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+            logger.info("The value of load(s) is/are set at minimum recommended value as per IS 800:2007, Cl.10.7.")
 
         elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
 
@@ -750,8 +750,8 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.min_axial_load = self.load.axial_force * 1000 + ((1 - self.sum_IR) * self.axial_capacity)
             self.load_moment_min = self.load.moment * 1000000
-            logger.info("Axial force defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
-            logger.info("Axial force is set at {} kN".format(round(self.min_axial_load / 1000, 2)))
+            logger.info("The value of axial force is less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+            logger.info("The value of axial force is set at {} kN.".format(round(self.min_axial_load / 1000, 2)))
 
         elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
 
@@ -760,8 +760,8 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.load_moment_min = self.load.moment * 1000000 + ((1 - self.sum_IR) * self.section.moment_capacity)
             self.min_axial_load = self.load.axial_force * 1000
-            logger.info("Moment defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
-            logger.info("Moment value is set at {} kN-m".format(round(self.load_moment_min / 1000000, 2)))
+            logger.info("The value of bending moment is less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+            logger.info("The value of bending moment is set at {} kNm.".format(round(self.load_moment_min / 1000000, 2)))
         else:
             self.min_axial_load = self.load.axial_force * 1000
             self.load_moment_min = self.load.moment * 1000000
@@ -788,27 +788,25 @@ class ColumnEndPlate(MomentConnection):
         self.factored_axial_load = round(max(self.load.axial_force * 1000, self.min_axial_load), 2)  # N
         self.fact_shear_load = round(max(self.shear_load1, self.load.shear_force * 1000), 2)  # N
 
-
         if self.factored_axial_load > self.axial_capacity:
-            logger.warning(' : Factored axial load is exceeding axial capacity,  {} kN.'.format(
+            logger.warning(' : The value of factored axial load exceeds the axial capacity, {} kN.'.format(
                 round(self.axial_capacity / 1000, 2)))
-            logger.error(" : Design is not safe. \n ")
+            logger.error(" : Design is unsafe. \n ")
             logger.info(" :=========End Of design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity:
-                logger.warning(' : Factored shear load is exceeding 0.6 times shear capacity,  {} kN.'.format(
+                logger.warning(' : The value of factored shear load exceeds by 0.6 times the shear capacity of the member, {} kN.'.format(
                     round(self.shear_capacity / 1000, 2)))
-                logger.error(" : High shear cases cannot be designed using Osdag, Design is not safe. \n ")
+                logger.error(" : Design of members in high shear is not recommended by Osdag. Design is unsafe. \n ")
                 logger.info(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
-
-                    logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(
+                    logger.warning(' : The value of bending moment exceeds the moment capacity of the member, i.e. {} kNm.'.format(
                         round(self.section.moment_capacity / 1000000), 2))
-                    logger.error(" : Design is not safe. \n ")
+                    logger.error(" : Design is unsafe. \n ")
                     logger.info(" :=========End Of design===========")
                 else:
                     self.member_capacity_status = True
@@ -840,14 +838,17 @@ class ColumnEndPlate(MomentConnection):
         for x in self.bolt.bolt_diameter:
             if VALUES_D == 'All':
                 if (self.section.flange_width/2 - self.section.web_thickness/2) < (2 * IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter[x],self.bolt.bolt_hole_type,self.bolt.edge_type)):
-                    logger.warning('Place not available for bolt spacing from the given list, change section')
+                    logger.warning('Sufficient space is not available to accommodate the bolt(s) from the defined list of bolt diameters.'
+                                   ' Provide a different section or bolt list.')
             elif VALUES_D == 'Customized':
                 if (self.section.flange_width/2 - self.section.web_thickness/2) < (2 * IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter[x],self.bolt.bolt_hole_type,self.bolt.edge_type)):
                     for i in self.bolt.bolt_diameter:
                         if i == 8:
-                            logger.warning('Place not available for bolt spacing from the given list, change section')
+                            logger.warning('Sufficient space is not available to accommodate the bolt(s) from the defined list of bolt diameters.'
+                                           ' Provide a different section or bolt list.')
                         else:
-                            logger.warning('Place not available for bolt spacing from the given list, change bolt sizes')
+                            logger.warning('Sufficient space is not available to accommodate the bolt(s) from the defined list of bolt diameters.'
+                                           ' Provide a different section or bolt list.')
             self.pitch = IS800_2007.cl_10_2_2_min_spacing(x)
             self.end_dist = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(x,self.bolt.bolt_hole_type,self.bolt.edge_type),5)
             print("Bolt diam: ", x,"Pitch: ",self.pitch,"End-dist: ",self.end_dist)
@@ -1121,11 +1122,11 @@ class ColumnEndPlate(MomentConnection):
         else:
             if KEY_D == 'Customized':
                 self.design_status = False
-                logger.error("Try Different bolt diam")
+                logger.error("Try with a different list of bolt diameter(s).")
 
             elif self.connection == "Flush End Plate":
                 self.design_status = False
-                logger.error("Try Different material or Try Extended both ways Connection")
+                logger.error("Try with a different material grade or try the extended both way connection.")
             #
             # elif self.load_moment > self.section.moment_capacity and self.factored_axial_load > self.axial_capacity:
             #     self.design_status = False
@@ -1133,10 +1134,8 @@ class ColumnEndPlate(MomentConnection):
 
             else:
                 self.design_status = False
-                logger.error("The number of bolt rows are not sufficient to cater for the given section and loads combination.\\"
-                             "Please do a manual check with increased number of rows outside the column depth. Osdag is not currently equipped to design such cases.")
-                logger.info("Else you can try with cover plate connection.")
-
+                logger.error("The number of bolt row(s) are not sufficient to cater for the given section and load combination.")
+                logger.info("Try cover plate connection.")
 
     #############################################################################################################
     ## Function to get Bolt grade ##
@@ -1450,7 +1449,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error("failed in bolt grade selection")
+            logger.error("Bolt grade selection failure!")
 
     ########################################################################################################
 
@@ -1544,10 +1543,10 @@ class ColumnEndPlate(MomentConnection):
                                                       conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1)
                     self.bolt_tension = self.bolt.bolt_tension_capacity
                     self.bolt_cap = self.bolt.bolt_capacity
-                    logger.info(": Overall Column end plate connection design is safe \n")
+                    logger.info(": Overall column end plate connection design is safe \n")
                     logger.info(" :=========End Of design===========")
                 else:
-                    logger.error(": Design is not safe \n ")
+                    logger.error(": Overall column end plate connection design is unsafe \n ")
                     logger.info(" :=========End Of design===========")
             else:
                 # if 2 * self.end_dist >= 50:
@@ -1650,10 +1649,10 @@ class ColumnEndPlate(MomentConnection):
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1)
             self.bolt_tension = self.bolt.bolt_tension_capacity
             self.bolt_cap = self.bolt.bolt_capacity
-            logger.info(": Overall Column end plate connection design is safe \n")
+            logger.info(": Overall column end plate connection design is safe \n")
             logger.info(" :=========End Of design===========")
         else:
-            logger.error(": Design is not safe \n ")
+            logger.error(": Overall column end plate connection design is unsafe \n ")
             logger.info(" :=========End Of design===========")
 
 ########################################################
@@ -2203,7 +2202,7 @@ class ColumnEndPlate(MomentConnection):
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                                   rel_path, Disp_2d_image, Disp_3d_image)
+                                   rel_path, Disp_2d_image, Disp_3d_image, module=self.module)
 
 
 # def save_latex(self, uiObj, Desigxn_Check, reportsummary, filename, rel_path, Disp_3d_image):

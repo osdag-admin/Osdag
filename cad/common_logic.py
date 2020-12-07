@@ -1107,11 +1107,11 @@ class CommonDesignLogic(object):
 
         # bcWeld for stiffener hight on left side
         print(BCE.notch_size,BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,BCE.weld_size_continuity_plate,"jjjj")
-        bcWeldStiffHeight = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
+        bcWeldStiffHeight = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
                                        L=BCE.stiffener_height-5.0)
 
         #
-        bcWeldStiffLength = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
+        bcWeldStiffLength = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
                                        L=BCE.stiffener_length-5.0)
 
 
@@ -1236,7 +1236,7 @@ class CommonDesignLogic(object):
             #                                        outputobj)
 
             col_web_connectivity = CADcolwebGroove(BCE, beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                                   bcWeldFlang,bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
+                                                   bcWeldFlang,bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, beam_stiffenerFlush,bcWeldFlushstiffHeight, bcWeldFlushstiffLength,endplate_type)
 
 
             col_web_connectivity.create_3DModel()
@@ -2019,9 +2019,9 @@ class CommonDesignLogic(object):
 
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
-                endplate = self.TObj.get_end_plates_models()
+
                 nutbolt = self.TObj.get_nut_bolt_array_models()
-                end_nutbolt = self.TObj.get_end_nut_bolt_array_models()
+
                 onlymember = self.TObj.get_only_members_models()
                 # distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
                 # Point = gp_Pnt(distance, 0.0, 300)
@@ -2034,6 +2034,8 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
                 elif self.component == "Endplate":
+                    endplate = self.TObj.get_end_plates_models()
+                    end_nutbolt = self.TObj.get_end_nut_bolt_array_models()
                     osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, end_nutbolt, color=Quantity_NOC_YELLOW, update=True)
                 else:
@@ -2048,7 +2050,7 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_class()
                 self.TObj = self.createTensionCAD()
-                endplate = self.TObj.get_end_plates_models()
+
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
@@ -2058,6 +2060,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
                 elif self.component == "Endplate":
+                    endplate = self.TObj.get_end_plates_models()
                     osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
                 else:
                     connector = BRepAlgoAPI_Fuse(welds, plate).Shape()

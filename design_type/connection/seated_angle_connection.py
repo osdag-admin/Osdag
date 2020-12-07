@@ -668,25 +668,26 @@ class SeatedAngleConnection(ShearConnection):
 
             if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                             40.0):
-                logger.warning(" : User input for shear force is very less compared to section capacity. "
-                               "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                logger.warning(" : The value of factored shear force is less than the minimum recommended value. "
+                               "Setting shear force value to 15% of supported beam shear capacity or 40 kN, whichever is lesser"
+                               "[Ref. IS 800:2007, Cl.10.7].")
                 self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                             40.0)
 
-            print("preliminary member check is satisfactory. Checking available Bolt Diameters")
+            print("Preliminary member check(s) have passed. Checking available bolt diameter(s).")
             self.select_angle_thickness(self)
 
         else:
             self.design_status = False
             if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
-                logger.error(" : Shear yielding capacity of supported section, {} kN is less "
-                             "than shear force, Please select larger sections or decrease loads"
+                logger.error(" : The shear yielding capacity of the supported section, ({} kN) is less "
+                             "than the factored shear force. Please select a larger section or decrease load."
                              .format(round(self.supported_section.shear_yielding_capacity / 1000, 2)))
             if self.supporting_section.tension_yielding_capacity / 1000 < self.load.shear_force:
-                logger.error(" : Axial yielding capacity of supporting section, {} kN is less "
-                             "than shear force, Please select larger sections or decrease loads"
-                             .format(round(self.supporting_section.tension_yielding_capacity / 1000, 2)))
-            print("failed in preliminary member checks. Select larger sections or decrease loads")
+                logger.error(" : The tension yielding capacity of the supported section, ({} kN) is less "
+                             "than the factored axial force. Please select a larger section or decrease load."
+                             .format(round(self.supported_section.tension_yielding_capacity / 1000, 2)))
+            print("The preliminary member check(s) have failed. Select a large/larger section(s) or decrease load and re-design.")
 
     def select_angle_thickness(self):
         self. plate.thickness = []
@@ -710,11 +711,11 @@ class SeatedAngleConnection(ShearConnection):
                 # print("popped", designation)
 
         if self.plate.thickness:
-            logger.info("Required Seated Angle thickness available. Getting angle leg size")
+            logger.info("The required seated angle thickness is available. Fetching angle leg size.")
             self.get_bolt_details(self)
         else:
             self.design_status = False
-            logger.error("Increase Seated Angle thickness")
+            logger.error("Increase the thickness of the seated angle.")
 
     def check_capacity(self, seated):
         self.b1 = IS800_2007.cl_8_7_1_3_stiff_bearing_length(self.load.shear_force,
@@ -864,14 +865,14 @@ class SeatedAngleConnection(ShearConnection):
             logger.info("=== End Of Design ===")
         elif self.bolt.design_status is False and self.bolt.plate_thk_status is False:
             self.design_status = False
-            logger.error("Total thickness of connecting elements is more than 8 times bolt diameter, "
-                         "please select higher bolt diameter")
-            logger.error("It fails in bolt grip length check as per Cl. 10.3.3.2 of IS 800:2007")
+            logger.error(" : The total thickness of the connecting elements is more than 8 times the bolt diameter. "
+                         "Define larger bolt diameter(s) and/or plate of lower thickness.")
+            logger.error(" : The connection fails in the bolt grip length check [Ref.Cl. 10.3.3.2, IS 800:2007].")
         else:
             self.design_status = False
             # logger.error("Decrease bolt diameter")
-            logger.error("Sufficient space not available to arrange bolts, " +
-                         "either decrease bolt diameter or increase angle leg size.")
+            logger.error("Sufficient space is not available to accommodate the defined bolts. " +
+                         "Either decrease the bolt diameter or increase the angle leg size.")
 
     def select_optimum(self):
         """This function sorts the list of available options and selects the combination with least leg size"""
@@ -1163,12 +1164,12 @@ class SeatedAngleConnection(ShearConnection):
         if self.top_angle.design_status is True:
             self.top_angle_bolt_details(self)
             # print("provided top angle", self.top_angle.designation)
-            logger.info(": Based on thumb rules, a minimum top angle leg size of {} mm and a thickness of {} mm "
-                        "is required to provide stability to {} ".format(top_angle_side, top_angle_thickness_min,
+            logger.info(": Based on the thumb rules, a minimum top angle leg size of {} mm and a thickness of {} mm "
+                        "is required to provide stability to {}.".format(top_angle_side, top_angle_thickness_min,
                                                                          self.supported_section.designation))
             self.design_status = True
         else:
-            logger.error(": Sufficient leg length is not available for Top Angle. ")
+            logger.error(": Sufficient leg length is not available for the top angle.")
             self.design_status = False
 
     def top_angle_bolt_details(self):
@@ -1640,7 +1641,7 @@ class SeatedAngleConnection(ShearConnection):
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 
     def get_3d_components(self):
         components = []

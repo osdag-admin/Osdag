@@ -162,8 +162,6 @@ class EndPlateSpliceHelper(object):
                         self.lever_arm.append(r_a)
                         row_web_counter += 1
 
-                    print("CASE TRUE")
-
         elif self.endplate_type == 'Extended One Way - Irreversible Moment':
             # Note: defining bolt models for this connection due to its un-symmetric nature of bolt placement, hence the equation cannot be
             # generalised up-to 5 rows (total)
@@ -336,9 +334,6 @@ class EndPlateSpliceHelper(object):
         # final list with all the lever arm distances calculated
         self.lever_arm = self.lever_arm
         self.lever_arm = [round(value_lever_arm, 2) for value_lever_arm in self.lever_arm]
-
-        print("LEVER ARM is {}".format(self.lever_arm))
-        print("PITCH IS {}".format(self.pitch_distance_web))
 
         # Check 3: Find force on each bolt under tension
         self.tension = []
@@ -617,8 +612,6 @@ class EndPlateSpliceHelper(object):
         self.tension = self.tension
         self.tension = [round(value_tension, 2) for value_tension in self.tension]
 
-        print("TENSION is {}".format(self.tension))
-
         # adding the lists of bolt row and tension
         print("ROWS BEFORE ADDING {}".format(self.bolt_row))
         print("ROWS AFTER ADDING {}".format(self.bolt_row + self.bolt_row_web))
@@ -640,21 +633,21 @@ class EndPlateSpliceHelper(object):
             self.flange_capacity_status = True
 
         # Check 6: Prying force check in the critical bolt
-        self.b_e = self.beam_bf / self.bolt_column
-        self.lv = self.end_distance_provided - (self.beam_r1 / 2)
-        self.le_1 = self.end_distance_provided
-        self.le_2 = (1.1 * self.plate_thickness) * math.sqrt((self.beta * self.proof_stress) / self.dp_plate_fy)
-        self.le = min(self.le_1, self.le_2)
+        self.b_e = self.beam_bf / self.bolt_column  # mm
+        self.lv = self.end_distance_provided - (self.beam_r1 / 2)  # mm
+        self.le_1 = self.end_distance_provided  # mm
+        self.le_2 = (1.1 * self.plate_thickness) * math.sqrt((self.beta * self.proof_stress) / self.dp_plate_fy)  # mm
+        self.le = min(self.le_1, self.le_2)  # mm
 
-        self.prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(self.t_1, self.lv, self.proof_stress, self.b_e, self.plate_thickness,
+        self.prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(self.t_1 * 1e3, self.lv, self.proof_stress, self.b_e, self.plate_thickness,
                                                                    self.dp_plate_fy, self.end_distance_provided, self.bolt.bolt_tensioning, eta=1.5)
-        self.prying_force = round(self.prying_force, 2)
+        self.prying_force = round(self.prying_force * 1e-3, 2)  # kN
 
         # Check 7: Moment capacity of the end plate and plate thickness check
 
         # taking moment about the toe of weld or edge of the flange from bolt center-line
         # Mp_plate = T*l_v - Q.l_e
-        self.mp_plate = round((self.t_1 * 1e3 * self.lv) - (self.prying_force * 1e3 * self.le))  # N-mm
+        self.mp_plate = round(((self.t_1 * self.lv) - (self.prying_force * self.le)) * 1e3, 2)  # N-mm
 
         # negative Mp means prying force is higher than the tension in bolt and the yielding location would be outside the bolts and not near the
         # root of the beam

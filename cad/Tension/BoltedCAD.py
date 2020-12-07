@@ -247,7 +247,7 @@ class TensionAngleBoltCAD(object):
 
     def get_end_plates_models(self):
         if self.Obj.sec_profile == 'Star Angles':
-            plate = BRepAlgoAPI_Fuse(self.plate1_Model,self.nutboltArrayLModels,self.nutboltArrayL_SAModels).Shape()
+            plate = BRepAlgoAPI_Fuse(self.plate1_Model,self.nutboltArrayLModels).Shape()
         else:
             plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.nutboltArrayLModels).Shape()
 

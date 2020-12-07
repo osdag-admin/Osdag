@@ -1408,7 +1408,7 @@ class EndPlateConnection(ShearConnection):
         # Section Capacities
         #######################
 
-        t1 = ('SubSection', 'Section Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Section Design Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         a = self.supported_section
@@ -1426,7 +1426,7 @@ class EndPlateConnection(ShearConnection):
         self.report_check.append(t1)
 
         if self.design_status_plate_tk is False:
-            t1 = ('SubSection', 'Minimum Plate thickness check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Minimum Plate Thickness Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness),
                   self.plate.thickness_provided,
@@ -1435,7 +1435,7 @@ class EndPlateConnection(ShearConnection):
             self.report_check.append(t1)
 
         if self.supported_section.design_status is True and self.design_status_plate_tk is True:
-            t1 = ('SubSection', 'Bolt Design Checks', '|p{3cm}|p{5.5cm}|p{6.3cm}|p{1.2cm}|')
+            t1 = ('SubSection', 'Bolt Design', '|p{3cm}|p{5.5cm}|p{6.3cm}|p{1.2cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
@@ -1515,7 +1515,7 @@ class EndPlateConnection(ShearConnection):
                 self.report_check.append(t3)
             else:
                 kh_disp = round(self.bolt.kh, 2)
-                t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
+                t4 = (KEY_OUT_DISP_BOLT_SLIP_DR, '',
                       cl_10_4_3_HSFG_bolt_capacity(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
                                                    Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
                                                    capacity=self.bolt.bolt_capacity), '')
@@ -1611,7 +1611,7 @@ class EndPlateConnection(ShearConnection):
             self.report_check.append(t1)
 
             #
-            t1 = ('SubSection', 'Plate Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Plate Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height),
@@ -1699,7 +1699,7 @@ class EndPlateConnection(ShearConnection):
                 weld_conn_plates_fu = [self.plate.fu, self.supported_section.fu, self.weld.fu]
                 weld_conn_plates_tk = [self.plate.thickness_provided,self.supported_section.web_thickness]
                 [available_welds,weld_min,weld_max] = self.get_available_welds(self,weld_conn_plates_tk)
-                t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Weld Design', '|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(weld_conn_plates_tk, weld_min),

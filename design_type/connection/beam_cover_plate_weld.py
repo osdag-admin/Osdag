@@ -2327,7 +2327,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
         ##################################weld design check remains same for outside and " outside +inside" ########################################
         if self.initial_pt_thk_status == True and self.initial_pt_thk_status_web ==True and self.web_plate_weld_status ==True:
-            t1 = ('SubSection', 'Flange Weld Design Check ', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Flange Weld Design ', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             if self.preference=="Outside":
                 t2 = (DISP_MIN_FLANGE_PLATE_THICK, display_prov(self.section.flange_thickness, "T"),
@@ -2483,7 +2483,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                           self.web_plate.thickness_provided)
             self.web_weld_conn_plates_fu = [self.section.fu, self.web_plate.fu]
             self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
-            t1 = ('SubSection', 'Web Weld Design Check ', '|p{3cm}|p{6.5cm}|p{4.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Weld Design ', '|p{3cm}|p{6.5cm}|p{4.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t2 = (DISP_MIN_WEB_PLATE_THICK, display_prov(self.section.web_thickness / 2, "t"),
                   display_prov(self.web_plate.thickness_provided, "t_{wp}"),

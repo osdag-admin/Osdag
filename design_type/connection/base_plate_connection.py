@@ -128,9 +128,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.beta_b_z = 1
         self.beta_b_y = 1
         self.M_dz = 0.0
-        self.M_dz = 0.0
         self.M_dy = 0.0
-        self.M_dy = 0.0
+        self.IR_axial = 0.0
+        self.IR_moment = 0.0
+        self.sum_IR = 0.0
         self.moment_capacity_column_major = 0.0
         self.moment_capacity_column_minor = 0.0
         self.load_moment_major_report = 0.0
@@ -2612,25 +2613,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # 7: Minimum Design Action
 
-        # 7.1: Axial capacity
-        self.column_axial_capacity = round(((self.column_area * self.dp_column_fy) / self.gamma_m0) * 1e-3, 2)  # kN
-        self.load_axial_input = round(self.load_axial_compression * 1e-3, 2)
+        # 7.1: Moment capacity of the column
 
-        if self.load_axial_compression * 1e-3 < (0.3 * self.column_axial_capacity):
-            logger.warning("[Minimum Design Action] The defined value of axial compression ({} kN) is less than 0.3 times the capacity of the column "
-                           "section ({} kN) [Ref. Cl. 10.7, IS 800:2007]".format(self.load_axial_compression * 1e-3, 0.3 * self.column_axial_capacity))
-            logger.info("Setting the value of axial compression equal to the minimum recommended value")
-
-            self.load_axial_compression = round(0.3 * self.column_axial_capacity * 1e3, 2)  # N
-
-        if self.load_axial_compression * 1e-3 > self.column_axial_capacity:
-            logger.warning("[Maximum Design Action] The defined value of axial compression ({} kN) is greater than the capacity of the column "
-                           "section ({} kN)".format(self.load_axial_compression * 1e-3, self.column_axial_capacity))
-            logger.info("Setting the value of axial compression equal to the maximum capacity of the column section")
-
-            self.load_axial_compression = self.column_axial_capacity * 1e3  # N
-
-        # 7.2: Section classification
+        # 7.1.1: Section classification
         self.epsilon_col = round(math.sqrt(250 / self.dp_column_fy), 2)
 
         # flange b/t check
@@ -2652,7 +2637,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             self.col_classification = 'Compact'
 
-        # 7.3: Bending capacity
+        # 7.1.2: Bending capacity
         if self.col_classification == 'Semi-compact':
             self.beta_b_z = self.column_Z_ez / self.column_Z_pz
             self.beta_b_y = self.column_Z_ey / self.column_Z_py
@@ -2670,42 +2655,120 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.M_dy = self.cl_8_2_1_2_design_moment_strength(self.column_Z_ey, self.column_Z_py, self.dp_column_fy, section_class='Compact')
             self.M_dy = round(self.M_dy, 2)  # Nmm
 
-        # 7.4: Moment check
+        # 7.2: Axial capacity
+        self.column_axial_capacity = round(((self.column_area * self.dp_column_fy) / self.gamma_m0) * 1e-3, 2)  # kN
+        self.load_axial_input = round(self.load_axial_compression * 1e-3, 2)
 
-        # major axis moment
-        if self.load_moment_major < (0.3 * self.M_dz):
-            logger.warning("[Minimum Moment] The external factored bending moment (acting along the major axis) is less than the minimum "
-                           "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-            logger.info("The minimum recommended design action effect for factored bending moment is 0.3 times the capacity of the column "
-                        "(i.e. 0.3 X {}, kNm)".format(round(self.M_dz * 1e-6, 2)))
-            logger.info("Note: The design action check is based on full capacity of the column")
-            self.load_moment_major = round(0.3 * self.M_dz, 2)
-            logger.info("The value of factored bending moment is set to {} kNm".format(round(self.load_moment_major * 1e-6, 2)))
+        if self.connectivity != 'Moment Base Plate':
+            if self.load_axial_compression * 1e-3 < (0.3 * self.column_axial_capacity):
+                logger.warning("[Minimum Design Action] The defined value of axial compression ({} kN) is less than 0.3 times the capacity of the column "
+                               "section ({} kN) [Ref. Cl. 10.7, IS 800:2007]".format(self.load_axial_compression * 1e-3, 0.3 * self.column_axial_capacity))
+                logger.info("Setting the value of axial compression equal to the minimum recommended value")
 
-        if self.load_moment_major > self.M_dz:
-            logger.warning("[Maximum Moment] The external factored bending moment (acting along the major (z-z) axis) is greater than the "
-                           "capacity of the column section")
-            logger.info("Note: The maximum moment check is based on full capacity of the column")
-            logger.info("The value of factored bending moment (M z-z) is set to be equal to the maximum capacity of the column {} kNm".
-                        format(round(self.M_dz * 1e-6, 2)))
+                self.load_axial_compression = round(0.3 * self.column_axial_capacity * 1e3, 2)  # N
 
-        # minor axis moment
-        if self.load_moment_minor > 0:
-            if self.load_moment_minor < (0.3 * self.M_dy):
-                logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the minimum "
-                               "recommended design action effect [Reference: clause 10.7, IS 800:2007]")
-                logger.info("The minimum recommended design action effect for factored bending moment is 0.3 times the capacity of the column "
-                            "(i.e. 0.3 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
-                logger.info("Note: The minimum design action is based on full capacity of the column for a conservative approach")
-                self.load_moment_minor = round(0.3 * self.M_dy, 2)
-                logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
+            if self.load_axial_compression * 1e-3 > self.column_axial_capacity:
+                logger.warning("[Maximum Design Action] The defined value of axial compression ({} kN) is greater than the capacity of the column "
+                               "section ({} kN)".format(self.load_axial_compression * 1e-3, self.column_axial_capacity))
+                logger.info("Setting the value of axial compression equal to the maximum capacity of the column section")
 
-        if self.load_moment_minor > self.M_dy:
-            logger.warning("[Maximum Moment] The external factored bending moment (acting along the major axis) is greater than the capacity of  "
-                           "the column section")
-            logger.info("The maximum moment is based on full capacity of the column")
-            logger.info("The value of factored bending moment is set to be equal to the maximum capacity of the column {} kNm".
-                        format(round(self.M_dy * 1e-6, 2)))
+                self.load_axial_compression = self.column_axial_capacity * 1e3  # N
+
+        # Interaction ratio check for loads
+        if self.connectivity == 'Moment Base Plate':
+
+            self.IR_axial = round((self.load_axial_compression * 1e-3) / self.column_axial_capacity, 3)
+            self.IR_moment = round(self.load_moment_major / self.M_dz, 3)
+            self.sum_IR = round(self.IR_axial + self.IR_moment, 3)
+
+            # Minimum load consideration check
+            if self.sum_IR <= 1.0:
+
+                if self.IR_axial < 0.3 and self.IR_moment < 0.5:
+
+                    logger.warning("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+                    logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
+                                   "capacity of the column ({} kNm)".format(round(self.load_moment_major * 1e-6, 2),
+                                                                            round(0.5 * self.M_dz * 1e-6, 2)))
+                    self.load_moment_major = round(0.5 * self.M_dz, 2)  # Nmm
+                    self.load_axial_compression = round(0.3 * self.column_axial_capacity * 1e3, 2)  # N
+                    logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to "
+                                "qualify the connection as rigid connection")
+                    logger.info("The value of load(s) is/are set at minimum recommended value as per Cl.10.7")
+                    logger.info("Designing the connection for a factored moment of {} kNm".format(round(self.load_moment_major * 1e-6, 2)))
+
+                elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
+
+                    if (0.5 - self.IR_moment) < (1 - self.sum_IR):
+                        self.load_moment_major = round(0.5 * self.M_dz, 2)
+                    else:
+                        self.load_moment_major = round(self.load_moment_major + ((1 - self.sum_IR) * self.M_dz), 2)
+
+                    self.load_axial_compression = round(self.load_axial_compression, 2)  # N
+
+                    logger.warning("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+                    logger.warning("[Minimum Factored Load] The external factored bending moment ({} kNm) is less than 0.5 times the plastic moment "
+                                   "capacity of the column ({} kNm)".format(round(2 * self.load_moment_major * 1e-6, 2),
+                                                                            round(0.5 * self.M_dz * 1e-6, 2)))
+                    logger.info("The minimum factored bending moment should be at least 0.5 times the plastic moment capacity of the beam to "
+                                "qualify the connection as rigid connection")
+                    logger.info("The value of load(s) is/are set at minimum recommended value as per Cl.10.7")
+                    logger.info("Designing the connection for a factored moment of {} kNm".format(round(self.load_moment_major * 1e-6, 2)))
+
+                elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
+
+                    if (0.3 - self.IR_axial) < (1 - self.sum_IR):
+                        self.load_axial_compression = round(0.3 * self.column_axial_capacity * 1e3, 2)  # N
+                    else:
+                        self.load_axial_compression = round(0.3 * self.column_axial_capacity * 1e3, 2)  # N
+
+                    self.load_moment_major = round(self.load_moment_major, 2)  # Nmm
+
+                    logger.warning("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7]")
+                    logger.info("The value of axial force is set at {} kN, as per the minimum recommended value by Cl.10.7".
+                                format(round(0.3 * self.column_axial_capacity * 1e-3, 2)))
+                else:
+                    self.load_axial_compression = round(self.load_axial_compression, 2)
+                    self.load_moment_major = round(self.load_moment_major, 2)
+
+            else:
+                # Maximum moment check
+                if self.load_moment_major > self.M_dz:
+                    logger.error("[Maximum Factored Load] The external factored bending moment ({} kNm) is greater than the plastic moment "
+                                 "capacity of the column ({} kNm)".format(round(self.load_moment_major * 1e-6, 2),
+                                                                          round(self.M_dz * 1e-6, 2)))
+
+                    self.load_moment_major = self.M_dz  # Nmm
+                    logger.warning("The maximum moment carrying capacity of the column is {} kNm".format(round(self.M_dz * 1e-6, 2)))
+                    logger.info("Define the value of factored bending moment as {} kNm or less and re-design")
+
+                # Maximum axial force check
+                if self.load_axial_compression > self.column_axial_capacity:
+                    logger.error("[Maximum Factored Load] The external factored axial force ({} kN) is greater than the axial capacity of "
+                                 "the column ({} kN)".format(round(self.load_axial_compression * 1e-3, 2),
+                                                             round(self.column_axial_capacity, 2)))
+
+                    self.load_axial_compression = self.column_axial_capacity * 1e3  # N
+                    logger.warning("The maximum axial capacity of the beam is {} kN".format(round(self.column_axial_capacity, 2)))
+                    logger.info("Define the value of axial force as {} kN or less and re-design")
+
+            # minor axis moment
+            if self.load_moment_minor > 0:
+
+                if self.load_moment_minor < (0.5 * self.M_dy):
+                    logger.warning("[Minimum Moment] The external factored bending moment (acting along the minor (y-y) axis) is less than the "
+                                   "minimum recommended design action effect [Reference: clause 10.7, IS 800:2007]")
+                    logger.info("The minimum recommended design action effect for factored bending moment is 0.5 times the capacity of the column "
+                                "(i.e. 0.5 X {}, kNm)".format(round(self.M_dy * 1e-6, 2)))
+                    self.load_moment_minor = round(0.5 * self.M_dy, 2)
+                    logger.info("The value of factored bending moment (M y-y) is set to {} kNm".format(round(self.load_moment_minor * 1e-6, 2)))
+
+            if self.load_moment_minor > self.M_dy:
+                logger.warning("[Maximum Moment] The external factored bending moment (acting along the major axis) is greater than the capacity of  "
+                               "the column section")
+                logger.info("The maximum moment is based on full capacity of the column")
+                logger.info("The value of factored bending moment is set to be equal to the maximum capacity of the column {} kNm".
+                            format(round(self.M_dy * 1e-6, 2)))
 
         # 8: Design Parameters
 
@@ -7225,13 +7288,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Moment Base Plate':
 
             t1 = ("Bending moment, major axis (z-z)  (kNm)", display_load_bp(round(self.load_moment_major_report * 1e-6, 2), 'M'),
-                  prov_moment_load_bp(moment_input=round(self.load_moment_major_report * 1e-6, 2), min_mc=round(0.3 * self.M_dz * 1e-6, 2),
+                  prov_moment_load_bp(moment_input=round(self.load_moment_major_report * 1e-6, 2), min_mc=round(0.5 * self.M_dz * 1e-6, 2),
                                       app_moment_load=round(self.load_moment_major * 1e-6, 2),
                                       moment_capacity=round(self.M_dz * 1e-6, 2), axis='Major', classification=self.col_classification), "OK")
             self.report_check.append(t1)
 
             if self.load_moment_minor > 0:
-                if self.load_moment_minor < (0.3 * self.M_dy):
+                if self.load_moment_minor < (0.5 * self.M_dy):
                     t1 = ("Bending moment, minor axis (y-y)  (kNm)", display_load_bp(round(self.load_moment_minor_report * 1e-6, 2), 'M'),
                           prov_moment_load_bp(moment_input=round(self.load_moment_minor_report * 1e-6, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
                                               app_moment_load=round(self.load_moment_minor * 1e-6, 2),
@@ -7572,7 +7635,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.report_check.append(t1)
 
             t1 = ('Eccentricity - about major axis $(mm)$', '', eccentricity(round(self.load_moment_major * 10 ** -6, 2),
-                                                                           self.load_axial_compression * 10 ** -3, self.eccentricity_zz), 'OK')
+                                                                             round(self.load_axial_compression * 10 ** -3, 2),
+                                                                             self.eccentricity_zz), 'OK')
             self.report_check.append(t1)
 
             if self.moment_bp_case == 'Case1':
@@ -7582,12 +7646,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t2)
             elif self.moment_bp_case == 'Case2':
                 t2 = ('Base plate type', mom_bp_case(self.moment_bp_case, self.eccentricity_zz, self.bp_length_min),
-                      'Case 2: The base plate is mostly under compression/bearing with a small tension force being transferred through the anchor '
+                      'Case 2: The base plate is mostly under compression/bearing while a small tension force being transferred through the anchor '
                       'bolts outside column flange on the tension side', 'OK')
                 self.report_check.append(t2)
             elif self.moment_bp_case == 'Case3':
                 t2 = ('Base plate type', mom_bp_case(self.moment_bp_case, self.eccentricity_zz, self.bp_length_min),
-                      'Case 3: A smaller part of the base plate is under compression/bearing with a large tension force being transferred through '
+                      'Case 3: A smaller part of the base plate is under compression/bearing while a large tension force being transferred through '
                       'the anchor bolts outside column flange on the tension side', 'OK')
                 self.report_check.append(t2)
 
@@ -7603,7 +7667,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.report_check.append(t5)
 
                 t4 = ('Bending stress $(N/mm^2)$', self.bearing_strength_concrete,
-                      bending_stress(self.load_axial_compression * 10 ** -3, self.load_moment_major * 10 ** -6, self.bp_length_provided,
+                      bending_stress(round(self.load_axial_compression * 10 ** -3, 2), self.load_moment_major * 10 ** -6, self.bp_length_provided,
                                      self.bp_width_provided, self.bp_area_provided, self.ze_zz, self.sigma_max_zz, self.sigma_min_zz),
                       get_pass_fail(self.sigma_max_zz, self.bearing_strength_concrete, relation='leq'))
                 self.report_check.append(t4)
@@ -7658,8 +7722,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t8 = ('Effective bearing length $(mm)$', y(self.k1, self.k2, self.k3, self.y), '', 'OK')
                 self.report_check.append(t8)
 
-                t9 = ('Total tension demand $(kN)$', tension_demand_anchor(self.load_axial_compression * 10 ** -3, self.bp_length_provided, self.y,
-                                                                         self.eccentricity_zz, self.f, self.tension_demand_anchor), '', 'OK')
+                t9 = ('Total tension demand $(kN)$', tension_demand_anchor(round(self.load_axial_compression * 10 ** -3, 2), self.bp_length_provided,
+                                                                           self.y, self.eccentricity_zz, self.f, self.tension_demand_anchor), '', 'OK')
                 self.report_check.append(t9)
 
                 t11 = ('Critical section - compression side $(mm)$', critical_section_case_2_3(self.critical_xx, self.y, self.bp_length_provided,
@@ -8163,7 +8227,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             t1 = ('SubSection', 'Shear Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t2 = ('Shear resistance $(kN)$', '', shear_resistance(self.load_axial_compression * 1e-3, 0.45, round(self.shear_resistance * 1e-3, 2)),
+            t2 = ('Shear resistance $(kN)$', '', shear_resistance(round(self.load_axial_compression * 10 ** -3, 2), 0.45,
+                                                                  round(self.shear_resistance * 1e-3, 2)),
                   'OK')
             self.report_check.append(t2)
 

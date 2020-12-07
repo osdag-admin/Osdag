@@ -689,13 +689,13 @@ class CleatAngleConnection(ShearConnection):
         else:
             available_length = (self.supporting_section.depth - 2 * self.supporting_section.flange_thickness -
                                 2 * self.supporting_section.root_radius - self.supported_section.web_thickness) / 2
-        self.cleat_list_leg = []
+        # self.cleat_list_leg = []
         for designation in self.cleat_list_thk:
             cleat = Angle(designation=designation, material_grade=self.cleat_material_grade)
-            if cleat.leg_a_length < available_length:
-                self.cleat_list_leg.append(designation)
+            if cleat.leg_a_length > available_length:
+                self.cleat_list_thk.pop(designation)
 
-        for self.cleatangle in self.cleat_list_leg:
+        for self.cleatangle in self.cleat_list_thk:
             self.cleat = Angle(designation=self.cleatangle, material_grade=self.cleat_material_grade)
             # self.sptd_leg.thickness_provided = self.cleat.thickness
             bolts_required_previous = 2
@@ -826,6 +826,7 @@ class CleatAngleConnection(ShearConnection):
                 # logger.error(self.sptd_leg.reason)
                 supporting_leg_check = False
 
+
             else:
                 supporting_leg_check = self.select_bolt_dia_supporting(self)
 
@@ -898,6 +899,8 @@ class CleatAngleConnection(ShearConnection):
             logger.error("The connection cannot be designed with provided bolt diameters or cleat angle list")
         else:
             self.select_optimum(self)
+            print("why repeat",self.bolt.bolt_diameter_provided,self.cleat.designation)
+            self.for_3D_view(self)
 
     def select_optimum(self):
         """This function sorts the list of available options and selects the combination with least leg size or
@@ -1018,10 +1021,11 @@ class CleatAngleConnection(ShearConnection):
 
         if self.spting_leg.design_status is False and self.cleat_list_thk and self.spting_leg.grip_status is True:
             self.cleat_list_thk = [x for x in self.cleat_list_thk if x != self.cleat.designation]
-            if not self.cleat_list:
-                self.design_status = False
-            else:
-                self.select_bolt_dia_beam(self)
+            # if not self.cleat_list_thk:
+            #     self.design_status = False
+            # else:
+            #     self.select_bolt_dia_beam(self)
+            self.design_status = False
         else:
             pass
 
@@ -1126,7 +1130,7 @@ class CleatAngleConnection(ShearConnection):
                                                 conn_plates_t_fu_fy=self.spting_bolt_conn_plates_t_fu_fy,n=1)
         self.bolt_capacity_disp_sptd = round((self.bolt.bolt_capacity * self.beta_lj_sptd * self.beta_lg_sptd)/1000, 2)
         self.bolt_capacity_disp_spting = round((self.bolt2.bolt_capacity * self.beta_lj_spting * self.beta_lg_spting)/1000, 2)
-        self.for_3D_view(self)
+
 
     def for_3D_view(self):
         self.design_status = True
@@ -1143,7 +1147,7 @@ class CleatAngleConnection(ShearConnection):
         self.cleat.edge_spting = self.spting_leg.edge_dist_provided
         # self.cleat.end_spting = self.spting_leg.end_dist_provided
         self.cleat.end_spting = self.cleat.leg_a_length - self.cleat.thickness - self.cleat.root_radius - self.spting_leg.end_dist_provided
-        self.cleat.bolt_lines_spting = max(int(self.spting_leg.bolt_line/2),1)
+        self.cleat.bolt_lines_spting = self.spting_leg.bolt_line
         self.cleat.bolt_one_line_spting = self.spting_leg.bolts_one_line
 
         self.cleat.height = max(self.spting_leg.height, self.sptd_leg.height)

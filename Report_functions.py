@@ -928,8 +928,8 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
     #     max_edge_dist = round(12 * t_epsilon_considered, 2)
 
     # max_edge_dist = str(max_edge_dist)
-    e1 = round(12*t_fu_fy[0][0]*math.sqrt(250/t_fu_fy[0][1]),2)
-    e2 = round(12 * t_fu_fy[1][0] * math.sqrt(250 / t_fu_fy[1][1]),2)
+    e1 = round(12*t_fu_fy[0][0]*math.sqrt(250/t_fu_fy[0][2]),2)
+    e2 = round(12 * t_fu_fy[1][0] * math.sqrt(250 / t_fu_fy[1][2]),2)
     max_edge_dist = str(min(e1,e2))
     e1 = str(e1)
     e2 = str(e2)
@@ -3381,7 +3381,7 @@ def forces_in_flange(Au, B, T, A, D, Mu, Mw, Mf, Af, ff):
     return forcesinflange_eqn
 
 
-def min_plate_ht_req(beam_depth, min_plate_ht):
+def min_plate_ht_req(beam_depth,r_r,t_f,min_plate_ht):
     """
     Calculate min plate height required
     Args:
@@ -3395,9 +3395,13 @@ def min_plate_ht_req(beam_depth, min_plate_ht):
 
     """
     beam_depth = str(beam_depth)
+    r_r = str(r_r)
+    t_f = str(t_f)
     min_plate_ht = str(round(min_plate_ht, 2))
     min_plate_ht_eqn = Math(inline=True)
-    min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}&0.6~d_b= 0.6 \times ' + beam_depth + r'=' + min_plate_ht + r'\\ \\'))
+    min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 \times &(d_b - 2 \times t_f - 2 \times r_r)\\'))
+    min_plate_ht_eqn.append(NoEscape(r'&= 0.6 \times (' + beam_depth +r'- 2 \times'+t_f+r'- 2 \times'+r_r+r')\\'))
+    min_plate_ht_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))
     min_plate_ht_eqn.append(NoEscape(r'&[Ref.~ INSDAG-Chpt.5,~Sect. 5.2.3]\end{aligned}'))
 
     return min_plate_ht_eqn
@@ -3777,7 +3781,7 @@ def min_flange_plate_length_req(min_pitch, min_end_dist, bolt_line, min_length, 
         min_flange_plate_length_eqn.append(NoEscape(r'&=' + min_length + ' \end{aligned}'))
     return min_flange_plate_length_eqn
 
-def min_plate_thk_req(t_w):
+def min_plate_thk_req(t_w,multiplier=1.0):
     """
     Calculate min thickness of the fin plate
     Args:
@@ -3785,9 +3789,14 @@ def min_plate_thk_req(t_w):
     Returns:
         min thickness of the fin plate
     """
+    t_eff = str(round(multiplier * t_w,2))
     t_w = str(t_w)
     min_plate_thk_eqn = Math(inline=True)
-    min_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_w=' + t_w + '\end{aligned}'))
+    if multiplier == 1.0:
+        min_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_w=' + t_w + '\end{aligned}'))
+    else:
+        multiplier = str(multiplier)
+        min_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_w=' +multiplier+ r'*'+ t_w + ' = '+t_eff+r'\end{aligned}'))
     return min_plate_thk_eqn
 
 

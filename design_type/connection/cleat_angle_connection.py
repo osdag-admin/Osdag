@@ -1157,62 +1157,66 @@ class CleatAngleConnection(ShearConnection):
 
         self.report_cleat_angle = {KEY_DISP_SEC_PROFILE: "equaldp",
                                    # Image shall be save with this name.png in resource files
-                                   KEY_DISP_SECSIZE: self.cleat.designation,
+                                   KEY_DISP_SECSIZE_REPORT: self.cleat.designation,
                                    KEY_DISP_MATERIAL: self.cleat.material,
-                                   'Ultimate strength, $f_u$ (MPa)': round(self.cleat.fu, 2),
-                                   'Yield strength, $f_y$ (MPa)': round(self.cleat.fy, 2),
-                                  'Mass, $M$ (kg/m)': round(self.cleat.mass, 2),
-                                   'Area, $A$ (cm$^2$)': round((self.cleat.area / 100), 2),
-                                   '$A$ (mm)': round(self.cleat.max_leg, 2),
-                                   '$B$ (mm)': round(self.cleat.min_leg, 2),
-                                   '$t$ (mm)': round(self.cleat.thickness, 2),
-                                   '$R_1$ (mm)': round(self.cleat.root_radius, 2),
-                                   '$R_2$ (mm)': round(self.cleat.toe_radius, 2),
-                                   '$C_y$ (mm)': round(self.cleat.Cy, 2),
-                                   '$C_z$ (mm)': round(self.cleat.Cz, 2),
-                                   '$I_z$ (cm$^4$)': round(self.cleat.mom_inertia_z / 10000, 2),
-                                   '$I_y$ (cm$^4$)': round(self.cleat.mom_inertia_y / 10000, 2),
-                                   '$I_u$ (cm$^4$)': round(self.cleat.mom_inertia_u / 10000, 2),
-                                   '$I_v$ (cm$^4$)': round(self.cleat.mom_inertia_v / 10000, 2),
-                                   '$r_z$ (cm)': round(self.cleat.rad_of_gy_z / 10, 2),
-                                   '$r_y$ (cm)': round((self.cleat.rad_of_gy_y) / 10, 2),
-                                   '$r_u$ (cm)': round((self.cleat.rad_of_gy_u) / 10, 2),
-                                   '$r_v$ (cm)': round((self.cleat.rad_of_gy_v) / 10, 2),
-                                   '$Z_z$ (cm$^3$)': round(self.cleat.elast_sec_mod_z / 1000, 2),
-                                   '$Z_y$ (cm$^3$)': round(self.cleat.elast_sec_mod_y / 1000, 2),
-                                   '$Z_{pz}$ (cm$^3$)': round(self.cleat.plast_sec_mod_z / 1000, 2),
-                                   '$Z_{py}$ (cm$^3$)': round(self.cleat.elast_sec_mod_y / 1000, 2)}
+                                   KEY_DISP_FU: round(self.cleat.fu, 2),
+                                   KEY_DISP_FY: round(self.cleat.fy, 2),
+                                  KEY_REPORT_MASS: round(self.cleat.mass, 2),
+                                   KEY_REPORT_AREA: round((self.cleat.area / 100), 2),
+                                   KEY_REPORT_MAX_LEG_SIZE: round(self.cleat.max_leg, 2),
+                                   KEY_REPORT_MIN_LEG_SIZE: round(self.cleat.min_leg, 2),
+                                   KEY_REPORT_ANGLE_THK: round(self.cleat.thickness, 2),
+                                   KEY_REPORT_R1: round(self.cleat.root_radius, 2),
+                                   KEY_REPORT_R2: round(self.cleat.toe_radius, 2),
+                                   KEY_REPORT_CY: round(self.cleat.Cy, 2),
+                                   KEY_REPORT_CZ: round(self.cleat.Cz, 2),
+                                   KEY_REPORT_IZ: round(self.cleat.mom_inertia_z / 10000, 2),
+                                   KEY_REPORT_IY: round(self.cleat.mom_inertia_y / 10000, 2),
+                                   KEY_REPORT_IU: round(self.cleat.mom_inertia_u / 10000, 2),
+                                   KEY_REPORT_IV: round(self.cleat.mom_inertia_v / 10000, 2),
+                                   KEY_REPORT_RZ: round(self.cleat.rad_of_gy_z / 10, 2),
+                                   KEY_REPORT_RY: round((self.cleat.rad_of_gy_y) / 10, 2),
+                                   KEY_REPORT_RU: round((self.cleat.rad_of_gy_u) / 10, 2),
+                                   KEY_REPORT_RV: round((self.cleat.rad_of_gy_v) / 10, 2),
+                                   KEY_REPORT_ZEZ: round(self.cleat.elast_sec_mod_z / 1000, 2),
+                                   KEY_REPORT_ZEY: round(self.cleat.elast_sec_mod_y / 1000, 2),
+                                   KEY_REPORT_ZPZ: round(self.cleat.plast_sec_mod_z / 1000, 2),
+                                   KEY_REPORT_ZPY: round(self.cleat.elast_sec_mod_y / 1000, 2)}
 
         self.report_input = \
             {KEY_MAIN_MODULE: self.mainmodule,
             KEY_MODULE: self.module,
              KEY_CONN: self.connectivity,
              KEY_DISP_SHEAR: self.load.shear_force,
-             "Supporting Section": "TITLE",
+             "Supporting Section - Mechanical Properties": "TITLE",
              "Supporting Section Details": self.report_supporting,
-             "Supported Section": "TITLE",
+
+             "Supported Section - Mechanical Properties": "TITLE",
              "Supported Section Details": self.report_supported,
-             "Bolt Details": "TITLE",
-             KEY_DISP_D: str(self.bolt.bolt_diameter),
+
+             "Bolt Details - Input and Design Preference": "TITLE",
+             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT: self.bolt.mu_f,
+
+             "Detailing - Design Preference": "TITLE",
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
              KEY_DISP_GAP: self.sptd_leg.gap,
-             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
+             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM: self.bolt.corrosive_influences,
              KEY_DISP_CLEAT_ANGLE_LIST: str(self.cleat_list),
              "Selected Section Details": self.report_cleat_angle
              }
         self.report_check = []
+
         t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
         self.report_check.append(t1)
-
 
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        t1 = ('SubSection', 'Initial Section Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Initial Section Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         a = self.supported_section
@@ -1229,7 +1233,7 @@ class CleatAngleConnection(ShearConnection):
         self.report_check.append(t1)
 
         if not self.cleat_list_thk:
-            t1 = ('SubSection', 'Minimum Plate thickness check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Minimum Plate Thickness Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness),
                   self.cleat_list_thk[-1],'Fail')
@@ -1254,14 +1258,13 @@ class CleatAngleConnection(ShearConnection):
                 if self.sptd_leg.design_status == False and leg == self.spting_leg:
                     continue
                 if leg == self.sptd_leg:
-                    t1 = ('SubSection', 'Bolt Design Checks - On Beam', '|p{3cm}|p{5.5cm}|p{6cm}|p{1.5cm}|')
+                    t1 = ('SubSection', 'Bolt Design - Connected to Beam', '|p{3cm}|p{5.5cm}|p{6cm}|p{1.5cm}|')
                     connecting_plates = [self.cleat.thickness, self.supported_section.web_thickness]
                     all_connecting_plates_tk = [i[0] for i in self.sptd_bolt_conn_plates_t_fu_fy]
                     bolt=self.bolt
                     bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
-                    if self.bolt.bolt_bearing_capacity != 'N/A':
+                    if self.bolt.bolt_type == "Bearing Bolt":
                         bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-
                     bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
                     bolt_force_kn = round(self.sptd_leg.bolt_force / 1000, 2)
                     bolt_capacity_red_kn = self.bolt_capacity_disp_sptd
@@ -1269,7 +1272,7 @@ class CleatAngleConnection(ShearConnection):
                     beta_lj = self.beta_lj_sptd
                     beta_lg = self.beta_lg_sptd
                 else:
-                    t1 = ('SubSection', 'Bolt Design Checks - On Column', '|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
+                    t1 = ('SubSection', 'Bolt Design - Connected to Column', '|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
                     if self.connectivity == VALUES_CONN_2[0]:
                         connecting_plates = [self.cleat.thickness, self.supporting_section.web_thickness]
                     else:
@@ -1279,6 +1282,7 @@ class CleatAngleConnection(ShearConnection):
                     bolt_shear_capacity_kn = round(self.bolt2.bolt_shear_capacity / 1000, 2)
                     if self.bolt2.bolt_bearing_capacity != 'N/A':
                         bolt_bearing_capacity_kn = round(self.bolt2.bolt_bearing_capacity / 1000, 2)
+
                     bolt_capacity_kn = round(self.bolt2.bolt_capacity / 1000, 2)
                     bolt_force_kn = round(self.spting_leg.bolt_force / 1000, 2)
                     bolt_capacity_red_kn = self.bolt_capacity_disp_spting
@@ -1435,6 +1439,7 @@ class CleatAngleConnection(ShearConnection):
                                                        capacity=bolt_capacity_kn), '')
                     self.report_check.append(t4)
 
+
                 t10 = (KEY_OUT_LONG_JOINT, '',
                        cl_10_3_3_1_long_joint_bolted_prov(leg.bolt_line, leg.bolts_one_line,
                                                           leg.pitch_provided, leg.gauge_provided,
@@ -1465,8 +1470,9 @@ class CleatAngleConnection(ShearConnection):
             ###################
             # Cleat angle checks
             ###################
+
             if self.sptd_leg.grip_status== True and self.spting_leg.grip_status == True:
-                t1 = ('SubSection', 'Cleat Angle Checks', '|p{3.5cm}|p{7.0cm}|p{4.5cm}|p{1cm}|')
+                t1 = ('SubSection', 'Cleat Angle Check', '|p{3.5cm}|p{7.0cm}|p{4.5cm}|p{1cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_CLEAT_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height),
@@ -1543,7 +1549,7 @@ class CleatAngleConnection(ShearConnection):
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image)
+                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 # if __name__ == '__main__':
 #     app = QApplication(sys.argv)
 #     folder = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'

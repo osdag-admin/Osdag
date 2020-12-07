@@ -101,7 +101,6 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.rows_near_web_max = 0
         self.bolt_numbers_tension_flange = 0
         self.bolt_numbers_web = 0
-        self.mid_bolt_row = 0
         self.bolt_column = 0
         self.bolt_row = 0
         self.last_column = 0

@@ -1109,6 +1109,7 @@ class Member(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
+
             image = ''
 
 

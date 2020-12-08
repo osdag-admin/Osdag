@@ -3178,7 +3178,7 @@ def parameter_req_bolt_force(bolts_one_line, gauge, ymax, xmax, bolt_line, pitch
 
     if conn == 'fin':
         parameter_req_bolt_force_eqn.append(NoEscape(r'x_{max} &= g(n_c - 1)/2 \\'))
-        parameter_req_bolt_force_eqn.append(NoEscape(r' &= ' + pitch + r' \times (\frac{' + bolt_line + r'}{2} - 1) / 2 \\'))
+        parameter_req_bolt_force_eqn.append(NoEscape(r' &= ' + pitch + r' \times (' + bolt_line + r' - 1) / 2 \\'))
     elif conn == 'col_col':
         parameter_req_bolt_force_eqn.append(NoEscape(r'x_{max} &= p(\frac{n_r}{2} - 1) / 2 \\'))
         parameter_req_bolt_force_eqn.append(NoEscape(r' &= ' + pitch + r' \times (\frac{' + bolt_line + r'}{2} - 1) / 2 \\'))

@@ -107,7 +107,7 @@ class NutBoltArray():
         for rw in range(self.cRow):
             for col in range(self.cCol):
                 pos = self.c_origin
-                pos = pos + (self.leg - self.cEnd) * self.c_gauge_dir
+                pos = pos + (self.cEnd) * self.c_gauge_dir
                 pos = pos + (col * self.cGauge * self.c_gauge_dir)
                 pos = pos + self.cEdge * self.c_pitch_dir
                 pos = pos + rw * self.cPitch * self.c_pitch_dir
@@ -117,7 +117,7 @@ class NutBoltArray():
         for rw in range(self.cRow):
             for col in range(self.cCol):
                 pos = self.c_origin1
-                pos = pos + ((self.cEnd) * self.c_gauge_dir)
+                pos = pos + ((self.leg-self.cEnd) * self.c_gauge_dir)
                 pos = pos - col * self.cGauge * self.c_gauge_dir
                 pos = pos - self.cEdge * self.c_pitch_dir
                 pos = pos - rw * self.cPitch * self.c_pitch_dir

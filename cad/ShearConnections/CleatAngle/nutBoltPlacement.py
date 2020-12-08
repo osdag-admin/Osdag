@@ -107,7 +107,7 @@ class NutBoltArray():
         for rw in range(self.cRow):
             for col in range(self.cCol):
                 pos = self.c_origin
-                pos = pos + self.cEnd * self.c_gauge_dir
+                pos = pos + (self.leg - self.cEnd) * self.c_gauge_dir
                 pos = pos + (col * self.cGauge * self.c_gauge_dir)
                 pos = pos + self.cEdge * self.c_pitch_dir
                 pos = pos + rw * self.cPitch * self.c_pitch_dir
@@ -117,7 +117,7 @@ class NutBoltArray():
         for rw in range(self.cRow):
             for col in range(self.cCol):
                 pos = self.c_origin1
-                pos = pos + ((self.leg - self.cEnd) * self.c_gauge_dir)
+                pos = pos + ((self.cEnd) * self.c_gauge_dir)
                 pos = pos - col * self.cGauge * self.c_gauge_dir
                 pos = pos - self.cEdge * self.c_pitch_dir
                 pos = pos - rw * self.cPitch * self.c_pitch_dir
@@ -129,7 +129,7 @@ class NutBoltArray():
         self.gauge_dir = gauge_dir
         self.pitch_dir = pitch_dir
         self.bolt_dir = bolt_dir
-# ###############Newly added####################
+    ###############Newly added####################
         self.c_origin = c_origin
         self.c_gauge_dir = c_gauge_dir
         self.c_pitch_dir = c_pitch_dir
@@ -140,13 +140,13 @@ class NutBoltArray():
         self.c_pitch_dir1 = c_pitch_dir1
         self.c_bolt_dir1 = c_bolt_dir1
         
-        ################################################
+    ################################################
         
         self.calculate_positions()
         for index, pos in enumerate(self.positions):
             self.bolts[index].place(pos, gauge_dir, bolt_dir)
             self.nuts[index].place((pos + self.gap * bolt_dir), gauge_dir, -bolt_dir)
-# ###############Newly added####################
+    ###############Newly added####################
         for index, pos in enumerate(self.cPositions):
             self.cBolts[index].place(pos, c_gauge_dir, c_bolt_dir)
             self.cNuts[index].place((pos + self.cGap * c_bolt_dir), c_gauge_dir, -c_bolt_dir)

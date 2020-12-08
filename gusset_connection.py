@@ -620,7 +620,7 @@ class GussetConnection(Connection,Member):
 
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_3D_image, module=self.module)
 
     def show_error_message(self):
         QMessageBox.about(self, 'information', "Your message!")

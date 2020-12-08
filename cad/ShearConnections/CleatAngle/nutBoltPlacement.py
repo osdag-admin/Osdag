@@ -85,9 +85,10 @@ class NutBoltArray():
         self.cGauge = bolt_place_obj.pitch_spting
         self.cEdge = bolt_place_obj.edge_spting
         self.cEnd = bolt_place_obj.end_spting
+        print(self.cEnd,"hghghwuuw")
         self.cRow = bolt_place_obj.bolt_one_line_spting
         self.cCol = bolt_place_obj.bolt_lines_spting
-    
+        # self.thk = bolt_place_obj.cleat.thickness
         self.leg = bolt_place_obj.leg_a_length
          
     def calculate_positions(self):
@@ -95,7 +96,7 @@ class NutBoltArray():
         for rw in range(self.row):
             for col in range(self.col):
                 pos = self.origin 
-                pos = pos + self.end * self.gauge_dir
+                pos = pos + (self.leg - self.end)* self.gauge_dir
                 pos = pos + col * self.gauge * self.gauge_dir
                 pos = pos + self.edge * self.pitch_dir
                 pos = pos + rw * self.pitch * self.pitch_dir
@@ -106,7 +107,7 @@ class NutBoltArray():
         for rw in range(self.cRow):
             for col in range(self.cCol):
                 pos = self.c_origin
-                pos = pos + self.cEnd * self.c_gauge_dir
+                pos = pos + (self.leg - self.cEnd) * self.c_gauge_dir
                 pos = pos + (col * self.cGauge * self.c_gauge_dir)
                 pos = pos + self.cEdge * self.c_pitch_dir
                 pos = pos + rw * self.cPitch * self.c_pitch_dir
@@ -116,7 +117,7 @@ class NutBoltArray():
         for rw in range(self.cRow):
             for col in range(self.cCol):
                 pos = self.c_origin1
-                pos = pos + ((self.leg - self.cEnd) * self.c_gauge_dir)
+                pos = pos + ((self.cEnd) * self.c_gauge_dir)
                 pos = pos - col * self.cGauge * self.c_gauge_dir
                 pos = pos - self.cEdge * self.c_pitch_dir
                 pos = pos - rw * self.cPitch * self.c_pitch_dir
@@ -128,7 +129,7 @@ class NutBoltArray():
         self.gauge_dir = gauge_dir
         self.pitch_dir = pitch_dir
         self.bolt_dir = bolt_dir
-# ###############Newly added####################
+    ###############Newly added####################
         self.c_origin = c_origin
         self.c_gauge_dir = c_gauge_dir
         self.c_pitch_dir = c_pitch_dir
@@ -139,13 +140,13 @@ class NutBoltArray():
         self.c_pitch_dir1 = c_pitch_dir1
         self.c_bolt_dir1 = c_bolt_dir1
         
-        ################################################
+    ################################################
         
         self.calculate_positions()
         for index, pos in enumerate(self.positions):
             self.bolts[index].place(pos, gauge_dir, bolt_dir)
             self.nuts[index].place((pos + self.gap * bolt_dir), gauge_dir, -bolt_dir)
-# ###############Newly added####################
+    ###############Newly added####################
         for index, pos in enumerate(self.cPositions):
             self.cBolts[index].place(pos, c_gauge_dir, c_bolt_dir)
             self.cNuts[index].place((pos + self.cGap * c_bolt_dir), c_gauge_dir, -c_bolt_dir)

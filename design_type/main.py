@@ -14,7 +14,15 @@ class Main():
 
     def bolt_values(self, input_dictionary):
 
-        values = {KEY_DP_BOLT_TYPE: 'Pretensioned', KEY_DP_BOLT_HOLE_TYPE: 'Standard',
+        if not input_dictionary or input_dictionary[KEY_TYP] == 'Bearing Bolt':
+            bolt_tension_type = 'Non pre-tensioned'
+        else:
+            bolt_tension_type = 'Pre-tensioned'
+
+        if KEY_DP_BOLT_TYPE in input_dictionary.keys():
+            bolt_tension_type = input_dictionary[KEY_DP_BOLT_TYPE]
+
+        values = {KEY_DP_BOLT_TYPE: bolt_tension_type, KEY_DP_BOLT_HOLE_TYPE: 'Standard',
                   KEY_DP_BOLT_SLIP_FACTOR: '0.3'}
 
         for key in values.keys():
@@ -23,7 +31,7 @@ class Main():
 
         bolt = []
 
-        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'], values[KEY_DP_BOLT_TYPE])
+        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pre-tensioned', 'Non pre-tensioned'], values[KEY_DP_BOLT_TYPE])
         bolt.append(t1)
 
         t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'], values[KEY_DP_BOLT_HOLE_TYPE])
@@ -118,7 +126,7 @@ class Main():
         design = []
 
         t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX,
-              ['Limit State Design', 'Limit State (Capacity based) Design', 'Working Stress Design'],
+              ['Limit State Design', 'Limit State (capacity based) Design', 'Working Stress Design'],
               values[KEY_DP_DESIGN_METHOD])
         design.append(t1)
 
@@ -167,6 +175,42 @@ class Main():
         connector.append(t3)
 
         return connector
+
+
+    # def get_def_I_sec_properties(self):
+    #
+    #     if 'default' in self:
+    #         mass = ''
+    #         area = ''
+    #         moa_z = ''
+    #         moa_y = ''
+    #         rog_z = ''
+    #         rog_y = ''
+    #         em_z = ''
+    #         em_y = ''
+    #         pm_z = ''
+    #         pm_y = ''
+    #         I_t = ''
+    #         I_w = ''
+    #         image = VALUES_IMG_BEAM[0]
+    #     d = {'Label_11': str(mass),
+    #          'Label_12': str(area),
+    #          'Label_13': str(moa_z),
+    #          'Label_14': str(moa_y),
+    #          'Label_15': str(rog_z),
+    #          'Label_16': str(rog_y),
+    #          'Label_17': str(em_z),
+    #          'Label_18': str(em_y),
+    #          'Label_19': str(pm_z),
+    #          'Label_20': str(pm_y),
+    #          'Label_21': str(I_t),
+    #          'Label_22': str(I_w),
+    #          KEY_IMAGE: image
+    #          }
+    #
+    #     return d
+
+
 
     def get_I_sec_properties(self):
 

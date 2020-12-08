@@ -1474,7 +1474,7 @@ class ColumnEndPlate(MomentConnection):
     def plate_details(self):
         ##############################   Prying Force  #######################################################
         self.q = (round(self.bolt.bolt_tension_capacity / 1000, 2) - round(self.t_b / 1000,2))
-        self.lv = self.end_dist - (self.section.root_radius / 2)
+        self.lv = self.end_dist #- (self.section.root_radius / 2)
         self.le1 = self.end_dist
         self.f_o = round((0.7 * self.bolt.bolt_fu), 2)
         self.b_e = self.section.flange_width/(2 * self.n_bf)

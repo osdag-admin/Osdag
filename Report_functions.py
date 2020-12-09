@@ -2520,6 +2520,24 @@ def ir_sum_bb_cc(Al, M, A_c, M_c, IR_axial, IR_moment, sum_IR):
     return ir_sum_bb_cc_eqn
 
 
+def IR_base_plate(P, P_c, M, M_d, IR_axial, IR_moment, sum_IR):
+
+    IR_base_plate_eqn = Math(inline=True)
+    IR_base_plate_eqn.append(NoEscape(r'\begin{aligned} IR, ~axial ~~~~ &= P / P_{c} \\'))
+    IR_base_plate_eqn.append(NoEscape(r'& =' + str(P) + '/' + str(P_c) + r' \\'))
+    IR_base_plate_eqn.append(NoEscape(r'& =' + str(IR_axial) + r' \\ \\'))
+
+    IR_base_plate_eqn.append(NoEscape(r'IR, ~moment ~~~~ &= M / {M_{d}}_{zz} \\'))
+    IR_base_plate_eqn.append(NoEscape(r'& =' + str(M) + '/' + str(M_d) + r' \\'))
+    IR_base_plate_eqn.append(NoEscape(r'& =' + str(IR_moment) + r' \\ \\'))
+
+    IR_base_plate_eqn.append(NoEscape(r'IR, ~sum~~~~~ &= IR, ~axial + IR, ~moment  \\'))
+    IR_base_plate_eqn.append(NoEscape(r'&= ' + str(IR_axial) + ' + ' + str(IR_moment) + r' \\'))
+    IR_base_plate_eqn.append(NoEscape(r'& =' + str(sum_IR) + r' \end{aligned}'))
+
+    return IR_base_plate_eqn
+
+
 def min_loads_required(conn):
     """
 
@@ -5002,15 +5020,21 @@ def anchor_len_above_footing(length):
     return anchor_len
 
 
-def bp_length(col_depth, end_distance, length):
+def bp_length(col_depth, end_distance, pitch_distance, length, bolt_column):
     """ equation for the min length of the base plate"""
     col_depth = str(col_depth)
     end_distance = str(end_distance)
+    pitch_distance = str(pitch_distance)
     length = str(length)
 
     bp_length_min = Math(inline=True)
-    bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2 ~ (e~+~e) \\'))
-    bp_length_min.append(NoEscape(r'   &= ' + col_depth + r' ~+~2 \times (' + end_distance + r'~+~' + end_distance + r') \\'))
+    if bolt_column == 1:
+        bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2 ~ (e~+~e) \\'))
+        bp_length_min.append(NoEscape(r'   &= ' + col_depth + r' ~+~2 \times (' + end_distance + r'~+~' + end_distance + r') \\'))
+    else:
+        bp_length_min.append(NoEscape(r'\begin{aligned} L &= D ~+~2 ~ (e~+~e) ~+~2~p \\'))
+        bp_length_min.append(NoEscape(r'   &= ' + col_depth + r' ~+~2 \times (' + end_distance + r'~+~' + end_distance + r') + 2 \times '
+                                      + pitch_distance + r' \\'))
     bp_length_min.append(NoEscape(r'   &= ' + length + r' \\ \\'))
     bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement] \end{aligned}'))
 
@@ -7592,13 +7616,15 @@ def bc_ep_compatibility_available(col_D, col_B, col_T, col_R1, space_available, 
 def axial_compression_prov(P, col_capa, provided_capa):
 
     axial_compression_prov_eqn = Math(inline=True)
-    axial_compression_prov_eqn.append(NoEscape(r'\begin{aligned}  P &= max(P,~0.3 P_{c}) \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'\begin{aligned}  P &= max(P,~0.3 P_{c}),~but,~ \leq P_{c} \\'))
     axial_compression_prov_eqn.append(NoEscape(r'                   &= max(' + str(P) + r',~0.3 \times ' + str(col_capa) + r') \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'                   &= max(' + str(P) + r',~ ' + str(round(0.3 * col_capa, 2)) + r') \\'))
+    axial_compression_prov_eqn.append(NoEscape(r'                   & \leq ' + str(col_capa) + r' \\'))
     axial_compression_prov_eqn.append(NoEscape(r'                   &= ' + str(provided_capa) + r' \\ \\'))
 
     axial_compression_prov_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl.~10.7] \\ \\'))
 
-    axial_compression_prov_eqn.append(NoEscape(r'Note:~& P_{c}~ is~ the~ capacity~ of~ the~ column \end{aligned}'))
+    axial_compression_prov_eqn.append(NoEscape(r'Note:~& P_{c}~ is~ the~axial~ capacity~ of~ the~ column \end{aligned}'))
 
     return axial_compression_prov_eqn
 
@@ -7620,11 +7646,12 @@ def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, 
     else:
         app_moment_load_eqn.append(NoEscape(r'\begin{aligned} M_{min} &= 0.5 * {M_{d}}_{y-y} \\'))
 
-    app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times' + str(moment_capacity) + r' \\'))
+    app_moment_load_eqn.append(NoEscape(r'&= 0.5 \times ' + str(moment_capacity) + r' \\'))
     app_moment_load_eqn.append(NoEscape(r'&=' + str(min_mc) + r' \\ \\'))
 
-    app_moment_load_eqn.append(NoEscape(r'M_{zz} &= max(M,~M_{min}) \\'))
+    app_moment_load_eqn.append(NoEscape(r'M_{zz} &= max(M,~M_{min}),~but, \leq {M_{d}}_{z-z} \\'))
     app_moment_load_eqn.append(NoEscape(r'&= max(' + str(moment_input) + r',~' + str(min_mc) + r') \\'))
+    app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity) + r' \\'))
     app_moment_load_eqn.append(NoEscape(r'&= ' + str(app_moment_load) + r' \\ \\'))
 
     if classification == 'Semi-compact':

@@ -62,6 +62,7 @@ class FinPlateConnection(ShearConnection):
 
         change_tab.append(t3)
 
+
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
                'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
@@ -1151,7 +1152,8 @@ class FinPlateConnection(ShearConnection):
                 t1 = ('SubSection','Plate Design','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
-                t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
+                t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.supported_section.root_radius,
+                                                              self.supported_section.flange_thickness,self.min_plate_height), self.plate.height,
                       get_pass_fail(self.min_plate_height, self.plate.height,relation="leq"))
                 self.report_check.append(t1)
 

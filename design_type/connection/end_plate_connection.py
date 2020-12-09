@@ -1614,7 +1614,8 @@ class EndPlateConnection(ShearConnection):
             t1 = ('SubSection', 'Plate Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height),
+            t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.supported_section.root_radius,
+                                                          self.supported_section.flange_thickness,self.min_plate_height),
                   self.plate.height,
                   get_pass_fail(self.min_plate_height, self.plate.height, relation="leq"))
             self.report_check.append(t1)

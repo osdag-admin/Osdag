@@ -987,19 +987,26 @@ class CommonDesignLogic(object):
             endplate_type = "both_way"
 
         if BCE.continuity_plate_tension_flange_status == True or BCE.continuity_plate_tension_flange_status == True:
-            contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
-                                        L=float(column_d) - 2 * float(column_T),
-                                        T=BCE.cont_plate_thk_provided)
+
             if BCE.connectivity != "Column Web-Beam Web":
+                contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
+                                            L=float(column_d) - 2 * float(column_T),
+                                            T=BCE.cont_plate_thk_provided, L21=BCE.notch_size, R22=BCE.notch_size,
+                                            R21=BCE.notch_size, L22=BCE.notch_size)
+
                 contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                       L=float(column_d) - 2 * float(column_T))
+                                       L=float(column_d) - 2 * float(column_T)-2*BCE.notch_size)
                 contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                       L=float(column_B) / 2 - float(column_tw) / 2)
+                                       L=float(column_B) / 2 - float(column_tw) / 2-BCE.notch_size)
             else:
+                contPlates = StiffenerPlate(W=(float(column_B) - float(column_tw)) / 2,
+                                            L=float(column_d) - 2 * float(column_T),
+                                            T=BCE.cont_plate_thk_provided, L11=BCE.notch_size, R11=BCE.notch_size,
+                                            R12=BCE.notch_size, L12=BCE.notch_size)
                 contWeldD = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                       L=float(column_d) - 2 * float(column_T))
+                                       L=float(column_d) - 2 * float(column_T)-2*BCE.notch_size)
                 contWeldB = FilletWeld(b=BCE.weld_size_continuity_plate, h=BCE.weld_size_continuity_plate,
-                                       L=float(column_B) / 2 - float(column_tw) / 2)
+                                       L=float(column_B) / 2 - float(column_tw) / 2-BCE.notch_size)
         else:
             contPlates = None
             contWeldD = None
@@ -1011,9 +1018,9 @@ class CommonDesignLogic(object):
             webplate = StiffenerPlate(W=BCE.web_stiffener_width,
                                        L=BCE.web_stiffener_depth,
                                        T=BCE.web_stiffener_thk_provided)
-            webWeldD = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+            webWeldD = FilletWeld(b=BCE.weld_size_web_stiffener, h=BCE.weld_size_web_stiffener,
                                    L=BCE.web_stiffener_depth)
-            webWeldB = FilletWeld(b=BCE.web_stiffener_thk_provided/2, h=BCE.web_stiffener_thk_provided/2,
+            webWeldB = FilletWeld(b=BCE.weld_size_web_stiffener, h=BCE.weld_size_web_stiffener,
                                    L=BCE.web_stiffener_width)
         else:
             webplate = None
@@ -1052,6 +1059,16 @@ class CommonDesignLogic(object):
                                          R12=BCE.stiffener_height - 25,
                                          L21=5.0, L22=5.0)  # TODO: given hard inputs to L21 and L22
 
+        beam_stiffenerFlush = StiffenerPlate(W=BCE.stiffener_height, L=BCE.stiffener_length,
+                                             T=BCE.stiffener_thickness,
+                                             L21=5.0, L22=5.0)
+
+        bcWeldFlushstiffHeight = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
+                                            L=BCE.stiffener_height - 5.0)
+
+        bcWeldFlushstiffLength = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
+                                            L=BCE.stiffener_length - 5.0)
+
         # beam_stiffener_2 = copy.copy(beam_stiffener_1)
 
         bolt_d = float(BCE.bolt.bolt_diameter_provided)  # Bolt diameter, entered by user
@@ -1089,12 +1106,12 @@ class CommonDesignLogic(object):
         ############################### Weld for the beam stiffeners ################################################
 
         # bcWeld for stiffener hight on left side
-        print(BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,BCE.weld_size_continuity_plate,"jjjj")
-        bcWeldStiffHeight = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
+        print(BCE.notch_size,BCE.stiffener_thickness,BCE.stiffener_height,BCE.stiffener_length, BCE.cont_plate_thk_provided,BCE.weld_size_continuity_plate,BCE.weld_size_continuity_plate,"jjjj")
+        bcWeldStiffHeight = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
                                        L=BCE.stiffener_height-5.0)
 
         #
-        bcWeldStiffLength = FilletWeld(b=BCE.stiffener_thickness/2, h=BCE.stiffener_thickness/2,
+        bcWeldStiffLength = FilletWeld(b=BCE.weld_size_stiffener, h=BCE.weld_size_stiffener,
                                        L=BCE.stiffener_length-5.0)
 
 
@@ -1146,7 +1163,8 @@ class CommonDesignLogic(object):
             #                         bcWeldStiffHeight, bcWeldStiffLength, contWeldD, contWeldB,
             #                         contPlates, beam_stiffeners, endplate_type, outputobj)
             extbothWays = BCECADGroove(BCE,beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,bcWeldFlang,
-                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
+                                    bcWeldWeb, contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, beam_stiffenerFlush,bcWeldFlushstiffHeight, bcWeldFlushstiffLength,endplate_type)
+
 
             extbothWays.create_3DModel()
 
@@ -1218,7 +1236,7 @@ class CommonDesignLogic(object):
             #                                        outputobj)
 
             col_web_connectivity = CADcolwebGroove(BCE, beam_Left, beam_Right, plate_Right, bbNutBoltArray, bolt,
-                                                   bcWeldFlang,bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, endplate_type)
+                                                   bcWeldFlang,bcWeldWeb,contPlates,beam_stiffeners,bcWeldStiffHeight,bcWeldStiffLength,contWeldD,contWeldB,  diagplate, diagWeldD, diagWeldB, webplate, webWeldB, webWeldD, beam_stiffenerFlush,bcWeldFlushstiffHeight, bcWeldFlushstiffLength,endplate_type)
 
 
             col_web_connectivity.create_3DModel()
@@ -2001,9 +2019,9 @@ class CommonDesignLogic(object):
 
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
-                endplate = self.TObj.get_end_plates_models()
+
                 nutbolt = self.TObj.get_nut_bolt_array_models()
-                end_nutbolt = self.TObj.get_end_nut_bolt_array_models()
+
                 onlymember = self.TObj.get_only_members_models()
                 # distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
                 # Point = gp_Pnt(distance, 0.0, 300)
@@ -2016,6 +2034,8 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
                 elif self.component == "Endplate":
+                    endplate = self.TObj.get_end_plates_models()
+                    end_nutbolt = self.TObj.get_end_nut_bolt_array_models()
                     osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, end_nutbolt, color=Quantity_NOC_YELLOW, update=True)
                 else:
@@ -2030,7 +2050,7 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_class()
                 self.TObj = self.createTensionCAD()
-                endplate = self.TObj.get_end_plates_models()
+
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
@@ -2040,6 +2060,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, welds, color=Quantity_NOC_RED, update=True)
                 elif self.component == "Endplate":
+                    endplate = self.TObj.get_end_plates_models()
                     osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
                 else:
                     connector = BRepAlgoAPI_Fuse(welds, plate).Shape()

@@ -1671,8 +1671,8 @@ class Tension_welded(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation, self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_REPORT_MASS: round(section_size.mass, 2),
-                                      KEY_REPORT_AREA: round(section_size.area, 2),
+                                      KEY_REPORT_MASS: round(2*section_size.mass, 2),
+                                      KEY_REPORT_AREA: round(2*section_size.area, 2),
                                       KEY_REPORT_DEPTH: round(section_size.depth, 2),
                                       KEY_REPORT_WIDTH: round(section_size.flange_width, 2),
                                       KEY_REPORT_WEB_THK: round(section_size.web_thickness, 2),
@@ -1739,8 +1739,8 @@ class Tension_welded(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation, self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_REPORT_MASS: round(section_size.mass,2),
-                                      KEY_REPORT_AREA: round((section_size.area),2),
+                                      KEY_REPORT_MASS: round(2*section_size.mass,2),
+                                      KEY_REPORT_AREA: round((2*section_size.area),2),
                                       KEY_REPORT_MAX_LEG_SIZE: round(section_size.max_leg,2),
                                       KEY_REPORT_MIN_LEG_SIZE: round(section_size.min_leg,2),
                                       KEY_REPORT_ANGLE_THK: round(section_size.thickness,2),
@@ -1772,8 +1772,8 @@ class Tension_welded(Member):
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (section_size.designation, self.sec_profile),
                                       KEY_DISP_MATERIAL: section_size.material,
-                                      KEY_REPORT_MASS: round(section_size.mass, 2),
-                                      KEY_REPORT_AREA: round((section_size.area), 2),
+                                      KEY_REPORT_MASS: round(2*section_size.mass, 2),
+                                      KEY_REPORT_AREA: round((2*section_size.area), 2),
                                       KEY_REPORT_MAX_LEG_SIZE: round(section_size.max_leg, 2),
                                       KEY_REPORT_MIN_LEG_SIZE: round(section_size.min_leg, 2),
                                       KEY_REPORT_ANGLE_THK: round(section_size.thickness, 2),
@@ -1873,7 +1873,7 @@ class Tension_welded(Member):
 
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                   cl_6_2_tension_yield_capacity_member(l=None, t=None,f_y=section_size.fy,gamma=gamma_m0,
-                                                       T_dg=member_yield_kn,multiple=multiple,area=section_size.area), '')
+                                                       T_dg=member_yield_kn ,area=section_size.area), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
                   cl_6_3_3_tension_rupture_member(self.A_nc, self.A_go, section_size.fu, section_size.fy, self.L_c, self.w,
@@ -1904,7 +1904,7 @@ class Tension_welded(Member):
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
                   cl_6_2_tension_yield_capacity_member(l=None, t=None, f_y=section_size.fy, gamma=gamma_m0,
-                                                       T_dg=member_yield_kn, multiple=multiple, area=section_size.area),
+                                                       T_dg=member_yield_kn , area=section_size.area),
                   get_pass_fail(self.load.axial_force, member_yield_kn, relation="lesser"))
             self.report_check.append(t2)
 
@@ -1947,8 +1947,15 @@ class Tension_welded(Member):
             t7 = ('SubSection', 'Weld Design', '|p{3cm}|p{6.5 cm}|p{5cm}|p{1cm}|')
             self.report_check.append(t7)
             #TODO
-            t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.min_weld ,self.weld.red), self.weld.size,
-                  min_prov_max(min(self.weld_connecting_plates)- self.weld.red, self.weld.size, self.weld.min_weld))
+            if self.weld.size == min(self.weld_connecting_plates):
+                t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.min_weld ,self.weld.red), self.weld.size,
+                      min_prov_max(min(self.weld_connecting_plates), self.weld.size, self.weld.min_weld))
+            else:
+                t1 = (DISP_MIN_WELD_SIZE,cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.min_weld,
+                                                                self.weld.red), self.weld.size,
+                      min_prov_max(min(self.weld_connecting_plates) - self.weld.red, self.weld.size,
+                                   self.weld.min_weld))
+
             self.report_check.append(t1)
 
             self.weld_size_max = 16.0

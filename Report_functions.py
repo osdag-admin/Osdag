@@ -1475,7 +1475,7 @@ def cl_10_4_7_tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist
 
 
 def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, beam_R1, plate_fy, bolt_fu, bolt_proof_stress, beam_B, bolt_column, Q,
-                           eta=1.5):
+                           eta=1.5, connection = None):
     """Calculate prying force of friction grip bolt
                    Args:
                       2 * T_e - Tension Force in 2 bolts on either sides of the web/plate
@@ -1504,8 +1504,13 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
         r'{27 \times l_e \times l_v^2}\Bigg] \\ \\'))
 
     # l_v
-    tension_in_bolt_due_to_prying.append(NoEscape(r'l_v &= e~-~ \frac{R_1}{2} \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'&= '+str(end_dist)+r'~-~ \frac{'+str(beam_R1)+r'}{2}'+' = ' + str(l_v) + r'~mm \\ \\'))
+    if connection == 'column_end_plate':
+        tension_in_bolt_due_to_prying.append(NoEscape(r'l_v &= e~-~ t_w \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'&= '+str(end_dist)+r'~-~ 0'+' = ' + str(l_v) + r'~mm \\ \\'))
+
+    else:
+        tension_in_bolt_due_to_prying.append(NoEscape(r'l_v &= e~-~ \frac{R_1}{2} \\'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'&= ' + str(end_dist) + r'~-~ \frac{' + str(beam_R1) + r'}{2}' + ' = ' + str(l_v) + r'~mm \\ \\'))
 
     # f_o
     tension_in_bolt_due_to_prying.append(NoEscape(r' f_{o} &= 0.7 \times f_{ub} \\'))
@@ -3531,7 +3536,7 @@ def end_plate_ht_req(D, e, h_p):
     return end_plate_ht_eqn
 
 
-def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_e):
+def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_e, beta):
     """
     Calculate end plate thickness
      Args:
@@ -3555,6 +3560,7 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
     # l_v = str(l_v)
     f_o = str(f_o)
     b_e = str(b_e)
+    beta = str(beta)
 
     end_plate_thk_eqn = Math(inline=True)
 
@@ -3570,7 +3576,7 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
     end_plate_thk_eqn.append(
         NoEscape(r'&=  max\Bigg\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
                  + gamma_m0 + r')} }, \\'))
-    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(' + t_b + r'- \frac{ '+ q + r'\times 2 \times '+  l_e + r'}{' + str(l_v) + r'}\Bigg) \times \Bigg(\frac{27 \times'+ l_e + r' \times' + str(l_v ** 2) + r'}{' + str(1) + r'\times' + str(1.5) + r'\times' + f_o + r'\times'+ b_e + r'}\Bigg) } \Bigg) \\'))
+    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(' + t_b + r'- \frac{ '+ q + r'\times 2 \times '+  l_e + r'}{' + str(l_v) + r'}\Bigg) \times \Bigg(\frac{27 \times'+ l_e + r' \times' + str(l_v ** 2) + r'}{' + beta + r'\times' + str(1.5) + r'\times' + f_o + r'\times'+ b_e + r'}\Bigg) } \Bigg) \\'))
 
     end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
     return end_plate_thk_eqn

@@ -1475,12 +1475,18 @@ class ColumnEndPlate(MomentConnection):
     def plate_details(self):
         ##############################   Prying Force  #######################################################
         self.q = (round(self.bolt.bolt_tension_capacity / 1000, 2) - round(self.t_b / 1000,2))
-        self.lv = self.end_dist - (self.section.root_radius / 2)
+        self.lv = self.end_dist #- (self.section.root_radius / 2)
         self.le1 = self.end_dist
         self.f_o = round((0.7 * self.bolt.bolt_fu), 2)
         self.b_e = self.section.flange_width/(2 * self.n_bf)
+        if self.bolt.bolt_type == "Bearing Bolt":
+            bolt_tensioning = 'Non pre-tensioned'
+            self.beta_prying = 2
+        else:
+            bolt_tensioning = 'Pre-tensioned'
+            self.beta_prying = 1
 
-        self.t_prying = ((round(self.t_b / 1000,2) - (self.q * 2 * self.le1/float(self.lv))) * ((27 * self.le1 * (self.lv)**2)/(1 * 1.5 * (self.f_o/1000) * self.b_e))) ** 0.25
+        self.t_prying = ((round(self.t_b / 1000,2) - (self.q * 2 * self.le1/float(self.lv))) * ((27 * self.le1 * (self.lv)**2)/(self.beta_prying * 1.5 * (self.f_o/1000) * self.b_e))) ** 0.25
 
         ########################################################################################################
 
@@ -2147,11 +2153,11 @@ class ColumnEndPlate(MomentConnection):
             self.report_check.append(t1)
 
 
-            t1 = ("Prying force (kN)", cl_10_4_7_prying_force(self.lv, self.le, round(self.le2,2), round(self.t_b/1000 ,2), 1, self.f_o, self.b_e, self.plate_thickness_provided,
+            t1 = ("Prying force (kN)", cl_10_4_7_prying_force(self.lv, self.le, round(self.le2,2), round(self.t_b/1000 ,2), self.beta_prying, self.f_o, self.b_e, self.plate_thickness_provided,
                                                               self.end_dist,
                                                               self.section.root_radius, self.plate.fy, self.bolt.bolt_fu,
                                                               self.f_o, self.section.flange_width,
-                                                              self.n_bf * 2, self.prying_f, eta=1.5),
+                                                              self.n_bf * 2, self.prying_f, eta=1.5, connection='column_end_plate'),
                   '', 'OK' if self.design_status else 'Fail')
             self.report_check.append(t1)
 
@@ -2224,7 +2230,7 @@ class ColumnEndPlate(MomentConnection):
 
             t1 = (DISP_MIN_PLATE_THICK,
                   end_plate_thk_req(M_ep=round(self.m_ep/1000000, 2), b_eff=self.b_eff, f_y=self.section.fy, gamma_m0=gamma_m0,
-                                    t_p=self.plate_thickness_provided, t_b=self.t_b, q=self.prying_f,l_e=self.le, l_v=self.lv, f_o=self.f_o,b_e=self.b_e),
+                                    t_p=self.plate_thickness_provided, t_b=self.t_b, q=self.prying_f,l_e=self.le, l_v=self.lv, f_o=self.f_o,b_e=self.b_e, beta=self.beta_prying),
                   self.plate_thickness_provided,
                   get_pass_fail(self.plate.thickness_provided, self.plate_thickness_provided, relation="leq"))
             self.report_check.append(t1)

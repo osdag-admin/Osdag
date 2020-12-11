@@ -614,7 +614,7 @@ class Window(QDialog):
 
         for ch in tab_Column.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
                 return
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() in keys_to_add:
@@ -680,7 +680,7 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
 
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
 
     def add_tab_column(self):
         '''
@@ -697,7 +697,7 @@ class Window(QDialog):
             pass
         for ch in tab_Column.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
                 # add_col = tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_COLSEC)
                 # add_col.setDisabled(True)
                 return
@@ -792,7 +792,7 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
 
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
 
     def add_tab_beam(self):
         '''
@@ -802,7 +802,7 @@ class Window(QDialog):
         name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Beam))
         for ch in tab_Beam.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
                 add_bm = tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_BEAMSEC)
                 add_bm.setDisabled(True)
                 return
@@ -885,7 +885,7 @@ class Window(QDialog):
                 conn.close()
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
 
     def add_tab_angle(self):
         '''
@@ -909,7 +909,7 @@ class Window(QDialog):
             return
         for ch in tab_Angle.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
                 add_bm = tab_Angle.findChild(QtWidgets.QWidget, 'pushButton_Add_'+tab_name)
                 add_bm.setDisabled(True)
                 return
@@ -1004,7 +1004,7 @@ class Window(QDialog):
                 conn.close()
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
 
     def add_tab_channel(self):
         '''
@@ -1018,7 +1018,7 @@ class Window(QDialog):
         name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Channel))
         for ch in tab_Channel.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
                 add_bm = tab_Channel.findChild(QtWidgets.QWidget, 'pushButton_Add_'+DISP_TITLE_ANGLE)
                 add_bm.setDisabled(True)
                 return
@@ -1108,7 +1108,7 @@ class Window(QDialog):
                 conn.close()
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
 
     def add_compound_section(self, tab):
         if tab.findChild(QWidget, KEY_SEC_PROFILE):
@@ -1308,7 +1308,7 @@ class Window(QDialog):
             widget_discarded = QWidget(scroll_discarded)
             layout_discarded = QVBoxLayout(widget_discarded)
             widget_discarded.setLayout(layout_discarded)
-            label_discarded = QLabel("These values were rejected because of validation.")
+            label_discarded = QLabel("These values were rejected in the validation checks.")
             layout_discarded.addWidget(label_discarded)
             scroll_discarded.setWidget(widget_discarded)
             text_discarded = QTextBrowser()
@@ -1323,7 +1323,7 @@ class Window(QDialog):
             widget_ignored = QWidget(scroll_ignored)
             layout_ignored = QVBoxLayout(widget_ignored)
             widget_ignored.setLayout(layout_ignored)
-            label_ignored = QLabel("These values were ignored because they already exist in database.")
+            label_ignored = QLabel("These values were ignored because they already exist in the database.")
             layout_ignored.addWidget(label_ignored)
             scroll_ignored.setWidget(widget_ignored)
             text_ignored = QTextBrowser()

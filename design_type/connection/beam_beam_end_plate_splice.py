@@ -1689,7 +1689,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.report_check.append(t1)
 
             t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Diameter Optimization", display_prov(int(self.bolt_diameter_provided), "d"),
-                  'Pass' if self.design_status else 'Fail' )
+                  'Pass' if self.design_status else 'Fail')
             self.report_check.append(t1)
 
             t1 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Property Class Optimization", self.bolt_grade_provided, 'Pass' if self.design_status else 'Fail')

@@ -6736,7 +6736,7 @@ def key_bearing_stress(load_shear, shear_resistance, key_length, key_depth, key_
     else:
         bearing_stress.append(NoEscape(r'\begin{aligned} \sigma_{2} &= \frac{V_{2} - V_{r}} {L_{2} \times H_{2}} \\'))
 
-    bearing_stress.append(NoEscape(r' &= \frac{(' + str(load_shear * 1e-3) + r' - ' + str(shear_resistance * 1e-3) + r') \times 10^{3} } {'
+    bearing_stress.append(NoEscape(r' &= \frac{(' + str(load_shear * 1e-3) + r' - ' + str(round(shear_resistance * 1e-3, 2)) + r') \times 10^{3} } {'
                                    + str(key_length) + r' \times ' + str(key_depth) + r'} \\'))
     bearing_stress.append(NoEscape(r' &= ' + str(key_bearing_stress) + r' \end{aligned}'))
 
@@ -6752,7 +6752,7 @@ def key_moment_demand(load_shear, shear_resistance, key_len, load_unit_len, key_
     else:
         key_md.append(NoEscape(r' \begin{aligned} w_{2} &= \frac{V_{2} - V_{r}}{L_{2}}~~~~(kN/mm) \\'))
 
-    key_md.append(NoEscape(r' &= \frac{' + str(load_shear * 1e-3) + r' - ' + str(shear_resistance * 1e-3) + r'}'r'{' + str(key_len) + r'} \\'))
+    key_md.append(NoEscape(r' &= \frac{' + str(load_shear * 1e-3) + r' - ' + str(round(shear_resistance * 1e-3, 2)) + r'}'r'{' + str(key_len) + r'} \\'))
     key_md.append(NoEscape(r'                       &= ' + str(round(load_unit_len * 1e-3, 2)) + r' \\ \\'))
 
     if location == 'L1':
@@ -6767,35 +6767,35 @@ def key_moment_demand(load_shear, shear_resistance, key_len, load_unit_len, key_
     return key_md
 
 
-def key_moment_capacity(key_len, key_thk, key_fy, gamma_m0, moment_capacity, beta_b=1, location='L1'):
+def key_moment_capacity(key_depth, key_thk, key_fy, gamma_m0, moment_capacity, beta_b=1, location='L1'):
     """ """
     key_capacity = Math(inline=True)
 
     if location == 'L1':
         key_capacity.append(NoEscape(r' \begin{aligned} {M_{p}}_{1} &= \beta_{b} Z_{p} f_{y} / \gamma_{m0} \\'))
-        key_capacity.append(NoEscape(r'&                           = \frac{\beta_{b} \bigg(\frac{L_{1}t_{1}^{2}} {4} \bigg) f_{y} } {\gamma_{m0}} \\'))
+        key_capacity.append(NoEscape(r'&                           = \frac{\beta_{b} \bigg(\frac{H_{1}t_{1}^{2}} {4} \bigg) f_{y} } {\gamma_{m0}} \\'))
     else:
         key_capacity.append(NoEscape(r' \begin{aligned} {M_{p}}_{2} &= \beta_{b} Z_{p} f_{y} / \gamma_{m0} \\'))
-        key_capacity.append(NoEscape(r'&                            = \frac{\beta_{b} \bigg(\frac{L_{2}t_{2}^{2}} {4} \bigg) f_{y} } {\gamma_{m0}} \\'))
+        key_capacity.append(NoEscape(r'&                            = \frac{\beta_{b} \bigg(\frac{H_{2}t_{2}^{2}} {4} \bigg) f_{y} } {\gamma_{m0}} \\'))
 
-    key_capacity.append(NoEscape(r'&                            = \frac{' + str(beta_b) + r' \times \bigg(\frac{' + str(key_len) + r' \times '
+    key_capacity.append(NoEscape(r'&                            = \frac{' + str(beta_b) + r' \times \bigg(\frac{' + str(key_depth) + r' \times '
                            + str(key_thk) + r'^{2}} {4} \bigg) \times ' + str(key_fy) + r' } {' + str(gamma_m0) + r' \times 10^{6} } \\'))
     key_capacity.append(NoEscape(r'&  = ' + str(moment_capacity) + r' \end{aligned}'))
 
     return key_capacity
 
 
-def key_thk(moment_demand, gamma_m0, key_fy, key_len, key_thk_val, column_tw, key_thk, location='L1'):
+def key_thk(moment_demand, gamma_m0, key_fy, key_depth, key_thk_val, column_tw, key_thk, location='L1'):
     """ """
     key_thk_eqn = Math(inline=True)
 
     if location == 'L1':
-        key_thk_eqn.append(NoEscape(r' \begin{aligned} t_{1} &= \sqrt{\frac{4 {M_{d}}_{1}}{L_{1}~ (f_{y}/\gamma_{m0})}} \\'))
+        key_thk_eqn.append(NoEscape(r' \begin{aligned} t_{1} &= \sqrt{\frac{4 {M_{d}}_{1}}{H_{1}~ (f_{y}/\gamma_{m0})}} \\'))
     else:
-        key_thk_eqn.append(NoEscape(r' \begin{aligned} t_{2} &= \sqrt{\frac{4 {M_{d}}_{2}}{L_{2}~ (f_{y}/\gamma_{m0})}} \\'))
+        key_thk_eqn.append(NoEscape(r' \begin{aligned} t_{2} &= \sqrt{\frac{4 {M_{d}}_{2}}{H_{2}~ (f_{y}/\gamma_{m0})}} \\'))
 
-    key_thk_eqn.append(NoEscape(r'& = \sqrt{\frac{4 \times ' + str(round(moment_demand * 1e-6, 2)) + r' \times 10^{6}} {' + str(key_len) + r' \times ('
-                                + str(key_fy) + r'/ '+ str(gamma_m0) + r')}} \\'))
+    key_thk_eqn.append(NoEscape(r'& = \sqrt{\frac{4 \times ' + str(round(moment_demand * 1e-6, 2)) + r' \times 10^{6}} {'
+                                + str(key_depth) + r' \times (' + str(key_fy) + r'/ '+ str(gamma_m0) + r')}} \\'))
     key_thk_eqn.append(NoEscape(r'& = ' + str(round(key_thk_val, 2)) + r' \\'))
 
     if location == 'L1':
@@ -6809,6 +6809,7 @@ def key_thk(moment_demand, gamma_m0, key_fy, key_len, key_thk_val, column_tw, ke
         key_thk_eqn.append(NoEscape(r'& = ' + str(key_thk) + r' \end{aligned}'))
     else:
         key_thk_eqn.append(NoEscape(r'& = ' + str(key_thk) + r' \\ \\'))
+
         key_thk_eqn.append(NoEscape(r' [Note: If~t_{1} & ~is~provided,~ t_{2}~is~at-least \\'))
         key_thk_eqn.append(NoEscape(r' equal~to~t_{1}] \end{aligned}'))
 

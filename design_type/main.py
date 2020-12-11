@@ -211,7 +211,6 @@ class Main():
     #     return d
 
 
-
     def get_I_sec_properties(self):
 
         if '' in self:
@@ -253,6 +252,121 @@ class Main():
                 image = VALUES_IMG_BEAM[0]
             else:
                 image = VALUES_IMG_BEAM[1]
+
+        d = {'Label_11': str(mass),
+             'Label_12': str(area),
+             'Label_13': str(moa_z),
+             'Label_14': str(moa_y),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(em_z),
+             'Label_18': str(em_y),
+             'Label_19': str(pm_z),
+             'Label_20': str(pm_y),
+             'Label_21': str(I_t),
+             'Label_22': str(I_w),
+             KEY_IMAGE: image
+            }
+
+        return d
+
+    def get_SHS_RHS_properties(self):
+
+        if '' in self:
+            mass = ''
+            area = ''
+            moa_z = ''
+            moa_y = ''
+            rog_z = ''
+            rog_y = ''
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+            I_t = ''
+            I_w = ''
+            image = ''
+
+        else:
+            D = float(self[0])
+            B = float(self[1])
+            t_w = float(self[2])
+            t_f = float(self[3])
+            sl = float(self[4])
+
+            sec_prop = SHS_RHS_Properties()
+            mass = sec_prop.calc_Mass(D, B, t_w, t_f)
+            area = sec_prop.calc_Area(D, B, t_w, t_f)
+            moa_z = sec_prop.calc_MomentOfAreaZ(D, B, t_w, t_f)
+            moa_y = sec_prop.calc_MomentOfAreaY(D, B, t_w, t_f)
+            rog_z = sec_prop.calc_RogZ(D, B, t_w, t_f)
+            rog_y = sec_prop.calc_RogY(D, B, t_w, t_f)
+            em_z = sec_prop.calc_ElasticModulusZz(D, B, t_w, t_f)
+            em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
+            pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
+            pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
+            I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
+            I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
+            if D == B:
+                image = VALUES_IMG_HOLLOWSECTION[0]
+            else:
+                image = VALUES_IMG_HOLLOWSECTION[1]
+
+        d = {'Label_11': str(mass),
+             'Label_12': str(area),
+             'Label_13': str(moa_z),
+             'Label_14': str(moa_y),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(em_z),
+             'Label_18': str(em_y),
+             'Label_19': str(pm_z),
+             'Label_20': str(pm_y),
+             'Label_21': str(I_t),
+             'Label_22': str(I_w),
+             KEY_IMAGE: image
+            }
+
+        return d
+
+    def get_CHS_properties(self):
+
+        if '' in self:
+            mass = ''
+            area = ''
+            moa_z = ''
+            moa_y = ''
+            rog_z = ''
+            rog_y = ''
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+            I_t = ''
+            I_w = ''
+            image = ''
+
+        else:
+            D = float(self[0])
+            B = float(self[1])
+            t_w = float(self[2])
+            t_f = float(self[3])
+            sl = float(self[4])
+
+            sec_prop = CHS_Properties()
+            mass = sec_prop.calc_Mass(D, B, t_w, t_f)
+            area = sec_prop.calc_Area(D, B, t_w, t_f)
+            moa_z = sec_prop.calc_MomentOfAreaZ(D, B, t_w, t_f)
+            moa_y = sec_prop.calc_MomentOfAreaY(D, B, t_w, t_f)
+            rog_z = sec_prop.calc_R(D, t_f)
+            rog_y = sec_prop.calc_R(D, t_f)
+            em_z = sec_prop.calc_ElasticModulusZz(D, B, t_w, t_f)
+            em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
+            pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
+            pm_y = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
+            I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
+            I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
+            image = VALUES_IMG_HOLLOWSECTION[2]
 
         d = {'Label_11': str(mass),
              'Label_12': str(area),

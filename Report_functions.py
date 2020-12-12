@@ -3554,7 +3554,7 @@ def end_plate_ht_req(D, e, h_p):
     return end_plate_ht_eqn
 
 
-def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_e, beta):
+def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_e, beta, module=''):
     """
     Calculate end plate thickness
      Args:
@@ -3575,28 +3575,32 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
     t_b = str(t_b)
     q = str(q)
     l_e = str(l_e)
-    # l_v = str(l_v)
+    l_v = str(l_v)
     f_o = str(f_o)
     b_e = str(b_e)
     beta = str(beta)
 
     end_plate_thk_eqn = Math(inline=True)
 
-    # end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
-    # end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
-    #                                   + gamma_m0 + r')} } \\'))
-    # end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
-    # return end_plate_thk_eqn
+    if module == 'BC_EP' or module == 'BB_EP':
+        end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
+        end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
+                                          + gamma_m0 + r')} } \\'))
 
-    end_plate_thk_eqn.append(
-        NoEscape(r'\begin{aligned} t_p &=  max\Bigg(\sqrt{\frac{4 M_{cr}} {b_{eff} (f_{y} / \gamma_{m0})} },\\'))
-    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(T_1 - \frac{Q \times 2 \times  l_e}{l_v}\Bigg) \times \Bigg(\frac{27 \times l_e \times l_v^{2}}{\beta \times \eta \times f_o \times b_e}\Bigg) } \Bigg) \\'))
-    end_plate_thk_eqn.append(
-        NoEscape(r'&=  max\Bigg\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
-                 + gamma_m0 + r')} }, \\'))
-    end_plate_thk_eqn.append(NoEscape(r'&\sqrt[4]{\Bigg(' + t_b + r'- \frac{ '+ q + r'\times 2 \times '+  l_e + r'}{' + str(l_v) + r'}\Bigg) \times \Bigg(\frac{27 \times'+ l_e + r' \times' + str(l_v ** 2) + r'}{' + beta + r'\times' + str(1.5) + r'\times' + f_o + r'\times'+ b_e + r'}\Bigg) } \Bigg) \\'))
+    if module == 'Column_EP':
+        end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  max\Bigg(\sqrt{\frac{4 M_{cr}} {b_{eff} (f_{y} / \gamma_{m0})} }, ~ \\'))
+        end_plate_thk_eqn.append(NoEscape(r'& \sqrt[4]{\Bigg(T_1 - \frac{2 Q l_e}{l_v}\Bigg) \times '
+                                          r'\Bigg(\frac{27 l_e l_v^{2}}{\beta \eta f_o b_e}\Bigg) }~ \Bigg) \\ \\'))
 
-    end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + ' \end{aligned}'))
+        end_plate_thk_eqn.append(NoEscape(r' &=  max\Bigg(\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times ('
+                                          + f_y + r' / ' + gamma_m0 + r')} }, ~ \\'))
+        end_plate_thk_eqn.append(NoEscape(r'& \sqrt[4]{\Bigg(' + t_b + r' - \frac{2 \times ' + q + r' \times ' + l_e + r'}{'
+                                          + l_v + r'}\Bigg) \times '
+                                          r'\Bigg(\frac{27 \times ' + l_e + r' \times ' + l_v + r'^{2}}{' + beta + r' \times 1.5 \times '
+                                          + f_o + r' \times ' + b_e + r'}\Bigg) }~ \Bigg) \\ \\'))
+
+    end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + r' \end{aligned}'))
+
     return end_plate_thk_eqn
 
 
@@ -7469,7 +7473,7 @@ def comp_plate_thk_p(A_cp, w_cp, l_cp, t_cp1, f_ycp, t_cp2, t_cp3, epsilon_cp, t
     return comp_plate_thk_p_eqn
 
 
-def ten_plate_thk_p(A_cp, w_cp, t_cp1,  t_cp2, t_cp):
+def ten_plate_thk_p(A_cp, w_cp, t_cp1,  t_cp2, t_cp, compression_cont_status):
     A_cp = str(A_cp)
     w_cp = str(w_cp)
     t_cp1 = str(t_cp1)
@@ -7480,21 +7484,27 @@ def ten_plate_thk_p(A_cp, w_cp, t_cp1,  t_cp2, t_cp):
     t_cp = str(t_cp)
     # beam_tf = str(beam_tf)
     ten_plate_thk_p_eqn = Math(inline=True)
-    ten_plate_thk_p_eqn.append(NoEscape(r'\begin{aligned}  t_{st1} &= Minimum~area~criteria \\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r'  t_{st1} &= \frac{A_{cp} / 2}{w_{cp}} \\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r' &= \frac{'+A_cp+r' / 2}{'+w_cp+r'} \\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp1 + r'\\ \\'))
 
-    ten_plate_thk_p_eqn.append(NoEscape(r't_{st2} &= Minimum~thickness~criteria \\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r't_{st2} &= T_{b}\\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp2 + r'\\ \\'))
+    if compression_cont_status == True:
+        ten_plate_thk_p_eqn.append(NoEscape(r'\begin{aligned}  t_{st1} &= Minimum~area~criteria \\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r'  t_{st1} &= \frac{A_{cp} / 2}{w_{cp}} \\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= \frac{'+A_cp+r' / 2}{'+w_cp+r'} \\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp1 + r'\\ \\'))
 
-    ten_plate_thk_p_eqn.append(NoEscape(r't_{st} &= max(t_{st1},~t_{st2} )\\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r' &= max(' + t_cp1 + ',~' + t_cp2 + r')\\'))
-    ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp + r'\end{aligned}'))
+        ten_plate_thk_p_eqn.append(NoEscape(r't_{st2} &= Minimum~thickness~criteria \\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r't_{st2} &= T_{b}\\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp2 + r'\\ \\'))
+
+        ten_plate_thk_p_eqn.append(NoEscape(r't_{st} &= max(t_{st1},~t_{st2} )\\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= max(' + t_cp1 + ',~' + t_cp2 + r')\\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp + r'\end{aligned}'))
+    else:
+        ten_plate_thk_p_eqn.append(NoEscape(r'\begin{aligned} t_{st} &= Minimum~thickness~criteria \\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r't_{st} &= T_{b}\\'))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp2 + r'\\ '))
+        ten_plate_thk_p_eqn.append(NoEscape(r' &= ' + t_cp + r'\end{aligned}'))
 
     return ten_plate_thk_p_eqn
-
 
 
 def Area_req_cont_plate(A_cp, R_c,p_cw,f_ycp,gamma_m0):

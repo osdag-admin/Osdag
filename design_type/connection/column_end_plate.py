@@ -2157,7 +2157,7 @@ class ColumnEndPlate(MomentConnection):
                                                               self.end_dist,
                                                               self.section.root_radius, self.plate.fy, self.bolt.bolt_fu,
                                                               self.f_o, self.section.flange_width,
-                                                              self.n_bf * 2, self.prying_f, eta=1.5, connection='column_end_plate'),
+                                                              self.n_bf * 2, round(self.prying_f, 2), eta=1.5, connection='column_end_plate'),
                   '', 'OK' if self.design_status else 'Fail')
             self.report_check.append(t1)
 
@@ -2230,10 +2230,12 @@ class ColumnEndPlate(MomentConnection):
 
             t1 = (DISP_MIN_PLATE_THICK,
                   end_plate_thk_req(M_ep=round(self.m_ep/1000000, 2), b_eff=self.b_eff, f_y=self.section.fy, gamma_m0=gamma_m0,
-                                    t_p=self.plate_thickness_provided, t_b=self.t_b, q=self.prying_f,l_e=self.le, l_v=self.lv, f_o=self.f_o,b_e=self.b_e, beta=self.beta_prying),
+                                    t_p=self.plate_thickness_provided, t_b=self.t_b, q=round(self.prying_f, 2), l_e=self.le, l_v=self.lv,
+                                    f_o=self.f_o, b_e=self.b_e, beta=self.beta_prying, module='Column_EP'),
                   self.plate_thickness_provided,
                   get_pass_fail(self.plate.thickness_provided, self.plate_thickness_provided, relation="leq"))
             self.report_check.append(t1)
+
             # if self.pitch >= 2*self.end_dist:
             #
             #     t1=(KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep/1000000, 2), b_eff=2*self.end_dist, f_y=self.plate.fy, gamma_m0=gamma_m0,

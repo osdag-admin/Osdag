@@ -291,8 +291,8 @@ class Main():
             D = float(self[0])
             B = float(self[1])
             t_w = float(self[2])
-            t_f = float(self[3])
-            sl = float(self[4])
+            t_f = float(self[2])
+            sl = 0.0
 
             sec_prop = SHS_RHS_Properties()
             mass = sec_prop.calc_Mass(D, B, t_w, t_f)
@@ -312,18 +312,18 @@ class Main():
             else:
                 image = VALUES_IMG_HOLLOWSECTION[1]
 
-        d = {'Label_11': str(mass),
-             'Label_12': str(area),
-             'Label_13': str(moa_z),
-             'Label_14': str(moa_y),
-             'Label_15': str(rog_z),
-             'Label_16': str(rog_y),
-             'Label_17': str(em_z),
-             'Label_18': str(em_y),
-             'Label_19': str(pm_z),
-             'Label_20': str(pm_y),
-             'Label_21': str(I_t),
-             'Label_22': str(I_w),
+        d = {'Label_HS_11': str(mass),
+             'Label_HS_12': str(area),
+             'Label_HS_13': str(moa_z),
+             'Label_HS_14': str(moa_y),
+             'Label_HS_15': str(rog_z),
+             'Label_HS_16': str(rog_y),
+             'Label_HS_17': str(em_z),
+             'Label_HS_18': str(em_y),
+             'Label_HS_19': str(pm_z),
+             'Label_HS_20': str(pm_y),
+             'Label_HS_21': str(I_t),
+             'Label_HS_22': str(I_w),
              KEY_IMAGE: image
             }
 
@@ -347,15 +347,16 @@ class Main():
             image = ''
 
         else:
-            D = float(self[0])
+            D = float(self[1])
             B = float(self[1])
             t_w = float(self[2])
-            t_f = float(self[3])
-            sl = float(self[4])
+            t_f = float(self[2])
+            sl = 0.0
 
             sec_prop = CHS_Properties()
             mass = sec_prop.calc_Mass(D, B, t_w, t_f)
             area = sec_prop.calc_Area(D, B, t_w, t_f)
+            internal_vol = 0.0
             moa_z = sec_prop.calc_MomentOfAreaZ(D, B, t_w, t_f)
             moa_y = sec_prop.calc_MomentOfAreaY(D, B, t_w, t_f)
             rog_z = sec_prop.calc_R(D, t_f)
@@ -368,18 +369,19 @@ class Main():
             I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
             image = VALUES_IMG_HOLLOWSECTION[2]
 
-        d = {'Label_11': str(mass),
-             'Label_12': str(area),
-             'Label_13': str(moa_z),
-             'Label_14': str(moa_y),
-             'Label_15': str(rog_z),
-             'Label_16': str(rog_y),
-             'Label_17': str(em_z),
-             'Label_18': str(em_y),
-             'Label_19': str(pm_z),
-             'Label_20': str(pm_y),
-             'Label_21': str(I_t),
-             'Label_22': str(I_w),
+        d = {'Label_CHS_11': str(mass),
+             'Label_CHS_12': str(area),
+             'Label_CHS_13': str(internal_vol),
+             'Label_CHS_14': str(moa_z),
+             # 'Label_HS_14': str(moa_y),
+             'Label_CHS_15': str(rog_z),
+             # 'Label_16': str(rog_y),
+             'Label_CHS_16': str(em_z),
+             # 'Label_18': str(em_y),
+             # 'Label_19': str(pm_z),
+             # 'Label_20': str(pm_y),
+             'Label_CHS_21': str(I_t),
+             'Label_CHS_22': str(I_w),
              KEY_IMAGE: image
             }
 

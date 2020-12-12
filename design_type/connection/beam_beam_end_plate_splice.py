@@ -1951,7 +1951,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
             t1 = (KEY_DISP_PLATE_THICK,
                   end_plate_thk_req(M_ep=round(self.ep_moment_capacity,2), b_eff=round(self.call_helper.b_e, 2), f_y=self.dp_plate_fy,
-                                    gamma_m0=self.gamma_m0, t_p=self.call_helper.plate_thickness_req),
+                                    gamma_m0=self.gamma_m0, t_p=self.call_helper.plate_thickness_req, t_b=0, q=0, l_e=0, l_v=0, f_o=0, b_e=0, beta=0,
+                                    module='BB_EP'),
                   int(self.plate_thickness),
                   get_pass_fail(self.call_helper.plate_thickness_req, self.plate_thickness, relation="leq"))
             self.report_check.append(t1)

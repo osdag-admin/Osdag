@@ -94,7 +94,7 @@ class I_sectional_Properties(Section_Properties):
     def calc_ElasticModulusZy(self, D, B, t_w, t_f, alpha=90, r_1=0, r_2=0):
         self.I_yy = ((D - 2 * t_f) * t_w ** 3 / 12 + B ** 3 * t_f / 6) / 10000
         self.Z_ey = (self.I_yy * 2 * 10) / (B)
-        return round(self.Z_ey, 1)
+        return round(self.Z_ey, 2)
 
     def calc_PlasticModulusZpz(self, D, B, t_w, t_f, alpha=90, r_1=0, r_2=0):
         self.A = ((2 * B * t_f) + ((D - 2 * t_f) * t_w)) / 100
@@ -1061,26 +1061,26 @@ class SHS_RHS_Properties(Section_Properties):
         self.A = 2 * t * ((B - (4 * t)) + (D - (4 * t)) + ((3 / 2) * math.pi * t))  # cm2
         self.M = 0.785 * self.A  # kg/m
 
-        return round(self.M, 2)
+        return round(self.M * 1e-2, 2)
 
     def calc_Area(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.A = 2 * t * ((B - (4 * t)) + (D - (4 * t)) + ((3 / 2) * math.pi * t))  # cm2
 
-        return round(self.A, 2)
+        return round(self.A * 1e-2, 2)
 
     def calc_MomentOfAreaZ(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_zz = (t * ((D - (4 * t)) ** 3 / 6)) + (0.5 * ((((B - (4 * t)) * t ** 3) / 3) + ((B - (4 * t)) * ((D - t) ** 2) * t))) + \
                     (((math.pi * t ** 4) / 108) * (405 - (3136 / math.pi ** 2))) + \
                     ((3 * math.pi * t ** 2) * (((9 * math.pi * (D - (4 * t))) + (56 * t)) / (18 * math.pi)) ** 2)  # cm4
 
-        return round(self.I_zz, 2)
+        return round(self.I_zz * 1e-4, 2)
 
     def calc_MomentOfAreaY(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_yy = (t * ((B - (4 * t)) ** 3 / 6)) + (0.5 * ((((D - (4 * t)) * t ** 3) / 3) + ((D - (4 * t)) * ((B - t) ** 2) * t))) + \
                     (((math.pi * t ** 4) / 108) * (405 - (3136 / math.pi ** 2))) + \
                     ((3 * math.pi * t ** 2) * (((9 * math.pi * (B - (4 * t))) + (56 * t)) / (18 * math.pi)) ** 2)  # cm4
 
-        return round(self.I_yy, 2)
+        return round(self.I_yy * 1e-4, 2)
 
     def calc_RogZ(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.A = 2 * t * ((B - (4 * t)) + (D - (4 * t)) + ((3 / 2) * math.pi * t))  # cm2
@@ -1089,7 +1089,7 @@ class SHS_RHS_Properties(Section_Properties):
                     ((3 * math.pi * t ** 2) * (((9 * math.pi * (D - (4 * t))) + (56 * t)) / (18 * math.pi)) ** 2)  # cm4
         self.r_z = math.sqrt(self.I_zz / self.A)  # cm
 
-        return round(self.r_z, 2)
+        return round(self.r_z * 1e-1, 2)
 
     def calc_RogY(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.A = 2 * t * ((B - (4 * t)) + (D - (4 * t)) + ((3 / 2) * math.pi * t))  # cm2
@@ -1098,7 +1098,7 @@ class SHS_RHS_Properties(Section_Properties):
                     ((3 * math.pi * t ** 2) * (((9 * math.pi * (B - (4 * t))) + (56 * t)) / (18 * math.pi)) ** 2)  # cm4
         self.r_y = math.sqrt(self.I_yy / self.A)  # cm
 
-        return round(self.r_y, 2)
+        return round(self.r_y * 1e-1, 2)
 
     def calc_ElasticModulusZz(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_zz = (t * ((D - (4 * t)) ** 3 / 6)) + (0.5 * ((((B - (4 * t)) * t ** 3) / 3) + ((B - (4 * t)) * ((D - t) ** 2) * t))) + \
@@ -1106,7 +1106,7 @@ class SHS_RHS_Properties(Section_Properties):
                     ((3 * math.pi * t ** 2) * (((9 * math.pi * (D - (4 * t))) + (56 * t)) / (18 * math.pi)) ** 2)  # cm4
         self.Z_ez = (2 * self.I_zz) / D  # cm3
 
-        return round(self.Z_ez, 2)
+        return round(self.Z_ez * 1e-3, 2)
 
     def calc_ElasticModulusZy(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_yy = (t * ((B - (4 * t)) ** 3 / 6)) + (0.5 * ((((D - (4 * t)) * t ** 3) / 3) + ((D - (4 * t)) * ((B - t) ** 2) * t))) + \
@@ -1115,19 +1115,19 @@ class SHS_RHS_Properties(Section_Properties):
 
         self.Z_ey = (2 * self.I_yy) / B  # cm3
 
-        return round(self.Z_ey, 1)
+        return round(self.Z_ey * 1e-3, 2)
 
     def calc_PlasticModulusZpz(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.Z_pz = (((t / 2) * (D - (4 * t)) ** 2) + (t * (B - (4 * t)) * (D - t)) + ((t ** 2 / 6) *
                                                                                        ((9 * math.pi * (D - (4 * t))) + (56 * t))))  # cm3
 
-        return round(self.Z_pz, 2)
+        return round(self.Z_pz * 1e-3, 2)
 
     def calc_PlasticModulusZpy(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.Z_py = (((t / 2) * (B - (4 * t)) ** 2) + (t * (D - (4 * t)) * (B - t)) + ((t ** 2 / 6) *
                                                                                        ((9 * math.pi * (B - (4 * t))) + (56 * t))))  # cm3
 
-        return round(self.Z_py, 2)
+        return round(self.Z_py * 1e-3, 2)
 
     def calc_TorsionConstantIt(self, D, B, t_w, t_f, alpha=90, r_1=0, r_2=0):
         return 0.0
@@ -1143,47 +1143,47 @@ class CHS_Properties(Section_Properties):
         self.A = (math.pi / 4) * (D ** 2 - (D - (2 * t)) ** 2)
         self.M = 0.785 * self.A  # kg/m
 
-        return round(self.M, 2)
+        return round(self.M * 1e-2, 2)
 
     def calc_Area(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.A = (math.pi / 4) * (D ** 2 - (D - (2 * t)) ** 2)
 
-        return round(self.A, 2)
+        return round(self.A * 1e-2, 2)
 
     def calc_MomentOfAreaZ(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_zz = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
 
-        return round(self.I_zz, 2)
+        return round(self.I_zz * 1e-4, 2)
 
     def calc_MomentOfAreaY(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_yy = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
 
-        return round(self.I_yy, 2)
+        return round(self.I_yy * 1e-4, 2)
 
     def calc_R(self, D, t):
         self.A = (math.pi / 4) * (D ** 2 - (D - (2 * t)) ** 2)  # cm2
         self.I = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
         self.r = math.sqrt(self.I_zz / self.A)  # cm
 
-        return round(self.r, 2)
+        return round(self.r, 1)
 
     def calc_ElasticModulusZz(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_zz = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
         self.Z_ez = (2 * self.I_zz) / D  # cm3
 
-        return round(self.Z_ez, 2)
+        return round(self.Z_ez * 1e-3, 2)
 
     def calc_ElasticModulusZy(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.I_yy = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
         self.Z_ey = (2 * self.I_yy) / D  # cm3
 
-        return round(self.Z_ey, 2)
+        return round(self.Z_ey * 1e-3, 2)
 
     def calc_PlasticModulusZpz(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.Z_pz = (((t / 2) * (D - (4 * t)) ** 2) + (t * (B - (4 * t)) * (D - t)) + ((t ** 2 / 6) *
                                                                                        ((9 * math.pi * (D - (4 * t))) + (56 * t))))  # cm3
 
-        return round(self.Z_pz, 2)
+        return round(self.Z_pz * 1e-3, 2)
 
     def calc_InternalVolume(self):
         return 0.0

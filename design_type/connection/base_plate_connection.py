@@ -1852,29 +1852,25 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
               [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF], TYPE_TEXTBOX, self.anchor_bolt_designation)
         change_tab.append(t3)
 
-        # t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
-        #       ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
-
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
+        t5 = (KEY_DISP_COLSEC, ['Label_HS_1', 'Label_HS_2', 'Label_HS_3'],
+              ['Label_HS_11', 'Label_HS_12', 'Label_HS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_HS_17', 'Label_HS_18',
+               'Label_HS_19', 'Label_HS_20', 'Label_HS_21', 'Label_HS_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_SHS_RHS_properties)
+        change_tab.append(t5)
+
+        t6 = (KEY_DISP_COLSEC, ['Label_CHS_1', 'Label_CHS_2', 'Label_CHS_3'],
+              ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_CHS_14', 'Label_CHS_15', 'Label_CHS_16', 'Label_CHS_21', 'Label_CHS_22',
+               KEY_IMAGE], TYPE_TEXTBOX, self.get_CHS_properties)
+        change_tab.append(t6)
+
         t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
         return change_tab
-
-    # def get_section_properties_custom(self):
-    #     """ """
-    #     flange_slope = self[-1]
-    #     print(flange_slope, "SSSSSSSSSSSSSSSSSSSSSSSS")
-    #
-    #     if flange_slope != 'Hollow/Tubular Column Base':
-    #         return self.get_I_sec_properties
-    #     else:
-    #         return self.get_CHS_properties
 
     def anchor_bolt_designation(self):
 
@@ -6895,14 +6891,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if self.safe:
             self.design_status = True
-            logger.info(": =====================Design Status=======================")
+            logger.info(": ================= Design Status ===================")
             logger.info(":      Overall base plate connection design is SAFE")
-            logger.info(": =====================End Of design=======================")
+            logger.info(": ================== End Of Design ==================")
         else:
             self.design_status = False
-            logger.info(": =====================Design Status=======================")
+            logger.info(": ================= Design Status ===================")
             logger.error(":     Overall base plate connection design is UNSAFE")
-            logger.info(": =====================End Of design=======================")
+            logger.info(": ================== End Of Design ==================")
 
         # printing values for output dock
 

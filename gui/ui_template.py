@@ -577,8 +577,8 @@ class Window(QMainWindow):
                 #l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 1, 1, 1)
                 metrices = QtGui.QFontMetrics(font)
-                maxi_width_left = max(maxi_width_left, metrices.boundingRect(lable).width() + 8)
-
+                if type not in [TYPE_TEXTBOX, '']:
+                    maxi_width_left = max(maxi_width_left, metrices.boundingRect(lable).width() + 8)
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)

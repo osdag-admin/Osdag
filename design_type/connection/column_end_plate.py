@@ -229,19 +229,19 @@ class ColumnEndPlate(MomentConnection):
         Function to set Logger for FinPlate Module
         """
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
         # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
         # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         # handler.setLevel(logging.INFO)
@@ -251,7 +251,7 @@ class ColumnEndPlate(MomentConnection):
         if key is not None:
             handler = OurLog(key)
             # handler.setLevel(logging.DEBUG)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -797,14 +797,14 @@ class ColumnEndPlate(MomentConnection):
         if self.factored_axial_load > self.axial_capacity:
             logger.warning(' : The value of factored axial load exceeds the axial capacity, {} kN.'.format(
                 round(self.axial_capacity / 1000, 2)))
-            logger.error(" : Design is unsafe. \n ")
-            logger.info(" :=========End Of design===========")
+            logger.error(" : Design is UNSAFE \n ")
+            logger.debug(" : =========End of Design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity:
                 logger.warning(' : The value of factored shear load exceeds by 0.6 times the shear capacity of the member, {} kN.'.format(
                     round(self.shear_capacity / 1000, 2)))
-                logger.error(" : Design of members in high shear is not recommended by Osdag. Design is unsafe. \n ")
+                logger.error(" : Design of members subjected to high shear is not recommended by Osdag. Design is UNSAFE. \n ")
                 logger.info(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
@@ -812,8 +812,8 @@ class ColumnEndPlate(MomentConnection):
                     self.member_capacity_status = False
                     logger.warning(' : The value of bending moment exceeds the moment capacity of the member, i.e. {} kNm.'.format(
                         round(self.section.moment_capacity / 1000000), 2))
-                    logger.error(" : Design is unsafe. \n ")
-                    logger.info(" :=========End Of design===========")
+                    logger.error(" : Design is UNSAFE \n ")
+                    logger.debug(" : =========End of Design===========")
                 else:
                     self.member_capacity_status = True
                     print("axial load", self.factored_axial_load)
@@ -1147,8 +1147,7 @@ class ColumnEndPlate(MomentConnection):
                 self.design_status = False
                 self.bolt_dia_status = False
                 logger.error("The number of bolt row(s) are not sufficient to cater for the given section and load combination.")
-                logger.info("Try cover plate connection.")
-
+                logger.info("Try Cover Plate connection.")
 
     #############################################################################################################
     ## Function to get Bolt grade ##
@@ -1591,10 +1590,10 @@ class ColumnEndPlate(MomentConnection):
                                                                                self.section.fy, self.end_dist,
                                                                                self.bolt.bolt_tensioning, eta=1.5)
 
-                    logger.info(": Overall column end plate connection design is safe \n")
+                    logger.info(": Overall Column End Plate connection design is SAFE \n")
                     logger.info(" :=========End Of design===========")
                 else:
-                    logger.error(": Overall column end plate connection design is unsafe \n ")
+                    logger.error(": Overall Column End Plate connection design is UNSAFE \n ")
                     logger.info(" :=========End Of design===========")
             else:
                 # if 2 * self.end_dist >= 50:
@@ -1697,10 +1696,10 @@ class ColumnEndPlate(MomentConnection):
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1)
             self.bolt_tension = self.bolt.bolt_tension_capacity
             self.bolt_cap = self.bolt.bolt_capacity
-            logger.info(": Overall column end plate connection design is safe \n")
+            logger.info(": Overall Column End Plate connection design is SAFE \n")
             logger.info(" :=========End Of design===========")
         else:
-            logger.error(": Overall column end plate connection design is unsafe \n ")
+            logger.error(": Overall Column End Plate connection design is UNSAFE \n ")
             logger.info(" :=========End Of design===========")
 
 

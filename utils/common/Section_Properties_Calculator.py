@@ -1160,7 +1160,14 @@ class CHS_Properties(Section_Properties):
 
         return round(self.I_yy * 1e-4, 2)
 
-    def calc_R(self, D, t):
+    def calc_RogZ(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
+        self.A = (math.pi / 4) * (D ** 2 - (D - (2 * t)) ** 2)  # cm2
+        self.I = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
+        self.r = math.sqrt(self.I_zz / self.A)  # cm
+
+        return round(self.r, 1)
+
+    def calc_RogY(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.A = (math.pi / 4) * (D ** 2 - (D - (2 * t)) ** 2)  # cm2
         self.I = (math.pi / 64) * (D ** 4 - (D - (2 * t)) ** 4)  # cm4
         self.r = math.sqrt(self.I_zz / self.A)  # cm
@@ -1180,6 +1187,12 @@ class CHS_Properties(Section_Properties):
         return round(self.Z_ey * 1e-3, 2)
 
     def calc_PlasticModulusZpz(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
+        self.Z_pz = (((t / 2) * (D - (4 * t)) ** 2) + (t * (B - (4 * t)) * (D - t)) + ((t ** 2 / 6) *
+                                                                                       ((9 * math.pi * (D - (4 * t))) + (56 * t))))  # cm3
+
+        return round(self.Z_pz * 1e-3, 2)
+
+    def calc_PlasticModulusZpy(self, D, B, t, t_f, alpha=90, r_1=0, r_2=0):
         self.Z_pz = (((t / 2) * (D - (4 * t)) ** 2) + (t * (B - (4 * t)) * (D - t)) + ((t ** 2 / 6) *
                                                                                        ((9 * math.pi * (D - (4 * t))) + (56 * t))))  # cm3
 

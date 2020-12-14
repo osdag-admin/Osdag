@@ -242,23 +242,23 @@ class BeamColumnEndPlate(MomentConnection):
     def set_osdaglogger(key):
         """ Function to set Logger for the module """
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -1177,7 +1177,8 @@ class BeamColumnEndPlate(MomentConnection):
             self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
         else:  # built-up sections
             self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
-        self.supported_section_shear_capa = round(self.supported_section_shear_capa * 1e-3, 2)  # kN
+
+        self.supported_section_shear_capa = round(0.60 * self.supported_section_shear_capa * 1e-3, 2)  # kN, restricted to low shear
 
         # 3: Axial capacity of the beam
         self.supported_section_axial_capa = round((self.supported_section.area * self.beam_fy / self.gamma_m0) * 1e-3, 2)  # kN
@@ -2247,13 +2248,13 @@ class BeamColumnEndPlate(MomentConnection):
                 self.design_status = True
 
         if self.design_status:
-            logger.info(": =====================Design Status=======================")
-            logger.info(": Overall beam to beam end plate splice connection design is SAFE")
-            logger.info(": =====================End Of design=======================")
+            logger.debug(": ========== Design Status ============")
+            logger.debug(": Overall beam to column end plate connection design is SAFE")
+            logger.debug(": ========== End Of Design ============")
         else:
-            logger.info(": =====================Design Status=======================")
-            logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
-            logger.info(": =====================End Of design=======================")
+            logger.debug(": ========== Design Status ============")
+            logger.debug(": Overall beam to column end plate connection design is UNSAFE")
+            logger.debug(": ========== End Of Design ============")
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
@@ -2276,14 +2277,14 @@ class BeamColumnEndPlate(MomentConnection):
                                   KEY_DISP_FLANGE_S_REPORT: self.supported_section.flange_slope,
                                   KEY_REPORT_R1: self.supported_section.root_radius,
                                   KEY_REPORT_R2: self.supported_section.toe_radius,
-                                  KEY_REPORT_IZ: self.supported_section.mom_inertia_z * 1e-4,
-                                  KEY_REPORT_IY: self.supported_section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_IZ: round(self.supported_section.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.supported_section.mom_inertia_y * 1e-4, 2),
                                   KEY_REPORT_RZ: round(self.supported_section.rad_of_gy_z * 1e-1, 2),
                                   KEY_REPORT_RY: round(self.supported_section.rad_of_gy_y * 1e-1, 2),
-                                  KEY_REPORT_ZEZ: self.supported_section.elast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZEY: self.supported_section.elast_sec_mod_y * 1e-3,
-                                  KEY_REPORT_ZPZ: self.supported_section.plast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZPY: self.supported_section.plast_sec_mod_y * 1e-3}
+                                  KEY_REPORT_ZEZ: round(self.supported_section.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.supported_section.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.supported_section.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.supported_section.plast_sec_mod_y * 1e-3, 2)}
 
         if self.supporting_section.flange_slope == 90:
             image = "Parallel_Beam"
@@ -2304,14 +2305,14 @@ class BeamColumnEndPlate(MomentConnection):
                                   KEY_DISP_FLANGE_S_REPORT: self.supporting_section.flange_slope,
                                   KEY_REPORT_R1: self.supporting_section.root_radius,
                                   KEY_REPORT_R2: self.supporting_section.toe_radius,
-                                  KEY_REPORT_IZ: self.supporting_section.mom_inertia_z * 1e-4,
-                                  KEY_REPORT_IY: self.supporting_section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_IZ: round(self.supporting_section.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.supporting_section.mom_inertia_y * 1e-4, 2),
                                   KEY_REPORT_RZ: round(self.supporting_section.rad_of_gy_z * 1e-1, 2),
                                   KEY_REPORT_RY: round(self.supporting_section.rad_of_gy_y * 1e-1, 2),
-                                  KEY_REPORT_ZEZ: self.supporting_section.elast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZEY: self.supporting_section.elast_sec_mod_y * 1e-3,
-                                  KEY_REPORT_ZPZ: self.supporting_section.plast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZPY: self.supporting_section.plast_sec_mod_y * 1e-3}
+                                  KEY_REPORT_ZEZ: round(self.supporting_section.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.supporting_section.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.supporting_section.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.supporting_section.plast_sec_mod_y * 1e-3, 2)}
 
         self.report_input = \
             {KEY_MAIN_MODULE: self.mainmodule,
@@ -2386,7 +2387,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         t1 = (KEY_DISP_SHEAR_CAPACITY, '',
               cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness, f_y=self.supported_section.fy,
-                                                    gamma_m0=self.gamma_m0, V_dg=round(self.supported_section_shear_capa, 2)),
+                                                    gamma_m0=self.gamma_m0, V_dg=round(self.supported_section_shear_capa, 2), multiple=0.60),
               'Restricted to low shear')
         self.report_check.append(t1)
 
@@ -2427,17 +2428,17 @@ class BeamColumnEndPlate(MomentConnection):
         #       get_pass_fail(self.IR_moment, 1.0, relation='leq'))
         # self.report_check.append(t1)
 
-        t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V"),
+        t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V_y"),
               prov_shear_force(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
                                app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.supported_section_shear_capa),
               "OK")
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_AXIAL, '', 'H = ' + str(self.load_axial), "OK")
+        t1 = (KEY_DISP_AXIAL, '', 'P_x = ' + str(self.load_axial), "OK")
         self.report_check.append(t1)
 
         if self.connectivity == VALUES_CONN_1[0]:
-            t1 = ("Bending Moment (major axis) (kNm)", display_prov(self.input_moment, "M"),
+            t1 = ("Bending Moment (major axis) (kNm)", display_prov(self.input_moment, "M_z"),
                   prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                    app_moment_load=round(self.load_moment, 2),
                                    moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=self.M_dz,

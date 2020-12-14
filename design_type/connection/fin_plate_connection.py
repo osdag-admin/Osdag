@@ -138,23 +138,23 @@ class FinPlateConnection(ShearConnection):
         # @author Arsil Zunzunia
         # super(FinPlateConnection, FinPlateConnection).set_osdaglogger(key)
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -958,7 +958,7 @@ class FinPlateConnection(ShearConnection):
         print("plate design status is ",self.plate.design_status,"weld status is",self.weld.design_status)
         if self.plate.design_status is True and self.weld.design_status is True:
             self.design_status = True
-            logger.info("=== End Of Design ===")
+            logger.debug("=== End Of Design ===")
 
     #############################
     # End of Calculations

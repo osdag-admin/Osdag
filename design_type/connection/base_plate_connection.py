@@ -487,23 +487,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         Set logger for Base Plate Module.
         """
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -1863,7 +1863,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         change_tab.append(t5)
 
         t6 = (KEY_DISP_COLSEC, ['Label_CHS_1', 'Label_CHS_2', 'Label_CHS_3'],
-              ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_CHS_14', 'Label_CHS_15', 'Label_CHS_16', 'Label_CHS_21', 'Label_CHS_22',
+              ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_21', 'Label_22',
                KEY_IMAGE], TYPE_TEXTBOX, self.get_CHS_properties)
         change_tab.append(t6)
 
@@ -2696,7 +2696,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # 7.3: Shear capacity
         self.column_shear_capacity = (((self.column_D - (2 * self.column_tf)) * self.column_tw) * self.dp_column_fy) / (math.sqrt(3) * self.gamma_m0)
-        self.column_shear_capacity = round(self.column_shear_capacity * 1e-3, 2)  # kN
+        self.column_shear_capacity = round(0.60 * self.column_shear_capacity * 1e-3, 2)  # kN
 
         if (max(self.load_shear_major, self.load_shear_minor) * 1e-3) > self.column_shear_capacity:
             self.design_status = False
@@ -4758,42 +4758,44 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             self.eccentricity_zz = round((self.load_moment_major / self.load_axial_compression), 2)
 
-            if self.eccentricity_zz >= (self.bp_length_min / 3):  # Case 3
-                self.moment_bp_case = 'Case3'
-                logger.info("[Base Plate Type] The value of eccentricity about the major axis is {} mm".format(round_down(self.eccentricity_zz, 2)))
-                logger.info("Eccentricity is greater than {} (L/3) mm".format(round(self.bp_length_min / 3, 2)))
-                logger.info("Case 3: A smaller part of the base plate is under pure compression/bearing with a large tension/uplift force being "
-                            "transferred through the anchor bolts outside column flange on the tension side")
+            if self.eccentricity_zz > (self.bp_length_min / 6):  # Case 1
 
-            else:  # (self.eccentricity_zz > (self.bp_length_min / 6)) or (self.eccentricity_zz < (self.bp_length_min / 3))
-                self.moment_bp_case = 'Case2'
-                logger.info("[Base Plate Type] The value of eccentricity about the major axis is {} mm".format(round_down(self.eccentricity_zz, 2)))
-                logger.info("Eccentricity is greater than {} (L/6) mm but less than {} (L/3) mm".format(round(self.bp_length_min / 6, 2),
-                                                                                                        round(self.bp_length_min / 3, 2)))
-                logger.info("Case 2: A larger part of the base plate is under compression/bearing with a small to moderate tension/uplift force "
-                            "being transferred through the anchor bolts outside column flange on the tension side")
+                if self.eccentricity_zz >= (self.bp_length_min / 3):  # Case 3
+                    self.moment_bp_case = 'Case3'
+                    logger.info("[Base Plate Type] The value of eccentricity about the major axis is {} mm".format(round_down(self.eccentricity_zz, 2)))
+                    logger.info("Eccentricity is greater than {} (L/3) mm".format(round(self.bp_length_min / 3, 2)))
+                    logger.info("Case 3: A smaller part of the base plate is under pure compression/bearing with a large tension/uplift force being "
+                                "transferred through the anchor bolts outside column flange on the tension side")
 
-            self.n = 2 * 10 ** 5 / (5000 * math.sqrt(self.cl_7_4_1_bearing_strength_concrete(self.footing_grade) / 0.45))
-            self.n = round(self.n, 3)
-            self.anchor_area_tension = round(self.anchor_area_outside_flange[0] * (self.anchor_nos_provided / 2), 2)  # mm^2, area of anchor under tension
-            self.f = round((self.bp_length_provided / 2) - self.end_distance_out, 2)  # mm
+                else:  # (self.eccentricity_zz > (self.bp_length_min / 6)) or (self.eccentricity_zz < (self.bp_length_min / 3))
+                    self.moment_bp_case = 'Case2'
+                    logger.info("[Base Plate Type] The value of eccentricity about the major axis is {} mm".format(round_down(self.eccentricity_zz, 2)))
+                    logger.info("Eccentricity is greater than {} (L/6) mm but less than {} (L/3) mm".format(round(self.bp_length_min / 6, 2),
+                                                                                                            round(self.bp_length_min / 3, 2)))
+                    logger.info("Case 2: A larger part of the base plate is under compression/bearing with a small to moderate tension/uplift force "
+                                "being transferred through the anchor bolts outside column flange on the tension side")
 
-            self.k1 = round(3 * (self.eccentricity_zz - (self.bp_length_provided / 2)), 2)
-            self.k2 = round(((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz), 2)
-            self.k3 = round(((self.bp_length_provided / 2) + self.f) * -self.k2, 2)
+                self.n = 2 * 10 ** 5 / (5000 * math.sqrt(self.cl_7_4_1_bearing_strength_concrete(self.footing_grade) / 0.45))
+                self.n = round(self.n, 3)
+                self.anchor_area_tension = round(self.anchor_area_outside_flange[0] * (self.anchor_nos_provided / 2), 2)  # mm^2, area of anchor under tension
+                self.f = round((self.bp_length_provided / 2) - self.end_distance_out, 2)  # mm
 
-            # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
-            roots = np.roots([1, self.k1, self.k2, self.k3])  # finding roots of the equation
-            r_1 = roots[0]
-            r_2 = roots[1]
-            r_3 = roots[2]
-            r = max(r_1, r_2, r_3)
-            r = r.real  # separating the imaginary part
+                self.k1 = round(3 * (self.eccentricity_zz - (self.bp_length_provided / 2)), 2)
+                self.k2 = round(((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz), 2)
+                self.k3 = round(((self.bp_length_provided / 2) + self.f) * -self.k2, 2)
 
-            self.y = round(r)  # mm
+                # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
+                roots = np.roots([1, self.k1, self.k2, self.k3])  # finding roots of the equation
+                r_1 = roots[0]
+                r_2 = roots[1]
+                r_3 = roots[2]
+                r = max(r_1, r_2, r_3)
+                r = r.real  # separating the imaginary part
 
-            self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.base_plate.fy * self.bp_width_provided))  # mm
-            self.plate_thk = round(self.plate_thk, 2)
+                self.y = round(r)  # mm
+
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.base_plate.fy * self.bp_width_provided))  # mm
+                self.plate_thk = round(self.plate_thk, 2)
 
         # Minor axis
         if self.load_moment_minor > 0:
@@ -5402,6 +5404,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.stiffener_plt_len_along_web = (self.bp_length_provided - self.column_D) / 2  # mm (each, along the web)
             self.stiffener_plt_len_across_web = max(self.stiffener_plt_len_along_flange,
                                                     self.stiffener_plt_len_along_web)  # mm (each, across the web)
+            self.stiffener_plt_len_across_web = min(self.stiffener_plt_len_across_web, (self.bp_width_provided - self.column_tw) / 2)
 
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
@@ -6891,14 +6894,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if self.safe:
             self.design_status = True
-            logger.info(": ================= Design Status ===================")
-            logger.info(":      Overall base plate connection design is SAFE")
-            logger.info(": ================== End Of Design ==================")
+            logger.debug(": =========== Design Status =============")
+            logger.debug(":      Overall base plate connection design is SAFE")
+            logger.debug(": ============ End Of Design ============")
         else:
             self.design_status = False
-            logger.info(": ================= Design Status ===================")
-            logger.error(":     Overall base plate connection design is UNSAFE")
-            logger.info(": ================== End Of Design ==================")
+            logger.debug(": =========== Design Status =============")
+            logger.debug(":     Overall base plate connection design is UNSAFE")
+            logger.debug(": ============ End Of Design ============")
 
         # printing values for output dock
 
@@ -7372,7 +7375,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_AXIAL_BP, display_prov(self.load_axial_input, "P"),
+        t1 = (KEY_DISP_AXIAL_BP, display_prov(self.load_axial_input, "P_x"),
               axial_compression_prov(self.load_axial_input, self.column_axial_capacity, round(self.load_axial_compression * 1e-3, 2)),
               get_pass_fail(self.load_axial_input, self.column_axial_capacity, relation='leq'))
         self.report_check.append(t1)
@@ -7393,7 +7396,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if self.connectivity == 'Moment Base Plate':
 
-            t1 = ("Bending Moment - major (z-z) axis (kNm)", display_load_bp(round(self.load_moment_major_report, 2), 'M'),
+            t1 = ("Bending Moment - major (z-z) axis (kNm)", display_load_bp(round(self.load_moment_major_report, 2), 'M_z'),
                   prov_moment_load_bp(moment_input=round(self.load_moment_major_report, 2), min_mc=round(0.5 * self.M_dz * 1e-6, 2),
                                       app_moment_load=round(self.load_moment_major * 1e-6, 2),
                                       moment_capacity=round(self.M_dz * 1e-6, 2), axis='Major', classification=self.col_classification),
@@ -7402,7 +7405,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.load_moment_minor > 0:
                 if self.load_moment_minor < (0.5 * self.M_dy):
-                    t1 = ("Bending Moment - minor (y-y) axis (kNm)", display_load_bp(round(self.load_moment_minor_report, 2), 'M'),
+                    t1 = ("Bending Moment - minor (y-y) axis (kNm)", display_load_bp(round(self.load_moment_minor_report, 2), 'M_y'),
                           prov_moment_load_bp(moment_input=round(self.load_moment_minor_report, 2), min_mc=round(0.5 * self.M_dy * 1e-6, 2),
                                               app_moment_load=round(self.load_moment_minor * 1e-6, 2),
                                               moment_capacity=round(self.M_dy * 1e-6, 2), axis='Minor', classification=self.col_classification),
@@ -7725,7 +7728,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 t1 = ('SubSection', 'Base Plate Analysis', '|p{3cm}|p{8.2cm}|p{4.3cm}|p{1cm}|')
                 self.report_check.append(t1)
 
-                t2 = ('Min. Area Required $(mm^2)$', min_area_req(self.load_axial_compression, self.bearing_strength_concrete, self.min_area_req),
+                t2 = ('Min. Area Required $(mm^2)$', min_area_req(round(self.load_axial_compression, 2), self.bearing_strength_concrete, self.min_area_req),
                       min_area_provided(self.bp_area_provided, self.bp_length_provided, self.bp_width_provided),
                       get_pass_fail(self.min_area_req, self.bp_area_provided, relation='leq'))
                 self.report_check.append(t2)
@@ -7758,8 +7761,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                 self.projection_dr, self.end_distance_out, col_type='CHS'), self.projection, 'Pass')
                         self.report_check.append(t4)
 
-                t5 = ('Actual Bearing Stress $(N/mm^2)$', self.bearing_strength_concrete, actual_bearing_pressure(self.load_axial_compression,
-                                                                                                                self.bp_area_provided, self.w),
+                t5 = ('Actual Bearing Stress $(N/mm^2)$', self.bearing_strength_concrete,
+                      actual_bearing_pressure(round(self.load_axial_compression, 2), self.bp_area_provided, self.w),
                       get_pass_fail(self.bearing_strength_concrete, self.w, relation='geq'))
                 self.report_check.append(t5)
 

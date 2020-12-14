@@ -690,14 +690,14 @@ class Connection(Main):
                                   KEY_DISP_FLANGE_S_REPORT: self.supporting_section.flange_slope,
                                   KEY_REPORT_R1: self.supporting_section.root_radius,
                                   KEY_REPORT_R2: self.supporting_section.toe_radius,
-                                  KEY_REPORT_IZ: self.supporting_section.mom_inertia_z * 1e-4,
-                                  KEY_REPORT_IY: self.supporting_section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_IZ: round(self.supporting_section.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.supporting_section.mom_inertia_y * 1e-4, 2),
                                   KEY_REPORT_RZ: round(self.supporting_section.rad_of_gy_z * 1e-1, 2),
                                   KEY_REPORT_RY: round(self.supporting_section.rad_of_gy_y * 1e-1, 2),
-                                  KEY_REPORT_ZEZ: self.supporting_section.elast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZEY: self.supporting_section.elast_sec_mod_y * 1e-3,
-                                  KEY_REPORT_ZPZ: self.supporting_section.plast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZPY: self.supporting_section.plast_sec_mod_y * 1e-3}
+                                  KEY_REPORT_ZEZ: round(self.supporting_section.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.supporting_section.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.supporting_section.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.supporting_section.plast_sec_mod_y * 1e-3, 2)}
 
             if self.supported_section.flange_slope != 90:
                 section2 = "Slope_Beam"
@@ -718,14 +718,14 @@ class Connection(Main):
                                   KEY_DISP_FLANGE_S_REPORT: self.supported_section.flange_slope,
                                   KEY_REPORT_R1: self.supported_section.root_radius,
                                   KEY_REPORT_R2: self.supported_section.toe_radius,
-                                  KEY_REPORT_IZ: self.supported_section.mom_inertia_z * 1e-4,
-                                  KEY_REPORT_IY: self.supported_section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_IZ: round(self.supported_section.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.supported_section.mom_inertia_y * 1e-4, 2),
                                   KEY_REPORT_RZ: round(self.supported_section.rad_of_gy_z * 1e-1, 2),
                                   KEY_REPORT_RY: round(self.supported_section.rad_of_gy_y * 1e-1, 2),
-                                  KEY_REPORT_ZEZ: self.supported_section.elast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZEY: self.supported_section.elast_sec_mod_y * 1e-3,
-                                  KEY_REPORT_ZPZ: self.supported_section.plast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZPY: self.supported_section.plast_sec_mod_y * 1e-3}
+                                  KEY_REPORT_ZEZ: round(self.supported_section.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.supported_section.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.supported_section.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.supported_section.plast_sec_mod_y * 1e-3, 2)}
 
             if self.module == KEY_DISP_FINPLATE or self.module == KEY_DISP_ENDPLATE:
                 self.report_input = \

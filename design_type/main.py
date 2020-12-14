@@ -359,12 +359,12 @@ class Main():
             internal_vol = 0.0
             moa_z = sec_prop.calc_MomentOfAreaZ(D, B, t_w, t_f)
             moa_y = sec_prop.calc_MomentOfAreaY(D, B, t_w, t_f)
-            rog_z = sec_prop.calc_R(D, t_f)
-            rog_y = sec_prop.calc_R(D, t_f)
+            rog_z = sec_prop.calc_RogZ(D, B, t_w, t_f)
+            rog_y = sec_prop.calc_RogY(D, B, t_w, t_f)
             em_z = sec_prop.calc_ElasticModulusZz(D, B, t_w, t_f)
             em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
-            pm_y = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
+            pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
             I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
             I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
             image = VALUES_IMG_HOLLOWSECTION[2]
@@ -372,16 +372,16 @@ class Main():
         d = {'Label_CHS_11': str(mass),
              'Label_CHS_12': str(area),
              'Label_CHS_13': str(internal_vol),
-             'Label_CHS_14': str(moa_z),
+             'Label_HS_14': str(moa_z),
              # 'Label_HS_14': str(moa_y),
-             'Label_CHS_15': str(rog_z),
+             'Label_HS_15': str(rog_z),
              # 'Label_16': str(rog_y),
-             'Label_CHS_16': str(em_z),
+             'Label_HS_16': str(em_z),
              # 'Label_18': str(em_y),
              # 'Label_19': str(pm_z),
              # 'Label_20': str(pm_y),
-             'Label_CHS_21': str(I_t),
-             'Label_CHS_22': str(I_w),
+             'Label_21': str(I_t),
+             'Label_22': str(I_w),
              KEY_IMAGE: image
             }
 

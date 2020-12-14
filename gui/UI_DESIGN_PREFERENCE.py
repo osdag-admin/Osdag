@@ -156,7 +156,10 @@ class Window(QDialog):
                     horizontal.addWidget(button)
                     button.setObjectName(object_name)
                     button.setText(btn_text)
-                    button.setFixedSize(button_size_x,button_size_y)
+                    button.setFixedSize(button_size_x, button_size_y)
+                    if input_dictionary != {}:
+                        if main.module_name(main) == KEY_DISP_BASE_PLATE and input_dictionary[KEY_CONN] == VALUES_CONN_BP[2]:
+                            button.setEnabled(False)
 
                 r = 1
                 grid = QGridLayout()

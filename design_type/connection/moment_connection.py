@@ -69,6 +69,7 @@ class MomentConnection(Connection, IS800_2007):
                 depth = str(RHS_sec_attributes.depth)
                 width = str(RHS_sec_attributes.flange_width)
                 thickness = str(RHS_sec_attributes.flange_thickness)
+                flange_slope = 0
                 mass = str(RHS_sec_attributes.mass)
                 area = str(round((RHS_sec_attributes.area / 10 ** 2), 2))
                 mom_inertia_z = str(round((RHS_sec_attributes.mom_inertia_z / 10 ** 4), 2))
@@ -88,6 +89,7 @@ class MomentConnection(Connection, IS800_2007):
                 depth = str(SHS_sec_attributes.depth)
                 width = str(SHS_sec_attributes.flange_width)
                 thickness = str(SHS_sec_attributes.flange_thickness)
+                flange_slope = 0
                 mass = str(SHS_sec_attributes.mass)
                 area = str(round((SHS_sec_attributes.area / 10 ** 2), 2))
                 mom_inertia_z = str(round((SHS_sec_attributes.mom_inertia_z / 10 ** 4), 2))
@@ -107,6 +109,7 @@ class MomentConnection(Connection, IS800_2007):
                 nominal_bore = str(CHS_sec_attributes.nominal_bore)
                 out_diameter = str(CHS_sec_attributes.out_diameter)
                 thickness = str(CHS_sec_attributes.flange_thickness)
+                flange_slope = 0
                 mass = str(CHS_sec_attributes.mass)
                 area = str(round((CHS_sec_attributes.area / 10 ** 2), 2))
                 internal_vol = str(CHS_sec_attributes.internal_vol)
@@ -362,12 +365,36 @@ class MomentConnection(Connection, IS800_2007):
 
         fu = ''
         fy = ''
+
         if material_grade != "Select Material" and designation != "Select Section":
-            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = ISection(designation)
-            I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
-            fu = str(I_sec_attributes.fu)
-            fy = str(I_sec_attributes.fy)
+
+            if designation[1:4] == "CHS":
+                table = "CHS" if designation in connectdb("CHS", "popup") else ""
+                CHS_attributes = CHS(designation, material_grade)
+                CHS_attributes.connect_to_database_update_other_attributes(designation, material_grade)
+                fu = str(CHS_attributes.fu)
+                fy = str(CHS_attributes.fy)
+
+            elif designation[1:4] == "RHS":
+                table = "RHS" if designation in connectdb("RHS", "popup") else ""
+                RHS_attributes = RHS(designation, material_grade)
+                RHS_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
+                fu = str(RHS_attributes.fu)
+                fy = str(RHS_attributes.fy)
+
+            elif designation[1:4] == "SHS":
+                table = "SHS" if designation in connectdb("SHS", "popup") else ""
+                SHS_attributes = SHS(designation, material_grade)
+                SHS_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
+                fu = str(SHS_attributes.fu)
+                fy = str(SHS_attributes.fy)
+
+            else:
+                table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
+                I_sec_attributes = ISection(designation)
+                I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
+                fu = str(I_sec_attributes.fu)
+                fy = str(I_sec_attributes.fy)
         else:
             pass
 

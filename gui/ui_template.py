@@ -577,8 +577,8 @@ class Window(QMainWindow):
                 #l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 1, 1, 1)
                 metrices = QtGui.QFontMetrics(font)
-                maxi_width_left = max(maxi_width_left, metrices.boundingRect(lable).width() + 8)
-
+                if type not in [TYPE_TEXTBOX, '']:
+                    maxi_width_left = max(maxi_width_left, metrices.boundingRect(lable).width() + 8)
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
@@ -2652,7 +2652,7 @@ class Window(QMainWindow):
         self.btn_Design.setText(_translate("MainWindow", "Design"))
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
-        self.btn_CreateDesign.setText(_translate("MainWindow", "Create design report"))
+        self.btn_CreateDesign.setText(_translate("MainWindow", "Create Design Report"))
         self.actionInput.setText(_translate("MainWindow", "Input"))
         self.actionInput.setToolTip(_translate("MainWindow", "Input browser"))
         self.actionInputwindow.setText(_translate("MainWindow", "inputwindow"))
@@ -2705,7 +2705,7 @@ class Window(QMainWindow):
         self.actionSave_current_image.setShortcut(_translate("MainWindow", "Alt+I"))
         self.actionSave_log_messages.setText(_translate("MainWindow", "Save log messages"))
         self.actionSave_log_messages.setShortcut(_translate("MainWindow", "Alt+M"))
-        self.actionCreate_design_report.setText(_translate("MainWindow", "Create design report"))
+        self.actionCreate_design_report.setText(_translate("MainWindow", "Create Design Report"))
         self.actionCreate_design_report.setShortcut(_translate("MainWindow", "Alt+C"))
         self.actionQuit_fin_plate_design.setText(_translate("MainWindow", "Quit fin plate design"))
         self.actionSave_Front_View.setText(_translate("MainWindow", "Save front view"))

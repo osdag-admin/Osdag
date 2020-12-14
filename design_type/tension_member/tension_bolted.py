@@ -230,23 +230,23 @@ class Tension_bolted(Member):
 
         # @author Arsil Zunzunia
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -2196,14 +2196,14 @@ class Tension_bolted(Member):
                                       KEY_REPORT_R1: round(section_size.root_radius,2),
                                       KEY_REPORT_R2:round(section_size.toe_radius,2),
                                       KEY_REPORT_CY: round(section_size.Cy,2),
-                                      KEY_REPORT_IZ: round(section_size.mom_inertia_z,2),
-                                      KEY_REPORT_IY: round(section_size.mom_inertia_y,2),
-                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z,2),
-                                      KEY_REPORT_RY: round(section_size.rad_of_gy_y,2),
-                                      KEY_REPORT_ZEZ: round(section_size.elast_sec_mod_z,2),
-                                      KEY_REPORT_ZEY: round(section_size.elast_sec_mod_y,2),
-                                      KEY_REPORT_ZPZ: round(section_size.plast_sec_mod_z,2),
-                                      KEY_REPORT_ZPY: round(section_size.elast_sec_mod_y,2),
+                                      KEY_REPORT_IZ: round(section_size.mom_inertia_z * 1e-4,2),
+                                      KEY_REPORT_IY: round(section_size.mom_inertia_y * 1e-4,2),
+                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z * 1e-1,2),
+                                      KEY_REPORT_RY: round(section_size.rad_of_gy_y * 1e-1,2),
+                                      KEY_REPORT_ZEZ: round(section_size.elast_sec_mod_z * 1e-3,2),
+                                      KEY_REPORT_ZEY: round(section_size.elast_sec_mod_y * 1e-3,2),
+                                      KEY_REPORT_ZPZ: round(section_size.plast_sec_mod_z * 1e-3,2),
+                                      KEY_REPORT_ZPY: round(section_size.elast_sec_mod_y * 1e-3,2),
                                       KEY_REPORT_RADIUS_GYRATION: round(gyration,2)}
 
             thickness = section_size.web_thickness
@@ -2225,14 +2225,14 @@ class Tension_bolted(Member):
                                       KEY_DISP_FLANGE_S_REPORT: round(section_size.flange_slope, 2),
                                       KEY_REPORT_R1: round(section_size.root_radius, 2),
                                       KEY_REPORT_R2: round(section_size.toe_radius, 2),
-                                      KEY_REPORT_IZ: round((BBChannel.calc_MomentOfAreaZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10000),2),
-                                      KEY_REPORT_IY: round((BBChannel.calc_MomentOfAreaY(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10000),2),
-                                      KEY_REPORT_RZ: round((BBChannel.calc_RogZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10),2),
-                                      KEY_REPORT_RY: round((BBChannel.calc_RogY(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10),2),
-                                      KEY_REPORT_ZEZ: round((BBChannel.calc_ElasticModulusZz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
-                                      KEY_REPORT_ZEY: round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
-                                      KEY_REPORT_ZPZ: round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
-                                      KEY_REPORT_ZPY: round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000),2),
+                                      KEY_REPORT_IZ: round((BBChannel.calc_MomentOfAreaZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10000) * 1e-4,2),
+                                      KEY_REPORT_IY: round((BBChannel.calc_MomentOfAreaY(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10000) * 1e-4,2),
+                                      KEY_REPORT_RZ: round((BBChannel.calc_RogZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10) * 1e-1,2),
+                                      KEY_REPORT_RY: round((BBChannel.calc_RogY(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*10) * 1e-1,2),
+                                      KEY_REPORT_ZEZ: round((BBChannel.calc_ElasticModulusZz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000) * 1e-3,2),
+                                      KEY_REPORT_ZEY: round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000) * 1e-3,2),
+                                      KEY_REPORT_ZPZ: round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000) * 1e-3,2),
+                                      KEY_REPORT_ZPY: round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness)*1000) * 1e-3,2),
                                       KEY_REPORT_RADIUS_GYRATION: round(gyration, 2)}
             thickness = section_size.web_thickness
             text = "C"
@@ -2251,18 +2251,18 @@ class Tension_bolted(Member):
                                       KEY_REPORT_R2: round(section_size.toe_radius,2),
                                       KEY_REPORT_CY: round(section_size.Cy,2),
                                       KEY_REPORT_CZ: round(section_size.Cz,2),
-                                      KEY_REPORT_IZ: round(section_size.mom_inertia_z,2),
-                                      KEY_REPORT_IY: round(section_size.mom_inertia_y,2),
-                                      KEY_REPORT_IU: round(section_size.mom_inertia_u,2),
-                                      KEY_REPORT_IV: round(section_size.mom_inertia_v,2),
-                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z,2),
-                                      KEY_REPORT_RY: round((section_size.rad_of_gy_y),2),
-                                      KEY_REPORT_RU: round((section_size.rad_of_gy_u),2),
-                                      KEY_REPORT_RV: round((section_size.rad_of_gy_v),2),
-                                      KEY_REPORT_ZEZ: round(section_size.elast_sec_mod_z,2),
-                                      KEY_REPORT_ZEY: round(section_size.elast_sec_mod_y,2),
-                                      KEY_REPORT_ZPZ: round(section_size.plast_sec_mod_z,2),
-                                      KEY_REPORT_ZPY: round(section_size.plast_sec_mod_y,2),
+                                      KEY_REPORT_IZ: round(section_size.mom_inertia_z * 1e-4,2),
+                                      KEY_REPORT_IY: round(section_size.mom_inertia_y * 1e-4,2),
+                                      KEY_REPORT_IU: round(section_size.mom_inertia_u * 1e-4,2),
+                                      KEY_REPORT_IV: round(section_size.mom_inertia_v * 1e-4,2),
+                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z * 1e-1,2),
+                                      KEY_REPORT_RY: round((section_size.rad_of_gy_y) * 1e-1,2),
+                                      KEY_REPORT_RU: round((section_size.rad_of_gy_u) * 1e-1,2),
+                                      KEY_REPORT_RV: round((section_size.rad_of_gy_v) * 1e-1,2),
+                                      KEY_REPORT_ZEZ: round(section_size.elast_sec_mod_z * 1e-3,2),
+                                      KEY_REPORT_ZEY: round(section_size.elast_sec_mod_y * 1e-3,2),
+                                      KEY_REPORT_ZPZ: round(section_size.plast_sec_mod_z * 1e-3,2),
+                                      KEY_REPORT_ZPY: round(section_size.plast_sec_mod_y * 1e-3,2),
                                       KEY_REPORT_RADIUS_GYRATION: round(gyration,2)}
             thickness = section_size.thickness
             text = "A"
@@ -2291,18 +2291,18 @@ class Tension_bolted(Member):
                                       KEY_REPORT_R2: round(section_size.toe_radius,2),
                                       KEY_REPORT_CY: Cy,
                                       KEY_REPORT_CZ: Cz,
-                                      KEY_REPORT_IZ: round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000),2),
-                                      KEY_REPORT_IY: round((Angle_attributes.calc_MomentOfAreaY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000),2),
-                                      KEY_REPORT_IU: round((Angle_attributes.calc_MomentOfAreaY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000),2),
-                                      KEY_REPORT_IV: round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000),2),
-                                      KEY_REPORT_RZ: round((Angle_attributes.calc_RogZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10),2),
-                                      KEY_REPORT_RY: round((Angle_attributes.calc_RogY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10),2),
-                                      KEY_REPORT_RU: round((Angle_attributes.calc_RogY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc) * 10), 2),
-                                      KEY_REPORT_RV: round((Angle_attributes.calc_RogZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc) * 10), 2),
-                                      KEY_REPORT_ZEZ: round((Angle_attributes.calc_ElasticModulusZz(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
-                                      KEY_REPORT_ZEY: round((Angle_attributes.calc_ElasticModulusZy(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
-                                      KEY_REPORT_ZPZ: round((Angle_attributes.calc_PlasticModulusZpz(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
-                                      KEY_REPORT_ZPY: round((Angle_attributes.calc_PlasticModulusZpy(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*1000),2),
+                                      KEY_REPORT_IZ: round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000) * 1e-4,2),
+                                      KEY_REPORT_IY: round((Angle_attributes.calc_MomentOfAreaY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000) * 1e-4,2),
+                                      KEY_REPORT_IU: round((Angle_attributes.calc_MomentOfAreaY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000) * 1e-4,2),
+                                      KEY_REPORT_IV: round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)*10000) * 1e-4,2),
+                                      KEY_REPORT_RZ: round((Angle_attributes.calc_RogZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)),2),
+                                      KEY_REPORT_RY: round((Angle_attributes.calc_RogY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)),2),
+                                      KEY_REPORT_RU: round((Angle_attributes.calc_RogY(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_RV: round((Angle_attributes.calc_RogZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_ZEZ: round((Angle_attributes.calc_ElasticModulusZz(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)),2),
+                                      KEY_REPORT_ZEY: round((Angle_attributes.calc_ElasticModulusZy(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)),2),
+                                      KEY_REPORT_ZPZ: round((Angle_attributes.calc_PlasticModulusZpz(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)),2),
+                                      KEY_REPORT_ZPY: round((Angle_attributes.calc_PlasticModulusZpy(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)),2),
                                       KEY_REPORT_RADIUS_GYRATION: round(gyration,2)}
             thickness = section_size.thickness
             text = "A"
@@ -2322,18 +2322,18 @@ class Tension_bolted(Member):
                                       '$T$ (mm)': round(self.plate.thickness_provided, 2),
                                       KEY_REPORT_R1: round(section_size.root_radius, 2),
                                       KEY_REPORT_R2: round(section_size.toe_radius, 2),
-                                      KEY_REPORT_IZ: round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc) * 10000), 2),
-                                      KEY_REPORT_IY: round((Angle_attributes.calc_MomentOfAreaY(section_size.max_leg, section_size.min_leg,section_size.thickness,self.loc) * 10000), 2),
-                                      KEY_REPORT_IU: round((Angle_attributes.calc_MomentOfAreaU(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc) * 10000), 2),
-                                      KEY_REPORT_IV: round((Angle_attributes.calc_MomentOfAreaV(section_size.max_leg,section_size.min_leg,section_size.thickness, self.loc) * 10000), 2),
-                                      KEY_REPORT_RZ: round((Angle_attributes.calc_RogZ(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc) * 10), 2),
-                                      KEY_REPORT_RY: round((Angle_attributes.calc_RogY(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc) * 10), 2),
-                                      KEY_REPORT_RU: round((Angle_attributes.calc_RogU(section_size.max_leg,section_size.min_leg, section_size.thickness, self.loc) * 10), 2),
-                                      KEY_REPORT_RV: round((Angle_attributes.calc_RogV(section_size.max_leg,section_size.min_leg,section_size.thickness, self.loc) * 10), 2),
-                                      KEY_REPORT_ZEZ: round((Angle_attributes.calc_ElasticModulusZz(section_size.max_leg, section_size.min_leg, section_size.thickness,  self.loc) * 1000), 2),
-                                      KEY_REPORT_ZEY: round((Angle_attributes.calc_ElasticModulusZy(section_size.max_leg, section_size.min_leg, section_size.thickness, self.loc) * 1000), 2),
-                                      KEY_REPORT_ZPZ: round((Angle_attributes.calc_PlasticModulusZpz(section_size.max_leg, section_size.min_leg, section_size.thickness, self.loc) * 1000), 2),
-                                      KEY_REPORT_ZPY: round((Angle_attributes.calc_PlasticModulusZpy(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc) * 1000), 2),
+                                      KEY_REPORT_IZ: round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_IY: round((Angle_attributes.calc_MomentOfAreaY(section_size.max_leg, section_size.min_leg,section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_IU: round((Angle_attributes.calc_MomentOfAreaU(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_IV: round((Angle_attributes.calc_MomentOfAreaV(section_size.max_leg,section_size.min_leg,section_size.thickness, self.loc)), 2),
+                                      KEY_REPORT_RZ: round((Angle_attributes.calc_RogZ(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_RY: round((Angle_attributes.calc_RogY(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc)), 2),
+                                      KEY_REPORT_RU: round((Angle_attributes.calc_RogU(section_size.max_leg,section_size.min_leg, section_size.thickness, self.loc)), 2),
+                                      KEY_REPORT_RV: round((Angle_attributes.calc_RogV(section_size.max_leg,section_size.min_leg,section_size.thickness, self.loc)), 2),
+                                      KEY_REPORT_ZEZ: round((Angle_attributes.calc_ElasticModulusZz(section_size.max_leg, section_size.min_leg, section_size.thickness,  self.loc)), 2),
+                                      KEY_REPORT_ZEY: round((Angle_attributes.calc_ElasticModulusZy(section_size.max_leg, section_size.min_leg, section_size.thickness, self.loc)), 2),
+                                      KEY_REPORT_ZPZ: round((Angle_attributes.calc_PlasticModulusZpz(section_size.max_leg, section_size.min_leg, section_size.thickness, self.loc)), 2),
+                                      KEY_REPORT_ZPY: round((Angle_attributes.calc_PlasticModulusZpy(section_size.max_leg, section_size.min_leg, section_size.thickness,self.loc)), 2),
                                       KEY_REPORT_RADIUS_GYRATION: round(gyration, 2)}
             thickness = section_size.thickness
             text = "A"

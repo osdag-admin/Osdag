@@ -242,23 +242,23 @@ class BeamColumnEndPlate(MomentConnection):
     def set_osdaglogger(key):
         """ Function to set Logger for the module """
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -1177,7 +1177,8 @@ class BeamColumnEndPlate(MomentConnection):
             self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
         else:  # built-up sections
             self.supported_section_shear_capa = (((self.beam_D - (2 * self.beam_tf)) * self.beam_tw) * self.beam_fy) / (math.sqrt(3) * self.gamma_m0)
-        self.supported_section_shear_capa = round(self.supported_section_shear_capa * 1e-3, 2)  # kN
+
+        self.supported_section_shear_capa = round(0.60 * self.supported_section_shear_capa * 1e-3, 2)  # kN, restricted to low shear
 
         # 3: Axial capacity of the beam
         self.supported_section_axial_capa = round((self.supported_section.area * self.beam_fy / self.gamma_m0) * 1e-3, 2)  # kN
@@ -1975,8 +1976,10 @@ class BeamColumnEndPlate(MomentConnection):
 
                 self.continuity_plate_compression_flange_status = True
                 # the design of the continuity plate is same for compression and tension side for reversible moment connections
-                if self.endplate_type == VALUES_ENDPLATE_TYPE[0] or VALUES_ENDPLATE_TYPE[2]:  # flush and both way
+                if (self.endplate_type == VALUES_ENDPLATE_TYPE[0]) or (self.endplate_type == VALUES_ENDPLATE_TYPE[2]):  # flush and both way
                     self.continuity_plate_tension_flange_status = True
+                else:
+                    self.continuity_plate_tension_flange_status = False
 
                 # continuity plate design
                 self.cont_plate_area_req = ((self.call_helper.r_c - self.p_bf) * 1e3) / (self.cont_plate_fy * self.gamma_m0)  # mm^2, total req area
@@ -2009,13 +2012,15 @@ class BeamColumnEndPlate(MomentConnection):
                     self.cont_plate_thk_provided = thk  # plate thickness provided (mm)
                     break
             else:
-                if self.endplate_type == VALUES_ENDPLATE_TYPE[0] or VALUES_ENDPLATE_TYPE[2]:  # flush and both way
+                if (self.endplate_type == VALUES_ENDPLATE_TYPE[0]) or (self.endplate_type == VALUES_ENDPLATE_TYPE[2]):  # flush and both way
                     self.continuity_plate_compression_flange_status = False
                     self.continuity_plate_tension_flange_status = False
                     self.cont_plate_length_out = 'N/A'
                     self.cont_plate_length_in = 'N/A'
                     self.cont_plate_width = 'N/A'
                     self.cont_plate_thk_provided = 'N/A'
+                else:
+                    self.continuity_plate_compression_flange_status = False
 
             # Design 2: Continuity Plates on tension side for one way connection
             if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one way
@@ -2243,13 +2248,13 @@ class BeamColumnEndPlate(MomentConnection):
                 self.design_status = True
 
         if self.design_status:
-            logger.info(": =====================Design Status=======================")
-            logger.info(": Overall beam to beam end plate splice connection design is SAFE")
-            logger.info(": =====================End Of design=======================")
+            logger.debug(": ========== Design Status ============")
+            logger.debug(": Overall beam to column end plate connection design is SAFE")
+            logger.debug(": ========== End Of Design ============")
         else:
-            logger.info(": =====================Design Status=======================")
-            logger.error(": Overall beam to beam end plate splice connection design is UNSAFE")
-            logger.info(": =====================End Of design=======================")
+            logger.debug(": ========== Design Status ============")
+            logger.debug(": Overall beam to column end plate connection design is UNSAFE")
+            logger.debug(": ========== End Of Design ============")
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
@@ -2272,14 +2277,14 @@ class BeamColumnEndPlate(MomentConnection):
                                   KEY_DISP_FLANGE_S_REPORT: self.supported_section.flange_slope,
                                   KEY_REPORT_R1: self.supported_section.root_radius,
                                   KEY_REPORT_R2: self.supported_section.toe_radius,
-                                  KEY_REPORT_IZ: self.supported_section.mom_inertia_z * 1e-4,
-                                  KEY_REPORT_IY: self.supported_section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_IZ: round(self.supported_section.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.supported_section.mom_inertia_y * 1e-4, 2),
                                   KEY_REPORT_RZ: round(self.supported_section.rad_of_gy_z * 1e-1, 2),
                                   KEY_REPORT_RY: round(self.supported_section.rad_of_gy_y * 1e-1, 2),
-                                  KEY_REPORT_ZEZ: self.supported_section.elast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZEY: self.supported_section.elast_sec_mod_y * 1e-3,
-                                  KEY_REPORT_ZPZ: self.supported_section.plast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZPY: self.supported_section.plast_sec_mod_y * 1e-3}
+                                  KEY_REPORT_ZEZ: round(self.supported_section.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.supported_section.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.supported_section.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.supported_section.plast_sec_mod_y * 1e-3, 2)}
 
         if self.supporting_section.flange_slope == 90:
             image = "Parallel_Beam"
@@ -2300,14 +2305,14 @@ class BeamColumnEndPlate(MomentConnection):
                                   KEY_DISP_FLANGE_S_REPORT: self.supporting_section.flange_slope,
                                   KEY_REPORT_R1: self.supporting_section.root_radius,
                                   KEY_REPORT_R2: self.supporting_section.toe_radius,
-                                  KEY_REPORT_IZ: self.supporting_section.mom_inertia_z * 1e-4,
-                                  KEY_REPORT_IY: self.supporting_section.mom_inertia_y * 1e-4,
+                                  KEY_REPORT_IZ: round(self.supporting_section.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.supporting_section.mom_inertia_y * 1e-4, 2),
                                   KEY_REPORT_RZ: round(self.supporting_section.rad_of_gy_z * 1e-1, 2),
                                   KEY_REPORT_RY: round(self.supporting_section.rad_of_gy_y * 1e-1, 2),
-                                  KEY_REPORT_ZEZ: self.supporting_section.elast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZEY: self.supporting_section.elast_sec_mod_y * 1e-3,
-                                  KEY_REPORT_ZPZ: self.supporting_section.plast_sec_mod_z * 1e-3,
-                                  KEY_REPORT_ZPY: self.supporting_section.plast_sec_mod_y * 1e-3}
+                                  KEY_REPORT_ZEZ: round(self.supporting_section.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.supporting_section.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.supporting_section.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.supporting_section.plast_sec_mod_y * 1e-3, 2)}
 
         self.report_input = \
             {KEY_MAIN_MODULE: self.mainmodule,
@@ -2382,7 +2387,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         t1 = (KEY_DISP_SHEAR_CAPACITY, '',
               cl_8_4_shear_yielding_capacity_member(h=self.h, t=self.supported_section.web_thickness, f_y=self.supported_section.fy,
-                                                    gamma_m0=self.gamma_m0, V_dg=round(self.supported_section_shear_capa, 2)),
+                                                    gamma_m0=self.gamma_m0, V_dg=round(self.supported_section_shear_capa, 2), multiple=0.60),
               'Restricted to low shear')
         self.report_check.append(t1)
 
@@ -2423,17 +2428,17 @@ class BeamColumnEndPlate(MomentConnection):
         #       get_pass_fail(self.IR_moment, 1.0, relation='leq'))
         # self.report_check.append(t1)
 
-        t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V"),
+        t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V_y"),
               prov_shear_force(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
                                app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.supported_section_shear_capa),
               "OK")
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_AXIAL, '', 'H = ' + str(self.load_axial), "OK")
+        t1 = (KEY_DISP_AXIAL, '', 'P_x = ' + str(self.load_axial), "OK")
         self.report_check.append(t1)
 
         if self.connectivity == VALUES_CONN_1[0]:
-            t1 = ("Bending Moment (major axis) (kNm)", display_prov(self.input_moment, "M"),
+            t1 = ("Bending Moment (major axis) (kNm)", display_prov(self.input_moment, "M_z"),
                   prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                    app_moment_load=round(self.load_moment, 2),
                                    moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=self.M_dz,
@@ -2741,7 +2746,8 @@ class BeamColumnEndPlate(MomentConnection):
             t1 = (KEY_DISP_PLATE_THICK,
                   end_plate_thk_req(M_ep=round(self.ep_moment_capacity, 2), b_eff=round(self.call_helper.b_e, 2),
                                     f_y=self.dp_plate_fy,
-                                    gamma_m0=self.gamma_m0, t_p=self.call_helper.plate_thickness_req),
+                                    gamma_m0=self.gamma_m0, t_p=self.call_helper.plate_thickness_req, t_b=0, q=0, l_e=0, l_v=0, f_o=0, b_e=0, beta=0,
+                                    module='BC_EP'),
                   int(self.plate_thickness),
                   get_pass_fail(self.call_helper.plate_thickness_req, self.plate_thickness, relation="leq"))
             self.report_check.append(t1)
@@ -2848,8 +2854,10 @@ class BeamColumnEndPlate(MomentConnection):
 
             if self.connectivity == VALUES_CONN_1[0]:
 
-                # if (self.continuity_plate_tension_flange_status == True) or (self.continuity_plate_compression_flange_status == True):
-                t1 = ('SubSection', 'Continuity Plate Check - Compression Flange', '|p{3.5cm}|p{4cm}|p{7.8cm}|p{1.2cm}|')
+                if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:
+                    t1 = ('SubSection', 'Continuity Plate Check - Compression Flange', '|p{3.5cm}|p{4cm}|p{7.8cm}|p{1.2cm}|')
+                else:
+                    t1 = ('SubSection', 'Continuity Plate Check - Compression/Tension Flange', '|p{3.5cm}|p{4cm}|p{7.8cm}|p{1.2cm}|')
                 self.report_check.append(t1)
 
                 self.k = round(self.column_tf + self.column_r1, 2)
@@ -2893,7 +2901,11 @@ class BeamColumnEndPlate(MomentConnection):
                 self.report_check.append(t1)
 
                 if self.continuity_plate_compression_flange_status == True:
-                    t1 = ('SubSection', 'Continuity Plate Design- Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+
+                    if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:
+                        t1 = ('SubSection', 'Continuity Plate Design - Compression Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+                    else:
+                        t1 = ('SubSection', 'Continuity Plate Design - Compression/Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                     self.report_check.append(t1)
 
                     t1 = (KEY_OUT_DISP_AREA_REQ, Area_req_cont_plate(A_cp=round(self.cont_plate_area_req, 2),
@@ -2943,40 +2955,52 @@ class BeamColumnEndPlate(MomentConnection):
                           display_prov(self.column_tf, "T_c"), remark_1)
                     self.report_check.append(t1)
 
-                if self.continuity_plate_tension_flange_status == True:
-                    t1 = ('SubSection', 'Continuity Plate Design - Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-                    self.report_check.append(t1)
-
-                    if self.continuity_plate_compression_flange_status != True:
-                        t1 = (KEY_OUT_DISP_AREA_REQ, Area_req_cont_plate(A_cp=round(self.cont_plate_area_req, 2),
-                                                                            R_c=round(self.call_helper.r_c, 2),
-                                                                            p_cw=round(self.p_bf, 2),
-                                                                            f_ycp=self.cont_plate_fy,
-                                                                            gamma_m0=self.gamma_m0), '', 'OK')
+                    if self.continuity_plate_tension_flange_status == True:
+                        t1 = ('SubSection', 'Continuity Plate Design - Tension Flange ', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                         self.report_check.append(t1)
 
-                    t1 = (KEY_OUT_DISP_NOTCH_SIZE, '', display_prov(self.notch_size, "n"), 'OK')
-                    self.report_check.append(t1)
+                        # if self.continuity_plate_compression_flange_status == False:
+                        #     t1 = (KEY_OUT_DISP_AREA_REQ, Area_req_cont_plate(A_cp=round(self.cont_plate_area_req, 2),
+                        #                                                         R_c=round(self.call_helper.r_c, 2),
+                        #                                                         p_cw=round(self.p_bf, 2),
+                        #                                                         f_ycp=self.cont_plate_fy,
+                        #                                                         gamma_m0=self.gamma_m0), '', 'OK')
+                        #     self.report_check.append(t1)
 
-                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
-                                                                                      l_cp2=self.cont_plate_length_in,
-                                                                                      D_c=self.column_D,
-                                                                                      T_c=self.column_tf, n=self.notch_size), 'OK')
-                    self.report_check.append(t1)
-                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
-                                                                                    column_tw=self.column_tw,
-                                                                                    notch_size=self.notch_size,
-                                                                                    w_cp=self.cont_plate_width), 'OK')
-                    self.report_check.append(t1)
+                        t1 = (KEY_OUT_DISP_NOTCH_SIZE, '', display_prov(self.notch_size, "n"), 'OK')
+                        self.report_check.append(t1)
 
-                    t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, ten_plate_thk_p(A_cp=round(self.cont_plate_area_req, 2),
-                                                                             w_cp=self.cont_plate_width,
-                                                                             t_cp1=round(self.cont_plate_thk_req_1, 2),
-                                                                             t_cp2=self.beam_tf,
-                                                                             t_cp=round(self.cont_plate_thk_req, 2)),
-                          self.cont_plate_thk_provided,
-                          get_pass_fail(max(self.cont_plate_thk_req_1, self.cont_plate_thk_req_3), self.cont_plate_thk_provided, relation="leq"))
-                    self.report_check.append(t1)
+                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_LENGTH, '', comp_plate_length(l_cp1=self.cont_plate_length_out,
+                                                                                          l_cp2=self.cont_plate_length_in,
+                                                                                          D_c=self.column_D,
+                                                                                          T_c=self.column_tf, n=self.notch_size), 'OK')
+                        self.report_check.append(t1)
+                        t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_WIDTH, '', comp_plate_width(column_bf=self.column_bf,
+                                                                                        column_tw=self.column_tw,
+                                                                                        notch_size=self.notch_size,
+                                                                                        w_cp=self.cont_plate_width), 'OK')
+                        self.report_check.append(t1)
+
+                        if self.continuity_plate_compression_flange_status == False:
+                            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, ten_plate_thk_p(A_cp=0.0, w_cp=0.0, t_cp1=0.0, t_cp2=self.beam_tf,
+                                                                                     t_cp=round(self.cont_plate_thk_req, 2),
+                                                                                     compression_cont_status=
+                                                                                     self.continuity_plate_compression_flange_status),
+                                  self.cont_plate_thk_provided,
+                                  get_pass_fail(self.beam_tf, self.cont_plate_thk_provided, relation="leq"))
+                        else:
+                            t1 = (KEY_OUT_DISP_CONTINUITY_PLATE_THK, ten_plate_thk_p(A_cp=round(self.cont_plate_area_req, 2),
+                                                                                     w_cp=self.cont_plate_width,
+                                                                                     t_cp1=round(self.cont_plate_thk_req_1, 2),
+                                                                                     t_cp2=self.beam_tf,
+                                                                                     t_cp=round(self.cont_plate_thk_req, 2),
+                                                                                     compression_cont_status=
+                                                                                     self.continuity_plate_compression_flange_status),
+                                  self.cont_plate_thk_provided,
+                                  get_pass_fail(max(self.cont_plate_thk_req_1, self.cont_plate_thk_req_3), self.cont_plate_thk_provided,
+                                                relation="leq"))
+
+                        self.report_check.append(t1)
 
                 # Continuity plate weld design
                 if (self.continuity_plate_compression_flange_status == True) or (self.continuity_plate_tension_flange_status == True):

@@ -162,7 +162,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            logger = logging.getLogger('osdag')  #  Remove all the previous handlers
+            logger = logging.getLogger('Osdag')  #  Remove all the previous handlers
             for handler in logger.handlers[:]:
                 logger.removeHandler(handler)
             self.closed.emit()
@@ -2643,7 +2643,7 @@ class Window(QMainWindow):
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.menuGraphics.setTitle(_translate("MainWindow", "Graphics"))
         self.menuDB.setTitle(_translate("MainWindow", "Database"))
-        self.inputDock.setWindowTitle(_translate("MainWindow", "Input dock"))
+        self.inputDock.setWindowTitle(_translate("MainWindow", "Input Dock"))
         #self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
         self.btn_Reset.setText(_translate("MainWindow", "Reset"))
@@ -2651,7 +2651,7 @@ class Window(QMainWindow):
         self.btn_Design.setToolTip(_translate("MainWindow", "Alt+D"))
         self.btn_Design.setText(_translate("MainWindow", "Design"))
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
-        self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
+        self.outputDock.setWindowTitle(_translate("MainWindow", "Output Dock"))
         self.btn_CreateDesign.setText(_translate("MainWindow", "Create Design Report"))
         self.actionInput.setText(_translate("MainWindow", "Input"))
         self.actionInput.setToolTip(_translate("MainWindow", "Input browser"))

@@ -3034,7 +3034,7 @@ class BeamCoverPlate(MomentConnection):
         t1 = (KEY_INTERACTION_RATIO, '', ir_sum_bb_cc(Al = self.load.axial_force, M = self.load.moment,
                                                       A_c = round(self.axial_capacity/1000,2),
                                                       M_c =round(self.section.moment_capacity/1000000,2),
-                                                      IR_axial =self.IR_axial,IR_moment =self.IR_moment,sum_IR =self.sum_IR, element='Beam'), '')
+                                                      IR_axial =self.IR_axial,IR_moment =self.IR_moment,sum_IR =self.sum_IR), '')
         self.report_check.append(t1)
         #############################
         #### Min load Required ###############

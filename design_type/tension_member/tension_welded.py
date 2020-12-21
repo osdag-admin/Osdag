@@ -225,7 +225,7 @@ class Tension_welded(Member):
 
         # @author Arsil Zunzunia
         global logger
-        logger = logging.getLogger('osdag')
+        logger = logging.getLogger('Osdag')
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()

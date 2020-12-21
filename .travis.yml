@@ -1,0 +1,46 @@
+{
+  "language": "generic",
+  "os": [
+    "linux"
+  ],
+  "dist": "bionic",
+  "env": {
+    "jobs": [
+      {
+        "CONDA_PYTHON": "3.7"
+      }
+    ]
+  },
+  "cache": {
+    "directories": [
+      "$HOME/miniconda",
+      "/tmp/texlive",
+      "$HOME/.texlive"
+    ]
+  },
+  "before_cache": [
+    "rm -rf $HOME/miniconda/locks $HOME/miniconda/pkgs $HOME/miniconda/var $HOME/miniconda/envs/test-environment/conda-meta/history $HOME/miniconda/lib/python3.7/__pycache__"
+  ],
+  "before_install": [
+    "MINICONDA_PATH=$HOME/miniconda;",
+    "MINICONDA_SUB_PATH=$MINICONDA_PATH/bin;",
+    "if [[ -f $HOME/download/miniconda.sh ]]; then echo \"miniconda.sh for posix already available from cache\"; else mkdir -p $HOME/download; if [[ \"$TRAVIS_OS_NAME\" == \"linux\" ]]; then echo \"downloading miniconda.sh for linux\"; wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/download/miniconda.sh; elif  [[ \"$TRAVIS_OS_NAME\" == \"osx\" ]]; then echo \"downloading miniconda.sh for osx\"; wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O $HOME/download/miniconda.sh; fi; fi;"
+  ],
+  "install": [
+    "if [[ -d $MINICONDA_SUB_PATH ]]; then echo \"miniconda for posix already available from cache\"; else echo \"installing miniconda for posix\"; bash $HOME/download/miniconda.sh -b -u -p $MINICONDA_PATH; fi;",
+    "export PATH=\"$MINICONDA_PATH:$MINICONDA_SUB_PATH:$PATH\";",
+    "hash -r;",
+    "echo $TRAVIS_OS_NAME",
+    "echo $TRAVIS_PYTHON_VERSION",
+    "echo $CONDA_PYTHON",
+    "conda config --set always_yes yes --set changeps1 no;",
+    "source $MINICONDA_PATH/etc/profile.d/conda.sh",
+    "conda info --all;",
+    "conda update --name base --channel defaults --quiet conda;",
+    "while read requirement; do conda install --yes $requirement || pip install --user $requirement; done < requirements.txt;",
+    "source ./texlive/texlive_install.sh;"
+  ],
+  "script": [
+    "python Module_test.py"
+  ]
+}

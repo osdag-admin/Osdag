@@ -1,9 +1,9 @@
 
 ## Contributing to Osdag
 
-It's through your contributions that Osdag will continue to improve. You can contribute in several ways.
+Osdag invites enthusiasts with similar interest(s) to contribute to Osdag development. Your contributions can go a long way in improving the software.
 
-Take a moment to review this document in order to make the contribution process easy and effective for everyone involved.
+Take a moment to review this document in order to make the contribution process easy and effective.
 
 Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue or assessing patches and features.
 

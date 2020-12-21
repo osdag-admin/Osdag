@@ -1,0 +1,42 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '20'
+- '24'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pre-tensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Coplanar tension-compression flange
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Plate.Thickness_List:
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '32'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '0'
+EndPlateType: Flushed - Reversible Moment
+Load.Axial: '20'
+Load.Moment: '80'
+Load.Shear: '50'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: MB 300
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Module: Beam-Beam End Plate Splice
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Weld.Type: Groove Weld

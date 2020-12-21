@@ -1,0 +1,31 @@
+Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Thickness_list:
+- '8'
+- '12'
+- '16'
+- '20'
+- '24'
+- '26'
+- '28'
+- '40'
+- '56'
+- '80'
+Connector.Material: E 350 (Fe 490)
+Connector.Web_Plate.Thickness_List:
+- '10'
+- '16'
+- '22'
+- '28'
+- '36'
+Design.Design_Method: Limit State Design
+Detailing.Gap: '3'
+Load.Axial: '25'
+Load.Moment: '250'
+Load.Shear: '50'
+Material: E 350 (Fe 490)
+Member.Designation: PBP 400 X 158.1
+Member.Material: E 350 (Fe 490)
+Module: Column Coverplate Weld Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '490'
+Weld.Type: Fillet Weld

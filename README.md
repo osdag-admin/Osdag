@@ -1,8 +1,10 @@
 <p align="center"> 
   <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png"><br>
-  Open steel design and graphics <br><br>
+  Open Steel Design and Graphics <br><br>
   <a href="http://osdag.fossee.in/">Osdag</a><br><br>
-  Osdag is a cross-platform, free, and open-source software for the design and detailing of steel structures.
+  Osdag is a cross-platform free/libre and open-source software for the design (and detailing) of steel structures, following the Indian Standard IS 800:2007. It allows the user to design steel connections, members and systems using a graphical user interface. The interactive GUI provides a 3D visualisation of the designed component and an option to export the CAD model to any drafting software for the creation of construction/fabrication drawings. The design is typically optimised following industry best practices.
+  Starting with version 2017.08.a.e2dd, the beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+
 </p>
 
 ## Table of contents
@@ -14,7 +16,8 @@
 
 ## <a id="user-content-quick-start" class="anchor" href="#quick-start" aria-hidden="true"></a> Quick start
 
-<a href= "http://osdag.fossee.in/resources/downloads">Download the latest release version 2017.08.a.e2dd</a>
+<a href= "http://osdag.fossee.in/resources/downloads">Download the latest version of Osdag</a>
+
 ### 1. Windows Installation
 
 #### System Requirements:
@@ -28,31 +31,20 @@
              64-bit
     RAM and Storage Space:
         Minimum 2 Gb RAM recommended
-        Minimum 4 Gb free storage space recommended        
+        Minimum 1 Gb free storage space recommended
         
 
 #### Basic User:
  
     Installation steps:
     ===================
-    # If you have already installed the  previous version of Osdag in your system then skip step 1) & 2) and just run the new downloaded 	Osdag_setup_x86.exe.
-    # See Advanced-User section below, before you execute these steps.
-    1) Run Miniconda2-latest-Windows-x86.exe
+    # If you have already installed the  previous version of Osdag in your system then Unistall it first and just run the new downloaded Osdag_windows_setup.exe.
+	  Run Osdag_windows_setup.exe
         # Follow on-screen instructions AND select the following options in the Setup:
-	NOTE: Installation of Miniconda2-latest-Windows-x86 is mandatory in 'C drive' only.
-        a) Install for: [All Users (requires admin privileges)]
-        b) Destination Folder: ["C:\Program Files (x86)\Miniconda2"]
-				1. After selecting the “Program Files (x86)\” directory, manually type “Miniconda2” (without quotes)
-				2. If an error message appears saying, “The installation directory has 2 spaces”, ignore it by clicking OK.
-        c) Advanced Options: Check both the options:
-            i) Add Anaconda to my PATH environment variable
-            ii) Register Anaconda as my default Python 2.7            
-    2) Run Osdag_setup_x86.exe    and follow on-screen instructions
-        # The default directory to install Osdag is the User’s Desktop.
-        You may choose any other location. However, DO NOT choose any of the following locations:
-            a) Program Files  
-            b) Program Files (x86)
-            c) ProgramData
+		i)Just after starting the setup their is two options 1.Osdag and 2.Miktex, if you already have latex install in your system ,untick option 2.miktex and click next.
+		ii)Click next, then install.
+		iii)Select the install location and click install.
+		iv)After process ends, click the finish botton.
     
     Running Osdag:
     ==============
@@ -62,43 +54,6 @@
         iii) navigating to the installation-directory and double-clicking on the Osdag shortcut
     
 
-#### Advanced User:
-    # If you have already installed the  previous version of Osdag in your system then skip step 1) & 2) and just run the new downloaded Osdag_setup_x86.exe.
-
-    Criteria:
-    =========
-    If you satisfy one of the following two conditions, then you will need to follow a different installation procedure.  
-    Condition a) You already use Anaconda/Miniconda
-    Condition b) You have already installed a version of python on your computer AND you wish to keep that as the system default instead of the Miniconda(/Anaconda)-python
-    
-    Installation:
-    =============
-    1) Run wkhtmltox-0.12.4_msvc2015-win32.exe
-        # Follow on-screen instructions AND select the following option in the Setup:
-        a) Destination Folder: ["C:\Program Files (x86)\wkhtmltopdf"]
-        
-    2) Miniconda
-        a) If you already are a Miniconda/Anaconda user:-
-            i) Navigate to the "dependencies" folder in the installation-directory
-            ii) Open the "install_osdag_dependencies.bat" in a text editor and  
-            iii) Manually install the missing python packages listed in the .bat file, through conda.            
-            iv) In Step 3 ("Run Osdag_setup_x86"), when the installer prompts if you have Miniconda installed, just close the window and let the installer continue.
-        b) If you do not have Miniconda installed and are OK with installing it and but do not wish to Register Anaconda as the default Python 2.7:
-            i) First install Miniconda2-latest-Windows-x86.exe (same as the basic user) BUT follow the steps in the "Running Osdag" section below, instead of the "Running Osdag" steps of the basic user.
-    3) Run Osdag_setup_x86.exe and follow on-screen instructions
-        # The default directory to install Osdag is the User Desktop.  
-        You may choose any other location. However, DO NOT choose any of the following locations:
-            a) Program Files  
-            b) Program Files (x86)
-            c) ProgramData    
-    
-    Running Osdag:
-    =============
-    You need navigate to the Osdag-installation folder, in a command prompt, and use the following command to run Osdag:
-        python osdagMainPage.py
-        # You need to replace 'python' in the above command with python from the miniconda-package, if you opted not to register it as the system default python
-    You may choose to create a batch file that contains the above command and create a shortcut to Run Osdag.
-
 ### 2. Ubuntu Installation
 
 #### System Requirements:
@@ -106,10 +61,10 @@
         Ubuntu 14.04 (LTS) and later; 64-bit
     Hardware Requirements:
         Minimum 4 Gb RAM
-        Minimum of 2 Gb of free disk space
+        Minimum of 1 Gb of free disk space
  
-    This setup script is for machines running Ubuntu that do not have Miniconda2.  
-    If you have Miniconda2 already installed on your computer, please skip Step/Command 1 and proceed to Step/Command 2.
+    This setup script is for machines running Ubuntu that do not have Miniconda3.  
+    If you have Miniconda3 already installed on your computer, please skip Step/Command 1 and proceed to Step/Command 2.
  
 
     Installation steps:
@@ -118,17 +73,23 @@
 
       # If you have already installed the  previous version of Osdag in your system then skip Step/Command 1) and just run the new 2-install-osdag.sh.
 
-      In bash, navigate to the extracted installation folder containing the shell scripts (the folder that contains this README file)
-      and a folder named Osdag, and enter Command 1 and Command 2 given below.  
-
-      Note: After entering Command 1, while installing Miniconda2, you will be asked whether you wish to set the system default python
-      to Miniconda2. You need to agree to this, in order for the second command to work. Alternatively, you may manually execute the 
-      steps in the script 2-install-osdag.sh, and specify the python version while calling pip to install pdfkit.
-
-      Step/Command 1:
-          bash 1-install-Miniconda2-latest-Linux-x86_64.sh
-      Step/Command 2:
-          bash 2-install-osdag.sh
+		In bash, navigate to the extracted installation folder containing the shell 
+		scripts (the folder that contains this README file) and a folder named Osdag, 
+		and enter Command 1 , Command 2 and Command 3 given below.  
+		 
+			Note: After entering Command 1, while installing Miniconda3, you will be asked  
+		whether you wish to set the system default python to Miniconda3. You need to agree  
+		to this.After that you have to run command 2 in order for the 3rd command to work.
+		After that execute the 3rd steps. After 3rd step completed run the command 4.Please be sure 
+		to have internet connection as it's required to download some files.
+			Step/Command 1:
+				bash 1-install-Miniconda3-latest-Linux-x86_64.sh
+			 Step/Command 2:
+			bash 2-init-conda_base.sh
+			Step/Command 3:
+				bash 3-install-osdag.sh
+			Step/Command 4:
+			bash 4-install-texlive.sh
 
 
     Running Osdag:
@@ -147,19 +108,172 @@
       Alternatively, you may specify the (installed) python you wish to use, in Command 2.
 
 ## <a id="user-content-contribute" class="anchor" href="#bugs" aria-hidden="true"></a> Contributing
-Anyone and everyone is welcome to contribute. It's through your contributions that Osdag will continue to improve. Please take a moment to review the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md">guidelines for contributing</a>.
+Osdag invites enthusiasts with similar interest(s) to contribute to Osdag development. Your contributions can go a long way in improving the software.
+Please take a moment to review the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md">guidelines for contributing</a>.
 
    * Bug reports
    * Feature requests
    * Pull requests
 
 ## <a id="user-content-bugs" class="anchor" href="#bugs" aria-hidden="true"></a> Bugs and known issues
-Have a bug or a feature request? Please first read the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md#using-the-issue-tracker">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> Osdag forum</a>.
+Have a bug or a feature request? Please first read the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md#using-the-issue-tracker">issue guidelines</a> and search for existing and closed issues. If your problem or idea has not been addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or post a query <a href= "https://osdag.fossee.in/forum"> on the Osdags discussion forum</a>.
 
 ## <a id="user-content-version" class="anchor" href="#version" aria-hidden="true"></a> Versioning
-This beta version of Osdag contains only the shear connection modules. Starting with version of Osdag 2017.06.a.874e. The latest version of Osdag 2017.08.a.e2dd is available with bugs fixed.
+The latest version of Osdag can perform design for two scenarios;
+
+Scenario 1: Users can obtain the optimum design for a given scenario, from a suite of available options in terms of steel sections (e.g., different channel sizes and plate thicknesses) and connectors (e.g., bolts of different grades and diameters). The optimum design is selected based on the total volume of material and this design solution is detailed in the output dock and design report.
+
+Scenario 2: Perform a design check with a specific set of single inputs/selections in the 'Customized' option. In this case, Osdag will inform if the design checks are satisfied and suggest changes otherwise. 
+
+The Design Report has been reformatted using the LaTeX software system through the PyLaTeX package. The report is much more detailed and shows step-by-step calculation(s) for a better user experience.
+
+The Shear and Moment connections available with the previous versions have been modified in terms of structure at the backend, GUI and calculations. Any know bug(s) have been fixed. 
+
+The latest version of Osdag contains the following modules (in addition to the ones available with the previous versions):
+
+    Beam-Beam Splice Connection
+
+        Beam-Beam Cover Plate Bolted
+        Beam-Beam End Plate
+        Beam-Beam Cover Plate Welded
+
+    Beam-Column Connection
+        
+        Beam-Column End Plate
+
+    Column-Column Splice Connection
+
+        Column-Column Cover Plate Bolted
+        Column-Column Cover Plate Welded
+        Column-Column End Plate
+
+    Base Plate Connection 
+    
+    Tension Member
+
+        Tension Member Bolted
+        Tension Member Welded
+
+Previous Releases
+
+Version: 2017.06.a.874e
+
+    Bugs fixed
+
+2017.06.a.874e
+
+    This beta version of Osdag contains only the shear connection modules.
+
+===============================================
+The contributors of the latest version are:
+
+Osdag development team (2019 - Present)
+
+===============================
+
+Project Investigator - Osdag and FOSSEE
+
+Professor Siddhartha Ghosh
+
+Professor Kannan M Moudgalya
+
+Professor Prabhu Ramachandran
+
+===============================
+
+Research Associates/Assistants - Technical and Development Team
+
+Mr. Danish Ansari
+
+Mr. Ajmal Babu MS
+
+Mr. N Dharma Teja
+
+Ms. Thushara Pushkaran
+
+Mr. Yash Lokhande
+
+Mr. Anand Swaroop
+
+Mr. Darshan Divesan
+
+Mr. Anjali Jatav
+
+Mr. Sourabh Das
+
+Ms. Deepthi Reddy
+
+===============================
+
+Project Interns
+
+Mr. Ansari Mohammad Umair 
+
+Mr. Amir Chappalwala
+
+Mr. Zunzunia Arsil
+
+Mr. Mohammad Azhar U Din Mir
+
+Mr. Satyam Singh Niranjan
+
+Mr. Anshul Kumar Singh
+
+Mr. Mosam Patel
+
+Mr. Shahadad PP
+
+Ms. Priti Kumari
+
+===============================
+
+Project Management
+
+Ms. Usha Viswanathan
+
+Ms. Vineeta Parmar
+
+Mr. Sunil Shetye
+
+===============================
+
+Web, Graphics, Promotions and System Administrators Team
+
+Ms. Sashi Rekha B M K
+
+Mr. Lee Thomas Stephen
+
+Mr. Rohan Mhatre
+
+Mr. Khushal Singh Rajput
+
+Mr. Yash Vohra
+
+===============================
+
+Office Staff
+
+Ms.Komal Solanki
+
+Mr.Vishal Birare
+
+Mr. Sushant Bammkanti
+
+===============================
+
+Acknowledgements:
+
+Ministry of Education (MoE), Govt. of India
+
+FOSSEE
+
+Professor. Prabhu Ramachandran
+
+Mr. Sunil Shetye
 
 ## <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"></a> Copyright and license
-(c) Copyright Osdag contributors 2017.<br>
+(c) Copyright Osdag contributors 2020.<br>
 This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the <a href="https://github.com/osdag-admin/Osdag/files/1207162/License.txt">License.txt</a> file for details regarding the license.
 The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+
+=============================== End of File ===============================

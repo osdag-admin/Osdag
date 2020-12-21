@@ -379,6 +379,9 @@ class EndPlateConnection(ShearConnection):
         weld_size_max = 0.0
         weld_size_min = 0.0
         count = 0
+        self.beta_lj = 1.0
+        self.beta_lg = 1.0
+        self.beta_pk = 1.0
         plate_cost = 7850e-9 # considered: Rs 1 per kg TODO: take input from user
         bolt_cost = 1 # considered: Rs 1 per unit TODO: take input from user
         for self.plate.thickness_provided in sorted(self.plate.thickness):
@@ -1182,6 +1185,8 @@ class EndPlateConnection(ShearConnection):
     def get_design_status(self):
         if self.weld.design_status is True:
             self.design_status = True
+            logger.info("End plate is designed with minimum possible plate thickness.")
+            logger.info("Bolt columns are limited to two (one on each side) in shear end plate.")
             logger.debug("=== End Of Design ===")
 
     def plate_width_check(self, plate_width):

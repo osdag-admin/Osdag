@@ -1,8 +1,10 @@
-<p align="center">
+<p align="center"> 
   <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png"><br>
-  Open steel design and graphics <br><br>
+  Open Steel Design and Graphics <br><br>
   <a href="http://osdag.fossee.in/">Osdag</a><br><br>
-  Osdag is a cross-platform, free, and open-source software for the design and detailing of steel structures.
+  Osdag is a cross-platform free/libre and open-source software for the design (and detailing) of steel structures, following the Indian Standard IS 800:2007. It allows the user to design steel connections, members and systems using a graphical user interface. The interactive GUI provides a 3D visualisation of the designed component and an option to export the CAD model to any drafting software for the creation of construction/fabrication drawings. The design is typically optimised following industry best practices.
+  Starting with version 2017.08.a.e2dd, the beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+
 </p>
 
 ## Table of contents
@@ -14,7 +16,8 @@
 
 ## <a id="user-content-quick-start" class="anchor" href="#quick-start" aria-hidden="true"></a> Quick start
 
-<a href= "http://osdag.fossee.in/resources/downloads">Download the latest release version 2020.12.a.e2dd</a>
+<a href= "http://osdag.fossee.in/resources/downloads">Download the latest version of Osdag</a>
+
 ### 1. Windows Installation
 
 #### System Requirements:
@@ -105,55 +108,172 @@
       Alternatively, you may specify the (installed) python you wish to use, in Command 2.
 
 ## <a id="user-content-contribute" class="anchor" href="#bugs" aria-hidden="true"></a> Contributing
-Anyone and everyone is welcome to contribute. It's through your contributions that Osdag will continue to improve. Please take a moment to review the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md">guidelines for contributing</a>.
+Osdag invites enthusiasts with similar interest(s) to contribute to Osdag development. Your contributions can go a long way in improving the software.
+Please take a moment to review the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md">guidelines for contributing</a>.
 
    * Bug reports
    * Feature requests
    * Pull requests
 
 ## <a id="user-content-bugs" class="anchor" href="#bugs" aria-hidden="true"></a> Bugs and known issues
-Have a bug or a feature request? Please first read the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md#using-the-issue-tracker">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> Osdag forum</a>.
+Have a bug or a feature request? Please first read the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md#using-the-issue-tracker">issue guidelines</a> and search for existing and closed issues. If your problem or idea has not been addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or post a query <a href= "https://osdag.fossee.in/forum"> on the Osdags discussion forum</a>.
 
 ## <a id="user-content-version" class="anchor" href="#version" aria-hidden="true"></a> Versioning
+The latest version of Osdag can perform design for two scenarios;
 
-This Release
+Scenario 1: Users can obtain the optimum design for a given scenario, from a suite of available options in terms of steel sections (e.g., different channel sizes and plate thicknesses) and connectors (e.g., bolts of different grades and diameters). The optimum design is selected based on the total volume of material and this design solution is detailed in the output dock and design report.
 
-    Creating optimum design by taking multiple inputs from user.
-    Detailed design report with improved formatting for equations.
+Scenario 2: Perform a design check with a specific set of single inputs/selections in the 'Customized' option. In this case, Osdag will inform if the design checks are satisfied and suggest changes otherwise. 
 
-    New Modules
-    Beam cover plate welded
-    Column cover plate bolted
-    Column cover plate welded
-    Column end plate
-    Beam column end plate
-    Base plate
-    Tension member bolted
-    Tension member welded
+The Design Report has been reformatted using the LaTeX software system through the PyLaTeX package. The report is much more detailed and shows step-by-step calculation(s) for a better user experience.
+
+The Shear and Moment connections available with the previous versions have been modified in terms of structure at the backend, GUI and calculations. Any know bug(s) have been fixed. 
+
+The latest version of Osdag contains the following modules (in addition to the ones available with the previous versions):
+
+    Beam-Beam Splice Connection
+
+        Beam-Beam Cover Plate Bolted
+        Beam-Beam End Plate
+        Beam-Beam Cover Plate Welded
+
+    Beam-Column Connection
+        
+        Beam-Column End Plate
+
+    Column-Column Splice Connection
+
+        Column-Column Cover Plate Bolted
+        Column-Column Cover Plate Welded
+        Column-Column End Plate
+
+    Base Plate Connection 
+    
+    Tension Member
+
+        Tension Member Bolted
+        Tension Member Welded
 
 Previous Releases
-2017.06.a.874e
-    Added Beam cover plate and Beam end plate connections.
-    Bugs fixed.
+
+Version: 2017.06.a.874e
+
+    Bugs fixed
 
 2017.06.a.874e
+
     This beta version of Osdag contains only the shear connection modules.
 
-Our Contributors
+===============================================
+The contributors of the latest version are:
 
-Staff:
-Ajmal Babu
-Anand Swaroop
-Anjali Jatav
-Danish Ansari
-Deepthi Reddy
-Dharma Teja
-Sourabh Das
-Yash Lokhande
+Osdag development team (2019 - Present)
 
-Interns:
+===============================
+
+Project Investigator - Osdag and FOSSEE
+
+Professor Siddhartha Ghosh
+
+Professor Kannan M Moudgalya
+
+Professor Prabhu Ramachandran
+
+===============================
+
+Research Associates/Assistants - Technical and Development Team
+
+Mr. Danish Ansari
+
+Mr. Ajmal Babu MS
+
+Mr. N Dharma Teja
+
+Ms. Thushara Pushkaran
+
+Mr. Yash Lokhande
+
+Mr. Anand Swaroop
+
+Mr. Darshan Divesan
+
+Mr. Anjali Jatav
+
+Mr. Sourabh Das
+
+Ms. Deepthi Reddy
+
+===============================
+
+Project Interns
+
+Mr. Ansari Mohammad Umair 
+
+Mr. Amir Chappalwala
+
+Mr. Zunzunia Arsil
+
+Mr. Mohammad Azhar U Din Mir
+
+Mr. Satyam Singh Niranjan
+
+Mr. Anshul Kumar Singh
+
+Mr. Mosam Patel
+
+Mr. Shahadad PP
+
+Ms. Priti Kumari
+
+===============================
+
+Project Management
+
+Ms. Usha Viswanathan
+
+Ms. Vineeta Parmar
+
+Mr. Sunil Shetye
+
+===============================
+
+Web, Graphics, Promotions and System Administrators Team
+
+Ms. Sashi Rekha B M K
+
+Mr. Lee Thomas Stephen
+
+Mr. Rohan Mhatre
+
+Mr. Khushal Singh Rajput
+
+Mr. Yash Vohra
+
+===============================
+
+Office Staff
+
+Ms.Komal Solanki
+
+Mr.Vishal Birare
+
+Mr. Sushant Bammkanti
+
+===============================
+
+Acknowledgements:
+
+Ministry of Education (MoE), Govt. of India
+
+FOSSEE
+
+Professor. Prabhu Ramachandran
+
+Mr. Sunil Shetye
 
 ## <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"></a> Copyright and license
 (c) Copyright Osdag contributors 2020.<br>
 This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the <a href="https://github.com/osdag-admin/Osdag/files/1207162/License.txt">License.txt</a> file for details regarding the license.
 The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+
+=============================== End of File ===============================

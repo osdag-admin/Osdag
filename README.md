@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-<p align="center"> 
+<p align="center">
   <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png"><br>
   Open steel design and graphics <br><br>
   <a href="http://osdag.fossee.in/">Osdag</a><br><br>
@@ -15,7 +14,7 @@
 
 ## <a id="user-content-quick-start" class="anchor" href="#quick-start" aria-hidden="true"></a> Quick start
 
-<a href= "http://osdag.fossee.in/resources/downloads">Download the latest release version 2020.08.a.e2dd</a>
+<a href= "http://osdag.fossee.in/resources/downloads">Download the latest release version 2020.12.a.e2dd</a>
 ### 1. Windows Installation
 
 #### System Requirements:
@@ -116,12 +115,45 @@ Anyone and everyone is welcome to contribute. It's through your contributions th
 Have a bug or a feature request? Please first read the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md#using-the-issue-tracker">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> Osdag forum</a>.
 
 ## <a id="user-content-version" class="anchor" href="#version" aria-hidden="true"></a> Versioning
-This beta version of Osdag contains only the shear connection modules. Starting with version of Osdag 2017.06.a.874e. The latest version of Osdag 2017.08.a.e2dd is available with bugs fixed.
+
+This Release
+
+    Creating optimum design by taking multiple inputs from user.
+    Detailed design report with improved formatting for equations.
+
+    New Modules
+    Beam cover plate welded
+    Column cover plate bolted
+    Column cover plate welded
+    Column end plate
+    Beam column end plate
+    Base plate
+    Tension member bolted
+    Tension member welded
+
+Previous Releases
+2017.06.a.874e
+    Added Beam cover plate and Beam end plate connections.
+    Bugs fixed.
+
+2017.06.a.874e
+    This beta version of Osdag contains only the shear connection modules.
+
+Our Contributors
+
+Staff:
+Ajmal Babu
+Anand Swaroop
+Anjali Jatav
+Danish Ansari
+Deepthi Reddy
+Dharma Teja
+Sourabh Das
+Yash Lokhande
+
+Interns:
 
 ## <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"></a> Copyright and license
 (c) Copyright Osdag contributors 2020.<br>
 This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the <a href="https://github.com/osdag-admin/Osdag/files/1207162/License.txt">License.txt</a> file for details regarding the license.
 The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
-=======
-# Osdag_refactored
->>>>>>> restructuring

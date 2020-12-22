@@ -1,6 +1,5 @@
-Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Preferences: Outside
 Connector.Flange_Plate.Thickness_list:
-- '6'
 - '8'
 - '10'
 - '12'
@@ -9,26 +8,23 @@ Connector.Flange_Plate.Thickness_list:
 - '18'
 - '20'
 - '22'
-- '24'
 - '25'
-- '26'
 - '28'
-- '28'
-- '30'
-- '32'
 - '32'
 - '36'
-- '36'
-- '40'
 - '40'
 - '45'
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
-Connector.Material: E 410 (Fe 540)
+- '90'
+- '100'
+- '110'
+- '120'
+Connector.Material: Cus_400_500_600_1400
 Connector.Web_Plate.Thickness_List:
-- '6'
 - '8'
 - '10'
 - '12'
@@ -37,32 +33,30 @@ Connector.Web_Plate.Thickness_List:
 - '18'
 - '20'
 - '22'
-- '24'
 - '25'
-- '26'
 - '28'
-- '28'
-- '30'
-- '32'
 - '32'
 - '36'
-- '36'
-- '40'
 - '40'
 - '45'
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Design.Design_Method: Limit State Design
 Detailing.Gap: '3'
-Load.Axial: '5'
-Load.Moment: '1'
-Load.Shear: '5'
-Material: E 410 (Fe 540)
-Member.Designation: NPB 750 X 270 X 174.54
-Member.Material: E 410 (Fe 540)
-Module: Beam Coverplate Weld Connection
+Load.Axial: '0'
+Load.Moment: '100'
+Load.Shear: '20'
+Material: Cus_400_500_600_1400
+Member.Designation: WPB 250 X 250 X 117.58
+Member.Material: Cus_400_500_600_1400
+Module: Beam Cover Plate - Welded
 Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '540'
+Weld.Material_Grade_OverWrite: '1400'
 Weld.Type: Fillet Weld

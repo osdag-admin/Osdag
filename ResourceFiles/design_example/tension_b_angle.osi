@@ -1,19 +1,26 @@
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
+- '8'
+- '10'
 - '12'
+- '14'
 - '16'
+- '18'
 - '20'
+- '22'
 - '24'
+- '27'
 - '30'
+- '33'
 - '36'
 - '39'
-- 08
-- '10'
-- '14'
-- '18'
-- '22'
-- '27'
-- '33'
+- '42'
+- '45'
+- '48'
+- '52'
+- '56'
+- '60'
+- '64'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -31,10 +38,6 @@ Bolt.Type: Bearing Bolt
 Conn_Location: Long Leg
 Connector.Material: E 250 (Fe 410 W)A
 Connector.Plate.Thickness_List:
-- '3'
-- '4'
-- '5'
-- '6'
 - '8'
 - '10'
 - '12'
@@ -43,11 +46,8 @@ Connector.Plate.Thickness_List:
 - '18'
 - '20'
 - '22'
-- '24'
 - '25'
-- '26'
 - '28'
-- '30'
 - '32'
 - '36'
 - '40'
@@ -55,10 +55,16 @@ Connector.Plate.Thickness_List:
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '0'
 Load.Axial: '500'
 Material: E 250 (Fe 410 W)A
 Member.Designation:
@@ -264,4 +270,4 @@ Member.Designation:
 Member.Length: '5000'
 Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Angles
-Module: Tension Members Bolted Design
+Module: Tension Member Bolted

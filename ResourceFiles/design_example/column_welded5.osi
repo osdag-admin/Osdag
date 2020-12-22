@@ -1,6 +1,5 @@
 Connector.Flange_Plate.Preferences: Outside
 Connector.Flange_Plate.Thickness_list: &id001
-- '6'
 - '8'
 - '10'
 - '12'
@@ -9,11 +8,8 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '18'
 - '20'
 - '22'
-- '24'
 - '25'
-- '26'
 - '28'
-- '30'
 - '32'
 - '36'
 - '40'
@@ -21,18 +17,23 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
-Connector.Material: E 250 (Fe 410 W)A
+- '90'
+- '100'
+- '110'
+- '120'
+Connector.Material: Cus_400_500_600_1400
 Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
 Detailing.Gap: '3'
-Load.Axial: '52'
-Load.Moment: '10'
-Load.Shear: '80'
-Material: E 450 (Fe 590) E
-Member.Designation: HB 400*
-Member.Material: E 250 (Fe 410 W)A
-Module: Column Coverplate Weld Connection
+Load.Axial: '1000'
+Load.Moment: '400'
+Load.Shear: '200'
+Material: Cus_400_500_600_1400
+Member.Designation: PBP 400 X 230.9
+Member.Material: Cus_400_500_600_1400
+Module: Column Cover Plate - Welded
 Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '410'
+Weld.Material_Grade_OverWrite: '1400'
 Weld.Type: Fillet Weld

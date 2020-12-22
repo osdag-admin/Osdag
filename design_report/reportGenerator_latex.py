@@ -281,7 +281,7 @@ class CreateLatex(Document):
         # 2D images
         if len(Disp_2d_image) != 0:
 
-            if module == KEY_DISP_BCENDPLATE or module == KEY_DISP_BEAMENDPLATE:
+            if module == KEY_DISP_BCENDPLATE or module == KEY_DISP_BB_EP_SPLICE:
                 if does_design_exist and sys.platform != 'darwin':
                     doc.append(NewPage())
                     weld_details = rel_path + Disp_2d_image[0]

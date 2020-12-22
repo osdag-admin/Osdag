@@ -322,7 +322,7 @@ TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
 
 ###################################
-# Module Keys
+# Module Keys DONOT CHANGE THESE
 ###################################
 KEY_MAIN_MODULE = 'Main Module'
 KEY_MODULE_STATUS = 'Module.Status'
@@ -339,7 +339,7 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam Cover Plate - Bolted'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Cover Plate - Bolted'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam Cover Plate - Welded'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column Cover Plate - Welded'
-KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
+# KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column End Plate'
 KEY_DISP_BCENDPLATE = 'Beam-Column End Plate'
 KEY_DISP_TENSION_BOLTED = 'Tension Member Bolted'

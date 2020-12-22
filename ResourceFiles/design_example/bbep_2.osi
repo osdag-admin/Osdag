@@ -1,42 +1,57 @@
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
 - '20'
-- '24'
 Bolt.Grade:
-- '3.6'
-- '4.6'
-- '4.8'
-- '5.6'
-- '5.8'
-- '6.8'
-- '8.8'
-- '9.8'
-- '10.9'
 - '12.9'
 Bolt.Slip_Factor: '0.3'
-Bolt.TensionType: Pre-tensioned
+Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
-Connectivity: Coplanar tension-compression flange
+Connectivity: Coplanar Tension-Compression Flange
 Connector.Material: E 250 (Fe 410 W)A
 Connector.Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
 - '14'
 - '16'
 - '18'
 - '20'
 - '22'
+- '25'
+- '28'
 - '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: Sheared or hand flame cut
-Detailing.Gap: '0'
-EndPlateType: Flushed - Reversible Moment
-Load.Axial: '20'
-Load.Moment: '80'
-Load.Shear: '50'
+Detailing.Gap: '10'
+EndPlateType: Extended Both Ways - Reversible Moment
+Load.Axial: '80'
+Load.Moment: '100'
+Load.Shear: '80'
 Material: E 250 (Fe 410 W)A
-Member.Supported_Section.Designation: MB 300
-Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: NPB 400 X 180 X 66.31
+Member.Supported_Section.Material: E 450 (Fe 590) E
 Module: Beam-Beam End Plate Splice
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
 Weld.Type: Groove Weld
+out_titles_status:
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1

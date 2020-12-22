@@ -1628,7 +1628,8 @@ class Window(QMainWindow):
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
                                                   "Save Design", os.path.join(self.folder, "untitled.osi"),
-                                                  "Input Files(*.osi)")
+                                                  "Input Files(*.osi)",None,
+                                                  QtWidgets.QFileDialog.DontUseNativeDialog)
         if not fileName:
             return
         try:

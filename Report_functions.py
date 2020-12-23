@@ -2735,7 +2735,10 @@ def prov_shear_force(shear_input, min_sc, app_shear_load, shear_capacity_1):
     app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r' \\ \\'))
 
     app_shear_load_eqn.append(NoEscape(r' V_{u} &= max(V_{y},~{V_{y}}_{min}) \\'))
+    app_shear_load_eqn.append(NoEscape(r' but,~ & \leq V_{dy} \\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',~' + min_sc + r') \\'))
+    app_shear_load_eqn.append(NoEscape(r' but,~ & \leq ' + shear_capacity_1 + r' \\ \\'))
+
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r' \\ \\'))
 
     app_shear_load_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~10.7] \end{aligned}'))
@@ -2783,16 +2786,22 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, mom
         app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r' \\ \\'))
 
         app_moment_load_eqn.append(NoEscape(r'M_{u} &= max(M_{z},~{M_{z}}_{min}) \\'))
+
         if type == 'EndPlateType-BC-zz':
             app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
         elif type == 'EndPlateType-BC-yy':
             app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{y-y} ~of~the~column~section \\'))
+        elif type == 'EndPlateType':
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} \\'))
 
         app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r') \\'))
-        if type == 'EndPlateType-BC-zz' or type == 'EndPlateType-BC-yy':
-            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\'))
-        app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
 
+        if type == 'EndPlateType-BC-zz' or type == 'EndPlateType-BC-yy':
+            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\ \\'))
+        elif type == 'EndPlateType':
+            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity) + r' \\ \\'))
+
+        app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     else:
@@ -3405,30 +3414,30 @@ def forces_in_flange(Au, B, T, A, D, Mu, Mw, Mf, Af, ff):
     return forcesinflange_eqn
 
 
-def min_plate_ht_req(beam_depth,r_r,t_f,min_plate_ht):
-    """
-    Calculate min plate height required
-    Args:
-        beam_depth: Depth of section in mm (float)
-        min_plate_ht:Min plate height required in mm (float)
-    Returns:
-          Min plate height required
-    Note:
-            Reference:
-            INSDAG - Chapter 5, Section 5.2.3
-
-    """
-    beam_depth = str(beam_depth)
-    r_r = str(r_r)
-    t_f = str(t_f)
-    min_plate_ht = str(round(min_plate_ht, 2))
-    min_plate_ht_eqn = Math(inline=True)
-    min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 \times &(d_b - 2 \times t_f - 2 \times r_r)\\'))
-    min_plate_ht_eqn.append(NoEscape(r'&= 0.6 \times (' + beam_depth +r'- 2 \times'+t_f+r'- 2 \times'+r_r+r')\\'))
-    min_plate_ht_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))
-    min_plate_ht_eqn.append(NoEscape(r'&[Ref.~ INSDAG-Chpt.5,~Sect. 5.2.3]\end{aligned}'))
-
-    return min_plate_ht_eqn
+# def min_plate_ht_req(beam_depth,r_r,t_f,min_plate_ht):
+#     """
+#     Calculate min plate height required
+#     Args:
+#         beam_depth: Depth of section in mm (float)
+#         min_plate_ht:Min plate height required in mm (float)
+#     Returns:
+#           Min plate height required
+#     Note:
+#             Reference:
+#             INSDAG - Chapter 5, Section 5.2.3
+#
+#     """
+#     beam_depth = str(beam_depth)
+#     r_r = str(r_r)
+#     t_f = str(t_f)
+#     min_plate_ht = str(round(min_plate_ht, 2))
+#     min_plate_ht_eqn = Math(inline=True)
+#     min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 \times &(d_b - 2 \times t_f - 2 \times r_r)\\'))
+#     min_plate_ht_eqn.append(NoEscape(r'&= 0.6 \times (' + beam_depth +r'- 2 \times'+t_f+r'- 2 \times'+r_r+r')\\'))
+#     min_plate_ht_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))
+#     min_plate_ht_eqn.append(NoEscape(r'&[Ref.~ INSDAG-Chpt.5,~Sect. 5.2.3]\end{aligned}'))
+#
+#     return min_plate_ht_eqn
 
 
 def min_flange_plate_ht_req(beam_width, min_flange_plate_ht):  ## when only outside plate is considered
@@ -4732,8 +4741,46 @@ def web_width_chk_weld(D, tk, R_1, webplatewidth):
     web_width_chk_weld_eqn.append(NoEscape(r' &=' + webplatewidth + r'\end{aligned}'))
     return web_width_chk_weld_eqn
 
+def width_req_sptng_seated(edge,t_w,r_r,bolt_col,gauge,width_req_sptng):
+    e = str(edge)
+    r_r = str(r_r)
+    t_w = str(t_w)
+    n_c = str(bolt_col)
+    g = str(gauge)
+    width_req_sptng = str(width_req_sptng)
+    width_req_sptng_seated_eqn = Math(inline=True)
+    width_req_sptng_seated_eqn.append(
+        NoEscape(r'\begin{aligned}4 \times e\textquotesingle &+ t_w + 2 \times r_r + \Big(\frac{n_{c}}{2} - 1)\Big \times g\\'))
+    width_req_sptng_seated_eqn.append(NoEscape(
+        r'&= 4 \times' + e + '+' + t_w + '+' + r'2 \times' + r_r + r'(\frac{' + n_c + r'}{2} - 1) \times' + g + r'\\'))
+    width_req_sptng_seated_eqn.append(NoEscape(r'&=' + width_req_sptng + r'\\ \end{aligned}'))
+    return width_req_sptng_seated_eqn
 
-def web_width_min(D, min_req_width):
+def width_req_sptd_seated(edge_dist,t_w,r_r,width_req_sptd):
+    e = str(edge_dist)
+    r_r = str(r_r)
+    t_w = str(t_w)
+    width_req_sptd = str(width_req_sptd)
+    width_req_sptd_seated_eqn = Math(inline=True)
+    width_req_sptd_seated_eqn.append(NoEscape(r'\begin{aligned}4 \times e\textquotesingle& + t_w + 2 \times r_r \\'))
+    width_req_sptd_seated_eqn.append(NoEscape(r'&= 4 \times' + e + '+' + t_w + '+' + r'2 \times' + r_r + r'\\'))
+    width_req_sptd_seated_eqn.append(NoEscape(r'&=' + width_req_sptd + r'\\ \end{aligned}'))
+    return width_req_sptd_seated_eqn
+
+def length_req_sptng_seated(end_dist,n_r,pitch,t,r_r,length_req_spting):
+    e = str(end_dist)
+    r_r = str(r_r)
+    t = str(t)
+    n_r = str(n_r)
+    p = str(pitch)
+    length_req_spting = str(length_req_spting)
+    length_req_eqn = Math(inline=True)
+    length_req_eqn.append(NoEscape(r'\begin{aligned}2 \times e\textquotesingle &+ t + r_{ra} + (n_r - 1) \times p \\'))
+    length_req_eqn.append(NoEscape(r'&= 2 \times' + e + '+' + t + '+' + r_r + r'+(' + n_r +r'- 1) \times' + p + r'\\'))
+    length_req_eqn.append(NoEscape(r'&=' + length_req_spting + r'\\ \end{aligned}'))
+    return length_req_eqn
+
+def min_plate_ht_req(D, r_r, t_f, min_req_width):
     """
     Calculate minimum web plate height
 
@@ -4745,13 +4792,17 @@ def web_width_min(D, min_req_width):
      Note:
            [Ref: INSDAG - Chapter 5, Sect. 5.2.3]
     """
-    D = str(D)
-    min_req_width = str(min_req_width)
+
+    beam_depth = str(D)
+    r_r = str(r_r)
+    t_f = str(t_f)
+    min_plate_ht = str(round(min_req_width, 2))
     web_width_min_eqn = Math(inline=True)
-    web_width_min_eqn.append(NoEscape(r'\begin{aligned}  &= 0.6 \times D\\'))
-    web_width_min_eqn.append(NoEscape(r' &= 0.6 \times' + D + r'\\'))
-    web_width_min_eqn.append(NoEscape(r' &= ' + min_req_width + r'\\ \\'))
-    web_width_min_eqn.append(NoEscape(r' &[Ref:INSDAG-Chp~ 5,\\&Sect.5.2.3]\end{aligned}'))
+    web_width_min_eqn.append(NoEscape(r'\begin{aligned}0.6 \times &(d_b - 2 \times t_f - 2 \times r_r)\\'))
+    web_width_min_eqn.append(
+        NoEscape(r'&= 0.6 \times (' + beam_depth + r'- 2 \times' + t_f + r'- 2 \times' + r_r + r')\\'))
+    web_width_min_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))
+    web_width_min_eqn.append(NoEscape(r'&[Ref.~ INSDAG-Chpt.5,~Sect. 5.2.3]\end{aligned}'))
     return web_width_min_eqn
 
 
@@ -7160,7 +7211,8 @@ def tension_critical_bolt_prov(M, t_ba, n_c, r_1, n_r, r_i, n, r_3, r_4, type=''
                                                        + r_3 +'^2}{'+r_1+'} +\displaystyle\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{r_i ^2}{'
                                                        + r_1 + r'}\Bigg) }\\'))
     else:
-        if (n == 4) or (n == 6):
+        # if (n == 4) or (n == 6):
+        if n < 8:
             i = 4
             i = str(i)
             tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} T_{1} &= \frac{M_{ue}}'

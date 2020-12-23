@@ -1,7 +1,16 @@
-Conn_Location: Long Leg
-Connector.Material: E 250 (Fe 410 W)B
+Conn_Location: Short Leg
+Connector.Material: E 300 (Fe 440)
 Connector.Plate.Thickness_List:
-- '30'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
 - '32'
 - '36'
 - '40'
@@ -9,11 +18,15 @@ Connector.Plate.Thickness_List:
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Design.Design_Method: Limit State Design
-Detailing.Gap: '10'
-Load.Axial: '500'
-Material: E 250 (Fe 410 W)B
+Load.Axial: '800'
+Material: E 300 (Fe 440)
 Member.Designation:
 - 20 x 20 x 3
 - 20 x 20 x 4
@@ -215,8 +228,8 @@ Member.Designation:
 - 200 x 150 x 15
 - 200 x 150 x 18
 Member.Length: '5000'
-Member.Material: E 250 (Fe 410 W)B
+Member.Material: E 300 (Fe 440)
 Member.Profile: Back to Back Angles
-Module: Tension Members Welded Design
+Module: Tension Member Welded
 Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '410'
+Weld.Material_Grade_OverWrite: '440'

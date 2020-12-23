@@ -1260,6 +1260,8 @@ class BeamColumnEndPlate(MomentConnection):
                              "the beam ({} kN)".format(self.load.axial_force, self.supported_section_axial_capa))
                 logger.warning("The maximum axial capacity of the beam is {} kN".format(self.supported_section_axial_capa))
                 logger.info("Define the value of axial force as {} kN or less and re-design".format(self.supported_section_axial_capa))
+            else:
+                self.load_axial = self.input_axial_force
 
         # Shear force check
         if self.load.shear_force < min((0.15 * self.supported_section_shear_capa), 40):
@@ -1430,7 +1432,7 @@ class BeamColumnEndPlate(MomentConnection):
         # create a list of tuple with a combination of each bolt diameter with each grade for iteration
         # list is created using the approach --- minimum diameter, small grade to maximum diameter, high grade
         self.bolt_list = [x for x in zip(*[iter(self.bolt_list)] * 2)]
-        logger.info("Checking the design with the following bolt diameter-grade combination {}".format(self.bolt_list))
+        # logger.info("Checking the design with the following bolt diameter-grade combination {}".format(self.bolt_list))
 
     def design_connection(self):
         """ perform analysis and design of bolt and end plate """
@@ -1448,7 +1450,7 @@ class BeamColumnEndPlate(MomentConnection):
                 logger.info("Providing stiffening to the column web")
             else:
                 self.web_stiffener_status = False
-                logger.warning("[Column Web] The web of the column is not susceptible to shear bucking due to the reaction transferred by the beam "
+                logger.warning("[Column Web] The web of the column is safe against shear bucking due to the reaction transferred by the beam "
                                "to the column")
                 logger.info("The minimum required thickness of the web i.e. {} mm is satisfied".format(self.t_wc))
                 logger.info("Additional stiffening of the column web is not required")
@@ -1485,8 +1487,8 @@ class BeamColumnEndPlate(MomentConnection):
             self.web_stiffener_thk_provided = 'N/A'
 
         # performing the check with minimum plate thickness and a suitable bolt dia-grade combination (thin plate - large dia approach)
-        logger.info("[Optimisation] Performing the design by optimising the plate thickness, using the thin plate and large (suitable) bolt diameter "
-                    "approach")
+        logger.info("[Optimisation] Performing the design by optimising the plate thickness, using the most optimum plate and a suitable bolt "
+                    "diameter approach")
         logger.info("If you wish to optimise the bolt diameter-grade combination, pass a higher value of plate thickness using the Input Dock")
 
         # loop starts
@@ -1614,16 +1616,16 @@ class BeamColumnEndPlate(MomentConnection):
 
                             if self.ep_width_provided >= space_req_4col:
                                 self.bolt_column = 4  # two columns on each side
-                                logger.info(
-                                    "The provided beam can accommodate two columns of bolts on either side of the web [Ref. based on the detailing "
-                                    "requirement]")
-                                logger.info("Performing the design with two column of bolts on each side")
+                                # logger.info(
+                                #     "The provided beam can accommodate two columns of bolts on either side of the web [Ref. based on the detailing "
+                                #     "requirement]")
+                                # logger.info("Performing the design with two column of bolts on each side")
 
                             if (self.ep_width_provided >= space_req_2col) and (self.ep_width_provided < space_req_4col):
                                 self.bolt_column = 2  # one column on each side
-                                logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on "
-                                            "detailing requirement]")
-                                logger.info("Performing the design with a single column of bolt on each side")
+                                # logger.info("The provided beam can accommodate a single column of bolt on either side of the web [Ref. based on "
+                                #             "detailing requirement]")
+                                # logger.info("Performing the design with a single column of bolt on each side")
 
                             if self.ep_width_provided < space_req_2col:
                                 self.bolt_column = 0
@@ -1695,7 +1697,6 @@ class BeamColumnEndPlate(MomentConnection):
 
                                         # step 1: max pitch distance
                                         self.pitch_distance_max = self.cl_10_2_3_1_max_spacing([self.plate_thickness])
-                                        print("PITCH MAX {}".format(self.pitch_distance_max))
 
                                         # step 2: checking space availability to accommodate extra rows based on maximum pitch criteria
                                         if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one-way
@@ -1718,8 +1719,6 @@ class BeamColumnEndPlate(MomentConnection):
                                                 self.space_available_web = self.beam_D - (2 * self.beam_tf) - (2 * self.end_distance_provided) - \
                                                                            ((rows_inside_D - 2) * self.pitch_distance_provided)
 
-                                        print("SPACE AVAILABLE IS {}".format(self.space_available_web))
-
                                         # step 3: adding rows to satisfy detailing criteria
                                         if self.space_available_web > self.pitch_distance_max:
                                             self.bolt_row_web = round_up(self.space_available_web / self.pitch_distance_max, 1) - 1
@@ -1731,7 +1730,6 @@ class BeamColumnEndPlate(MomentConnection):
                                         if self.bolt_row_web >= 1:
 
                                             self.pitch_distance_web = self.space_available_web / (self.bolt_row_web + 1)
-                                            print("ACTUAL PITCH {}".format(self.pitch_distance_web))
 
                                             # run the bolt and end plate check function from the helper class
                                             self.design_bolt = self.call_helper.perform_bolt_design(self.endplate_type, self.supported_section,
@@ -1808,66 +1806,6 @@ class BeamColumnEndPlate(MomentConnection):
                                             self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (
                                                     2 * self.pitch_distance_provided)
 
-                                    # Log messages for helper file
-                                    if not self.call_helper.flange_capacity_status:
-                                        logger.error(
-                                            "[Flange Strength] The reaction at the compression flange of the beam {} kN exceeds the flange capacity {} "
-                                            "kN".
-                                                format(round(self.call_helper.r_c, 2), self.call_helper.flange_capacity))
-                                        logger.error("Reaction on the flange exceeds the flange capacity by {} kN".
-                                                     format(round(self.call_helper.r_c - self.call_helper.flange_capacity, 2)))
-                                        logger.warning("The beam flange can have local buckling")
-                                        logger.info(
-                                            "Select a different beam with more flange area or provide stiffening at the flange to increase the beam "
-
-                                            "flange thickness. Re-design connection using the effective flange thickness after stiffening")
-                                        logger.info("Custom beams can be defined through the Osdag Design Preferences tab")
-                                    else:
-                                        logger.info(
-                                            "[Flange Strength] The reaction at the compression flange of the beam {} kN is less than the flange capacity"
-                                            " {} kN. The flange strength requirement is satisfied.".
-                                                format(round(self.call_helper.r_c, 2), self.call_helper.flange_capacity))
-
-                                    if not self.call_helper.plate_design_status:
-                                        logger.error(
-                                            "[End Plate] The selected trial end plate of {} mm is insufficient and fails in the moment capacity check".
-                                                format(self.plate_thickness))
-                                        logger.info(
-                                            "The minimum required thickness of end plate is {} mm".format(
-                                                round(self.call_helper.plate_thickness_req, 2)))
-                                        logger.info("Re-designing the connection with a plate of available higher thickness")
-                                    else:
-                                        logger.info(
-                                            "[End Plate] The end plate of {} mm passes the moment capacity check. The end plate is checked for yielding "
-                                            "due tension caused by bending moment and prying force".format(self.plate_thickness))
-
-                                    if not self.call_helper.bolt_tension_design_status:
-                                        logger.error("[Bolt Design] The bolt of {} mm diameter and {} grade fails the tension check".
-                                                     format(self.bolt_diameter_provided, self.bolt_grade_provided))
-                                        logger.error(
-                                            "Total tension demand on bolt (due to direct tension + prying action) is {} kN and exceeds the bolt tension "
-                                            "capacity ({} kN)".format(self.call_helper.bolt_tension_demand, self.call_helper.bolt_tension_capacity))
-                                        logger.info("Re-designing the connection with a bolt of higher grade and/or diameter")
-                                    else:
-                                        logger.info("[Bolt Design] The bolt of {} mm diameter and {} grade passes the tension check".
-                                                    format(self.bolt_diameter_provided, self.bolt_grade_provided))
-                                        logger.info(
-                                            "Total tension demand on bolt (due to direct tension + prying action) is {} kN and the bolt tension "
-                                            "capacity is ({} kN)".format(self.call_helper.bolt_tension_demand,
-                                                                         self.call_helper.bolt_tension_capacity))
-
-                                    if not self.call_helper.bolt_design_combined_check_status:
-                                        logger.error("[Bolt Design] The bolt of {} mm diameter and {} grade fails the combined shear + tension check".
-                                                     format(self.bolt_diameter_provided, self.bolt_grade_provided))
-                                        logger.error(
-                                            "The Interaction Ratio (IR) of the critical bolt is {} ".format(self.call_helper.bolt_combined_check_UR))
-                                        logger.info("Re-designing the connection with a bolt of higher grade and/or diameter")
-                                    else:
-                                        logger.info("[Bolt Design] The bolt of {} mm diameter and {} grade passes the combined shear + tension check".
-                                                    format(self.bolt_diameter_provided, self.bolt_grade_provided))
-                                        logger.info(
-                                            "The Interaction Ratio (IR) of the critical bolt is {} ".format(self.call_helper.bolt_combined_check_UR))
-
                                     # checker for bolt column-row selection loop
                                     if self.call_helper.helper_file_design_status == True:
                                         self.design_status = True
@@ -1898,6 +1836,66 @@ class BeamColumnEndPlate(MomentConnection):
 
         # results of overall safe design
         if len(self.plate_thickness_list) != 0 and len(combined_list) != 0:
+
+            # Log messages for helper file
+            if not self.call_helper.flange_capacity_status:
+                logger.error(
+                    "[Flange Strength] The reaction at the compression flange of the beam {} kN exceeds the flange capacity {} "
+                    "kN".
+                        format(round(self.call_helper.r_c, 2), self.call_helper.flange_capacity))
+                logger.error("Reaction on the flange exceeds the flange capacity by {} kN".
+                             format(round(self.call_helper.r_c - self.call_helper.flange_capacity, 2)))
+                logger.warning("The beam flange can have local buckling")
+                logger.info(
+                    "Select a different beam with more flange area or provide stiffening at the flange to increase the beam "
+
+                    "flange thickness. Re-design connection using the effective flange thickness after stiffening")
+                logger.info("Custom beams can be defined through the Osdag Design Preferences tab")
+            else:
+                logger.info(
+                    "[Flange Strength] The reaction at the compression flange of the beam {} kN is less than the flange capacity"
+                    " {} kN. The flange strength requirement is satisfied.".
+                        format(round(self.call_helper.r_c, 2), self.call_helper.flange_capacity))
+
+            if not self.call_helper.plate_design_status:
+                logger.error(
+                    "[End Plate] The selected trial end plate of {} mm is insufficient and fails in the moment capacity check".
+                        format(self.plate_thickness))
+                logger.info(
+                    "The minimum required thickness of end plate is {} mm".format(
+                        round(self.call_helper.plate_thickness_req, 2)))
+                logger.info("Re-designing the connection with a plate of available higher thickness")
+            else:
+                logger.info(
+                    "[End Plate] The end plate of {} mm passes the moment capacity check. The end plate is checked for yielding "
+                    "due tension caused by bending moment and prying force".format(self.plate_thickness))
+
+            if not self.call_helper.bolt_tension_design_status:
+                logger.error("[Bolt Design] The bolt of {} mm diameter and {} grade fails the tension check".
+                             format(self.bolt_diameter_provided, self.bolt_grade_provided))
+                logger.error(
+                    "Total tension demand on bolt (due to direct tension + prying action) is {} kN and exceeds the bolt tension "
+                    "capacity ({} kN)".format(self.call_helper.bolt_tension_demand, self.call_helper.bolt_tension_capacity))
+                logger.info("Re-designing the connection with a bolt of higher grade and/or diameter")
+            else:
+                logger.info("[Bolt Design] The bolt of {} mm diameter and {} grade passes the tension check".
+                            format(self.bolt_diameter_provided, self.bolt_grade_provided))
+                logger.info(
+                    "Total tension demand on bolt (due to direct tension + prying action) is {} kN and the bolt tension "
+                    "capacity is ({} kN)".format(self.call_helper.bolt_tension_demand,
+                                                 self.call_helper.bolt_tension_capacity))
+
+            if not self.call_helper.bolt_design_combined_check_status:
+                logger.error("[Bolt Design] The bolt of {} mm diameter and {} grade fails the combined shear + tension check".
+                             format(self.bolt_diameter_provided, self.bolt_grade_provided))
+                logger.error(
+                    "The Interaction Ratio (IR) of the critical bolt is {} ".format(self.call_helper.bolt_combined_check_UR))
+                logger.info("Re-designing the connection with a bolt of higher grade and/or diameter")
+            else:
+                logger.info("[Bolt Design] The bolt of {} mm diameter and {} grade passes the combined shear + tension check".
+                            format(self.bolt_diameter_provided, self.bolt_grade_provided))
+                logger.info(
+                    "The Interaction Ratio (IR) of the critical bolt is {} ".format(self.call_helper.bolt_combined_check_UR))
 
             # shear design
             self.bolt_shear_demand = self.call_helper.bolt_shear_demand
@@ -1940,7 +1938,8 @@ class BeamColumnEndPlate(MomentConnection):
                 if self.bolt_column == 0:
                     self.bolt_column = self.last_column
                     self.bolt_numbers = self.bolt_column * self.bolt_row
-        else:
+
+            # plate height
             if self.endplate_type == 'Flushed - Reversible Moment':
                 self.ep_height_provided = self.beam_D + 25
 
@@ -1956,6 +1955,18 @@ class BeamColumnEndPlate(MomentConnection):
                 else:  # 2 rows outside tension and compression flange which is maximum allowable
                     self.ep_height_provided = self.beam_D + (2 * (2 * self.end_distance_provided)) + (
                             2 * self.pitch_distance_provided)
+
+        else:
+            if self.bc_compatibility_status == False or len(self.plate_thickness_list) == 0:
+
+                if self.endplate_type == 'Flushed - Reversible Moment':
+                    self.bolt_row = 2
+                elif self.endplate_type == 'Extended One Way - Irreversible Moment':
+                    self.bolt_row = 3
+                else:
+                    self.bolt_row = 4
+
+                combined_list = []
 
         if len(combined_list) == 0:
             self.last_column = 0
@@ -2044,6 +2055,11 @@ class BeamColumnEndPlate(MomentConnection):
                 else:
                     self.continuity_plate_compression_flange_status = False
 
+            if self.column_r1 > 0:
+                self.notch_size = round_up(self.column_r1 + (self.column_r1 / 2), 2)  # mm
+            else:
+                self.notch_size = 10  # mm, assumed (10 X 10)
+
             # Design 2: Continuity Plates on tension side for one way connection
             if self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # one way
                 self.t_bf = round(0.4 * math.sqrt((self.beam_bf * self.beam_tf) / self.gamma_m0), 2)  # mm
@@ -2114,7 +2130,7 @@ class BeamColumnEndPlate(MomentConnection):
     def design_stiffener(self):
         """ design stiffener for the connection """
 
-        if len(self.plate_thickness_list) != 0:
+        if (len(self.plate_thickness_list) != 0) and (self.bolt_row != 0) and (self.bolt_column != 0):
             if self.endplate_type == 'Flushed - Reversible Moment':
                 self.stiffener_height = (self.ep_width_provided - self.beam_tw) / 2  # mm
                 self.stiffener_length = 2 * self.stiffener_height  # mm
@@ -2130,7 +2146,7 @@ class BeamColumnEndPlate(MomentConnection):
 
     def design_weld(self):
         """ design fillet weld at web for the connection and continuity/stiffener plates """
-        if len(self.plate_thickness_list) != 0:
+        if (len(self.plate_thickness_list) != 0) and (self.bolt_row != 0) and (self.bolt_column != 0):
 
             # weld strength
             self.weld_fu = min(self.web_weld.fu, self.plate.fu)
@@ -2270,13 +2286,13 @@ class BeamColumnEndPlate(MomentConnection):
                 self.design_status = True
 
         if self.design_status:
-            logger.debug(": ========== Design Status ============")
-            logger.debug(": Overall beam to column end plate connection design is SAFE")
-            logger.debug(": ========== End Of Design ============")
+            logger.info(": ========== Design Status ============")
+            logger.info(": Overall beam to column end plate connection design is SAFE")
+            logger.info(": ========== End Of Design ============")
         else:
-            logger.debug(": ========== Design Status ============")
-            logger.debug(": Overall beam to column end plate connection design is UNSAFE")
-            logger.debug(": ========== End Of Design ============")
+            logger.info(": ========== Design Status ============")
+            logger.info(": Overall beam to column end plate connection design is UNSAFE")
+            logger.info(": ========== End Of Design ============")
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
@@ -2453,7 +2469,7 @@ class BeamColumnEndPlate(MomentConnection):
         t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V_y"),
               prov_shear_force(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
                                app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.supported_section_shear_capa),
-              "OK")
+              get_pass_fail(self.input_shear_force, self.load_shear, relation='leq'))
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_AXIAL, '', 'P_x = ' + str(self.load_axial), "OK")
@@ -2464,13 +2480,13 @@ class BeamColumnEndPlate(MomentConnection):
                   prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                    app_moment_load=round(self.load_moment, 2),
                                    moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=self.M_dz,
-                                   type='EndPlateType-BC-zz'), "OK")
+                                   type='EndPlateType-BC-zz'), get_pass_fail(self.input_moment, self.load_moment, relation='leq'))
         else:
             t1 = ("Bending Moment (major axis) (kNm)", display_prov(self.input_moment, "M"),
                   prov_moment_load(moment_input=self.input_moment, min_mc=round(self.load_moment_min, 2),
                                    app_moment_load=round(self.load_moment, 2),
                                    moment_capacity=round(self.supported_section_mom_capa_m_zz, 2), moment_capacity_supporting=self.M_dy,
-                                   type='EndPlateType-BC-yy'), "OK")
+                                   type='EndPlateType-BC-yy'), get_pass_fail(self.input_moment, self.load_moment, relation='leq'))
 
         self.report_check.append(t1)
 
@@ -2480,7 +2496,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.report_check.append(t1)
 
-        if (len(self.plate_thickness_list) != 0) and (self.bolt_row != 0):
+        if (len(self.plate_thickness_list) != 0) and (self.bolt_row != 0) and (self.bolt_column != 0):
 
             # CHECK 2: BOLT CHECKS
             t1 = ('SubSection', ' Bolt Optimization', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')

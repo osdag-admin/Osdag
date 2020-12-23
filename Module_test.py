@@ -50,6 +50,7 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
@@ -84,16 +85,13 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
-                    KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
-                    KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
-                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, KEY_DISP_ENDPLATE:EndPlateConnection,
-                    KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
-
-# available_module = {KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
-#                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
-#                     KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate}
-
+available_module = {KEY_DISP_FINPLATE:FinPlateConnection,  KEY_DISP_ENDPLATE:EndPlateConnection,
+                    KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_CLEATANGLE:CleatAngleConnection,
+                    KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate,
+                    KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate,
+                    KEY_DISP_TENSION_WELDED:Tension_welded,KEY_DISP_TENSION_BOLTED:Tension_bolted,
+                    KEY_DISP_COLUMNENDPLATE:ColumnEndPlate,KEY_DISP_BASE_PLATE:BasePlateConnection,
+                    KEY_DISP_BB_EP_SPLICE:BeamBeamEndPlateSplice, KEY_DISP_BCENDPLATE: BeamColumnEndPlate}
 
 #predefined pop-up summary.
 popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName':

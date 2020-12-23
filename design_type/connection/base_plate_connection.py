@@ -6894,14 +6894,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if self.safe:
             self.design_status = True
-            logger.debug(": =========== Design Status =============")
-            logger.debug(":      Overall base plate connection design is SAFE")
-            logger.debug(": ============ End Of Design ============")
+            logger.info(": =========== Design Status =============")
+            logger.info(":      Overall base plate connection design is SAFE")
+            logger.info(": ============ End Of Design ============")
         else:
             self.design_status = False
-            logger.debug(": =========== Design Status =============")
-            logger.debug(":     Overall base plate connection design is UNSAFE")
-            logger.debug(": ============ End Of Design ============")
+            logger.info(": =========== Design Status =============")
+            logger.info(":     Overall base plate connection design is UNSAFE")
+            logger.info(": ============ End Of Design ============")
 
         # printing values for output dock
 

@@ -1037,7 +1037,7 @@ class BeamCoverPlateWeld(MomentConnection):
                     self.initial_pt_thk_status = False and self.initial_pt_thk_status_web == False and self.webheight_status == False
                     self.design_status = False
                     logger.error(" : Design is unsafe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
 
             else:
                 self.initial_pt_thk_status = False
@@ -1046,7 +1046,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                .format(round(self.flange_force/1000, 2)))
                 logger.info(" : Select a larger beam section or decrease the applied load.")
                 logger.error(" : Design is unsafe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
         else:
             self.initial_pt_thk_status_web = False
             self.design_status = False
@@ -1054,7 +1054,7 @@ class BeamCoverPlateWeld(MomentConnection):
                             .format(round(self.axial_force_w/1000, 2)))
             logger.info(" : Select a larger beam section or decrease the applied axial load.")
             logger.error(" : Design is unsafe. \n ")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
 
     def web_plate_weld(self):
@@ -1136,7 +1136,7 @@ class BeamCoverPlateWeld(MomentConnection):
         else:
             logger.warning(" : The weld strength of the web plate is less than the weld stress of the web plate.")
             logger.error(" : Design is unsafe.")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
 
     def flange_plate_weld(self):
         """
@@ -1223,7 +1223,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.design_status =False
                 logger.warning(" : The weld strength of the flange plate is less than the weld stress of the flange plate.")
                 logger.error(" : Design is unsafe.")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
         else:
             ################ OUTSIDE + INSIDE ###############################
             self.Required_weld_flange_length = round(self.flange_force / self.flange_weld.strength,2)
@@ -1304,7 +1304,7 @@ class BeamCoverPlateWeld(MomentConnection):
                     # logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates".format(
                     #         self.max_possible_tk))
                     logger.error(" : Design is unsafe.")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
                     self.flange_plate_weld_status = False
                 else:
                     self.flange_plate_weld_status = True
@@ -1316,7 +1316,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.design_status = False
                 logger.warning(" : The weld strength of the flange plate is less than the weld stress of the flange plate.")
                 logger.error(" : Design is unsafe.")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
 
     def flange_plate_capacity_axial(self):  # flange plate capacity check in axial
         self.flange_plate_capacity_axial_status = False
@@ -1341,7 +1341,7 @@ class BeamCoverPlateWeld(MomentConnection):
                         self.flange_force / 1000, 2)))
                     logger.info(": Increase the thickness of the flange plate or decrease the applied load")
                     logger.error(" : Design is unsafe.")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
             else:
                 self.flange_plate_capacity_axial_status = True
                 self.recheck_flange_capacity_axial(self)
@@ -1370,7 +1370,7 @@ class BeamCoverPlateWeld(MomentConnection):
                             self.flange_force / 1000, 2)))
                     logger.info(": Increase the thickness of the flange plate or decrease the applied load.")
                     logger.error(" : Design is unsafe.")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
             else:
                 self.flange_plate_capacity_axial_status = True
                 self.recheck_flange_capacity_axial(self)
@@ -1393,7 +1393,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.flange_force / 1000, 2)))
             logger.info(": Select a larger beam section or decrease the applied load.")
             logger.error(" : Design is unsafe.")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
         else:
             self.recheck_flange_capacity_axial_status = True
             self.web_plate_capacity_axial(self)
@@ -1419,7 +1419,7 @@ class BeamCoverPlateWeld(MomentConnection):
                     self.axial_force_w / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate or decrease the applied axial load.")
                 logger.error(" : Design is unsafe.")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
 
         else:
             self.web_plate_capacity_axial_status = True
@@ -1443,7 +1443,7 @@ class BeamCoverPlateWeld(MomentConnection):
                     round(self.fact_shear_load / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate or decrease the applied shear load.")
                 logger.error(" : Design is unsafe. \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
         else:
             self.design_status = True
             self.shear_yielding_status = True
@@ -1463,7 +1463,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                    .format(round(self.fact_shear_load/1000, 2)))
                     logger.info(": Increase the thickness of the web plate or decrease the applied shear load.")
                     logger.error(" : Design is unsafe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    logger.info(" :=========End Of design===========")
             else:
                 self.web_plate_capacity_shear_status = True
                 self.cap_blockcheck_web_axial(self)
@@ -1509,18 +1509,18 @@ class BeamCoverPlateWeld(MomentConnection):
                     self.axial_force_w / 1000, 2)))
                 logger.info(" : Select a larger beam section or decrease the applied axial load.")
                 logger.error(" : Design is unsafe.")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
             else:
                 self.design_status = True
                 logger.info(" : Overall beam cover plate welded connection design is safe.")
-                logger.debug(" :=========End Of design===========")
+                logger.info(" :=========End Of design===========")
         else:
             self.design_status = False
             logger.warning(" : The block shear capacity of the web is less than the required axial force, i.e. {} kN."
                            .format(round(self.axial_force_w / 1000, 2)))
             logger.info(" : Select a larger beam section or decrease the applied axial load.")
             logger.error(" : Design is unsafe.")
-            logger.debug(" :=========End Of design===========")
+            logger.info(" :=========End Of design===========")
         if self.preference == "Outside":
             self.flange_out_plate_tk = self.flange_plate.thickness_provided
             self.flange_in_plate_tk = 0.0
@@ -2294,7 +2294,8 @@ class BeamCoverPlateWeld(MomentConnection):
                     len(self.flange_plate_thickness_possible) != 0):
                 t1 = ('SubSection', 'Initial Web Plate Height Check', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
-                t1 = (KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
+                t1 = (KEY_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                                                             t_f=self.section.flange_thickness),
                       web_width_chk_weld(D=self.section.depth,
                                          tk=self.section.flange_thickness,
                                          R_1=self.section.root_radius,
@@ -2533,8 +2534,9 @@ class BeamCoverPlateWeld(MomentConnection):
             self.report_check.append(t1)
             self.min_web_plate_height = round(self.section.min_plate_height(),2)
             self.min_length_required_web = self.section.flange_width
-            t1 = (DISP_MIN_WEB_PLATE_HEIGHT, web_width_min (D=self.section.depth,min_req_width =self.min_web_plate_height )
-                  ,height_of_web_cover_plate(D=self.section.depth, sp=self.webspace,b_wp=self.web_plate.height,
+            t1 = (DISP_MIN_WEB_PLATE_HEIGHT, min_plate_ht_req (D=self.section.depth, min_req_width =self.min_web_plate_height, r_r=self.section.root_radius,
+                                                               t_f=self.section.flange_thickness)
+                  , height_of_web_cover_plate(D=self.section.depth, sp=self.webspace,b_wp=self.web_plate.height,
                                              T=self.section.flange_thickness, R_1 = self.section.root_radius),
                   get_pass_fail(self.min_web_plate_height, self.web_plate.height, relation="lesser"))
             self.report_check.append(t1)

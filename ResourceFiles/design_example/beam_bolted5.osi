@@ -1,19 +1,26 @@
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
+- '8'
+- '10'
 - '12'
 - '16'
 - '20'
 - '24'
 - '30'
 - '36'
-- '39'
-- 08
-- '10'
+- '42'
+- '48'
+- '56'
+- '64'
 - '14'
 - '18'
 - '22'
 - '27'
 - '33'
+- '39'
+- '45'
+- '52'
+- '60'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -25,16 +32,11 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
-Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
-Bolt.TensionType: Pretensioned
+Bolt.TensionType: Non pre-tensioned
 Bolt.Type: Bearing Bolt
-Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Preferences: Outside
 Connector.Flange_Plate.Thickness_list:
-- '10'
-Connector.Material: E 250 (Fe 410 W)A
-Connector.Web_Plate.Thickness_List:
-- '6'
 - '8'
 - '10'
 - '12'
@@ -43,11 +45,8 @@ Connector.Web_Plate.Thickness_List:
 - '18'
 - '20'
 - '22'
-- '24'
 - '25'
-- '26'
 - '28'
-- '30'
 - '32'
 - '36'
 - '40'
@@ -55,15 +54,45 @@ Connector.Web_Plate.Thickness_List:
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Connector.Material: E 450 (Fe 590) E
+Connector.Web_Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: Sheared or hand flame cut
-Detailing.Gap: '3'
-Load.Axial: '100'
-Load.Moment: '25'
-Load.Shear: '50'
-Material: E 250 (Fe 410 W)A
-Member.Designation: WPB 200 X 200 X 34.65
+Detailing.Gap: '10'
+Load.Axial: '40'
+Load.Moment: '60'
+Load.Shear: '40'
+Material: E 300 (Fe 440)
+Member.Designation: UB 305 x 165 x 54
 Member.Material: E 250 (Fe 410 W)A
-Module: Beam Coverplate Connection
+Module: Beam Cover Plate - Bolted

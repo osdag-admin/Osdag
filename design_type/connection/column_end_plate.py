@@ -798,7 +798,7 @@ class ColumnEndPlate(MomentConnection):
             logger.warning(' : The value of factored axial load exceeds the axial capacity, {} kN.'.format(
                 round(self.axial_capacity / 1000, 2)))
             logger.error(" : Design is UNSAFE \n ")
-            logger.debug(" : =========End of Design===========")
+            logger.info(" : =========End of Design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity:
@@ -813,7 +813,7 @@ class ColumnEndPlate(MomentConnection):
                     logger.warning(' : The value of bending moment exceeds the moment capacity of the member, i.e. {} kNm.'.format(
                         round(self.section.moment_capacity / 1000000), 2))
                     logger.error(" : Design is UNSAFE \n ")
-                    logger.debug(" : =========End of Design===========")
+                    logger.info(" : =========End of Design===========")
                 else:
                     self.member_capacity_status = True
                     print("axial load", self.factored_axial_load)

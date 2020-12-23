@@ -1187,7 +1187,7 @@ class EndPlateConnection(ShearConnection):
             self.design_status = True
             logger.info("End plate is designed with minimum possible plate thickness.")
             logger.info("Bolt columns are limited to two (one on each side) in shear end plate.")
-            logger.debug("=== End Of Design ===")
+            logger.info("=== End Of Design ===")
 
     def plate_width_check(self, plate_width):
         if self.connectivity == VALUES_CONN_1[0]:

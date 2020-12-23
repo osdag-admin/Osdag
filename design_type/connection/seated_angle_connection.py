@@ -927,7 +927,7 @@ class SeatedAngleConnection(ShearConnection):
             print(output)
             self.select_optimum(self,output)
             self.top_angle_section(self)
-            logger.debug("=== End Of Design ===")
+            logger.info("=== End Of Design ===")
         elif self.bolt.design_status is False and self.bolt.plate_thk_status is False:
             self.design_status = False
             logger.error(" : The total thickness of the connecting elements is more than 8 times the bolt diameter. "

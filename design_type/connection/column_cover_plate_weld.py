@@ -1137,7 +1137,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                     self.initial_pt_thk_status = False and self.initial_pt_thk_status_web == False and self.webheight_status == False
                     self.design_status = False
                     logger.error(" : Design is UNSAFE \n ")
-                    logger.debug(" : =========End of Design===========")
+                    logger.info(" : =========End of Design===========")
 
             else:
                 self.initial_pt_thk_status = False
@@ -1146,7 +1146,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                     self.flange_force / 1000, 2)))
                 logger.info(" : Select a larger column section and/or decrease the applied load(s)")
                 logger.error(" : Design is UNSAFE \n ")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
         else:
             self.initial_pt_thk_status_web = False
             self.design_status = False
@@ -1154,7 +1154,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.axial_force_w / 1000, 2)))
             logger.info(" : Select a larger column section and/or decrease the applied axial force")
             logger.error(" : Design is UNSAFE \n ")
-            logger.debug(" : =========End of Design===========")
+            logger.info(" : =========End of Design===========")
 
     def web_plate_weld(self):
         """
@@ -1234,7 +1234,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         else:
             logger.warning(" : The weld strength of the web plate is less than the required weld stress")
             logger.error(" : Design is UNSAFE \n ")
-            logger.debug(" : =========End of Design===========")
+            logger.info(" : =========End of Design===========")
 
     def flange_plate_weld(self):
         """
@@ -1327,7 +1327,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.design_status = False
                 logger.warning(" : The weld strength of the web plate is less than the required weld stress")
                 logger.error(" : Design is UNSAFE \n ")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
         else:
             ################ OUTSIDE + INSIDE ###############################
             self.Required_weld_flange_length = round(self.flange_force / self.flange_weld.strength, 2)
@@ -1411,7 +1411,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                     # logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates".format(
                     #         self.max_possible_tk))
                     logger.error(" : Design is UNSAFE \n ")
-                    logger.debug(" : =========End of Design===========")
+                    logger.info(" : =========End of Design===========")
                     self.flange_plate_weld_status = False
 
                 else:
@@ -1424,7 +1424,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.design_status = False
                 logger.warning(" : The weld strength of the web plate is less than the required weld stress")
                 logger.error(" : Design is UNSAFE \n ")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
 
     def flange_plate_capacity_axial(self):  # flange plate capacity check in axial
         self.flange_plate_capacity_axial_status = False
@@ -1449,7 +1449,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                             round(self.flange_force * 1e-3, 2)))
                     logger.info(": Select a larger column section and/or decrease the applied load(s)")
                     logger.error(" : Design is UNSAFE \n ")
-                    logger.debug(" : =========End of Design===========")
+                    logger.info(" : =========End of Design===========")
             else:
                 self.flange_plate_capacity_axial_status = True
                 self.recheck_flange_capacity_axial(self)
@@ -1480,7 +1480,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                             round(self.flange_force / 1000, 2)))
                     logger.info(": Increase the thickness of the flange plate and/or decrease the applied load(s)")
                     logger.error(" : Design is UNSAFE \n ")
-                    logger.debug(" : =========End of Design===========")
+                    logger.info(" : =========End of Design===========")
             else:
                 self.flange_plate_capacity_axial_status = True
                 self.recheck_flange_capacity_axial(self)
@@ -1504,7 +1504,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                     round(self.flange_force / 1000, 2)))
             logger.info(": Select a larger column section and/or decrease the applied load(s)")
             logger.error(" : Design is UNSAFE \n ")
-            logger.debug(" : =========End of Design===========")
+            logger.info(" : =========End of Design===========")
         else:
             self.recheck_flange_capacity_axial_status = True
             self.web_plate_capacity_axial(self)
@@ -1530,7 +1530,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                         self.axial_force_w / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate and/or decrease the applied Axial Force")
                 logger.error(" : Design is UNSAFE \n ")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
 
         else:
             self.web_plate_capacity_axial_status = True
@@ -1554,7 +1554,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                         round(self.fact_shear_load / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate and/or decrease the applied Shear Force")
                 logger.error(" : Design is UNSAFE \n ")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
         else:
             self.design_status = True
             self.shear_yielding_status = True
@@ -1575,7 +1575,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                             round(self.fact_shear_load / 1000, 2)))
                     logger.info(": Increase the thickness of the web plate and/or decrease the applied Shear Force")
                     logger.error(" : Design is UNSAFE \n ")
-                    logger.debug(" : =========End of Design===========")
+                    logger.info(" : =========End of Design===========")
             else:
                 self.web_plate_capacity_shear_status = True
                 self.cap_blockcheck_web_axial(self)
@@ -1621,17 +1621,17 @@ class ColumnCoverPlateWeld(MomentConnection):
                     ": The tension capacity of the web is less than the required Axial Force, {} kN".format(round(self.axial_force_w * 1e-3, 2)))
                 logger.info(": Select a larger column section and/or decrease the applied load(s)")
                 logger.error(" : Design is UNSAFE \n ")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
             else:
                 self.design_status = True
                 logger.info(" : Overall Column Cover Plate Welded member design is SAFE \n")
-                logger.debug(" : =========End of Design===========")
+                logger.info(" : =========End of Design===========")
         else:
             self.design_status = False
             logger.warning(": The block shear capacity of the web is less than the required Axial Force, {} kN".format(round(self.axial_force_w * 1e-3, 2)))
             logger.info(": Select a larger section")
             logger.error(" : Design is UNSAFE \n ")
-            logger.debug(" : =========End of Design===========")
+            logger.info(" : =========End of Design===========")
         if self.preference == "Outside":
             self.flange_out_plate_tk = self.flange_plate.thickness_provided
             self.flange_in_plate_tk = 0.0

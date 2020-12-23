@@ -1857,7 +1857,7 @@ class Tension_bolted(Member):
                 logger.warning (":The plate length of {} mm is larger than the member length of {} mm.". format(2*self.plate.length,self.length))
                 logger.info(":Try a bolt of larger diameter and/or increase the member length.")
                 logger.error(":Design is unsafe. \n ")
-                logger.debug(":=========End Of design===========")
+                logger.info(":=========End Of design===========")
 
             elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
                 print("bolt check")
@@ -1896,7 +1896,7 @@ class Tension_bolted(Member):
                     self.design_status = False
                     logger.warning(":Design is unsuccessful due to long joint and/or large grip length, bolt reduction factors.")
                     logger.error(":Design is unsafe. \n ")
-                    logger.debug(":=========End Of design===========")
+                    logger.info(":=========End Of design===========")
             else:
                 pass
         else:
@@ -1914,14 +1914,14 @@ class Tension_bolted(Member):
                                    "thickness of {} mm."
                                    . format(round(self.res_force/1000,2),round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
                     logger.error(":Design is unsafe. \n ")
-                    logger.debug(":=========End Of design===========")
+                    logger.info(":=========End Of design===========")
             else:
                 self.design_status = False
                 logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
                                "thickness of {} mm."
                                .format(round(self.res_force / 1000, 2), round(self.plate_tension_capacity / 1000, 2), max(self.plate.thickness)))
                 logger.error(":Design is unsafe. \n ")
-                logger.debug(":=========End Of design===========")
+                logger.info(":=========End Of design===========")
                 print(self.design_status)
 
     def status_pass(self,design_dictionary):
@@ -1932,7 +1932,7 @@ class Tension_bolted(Member):
 
             logger.info(":Try a bolt of larger diameter and/or increase the member length.")
             logger.error(":Design is unsafe. \n ")
-            logger.debug(":=========End Of design===========")
+            logger.info(":=========End Of design===========")
 
         else:
             self.plate_design_status = True
@@ -1954,7 +1954,7 @@ class Tension_bolted(Member):
                 pass
 
             logger.info(":Overall bolted tension member design is safe. \n")
-            logger.debug(":=========End Of design===========")
+            logger.info(":=========End Of design===========")
 
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                 self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,

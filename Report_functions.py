@@ -2735,7 +2735,10 @@ def prov_shear_force(shear_input, min_sc, app_shear_load, shear_capacity_1):
     app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r' \\ \\'))
 
     app_shear_load_eqn.append(NoEscape(r' V_{u} &= max(V_{y},~{V_{y}}_{min}) \\'))
+    app_shear_load_eqn.append(NoEscape(r' but,~ & \leq V_{dy} \\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',~' + min_sc + r') \\'))
+    app_shear_load_eqn.append(NoEscape(r' but,~ & \leq ' + shear_capacity_1 + r' \\ \\'))
+
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r' \\ \\'))
 
     app_shear_load_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~10.7] \end{aligned}'))
@@ -2783,16 +2786,22 @@ def prov_moment_load(moment_input, min_mc, app_moment_load, moment_capacity, mom
         app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r' \\ \\'))
 
         app_moment_load_eqn.append(NoEscape(r'M_{u} &= max(M_{z},~{M_{z}}_{min}) \\'))
+
         if type == 'EndPlateType-BC-zz':
             app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} ~of~the~column~section \\'))
         elif type == 'EndPlateType-BC-yy':
             app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{y-y} ~of~the~column~section \\'))
+        elif type == 'EndPlateType':
+            app_moment_load_eqn.append(NoEscape(r'but,~ & \leq {M_{d}}_{z-z} \\'))
 
         app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r') \\'))
-        if type == 'EndPlateType-BC-zz' or type == 'EndPlateType-BC-yy':
-            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\'))
-        app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
 
+        if type == 'EndPlateType-BC-zz' or type == 'EndPlateType-BC-yy':
+            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity_supporting) + r' \\ \\'))
+        elif type == 'EndPlateType':
+            app_moment_load_eqn.append(NoEscape(r'& \leq ' + str(moment_capacity) + r' \\ \\'))
+
+        app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r' \\ \\'))
         app_moment_load_eqn.append(NoEscape(r'[Re&f.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
 
     else:
@@ -7160,7 +7169,8 @@ def tension_critical_bolt_prov(M, t_ba, n_c, r_1, n_r, r_i, n, r_3, r_4, type=''
                                                        + r_3 +'^2}{'+r_1+'} +\displaystyle\sum_{i=' + i + '} ^ {' + n_r + r'} \frac{r_i ^2}{'
                                                        + r_1 + r'}\Bigg) }\\'))
     else:
-        if (n == 4) or (n == 6):
+        # if (n == 4) or (n == 6):
+        if n < 8:
             i = 4
             i = str(i)
             tension_critical_bolt_prov.append(NoEscape(r'\begin{aligned} T_{1} &= \frac{M_{ue}}'

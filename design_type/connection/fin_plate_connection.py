@@ -958,7 +958,7 @@ class FinPlateConnection(ShearConnection):
         print("plate design status is ",self.plate.design_status,"weld status is",self.weld.design_status)
         if self.plate.design_status is True and self.weld.design_status is True:
             self.design_status = True
-            logger.debug("=== End Of Design ===")
+            logger.info("=== End Of Design ===")
 
     #############################
     # End of Calculations

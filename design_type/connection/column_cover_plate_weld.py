@@ -2376,12 +2376,13 @@ class ColumnCoverPlateWeld(MomentConnection):
                 t1 = ('SubSection', 'Initial Web Plate Height Check', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 t1 = (
-                KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
-                web_width_chk_weld(D=self.section.depth,
+                    KEY_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                                                           t_f=self.section.flange_thickness),
+                    web_width_chk_weld(D=self.section.depth,
                                    tk=self.section.flange_thickness,
                                    R_1=self.section.root_radius,
                                    webplatewidth=self.webplatewidth),
-                get_pass_fail(self.min_web_plate_height, self.webplatewidth, relation="leq"))
+                    get_pass_fail(self.min_web_plate_height, self.webplatewidth, relation="leq"))
                 self.report_check.append(t1)
 
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force):
@@ -2663,10 +2664,11 @@ class ColumnCoverPlateWeld(MomentConnection):
             self.report_check.append(t1)
             self.min_web_plate_height = round(self.section.min_plate_height(), 2)
             self.min_length_required_web = self.section.flange_width
-            t1 = (DISP_MIN_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height)
+            t1 = (DISP_MIN_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                                                              t_f=self.section.flange_thickness)
             , height_of_web_cover_plate(D=self.section.depth, sp=self.webspace, b_wp=self.web_plate.height,
                                         T=self.section.flange_thickness, R_1=self.section.root_radius),
-            get_pass_fail(self.min_height_required, self.web_plate.height, relation="lesser"))
+                  get_pass_fail(self.min_height_required, self.web_plate.height, relation="lesser"))
             self.report_check.append(t1)
             t1 = (DISP_MIN_WEB_PLATE_LENGTH, self.min_length_required_web, plate_Length_req(l_w=self.web_weld.length,
                                                                                         t_w=self.web_weld.size,

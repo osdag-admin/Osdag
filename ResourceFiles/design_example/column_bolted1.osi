@@ -1,28 +1,42 @@
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
+- '8'
+- '10'
 - '12'
 - '16'
 - '20'
 - '24'
 - '30'
 - '36'
-- '39'
-- 08
-- '10'
+- '42'
+- '48'
+- '56'
+- '64'
 - '14'
 - '18'
 - '22'
 - '27'
 - '33'
+- '39'
+- '45'
+- '52'
+- '60'
 Bolt.Grade:
 - '3.6'
-Bolt.Material_Grade_OverWrite: '410'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
-Connector.Flange_Plate.Preferences: Outside + Inside
-Connector.Flange_Plate.Thickness_list: &id001
-- '6'
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list:
 - '8'
 - '10'
 - '12'
@@ -31,13 +45,6 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '18'
 - '20'
 - '22'
-- '24'
-- '26'
-- '28'
-- '30'
-- '32'
-- '36'
-- '40'
 - '25'
 - '28'
 - '32'
@@ -47,17 +54,45 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '50'
 - '56'
 - '63'
+- '75'
 - '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Connector.Material: E 250 (Fe 410 W)A
-Connector.Web_Plate.Thickness_List: *id001
+Connector.Web_Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: Sheared or hand flame cut
 Detailing.Gap: '3'
-Load.Axial: '100'
-Load.Moment: '5'
-Load.Shear: '100'
+Load.Axial: ''
+Load.Moment: ''
+Load.Shear: ''
 Material: E 250 (Fe 410 W)A
-Member.Designation: UC 305 x 305 x 97
+Member.Designation: UC 152 x 152 x 37
 Member.Material: E 250 (Fe 410 W)A
-Module: Column Coverplate Connection
+Module: Column Cover Plate - Bolted

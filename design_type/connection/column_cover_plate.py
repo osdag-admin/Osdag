@@ -3201,7 +3201,8 @@ class ColumnCoverPlate(MomentConnection):
 
                     t1 = (
                         KEY_DISP_WEB_PLATE_HEIGHT,
-                        web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
+                        min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                                         t_f=self.section.flange_thickness),
                         web_width_chk_bolt(pref=self.preference, D=self.section.depth,
                                            tk=self.flange_plate.thickness_provided, T=self.section.flange_thickness,
                                            R_1=self.section.root_radius, webplatewidth=self.webplatewidth,
@@ -3211,12 +3212,13 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     # self.min_web_plate_height = self.section.min_plate_height()
                     t1 = (
-                    KEY_DISP_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
-                    web_width_chk_bolt(pref=self.preference, D=self.section.depth,
+                        KEY_DISP_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                                                                    t_f=self.section.flange_thickness),
+                        web_width_chk_bolt(pref=self.preference, D=self.section.depth,
                                        tk=self.flange_plate.thickness_provided, T=self.section.flange_thickness,
                                        R_1=self.section.root_radius, webplatewidth=self.webplatewidth,
                                        webclearance=self.webclearance),
-                    get_pass_fail(self.min_web_plate_height, self.webplatewidth, relation="leq"))
+                        get_pass_fail(self.min_web_plate_height, self.webplatewidth, relation="leq"))
                     self.report_check.append(t1)
 
             if self.member_capacity_status == True and (
@@ -3733,7 +3735,8 @@ class ColumnCoverPlate(MomentConnection):
             t1 = ('SubSection', 'Web Plate Dimensions Check', '|p{4cm}|p{4.5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t1 = (DISP_MIN_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
+            t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                                                          t_f=self.section.flange_thickness),
                   self.web_plate.height,
                   get_pass_fail(self.min_web_plate_height, self.web_plate.height, relation="leq"))
             self.report_check.append(t1)

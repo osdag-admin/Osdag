@@ -694,7 +694,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         super(BeamBeamEndPlateSplice, self).set_input_values(self, design_dictionary)
 
         self.mainmodule = "Moment Connection"
-        self.module = KEY_DISP_BEAMENDPLATE
+        self.module = KEY_DISP_BB_EP_SPLICE
         self.connectivity = design_dictionary[KEY_CONN]
         self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
         self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])

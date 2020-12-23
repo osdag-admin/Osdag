@@ -1368,6 +1368,13 @@ class EndPlateConnection(ShearConnection):
 
         spacing = []
 
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details")
+        spacing.append(t00)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/ep_shear.png', 400, 277, ""])  # [image, width, height, caption]
+        spacing.append(t99)
+
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if flag else '')
         spacing.append(t9)
 

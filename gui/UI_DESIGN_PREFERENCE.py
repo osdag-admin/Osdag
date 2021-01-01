@@ -488,7 +488,7 @@ class Window(QDialog):
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
 
-        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD or module == KEY_DISP_BEAMENDPLATE:
+        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)

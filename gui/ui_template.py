@@ -1657,7 +1657,7 @@ class Window(QMainWindow):
             return BeamCoverPlate
         elif name == KEY_DISP_BEAMCOVERPLATEWELD:
             return BeamCoverPlateWeld
-        elif name == KEY_DISP_BEAMENDPLATE:
+        elif name == KEY_DISP_BB_EP_SPLICE:
             return BeamBeamEndPlateSplice
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate

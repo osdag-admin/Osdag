@@ -48,7 +48,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
     def __init__(self):
         super(BeamBeamEndPlateSplice, self).__init__()
 
-        self.module = KEY_DISP_BEAMENDPLATE
+        self.module = KEY_DISP_BB_EP_SPLICE
 
         self.load_moment = 0.0
         self.load_moment_effective = 0.0

@@ -1825,7 +1825,7 @@ class CommonDesignLogic(object):
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
                                         color=Quantity_NOC_YELLOW)
-            elif self.connection == KEY_DISP_BEAMENDPLATE:
+            elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 self.B = self.module_class()
 
                 self.ExtObj = self.createBBEndPlateCAD()
@@ -2116,7 +2116,7 @@ class CommonDesignLogic(object):
                 else:
                     self.display.EraseAll()
 
-            elif self.connection == KEY_DISP_BEAMENDPLATE:
+            elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 if flag is True:
 
                     self.CPObj = self.createBBEndPlateCAD()
@@ -2311,7 +2311,7 @@ class CommonDesignLogic(object):
                 else:
                     cadlist = self.CPObj.get_models()
 
-            elif self.connection == KEY_DISP_BEAMENDPLATE:
+            elif self.connection == KEY_DISP_BB_EP_SPLICE:
 
                 if self.component == "Beam":
                     final_model = self.CPObj.get_beam_models()

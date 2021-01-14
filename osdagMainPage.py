@@ -260,38 +260,38 @@ class OsdagMainWindow(QMainWindow):
                                     self.show_shear_connection,
                                                     ],
                                 'Moment Connection' :{
-                                                    'Beam to Beam' :[
+                                                    'Beam-to-Beam Splice' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
-                                                                ('End Plate Splice', 'ResourceFiles/images/bb_splice.png', 'B2B_End_Plate_Splice'),
+                                                                ('End Plate', 'ResourceFiles/images/bb_splice.png', 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
-                                                    'Beam to Column': [
+                                                    'Beam-to-Column': [
                                                                 ('End Plate', 'ResourceFiles/images/BC-EBW_GUI.png','BC_End_Plate'),
                                                                 self.show_moment_connection_bc
                                                                     ],
-                                                    'Column to Column' :[
+                                                    'Column-to-Column Splice' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/cccoverplatebolted.png','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/cccoverplatewelded.png','C2C_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
+                                                                ('End Plate','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,
                                                     },
                                 'Base Plate':[
-                                        ('Base Plate', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
+                                        ('Base Plate Connection', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
                                 'Truss Connection' : self.Under_Development,
                                 },
                 'Tension Member' : [
-                            ('Bolted','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
-                            ('Welded','ResourceFiles/images/welded_ten.png','Tension_Welded'),
+                            ('Bolted to End Gusset','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
+                            ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
                 'Compression Member' : [
-                            ('Bolted','ResourceFiles/images/beam_column_endplate.png','Compression_Bolted'),
-                            ('Welded','ResourceFiles/images/finplate.png','Compression_Welded'),
+                            ('Bolted to End Gusset','ResourceFiles/images/beam_column_endplate.png','Compression_Bolted'),
+                            ('Welded to End Gusset','ResourceFiles/images/finplate.png','Compression_Welded'),
                             self.show_compression_module,
                                        ],
                 'Flexural Member' : self.Under_Development,

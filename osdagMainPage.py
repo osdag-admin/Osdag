@@ -289,11 +289,7 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member' : [
-                            ('Bolted to End Gusset','ResourceFiles/images/beam_column_endplate.png','Compression_Bolted'),
-                            ('Welded to End Gusset','ResourceFiles/images/finplate.png','Compression_Welded'),
-                            self.show_compression_module,
-                                       ],
+                'Compression Member' : self.Under_Development,
                 'Flexural Member' : self.Under_Development,
                 'Beam-Column' : self.Under_Development,
                 'Plate Girder' : self.Under_Development,

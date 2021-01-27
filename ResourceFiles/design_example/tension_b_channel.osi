@@ -131,4 +131,4 @@ Member.Designation:
 Member.Length: '5000'
 Member.Material: E 165 (Fe 290)
 Member.Profile: Channels
-Module: Tension Member Bolted
+Module: Tension Member Design - Bolted to End Gusset

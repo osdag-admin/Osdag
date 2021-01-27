@@ -1725,13 +1725,13 @@ class CommonDesignLogic(object):
             self.loc = A.connectivity
 
 
-            if self.loc == "Column Flange-Beam Web" and self.connection == "Fin Plate":
+            if self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_FINPLATE:
                 # pass
                 # print("hghghghg")
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
-            elif self.loc == "Column Flange-Beam Web" and self.connection == "Seated Angle":
+            elif self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_SEATED_ANGLE:
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
-            elif self.loc == "Column Flange-Beam Web" and self.connection == "Seated Angle":
+            elif self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_SEATED_ANGLE:
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XposYnegZpos)
 
             if self.component == "Column":

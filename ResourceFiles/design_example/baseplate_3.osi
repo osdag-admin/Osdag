@@ -52,7 +52,7 @@ Member.Designation: HB 450
 Member.Fu: '410'
 Member.Fy: '250'
 Member.Material: E 250 (Fe 410 W)A
-Module: Base Plate
+Module: Base Plate Connection
 Stiffener_Key.Material: E 250 (Fe 410 W)A
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '510'

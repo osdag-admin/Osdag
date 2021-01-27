@@ -71,4 +71,4 @@ Load.Shear: '20'
 Material: E 250 (Fe 410 W)A
 Member.Designation: UC 203 x 203 x 60
 Member.Material: E 250 (Fe 410 W)A
-Module: Column End Plate
+Module: Column-to-Column End Plate Connection

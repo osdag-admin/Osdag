@@ -95,4 +95,4 @@ Load.Shear: ''
 Material: E 250 (Fe 410 W)A
 Member.Designation: UB 254 x 102 x 25
 Member.Material: E 250 (Fe 410 W)A
-Module: Beam Cover Plate - Bolted
+Module: Beam-to-Beam Cover Plate Bolted Connection

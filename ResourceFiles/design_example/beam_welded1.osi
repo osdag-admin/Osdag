@@ -56,7 +56,7 @@ Load.Shear: ''
 Material: E 300 (Fe 440)
 Member.Designation: NPB 300 X 165 X 39.88
 Member.Material: E 300 (Fe 440)
-Module: Beam Cover Plate - Welded
+Module: Beam-to-Beam Cover Plate Welded Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '440'
 Weld.Type: Fillet Weld

@@ -29,7 +29,7 @@ Member.Supported_Section.Designation: MB 500
 Member.Supported_Section.Material: E 300 (Fe 440)
 Member.Supporting_Section.Designation: PBP 400 X 158.1
 Member.Supporting_Section.Material: E 350 (Fe 490)
-Module: Beam-Column End Plate
+Module: Beam-to-Column End Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '590'
 Weld.Type: Groove Weld

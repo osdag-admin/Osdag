@@ -56,7 +56,7 @@ Load.Shear: '20'
 Material: Cus_400_500_600_1400
 Member.Designation: WPB 250 X 250 X 117.58
 Member.Material: Cus_400_500_600_1400
-Module: Beam Cover Plate - Welded
+Module: Beam-to-Beam Cover Plate Welded Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '1400'
 Weld.Type: Fillet Weld

@@ -22,6 +22,6 @@ Member.Supported_Section.Designation: UB 305 x 127 x 37
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section.Designation: PBP 400 X 140.2
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A
-Module: End Plate
+Module: End Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'

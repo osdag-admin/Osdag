@@ -33,7 +33,7 @@ Load.Shear: ''
 Material: E 250 (Fe 410 W)A
 Member.Designation: PBP 400 X 230.9
 Member.Material: E 250 (Fe 410 W)A
-Module: Column Cover Plate - Welded
+Module: Column-to-Column Cover Plate Welded Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
 Weld.Type: Fillet Weld

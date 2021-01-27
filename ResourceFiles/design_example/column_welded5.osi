@@ -33,7 +33,7 @@ Load.Shear: '200'
 Material: Cus_400_500_600_1400
 Member.Designation: PBP 400 X 230.9
 Member.Material: Cus_400_500_600_1400
-Module: Column Cover Plate - Welded
+Module: Column-to-Column Cover Plate Welded Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '1400'
 Weld.Type: Fillet Weld

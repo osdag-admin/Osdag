@@ -119,7 +119,7 @@ Member.Supported_Section.Designation: NPB 220 X 110 X 29.35
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section.Designation: HB 350
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A
-Module: Cleat Angle
+Module: Cleat Angle Connection
 out_titles_status:
 - 1
 - 1

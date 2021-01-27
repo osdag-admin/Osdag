@@ -43,7 +43,7 @@ Load.Shear: '80'
 Material: E 250 (Fe 410 W)A
 Member.Supported_Section.Designation: NPB 400 X 180 X 66.31
 Member.Supported_Section.Material: E 450 (Fe 590) E
-Module: Beam-Beam End Plate Splice
+Module: Beam-to-Beam End Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
 Weld.Type: Groove Weld

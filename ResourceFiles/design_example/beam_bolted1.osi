@@ -95,7 +95,7 @@ Load.Shear: ''
 Material: E 250 (Fe 410 W)A
 Member.Designation: NPB 270 X 135 X 30.73
 Member.Material: E 250 (Fe 410 W)A
-Module: Beam Cover Plate - Bolted
+Module: Beam-to-Beam Cover Plate Bolted Connection
 out_titles_status:
 - 1
 - 1

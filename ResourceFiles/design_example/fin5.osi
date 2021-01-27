@@ -46,6 +46,6 @@ Member.Supported_Section.Designation: MB 600
 Member.Supported_Section.Material: E 165 (Fe 290)
 Member.Supporting_Section.Designation: UB 1016 x 305 x 272
 Member.Supporting_Section.Material: E 165 (Fe 290)
-Module: Fin Plate
+Module: Fin Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '540'

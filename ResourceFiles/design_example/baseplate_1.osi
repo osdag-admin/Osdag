@@ -73,7 +73,7 @@ Load.Shear.Minor: ''
 Material: E 250 (Fe 410 W)A
 Member.Designation: UC 254 x 254 x 167
 Member.Material: E 250 (Fe 410 W)A
-Module: Base Plate
+Module: Base Plate Connection
 Stiffener_Key.Fu: '410'
 Stiffener_Key.Fy: '230'
 Stiffener_Key.Material: E 250 (Fe 410 W)A

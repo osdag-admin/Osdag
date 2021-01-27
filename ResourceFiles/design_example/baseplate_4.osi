@@ -41,7 +41,7 @@ Member.Designation: HB 450
 Member.Fu: '440'
 Member.Fy: '300'
 Member.Material: E 300 (Fe 440)
-Module: Base Plate
+Module: Base Plate Connection
 Stiffener_Key.Material: E 300 (Fe 440)
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '600'

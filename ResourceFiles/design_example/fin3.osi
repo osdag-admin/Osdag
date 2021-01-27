@@ -51,6 +51,6 @@ Member.Supported_Section.Designation: UB 406 x 140 x 39
 Member.Supported_Section.Material: E 165 (Fe 290)
 Member.Supporting_Section.Designation: UC 305 x 305 x 198
 Member.Supporting_Section.Material: E 350 (Fe 490)
-Module: Fin Plate
+Module: Fin Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '490'

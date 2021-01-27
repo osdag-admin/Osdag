@@ -67,4 +67,4 @@ Load.Shear: '50'
 Material: E 250 (Fe 410 W)A
 Member.Designation: PBP 360 X 152.2
 Member.Material: E 250 (Fe 410 W)A
-Module: Column Cover Plate - Bolted
+Module: Column-to-Column Cover Plate Bolted Connection

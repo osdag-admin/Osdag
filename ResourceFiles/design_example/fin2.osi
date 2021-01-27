@@ -46,6 +46,6 @@ Member.Supported_Section.Designation: MB 550
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section.Designation: UC 305 x 305 x 97
 Member.Supporting_Section.Material: E 410 (Fe 540)
-Module: Fin Plate
+Module: Fin Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '570'

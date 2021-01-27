@@ -22,6 +22,6 @@ Member.Supported_Section.Designation: NPB 400 X 180 X 66.31
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section.Designation: NPB 450 X190 X 67.16
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A
-Module: End Plate
+Module: End Plate Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'

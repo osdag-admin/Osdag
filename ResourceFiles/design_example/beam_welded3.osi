@@ -56,7 +56,7 @@ Load.Shear: '20'
 Material: E 450 (Fe 590) E
 Member.Designation: WB 550
 Member.Material: E 450 (Fe 590) E
-Module: Beam Cover Plate - Welded
+Module: Beam-to-Beam Cover Plate Welded Connection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '590'
 Weld.Type: Fillet Weld

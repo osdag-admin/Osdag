@@ -1479,7 +1479,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                     self.bolt_column = self.last_column
                     self.bolt_numbers = self.bolt_column * self.bolt_row
 
-        if len(combined_list) == 0:
+        if len(self.plate_thickness_list) == 0 or len(combined_list) == 0:
             self.last_column = 0
             self.bolt_column = 0
             self.bolt_row = 0

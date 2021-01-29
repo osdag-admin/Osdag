@@ -1366,8 +1366,8 @@ def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db, val
     value = str(value)
 
     combined_capacity_eqn = Math(inline=True)
-    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sb}}{V_{db}}\bigg)^2 + \bigg(\frac{T_{b}}{T_{db}}\bigg)^2  &\leq 1.0\\'))
-    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sb + '}{' + V_db + r'}\bigg)^2 + \bigg(\frac{' + T_b + '}{' + T_db + r'}\bigg)^2 &= '
+    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sb}}{V_{db}}\bigg)^2 &+ \bigg(\frac{T_{b}}{T_{db}}\bigg)^2  \leq 1.0\\'))
+    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sb + '}{' + V_db + r'}\bigg)^2 &+ \bigg(\frac{' + T_b + '}{' + T_db + r'}\bigg)^2 = '
                                           + value + r'\\ \\'))
     combined_capacity_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.10.3.6}] \end{aligned}'))
 
@@ -1558,7 +1558,7 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
     else:
         tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= ' + str(Q) + r'\\ \\'))
 
-    tension_in_bolt_due_to_prying.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.4.7] \end{aligned}'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.10.4.7}] \end{aligned}'))
 
     return tension_in_bolt_due_to_prying
 
@@ -1620,7 +1620,7 @@ def cl_10_5_2_3_table_21_min_fillet_weld_size_required(conn_plates_thk, min_weld
     min_weld_size_eqn.append(NoEscape(r'             & =' + str(thinner_plate) + r' \\'))
     min_weld_size_eqn.append(NoEscape(r' {t_{w}}_{\min} & \leq ~ \min(' + str(min_weld_size) + r',~ ' + str(thinner_plate) + r') \\ \\'))
 
-    min_weld_size_eqn.append(NoEscape(r' [Ref~IS~&800:2007,Table ~21 ~,~Cl 10.5.2.3] \end{aligned}'))
+    min_weld_size_eqn.append(NoEscape(r'& [ \text{Ref. IS 800:2007, Table 21, Cl 10.5.2.3}] \end{aligned}'))
 
     return min_weld_size_eqn
 
@@ -1717,7 +1717,7 @@ def cl_10_5_3_1_max_weld_size_v2(conn_plates_thk, max_weld_size):
     max_weld_size_eqn.append(NoEscape(r' t_{\text{thinner}} & =~ \min(' + str(conn_plates_thk[0]) + r',~ ' + str(conn_plates_thk[1]) + r') \\'))
     max_weld_size_eqn.append(NoEscape(r'             & =' + str(thinner_plate) + r' \\'))
     max_weld_size_eqn.append(NoEscape(r' {t_{w}}_{\max} & = ' + str(max_weld_size) + r' \\ \\'))
-    max_weld_size_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.5.3.1] \end{aligned}'))
+    max_weld_size_eqn.append(NoEscape(r'& [ \text{Ref. IS 800:2007, Cl.10.5.3.1}] \end{aligned}'))
 
     return max_weld_size_eqn
 
@@ -2924,7 +2924,7 @@ def design_capacity_of_end_plate(M_dp, b_eff, f_y, gamma_m0, t_p):
 
     design_capacity_of_end_plate = Math(inline=True)
 
-    design_capacity_of_end_plate.append(NoEscape(r'\begin{aligned}  M_{dp} & = { \frac{ b_{eff}~t_p^2~f_y}{ 4~\gamma_{m0}}}\\'))
+    design_capacity_of_end_plate.append(NoEscape(r'\begin{aligned}  M_{dp} & = { \frac{ b_{\text{eff}} t_p^2 f_y}{ 4 \gamma_{m0}}}\\'))
 
     design_capacity_of_end_plate.append(
         NoEscape(r'&={\frac{' + b_eff + r'\times' + t_p + r'^2' + r' \times' + f_y + r'}{4\times' + gamma_m0 + r'}}\\'))
@@ -2988,60 +2988,60 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
 
     elif ep_type == 'Extended One Way - Irreversible Moment':
         if bolt_row == 3:
-            display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the~ first~ row~ outside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{2} ~is~ the ~first~ row ~inside ~tension/top ~flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{3}~ is ~the ~first ~row ~inside ~compression/bottom ~flange  \\'))
-            display_eqn.append(NoEscape(r' & row(s)~ r_{4} ~and~ beyond~ are~ rows ~inside~ the~ flange.  \\ \\'))
+            display_eqn.append(NoEscape(r' & \text{Note: } r_{1} \text{is the first row outside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{2} \text{ is the first row inside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{3} \text{ is the first row inside compression/bottom flange,}  \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{4} \text{ and beyond are rows inside the flange.}  \\ \\'))
         elif bolt_row == 4:
-            display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the~ first~ row~ outside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{2} ~is~ the ~first~ row ~inside ~tension/top ~flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{3}~ is ~the ~first ~row ~inside ~compression/bottom ~flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{4}~ is ~the~ second~ row ~inside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & row(s)~ r_{5} ~and~ beyond~ are~ rows ~inside~ the~ flange.  \\ \\'))
+            display_eqn.append(NoEscape(r' & \text{Note: } r_{1} \text{is the first row outside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{2} \text{ is the first row inside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{3} \text{ is the first row inside compression/bottom flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{4} \text{ is the second row inside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{5} \text{ and beyond are rows inside the flange.}  \\ \\'))
         elif bolt_row == 5:
-            display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the~ first~ row~ outside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{2} ~is~ the ~first~ row ~inside ~tension/top ~flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{3}~ is ~the ~first ~row ~inside ~compression/bottom ~flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{4}~ is ~the~ second~ row ~inside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second ~row ~outside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & row(s)~ r_{6} ~and~ beyond~ are~ rows ~inside~ the~ flange.  \\ \\'))
+            display_eqn.append(NoEscape(r' & \text{Note: } r_{1} \text{is the first row outside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{2} \text{ is the first row inside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{3} \text{ is the first row inside compression/bottom flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{4} \text{ is the second row inside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{5} \text{ is the second row outside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{6} \text{ and beyond are rows inside the flange.}  \\ \\'))
         else:
-            display_eqn.append(NoEscape(r' Note:~ & r_{1}~ is ~the~ first~ row~ outside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{2} ~is~ the ~first~ row ~inside ~tension/top ~flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{3}~ is ~the ~first ~row ~inside ~compression/bottom ~flange  \\'))
+            display_eqn.append(NoEscape(r' & \text{Note: } r_{1} \text{is the first row outside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{2} \text{ is the first row inside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & r_{3} \text{ is the first row inside compression/bottom flange,}  \\'))
             display_eqn.append(NoEscape(r' & r_{4}~ is ~the~ second~ row ~inside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second ~row ~outside~ tension/top~ flange  \\'))
-            display_eqn.append(NoEscape(r' & row(s)~ r_{6} ~and~ beyond~ are~ rows ~inside~ the~ flange.  \\ \\'))
+            display_eqn.append(NoEscape(r' & r_{5} \text{ is the second row outside tension/top flange,}  \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{6} \text{ and beyond are rows inside the flange.}  \\ \\'))
 
     elif ep_type == 'Extended Both Ways - Reversible Moment':
-        display_eqn.append(NoEscape(r' Note:~ & r_{1}~ and~ r_{2}~ are~ the ~first~ rows~ outside \\'))
-        display_eqn.append(NoEscape(r' & and ~inside~ the~ tension/top~ flange    \\'))
-        display_eqn.append(NoEscape(r' & r_{3} ~and~ r_{4}~ are~ the~ first~ rows~ outside \\'))
-        display_eqn.append(NoEscape(r' & and ~inside~ the~ compression/bottom~ flange    \\'))
+        display_eqn.append(NoEscape(r' & \text{Note: } r_{1} \text{ and } r_{2} \text{ are the first rows outside} \\'))
+        display_eqn.append(NoEscape(r' & \text{and inside the tension/top flange.}    \\'))
+        display_eqn.append(NoEscape(r' & r_{3} \text{ and } r_{4} \text{ are the first rows outside} \\'))
+        display_eqn.append(NoEscape(r' & \text{and inside the compression/bottom flange.}    \\'))
 
         if bolt_row == 4:
-            display_eqn.append(NoEscape(r' & row(s)~ r_{5}~ and~ beyond~ are~ rows~ inside~ the~ flange, \\'))
-            display_eqn.append(NoEscape(r' & placed~ in~ a~ symmetrical~ manner. \\ \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{5} \text{ and beyond are the rows inside the flange,} \\'))
+            display_eqn.append(NoEscape(r' & \text{placed in a symmetrical manner.} \\ \\'))
 
         elif bolt_row == 6:
-            display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second~ row~ inside~ tension/top~ flange\\'))
-            display_eqn.append(NoEscape(r' & and ~r_{6}~ is~ the~ second~ row~ inside~ the~ compression/bottom~ flange \\'))
-            display_eqn.append(NoEscape(r' & row(s)~ r_{7}~ and~ beyond~ are~ rows~ inside~ the~ flange, \\'))
-            display_eqn.append(NoEscape(r' & placed~ in~ a~ symmetrical~ manner. \\ \\'))
+            display_eqn.append(NoEscape(r' & r_{5} \text{ is the second row inside tension/top flange,} \\'))
+            display_eqn.append(NoEscape(r' & \text{and } r_{6} \text{ is the second row inside the compression/bottom flange.} \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{7}  \text{ and beyond are the rows inside the flange,} \\'))
+            display_eqn.append(NoEscape(r' & \text{placed in a symmetrical manner.} \\ \\'))
 
         elif bolt_row >= 8:
-            display_eqn.append(NoEscape(r' & r_{5}~ is~ the~ second~ row~ outside~ tension/top~ flange\\'))
-            display_eqn.append(NoEscape(r' & and ~r_{6}~ is~ the~ second~ row~ inside~ the~ tension/top~ flange \\'))
-            display_eqn.append(NoEscape(r' & r_{7}~ is~ the~ second~ row~ outside~ compression/bottom~ flange\\'))
-            display_eqn.append(NoEscape(r' & and~ r_{8}~ is~ the~ second~ row~ inside~ the~ compression/bottom ~flange \\'))
-            display_eqn.append(NoEscape(r' & row(s)~ r_{9}~ and~ beyond~ are~ rows~ inside~ the~ flange, \\'))
-            display_eqn.append(NoEscape(r' & placed~ in~ a~ symmetrical~ manner. \\ \\'))
+            display_eqn.append(NoEscape(r' & r_{5} \text{ is the second row outside tension/top flange,} \\'))
+            display_eqn.append(NoEscape(r' & \text{and, } r_{6}  \text{ is the second row inside the tension/top flange.} \\'))
+            display_eqn.append(NoEscape(r' & r_{7} \text{ is the second row outside compression/bottom flange,} \\'))
+            display_eqn.append(NoEscape(r' & \text{and, } r_{8} \text{ is the second row inside the compression/bottom flange.} \\'))
+            display_eqn.append(NoEscape(r' & \text{row(s) } r_{9} \text{ and beyond are the rows inside the flange,}] \\'))
+            display_eqn.append(NoEscape(r' & \text{placed in a symmetrical manner.} \\ \\'))
 
-    display_eqn.append(NoEscape(r' Note:~ & The~ lever~ arm~ is~ computed~ by~ considering \\'))
-    display_eqn.append(NoEscape(r' & the~ NA~ at~ the~ centre~of~ the~ bottom~ flange. \\'))
-    display_eqn.append(NoEscape(r' & Rows~with~identical~lever~arm~values~ \\'))
-    display_eqn.append(NoEscape(r' & mean~they~are~considered~acting~as~bolt \\'))
-    display_eqn.append(NoEscape(r' & group~near~the~tension~or~compression~flange. \end{aligned}'))
+    display_eqn.append(NoEscape(r' & \text{Note: The lever arm is computed by considering} \\'))
+    display_eqn.append(NoEscape(r' & \text{the N.A at the centre of the bottom flange.} \\'))
+    display_eqn.append(NoEscape(r' & \text{Rows with identical lever arm values} \\'))
+    display_eqn.append(NoEscape(r' & \text{mean they are considered acting as bolt} \\'))
+    display_eqn.append(NoEscape(r' & \text{group near the tension or compression flange.} \end{aligned}'))
 
     return display_eqn
 
@@ -3673,7 +3673,7 @@ def moment_acting_on_end_plate(M_ep, t_b, e):
 
     moment_acting_on_end_plate = Math(inline=True)
 
-    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= Tension~ in~ Bolt \times End~ dist\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{Tension in bolt X end distance} \\'))
     moment_acting_on_end_plate.append(NoEscape(r'&= T_b \times e\\'))
 
     moment_acting_on_end_plate.append(NoEscape(r'&=' + t_b + r'\times' + e + r'\\'))
@@ -3703,11 +3703,11 @@ def moment_acting_on_end_plate_flush(M_ep, t_b, e, tb_2):
 
     moment_acting_on_end_plate = Math(inline=True)
 
-    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= max (0.5 \times Tension~ in~ First~ Bolt \times End~ \\'))
-    moment_acting_on_end_plate.append(NoEscape(r'& dist, Tension~ in~ Second~ Bolt \times End~ dist)\\'))
-    moment_acting_on_end_plate.append(NoEscape(r'&= max(0.5 \times  T_b1  \times  e, T_b2  \times  e)\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{max (0.5 X Tension in first bolt X end distance, } \\'))
+    moment_acting_on_end_plate.append(NoEscape(r'& \text{Tension in second bolt X end distance)} \\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  T_b1  e, ~ T_b2  e)\\'))
 
-    moment_acting_on_end_plate.append(NoEscape(r'&= max(0.5  \times  ' + t_b + r'\times' + e + ',' + tb_2 + r'\times' + e + r'\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  \times  ' + t_b + r'\times' + e + ',~' + tb_2 + r'\times' + e + r'\\'))
     moment_acting_on_end_plate.append(NoEscape(r'&=' + M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 
@@ -7027,8 +7027,8 @@ def stiffener_length_prov(h_sp, l_sp, type=None):
     stiffener_length_prov = Math(inline=True)
 
     if type == 'Flushed - Reversible Moment':
-        stiffener_length_prov.append(NoEscape(r'\begin{aligned} L_{st} &= 2 * W_{st}  \\'))
-        stiffener_length_prov.append(NoEscape(r'&= 2 * '+ h_sp +r' \\'))
+        stiffener_length_prov.append(NoEscape(r'\begin{aligned} L_{st} &= 2 W_{st}  \\'))
+        stiffener_length_prov.append(NoEscape(r'&= 2 \times '+ h_sp +r' \\'))
     else:
         stiffener_length_prov.append(NoEscape(r'\begin{aligned} L_{st} &= \frac{H_{st}}{ \tan30 ^ {\circ} }  \\'))
         stiffener_length_prov.append(NoEscape(r'&= \frac{'+h_sp+r'} {\tan30 ^ {\circ}}  \\'))
@@ -7054,7 +7054,7 @@ def f_a_stress_due_to_axial_force(A_f, t_w, L_weld, f_a):
     f_a_stress_due_to_axial_force.append(NoEscape(r'\begin{aligned} f_a &= \frac{H}{0.7 t_w L_{w}}\\'))
     f_a_stress_due_to_axial_force.append(NoEscape(r' &= \frac{'+A_f+r'\times 10^3}{0.7 \times '+t_w+r' \times '+L_weld+r'}\\'))
     f_a_stress_due_to_axial_force.append(NoEscape(r' &= '+f_a+r'\\ \\'))
-    f_a_stress_due_to_axial_force.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.9]\end{aligned}'))
+    f_a_stress_due_to_axial_force.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.10.5.9}] \end{aligned}'))
 
     return f_a_stress_due_to_axial_force
 
@@ -7075,7 +7075,7 @@ def q_stress_due_to_shear_force(V, t_w, L_weld, q):
     q_stress_due_to_shear_force.append(NoEscape(r'\begin{aligned} q &= \frac{V}{0.7 t_w L_{w}}\\'))
     q_stress_due_to_shear_force.append(NoEscape(r'&= \frac{'+V+ r' \times  10^3}{0.7 \times'+t_w+r' \times '+L_weld+r'}\\'))
     q_stress_due_to_shear_force.append(NoEscape(r' &= ' + q + r'\\ \\'))
-    q_stress_due_to_shear_force.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.9] \end{aligned}'))
+    q_stress_due_to_shear_force.append(NoEscape(r'& [ \text{Ref. IS 800:2007, Cl.10.5.9}] \end{aligned}'))
     return q_stress_due_to_shear_force
 
 
@@ -7095,7 +7095,7 @@ def f_e_weld_stress_due_to_combined_load(f_a, f_e, q):
 
     f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= \sqrt{'+f_a+r'^{2}  + (3 \times'+ q+r' ^ 2)}\\'))
     f_e_weld_stress_due_to_combined_load.append(NoEscape(r' &= ' + f_e+ r' \\ \\'))
-    f_e_weld_stress_due_to_combined_load.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.10.1.1] \end{aligned}'))
+    f_e_weld_stress_due_to_combined_load.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.10.5.10.1.1}] \end{aligned}'))
 
     return f_e_weld_stress_due_to_combined_load
 
@@ -7103,9 +7103,9 @@ def f_e_weld_stress_due_to_combined_load(f_a, f_e, q):
 def weld_fu(weld_material_fu, plate_material_fu):
     weld_fu_eqn = Math(inline=True)
 
-    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{uw} &= \min(f_{w}, ~f_{u}) \\'))
+    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{u_w} &= \min(f_{w}, ~f_{u}) \\'))
     weld_fu_eqn.append(NoEscape(r'  &= \min(' + str(weld_material_fu) + r', ~' + str(plate_material_fu) + r') \\ \\'))
-    weld_fu_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1] \end{aligned}'))
+    weld_fu_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.10.5.7.1.1}] \end{aligned}'))
 
     return weld_fu_eqn
 
@@ -7151,7 +7151,7 @@ def weld_size_cp_req(r_c, p_cw, gamma_mw, weld_length_cp, fu, weld_size_cp):
 def weld_fu_provided(weld_fu):
     weld_fu_eqn = Math(inline=True)
 
-    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{uw} &= ' + str(weld_fu) + r' \end{aligned}'))
+    weld_fu_eqn.append(NoEscape(r'\begin{aligned} f_{u_w} &= ' + str(weld_fu) + r' \end{aligned}'))
     return weld_fu_eqn
 
 
@@ -7241,9 +7241,9 @@ def tension_critical_bolt_prov(M, t_ba, n_c, r_1, n_r, r_i, n, r_3, r_4, type=''
                                                        r'\displaystyle\sum_{i = ' + i + r'} ^ {' + n_r + r'}\frac{r_i ^2}{' + r_1 + r'}\Bigg) }\\'))
 
     tension_critical_bolt_prov.append(NoEscape(r' &= ' + t_ba + r' \\ \\'))
-    tension_critical_bolt_prov.append(NoEscape(r' Note:~ & T_{1}~is~ the~ tension~ in~ the~ critical~ bolt  \\'))
-    tension_critical_bolt_prov.append(NoEscape(r' & The~ critical~ bolt~ is~ the~ bolt~ nearest~ to~ the~ tension \\'))
-    tension_critical_bolt_prov.append(NoEscape(r' & flange  \end{aligned}'))
+
+    tension_critical_bolt_prov.append(NoEscape(r' & \text{Note: } T_{1} \text{ is the tension in the critical bolt.}  \\'))
+    tension_critical_bolt_prov.append(NoEscape(r' & \text{The critical bolt is the bolt nearest to the tension flange} \end{aligned}'))
 
     return tension_critical_bolt_prov
 
@@ -7296,10 +7296,10 @@ def cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf, V_df, T_f, T_df, va
     value = str(value)
 
     combined_capacity_eqn = Math(inline=True)
-    combined_capacity_eqn.append(NoEscape(r'\begin{aligned}\bigg(\frac{V_{sf}}{V_{df}}\bigg)^2 + \bigg(\frac{T_{f}}{T_{df}}\bigg)^2  &\leq 1.0\\'))
-    combined_capacity_eqn.append(NoEscape(r'\bigg(\frac{' + V_sf + '}{' + V_df + r'}\bigg)^2 + \bigg(\frac{' + T_f + '}{' + T_df + r'}\bigg)^2 &= '
+    combined_capacity_eqn.append(NoEscape(r'\begin{aligned} \bigg(\frac{V_{sf}}{V_{df}}\bigg)^2 & + \bigg(\frac{T_{f}}{T_{df}}\bigg)^2  \leq 1.0\\'))
+    combined_capacity_eqn.append(NoEscape(r' \bigg(\frac{' + V_sf + '}{' + V_df + r'}\bigg)^2 & + \bigg(\frac{' + T_f + '}{' + T_df + r'}\bigg)^2 = '
                                           + value + r'\\ \\'))
-    combined_capacity_eqn.append(NoEscape(r'[Ref.~IS~800:2007,~Cl.~10.3.6]\end{aligned}'))
+    combined_capacity_eqn.append(NoEscape(r' & [\text{Ref. IS 800:2007, Cl.10.3.6}] \end{aligned}'))
 
     return combined_capacity_eqn
 
@@ -7333,7 +7333,7 @@ def weld_size_ep_web_req(load_shear, gamma_mw, weld_length_web, fu, weld_size_we
     weld_size_ep_web_req_eqn.append(NoEscape(r' &= \frac{'+load_shear+r' \times 10^{3}}{'+fu+r' \times 0.7 \times '+
                                              weld_length_web+r'} \times \sqrt{3} \times ' +gamma_mw+r' \\'))
     weld_size_ep_web_req_eqn.append(NoEscape(r'&= ' + weld_size_web + r' \\ \\'))
-    weld_size_ep_web_req_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7]\end{aligned}'))
+    weld_size_ep_web_req_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.10.5.7}] \end{aligned}'))
 
     return weld_size_ep_web_req_eqn
 
@@ -7351,7 +7351,7 @@ def max_weld_size_ep_web_prov(weld_size_web, max_size):
 
 def min_weld_size_ep_web_prov(weld_size_web, weld_size_web_provided, min_size):
     weld_size_ep_web_prov_eqn = Math(inline=True)
-    weld_size_ep_web_prov_eqn.append(NoEscape(r'\begin{aligned} t_w & = max(t_{w}, ~{t_{w}}_{\min}) \\'))
+    weld_size_ep_web_prov_eqn.append(NoEscape(r'\begin{aligned} t_w & = \max(t_{w}, ~{t_{w}}_{\min}) \\'))
     weld_size_ep_web_prov_eqn.append(NoEscape(r' & = \max(' + str(weld_size_web) + r', ~' + str(min_size) + r') \\'))
     weld_size_ep_web_prov_eqn.append(NoEscape(r' & = ' + str(weld_size_web_provided) + r' \end{aligned}'))
 

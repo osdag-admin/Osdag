@@ -1574,8 +1574,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC_REPORT: self.supported_section.designation,
                                   KEY_DISP_MATERIAL: self.supported_section.material,
-                                  KEY_DISP_FU: self.supported_section.fu,
-                                  KEY_DISP_FY: self.supported_section.fy,
+                                  KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.supported_section.fu,
+                                  KEY_DISP_YIELD_STRENGTH_REPORT: self.supported_section.fy,
                                   KEY_REPORT_MASS: self.supported_section.mass,
                                   KEY_REPORT_AREA: round(self.supported_section.area, 2),
                                   KEY_REPORT_DEPTH: self.supported_section.depth,
@@ -1609,8 +1609,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
              "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
              KEY_DISP_MATERIAL: self.plate.material,
-             KEY_DISP_FU: self.plate.fu,
-             KEY_DISP_FY: self.plate.fy,
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.plate.fu,
+             KEY_DISP_YIELD_STRENGTH_REPORT: self.plate.fy,
 
              "Bolt Details - Input and Design Preference": "TITLE",
              KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
@@ -1677,7 +1677,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
               get_pass_fail(self.input_shear_force, self.load_shear, relation='leq'))
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_AXIAL, '', 'P_x = ' + str(self.load_axial), "OK")
+        t1 = (KEY_DISP_AXIAL, '', display_prov(self.load_axial, "P_x"), "OK")
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_MOMENT, display_prov(self.input_moment, "M_z"),

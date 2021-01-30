@@ -1810,8 +1810,8 @@ class Tension_welded(Member):
              "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
              KEY_DISP_MATERIAL: self.plate.material,
-             KEY_DISP_FU: round(self.plate.fu, 2),
-             KEY_DISP_FY: round(self.plate.fy, 2),
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: round(self.plate.fu, 2),
+             KEY_DISP_YIELD_STRENGTH_REPORT: round(self.plate.fy, 2),
 
              "Weld Details - Input and Design Preference": "TITLE",
              KEY_DISP_DP_WELD_TYPE: "Fillet",

@@ -948,7 +948,7 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip Factor, (mu<sub>f</sub>)'
-KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = 'Slip Factor, ($mu_{f}$)'
+KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = 'Slip Factor, ($\mu_{f}$)'
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
 KEY_DISP_GAMMA_M0 = "Governed by Yielding"
@@ -973,7 +973,7 @@ KEY_DP_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD]
 
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material Grade Overwrite, Fu (MPa)'
-KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT = 'Material Grade Overwrite, $f_{u}$ (MPa)'
+KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT = 'Material Grade Overwrite, $F_{u}$ (MPa)'
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
 # KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edge'
 KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Edge Preparation Method'  # added by Danish Ansari
@@ -1045,13 +1045,13 @@ KEY_DISP_B= 'Short Leg, B (mm)*'
 KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_ST_SK_MATERIAL = 'Material '
-KEY_DISP_REPORT_MATERIAL_GRADE = 'Material Grade, $f_{u}$ (MPa)'
+KEY_DISP_REPORT_MATERIAL_GRADE = 'Material Grade, $F_{u}$ (MPa)'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate Strength, Fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , Fy (MPa)'
 KEY_DISP_ST_SK_FU = 'Ultimate Strength, Fu (MPa)'
 KEY_DSIP_ST_SK_FY = 'Yield Strength , Fy (MPa)'
-KEY_DISP_ULTIMATE_STRENGTH_REPORT = 'Ultimate Strength, $f_u$ (MPa)'
-KEY_DISP_YIELD_STRENGTH_REPORT = 'Yield Strength, $f_y$ (MPa)'
+KEY_DISP_ULTIMATE_STRENGTH_REPORT = 'Ultimate Strength, $F_u$ (MPa)'
+KEY_DISP_YIELD_STRENGTH_REPORT = 'Yield Strength, $F_y$ (MPa)'
 
 # Common keys for design report
 
@@ -1822,7 +1822,7 @@ KEY_OUT_DISP_WEB_CRIPPLING = 'Web Crippling'
 KEY_OUT_DISP_COMP_STRENGTH = 'Compression Strength (kN)'
 #Continuity Plate
 KEY_OUT_DISP_CONT_PLATE_REQ = 'Continuity Plate Required?'
-KEY_OUT_DISP_DIAG_PLATE_REQ = 'Web Stiffener Plate Required ?'
+KEY_OUT_DISP_DIAG_PLATE_REQ = 'Web Stiffener Plate Required?'
 KEY_OUT_DISP_AREA_REQ= "Area Required (mm2)"
 KEY_OUT_DISP_NOTCH_SIZE ="Notch Size (mm)"
 KEY_OUT_DISP_DIAG_LOAD_STIFF="Load taken by Stiffener"

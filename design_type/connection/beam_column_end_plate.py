@@ -2304,8 +2304,8 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_supported = {KEY_DISP_SEC_PROFILE: "ISection",
                                  KEY_DISP_BEAMSEC_REPORT: self.supported_section.designation,
                                  KEY_DISP_MATERIAL: self.supported_section.material,
-                                 KEY_DISP_FU: self.supported_section.fu,
-                                 KEY_DISP_FY: self.supported_section.fy,
+                                 KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.supported_section.fu,
+                                 KEY_DISP_YIELD_STRENGTH_REPORT: self.supported_section.fy,
                                  KEY_REPORT_MASS: self.supported_section.mass,
                                   KEY_REPORT_AREA: round(self.supported_section.area * 1e-2, 2),
                                   KEY_REPORT_DEPTH: self.supported_section.depth,
@@ -2472,7 +2472,7 @@ class BeamColumnEndPlate(MomentConnection):
               get_pass_fail(self.input_shear_force, self.load_shear, relation='leq'))
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_AXIAL, '', 'P_x = ' + str(self.load_axial), "OK")
+        t1 = (KEY_DISP_AXIAL, '', display_prov(self.load_axial, "P_x"), "OK")
         self.report_check.append(t1)
 
         if self.connectivity == VALUES_CONN_1[0]:
@@ -2636,9 +2636,9 @@ class BeamColumnEndPlate(MomentConnection):
                       'OK')
                 self.report_check.append(t3)
 
-                t3 = ('Shear Demand (kN)', bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers,
+                t3 = ('Shear Demand (per bolt) (kN)', bolt_shear_demand(V=self.load_shear, n_bolts=self.bolt_numbers,
                                                               V_sb=self.bolt_shear_demand, type='Bearing Bolt'),
-                      'Vdb = ' + str(round(self.bolt_capacity, 2)) + '',
+                      display_prov(round(self.bolt_capacity, 2), 'V_{db}', ref=None),
                       get_pass_fail(self.bolt_shear_demand, round(self.bolt_capacity, 2), relation='leq'))
                 self.report_check.append(t3)
             else:
@@ -2730,7 +2730,7 @@ class BeamColumnEndPlate(MomentConnection):
             self.report_check.append(t1)
 
             if self.bolt.bolt_type == TYP_BEARING:
-                t1 = ('Combined Capacity, (I.R)', required_IR_or_utilisation_ratio(IR=1),
+                t1 = ('Combined Capacity (I.R.)', required_IR_or_utilisation_ratio(IR=1),
                       cl_10_3_6_bearing_bolt_combined_shear_and_tension(round(self.bolt_shear_demand, 2),
                                                                         round(self.bolt_capacity, 2),
                                                                         round(self.tension_demand_critical_bolt, 2),
@@ -2822,10 +2822,10 @@ class BeamColumnEndPlate(MomentConnection):
             self.report_check.append(t1)
 
             t1 = (KEY_OUT_DISP_STIFFENER_THICKNESS, display_prov(self.beam_tw, "t"),
-                  display_prov(self.stiffener_thickness, "tst"), 'Pass')
+                  display_prov(self.stiffener_thickness, "t_{st}"), 'Pass')
             self.report_check.append(t1)
 
-            t1 = (DISP_WELD_SIZE, round(self.stiffener_weld.min_size), 'tw = ' + str(self.weld_size_stiffener) + '', 'Pass')
+            t1 = (DISP_WELD_SIZE, round(self.stiffener_weld.min_size), display_prov(self.weld_size_stiffener, 't_w'), 'Pass')
             self.report_check.append(t1)
 
             # ##################

@@ -2350,8 +2350,8 @@ class Tension_bolted(Member):
              KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE : str(self.sizelist),
              "Section Material": section_size.material,
-             'Section Ultimate Strength, $f_u$ (MPa)': round(section_size.fu, 2),
-             'Section Yield Strength, $f_y$ (MPa)': round(section_size.fy, 2),
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: round(section_size.fu, 2),
+             KEY_DISP_YIELD_STRENGTH_REPORT: round(section_size.fy, 2),
 
              "Bolt Details - Input and Design Preference": "TITLE",
              KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
@@ -2371,8 +2371,8 @@ class Tension_bolted(Member):
              "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
              KEY_DISP_MATERIAL: self.plate.material,
-             KEY_DISP_FU: round(self.plate.fu, 2),
-             KEY_DISP_FY: round(self.plate.fy, 2),
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: round(self.plate.fu, 2),
+             KEY_DISP_YIELD_STRENGTH_REPORT: round(self.plate.fy, 2),
 
              # "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              # KEY_DISP_GAMMA_M0 : cl_5_4_1_table_4_5_gamma_value(1.1, "m0"),
@@ -2524,13 +2524,13 @@ class Tension_bolted(Member):
             t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimization", self.bolt.bolt_grade_provided, '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_DP_BOLT_FU, "", display_prov(round(self.bolt.bolt_fu,2), "f_{ub}"), '')
+            t8 = (KEY_DISP_DP_BOLT_FU, "", display_prov(round(self.bolt.bolt_fu,2), "f_{u_{b}}"), '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_DP_BOLT_FY, "", display_prov(round(self.bolt.bolt_fy, 2), "f_{yb}"), '')
+            t8 = (KEY_DISP_DP_BOLT_FY, "", display_prov(round(self.bolt.bolt_fy, 2), "f_{y_{b}}"), '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," [Ref~IS~1367-3~(2002)]"), '')
+            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{n_{b}}"," [Ref.~IS~1367-3~(2002)]"), '')
             self.report_check.append(t8)
 
             t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),

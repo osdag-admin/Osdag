@@ -1574,8 +1574,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC_REPORT: self.supported_section.designation,
                                   KEY_DISP_MATERIAL: self.supported_section.material,
-                                  KEY_DISP_FU: self.supported_section.fu,
-                                  KEY_DISP_FY: self.supported_section.fy,
+                                  KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.supported_section.fu,
+                                  KEY_DISP_YIELD_STRENGTH_REPORT: self.supported_section.fy,
                                   KEY_REPORT_MASS: self.supported_section.mass,
                                   KEY_REPORT_AREA: round(self.supported_section.area, 2),
                                   KEY_REPORT_DEPTH: self.supported_section.depth,
@@ -1609,8 +1609,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
              "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
              KEY_DISP_MATERIAL: self.plate.material,
-             KEY_DISP_FU: self.plate.fu,
-             KEY_DISP_FY: self.plate.fy,
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.plate.fu,
+             KEY_DISP_YIELD_STRENGTH_REPORT: self.plate.fy,
 
              "Bolt Details - Input and Design Preference": "TITLE",
              KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
@@ -1677,7 +1677,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
               get_pass_fail(self.input_shear_force, self.load_shear, relation='leq'))
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_AXIAL, '', 'P_x = ' + str(self.load_axial), "OK")
+        t1 = (KEY_DISP_AXIAL, '', display_prov(self.load_axial, "P_x"), "OK")
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_MOMENT, display_prov(self.input_moment, "M_z"),
@@ -1910,7 +1910,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                 get_pass_fail(1, round(self.combined_capacity_critical_bolt,2) , relation="greater"))
                 self.report_check.append(t1)
             else:
-                t1 = ('Combined Capacity, (I.R)', required_IR_or_utilisation_ratio(IR=1),
+                t1 = ('Combined Capacity, (I.R.)', required_IR_or_utilisation_ratio(IR=1),
                 cl_10_4_6_friction_bolt_combined_shear_and_tension(round(self.bolt_shear_demand, 2),
                                                                   round(self.bolt_capacity, 2),
                                                                   round(self.tension_demand_critical_bolt, 2),
@@ -1983,11 +1983,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
             t1 = (KEY_OUT_DISP_STIFFENER_WIDTH if self.endplate_type == VALUES_ENDPLATE_TYPE[0] else KEY_OUT_DISP_STIFFENER_HEIGHT, ' ',
                   stiffener_height_prov(b_ep=self.ep_width_provided, t_w=self.supported_section.web_thickness, h_ep=self.ep_height_provided,
-                                        D=self.supported_section.depth, h_sp=self.stiffener_height, type=self.endplate_type), 'Pass')
+                                        D=self.supported_section.depth, h_sp=round_down(self.stiffener_height, 2), type=self.endplate_type), 'Pass')
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_STIFFENER_LENGTH, ' ', stiffener_length_prov(h_sp=self.stiffener_height,
-                                                                            l_sp=self.stiffener_length,
+            t1 = (KEY_OUT_DISP_STIFFENER_LENGTH, ' ', stiffener_length_prov(h_sp=round_down(self.stiffener_height, 2),
+                                                                            l_sp=round_down(self.stiffener_length, 2),
                                                                             type=self.endplate_type), 'Pass')
             self.report_check.append(t1)
 
@@ -2011,13 +2011,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.report_check.append(t1)
 
             t1 = ('Total Weld Length (mm)', "", weld_length_web_prov(beam_D=self.supported_section.depth, beam_tf=self.supported_section.flange_thickness,
-                                                                     beam_r1=self.supported_section.root_radius, L_weld=self.weld_length_web), "")
+                                                                     beam_r1=self.supported_section.root_radius,
+                                                                     L_weld=round_down(self.weld_length_web, 2)), "")
             self.report_check.append(t1)
 
             self.weld_size_web1 = round((self.load_shear * 1e3 * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_length_web * self.weld_fu), 2)  # mm
 
-            t1 = (DISP_WELD_SIZE, weld_size_ep_web_req(load_shear=self.load_shear, gamma_mw=self.gamma_mw, weld_length_web=self.weld_length_web,
-                                                         fu=self.weld_fu, weld_size_web=self.weld_size_web1), self.weld_size_web,
+            t1 = (DISP_WELD_SIZE, weld_size_ep_web_req(load_shear=self.load_shear, gamma_mw=self.gamma_mw,
+                                                       weld_length_web=round_down(self.weld_length_web, 2), fu=self.weld_fu,
+                                                       weld_size_web=self.weld_size_web1), self.weld_size_web,
                   get_pass_fail(self.weld_size_web1, self.weld_size_web, relation="leq"))
             self.report_check.append(t1)
 
@@ -2033,12 +2035,13 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   get_pass_fail(self.web_weld.max_size, self.weld_size_web, relation="geq"))
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_WELD_NORMAL_STRESS, "", f_a_stress_due_to_axial_force(A_f=self.load_axial, t_w=self.weld_size_web, L_weld=self.weld_length_web,
-                                                                                f_a=round(self.f_a, 2)), "OK")
+            t1 = (KEY_OUT_DISP_WELD_NORMAL_STRESS, "", f_a_stress_due_to_axial_force(A_f=self.load_axial, t_w=self.weld_size_web,
+                                                                                     L_weld=round_down(self.weld_length_web, 2),
+                                                                                     f_a=round(self.f_a, 2)), "OK")
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_WELD_SHEAR_STRESS, "", q_stress_due_to_shear_force(V=self.load_shear, t_w=self.weld_size_web, L_weld=self.weld_length_web,
-                                                                             q=self.q), "OK")
+            t1 = (KEY_OUT_DISP_WELD_SHEAR_STRESS, "", q_stress_due_to_shear_force(V=self.load_shear, t_w=self.weld_size_web,
+                                                                                  L_weld=round_down(self.weld_length_web, 2), q=self.q), "OK")
             self.report_check.append(t1)
 
             t1 = (KEY_OUT_DISP_WELD_STRESS_EQUIVALENT, f_e_weld_stress_due_to_combined_load(f_a=self.f_a, f_e=self.f_e, q=self.q),

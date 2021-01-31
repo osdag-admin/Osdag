@@ -292,7 +292,7 @@ class CreateLatex(Document):
 
                         with doc.create(Figure()) as image:
                             image.add_image(weld_details, width=NoEscape(r'0.7\textwidth'), placement=NoEscape(r'\centering'))
-                            image.add_caption('Typical Weld Details - Beam to End Plate Connection')
+                            image.add_caption('Typical Weld Details -- Beam to End Plate Connection')
                             # doc.append(NewPage())
 
                         with doc.create(Figure()) as image_2:

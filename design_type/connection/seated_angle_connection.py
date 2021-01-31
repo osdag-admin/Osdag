@@ -1392,8 +1392,8 @@ class SeatedAngleConnection(ShearConnection):
                                   # Image shall be save with this name.png in resource files
                                   KEY_DISP_SECSIZE: self.seated_angle.designation,
                                   KEY_DISP_MATERIAL: self.seated_angle.material,
-                                  KEY_DISP_FU: round(self.seated_angle.fu, 2),
-                                  KEY_DISP_FY: round(self.seated_angle.fy, 2),
+                                  KEY_DISP_ULTIMATE_STRENGTH_REPORT: round(self.seated_angle.fu, 2),
+                                  KEY_DISP_YIELD_STRENGTH_REPORT: round(self.seated_angle.fy, 2),
                                   KEY_REPORT_MASS: round(self.seated_angle.mass, 2),
                                   KEY_REPORT_AREA: round((self.seated_angle.area / 100), 2),
                                   KEY_REPORT_MAX_LEG_SIZE: round(self.seated_angle.max_leg, 2),
@@ -1420,8 +1420,8 @@ class SeatedAngleConnection(ShearConnection):
                                   # Image shall be save with this name.png in resource files
                                   KEY_DISP_SECSIZE: self.top_angle.designation,
                                   KEY_DISP_MATERIAL: self.top_angle.material,
-                                  KEY_DISP_FU: round(self.top_angle.fu, 2),
-                                  KEY_DISP_FY: round(self.top_angle.fy, 2),
+                                  KEY_DISP_ULTIMATE_STRENGTH_REPORT: round(self.top_angle.fu, 2),
+                                  KEY_DISP_YIELD_STRENGTH_REPORT: round(self.top_angle.fy, 2),
                                   KEY_REPORT_MASS: round(self.top_angle.mass, 2),
                                   KEY_REPORT_AREA: round((self.top_angle.area / 100), 2),
                                   KEY_REPORT_MAX_LEG_SIZE: round(self.top_angle.max_leg, 2),
@@ -1704,7 +1704,7 @@ class SeatedAngleConnection(ShearConnection):
                                         self.supporting_section.root_radius * 2 + (
                                                 self.bolt.bolt_col / 2 - 1) * self.bolt.min_gauge_round, 2)
                 prov_width_sptng = self.supporting_section.flange_width
-                t2 = (DISP_MIN_WIDTH + ' On Column', width_req_sptng_seated(self.bolt.min_end_dist_round,
+                t2 = (DISP_MIN_WIDTH + ' (on column)', width_req_sptng_seated(self.bolt.min_end_dist_round,
                                                                             self.supporting_section.web_thickness,
                                                                             self.supporting_section.root_radius,
                                                                             self.bolt.bolt_col,self.bolt.min_gauge_round,width_req_sptng), prov_width_sptng,
@@ -1714,12 +1714,12 @@ class SeatedAngleConnection(ShearConnection):
             prov_width_sptd = self.supported_section.flange_width
             #TODO: write detailed formulae for required and provided
 
-            t2 = (DISP_MIN_WIDTH + ' On Beam', width_req_sptd_seated(self.bolt.min_end_dist_round,
+            t2 = (DISP_MIN_WIDTH + ' (on beam)', width_req_sptd_seated(self.bolt.min_end_dist_round,
                                                                             self.supporting_section.web_thickness,
                                                                             self.supporting_section.root_radius,width_req_sptd), prov_width_sptd,
                   get_pass_fail(width_req_sptd, prov_width_sptd, 'leq'))
             self.report_check.append(t2)
-            t2 = (DISP_MIN_LEG_LENGTH + ' On Column', length_req_sptng_seated(self.bolt.min_end_dist_round,self.bolt.bolt_row,
+            t2 = (DISP_MIN_LEG_LENGTH + ' (on column)', length_req_sptng_seated(self.bolt.min_end_dist_round,self.bolt.bolt_row,
                                                                               self.bolt.min_pitch_round,self.seated.thickness,
                                                                               self.seated.root_radius,length_req_sptng), prov_length_sptng,
                   get_pass_fail(length_req_sptng, prov_length_sptng, 'leq'))
@@ -1729,7 +1729,7 @@ class SeatedAngleConnection(ShearConnection):
                 width_req_sptng = round(4 * self.bolt.min_edge_dist_round + self.supporting_section.web_thickness + \
                                     self.supporting_section.root_radius * 2, 2)
                 prov_width_sptng = self.supporting_section.flange_width
-                t2 = (DISP_MIN_WIDTH + ' On Column', seated_width_req(width_req_sptng),
+                t2 = (DISP_MIN_WIDTH + ' (on column)', seated_width_req(width_req_sptng),
                       seated_width_prov(prov_width_sptng), get_pass_fail(width_req_sptng, prov_width_sptng, 'leq'))
                 self.report_check.append(t2)
 
@@ -1741,7 +1741,7 @@ class SeatedAngleConnection(ShearConnection):
             t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type, parameter='edge_dist'),'','')
             self.report_check.append(t3)
 
-            t2 = (DISP_MIN_WIDTH + ' On Beam', seated_width_req(width_req_sptd),
+            t2 = (DISP_MIN_WIDTH + ' (on beam)', seated_width_req(width_req_sptd),
                   seated_width_prov(prov_width_sptd),get_pass_fail(width_req_sptd, prov_width_sptd, 'leq'))
             self.report_check.append(t2)
 

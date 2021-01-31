@@ -1,6 +1,8 @@
 Copyright (C) 2017 Osdag
-
-Osdag is a cross-platform, free, and open-source software for the design and detailing of steel structures. Starting with the next version 2017.08.a.e2dd beta1, the beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+OsdagⓇ and the Osdag logo are the registered trademarks of the Indian Institute of Technology Bombay (IIT Bombay)
+========================================================================================================
+Osdag is a cross-platform free/libre and open-source software for the design (and detailing) of steel structures, following the Indian Standard IS 800:2007. It allows the user to design steel connections, members and systems using a graphical user interface. The interactive GUI provides a 3D visualisation of the designed component and an option to export the CAD model to any drafting software for the creation of construction/fabrication drawings. The design is typically optimised following industry best practices.
+Starting with version 2017.06.a.e2dd, the beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -183,3 +185,101 @@ whether future versions of the GNU Lesser General Public License shall
 apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
+
+=======================================
+Osdag development team (2014 - Present)
+=======================================
+Project Investigator
+
+Professor Siddhartha Ghosh
+
+===============================
+Research Associates/Assistants
+
+Mr. Danish Ansari
+Mr. Yash Lokhande
+Mr. Anand Swaroop
+Mr. Darshan Divesan
+Mr. Anjali Jatav
+Mr. Sourabh Das
+Ms. Deepthi Reddy
+Mr. Ajmal Babu MS
+Mr. N Dharma Teja
+Ms. Thushara Pushkaran
+Ms. Reshma Konjari
+Ms. Swathi M
+Mr. Siddesh Chavan
+Ms. Deepa Chaudhari
+Mr. Jayant Patil
+Mr. Suhel Hashmi
+Mr. Subhrajit Dutta
+Mr. Shihabuddin Khan
+
+===============================
+Project Interns
+
+Mr.Aravind P
+Mr. Sasir Pentyala
+Mr. Riyaz Khan
+Mr. Mayur Mistry
+Mr. Yash Lokhande
+Mr. Aryamaan Pandey
+Ms. Saumya Mishra
+Ms. Pragya Thakur
+Mr. Tanmay Kalla
+Mr. Nikhil Kapoor
+Mr. Himanshu Singh
+Mr. Aditya Pawar
+Ms. Shreya Bhende
+Ms. Deepthi Reddy
+Mr. Ansari Mohammad Umair
+Mr. Amir Chappalwala
+Mr. Zunzunia Arsil
+Mr. Mohammad Azhar U Din Mir
+Mr. Satyam Singh Niranjan
+Mr. Anshul Kumar Singh
+Mr. Mosam Patel
+Mr. Shahadad PP
+Ms. Priti Kumari
+
+===============================
+Project Management
+
+Ms. Usha Viswanathan
+Ms. Vineeta Parmar
+Mr. Sunil Shetye
+Mr. Kiran Kishore
+
+===============================
+Web, Graphics, Promotions and System Administrators Team
+
+Mr. Prashant Sinalkar
+Ms. Dipti Ghosalkar
+Ms. Sashi Rekha B M K
+Ms. Priyanka Bhagwat
+Mr. Lee Thomas Stephen
+Mr. Rohan Mhatre
+Mr. Khushal Singh Rajput
+Mr. Yash Vohra
+Ms. Ulfa Khawaja
+
+===============================
+Office Staff
+
+Ms.Komal Solanki
+Mr.Vishal Birare
+Mr. Sushant Bammkanti
+Ms. Priya Hiregange
+
+===============================
+Osdag Expert Reviewers
+
+Professor S R Satish Kumar (IIT Madras, Chennai)
+Dr. Pradyumna M (Independent Consultant, Bengaluru)
+Mr. Yogesh D Pisal (Aker Powergas Pvt Ltd, Mumbai)
+Professor Meera Raghunandan (IIT Bombay, Mumbai)
+Mr. Somnath Mukherjee (MN Dastur & Co (P) Ltd, Kolkata)
+Mr. Manas M Ghosh (INSDAG, Kolkata)
+Mr. Pratip Bhattacharya (Tata Consulting Engineers Ltd, Kolkata)
+Dr. Harshvardhan Subbarao (Construma Consultancy Pvt Ltd, Mumbai)
+Professor V Kalyanaraman (Retd.) (IIT Madras, Chennai)

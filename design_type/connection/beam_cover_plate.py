@@ -2972,8 +2972,8 @@ class BeamCoverPlate(MomentConnection):
 
              "Plate Details - Input and Design Preference": "TITLE",
              KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
-             KEY_DISP_FU: self.flange_plate.fu,
-             KEY_DISP_FY: self.flange_plate.fy,
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.flange_plate.fu,
+             KEY_DISP_YIELD_STRENGTH_REPORT: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
              KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
              KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
@@ -3719,7 +3719,7 @@ class BeamCoverPlate(MomentConnection):
                                                                               min_length=min_plate_length,
                                                                               gap=self.flange_plate.gap, sec="beam"),
                       self.flange_plate.length,
-                      get_pass_fail(min_plate_length, self.flange_plate.length, relation="lesser"))
+                      get_pass_fail(min_plate_length, self.flange_plate.length, relation="leq"))
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_FLANGE_PLATE_THICK, display_prov(self.section.flange_thickness / 2, "T/2"),

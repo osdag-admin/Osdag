@@ -171,13 +171,9 @@ Osdag development team (2019 - Present)
 
 ===============================
 
-Project Investigator - Osdag and FOSSEE
+Project Investigator - Osdag
 
 Professor Siddhartha Ghosh
-
-Professor Kannan M Moudgalya
-
-Professor Prabhu Ramachandran
 
 ===============================
 

@@ -69,9 +69,9 @@
     ==============
     After the installation is complete, you may run Osdag by one of the following methods:
     
-    i)   Double-clicking on the Desktop shortcut or
-    ii)  Press the Windows key and search Osdag 
-    iii) Navigating to the installation-directory and double-clicking on the Osdag shortcut
+    	i)   Double-clicking on the Desktop shortcut or
+	ii)  Press the Windows key and search Osdag 
+	iii) Navigating to the installation-directory and double-clicking on the Osdag shortcut
 
     
 

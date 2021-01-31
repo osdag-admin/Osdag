@@ -830,11 +830,12 @@ if __name__ == '__main__':
     #my_settings = QtCore.QSettings('FOSSEE','osdag')
     #appcrash.set_qsettings(my_settings)
     '''
-    If you want to save your github username and password across each sessions, so that you dont have to enter it each time you report an issue .
-    Simply uncomment above two line. To use QSetings we need to give an organisation name and the application name(Compulsory).
+    You can save your GitHub username and password across each sessions so that you don't have to enter it each time you report an issue.
+    
+    Simply uncomment above two lines. To use QSetings we need to give an organisation name and the application name (compulsory).
 
-    As an example 'FOSSEE' is organisation name and 'osdag' is the application name in the above QSettings. Feel free to change it accordingly, but try to keep it fix
-    don't change it frequently.
+    For example, 'FOSSEE' is an organisation name and 'Osdag' is the application name in the above QSettings. Feel free to change them to suit your requirement, but try to keep it constant.
+    Do not change it frequently.
 
     '''
 

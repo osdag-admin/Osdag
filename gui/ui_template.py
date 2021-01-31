@@ -2706,7 +2706,7 @@ class Window(QMainWindow):
         self.actionSave_current_image.setShortcut(_translate("MainWindow", "Alt+I"))
         self.actionSave_log_messages.setText(_translate("MainWindow", "Save log messages"))
         self.actionSave_log_messages.setShortcut(_translate("MainWindow", "Alt+M"))
-        self.actionCreate_design_report.setText(_translate("MainWindow", "Create Design Report"))
+        self.actionCreate_design_report.setText(_translate("MainWindow", "Create design report"))
         self.actionCreate_design_report.setShortcut(_translate("MainWindow", "Alt+C"))
         self.actionQuit_fin_plate_design.setText(_translate("MainWindow", "Quit fin plate design"))
         self.actionSave_Front_View.setText(_translate("MainWindow", "Save front view"))

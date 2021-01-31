@@ -26,8 +26,8 @@ class Update():
             # decoded_line = line.decode("utf-8")
             # new_version = decoded_line.split("=")[1]
             if version != self.old_version:
-                msg = 'Current version:'+ self.old_version+'<br>'+'Latest Version'+ str(version)+'<br>'+\
-                      'Update available<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>'
+                msg = 'Current version: '+ self.old_version+'<br>'+'Latest version '+ str(version)+'<br>'+\
+                      'Update available: <a href=\"https://imatrixhosting.in/deepthi/\">click here to downlaod<a/>'
             else:
                 msg = 'Already up to date'
             return msg

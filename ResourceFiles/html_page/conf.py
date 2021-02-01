@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = u'Main Home | Help_Design_Examples'
-copyright = u'2018, Osdag Team'
+copyright = u'2017, Osdag Team'
 author = u'Osdag Team'
 
 # The short X.Y version
 version = u'0.2'
 # The full version, including alpha/beta/rc tags
-release = u'2017.06.0.2'
+release = u'2021.01'
 
 
 # -- General configuration ---------------------------------------------------
@@ -80,6 +80,8 @@ todo_include_todos = True
 html_theme = "classic"
 html_theme_options = {
 "rightsidebar": "false",
+"sidebarwidth": "300",
+"stickysidebar": "True",
 "sidebarbgcolor": "YellowGreen ",
 "relbarbgcolor": " YellowGreen",
 "sidebartextcolor":"black",

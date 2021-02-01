@@ -2589,7 +2589,7 @@ class BeamColumnEndPlate(MomentConnection):
             t1 = (DISP_CS_GAUGE, '', self.gauge_cs_distance_provided, 'Pass')
             self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Critical Bolt Design', '|p{2.5cm}|p{7.5cm}|p{5.5cm}|p{1cm}|')
+            t1 = ('SubSection', 'Critical Bolt Design', '|p{2.5cm}|p{6.7cm}|p{6.3cm}|p{1cm}|')
             self.report_check.append(t1)
             if self.bolt.bolt_type == TYP_BEARING:
                 bolt_bearing_capacity_kn = round(self.bolt_bearing_capacity, 2)

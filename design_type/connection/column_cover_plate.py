@@ -3142,7 +3142,7 @@ class ColumnCoverPlate(MomentConnection):
                           get_pass_fail(50, round(self.outerwidth, 2), relation="leq"))
                     self.report_check.append(t1)
 
-                    t1 = (KEY_INNERFLANGE_PLATE_HEIGHT, 'Bifp >= 50',
+                    t1 = ('Flange Plate Inner Width (mm)', 'Bifp >= 50',
                           width_pt_chk_bolted(B=self.section.flange_width, t=self.section.web_thickness,
                                               r_1=self.section.root_radius),
                           get_pass_fail(50, round(self.innerwidth, 2), relation="leq"))

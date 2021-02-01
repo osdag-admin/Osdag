@@ -661,7 +661,7 @@ class OsdagMainWindow(QMainWindow):
         self.ask_question()
 
     def design_examples(self):
-        root_path = os.path.join('ResourceFiles', 'design_example', '_build', 'html')
+        root_path = os.path.join('ResourceFiles', 'html_page', '_build', 'html')
         for html_file in os.listdir(root_path):
             # if html_file.startswith('index'):
             print(os.path.splitext(html_file)[1])

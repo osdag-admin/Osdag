@@ -438,7 +438,7 @@ def cl_8_2_1_2_plastic_moment_capacity_yy(beta_b, Z_py, f_y, gamma_m0, Pmc):
     Pmc_eqn.append(NoEscape(r' & \text{based~on~the~beam-colum~or~column~ design.} \\'))
     Pmc_eqn.append(NoEscape(r' & \text{The~actual~capacity~might~vary.} \\ \\'))
 
-    Pmc_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~8.2.1.2] \end{aligned}'))
+    Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
 
     return Pmc_eqn
 
@@ -7241,7 +7241,8 @@ def tension_critical_bolt_prov(M, t_ba, n_c, r_1, n_r, r_i, n, r_3, r_4, type=''
     tension_critical_bolt_prov.append(NoEscape(r' &= ' + t_ba + r' \\ \\'))
 
     tension_critical_bolt_prov.append(NoEscape(r' & \text{Note: } T_{1} \text{ is the tension in the critical bolt.}  \\'))
-    tension_critical_bolt_prov.append(NoEscape(r' & \text{The critical bolt is the bolt nearest to the tension flange} \end{aligned}'))
+    tension_critical_bolt_prov.append(NoEscape(r' & \text{The critical bolt is the bolt nearest} \\'))
+    tension_critical_bolt_prov.append(NoEscape(r' & \text{to the tension flange.} \end{aligned}'))
 
     return tension_critical_bolt_prov
 

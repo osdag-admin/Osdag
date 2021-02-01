@@ -284,7 +284,9 @@ Ministry of Education (MoE), Govt. of India
 
 FOSSEE
 
-Professor. Prabhu Ramachandran
+Professor Kannan Moudgalya
+
+Professor Prabhu Ramachandran
 
 Mr. Sunil Shetye
 

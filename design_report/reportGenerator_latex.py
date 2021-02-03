@@ -197,7 +197,7 @@ class CreateLatex(Document):
                 if does_design_exist != True:
                     table.add_row(bold('Design Status'),color_cell("Red",bold("Fail")))
                 else:
-                    table.add_row(bold('Design Status'),color_cell("Green",bold("Pass")))
+                    table.add_row(bold('Design Status'),color_cell("OsdagGreen",bold("Pass")))
                 table.add_hline()
 
 
@@ -275,7 +275,7 @@ class CreateLatex(Document):
                     if check[3] == 'Fail':
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
                     else:
-                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Green", bold(check[3])))
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("OsdagGreen", bold(check[3])))
                     table.add_hline()
 
         # 2D images
@@ -380,7 +380,7 @@ class CreateLatex(Document):
                 if('WARNING' in msg):
                     colour='blue'
                 elif('INFO' in msg):
-                    colour='green'
+                    colour='OsdagGreen'
                 elif('ERROR' in msg):
                     colour='red'
                 else:

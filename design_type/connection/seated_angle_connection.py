@@ -1575,7 +1575,7 @@ class SeatedAngleConnection(ShearConnection):
                         self.plate.thickness_provided + self.supporting_section.flange_thickness)
 
         if self.plate.thickness:
-            t1 = ('SubSection', 'Bolt Design Checks on Column', '|p{3cm}|p{5cm}|p{6.3cm}|p{1.2cm}|')
+            t1 = ('SubSection', 'Bolt Design Checks on Column', '|p{3cm}|p{5cm}|p{6.8cm}|p{1.2cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)

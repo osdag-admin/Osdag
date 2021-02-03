@@ -1666,7 +1666,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                         Pmc=round(self.supported_section_mom_capa_m_zz, 2), supporting_or_supported='NA'), 'V < 0.6 Vdy')
         self.report_check.append(t1)
 
-        t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.2cm}|p{5.3cm}|p{1.5cm}|')
         self.report_check.append(t1)
         self.load_shear_min = min((0.15 * self.supported_section_shear_capa), 40)
         self.load_moment_min = (0.5 * self.supported_section_mom_capa_m_zz)

@@ -2438,6 +2438,9 @@ class BeamColumnEndPlate(MomentConnection):
               'V < 0.6 Vdy')
         self.report_check.append(t1)
 
+        t1 = ('', '', '', '')
+        self.report_check.append(t1)
+
         t1 = ('SubSection', 'Member Capacity - Supporting Section', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
@@ -2454,6 +2457,7 @@ class BeamColumnEndPlate(MomentConnection):
               self.col_classification)
         self.report_check.append(t1)
 
+
         t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
@@ -2466,13 +2470,13 @@ class BeamColumnEndPlate(MomentConnection):
         #       get_pass_fail(self.IR_moment, 1.0, relation='leq'))
         # self.report_check.append(t1)
 
+        t1 = (KEY_DISP_AXIAL, '', display_prov(self.load_axial, "P_x"), "OK")
+        self.report_check.append(t1)
+
         t1 = (KEY_DISP_SHEAR, display_prov(self.input_shear_force, "V_y"),
               prov_shear_force(shear_input=self.input_shear_force, min_sc=round(self.load_shear_min, 2),
                                app_shear_load=round(self.load_shear, 2), shear_capacity_1=self.supported_section_shear_capa),
               get_pass_fail(self.input_shear_force, self.load_shear, relation='leq'))
-        self.report_check.append(t1)
-
-        t1 = (KEY_DISP_AXIAL, '', display_prov(self.load_axial, "P_x"), "OK")
         self.report_check.append(t1)
 
         if self.connectivity == VALUES_CONN_1[0]:

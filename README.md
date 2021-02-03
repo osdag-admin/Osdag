@@ -3,7 +3,7 @@
   Open Steel Design and Graphics <br><br>
   <a href="http://osdag.fossee.in/">Osdag</a><br><br>
   Osdag is a cross-platform free/libre and open-source software for the design (and detailing) of steel structures, following the Indian Standard IS 800:2007. It allows the user to design steel connections, members and systems using a graphical user interface. The interactive GUI provides a 3D visualisation of the designed component and an option to export the CAD model to any drafting software for the creation of construction/fabrication drawings. The design is typically optimised following industry best practices.
-  Starting with version 2017.08.a.e2dd, the beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+  Starting with version 2017.06.a.e2dd, the beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
 
 </p>
 
@@ -33,25 +33,46 @@
         Minimum 2 Gb RAM recommended
         Minimum 1 Gb free storage space recommended
         
-
-#### Basic User:
- 
+	
     Installation steps:
     ===================
-    # If you have already installed the  previous version of Osdag in your system then Unistall it first and just run the new downloaded Osdag_windows_setup.exe.
-	  Run Osdag_windows_setup.exe
-        # Follow on-screen instructions AND select the following options in the Setup:
-		i)Just after starting the setup their is two options 1.Osdag and 2.Miktex, if you already have latex install in your system ,untick option 2.miktex and click next.
-		ii)Click next, then install.
-		iii)Select the install location and click install.
-		iv)After process ends, click the finish botton.
+    
+    Uninstalling Earlier Version of Osdag: If you have a previous version of Osdag installed then it is mandatory to uninstall the same.
+    
+    		i) Go to the location where Osdag was installed and run "Uninstall.exe".
+   
+    # Note: If you have an active Antivirus package installed on your system please disable it during the installation of Osdag. Since, Osdag is not registered with the Microsoft store, the antivirus might block installation/running of Osdag. Osdag does not install any harmful package on your system.
+    
+    To install Osdag, Run Osdag_windows_setup.exe
+    
+    # Follow on-screen instructions AND select the following options in the Setup:
+    
+        	i)    Double click on the Osdag_windows_installer.exe to start the start the installation process. 
+		ii)   Click Next.
+		iii)  Read the License and click 'I Agree' to proceed.
+		iv)   Select the installation directory after checking the space requirement and click Next.
+		v)    Click Install.
+		vi)   Wait for the installation process to get over (this might take several minutes).
+		vii)  Accept the MiKTeX license and click Next.
+		Viii) Choose the MiKTeX installation scope and click Next.
+		ix)   Select the installation directory and click Next.
+		x)    Keep the MiKTeX setting to default and click Next.
+		xi)   Click start to install MiKTeX.
+		xii)  Click Next.
+		Xiii) (optional) You can check for MiKTeX package updates.
+		xiv)  Click Close to exit the MiKTeX setup wizard.
+		xv)   The installation process will continue. After the process ends, click the Finish button.
+	
+	Osdag will be successfully installed!
     
     Running Osdag:
     ==============
     After the installation is complete, you may run Osdag by one of the following methods:
-        i) double-clicking on the Desktop shortcut or
-        ii) double-clicking on the Start Menu shortcut or
-        iii) navigating to the installation-directory and double-clicking on the Osdag shortcut
+    
+    		i)   Double-clicking on the Desktop shortcut or
+		ii)  Press the Windows key and search Osdag 
+		iii) Navigating to the installation-directory and double-clicking on the Osdag shortcut
+
     
 
 ### 2. Ubuntu Installation
@@ -156,11 +177,11 @@ The latest version of Osdag contains the following modules (in addition to the o
 
 Previous Releases
 
-Version: 2017.06.a.874e
+Version 2017.08.a.874e
 
     Bugs fixed
 
-2017.06.a.874e
+Version 2017.06.a.e2dd
 
     This beta version of Osdag contains only the shear connection modules.
 
@@ -171,13 +192,9 @@ Osdag development team (2019 - Present)
 
 ===============================
 
-Project Investigator - Osdag and FOSSEE
+Project Investigator - Osdag
 
 Professor Siddhartha Ghosh
-
-Professor Kannan M Moudgalya
-
-Professor Prabhu Ramachandran
 
 ===============================
 
@@ -267,7 +284,9 @@ Ministry of Education (MoE), Govt. of India
 
 FOSSEE
 
-Professor. Prabhu Ramachandran
+Professor Kannan Moudgalya
+
+Professor Prabhu Ramachandran
 
 Mr. Sunil Shetye
 

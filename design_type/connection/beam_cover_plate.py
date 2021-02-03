@@ -3107,17 +3107,17 @@ class BeamCoverPlate(MomentConnection):
                 t1 = ('SubSection', 'Initial Flange Plate Height Check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
-                    t1 = (KEY_FLANGE_PLATE_HEIGHT , 'Bfp >= 50',
+                    t1 = ('Flange Plate Width (mm)' , 'Bfp >= 50',
                           display_prov(round(self.outerwidth,2), "B_{fp}"),
                           get_pass_fail(50,round(self.outerwidth,2), relation="leq"))
                     self.report_check.append(t1)
                 else:
-                    t1 = (KEY_FLANGE_PLATE_HEIGHT , 'Bfp >= 50',
+                    t1 = ('Flange Plate Width (mm)' , 'Bfp >= 50',
                           display_prov(round(self.outerwidth,2), "B_{fp}"),
                           get_pass_fail(50, round(self.outerwidth,2), relation="leq"))
                     self.report_check.append(t1)
 
-                    t1 = (KEY_INNERFLANGE_PLATE_HEIGHT, 'Bifp >= 50' ,
+                    t1 = ('Flange Plate Inner Width (mm)', 'Bifp >= 50' ,
                           width_pt_chk_bolted(B =self.section.flange_width,t = self.section.web_thickness,r_1 =self.section.root_radius),
                          get_pass_fail(50, round(self.innerwidth,2), relation="leq"))
                     self.report_check.append(t1)
@@ -3166,7 +3166,7 @@ class BeamCoverPlate(MomentConnection):
                 if self.preference == "Outside":
 
                     t1 = (
-                        KEY_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                        'Web Plate Height (mm)', min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
                                                                t_f=self.section.flange_thickness),
                         web_width_chk_bolt(pref=self.preference, D=self.section.depth, tk=self.flange_plate.thickness_provided,T=self.section.flange_thickness,
                                        R_1=self.section.root_radius, webplatewidth=self.webplatewidth, webclearance=None),
@@ -3174,7 +3174,7 @@ class BeamCoverPlate(MomentConnection):
                     self.report_check.append(t1)
                 else:
                     # self.min_web_plate_height = self.section.min_plate_height()
-                    t1 = (KEY_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
+                    t1 = ('Web Plate Height (mm)', min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,
                                                                  t_f=self.section.flange_thickness),
                           web_width_chk_bolt(pref=self.preference, D=self.section.depth, tk=self.flange_plate.thickness_provided,T=self.section.flange_thickness,
                                              R_1=self.section.root_radius, webplatewidth=self.webplatewidth,

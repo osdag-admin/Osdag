@@ -1991,7 +1991,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                                                             type=self.endplate_type), 'Pass')
             self.report_check.append(t1)
 
-            t1 = (KEY_OUT_DISP_STIFFENER_THICKNESS, display_prov(self.beam_tw, "t"), display_prov(self.stiffener_thickness, "tst"), 'Pass')
+            t1 = (KEY_OUT_DISP_STIFFENER_THICKNESS, display_prov(self.beam_tw, "t"), display_prov(self.stiffener_thickness, "t_{st}"), 'Pass')
             self.report_check.append(t1)
 
             t1 = (DISP_WELD_SIZE, round(self.stiffener_weld.min_size), 'tw = ' + str(self.weld_size_stiffener) + '', 'Pass')

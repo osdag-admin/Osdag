@@ -2159,7 +2159,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                   2)),
               '')
         self.report_check.append(t1)
-        t1 = ('SubSection', 'Load Consideration', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{3cm}|p{5.8cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         #####INTERACTION RATIO#######
 

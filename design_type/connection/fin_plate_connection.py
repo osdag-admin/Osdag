@@ -1013,13 +1013,13 @@ class FinPlateConnection(ShearConnection):
             min_shear_load = min(40, round(0.15 * self.supported_section.shear_yielding_capacity / 0.6, 2))
             applied_shear_force = max(self.load.shear_force, min_shear_load)
 
+            t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, self.load.axial_force, self.load.axial_force, "")
+            self.report_check.append(t1)
+
             t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, self.load.shear_force,
                   prov_shear_load(shear_input=self.load.shear_force, min_sc=min_shear_load,
                                   app_shear_load=applied_shear_force,
                                   shear_capacity_1=round(self.supported_section.shear_yielding_capacity/1000,2)), "")
-            self.report_check.append(t1)
-
-            t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, self.load.axial_force, self.load.axial_force, "")
             self.report_check.append(t1)
 
             connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
@@ -1027,7 +1027,7 @@ class FinPlateConnection(ShearConnection):
             bolt_force_kn=round(self.plate.bolt_force/1000,2)
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)
 
-            t1 = ('SubSection', 'Bolt Design','|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Bolt Design','|p{3.5cm}|p{5.3cm}|p{6.7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
@@ -1149,7 +1149,7 @@ class FinPlateConnection(ShearConnection):
                     get_pass_fail(bolt_force_kn,bolt_capacity_red_kn,relation="lesser"))
                 self.report_check.append(t5)
 
-                t1 = ('SubSection','Plate Design','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection','Plate Design','|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.supported_section.root_radius,
@@ -1183,7 +1183,7 @@ class FinPlateConnection(ShearConnection):
                         h = a.height
                         t = a.thickness_provided
                     else:
-                        t1 = ('SubSection', 'Section Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                        t1 = ('SubSection', 'Section Design', '|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
                         self.report_check.append(t1)
                         h = a.web_height
                         t = a.web_thickness
@@ -1249,7 +1249,7 @@ class FinPlateConnection(ShearConnection):
                 # Weld Checks
                 ##################
 
-                t1 = ('SubSection', 'Weld Design', '|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Weld Design', '|p{3.5cm}|p{6.5cm}|p{4.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_WELD_SIZE, cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld_size_min), self.weld.size,

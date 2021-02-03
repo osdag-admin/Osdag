@@ -1447,7 +1447,7 @@ class EndPlateConnection(ShearConnection):
             self.report_check.append(t1)
 
         if self.supported_section.design_status is True and self.design_status_plate_tk is True:
-            t1 = ('SubSection', 'Bolt Design', '|p{3cm}|p{5.5cm}|p{6.3cm}|p{1.2cm}|')
+            t1 = ('SubSection', 'Bolt Design', '|p{3cm}|p{6cm}|p{6.6cm}|p{1.2cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)

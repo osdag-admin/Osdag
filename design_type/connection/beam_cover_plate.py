@@ -3027,7 +3027,7 @@ class BeamCoverPlate(MomentConnection):
                                                                                                                M_c=round(self.section.moment_capacity / 1000000, 2)),
               '')
         self.report_check.append(t1)
-        t1 = ('SubSection', 'Load Consideration', '|p{3cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{3cm}|p{6cm}|p{5.2cm}|p{1.5cm}|')
         self.report_check.append(t1)
         #####INTERACTION RATIO#######
 
@@ -3473,7 +3473,7 @@ class BeamCoverPlate(MomentConnection):
             res_force = self.web_plate.bolt_force * self.web_plate.bolt_line * self.web_plate.bolts_one_line
             print("res_focce", res_force)
 
-            t1 = ('SubSection', 'Web Bolt Check', '|p{2.5cm}|p{6cm}|p{6cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Bolt Check', '|p{2.5cm}|p{5.6cm}|p{6.4cm}|p{1.5cm}|')
 
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimization", display_prov(self.bolt.bolt_diameter_provided, "d"),
@@ -3741,7 +3741,7 @@ class BeamCoverPlate(MomentConnection):
          ################
         if self.select_bolt_dia_status == True:
             self.min_web_plate_height = round(self.section.min_plate_height(), 2)
-            t1 = ('SubSection', 'Web Plate Dimension Check', '|p{4cm}|p{4.5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate Dimension Check', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = (DISP_MIN_WEB_PLATE_HEIGHT, min_plate_ht_req(D=self.section.depth, min_req_width=self.min_web_plate_height, r_r=self.section.root_radius,

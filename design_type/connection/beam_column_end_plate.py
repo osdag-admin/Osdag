@@ -2458,7 +2458,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.report_check.append(t1)
 
 
-        t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{5.3cm}|p{5.2cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         self.load_shear_min = min(round(0.15 * self.supported_section_shear_capa, 2), 40.0)

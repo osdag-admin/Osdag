@@ -286,6 +286,128 @@ class IS800_2007(object):
         bearing_strength = 0.45 * f_ck  # MPa (N/mm^2)
         return bearing_strength
 
+    # cl. 7.1, Design strength
+    @staticmethod
+    def cl_7_1_2_design_compressisive_strength_member( effective_area , design_compressive_stress , axial_load ):
+        """
+        Args:
+            effective_area:effective sectional area as defined in 7.3.2                             (float)
+            design_compressive_stress:design compressive stress, obtained as per 7.1.2.1            (float)
+            axial_load:Load acting on column                                                        (float)
+
+        Returns:
+            Design compressive strength
+           'Pass', if the section qualifies as the required section_class, 'Fail' if it does not
+
+        Note:
+            Reference: IS 800 pg34
+            @author:Rutvik Joshi
+        """
+        design_compressive_strength= effective_area * design_compressive_stress                     #area in mm2,stress in kN/mm2
+        if axial_load < design_compressive_strength:                                                #kN
+            check = 'pass'
+        else:
+            check = 'fail'
+        return check                                                                                #str
+
+    # cl. 7.2.2 Effective Length of Prismatic Compression Members
+    @staticmethod
+    def cl_7_2_2_effective_length_of_prismatic_compression_members( V1 , theta1 , V2 , theta2 , l , ry ):
+        """
+        Args:
+            V1:Translation At One End                                                               (str)
+            theta1:Rotation At One End                                                              (str)
+            V2:Translation At the Other End                                                         (str)
+            theta2:Rotation At the Other End                                                        (str)
+            l: Complete length of member                                                            (float)
+            ry: section detail ry                                                                   (float)
+
+        Returns:
+            effective_length                                                                        (float)
+
+        Note:
+            Reference: IS 800 pg45
+            @author:Rutvik Joshi
+        """
+        if V1 == 'r' and theta1 == 'r' and V2 == 'r' and theta2 == 'r':
+            KL = 0.65 * l                                                                           # l in mm
+        elif V1 == 'r' and theta1 == 'r' and V2 == 'r' and theta2 == 'f':
+            KL = 0.8 * l
+        elif V1 == 'r' and theta1 == 'r' and V2 == 'f' and theta2 == 'r':
+            KL = 1.2 * l
+        elif V1 == 'r' and theta1 == 'f' and V2 == 'r' and theta2 == 'f':
+            KL = 1 * l
+        elif V1 == 'f' and theta1 == 'r' and V2 == 'f' and theta2 == 'r':
+            KL = 2 * l
+        elif V1 == 'r' and theta1 == 'r' and V2 == 'f' and theta2 == 'f':
+            KL = 2 * l
+        lamba = KL / (ry * 10)                                                                     # ry in cm
+        if lamba <= 180:
+            lamba = lamba
+        else:
+            lamba = 180
+        return lamba                                                                               #lamba in mm
+    # cl. 7.1.2.1, Design stress
+    @staticmethod
+    def cl_7_1_2_1_design_compressisive_stress(f_y,  lamba , buklingclass ):
+        """
+        Args:
+            f_y:Yield stress                                                                        (float)
+            lamba:Effective length of member                                                        (float)
+            buklingclass:Euler buckling class                                                       (float)
+
+        Returns:
+            Design compressive stress
+        Note:
+            Reference: IS 800 pg34
+            @author:Rutvik Joshi
+        """
+        Esteel= 2*(10**5)
+        gamma_mo=1.1                                                                                 #table 5 of IS 800:2007
+        fcc = (3.14 ** 2 * Esteel) / lamba ** 2
+        lambda1 = (f_y / fcc) ** 0.5
+        phi = 0.5 * (1 + buklingclass * (lambda1 - 0.2) + lambda1 ** 2)
+        facd = (f_y / gamma_mo) / (phi + ((phi ** 2 - lambda1 ** 2) ** 0.5))
+        return facd                                                                                  #kN/cm2
+
+    # cl. 7.1.2.1, Buckling Class of Cross-Sections
+    @staticmethod
+    def cl_7_1_2_2_buckling_class_of_crosssections( h , bf , tf ):
+        """
+        Args:
+            h:Depth of section(mm)                                                                   (float)
+            bf: Breadth of section(mm)                                                               (float)
+            tf:Thickness of flange                                                                   (float)
+
+        Returns:
+                alphaxx                                                                              (float)
+                alphayy                                                                              (float)
+                buklingclass                                                                         (float)
+
+        Note:
+            Reference: IS 800 pg44
+            @author:Rutvik Joshi
+        """
+        #for rolled I section only
+        if h / bf > 1.2:
+            if tf <= 40:
+                alphaxx = 0.21
+                alphayy = 0.34
+                buklingclass = 0.34
+            if 40 <= tf <= 100:
+                alphaxx = 0.34
+                alphayy = 0.49
+                buklingclass = 0.49
+        if h / bf <= 1.2:
+            if tf <= 100:
+                alphaxx = 0.34
+                alphayy = 0.49
+                buklingclass = 0.49
+            if tf > 100:
+                alphaxx = 0.76
+                alphayy = 0.76
+                buklingclass = 0.76
+        return(alphaxx , alphayy , buklingclass)
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
 

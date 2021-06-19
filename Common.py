@@ -349,6 +349,90 @@ KEY_DISP_BB_EP_SPLICE = 'Beam-to-Beam End Plate Connection'
 
 DISP_TITLE_CM = 'Connecting Members'
 
+# Compression Members
+KEY_DISP_COMPRESSION_COLUMN = 'Column Design'
+KEY_SECTION_PROPERTY = 'Section Property'
+KEY_SECTION_DATA = 'Section Data'
+KEY_MEMBER_PROPERTY = 'Member Property'
+KEY_MEMBER_DATA = 'Member.Data'
+KEY_SECTION_PROFILE = 'Section.Profile'
+KEY_DISP_SECTION_PROFILE = 'Section Profile *'
+VALUES_SEC_PROFILE_COLUMN = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
+KEY_SECTION_DEFINITION = 'SectionDefinition'
+KEY_DISP_SECTION_DEFINITION = 'Section Definition*'
+KEY_DISP_MEMBER_DATA = 'Member Data'
+KEY_ACTUAL_LENGTH = 'Length.Actual'
+KEY_DISP_ACTUAL_LENGTH = 'Actual Length'
+KEY_COLUMN_DESIGN = 'Column Design'
+KEY_COLUMN_CAPACITY = 'Column.Capacity'
+KEY_DISP_COLUMN_CAPACITY = 'Column Capacity (kN)'
+KEY_ACTUAL_LEN_ZZ = 'Actual.Length_zz'
+KEY_DISP_ACTUAL_LEN_ZZ = 'Actual Length (z-z), mm'
+KEY_ACTUAL_LEN_YY = 'Actual.Length_yy'
+KEY_DISP_ACTUAL_LEN_YY = 'Actual Length (y-y), mm'
+KEY_DESIGN_COMPRESSION = 'Design Results'
+KEY_DESIGN_STRENGTH_COMPRESSION = 'Design.Strength'
+KEY_DISP_DESIGN_STRENGTH_COMPRESSION = 'Design Strength (kN)'
+DISP_TITLE_OPTIMUM_SECTION = 'Optimum Section'
+KEY_TITLE_OPTIMUM_DESIGNATION = 'Optimum.Designation'
+KEY_DISP_TITLE_OPTIMUM_DESIGNATION = 'Designation'
+KEY_OPTIMUM_UR_COMPRESSION = 'Optimum.UR'
+KEY_DISP_OPTIMUM_UR_COMPRESSION = 'Utilization Ratio'
+KEY_OPTIMUM_SC = 'Optimum.SectionClassification'
+KEY_DISP_OPTIMUM_SC = 'Section Classification'
+DISP_TITLE_ZZ = 'Major Axis (z-z)'
+DISP_TITLE_YY = 'Minor Axis (y-y)'
+KEY_EFF_LEN_ZZ = 'Major.Effective_Length'
+KEY_DISP_EFF_LEN_ZZ = 'Effective Length (m)'
+KEY_EFF_LEN_YY = 'MinorEffLen'
+KEY_DISP_EFF_LEN_YY = 'Effective Length (m)'
+KEY_EULER_BUCKLING_STRESS_ZZ = 'MajorBucklingStress'
+KEY_DISP_EULER_BUCKLING_STRESS_ZZ = 'Euler Buckling Stress (MPa)'
+KEY_EULER_BUCKLING_STRESS_YY = 'MinorBucklingStress'
+KEY_DISP_EULER_BUCKLING_STRESS_YY = 'Euler Buckling Stress (MPa)'
+KEY_BUCKLING_CURVE_ZZ = 'MajorBC'
+KEY_DISP_BUCKLING_CURVE_ZZ = 'Buckling Curve Classification'
+KEY_BUCKLING_CURVE_YY = 'MinorBC'
+KEY_DISP_BUCKLING_CURVE_YY = 'Buckling Curve Classification'
+KEY_IMPERFECTION_FACTOR_ZZ = 'MajorIF'
+KEY_DISP_IMPERFECTION_FACTOR_ZZ = 'Imperfection Factor'
+KEY_IMPERFECTION_FACTOR_YY = 'MinorIF'
+KEY_DISP_IMPERFECTION_FACTOR_YY = 'Imperfection Factor'
+KEY_SR_FACTOR_ZZ = 'MajorSRF'
+KEY_DISP_SR_FACTOR_ZZ = 'Stress Reduction Factor'
+KEY_SR_FACTOR_YY = 'MinorSRF'
+KEY_DISP_SR_FACTOR_YY = 'Stress Reduction Factor'
+KEY_NON_DIM_ESR_ZZ = 'MajorNDESR'
+KEY_DISP_NON_DIM_ESR_ZZ = 'Non-dimensional Effective SR'
+KEY_NON_DIM_ESR_YY = 'MinorNDESR'
+KEY_DISP_NON_DIM_ESR_YY = 'Non-dimensional Effective SR'
+KEY_EFF_SEC_AREA_ZZ = 'MajorEffSecArea'
+KEY_DISP_EFF_SEC_AREA_ZZ = 'Effective Sectional Area (mm2)'
+KEY_EFF_SEC_AREA_YY = 'MinorEffSecArea'
+KEY_DISP_EFF_SEC_AREA_YY = 'Effective Sectional Area (mm2)'
+KEY_COMP_STRESS_ZZ = 'MajorDCS'
+KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
+KEY_COMP_STRESS_YY = 'MinorDCS'
+KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
+
+KEY_ALLOW_CLASS1 = 'Optimum.Class1'
+KEY_DISP_CLASS1 = 'Choose Plastic sections'
+KEY_ALLOW_CLASS2 = 'Optimum.Class2'
+KEY_DISP_CLASS2 = 'Choose Compact sections'
+KEY_ALLOW_CLASS3 = 'Optimum.Class3'
+KEY_DISP_CLASS3 = 'Choose Semi-compact sections'
+KEY_ALLOW_CLASS4 = 'Optimum.Class4'
+KEY_DISP_CLASS4 = 'Choose Slender sections'
+KEY_ALLOW_UR = 'Optimum.AllowUR'
+KEY_DISP_UR = 'Allowable Utilization Ratio (UR)'
+KEY_OPTIMIZATION_PARA = 'Optimum.Para'
+KEY_DISP_OPTIMIZATION_PARA = 'Optimization Parameter'
+KEY_EFFECTIVE_AREA_PARA = 'Effective.Area_Para'
+KEY_DISP_EFFECTIVE_AREA_PARA = 'Effective Area Parameter'
+KEY_DISP_SECTION_DEFINITION_DP = 'Section Definition (Table 2)'
+KEY_DISP_OPTIMIZATION_STEEL_COST = 'Cost'
+KEY_STEEL_COST = 'Steel.Cost'
+KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 ###################################
 # All Input Keys
 ###################################
@@ -370,6 +454,7 @@ KEY_SECSIZE = 'Member.Designation'
 KEY_SECSIZE_DP = 'Member.Designation_dp'
 KEY_SECSIZE_SELECTED = 'Member.Designation_Selected'        #Extra Keys for Display
 KEY_SUPTNGSEC = 'Member.Supporting_Section.Designation'
+KEY_COLUMN_SECTION = 'Member.Column_Section.Designation'
 KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
 KEY_A = 'Member.A'
 KEY_B = 'Member.B'
@@ -2144,4 +2229,18 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm or 1.5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5mm {tolerance} or if the assumed clearance is 1.5mm, then the gap should be = 3mm (= 1.5mm {clearance} + 1.5mm {tolerance}. These are the default gap values based on the site practice for convenience of erection and IS 7215,Clause 2.3.1. The gap value can also be zero based on the nature of connection where clearance is not required.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+
+COLUMN_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Allowable Utilization Ratio (UR)</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the maximum allowable value of the demand to capacity ratio for performing the design. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.0</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The UR can be re-defined for any particular design session with a maximum allowable value of 1.0 and a minimum of 0.1.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Optimization Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used for selecting the most optimum section as the design output. The default parameter is set as the </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Utilization Ratio (UR)</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Optimum sections can be selected based on the cost plus UR by choosing the '</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Cost</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">' parameter from the drop-down list.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Area Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used to define the reduction in the area of the section due to connection detailing and other such requirements. The default value of this parameter is set at 1.0, which means that the effective area is 100% of the gross area for Plastic, Compact and Semi-compact sections. For Slender sections, the initial area will be computed based on the recommendations in Fig.2B of The National Building Code (2016). The value of the parameter should be defined in terms of the effective area to be considered for design simulation after deducting the area lost. The maximum value of the parameter is 1.0 (effective area is 100% of the gross area) with a minimum value of 0.1.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")

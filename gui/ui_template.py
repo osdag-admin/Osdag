@@ -50,6 +50,7 @@ from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
+from design_type.compression_member.Column import ColumnDesign
 from gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -1669,6 +1670,8 @@ class Window(QMainWindow):
             return Tension_bolted
         elif name == KEY_DISP_TENSION_WELDED:
             return Tension_welded
+        elif name == KEY_DISP_COMPRESSION_COLUMN:
+            return ColumnDesign
         else:
             return GussetConnection
 # Function for getting inputs from a file
@@ -1892,12 +1895,10 @@ class Window(QMainWindow):
             # ##############trial##############
             # status = True
             # ##############trial##############
-            if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
-                                                  KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
-                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
-                                                  KEY_DISP_COLUMNCOVERPLATE,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE]:
+            if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
+                                                  KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+                                                  KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COMPRESSION_COLUMN]:
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)

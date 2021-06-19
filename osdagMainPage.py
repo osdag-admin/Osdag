@@ -153,7 +153,9 @@ from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSp
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.compression_member.compression_column import CompressionColumn
 from design_type.compression_member.compression import Compression
+from design_type.compression_member.Column import ColumnDesign
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 import APP_CRASH.Appcrash.api as appcrash
@@ -289,7 +291,11 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member' : self.Under_Development,
+                'Compression Member': [('Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
+                                       ('Beam-Column Design', 'ResourceFiles/images/compression_column.png', 'Beam_Column_Design'),
+                                       ('Strut Design', 'ResourceFiles/images/compression_column.png', 'Strut_Design'),
+                                       self.show_compression_module,
+                                       ],
                 'Flexural Member' : self.Under_Development,
                 'Beam-Column' : self.Under_Development,
                 'Plate Girder' : self.Under_Development,
@@ -568,39 +574,39 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-    def show_compression_module(self):
-        # folder = self.select_workspace_folder()
-        # folder = str(folder)
-        # if not os.path.exists(folder):
-        #     if folder == '':
-        #         pass
-        #     else:
-        #         os.mkdir(folder, 0o755)
-        #
-        # root_path = folder
-        # images_html_folder = ['images_html']
-        # flag = True
-        # for create_folder in images_html_folder:
-        #     if root_path == '':
-        #         flag = False
-        #         return flag
-        #     else:
-        #         try:
-        #             os.mkdir(os.path.join(root_path, create_folder))
-        #         except OSError:
-        #             shutil.rmtree(os.path.join(folder, create_folder))
-        #             os.mkdir(os.path.join(root_path, create_folder))
-        if self.findChild(QRadioButton,'Compression_Bolted').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Compression, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-
-        elif self.findChild(QRadioButton,'Compression_Welded').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Compression, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+    # def show_compression_module(self):
+    #     # folder = self.select_workspace_folder()
+    #     # folder = str(folder)
+    #     # if not os.path.exists(folder):
+    #     #     if folder == '':
+    #     #         pass
+    #     #     else:
+    #     #         os.mkdir(folder, 0o755)
+    #     #
+    #     # root_path = folder
+    #     # images_html_folder = ['images_html']
+    #     # flag = True
+    #     # for create_folder in images_html_folder:
+    #     #     if root_path == '':
+    #     #         flag = False
+    #     #         return flag
+    #     #     else:
+    #     #         try:
+    #     #             os.mkdir(os.path.join(root_path, create_folder))
+    #     #         except OSError:
+    #     #             shutil.rmtree(os.path.join(folder, create_folder))
+    #     #             os.mkdir(os.path.join(root_path, create_folder))
+    #     if self.findChild(QRadioButton,'Compression_Bolted').isChecked():
+    #         self.hide()
+    #         self.ui2 = Ui_ModuleWindow(Compression, ' ')
+    #         self.ui2.show()
+    #         self.ui2.closed.connect(self.show)
+    #
+    #     elif self.findChild(QRadioButton,'Compression_Welded').isChecked():
+    #         self.hide()
+    #         self.ui2 = Ui_ModuleWindow(Compression, ' ')
+    #         self.ui2.show()
+    #         self.ui2.closed.connect(self.show)
 
     def show_tension_module(self):
         # folder = self.select_workspace_folder()
@@ -634,6 +640,26 @@ class OsdagMainWindow(QMainWindow):
         elif self.findChild(QRadioButton,'Tension_Welded').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(Tension_welded, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+    def show_compression_module(self):
+        """ Create radio buttons for the sub-modules under the compression module"""
+        if self.findChild(QRadioButton, 'Column_Design').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(ColumnDesign, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+        elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+        elif self.findChild(QRadioButton, 'Strut_Design').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(Compression, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

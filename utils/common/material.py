@@ -16,6 +16,8 @@ class Material(object):
         # if material_grade not in ["Select Material", "Custom"] and "Custom" not in material_grade:
         self.connect_to_database_to_get_fy_fu(grade=material_grade, thickness=thickness)
         self.material = material_grade
+        self.modulus_of_elasticity = 200000  # MPa
+        self.unit_mass = 7850  # kg/m3
         # if material_grade.split(" ")[0] == "Custom":
         #     material = material_grade.split(" ")
         #     if len(material) == 3:

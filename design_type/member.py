@@ -1639,6 +1639,60 @@ class Member(Main):
 
         return detailing
 
+    def optimization_tab_column_design(self, input_dictionary):
+
+        values = {KEY_ALLOW_CLASS1: 'Yes', KEY_ALLOW_CLASS2: 'Yes', KEY_ALLOW_CLASS3: 'Yes', KEY_ALLOW_CLASS4: 'Yes',
+                  KEY_ALLOW_UR: '1.0', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_STEEL_COST: '50'}
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
+        optimum = []
+
+        t2 = (KEY_ALLOW_UR, KEY_DISP_UR, TYPE_TEXTBOX, None, values[KEY_ALLOW_UR])
+        optimum.append(t2)
+
+        t2 = (KEY_OPTIMIZATION_PARA, KEY_DISP_OPTIMIZATION_PARA, TYPE_COMBOBOX, ['Utilization Ratio', 'Cost'], values[KEY_OPTIMIZATION_PARA])
+        optimum.append(t2)
+
+        t2 = (KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
+        optimum.append(t2)
+
+        t4 = (None, None, TYPE_ENTER, None, None)
+        optimum.append(t4)
+
+        t5 = (None, KEY_DISP_SECTION_DEFINITION_DP, TYPE_TITLE, None, None)
+        optimum.append(t5)
+
+        t1 = (KEY_ALLOW_CLASS1, KEY_DISP_CLASS1, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS1])
+        optimum.append(t1)
+
+        t1 = (KEY_ALLOW_CLASS2, KEY_DISP_CLASS2, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS2])
+        optimum.append(t1)
+
+        t1 = (KEY_ALLOW_CLASS3, KEY_DISP_CLASS3, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS3])
+        optimum.append(t1)
+
+        t1 = (KEY_ALLOW_CLASS4, KEY_DISP_CLASS4, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS4])
+        optimum.append(t1)
+
+        t4 = (None, None, TYPE_ENTER, None, None)
+        optimum.append(t4)
+
+        t5 = (None, KEY_DISP_OPTIMIZATION_STEEL_COST, TYPE_TITLE, None, None)
+        optimum.append(t5)
+
+        t1 = (KEY_STEEL_COST, KEY_DISP_STEEL_COST, TYPE_TEXTBOX, None, values[KEY_STEEL_COST])
+        optimum.append(t1)
+
+        t7 = (None, None, TYPE_ENTER, None, None)
+        optimum.append(t7)
+
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, COLUMN_OPTIMIZATION_DESCRIPTION, None)
+        optimum.append(t9)
+
+        return optimum
 
     ########################################
     # Design Preference Functions End

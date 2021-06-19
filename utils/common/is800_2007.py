@@ -166,6 +166,123 @@ class IS800_2007(object):
 
         return check
 
+    @staticmethod
+    def Table2_i(width, thickness, f_y, section_type='Rolled'):
+        """ Calculate the limiting width to thickness ratio as per Table 2 for;
+                sr. no i) Outstanding element of compression flange
+
+        Args:
+            width: width of the element in mm (float or int)
+            thickness: thickness of the element in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            section_type: Type of section ('Rolled' or 'Welded') (string)
+
+        Returns:
+            A list of values with;
+            1- The class of the section as Plastic, Compact, Semi-compact or Slender on account of the flange
+            2- Ratio
+
+            ['Section Class', 'Ratio']
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(250 / f_y)
+
+        ratio = width / thickness
+
+        if section_type == 'Rolled':
+            if ratio <= (9.4 * epsilon):
+                section_class = 'Plastic'
+            elif ratio <= (10.5 * epsilon):
+                section_class = 'Compact'
+            elif ratio <= (15.7 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+        else:
+            if ratio <= (8.4 * epsilon):
+                section_class = 'Plastic'
+            elif ratio <= (9.4 * epsilon):
+                section_class = 'Compact'
+            elif ratio <= (13.6 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+
+        return [section_class, ratio]
+
+    @staticmethod
+    def Table2_iii(depth, thickness, f_y, classification_type='Axial compression'):
+        """ Calculate the limiting width to thickness ratio as per Table 2 for;
+                sr. no iii) Web of an I, H or box section for axial compression
+
+        Args:
+            depth: width of the element in mm (float or int)
+            thickness: thickness of the element in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            classification_type: Type of classification required (Neutral axis at mid-depth, Generaly, Axial Compression) (string)
+
+        Returns:
+            The class of the section as Plastic, Compact, Semi-compact or Slender on account of the web
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(250 / f_y)
+
+        ratio = depth / thickness
+
+        if classification_type == 'Neutral axis at mid-depth':
+            ''
+        elif classification_type == 'Generally':
+            ''
+        elif classification_type == 'Axial compression':
+            if ratio > (42 * epsilon):
+                section_class = 'Slender'
+            else:
+                section_class = 'Semi-Compact'
+
+        return section_class
+
+    @staticmethod
+    def Table2_x(outer_diameter, tube_thickness, f_y, load_type='axial compression'):
+        """ Calculate the limiting width to thickness ratio as per Table 2 for;
+                sr. no x) Circular hollow tube
+
+        Args:
+            outer_diameter: outer diameter of the tube in mm (float or int)
+            tube_thickness: thickness of the tube in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            load_type: Type of loading (moment, axial compression) (string)
+
+        Returns:
+            The class of the section as Plastic, Compact, Semi-compact or Slender
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(250 / f_y)
+
+        ratio = outer_diameter / tube_thickness
+
+        if load_type == 'axial compression':
+            if ratio > (88 * epsilon):
+                section_class = 'Slender'
+            else:
+                section_class = 'Semi-Compact'
+        else:
+            if ratio <= (42 * epsilon):
+                section_class = 'Plastic'
+            elif (ratio > (42 * epsilon)) and (ratio <= (52 * epsilon)):
+                section_class = 'Compact'
+            elif ratio <= (146 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+
+        return section_class
+
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """
     # ==========================================================================
@@ -312,41 +429,36 @@ class IS800_2007(object):
 
     # cl. 7.2.2 Effective Length of Prismatic Compression Members
     @staticmethod
-    def cl_7_2_2_effective_length_of_prismatic_compression_members( V1 , theta1 , V2 , theta2 , l , ry ):
+    def cl_7_2_2_effective_length_of_prismatic_compression_members(unsupported_length, end_1='Fixed', end_2='Fixed'):
         """
+        Calculate the effective length of the member as per Cl. 7.2.2 (Table 11) of IS 800:2007
+
         Args:
-            V1:Translation At One End                                                               (str)
-            theta1:Rotation At One End                                                              (str)
-            V2:Translation At the Other End                                                         (str)
-            theta2:Rotation At the Other End                                                        (str)
-            l: Complete length of member                                                            (float)
-            ry: section detail ry                                                                   (float)
+            unsupported_length: actula length of the member about any axis in mm (float)
+            end_1: End condition at end 1 of the member (string)
+            end_2: End condition at end 2 of the member (string)
 
         Returns:
-            effective_length                                                                        (float)
-
-        Note:
-            Reference: IS 800 pg45
-            @author:Rutvik Joshi
+            Effective length in mm
         """
-        if V1 == 'r' and theta1 == 'r' and V2 == 'r' and theta2 == 'r':
-            KL = 0.65 * l                                                                           # l in mm
-        elif V1 == 'r' and theta1 == 'r' and V2 == 'r' and theta2 == 'f':
-            KL = 0.8 * l
-        elif V1 == 'r' and theta1 == 'r' and V2 == 'f' and theta2 == 'r':
-            KL = 1.2 * l
-        elif V1 == 'r' and theta1 == 'f' and V2 == 'r' and theta2 == 'f':
-            KL = 1 * l
-        elif V1 == 'f' and theta1 == 'r' and V2 == 'f' and theta2 == 'r':
-            KL = 2 * l
-        elif V1 == 'r' and theta1 == 'r' and V2 == 'f' and theta2 == 'f':
-            KL = 2 * l
-        lamba = KL / (ry * 10)                                                                     # ry in cm
-        if lamba <= 180:
-            lamba = lamba
+
+        if end_1 == 'Fixed' and end_2 == 'Fixed':
+            effective_length = 0.65 * unsupported_length
+        elif end_1 == 'Fixed' and end_2 == 'Hinged':
+            effective_length = 0.8 * unsupported_length
+        elif end_1 == 'Fixed' and end_2 == 'Roller':
+            effective_length = 1.2 * unsupported_length
+        elif end_1 == 'Hinged' and end_2 == 'Hinged':
+            effective_length = 1.0 * unsupported_length
+        elif end_1 == 'Hinged' and end_2 == 'Roller':
+            effective_length = 2.0 * unsupported_length
+        elif end_1 == 'Fixed' and end_2 == 'Free':
+            effective_length = 2.0 * unsupported_length
         else:
-            lamba = 180
-        return lamba                                                                               #lamba in mm
+            effective_length = 2.0 * unsupported_length
+
+        return effective_length
+
     # cl. 7.1.2.1, Design stress
     @staticmethod
     def cl_7_1_2_1_design_compressisive_stress(f_y,  lamba , buklingclass ):
@@ -370,44 +482,97 @@ class IS800_2007(object):
         facd = (f_y / gamma_mo) / (phi + ((phi ** 2 - lambda1 ** 2) ** 0.5))
         return facd                                                                                  #kN/cm2
 
+    # Cl. 7.1.1, Cl.7.1.2.1, Imperfection Factor
+    @staticmethod
+    def cl_7_1_2_1_imperfection_factor(buckling_class=''):
+        """
+        Determine the Imperfection Factor of the cross-section as per Cl 7.1.1, Cl.7.1.2.1 (Table 7) of IS 800:2007
+
+        Args:
+            buckling_class (string)
+
+        Returns: Imperfection factor value (string)
+        """
+        imperfection_factor = {
+            'a': 0.21,
+            'b': 0.34,
+            'c': 0.49,
+            'd': 0.76
+        }[buckling_class]
+
+        return imperfection_factor
+
     # cl. 7.1.2.1, Buckling Class of Cross-Sections
     @staticmethod
-    def cl_7_1_2_2_buckling_class_of_crosssections( h , bf , tf ):
+    def cl_7_1_2_2_buckling_class_of_crosssections(b, h, t_f, cross_section='Rolled I-sections', section_type='Hot rolled'):
         """
+        Determine the buckling class of the cross-section as per Cl 7.1.2.2 (Table 10) of IS 800:2007
+
         Args:
-            h:Depth of section(mm)                                                                   (float)
-            bf: Breadth of section(mm)                                                               (float)
-            tf:Thickness of flange                                                                   (float)
+            b: width of the flange
+            h: depth of the section
+            t_f: thickness of the flange
+            cross_section: type of cross-section
+            section_type: Hot rolled or Cold formed
 
-        Returns:
-                alphaxx                                                                              (float)
-                alphayy                                                                              (float)
-                buklingclass                                                                         (float)
-
-        Note:
-            Reference: IS 800 pg44
-            @author:Rutvik Joshi
+        Returns: Buckling class values about z-z and y-y axis (dictionary)
         """
-        #for rolled I section only
-        if h / bf > 1.2:
-            if tf <= 40:
-                alphaxx = 0.21
-                alphayy = 0.34
-                buklingclass = 0.34
-            if 40 <= tf <= 100:
-                alphaxx = 0.34
-                alphayy = 0.49
-                buklingclass = 0.49
-        if h / bf <= 1.2:
-            if tf <= 100:
-                alphaxx = 0.34
-                alphayy = 0.49
-                buklingclass = 0.49
-            if tf > 100:
-                alphaxx = 0.76
-                alphayy = 0.76
-                buklingclass = 0.76
-        return(alphaxx , alphayy , buklingclass)
+
+        if cross_section == 'Rolled I-sections':
+            if h / b > 1.2:
+                if t_f <= 40:
+                    buckling_class = {
+                        'z-z': 'a',
+                        'y-y': 'b'
+                    }
+                elif 40 <= t_f <= 100:
+                    buckling_class = {
+                        'z-z': 'b',
+                        'y-y': 'c'
+                    }
+                else:  # this case if not derived from the code (for t_f >100mm, buckling class d is assumed about both the axis)
+                    buckling_class = {
+                        'z-z': 'd',
+                        'y-y': 'd'
+                    }
+            elif h / b <= 1.2:
+                if t_f <= 100:
+                    buckling_class = {
+                        'z-z': 'b',
+                        'y-y': 'c'
+                    }
+                if t_f > 100:
+                    buckling_class = {
+                        'z-z': 'd',
+                        'y-y': 'd'
+                    }
+
+        elif cross_section == 'Welded I-section':
+            if t_f <= 40:
+                buckling_class = {
+                    'z-z': 'b',
+                    'y-y': 'c'
+                }
+            if t_f > 40:
+                buckling_class = {
+                    'z-z': 'c',
+                    'y-y': 'd'
+                }
+
+        elif cross_section == 'Hollow Section':
+            if section_type == 'Hot rolled':
+                buckling_class = {
+                    'z-z': 'a',
+                    'y-y': 'a'
+                }
+            else:
+                buckling_class = {
+                    'z-z': 'b',
+                    'y-y': 'b'
+                }
+
+        return buckling_class
+
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
 

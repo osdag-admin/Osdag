@@ -19,6 +19,8 @@ from utils.common.load import Load
 from utils.common.component import ISection, Material
 from utils.common.component import *
 from design_type.member import Member
+from Report_functions import *
+from design_report.reportGenerator_latex import CreateLatex
 
 
 class ColumnDesign(Member):
@@ -527,14 +529,14 @@ class ColumnDesign(Member):
         self.load = Load(axial_force=design_dictionary[KEY_AXIAL], shear_force="", moment="", moment_minor="", unit_kNm=True)
 
         # design preferences
-        self.allowable_utilization_ratio = design_dictionary[KEY_ALLOW_UR]
-        self.effective_area_factor = design_dictionary[KEY_EFFECTIVE_AREA_PARA]
+        self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
+        self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         self.optimization_parameter = design_dictionary[KEY_OPTIMIZATION_PARA]
         self.allow_class1 = design_dictionary[KEY_ALLOW_CLASS1]
         self.allow_class2 = design_dictionary[KEY_ALLOW_CLASS2]
         self.allow_class3 = design_dictionary[KEY_ALLOW_CLASS3]
         self.allow_class4 = design_dictionary[KEY_ALLOW_CLASS4]
-        self.steel_cost_per_kg = design_dictionary[KEY_STEEL_COST]
+        self.steel_cost_per_kg = float(design_dictionary[KEY_STEEL_COST])
 
         self.allowed_sections = []
 
@@ -1079,5 +1081,139 @@ class ColumnDesign(Member):
             logger.info(": ========== Design Status ============")
             logger.info(": Overall Column design is UNSAFE")
             logger.info(": ========== End Of Design ============")
+
+    ### start writing save_design from here!
+    def save_design(self, popup_summary):
+
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                select_section_img = 'SHS'
+            elif self.dp_column_designation[1:4] == 'RHS':
+                select_section_img = 'RHS'
+            else:
+                select_section_img = 'CHS'
+        else:
+            if self.column_properties.flange_slope != 90:
+                select_section_img = "Slope_Beam"
+            else:
+                select_section_img = "Parallel_Beam"
+
+            # column section properties
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                section_type = 'Square Hollow Section (SHS)'
+            elif self.dp_column_designation[1:4] == 'RHS':
+                section_type = 'Rectangular Hollow Section (RHS)'
+            else:
+                section_type = 'Circular Hollow Section (CHS)'
+        else:
+            section_type = 'I Section'
+
+
+        if self.section_property=='Columns' or self.section_property=='Beams':
+            self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  KEY_DISP_COLSEC_REPORT: self.section_property.designation,
+                                  KEY_DISP_MATERIAL: self.section_property.material,
+ #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
+                                  KEY_REPORT_MASS: self.section_property.mass,
+                                  KEY_REPORT_AREA: round(self.section_property.area * 1e-2, 2),
+                                  KEY_REPORT_DEPTH: self.section_property.depth,
+                                  KEY_REPORT_WIDTH: self.section_property.flange_width,
+                                  KEY_REPORT_WEB_THK: self.section_property.web_thickness,
+                                  KEY_REPORT_FLANGE_THK: self.section_property.flange_thickness,
+                                  KEY_DISP_FLANGE_S_REPORT: self.section_property.flange_slope,
+                                  KEY_REPORT_R1: self.section_property.root_radius,
+                                  KEY_REPORT_R2: self.section_property.toe_radius,
+                                  KEY_REPORT_IZ: round(self.section_property.mom_inertia_z * 1e-4, 2),
+                                  KEY_REPORT_IY: round(self.section_property.mom_inertia_y * 1e-4, 2),
+                                  KEY_REPORT_RZ: round(self.section_property.rad_of_gy_z * 1e-1, 2),
+                                  KEY_REPORT_RY: round(self.section_property.rad_of_gy_y * 1e-1, 2),
+                                  KEY_REPORT_ZEZ: round(self.section_property.elast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZEY: round(self.section_property.elast_sec_mod_y * 1e-3, 2),
+                                  KEY_REPORT_ZPZ: round(self.section_property.plast_sec_mod_z * 1e-3, 2),
+                                  KEY_REPORT_ZPY: round(self.section_property.plast_sec_mod_y * 1e-3, 2)}
+        else:
+            self.report_column = {KEY_DISP_COLSEC_REPORT: self.section_property.designation,
+                                  KEY_DISP_MATERIAL: self.section_property.material,
+                                  #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
+                                  KEY_REPORT_MASS: self.section_property.mass,
+                                  KEY_REPORT_AREA: round(self.section_property.area * 1e-2, 2),
+                                  KEY_REPORT_DEPTH: self.section_property.depth,
+                                  KEY_REPORT_WIDTH: self.section_property.flange_width,
+                                  KEY_REPORT_WEB_THK: self.section_property.web_thickness,
+                                  KEY_REPORT_FLANGE_THK: self.section_property.flange_thickness,
+                                  KEY_DISP_FLANGE_S_REPORT: self.section_property.flange_slope}
+
+
+        self.report_input = \
+            {KEY_MAIN_MODULE: self.mainmodule,
+             KEY_MODULE: self.module, #"Axial load on column "
+             KEY_DISP_SECTION_PROFILE: self.sec_profile,
+             KEY_MATERIAL: self.material,
+             KEY_DISP_ACTUAL_LEN_ZZ: self.length_zz,
+             KEY_DISP_ACTUAL_LEN_YY: self.length_yy,
+             KEY_DISP_END1: self.end_1,
+             KEY_DISP_END2: self.end_2,
+             KEY_DISP_AXIAL: self.load,
+             KEY_DISP_SEC_PROFILE: self.sec_profile,
+             KEY_DISP_SECSIZE: self.result_section_class,
+             KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.euler_bs_yy,
+             KEY_DISP_YIELD_STRENGTH_REPORT: self.result_bc_yy,
+
+
+             "Column Section - Mechanical Properties": "TITLE",
+             "Section Details": self.report_column,
+             }
+
+        self.report_check = []
+
+        self.h = (self.beam_D - (2 * self.beam_tf))
+
+        #1.1 Input sections display
+        t1 = ('SubSection', 'List of Input Sections',self.input_section_list),
+        self.report_check.append(t1)
+
+        # 2.2 CHECK: Buckling Class - Compatibility Check
+        t1 = ('SubSection', 'Buckling Class - Compatibility Check', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{2cm}|')
+        self.report_check.append(t1)
+
+        t1 = ("h/bf , tf ", comp_column_class_section_check_required(self.bucklingclass, self.h, self.bf),
+              comp_column_class_section_check_provided(self.bucklingclass, self.h, self.bf, self.tf, self.var_h_bf),
+              'Compatible')  # if self.bc_compatibility_status is True else 'Not compatible')
+        self.report_check.append(t1)
+
+        # 2.3 CHECK: Cross-section classification
+        t1 = ('SubSection', 'Cross-section classification', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = ("b/tf and d/tw ", cross_section_classification_required(self.section),
+              cross_section_classification_provided(self.tf, self.b1, self.epsilon, self.section, self.b1_tf,
+                                                    self.d1_tw, self.ep1, self.ep2, self.ep3, self.ep4),
+              'b = bf / 2,d = h – 2 ( T + R1),έ = (250 / Fy )^0.5,Compatible')  # if self.bc_compatibility_status is True else 'Not compatible')
+        self.report_check.append(t1)
+
+        # 2.4 CHECK : Member Check
+        t1 = ("Slenderness", cl_7_2_2_slenderness_required(self.KL, self.ry, self.lamba),
+              cl_7_2_2_slenderness_provided(self.KL, self.ry, self.lamba), 'PASS')
+        self.report_check.append(t1)
+
+        t1 = (
+        "Design Compressive stress (fcd)", cl_7_1_2_1_fcd_check_required(self.gamma_mo, self.f_y, self.f_y_gamma_mo),
+        cl_7_1_2_1_fcd_check_provided(self.facd), 'PASS')
+        self.report_check.append(t1)
+
+        t1 = ("Design Compressive strength (Pd)", cl_7_1_2_design_comp_strength_required(self.axial),
+              cl_7_1_2_design_comp_strength_provided(self.Aeff, self.facd, self.A_eff_facd), "PASS")
+        self.report_check.append(t1)
+
+        t1 = ('', '', '', '')
+        self.report_check.append(t1)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+        fname_no_ext = popup_summary['filename']
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                              rel_path, module=self.module)
+
 
 

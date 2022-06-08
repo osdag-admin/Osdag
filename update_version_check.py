@@ -53,3 +53,88 @@ class Update():
             else:
                 print("unable to find version in %s" % (VERSIONFILE,))
                 raise RuntimeError("if %s.py exists, it is required to be well-formed" % (VERSIONFILE,))
+import imp
+from tokenize import cookie_re
+import requests
+import json
+import os
+from pathlib import Path
+
+
+class Update_viagithub():
+    def __init__(self):
+        self.url = "https://api.github.com/repos/spartan289/Practical/commits"
+        # self.version = self.get_version()
+        # self.release_url = ""
+        # self.commit_sha_id = self.get_commit_sha_id()
+        self.file_update_dict = {"added":[], "modified":[], "removed":[]}
+        self.latest_commit_sha_id = self.get_latest_commit_sha_id()
+    def get_version(self):
+        return self.version
+    def get_latest_commit_sha_id(self):
+        commits = requests.get(self.url)
+        commits_parse = json.loads(commits.text)
+        latest_commit = commits_parse[0]["sha"]
+        return latest_commit
+    def get_total_commits(self):
+        return self.total_commits
+    def get_commit_sha_id(self):
+        pass
+    def update_structure_all(self, current_commit_sha_id):
+        commits = requests.get(self.url)
+        commits_parse = json.loads(commits.text)
+        all_shaid = []
+        for commit in commits_parse:
+            all_shaid.append(commit["sha"])
+        all_shaid.reverse()
+        for shaid in all_shaid:
+            print("Sha id: " + shaid)
+            self.update_structure(shaid)
+            print("\n\n")
+    def update_structure(self,shaid):
+        commit_url = "https://api.github.com/repos/spartan289/Practical/commits/" + shaid
+        commit_request = requests.get(commit_url)
+        if(commit_request.status_code==200):
+            commit_parse = json.loads(commit_request.text)
+
+            total_changed_files = len(commit_parse["files"])
+            print(total_changed_files)
+            for file in commit_parse["files"]:
+                if(file['status']=='added'):
+                    # self.file_update_dict["added"].append(file["filename"])
+                    print("File Added: " + file['filename'])
+                    self.add_file(file['filename'],shaid)
+                elif(file['status']=='modified'):
+                    # self.file_update_dict["modified"].append(file["filename"])
+                    print("File Modified: " + file['filename'])
+                    self.update_file(file['filename'],shaid)
+
+                elif(file['status']=='removed'):
+                    # self.file_update_dict["removed"].append(file["filename"])
+                    print("File Removed: " + file['filename'])
+                    self.delete_file(file['filename'])
+                else:
+                    print("File Status: " + file['status'])
+        pass
+    def add_file(self,filename,sha_id):
+        url = "https://raw.githubusercontent.com/spartan289/Practical/"+sha_id+"/" + filename
+        file_request = requests.get(url)
+        if(file_request.status_code==200):
+            file_content = file_request.text
+            filepath = Path(filename)
+            filepath.parent.mkdir(parents=True, exist_ok=True)
+            with filepath.open("w+", encoding="utf-8") as f:
+                for line in file_content:
+                    f.write(line)
+
+    def delete_file(self,filename):
+        filepath = Path(filename)
+        if(filepath.exists()):
+            filepath.unlink()
+        else:
+            print("File does not exist")
+
+        pass
+    def update_file(self,filename,sha_id):
+        self.delete_file(filename)
+        self.add_file(filename,sha_id)

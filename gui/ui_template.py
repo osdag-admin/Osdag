@@ -1,3 +1,6 @@
+from threading import Thread
+
+import cairosvg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -1228,7 +1231,42 @@ class Window(QMainWindow):
     def notification(self):
         update_class = Update()
         msg = update_class.notifi()
-        QMessageBox.information(self, 'Info', msg)
+        print(msg)
+        if msg == "no update found!! <br>Osdag already upto date" or msg == "No internet connection":
+            QMessageBox.information(self, 'Info', msg)  # no update found
+        elif msg == "New update is avialable at <a href=\"https://osdag.fossee.in/resources/downloads\"> here <a/>":
+            QMessageBox.information(self, 'Info', msg)  # major update found
+        else:  # minor update found from git
+            msgbox = QMessageBox()
+
+            msgbox.setWindowTitle("Info")
+            msgbox.setText(msg)
+            update_btn = msgbox.addButton('Update', QMessageBox.YesRole)
+            update_btn.clicked.connect(self.thread_fxn)
+            msgbox.exec_()
+
+    def updated(self):
+        QMessageBox.information(self, 'Info', 'Osdag Updated')
+
+    def thread_fxn(self):
+        # QDialog.information(self,'Info','Updating Osdag software')
+        # qDlg = QDialog()
+        # qDlg.setWindowTitle('Dialog')
+        #
+        # layout = QVBoxLayout()
+        # label = QLabel(qDlg)
+        # label.setText('Updating Osdag software')
+        # layout.addWidget(label)
+        #
+        # qDlg.setLayout(layout)
+        update = Update()
+
+        t1 = Thread(target=update.update_structure_from)
+
+        t1.start()
+        while (t1.is_alive()):
+            pass
+        QMessageBox.information(self, 'info', 'OSDAG Updated please restart to finish Update')
 
     def save_output_to_csv(self, main):
         def save_fun():

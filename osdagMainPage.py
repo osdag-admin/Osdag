@@ -83,6 +83,8 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 import os
 from pathlib import Path
 import re
+from threading import Thread
+
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
 from update_version_check import Update
@@ -462,10 +464,28 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Check for Update":
             update_class = Update()
             msg = update_class.notifi()
-            QMessageBox.information(self, 'Info',msg)
-        # elif loc == "FAQ":
-        #     pass
+            print(msg)
+            if msg == "no update found!! <br>Osdag already upto date" or msg == "No internet connection":
+                QMessageBox.information(self, 'Info', msg)  # no update found
+            elif msg == "New update is avialable at <a href=\"https://osdag.fossee.in/resources/downloads\"> here <a/>":
+                QMessageBox.information(self, 'Info', msg, )  # major update found
+            else:  # minor update found from git
+                msgbox = QMessageBox()
 
+                msgbox.setWindowTitle("Info")
+                msgbox.setText(msg)
+
+                update_btn = msgbox.addButton('Update', QMessageBox.YesRole)
+                update_btn.clicked.connect(self.thread_fxn)
+
+                msgbox.exec_()
+        elif loc == "FAQ":
+            pass
+
+    def thread_fxn(self):
+        update = Update()
+        t1 = Thread(target=update.update_structure_from)
+        t1.start()
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder

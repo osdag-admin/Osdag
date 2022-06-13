@@ -21,7 +21,7 @@ import json
 class Update():
     def __init__(self):
         super().__init__()
-        self.url = "https://api.github.com/repos/spartan289/Osdag/commits"
+        self.url = "https://api.github.com/repos/osdag-admin/Osdag/commits"
 
         self.old_version, self.old_no_of_commits, self.old_commitid = self.get_current_version()  # this fxn gets version and no of commits
         # msg = self.notifi()
@@ -30,7 +30,7 @@ class Update():
 
     def notifi(self):
         try:
-            url = "https://raw.githubusercontent.com/spartan289/Osdag/master/version.json"
+            url = "https://raw.githubusercontent.com/osdag-admin/Osdag/master/version.json"
             file = requests.get(url)
             fileobj = json.loads(file.text)
             version = 'not found'
@@ -106,7 +106,7 @@ class Update():
         json.dump(version_obj, open('version.json', 'w'))
 
     def update_structure(self, shaid):
-        commit_url = "https://api.github.com/repos/spartan289/Osdag/commits/" + shaid
+        commit_url = "https://api.github.com/repos/osdag-admin/Osdag/commits/" + shaid
         commit_request = requests.get(commit_url)
         if (commit_request.status_code == 200):
             commit_parse = json.loads(commit_request.text)
@@ -132,7 +132,7 @@ class Update():
         pass
 
     def add_file(self, filename, sha_id):
-        url = "https://raw.githubusercontent.com/spartan289/Osdag/" + sha_id + "/" + filename
+        url = "https://raw.githubusercontent.com/osdag-admin/Osdag/" + sha_id + "/" + filename
         file_request = requests.get(url)
         if (file_request.status_code == 200):
             file_content = file_request.text

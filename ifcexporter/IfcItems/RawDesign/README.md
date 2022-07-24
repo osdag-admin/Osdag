@@ -1,0 +1,1 @@
+In these files Raw design information is fed to produce the geometry, say in case of ISection, profile parameters and extrusion length is fed. Geometry creation using this method is hard but it can save a lot more data. To see the data reduction, compare stage_1 sample to final stage sample in the testing directory. stage1 is completely made from raw design. 

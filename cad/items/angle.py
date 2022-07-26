@@ -108,6 +108,7 @@ class Angle(object):
 
         ######################################################
         edges = []
+        
         if self.R2 == 0.0 or self.R1 == 0.0:
             self.a3 = self.a4 = self.a5
             edge1 = make_edge(getGpPt(self.a1), getGpPt(self.a2))

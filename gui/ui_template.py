@@ -38,6 +38,8 @@ from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
 from cad.cad3dconnection import cadconnection
+from ifcexporter.IfcCadModules.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import CleatAngle_colFlangeBeamWebConnectivity
+from ifcexporter.IfcCadModules.ShearConnections.CleatAngle.colWebBeamWebConnectivity import CleatAngle_colWebBeamWebConnectivity
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -1678,6 +1680,16 @@ class Window(QMainWindow):
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
             return
 
+    def get_ifc_class(self, module, mainmodule):
+        module_class = self.return_class(module)
+        A = module_class()
+        loc = A.connectivity
+        if mainmodule == "Shear Connection":
+            if loc == CONN_CFBW:
+                return CleatAngle_colFlangeBeamWebConnectivity
+            if loc == CONN_CWBW:
+                return CleatAngle_colWebBeamWebConnectivity
+
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
@@ -2582,7 +2594,7 @@ class Window(QMainWindow):
                 self.fuse_model = self.commLogicObj.create2Dcad()
             shape = self.fuse_model
 
-            files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+            files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep);;IFC2X3(*.ifc)"
 
             fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
                                                       files_types)
@@ -2611,6 +2623,16 @@ class Window(QMainWindow):
                     status = step_writer.Write(fName)
 
                     assert (status == IFSelect_RetDone)
+                
+                elif file_extension == 'ifc':
+                    ifc_class = self.get_ifc_class(main.module, main.mainmodule)
+                    CONFIG = {
+                        "filename": os.path.basename(os.path.normpath(fName)),
+                        "creator": "Mukunth A G", # To be changed as the input to come from user
+                        "project_name": "Project Osdag" # To be changed as the input to come from user
+                    }
+                    ifcobj = ifc_class(**CONFIG)
+                    ifcobj.ifc_write_to_path(fName)
 
                 else:
                     stl_writer = StlAPI_Writer()

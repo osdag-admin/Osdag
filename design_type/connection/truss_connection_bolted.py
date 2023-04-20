@@ -4,6 +4,7 @@ from utils.common.component import Bolt
 import copy
 from utils.common.other_standards import *
 from utils.common.common_calculation import *
+import math
 
 """ ======The input values start here====== """
 
@@ -35,7 +36,7 @@ plate_details = [[6, 410, 250],
 
 """ List of axial load (in KN)  on the members starting from 1st member and proceeding one by one """
 # beware of connecting the load inputs of star angles. the load should be divided by 2 because further design will be
-# done considering one of the angles of star angle as a single angle but whitemore width will consider both angles
+# done considering one of the angles of star angle as a single angle but whitmore width will consider both angles
 load_details = [20, 25, 30]
 
 """ ======The input values end here====== """
@@ -219,10 +220,19 @@ for i in len(plate_details):
 
 """ Starting the loop of gusset plate """
 for i in len(plate_details_iter):
+    """ defining candidate_bolts_all to store the eligible bolts for all the members"""
+    candidate_bolts_all = []
+
     """gusset_plate_t_fu_fy - [thickness, fu_plate, fy_plate] of gusset plate"""
     gusset_plate_t_fu_fy = plate_details_iter[i]
 
     for j in len(member_details):
+        """ candidate_bolts1 is the list which will store all the combination of diameter and grade of bolt which can
+        be used for the connection of that member. It will be empty for every value of j. the assignment of this 
+        variable to an empty list will be done after adding this list to another list which stores such list for all 
+        the members """
+        candidate_bolts1 = []
+
         """ member_detail_iter is the variable having detail of that member 
         e.g ['Angles', 70, 8, 410, 250, 'tension', 0, 858, 55.5]
         for which the iteration of the bolt design is to run """
@@ -249,7 +259,7 @@ for i in len(plate_details_iter):
                                                   connection_plates_t_fu_fy_iter[1][0],
                                                   connection_plates_t_fu_fy_iter[2][0]]
 
-        design_load_iter = min((load_details[j]), (
+        design_load_iter = min(abs(load_details[j]), (
                     0.3 * IS800_2007.cl_6_2_tension_yielding_strength(member_detail_iter[7], member_detail_iter[4])))
 
         """ bolt_dia_iter is a list having all the input bolt diameter e.g [8, 10, 12, 20, 32] """
@@ -287,7 +297,9 @@ for i in len(plate_details_iter):
 
                 """ Condition to ensure that the bolt dia selected will be able to be accommodated in the connected 
                 part of the member. number of bolt lines(no_rows) possible** = round_down((h1 - 2e_min)/gauge_dist) + 1
-                here for simplicity gauge dist has been taken as the pitch"""
+                here for simplicity gauge dist has been taken as the pitch. 
+                Note - rows means bolt lines along the direction of load applied
+                    columns means bolt line perpendicular to the direction of load applied """
                 no_rows = round_down((member_detail_iter[8] - 2 * bolt1.edge_dist_provided) / bolt1.pitch_provided) + 1
                 if no_rows < 1:
                     """ coming out of the bolt grade loop """
@@ -318,7 +330,9 @@ for i in len(plate_details_iter):
                     no_rows1 = o+1
                     no_column1 = round_up((no_bolts1/no_rows1), 1)
                     """ Note - The arrangement of the bolts are in chain pattern not in staggered or diamond pattern 
-                    therefore the number of bolts = rows*columns """
+                    therefore the number of bolts = rows*columns
+                    rows means bolt lines along the direction of load applied
+                    columns means bolt line perpendicular to the direction of load applied """
                     no_bolts2 = no_rows1*no_column1
                     """ now joint length = (columns - 1)*pitch """
                     joint_len = (no_column1-1)*pitch1
@@ -338,9 +352,9 @@ for i in len(plate_details_iter):
 
                 """ increasing the number of bolts by increasing one one column in case the bolt group capacity is
                 less than the design load. the no. of times the while loop iterates is limited to 10 in order to escape
-                from entering into an infinite loop """
+                from entering into an infinite loop in any case """
                 count1 = 1
-                while bolt_group_capacity1 < design_load_iter and count1 < 1:
+                while bolt_group_capacity1 < design_load_iter and count1 < 10:
                     count1 = count1+1
                     no_column1 = no_column1 + 1
                     no_bolts2 = no_rows1 * no_column1
@@ -350,17 +364,232 @@ for i in len(plate_details_iter):
                     else:
                         bolt_group_capacity1 = no_bolts2 * bolt1.friction_bolt_design_capacity()
 
+                """ overlap_length is the length required from the end of the plate to accommodate the member """
+                overlap_length = edge_dist1 + (no_column1 - 1) * pitch1
+
+                """ now we need to check for the tension or compression yielding capacity of the gusset plate on the 
+                 area corresponding to the whitmore width. It is the width obtained by connecting the ends of two
+                 line segments extending from the first bolt towards the load side to the last bolt, making an angle
+                 of 30 degree or pi/6 radian from the direction of load on either side of the load direction. 
+                 If the capacity thus obtained is less than the design action then a flag named safe_whitmore_section 
+                 is generated. if flag is no, then the loop will be broken from grade, diameter, member loop and the
+                 iteration should continue for the plate loop with the next plate size. """
+                whitmore_width = (no_rows1-1)*gauge1 + 2*(joint_len*(math.tan(math.pi/6)))
+                whitmore_eff_width = whitmore_width - no_rows1*bolt1.bolt_hole_dia
+                whitmore_area = whitmore_width*gusset_plate_t_fu_fy[0]
+                whitmore_eff_area = whitmore_eff_width*gusset_plate_t_fu_fy[0]
+
+                if member_detail_iter[5] == 'tension':
+                    gusset_yield_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_area,
+                                                                                        f_y=gusset_plate_t_fu_fy[2])
+
+                    gusset_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n=whitmore_eff_area,
+                                                                                           f_u=gusset_plate_t_fu_fy[1])
+
+                    if gusset_yield_capacity > design_load_iter and gusset_rupture_capacity > design_load_iter:
+                        safe_whitmore_section = True
+                    else:
+                        safe_whitmore_section = False
+                        """ coming out of grade of bolt loop """
+                        break
+                elif member_detail_iter[5] == 'compression':
+                    """ here we are trying to find the factored design compression considering the stress reduction
+                    factor (kai) as 1 as per cl 7.1.2 of IS800:2007. It is equal to (eff. area * fy/gamma_m0) """
+                    gusset_yield_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_eff_area,
+                                                                                        f_y=gusset_plate_t_fu_fy[2])
+                    if gusset_yield_capacity > design_load_iter:
+                        safe_whitmore_section = True
+                    else:
+                        safe_whitmore_section = False
+                        """ coming out of grade of bolt loop """
+                        break
+
+                """ now checking for block shear failure of members. t_db = block shear strength. If block shear failure
+                 can happen then the variable block_shear_failure = True """
+                block_shear_failure = False
+                if member_detail_iter[0] in ['Angles', 'Star Angles', 'Back to Back Angles']:
+                    if member_detail_iter[0] in ['Angles', 'Star Angles']:
+                        a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * member_detail_iter[2]
+                        a_vn = (edge_dist1 + (no_column1 - 1) * pitch1 - (no_column1 - 0.5) * bolt1.bolt_hole_dia) * \
+                               member_detail_iter[2]
+                        a_tg = (edge_dist1 + (no_rows1 - 1) * gauge1) * member_detail_iter[2]
+                        a_tn = (edge_dist1 + (no_rows1 - 1) * gauge1 - (no_rows1 - 0.5) * bolt1.bolt_hole_dia) * \
+                               member_detail_iter[2]
+
+                        t_db = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg, A_tn=a_tn,
+                                                                        f_u=member_detail_iter[3],
+                                                                        f_y=member_detail_iter[4])
+                    elif member_detail_iter[0] == 'Back to Back Angles':
+                        a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * member_detail_iter[2]
+                        a_vn = (edge_dist1 + (no_column1 - 1) * pitch1 - (no_column1 - 0.5) * bolt1.bolt_hole_dia) * \
+                               member_detail_iter[2]
+                        a_tg = (edge_dist1 + (no_rows1 - 1) * gauge1) * member_detail_iter[2]
+                        a_tn = (edge_dist1 + (no_rows1 - 1) * gauge1 - (no_rows1 - 0.5) * bolt1.bolt_hole_dia) * \
+                               member_detail_iter[2]
+
+                        t_db = 2 * IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
+                                                                            A_tn=a_tn,
+                                                                            f_u=member_detail_iter[3],
+                                                                            f_y=member_detail_iter[4])
+                    if t_db < design_load_iter:
+                        block_shear_failure = True
+                    elif t_db > design_load_iter:
+                        block_shear_failure = False
+                elif member_detail_iter[0] in ['Channels', 'Back to Back Channels']:
+                    if no_rows1 > 1:
+                        if member_detail_iter[0] == 'Channels':
+                            a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * member_detail_iter[2] * 2
+                            a_vn = (edge_dist1 + (no_column1 - 1) * pitch1 - (no_column1 - 0.5) * bolt1.bolt_hole_dia) * \
+                                    member_detail_iter[2] * 2
+                            a_tg = (no_rows1 - 1) * gauge1 * member_detail_iter[2]
+                            a_tn = ((no_rows1 - 1) * gauge1 - (no_rows1 - 1) * bolt1.bolt_hole_dia) * \
+                                    member_detail_iter[2]
+
+                            t_db = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
+                                                                            A_tn=a_tn,
+                                                                            f_u=member_detail_iter[3],
+                                                                            f_y=member_detail_iter[4])
+
+                        elif member_detail_iter[0] == 'Back to Back Channels':
+                            a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * member_detail_iter[2] * 2
+                            a_vn = (edge_dist1 + (no_column1 - 1) * pitch1 - (no_column1 - 0.5) * bolt1.bolt_hole_dia) * \
+                                   member_detail_iter[2] * 2
+                            a_tg = (no_rows1 - 1) * gauge1 * member_detail_iter[2]
+                            a_tn = ((no_rows1 - 1) * gauge1 - (no_rows1 - 1) * bolt1.bolt_hole_dia) * \
+                                   member_detail_iter[2]
+
+                            t_db = 2 * IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
+                                                                                A_tn=a_tn,
+                                                                                f_u=member_detail_iter[3],
+                                                                                f_y=member_detail_iter[4])
+                        if t_db < design_load_iter:
+                            block_shear_failure = True
+                        elif t_db > design_load_iter:
+                            block_shear_failure = False
+                    elif no_rows1 == 1:
+                        block_shear_failure = False
+
+                """ now checking block shear failure for the gusset plate. gusset_t_db = gusset block shear strength """
+                gusset_block_shear_failure = False
+                gusset_a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * gusset_plate_t_fu_fy[0] * 2
+                gusset_a_vn = (edge_dist1 + (no_column1 - 1) * pitch1 - (no_column1 - 0.5) * bolt1.bolt_hole_dia) * \
+                       gusset_plate_t_fu_fy[0] * 2
+                gusset_a_tg = (no_rows1 - 1) * gauge1 * gusset_plate_t_fu_fy[0]
+                gusset_a_tn = ((no_rows1 - 1) * gauge1 - (no_rows1 - 1) * bolt1.bolt_hole_dia) * \
+                       gusset_plate_t_fu_fy[0]
+
+                gusset_t_db = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=gusset_a_vg, A_vn=gusset_a_vn,
+                                                                       A_tg=gusset_a_tg,
+                                                                       A_tn=gusset_a_tn,
+                                                                       f_u=gusset_plate_t_fu_fy[1],
+                                                                       f_y=gusset_plate_t_fu_fy[2])
+                if gusset_t_db < design_load_iter:
+                    block_shear_failure = True
+                    """ coming out of bolt grade loop """
+                    break
+                elif gusset_t_db > design_load_iter:
+                    block_shear_failure = False
+
+                """ now storing the design data in a list called recommended_bolt which looks as follows:
+                 [dia, grade, num_bolts, rows, columns, group_capacity, block_shear_status, overlap_length, e, p, g ]"""
+                recommended_bolt = [bolt_dia1, bolt_grade1, no_bolts2, no_rows1, no_column1, bolt_group_capacity1,
+                                    block_shear_failure, overlap_length, edge_dist1, pitch1, gauge1]
+
+                candidate_bolts1 = candidate_bolts1 + [recommended_bolt]
+                recommended_bolt = []
 
 
 
 
-
-
-
-
-            if large_grip1 or no_rows < 1 or no_bolts1 < 2:
+            if large_grip1:
                 """ going for the next diameter in the diameter loop """
                 continue
+
+            if no_rows < 1:
+                """ going for the next diameter in the diameter loop """
+                continue
+
+            if no_bolts1 < 2:
+                """ going for the next diameter in the diameter loop """
+                continue
+
+            if safe_whitmore_section == False:
+                """ coming out of bolt dia loop """
+                break
+            else:
+                pass
+
+            if gusset_block_shear_failure == True:
+                """ coming out of bolt dia loop """
+                break
+        if safe_whitmore_section == False:
+            """ coming out of members loop """
+            break
+        else:
+            pass
+
+        if gusset_block_shear_failure == True:
+            """ coming out of member loop """
+            break
+
+        """ storing the bolts eligible for each member """
+        candidate_bolts_all = candidate_bolts_all + candidate_bolts1
+        candidate_bolts1 = []
+    if safe_whitmore_section == False:
+        """ going for the next thickness of the plate """
+        continue
+
+    if gusset_block_shear_failure == True:
+        """ going for the next thickness of the plate """
+        continue
+
+    """ now selecting the final bolts for each member """
+    """ first of we will check if the bolt_dia and grade of all the members are same then those will be selected """
+    final_selected_bolts = []
+    for p in reversed(candidate_bolts_all[0]):
+        final_selected_bolts = final_selected_bolts + [p]
+        for q in range(1, (len(candidate_bolts_all-1))):
+            for r in reversed(q):
+                if p[0] == r[0] and p[1] == r[1]:
+                    final_selected_bolts = final_selected_bolts + [r]
+                else:
+                    continue
+
+        if len(final_selected_bolts) == len(member_details):
+            break
+        else:
+            continue
+
+    """ if no common bolt_dia and grade is found then going to selected those with common grade but with different 
+    diameter """
+    if len(final_selected_bolts) != len(member_details):
+        final_selected_bolts = []
+        for p in reversed(candidate_bolts_all[0]):
+            final_selected_bolts = final_selected_bolts + [p]
+            for q in range(1, (len(candidate_bolts_all - 1))):
+                for r in reversed(q):
+                    if p[1] == r[1]:
+                        final_selected_bolts = final_selected_bolts + [r]
+                    else:
+                        continue
+
+            if len(final_selected_bolts) == len(member_details):
+                break
+            else:
+                continue
+
+    """if no bolts with common diameter and grade are there then go for the first entries from the last """
+    if len(final_selected_bolts) != len(member_details):
+        final_selected_bolts = []
+        for p in candidate_bolts_all:
+            final_selected_bolts += [p[len(p)-1]]
+
+
+
+
+
+
+
 
 
 

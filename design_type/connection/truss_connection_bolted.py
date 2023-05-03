@@ -1,12 +1,14 @@
 # Author: Devesh Kumar
 #from utils.common.is800_2007 import IS800_2007
 #import utils.common.is800_2007
-from utils.common import is800_2007
-#from utils.common.component import Bolt
+
+from utils.common.component import Bolt
 import copy
 #from utils.common.other_standards import *
 from utils.common.common_calculation import *
 import math
+from utils.common import is800_2007
+from utils.common.is800_2007 import IS800_2007
 
 """ ======The input values start here====== """
 
@@ -19,14 +21,15 @@ i.e.[section_profile, conn_part_width(mm), conn_part_t(mm), fu_memb(MPa), fy_mem
      here h1(mm) is the width available for bolt accommodation = conn_part_width - t_flanges - root_radi
 starting from 1st member and proceeding one by one.
 member_type means 'tension' or 'compression' or 'compression_butting' (str) """
-# be careful while connecting the input values of gross area of back to back members and star-angles
+# be careful while connecting the input values of gross area of back to back members (2Area) and star-angles(1 Area with
+# halved load)
 member_details = [['Angles', 70, 8, 410, 250, 'tension', 0, 858, 55.5],
                   ['Angles', 75, 10, 410, 250, 'compression', 45, 1152, 58.5],
                   ['Angles', 80, 8, 410, 250, 'tension', 90, 978, 65]
                   ]
 
 """ here type of bolt may be 'Bearing' or 'Friction'. It is also mandatory to connect the input values such that
- the values inside the 'grade' and the 'Diameter' key are in ascending order to avoid any unforeseen error """
+ the values inside the 'grade' and the 'Diameter'(mm) key are in ascending order to avoid any unforeseen error """
 bolts_details = {'type': 'Bearing', 'grade': [4.6, 4.8, 6.8], 'Diameter': [8, 10, 12, 20, 32], 'mu_f': 0.2}
 
 """List of the input of the [thickness, fu_plate, fy_plate] of gusset plate"""
@@ -44,55 +47,33 @@ load_details = [20, 25, 30]
 """ ======The input values end here====== """
 
 
-# input_Conn_Location = 'Angles'
-# input_dia_list = [8,10,12,16]
-# input_bolt_grades = [4.6,4.8,8.8]
-
-
 class bolt_general():
     def __init__(self, grade, bolt_dia, connection_plates_t_fu_fy, connection_plates_t, member_detail):
         self.grade = grade
         self.bolt_dia = bolt_dia
         """ conn_plates_t_fu_fy - List of tuples with plate thicknesses in mm, fu in MPa, fy in MPa (list of tuples)"""
         self.connection_plates_t_fu_fy = connection_plates_t_fu_fy
-        """ connection_plates_t - List of thicknesses in mm of connected plates (list or tuple)"""
+        """ connection_plates_t - List or tuple of thicknesses in mm of connected plates, the first entry being the 
+        thickness of gusset plate"""
         self.connection_plates_t = connection_plates_t
-        """ member_detail - 'Angles','Channels','Star Angles', 'Back to Back Angles','Back to Back Channels' """
+        """ example of member_detail - ['Angles', 70, 8, 410, 250, 'tension', 0, 858, 55.5] """
         self.member_detail = member_detail
-        self.bolt_hole_dia = is800_2007.IS800_2007.cl_10_2_1_bolt_hole_size(bolt_dia, 'Standard')
+        self.bolt_hole_dia = IS800_2007.cl_10_2_1_bolt_hole_size(bolt_dia, 'Standard')
         self.fu_b = bolt_general.f_u_bolt(grade=grade, bolt_dia=bolt_dia)
-        self.min_edge_dist = is800_2007.IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=self.bolt_dia, bolt_hole_type='Standard',
+        self.min_edge_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=self.bolt_dia, bolt_hole_type='Standard',
                                                                       edge_type='Sheared or hand flame cut')
-        # in the below variable global variable (connection_plates_t_fu_fy) is being used so care has to be taken that
-        # the global variable changes respectively for respective loop
-        self.max_edge_dist = is800_2007.IS800_2007.cl_10_2_4_3_max_edge_dist(self.connection_plates_t_fu_fy, False)
-        self.max_spacing = is800_2007.IS800_2007.cl_10_2_3_1_max_spacing(self.connection_plates_t)
-        self.min_pitch = is800_2007.IS800_2007.cl_10_2_2_min_spacing(d=bolt_dia)
-        self.max_pitch = is800_2007.IS800_2007.cl_10_2_3_2_max_pitch_tension_compression(d=bolt_dia,
+        self.max_edge_dist = IS800_2007.cl_10_2_4_3_max_edge_dist(self.connection_plates_t_fu_fy, False)
+        self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connection_plates_t)
+        self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(d=bolt_dia)
+        self.max_pitch = IS800_2007.cl_10_2_3_2_max_pitch_tension_compression(d=bolt_dia,
                                                                               plate_thicknesses=self.connection_plates_t,
                                                                               member_type=self.member_detail[5])
         self.pitch_provided = min(round_up(self.min_pitch, 5), round_down(self.max_pitch, 5))
         self.edge_dist_provided = min(round_up(self.min_edge_dist, 5), round_down(self.max_edge_dist, 5))
-        self.n_n = bolt_general.get_n_n(section_profile=member_detail)
+        self.n_n = bolt_general.get_n_n(section_profile=self.member_detail[0])
         self.a_nb = bolt_general.get_a_nb(bolt_dia=self.bolt_dia)
         self.a_sb = round(math.pi / 4 * bolt_dia ** 2)
 
-    def bolt_dia_number_bearing(self, conn_loc_t, guss_plate_t, diam=None, bolt_gr=None):
-        """will return the diameter and the no. of such bearing bolts required for a given member thickness
-        gusset thickness and given load"""
-
-        if diam == None or bolt_gr == None:
-            diam = self.dia_list
-            bolt_gr = self.bolt_grade
-
-        'selecting the min dia and removing the dia of bolt below that, required for a given member and '
-        'gusset thickness keeping large grip provision in mind'
-        m = len(diam)
-        for i in range(m):
-
-            if diam[i] <= (conn_loc_t + guss_plate_t) / 8:
-                trimmed_dia = copy.copy(diam)
-                del trimmed_dia[i]
 
     @staticmethod
     def get_n_n(section_profile):
@@ -109,7 +90,7 @@ class bolt_general():
 
     @staticmethod
     def f_u_bolt(grade, bolt_dia):
-        'returns the ultimate strength of the bolt as per Table -1 of IS 800: 2007'
+        """returns the ultimate strength of the bolt as per Table -1 of IS 800: 2007"""
         grade = float(grade)
         bolt_dia = float(bolt_dia)
 
@@ -165,25 +146,23 @@ class bearing_bolt(bolt_general):
         super().__init__(grade, bolt_dia, connection_plates_t_fu_fy, connection_plates_t, member_detail)
         # joint_length(lj) is the distance between the first and the last row of joint in the direction of load
         self.joint_length = joint_length
-        self.beta_lj = is800_2007.IS800_2007.cl_10_3_3_1_bolt_long_joint(d=self.bolt_dia, l_j=self.joint_length)
-        # if self.joint_length is not None:
-        # self.beta_lj = is800_2007.IS800_2007.cl_10_3_3_1_bolt_long_joint(d=self.bolt_dia, l_j=self.joint_length)
+        self.beta_lj = IS800_2007.cl_10_3_3_1_bolt_long_joint(d=self.bolt_dia, l_j=self.joint_length)
         # considering no packing plates to be used in the gusset connection, taking beta_pkg = 1
         self.beta_pkg = 1
         self.grip_length = sum(self.connection_plates_t)
-        self.beta_lg = is800_2007.IS800_2007.cl_10_3_3_2_bolt_large_grip(d=self.bolt_dia, l_g=self.grip_length,
+        self.beta_lg = IS800_2007.cl_10_3_3_2_bolt_large_grip(d=self.bolt_dia, l_g=self.grip_length,
                                                               l_j=self.joint_length)
         self.t_bearing = min(self.connection_plates_t[0], (sum(self.connection_plates_t) - self.connection_plates_t[0]))
 
     def bearing_bolt_design_capacity(self):
         v_dsb = self.beta_lj * self.beta_lg * self.beta_pkg * \
-                is800_2007.IS800_2007.cl_10_3_3_bolt_shear_capacity(f_ub=self.fu_b, A_nb=self.a_nb, A_sb=self.a_sb, n_n=self.n_n)
-        v_dpb = is800_2007.IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.member_detail[3], f_ub=self.fu_b, t=self.t_bearing,
+                IS800_2007.cl_10_3_3_bolt_shear_capacity(f_ub=self.fu_b, A_nb=self.a_nb, A_sb=self.a_sb, n_n=self.n_n)
+        v_dpb = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.member_detail[3], f_ub=self.fu_b, t=self.t_bearing,
                                                            d=self.bolt_dia, e=self.edge_dist_provided,
-                                                           p=self.pitch_provided, bolt_hole_type='Standard',
-                                                           safety_factor_parameter='Field weld')
+                                                           p=self.pitch_provided, bolt_hole_type='Standard')
+
         v_db = min(v_dsb, v_dpb)
-        return v_db
+        return round(v_db/1000, 3)
 
 
 class friction_bolt(bolt_general):
@@ -192,10 +171,10 @@ class friction_bolt(bolt_general):
         self.mu_f = mu_f
 
     def friction_bolt_design_capacity(self):
-        v_dsf = is800_2007.IS800_2007.cl_10_4_3_bolt_slip_resistance(f_ub=self.fu_b, A_nb=self.a_nb, n_e=self.n_n,
+        v_dsf = IS800_2007.cl_10_4_3_bolt_slip_resistance(f_ub=self.fu_b, A_nb=self.a_nb, n_e=self.n_n,
                                                           mu_f=self.mu_f, bolt_hole_type='Standard',
                                                           slip_resistance='ultimate_load')
-        return v_dsf[0]
+        return round(v_dsf[0]/1000, 3)
 
 
 """ creating some miscellaneous functions to be used in this module """
@@ -243,7 +222,8 @@ def get_clearance_d(alpha ,p0 , p1):
         c1 = (c*math.sin(alpha))/(1+c*math.cos(alpha))
         beta = math.atan(c1)
         d = p0/math.tan(beta)
-        return d
+        return round_up(d, 5)
+        # increased the calculated value by 5mm to provide some space between members on the plate
     elif alpha > 180:
         return
 
@@ -254,18 +234,22 @@ def get_quadrant(angle):
         return 1
     elif 90 < angle <= 180:
         return 2
-    elif 180 < angle <= 270:
+    elif 180 < angle < 270:
         return 3
-    elif 270 < angle <= 360:
+    elif 270 <= angle <= 360:  # actually 360 = 0 therefore input should not accept 360 instead that 0 should be input
         return 4
 
+
 """function to get included angle where included angle is the angle less than 180degrees between two lines. no need to
-worry about the sequence of the angles"""
-def get_included_angle(theta1,theta2):
+worry about the sequence of the angles. the angles should be positive and not greater than 360 """
+
+
+def get_included_angle(theta1, theta2):
     if abs(theta1-theta2) <= 180:
         return abs(theta1-theta2)
     elif abs(theta1-theta2) > 180:
         return 360-abs(theta1-theta2)
+
 
 """ function to get the value of d - the clearance for all members"""
 # defining a function which take lists [a,b,angle] for previous and the current member respectively and return p,p1
@@ -378,8 +362,8 @@ def rotate_points(points, angle):
     # Loop over input points
     for x, y in points:
         # Apply rotation formula to each point
-        x_rotated = round(x * math.cos(angle) - y * math.sin(angle))
-        y_rotated = round(x * math.sin(angle) + y * math.cos(angle))
+        x_rotated = round((x * math.cos(angle) - y * math.sin(angle)), 2)
+        y_rotated = round(x * math.sin(angle) + y * math.cos(angle), 2)
         # Add rotated point to list
         rotated_points.append((x_rotated, y_rotated))
     # Return list of rotated points
@@ -396,8 +380,8 @@ def polygon_side_lengths(vertices):
     n = len(vertices)
     for ijk in range(n):
         x__1, y__1 = vertices[ijk]
-        x__2, y__2 = vertices[(ijk+1)% n]
-        side_length = math.sqrt((x__2 - x__1)**2 + (y__2 - y__1)**2)
+        x__2, y__2 = vertices[(ijk+1) % n]
+        side_length = round(math.sqrt((x__2 - x__1)**2 + (y__2 - y__1)**2), 1)
         side_lengths.append(side_length)
     return side_lengths
 
@@ -407,7 +391,7 @@ def polygon_side_lengths(vertices):
 
 def gusset_design_comp_strength(whitmore_width_guss, sec_thick, clearance_d, fy_guss):
     """ radius of gyration taken as 0.2887*thickness considering buckling of rectangle section with
-    whitmore_width and  sec_thick as its dimension """
+    whitmore_width and  sec_thick(gusset plate thickness) as its dimension """
     rad_gyr = 0.2887*sec_thick
     k_l = 2*clearance_d
     # here clearance_d is offset from origin and k is taken 2 considering 1st case of table 11(IS800:2007)
@@ -420,38 +404,40 @@ def gusset_design_comp_strength(whitmore_width_guss, sec_thick, clearance_d, fy_
     phi_guss = 0.5*(1+alpha_guss*(lembda_guss-0.2)+lembda_guss**2)
     gamma_m0_guss = 1.1
     f_cd = min((fy_guss/gamma_m0_guss)/(phi_guss+(phi_guss**2-alpha_guss**2)**0.5), fy_guss/gamma_m0_guss)
-    p_d = f_cd * whitmore_width_guss * sec_thick
+    p_d = round((f_cd * whitmore_width_guss * sec_thick)/1000, 3)  # divided by 1000 to convert to KN
     return p_d
 
 
 """ starting the loop for the truss connection design. starting with selecting a thickness of a gusset plate and
 then for the same thickness all the joining members are designed for the available bolts. In the available bolts the 
-bolts that can be suitably used will be stored and later some common or most suitable bolt design will be selected"""
+bolts that can be suitably used will be stored and later the bolts common to all the members or most suitable 
+bolt design will be selected"""
 
 """ starting with selecting and deciding the thicknesses of the gusset plate for which the loop has to run """
 
 """ selecting the thickness of thickest connected member and for that first creating the list of thickness 
 of all the connected members named member_thickness_iter """
 member_thickness_iter = []
-for i in len(member_details):
+for i in range(len(member_details)):
     member_thickness_iter.append(member_details[i][2])
 
 
 """Creating a list of input plate thickness having thickness greater than the max of thickness of all the members as it
 is a thumb rule to take the thickness of the gusset plate greater than the thickness of any connecting member
-plate_details_iter is a list - 
-[section_profile, conn_part_width, conn_part_t, fu_memb, fy_memb, member_type, angle, A_g, h1]
+plate_details_iter is a list - [gusset thickness, fu of gusset plate, fy of gusset plate]
+member_detail_iter - [section_profile, conn_part_width, conn_part_t, fu_memb, fy_memb, member_type, angle, A_g, h1]
  here h1(mm) is the width available for bolt accommodation = conn_part_width - t_flanges - root_radius """
 plate_details_iter = []
-for i in len(plate_details):
+for i in range(len(plate_details)):
     if plate_details[i][0] > max(tuple(member_thickness_iter)):
         plate_details_iter.append(plate_details[i])
 
 large_grip1 = False
 safe_whitmore_section = True
 gusset_block_shear_failure = False
+mem_width_too_large = False
 """ Starting the loop of gusset plate """
-for i in len(plate_details_iter):
+for i in range(len(plate_details_iter)):
     """ defining candidate_bolts_all to store the eligible bolts for all the members. it is as follows:
     candidate_bolts_all = [[candidate_bolt1 of member1],[candidate_bolt1 of member2],[candidate_bolt1 of member3]]"""
     candidate_bolts_all = []
@@ -459,7 +445,9 @@ for i in len(plate_details_iter):
     """gusset_plate_t_fu_fy - [thickness, fu_plate, fy_plate] of gusset plate"""
     gusset_plate_t_fu_fy = plate_details_iter[i]
 
-    for j in len(member_details):
+    design_load_all = []
+
+    for j in range(len(member_details)):
         """ candidate_bolts1 is the list which will store all the combination of diameter and grade of bolt which can
         be used for the connection of that member. It will be empty for every value of j. the assignment of this 
         variable to an empty list will be done after adding this list to another list which stores such list for all 
@@ -496,20 +484,20 @@ for i in len(plate_details_iter):
 
         """ design_load_all is the list of load for which the members are being designed and design_load_iter is the
          load for which the member under the current loop has to be designed """
-        design_load_all = []
+
         design_load_iter = min(abs(load_details[j]), (
-                    0.3 * is800_2007.IS800_2007.cl_6_2_tension_yielding_strength(member_detail_iter[7], member_detail_iter[4])))
+                    0.3 * IS800_2007.cl_6_2_tension_yielding_strength(member_detail_iter[7], member_detail_iter[4])))
 
         design_load_all = design_load_all + [design_load_iter]
 
         """ bolt_dia_iter is a list having all the input bolt diameter e.g [8, 10, 12, 20, 32] """
         bolt_dia_iter = bolts_details['Diameter']
         bolt_grade_iter = bolts_details['grade']
-        for k in len(bolt_dia_iter):
+        for k in range(len(bolt_dia_iter)):
             bolt_dia1 = bolt_dia_iter[k]
 
             """ Now running a loop for every grade of bolts in the list of input grades of the bolt """
-            for l in len(bolt_grade_iter):
+            for l in range(len(bolt_grade_iter)):
                 bolt_grade1 = bolt_grade_iter[l]
 
                 """ creating an instance named bolt1 from the bearing bolt class or friction bolt class 
@@ -520,17 +508,17 @@ for i in len(plate_details_iter):
                     bolt1 = bearing_bolt(grade=bolt_grade1, bolt_dia=bolt_dia1,
                                          connection_plates_t_fu_fy=connection_plates_t_fu_fy_iter,
                                          connection_plates_t=thickness_connection_plates_t_iter,
-                                         member_detail=member_detail_iter[0], joint_length=joint_len)
+                                         member_detail=member_detail_iter, joint_length=joint_len)
                 else:
                     bolt1 = friction_bolt(grade=bolt_grade1, bolt_dia=bolt_dia1,
                                           connection_plates_t_fu_fy=connection_plates_t_fu_fy_iter,
                                           connection_plates_t=thickness_connection_plates_t_iter,
-                                          member_detail=member_detail_iter[0], mu_f=mu_f1)
+                                          member_detail=member_detail_iter, mu_f=mu_f1)
 
-                """ using large grip criteria as per Cl 10.3.3.2 of IS800:2007, ensuring the min dia bolt for which
+                """ using large grip criteria as per Cl 10.3.3.2 of IS800:2007, ensuring the minimum dia bolt for which
                  the loop should run """
                 large_grip1 = False
-                if bolt_dia_iter <= sum(thickness_connection_plates_t_iter) / 8:
+                if bolt_dia1 <= sum(thickness_connection_plates_t_iter) / 8:
                     large_grip1 = True
                     """ coming out of the bolt grade loop """
                     break
@@ -546,43 +534,16 @@ for i in len(plate_details_iter):
                     break
 
                 """ the edge distance, gauge and pitch used are represented as follows by edge_dist1, gauge1 
-                and pitch1 """
+                and pitch1 . edge_dist2 is the distance towards the toe side of an angle"""
                 edge_dist1 = bolt1.edge_dist_provided
                 edge_dist2 = edge_dist1
-                gauge1 = min((member_detail_iter[8] - 2 * edge_dist1) / (no_rows - 1), bolt1.max_spacing)
+                if no_rows == 1:
+                    gauge1 = 0
+                else:
+                    gauge1 = min((member_detail_iter[8] - 2 * edge_dist1) / (no_rows - 1), bolt1.max_spacing)
+
                 pitch1 = bolt1.pitch_provided
 
-                """ ensuring that the member is not so much big that the bolt's end distance becomes grater than the 
-                maximum edge distance. here we are using the whole width of the connected member because we are looking 
-                on the maximum side of the edge distance not the minimum (we provide minimum spacing so that we  
-                get space to work ). edge_dist1 is the spacing from the end of the root radius to the center of the 
-                bolthole. whereas edge_dist2 is the distance from the bolt hole center to the end of the toe."""
-                if no_rows1 == 1:
-                    if member_detail_iter[0] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                        edge_dist2 = member_detail_iter[8] - edge_dist1
-                        if edge_dist2 > bolt1.max_edge_dist:
-                            edge_dist2 = bolt1.max_edge_dist
-                            edge_dist1 = member_detail_iter[8] - edge_dist2
-
-                            if edge_dist1 > (bolt1.max_edge_dist-(member_detail_iter[1]-member_detail_iter[8])):
-                                print('edge distance exceeds the maximum edge distance')
-                                mem_width_too_large = True
-                                break
-                    elif member_detail_iter[0] in ['Channels', 'Back to Back Channels']:
-                        edge_dist1 = member_detail_iter[8]/2
-                        if edge_dist1 > (bolt1.max_edge_dist-(member_detail_iter[1]-member_detail_iter[8])/2):
-                            print('edge distance exceeds the maximum edge distance')
-                            mem_width_too_large = True
-                            break
-                else:
-                    if gauge1 == bolt1.max_spacing:
-                        edge_dist1 = min(((member_detail_iter[8] - (no_rows - 1) * gauge1) / 2),
-                                           bolt1.max_edge_dist)
-
-                    if (2 * edge_dist1 + (no_rows - 1) * gauge1) < member_detail_iter[8]:
-                        print('edge distance exceeds the maximum edge distance')
-                        mem_width_too_large = True
-                        break
 
                 """ finding the bolt capacity (bolt_capacity1) of the selected bolt and grade """
                 bolt_capacity1 = 0
@@ -637,6 +598,39 @@ for i in len(plate_details_iter):
                     else:
                         bolt_group_capacity1 = no_bolts2 * bolt1.friction_bolt_design_capacity()
 
+                """ ensuring that the member is not so much big that the bolt's end distance becomes grater than the 
+                maximum edge distance. here we are using the whole width of the connected member because we are looking 
+                on the maximum side of the edge distance not the minimum (we provide minimum spacing so that we  
+                get space to work ). edge_dist1 is the spacing from the end of the root radius to the center of the 
+                bolthole. whereas edge_dist2 is the distance from the bolt hole center to the end of the toe."""
+                if no_rows1 == 1:
+                    if member_detail_iter[0] in ['Angles', 'Star Angles', 'Back to Back Angles']:
+                        edge_dist2 = member_detail_iter[8] - edge_dist1
+                        if edge_dist2 > bolt1.max_edge_dist:
+                            edge_dist2 = bolt1.max_edge_dist
+                            edge_dist1 = member_detail_iter[8] - edge_dist2
+
+                            if edge_dist1 > (bolt1.max_edge_dist - (member_detail_iter[1] - member_detail_iter[8])):
+                                print('edge distance exceeds the maximum edge distance')
+                                mem_width_too_large = True
+                                break
+                    elif member_detail_iter[0] in ['Channels', 'Back to Back Channels']:
+                        edge_dist1 = member_detail_iter[8] / 2
+
+                        if edge_dist1 > (bolt1.max_edge_dist - (member_detail_iter[1] - member_detail_iter[8]) / 2):
+                            print('edge distance exceeds the maximum edge distance')
+                            mem_width_too_large = True
+                            break
+                else:
+                    if gauge1 >= bolt1.max_spacing:
+                        edge_dist1 = min(((member_detail_iter[8] - (no_rows - 1) * gauge1) / 2),
+                                         bolt1.max_edge_dist)
+
+                    if (2 * edge_dist1 + (no_rows - 1) * gauge1) < member_detail_iter[8]:
+                        print('edge distance exceeds the maximum edge distance')
+                        mem_width_too_large = True
+                        break
+
                 """ overlap_length is the length required from the end of the plate to accommodate the member """
                 overlap_length = edge_dist1 + (no_column1 - 1) * pitch1
 
@@ -653,11 +647,11 @@ for i in len(plate_details_iter):
                 whitmore_eff_area = whitmore_eff_width*gusset_plate_t_fu_fy[0]
 
                 if member_detail_iter[5] == 'tension':
-                    gusset_yield_capacity = is800_2007.IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_area,
-                                                                                        f_y=gusset_plate_t_fu_fy[2])
+                    gusset_yield_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_area,
+                                                                                        f_y=gusset_plate_t_fu_fy[2])/1000
 
-                    gusset_rupture_capacity = is800_2007.IS800_2007.cl_6_3_1_tension_rupture_strength(A_n=whitmore_eff_area,
-                                                                                           f_u=gusset_plate_t_fu_fy[1])
+                    gusset_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n=whitmore_eff_area,
+                                                                                           f_u=gusset_plate_t_fu_fy[1])/1000
 
                     if gusset_yield_capacity > design_load_iter and gusset_rupture_capacity > design_load_iter:
                         safe_whitmore_section = True
@@ -668,8 +662,8 @@ for i in len(plate_details_iter):
                 elif member_detail_iter[5] == 'compression':
                     """ here we are trying to find the factored design compression considering the stress reduction
                     factor (kai) as 1 as per cl 7.1.2 of IS800:2007. It is equal to (eff. area * fy/gamma_m0) """
-                    gusset_yield_capacity = is800_2007.IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_eff_area,
-                                                                                        f_y=gusset_plate_t_fu_fy[2])
+                    gusset_yield_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_eff_area,
+                                                                                        f_y=gusset_plate_t_fu_fy[2])/(0.9*1000)
                     if gusset_yield_capacity > design_load_iter:
                         safe_whitmore_section = True
                     else:
@@ -678,7 +672,7 @@ for i in len(plate_details_iter):
                         break
 
                 """ now checking for block shear failure of members. t_db = block shear strength. If block shear failure
-                 can happen then the variable block_shear_failure = True """
+                 can happen then the variable, block_shear_failure = True """
                 block_shear_failure = False
                 if member_detail_iter[0] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                     if member_detail_iter[0] in ['Angles', 'Star Angles']:
@@ -697,9 +691,9 @@ for i in len(plate_details_iter):
                             a_tn = (edge_dist1 + (no_rows1 - 1) * gauge1 - (no_rows1 - 0.5) * bolt1.bolt_hole_dia) * \
                                    member_detail_iter[2]
 
-                        t_db = is800_2007.IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg, A_tn=a_tn,
+                        t_db = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg, A_tn=a_tn,
                                                                         f_u=member_detail_iter[3],
-                                                                        f_y=member_detail_iter[4])
+                                                                        f_y=member_detail_iter[4])/1000
                     elif member_detail_iter[0] == 'Back to Back Angles':
                         if no_rows1 == 1:
                             a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * member_detail_iter[2]
@@ -716,10 +710,10 @@ for i in len(plate_details_iter):
                             a_tn = (edge_dist1 + (no_rows1 - 1) * gauge1 - (no_rows1 - 0.5) * bolt1.bolt_hole_dia) * \
                                    member_detail_iter[2]
 
-                        t_db = 2 * is800_2007.IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
+                        t_db = 2 * IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
                                                                             A_tn=a_tn,
                                                                             f_u=member_detail_iter[3],
-                                                                            f_y=member_detail_iter[4])
+                                                                            f_y=member_detail_iter[4])/1000
                     if t_db < design_load_iter:
                         block_shear_failure = True
                         continue
@@ -735,10 +729,10 @@ for i in len(plate_details_iter):
                             a_tn = ((no_rows1 - 1) * gauge1 - (no_rows1 - 1) * bolt1.bolt_hole_dia) * \
                                     member_detail_iter[2]
 
-                            t_db = is800_2007.IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
+                            t_db = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
                                                                             A_tn=a_tn,
                                                                             f_u=member_detail_iter[3],
-                                                                            f_y=member_detail_iter[4])
+                                                                            f_y=member_detail_iter[4])/1000
 
                         elif member_detail_iter[0] == 'Back to Back Channels':
                             a_vg = (edge_dist1 + (no_column1 - 1) * pitch1) * member_detail_iter[2] * 2
@@ -748,10 +742,10 @@ for i in len(plate_details_iter):
                             a_tn = ((no_rows1 - 1) * gauge1 - (no_rows1 - 1) * bolt1.bolt_hole_dia) * \
                                    member_detail_iter[2]
 
-                            t_db = 2 * is800_2007.IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
+                            t_db = 2 * IS800_2007.cl_6_4_1_block_shear_strength(A_vg=a_vg, A_vn=a_vn, A_tg=a_tg,
                                                                                 A_tn=a_tn,
                                                                                 f_u=member_detail_iter[3],
-                                                                                f_y=member_detail_iter[4])
+                                                                                f_y=member_detail_iter[4])/1000
                         if t_db < design_load_iter:
                             block_shear_failure = True
                             continue
@@ -769,11 +763,11 @@ for i in len(plate_details_iter):
                 gusset_a_tn = ((no_rows1 - 1) * gauge1 - (no_rows1 - 1) * bolt1.bolt_hole_dia) * \
                                gusset_plate_t_fu_fy[0]
 
-                gusset_t_db = is800_2007.IS800_2007.cl_6_4_1_block_shear_strength(A_vg=gusset_a_vg, A_vn=gusset_a_vn,
+                gusset_t_db = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=gusset_a_vg, A_vn=gusset_a_vn,
                                                                        A_tg=gusset_a_tg,
                                                                        A_tn=gusset_a_tn,
                                                                        f_u=gusset_plate_t_fu_fy[1],
-                                                                       f_y=gusset_plate_t_fu_fy[2])
+                                                                       f_y=gusset_plate_t_fu_fy[2])/1000
                 if gusset_t_db < design_load_iter:
                     gusset_block_shear_failure = True
                     """ coming out of bolt grade loop """
@@ -827,7 +821,7 @@ for i in len(plate_details_iter):
             break
 
         """ storing the bolts eligible for each member """
-        candidate_bolts_all = candidate_bolts_all + candidate_bolts1
+        candidate_bolts_all = candidate_bolts_all + [candidate_bolts1]
         candidate_bolts1 = []
     if not safe_whitmore_section:
         """ going for the next thickness of the plate """
@@ -966,7 +960,7 @@ for i in len(plate_details_iter):
                                                                      list5=sorted_lap_length)
     """the coordinate is stored in a list of tuples in an order which when joined, takes the shape of the gusset plate"""
     guss_coord = []
-    for x4 in len(asc_angle):
+    for x4 in range(len(asc_angle)):
         """ included angle between the first and the last entry of the asc_angle """
         included_angle_min_max = get_included_angle(theta1=asc_angle[0],
                                                     theta2=asc_angle[len(asc_angle)-1])

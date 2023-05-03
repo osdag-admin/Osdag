@@ -7746,6 +7746,233 @@ def prov_moment_load_bp(moment_input, min_mc, app_moment_load, moment_capacity, 
     app_moment_load_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
 
     return app_moment_load_eqn
+
+
+
+def comp_column_class_section_check_required( bucklingclass , h , bf ):
+    """
+    Args:
+        h:Depth of section(mm)                                                                   (float)
+        bf: Breadth of section(mm)                                                               (float)
+        bucklingclass: buckling class                                                             (float)
+    Returns:
+            bucklingclass_eq
+    Note:
+        Reference: IS 800 Cl.7.1.2.2
+        @author:Rutvik Joshi
+    """
+    bucklingclass_eq=Math(inline=True)
+    if bucklingclass==0.34:
+        bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}>1.2\\'))
+        bucklingclass_eq.append(NoEscape(r'                 t_\text{f}<=40\\'))
+        bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+    elif bucklingclass==0.49:
+        if h/bf>1.2:
+            bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}>1.2\\'))
+            bucklingclass_eq.append(NoEscape(r'40 <= t_\text{f} <= 100'))
+            bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+        else:
+            bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}<=1.2\\'))
+            bucklingclass_eq.append(NoEscape(r' t_\text{f} <= 100'))
+            bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+    elif bucklingclass==0.76:
+        bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}<=1.2\\'))
+        bucklingclass_eq.append(NoEscape(r' t_\text{f} > 100'))
+        bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+    return bucklingclass_eq
+
+
+def comp_column_class_section_check_provided( bucklingclass , h , bf , tf , var_h_bf ):
+    """
+    Args:
+        h:Depth of section(mm)                                                                   (float)
+        bf: Breadth of section(mm)                                                               (float)
+        bucklingclass: buckling class                                                             (float)
+    Returns:
+            bucklingclass_eq
+    Note:
+        Reference: IS 800 Cl.7.1.2.2
+        @author:Rutvik Joshi
+    """
+    bucklingclass_eq=Math(inline=True)
+    h=str(h)
+    bf=str(bf)
+    tf=str(tf)
+    var_h_bf=str(var_h_bf)
+
+    bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}&= frac{'+ h +r'}{' + bf + r'}\\'))
+    bucklingclass_eq.append(NoEscape(r'                                  &='+ var_h_bf +r'\\'))
+    bucklingclass_eq.append(NoEscape(r' t_f =' + tf + r' \\'))
+    bucklingclass_eq.append(NoEscape(r'&[\text{Ref. IS\:800:2007,\:Cl.7.1.2.2}]\end{aligned}'))
+    return bucklingclass_eq
+
+
+def cross_section_classification_required( section ):
+    """
+    Args:
+        section:type of section
+    Returns:
+            cross_section_classification_required_eq
+    Note:
+        Reference: IS 800 Cl.7.1.2.2
+        @author:Rutvik Joshi
+    """
+    section=str(section)
+    cross_section_classification_required_eq=Math(inline=True)
+    if section=='plastic':
+        cross_section_classification_required_eq.append(NoEscape(r'\begin{aligned} frac{b}{t_f} & < 9.4 \times {epsilon} and frac{d}{tw}<=42 \times {epsilon} \\'))
+    elif section=='compact':
+        cross_section_classification_required_eq.append(NoEscape(r'\begin{aligned} 9.4 \times {epsilon} < frac{b}{t_f} <10.5 \times {epsilon} and frac{d}{tw}<=42 \times {epsilon} \\'))
+    elif section=='semi-compact':
+        cross_section_classification_required_eq.append(NoEscape(r'\begin{aligned} 10.5 \times {epsilon} < frac{b}{t_f} <15.7 \times {epsilon} and frac{d}{tw}<=42 \times {epsilon} \\'))
+    cross_section_classification_required_eq.append(NoEscape(r'                                                    \end{aligned}'))
+    return cross_section_classification_required_eq
+
+
+def cross_section_classification_provided( tf , b1 , epsilon , section , b1_tf , d1_tw , ep1 , ep2 , ep3 , ep4 ):
+    """
+    Args:
+        tf:Thickness of flange(mm)                                                                   (float)
+        tw:Thickness of web(mm)                                                               (float)
+        b1,d1,epsilon,b1_tf,d1_tw,ep1,ep2,ep3,ep4....... refer 3.7.2 , 3.7.4                                                             (float)
+    Returns:
+            cross_section_classification_required_eq
+    Note:
+        Reference: IS 800 Cl:3.7.2 & 3.7.4
+        @author:Rutvik Joshi
+    """
+    tf = str(tf)
+    b1 = str(b1)
+    epsilon = str(epsilon)
+    section=str(section)
+    b1_tf=str(b1_tf)
+    d1_tw=str(d1_tw)
+    ep1=str(ep1)
+    ep2=str(ep2)
+    ep3=str(ep3)
+    ep4=str(ep4)
+    cross_section_classification_required_eq = Math(inline=True)
+    cross_section_classification_required_eq.append(NoEscape(r'\begin{aligned} frac{b}{t_f} & =frac{' + b1 + r'}{' + tf + r'} \\'))
+    cross_section_classification_required_eq.append(NoEscape(r'\'                                & =' + b1_tf + r'\\'))
+    if section=='plastic':
+        cross_section_classification_required_eq.append(NoEscape(r' 9.4 \times{ ' + epsilon + '} &='+ ep1 + r'\\'))
+    elif section=='compact':
+        cross_section_classification_required_eq.append(NoEscape(r' 9.4 \times{' + epsilon + '} &='+ ep1 + r'\text{and} 10.5 \times {' + epsilon + '} &='+ ep2 + r'\\'))
+    elif section=='semi_compact':
+        cross_section_classification_required_eq.append(NoEscape(r'  10.5 \times {' + epsilon + '} &='+ ep2 + r'\text{and} 15.7 \times{' + epsilon + '} &=' + ep3 + r'\\'))
+    cross_section_classification_required_eq.append(NoEscape(r' frac{d}{t_w}&=' + d1_tw + r'\\'))
+    cross_section_classification_required_eq.append(NoEscape(r' 42 \times ' + epsilon + ' &='+ ep4 + r'\\'))
+    cross_section_classification_required_eq.append(NoEscape(r' \text{Therefore section is }'+ section + r'\end{aligned}'))
+    return cross_section_classification_required_eq
+
+
+def cl_7_2_2_slenderness_required( KL , ry , lamba ):
+    """
+        Args:
+            KL,ry,lamba:refer cl:7.2.2
+        Returns:
+                slenderness_eq
+        Note:
+            Reference: IS 800 Cl:7.2.2
+            @author:Rutvik Joshi
+        """
+    slenderness_eq=Math(inline=True)
+    slenderness_eq.append(NoEscape(r'\begin{aligned} \text{slenderness ratio(\lambda)} =frac{KL}{ry}<=180 \end{aligned}'))
+
+
+def cl_7_2_2_slenderness_provided( KL , ry , lamba ):
+    """
+        Args:
+            KL,ry,lamba:refer cl:7.2.2
+        Returns:
+                slenderness_eq
+        Note:
+            Reference: IS 800 Cl:7.2.2
+            @author:Rutvik Joshi
+        """
+    KL = str(KL)
+    ry = str(ry)
+    lamba = str(lamba)
+    slenderness_eq=Math(inline=True)
+    slenderness_eq.append(NoEscape(r'\begin{aligned} \lambda =frac{'+ KL +r'}{'+ ry +r'\\'))
+    slenderness_eq.append(NoEscape(r'   &= '+ lamba + r'\end{aligned}'))
+
+
+def cl_7_1_2_1_fcd_check_required( gamma_mo , f_y , f_y_gamma_mo ):
+    """
+            Args:
+                facd:design compressive stress
+                gamma_mo:1.1
+                f_y:yield strength
+                f_y_gamma_mo:f_y/gamma_mo
+                axial:axial load
+                Aeff:Aeff area determined by code
+                A_eff_facd:A_eff*facd
+            Returns:
+                    facd_check_required_eq
+            Note:
+                Reference: IS 800 Cl:7.1.2.1
+                @author:Rutvik Joshi
+            """
+    f_y= str(f_y)
+    gamma_mo=str(gamma_mo)
+    f_y_gamma_mo=str(f_y_gamma_mo)
+    facd_check_required_eq=Math(inline=True)
+    facd_check_required_eq.append(NoEscape(r' \begin{aligned} f_\text{cd} & <= frac{d}{\gamma_\text{mo}'))
+    facd_check_required_eq.append(NoEscape(r'            & =frac{'+ f_y + r'}{'+ gamma_mo + r'}'))
+    facd_check_required_eq.append(NoEscape(r'            & = '+ f_y_gamma_mo + r'\\'))
+
+
+def cl_7_1_2_1_fcd_check_provided( facd  ):
+    """
+                Args:
+                    facd:design compressive stress
+                Returns:
+                        facd_check_required_eq
+                Note:
+                    Reference: IS 800 Cl:7.1.2.1
+                    @author:Rutvik Joshi
+                """
+    facd = str(facd)
+    facd_check_required_eq=Math(inline=True)
+    facd_check_required_eq.append(NoEscape(r'\begin{aligned} f_\text{cd} & ='+ facd + r'\end{aligned}'))
+
+
+def cl_7_1_2_design_comp_strength_required( axial ):
+    """
+                Args:
+                    axial:axial load
+                Returns:
+                        facd_check_required_eq
+                Note:
+                    Reference: IS 800 Cl:7.1.2
+                    @author:Rutvik Joshi
+                """
+    axial=str(axial)
+    facd_check_required_eq=Math(inline=True)
+    facd_check_required_eq.append(NoEscape(r' \begin{aligned} Compressive designed strength & = A_\text{eff} \times {f_\text{cd}} '))
+    facd_check_required_eq.append(NoEscape(r' A_\text{eff} \times {f_\text{cd}} & > axial end{aligned}'))
+    facd_check_required_eq.append(NoEscape(r' axial=' + axial + r'\end{aligned}'))
+
+
+def cl_7_1_2_design_comp_strength_provided( Aeff , facd , A_eff_facd ):
+    """
+                Args:
+                    facd:design compressive stress
+                    Aeff:Aeff area determined by code
+                    A_eff_facd:A_eff*facd
+                Returns:
+                        facd_check_required_eq
+                Note:
+                    Reference: IS 800 Cl:7.1.2
+                    @author:Rutvik Joshi
+                """
+    Aeff=str(Aeff)
+    facd=str(facd)
+    A_eff_facd=str(A_eff_facd)
+    facd_check_required_eq=Math(inline=True)
+    facd_check_required_eq.append(NoEscape(r' \begin{aglined} A_\text{eff} \times {f_\text{cd}} &=' + Aeff + ' \times ' + facd + r'\\'))
+    facd_check_required_eq.append(NoEscape(r' A_\text{eff_\text{provided}} \times {f_\text{cd}} & =' + A_eff_facd + r'\end{aligned}'))
 # def dia_plate_thk_provided(t_wc,)
 #     t_wc
 # t_wc = round((1.9 * self.load_moment_effective * 1e6) / (self.column_D * self.beam_D * self.column_fy), 2)

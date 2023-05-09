@@ -1,0 +1,2230 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Osdag help! &#8212; Main Home | Help_Design_Examples 2021.01 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Main Home | Help_Design_Examples 2021.01 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to Osdag help!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <a class="reference external image-reference" href="http://osdag.fossee.in/"><img alt="_images/website_header.png" src="_images/website_header.png" /></a>
+<div class="section" id="welcome-to-osdag-help">
+<h1>Welcome to Osdag help!<a class="headerlink" href="#welcome-to-osdag-help" title="Permalink to this headline">¶</a></h1>
+<dl>
+<dt>Osdag is a cross-platform free and open-source software for the design and detailing of steel structures, following relevant Indian Standards. Osdag is primarily built upon Python and other Python-based FOSS tools, such as, PyQt, OpenCascade, PythonOCC, SQLite, etc. It is developed by the Osdag team at IIT Bombay.</dt><dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd>
+</dl>
+<p>The OSI file of a sample design can be loaded through the <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">-&gt;</span> <span class="pre">Load</span> <span class="pre">input</span></code> option of the appropriate module.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The examples highlighted inside a box are from the <strong>Release 2018-06-21</strong>  and older versions of Osdag. Please use the examples with the appropriate version of Osdag.</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="osdag-homepage">
+<h2>Osdag <a class="reference external" href="http://osdag.fossee.in">Homepage</a>.<a class="headerlink" href="#osdag-homepage" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="connection">
+<h2>1.  <strong>Connection</strong><a class="headerlink" href="#connection" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="shear-connection">
+<h3>1.1. <em>Shear Connection</em><a class="headerlink" href="#shear-connection" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="fin-plate">
+<h4>1.1.1. Fin Plate<a class="headerlink" href="#fin-plate" title="Permalink to this headline">¶</a></h4>
+<p>1.1.1.1 Column Flange-Beam Web (CFBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Fin Plate</em> connection for a beam <em>MB 350</em> connected to a column <em>HB 450</em> to transfer a factored shear force of <strong>180 kN</strong> and an axial force of <strong>50 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 12, 16, 20, 24, 30; Grade: 4.6, 4.8, 5.6, 6.8, 8.8</p></li>
+<li><p><strong>Plate:</strong> Material E 350 (Fe 490); Thickness (mm): 10, 12, 16, 18, 20</p></li>
+<li><p>Bolt hole type is standard and slip factor is 0.3</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 15 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.1.1.1.pdf">DesignReport_1.1.1.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.1.1.1.osi">Example_1.1.1.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Fin Plate</em> connection for a beam <em>WB 300</em> connected to a column <em>PBP 300 X 88.48</em> to transfer a factored shear force of <strong>175 kN</strong> and an axial force of <strong>35 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20; Grade: 6.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.1.1.2.pdf">DesignReport_1.1.1.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.1.1.2.osi">Example_1.1.1.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.1.2. Column Web-Beam Web (CWBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Fin Plate</em> connection for a beam <em>NPB 350 X 250 X 79.18</em> connected to a column <em>PBP 400 X 230.9</em> to transfer a factored shear force of <strong>225 kN</strong> and an axial force of <strong>100 kN</strong>.
+The grade of the beam and the column material is <strong>E 350 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 12, 16, 20, 24 ; Grade: 4.6, 8.8, 10.9</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 12, 14, 16, 18, 20, 22, 25</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 510 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 12 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.1.2.1.pdf">DesignReport_1.1.1.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.1.2.1.osi">Example_1.1.1.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Fin Plate</em> connection for a beam <em>WPB 300 X 300 X 100.85</em> connected to a column <em>UC 356 X 368 X 129</em> to transfer a factored shear force of <strong>140 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16; Grade: 4.6</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.1.2.2.pdf">DesignReport_1.1.1.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.1.2.2.osi">Example_1.1.1.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.1.3. Beam-Beam (BB) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Fin Plate</em> connection for a primary beam <em>WB 400</em> connected to a secondary beam <em>MB 300</em> to transfer a factored shear force of <strong>160 kN</strong> and an axial force of <strong>20 kN</strong>.
+The grade of the primary and secondary beam material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 16, 20, 24 ; Grade: 8.8, 10.9</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 18, 20, 22</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Sand blast (slip factor = 0.48)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 5 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.1.3.1.pdf">DesignReport_1.1.1.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.1.3.1.osi">Example_1.1.1.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Fin Plate</em> connection for a primary beam <em>UB 305 x 102 x 33</em> connected to a secondary beam <em>MB 300</em> to transfer a factored shear force of <strong>100 kN</strong>.
+The grade of the primary and secondary beam material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16; Grade: 5.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.1.3.2.pdf">DesignReport_1.1.1.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.1.3.2.osi">Example_1.1.1.3.2.osi</a>.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong>  and lower versions - Fin Plate</p>
+<p>1.1.1.1 Column Flange-Beam Web (CFBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a fin plate connection between a beam MB 500 and a column UC 305 x 305 x 97 for transferring a vertical (factored) shear force of 140 kN. Use M24 Friction grip bolts of grade 8.8. Try 12mm thick fin plate with weld thickness of 12mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, weld type as shop weld and type of edge as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.1.1.1.pdf">Design_Report_1.1.1.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.1.1.1.osi">Design_Example_1.1.1.1.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a fin plate connection between a beam MB 350 and a column SC 200 for transferring a vertical (factored) shear force of 150 kN. Use M20 bearing bolts of grade 4.6. Try 12mm thick fin plate with weld thickness of 8mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume weld type as shop weld and type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.1.1.2.pdf">Design_Report_1.1.1.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.1.1.2.osi">Design_Example_1.1.1.1.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong>  and lower versions - Fin Plate</p>
+<p>1.1.1.2. Column Web-Beam Web (CWBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a fin plate connection between a beam UB 356 x 171 x 45 and a column PBP 300 x 180 for transferring a vertical (factored) shear force of 120 kN. Use M16 Friction grip bolts of grade 8.8. Try 8mm thick fin plate with weld thickness of 8mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, slip factor of 0.25, type of weld as field weld and edge as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.1.2.1.pdf">Design_Report_1.1.1.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.1.2.1.osi">Design_Example_1.1.1.2.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a fin plate connection between a beam LB 300 and a column SC 250 for transferring a vertical (factored) shear force of 135 kN. Use M24 bearing bolts of grade 4.8. Try 10mm thick fin plate with weld thickness of 8mm. Take Fe410 grade steel fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, type of weld as shop weld and edge as hand flame cut and environment as corrosive.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.1.2.2.pdf">Design_Report_1.1.1.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.1.2.2.osi">Design_Example_1.1.1.2.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong>  and lower versions - Fin Plate</p>
+<p>1.1.1.3. Beam-Beam (BB) connectivity</p>
+<blockquote>
+<div><p><em>Sample Problem 1</em></p>
+<blockquote>
+<div><p>Design a fin plate connection between a primary beam MB 350 and a secondary beam NPB 270 x 135 x 36.1 for transferring a vertical (factored) shear force of 110 kN. Use M20 Friction grip bolts of grade 10.9. Try 10mm thick fin plate with weld thickness of 8mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume slip factor of 0.52, bolt hole type oversized and type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.1.3.1.pdf">Design_Report_1.1.1.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.1.3.1.osi">Design_Example_1.1.1.3.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a fin plate connection between a primary beam WPB 450 x 300 x 99.7 and a secondary beam UB 356 x 171 x 67 for transferring a vertical (factored) shear force of 220 kN. Use M24 Friction grip bolts of grade 10.9. Try 14mm thick fin plate with weld thickness of 12mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume slip factor of 0.48, bolt hole type standard, weld type as shop weld and type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.1.3.2.pdf">Design_Report_1.1.1.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.1.3.2.osi">Design_Example_1.1.1.3.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="end-plate">
+<h4>1.1.2. End Plate<a class="headerlink" href="#end-plate" title="Permalink to this headline">¶</a></h4>
+<p>1.1.2.1. Column Flange-Beam Web (CFBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design an <em>End Plate</em> connection for a beam <em>LB 400</em> connected to a column <em>PBP 300 X 109.54</em> to transfer a factored shear force of <strong>240 kN</strong> and an axial force of <strong>125 kN</strong>.
+The grade of the beam and the column material are <strong>E 250 (Fe 410 W)A</strong> and <strong>E 350 (Fe 490)</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16, 20, 24, 30; Grade: 4.8, 5.6, 6.8, 9.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14, 16, 18, 20, 22, 25, 28</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.2.1.1.pdf">DesignReport_1.1.2.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.2.1.1.osi">Example_1.1.2.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design an <em>End Plate</em> connection for a beam <em>UB 356 x 127 x 39</em> connected to a column <em>UB 254 x 254 x 89</em> to transfer a factored shear force of <strong>250 kN</strong> and an axial force of <strong>80 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 24; Grade: 8.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 18</p></li>
+<li><p>Bolt hole type is standard and slip factor is 0.25</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.2.1.2.pdf">DesignReport_1.1.2.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.2.1.2.osi">Example_1.1.2.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.2.2. Column Web-Beam Web (CWBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design an <em>End Plate</em> connection for a beam <em>WB 300</em> connected to a column <em>HB 350</em> to transfer a factored shear force of <strong>220 kN</strong> and an axial force of <strong>30 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16, 20, 24; Grade: 4.6, 4.8, 5.6, 5.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14, 16, 20</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 500 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.2.2.1.pdf">DesignReport_1.1.2.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.2.2.1.osi">Example_1.1.2.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design an <em>End Plate</em> connection for a beam <em>MB 400</em> connected to a column <em>HB 350</em> to transfer a factored shear force of <strong>275 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20; Grade: 9.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness(mm): 20</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.2.2.2.pdf">DesignReport_1.1.2.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.2.2.2.osi">Example_1.1.2.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.2.3. Beam-Beam (BB) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design an <em>End Plate</em> connection for a primary beam <em>WB 400</em> connected to a secondary beam <em>MB 300</em> to transfer a factored shear force of <strong>160 kN</strong> and an axial force of <strong>20 kN</strong>.
+The grade of the primary and secondary beam material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 16, 20, 24 ; Grade: 8.8, 10.9</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 18, 20, 22</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Sand blast (slip factor = 0.48)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.2.3.1.pdf">DesignReport_1.1.2.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.2.3.1.osi">Example_1.1.2.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design an <em>End Plate</em> connection for a primary beam <em>UB 305 x 102 x 33</em> connected to a secondary beam <em>MB 300</em> to transfer a factored shear force of <strong>100 kN</strong>.
+The grade of the primary and secondary beam material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16; Grade: 5.8</p></li>
+<li><p><strong>Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.2.3.2.pdf">DesignReport_1.1.2.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.2.3.2.osi">Example_1.1.2.3.2.osi</a>.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong> and lower versions - End Plate</p>
+<p>1.1.2.1. Column Flange-Beam Web (CFBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design an end plate connection between a beam MB 350 and a column SC 250 for transferring a vertical (factored) shear force of 140 kN. Use M20 bearing bolts of grade 4.6. Try 10mm thick end plate with weld thickness of 6mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, weld type shop weld and type of edge as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.2.1.1.pdf">Design_Report_1.1.2.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.2.1.1.osi">Design_Example_1.1.2.1.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design an end plate connection between a beam MB 300 and a column UC 254 x254 x 107 for transferring a vertical (factored) shear force of 195 kN. Use M16 Friction grip bolts of grade 8.8. Try 12mm thick end plate with weld thickness of 10mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, weld type shop weld and type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.2.1.2.pdf">Design_Report_1.1.2.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.2.1.2.osi">Design_Example_1.1.2.1.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong> and lower versions - End Plate</p>
+<p>1.1.2.2. Column Web-Beam Web (CWBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design an end plate connection between a beam UB 356 x 171 x 45 and a column PBP 300 x 180 for transferring a vertical (factored) shear force of 120 kN. Use M16 Friction grip bolts of grade 10.9. Try 12mm thick end plate with weld thickness of 6mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, slip factor of 0.25, type of weld as field weld and edge type as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.2.2.1.pdf">Design_Report_1.1.2.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.2.2.1.osi">Design_Example_1.1.2.2.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design an end plate connection between a beam LB 300 and a column SC 250 for transferring a vertical (factored) shear force of 135 kN. Use M12 bearing bolts of grade 4.8. Try 10mm thick end plate with weld thickness of 10mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, type of weld as shop weld and edge type as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.2.2.2.pdf">Design_Report_1.1.2.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.2.2.2.osi">Design_Example_1.1.2.2.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong> and lower versions - End Plate</p>
+<p>1.1.2.3. Beam-Beam (BB) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design an end plate connection between a primary beam MB 500 and a secondary beam MB 400 for transferring a vertical (factored) shear force of 160 kN. Use M20 Friction grip bolts of grade 8.8. Try 16mm thick end plate with weld thickness of 8mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume slip factor of 0.2, bolt hole type as oversized, weld type shop weld and type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.2.3.1.pdf">Design_Report_1.1.2.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.2.3.1.osi">Design_Example_1.1.2.3.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design an end plate connection between a primary beam WPB 450 x 300 x 99.7 and a secondary beam UB 356 x 171 x 67 for transferring a vertical (factored) shear force of 220 kN. Use M24 Friction grip bolts of grade 10.9. Try 14mm thick end plate with weld thickness of 12mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume slip factor of 0.48, bolt hole type as standard, weld type shop weld and type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.2.3.2.pdf">Design_Report_1.1.2.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.2.3.2.osi">Design_Example_1.1.2.3.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="cleat-angle">
+<h4>1.1.3. Cleat Angle<a class="headerlink" href="#cleat-angle" title="Permalink to this headline">¶</a></h4>
+<p>1.1.3.1. Column Flange-Beam Web (CFBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Cleat Angle</em> connection for a beam <em>MB 300</em> connected to a column <em>HB 250</em> to transfer a factored shear force of <strong>130 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16, 20; Grade: 4.6, 4.8</p></li>
+<li><p><strong>Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 90 x 90 x 10, 90 x 90 x 12, 100 x 100 x 6, 100 x 100 x 8</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.3.1.1.pdf">DesignReport_1.1.3.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.3.1.1.osi">Example_1.1.3.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Cleat Angle</em> connection for a beam <em>MB 450</em> connected to a column <em>UC 305 x 305 x 118</em> to transfer a factored shear force of <strong>240 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 20; Grade: 12.9</p></li>
+<li><p><strong>Cleat Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 120 x 120 x 8</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Clean mill scale (slip factor = 0.33)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.3.1.2.pdf">DesignReport_1.1.3.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.3.1.2.osi">Example_1.1.3.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.3.2. Column Web-Beam Web (CWBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Cleat Angle</em> connection for a beam <em>WPB 250 X 250 X 85.4</em> connected to a column <em>PBP 300 X 95</em> to transfer a factored shear force of <strong>170 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16, 20, 24; Grade: 6.8, 8.8, 98</p></li>
+<li><p><strong>Angle:</strong> Material E 250 (Fe 410 W)A; Designation: All the sections available with the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.3.2.1.pdf">DesignReport_1.1.3.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.3.2.1.osi">Example_1.1.3.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Cleat Angle</em> connection for a beam <em>MB 450</em> connected to a column <em>UC 305 x 305 x 118</em> to transfer a factored shear force of <strong>240 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 20; Grade: 12.9</p></li>
+<li><p><strong>Cleat Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 80 x 80 x 8</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Clean mill scale (slip factor = 0.33)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.3.2.2.pdf">DesignReport_1.1.3.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.3.2.2.osi">Example_1.1.3.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.3.3. Beam-Beam (BB) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Cleat Angle</em> connection for a primary beam <em>WB 400</em> connected to a secondary beam <em>MB 300</em> to transfer a factored shear force of <strong>160 kN</strong>.
+The grade of the primary and secondary beam material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 16, 20, 24 ; Grade: 8.8, 12.9</p></li>
+<li><p><strong>Cleat Angle:</strong> Material E 165 (Fe 290); Designation: 80 x 80 x 8, 90 x 90 x 6, 90 x 90 x 8, 90 x 90 x 10, 90 x 90 x 12, 100 x 100 x 8, 100 x 100 x 10, 110 x 110 x 10</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Sand blast (slip factor = 0.48)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.3.3.1.pdf">DesignReport_1.1.3.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.3.3.1.osi">Example_1.1.3.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Cleat Angle</em> connection for a primary beam <em>UB 305 x 102 x 33</em> connected to a secondary beam <em>MB 300</em> to transfer a factored shear force of <strong>100 kN</strong>.
+The grade of the primary and secondary beam material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16; Grade: 5.8</p></li>
+<li><p><strong>Cleat Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 130 x 130 x 10</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.3.3.2.pdf">DesignReport_1.1.3.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.3.3.2.osi">Example_1.1.3.3.2.osi</a>.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Examples for <strong>Release 2018-06-21</strong> and lower versions - Cleat Angle</p>
+<p>1.1.3.1. Column Flange-Beam Web (CFBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a cleat angle connection between a beam MB 400 and a column SC 250 for transferring a vertical (factored) shear force of 140 kN. Use M20 Friction grip bolts of grade 8.8. Try cleat angle of size 90 x 90 x 12. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume slip factor of 0.48, bolt hole type as standard and type of edge as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.3.1.1.pdf">Design_Report_1.1.3.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.3.1.1.osi">Design_Example_1.1.3.1.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a cleat angle connection between a beam MB 350 and a column HB 300 for transferring a vertical (factored) shear force of 170 kN. Use M16 bearing bolts of grade 4.6. Try cleat angle of size 100 x 100 x 12. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, type of edge as machine flame cut and environment as corrosive.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.3.1.2.pdf">Design_Report_1.1.3.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.3.1.2.osi">Design_Example_1.1.3.1.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Examples for <strong>Release 2018-06-21</strong> and lower versions - Cleat Angle</p>
+<p>1.1.3.2. Column Web-Beam Web (CWBW) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a cleat angle connection between a beam MB 350 and a column UC 305 x 305 x 97 for transferring a vertical (factored) shear force of 120.5 kN. Use M20 Friction grip bolts of grade 8.8. Try cleat angle of size 110 x 110 x 16. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, slip factor of 0.2, type of edge as hand flame cut and gap between column and beam as 5mm.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.3.2.1.pdf">Design_Report_1.1.3.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.3.2.1.osi">Design_Example_1.1.3.2.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a cleat angle connection between a beam MB 200 and a column UC 305 x 305 x 118 for transferring a vertical (factored) shear force of 80 kN. Use M12 bearing bolts of grade 6.8. Try cleat angle of size 110 x 110 x 16. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, type of edge as hand flame cut and environment as corrosive.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.3.2.2.pdf">Design_Report_1.1.3.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.3.2.2.osi">Design_Example_1.1.3.2.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Examples for <strong>Release 2018-06-21</strong> and lower versions - Cleat Angle</p>
+<p>1.1.3.3. Beam-Beam (BB) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a cleat angle connection between a primary beam WB 450 and a secondary beam MB 400 for transferring a vertical (factored) shear force of 145 kN. Use M24 bearing bolts of grade 4.6. Try cleat angle of size 100 100 x 10. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard and type of edge as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.3.3.1.pdf">Design_Report_1.1.3.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.3.3.1.osi">Design_Example_1.1.3.3.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a cleat angle connection between a primary beam WPB 280x280x61.2 and a secondary beam NPB 220x110x29.4 for transferring a vertical (factored) shear force of 100 kN. Use M20 Friction grip bolts of grade 10.9. Try cleat angle of size 100 100 x 8. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as oversized, slip factor of 0.52, type of edge as machine flame cut and gap between column and beam as 15mm.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.3.3.2.pdf">Design_Report_1.1.3.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.3.3.2.osi">Design_Example_1.1.3.3.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="seated-angle">
+<h4>1.1.4. Seated Angle<a class="headerlink" href="#seated-angle" title="Permalink to this headline">¶</a></h4>
+<p>1.1.4.1. Column Flange-Beam Flange (CFBF) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Seated Angle</em> connection for a beam <em>WB 400</em> connected to a column <em>PBP 360 X 152.2</em> to transfer a factored shear force of <strong>210 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8</p></li>
+<li><p><strong>Seated Angle:</strong> Material E 300 (Fe 440); Designation: All the sections available with the Osdag database</p></li>
+<li><p><strong>Top Angle:</strong> Material E 300 (Fe 440); Designation: All the sections available with the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.4.1.1.pdf">DesignReport_1.1.4.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.4.1.1.osi">Example_1.1.4.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Seated Angle</em> connection for a beam <em>MB 500</em> connected to a column <em>UC 305 x 305 x 118</em> to transfer a factored shear force of <strong>185 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Diameter: 20; Grade: 12.9</p></li>
+<li><p><strong>Seated Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 150 x 150 x 10</p></li>
+<li><p><strong>Top Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 150 x 150 x 10</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Blasted with short or grit, loose rust removed (slip factor = 0.5)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.4.1.2.pdf">DesignReport_1.1.4.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.4.1.2.osi">Example_1.1.4.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.1.4.2. Column Web-Beam Flange (CWBF) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Seated Angle</em> connection for a beam <em>MB 400</em> connected to a column <em>HB 450</em> to transfer a factored shear force of <strong>230 kN</strong>.
+The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8</p></li>
+<li><p><strong>Seated Angle:</strong> Material E 250 (Fe 410 W)A; Designation: All the sections available with the Osdag database</p></li>
+<li><p><strong>Top Angle:</strong> Material E 250 (Fe 410 W)A; Designation: All the sections available with the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.4.2.1.pdf">DesignReport_1.1.4.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.4.2.1.osi">Example_1.1.4.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Seated Angle</em> connection for a beam <em>LB 325</em> connected to a column <em>UC 203 x 203 x 52</em> to transfer a factored shear force of <strong>90 kN</strong>.
+The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16; Grade: 8.8</p></li>
+<li><p><strong>Seated Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 90 x 90 x 10</p></li>
+<li><p><strong>Top Angle:</strong> Material E 250 (Fe 410 W)A; Designation: 80 x 80 x 10</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 10 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.1.4.2.2.pdf">DesignReport_1.1.4.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.1.4.2.2.osi">Example_1.1.4.2.2.osi</a>.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Examples for <strong>Release 2018-06-21</strong> and lower versions - Seated Angle</p>
+<p>1.1.4.1. Column Flange-Beam Flange (CFBF) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a seated angle connection between a beam MB 300 and a column UC 203 x 203 x 86 for transferring a vertical (factored) shear force of 100 kN. Use M20 Friction grip bolts of grade 10.9. Try a top angle of size 150 150 x 10 and seated angle of size 150 150 x 15. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume slip factor of 0.55, bolt fu = 940 MPa and type of edge as hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.4.1.1.pdf">Design_Report_1.1.4.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.4.1.1.osi">Design_Example_1.1.4.1.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a seated angle connection between a beam MB 200 and a column SC 140 for transferring a vertical (factored) shear force of 140 kN. Use M12 bearing bolts of grade 6.8. Try a top angle of size 90 90 x 8 and seated angle of size 110 110 x 16. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume type of edge as hand flame cut and environment as corrosive.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.4.1.2.pdf">Design_Report_1.1.4.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.4.1.2.osi">Design_Example_1.1.4.1.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Examples for <strong>Release 2018-06-21</strong> and lower versions - Seated Angle</p>
+<p>1.1.4.2. Column Web-Beam Flange (CWBF) connectivity</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a seated angle connection between a beam NPB 250x150x39.8 and a column PBP 300x180 for transferring a vertical (factored) shear force of 80 kN. Use M16 bearing bolts of grade 5.8. Try a top angle of size 90 90 x 10 and seated angle of size 150 150 x 15. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume type of edge as machine flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.4.2.1.pdf">Design_Report_1.1.4.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.4.2.1.osi">Design_Example_1.1.4.2.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a seated angle connection between a beam WPB 140x140x24.7 and a column HB 200 for transferring a vertical (factored) shear force of 140 kN. Use M12 bearing bolts of grade 5.8. Try a top angle of size 90 90 x 10 and seated angle of size 150 150 x 15. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as Oversized, type of edge as machine flame cut and gap between column and beam as 5mm.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.1.4.2.2.pdf">Design_Report_1.1.4.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.1.4.2.2.osi">Design_Example_1.1.4.2.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="moment-connection">
+<h3>1.2. <em>Moment Connection</em><a class="headerlink" href="#moment-connection" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="beam-to-beam-splice-connection">
+<h4>1.2.1. Beam-to-Beam Splice Connection<a class="headerlink" href="#beam-to-beam-splice-connection" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="cover-plate-bolted">
+<h5>1.2.1.1. Cover Plate Bolted<a class="headerlink" href="#cover-plate-bolted" title="Permalink to this headline">¶</a></h5>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam Cover Plate Splice</em> connection for a beam <em>UB 610 x 305 x 179</em>. The grade of the beam material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 300 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 160 kN</p></li>
+<li><p><strong>Axial Force</strong>: 40 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30, 36; Grade: 6.8, 8.8, 9.8</p></li>
+<li><p><strong>Flange Splice Plate:</strong> Material E 250 (Fe 410 W)A; Preference: Outside; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.1.1.pdf">DesignReport_1.2.1.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.1.1.osi">Example_1.2.1.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam Cover Plate Splice</em> connection for a beam <em>WPB 900 x 300 x 198.01</em>. The grade of the beam material is <strong>E 350 (Fe 490)</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 395 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 110 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 24; Grade: 8.8</p></li>
+<li><p><strong>Flange Splice Plate:</strong> Material E 300 (Fe 440); Preference: Outside + Inside; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 300 (Fe 440); Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.1.2.pdf">DesignReport_1.2.1.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.1.2.osi">Example_1.2.1.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong> and lower versions - Cover Plate Bolted Connection</p>
+<p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a bolted cover plate splice connection for beam MB 450 to transfer a factored external moment of 140 kNm, factored shear of 110 kN and factored axial force of 40 kN. Use M20 Friction grip bolts of grade 8.8. Try 20mm thick flange splice plate and 10mm thick web splice plate. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as standard, edge as hand flame cut, gap between the beams as 5mm and surface of the metal to be treated with sand blast.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.2.1.1.1.1.pdf">Design_Report_1.2.1.1.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.2.1.1.1.1.osi">Design_Example_1.2.1.1.1.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a bolted cover plate splice connection for beam NPB 350 x 250 x 79.2 to transfer a factored external moment and shear force of 225 kNm ad 55 kN. Use M24 Friction grip bolts of grade 10.9. Try 14mm thick flange splice plate and 6mm thick web splice plate. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume bolt hole type as oversized, edge as machine-flame cut, slip factor as 0.33 and gap between the beams as 3mm.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.2.1.1.1.2.pdf">Design_Report_1.2.1.1.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.2.1.1.1.2.osi">Design_Example_1.2.1.1.1.2.osi</a>.</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h5>1.2.1.2. End Plate<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h5>
+<p>1.2.1.2.1. Coplanar Tension-Compression Flange</p>
+<p>1.2.1.2.1.1. Flushed - Reversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam End Plate Splice</em> connection for a beam <em>WB 500</em>. The grade of the beam material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 250 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 120 kN</p></li>
+<li><p><strong>Axial Force</strong>: 35 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 6.8, 8.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 20, 22, 25, 28, 32</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 500 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.2.1.1.1.pdf">DesignReport_1.2.1.2.1.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.2.1.1.1.osi">Example_1.2.1.2.1.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam End Plate Splice</em> connection for a beam <em>MB 400</em>. The grade of the beam material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 100 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 40 kN</p></li>
+<li><p><strong>Axial Force</strong>: 20 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 16; Grade: 12.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 22</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Sand blast (slip factor = 0.48)</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are exposed to marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.2.1.1.2.pdf">DesignReport_1.2.1.2.1.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.2.1.1.2.osi">Example_1.2.1.2.1.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.1.2.1.2. Extended One way - Irreversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam End Plate Splice</em> connection for a beam <em>UB 610 x 229 x 125</em>. The grade of the beam material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 300 kNm (irreversible)</p></li>
+<li><p><strong>Shear Force</strong>: 140 kN</p></li>
+<li><p><strong>Axial Force</strong>: 50 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 8.8, 10.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 18, 20, 22</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.2.1.2.1.pdf">DesignReport_1.2.1.2.1.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.2.1.2.1.osi">Example_1.2.1.2.1.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam End Plate Splice</em> connection for a beam <em>LB 400</em>. The grade of the beam material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 110 kNm (irreversible)</p></li>
+<li><p><strong>Shear Force</strong>: 55 kN</p></li>
+<li><p><strong>Axial Force</strong>: 15 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20; Grade: 5.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 12</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.2.1.2.2.pdf">DesignReport_1.2.1.2.1.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.2.1.2.2.osi">Example_1.2.1.2.1.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.1.2.1.3. Extended Both Ways - Reversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam End Plate Splice</em> connection for a beam <em>WPB 360 X 300 X 91.4</em>. The grade of the beam material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 120 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 75 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24; Grade: 4.6, 4.8, 5.6, 5.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.2.1.3.1.pdf">DesignReport_1.2.1.2.1.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.2.1.3.1.osi">Example_1.2.1.2.1.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam End Plate Splice</em> connection for a beam <em>UB 406 x 140 x 46</em>. The grade of the beam material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 85 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 40 kN</p></li>
+<li><p><strong>Axial Force</strong>: 12 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 16; Grade: 12.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>Bolt hole type is standard and bot type is Pre-tensioned</p></li>
+<li><p>Surface treatment: Sand blast (slip factor = 0.48)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.2.1.3.2.pdf">DesignReport_1.2.1.2.1.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.2.1.3.2.osi">Example_1.2.1.2.1.3.2.osi</a>.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example for <strong>Release 2018-06-21</strong> and lower versions - End Plate Splice Connection (Extended both ways)</p>
+<p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a bolted extended (both way) end plate spliced connection for a beam NPB 350x170x50.2, for transferring a factored reversible moment and shear force of 100 kNm and 40 kN. Use M20 bearing bolts of grade 9.8. Try an end plate 20 mm thick and weld of sizes 8 mm and 6 mm at flange and web, respectively. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). The bearing bolt is non-pretensioned and the bolt hole type is oversized. The type of weld is shop weld and the edge type is sheared or hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.2.1.2.1.1.pdf">Design_Report_1.2.1.2.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.2.1.2.1.1.osi">Design_Example_1.2.1.2.1.1.osi</a>.</p>
+<p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a bolted extended (both way) end plate spliced connection for a beam MB 450, for transferring a factored reversible moment, shear force and axial force of 170 kNm, 100 kN and 40 kN, respectively. Use M20 friction grip bolts of grade 8.8. Try an end plate 12 mm thick. The size of weld at flange and web is 6 mm and 8 mm. Take Fe410 grade steel (fy = 250 MPa, fu = 410 MPa). Assume the bolts to be pre-tensioned, bolt hole type is standard and the slip factor is 0.3. The type of weld is shop weld and the edge type is sheared or hand flame cut.</p>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="Design_Report_1.2.1.2.1.2.pdf">Design_Report_1.2.1.2.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Design_Example_1.2.1.2.1.2.osi">Design_Example_1.2.1.2.1.2.osi</a>.</p>
+</div>
+</div>
+<div class="section" id="cover-plate-welded">
+<h5>1.2.1.3. Cover Plate Welded<a class="headerlink" href="#cover-plate-welded" title="Permalink to this headline">¶</a></h5>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam Cover Plate Splice</em> connection for a beam <em>UB 686 x 254 x 140</em>. The grade of the beam material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 235 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 150 kN</p></li>
+<li><p><strong>Axial Force</strong>: 20 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Flange Splice Plate:</strong> Material E 250 (Fe 410 W)A; Preference: Outside + Inside; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Type of weld fabrication: Field weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 550 MPa</p></li>
+<li><p>Gap between the members is 5 mm</p></li>
+<li><p>Members are exposed to (mild) marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.3.1.pdf">DesignReport_1.2.1.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.3.1.osi">Example_1.2.1.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Beam Cover Plate Splice</em> connection for a beam <em>WB 400</em>. The grade of the beam material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The beam is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 150 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 80 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Flange Splice Plate:</strong> Material E 300 (Fe 440); Preference: Outside + Inside; Thickness (mm): 18</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 12</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+<li><p>Gap between the members is 8 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.1.3.2.pdf">DesignReport_1.2.1.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.1.3.2.osi">Example_1.2.1.3.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="beam-to-column-connection">
+<h4>1.2.2. Beam-to-Column Connection<a class="headerlink" href="#beam-to-column-connection" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id2">
+<h5>1.2.2.1. End Plate<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h5>
+<p>1.2.2.1.1. Column Flange-Beam Web (CFBW) connectivity</p>
+<p>1.2.2.1.1.1. Flushed - Reversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>WB 500</em> connected to a column <em>PBP 400 X 140.2</em>. The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 220 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 95 kN</p></li>
+<li><p><strong>Axial Force</strong>: 32 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 24, 30; Grade: 10.9, 12.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 20, 22, 25, 28, 32</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 510 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.1.1.1.pdf">DesignReport_1.2.2.1.1.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.1.1.1.osi">Example_1.2.2.1.1.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>MB 500</em> connected to a column <em>UC 305 x 305 x 118</em>. The grade of the beam and the column material are <strong>E 250 (Fe 410 W)A</strong> and <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 150 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 90 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 20; Grade: 12.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 28</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Sand blast (slip factor = 0.48)</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are exposed to marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.1.1.2.pdf">DesignReport_1.2.2.1.1.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.1.1.2.osi">Example_1.2.2.1.1.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.2.1.1.2. Extended One way - Irreversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>WB 450</em> connected to a column <em>HB 450</em>. The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 210 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 40 kN</p></li>
+<li><p><strong>Axial Force</strong>: 15 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 6.8, 8.8, 9.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 18, 20, 22</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.1.2.1.pdf">DesignReport_1.2.2.1.1.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.1.2.1.osi">Example_1.2.2.1.1.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>LB 450</em> connected to a column <em>PBP 300 X 124.2</em>. The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 100 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 55 kN</p></li>
+<li><p><strong>Axial Force</strong>: 12 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 24; Grade: 10.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.1.2.2.pdf">DesignReport_1.2.2.1.1.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.1.2.2.osi">Example_1.2.2.1.1.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.2.1.1.3. Extended Both Ways - Reversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>MB 500</em> connected to a column <em>PBP 400 X 158.1</em>. The grade of the beam and the column material are <strong>E 300 (Fe 440)</strong> and <strong>E 350 (Fe 490)</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 180 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 100 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 6.8, 8.8, 9.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 20, 22</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 590 MPa</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are exposed to marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.1.3.1.pdf">DesignReport_1.2.2.1.1.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.1.3.1.osi">Example_1.2.2.1.1.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>LB(P) 300</em> connected to a column <em>HB 300</em>. The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 90 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 45 kN</p></li>
+<li><p><strong>Axial Force</strong>: 10 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 16; Grade: 8.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 18</p></li>
+<li><p>Bolt hole type is standard and bot type is Pre-tensioned</p></li>
+<li><p>Surface treatment: Clean mill scale (slip factor = 0.33)</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.1.3.2.pdf">DesignReport_1.2.2.1.1.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.1.3.2.osi">Example_1.2.2.1.1.3.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.2.1.2. Column Web-Beam Web (CWBW) connectivity</p>
+<p>1.2.2.1.2.1. Flushed - Reversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>WB 300</em> connected to a column <em>HB 450</em>. The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 75 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 50 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 16, 20, 24, 30; Grade: 8.8, 9.8, 10.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 14, 16, 18, 20</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 490 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.2.1.1.pdf">DesignReport_1.2.2.1.2.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.2.1.1.osi">Example_1.2.2.1.2.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>MB 300</em> connected to a column <em>UC 305 x 305 x 118</em>. The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 45 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 70 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20; Grade: 9.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 435 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are exposed to marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.2.1.2.pdf">DesignReport_1.2.2.1.2.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.2.1.2.osi">Example_1.2.2.1.2.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.2.1.2.2. Extended One way - Irreversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>NPB 300 x 200 x 59.57</em> connected to a column <em>PBP 400 X 122.4</em>. The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 73 kNm (irreversible)</p></li>
+<li><p><strong>Shear Force</strong>: 50 kN</p></li>
+<li><p><strong>Axial Force</strong>: 15 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24; Grade: 8.8, 9.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14, 16, 18</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 440 MPa</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.2.2.1.pdf">DesignReport_1.2.2.1.2.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.2.2.1.osi">Example_1.2.2.1.2.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>LB 400</em> connected to a column <em>PBP 400 X 122.4</em>. The grade of the beam and the column material is <strong>E 300 (Fe 440)</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 110 kNm (irreversible)</p></li>
+<li><p><strong>Shear Force</strong>: 55 kN</p></li>
+<li><p><strong>Axial Force</strong>: 15 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20; Grade: 4.8</p></li>
+<li><p><strong>End Plate:</strong> E 300 (Fe 440); Thickness (mm): 16</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.2.2.2.pdf">DesignReport_1.2.2.1.2.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.2.2.2.osi">Example_1.2.2.1.2.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.2.1.2.3. Extended Both Ways - Reversible Moment</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>UB 305 x 165 x 40</em> connected to a column <em>UC 356 x 406 x 235</em>. The grade of the beam and the column material are <strong>E 300 (Fe 440)</strong> and <strong>E 350 (Fe 490)</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 65 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 150 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 24; Grade: 8.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 18, 20</p></li>
+<li><p>Bolt hole type is standard and slip factor is 0.3</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.2.3.1.pdf">DesignReport_1.2.2.1.2.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.2.3.1.osi">Example_1.2.2.1.2.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Beam-Column End Plate</em> connection for a beam <em>MB 500</em> connected to a column <em>PBP 400 X 212.5</em>. The grade of the beam and the column material is <strong>E 250 (Fe 410 W)A</strong> respectively.</p>
+<p>The load transferred from the beam to the column is as follows;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 85 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 120 kN</p></li>
+<li><p><strong>Axial Force</strong>: 18 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 20; Grade: 8.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 20</p></li>
+<li><p>Bolt hole type is standard and bot type is Pre-tensioned</p></li>
+<li><p>Surface treatment: Blasted with short or girt (slip factor = 0.5)</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 500 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.2.1.2.3.2.pdf">DesignReport_1.2.2.1.2.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.2.1.2.3.2.osi">Example_1.2.2.1.2.3.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="column-to-column-splice-connection">
+<h4>1.2.3. Column-to-Column Splice Connection<a class="headerlink" href="#column-to-column-splice-connection" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id3">
+<h5>1.2.3.1. Cover Plate Bolted<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h5>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column Cover Plate</em> bolted connection for a column <em>HB 300</em>. The grade of the column material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 127 kNm (reversible)</p></li>
+<li><p><strong>Axial Force</strong>: 320 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 20, 24, 30; Grade: 10.9, 12.9</p></li>
+<li><p><strong>Flange Splice Plate:</strong> Material E 300 (Fe 440); Preference: Outside + Inside; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 300 (Fe 440); Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.1.1.pdf">DesignReport_1.2.3.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.1.1.osi">Example_1.2.3.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column Cover Plate</em> bolted connection for a column <em>PBP 400 X 176.1</em>. The grade of the column material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 60 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 40 kN</p></li>
+<li><p><strong>Axial Force</strong>: 520 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 24; Grade: 8.8</p></li>
+<li><p><strong>Flange Splice Plate:</strong> Material E 300 (Fe 440); Preference: Outside; Thickness (mm): 20</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 16</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>Surface treatment: Sand blasted (slip factor = 0.52)</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are exposed to marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.1.2.pdf">DesignReport_1.2.3.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.1.2.osi">Example_1.2.3.1.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="id4">
+<h5>1.2.3.2. Cover Plate Welded<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h5>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column Cover Plate</em> welded connection for a column <em>PBP 400 X 140.2</em>. The grade of the column material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 127 kNm (reversible)</p></li>
+<li><p><strong>Axial Force</strong>: 370 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Flange Splice Plate:</strong> Material E 300 (Fe 440); Preference: Outside + Inside; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 300 (Fe 440); Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Type of weld fabrication: Field weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 540 MPa</p></li>
+<li><p>Gap between the members is 3 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.2.1.pdf">DesignReport_1.2.3.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.2.1.osi">Example_1.2.3.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column Cover Plate</em> welded connection for a column <em>HB 400</em>. The grade of the column material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 50 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 30 kN</p></li>
+<li><p><strong>Axial Force</strong>: 480 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Flange Splice Plate:</strong> Material E 250 (Fe 410 W)A; Preference: Outside; Thickness (mm): 18</p></li>
+<li><p><strong>Web Splice Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>Type of weld fabrication: Field weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 510 MPa</p></li>
+<li><p>Gap between the members is 5 mm</p></li>
+<li><p>Members are exposed to (mild) marine environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.2.2.pdf">DesignReport_1.2.3.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.2.2.osi">Example_1.2.3.2.2.osi</a>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="id5">
+<h5>1.2.3.3. End Plate<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h5>
+<p>1.2.3.3.1. Flush End Plate</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column End Plate</em> connection for a column <em>HB 250</em>. The grade of the column material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Axial Force</strong>: 350 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 24, 30; Grade: 8.8, 9.8, 10.9, 12.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.3.1.1.pdf">DesignReport_1.2.3.3.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.3.1.1.osi">Example_1.2.3.3.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column End Plate</em> connection for a column <em>PBP 300 X 95</em>. The grade of the column material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 50 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 20 kN</p></li>
+<li><p><strong>Axial Force</strong>: 250 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 30; Grade: 9.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 32</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.3.1.2.pdf">DesignReport_1.2.3.3.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.3.1.2.osi">Example_1.2.3.3.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.2.3.3.2. Extended Both Ways</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column End Plate</em> connection for a column <em>HB 250</em>. The grade of the column material is <strong>E 250 (Fe 410 W)A</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Axial Force</strong>: 350 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Bearing bolt; Diameter: 24, 30; Grade: 8.8, 9.8, 10.9, 12.9</p></li>
+<li><p><strong>End Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): Most optimum from the available thicknesses in the Osdag database</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.3.2.1.pdf">DesignReport_1.2.3.3.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.3.2.1.osi">Example_1.2.3.3.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Column-Column End Plate</em> connection for a column <em>PBP 300 X 95</em>. The grade of the column material is <strong>E 300 (Fe 440)</strong>.</p>
+<p>The column is subjected to the following loading condition;</p>
+<ul class="simple">
+<li><p><strong>Bending Moment</strong>: 50 kNm (reversible)</p></li>
+<li><p><strong>Shear Force</strong>: 20 kN</p></li>
+<li><p><strong>Axial Force</strong>: 250 kN</p></li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Bolt type:</strong> Friction grip (HSFG); Pre-tensioned; Diameter: 30; Grade: 9.8</p></li>
+<li><p><strong>End Plate:</strong> Material E 300 (Fe 440); Thickness (mm): 32</p></li>
+<li><p>Bolt hole type is standard</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Gap between the members is 0 mm</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.2.3.3.2.2.pdf">DesignReport_1.2.3.3.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.2.3.3.2.2.osi">Example_1.2.3.3.2.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="base-plate-connection">
+<h3>1.3. <em>Base Plate Connection</em><a class="headerlink" href="#base-plate-connection" title="Permalink to this headline">¶</a></h3>
+<p>1.3.1. Welded Column Base</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Base Plate</em> connection for a column <em>HB 450</em> subjected to the following reactions at the base;</p>
+<ul class="simple">
+<li><p><strong>Axial Compression</strong>: 1100 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Column:</strong> Grade of the column material is <strong>E 250 (Fe 410 W)A</strong>.</p></li>
+<li><p><strong>Anchor Bolt:</strong> Type: End Plate Type; Diameter: M20, M24, M30; Grade: 8.8, 9.8</p></li>
+<li><p><strong>Footing:</strong> Grade of concrete is M 25</p></li>
+<li><p><strong>Base Plate:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p>Bolt hole type is over-sized and the Anchor bolt is <em>Galvanized</em></p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 510 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Members are exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.3.1.1.pdf">DesignReport_1.3.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.3.1.1.osi">Example_1.3.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Base Plate</em> connection for a column <em>PBP 360 X 178.4</em> subjected to the following reactions at the base;</p>
+<ul class="simple">
+<li><p><strong>Axial Compression</strong>: 880 kN</p></li>
+<li><dl class="simple">
+<dt><strong>Shear Force (at base)</strong>:</dt><dd><ul>
+<li><p>Along major (z-z) axis: 25 kN</p></li>
+<li><p>Along minor (y-y) axis: 10 kN</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Column:</strong> Grade of the column material is <strong>E 300 (Fe 440)</strong>.</p></li>
+<li><p><strong>Anchor Bolt:</strong> Type: End Plate Type; Diameter: M20; Grade: 10.9</p></li>
+<li><p><strong>Footing:</strong> Grade of concrete is M 30</p></li>
+<li><p><strong>Base Plate:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p><strong>Stiffener/Shear Key:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p>Bolt hole type is over-sized and the Anchor bolt is <em>Galvanized</em></p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 440 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Members are exposed to corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.3.1.2.pdf">DesignReport_1.3.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.3.1.2.osi">Example_1.3.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.3.2. Moment Base Plate</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Base Plate</em> connection for a column <em>PBP 400 X 140.2</em> subjected to the following reactions at the base;</p>
+<ul class="simple">
+<li><p><strong>Axial Compression</strong>: 900 kN</p></li>
+<li><p><strong>Axial Tension/Uplift</strong>: 27 kN</p></li>
+<li><dl class="simple">
+<dt><strong>Shear Force (at base)</strong>:</dt><dd><ul>
+<li><p>Along major (z-z) axis: 85 kN</p></li>
+<li><p>Along minor (y-y) axis: 12 kN</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Bending Moment</strong>:</dt><dd><ul>
+<li><p>Major (z-z) axis: 123 kN</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Column:</strong> Grade of the column material is <strong>E 350 (Fe 490)</strong>.</p></li>
+<li><p><strong>Anchor Bolt - Outside Column Flange:</strong> Type: End Plate Type; Diameter: M24, M30; Grade: 8.8, 12.9</p></li>
+<li><p><strong>Anchor Bolt - Inside Column Flange:</strong> Type: End Plate Type; Diameter: M20, M24; Grade: 8.8, 9.8</p></li>
+<li><p><strong>Footing:</strong> Grade of concrete is M 30</p></li>
+<li><p><strong>Base Plate:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p><strong>Stiffener/Shear Key:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p>Bolt hole type is over-sized and the Anchor bolt is <em>Galvanized</em> (both, outside and inside flange)</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 510 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Members are exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.3.2.1.pdf">DesignReport_1.3.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.3.2.1.osi">Example_1.3.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Base Plate</em> connection for a column <em>HB 450</em> subjected to the following reactions at the base;</p>
+<ul class="simple">
+<li><p><strong>Axial Compression</strong>: 1600 kN</p></li>
+<li><dl class="simple">
+<dt><strong>Shear Force (at base)</strong>:</dt><dd><ul>
+<li><p>Along major (z-z) axis: 80 kN</p></li>
+<li><p>Along minor (y-y) axis: 23 kN</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Bending Moment</strong>:</dt><dd><ul>
+<li><p>Major (z-z) axis: 180 kN</p></li>
+<li><p>Minor (y-y) axis: 45 kN</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Column:</strong> Grade of the column material is <strong>E 300 (Fe 440)</strong>.</p></li>
+<li><p><strong>Anchor Bolt - Outside Column Flange:</strong> Type: End Plate Type; Diameter: M30; Grade: 10.9</p></li>
+<li><p><strong>Anchor Bolt - Inside Column Flange:</strong> Type: End Plate Type; Diameter: M20; Grade: 8.8</p></li>
+<li><p><strong>Footing:</strong> Grade of concrete is M 25</p></li>
+<li><p><strong>Base Plate:</strong> Material E 300 (Fe 440)</p></li>
+<li><p><strong>Stiffener/Shear Key:</strong> Material E 300 (Fe 440)</p></li>
+<li><p>Bolt hole type is over-sized and the Anchor bolt is <em>Galvanized</em> (both, outside and inside flange)</p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 600 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Members are not exposed to marine/corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.3.2.2.pdf">DesignReport_1.3.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.3.2.2.osi">Example_1.3.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>1.3.3. Hollow/Tubular Column Base</p>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Base Plate</em> connection for a square hollow column section <em>SHS 180 x 180 x 8</em> subjected to the following reactions at the base;</p>
+<ul class="simple">
+<li><p><strong>Axial Compression</strong>: 650 kN</p></li>
+</ul>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p>** Hollow Column:** Grade of the column material is <strong>E 300 (Fe 440)</strong></p></li>
+<li><p><strong>Anchor Bolt:</strong> Type: End Plate Type; Diameter: M20, M24, M30; Grade: 8.8, 10.9</p></li>
+<li><p><strong>Footing:</strong> Grade of concrete is M 25</p></li>
+<li><p><strong>Base Plate:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p><strong>Stiffener Plate:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p>Bolt hole type is over-sized and the Anchor bolt is <em>Galvanized</em></p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 510 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Members are not exposed to corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.3.3.1.pdf">DesignReport_1.3.3.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.3.3.1.osi">Example_1.3.3.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Base Plate</em> connection for a circular hollow column section <em>CHS 355.6 x 10</em> subjected to the following reactions at the base;</p>
+<ul class="simple">
+<li><p><strong>Axial Compression</strong>: 775 kN</p></li>
+<li><dl class="simple">
+<dt><strong>Shear Force (at base)</strong>:</dt><dd><ul>
+<li><p>Along major (z-z) axis: 45 kN</p></li>
+<li><p>Along minor (y-y) axis: 10 kN</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><p><strong>Column:</strong> Grade of the column material is <strong>E 300 (Fe 440)</strong>.</p></li>
+<li><p><strong>Anchor Bolt:</strong> Type: End Plate Type; Diameter: M20; Grade: 8.8</p></li>
+<li><p><strong>Footing:</strong> Grade of concrete is M 35</p></li>
+<li><p><strong>Base Plate:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p><strong>Stiffener/Shear Key:</strong> Material E 250 (Fe 410 W)A</p></li>
+<li><p>Bolt hole type is over-sized and the Anchor bolt is <em>Galvanized</em></p></li>
+<li><p>Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 440 MPa</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+<li><p>Members are exposed to corrosive environment</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_1.3.3.2.pdf">DesignReport_1.3.3.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_1.3.3.2.osi">Example_1.3.3.2.osi</a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="tension-member-design">
+<h2>2.  <strong>Tension Member Design</strong><a class="headerlink" href="#tension-member-design" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tension-member-bolted-to-end-gusset">
+<h3>2.1. <em>Tension Member - Bolted to End Gusset</em><a class="headerlink" href="#tension-member-bolted-to-end-gusset" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with a bolted end connection to transfer a factored axial force of <strong>235 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Angle</p></li>
+<li><p>Material Grade: E 250 (Fe 410 W)A</p></li>
+<li><p>Connection Location: Longer leg</p></li>
+<li><p>Length: 2560 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Bolted; Bolt type: Bearing bolt; Diameter: 16, 20; Grade: 4.6, 4.8</p></li>
+<li><p>Bolt hole type is standard</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 10, 12, 14, 16</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.1.1.pdf">DesignReport_2.1.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.1.1.osi">Example_2.1.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with a bolted end connection to transfer a factored axial force of <strong>330 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Back to Back Angles</p></li>
+<li><p>Material Grade: E 250 (Fe 410 W)A</p></li>
+<li><p>Connection Location: Longer leg</p></li>
+<li><p>Length: 2200 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Bolted; Bolt type: Bearing bolt; Diameter: 16, 20, 24; Grade: 6.8, 8.8</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 10, 12, 14, 16, 20</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.1.2.pdf">DesignReport_2.1.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.1.2.osi">Example_2.1.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 3</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with a bolted end connection to transfer a factored axial force of <strong>180 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Star Angles</p></li>
+<li><p>Material Grade: E 165 (Fe 290)</p></li>
+<li><p>Connection Location: Short leg</p></li>
+<li><p>Length: 2500 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Bolted; Bolt type: Bearing bolt; Diameter: 16, 20; Grade: 5.6, 5.8, 6.8</p></li>
+<li><p>Bolt hole type is standard</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 10, 12, 14</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.1.3.pdf">DesignReport_2.1.3.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.1.3.osi">Example_2.1.3.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 4</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with a bolted end connection to transfer a factored axial force of <strong>240 kN</strong>.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Channel</p></li>
+<li><p>Designation: MC 250</p></li>
+<li><p>Material Grade: E 250 (Fe 410 W)A</p></li>
+<li><p>Connection Location: Web</p></li>
+<li><p>Length: 3200 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Bolted; Bolt type: Friction grip (HSFG); Diameter: 20; Grade: 8.8</p></li>
+<li><p>Bolt hole type is standard and slip factor is 0.3</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.1.4.pdf">DesignReport_2.1.4.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.1.4.osi">Example_2.1.4.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 5</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with a bolted end connection to transfer a factored axial force of <strong>500 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Back to Back Channels</p></li>
+<li><p>Material Grade: E 300 (Fe 440)</p></li>
+<li><p>Connection Location: Web</p></li>
+<li><p>length: 3000 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Bolted; Bolt type: Bearing bolt; Diameter: 20, 24; Grade: 8.8, 9.8, 10.9</p></li>
+<li><p>Bolt hole type is over-sized</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 18, 20</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.1.5.pdf">DesignReport_2.1.5.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.1.5.osi">Example_2.1.5.osi</a>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="tension-member-welded-to-end-gusset">
+<h3>2.2. <em>Tension Member - Welded to End Gusset</em><a class="headerlink" href="#tension-member-welded-to-end-gusset" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p><strong>Sample Problem 1</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with a welded end connection to transfer a factored axial force of <strong>235 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Angle</p></li>
+<li><p>Material Grade: E 250 (Fe 410 W)A</p></li>
+<li><p>Connection Location: Longer leg</p></li>
+<li><p>Length: 2560 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Welded; Type of weld fabrication: Field weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 450 MPa</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 10, 12, 14, 16</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.2.1.pdf">DesignReport_2.2.1.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.2.1.osi">Example_2.2.1.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 2</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with bolted end connection to transfer a factored axial force of <strong>330 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Back to Back Angles</p></li>
+<li><p>Material Grade: E 250 (Fe 410 W)A</p></li>
+<li><p>Connection Location: Longer leg</p></li>
+<li><p>Length: 2200 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Welded; Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 10, 12, 14, 16, 20</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.2.2.pdf">DesignReport_2.2.2.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.2.2.osi">Example_2.2.2.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 3</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with bolted end connection to transfer a factored axial force of <strong>180 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Star Angles</p></li>
+<li><p>Material Grade: E 165 (Fe 290)</p></li>
+<li><p>Connection Location: Short leg</p></li>
+<li><p>Length: 2500 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Welded; Type of weld fabrication: Field weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 10, 12, 14</p></li>
+<li><p>The plate edges are hand flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.2.3.pdf">DesignReport_2.2.3.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.2.3.osi">Example_2.2.3.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 4</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with bolted end connection to transfer a factored axial force of <strong>240 kN</strong>.</p>
+<p>Perform a <em>design check</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Channel</p></li>
+<li><p>Designation: MC 250</p></li>
+<li><p>Material Grade: E 250 (Fe 410 W)A</p></li>
+<li><p>Connection Location: Web</p></li>
+<li><p>Length: 3200 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Welded; Type of weld fabrication: Field weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 410 MPa</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 14</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.2.4.pdf">DesignReport_2.2.4.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.2.4.osi">Example_2.2.4.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p><strong>Sample Problem 5</strong></p>
+<blockquote>
+<div><p>Design a <em>Tension Member</em> with bolted end connection to transfer a factored axial force of <strong>500 kN</strong>.</p>
+<p>Perform an <em>optimum design</em> by adopting the following design specifications:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Section:</strong></dt><dd><ul>
+<li><p>Profile: Back to Back Channels</p></li>
+<li><p>Material Grade: E 300 (Fe 440)</p></li>
+<li><p>Connection Location: Web</p></li>
+<li><p>length: 3000 mm</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>End Connection:</strong></dt><dd><ul>
+<li><p>Connector: Type: Welded; Type of weld fabrication: Shop weld</p></li>
+<li><p>The ultimate strength of the weld material is, f<sub>u</sub> = 440 MPa</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Gusset Plate:</strong> Material E 250 (Fe 410 W)A; Thickness (mm): 16, 18, 20</p></li>
+<li><p>The plate edges are machine-flame cut</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Download:</strong></p>
+<p><a class="reference external" href="DesignReport_2.2.5.pdf">DesignReport_2.2.5.pdf</a>.</p>
+<p><a class="reference external" href="Example_2.2.5.osi">Example_2.2.5.osi</a>.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p><strong>Other Resources</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>How to use Osdag? Learn through Osdag’s audio-video <a class="reference external" href="https://osdag.fossee.in/resources/videos">Tutorials</a></p></li>
+<li><p>We are on <a class="reference external" href="https://www.youtube.com/channel/UCnSZ7EjhDwNi3eCPcSKpgJg">YouTube</a> as well. Like and Subscribe our channel to keep up-to-date with Osdag</p></li>
+<li><p>Comments, questions, suggestions? Check the forum <a class="reference external" href="https://osdag.fossee.in/forum">Discussion</a></p></li>
+<li><p>Or, ask us a query directly through the FOSSEE <a class="reference external" href="https://forums.fossee.in/">Forum</a></p></li>
+</ul>
+</div></blockquote>
+<hr class="docutils" />
+<blockquote>
+<div><p>Copyright © 2017 Osdag. All rights reserved.</p>
+</div></blockquote>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Osdag help!</a><ul>
+<li><a class="reference internal" href="#osdag-homepage">Osdag Homepage.</a></li>
+<li><a class="reference internal" href="#connection">1.  <strong>Connection</strong></a><ul>
+<li><a class="reference internal" href="#shear-connection">1.1. <em>Shear Connection</em></a><ul>
+<li><a class="reference internal" href="#fin-plate">1.1.1. Fin Plate</a></li>
+<li><a class="reference internal" href="#end-plate">1.1.2. End Plate</a></li>
+<li><a class="reference internal" href="#cleat-angle">1.1.3. Cleat Angle</a></li>
+<li><a class="reference internal" href="#seated-angle">1.1.4. Seated Angle</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#moment-connection">1.2. <em>Moment Connection</em></a><ul>
+<li><a class="reference internal" href="#beam-to-beam-splice-connection">1.2.1. Beam-to-Beam Splice Connection</a><ul>
+<li><a class="reference internal" href="#cover-plate-bolted">1.2.1.1. Cover Plate Bolted</a></li>
+<li><a class="reference internal" href="#id1">1.2.1.2. End Plate</a></li>
+<li><a class="reference internal" href="#cover-plate-welded">1.2.1.3. Cover Plate Welded</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beam-to-column-connection">1.2.2. Beam-to-Column Connection</a><ul>
+<li><a class="reference internal" href="#id2">1.2.2.1. End Plate</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#column-to-column-splice-connection">1.2.3. Column-to-Column Splice Connection</a><ul>
+<li><a class="reference internal" href="#id3">1.2.3.1. Cover Plate Bolted</a></li>
+<li><a class="reference internal" href="#id4">1.2.3.2. Cover Plate Welded</a></li>
+<li><a class="reference internal" href="#id5">1.2.3.3. End Plate</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#base-plate-connection">1.3. <em>Base Plate Connection</em></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tension-member-design">2.  <strong>Tension Member Design</strong></a><ul>
+<li><a class="reference internal" href="#tension-member-bolted-to-end-gusset">2.1. <em>Tension Member - Bolted to End Gusset</em></a></li>
+<li><a class="reference internal" href="#tension-member-welded-to-end-gusset">2.2. <em>Tension Member - Welded to End Gusset</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Main Home | Help_Design_Examples 2021.01 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to Osdag help!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Osdag Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

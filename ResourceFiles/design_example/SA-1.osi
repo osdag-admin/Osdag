@@ -1,0 +1,26 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '20'
+Bolt.Grade:
+- '8.8'
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Column Flange-Beam Web
+Connector.Angle_List:
+- 130 x130 x 12
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Top_Angle:
+- 90 x 90 x 8
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Shear: '120'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: NPB 300 X 200 X 66.75
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: PBP 400 X 230.9
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
+Module: Seated Angle Connection

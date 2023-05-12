@@ -1,19 +1,15 @@
 # Author: Devesh Kumar
-#from utils.common.is800_2007 import IS800_2007
-#import utils.common.is800_2007
 
 from utils.common.component import Bolt
 import copy
-#from utils.common.other_standards import *
 from utils.common.common_calculation import *
 import math
-from utils.common import is800_2007
 from utils.common.is800_2007 import IS800_2007
 
 """ ======The input values start here====== """
 
 """ These values are to be extracted from the input provided by the users """
-no_of_members = 3
+no_of_members = 8
 
 """ List of details of members 
 i.e.[section_profile, conn_part_width(mm), conn_part_t(mm), fu_memb(MPa), fy_memb(MPa), member_type,  
@@ -23,26 +19,34 @@ starting from 1st member and proceeding one by one.
 member_type means 'tension' or 'compression' or 'compression_butting' (str) """
 # be careful while connecting the input values of gross area of back to back members (2Area) and star-angles(1 Area with
 # halved load)
-member_details = [['Angles', 70, 8, 410, 250, 'tension', 0, 858, 55.5],
-                  ['Angles', 75, 10, 410, 250, 'compression', 45, 1152, 58.5],
-                  ['Angles', 80, 8, 410, 250, 'tension', 90, 978, 65]
+member_details = [['Back to Back Angles', 80, 10, 410, 250, 'tension', 0, 3000, 62],
+                  ['Back to Back Angles', 70, 10, 410, 250, 'tension', 180, 2600, 53],
+                  ['Angles', 75, 8, 410, 250, 'tension', 240, 1140, 55],
+                  ['Angles', 60, 6, 410, 250, 'tension', 270, 684, 47.5],
                   ]
 
+                  #['Angles', 75, 8, 410, 250, 'compression', 180, 938, 55.5],
+                  #['Angles', 65, 6, 410, 250, 'compression', 225, 625, 53],
+                  #['Angles', 80, 8, 410, 250, 'tension', 270, 978, 65],
+                  #['Angles', 65, 8, 410, 250, 'tension', 315, 817, 51],
+                  #]
+
 """ here type of bolt may be 'Bearing' or 'Friction'. It is also mandatory to connect the input values such that
- the values inside the 'grade' and the 'Diameter'(mm) key are in ascending order to avoid any unforeseen error """
-bolts_details = {'type': 'Bearing', 'grade': [4.6, 4.8, 6.8], 'Diameter': [8, 10, 12, 20, 32], 'mu_f': 0.2}
+ the values inside the 'grade' and the 'Diameter'(mm) key are in ascending order to avoid any unforeseen error
+here grade can be like [4.6, 4.8, 6.8], Diameter like [8, 10, 12, 20, 32] """
+bolts_details = {'type': 'Bearing', 'grade': [4.6], 'Diameter': [10, 12], 'mu_f': 0.2}
 
 """List of the input of the [thickness, fu_plate, fy_plate] of gusset plate"""
 plate_details = [[6, 410, 250],
                  [8, 410, 250],
-                 [10, 410, 250],
                  [12, 410, 250]
                  ]
+
 
 """ List of axial load (in KN)  on the members starting from 1st member and proceeding one by one """
 # beware of connecting the load inputs of star angles. the load should be divided by 2 because further design will be
 # done considering one of the angles of star angle as a single angle but whitmore width will consider both angles
-load_details = [20, 25, 30]
+load_details = [225, 180, 110, 75]
 
 """ ======The input values end here====== """
 
@@ -86,7 +90,7 @@ class bolt_general():
 
     @staticmethod
     def get_a_nb(bolt_dia):
-        return round(0.78 * math.pi / 4 * bolt_dia ** 2)
+        return round(0.78 * math.pi / 4 * bolt_dia ** 2, 2)
 
     @staticmethod
     def f_u_bolt(grade, bolt_dia):
@@ -211,6 +215,7 @@ def sort_five_lists(list1, list2, list3, list4, list5):
     sorted_lists = sorted(zip(list1, list2, list3, list4, list5))
     sorted_list1, sorted_list2, sorted_list3, sorted_list4, sorted_list5 = zip(*sorted_lists)
     return list(sorted_list1), list(sorted_list2), list(sorted_list3), list(sorted_list4), list(sorted_list5)
+
 
 """ creating a function to get the clearance distance d from the origin of any member """
 def get_clearance_d(alpha ,p0 , p1):
@@ -398,14 +403,47 @@ def gusset_design_comp_strength(whitmore_width_guss, sec_thick, clearance_d, fy_
     mod_elasticity = 2*10**5  # Modulus of elasticity in MPa
     """ f_cc is Euler buckling stress """
     f_cc = (math.pi**2*mod_elasticity)/((k_l/rad_gyr)**2)
-    lembda_guss = (fy_guss/f_cc)
+    lembda_guss = (fy_guss/f_cc)**0.5
     """ considering the section as the buckling class c as per table 10 of IS800:2007 and hence alpha = 0.49 """
     alpha_guss = 0.49
     phi_guss = 0.5*(1+alpha_guss*(lembda_guss-0.2)+lembda_guss**2)
     gamma_m0_guss = 1.1
-    f_cd = min((fy_guss/gamma_m0_guss)/(phi_guss+(phi_guss**2-alpha_guss**2)**0.5), fy_guss/gamma_m0_guss)
+    f_cd = min((fy_guss/gamma_m0_guss)/(phi_guss+(phi_guss**2-lembda_guss**2)**0.5), fy_guss/gamma_m0_guss)
     p_d = round((f_cd * whitmore_width_guss * sec_thick)/1000, 3)  # divided by 1000 to convert to KN
     return p_d
+
+
+def calculate_side_lengths(A):
+    # Select every odd-numbered point starting from the third point
+    odd_points = A[2:(len(A) - 2):2]
+
+    # Select every even-numbered point starting from the fourth point
+    even_points = A[3:(len(A) - 2):2]
+
+    # Pair the odd-numbered points with the next even-numbered point
+    pairs = zip(odd_points, even_points)
+
+    # Calculate the distance between each pair of points and store them in a list
+    lengths = [math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) for ((x1, y1), (x2, y2)) in pairs]
+
+    return lengths
+
+
+def calculate_even_side_lengths(poly):
+    # Calculate the total number of vertices
+    n = len(poly)
+
+    # Initialize an empty list to store the side lengths
+    side_lengths = []
+
+    # Loop over every even-numbered vertex and calculate the distance to the next vertex
+    for i in range(0, n, 2):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % n]
+        side_length = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        side_lengths.append(side_length)
+
+    return side_lengths
 
 
 """ starting the loop for the truss connection design. starting with selecting a thickness of a gusset plate and
@@ -438,6 +476,7 @@ gusset_block_shear_failure = False
 mem_width_too_large = False
 """ Starting the loop of gusset plate """
 for i in range(len(plate_details_iter)):
+    selected_gusset = plate_details_iter[i]
     """ defining candidate_bolts_all to store the eligible bolts for all the members. it is as follows:
     candidate_bolts_all = [[candidate_bolt1 of member1],[candidate_bolt1 of member2],[candidate_bolt1 of member3]]"""
     candidate_bolts_all = []
@@ -485,8 +524,9 @@ for i in range(len(plate_details_iter)):
         """ design_load_all is the list of load for which the members are being designed and design_load_iter is the
          load for which the member under the current loop has to be designed """
 
-        design_load_iter = min(abs(load_details[j]), (
-                    0.3 * IS800_2007.cl_6_2_tension_yielding_strength(member_detail_iter[7], member_detail_iter[4])))
+        design_load_iter = round(max(abs(load_details[j]), (
+                    0.3 * IS800_2007.cl_6_2_tension_yielding_strength(member_detail_iter[7],
+                                                                      member_detail_iter[4])/1000)), 3)
 
         design_load_all = design_load_all + [design_load_iter]
 
@@ -528,7 +568,7 @@ for i in range(len(plate_details_iter)):
                 here for simplicity gauge dist has been taken as the pitch. 
                 Note - rows means bolt lines along the direction of load applied
                     columns means bolt line perpendicular to the direction of load applied """
-                no_rows = round_down((member_detail_iter[8] - 2 * bolt1.edge_dist_provided) / bolt1.pitch_provided) + 1
+                no_rows = round_down((member_detail_iter[8] - 2 * bolt1.edge_dist_provided) / bolt1.pitch_provided + 1)
                 if no_rows < 1:
                     """ coming out of the bolt grade loop """
                     break
@@ -632,7 +672,7 @@ for i in range(len(plate_details_iter)):
                         break
 
                 """ overlap_length is the length required from the end of the plate to accommodate the member """
-                overlap_length = edge_dist1 + (no_column1 - 1) * pitch1
+                overlap_length = 2*edge_dist1 + (no_column1 - 1) * pitch1
 
                 """ now we need to check for the tension or compression yielding capacity of the gusset plate on the 
                  area corresponding to the whitmore width. It is the width obtained by connecting the ends of two
@@ -641,10 +681,10 @@ for i in range(len(plate_details_iter)):
                  If the capacity thus obtained is less than the design action then a flag named safe_whitmore_section 
                  is generated. if flag is no, then the loop will be broken from grade, diameter, member loop and the
                  iteration should continue for the plate loop with the next plate size. """
-                whitmore_width = (no_rows1-1)*gauge1 + 2*(joint_len*(math.tan(math.pi/6)))
-                whitmore_eff_width = whitmore_width - no_rows1*bolt1.bolt_hole_dia
-                whitmore_area = whitmore_width*gusset_plate_t_fu_fy[0]
-                whitmore_eff_area = whitmore_eff_width*gusset_plate_t_fu_fy[0]
+                whitmore_width = round((no_rows1-1)*gauge1 + 2*(joint_len*(math.tan(math.pi/6))), 2)
+                whitmore_eff_width = round(whitmore_width - no_rows1*bolt1.bolt_hole_dia, 2)
+                whitmore_area = round(whitmore_width*gusset_plate_t_fu_fy[0], 2)
+                whitmore_eff_area = round(whitmore_eff_width*gusset_plate_t_fu_fy[0], 2)
 
                 if member_detail_iter[5] == 'tension':
                     gusset_yield_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g=whitmore_area,
@@ -790,7 +830,8 @@ for i in range(len(plate_details_iter)):
                 continue
 
             if no_rows < 1:
-                """ coming out of the bolt loop """
+                """ coming out of the bolt loop because the bolt dia is in ascending order and next bolts will certainly
+                 not qualify this criteria. """
                 break
 
             if mem_width_too_large:
@@ -884,7 +925,7 @@ for i in range(len(plate_details_iter)):
     the members carrying larger loads as much closer to the origin as possible. the next coming member should have the 
     clearance such that it does not overlap with any of the previously placed member """
 
-    """ arranging the loads in descending order """
+    """ arranging the absolute loads in descending order """
     sorted_load, sorted_index = sort_abs_desc(design_load_all)
 
     """ creating a list of a and b corresponding to the sorted_index. here a is distance from the bolt centroid to the 
@@ -935,7 +976,7 @@ for i in range(len(plate_details_iter)):
         sorted_angle = sorted_angle + [member_details[x1][6]]
         sorted_lap_length = sorted_lap_length + [final_selected_bolts[x1][7]]
 
-    """ now we want to get the list of spacing(d) from the origin for all the members """
+    """ now we want to get the list of spacing(d) from the origin for all the member's end """
     sorted_d = []
     counter_x2 = 0
     for x2 in sorted_index:
@@ -960,10 +1001,11 @@ for i in range(len(plate_details_iter)):
                                                                      list5=sorted_lap_length)
     """the coordinate is stored in a list of tuples in an order which when joined, takes the shape of the gusset plate"""
     guss_coord = []
+    origin_offset = []
     for x4 in range(len(asc_angle)):
         """ included angle between the first and the last entry of the asc_angle """
-        included_angle_min_max = get_included_angle(theta1=asc_angle[0],
-                                                    theta2=asc_angle[len(asc_angle)-1])
+        included_angle_min_max = asc_angle[len(asc_angle)-1] - asc_angle[0]  # get_included_angle(theta1=asc_angle[0],
+                                                    # theta2=asc_angle[len(asc_angle)-1])
         if included_angle_min_max <= 180:
             if x4 == 0:
                 absc1 = 0
@@ -990,6 +1032,32 @@ for i in range(len(plate_details_iter)):
                 ordn2 = asc_a[x4]
                 guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2)],
                                                         angle=asc_angle[x4])
+        elif asc_angle[1] - asc_angle[0] >= 180:
+            if x4 == 1:
+                absc1 = 0
+                ordn1 = -1*asc_b[x4]
+                absc2 = asc_d[x4]+asc_lap_length[x4]
+                ordn2 = -1 * asc_b[x4]
+                absc3 = asc_d[x4] + asc_lap_length[x4]
+                ordn3 = asc_a[x4]
+                guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2), (absc3, ordn3)],
+                                                        angle=asc_angle[x4])
+            elif x4 == 0:
+                absc3 = 0
+                ordn3 = asc_a[x4]
+                absc1 = asc_d[x4] + asc_lap_length[x4]
+                ordn1 = -1 * asc_b[x4]
+                absc2 = asc_d[x4] + asc_lap_length[x4]
+                ordn2 = asc_a[x4]
+                guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2), (absc3, ordn3)],
+                                                        angle=asc_angle[x4])
+            else:
+                absc1 = asc_d[x4] + asc_lap_length[x4]
+                ordn1 = -1 * asc_b[x4]
+                absc2 = asc_d[x4] + asc_lap_length[x4]
+                ordn2 = asc_a[x4]
+                guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2)],
+                                                        angle=asc_angle[x4])
         else:
             absc1 = asc_d[x4] + asc_lap_length[x4]
             ordn1 = -1 * asc_b[x4]
@@ -998,33 +1066,170 @@ for i in range(len(plate_details_iter)):
             guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2)],
                                                     angle=asc_angle[x4])
 
+        """origin_offset = distance of the edge of the gusset from the assumed origin"""
+        origin_offset = origin_offset + [asc_d[x4] + asc_lap_length[x4]]
+
+    offset_excess_min_max = (max(tuple(origin_offset)) - min(tuple(origin_offset)))/ min(tuple(origin_offset))
+
+    if (included_angle_min_max <= 180 and offset_excess_min_max >= 1.5) or \
+            (asc_angle[1] - asc_angle[0] > 180 and offset_excess_min_max >= 1.5):
+        guss_coord = []
+        for x5 in range(len(asc_angle)):
+            if included_angle_min_max <= 180:
+                if x5 == 0:
+                    absc1 = 0
+                    ordn1 = -1 * asc_b[x5]
+                    absc2 = asc_d[x5] + asc_lap_length[x5]
+                    ordn2 = -1 * asc_b[x5]
+                    absc3 = asc_d[x5] + asc_lap_length[x5]
+                    ordn3 = asc_a[x5]
+                    if (max(tuple(origin_offset)) - origin_offset[x5]) / origin_offset[x5] >= 1.5:
+                        absc2 = max(tuple(asc_d))  # [] + asc_lap_length[x4]
+                        absc3 = max(tuple(asc_d))
+                        ind1 = sorted_angle.index(asc_angle[x5])
+                        ind2 = sorted_index[sorted_angle.index(asc_angle[x5])]
+                        sorted_d[ind1] = absc2 - final_selected_bolts[ind2][7]
+                    guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2), (absc3, ordn3)],
+                                                            angle=asc_angle[x5])
+                elif x5 == (len(asc_angle) - 1):
+                    absc3 = 0
+                    ordn3 = asc_a[x5]
+                    absc1 = asc_d[x5] + asc_lap_length[x5]
+                    ordn1 = -1 * asc_b[x5]
+                    absc2 = asc_d[x5] + asc_lap_length[x5]
+                    ordn2 = asc_a[x5]
+                    if (max(tuple(origin_offset)) - origin_offset[x5]) / origin_offset[x5] >= 1.5:
+                        absc2 = max(tuple(asc_d))  # [] + asc_lap_length[x4]
+                        absc1 = max(tuple(asc_d))
+                        ind1 = sorted_angle.index(asc_angle[x5])
+                        ind2 = sorted_index[sorted_angle.index(asc_angle[x5])]
+                        sorted_d[ind1] = absc2 - final_selected_bolts[ind2][7]
+                    guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2), (absc3, ordn3)],
+                                                            angle=asc_angle[x5])
+                else:
+                    absc1 = asc_d[x5] + asc_lap_length[x5]
+                    ordn1 = -1 * asc_b[x5]
+                    absc2 = asc_d[x5] + asc_lap_length[x5]
+                    ordn2 = asc_a[x5]
+                    if (max(tuple(origin_offset)) - origin_offset[x5]) / origin_offset[x5] >= 1.5:
+                        absc1 = max(tuple(asc_d))  # [] + asc_lap_length[x4]
+                        absc2 = max(tuple(asc_d))
+                        ind1 = sorted_angle.index(asc_angle[x5])
+                        ind2 = sorted_index[sorted_angle.index(asc_angle[x5])]
+                        sorted_d[ind1] = absc2 - final_selected_bolts[ind2][7]
+                    guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2)],
+                                                            angle=asc_angle[x5])
+            elif asc_angle[1] - asc_angle[0] >= 180:
+                if x5 == 1:
+                    absc1 = 0
+                    ordn1 = -1 * asc_b[x5]
+                    absc2 = asc_d[x5] + asc_lap_length[x5]
+                    ordn2 = -1 * asc_b[x5]
+                    absc3 = asc_d[x5] + asc_lap_length[x5]
+                    ordn3 = asc_a[x5]
+                    if (max(tuple(origin_offset)) - origin_offset[x5]) / origin_offset[x5] >= 1.5:
+                        absc2 = max(tuple(asc_d))  # [] + asc_lap_length[x4]
+                        absc3 = max(tuple(asc_d))
+                        ind1 = sorted_angle.index(asc_angle[x5])
+                        ind2 = sorted_index[sorted_angle.index(asc_angle[x5])]
+                        sorted_d[ind1] = absc2 - final_selected_bolts[ind2][7]
+                    guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2), (absc3, ordn3)],
+                                                            angle=asc_angle[x5])
+                elif x5 == 0:
+                    absc3 = 0
+                    ordn3 = asc_a[x5]
+                    absc1 = asc_d[x5] + asc_lap_length[x5]
+                    ordn1 = -1 * asc_b[x5]
+                    absc2 = asc_d[x5] + asc_lap_length[x5]
+                    ordn2 = asc_a[x5]
+                    if (max(tuple(origin_offset)) - origin_offset[x5]) / origin_offset[x5] >= 1.5:
+                        absc2 = max(tuple(asc_d))  # [] + asc_lap_length[x4]
+                        absc1 = max(tuple(asc_d))
+                        ind1 = sorted_angle.index(asc_angle[x5])
+                        ind2 = sorted_index[sorted_angle.index(asc_angle[x5])]
+                        sorted_d[ind1] = absc2 - final_selected_bolts[ind2][7]
+                    guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2), (absc3, ordn3)],
+                                                            angle=asc_angle[x5])
+                else:
+                    absc1 = asc_d[x5] + asc_lap_length[x5]
+                    ordn1 = -1 * asc_b[x5]
+                    absc2 = asc_d[x5] + asc_lap_length[x5]
+                    ordn2 = asc_a[x5]
+                    if (max(tuple(origin_offset)) - origin_offset[x5]) / origin_offset[x5] >= 1.5:
+                        absc1 = max(tuple(asc_d))  # [] + asc_lap_length[x4]
+                        absc2 = max(tuple(asc_d))
+                        ind1 = sorted_angle.index(asc_angle[x5])
+                        ind2 = sorted_index[sorted_angle.index(asc_angle[x5])]
+                        sorted_d[ind1] = absc2 - final_selected_bolts[ind2][7]
+                    guss_coord = guss_coord + rotate_points(points=[(absc1, ordn1), (absc2, ordn2)],
+                                                            angle=asc_angle[x5])
+
+    """ Getting the co-ordinates of the center of bolt holes member by member """
+    coord_bolt_holes_all = []
+    for x6 in range(len(member_details)):
+        n_r = final_selected_bolts[x6][3]
+        n_c = final_selected_bolts[x6][4]
+        e1 = final_selected_bolts[x6][8]
+        p1 = final_selected_bolts[x6][10]
+        g1 = final_selected_bolts[x6][11]
+        d1 = sorted_d[sorted_index.index(x6)]
+        angle1 = member_details[x6][6]
+        y_max = (n_r - 1)/2 * g1
+        """ here n_r and n_c are the number of rows and number of columns respectively for member under iteration """
+        coord_bolt_holes = []
+        for x7 in range(n_r):
+
+            for x8 in range(n_c):
+                absc_x = d1 + e1 + x8*p1
+                ordn_y = y_max - x7*g1
+
+                coord_bolt_holes += [(absc_x, ordn_y)]
+        coord_bolt_holes = rotate_points(coord_bolt_holes, angle=angle1)
+
+        coord_bolt_holes_all += [coord_bolt_holes]
+
     """ finding the edge length of the gusset plate to find its tendency towards local buckling """
     gusset_side_length = polygon_side_lengths(guss_coord)
+
+    if included_angle_min_max <= 180 or asc_angle[1] - asc_angle[0] > 180:
+        gusset_free_side_length = calculate_side_lengths(A=guss_coord)
+    else:
+        gusset_free_side_length = calculate_even_side_lengths(poly=guss_coord)
+
     """ Local buckling may be prevented if the unsupported edge of a gusset plate is restricted to 
     42*epsilon times the thickness (Gaylord et al. 1992), where epsilon = (250/fy)^0.5 """
     epsilon_guss = (250/gusset_plate_t_fu_fy[2])**0.5
     local_buckling1 = False
-    if max(tuple(gusset_side_length)) < 42*epsilon_guss*gusset_plate_t_fu_fy[0]:
+    if max(tuple(gusset_free_side_length)) > 42*epsilon_guss*gusset_plate_t_fu_fy[0]:
         local_buckling1 = True
         continue
 
     """ now checking for local buckling of gusset plate due to the compression members. Therefore checking for the
     compression member with highest load. if local_buckling2 is found to be True then go for next thickness of plate"""
-    guss_max_comp = min(tuple(design_load_all))
-    d_max_comp = final_selected_bolts[design_load_all.index(guss_max_comp)][7]
-    whitmore_width_max_comp = final_selected_bolts[design_load_all.index(guss_max_comp)][12]
-    if guss_max_comp < gusset_design_comp_strength(whitmore_width_guss=whitmore_width_max_comp,
-                                                   sec_thick=gusset_plate_t_fu_fy[0],
-                                                   clearance_d=d_max_comp,
-                                                   fy_guss=gusset_plate_t_fu_fy[2]):
-        local_buckling2 = False
-    else:
-        local_buckling2 = True
-        continue
+    negative_list = [x for x in load_details if x < 0]
 
-    """ now breaking the loop if all the checks are found to be true """
+    local_buckling2 = False
+    if len(negative_list) > 0:
+        max_comp_load = min(tuple(negative_list))
+        for x9 in negative_list:
+            # guss_max_comp = design_load_all[load_details.index(x9)]
+            d_comp = sorted_d[sorted_index.index(load_details.index(x9))]
+            whitmore_width_comp = final_selected_bolts[load_details.index(x9)][12]
+            if design_load_all[load_details.index(x9)] > \
+                    gusset_design_comp_strength(whitmore_width_guss=whitmore_width_comp,
+                                                sec_thick=gusset_plate_t_fu_fy[0],
+                                                clearance_d=d_comp,
+                                                fy_guss=gusset_plate_t_fu_fy[2]):
+                local_buckling2 = True
+                break
+        if local_buckling2:
+            continue
+
+    """ now breaking the loop if all the local buckling checks are found to be true """
     if not local_buckling1 and not local_buckling2:
         break
+
+
 
 """ completion of the main loop """
 
@@ -1036,6 +1241,9 @@ for i in range(len(plate_details_iter)):
 """check"""
 print(final_selected_bolts)
 print(guss_coord)
+print(coord_bolt_holes_all)
+print(selected_gusset)
+print(local_buckling2, local_buckling1)
 
 
 

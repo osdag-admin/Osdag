@@ -9,7 +9,8 @@ from utils.common.is800_2007 import IS800_2007
 """ ======The input values start here====== """
 
 """ These values are to be extracted from the input provided by the users """
-no_of_members = 8
+no_of_members = 4
+""" this number of members info is not being used directly in the code """
 
 """ List of details of members 
 i.e.[section_profile, conn_part_width(mm), conn_part_t(mm), fu_memb(MPa), fy_memb(MPa), member_type,  

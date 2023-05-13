@@ -38,6 +38,8 @@ here grade can be like [4.6, 4.8, 6.8], Diameter like [8, 10, 12, 20, 32] """
 bolts_details = {'type': 'Bearing', 'grade': [4.6], 'Diameter': [10, 12], 'mu_f': 0.2}
 
 """List of the input of the [thickness, fu_plate, fy_plate] of gusset plate"""
+""" Note that currently at least one plate should be having thickness grater than the thickness of any of the members
+in the input """
 plate_details = [[6, 410, 250],
                  [8, 410, 250],
                  [12, 410, 250]

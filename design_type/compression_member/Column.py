@@ -24,7 +24,9 @@ from design_report.reportGenerator_latex import CreateLatex
 
 
 class ColumnDesign(Member):
+
     def __init__(self):
+        print(f"Here10")
         super(ColumnDesign, self).__init__()
 
     ###############################################
@@ -176,7 +178,7 @@ class ColumnDesign(Member):
         return add_buttons
 
     def get_values_for_design_pref(self, key, design_dictionary):
-
+        print(f"Here get_values_for_design_pref")
         if design_dictionary[KEY_MATERIAL] != 'Select Material':
             material = Material(design_dictionary[KEY_MATERIAL], 41)
             fu = material.fu
@@ -456,7 +458,7 @@ class ColumnDesign(Member):
         return out_list
 
     def func_for_validation(self, design_dictionary):
-
+        print(f"func_for_validation")
         all_errors = []
         self.design_status = False
         flag = False
@@ -482,7 +484,7 @@ class ColumnDesign(Member):
 
         if flag:
             self.set_input_values(self, design_dictionary)
-            print(design_dictionary)
+            print(f"design_dictionary{design_dictionary}")
         else:
             return all_errors
 
@@ -564,7 +566,7 @@ class ColumnDesign(Member):
 
         # safety factors
         self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
-
+        print(f"Here[Column/set_input_values/self.gamma_m0{self.gamma_m0}]")
         # material property
         self.material_property = Material(material_grade=self.material, thickness=0)
 
@@ -575,6 +577,7 @@ class ColumnDesign(Member):
         self.section_classification(self)
         self.design_column(self)
         self.results(self)
+        print(f"Here[Column/set_input_values]")
 
     # Simulation starts here
     def section_classification(self):
@@ -627,7 +630,8 @@ class ColumnDesign(Member):
             elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
                 self.flange_class = IS800_2007.Table2_x(self.section_property.out_diameter, self.section_property.flange_thickness,
                                                         self.material_property.fy, load_type='axial compression')
-                self.web_class = self.flange_class
+                self.web_class = self.flange_class  #Why?
+                print(f"self.web_class{self.web_class}")
 
             if self.flange_class == 'Slender' or self.web_class == 'Slender':
                 self.section_class = 'Slender'
@@ -663,6 +667,7 @@ class ColumnDesign(Member):
             if self.section_class in self.allowed_sections:
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_class})
+            print(f"self.section_class{self.section_class}")
 
     def design_column(self):
         """ Perform design of column """
@@ -717,7 +722,7 @@ class ColumnDesign(Member):
                     self.section_property = SHS(designation=section, material_grade=self.material)
                 elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
                     self.section_property = CHS(designation=section, material_grade=self.material)
-                else:
+                else:   #Why?
                     self.section_property = Column(designation=section, material_grade=self.material)
 
                 self.material_property.connect_to_database_to_get_fy_fu(self.material, max(self.section_property.flange_thickness,
@@ -747,6 +752,7 @@ class ColumnDesign(Member):
                         self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
                 else:
                     self.effective_area = self.section_property.area  # mm2
+                    print(f"self.effective_area{self.effective_area}")
 
                 # reduction of the area based on the connection requirements (input from design preferences)
                 if self.effective_area_factor < 1.0:
@@ -806,10 +812,10 @@ class ColumnDesign(Member):
                 list_yy.append(self.imperfection_factor_yy)
 
                 # 2.2 - Effective length
-                self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_zz * 1e3,
+                self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_zz ,
                                                                                                                  end_1=self.end_1,
                                                                                                                  end_2=self.end_2)  # mm
-                self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_yy * 1e3,
+                self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_yy ,
                                                                                                                  end_1=self.end_1,
                                                                                                                  end_2=self.end_2)  # mm
 
@@ -833,13 +839,15 @@ class ColumnDesign(Member):
                 # 2.5 - Non-dimensional effective slenderness ratio
                 self.non_dim_eff_sr_zz = math.sqrt(self.material_property.fy / self.euler_bs_zz)
                 self.non_dim_eff_sr_yy = math.sqrt(self.material_property.fy / self.euler_bs_yy)
+                print(f"self.non_dim_eff_sr_zz{self.non_dim_eff_sr_yy},self.phi_yy{self.non_dim_eff_sr_yy}/n")
 
                 list_zz.append(self.non_dim_eff_sr_zz)
                 list_yy.append(self.non_dim_eff_sr_yy)
 
                 # 2.5 - phi
                 self.phi_zz = 0.5 * (1 + (self.imperfection_factor_zz * (self.non_dim_eff_sr_zz - 0.2)) + self.non_dim_eff_sr_zz ** 2)
-                self.phi_yy = 0.5 * (1 + (self.imperfection_factor_zz * (self.non_dim_eff_sr_yy - 0.2)) + self.non_dim_eff_sr_yy ** 2)
+                self.phi_yy = 0.5 * (1 + (self.imperfection_factor_yy * (self.non_dim_eff_sr_yy - 0.2)) + self.non_dim_eff_sr_yy ** 2)
+                print(f"self.phi_zz{self.phi_zz},self.phi_yy{self.phi_yy}, self.imperfection_factor_zz{self.imperfection_factor_zz}")
 
                 list_zz.append(self.phi_zz)
                 list_yy.append(self.phi_yy)
@@ -892,6 +900,7 @@ class ColumnDesign(Member):
                 list_zz.append(self.cost)
                 list_yy.append(self.cost)
                 self.optimum_section_cost.append(self.cost)
+                print(f"list_zz{list_zz},list_yy{list_yy} ")
 
                 # Step 3 - Storing the optimum results to a list in a descending order
 
@@ -915,7 +924,7 @@ class ColumnDesign(Member):
                 # 2- Based on optimum cost
                 self.optimum_section_cost_results[self.cost] = {}
 
-                list_2 = list_zz + list_yy
+                list_2 = list_zz + list_yy                                  #Why?
                 for j in list_1:
                     for k in list_2:
                         self.optimum_section_cost_results[self.cost][j] = k
@@ -928,6 +937,7 @@ class ColumnDesign(Member):
             logger.info("Change the inputs provided and re-design.")
             self.design_status = False
             self.design_status_list.append(self.design_status)
+            print(f"design_status_list{self.design_status_list}")
 
     def results(self):
         """ """
@@ -939,6 +949,8 @@ class ColumnDesign(Member):
             self.optimum_section_ur = list(filter_UR)
 
             self.optimum_section_ur.sort()
+            print(f"self.optimum_section_ur{self.optimum_section_ur}")
+            #print(f"self.result_UR{self.result_UR}")
 
             # selecting the section with most optimum UR
             if len(self.optimum_section_ur) == 0:  # no design was successful
@@ -948,8 +960,10 @@ class ColumnDesign(Member):
                 logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
                 self.design_status = False
                 self.design_status_list.append(self.design_status)
+                logger.info(" :=========End Of design===========")
             else:
                 self.result_UR = self.optimum_section_ur[-1]  # optimum section which passes the UR check
+                print(f"self.result_UR{self.result_UR}")
                 self.design_status = True
 
         else:  # results based on cost
@@ -959,110 +973,123 @@ class ColumnDesign(Member):
             self.result_cost = self.optimum_section_cost[0]
 
         # print results
-        if self.optimization_parameter == 'Utilization Ratio':
-            self.result_designation = self.optimum_section_ur_results[self.result_UR]['Designation']
-            self.result_section_class = self.optimum_section_ur_results[self.result_UR]['Section class']
-            self.result_effective_area = self.optimum_section_ur_results[self.result_UR]['Effective area']
-
-            self.result_bc_zz = self.optimum_section_ur_results[self.result_UR]['Buckling_curve_zz']
-            self.result_bc_yy = self.optimum_section_ur_results[self.result_UR]['Buckling_curve_yy']
-
-            self.result_IF_zz = self.optimum_section_ur_results[self.result_UR]['IF_zz']
-            self.result_IF_yy = self.optimum_section_ur_results[self.result_UR]['IF_yy']
-
-            self.result_eff_len_zz = self.optimum_section_ur_results[self.result_UR]['Effective_length_zz']
-            self.result_eff_len_yy = self.optimum_section_ur_results[self.result_UR]['Effective_length_yy']
-
-            self.result_eff_sr_zz = self.optimum_section_ur_results[self.result_UR]['Effective_SR_zz']
-            self.result_eff_sr_yy = self.optimum_section_ur_results[self.result_UR]['Effective_SR_yy']
-
-            self.result_ebs_zz = self.optimum_section_ur_results[self.result_UR]['EBS_zz']
-            self.result_ebs_yy = self.optimum_section_ur_results[self.result_UR]['EBS_yy']
-
-            self.result_nd_esr_zz = self.optimum_section_ur_results[self.result_UR]['ND_ESR_zz']
-            self.result_nd_esr_yy = self.optimum_section_ur_results[self.result_UR]['ND_ESR_yy']
-
-            self.result_phi_zz = self.optimum_section_ur_results[self.result_UR]['phi_zz']
-            self.result_phi_yy = self.optimum_section_ur_results[self.result_UR]['phi_yy']
-
-            self.result_srf_zz = self.optimum_section_ur_results[self.result_UR]['SRF_zz']
-            self.result_srf_yy = self.optimum_section_ur_results[self.result_UR]['SRF_yy']
-
-            self.result_fcd_1_zz = self.optimum_section_ur_results[self.result_UR]['FCD_1_zz']
-            self.result_fcd_1_yy = self.optimum_section_ur_results[self.result_UR]['FCD_1_yy']
-
-            self.result_fcd_2 = self.optimum_section_ur_results[self.result_UR]['FCD_2']
-
-            self.result_fcd_zz = self.optimum_section_ur_results[self.result_UR]['FCD_zz']
-            self.result_fcd_yy = self.optimum_section_ur_results[self.result_UR]['FCD_yy']
-
-            self.result_fcd = self.optimum_section_ur_results[self.result_UR]['FCD']
-            self.result_capacity = self.optimum_section_ur_results[self.result_UR]['Capacity']
-            self.result_cost = self.optimum_section_ur_results[self.result_UR]['Cost']
+        if len(self.optimum_section_ur) == 0:
+            logger.warning(
+                "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                "criteria")
+            logger.error("The solver did not find any adequate section from the defined list.")
+            logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
+            pass
         else:
-            self.result_UR = self.optimum_section_cost_results[self.result_cost]['UR']
+            if self.optimization_parameter == 'Utilization Ratio':
+                self.result_designation = self.optimum_section_ur_results[self.result_UR]['Designation']
+                self.result_section_class = self.optimum_section_ur_results[self.result_UR]['Section class']
+                self.result_effective_area = self.optimum_section_ur_results[self.result_UR]['Effective area']
 
-            # checking if the selected section based on cost satisfies the UR
-            if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
+                self.result_bc_zz = self.optimum_section_ur_results[self.result_UR]['Buckling_curve_zz']
+                self.result_bc_yy = self.optimum_section_ur_results[self.result_UR]['Buckling_curve_yy']
 
-                trial_cost = []
-                for cost in self.optimum_section_cost:
-                    self.result_UR = self.optimum_section_cost_results[cost]['UR']
-                    if self.result_UR <= min(self.allowable_utilization_ratio, 1.0):
-                        trial_cost.append(cost)
+                self.result_IF_zz = self.optimum_section_ur_results[self.result_UR]['IF_zz']
+                self.result_IF_yy = self.optimum_section_ur_results[self.result_UR]['IF_yy']
 
-                trial_cost.sort()
+                self.result_eff_len_zz = self.optimum_section_ur_results[self.result_UR]['Effective_length_zz']
+                self.result_eff_len_yy = self.optimum_section_ur_results[self.result_UR]['Effective_length_yy']
 
-                if len(trial_cost) == 0:  # no design was successful
-                    logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                                   "criteria")
-                    logger.error("The solver did not find any adequate section from the defined list.")
-                    logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
-                    self.design_status = False
-                    self.design_status_list.append(self.design_status)
-                else:
-                    self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
-                    self.design_status = True
+                self.result_eff_sr_zz = self.optimum_section_ur_results[self.result_UR]['Effective_SR_zz']
+                self.result_eff_sr_yy = self.optimum_section_ur_results[self.result_UR]['Effective_SR_yy']
 
-            # results
-            self.result_designation = self.optimum_section_cost_results[self.result_cost]['Designation']
-            self.result_section_class = self.optimum_section_cost_results[self.result_cost]['Section class']
-            self.result_effective_area = self.optimum_section_cost_results[self.result_cost]['Effective area']
+                self.result_ebs_zz = self.optimum_section_ur_results[self.result_UR]['EBS_zz']
+                self.result_ebs_yy = self.optimum_section_ur_results[self.result_UR]['EBS_yy']
 
-            self.result_bc_zz = self.optimum_section_cost_results[self.result_cost]['Buckling_curve_zz']
-            self.result_bc_yy = self.optimum_section_cost_results[self.result_cost]['Buckling_curve_yy']
+                self.result_nd_esr_zz = self.optimum_section_ur_results[self.result_UR]['ND_ESR_zz']
+                self.result_nd_esr_yy = self.optimum_section_ur_results[self.result_UR]['ND_ESR_yy']
 
-            self.result_IF_zz = self.optimum_section_cost_results[self.result_cost]['IF_zz']
-            self.result_IF_yy = self.optimum_section_cost_results[self.result_cost]['IF_yy']
+                self.result_phi_zz = self.optimum_section_ur_results[self.result_UR]['phi_zz']
+                self.result_phi_yy = self.optimum_section_ur_results[self.result_UR]['phi_yy']
 
-            self.result_eff_len_zz = self.optimum_section_cost_results[self.result_cost]['Effective_length_zz']
-            self.result_eff_len_yy = self.optimum_section_cost_results[self.result_cost]['Effective_length_yy']
+                self.result_srf_zz = self.optimum_section_ur_results[self.result_UR]['SRF_zz']
+                self.result_srf_yy = self.optimum_section_ur_results[self.result_UR]['SRF_yy']
 
-            self.result_eff_sr_zz = self.optimum_section_cost_results[self.result_cost]['Effective_SR_zz']
-            self.result_eff_sr_yy = self.optimum_section_cost_results[self.result_cost]['Effective_SR_yy']
+                self.result_fcd_1_zz = self.optimum_section_ur_results[self.result_UR]['FCD_1_zz']
+                self.result_fcd_1_yy = self.optimum_section_ur_results[self.result_UR]['FCD_1_yy']
 
-            self.result_ebs_zz = self.optimum_section_cost_results[self.result_cost]['EBS_zz']
-            self.result_ebs_yy = self.optimum_section_cost_results[self.result_cost]['EBS_yy']
+                self.result_fcd_2 = self.optimum_section_ur_results[self.result_UR]['FCD_2']
 
-            self.result_nd_esr_zz = self.optimum_section_cost_results[self.result_cost]['ND_ESR_zz']
-            self.result_nd_esr_yy = self.optimum_section_cost_results[self.result_cost]['ND_ESR_yy']
+                self.result_fcd_zz = self.optimum_section_ur_results[self.result_UR]['FCD_zz']
+                self.result_fcd_yy = self.optimum_section_ur_results[self.result_UR]['FCD_yy']
 
-            self.result_phi_zz = self.optimum_section_cost_results[self.result_cost]['phi_zz']
-            self.result_phi_yy = self.optimum_section_cost_results[self.result_cost]['phi_yy']
+                self.result_fcd = self.optimum_section_ur_results[self.result_UR]['FCD']
+                self.result_capacity = self.optimum_section_ur_results[self.result_UR]['Capacity']
+                self.result_cost = self.optimum_section_ur_results[self.result_UR]['Cost']
+            else:
+                self.result_UR = self.optimum_section_cost_results[self.result_cost]['UR']
 
-            self.result_srf_zz = self.optimum_section_cost_results[self.result_cost]['SRF_zz']
-            self.result_srf_yy = self.optimum_section_cost_results[self.result_cost]['SRF_yy']
+                # checking if the selected section based on cost satisfies the UR
+                if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
 
-            self.result_fcd_1_zz = self.optimum_section_cost_results[self.result_cost]['FCD_1_zz']
-            self.result_fcd_1_yy = self.optimum_section_cost_results[self.result_cost]['FCD_1_yy']
+                    trial_cost = []
+                    for cost in self.optimum_section_cost:
+                        self.result_UR = self.optimum_section_cost_results[cost]['UR']
+                        if self.result_UR <= min(self.allowable_utilization_ratio, 1.0):
+                            trial_cost.append(cost)
 
-            self.result_fcd_2 = self.optimum_section_cost_results[self.result_cost]['FCD_2']
+                    trial_cost.sort()
 
-            self.result_fcd_zz = self.optimum_section_cost_results[self.result_cost]['FCD_zz']
-            self.result_fcd_yy = self.optimum_section_cost_results[self.result_cost]['FCD_yy']
+                    if len(trial_cost) == 0:  # no design was successful
+                        logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                                       "criteria")
+                        logger.error("The solver did not find any adequate section from the defined list.")
+                        logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                        self.design_status = False
+                        self.design_status_list.append(self.design_status)
+                        print(f"design_status_list{design_status_list} \n")
+                    else:
+                        self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
+                        self.design_status = True
 
-            self.result_fcd = self.optimum_section_cost_results[self.result_cost]['FCD']
-            self.result_capacity = self.optimum_section_cost_results[self.result_cost]['Capacity']
+                # results
+                self.result_designation = self.optimum_section_cost_results[self.result_cost]['Designation']
+                self.result_section_class = self.optimum_section_cost_results[self.result_cost]['Section class']
+                self.result_effective_area = self.optimum_section_cost_results[self.result_cost]['Effective area']
+
+                self.result_bc_zz = self.optimum_section_cost_results[self.result_cost]['Buckling_curve_zz']
+                self.result_bc_yy = self.optimum_section_cost_results[self.result_cost]['Buckling_curve_yy']
+
+                self.result_IF_zz = self.optimum_section_cost_results[self.result_cost]['IF_zz']
+                self.result_IF_yy = self.optimum_section_cost_results[self.result_cost]['IF_yy']
+
+                self.result_eff_len_zz = self.optimum_section_cost_results[self.result_cost]['Effective_length_zz']
+                self.result_eff_len_yy = self.optimum_section_cost_results[self.result_cost]['Effective_length_yy']
+
+                self.result_eff_sr_zz = self.optimum_section_cost_results[self.result_cost]['Effective_SR_zz']
+                self.result_eff_sr_yy = self.optimum_section_cost_results[self.result_cost]['Effective_SR_yy']
+
+                self.result_ebs_zz = self.optimum_section_cost_results[self.result_cost]['EBS_zz']
+                self.result_ebs_yy = self.optimum_section_cost_results[self.result_cost]['EBS_yy']
+
+                self.result_nd_esr_zz = self.optimum_section_cost_results[self.result_cost]['ND_ESR_zz']
+                self.result_nd_esr_yy = self.optimum_section_cost_results[self.result_cost]['ND_ESR_yy']
+
+                self.result_phi_zz = self.optimum_section_cost_results[self.result_cost]['phi_zz']
+                self.result_phi_yy = self.optimum_section_cost_results[self.result_cost]['phi_yy']
+
+                self.result_srf_zz = self.optimum_section_cost_results[self.result_cost]['SRF_zz']
+                self.result_srf_yy = self.optimum_section_cost_results[self.result_cost]['SRF_yy']
+
+                self.result_fcd_1_zz = self.optimum_section_cost_results[self.result_cost]['FCD_1_zz']
+                self.result_fcd_1_yy = self.optimum_section_cost_results[self.result_cost]['FCD_1_yy']
+
+                self.result_fcd_2 = self.optimum_section_cost_results[self.result_cost]['FCD_2']
+
+                self.result_fcd_zz = self.optimum_section_cost_results[self.result_cost]['FCD_zz']
+                self.result_fcd_yy = self.optimum_section_cost_results[self.result_cost]['FCD_yy']
+
+                self.result_fcd = self.optimum_section_cost_results[self.result_cost]['FCD']
+                self.result_capacity = self.optimum_section_cost_results[self.result_cost]['Capacity']
+
+                print(f"design_status_list2{design_status_list}")
 
         # end of the design simulation
         # overall design status

@@ -153,7 +153,7 @@ from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSp
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
-from design_type.compression_member.compression_column import CompressionColumn
+from design_type.compression_member import Column
 from design_type.compression_member.compression import Compression
 from design_type.compression_member.Column import ColumnDesign
 #from design_type.tension_member.tension import Tension
@@ -310,13 +310,16 @@ class OsdagMainWindow(QMainWindow):
             Button= LeftPanelButton(ModuleName)
             self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)
             self.ui.verticalLayout.addWidget(Button)
+            print(f"Here1{ModuleName}")
             if(type(self.Modules[ModuleName])==dict):        #level 2 dictionary handling
                 Page= ModulePage()
                 self.ui.myStackedWidget.addWidget(Page)
                 Current_Module=self.Modules[ModuleName]
                 Tab_Widget=New_Tab_Widget()
                 Page.layout.addWidget(Tab_Widget)
+                print(f"Here2{self.Modules[ModuleName]}")
                 for Submodule in Current_Module:
+                    print(f"Here3{Submodule}")
                     if(type(Current_Module[Submodule])==dict):          #Level 3 dictionary handling
                         New_Tab=ModulePage()
                         Tab_Widget.addTab(New_Tab,Submodule)
@@ -325,8 +328,10 @@ class OsdagMainWindow(QMainWindow):
                         Current_SubModule=Current_Module[Submodule]
                         Sub_Tab_Widget=New_Tab_Widget()
                         Sub_Page.layout.addWidget(Sub_Tab_Widget)
+                        print(f"Here4{Submodule}")
 
                         for Sub_Sub_Module in Current_SubModule:
+                            print(f"Here5{Sub_Sub_Module}")
                             if(type(Current_SubModule[Sub_Sub_Module]) in [list,tuple]):        # Final List/tuple Handling
                                 New_Sub_Tab=Submodule_Page()
                                 Sub_Tab_Widget.addTab(New_Sub_Tab,Sub_Sub_Module)
@@ -359,6 +364,7 @@ class OsdagMainWindow(QMainWindow):
                         group=QButtonGroup(QWidget(Page))
                         row,col=0,0
                         n=math.floor((len(Current_Module[Submodule])-2)/2)
+                        print(f"Here6")
 
                         for Selection in Current_Module[Submodule][:-1]:
                             widget=Submodule_Widget(Selection,New_Tab)
@@ -385,6 +391,7 @@ class OsdagMainWindow(QMainWindow):
                 group=QButtonGroup(QWidget(Page))
                 row,col=0,0
                 n=math.floor((len(self.Modules[ModuleName])-2)/2)
+                print(f"Here7")
 
                 for Selection in self.Modules[ModuleName][:-1]:
                     widget=Submodule_Widget(Selection,Page)
@@ -645,21 +652,28 @@ class OsdagMainWindow(QMainWindow):
 
     def show_compression_module(self):
         """ Create radio buttons for the sub-modules under the compression module"""
+        print(f"Here8")
         if self.findChild(QRadioButton, 'Column_Design').isChecked():
+            print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(ColumnDesign, ' ')
+            print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
         elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+            print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+            print(f"Here11.1")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
         elif self.findChild(QRadioButton, 'Strut_Design').isChecked():
+            print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(Compression, ' ')
+            print(f"Here11.2")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
@@ -839,6 +853,7 @@ if __name__ == '__main__':
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
+    print("Here0")
 
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 

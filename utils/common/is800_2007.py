@@ -266,17 +266,19 @@ class IS800_2007(object):
 
         ratio = outer_diameter / tube_thickness
 
+        print(f"outer_diameter{outer_diameter},tube_thickness{tube_thickness}")
+
         if load_type == 'axial compression':
-            if ratio > (88 * epsilon):
+            if ratio > (88 * epsilon**2):
                 section_class = 'Slender'
             else:
                 section_class = 'Semi-Compact'
         else:
-            if ratio <= (42 * epsilon):
+            if ratio <= (42 * epsilon**2):
                 section_class = 'Plastic'
-            elif (ratio > (42 * epsilon)) and (ratio <= (52 * epsilon)):
+            elif (ratio > (42 * epsilon**2)) and (ratio <= (52 * epsilon**2)):
                 section_class = 'Compact'
-            elif ratio <= (146 * epsilon):
+            elif ratio <= (146 * epsilon**2):
                 section_class = 'Semi-Compact'
             else:
                 section_class = 'Slender'

@@ -1498,6 +1498,7 @@ class Tension_bolted(Member):
         print(self.plate.bolt_line)
 
         self.member_check(self, design_dictionary)
+        print(f"")
 
 
 

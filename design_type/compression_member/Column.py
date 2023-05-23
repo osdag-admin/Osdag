@@ -960,7 +960,7 @@ class ColumnDesign(Member):
                 logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
                 self.design_status = False
                 self.design_status_list.append(self.design_status)
-                logger.info(" :=========End Of design===========")
+
             else:
                 self.result_UR = self.optimum_section_ur[-1]  # optimum section which passes the UR check
                 print(f"self.result_UR{self.result_UR}")

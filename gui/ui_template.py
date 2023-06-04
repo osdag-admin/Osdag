@@ -628,7 +628,7 @@ class Window(QMainWindow):
             if type == TYPE_TABLE_IN:
                 table_widget = QtWidgets.QTableWidget(self.dockWidgetContents)
                 table_widget.setObjectName(option[0])
-                table_widget.setRowCount(5)
+                table_widget.setRowCount(8)
                 table_widget.setColumnCount(6)
 
 

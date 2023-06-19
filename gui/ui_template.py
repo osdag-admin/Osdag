@@ -635,20 +635,29 @@ class Window(QMainWindow):
                 # header_labels = ["<html>Section profile</html>", "<html>Connection<br/>Location</html>", "<html>Section<br/>Size</html>",
                 #                  "<html>Material</html>", "<html>Angle with<br/>x-axis<br/>(Degrees)</html>", "<html>Factored<br/>Load(KN)</html>"]
 
-                table_widget.setHorizontalHeaderLabels(["Section profile", "Connection Location", "Section Size", "Material", "Angle with x-axis (Degrees)", "Factored Load (KN)"])
 
+                selectable_options = {   
+                    'Section profile':      ['Angle', 'Channel', 'Back to Back Angles', 'Back to Back channels', 'Star Angles'],
+                    'Connection Location':  { 'Angle': ['Long leg connected','Short leg connected'], 'Channel': ['Web-connected']},
+                    'Section Size':         ['20 x 20 x 3', '20 x 20 x4', '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5'],
+                    'Material':             ['E165', 'E250 (Fe 410W) A', 'E250 (Fe 410W) B', 'E250 (Fe 410W) C', 'E350 (Fe 490)', 'E300 (Fe 440)', 'E410 (Fe 940)', 'E450 (Fe 570) D', 'E450 (Fe 590) E', 'Custom']
+                }
+                
+                combo_box_dictionary = dict()   # Just in case, if we need the combo_box object for each option
+                
+                table_widget.setHorizontalHeaderLabels(list(selectable_options.keys()) + ["Angle with x-axis (Degrees)", "Factored Load (KN)"])
 
-                combo_box1 = QtWidgets.QComboBox()
-                combo_box1.addItems(['Angle', 'Channel', 'Back to Back Angles', 'Back to Back channels', 'Star Angles'])
-                table_widget.setCellWidget(0, 0, combo_box1)
+                for col,(key,value) in enumerate(selectable_options.items()):
+                    if key == 'Connection Location':
+                        continue
+                    combo_box_list = []
+                    for row in range(8):
+                        combo_box = QtWidgets.QComboBox()
+                        combo_box.addItems(value)
+                        table_widget.setCellWidget(row, col, combo_box)
+                        combo_box_list.append(combo_box)
+                    combo_box_dictionary[key] = combo_box_list
 
-                combo_box2 = QtWidgets.QComboBox()
-                combo_box2.addItems(['E165', 'E250 (Fe 410W) A', 'E250 (Fe 410W) B', 'E250 (Fe 410W) C', 'E350 (Fe 490)', 'E300 (Fe 440)', 'E410 (Fe 940)', 'E450 (Fe 570) D', 'E450 (Fe 590) E', 'Custom'])
-                table_widget.setCellWidget(0, 3, combo_box2)
-
-                combo_box6 = QtWidgets.QComboBox()
-                combo_box6.addItems(['20 x 20 x 3', '20 x 20 x4', '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5'])
-                table_widget.setCellWidget(0, 6, combo_box6)
 
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()

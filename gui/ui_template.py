@@ -637,10 +637,31 @@ class Window(QMainWindow):
 
 
                 selectable_options = {   
-                    'Section profile':      ['Angle', 'Channel', 'Back to Back Angles', 'Back to Back channels', 'Star Angles'],
-                    'Connection Location':  { 'Angle': ['Long leg connected','Short leg connected'], 'Channel': ['Web-connected']},
-                    'Section Size':         ['20 x 20 x 3', '20 x 20 x4', '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5'],
-                    'Material':             ['E165', 'E250 (Fe 410W) A', 'E250 (Fe 410W) B', 'E250 (Fe 410W) C', 'E350 (Fe 490)', 'E300 (Fe 440)', 'E410 (Fe 940)', 'E450 (Fe 570) D', 'E450 (Fe 590) E', 'Custom']
+                    'Section profile':      ['Angle', 'Star Angles', 'Back to Back Angles', 'Channel', 'Back to Back channels'],
+                    'Connection Location':  { 
+                                                'Angle': ['Long leg connected','Short leg connected'], 
+                                                'Channel': ['Web-connected']
+                                            },
+                    'Section Size': [
+                                        '20 x 20 x 3', '20 x 20 x 4', 
+                                        '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5', 
+                                        '30 x 20 x 3', '30 x 20 x 4', '30 x 20 x 5', 
+                                        '30 x 30 x 3', '30 x 30 x 4', '30 x 30 x 5', 
+                                        '35 x 35 x 3', '35 x 35 x 4', '35 x 35 x 5', '35 x 35 x 6', 
+                                        '40 x 20 x 3', '40 x 20 x 4', '40 x 20 x 5', 
+                                        '40 x 25 x 3', '40 x 25 x 4', '40 x 25 x 5', '40 x 25 x 6',
+                                        '40 x 40 x 3', '40 x 40 x 4', '40 x 40 x 5', '40 x 40 x 6',
+                                        '45 x 30 x 3', '45 x 30 x 4', '45 x 30 x 5', '45 x 30 x 6',
+                                        '45 x 45 x 3'
+                                    ],
+                    'Material':     [
+                                        'E165', 
+                                        'E250 (Fe 410W) A', 'E250 (Fe 410W) B', 'E250 (Fe 410W) C',
+                                        'E300 (Fe 440)', 
+                                        'E350 (Fe 490)', 
+                                        'E450 (Fe 570) D', 'E450 (Fe 590) E',
+                                        'Custom'
+                                    ]
                 }
                 
                 combo_box_dictionary = dict()   # Just in case, if we need the combo_box object for each option

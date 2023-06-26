@@ -637,8 +637,8 @@ class Window(QMainWindow):
 
 
                 selectable_options = {   
-                    'Section profile':      ['Angle', 'Star Angles', 'Back to Back Angles', 'Channel', 'Back to Back channels'],
-                    'Connection Location':  { 
+                    'Section profile':      ['Angle', 'Star Angles', 'Back to Back Angles', 'Channel', 'Back to Back Channels'],
+                    'Connection Location':  {
                                                 'Angle': ['Long leg connected','Short leg connected'], 
                                                 'Channel': ['Web-connected']
                                             },
@@ -669,27 +669,56 @@ class Window(QMainWindow):
                 table_widget.setHorizontalHeaderLabels(list(selectable_options.keys()) + ["Angle with x-axis (Degrees)", "Factored Load (KN)"])
 
                 for col,(key,value) in enumerate(selectable_options.items()):
-                    if key == 'Section profile' or key == 'Connection Location':
+                    if key == 'Connection Location':
                         continue
-                    combo_box_list = []
-                    for row in range(8):
-                        combo_box = QtWidgets.QComboBox()
-                        combo_box.addItems(value)
-                        table_widget.setCellWidget(row, col, combo_box)
-                        combo_box_list.append(combo_box)
-                    combo_box_dictionary[key] = combo_box_list
+                    elif key == 'Section profile':
+                        combo_box_section_profile = QtWidgets.QComboBox()
+                        combo_box_connection_location = QtWidgets.QComboBox()
 
-                    combo_box_secpro = QtWidgets.QComboBox()
-                    combo_box_connloc = QtWidgets.QComboBox()
+                        for item in selectable_options['Section profile']:
+                            value = None
+                            if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
+                                value = selectable_options['Connection Location']['Angle']
+                            elif item in ['Channel', 'Back to Back Channels']:
+                                value = selectable_options['Connection Location']['Channel']
+                            combo_box_section_profile.addItem(item,value)
 
-                    combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
-                    combo_box_secpro.addItem('Channel',['Web-connected'])
+                        combo_box_section_profile.activated.connect(
+                            lambda: combo_box_connection_location.clear() or
+                                    combo_box_connection_location.addItems(selectable_options['Connection Location'][combo_box_section_profile.currentText()])
+                        )
 
-                    combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
-                        selectable_options['Connection Location'][combo_box_secpro.currentText()]))
+                        combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
 
-                    table_widget.setCellWidget(0,0,combo_box_secpro)
-                    table_widget.setCellWidget(0,1,combo_box_connloc)
+                        combo_box_section_profile_list = []
+                        combo_box_connection_location_list = []
+                        for row in range(8):
+                            table_widget.setCellWidget(row, col, combo_box_section_profile)
+                            table_widget.setCellWidget(row, col+1, combo_box_connection_location)
+                            combo_box_section_profile_list.append(combo_box_section_profile)
+                            combo_box_connection_location_list.append(combo_box_connection_location)
+                        combo_box_dictionary['Section profile'] = combo_box_section_profile_list
+                        combo_box_dictionary['Connection Location'] = combo_box_connection_location_list
+                    else:
+                        combo_box_list = []
+                        for row in range(8):
+                            combo_box = QtWidgets.QComboBox()
+                            combo_box.addItems(value)
+                            table_widget.setCellWidget(row, col, combo_box)
+                            combo_box_list.append(combo_box)
+                        combo_box_dictionary[key] = combo_box_list
+
+                    # combo_box_secpro = QtWidgets.QComboBox()
+                    # combo_box_connloc = QtWidgets.QComboBox()
+                    #
+                    # combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
+                    # combo_box_secpro.addItem('Channel',['Web-connected'])
+                    #
+                    # combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
+                    #     selectable_options['Connection Location'][combo_box_secpro.currentText()]))
+
+                    # table_widget.setCellWidget(0,0,combo_box_secpro)
+                    # table_widget.setCellWidget(0,1,combo_box_connloc)
 
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()

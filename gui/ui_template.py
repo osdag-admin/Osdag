@@ -669,7 +669,7 @@ class Window(QMainWindow):
                 table_widget.setHorizontalHeaderLabels(list(selectable_options.keys()) + ["Angle with x-axis (Degrees)", "Factored Load (KN)"])
 
                 for col,(key,value) in enumerate(selectable_options.items()):
-                    if key == 'Connection Location':
+                    if key == 'Section profile' or key == 'Connection Location':
                         continue
                     combo_box_list = []
                     for row in range(8):
@@ -679,6 +679,17 @@ class Window(QMainWindow):
                         combo_box_list.append(combo_box)
                     combo_box_dictionary[key] = combo_box_list
 
+                    combo_box_secpro = QtWidgets.QComboBox()
+                    combo_box_connloc = QtWidgets.QComboBox()
+
+                    combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
+                    combo_box_secpro.addItem('Channel',['Web-connected'])
+
+                    combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
+                        selectable_options['Connection Location'][combo_box_secpro.currentText()]))
+
+                    table_widget.setCellWidget(0,0,combo_box_secpro)
+                    table_widget.setCellWidget(0,1,combo_box_connloc)
 
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()
@@ -1268,7 +1279,7 @@ class Window(QMainWindow):
         self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
         # To disable loading window comment below line and uncomment line below that
         self.btn_Design.clicked.connect(lambda: self.start_loadingWindow(main, data))
-        # self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
+        # self.btn_Design.clicked.co0nnect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         self.actionChange_background.triggered.connect(self.showColorDialog)

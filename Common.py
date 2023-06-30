@@ -356,6 +356,7 @@ DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
 KEY_DISP_COMPRESSION_COLUMN = 'Pure Axial Column Design'
+KEY_DISP_COMPRESSION_Strut = 'Strut Design'
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'
@@ -1988,8 +1989,9 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
+VALUES_SEC_PROFILE_Compression_Strut = ['Angles', 'Back to Back Angles']
 
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)'

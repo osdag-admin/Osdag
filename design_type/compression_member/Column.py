@@ -306,8 +306,10 @@ class ColumnDesign(Member):
             return connectdb("SHS", call_type="popup")
         elif profile == 'CHS':
             return connectdb("CHS", call_type="popup")
-        elif profile == 'Angles':
+        elif profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
             return connectdb('Angles', call_type= "popup")
+        elif profile in ['Channels', 'Back to Back Channels']:
+            return connectdb("Channels", call_type= "popup")
 
     def fn_end1_end2(self):
 

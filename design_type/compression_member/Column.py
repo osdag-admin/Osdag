@@ -14,7 +14,7 @@ import math
 import numpy as np
 from Common import *
 from design_type.connection.moment_connection import MomentConnection
-from utils.common.material import Material
+from utils.common.material import *
 from utils.common.load import Load
 from utils.common.component import ISection, Material
 from utils.common.component import *
@@ -119,7 +119,7 @@ class ColumnDesign(Member):
         design_input = []
 
         # t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SEC_MATERIAL])
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])#Need to check
         design_input.append(t1)
 
         # t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY, 'Label_21'])
@@ -178,7 +178,6 @@ class ColumnDesign(Member):
         return add_buttons
 
     def get_values_for_design_pref(self, key, design_dictionary):
-        print(f"Here get_values_for_design_pref")
         if design_dictionary[KEY_MATERIAL] != 'Select Material':
             material = Material(design_dictionary[KEY_MATERIAL], 41)
             fu = material.fu
@@ -205,6 +204,8 @@ class ColumnDesign(Member):
     # Design Preference Functions End
     ####################################
 
+    # Setting up logger and Input and Output Docks
+    ####################################
     def module_name(self):
         return KEY_DISP_COMPRESSION_COLUMN
 
@@ -245,6 +246,7 @@ class ColumnDesign(Member):
     def input_values(self):
         """ Fuction to return a list of tuples to be displayed as the UI (Input Dock)"""
 
+        self.module = KEY_DISP_COMPRESSION_COLUMN
         options_list = []
 
         t1 = (None, KEY_SECTION_PROPERTY, TYPE_TITLE, None, True, 'No Validator')
@@ -304,6 +306,8 @@ class ColumnDesign(Member):
             return connectdb("SHS", call_type="popup")
         elif profile == 'CHS':
             return connectdb("CHS", call_type="popup")
+        elif profile == 'Angles':
+            return connectdb('Angles', call_type= "popup")
 
     def fn_end1_end2(self):
 

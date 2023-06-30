@@ -291,12 +291,16 @@ class MaterialValidator(object):
 ###########################
 TYPE_COMBOBOX = 'ComboBox'
 TYPE_COMBOBOX_FREEZE = 'Disable_ComboBoc'
+TYPE_TABLE_IN = 'Table_Input'
+TYPE_TABLE_OU = 'Table_Output'
+TYPE_TABLE_GUS = 'Gusset_Table'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+TYPE_IN_BUTTON = 'Input_dock_Button'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_OUT_DOCK = 'Output_dock_Item'
 TYPE_OUT_LABEL = 'Output_dock_Label'
@@ -334,6 +338,7 @@ KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
 KEY_DISP_SEATED_ANGLE = 'Seated Angle Connection'
 KEY_DISP_BASE_PLATE = 'Base Plate Connection'
+KEY_DISP_TRUSS_BOLTED = 'Truss Connection Bolted'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
@@ -350,14 +355,14 @@ KEY_DISP_BB_EP_SPLICE = 'Beam-to-Beam End Plate Connection'
 DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
-KEY_DISP_COMPRESSION_COLUMN = 'Column Design'
+KEY_DISP_COMPRESSION_COLUMN = 'Pure Axial Column Design'
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'
 KEY_MEMBER_DATA = 'Member.Data'
 KEY_SECTION_PROFILE = 'Section.Profile'
 KEY_DISP_SECTION_PROFILE = 'Section Profile *'
-VALUES_SEC_PROFILE_COLUMN = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
+VALUES_SEC_PROFILE_COLUMN = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles']
 KEY_SECTION_DEFINITION = 'SectionDefinition'
 KEY_DISP_SECTION_DEFINITION = 'Section Definition*'
 KEY_DISP_MEMBER_DATA = 'Member Data'
@@ -438,6 +443,8 @@ KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 ###################################
 KEY_MODULE = 'Module'
 KEY_CONN = 'Connectivity'
+KEY_TABLE = 'Table'
+KEY_MEMBERS = 'No of Members'
 KEY_LOCATION = 'Conn_Location'
 KEY_ENDPLATE_TYPE = 'EndPlateType'
 KEY_MATERIAL = 'Material'
@@ -477,6 +484,7 @@ KEY_MOMENT = 'Load.Moment'
 
 KEY_D = 'Bolt.Diameter'
 KEY_TYP = 'Bolt.Type'
+KEY_COF = 'Bolt.Coefficient'
 KEY_GRD = 'Bolt.Grade'
 
 # KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
@@ -556,7 +564,9 @@ VALUES_PLATETHK = ['All', 'Customized']
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ANGLESEC= ['All', 'Customized']
+VALUES_TRUSSBOLT_THK = ['8', '10', '12', '14', '16']
 
+VALUES_MEMBERS = ['2', '3', '4', '5', '6', '7', '8']
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 VALUES_TYP_ANCHOR = ['End Plate Type', 'IS 5624-Type A', 'IS 5624-Type B']
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
@@ -692,6 +702,7 @@ DISP_TITLE_FOOTING = 'Pedestal/Footing'
 KEY_DISP_CONN = 'Connectivity'
 
 KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
+KEY_DISP_MEMBERS = 'No of Members'
 
 
 # VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
@@ -760,6 +771,7 @@ KEY_DISP_AXIAL = 'Axial Force (kN)'
 KEY_DISP_AXIAL_STAR = 'Axial (kN)* '
 DISP_TITLE_PLATE = 'Plate'
 KEY_DISP_TYP = 'Type'
+KEY_DISP_COF = 'Coefficient of friction'
 KEY_DISP_TYP_ANCHOR = 'Anchor Type'
 KEY_DISP_GRD_ANCHOR = 'Property Class'
 KEY_DISP_GRD_FOOTING = 'Grade*'
@@ -776,6 +788,7 @@ KEY_DISP_APPLIED_SHEAR_LOAD = 'Applied Shear Force (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE = 'Applied Axial Force (kN)'
 KEY_DISP_APPLIED_MOMENT_LOAD = 'Applied Moment (kNm)'
 KEY_DISP_AXIAL_FORCE_CON = 'Axial Load Considered (kN)'
+
 
 # capacity
 

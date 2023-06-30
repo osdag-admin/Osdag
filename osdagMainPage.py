@@ -141,6 +141,7 @@ from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.base_plate_connection import BasePlateConnection
+from design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
@@ -284,19 +285,27 @@ class OsdagMainWindow(QMainWindow):
                                         ('Base Plate Connection', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
-                                'Truss Connection' : self.Under_Development,
+                                'Truss Connection' : [
+                                    ('Truss Connection Bolted', 'ResourceFiles/images/broken.png', 'Truss_Bolted'),
+                                    ('Truss Connection Welded', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                                    self.show_truss_bolted,
+                                                   ],
                                 },
                 'Tension Member' : [
                             ('Bolted to End Gusset','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
-                                       ('Beam-Column Design', 'ResourceFiles/images/compression_column.png', 'Beam_Column_Design'),
+                'Compression Member': [('Pure Axial Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
+                                       ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
                                        ('Strut Design', 'ResourceFiles/images/compression_column.png', 'Strut_Design'),
                                        self.show_compression_module,
                                        ],
-                'Flexural Member' : self.Under_Development,
+                'Flexural Member' : [
+                    ('Laterally Supported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    self.show_truss_bolted,
+                ],
                 'Beam-Column' : self.Under_Development,
                 'Plate Girder' : self.Under_Development,
                 'Truss' : self.Under_Development,
@@ -562,6 +571,20 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(BasePlateConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+
+    def show_truss_bolted(self):
+        if self.findChild(QRadioButton, 'Truss_Bolted').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(TrussConnectionBolted, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        #elif self.findChild(QRadioButton,'Truss_Welded').isChecked():
+        #    self.hide()
+        #    self.ui2 = Ui_ModuleWindow(BasePlateConnection, ' ')
+        #    self.ui2.show()
+        #    self.ui2.closed.connect(self.show)
+        else:
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     def show_moment_connection_cc(self):
         if self.findChild(QRadioButton,'C2C_Cover_Plate_Bolted').isChecked() :

@@ -626,6 +626,41 @@ class Window(QMainWindow):
                     for disabled in option[6]:
                         combo.model().item(disabled).setEnabled(False)
 
+            if type == TYPE_TABLE_IN:
+                table_widget = QtWidgets.QTableWidget(self.dockWidgetContents)
+                table_widget.setObjectName(option[0])
+                table_widget.setRowCount(8)
+                table_widget.setColumnCount(6)
+
+
+                # header_labels = ["<html>Section profile</html>", "<html>Connection<br/>Location</html>", "<html>Section<br/>Size</html>",
+                #                  "<html>Material</html>", "<html>Angle with<br/>x-axis<br/>(Degrees)</html>", "<html>Factored<br/>Load(KN)</html>"]
+
+                table_widget.setHorizontalHeaderLabels(["Section profile", "Connection Location", "Section Size", "Material", "Angle with x-axis (Degrees)", "Factored Load (KN)"])
+
+
+                combo_box1 = QtWidgets.QComboBox()
+                combo_box1.addItems(['Angle', 'Channel', 'Back to Back Angles', 'Back to Back channels', 'Star Angles'])
+                table_widget.setCellWidget(0, 0, combo_box1)
+
+                combo_box2 = QtWidgets.QComboBox()
+                combo_box2.addItems(['E165', 'E250 (Fe 410W) A', 'E250 (Fe 410W) B', 'E250 (Fe 410W) C', 'E350 (Fe 490)', 'E300 (Fe 440)', 'E410 (Fe 940)', 'E450 (Fe 570) D', 'E450 (Fe 590) E', 'Custom'])
+                table_widget.setCellWidget(0, 3, combo_box2)
+
+                combo_box6 = QtWidgets.QComboBox()
+                combo_box6.addItems(['20 x 20 x 3', '20 x 20 x4', '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5'])
+                table_widget.setCellWidget(0, 6, combo_box6)
+
+                table_widget.resizeRowsToContents()
+                table_widget.resizeColumnsToContents()
+
+                if option[0] in input_dp_conn_list:
+                    self.input_dp_connection(table_widget)
+                table_widget.setEnabled(True if option[4] else False)
+                if option[5] != 'No Validator':
+                    table_widget.setValidator(self.get_validator(option[5]))
+                in_layout2.addWidget(table_widget, j, 1, 1, 2)
+
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
                 r.setObjectName(option[0])
@@ -879,6 +914,65 @@ class Window(QMainWindow):
                 out_layout2.addWidget(b, j, 2, 1, 1)
                 maxi_width_right = max(maxi_width_right, b.sizeHint().width())
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
+
+            if output_type == TYPE_TABLE_OU:
+                table_widget = QtWidgets.QTableWidget(self.dockWidgetContents_out)
+                table_widget.setObjectName(option[0])
+                table_widget.setRowCount(18)
+                table_widget.setColumnCount(8)
+
+                # Set the vertical header labels
+                vertical_labels = ["Bolt Details", "Dia. of Bolt(mm)", "Property Class", "Bolt Hole Dia.(mm)", "No. of Bolts(nos)", "Bolt Rows(nos)", "Bolt Columns(nos)", "End Distance(mm)", "Pitch Distance(mm)", "Edge Distance_1(mm)", "Gauge Distance(mm)", "Edge Distance_2(mm)", "Overlap Length(mm)", "Bolt Strength Detail", "Single Bolt Capacity(KN)", "Bolt Group Capacity(KN)", "Factored Laod(KN)", "Capacity Factor(KN)"]
+                table_widget.setVerticalHeaderLabels(vertical_labels)
+
+                table_widget.setHorizontalHeaderLabels(["1", "2", "3", "4", "5", "6", "7", "8"])
+
+
+                # Populate the table with read-only items
+                for row in range(table_widget.rowCount()):
+                    for col in range(table_widget.columnCount()):
+                        item = QTableWidgetItem()
+                        item.setTextAlignment(Qt.AlignCenter)
+                        item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # Disable editing
+                        table_widget.setItem(row, col, item)
+
+
+                table_widget.resizeRowsToContents()
+                table_widget.resizeColumnsToContents()
+
+                # if option[0] in input_dp_conn_list:
+                    # self.input_dp_connection(table_widget)
+                table_widget.setEnabled(True if option[4] else False)
+                if option[5] != 'No Validator':
+                    table_widget.setValidator(self.get_validator(option[5]))
+                out_layout2.addWidget(table_widget, j, 1, 1, 2)
+
+            if output_type == TYPE_TABLE_GUS:
+                table_widget = QtWidgets.QTableWidget(self.dockWidgetContents_out)
+                table_widget.setObjectName(option[0])
+                table_widget.setRowCount(1)
+                table_widget.setColumnCount(3)
+                table_widget.setHorizontalHeaderLabels(["Plate Thickness", "f_u (Mpa)", "f_y (Mpa)"])
+                table_widget.setColumnWidth(1, 80)
+                table_widget.setColumnWidth(2, 80)
+
+                # Populate the table with read-only items
+                for row in range(table_widget.rowCount()):
+                    for col in range(table_widget.columnCount()):
+                        item = QTableWidgetItem()
+                        item.setTextAlignment(Qt.AlignCenter)
+                        item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # Disable editing
+                        table_widget.setItem(row, col, item)
+
+                #table_widget.resizeRowsToContents()
+                #table_widget.resizeColumnsToContents()
+
+                # if option[0] in input_dp_conn_list:
+                    # self.input_dp_connection(table_widget)
+                table_widget.setEnabled(True if option[4] else False)
+                if option[5] != 'No Validator':
+                    table_widget.setValidator(self.get_validator(option[5]))
+                out_layout2.addWidget(table_widget, j, 1, 1, 2)
 
             if output_type == TYPE_TITLE:
                 key = lable
@@ -1989,6 +2083,10 @@ class Window(QMainWindow):
         note_layout = QVBoxLayout(note_widget)
         layout1.addWidget(note_widget)
 
+        tabel_widget = QWidget(dialog)
+        table_layout = QVBoxLayout(tabel_widget)
+        layout1.addWidget(tabel_widget)
+
         scroll = QScrollArea(dialog)
         layout1.addWidget(scroll)
         scroll.setWidgetResizable(True)
@@ -2086,6 +2184,12 @@ class Window(QMainWindow):
                         r.setObjectName(option[0])
                         r.setText(str(value))
                         inner_grid_layout.addWidget(r, j, 2, 1, 1)
+
+                    if option_type == TYPE_TABLE_OU:
+                        tb = QtWidgets.QTableWidget(tabel_widget)
+                        #tb.setAlignment(Qt.AlignCenter)
+                        #tb.setScaledContents(True)
+                        table_layout.addWidget(tb)
 
                     if option_type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(image_widget)

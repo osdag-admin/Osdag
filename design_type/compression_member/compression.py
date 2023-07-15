@@ -2,6 +2,7 @@ from design_type.member import Member
 from Common import *
 from utils.common.component import ISection, Material
 from utils.common.load import Load
+from design_type.tension_member import *
 from utils.common.Section_Properties_Calculator import I_sectional_Properties
 
 
@@ -134,7 +135,15 @@ class Compression(Member):
         """
         add_buttons = []
 
-        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        # t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        # add_buttons.append(t2)
+
+        t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
+              ['Angles', 'Back to Back Angles'], "Angles")
+        add_buttons.append(t2)
+
+        t2 = (DISP_TITLE_CHANNEL, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
+              ['Channels', 'Back to Back Channels'], "Channels")
         add_buttons.append(t2)
 
         return add_buttons
@@ -217,17 +226,20 @@ class Compression(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE_Compression_Strut, True, 'No Validator')
         options_list.append(t2)
 
+        # t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        # options_list.append(t3)
+
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
         options_list.append(t4)
 
         t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_LENZZ, KEY_DISP_LENZZ, TYPE_TEXTBOX, None, True, 'No Validator')
+        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
-        t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t6)
+        # t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, None, True, 'No Validator')
+        # options_list.append(t6)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
@@ -235,11 +247,11 @@ class Compression(Member):
         t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t12)
-
-        t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t13)
+        # t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, None, True, 'No Validator')
+        # options_list.append(t12)
+        #
+        # t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, None, True, 'No Validator')
+        # options_list.append(t13)
 
         t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
@@ -255,9 +267,23 @@ class Compression(Member):
 
         return options_list
 
+    def fn_conn_image(self):
+
+        "Function to populate section images based on the type of section "
+        img = self[0]
+        if img == VALUES_SEC_PROFILE_Compression_Strut[0]:
+            return VALUES_IMG_TENSIONBOLTED[0]
+        elif img ==VALUES_SEC_PROFILE_Compression_Strut[1]:
+            return VALUES_IMG_TENSIONBOLTED[1]
+        elif img ==VALUES_SEC_PROFILE_Compression_Strut[2]:
+            return VALUES_IMG_TENSIONBOLTED[3]
+        else:
+            return VALUES_IMG_TENSIONBOLTED[4]
+
     def fn_profile_section(self):
 
         profile = self[0]
+        print(f'profile = {self[0]}')
         if profile == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif profile == 'Columns':
@@ -268,59 +294,63 @@ class Compression(Member):
             return connectdb("SHS", call_type="popup")
         elif profile == 'CHS':
             return connectdb("CHS", call_type="popup")
+        elif profile in ['Angles', 'Back to Back Angles']:
+            return connectdb("Angles", call_type="popup")
+        elif profile in ['Channels', 'Back to Back Channels']:
+            return connectdb("Channels", call_type="popup")
 
 
-    def fn_end1_end2(self):
+    # def fn_end1_end2(self):
+    #
+    #     end1 = self[0]
+    #     if end1 == 'Fixed':
+    #         return VALUES_END2
+    #     elif end1 == 'Free':
+    #         return ['Fixed']
+    #     elif end1 == 'Hinged':
+    #         return ['Fixed', 'Hinged', 'Roller']
+    #     elif end1 == 'Roller':
+    #         return ['Fixed', 'Hinged']
 
-        end1 = self[0]
-        if end1 == 'Fixed':
-            return VALUES_END2
-        elif end1 == 'Free':
-            return ['Fixed']
-        elif end1 == 'Hinged':
-            return ['Fixed', 'Hinged', 'Roller']
-        elif end1 == 'Roller':
-            return ['Fixed', 'Hinged']
+    # def fn_end1_image(self):
+    #
+    #     if self == 'Fixed':
+    #         return "./ResourceFiles/images/6.RRRR.PNG"
+    #     elif self == 'Free':
+    #         return "./ResourceFiles/images/1.RRFF.PNG"
+    #     elif self == 'Hinged':
+    #         return "./ResourceFiles/images/5.RRRF.PNG"
+    #     elif self == 'Roller':
+    #         return "./ResourceFiles/images/4.RRFR.PNG"
 
-    def fn_end1_image(self):
-
-        if self == 'Fixed':
-            return "./ResourceFiles/images/6.RRRR.PNG"
-        elif self == 'Free':
-            return "./ResourceFiles/images/1.RRFF.PNG"
-        elif self == 'Hinged':
-            return "./ResourceFiles/images/5.RRRF.PNG"
-        elif self == 'Roller':
-            return "./ResourceFiles/images/4.RRFR.PNG"
-
-    def fn_end2_image(self):
-
-        end1 = self[0]
-        end2 = self[1]
-
-        if end1 == 'Fixed':
-            if end2 == 'Fixed':
-                return "./ResourceFiles/images/6.RRRR.PNG"
-            elif end2 == 'Free':
-                return "./ResourceFiles/images/1.RRFF_rotated.PNG"
-            elif end2 == 'Hinged':
-                return "./ResourceFiles/images/5.RRRF_rotated.PNG"
-            elif end2 == 'Roller':
-                return "./ResourceFiles/images/4.RRFR_rotated.PNG"
-        elif end1 == 'Free':
-            return "./ResourceFiles/images/1.RRFF.PNG"
-        elif end1 == 'Hinged':
-            if end2 == 'Fixed':
-                return "./ResourceFiles/images/5.RRRF.PNG"
-            elif end2 == 'Hinged':
-                return "./ResourceFiles/images/3.RFRF.PNG"
-            elif end2 == 'Roller':
-                return "./ResourceFiles/images/2.FRFR_rotated.PNG"
-        elif end1 == 'Roller':
-            if end2 == 'Fixed':
-                return "./ResourceFiles/images/4.RRFR.PNG"
-            elif end2 == 'Hinged':
-                return "./ResourceFiles/images/2.FRFR.PNG"
+    # def fn_end2_image(self):
+    #
+    #     end1 = self[0]
+    #     end2 = self[1]
+    #
+    #     if end1 == 'Fixed':
+    #         if end2 == 'Fixed':
+    #             return "./ResourceFiles/images/6.RRRR.PNG"
+    #         elif end2 == 'Free':
+    #             return "./ResourceFiles/images/1.RRFF_rotated.PNG"
+    #         elif end2 == 'Hinged':
+    #             return "./ResourceFiles/images/5.RRRF_rotated.PNG"
+    #         elif end2 == 'Roller':
+    #             return "./ResourceFiles/images/4.RRFR_rotated.PNG"
+    #     elif end1 == 'Free':
+    #         return "./ResourceFiles/images/1.RRFF.PNG"
+    #     elif end1 == 'Hinged':
+    #         if end2 == 'Fixed':
+    #             return "./ResourceFiles/images/5.RRRF.PNG"
+    #         elif end2 == 'Hinged':
+    #             return "./ResourceFiles/images/3.RFRF.PNG"
+    #         elif end2 == 'Roller':
+    #             return "./ResourceFiles/images/2.FRFR_rotated.PNG"
+    #     elif end1 == 'Roller':
+    #         if end2 == 'Fixed':
+    #             return "./ResourceFiles/images/4.RRFR.PNG"
+    #         elif end2 == 'Hinged':
+    #             return "./ResourceFiles/images/2.FRFR.PNG"
 
     def input_value_changed(self):
 
@@ -329,15 +359,18 @@ class Compression(Member):
         t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
 
-        t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
-        lst.append(t2)
+        # t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
+        # lst.append(t2)
 
-        t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t3)
+
+        # t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        # lst.append(t3)
 
         # t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         # lst.append(t4)
-
+        print(f'input_value_changed lst={lst}')
         return lst
 
     def output_values(self,flag):
@@ -352,6 +385,8 @@ class Compression(Member):
         self.design_status = False
         flag = False
         option_list = self.input_values(self)
+        print(f'option list = {option_list}')
+        print(f'design_dictionary = {design_dictionary}')
         missing_fields_list = []
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:

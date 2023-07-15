@@ -555,14 +555,17 @@ class Window(QMainWindow):
         in_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
         input_dp_conn_list = main.input_dictionary_without_design_pref(main)
+        print(f'input_dp_conn_list {input_dp_conn_list}')
         input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
-        print(input_dp_conn_list)
+
 
         """
         This routine takes the returned list from input_values function of corresponding module
         and creates the specified QT widgets, [Ref input_values function is any module for details]
         """
         option_list = main.input_values(self)
+        print(f'setupui option_list {option_list}')
+
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
@@ -760,6 +763,7 @@ class Window(QMainWindow):
 
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
+        print(f'ui_template.py input_value_changed ')
         data = {}
 
         d = {}
@@ -1232,6 +1236,7 @@ class Window(QMainWindow):
         self.menubar.addAction(self.menuDB.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
+        print(f'setupUi 1236 line')
         self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -1245,6 +1250,7 @@ class Window(QMainWindow):
         self.actionSave_3D_model.triggered.connect(lambda: self.save3DcadImages(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
         self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
+        print(f'setupUi actionCreate_design_report done ')
 
         self.check_for_update.triggered.connect(lambda: self.notification())
         self.actionZoom_out.triggered.connect(lambda: self.display.ZoomFactor(1/1.1))
@@ -1260,6 +1266,7 @@ class Window(QMainWindow):
         self.actionAbout_Osdag_2.triggered.connect(lambda: MyAboutOsdag(self).exec())
         self.actionAsk_Us_a_Question.triggered.connect(lambda: MyAskQuestion(self).exec())
         self.actionDesign_examples.triggered.connect(self.design_examples)
+        print(f'setupUi actionDesign_examples done ')
 
         self.actionSave_Top_View.triggered.connect(lambda: self.display.View_Top())
         self.actionSave_Front_View.triggered.connect(lambda: self.display.View_Front())
@@ -1285,17 +1292,20 @@ class Window(QMainWindow):
         self.btnTop.clicked.connect(lambda: self.display.FitAll())
         self.btnFront.clicked.connect(lambda: self.display.FitAll())
         self.btnSide.clicked.connect(lambda: self.display.FitAll())
+        print(f'setupUi btnSide.clicked done ')
 
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
         last_design_file = os.path.join(last_design_folder, last_design_file)
         last_design_dictionary = {}
+        print(f'last_design_dictionary {last_design_dictionary}')
         if not os.path.isdir(last_design_folder):
             os.mkdir(last_design_folder)
         if os.path.isfile(last_design_file):
             with open(str(last_design_file), 'r') as last_design:
                 last_design_dictionary = yaml.safe_load(last_design)
+                print(f'last_design_dictionary {last_design_dictionary}')
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
             if "out_titles_status" in last_design_dictionary.keys():
@@ -1319,6 +1329,7 @@ class Window(QMainWindow):
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None
+        print(f'setupUi done 10')
 
     def notification(self):
         update_class = Update()
@@ -2413,6 +2424,7 @@ class Window(QMainWindow):
     def combined_design_prefer(self, data, main):
 
         on_change_tab_list = main.tab_value_changed(main)
+        print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list}")
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)

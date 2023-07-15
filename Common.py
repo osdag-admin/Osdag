@@ -1991,14 +1991,14 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
 VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
-VALUES_SEC_PROFILE_Compression_Strut = ['Angles', 'Back to Back Angles']
+VALUES_SEC_PROFILE_Compression_Strut = ['Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels']
 
 KEY_LENZZ = 'Member.Length_zz'
-KEY_DISP_LENZZ = 'Length (z-z)'
+KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
 
 KEY_LENYY = 'Member.Length_yy'
-KEY_DISP_LENYY = 'Length (y-y)'
+KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 
 DISP_TITLE_SC = 'Supporting Condition'
 

@@ -671,39 +671,40 @@ class Window(QMainWindow):
                     list(selectable_options.keys()) + ["Angle with x-axis (Degrees)", "Factored Load (KN)"])
 
                 for col, (key, value) in enumerate(selectable_options.items()):
-                    if key == 'Connection Location' or key == 'Section profile':
+                    if key == 'Connection Location':
                         continue
-                    # elif key == 'Section profile':
-                    #     combo_box_section_profile = QtWidgets.QComboBox()
-                    #     combo_box_connection_location = QtWidgets.QComboBox()
-                    #     key_value_connloc = None
-                    #
-                    #     for item in selectable_options['Section profile']:
-                    #         value = None
-                    #         if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
-                    #             value = selectable_options['Connection Location']['Angle']
-                    #             key_value_connloc = 'Angles'
-                    #         elif item in ['Channel', 'Back to Back Channels']:
-                    #             value = selectable_options['Connection Location']['Channel']
-                    #             key_value_connloc = 'Channel'
-                    #         combo_box_section_profile.addItem(item, value)
-                    #
-                    #     combo_box_section_profile.activated.connect(
-                    #         lambda: combo_box_connection_location.clear() or
-                    #                 combo_box_connection_location.addItems(selectable_options['Connection Location'][                                                                                                                                                                                                                                                                                                                                                           key_value_connloc])
-                    #     )
-                    #
-                    #     combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
-                    #
-                    #     combo_box_section_profile_list = []
-                    #     combo_box_connection_location_list = []
-                    #     for row in range(8):
-                    #         table_widget.setCellWidget(row, col, combo_box_section_profile)
-                    #         table_widget.setCellWidget(row, col + 1, combo_box_connection_location)
-                    #         combo_box_section_profile_list.append(combo_box_section_profile)
-                    #         combo_box_connection_location_list.append(combo_box_connection_location)
-                    #     combo_box_dictionary['Section profile'] = combo_box_section_profile_list
-                    #     combo_box_dictionary['Connection Location'] = combo_box_connection_location_list
+                    elif key == 'Section profile':
+                        combo_box_section_profile_list = []
+                        combo_box_connection_location_list = []
+                        for row in range(8):
+                            combo_box_section_profile = QtWidgets.QComboBox()
+                            combo_box_connection_location = QtWidgets.QComboBox()
+
+                            for item in selectable_options['Section profile']:
+                                value = None
+                                if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
+                                    value = selectable_options['Connection Location']['Angle']
+                                elif item in ['Channel', 'Back to Back Channels']:
+                                    value = selectable_options['Connection Location']['Channel']
+                                combo_box_section_profile.addItem(item, value)
+
+                            combo_box_section_profile.activated.connect(
+                                lambda: combo_box_connection_location.clear() or combo_box_connection_location.addItems(
+                                    selectable_options['Connection Location']['Angle' if combo_box_section_profile.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']
+                                )
+                            )
+
+                            combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
+
+                            table_widget.setCellWidget(row, col, combo_box_section_profile)
+                            table_widget.setCellWidget(row, col+1, combo_box_connection_location)
+
+                            combo_box_section_profile_list.append(combo_box_section_profile)
+                            combo_box_connection_location_list.append(combo_box_connection_location)
+
+                        combo_box_dictionary['Section profile'] = combo_box_section_profile_list
+                        combo_box_dictionary['Connection Location'] = combo_box_connection_location_list
+
                     else:
                         combo_box_list = []
                         for row in range(8):
@@ -713,27 +714,24 @@ class Window(QMainWindow):
                             combo_box_list.append(combo_box)
                         combo_box_dictionary[key] = combo_box_list
 
-                combo_box_secpro = QtWidgets.QComboBox()
-                combo_box_connloc = QtWidgets.QComboBox()
-                key_value_connloc = None
-
-                for item in selectable_options['Section profile']:
-                    value = None
-                    if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
-                        value = selectable_options['Connection Location']['Angle']
-                        key_value_connloc = 'Angles'
-                    elif item in ['Channel', 'Back to Back Channels']:
-                        value = selectable_options['Connection Location']['Channel']
-                        key_value_connloc = 'Channel'
-                    combo_box_secpro.addItem(item, value)
-                # combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
-                # combo_box_secpro.addItem('Channel',['Web-connected'])
-
-                combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
-                    selectable_options['Connection Location']['Angle' if combo_box_secpro.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']))
-
-                table_widget.setCellWidget(0,0,combo_box_secpro)
-                table_widget.setCellWidget(0,1,combo_box_connloc)
+                # combo_box_secpro = QtWidgets.QComboBox()
+                # combo_box_connloc = QtWidgets.QComboBox()
+                #
+                # for item in selectable_options['Section profile']:
+                #     value = None
+                #     if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
+                #         value = selectable_options['Connection Location']['Angle']
+                #     elif item in ['Channel', 'Back to Back Channels']:
+                #         value = selectable_options['Connection Location']['Channel']
+                #     combo_box_secpro.addItem(item, value)
+                # # combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
+                # # combo_box_secpro.addItem('Channel',['Web-connected'])
+                #
+                # combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
+                #     selectable_options['Connection Location']['Angle' if combo_box_secpro.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']))
+                #
+                # table_widget.setCellWidget(0,0,combo_box_secpro)
+                # table_widget.setCellWidget(0,1,combo_box_connloc)
 
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()

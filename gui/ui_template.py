@@ -763,7 +763,7 @@ class Window(QMainWindow):
 
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
-        print(f'ui_template.py input_value_changed ')
+        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         data = {}
 
         d = {}
@@ -1299,7 +1299,6 @@ class Window(QMainWindow):
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
         last_design_file = os.path.join(last_design_folder, last_design_file)
         last_design_dictionary = {}
-        print(f'last_design_dictionary {last_design_dictionary}')
         if not os.path.isdir(last_design_folder):
             os.mkdir(last_design_folder)
         if os.path.isfile(last_design_file):
@@ -1325,6 +1324,7 @@ class Window(QMainWindow):
                         out_titles.append(title_name)
         self.ui_loaded = True
 
+        print("\n here now")
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
@@ -1710,7 +1710,6 @@ class Window(QMainWindow):
                         design_dictionary.update({key_name: val})
         else:
             print('flag false')
-
             for without_des_pref in main.input_dictionary_without_design_pref(main):
                 input_dock_key = without_des_pref[0]
                 input_list = without_des_pref[1]
@@ -1727,6 +1726,7 @@ class Window(QMainWindow):
 
         self.design_inputs = design_dictionary
         self.design_inputs = design_dictionary
+        print(f"\n self.input_dock_inputs {self.input_dock_inputs}")
 
     '''
     @author: Umair
@@ -1907,12 +1907,15 @@ class Window(QMainWindow):
         # @author: Amir
 
         option_list = main.input_values(self)
-
         for data_key_tuple in main.customized_input(main):
             data_key = data_key_tuple[0] + "_customized"
             if data_key in data.keys() and len(data_key_tuple) == 4:
                 data[data_key] = [data_values for data_values in data[data_key]
                                   if data_values not in data_key_tuple[2]]
+
+        print(f"ui_template.py common_function_for_save_and_design \n")
+        print(f"option_list {option_list} \n")
+        print(f"data {data} ")
 
         self.design_fn(option_list, data, main)
 
@@ -1941,10 +1944,11 @@ class Window(QMainWindow):
             self.textEdit.clear()
             with open("logging_text.log", 'w') as log_file:
                 pass
-
+            
+            print(f"\n self.design_inputs {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
-            print(status)
+            print(f"status{status}")
 
             if error is not None:
                 self.show_error_msg(error)
@@ -2414,7 +2418,7 @@ class Window(QMainWindow):
     # Function for showing design-preferences popup
 
     def design_preferences(self):
-        #print(self.designPrefDialog.module_window.input_dock_inputs)
+        print(f"design_preferences{self.designPrefDialog.module_window.input_dock_inputs}")
         self.designPrefDialog.show()
 
     # Function for getting input for design preferences from input dock

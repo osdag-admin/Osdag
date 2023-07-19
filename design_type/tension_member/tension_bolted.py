@@ -29,6 +29,7 @@ from design_type.member import Member
 class Tension_bolted(Member):
 
     def __init__(self):
+        print(f'Entering Tension_bolted')
         super(Tension_bolted, self).__init__()
         self.design_status = False
 

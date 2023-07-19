@@ -1989,10 +1989,10 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels']
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS','Channels', 'Back to Back Channels']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
-VALUES_SEC_PROFILE_Compression_Strut = ['Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels']
-
+VALUES_SEC_PROFILE_Compression_Strut = ['Angles', 'Back to Back Angles']
+#, 'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
@@ -2005,11 +2005,12 @@ DISP_TITLE_SC = 'Supporting Condition'
 KEY_END1 = 'End_1'
 KEY_DISP_END1 = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
-
+VALUES_STRUT_END1 = 'Hinged'
 
 KEY_END2 = 'End_2'
 KEY_DISP_END2 = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END2 = 'Hinged'
 
 KEY_END_CONDITION = 'End Condition'
 KEY_DISP_END_CONDITION = 'End Condition'

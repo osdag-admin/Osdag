@@ -244,6 +244,55 @@ class IS800_2007(object):
                 section_class = 'Semi-Compact'
 
         return section_class
+    
+    @staticmethod
+    def Table2_vi(width, depth, thickness, f_y, force_type = "Axial Compression"):
+        """ Calculate the limiting width to thickness ratio as per Table 2 for;
+                sr. no i) Members subjected to Axial Compression
+                sr. no ii)Members subjected to Compression due to bending
+
+        Args:
+            width(b): width of the element in mm (float or int)
+            depth(d): depth of the element in mm (float or int)
+            thickness(t): thickness of the element in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            force_type: Type of failure in member ('Axial') ('Compression')
+            section_type: Type of section ('Angle') (string)
+
+        Returns:
+            A list of values with;
+            1- The class of the section as Semi-compact or Slender on account of the 
+             b/t, d/t, (b+d)/t Ratio
+
+            ['Section Class', 'Ratio']
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(250 / f_y)
+
+        b_t = width / thickness
+        d_t = depth / thickness
+        bd_t = (width + depth) / thickness
+
+
+        if force_type == 'Axial Compression':
+            if b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon) and  bd_t<= (15.7 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+        else:
+            if b_t <= (9.4 * epsilon) and d_t<= (9.4 * epsilon):
+                section_class = 'Plastic'
+            elif b_t <= (10.5 * epsilon) and d_t<= (10.5 * epsilon):
+                section_class = 'Compact'
+            elif b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+
+        return [section_class, b_t,d_t, bd_t ]
+
 
     @staticmethod
     def Table2_x(outer_diameter, tube_thickness, f_y, load_type='axial compression'):
@@ -284,6 +333,7 @@ class IS800_2007(object):
                 section_class = 'Slender'
 
         return section_class
+    
 
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """

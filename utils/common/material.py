@@ -7,7 +7,6 @@ from utils.common.is800_2007 import IS800_2007
 class Material(object):
 
     def __init__(self, material_grade='', thickness=41):
-        print(f"Here[Material/__init__1]")
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0
@@ -18,7 +17,6 @@ class Material(object):
         self.material = material_grade
         self.modulus_of_elasticity = 200000  # MPa
         self.unit_mass = 7850  # kg/m3
-        print(f"Here[Material/__init__2]")
         # if material_grade.split(" ")[0] == "Custom":
         #     material = material_grade.split(" ")
         #     if len(material) == 3:

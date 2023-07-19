@@ -139,12 +139,15 @@ class ColumnDesign(Member):
 
     def input_dictionary_without_design_pref(self):
         """
+        This is declared in ui_template.py line 557
 
         :return: This function is used to choose values of design preferences to be saved to
         design dictionary if design preference is never opened by user. It sets are design preference values to default.
         If any design preference value needs to be set to input dock value, tuple shall be written as:
 
         (Key of input dock, [List of Keys from design prefernce], 'Input Dock')
+
+        eg: input_dp_conn_list [('Material', ['Member.Material'], 'Input Dock'), (None, ['Optimum.AllowUR', 'Effective.Area_Para', 'Optimum.Para', 'Optimum.Class1', 'Optimum.Class2', 'Optimum.Class3', 'Optimum.Class4', 'Steel.Cost', 'Design.Design_Method'], '')]
 
         If the values needs to be set to default,
 
@@ -244,7 +247,13 @@ class ColumnDesign(Member):
         return c_lst
 
     def input_values(self):
-        """ Fuction to return a list of tuples to be displayed as the UI (Input Dock)"""
+        """ 
+        Function declared in ui_template.py line 566
+
+        Fuction to return a list of tuples to be displayed as the UI (Input Dock)
+        
+        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), (None, 'Section Data', 'Title', None, True, 'No Validator'), ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), (None, 'End Condition', 'Title', None, True, 'No Validator'), ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('Image', None, 'Image_compression', './ResourceFiles/images/6.RRRR.PNG', True, 'No Validator'), (None, 'Factored Loads', 'Title', None, True, 'No Validator'), ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
+        """
 
         self.module = KEY_DISP_COMPRESSION_COLUMN
         options_list = []
@@ -464,13 +473,13 @@ class ColumnDesign(Member):
         return out_list
 
     def func_for_validation(self, design_dictionary):
-        print(f"func_for_validation")
+        print(f"func_for_validation here")
         all_errors = []
         self.design_status = False
         flag = False
         option_list = self.input_values(self)
         missing_fields_list = []
-
+        print(f'func_for_validation option_list {option_list}')
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
@@ -572,7 +581,7 @@ class ColumnDesign(Member):
 
         # safety factors
         self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
-        print(f"Here[Column/set_input_values/self.gamma_m0{self.gamma_m0}]")
+        # print(f"Here[Column/set_input_values/self.gamma_m0{self.gamma_m0}]")
         # material property
         self.material_property = Material(material_grade=self.material, thickness=0)
 
@@ -637,7 +646,7 @@ class ColumnDesign(Member):
                 self.flange_class = IS800_2007.Table2_x(self.section_property.out_diameter, self.section_property.flange_thickness,
                                                         self.material_property.fy, load_type='axial compression')
                 self.web_class = self.flange_class  #Why?
-                print(f"self.web_class{self.web_class}")
+                # print(f"self.web_class{self.web_class}")
 
             if self.flange_class == 'Slender' or self.web_class == 'Slender':
                 self.section_class = 'Slender'
@@ -673,7 +682,7 @@ class ColumnDesign(Member):
             if self.section_class in self.allowed_sections:
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_class})
-            print(f"self.section_class{self.section_class}")
+            # print(f"self.section_class{self.section_class}")
 
     def design_column(self):
         """ Perform design of column """
@@ -758,7 +767,7 @@ class ColumnDesign(Member):
                         self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
                 else:
                     self.effective_area = self.section_property.area  # mm2
-                    print(f"self.effective_area{self.effective_area}")
+                    # print(f"self.effective_area{self.effective_area}")
 
                 # reduction of the area based on the connection requirements (input from design preferences)
                 if self.effective_area_factor < 1.0:
@@ -845,7 +854,7 @@ class ColumnDesign(Member):
                 # 2.5 - Non-dimensional effective slenderness ratio
                 self.non_dim_eff_sr_zz = math.sqrt(self.material_property.fy / self.euler_bs_zz)
                 self.non_dim_eff_sr_yy = math.sqrt(self.material_property.fy / self.euler_bs_yy)
-                print(f"self.non_dim_eff_sr_zz{self.non_dim_eff_sr_yy},self.phi_yy{self.non_dim_eff_sr_yy}/n")
+                # print(f"self.non_dim_eff_sr_zz{self.non_dim_eff_sr_yy},self.phi_yy{self.non_dim_eff_sr_yy}/n")
 
                 list_zz.append(self.non_dim_eff_sr_zz)
                 list_yy.append(self.non_dim_eff_sr_yy)
@@ -853,7 +862,7 @@ class ColumnDesign(Member):
                 # 2.5 - phi
                 self.phi_zz = 0.5 * (1 + (self.imperfection_factor_zz * (self.non_dim_eff_sr_zz - 0.2)) + self.non_dim_eff_sr_zz ** 2)
                 self.phi_yy = 0.5 * (1 + (self.imperfection_factor_yy * (self.non_dim_eff_sr_yy - 0.2)) + self.non_dim_eff_sr_yy ** 2)
-                print(f"self.phi_zz{self.phi_zz},self.phi_yy{self.phi_yy}, self.imperfection_factor_zz{self.imperfection_factor_zz}")
+                # print(f"self.phi_zz{self.phi_zz},self.phi_yy{self.phi_yy}, self.imperfection_factor_zz{self.imperfection_factor_zz}")
 
                 list_zz.append(self.phi_zz)
                 list_yy.append(self.phi_yy)
@@ -906,7 +915,7 @@ class ColumnDesign(Member):
                 list_zz.append(self.cost)
                 list_yy.append(self.cost)
                 self.optimum_section_cost.append(self.cost)
-                print(f"list_zz{list_zz},list_yy{list_yy} ")
+                # print(f"list_zz{list_zz},list_yy{list_yy} ")
 
                 # Step 3 - Storing the optimum results to a list in a descending order
 
@@ -943,7 +952,7 @@ class ColumnDesign(Member):
             logger.info("Change the inputs provided and re-design.")
             self.design_status = False
             self.design_status_list.append(self.design_status)
-            print(f"design_status_list{self.design_status_list}")
+            # print(f"design_status_list{self.design_status_list}")
 
     def results(self):
         """ """
@@ -955,7 +964,7 @@ class ColumnDesign(Member):
             self.optimum_section_ur = list(filter_UR)
 
             self.optimum_section_ur.sort()
-            print(f"self.optimum_section_ur{self.optimum_section_ur}")
+            # print(f"self.optimum_section_ur{self.optimum_section_ur}")
             #print(f"self.result_UR{self.result_UR}")
 
             # selecting the section with most optimum UR
@@ -1050,7 +1059,7 @@ class ColumnDesign(Member):
                         logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
                         self.design_status = False
                         self.design_status_list.append(self.design_status)
-                        print(f"design_status_list{design_status_list} \n")
+                        print(f"design_status_list{self.design_status} \n")
                     else:
                         self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
                         self.design_status = True
@@ -1095,7 +1104,7 @@ class ColumnDesign(Member):
                 self.result_fcd = self.optimum_section_cost_results[self.result_cost]['FCD']
                 self.result_capacity = self.optimum_section_cost_results[self.result_cost]['Capacity']
 
-                print(f"design_status_list2{design_status_list}")
+                print(f"design_status_list2{self.design_status}")
 
         # end of the design simulation
         # overall design status

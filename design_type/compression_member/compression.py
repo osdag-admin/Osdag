@@ -1,12 +1,20 @@
 from design_type.member import Member
 from Common import *
 from utils.common.component import ISection, Material
+from utils.common.common_calculation import *
 from utils.common.load import Load
 from design_type.tension_member import *
 from utils.common.Section_Properties_Calculator import I_sectional_Properties
+import math
+import numpy as np
+from utils.common import is800_2007
 
 
 class Compression(Member):
+
+    def __init__(self):
+        print(f"Here Compression")
+        super(Compression, self).__init__()
 
     ###############################################
     # Design Preference Functions Start
@@ -123,6 +131,10 @@ class Compression(Member):
         t2 = (None, [KEY_DP_DESIGN_METHOD], '')
         design_input.append(t2)
 
+        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS1, KEY_ALLOW_CLASS2, KEY_ALLOW_CLASS3,
+                     KEY_ALLOW_CLASS4, KEY_STEEL_COST, KEY_DP_DESIGN_METHOD], '')
+        design_input.append(t2)
+
         return design_input
 
     def refresh_input_dock(self):
@@ -223,11 +235,15 @@ class Compression(Member):
         t1 = (KEY_MODULE, KEY_DISP_COMPRESSION_Strut, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t1)
 
+        t1 = (None, KEY_SECTION_DATA, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t1)
+
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE_Compression_Strut, True, 'No Validator')
         options_list.append(t2)
 
-        # t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
-        # options_list.append(t3)
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
+        options_list.append(t3)
+#([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
 
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
         options_list.append(t4)
@@ -238,14 +254,11 @@ class Compression(Member):
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
+
         # t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, None, True, 'No Validator')
         # options_list.append(t6)
 
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t7)
-
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t8)
+        
 
         # t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, None, True, 'No Validator')
         # options_list.append(t12)
@@ -256,14 +269,20 @@ class Compression(Member):
         t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_END1, True, 'No Validator')
+        t10 = (KEY_END1, KEY_DISP_END1, TYPE_NOTE, VALUES_STRUT_END1, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
+        t11 = (KEY_END2, KEY_DISP_END2, TYPE_NOTE, VALUES_STRUT_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/3.RFRF.PNG", True, 'No Validator')
         options_list.append(t12)
+
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t7)
+
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        options_list.append(t8)
 
         return options_list
 
@@ -380,21 +399,22 @@ class Compression(Member):
 
         return out_list
     def func_for_validation(self, design_dictionary):
-
+        '''Need to check'''
         all_errors = []
         self.design_status = False
         flag = False
         option_list = self.input_values(self)
-        print(f'option list = {option_list}')
-        print(f'design_dictionary = {design_dictionary}')
+        print(f'\n func_for_validation option list = {option_list}')
         missing_fields_list = []
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
+                    print(f'option[0] = {option[0]}')
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
+                    print(f'option[0] = {option[0]}')
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
@@ -405,31 +425,39 @@ class Compression(Member):
         else:
             flag = True
 
+        print(f'flag = {flag}')
         if flag:
             self.set_input_values(self, design_dictionary)
             # print(design_dictionary)
         else:
             return all_errors
 
-    def set_input_values(self, design_dictionary):
-        self.module = design_dictionary[KEY_MODULE]
-        self.sizelist = design_dictionary[KEY_SECSIZE]
-        self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
-        self.material = design_dictionary[KEY_SEC_MATERIAL]
-        self.length_zz = float(design_dictionary[KEY_LENZZ])
-        self.length_yy = float(design_dictionary[KEY_LENYY])
-        self.load = Load(shear_force="", axial_force=design_dictionary[KEY_AXIAL],moment=design_dictionary[KEY_MOMENT_MAJOR],
-                         moment_minor = design_dictionary[KEY_MOMENT_MINOR],unit_kNm=True)
+    # Setting inputs from the input dock GUI
 
-        print(self.module)
-        print(self.sec_profile)
-        print(self.material)
-        print(self.length_yy)
-        print(self.length_zz)
-        print(self.load)
+    def set_input_values(self, design_dictionary):
+        super(Compression,self).set_input_values(self, design_dictionary)
+        self.module = design_dictionary[KEY_MODULE]
+        # self.sizelist = design_dictionary[KEY_SECSIZE]
+        self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
+        self.sec_list = design_dictionary[KEY_SECSIZE]
+        self.length = float(design_dictionary[KEY_LENGTH])
+        self.material = design_dictionary[KEY_SEC_MATERIAL]
+        # self.length_zz = float(design_dictionary[KEY_LENZZ])
+        # self.length_yy = float(design_dictionary[KEY_LENYY])
+        self.load = Load(shear_force="", axial_force=design_dictionary[KEY_AXIAL],moment="",unit_kNm=True)
+        #  moment=design_dictionary[KEY_MOMENT_MAJOR]
+        #                  moment_minor = design_dictionary[KEY_MOMENT_MINOR],unit_kNm=True)
+        print(f"set_input_values design_dictionary {design_dictionary}")
+        print(f"set_input_values self.module {self.module}")
+        print(f"set_input_values self.sec_profile {self.sec_profile}")
+        print(f"set_input_values self.material {self.material}")
+        # print(f"set_input_values self.length_yy {self.length_yy}")
+        print(f"set_input_values self.load {self.load}")
+        
+        # print(self.length_zz)
         # Assuming first member as selected size
-        selectedsize = design_dictionary[KEY_SECSIZE][0]
-        self.select_section(self,selectedsize)
+        # selectedsize = design_dictionary[KEY_SECSIZE][0]
+        self.select_section(self,self.sec_list)
 
     def select_section(self, selectedsize):
 
@@ -443,12 +471,31 @@ class Compression(Member):
             self.section_size = SHS(designation=selectedsize, material_grade=self.material)
         elif self.sec_profile in ['Beams','Columns']:
             self.section_size = ISection(designation=selectedsize, material_grade=self.material)
+        elif self.sec_profile in ['Angles','Columns']:
+            self.section_size = Angle(designation=selectedsize, material_grade=self.material)
         else:
             pass
 
-        print(self.section_size)
+        print(self.selectedsize)
+
+    # Simulation starts here
+    def section_classification(self):
+        """ Classify the sections based on Table 2 of IS 800:2007 """
+        self.input_section_list = []
+        self.input_section_classification = {}
+
+        print(f"self.sec_list {self.sec_list}")
+
+        for section in self.sec_list:
+            trial_section = section.strip("'")
 
     def get_3d_components(self):
 
         components = []
         return components
+    
+
+""" ======The input values start here====== """
+    # print(self.dir())
+
+

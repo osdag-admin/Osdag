@@ -170,7 +170,6 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         else:
             event.ignore()
 
-
 class Window(QMainWindow):
     closed = QtCore.pyqtSignal()
 
@@ -677,22 +676,8 @@ class Window(QMainWindow):
                         combo_box_section_profile_list = []
                         combo_box_connection_location_list = []
                         for row in range(8):
-                            combo_box_section_profile = QtWidgets.QComboBox()
-                            combo_box_connection_location = QtWidgets.QComboBox()
 
-                            for item in selectable_options['Section profile']:
-                                value = None
-                                if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
-                                    value = selectable_options['Connection Location']['Angle']
-                                elif item in ['Channel', 'Back to Back Channels']:
-                                    value = selectable_options['Connection Location']['Channel']
-                                combo_box_section_profile.addItem(item, value)
-
-                            combo_box_section_profile.activated.connect(
-                                lambda: combo_box_connection_location.clear() or combo_box_connection_location.addItems(
-                                    selectable_options['Connection Location']['Angle' if combo_box_section_profile.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']
-                                )
-                            )
+                            combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(selectable_options)
 
                             combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
 
@@ -1419,6 +1404,39 @@ class Window(QMainWindow):
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None
+
+    def create_dependent_QComboBox(self, selectable_options):
+        '''
+            Created for creating Dependent QComboBox
+            Especially for `type == TYPE_TABLE_IN` in the Input Dock
+
+            Can be modified by passing more argument to keep the current functionality
+            required for `type == TYPE_TABLE_IN` by adding & changing the current args
+            of this method for future use.
+
+            If you don't know how to do it please don't modify this method as it may affect
+            the truss-connection-bolted module's connecting memeber attribute.
+        '''
+        combo_box_section_profile = QtWidgets.QComboBox()
+        combo_box_connection_location = QtWidgets.QComboBox()
+
+        for item in selectable_options['Section profile']:
+            value = None
+            if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
+                value = selectable_options['Connection Location']['Angle']
+            elif item in ['Channel', 'Back to Back Channels']:
+                value = selectable_options['Connection Location']['Channel']
+            combo_box_section_profile.addItem(item, value)
+
+        combo_box_section_profile.activated.connect(
+            lambda: combo_box_connection_location.clear() or combo_box_connection_location.addItems(
+                selectable_options['Connection Location'][
+                    'Angle' if combo_box_section_profile.currentText() in ['Angle', 'Star Angles',
+                                                                           'Back to Back Angles'] else 'Channel']
+            )
+        )
+
+        return combo_box_section_profile, combo_box_connection_location
 
     def notification(self):
         update_class = Update()

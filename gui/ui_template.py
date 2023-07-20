@@ -699,25 +699,6 @@ class Window(QMainWindow):
                             combo_box_list.append(combo_box)
                         combo_box_dictionary[key] = combo_box_list
 
-                # combo_box_secpro = QtWidgets.QComboBox()
-                # combo_box_connloc = QtWidgets.QComboBox()
-                #
-                # for item in selectable_options['Section profile']:
-                #     value = None
-                #     if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
-                #         value = selectable_options['Connection Location']['Angle']
-                #     elif item in ['Channel', 'Back to Back Channels']:
-                #         value = selectable_options['Connection Location']['Channel']
-                #     combo_box_secpro.addItem(item, value)
-                # # combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
-                # # combo_box_secpro.addItem('Channel',['Web-connected'])
-                #
-                # combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
-                #     selectable_options['Connection Location']['Angle' if combo_box_secpro.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']))
-                #
-                # table_widget.setCellWidget(0,0,combo_box_secpro)
-                # table_widget.setCellWidget(0,1,combo_box_connloc)
-
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()
 

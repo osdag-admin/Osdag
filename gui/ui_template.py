@@ -1411,11 +1411,10 @@ class Window(QMainWindow):
             combo_box_section_profile.addItem(item, value)
 
         combo_box_section_profile.currentIndexChanged.connect(
-            lambda: combo_box_connection_location.clear() or combo_box_connection_location.addItems(
-                selectable_options['Connection Location'][
-                    'Angle' if combo_box_section_profile.currentText() in ['Angle', 'Star Angles',
-                                                                           'Back to Back Angles'] else 'Channel']
-            )
+            lambda: combo_box_connection_location.clear() or
+                    combo_box_connection_location.addItems(
+                        combo_box_section_profile.currentData()
+                    )
         )
 
         return combo_box_section_profile, combo_box_connection_location

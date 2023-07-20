@@ -498,8 +498,8 @@ class ColumnDesign(Member):
             flag = True
 
         if flag:
+            print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
-            print(f"design_dictionary{design_dictionary}")
         else:
             return all_errors
 
@@ -534,7 +534,7 @@ class ColumnDesign(Member):
         self.sec_list = design_dictionary[KEY_SECSIZE]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
-        # section data
+        # section user data
         self.length_zz = float(design_dictionary[KEY_ACTUAL_LEN_ZZ])
         self.length_yy = float(design_dictionary[KEY_ACTUAL_LEN_YY])
 

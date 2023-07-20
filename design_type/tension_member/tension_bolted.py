@@ -828,14 +828,15 @@ class Tension_bolted(Member):
     def select_section(self, design_dictionary, selectedsize):
 
         "selecting components class based on the section passed "
-
+        print(f" \n select_section started \n")
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
             self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
             self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         else:
             pass
-
+        print(f"\n select_section done \n")
+        
         return self.section_size
 
     def max_section(self, design_dictionary, sizelist):

@@ -1663,11 +1663,14 @@ class Window(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
+
             self.input_dock_inputs.update(d1)
+
 
         for design_pref_key in self.design_pref_inputs.keys():
             if design_pref_key not in self.input_dock_inputs.keys():
                 self.input_dock_inputs.update({design_pref_key: self.design_pref_inputs[design_pref_key]})
+        
         if self.designPrefDialog.flag:
             print('flag true')
 
@@ -1714,6 +1717,12 @@ class Window(QMainWindow):
                 input_dock_key = without_des_pref[0]
                 input_list = without_des_pref[1]
                 input_source = without_des_pref[2]
+                print(f"\n ========================Check===========================")    
+                print(f"\n design_fn design_dictionary{design_dictionary}")
+                print(f"\n self.input_dock_inputs{self.input_dock_inputs}")
+                print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
+                print(f"\n input_list{input_list}")
+                print(f"\n self.design_pref_inputs.keys() {self.design_pref_inputs.keys()}")
                 for key_name in input_list:
                     if input_source == 'Input Dock':
                         design_dictionary.update({key_name: design_dictionary[input_dock_key]})
@@ -1723,6 +1732,7 @@ class Window(QMainWindow):
 
             for dp_key in self.design_pref_inputs.keys():
                 design_dictionary[dp_key] = self.design_pref_inputs[dp_key]
+        print(f"\n ========================Check done ===========================")    
 
         self.design_inputs = design_dictionary
         self.design_inputs = design_dictionary

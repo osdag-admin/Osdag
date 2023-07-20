@@ -557,7 +557,6 @@ class Window(QMainWindow):
 
         input_dp_conn_list = main.input_dictionary_without_design_pref(main)
         input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
-        print(input_dp_conn_list)
 
         """
         This routine takes the returned list from input_values function of corresponding module
@@ -635,51 +634,19 @@ class Window(QMainWindow):
                 # header_labels = ["<html>Section profile</html>", "<html>Connection<br/>Location</html>", "<html>Section<br/>Size</html>",
                 #                  "<html>Material</html>", "<html>Angle with<br/>x-axis<br/>(Degrees)</html>", "<html>Factored<br/>Load(KN)</html>"]
 
-                selectable_options = {
-                    'Section profile': ['Angle', 'Star Angles', 'Back to Back Angles', 'Channel',
-                                        'Back to Back Channels'],
-                    'Connection Location': {
-                        'Angle': ['Long leg connected', 'Short leg connected'],
-                        'Channel': ['Web-connected']
-                    },
-                    'Section Size': [
-                        '20 x 20 x 3', '20 x 20 x 4',
-                        '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5',
-                        '30 x 20 x 3', '30 x 20 x 4', '30 x 20 x 5',
-                        '30 x 30 x 3', '30 x 30 x 4', '30 x 30 x 5',
-                        '35 x 35 x 3', '35 x 35 x 4', '35 x 35 x 5', '35 x 35 x 6',
-                        '40 x 20 x 3', '40 x 20 x 4', '40 x 20 x 5',
-                        '40 x 25 x 3', '40 x 25 x 4', '40 x 25 x 5', '40 x 25 x 6',
-                        '40 x 40 x 3', '40 x 40 x 4', '40 x 40 x 5', '40 x 40 x 6',
-                        '45 x 30 x 3', '45 x 30 x 4', '45 x 30 x 5', '45 x 30 x 6',
-                        '45 x 45 x 3'
-                    ],
-                    'Material': [
-                        'E165',
-                        'E250 (Fe 410W) A', 'E250 (Fe 410W) B', 'E250 (Fe 410W) C',
-                        'E300 (Fe 440)',
-                        'E350 (Fe 490)',
-                        'E450 (Fe 570) D', 'E450 (Fe 590) E',
-                        'Custom'
-                    ]
-                }
-
                 combo_box_dictionary = dict()  # Just in case, if we need the combo_box object for each option
 
-                table_widget.setHorizontalHeaderLabels(
-                    list(selectable_options.keys()) + ["Angle with x-axis (Degrees)", "Factored Load (KN)"])
+                table_widget.setHorizontalHeaderLabels(list(option[3].keys()))
 
-                for col, (key, value) in enumerate(selectable_options.items()):
-                    if key == 'Connection Location':
+                for col, (key, value) in enumerate(option[3].items()):
+                    if key == 'Connection Location' or value is None:
                         continue
                     elif key == 'Section profile':
                         combo_box_section_profile_list = []
                         combo_box_connection_location_list = []
                         for row in range(8):
 
-                            combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(selectable_options)
-
-                            combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
+                            combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(option[3])
 
                             table_widget.setCellWidget(row, col, combo_box_section_profile)
                             table_widget.setCellWidget(row, col+1, combo_box_connection_location)
@@ -1404,10 +1371,12 @@ class Window(QMainWindow):
 
         for item in selectable_options['Section profile']:
             value = None
-            if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
+            if item in ['Angles', 'Star Angles', 'Back to Back Angles']:
                 value = selectable_options['Connection Location']['Angle']
-            elif item in ['Channel', 'Back to Back Channels']:
+            elif item in ['Channels', 'Back to Back Channels']:
                 value = selectable_options['Connection Location']['Channel']
+            else:
+                value = ['Invalid Option']
             combo_box_section_profile.addItem(item, value)
 
         combo_box_section_profile.currentIndexChanged.connect(
@@ -1416,6 +1385,8 @@ class Window(QMainWindow):
                         combo_box_section_profile.currentData()
                     )
         )
+
+        combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
 
         return combo_box_section_profile, combo_box_connection_location
 

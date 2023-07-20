@@ -90,7 +90,7 @@ class TrussConnectionBolted(TrussConnection):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t00 = (KEY_TABLE, '', TYPE_TABLE_IN, None, True, 'No Validator')
+        t00 = (KEY_TABLE, '', TYPE_TABLE_IN, {'Section profile': VALUES_SEC_PROFILE_2, 'Connection Location': {'Angle': VALUES_LOCATION_1, 'Channel': VALUES_LOCATION_2}, 'Section Size': get_available_cleat_list(all_angles, 45.0, 20.0), 'Material': (VALUES_MATERIAL[:6]+VALUES_MATERIAL[7:9]+VALUES_MATERIAL[10:]), 'Angle with x-axis (Degrees)': None, 'Factored Load (KN)': None}, True, 'No Validator')
         options_list.append(t00)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')

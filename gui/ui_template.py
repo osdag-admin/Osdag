@@ -694,7 +694,8 @@ class Window(QMainWindow):
                         combo_box_list = []
                         for row in range(8):
                             combo_box = QtWidgets.QComboBox()
-                            combo_box.addItems(value)
+                            for item in value:
+                                combo_box.addItem(item, value)
                             table_widget.setCellWidget(row, col, combo_box)
                             combo_box_list.append(combo_box)
                         combo_box_dictionary[key] = combo_box_list
@@ -1409,7 +1410,7 @@ class Window(QMainWindow):
                 value = selectable_options['Connection Location']['Channel']
             combo_box_section_profile.addItem(item, value)
 
-        combo_box_section_profile.activated.connect(
+        combo_box_section_profile.currentIndexChanged.connect(
             lambda: combo_box_connection_location.clear() or combo_box_connection_location.addItems(
                 selectable_options['Connection Location'][
                     'Angle' if combo_box_section_profile.currentText() in ['Angle', 'Star Angles',
@@ -1709,6 +1710,15 @@ class Window(QMainWindow):
                 widget.setCurrentIndex(1)
             elif op[2] == TYPE_TEXTBOX:
                 widget.setText('')
+            elif op[2] == TYPE_TABLE_IN:
+                for row in range(widget.rowCount()):
+                    for col in range(widget.columnCount()):
+                        item = widget.cellWidget(row,col)
+                        if isinstance(item, QtWidgets.QComboBox):
+                            item.setCurrentIndex(0)
+                        else:
+                            item = QtWidgets.QTableWidgetItem('')
+                            widget.setItem(row,col,item)
             else:
                 pass
 

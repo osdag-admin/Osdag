@@ -170,7 +170,6 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         else:
             event.ignore()
 
-
 class Window(QMainWindow):
     closed = QtCore.pyqtSignal()
 
@@ -677,22 +676,8 @@ class Window(QMainWindow):
                         combo_box_section_profile_list = []
                         combo_box_connection_location_list = []
                         for row in range(8):
-                            combo_box_section_profile = QtWidgets.QComboBox()
-                            combo_box_connection_location = QtWidgets.QComboBox()
 
-                            for item in selectable_options['Section profile']:
-                                value = None
-                                if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
-                                    value = selectable_options['Connection Location']['Angle']
-                                elif item in ['Channel', 'Back to Back Channels']:
-                                    value = selectable_options['Connection Location']['Channel']
-                                combo_box_section_profile.addItem(item, value)
-
-                            combo_box_section_profile.activated.connect(
-                                lambda: combo_box_connection_location.clear() or combo_box_connection_location.addItems(
-                                    selectable_options['Connection Location']['Angle' if combo_box_section_profile.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']
-                                )
-                            )
+                            combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(selectable_options)
 
                             combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
 
@@ -709,29 +694,11 @@ class Window(QMainWindow):
                         combo_box_list = []
                         for row in range(8):
                             combo_box = QtWidgets.QComboBox()
-                            combo_box.addItems(value)
+                            for item in value:
+                                combo_box.addItem(item, value)
                             table_widget.setCellWidget(row, col, combo_box)
                             combo_box_list.append(combo_box)
                         combo_box_dictionary[key] = combo_box_list
-
-                # combo_box_secpro = QtWidgets.QComboBox()
-                # combo_box_connloc = QtWidgets.QComboBox()
-                #
-                # for item in selectable_options['Section profile']:
-                #     value = None
-                #     if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
-                #         value = selectable_options['Connection Location']['Angle']
-                #     elif item in ['Channel', 'Back to Back Channels']:
-                #         value = selectable_options['Connection Location']['Channel']
-                #     combo_box_secpro.addItem(item, value)
-                # # combo_box_secpro.addItem('Angle',['Long leg connected','Short leg connected'])
-                # # combo_box_secpro.addItem('Channel',['Web-connected'])
-                #
-                # combo_box_secpro.activated.connect(lambda: combo_box_connloc.clear() or combo_box_connloc.addItems(
-                #     selectable_options['Connection Location']['Angle' if combo_box_secpro.currentText() in ['Angle', 'Star Angles', 'Back to Back Angles'] else 'Channel']))
-                #
-                # table_widget.setCellWidget(0,0,combo_box_secpro)
-                # table_widget.setCellWidget(0,1,combo_box_connloc)
 
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()
@@ -1420,6 +1387,38 @@ class Window(QMainWindow):
         self.connectivity = None
         self.fuse_model = None
 
+    def create_dependent_QComboBox(self, selectable_options):
+        '''
+            Created for creating Dependent QComboBox
+            Especially for `type == TYPE_TABLE_IN` in the Input Dock
+
+            Can be modified by passing more argument to keep the current functionality
+            required for `type == TYPE_TABLE_IN` by adding & changing the current args
+            of this method for future use.
+
+            If you don't know how to do it please don't modify this method as it may affect
+            the truss-connection-bolted module's connecting memeber attribute.
+        '''
+        combo_box_section_profile = QtWidgets.QComboBox()
+        combo_box_connection_location = QtWidgets.QComboBox()
+
+        for item in selectable_options['Section profile']:
+            value = None
+            if item in ['Angle', 'Star Angles', 'Back to Back Angles']:
+                value = selectable_options['Connection Location']['Angle']
+            elif item in ['Channel', 'Back to Back Channels']:
+                value = selectable_options['Connection Location']['Channel']
+            combo_box_section_profile.addItem(item, value)
+
+        combo_box_section_profile.currentIndexChanged.connect(
+            lambda: combo_box_connection_location.clear() or
+                    combo_box_connection_location.addItems(
+                        combo_box_section_profile.currentData()
+                    )
+        )
+
+        return combo_box_section_profile, combo_box_connection_location
+
     def notification(self):
         update_class = Update()
         msg = update_class.notifi()
@@ -1710,6 +1709,15 @@ class Window(QMainWindow):
                 widget.setCurrentIndex(1)
             elif op[2] == TYPE_TEXTBOX:
                 widget.setText('')
+            elif op[2] == TYPE_TABLE_IN:
+                for row in range(widget.rowCount()):
+                    for col in range(widget.columnCount()):
+                        item = widget.cellWidget(row,col)
+                        if isinstance(item, QtWidgets.QComboBox):
+                            item.setCurrentIndex(0)
+                        else:
+                            item = QtWidgets.QTableWidgetItem('')
+                            widget.setItem(row,col,item)
             else:
                 pass
 

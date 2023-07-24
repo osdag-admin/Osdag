@@ -626,7 +626,15 @@ class Window(QMainWindow):
                         combo.model().item(disabled).setEnabled(False)
 
             if type == TYPE_TABLE_IN:
-                table_widget = QtWidgets.QTableWidget(self.dockWidgetContents)
+
+                popup_dialog = QtWidgets.QDialog(self.dockWidgetContents)
+                popup_dialog.setWindowTitle("Connecting Members")
+
+                layout = QtWidgets.QVBoxLayout(popup_dialog)
+
+                button = QtWidgets.QPushButton("Open Connecting Members")
+
+                table_widget = QtWidgets.QTableWidget(popup_dialog)
                 table_widget.setObjectName(option[0])
                 table_widget.setRowCount(8)
                 table_widget.setColumnCount(6)
@@ -670,12 +678,20 @@ class Window(QMainWindow):
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()
 
+                layout.addWidget(table_widget)
+
+                popup_dialog.setLayout(layout)
+                popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+                popup_dialog.resize(820,260)
+
+                button.clicked.connect(lambda: popup_dialog.show())
+
                 if option[0] in input_dp_conn_list:
                     self.input_dp_connection(table_widget)
                 table_widget.setEnabled(True if option[4] else False)
                 if option[5] != 'No Validator':
                     table_widget.setValidator(self.get_validator(option[5]))
-                in_layout2.addWidget(table_widget, j, 1, 1, 2)
+                in_layout2.addWidget(button, j, 1, 1, 2)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)

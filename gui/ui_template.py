@@ -568,6 +568,7 @@ class Window(QMainWindow):
         i = 0
         j = 1
         maxi_width_left, maxi_width_right = -1, -1
+        no_of_members = QtWidgets.QComboBox()
         for option in option_list:
             lable = option[1]
             type = option[2]
@@ -625,6 +626,9 @@ class Window(QMainWindow):
                     for disabled in option[6]:
                         combo.model().item(disabled).setEnabled(False)
 
+                if lable == KEY_DISP_MEMBERS:
+                    no_of_members = combo
+
             if type == TYPE_TABLE_IN:
 
                 popup_dialog = QtWidgets.QDialog(self.dockWidgetContents)
@@ -638,9 +642,6 @@ class Window(QMainWindow):
                 table_widget.setObjectName(option[0])
                 table_widget.setRowCount(8)
                 table_widget.setColumnCount(6)
-
-                # header_labels = ["<html>Section profile</html>", "<html>Connection<br/>Location</html>", "<html>Section<br/>Size</html>",
-                #                  "<html>Material</html>", "<html>Angle with<br/>x-axis<br/>(Degrees)</html>", "<html>Factored<br/>Load(KN)</html>"]
 
                 combo_box_dictionary = dict()  # Just in case, if we need the combo_box object for each option
 

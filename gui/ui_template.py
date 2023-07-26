@@ -640,41 +640,16 @@ class Window(QMainWindow):
 
                 table_widget = QtWidgets.QTableWidget(popup_dialog)
                 table_widget.setObjectName(option[0])
-                table_widget.setRowCount(8)
+                table_widget.setRowCount(2)
                 table_widget.setColumnCount(6)
 
                 combo_box_dictionary = dict()  # Just in case, if we need the combo_box object for each option
 
-                table_widget.setHorizontalHeaderLabels(list(option[3].keys()))
+                data_dictionary, table_widget_cp = option[3], table_widget
 
-                for col, (key, value) in enumerate(option[3].items()):
-                    if key == 'Connection Location' or value is None:
-                        continue
-                    elif key == 'Section profile':
-                        combo_box_section_profile_list = []
-                        combo_box_connection_location_list = []
-                        for row in range(8):
+                table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
 
-                            combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(option[3])
-
-                            table_widget.setCellWidget(row, col, combo_box_section_profile)
-                            table_widget.setCellWidget(row, col+1, combo_box_connection_location)
-
-                            combo_box_section_profile_list.append(combo_box_section_profile)
-                            combo_box_connection_location_list.append(combo_box_connection_location)
-
-                        combo_box_dictionary['Section profile'] = combo_box_section_profile_list
-                        combo_box_dictionary['Connection Location'] = combo_box_connection_location_list
-
-                    else:
-                        combo_box_list = []
-                        for row in range(8):
-                            combo_box = QtWidgets.QComboBox()
-                            for item in value:
-                                combo_box.addItem(item, value)
-                            table_widget.setCellWidget(row, col, combo_box)
-                            combo_box_list.append(combo_box)
-                        combo_box_dictionary[key] = combo_box_list
+                self.add_widget_to_table_widget(table_widget, data_dictionary, 2)
 
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()
@@ -1406,6 +1381,24 @@ class Window(QMainWindow):
         combo_box_connection_location.addItems(selectable_options['Connection Location']['Angle'])
 
         return combo_box_section_profile, combo_box_connection_location
+
+    def add_widget_to_table_widget(self, table_widget, data_dictionary, row_count):
+        if row_count < table_widget.rowCount():
+            return
+        for col, (key, value) in enumerate(data_dictionary.items()):
+            if key == 'Connection Location' or value is None:
+                continue
+            elif key == 'Section profile':
+                for row in range(row_count):
+                    combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(data_dictionary)
+                    table_widget.setCellWidget(row, col, combo_box_section_profile)
+                    table_widget.setCellWidget(row, col + 1, combo_box_connection_location)
+            else:
+                for row in range(row_count):
+                    combo_box = QtWidgets.QComboBox()
+                    for item in value:
+                        combo_box.addItem(item, value)
+                    table_widget.setCellWidget(row, col, combo_box)
 
     def notification(self):
         update_class = Update()

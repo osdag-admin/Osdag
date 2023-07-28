@@ -1842,7 +1842,7 @@ class Angle(Material):
         db_query = "SELECT * FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
 
-        print(f" Component.py connect_to_database_update_other_attributes \n designation{designation} \n material_grade{material_grade}")
+        # print(f" Component.py connect_to_database_update_other_attributes \n designation{designation} \n material_grade{material_grade}")
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
 
@@ -1881,7 +1881,7 @@ class Angle(Material):
         self.It = row[24] * 10 ** 4
         self.source = row[25]
         self.type = 'Rolled' if row[26] is None else row[26]
-        print(f"\n connect_to_database_update_other_attributes done")
+        # print(f"\n connect_to_database_update_other_attributes done")
 
         conn.close()
 

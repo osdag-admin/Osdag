@@ -1168,7 +1168,9 @@ class Window(QMainWindow):
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
 
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
+        print(f"inside common_function_for_save_and_design ")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
+        print(f"outside common_function_for_save_and_design ")
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
@@ -1324,7 +1326,7 @@ class Window(QMainWindow):
                         out_titles.append(title_name)
         self.ui_loaded = True
 
-        print("\n here now")
+        print("\n outside now")
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
@@ -1675,6 +1677,7 @@ class Window(QMainWindow):
             print('flag true')
 
             des_pref_input_list = main.input_dictionary_design_pref(main)
+            print(f"des_pref_input_list = {des_pref_input_list}\n")
             edit_tabs_list = main.edit_tabs(main)
             edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB, edit_tabs_list))
             remove_tab_name = [x[0] for x in edit_tabs_remove]
@@ -1932,14 +1935,18 @@ class Window(QMainWindow):
         if trigger_type == "Save":
             self.saveDesign_inputs()
         elif trigger_type == "Design_Pref":
-
+            print(f"trigger_type == Design_Pref")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
+                # print(f"QDialog.Accepted")
                 self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
+                    print(f"self.designPrefDialog.flag = False")
                     self.designPrefDialog.flag = False
                 else:
                     self.designPrefDialog.flag = True
+                print(f"QDialog done")
+                
 
                 # if self.prev_inputs != {}:
                 #     self.design_pref_inputs = {}
@@ -1955,7 +1962,7 @@ class Window(QMainWindow):
             with open("logging_text.log", 'w') as log_file:
                 pass
             
-            print(f"\n self.design_inputs {self.design_inputs}")
+            print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(f"status{status}")
@@ -2438,7 +2445,7 @@ class Window(QMainWindow):
     def combined_design_prefer(self, data, main):
 
         on_change_tab_list = main.tab_value_changed(main)
-        print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list}")
+        print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list} \n")
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)

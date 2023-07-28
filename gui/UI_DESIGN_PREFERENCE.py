@@ -110,6 +110,7 @@ class Window(QDialog):
         self.btn_save.setFixedSize(button_size_x,button_size_y)
 
         tab_index = 0
+        print(f"\n main.tab_list(main)= {main.tab_list(main)} ")
         for tab_details in main.tab_list(main):
             last_title = ""
             tab_name = tab_details[0]
@@ -167,7 +168,7 @@ class Window(QDialog):
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
                 grid.setHorizontalSpacing(10)
                 grid.setVerticalSpacing(10)
-
+                print(f"ui_de_pref elements {elements}\n")
                 for element in elements:
                     type = element[2]
                     lable = element[1]
@@ -517,7 +518,33 @@ class Window(QDialog):
             pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
+            pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
+            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CHANNEL))
+            pushButton_Add_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
+            pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
+            pushButton_Import_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
+            pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
+            pushButton_Download_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
+            pushButton_Download_Channel.clicked.connect(lambda: self.download_Database(table="Channels", call_type="header"))
             # pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
+            # pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
+            # pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
+            # pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            # pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
+            # pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            # pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
+            # pushButton_Download_Beam.clicked.connect(lambda: self.download_Database(table="Beams", call_type="header"))
+
+        if module == KEY_DISP_COMPRESSION_STRUT:
+            pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_ANGLE))
+            pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
+            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
+            pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+            pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
+            pushButton_Download_Angle.clicked.connect(lambda: self.download_Database(table="Angles", call_type="header"))
+            # .tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             # pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             # pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             # pushButton_Add_Beam.clicked.connect(self.add_tab_beam)

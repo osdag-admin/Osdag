@@ -830,6 +830,7 @@ class Tension_bolted(Member):
         "selecting components class based on the section passed "
         print(f" \n select_section started \n")
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            print(f"\n selectedsize {selectedsize},\n design_dictionary[KEY_SEC_MATERIAL]{design_dictionary[KEY_SEC_MATERIAL]}")
             self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
             self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])

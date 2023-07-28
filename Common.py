@@ -349,8 +349,9 @@ KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
 KEY_DISP_TENSION_BOLTED = 'Tension Member Design - Bolted to End Gusset'
 KEY_DISP_TENSION_WELDED = 'Tension Member Design - Welded to End Gusset'
-KEY_DISP_COMPRESSION = 'Compression Member'
 KEY_DISP_BB_EP_SPLICE = 'Beam-to-Beam End Plate Connection'
+KEY_DISP_COMPRESSION = 'Compression Member'
+KEY_DISP_COMPRESSION_STRUT = 'Compression Member Design - Strut Design'
 
 DISP_TITLE_CM = 'Connecting Members'
 
@@ -420,6 +421,22 @@ KEY_COMP_STRESS_ZZ = 'MajorDCS'
 KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
 KEY_COMP_STRESS_YY = 'MinorDCS'
 KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
+##Strut Design
+KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
+KEY_DISP_EULER_BUCKLING_STRESS = 'Euler Buckling Stress (MPa)'
+KEY_EFF_SEC_AREA = 'MajorEffSecArea'
+KEY_DISP_EFF_SEC_AREA = 'Effective Sectional Area (mm2)'
+KEY_BUCKLING_CURVE = 'BucklingCurve'
+KEY_DISP_BUCKLING_CURVE = 'Buckling Curve Classification'
+KEY_IMPERFECTION_FACTOR = 'ImperfectionFactor'
+KEY_DISP_IMPERFECTION_FACTOR = 'Imperfection Factor'
+KEY_SR_FACTOR = 'StressReductionFactor'
+KEY_DISP_SR_FACTOR = 'Stress Reduction Factor'
+KEY_NON_DIM_ESR = 'NDESR'
+KEY_DISP_NON_DIM_ESR = 'Non-dimensional Effective SR'
+KEY_ALLOW_CLASS = 'Optimum.Class'
+KEY_DISP_CLASS = 'Semi-compact sections'
+
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'
@@ -499,6 +516,8 @@ KEY_CONNECTOR_FY = 'Connector.Fy'               #Extra Keys for DP Display
 KEY_CONNECTOR_FY_20 = 'Connector.Fy_20'         #Extra Keys for DP Display
 KEY_CONNECTOR_FY_20_40 = 'Connector.Fy_20_40'   #Extra Keys for DP Display
 KEY_CONNECTOR_FY_40 = 'Connector.Fy_40'         #Extra Keys for DP Display
+KEY_CONNECTOR_GUSSET = 'Connector.GUSSET'         #Extra Keys for DP Display
+
 
 KEY_PLATETHK = 'Connector.Plate.Thickness_List'
 KEY_FLANGEPLATE_PREFERENCES = 'Connector.Flange_Plate.Preferences'
@@ -695,6 +714,10 @@ DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm2)'
 KEY_DISP_FY_20 = 'Yield Strength, Fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength, Fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield Strength, Fy (MPa) (>40mm)'
+KEY_DISP_GUSSET = 'Gusset Plate'
+KEY_GUSSET = 'Thickness (mm)'
+
+
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
@@ -710,6 +733,7 @@ KEY_DISP_MEMBERS = 'No of Members'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
+KEY_DISP_LOCATION_STRUT = 'Connection'
 KEY_DISP_MATERIAL = 'Material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_SUPTNGSEC_REPORT = 'Supporting Section - Mechanical Properties'
@@ -735,7 +759,7 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange Splice Plate '
 DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer Plate '
 DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner Plate '
-KEY_DISP_SLENDER = 'Slenderness'
+KEY_DISP_SLENDER = 'Slenderness ratio'
 
 
 KEY_DISP_PLATETHK = 'Thickness (mm)'

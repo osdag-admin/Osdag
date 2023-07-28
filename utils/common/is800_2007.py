@@ -269,7 +269,7 @@ class IS800_2007(object):
         Reference: Table 2 and Cl.3.7.2, IS 800:2007
 
         """
-        epsilon = math.sqrt(250 / f_y)
+        epsilon = math.sqrt(250 / int(f_y))
 
         b_t = width / thickness
         d_t = depth / thickness

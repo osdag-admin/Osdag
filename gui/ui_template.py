@@ -763,7 +763,7 @@ class Window(QMainWindow):
 
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
-        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
+        # print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         data = {}
 
         d = {}
@@ -1168,9 +1168,9 @@ class Window(QMainWindow):
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
 
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
-        print(f"inside common_function_for_save_and_design ")
+        # print(f"inside common_function_for_save_and_design ")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
-        print(f"outside common_function_for_save_and_design ")
+        # print(f"outside common_function_for_save_and_design ")
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
@@ -1238,7 +1238,6 @@ class Window(QMainWindow):
         self.menubar.addAction(self.menuDB.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        print(f'setupUi 1236 line')
         self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -1252,7 +1251,7 @@ class Window(QMainWindow):
         self.actionSave_3D_model.triggered.connect(lambda: self.save3DcadImages(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
         self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
-        print(f'setupUi actionCreate_design_report done ')
+        # print(f'setupUi actionCreate_design_report done ')
 
         self.check_for_update.triggered.connect(lambda: self.notification())
         self.actionZoom_out.triggered.connect(lambda: self.display.ZoomFactor(1/1.1))
@@ -1268,7 +1267,7 @@ class Window(QMainWindow):
         self.actionAbout_Osdag_2.triggered.connect(lambda: MyAboutOsdag(self).exec())
         self.actionAsk_Us_a_Question.triggered.connect(lambda: MyAskQuestion(self).exec())
         self.actionDesign_examples.triggered.connect(self.design_examples)
-        print(f'setupUi actionDesign_examples done ')
+        # print(f'setupUi actionDesign_examples done ')
 
         self.actionSave_Top_View.triggered.connect(lambda: self.display.View_Top())
         self.actionSave_Front_View.triggered.connect(lambda: self.display.View_Front())
@@ -1294,7 +1293,7 @@ class Window(QMainWindow):
         self.btnTop.clicked.connect(lambda: self.display.FitAll())
         self.btnFront.clicked.connect(lambda: self.display.FitAll())
         self.btnSide.clicked.connect(lambda: self.display.FitAll())
-        print(f'setupUi btnSide.clicked done ')
+        # print(f'setupUi btnSide.clicked done ')
 
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
@@ -1306,7 +1305,7 @@ class Window(QMainWindow):
         if os.path.isfile(last_design_file):
             with open(str(last_design_file), 'r') as last_design:
                 last_design_dictionary = yaml.safe_load(last_design)
-                print(f'last_design_dictionary {last_design_dictionary}')
+                # print(f'last_design_dictionary {last_design_dictionary}')
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
             if "out_titles_status" in last_design_dictionary.keys():
@@ -1326,12 +1325,12 @@ class Window(QMainWindow):
                         out_titles.append(title_name)
         self.ui_loaded = True
 
-        print("\n outside now")
+        # print("\n outside now")
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None
-        print(f'setupUi done 10')
+        # print(f'setupUi done 10')
 
     def notification(self):
         update_class = Update()
@@ -1677,7 +1676,7 @@ class Window(QMainWindow):
             print('flag true')
 
             des_pref_input_list = main.input_dictionary_design_pref(main)
-            print(f"des_pref_input_list = {des_pref_input_list}\n")
+            print(f"design preference input list = {des_pref_input_list}\n")
             edit_tabs_list = main.edit_tabs(main)
             edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB, edit_tabs_list))
             remove_tab_name = [x[0] for x in edit_tabs_remove]
@@ -1720,12 +1719,8 @@ class Window(QMainWindow):
                 input_dock_key = without_des_pref[0]
                 input_list = without_des_pref[1]
                 input_source = without_des_pref[2]
-                print(f"\n ========================Check===========================")    
-                print(f"\n design_fn design_dictionary{design_dictionary}")
-                print(f"\n self.input_dock_inputs{self.input_dock_inputs}")
-                print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
-                print(f"\n input_list{input_list}")
-                print(f"\n self.design_pref_inputs.keys() {self.design_pref_inputs.keys()}")
+                # print(f"\n ========================Check===========================")
+                # print(f"\n self.design_pref_inputs.keys() {self.design_pref_inputs.keys()}")
                 for key_name in input_list:
                     if input_source == 'Input Dock':
                         design_dictionary.update({key_name: design_dictionary[input_dock_key]})
@@ -1735,11 +1730,13 @@ class Window(QMainWindow):
 
             for dp_key in self.design_pref_inputs.keys():
                 design_dictionary[dp_key] = self.design_pref_inputs[dp_key]
-        print(f"\n ========================Check done ===========================")    
+        # print(f"\n ========================Check done ===========================")
 
         self.design_inputs = design_dictionary
         self.design_inputs = design_dictionary
         print(f"\n self.input_dock_inputs {self.input_dock_inputs}")
+        print(f"\n design_fn design_dictionary{self.design_inputs}")
+        print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
 
     '''
     @author: Umair

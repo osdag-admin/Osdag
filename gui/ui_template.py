@@ -643,7 +643,7 @@ class Window(QMainWindow):
                 table_widget.setRowCount(2)
                 table_widget.setColumnCount(6)
 
-                data_dictionary, table_widget_cp = option[3], table_widget
+                data_dictionary, table_widget_cp, popup_dialog_cp = option[3], table_widget, popup_dialog
 
                 table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
 
@@ -656,7 +656,7 @@ class Window(QMainWindow):
 
                 popup_dialog.setLayout(layout)
                 popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-                popup_dialog.resize(820,260)
+                popup_dialog.resize(820,100)
 
                 button.clicked.connect(lambda: popup_dialog.show())
 
@@ -669,7 +669,7 @@ class Window(QMainWindow):
 
 
                 no_of_members.currentIndexChanged.connect(
-                    lambda: self.update_table_widget(table_widget_cp, data_dictionary, int(no_of_members.currentText()))
+                    lambda: self.update_table_widget_popup(table_widget_cp, data_dictionary, popup_dialog_cp, int(no_of_members.currentText()))
                 )
 
             if type == TYPE_TEXTBOX:
@@ -1414,9 +1414,9 @@ class Window(QMainWindow):
                         combo_box.addItem(item, value)
                     table_widget.setCellWidget(row, col, combo_box)
 
-    def update_table_widget(self, table_widget, data_dictionary, no_of_rows):
+    def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
         '''
-            Created for updating the table row size
+            Created for updating the table row size and popup window size
             Especially for `type == TYPE_TABLE_IN` in the Input Dock
 
             Can be modified by passing more argument to keep the current functionality
@@ -1433,6 +1433,8 @@ class Window(QMainWindow):
         self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
         table_widget.resizeRowsToContents()
         table_widget.resizeColumnsToContents()
+        pop_window_sizes = [ (820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)]
+        popup_dialog.resize(pop_window_sizes[no_of_rows-2][0],pop_window_sizes[no_of_rows-2][1])
 
     def notification(self):
         update_class = Update()

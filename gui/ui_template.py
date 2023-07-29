@@ -1386,6 +1386,17 @@ class Window(QMainWindow):
         return combo_box_section_profile, combo_box_connection_location
 
     def add_widget_to_table_widget(self, table_widget, data_dictionary, row_count):
+        '''
+            Created for adding QComboBox to Table widget
+            Especially for `type == TYPE_TABLE_IN` in the Input Dock
+
+            Can be modified by passing more argument to keep the current functionality
+            required for `type == TYPE_TABLE_IN` by adding & changing the current args
+            of this method for future use.
+
+            If you don't know how to do it please don't modify this method as it may affect
+            the truss-connection-bolted module's connecting memeber attribute.
+        '''
         if row_count < table_widget.rowCount():
             return
         for col, (key, value) in enumerate(data_dictionary.items()):
@@ -1404,6 +1415,17 @@ class Window(QMainWindow):
                     table_widget.setCellWidget(row, col, combo_box)
 
     def update_table_widget(self, table_widget, data_dictionary, no_of_rows):
+        '''
+            Created for updating the table row size
+            Especially for `type == TYPE_TABLE_IN` in the Input Dock
+
+            Can be modified by passing more argument to keep the current functionality
+            required for `type == TYPE_TABLE_IN` by adding & changing the current args
+            of this method for future use.
+
+            If you don't know how to do it please don't modify this method as it may affect
+            the truss-connection-bolted module's connecting memeber attribute.
+        '''
         table_widget.clear()
         table_widget.setRowCount(no_of_rows)
         table_widget.setColumnCount(6)

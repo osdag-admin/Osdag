@@ -643,8 +643,6 @@ class Window(QMainWindow):
                 table_widget.setRowCount(2)
                 table_widget.setColumnCount(6)
 
-                combo_box_dictionary = dict()  # Just in case, if we need the combo_box object for each option
-
                 data_dictionary, table_widget_cp = option[3], table_widget
 
                 table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
@@ -668,6 +666,11 @@ class Window(QMainWindow):
                 if option[5] != 'No Validator':
                     table_widget.setValidator(self.get_validator(option[5]))
                 in_layout2.addWidget(button, j, 1, 1, 2)
+
+
+                no_of_members.currentIndexChanged.connect(
+                    lambda: self.update_table_widget(table_widget_cp, data_dictionary, int(no_of_members.currentText()))
+                )
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -1399,6 +1402,15 @@ class Window(QMainWindow):
                     for item in value:
                         combo_box.addItem(item, value)
                     table_widget.setCellWidget(row, col, combo_box)
+
+    def update_table_widget(self, table_widget, data_dictionary, no_of_rows):
+        table_widget.clear()
+        table_widget.setRowCount(no_of_rows)
+        table_widget.setColumnCount(6)
+        table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
+        self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
+        table_widget.resizeRowsToContents()
+        table_widget.resizeColumnsToContents()
 
     def notification(self):
         update_class = Update()

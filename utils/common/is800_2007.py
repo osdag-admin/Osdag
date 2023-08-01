@@ -511,28 +511,57 @@ class IS800_2007(object):
 
         return effective_length
 
+    @staticmethod
+    def cl_7_2_4_effective_length_of_truss_compression_members(length, section_profile = 'Angles'):
+        """
+        Calculate the effective length of the member as per Cl. 7.5.2.1 (Table 11) of IS 800:2007
+
+        Args:
+            unsupported_length: actula length of the member about any axis in mm (float)
+            end_1: End condition at end 1 of the member (string)
+            end_2: End condition at end 2 of the member (string)
+
+        Returns:
+            Effective length in mm
+        """
+
+        if section_profile == 'Angles':
+            effective_length = 1 * length
+        elif section_profile == 'Back to Back Angles':
+            effective_length = 0.85 * length
+        else:
+            pass
+
+        return effective_length
+
     # cl. 7.1.2.1, Design stress
     @staticmethod
-    def cl_7_1_2_1_design_compressisive_stress(f_y,  lamba , buklingclass ):
+    def cl_7_1_2_1_design_compressisive_stress(f_y, gamma_mo, effective_slenderness_ratio , imperfection_factor, modulus_of_elasticity ):
         """
         Args:
             f_y:Yield stress                                                                        (float)
-            lamba:Effective length of member                                                        (float)
-            buklingclass:Euler buckling class                                                       (float)
+            gamma_mo:Effective length of member                                                        (float)
+            effective_slenderness_ratio:Euler buckling class                                                       (float)
+            imperfection_factor
+            modulus_of_elasticity
 
         Returns:
-            Design compressive stress
+            list of euler_buckling_stress, nondimensional_effective_slenderness_ratio, phi, stress_reduction_factor, design_compressive_stress_fr .design_compressive_stress, design_compressive_stress_min
         Note:
             Reference: IS 800 pg34
             @author:Rutvik Joshi
         """
-        Esteel= 2*(10**5)
-        gamma_mo=1.1                                                                                 #table 5 of IS 800:2007
-        fcc = (3.14 ** 2 * Esteel) / lamba ** 2
-        lambda1 = (f_y / fcc) ** 0.5
-        phi = 0.5 * (1 + buklingclass * (lambda1 - 0.2) + lambda1 ** 2)
-        facd = (f_y / gamma_mo) / (phi + ((phi ** 2 - lambda1 ** 2) ** 0.5))
-        return facd                                                                                  #kN/cm2
+        # 2.4 - Euler buckling stress
+        euler_buckling_stress = (math.pi ** 2 * modulus_of_elasticity) / effective_slenderness_ratio ** 2
+        # 2.5 - Non-dimensional effective slenderness ratio
+        nondimensional_effective_slenderness_ratio = math.sqrt(f_y / euler_buckling_stress)
+        phi = 0.5 * (1 + imperfection_factor * (nondimensional_effective_slenderness_ratio - 0.2) + nondimensional_effective_slenderness_ratio ** 2)
+        # 2.6 - Design compressive stress
+        stress_reduction_factor = 1/(phi + math.sqrt(phi**2 - nondimensional_effective_slenderness_ratio))
+        design_compressive_stress_fr = f_y * stress_reduction_factor / gamma_mo
+        design_compressive_stress_min = f_y / gamma_mo
+        design_compressive_stress = min(design_compressive_stress_fr , design_compressive_stress_min)
+        return [euler_buckling_stress, nondimensional_effective_slenderness_ratio, phi, stress_reduction_factor,design_compressive_stress_fr, design_compressive_stress, design_compressive_stress_min]                                                                                  #kN/cm2
 
     # Cl. 7.1.1, Cl.7.1.2.1, Imperfection Factor
     @staticmethod

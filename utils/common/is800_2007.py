@@ -557,11 +557,11 @@ class IS800_2007(object):
         nondimensional_effective_slenderness_ratio = math.sqrt(f_y / euler_buckling_stress)
         phi = 0.5 * (1 + imperfection_factor * (nondimensional_effective_slenderness_ratio - 0.2) + nondimensional_effective_slenderness_ratio ** 2)
         # 2.6 - Design compressive stress
-        stress_reduction_factor = 1/(phi + math.sqrt(phi**2 - nondimensional_effective_slenderness_ratio))
+        stress_reduction_factor = 1/(phi + math.sqrt(phi**2 - nondimensional_effective_slenderness_ratio**2))
         design_compressive_stress_fr = f_y * stress_reduction_factor / gamma_mo
-        design_compressive_stress_min = f_y / gamma_mo
-        design_compressive_stress = min(design_compressive_stress_fr , design_compressive_stress_min)
-        return [euler_buckling_stress, nondimensional_effective_slenderness_ratio, phi, stress_reduction_factor,design_compressive_stress_fr, design_compressive_stress, design_compressive_stress_min]                                                                                  #kN/cm2
+        design_compressive_stress_max = f_y / gamma_mo
+        design_compressive_stress = min(design_compressive_stress_fr , design_compressive_stress_max)
+        return [euler_buckling_stress, nondimensional_effective_slenderness_ratio, phi, stress_reduction_factor,design_compressive_stress_fr, design_compressive_stress, design_compressive_stress_max]                                                                                  #kN/cm2
 
     # Cl. 7.1.1, Cl.7.1.2.1, Imperfection Factor
     @staticmethod

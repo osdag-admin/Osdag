@@ -76,6 +76,8 @@ class Member(Main):
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
             section_profile = str(input_dictionary[KEY_SEC_PROFILE])
+            if KEY_LOCATION not in input_dictionary:
+                input_dictionary[KEY_LOCATION] = 'Long Leg'
             l = str(input_dictionary[KEY_LOCATION])
             Angle_attributes = Angle(designation,material_grade)
             source = str(Angle_attributes.source)
@@ -86,6 +88,9 @@ class Member(Main):
             thickness = (Angle_attributes.thickness)
             root_radius = str(Angle_attributes.root_radius)
             toe_radius = str(Angle_attributes.toe_radius)
+            if KEY_PLATETHK not in input_dictionary:
+                input_dictionary[KEY_PLATETHK] = PLATE_THICKNESS_IS_1730_1989
+
             plate_thk = float(input_dictionary[KEY_PLATETHK][0])
             Type = str(Angle_attributes.type)
             source = str(Angle_attributes.source)
@@ -202,6 +207,11 @@ class Member(Main):
 
         t1 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_TEXTBOX, None, section_profile)
         section.append(t1)
+
+        # if KEY_LOCATION in input_dictionary:
+        #     l = str(input_dictionary[KEY_LOCATION])
+        # else:
+        #     input_dictionary[KEY_LOCATION] = 'Long Leg'
 
         t1 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_TEXTBOX, None, l)
         section.append(t1)

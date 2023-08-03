@@ -138,10 +138,10 @@ class Compression(Member):
         t2 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_STEEL_COST, KEY_ALLOW_CLASS])
+        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_STEEL_COST])
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA])
+        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_ALLOW_LOAD])
         design_input.append(t2)
 
         # t2 = ("Optimization", TYPE_NOTE, [ KEY_ALLOW_CLASS])
@@ -581,8 +581,8 @@ class Compression(Member):
         self.loc = 'Long Leg'
 
         # end condition
-        self.end_1 = design_dictionary[KEY_END1]
-        self.end_2 = design_dictionary[KEY_END2]
+        self.end_1 = 'Hinged'
+        self.end_2 = 'Hinged'
 
         # self.length_zz = float(design_dictionary[KEY_LENZZ])
         # self.length_yy = float(design_dictionary[KEY_LENYY])

@@ -45,7 +45,7 @@ class Compression(Member):
         t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_strut_design)
         tabs.append(t2)
 
-        t6 = ("Connector", TYPE_TAB_2, self.gusset_connector_values)
+        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)#plate_connector_values
         tabs.append(t6)
 
         t5 = ("Design", TYPE_TAB_2, self.design_values)
@@ -138,16 +138,15 @@ class Compression(Member):
         t2 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
         design_input.append(t2)
 
-
-
-        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_STEEL_COST])
+        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_STEEL_COST, KEY_ALLOW_CLASS])
         design_input.append(t2)
 
         t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA])
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_NOTE, [ KEY_ALLOW_CLASS])
-
+        # t2 = ("Optimization", TYPE_NOTE, [ KEY_ALLOW_CLASS])
+        # design_input.append(t2)
+        # Can add in description
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
@@ -175,7 +174,7 @@ class Compression(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST, KEY_DP_DESIGN_METHOD], '')
+        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST, KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD], '')#, KEY_CONNECTOR_MATERIAL
         design_input.append(t2)
 
         # t2 = (None, [KEY_DP_DESIGN_METHOD], '')
@@ -219,6 +218,7 @@ class Compression(Member):
             KEY_OPTIMIZATION_PARA: 'Utilization Ratio',
             KEY_STEEL_COST: '50',
             KEY_ALLOW_CLASS:'Yes',
+            KEY_ALLOW_LOAD: 'Concentric Load',
             # KEY_ALLOW_CLASS1: 'Yes',
             # KEY_ALLOW_CLASS2: 'Yes',
             # KEY_ALLOW_CLASS3: 'Yes',
@@ -276,6 +276,9 @@ class Compression(Member):
         t1 = (KEY_SECSIZE, self.fn_profile_section)
         c_lst.append(t1)
 
+        # t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        # c_lst.append(t4)
+
         return c_lst
 
     def input_values(self):
@@ -300,8 +303,8 @@ class Compression(Member):
         t3 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
         options_list.append(t3)
 
-        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_NOTE, VALUES_LOCATION_1[0], True, 'No Validator')
-        options_list.append(t3)
+        # t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_NOTE, VALUES_LOCATION_1[0], True, 'No Validator')
+        # options_list.append(t3)
 
         #([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
 
@@ -326,17 +329,17 @@ class Compression(Member):
         # t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, None, True, 'No Validator')
         # options_list.append(t13)
 
-        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t9)
-
-        t10 = (KEY_END1, KEY_DISP_END1, TYPE_NOTE, VALUES_STRUT_END1, True, 'No Validator')
-        options_list.append(t10)
-
-        t11 = (KEY_END2, KEY_DISP_END2, TYPE_NOTE, VALUES_STRUT_END2, True, 'No Validator')
-        options_list.append(t11)
-
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/3.RFRF.PNG", True, 'No Validator')
-        options_list.append(t12)
+        # t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t9)
+        #
+        # t10 = (KEY_END1, KEY_DISP_END1, TYPE_NOTE, VALUES_STRUT_END1, True, 'No Validator')
+        # options_list.append(t10)
+        #
+        # t11 = (KEY_END2, KEY_DISP_END2, TYPE_NOTE, VALUES_STRUT_END2, True, 'No Validator')
+        # options_list.append(t11)
+        #
+        # t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/3.RFRF.PNG", True, 'No Validator')
+        # options_list.append(t12)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
@@ -350,13 +353,11 @@ class Compression(Member):
         # t10 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,'10', True, 'No Validator')
         # options_list.append(t10)
 
-        t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t13)
-
-        t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_TEXTBOX, '10', True, 'No Validator')
-        options_list.append(t14)
-
-
+        # t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t13)
+        #
+        # t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_TEXTBOX, '10', True, 'No Validator')
+        # options_list.append(t14)
 
         return options_list
 
@@ -458,7 +459,13 @@ class Compression(Member):
         t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t3)
 
-        # t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        # t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        # lst.append(t8)
+        #
+        # t9 = ([KEY_SECSIZE], KEY_SECSIZE, TYPE_CUSTOM_SECTION, self.new_material)
+        # lst.append(t9)
+
+        # # t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         # lst.append(t3)
 
         # t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
@@ -596,6 +603,7 @@ class Compression(Member):
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         self.optimization_parameter = design_dictionary[KEY_OPTIMIZATION_PARA]
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
+        self.load_type = design_dictionary[KEY_ALLOW_LOAD]
         # self.allow_class2 = design_dictionary[KEY_ALLOW_CLASS2]
         # self.allow_class3 = design_dictionary[KEY_ALLOW_CLASS3]
         # self.allow_class4 = design_dictionary[KEY_ALLOW_CLASS4]
@@ -616,6 +624,8 @@ class Compression(Member):
 
         print(f"self.allowed_sections {self.allowed_sections}")
         print("==================")
+        print(f"self.load_type {self.load_type}")
+
         print(f"self.module{self.module}")
         print(f"self.sec_list {self.sec_list}")
         print(f"self.material {self.material}")
@@ -667,9 +677,9 @@ class Compression(Member):
         self.results(self)
         # self.initial_member_capacity(self,design_dictionary)
         print(f"self.sec_list {self.sec_list}")
-        for selectedsize in self.sec_list:
-            # print(f"selectedsize{selectedsize}")
-            self.select_section(self,selectedsize, design_dictionary)
+        # for selectedsize in self.sec_list:
+        #     # print(f"selectedsize{selectedsize}")
+        #     self.select_section(self,selectedsize, design_dictionary)
 
     def select_section(self, selectedsize, design_dictionary):
 
@@ -922,11 +932,11 @@ class Compression(Member):
             logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
 
 
-            # if len(self.allowed_sections) == 0:
-            #     logger.warning("Select at-least one type of section in the design preferences tab.")
-            #     logger.error("Cannot compute. Selected section classification type is Null.")
-            #     self.design_status = False
-            #     self.design_status_list.append(self.design_status)
+            if len(self.allowed_sections) == 0:
+                logger.warning("Select at-least one type of section in the design preferences tab.")
+                logger.error("Cannot compute. Selected section classification type is Null.")
+                self.design_status = False
+                self.design_status_list.append(self.design_status)
 
             if self.section_class in self.allowed_sections:
                 self.input_section_list.append(trial_section)

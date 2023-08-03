@@ -437,7 +437,8 @@ KEY_DISP_NON_DIM_ESR = 'Non-dimensional Effective SR'
 KEY_ALLOW_CLASS = 'Optimum.Class'
 KEY_DISP_CLASS = 'Semi-compact sections'
 DISP_TITLE_STRUT_SECTION = 'Section Details'
-
+KEY_ALLOW_LOAD = 'Load.Type'
+KEY_DISP_LOAD = 'Type of Load'
 
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'

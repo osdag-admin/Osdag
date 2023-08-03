@@ -1698,7 +1698,8 @@ class Member(Main):
     def optimization_tab_strut_design(self, input_dictionary):
 
         values = {KEY_ALLOW_CLASS: 'Yes',
-                  KEY_ALLOW_UR: '1.0', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_STEEL_COST: '50'}
+                  KEY_ALLOW_UR: '1.0', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_EFFECTIVE_AREA_PARA: '1.0',
+                  KEY_STEEL_COST: '50', KEY_ALLOW_LOAD : 'Concentric Load'}
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -1717,6 +1718,9 @@ class Member(Main):
 
         t4 = (None, None, TYPE_ENTER, None, None)
         optimum.append(t4)
+
+        t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, ['Concentric Load', 'Leg Load'], values[KEY_ALLOW_LOAD])
+        optimum.append(t1)
 
         t5 = (None, KEY_DISP_SECTION_DEFINITION_DP, TYPE_TITLE, None, None)
         optimum.append(t5)

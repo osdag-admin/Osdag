@@ -833,15 +833,11 @@ class Window(QMainWindow):
                         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
                         popup_dialog = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog")
                         button = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Button")
-
                         button.clicked.connect(lambda: popup_dialog.show())
-
                         no_of_members.currentIndexChanged.connect(
                             lambda: self.update_table_widget_popup(key_changed, data_dictionary, popup_dialog,
                                                                    int(no_of_members.currentText()))
                         )
-
-                        l = [key_changed.cellWidget(i,3).objectName() for i in range(key_changed.rowCount())]
                     else:
                         self.on_change_connect(key_changed, updated_list, data, main)
 

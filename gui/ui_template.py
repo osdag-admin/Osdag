@@ -568,7 +568,6 @@ class Window(QMainWindow):
         i = 0
         j = 1
         maxi_width_left, maxi_width_right = -1, -1
-        no_of_members = QtWidgets.QComboBox()
         for option in option_list:
             lable = option[1]
             type = option[2]
@@ -632,18 +631,20 @@ class Window(QMainWindow):
             if type == TYPE_TABLE_IN:
 
                 popup_dialog = QtWidgets.QDialog(self.dockWidgetContents)
+                popup_dialog.setObjectName("Connecting Members Popup Dialog")
                 popup_dialog.setWindowTitle("Connecting Members")
 
                 layout = QtWidgets.QVBoxLayout(popup_dialog)
 
                 button = QtWidgets.QPushButton("Open Connecting Members")
+                button.setObjectName("Connecting Members Button")
 
                 table_widget = QtWidgets.QTableWidget(popup_dialog)
                 table_widget.setObjectName(option[0])
                 table_widget.setRowCount(2)
                 table_widget.setColumnCount(6)
 
-                data_dictionary, table_widget_cp, popup_dialog_cp = option[3], table_widget, popup_dialog
+                data_dictionary = option[3]
 
                 table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
 
@@ -658,19 +659,12 @@ class Window(QMainWindow):
                 popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
                 popup_dialog.resize(820,100)
 
-                button.clicked.connect(lambda: popup_dialog.show())
-
                 if option[0] in input_dp_conn_list:
                     self.input_dp_connection(table_widget)
                 table_widget.setEnabled(True if option[4] else False)
                 if option[5] != 'No Validator':
                     table_widget.setValidator(self.get_validator(option[5]))
                 in_layout2.addWidget(button, j, 1, 1, 2)
-
-
-                no_of_members.currentIndexChanged.connect(
-                    lambda: self.update_table_widget_popup(table_widget_cp, data_dictionary, popup_dialog_cp, int(no_of_members.currentText()))
-                )
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -836,13 +830,18 @@ class Window(QMainWindow):
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
                     if key_name == KEY_TABLE:
-                        l = [key_changed.cellWidget(i,3).objectName() for i in range(key_changed.rowCount())]
+                        no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
+                        popup_dialog = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog")
+                        button = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Button")
 
-                        for i in l:
-                            obj = self.dockWidgetContents.findChild(QtWidgets.QWidget, i)
-                            print(i,obj)
-                            self.connect_widget(obj)
-                        #   self.new_material_dialog(i))
+                        button.clicked.connect(lambda: popup_dialog.show())
+
+                        no_of_members.currentIndexChanged.connect(
+                            lambda: self.update_table_widget_popup(key_changed, data_dictionary, popup_dialog,
+                                                                   int(no_of_members.currentText()))
+                        )
+
+                        l = [key_changed.cellWidget(i,3).objectName() for i in range(key_changed.rowCount())]
                     else:
                         self.on_change_connect(key_changed, updated_list, data, main)
 
@@ -1446,15 +1445,13 @@ class Window(QMainWindow):
         pop_window_sizes = [ (820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)]
         popup_dialog.resize(pop_window_sizes[no_of_rows-2][0],pop_window_sizes[no_of_rows-2][1])
 
-    def connect_widget(self, obj):
-        obj_cp = obj
-        obj.currentIndexChanged.connect(lambda: self.update_all_custom_material_in_table_widget(obj_cp.objectName()) )
+    def update_all_custom_material(self, table_widget):
+        pass
 
-    def update_all_custom_material_in_table_widget(self, table_widget_item_key_name):
+    def update_custom_material(self, table_widget_item_key_name):
         table_widget_item = self.dockWidgetContents.findChild(QtWidgets.QWidget, table_widget_item_key_name)
         if table_widget_item.currentText().lower() == 'custom':
             self.new_material_dialog(table_widget_item_key_name)
-
 
     def notification(self):
         update_class = Update()

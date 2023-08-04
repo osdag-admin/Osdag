@@ -1421,6 +1421,8 @@ class Window(QMainWindow):
                     combo_box.setObjectName(key + str(row))
                     for item in value:
                         combo_box.addItem(item, value)
+                    if key == KEY_MATERIAL:
+                        self.create_custom_material(combo_box)
                     table_widget.setCellWidget(row, col, combo_box)
 
     def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
@@ -1445,13 +1447,12 @@ class Window(QMainWindow):
         pop_window_sizes = [ (820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)]
         popup_dialog.resize(pop_window_sizes[no_of_rows-2][0],pop_window_sizes[no_of_rows-2][1])
 
-    def update_all_custom_material(self, table_widget):
-        pass
+    def create_custom_material(self, combo_box):
+        combo_box.currentIndexChanged.connect(lambda: self.update_custom_material(combo_box))
 
-    def update_custom_material(self, table_widget_item_key_name):
-        table_widget_item = self.dockWidgetContents.findChild(QtWidgets.QWidget, table_widget_item_key_name)
+    def update_custom_material(self, table_widget_item):
         if table_widget_item.currentText().lower() == 'custom':
-            self.new_material_dialog(table_widget_item_key_name)
+            self.new_material_dialog(table_widget_item.objectName())
 
     def notification(self):
         update_class = Update()

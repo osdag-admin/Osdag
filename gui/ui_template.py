@@ -835,7 +835,16 @@ class Window(QMainWindow):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    self.on_change_connect(key_changed, updated_list, data, main)
+                    if key_name == KEY_TABLE:
+                        l = [key_changed.cellWidget(i,3).objectName() for i in range(key_changed.rowCount())]
+
+                        for i in l:
+                            obj = self.dockWidgetContents.findChild(QtWidgets.QWidget, i)
+                            print(i,obj)
+                            self.connect_widget(obj)
+                        #   self.new_material_dialog(i))
+                    else:
+                        self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect((maxi_width / 2) - 110, 650, 100, 35))
@@ -1410,6 +1419,7 @@ class Window(QMainWindow):
             else:
                 for row in range(row_count):
                     combo_box = QtWidgets.QComboBox()
+                    combo_box.setObjectName(key + str(row))
                     for item in value:
                         combo_box.addItem(item, value)
                     table_widget.setCellWidget(row, col, combo_box)
@@ -1435,6 +1445,16 @@ class Window(QMainWindow):
         table_widget.resizeColumnsToContents()
         pop_window_sizes = [ (820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)]
         popup_dialog.resize(pop_window_sizes[no_of_rows-2][0],pop_window_sizes[no_of_rows-2][1])
+
+    def connect_widget(self, obj):
+        obj_cp = obj
+        obj.currentIndexChanged.connect(lambda: self.update_all_custom_material_in_table_widget(obj_cp.objectName()) )
+
+    def update_all_custom_material_in_table_widget(self, table_widget_item_key_name):
+        table_widget_item = self.dockWidgetContents.findChild(QtWidgets.QWidget, table_widget_item_key_name)
+        if table_widget_item.currentText().lower() == 'custom':
+            self.new_material_dialog(table_widget_item_key_name)
+
 
     def notification(self):
         update_class = Update()
@@ -2376,7 +2396,7 @@ class Window(QMainWindow):
         SecProfile = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText()
         return parameters
 
-    def new_material_dialog(self):
+    def new_material_dialog(self, custom_option_obj=KEY_MATERIAL):
         dialog = QtWidgets.QDialog(self)
         self.material_popup_message = ''
         self.invalid_field = ''
@@ -2426,7 +2446,7 @@ class Window(QMainWindow):
         dialog.setFixedSize(350, 250)
         closed = dialog.exec()
         if closed is not None:
-            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
+            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, custom_option_obj)
             input_dock_material.clear()
             for item in connectdb("Material"):
                 input_dock_material.addItem(item)

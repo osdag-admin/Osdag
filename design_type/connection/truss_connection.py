@@ -44,4 +44,8 @@ class TrussConnection(Connection):
     def input_value_changed(self):
 
         lst = []
+
+        t1 = ([KEY_TABLE], KEY_TABLE, TYPE_TABLE_IN, self.new_material)
+        lst.append(t1)
+
         return lst

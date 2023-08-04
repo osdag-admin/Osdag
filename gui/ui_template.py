@@ -944,10 +944,19 @@ class Window(QMainWindow):
                 # b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if output_type == TYPE_TABLE_OU:
-                table_widget = QtWidgets.QTableWidget(self.dockWidgetContents_out)
-                table_widget.setObjectName(option[0])
+                output_popup_dialog = QtWidgets.QDialog(self.dockWidgetContents_out)
+                output_popup_dialog.setObjectName("Bolt Design Summary Table")
+                output_popup_dialog.setWindowTitle("Bolt Design Summary")
+
+                output_table_layout = QtWidgets.QVBoxLayout(output_popup_dialog)
+
+                button = QtWidgets.QPushButton("Open Bolt Design Summary")
+                button.setObjectName("Bolt Design Summary Table Button")
+
+                table_widget = QtWidgets.QTableWidget(output_popup_dialog)
+                table_widget.setObjectName(option[2])
                 table_widget.setRowCount(18)
-                table_widget.setColumnCount(8)
+                table_widget.setColumnCount(2)
 
                 # Set the vertical header labels
                 vertical_labels = ["Bolt Details", "Dia. of Bolt(mm)", "Property Class", "Bolt Hole Dia.(mm)",
@@ -958,7 +967,7 @@ class Window(QMainWindow):
                                    "Capacity Factor(KN)"]
                 table_widget.setVerticalHeaderLabels(vertical_labels)
 
-                table_widget.setHorizontalHeaderLabels(["1", "2", "3", "4", "5", "6", "7", "8"])
+                table_widget.setHorizontalHeaderLabels([str(i+1) for i in range(table_widget.columnCount())])
 
                 # Populate the table with read-only items
                 for row in range(table_widget.rowCount()):
@@ -971,12 +980,23 @@ class Window(QMainWindow):
                 table_widget.resizeRowsToContents()
                 table_widget.resizeColumnsToContents()
 
+                output_table_layout.addWidget(table_widget)
+
+                output_popup_dialog.setLayout(output_table_layout)
+                output_popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
+                output_popup_dialog.resize(205, 424)
+
+                button.clicked.connect(lambda: output_popup_dialog.show())
+
+                no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
+                no_of_members.currentIndexChanged.connect(self.update_output_dock_table_widget)
+
                 # if option[0] in input_dp_conn_list:
                 # self.input_dp_connection(table_widget)
                 table_widget.setEnabled(True if option[4] else False)
                 if option[5] != 'No Validator':
                     table_widget.setValidator(self.get_validator(option[5]))
-                out_layout2.addWidget(table_widget, j, 1, 1, 2)
+                out_layout2.addWidget(button, j, 1, 1, 2)
 
             if output_type == TYPE_TABLE_GUS:
                 table_widget = QtWidgets.QTableWidget(self.dockWidgetContents_out)
@@ -1421,6 +1441,12 @@ class Window(QMainWindow):
                         self.create_custom_material(combo_box)
                     table_widget.setCellWidget(row, col, combo_box)
 
+    def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0, table_widget=None):
+        if table_widget is not None:
+            table_widget.resizeRowsToContents()
+            table_widget.resizeColumnsToContents()
+        popup_dialog.resize(popup_window_sizes[index - default_start][0], popup_window_sizes[index - default_start][1])
+
     def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
         '''
             Created for updating the table row size and popup window size
@@ -1438,10 +1464,15 @@ class Window(QMainWindow):
         table_widget.setColumnCount(6)
         table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
         self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
-        table_widget.resizeRowsToContents()
-        table_widget.resizeColumnsToContents()
-        pop_window_sizes = [ (820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)]
-        popup_dialog.resize(pop_window_sizes[no_of_rows-2][0],pop_window_sizes[no_of_rows-2][1])
+        self.resize_popup_dialog(popup_dialog, [(820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)], no_of_rows, 2, table_widget)
+
+    def update_output_dock_table_widget(self, index):
+        popup_dialog = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, "Bolt Design Summary Table")
+        table_widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, TYPE_TABLE_OU)
+        table_widget.setColumnCount(0)
+        table_widget.setColumnCount(index+2)
+        popup_window_sizes = [(205,424), (223,424), (240,424), (256,424), (274,424), (291,424), (308,424)]
+        self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0, table_widget)
 
     def create_custom_material(self, combo_box):
         combo_box.currentIndexChanged.connect(lambda: self.update_custom_material(combo_box))

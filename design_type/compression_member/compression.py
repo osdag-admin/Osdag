@@ -677,15 +677,18 @@ class Compression(Member):
         #'Conn_Location'
         self.loc = design_dictionary[KEY_LOCATION]
 
-        #
+        #['Concentric Load', 'Leg Load']
         self.load_type = design_dictionary[KEY_ALLOW_LOAD]
-        self.load_type = 'Concentrically Loaded'
+        self.load_type = 'Concentric Load'
 
 
         # end condition
         self.end_1 = design_dictionary[KEY_END1]
         self.end_2 = design_dictionary[KEY_END2]
-
+        if self.end_1 == 'Fixed' and self.end_2 == 'Fixed':
+            self.fixity = 'Fixed'
+        else:
+            self.fixity = 'Hinged'
         # 'Bolt.Diameter'
         self.bolt_list = design_dictionary[KEY_D]
         self.bolt_type = design_dictionary[KEY_TYP]
@@ -710,10 +713,7 @@ class Compression(Member):
         print(f"set_input_values self.module {self.module}")
         print(f"set_input_values self.sec_profile {self.sec_profile}")
         print(f"set_input_values self.material {self.material}")
-        # print(f"set_input_values self.length_yy {self.length_yy}")
         print(f"set_input_values self.load {self.load}")
-
-
 
         self.allowed_sections = []
 
@@ -768,11 +768,7 @@ class Compression(Member):
 
         print("The input values are set. Performing preliminary member check(s).")
         # self.i = 0
-        self.section_classification(self)
-        if design_dictionary[KEY_AXIAL] == '':
-            self.strength_of_strut(self)
-        else:
-            self.design_strut(self)
+        self.design(self, design_dictionary)
         self.results(self)
         # self.initial_member_capacity(self,design_dictionary)
         print(f"self.sec_list {self.sec_list}")
@@ -986,14 +982,10 @@ class Compression(Member):
             logger.error(": Design is unsafe. \n ")
             logger.info(" :=========End Of design===========")
 
-
-
-
     def get_3d_components(self):
 
         components = []
         return components
-
 
     def section_classification(self):
         """ Classify the sections based on Table 2 of IS 800:2007 """
@@ -1144,8 +1136,6 @@ class Compression(Member):
             self.effective_length = IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(self.length,
                                                                                                       self.sec_profile)  # mm
         elif step == 4:
-            self.slenderness = self.effective_length / min(self.section_property.rad_of_gy_z,
-                                                           self.section_property.rad_of_gy_y)
 
             list_cl_7_1_2_1_design_compressisive_stress = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
                 self.material_property.fy, self.gamma_m0, self.slenderness, self.imperfection_factor,
@@ -1192,6 +1182,10 @@ class Compression(Member):
                         list_2.pop(0)
                         break
             print(f"\n self.single_result {self.single_result}")
+        elif step == 7:
+            pass
+            # initial check
+
 
     def common_result(self, list_result):
             self.result_designation = list_result[self.result_UR]['Designation']
@@ -1291,20 +1285,143 @@ class Compression(Member):
 
         return self.section_size_max.tension_yielding_capacity, self.max_length, self.section_size_max.slenderness,self.min_radius_gyration
 
-    # def min_rad_gyration_calc(self, key, subkey, mom_inertia_y, mom_inertia_z, area, rad_y, rad_z, rad_u=0.0, rad_v=0.0,
-    #                           Cg_1=0, Cg_2=0, thickness=0.0):
+    def design(self, design_dictionary , flag = 0):
+        self.section_classification(self)
 
-
-
-    def design_strut(self):
         """ Perform design of struct """
         # checking DP inputs
         self.optimization_tab_check(self)
-    # optimization_tab_check()
+        # optimization_tab_check()
 
         print(f"\n self.input_section_list {self.input_section_list}")
         print(f"\n self.input_section_classification {self.input_section_classification}")
         print(f"\n self.loc {self.loc}")
+
+        if design_dictionary[KEY_AXIAL] == '' and len(self.input_section_list) == 1:
+            self.strength_of_strut(self)
+        elif design_dictionary[KEY_AXIAL] != '' and len(self.input_section_list) > 1:
+            self.design_strut(self)
+        else:
+            logger.warning(
+                "More than 1 section given as input without giving Load")
+            logger.error("Cannot compute!")
+            logger.info("Give 1 section as Inputs and/or "
+                        "Give load and re-design.")
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
+
+    def design_strut(self):
+
+        if len(self.input_section_list) > 0:
+            # initializing lists to store the optimum results based on optimum UR and cost
+            # 1- Based on optimum UR
+            self.optimum_section_ur_results = {}
+            self.optimum_section_ur = []
+
+            # 2 - Based on optimum cost
+            self.optimum_section_cost_results = {}
+            self.optimum_section_cost = []
+
+            for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
+
+                #Common checks
+                self.common_checks_1(self,section)
+                # initialize lists for updating the results dictionary
+                list_result = []
+                list_result.append(section)
+                print(f"Common checks"
+                      f"list_result {list_result}")
+
+                # Step 1 - computing the effective sectional area
+                self.section_class = self.input_section_classification[section]
+
+                self.common_checks_1(self,section,2)
+                # if self.loc == "Long Leg":
+                #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
+                # else:
+                #     self.max_depth =self.section_size_max.min_leg - self.section_size_max.thickness - self.section_size_max.root_radius
+
+                list_result.extend([self.section_class, self.effective_area])
+
+                # Step 2 - computing the design compressive stress
+                self.common_checks_1(self,section,3)
+                list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
+
+
+                # 2.3 - slenderness ratio
+                self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
+                if self.load_type == 'Concentric Load':
+                    print(f"step == 4"
+                          f"list_result {list_result}")
+                    #step == 4
+                    self.slenderness = self.effective_length / self.min_radius_gyration
+                    print(f"self.min_radius_gyration {self.min_radius_gyration}")
+                else:
+                    # self.min_radius_gyration = min(self.section_property.rad_of_gy_y, self.section_property.rad_of_gy_z)
+                    print(f"self.min_radius_gyration {self.min_radius_gyration}")
+                    returned_list = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                    self.length, self.min_radius_gyration, self.section_property.leg_a_length,
+                    self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy, 2, self.fixity)
+
+                    self.slenderness = returned_list[0]
+                    self.lambda_vv =  returned_list[1]
+                    self.lambda_psi =  returned_list[2]
+                    self.k1 =  returned_list[3]
+                    self.k2 =  returned_list[4]
+                    self.k3 =  returned_list[5]
+
+                self.common_checks_1(self, section, 4)
+
+                # 2.7 - Capacity of the section
+                self.section_capacity = self.design_compressive_stress * self.effective_area  # N
+
+                # 2.8 - UR
+                self.ur = round(self.load.axial_force / self.section_capacity, 3)
+                self.optimum_section_ur.append(self.ur)
+
+                # 2.9 - Cost of the section in INR
+                self.cost = (self.section_property.unit_mass * self.section_property.area * 1e-4) * self.length * \
+                            self.steel_cost_per_kg
+                self.optimum_section_cost.append(self.cost)
+
+                list_result.extend([self.slenderness, self.euler_buckling_stress,
+                                   self.nondimensional_effective_slenderness_ratio,
+                                   self.phi, self.stress_reduction_factor,
+                                   self.design_compressive_stress_fr,
+                                   self.design_compressive_stress_max,
+                                   self.design_compressive_stress,
+                                   self.section_capacity, self.ur, self.cost]
+                                   )
+
+                # Step 3 - Storing the optimum results to a list in a descending order
+
+                list_1 = ['Designation','Section class', 'Effective area', 'Buckling_class', 'IF',
+                          'Effective_length', 'Effective_SR', 'EBS','ND_ESR', 'phi', 'SRF',
+                          'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
+
+                # step ==5
+                #if len(self.input_section_list) != 1:
+                        # step ==5
+                # else
+                        # step ==6
+                if len(self.input_section_list) != 1:
+                    self.common_checks_1(self, section, 5, list_result, list_1)
+
+                else:
+                    self.common_checks_1(self, section, 6, list_result, list_1)
+                    break
+
+        else:
+            logger.warning("The section(s) defined for performing the column design is/are not selected based on the selected Inputs and/or "
+                           "Design Preferences")
+            logger.error("Cannot compute!")
+            logger.info("Change the Inputs and/or "
+                           "Design Preferences provided and re-design.")
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
+            # print(f"design_status_list{self.design_status_list}")
+    def strength_of_strut(self):
+
         if len(self.input_section_list) > 0:
 
             # initializing lists to store the optimum results based on optimum UR and cost

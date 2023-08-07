@@ -763,7 +763,7 @@ class Window(QMainWindow):
 
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
-        # print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
+        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         data = {}
 
         d = {}
@@ -790,6 +790,7 @@ class Window(QMainWindow):
                     data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                   if all_values_available not in disabled_values]
             try:
+                print(f"<class 'AttributeError'>: {d} \n {new_list}")
                 d.get(new_list[0][0]).activated.connect(lambda: self.popup(d.get(new_list[0][0]), new_list,updated_list,data))
                 d.get(new_list[1][0]).activated.connect(lambda: self.popup(d.get(new_list[1][0]), new_list,updated_list,data))
                 d.get(new_list[2][0]).activated.connect(lambda: self.popup(d.get(new_list[2][0]), new_list,updated_list,data))
@@ -1676,7 +1677,6 @@ class Window(QMainWindow):
             print('flag true')
 
             des_pref_input_list = main.input_dictionary_design_pref(main)
-            print(f"design preference input list = {des_pref_input_list}\n")
             edit_tabs_list = main.edit_tabs(main)
             edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB, edit_tabs_list))
             remove_tab_name = [x[0] for x in edit_tabs_remove]
@@ -1698,17 +1698,23 @@ class Window(QMainWindow):
             else:
                 des_pref_input_list_updated = des_pref_input_list
 
+            print(f"design_fn des_pref_input_list_updated = {des_pref_input_list_updated}\n")
             for des_pref in des_pref_input_list_updated:
                 tab_name = des_pref[0]
                 input_type = des_pref[1]
                 input_list = des_pref[2]
                 tab = self.designPrefDialog.ui.findChild(QtWidgets.QWidget, tab_name)
+                # print(f"design_fn tab_name = {tab_name}\n")
+                # print(f"design_fn input_type = {input_type}\n")
+                # print(f"design_fn input_list = {input_list}\n")
+                # print(f"design_fn tab = {tab}\n")
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
                     if key is None:
                         continue
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
+                        print(f"design_fn val = {val}\n")
                         design_dictionary.update({key_name: val})
                     elif input_type == TYPE_COMBOBOX:
                         val = key.currentText()

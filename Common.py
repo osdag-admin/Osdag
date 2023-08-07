@@ -322,6 +322,7 @@ TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
 TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
+KEY_IMAGE_two = 'Imagetwo'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
 
@@ -2032,12 +2033,12 @@ DISP_TITLE_SC = 'Supporting Condition'
 KEY_END1 = 'End_1'
 KEY_DISP_END1 = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
-VALUES_STRUT_END1 = 'Hinged'
+VALUES_STRUT_END1 = ['Fixed','Hinged']
 
 KEY_END2 = 'End_2'
 KEY_DISP_END2 = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
-VALUES_STRUT_END2 = 'Hinged'
+VALUES_STRUT_END2 = ['Fixed','Hinged']
 
 KEY_END_CONDITION = 'End Condition'
 KEY_DISP_END_CONDITION = 'End Condition'

@@ -277,7 +277,7 @@ class IS800_2007(object):
 
 
         if force_type == 'Axial Compression':
-            if b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon) and  bd_t<= (15.7 * epsilon):
+            if b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon) and  bd_t<= (25 * epsilon):
                 section_class = 'Semi-Compact'
             else:
                 section_class = 'Slender'
@@ -654,6 +654,53 @@ class IS800_2007(object):
 
         return buckling_class
 
+    @staticmethod
+    def cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no = 2, fixity = 'Fixed'):
+        """
+        Calculate the equivalent slenderness ratio of the member as per Cl. 7.5.1.2 (Table 12) of IS 800:2007
+
+        Args:
+            length: actual length of the member about any axis in mm (float)
+            end_1: End condition at end 1 of the member (string)
+            end_2: End condition at end 2 of the member (string)
+            r_min: minimum radius of gyration of the section(angle)
+            b1: leg of section(angle) (float)
+            b2: another leg of section(angle) (float)
+            t : thickness (float)
+            f_y: yield strength (float)
+            bolt_no: number of bolt in the connection (float)
+            fixity = depends on end_1 and end_2 (string)
+
+        Returns:
+            list of
+            equivalent_slenderness_ratio
+            lambda_vv, lambda_psi defined in clause
+            k1, k2, k3
+        """
+        e = math.pow(250/f_y,0.5)
+        if bolt_no >= 2:
+            if fixity == 'Fixed':
+                k1 = 0.2
+                k2 = 0.35
+                k3 = 20
+            elif fixity == 'Hinged':
+                k1 = 0.7
+                k2 = 0.6
+                k3 = 5
+        elif bolt_no == 1:
+            if fixity == 'Fixed':
+                k1 = 0.75
+                k2 = 0.35
+                k3 = 20
+            elif fixity == 'Hinged':
+                k1 = 1.25
+                k2 = 0.5
+                k3 = 60
+
+        lambda_vv = (length/ r_min)/(e* math.sqrt(math.pi**2 * e/250))
+        lambda_psi = ((b1 + b2)/2 * t )/(e* math.sqrt(math.pi**2 * e/250))
+        equivalent_slenderness_ratio = math.sqrt(k1 + k2 * lambda_vv **2 + k3 * lambda_psi**2)
+        return [equivalent_slenderness_ratio, lambda_vv, lambda_psi, k1, k2, k3]
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
 

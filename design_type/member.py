@@ -29,7 +29,7 @@ class Member(Main):
 
 
     def tab_angle_section(self, input_dictionary):
-
+        print(f"tab_angle_section input_dictionary {input_dictionary}")
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
         if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
@@ -268,7 +268,10 @@ class Member(Main):
         t12 = ('Label_5', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
 
-        t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
+        if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_COMPRESSION_Strut:
+            t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, PLATE_THICKNESS_IS_1730_1989, plate_thk)
+        else:
+            t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
         section.append(t12)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
@@ -1797,6 +1800,10 @@ class Member(Main):
         d = VALUES_PLATETHK_CUSTOMIZED
         return d
 
+    @staticmethod
+    def plate_thick_customized_IS():
+        d = PLATE_THICKNESS_IS_1730_1989
+        return d
     #
     # @staticmethod
     # def size_customized():

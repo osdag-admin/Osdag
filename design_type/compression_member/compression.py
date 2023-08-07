@@ -48,6 +48,12 @@ class Compression(Member):
         t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)#plate_connector_values
         tabs.append(t6)
 
+        # t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        # tabs.append(t3)
+        #
+        # t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        # tabs.append(t4)
+
         t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
 
@@ -144,9 +150,14 @@ class Compression(Member):
         t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_ALLOW_LOAD])
         design_input.append(t2)
 
-        # t2 = ("Optimization", TYPE_NOTE, [ KEY_ALLOW_CLASS])
-        # design_input.append(t2)
-        # Can add in description
+        # t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        # design_input.append(t3)
+        #
+        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        # design_input.append(t5)
+        #
+        # t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DETAILING_EDGE_TYPE])
+        # design_input.append(t5)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
@@ -174,7 +185,10 @@ class Compression(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST, KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD], '')#, KEY_CONNECTOR_MATERIAL
+        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST,
+                     KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD], '')#, , KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
+                     # KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
+                     # KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_CONNECTOR_MATERIAL
         design_input.append(t2)
 
         # t2 = (None, [KEY_DP_DESIGN_METHOD], '')
@@ -275,6 +289,14 @@ class Compression(Member):
 
         t1 = (KEY_SECSIZE, self.fn_profile_section)
         c_lst.append(t1)
+        t2 = (KEY_GRD, self.grdval_customized)
+        c_lst.append(t2)
+        t3 = (KEY_D, self.diam_bolt_customized)
+        c_lst.append(t3)
+        # # t3= (KEY_IMAGE, self.fn_conn_image)
+        # # c_lst.append(t3)
+        t4 = (KEY_PLATETHK, self.plate_thick_customized_IS)
+        c_lst.append(t4)
 
         # t4 = (KEY_PLATETHK, self.plate_thick_customized)
         # c_lst.append(t4)
@@ -303,10 +325,10 @@ class Compression(Member):
         t3 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
         options_list.append(t3)
 
-        # t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_NOTE, VALUES_LOCATION_1[0], True, 'No Validator')
-        # options_list.append(t3)
+        t3 = (KEY_LOCATION, KEY_DISP_LOCATION_STRUT, TYPE_COMBOBOX, VALUES_LOCATION_1, True, 'No Validator')
+        options_list.append(t3)
 
-        #([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        # ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
 
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
         options_list.append(t4)
@@ -317,29 +339,17 @@ class Compression(Member):
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
+        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t9)
 
-        # t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, None, True, 'No Validator')
-        # options_list.append(t6)
+        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_STRUT_END1, True, 'No Validator')
+        options_list.append(t10)
 
+        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_STRUT_END2, True, 'No Validator')
+        options_list.append(t11)
 
-
-        # t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, None, True, 'No Validator')
-        # options_list.append(t12)
-        #
-        # t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, None, True, 'No Validator')
-        # options_list.append(t13)
-
-        # t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
-        # options_list.append(t9)
-        #
-        # t10 = (KEY_END1, KEY_DISP_END1, TYPE_NOTE, VALUES_STRUT_END1, True, 'No Validator')
-        # options_list.append(t10)
-        #
-        # t11 = (KEY_END2, KEY_DISP_END2, TYPE_NOTE, VALUES_STRUT_END2, True, 'No Validator')
-        # options_list.append(t11)
-        #
-        # t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/3.RFRF.PNG", True, 'No Validator')
-        # options_list.append(t12)
+        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/3.RFRF.PNG", True, 'No Validator')
+        options_list.append(t12)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
@@ -347,19 +357,81 @@ class Compression(Member):
         t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        # t9 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
-        # options_list.append(t9)
+        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t8)
 
-        # t10 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,'10', True, 'No Validator')
-        # options_list.append(t10)
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
+        options_list.append(t10)
 
-        # t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
-        # options_list.append(t13)
-        #
-        # t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_TEXTBOX, '10', True, 'No Validator')
-        # options_list.append(t14)
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
+        options_list.append(t11)
+
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
+        options_list.append(t12)
+
+        t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t13)
+
+        # try:
+        #     if self.sec_profile != 'Back to Back Angles':
+        #         t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_TEXTBOX, ' ', True, 'No Validator')
+
+        t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
+        options_list.append(t14)
 
         return options_list
+
+    def fn_end1_end2(self):
+
+        end1 = self[0]
+        if end1 == 'Fixed':
+            return VALUES_STRUT_END2
+        elif end1 == 'Free':
+            return ['Fixed']
+        elif end1 == 'Hinged':
+            return ['Fixed', 'Hinged']
+        elif end1 == 'Roller':
+            return ['Fixed', 'Hinged']
+
+    def fn_end1_image(self):
+
+        if self == 'Fixed':
+            return "./ResourceFiles/images/6.RRRR.PNG"
+        elif self == 'Free':
+            return "./ResourceFiles/images/1.RRFF.PNG"
+        elif self == 'Hinged':
+            return "./ResourceFiles/images/5.RRRF.PNG"
+        elif self == 'Roller':
+            return "./ResourceFiles/images/4.RRFR.PNG"
+
+    def fn_end2_image(self):
+
+        end1 = self[0]
+        end2 = self[1]
+
+        if end1 == 'Fixed':
+            if end2 == 'Fixed':
+                return "./ResourceFiles/images/6.RRRR.PNG"
+            elif end2 == 'Free':
+                return "./ResourceFiles/images/1.RRFF_rotated.PNG"
+            elif end2 == 'Hinged':
+                return "./ResourceFiles/images/5.RRRF_rotated.PNG"
+            elif end2 == 'Roller':
+                return "./ResourceFiles/images/4.RRFR_rotated.PNG"
+        elif end1 == 'Free':
+            return "./ResourceFiles/images/1.RRFF.PNG"
+        elif end1 == 'Hinged':
+            if end2 == 'Fixed':
+                return "./ResourceFiles/images/5.RRRF.PNG"
+            elif end2 == 'Hinged':
+                return "./ResourceFiles/images/3.RFRF.PNG"
+            elif end2 == 'Roller':
+                return "./ResourceFiles/images/2.FRFR_rotated.PNG"
+        elif end1 == 'Roller':
+            if end2 == 'Fixed':
+                return "./ResourceFiles/images/4.RRFR.PNG"
+            elif end2 == 'Hinged':
+                return "./ResourceFiles/images/2.FRFR.PNG"
 
     def fn_conn_image(self):
 
@@ -375,7 +447,7 @@ class Compression(Member):
             return VALUES_IMG_TENSIONBOLTED[4]
 
     def fn_profile_section(self):
-
+        print(f"fn_profile_section self {self}")
         profile = self[0]
         print(f'profile = {self[0]}')
         if profile == 'Beams':
@@ -394,58 +466,6 @@ class Compression(Member):
             return connectdb("Channels", call_type="popup")
 
 
-    # def fn_end1_end2(self):
-    #
-    #     end1 = self[0]
-    #     if end1 == 'Fixed':
-    #         return VALUES_END2
-    #     elif end1 == 'Free':
-    #         return ['Fixed']
-    #     elif end1 == 'Hinged':
-    #         return ['Fixed', 'Hinged', 'Roller']
-    #     elif end1 == 'Roller':
-    #         return ['Fixed', 'Hinged']
-
-    # def fn_end1_image(self):
-    #
-    #     if self == 'Fixed':
-    #         return "./ResourceFiles/images/6.RRRR.PNG"
-    #     elif self == 'Free':
-    #         return "./ResourceFiles/images/1.RRFF.PNG"
-    #     elif self == 'Hinged':
-    #         return "./ResourceFiles/images/5.RRRF.PNG"
-    #     elif self == 'Roller':
-    #         return "./ResourceFiles/images/4.RRFR.PNG"
-
-    # def fn_end2_image(self):
-    #
-    #     end1 = self[0]
-    #     end2 = self[1]
-    #
-    #     if end1 == 'Fixed':
-    #         if end2 == 'Fixed':
-    #             return "./ResourceFiles/images/6.RRRR.PNG"
-    #         elif end2 == 'Free':
-    #             return "./ResourceFiles/images/1.RRFF_rotated.PNG"
-    #         elif end2 == 'Hinged':
-    #             return "./ResourceFiles/images/5.RRRF_rotated.PNG"
-    #         elif end2 == 'Roller':
-    #             return "./ResourceFiles/images/4.RRFR_rotated.PNG"
-    #     elif end1 == 'Free':
-    #         return "./ResourceFiles/images/1.RRFF.PNG"
-    #     elif end1 == 'Hinged':
-    #         if end2 == 'Fixed':
-    #             return "./ResourceFiles/images/5.RRRF.PNG"
-    #         elif end2 == 'Hinged':
-    #             return "./ResourceFiles/images/3.RFRF.PNG"
-    #         elif end2 == 'Roller':
-    #             return "./ResourceFiles/images/2.FRFR_rotated.PNG"
-    #     elif end1 == 'Roller':
-    #         if end2 == 'Fixed':
-    #             return "./ResourceFiles/images/4.RRFR.PNG"
-    #         elif end2 == 'Hinged':
-    #             return "./ResourceFiles/images/2.FRFR.PNG"
-
     def input_value_changed(self):
 
         lst = []
@@ -453,21 +473,92 @@ class Compression(Member):
         t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
 
-        # t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
-        # lst.append(t2)
-
         t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t3)
 
+        t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
+        lst.append(t2)
+
+        t3 = ([KEY_END1, KEY_END2], KEY_IMAGE_two, TYPE_IMAGE, self.fn_end2_image)
+        lst.append(t3)
+
+        # t4 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        # lst.append(t4)
+        #
+        # t5 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        # lst.append(t5)
+        #
+        # t4 = ([KEY_TYP], KEY_REDUCTION_LARGE_GRIP, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        # lst.append(t4)
+        #
+        # t5 = ([KEY_TYP], KEY_REDUCTION_LARGE_GRIP, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
         # t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         # lst.append(t8)
         #
         # t9 = ([KEY_SECSIZE], KEY_SECSIZE, TYPE_CUSTOM_SECTION, self.new_material)
         # lst.append(t9)
 
+
+        #
+        # t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        # lst.append(t8)
+        #
+        # t9 = ([KEY_SECSIZE], KEY_SECSIZE, TYPE_CUSTOM_SECTION, self.new_material)
+        # lst.append(t9)
+        #
         # # t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         # lst.append(t3)
-
+        #
         # t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         # lst.append(t4)
         print(f'input_value_changed lst={lst}')
@@ -520,6 +611,10 @@ class Compression(Member):
         '', True)
         out_list.append(t1)
 
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
+               int(round(22.02, 0)) if flag else '', True)
+        out_list.append(t19)
+
         return out_list
 
         return out_list
@@ -566,9 +661,7 @@ class Compression(Member):
 
     def set_input_values(self, design_dictionary):
         super(Compression,self).set_input_values(self, design_dictionary)
-
         #self.sizelist == self.sec_list
-
         # section properties
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
@@ -577,26 +670,33 @@ class Compression(Member):
         self.length = float(design_dictionary[KEY_LENGTH])
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
+        # self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+        #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
+        # print(f"self.plate {self.plate}")
 
-        self.loc = 'Long Leg'
+        #'Conn_Location'
+        self.loc = design_dictionary[KEY_LOCATION]
+
+        #
+        self.load_type = design_dictionary[KEY_ALLOW_LOAD]
+        self.load_type = 'Concentrically Loaded'
+
 
         # end condition
-        self.end_1 = 'Hinged'
-        self.end_2 = 'Hinged'
+        self.end_1 = design_dictionary[KEY_END1]
+        self.end_2 = design_dictionary[KEY_END2]
 
-        # self.length_zz = float(design_dictionary[KEY_LENZZ])
-        # self.length_yy = float(design_dictionary[KEY_LENYY])
+        # 'Bolt.Diameter'
+        self.bolt_list = design_dictionary[KEY_D]
+        self.bolt_type = design_dictionary[KEY_TYP]
+        self.bolt_grade = design_dictionary[KEY_GRD]
+
+        #Gusset plate details
+        self.plate_thickness = design_dictionary[KEY_PLATETHK]
+        self.plate_grade = design_dictionary[KEY_SEC_MATERIAL]
 
         # factored loads
         self.load = Load(shear_force="", axial_force=design_dictionary[KEY_AXIAL],moment="",unit_kNm=True)
-        #  moment=design_dictionary[KEY_MOMENT_MAJOR]
-        #                  moment_minor = design_dictionary[KEY_MOMENT_MINOR],unit_kNm=True)
-        print(f"set_input_values design_dictionary {design_dictionary}")
-        print(f"set_input_values self.module {self.module}")
-        print(f"set_input_values self.sec_profile {self.sec_profile}")
-        print(f"set_input_values self.material {self.material}")
-        # print(f"set_input_values self.length_yy {self.length_yy}")
-        print(f"set_input_values self.load {self.load}")
 
         # design preferences
         self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
@@ -604,17 +704,19 @@ class Compression(Member):
         self.optimization_parameter = design_dictionary[KEY_OPTIMIZATION_PARA]
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
         self.load_type = design_dictionary[KEY_ALLOW_LOAD]
-        # self.allow_class2 = design_dictionary[KEY_ALLOW_CLASS2]
-        # self.allow_class3 = design_dictionary[KEY_ALLOW_CLASS3]
-        # self.allow_class4 = design_dictionary[KEY_ALLOW_CLASS4]
         self.steel_cost_per_kg = float(design_dictionary[KEY_STEEL_COST])
+
+        print(f"set_input_values design_dictionary {design_dictionary}")
+        print(f"set_input_values self.module {self.module}")
+        print(f"set_input_values self.sec_profile {self.sec_profile}")
+        print(f"set_input_values self.material {self.material}")
+        # print(f"set_input_values self.length_yy {self.length_yy}")
+        print(f"set_input_values self.load {self.load}")
+
+
 
         self.allowed_sections = []
 
-        # if self.allow_class1 == "Yes":
-        #     self.allowed_sections.append('Plastic')
-        # if self.allow_class2 == "Yes":
-        #     self.allowed_sections.append('Compact')
         if self.allow_class == "Yes":
             self.allowed_sections.append('Semi-Compact')
             print(f"Allowed Semi-Compact")
@@ -633,9 +735,7 @@ class Compression(Member):
         print(f"self.load {self.load}")
         print(f"self.end_1,2 {self.end_1}, {self.end_2}")
         print("==================")
-        # print(self.length_zz)
-        # Assuming first member as selected size
-        # selectedsize = design_dictionary[KEY_SECSIZE][0]
+
         # safety factors
         self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
         # material property
@@ -651,7 +751,6 @@ class Compression(Member):
         # self.results(self)
 
         "Unknown keys"
-        self.load_type = 'Concentrically Loaded'
         if self.sec_profile == 'Angles':
             self.K = 1
         elif self.sec_profile == 'Back to Back Angles':
@@ -1528,3 +1627,37 @@ class Compression(Member):
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                 rel_path, module=self.module)
 
+    def memb_pattern(self, status):
+
+        if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            image = './ResourceFiles/images/L.png'
+            x, y = 400, 202
+
+        else:
+            image = './ResourceFiles/images/U.png'
+            x, y = 400, 202
+
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        pattern.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_IMAGE,
+               [image, x, y, "Member Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        return pattern
+
+    def plate_pattern(self, status):
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        pattern.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
+               ['./ResourceFiles/images/L.png',400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        return pattern

@@ -298,7 +298,7 @@ class OsdagMainWindow(QMainWindow):
                                    ],
                 'Compression Member': [('Pure Axial Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
                                        ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
-                                       ('Strut Design', 'ResourceFiles/images/compression_column.png', 'Strut_Design'),
+                                       ('Strut Design', 'ResourceFiles/images/broken.png', 'Strut_Design'),
                                        self.show_compression_module,
                                        ],
                 'Flexural Member' : [

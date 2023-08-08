@@ -536,7 +536,7 @@ class IS800_2007(object):
 
     # cl. 7.1.2.1, Design stress
     @staticmethod
-    def cl_7_1_2_1_design_compressisive_stress(f_y, gamma_mo, effective_slenderness_ratio , imperfection_factor, modulus_of_elasticity ):
+    def cl_7_1_2_1_design_compressisive_stress(f_y, gamma_mo, effective_slenderness_ratio , imperfection_factor, modulus_of_elasticity, check_type ):
         """
         Args:
             f_y:Yield stress                                                                        (float)
@@ -553,8 +553,11 @@ class IS800_2007(object):
         """
         # 2.4 - Euler buckling stress
         euler_buckling_stress = (math.pi ** 2 * modulus_of_elasticity) / effective_slenderness_ratio ** 2
-        # 2.5 - Non-dimensional effective slenderness ratio
-        nondimensional_effective_slenderness_ratio = math.sqrt(f_y / euler_buckling_stress)
+        if 'Concentric' in check_type:
+            # 2.5 - Non-dimensional effective slenderness ratio
+            nondimensional_effective_slenderness_ratio = math.sqrt(f_y / euler_buckling_stress)
+        elif 'Leg' in check_type:
+            nondimensional_effective_slenderness_ratio = check_type[1]
         phi = 0.5 * (1 + imperfection_factor * (nondimensional_effective_slenderness_ratio - 0.2) + nondimensional_effective_slenderness_ratio ** 2)
         # 2.6 - Design compressive stress
         stress_reduction_factor = 1/(phi + math.sqrt(phi**2 - nondimensional_effective_slenderness_ratio**2))
@@ -677,7 +680,8 @@ class IS800_2007(object):
             lambda_vv, lambda_psi defined in clause
             k1, k2, k3
         """
-        e = math.pow(250/f_y,0.5)
+        e = math.sqrt(250/f_y )
+        E = 2 * 10 ** 5
         if bolt_no >= 2:
             if fixity == 'Fixed':
                 k1 = 0.2
@@ -697,8 +701,8 @@ class IS800_2007(object):
                 k2 = 0.5
                 k3 = 60
 
-        lambda_vv = (length/ r_min)/(e* math.sqrt(math.pi**2 * e/250))
-        lambda_psi = ((b1 + b2)/2 * t )/(e* math.sqrt(math.pi**2 * e/250))
+        lambda_vv = (length/ r_min)/(e* math.sqrt(math.pi**2 * E/250))
+        lambda_psi = ((b1 + b2)/(2 * t) )/(e* math.sqrt(math.pi**2 * E/250))
         equivalent_slenderness_ratio = math.sqrt(k1 + k2 * lambda_vv **2 + k3 * lambda_psi**2)
         return [equivalent_slenderness_ratio, lambda_vv, lambda_psi, k1, k2, k3]
     # ==========================================================================

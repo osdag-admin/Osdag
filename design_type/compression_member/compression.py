@@ -769,7 +769,7 @@ class Compression(Member):
         print("The input values are set. Performing preliminary member check(s).")
         # self.i = 0
         self.design(self, design_dictionary)
-        self.results(self)
+        self.results(self, design_dictionary)
         # self.initial_member_capacity(self,design_dictionary)
         print(f"self.sec_list {self.sec_list}")
         # for selectedsize in self.sec_list:
@@ -1011,6 +1011,7 @@ class Compression(Member):
                 if self.section_property.type == 'Rolled':
                       list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
                                                             self.material_property.fy, "Axial Compression")
+                      print(f"\n \n \n self.material_property.fy {self.material_property.fy} \n \n \n")
                       self.section_class = list_Table2_vi[0]
                       self.width_thickness_ratio  = list_Table2_vi[1]
                       self.depth_thickness_ratio = list_Table2_vi[2]
@@ -1135,11 +1136,20 @@ class Compression(Member):
             # 2.2 - Effective length
             self.effective_length = IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(self.length,
                                                                                                       self.sec_profile)  # mm
+            print(f"self.effective_length {self.effective_length} ")
         elif step == 4:
+            print(f"\n data sent "
+                  f" self.material_property.fy {self.material_property.fy}"
+                  f"self.gamma_m0 {self.gamma_m0}"
+                  f"self.slenderness {self.slenderness}"
+                  f" self.imperfection_factor {self.imperfection_factor}"
+                  f"self.section_property.modulus_of_elasticity {self.section_property.modulus_of_elasticity}")
 
             list_cl_7_1_2_1_design_compressisive_stress = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
                 self.material_property.fy, self.gamma_m0, self.slenderness, self.imperfection_factor,
-                self.section_property.modulus_of_elasticity)
+                self.section_property.modulus_of_elasticity, check_type= list_result)
+            for x in list_cl_7_1_2_1_design_compressisive_stress:
+                print(f"x {x} ")
             self.euler_buckling_stress = list_cl_7_1_2_1_design_compressisive_stress[0]
             self.nondimensional_effective_slenderness_ratio = list_cl_7_1_2_1_design_compressisive_stress[1]
             self.phi = list_cl_7_1_2_1_design_compressisive_stress[2]
@@ -1171,62 +1181,68 @@ class Compression(Member):
             print(f"\n self.optimum_section_cost_results {self.optimum_section_cost_results}"
                   f"\n self.optimum_section_ur_results {self.optimum_section_ur_results}")
         elif step == 6:
-            self.single_result = {}
+
+            self.single_result[self.sec_profile] = {}
             if len(self.input_section_list) != 1:
                 list_2 = list_result.copy()
                 for j in list_1:
                     # k = 0
                     for k in list_2:
-                        self.single_result[j] = k
+                        self.single_result[self.sec_profile][j] = k
                         # k += 1
                         list_2.pop(0)
                         break
             print(f"\n self.single_result {self.single_result}")
-        elif step == 7:
-            pass
+        # elif step == 7:
+        #     if self.section_property.thickness < 20:
+        #         self.fy == self.section_property.fy_20
+        #     elif self.section_property.thickness >= 20 and self.section_property.thickness < 40:
+        #         self.fy = self.section_property.fy_20_40
+        #     elif self.section_property.thickness >= 40:
+        #         self.fy = self.section_property.fy_40
             # initial check
 
 
-    def common_result(self, list_result):
-            self.result_designation = list_result[self.result_UR]['Designation']
-            self.result_section_class = list_result[self.result_UR]['Section class']
-            self.result_effective_area = list_result[self.result_UR]['Effective area']
+    def common_result(self, list_result,result_type, flag = 1):
+            self.result_designation = list_result[result_type]['Designation']
+            self.result_section_class = list_result[result_type]['Section class']
+            self.result_effective_area = list_result[result_type]['Effective area']
 
-            self.result_bc = list_result[self.result_UR]['Buckling_class']
-            # self.result_bc_yy = list_result[self.result_UR]['Buckling_curve_yy']
+            self.result_bc = list_result[result_type]['Buckling_class']
+            # self.result_bc_yy = list_result[result_type]['Buckling_curve_yy']
 
-            self.result_IF = list_result[self.result_UR]['IF']
-            # self.result_IF_yy = list_result[self.result_UR]['IF_yy']
+            self.result_IF = list_result[result_type]['IF']
+            # self.result_IF_yy = list_result[result_type]['IF_yy']
 
-            self.result_eff_len_zz = list_result[self.result_UR]['Effective_length']
-            # self.result_eff_len_yy = list_result[self.result_UR]['Effective_length_yy']
+            self.result_eff_len_zz = list_result[result_type]['Effective_length']
+            # self.result_eff_len_yy = list_result[result_type]['Effective_length_yy']
 
-            self.result_eff_sr_zz = list_result[self.result_UR]['Effective_SR']
-            # self.result_eff_sr_yy = list_result[self.result_UR]['Effective_SR_yy']
+            self.result_eff_sr_zz = list_result[result_type]['Effective_SR']
+            # self.result_eff_sr_yy = list_result[result_type]['Effective_SR_yy']
 
-            self.result_ebs = list_result[self.result_UR]['EBS']
-            # self.result_ebs_yy = list_result[self.result_UR]['EBS_yy']
+            self.result_ebs = list_result[result_type]['EBS']
+            # self.result_ebs_yy = list_result[result_type]['EBS_yy']
 
-            self.result_nd_esr = list_result[self.result_UR]['ND_ESR']
-#                 self.result_nd_esr_yy = list_result[self.result_UR]['ND_ESR_yy']
+            self.result_nd_esr = list_result[result_type]['ND_ESR']
+#                 self.result_nd_esr_yy = list_result[result_type]['ND_ESR_yy']
 
-            self.result_phi_zz = list_result[self.result_UR]['phi']
-#                 self.result_phi_yy = list_result[self.result_UR]['phi_yy']
+            self.result_phi_zz = list_result[result_type]['phi']
+#                 self.result_phi_yy = list_result[result_type]['phi_yy']
 
-            self.result_srf = list_result[self.result_UR]['SRF']
-#                 self.result_srf_yy = list_result[self.result_UR]['SRF_yy']
+            self.result_srf = list_result[result_type]['SRF']
+#                 self.result_srf_yy = list_result[result_type]['SRF_yy']
 
-            self.result_fcd_1_zz = list_result[self.result_UR]['FCD_formula']
-#                 self.result_fcd_1_yy = list_result[self.result_UR]['FCD_1_yy']
+            self.result_fcd_1_zz = list_result[result_type]['FCD_formula']
+#                 self.result_fcd_1_yy = list_result[result_type]['FCD_1_yy']
 
-            self.result_fcd_2 = list_result[self.result_UR]['FCD_max']
+            self.result_fcd_2 = list_result[result_type]['FCD_max']
 
-            # self.result_fcd_zz = list_result[self.result_UR]['FCD_zz']
-            # self.result_fcd_yy = list_result[self.result_UR]['FCD_yy']
+            # self.result_fcd_zz = list_result[result_type]['FCD_zz']
+            # self.result_fcd_yy = list_result[result_type]['FCD_yy']
 
-            self.result_fcd = list_result[self.result_UR]['FCD']
-            self.result_capacity = list_result[self.result_UR]['Capacity']
-            self.result_cost = list_result[self.result_UR]['Cost']
+            self.result_fcd = list_result[result_type]['FCD']
+            self.result_capacity = list_result[result_type]['Capacity']
+            self.result_cost = list_result[result_type]['Cost']
     def max_force_length(self,section):
 
         "calculated max force and length based on the maximum section size avaialble for diff section type"
@@ -1297,232 +1313,251 @@ class Compression(Member):
         print(f"\n self.input_section_classification {self.input_section_classification}")
         print(f"\n self.loc {self.loc}")
 
-        if design_dictionary[KEY_AXIAL] == '' and len(self.input_section_list) == 1:
-            self.strength_of_strut(self)
-        elif design_dictionary[KEY_AXIAL] != '' and len(self.input_section_list) > 1:
-            self.design_strut(self)
+
+        if design_dictionary[KEY_AXIAL] == '' :
+            self.single_result = {}
+            if len(self.input_section_list) == 1 :
+                self.strength_of_strut(self)
+            else:
+                logger.warning(
+                    "More than 1 section given as input without giving Load")
+                logger.error("Cannot compute!")
+                logger.info("Give 1 section as Inputs and/or "
+                            "Give load and re-design.")
+                self.design_status = False
+                self.design_status_list.append(self.design_status)
+        elif design_dictionary[KEY_AXIAL] != '' :
+            if len(self.input_section_list) > 1 :
+                self.design_strut(self)
+            else:
+                logger.warning(
+                    "Only one section provided and load as well")
+                # logger.error("Cannot compute!")
+                logger.info("No need for load input. Ignoring load ")
+                design_dictionary[KEY_AXIAL] == ''
+                self.strength_of_strut(self)
+
         else:
-            logger.warning(
-                "More than 1 section given as input without giving Load")
+            # logger.warning(
+            #     "More than 1 section given as input without giving Load")
             logger.error("Cannot compute!")
-            logger.info("Give 1 section as Inputs and/or "
-                        "Give load and re-design.")
+            # logger.info("Give 1 section as Inputs and/or "
+            #             "Give load and re-design.")
             self.design_status = False
             self.design_status_list.append(self.design_status)
 
     def design_strut(self):
 
-        if len(self.input_section_list) > 0:
-            # initializing lists to store the optimum results based on optimum UR and cost
-            # 1- Based on optimum UR
-            self.optimum_section_ur_results = {}
-            self.optimum_section_ur = []
+        # initializing lists to store the optimum results based on optimum UR and cost
+        # 1- Based on optimum UR
+        self.optimum_section_ur_results = {}
+        self.optimum_section_ur = []
 
-            # 2 - Based on optimum cost
-            self.optimum_section_cost_results = {}
-            self.optimum_section_cost = []
+        # 2 - Based on optimum cost
+        self.optimum_section_cost_results = {}
+        self.optimum_section_cost = []
 
-            for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
+        for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
 
-                #Common checks
-                self.common_checks_1(self,section)
-                # initialize lists for updating the results dictionary
-                list_result = []
-                list_result.append(section)
-                print(f"Common checks"
+            # Yield strength of steel
+            # self.common_checks_1(self,section, step=7)
+
+            #Common checks
+            self.common_checks_1(self,section)
+            # initialize lists for updating the results dictionary
+            list_result = []
+            list_result.append(section)
+            print(f"Common checks"
+                  f"list_result {list_result}")
+
+            # Step 1 - computing the effective sectional area
+            self.section_class = self.input_section_classification[section]
+
+            self.common_checks_1(self,section,2)
+            # if self.loc == "Long Leg":
+            #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
+            # else:
+            #     self.max_depth =self.section_size_max.min_leg - self.section_size_max.thickness - self.section_size_max.root_radius
+
+            list_result.extend([self.section_class, self.effective_area])
+
+            # Step 2 - computing the design compressive stress
+            self.common_checks_1(self,section,3)
+            list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
+
+
+            # 2.3 - slenderness ratio
+            self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
+            self.slenderness = self.effective_length / self.min_radius_gyration
+            print(f"self.min_radius_gyration {self.min_radius_gyration}"
+                  f"self.slenderness {self.slenderness}")
+            if self.load_type == 'Concentric Load':
+                print(f"step == 4"
                       f"list_result {list_result}")
-
-                # Step 1 - computing the effective sectional area
-                self.section_class = self.input_section_classification[section]
-
-                self.common_checks_1(self,section,2)
-                # if self.loc == "Long Leg":
-                #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
-                # else:
-                #     self.max_depth =self.section_size_max.min_leg - self.section_size_max.thickness - self.section_size_max.root_radius
-
-                list_result.extend([self.section_class, self.effective_area])
-
-                # Step 2 - computing the design compressive stress
-                self.common_checks_1(self,section,3)
-                list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
-
-
-                # 2.3 - slenderness ratio
-                self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
-                if self.load_type == 'Concentric Load':
-                    print(f"step == 4"
-                          f"list_result {list_result}")
-                    #step == 4
-                    self.slenderness = self.effective_length / self.min_radius_gyration
-                    print(f"self.min_radius_gyration {self.min_radius_gyration}")
-                else:
-                    # self.min_radius_gyration = min(self.section_property.rad_of_gy_y, self.section_property.rad_of_gy_z)
-                    print(f"self.min_radius_gyration {self.min_radius_gyration}")
-                    returned_list = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                #step == 4
+                self.common_checks_1(self, section, step=4, list_result=['Concentric'])
+            else:
+                # self.min_radius_gyration = min(self.section_property.rad_of_gy_y, self.section_property.rad_of_gy_z)
+                returned_list = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
                     self.length, self.min_radius_gyration, self.section_property.leg_a_length,
                     self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy, 2, self.fixity)
 
-                    self.slenderness = returned_list[0]
-                    self.lambda_vv =  returned_list[1]
-                    self.lambda_psi =  returned_list[2]
-                    self.k1 =  returned_list[3]
-                    self.k2 =  returned_list[4]
-                    self.k3 =  returned_list[5]
+                self.equivalent_slenderness = returned_list[0]
+                self.lambda_vv =  returned_list[1]
+                self.lambda_psi =  returned_list[2]
+                self.k1 =  returned_list[3]
+                self.k2 =  returned_list[4]
+                self.k3 =  returned_list[5]
+                print(f"self.equivalent_slenderness {self.equivalent_slenderness} "
+                      f" \n self.slenderness {self.slenderness} "
+                      f" \n self.lambda_vv {self.lambda_vv} "
+                      f" \n self.lambda_psi {self.lambda_psi} "
+                      f" \n self.k1 {self.k1} "
+                      f" \n self.k2 {self.k2} "
+                      f" \n self.k3 {self.k3} ")
+                self.common_checks_1(self, section, step=4, list_result=['Leg', self.equivalent_slenderness])
 
-                self.common_checks_1(self, section, 4)
 
-                # 2.7 - Capacity of the section
-                self.section_capacity = self.design_compressive_stress * self.effective_area  # N
 
-                # 2.8 - UR
-                self.ur = round(self.load.axial_force / self.section_capacity, 3)
-                self.optimum_section_ur.append(self.ur)
+            # 2.7 - Capacity of the section
+            self.section_capacity = self.design_compressive_stress * self.effective_area  # N
 
-                # 2.9 - Cost of the section in INR
-                self.cost = (self.section_property.unit_mass * self.section_property.area * 1e-4) * self.length * \
-                            self.steel_cost_per_kg
-                self.optimum_section_cost.append(self.cost)
+            # 2.8 - UR
+            self.ur = round(self.load.axial_force / self.section_capacity, 3)
+            self.optimum_section_ur.append(self.ur)
 
-                list_result.extend([self.slenderness, self.euler_buckling_stress,
-                                   self.nondimensional_effective_slenderness_ratio,
-                                   self.phi, self.stress_reduction_factor,
-                                   self.design_compressive_stress_fr,
-                                   self.design_compressive_stress_max,
-                                   self.design_compressive_stress,
-                                   self.section_capacity, self.ur, self.cost]
-                                   )
+            # 2.9 - Cost of the section in INR
+            self.cost = (self.section_property.unit_mass * self.section_property.area * 1e-4) * self.length * \
+                        self.steel_cost_per_kg
+            self.optimum_section_cost.append(self.cost)
 
-                # Step 3 - Storing the optimum results to a list in a descending order
+            list_result.extend([self.slenderness, self.euler_buckling_stress,
+                                self.nondimensional_effective_slenderness_ratio,
+                                self.phi, self.stress_reduction_factor,
+                                self.design_compressive_stress_fr,
+                                self.design_compressive_stress_max,
+                                self.design_compressive_stress,
+                                self.section_capacity, self.ur, self.cost]
+                               )
 
-                list_1 = ['Designation','Section class', 'Effective area', 'Buckling_class', 'IF',
-                          'Effective_length', 'Effective_SR', 'EBS','ND_ESR', 'phi', 'SRF',
-                          'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
+            # Step 3 - Storing the optimum results to a list in a descending order
 
-                # step ==5
-                #if len(self.input_section_list) != 1:
-                        # step ==5
-                # else
-                        # step ==6
-                if len(self.input_section_list) != 1:
-                    self.common_checks_1(self, section, 5, list_result, list_1)
+            list_1 = ['Designation','Section class', 'Effective area', 'Buckling_class', 'IF',
+                      'Effective_length', 'Effective_SR', 'EBS','ND_ESR', 'phi', 'SRF',
+                      'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
 
-                else:
-                    self.common_checks_1(self, section, 6, list_result, list_1)
-                    break
+            # step ==5
+            #if len(self.input_section_list) != 1:
+            # step ==5
+            # else
+            # step ==6
+            self.common_checks_1(self, section, 5, list_result, list_1)
+            # if len(self.input_section_list) != 1:
+            #     pass
+            #
+            # else:
+            #     self.common_checks_1(self, section, 6, list_result, list_1)
+            #     break
 
-        else:
-            logger.warning("The section(s) defined for performing the column design is/are not selected based on the selected Inputs and/or "
-                           "Design Preferences")
-            logger.error("Cannot compute!")
-            logger.info("Change the Inputs and/or "
-                           "Design Preferences provided and re-design.")
-            self.design_status = False
-            self.design_status_list.append(self.design_status)
-            # print(f"design_status_list{self.design_status_list}")
+        # else:
+        #     logger.warning("The section(s) defined for performing the column design is/are not selected based on the selected Inputs and/or "
+        #                    "Design Preferences")
+        #     logger.error("Cannot compute!")
+        #     logger.info("Change the Inputs and/or "
+        #                    "Design Preferences provided and re-design.")
+        #     self.design_status = False
+        #     self.design_status_list.append(self.design_status)
+        #     # print(f"design_status_list{self.design_status_list}")
     def strength_of_strut(self):
+        # iterating the design over each section to find the most optimum section
+        section = self.input_section_list[0]
 
-        if len(self.input_section_list) > 0:
+        # Yield strength of steel
+        # self.common_checks_1(self,section, step=7)
 
-            # initializing lists to store the optimum results based on optimum UR and cost
+        # Common checks
+        self.common_checks_1(self, section)
+        # initialize lists for updating the results dictionary
+        list_result = []
+        list_result.append(section)
+        print(f"Common checks"
+              f"list_result {list_result}")
 
-            # 1- Based on optimum UR
-            self.optimum_section_ur_results = {}
-            self.optimum_section_ur = []
+        # Step 1 - computing the effective sectional area
+        self.section_class = self.input_section_classification[section]
 
-            # 2 - Based on optimum cost
-            self.optimum_section_cost_results = {}
-            self.optimum_section_cost = []
+        self.common_checks_1(self, section, 2)
+        # if self.loc == "Long Leg":
+        #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
+        # else:
+        #     self.max_depth =self.section_size_max.min_leg - self.section_size_max.thickness - self.section_size_max.root_radius
 
-            i = 1
-            for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
+        list_result.extend([self.section_class, self.effective_area])
 
-                #Common checks
-                self.common_checks_1(self,section)
-                # initialize lists for updating the results dictionary
-                list_result = []
-                # list_yy = []
-                list_result.append(section)
-                print(f"list_result {list_result}")
+        # Step 2 - computing the design compressive stress
+        self.common_checks_1(self, section, 3)
+        list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
 
-                # list_yy.append(section)
-
-                # Step 1 - computing the effective sectional area
-                self.section_class = self.input_section_classification[section]
-
-                self.common_checks_1(self,section,2)
-                # if self.loc == "Long Leg":
-                #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
-                # else:
-                #     self.max_depth =self.section_size_max.min_leg - self.section_size_max.thickness - self.section_size_max.root_radius
-
-                list_result.extend([self.section_class, self.effective_area])
-
-                # Step 2 - computing the design compressive stress
-                self.common_checks_1(self,section,3)
-                list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
-
-
-                # 2.3 - slenderness ratio
-                if self.load_type == 'Concentrically Loaded':
-                    #step == 4
-                    self.common_checks_1(self, section, 4)
-                    # 2.7 - Capacity of the section
-                    self.section_capacity = self.design_compressive_stress * self.effective_area  # N
-
-                    # 2.8 - UR
-                    self.ur = round(self.load.axial_force / self.section_capacity, 3)
-                    self.optimum_section_ur.append(self.ur)
-
-                    # 2.9 - Cost of the section in INR
-                    self.cost = (self.section_property.unit_mass * self.section_property.area * 1e-4) * self.length * \
-                                self.steel_cost_per_kg
-                    self.optimum_section_cost.append(self.cost)
-
-                    list_result.extend([self.slenderness, self.euler_buckling_stress,
-                                       self.nondimensional_effective_slenderness_ratio,
-                                       self.phi, self.stress_reduction_factor,
-                                       self.design_compressive_stress_fr,
-                                       self.design_compressive_stress_max,
-                                       self.design_compressive_stress,
-                                       self.section_capacity, self.ur, self.cost]
-                                       )
-
-                    # Step 3 - Storing the optimum results to a list in a descending order
-
-                    list_1 = ['Designation','Section class', 'Effective area', 'Buckling_class', 'IF',
-                              'Effective_length', 'Effective_SR', 'EBS','ND_ESR', 'phi', 'SRF',
-                              'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
-
-                    # step ==5
-                    #if len(self.input_section_list) != 1:
-                            # step ==5
-                    # else
-                            # step ==6
-                    if len(self.input_section_list) != 1:
-                        self.common_checks_1(self, section, 5, list_result, list_1)
-
-                    else:
-                        self.common_checks_1(self, section, 6, list_result, list_1)
-                        break
-
+        # 2.3 - slenderness ratio
+        self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
+        self.slenderness = self.effective_length / self.min_radius_gyration
+        print(f"self.min_radius_gyration {self.min_radius_gyration}"
+              f"self.slenderness {self.slenderness}")
+        if self.load_type == 'Concentric Load':
+            print(f"step == 4"
+                  f"list_result {list_result}")
+            # step == 4
+            self.common_checks_1(self, section, step=4, list_result=['Concentric'])
         else:
-            logger.warning("The section(s) defined for performing the column design is/are not selected based on the selected Inputs and/or "
-                           "Design Preferences")
-            logger.error("Cannot compute!")
-            logger.info("Change the Inputs and/or "
-                           "Design Preferences provided and re-design.")
-            self.design_status = False
-            self.design_status_list.append(self.design_status)
-            # print(f"design_status_list{self.design_status_list}")
+            # self.min_radius_gyration = min(self.section_property.rad_of_gy_y, self.section_property.rad_of_gy_z)
+            returned_list = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                self.length, self.min_radius_gyration, self.section_property.leg_a_length,
+                self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy, 2,
+                self.fixity)
 
-    def results(self):
+            self.equivalent_slenderness = returned_list[0]
+            self.lambda_vv = returned_list[1]
+            self.lambda_psi = returned_list[2]
+            self.k1 = returned_list[3]
+            self.k2 = returned_list[4]
+            self.k3 = returned_list[5]
+            print(f"self.equivalent_slenderness {self.equivalent_slenderness} "
+                  f" \n self.slenderness {self.slenderness} "
+                  f" \n self.lambda_vv {self.lambda_vv} "
+                  f" \n self.lambda_psi {self.lambda_psi} "
+                  f" \n self.k1 {self.k1} "
+                  f" \n self.k2 {self.k2} "
+                  f" \n self.k3 {self.k3} ")
+            self.common_checks_1(self, section, step=4, list_result=['Leg', self.equivalent_slenderness])
+
+        # 2.7 - Capacity of the section
+        self.section_capacity = self.design_compressive_stress * self.effective_area  # N
+
+        list_result.extend([self.slenderness, self.euler_buckling_stress,
+                            self.nondimensional_effective_slenderness_ratio,
+                            self.phi, self.stress_reduction_factor,
+                            self.design_compressive_stress_fr,
+                            self.design_compressive_stress_max,
+                            self.design_compressive_stress,
+                            self.section_capacity, self.ur, self.cost]
+                           )
+
+        # Step 3 - Storing the optimum results to a list in a descending order
+
+        list_1 = ['Designation', 'Section class', 'Effective area', 'Buckling_class', 'IF',
+                  'Effective_length', 'Effective_SR', 'EBS', 'ND_ESR', 'phi', 'SRF',
+                  'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
+
+        self.common_checks_1(self, section, 6, list_result, list_1)
+        #     break
+
+    def results(self,design_dictionary):
         """ """
         # sorting results from the dataset
-        if len(self.input_section_list) > 1:
+        if len(self.input_section_list) > 1 and design_dictionary[KEY_AXIAL] != '':
         # results based on UR
             if self.optimization_parameter == 'Utilization Ratio':
-                filter_UR = filter(lambda x: x <= min(self.allowable_utilization_ratio, 1.0), self.optimum_section_ur_results)
+                filter_UR = filter(lambda x: x <= min(self.allowable_utilization_ratio, 1.0), self.optimum_section_ur)
                 self.optimum_section_ur = list(filter_UR)
 
                 self.optimum_section_ur.sort()
@@ -1549,58 +1584,65 @@ class Compression(Member):
                 # selecting the section with most optimum cost
                 self.result_cost = self.optimum_section_cost[0]
 
-        # print results
-        if len(self.optimum_section_ur) == 0:
-            logger.warning(
-                "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                "criteria")
-            logger.error("The solver did not find any adequate section from the defined list.")
-            logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
-            self.design_status = False
-            self.design_status_list.append(self.design_status)
-            pass
-        else:
-            if self.optimization_parameter == 'Utilization Ratio':
-                self.common_result(self, self.optimum_section_ur_results)
+            # print results
+            if len(self.optimum_section_ur) == 0:
+                logger.warning(
+                    "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                    "criteria")
+                logger.error("The solver did not find any adequate section from the defined list.")
+                logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                self.design_status = False
+                self.design_status_list.append(self.design_status)
+                pass
             else:
-                self.result_UR = self.optimum_section_cost_results[self.result_cost]['UR']
+                if self.optimization_parameter == 'Utilization Ratio':
+                    self.common_result(self, list_result=self.optimum_section_ur_results, result_type=self.result_UR)
+                else:
+                    self.result_UR = self.optimum_section_cost_results[self.result_cost]['UR']
 
-                # checking if the selected section based on cost satisfies the UR
-                if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
+                    # checking if the selected section based on cost satisfies the UR
+                    if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
 
-                    trial_cost = []
-                    for cost in self.optimum_section_cost:
-                        self.result_UR = self.optimum_section_cost_results[cost]['UR']
-                        if self.result_UR <= min(self.allowable_utilization_ratio, 1.0):
-                            trial_cost.append(cost)
+                        trial_cost = []
+                        for cost in self.optimum_section_cost:
+                            self.result_UR = self.optimum_section_cost_results[cost]['UR']
+                            if self.result_UR <= min(self.allowable_utilization_ratio, 1.0):
+                                trial_cost.append(cost)
 
-                    trial_cost.sort()
+                        trial_cost.sort()
 
-                    if len(trial_cost) == 0:  # no design was successful
-                        logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                                        "criteria")
-                        logger.error("The solver did not find any adequate section from the defined list.")
-                        logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
-                        self.design_status = False
-                        self.design_status_list.append(self.design_status)
-                        print(f"design_status_list{self.design_status} \n")
-                    else:
-                        self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
-                        self.design_status = True
+                        if len(trial_cost) == 0:  # no design was successful
+                            logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                                            "criteria")
+                            logger.error("The solver did not find any adequate section from the defined list.")
+                            logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                            self.design_status = False
+                            self.design_status_list.append(self.design_status)
+                            print(f"design_status_list{self.design_status} \n")
+                        else:
+                            self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
+                            self.design_status = True
 
-                # results
-                self.common_result(self, self.optimum_section_cost_results)
+                    # results
+                    self.common_result(self, list_result=self.optimum_section_cost_results, result_type=self.result_cost)
 
-                print(f"design_status_list2{self.design_status}")
-
+                    print(f"design_status_list2{self.design_status}")
+            for status in self.design_status_list:
+                if status is False:
+                    self.design_status = False
+                    break
+                else:
+                    self.design_status = True
+        else:
+            if len(self.single_result) == 1:
+                print(f"self.single_result {self.single_result}"
+                      f"len(self.single_result) {len(self.single_result)}")
+                self.result = self.single_result[0]
+                self.common_result(self, self.result, 1)
+            pass
         # end of the design simulation
         # overall design status
-        for status in self.design_status_list:
-            if status is False:
-                self.design_status = False
-                break
-            else:
-                self.design_status = True
+
 
         if self.design_status:
             logger.info(": ========== Design Status ============")

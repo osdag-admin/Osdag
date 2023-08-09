@@ -555,7 +555,7 @@ class Window(QMainWindow):
         in_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
         input_dp_conn_list = main.input_dictionary_without_design_pref(main)
-        print(f'input_dp_conn_list {input_dp_conn_list}')
+        # print(f'input_dp_conn_list {input_dp_conn_list}')
         input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
 
 
@@ -564,7 +564,7 @@ class Window(QMainWindow):
         and creates the specified QT widgets, [Ref input_values function is any module for details]
         """
         option_list = main.input_values(self)
-        print(f'setupui option_list {option_list}')
+        # print(f'setupui option_list {option_list}')
 
         _translate = QtCore.QCoreApplication.translate
 
@@ -763,7 +763,7 @@ class Window(QMainWindow):
 
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
-        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
+        # print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         data = {}
 
         d = {}
@@ -790,7 +790,7 @@ class Window(QMainWindow):
                     data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                   if all_values_available not in disabled_values]
             try:
-                print(f"<class 'AttributeError'>: {d} \n {new_list}")
+                # print(f"<class 'AttributeError'>: {d} \n {new_list}")
                 d.get(new_list[0][0]).activated.connect(lambda: self.popup(d.get(new_list[0][0]), new_list,updated_list,data))
                 d.get(new_list[1][0]).activated.connect(lambda: self.popup(d.get(new_list[1][0]), new_list,updated_list,data))
                 d.get(new_list[2][0]).activated.connect(lambda: self.popup(d.get(new_list[2][0]), new_list,updated_list,data))
@@ -1698,7 +1698,7 @@ class Window(QMainWindow):
             else:
                 des_pref_input_list_updated = des_pref_input_list
 
-            print(f"design_fn des_pref_input_list_updated = {des_pref_input_list_updated}\n")
+            # print(f"design_fn des_pref_input_list_updated = {des_pref_input_list_updated}\n")
             for des_pref in des_pref_input_list_updated:
                 tab_name = des_pref[0]
                 input_type = des_pref[1]
@@ -1714,7 +1714,7 @@ class Window(QMainWindow):
                         continue
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
-                        print(f"design_fn val = {val}\n")
+                        # print(f"design_fn val = {val}\n")
                         design_dictionary.update({key_name: val})
                     elif input_type == TYPE_COMBOBOX:
                         val = key.currentText()
@@ -1740,9 +1740,9 @@ class Window(QMainWindow):
 
         self.design_inputs = design_dictionary
         self.design_inputs = design_dictionary
-        print(f"\n self.input_dock_inputs {self.input_dock_inputs}")
-        print(f"\n design_fn design_dictionary{self.design_inputs}")
-        print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
+        # print(f"\n self.input_dock_inputs {self.input_dock_inputs}")
+        # print(f"\n design_fn design_dictionary{self.design_inputs}")
+        # print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
 
     '''
     @author: Umair
@@ -1929,22 +1929,22 @@ class Window(QMainWindow):
                 data[data_key] = [data_values for data_values in data[data_key]
                                   if data_values not in data_key_tuple[2]]
 
-        print(f"ui_template.py common_function_for_save_and_design \n")
-        print(f"option_list {option_list} \n")
-        print(f"data {data} ")
+        # print(f"ui_template.py common_function_for_save_and_design \n")
+        # print(f"option_list {option_list} \n")
+        # print(f"data {data} ")
 
         self.design_fn(option_list, data, main)
 
         if trigger_type == "Save":
             self.saveDesign_inputs()
         elif trigger_type == "Design_Pref":
-            print(f"trigger_type == Design_Pref")
+            # print(f"trigger_type == Design_Pref")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
                 # print(f"QDialog.Accepted")
                 self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
-                    print(f"self.designPrefDialog.flag = False")
+                    # print(f"self.designPrefDialog.flag = False")
                     self.designPrefDialog.flag = False
                 else:
                     self.designPrefDialog.flag = True
@@ -1965,10 +1965,10 @@ class Window(QMainWindow):
             with open("logging_text.log", 'w') as log_file:
                 pass
             
-            print(f"\n design_dictionary {self.design_inputs}")
+            # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
-            print(f"status{status}")
+            # print(f"status{status}")
 
             if error is not None:
                 self.show_error_msg(error)
@@ -2029,9 +2029,9 @@ class Window(QMainWindow):
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COMPRESSION_COLUMN]:
                 # print(self.display, self.folder, main.module, main.mainmodule)
-                print("common start")
+                # print("common start")
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                print("common start")
+                # print("common start")
                 status = main.design_status
                 ##############trial##############
                 # status = True
@@ -2438,7 +2438,7 @@ class Window(QMainWindow):
     # Function for showing design-preferences popup
 
     def design_preferences(self):
-        print(f"design_preferences{self.designPrefDialog.module_window.input_dock_inputs}")
+        # print(f"design_preferences{self.designPrefDialog.module_window.input_dock_inputs}")
         self.designPrefDialog.show()
 
     # Function for getting input for design preferences from input dock
@@ -2448,7 +2448,7 @@ class Window(QMainWindow):
     def combined_design_prefer(self, data, main):
 
         on_change_tab_list = main.tab_value_changed(main)
-        print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list} \n")
+        # print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list} \n")
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
@@ -2536,7 +2536,7 @@ class Window(QMainWindow):
             val = f(arg_list)
 
             for k2_key_name in k2_key_list:
-                print(k2_key_name)
+                # print(k2_key_name)
                 k2 = tab.findChild(QtWidgets.QWidget, k2_key_name)
                 if isinstance(k2, QtWidgets.QComboBox):
                     if k2_key_name in val.keys():
@@ -2874,7 +2874,7 @@ class Window(QMainWindow):
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
-        print("Done")
+        # print("Done")
 
     # Function for hiding and showing input and output dock
     def dockbtn_clicked(self, widget):

@@ -444,9 +444,10 @@ KEY_ALLOW_LOAD = 'Load.Type'
 KEY_DISP_LOAD = 'Type of Load'
 KEY_DISP_ESR = 'Effective SR'
 KEY_ESR = 'ESR'
-KEY_SR_lambdavv = 'StressReductionFactor'
-KEY_DISP_SR_lambdavv = 'Stress Reduction Factor'
-
+KEY_SR_lambdavv = 'ESRLambdavv'
+KEY_DISP_SR_lambdavv = 'Lambda v-v'
+KEY_SR_lambdapsi = 'ESRLambdapsi'
+KEY_DISP_SR_lambdapsi = 'Lambda psi'
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'

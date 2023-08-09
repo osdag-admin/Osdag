@@ -596,6 +596,12 @@ class Compression(Member):
         t2 = (KEY_ESR, KEY_DISP_ESR, TYPE_TEXTBOX, round(self.result_eff_sr, 2) if flag else '', True)
         out_list.append(t2)
 
+        t2 = (KEY_SR_lambdavv, KEY_DISP_SR_lambdavv, TYPE_TEXTBOX, self.result_lambda_vv if flag else '', True)
+        out_list.append(t2)
+
+        t2 = (KEY_SR_lambdapsi, KEY_DISP_SR_lambdapsi, TYPE_TEXTBOX, self.result_lambda_psi if flag else '', True)
+        out_list.append(t2)
+
         t2 = (KEY_EULER_BUCKLING_STRESS, KEY_DISP_EULER_BUCKLING_STRESS, TYPE_TEXTBOX, round(self.result_ebs, 2) if flag else '', True)
         out_list.append(t2)
 
@@ -635,7 +641,8 @@ class Compression(Member):
         self.design_status = False
         flag = False
         option_list = self.input_values(self)
-        # print(f'\n func_for_validation option list = {option_list}')
+        print(f'\n func_for_validation option list = {option_list}'
+              f'\n  design_dictionary {design_dictionary}')
         missing_fields_list = []
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
@@ -646,7 +653,7 @@ class Compression(Member):
                     #     continue
                     # else:
                     missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_LOCATION, KEY_TYP]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     # print(f'option[0] = {option[0]}')
@@ -1076,7 +1083,7 @@ class Compression(Member):
             self.design_status = False
             self.design_status_list.append(self.design_status)
         else:
-            logger.info("Provided appropriate input and starting design.")
+            logger.info("Provided appropriate design preference, now checking input.")
 
     def section_classification_subchecks(self, section):
         if self.sec_profile in VALUES_SEC_PROFILE_Compression_Strut:  # Angles
@@ -1229,6 +1236,10 @@ class Compression(Member):
 
             self.result_eff_sr = list_result[result_type]['Effective_SR']
             # self.result_eff_sr_yy = list_result[result_type]['Effective_SR_yy']
+            self.result_lambda_vv = list_result[result_type]['lambda_vv']
+
+            self.result_lambda_psi = list_result[result_type]['lambda_psi']
+
 
             self.result_ebs = list_result[result_type]['EBS']
             # self.result_ebs_yy = list_result[result_type]['EBS_yy']
@@ -1318,33 +1329,29 @@ class Compression(Member):
         # checking DP inputs
         self.optimization_tab_check(self)
         # optimization_tab_check()
+        #
+        # print(f"\n self.input_section_list {self.input_section_list}")
+        # print(f"\n self.input_section_classification {self.input_section_classification}")
+        # print(f"\n self.loc {self.loc}")
 
-        print(f"\n self.input_section_list {self.input_section_list}")
-        print(f"\n self.input_section_classification {self.input_section_classification}")
-        print(f"\n self.loc {self.loc}")
 
-
-        if design_dictionary[KEY_AXIAL] == '' :
+        if design_dictionary[KEY_AXIAL] == '' and len(self.input_section_list) == 1 :
             self.single_result = {}
-            if len(self.input_section_list) == 1 :
-                self.strength_of_strut(self)
-            else:
-                logger.warning(
-                    "More than 1 section given as input without giving Load")
-                logger.error("Cannot compute!")
-                logger.info("Give 1 section as Inputs and/or "
-                            "Give load and re-design.")
-                self.design_status = False
-                self.design_status_list.append(self.design_status)
+            logger.info("Provided appropriate input and starting design.")
+
+            self.strength_of_strut(self)
         elif design_dictionary[KEY_AXIAL] != '' :
             if len(self.input_section_list) > 1 :
+                logger.info("Provided appropriate input and starting design.")
+
                 self.design_strut(self)
             else:
                 logger.warning(
                     "Only one section provided and load as well")
                 # logger.error("Cannot compute!")
-                logger.info("No need for load input. Ignoring load ")
+                logger.info("No need for load input. Ignoring load and starting design.")
                 design_dictionary[KEY_AXIAL] = ''
+
                 self.strength_of_strut(self)
 
         else:
@@ -1404,6 +1411,8 @@ class Compression(Member):
             if self.load_type == 'Concentric Load':
                 print(f"step == 4"
                       f"list_result {list_result}")
+                self.lambda_vv = 'NA'
+                self.lambda_psi = 'NA'
                 #step == 4
                 self.common_checks_1(self, section, step=4, list_result=['Concentric'])
             else:
@@ -1413,8 +1422,8 @@ class Compression(Member):
                     self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy, 2, self.fixity)
 
                 self.equivalent_slenderness = returned_list[0]
-                self.lambda_vv =  returned_list[1]
-                self.lambda_psi =  returned_list[2]
+                self.lambda_vv =  round(returned_list[1],2)
+                self.lambda_psi =  round(returned_list[2],2)
                 self.k1 =  returned_list[3]
                 self.k2 =  returned_list[4]
                 self.k3 =  returned_list[5]
@@ -1442,6 +1451,7 @@ class Compression(Member):
             self.optimum_section_cost.append(self.cost)
 
             list_result.extend([self.slenderness, self.euler_buckling_stress,
+                                self.lambda_vv, self.lambda_psi,
                                 self.nondimensional_effective_slenderness_ratio,
                                 self.phi, self.stress_reduction_factor,
                                 self.design_compressive_stress_fr,
@@ -1453,7 +1463,7 @@ class Compression(Member):
             # Step 3 - Storing the optimum results to a list in a descending order
 
             list_1 = ['Designation','Section class', 'Effective area', 'Buckling_class', 'IF',
-                      'Effective_length', 'Effective_SR', 'EBS','ND_ESR', 'phi', 'SRF',
+                      'Effective_length', 'Effective_SR', 'EBS', 'lambda_vv', 'lambda_psi', 'ND_ESR', 'phi', 'SRF',
                       'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
 
             # step ==5
@@ -1516,6 +1526,8 @@ class Compression(Member):
         if self.load_type == 'Concentric Load':
             print(f"step == 4"
                   f"list_result {list_result}")
+            self.lambda_vv = 'NA'
+            self.lambda_psi = 'NA'
             # step == 4
             self.common_checks_1(self, section, step=4, list_result=['Concentric'])
         else:
@@ -1526,8 +1538,8 @@ class Compression(Member):
                 self.fixity)
 
             self.equivalent_slenderness = returned_list[0]
-            self.lambda_vv = returned_list[1]
-            self.lambda_psi = returned_list[2]
+            self.lambda_vv = round(returned_list[1], 2)
+            self.lambda_psi = round(returned_list[2], 2)
             self.k1 = returned_list[3]
             self.k2 = returned_list[4]
             self.k3 = returned_list[5]
@@ -1548,18 +1560,19 @@ class Compression(Member):
                     self.steel_cost_per_kg
 
         list_result.extend([self.slenderness, self.euler_buckling_stress,
-                            self.nondimensional_effective_slenderness_ratio,
-                            self.phi, self.stress_reduction_factor,
-                            self.design_compressive_stress_fr,
-                            self.design_compressive_stress_max,
-                            self.design_compressive_stress,
-                            self.section_capacity,"NA", self.cost]
+                                self.lambda_vv, self.lambda_psi,
+                                self.nondimensional_effective_slenderness_ratio,
+                                self.phi, self.stress_reduction_factor,
+                                self.design_compressive_stress_fr,
+                                self.design_compressive_stress_max,
+                                self.design_compressive_stress,
+                                self.section_capacity,"NA", self.cost]
                            )
         print(f"list_result {list_result}")
         # Step 3 - Storing the optimum results to a list in a descending order
 
         list_1 = ['Designation', 'Section class', 'Effective area', 'Buckling_class', 'IF',
-                  'Effective_length', 'Effective_SR', 'EBS', 'ND_ESR', 'phi', 'SRF',
+                  'Effective_length', 'Effective_SR', 'EBS', 'lambda_vv', 'lambda_psi', 'ND_ESR', 'phi', 'SRF',
                   'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
 
         self.common_checks_1(self, section, step = 6, list_result= list_result, list_1= list_1)
@@ -1568,86 +1581,94 @@ class Compression(Member):
     def results(self,design_dictionary):
         """ """
         # sorting results from the dataset
-        if len(self.input_section_list) > 1 and design_dictionary[KEY_AXIAL] != '':
-        # results based on UR
-            if self.optimization_parameter == 'Utilization Ratio':
-                filter_UR = filter(lambda x: x <= min(self.allowable_utilization_ratio, 1.0), self.optimum_section_ur)
-                self.optimum_section_ur = list(filter_UR)
+        if len(self.input_section_list) > 1 :
+            if design_dictionary[KEY_AXIAL] != '':
+                # results based on UR
+                if self.optimization_parameter == 'Utilization Ratio':
+                    filter_UR = filter(lambda x: x <= min(self.allowable_utilization_ratio, 1.0), self.optimum_section_ur)
+                    self.optimum_section_ur = list(filter_UR)
 
-                self.optimum_section_ur.sort()
-                # print(f"self.optimum_section_ur{self.optimum_section_ur}")
-                #print(f"self.result_UR{self.result_UR}")
+                    self.optimum_section_ur.sort()
+                    # print(f"self.optimum_section_ur{self.optimum_section_ur}")
+                    #print(f"self.result_UR{self.result_UR}")
 
-                # selecting the section with most optimum UR
-                if len(self.optimum_section_ur) == 0:  # no design was successful
-                    logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                                    "criteria")
+                    # selecting the section with most optimum UR
+                    if len(self.optimum_section_ur) == 0:  # no design was successful
+                        logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                                        "criteria")
+                        logger.error("The solver did not find any adequate section from the defined list.")
+                        logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                        self.design_status = False
+                        self.design_status_list.append(self.design_status)
+
+                    else:
+                        self.result_UR = self.optimum_section_ur[-1]  # optimum section which passes the UR check
+                        print(f"self.result_UR{self.result_UR}")
+                        self.design_status = True
+
+                else:  # results based on cost
+                    self.optimum_section_cost.sort()
+
+                    # selecting the section with most optimum cost
+                    self.result_cost = self.optimum_section_cost[0]
+
+                # print results
+                if len(self.optimum_section_ur) == 0:
+                    logger.warning(
+                        "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                        "criteria")
                     logger.error("The solver did not find any adequate section from the defined list.")
                     logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
                     self.design_status = False
                     self.design_status_list.append(self.design_status)
-
+                    pass
                 else:
-                    self.result_UR = self.optimum_section_ur[-1]  # optimum section which passes the UR check
-                    print(f"self.result_UR{self.result_UR}")
-                    self.design_status = True
+                    if self.optimization_parameter == 'Utilization Ratio':
+                        self.common_result(self, list_result=self.optimum_section_ur_results, result_type=self.result_UR)
+                    else:
+                        self.result_UR = self.optimum_section_cost_results[self.result_cost]['UR']
 
-            else:  # results based on cost
-                self.optimum_section_cost.sort()
+                        # checking if the selected section based on cost satisfies the UR
+                        if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
 
-                # selecting the section with most optimum cost
-                self.result_cost = self.optimum_section_cost[0]
+                            trial_cost = []
+                            for cost in self.optimum_section_cost:
+                                self.result_UR = self.optimum_section_cost_results[cost]['UR']
+                                if self.result_UR <= min(self.allowable_utilization_ratio, 1.0):
+                                    trial_cost.append(cost)
 
-            # print results
-            if len(self.optimum_section_ur) == 0:
+                            trial_cost.sort()
+
+                            if len(trial_cost) == 0:  # no design was successful
+                                logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                                                "criteria")
+                                logger.error("The solver did not find any adequate section from the defined list.")
+                                logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                                self.design_status = False
+                                self.design_status_list.append(self.design_status)
+                                print(f"design_status_list{self.design_status} \n")
+                            else:
+                                self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
+                                self.design_status = True
+
+                        # results
+                        self.common_result(self, list_result=self.optimum_section_cost_results, result_type=self.result_cost)
+
+                        print(f"design_status_list2{self.design_status}")
+                for status in self.design_status_list:
+                    if status is False:
+                        self.design_status = False
+                        break
+                    else:
+                        self.design_status = True
+            else:
                 logger.warning(
-                    "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                    "criteria")
-                logger.error("The solver did not find any adequate section from the defined list.")
-                logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                    "More than 1 section given as input without giving Load")
+                logger.error("Cannot compute!")
+                logger.info("Give 1 section as Inputs and/or "
+                            "Give load and re-design.")
                 self.design_status = False
                 self.design_status_list.append(self.design_status)
-                pass
-            else:
-                if self.optimization_parameter == 'Utilization Ratio':
-                    self.common_result(self, list_result=self.optimum_section_ur_results, result_type=self.result_UR)
-                else:
-                    self.result_UR = self.optimum_section_cost_results[self.result_cost]['UR']
-
-                    # checking if the selected section based on cost satisfies the UR
-                    if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
-
-                        trial_cost = []
-                        for cost in self.optimum_section_cost:
-                            self.result_UR = self.optimum_section_cost_results[cost]['UR']
-                            if self.result_UR <= min(self.allowable_utilization_ratio, 1.0):
-                                trial_cost.append(cost)
-
-                        trial_cost.sort()
-
-                        if len(trial_cost) == 0:  # no design was successful
-                            logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                                            "criteria")
-                            logger.error("The solver did not find any adequate section from the defined list.")
-                            logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
-                            self.design_status = False
-                            self.design_status_list.append(self.design_status)
-                            print(f"design_status_list{self.design_status} \n")
-                        else:
-                            self.result_cost = trial_cost[0]  # optimum section based on cost which passes the UR check
-                            self.design_status = True
-
-                    # results
-                    self.common_result(self, list_result=self.optimum_section_cost_results, result_type=self.result_cost)
-
-                    print(f"design_status_list2{self.design_status}")
-            for status in self.design_status_list:
-                if status is False:
-                    self.design_status = False
-                    break
-                else:
-                    self.design_status = True
-
             if self.design_status:
                 logger.info(": ========== Design Status ============")
                 logger.info(": Overall Column design is SAFE")

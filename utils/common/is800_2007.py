@@ -244,7 +244,41 @@ class IS800_2007(object):
                 section_class = 'Semi-Compact'
 
         return section_class
-    
+
+    @staticmethod
+    def Table2_iv(depth, thickness_web, f_y):
+        """ Calculate the limiting width to thickness ratio as per Table 2 for;
+                sr. no i) Members subjected to Axial Compression
+                sr. no ii)Members subjected to Compression due to bending
+
+        Args:
+            width(b): width of the element in mm (float or int)
+            depth(d): depth of the element in mm (float or int)
+            thickness(t): thickness of the element in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            force_type: Type of failure in member ('Axial') ('Compression')
+            section_type: Type of section ('Angle') (string)
+
+        Returns:
+            A list of values with;
+            1- The class of the section as Semi-compact or Slender on account of the
+             b/t, d/t, (b+d)/t Ratio
+
+            ['Section Class', 'Ratio']
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(250 / int(f_y))
+        d_t = depth / thickness_web
+
+        if d_t <= (42 * epsilon) :
+            section_class = 'Semi-Compact'
+        else:
+            section_class = 'Slender'
+
+        return [section_class, d_t]
+
     @staticmethod
     def Table2_vi(width, depth, thickness, f_y, force_type = "Axial Compression"):
         """ Calculate the limiting width to thickness ratio as per Table 2 for;

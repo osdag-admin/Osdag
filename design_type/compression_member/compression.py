@@ -339,7 +339,7 @@ class Compression(Member):
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
-        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
+        t9 = (None, DISP_TITLE_STRUT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
         t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_STRUT_END1, True, 'No Validator')
@@ -640,6 +640,8 @@ class Compression(Member):
         all_errors = []
         self.design_status = False
         flag = False
+        flag1 = False
+        flag2 = False
         option_list = self.input_values(self)
         print(f'\n func_for_validation option list = {option_list}'
               f'\n  design_dictionary {design_dictionary}')
@@ -653,6 +655,23 @@ class Compression(Member):
                     #     continue
                     # else:
                     missing_fields_list.append(option[1])
+                elif design_dictionary[option[0]] == '' and option[0] is KEY_AXIAL:
+                    flag2 = True
+                else:
+                    if option[0] == KEY_LENGTH :
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag1 = True
+                    elif option[0] == KEY_AXIAL :
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag2 = True
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_LOCATION, KEY_TYP]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
@@ -668,7 +687,7 @@ class Compression(Member):
             flag = True
 
         print(f'flag = {flag}')
-        if flag:
+        if flag and flag1 and flag2:
             self.set_input_values(self, design_dictionary)
             # print(design_dictionary)
         else:
@@ -688,16 +707,20 @@ class Compression(Member):
         self.length = float(design_dictionary[KEY_LENGTH])
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
-        # self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-        #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-        # print(f"self.plate {self.plate}")
+        self.member_design_status = False
+        self.bolt_design_status = False
+        self.plate_design_status = False
+        # Plate inputs
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
+        print(f"self.plate {self.plate}")
 
         #'Conn_Location'
         self.loc = design_dictionary[KEY_LOCATION]
 
         #['Concentric Load', 'Leg Load']
         self.load_type = design_dictionary[KEY_ALLOW_LOAD]
-        self.load_type = 'Concentric Load'
+        # self.load_type = 'Concentric Load'
 
 
         # end condition
@@ -1024,7 +1047,7 @@ class Compression(Member):
             self.material_property.connect_to_database_to_get_fy_fu(self.material,self.section_property.thickness)
 
             # section classification
-            if (self.sec_profile in VALUES_SEC_PROFILE_Compression_Strut):  # Angles or Back to Back
+            if (self.sec_profile in ['Angles', 'Back to Back Angles']):  # Angles or Back to Back
 
                 if self.section_property.type == 'Rolled':
                       list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
@@ -1037,9 +1060,15 @@ class Compression(Member):
                       print(f"DONE {self.section_class} {self.width_thickness_ratio} {self.depth_thickness_ratio} {self.width_depth_thickness_ratio}")
                 else:
                     print(f"section_classification _ not done")
+            elif (self.sec_profile in ['Channels', 'Back to Back Channels']):
+                list_Table2_iv = IS800_2007.Table2_iv(depth=self.section_property.depth, f_y=self.material_property.fy, thickness_web= self.section_property.web_thickness)
+                print(f"Checking Channel Properties")
+                self.section_class = list_Table2_vi[0]
+                self.depth_thickness_ratio = list_Table2_vi[1]
+                logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
             else:
                 print(f"section_classification _ cannot do")
-            logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
+                logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
 
 
             if len(self.allowed_sections) == 0:
@@ -1086,12 +1115,12 @@ class Compression(Member):
             logger.info("Provided appropriate design preference, now checking input.")
 
     def section_classification_subchecks(self, section):
-        if self.sec_profile in VALUES_SEC_PROFILE_Compression_Strut:  # Angles
+        if self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[0] or self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[1]:  # Angles
             self.section_property = Angle(designation = section, material_grade = self.material)
         # elif self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[1]:  # Back to Back Angles
         #     self.section_property = Angle(designation=section, material_grade=self.material)
-        # # elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # Channels
-        # #     self.section_property = RHS(designation=section, material_grade=self.material)
+        elif self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[2] or self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[3]:  # Channels
+            self.section_property = Channel(designation=section, material_grade=self.material)
         # # elif self.sec_profile == VALUES_SEC_PROFILE[3]:  # Columns
         # #     self.section_property = SHS(designation=section, material_grade=self.material)
         # # elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS

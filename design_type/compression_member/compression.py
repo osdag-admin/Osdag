@@ -39,7 +39,7 @@ class Compression(Member):
         """
         tabs = []
 
-        t1 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
+        t1 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_strut_angle_section)
         tabs.append(t1)
 
         t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_strut_design)
@@ -104,14 +104,14 @@ class Compression(Member):
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
                'Label_18',
                'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24', KEY_IMAGE], TYPE_TEXTBOX,
-              self.get_new_angle_section_properties)
+              self.get_strut_angle_section_properties)
         change_tab.append(t1)
 
         t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3','Label_0'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
                KEY_IMAGE],
-              TYPE_TEXTBOX, self.get_Angle_sec_properties)
+              TYPE_TEXTBOX, self.get_Strut_Angle_sec_properties)
         change_tab.append(t2)
 
         t5 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
@@ -473,6 +473,9 @@ class Compression(Member):
         t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
 
+        t3 = ([KEY_SEC_PROFILE], KEY_LOCATION, TYPE_COMBOBOX, self.fn_conn_type)
+        lst.append(t3)
+
         t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t3)
 
@@ -694,6 +697,15 @@ class Compression(Member):
             return all_errors
         print(f"func_for_validation done")
 
+    def fn_conn_type(self):
+
+        "Function to populate section size based on the type of section "
+        conn = self[0]
+        if conn in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            return VALUES_LOCATION_1
+        elif conn in ["Channels", "Back to Back Channels"]:
+            return VALUES_LOCATION_2
+
     # Setting inputs from the input dock GUI
 
     def set_input_values(self, design_dictionary):
@@ -711,8 +723,11 @@ class Compression(Member):
         self.bolt_design_status = False
         self.plate_design_status = False
         # Plate inputs
+        print("========Unknown keys==========")
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
+        self.plate = Plate(thickness=['10'],
+                           material_grade='E 250 (Fe 410 W)A')
         print(f"self.plate {self.plate}")
 
         #'Conn_Location'
@@ -730,14 +745,17 @@ class Compression(Member):
             self.fixity = 'Fixed'
         else:
             self.fixity = 'Hinged'
+
         # 'Bolt.Diameter'
         self.bolt_list = design_dictionary[KEY_D]
         self.bolt_type = design_dictionary[KEY_TYP]
         self.bolt_grade = design_dictionary[KEY_GRD]
+        print(f"bolt_list {self.bolt_list}")
 
         #Gusset plate details
         self.plate_thickness = design_dictionary[KEY_PLATETHK]
         self.plate_grade = design_dictionary[KEY_SEC_MATERIAL]
+        print(f"plate_thickness {self.plate_thickness}")
 
         # factored loads
         self.load = Load(shear_force="", axial_force=design_dictionary[KEY_AXIAL],moment="",unit_kNm=True)
@@ -783,6 +801,7 @@ class Compression(Member):
         self.material_property = Material(material_grade=self.material, thickness=0)
         print(f"self.material_property {self.material_property}]")
 
+
         # initialize the design status
         self.design_status_list = []
         self.design_status = False
@@ -796,8 +815,13 @@ class Compression(Member):
             self.K = 1
         elif self.sec_profile == 'Back to Back Angles':
             self.K = 0.85
-        self.plate = Plate(thickness=['10'],
-                           material_grade='E 250 (Fe 410 W)A')
+        elif self.sec_profile == 'Channels':
+            print("========Unknown keys==========")
+            self.K = 0.85
+        elif self.sec_profile == 'Back to Back Channels':
+            print("========Unknown keys==========")
+            self.K = 0.85
+
         self.count = 0
         self.member_design_status = False
         self.max_limit_status_1 = False
@@ -809,8 +833,14 @@ class Compression(Member):
 
         print("The input values are set. Performing preliminary member check(s).")
         # self.i = 0
-        self.design(self, design_dictionary)
-        self.results(self, design_dictionary)
+        # checking input values
+        flag = self.section_classification(self)
+        print(flag)
+        if flag:
+            self.design(self, design_dictionary)
+            self.results(self, design_dictionary)
+
+
         # self.initial_member_capacity(self,design_dictionary)
         # print(f"self.sec_list {self.sec_list}")
         # for selectedsize in self.sec_list:
@@ -1031,6 +1061,7 @@ class Compression(Member):
     def section_classification(self):
         """ Classify the sections based on Table 2 of IS 800:2007 """
         # print(f"Inside section_classification")
+        local_flag = True
         self.input_section_list = []
         self.input_section_classification = {}
 
@@ -1041,34 +1072,64 @@ class Compression(Member):
             # section_classification_subchecks(trial_section, self.material)
 
             # fetching the section properties
-            self.section_classification_subchecks(self,trial_section)
-
-            # updating the material property based on thickness of the thickest element
-            self.material_property.connect_to_database_to_get_fy_fu(self.material,self.section_property.thickness)
+            self.section_property = self.section_classification_subchecks(self,trial_section)
+            print(f"Type of section{type(section)}")
 
             # section classification
             if (self.sec_profile in ['Angles', 'Back to Back Angles']):  # Angles or Back to Back
 
+                # updating the material property based on thickness of the thickest element
+                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
                 if self.section_property.type == 'Rolled':
-                      list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
+
+                    list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
                                                             self.material_property.fy, "Axial Compression")
-                      # print(f"\n \n \n self.material_property.fy {self.material_property.fy} \n \n \n")
-                      self.section_class = list_Table2_vi[0]
-                      self.width_thickness_ratio  = list_Table2_vi[1]
-                      self.depth_thickness_ratio = list_Table2_vi[2]
-                      self.width_depth_thickness_ratio = list_Table2_vi[3]
-                      print(f"DONE {self.section_class} {self.width_thickness_ratio} {self.depth_thickness_ratio} {self.width_depth_thickness_ratio}")
+                    # print(f"\n \n \n self.material_property.fy {self.material_property.fy} \n \n \n")
+                    self.section_class = list_Table2_vi[0]
+                    self.width_thickness_ratio  = list_Table2_vi[1]
+                    self.depth_thickness_ratio = list_Table2_vi[2]
+                    self.width_depth_thickness_ratio = list_Table2_vi[3]
+                    print(f"DONE {self.section_class} {self.width_thickness_ratio} {self.depth_thickness_ratio} {self.width_depth_thickness_ratio}")
+                    logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
                 else:
                     print(f"section_classification _ not done")
+                    local_flag = False
             elif (self.sec_profile in ['Channels', 'Back to Back Channels']):
+
+                # updating the material property based on thickness of the thickest element
+                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.web_thickness)
+
                 list_Table2_iv = IS800_2007.Table2_iv(depth=self.section_property.depth, f_y=self.material_property.fy, thickness_web= self.section_property.web_thickness)
                 print(f"Checking Channel Properties")
-                self.section_class = list_Table2_vi[0]
-                self.depth_thickness_ratio = list_Table2_vi[1]
-                logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
+                self.section_class = list_Table2_iv[0]
+                self.depth_thickness_ratio = list_Table2_iv[1]
+                logger.info("The section is {}. The d/t_web of the trial section ({}) is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.depth_thickness_ratio,2) ))
             else:
                 print(f"section_classification _ cannot do")
-                logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
+                local_flag = False
+
+            # 2.2 - Effective length
+            temp = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+                self.length,
+                end_1=self.end_1,
+                end_2=self.end_2)
+            self.effective_length = temp * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+                self.length,
+                self.sec_profile)/ self.length  # mm
+            print(f"self.effective_length {self.effective_length} ")
+            # 2.3 - slenderness ratio
+            # self.section_property.min_rad_gyration_calc(self, self.sec_profile)
+            self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
+            self.slenderness = self.effective_length / self.min_radius_gyration
+            print(f"self.min_radius_gyration {self.min_radius_gyration}"
+                  f"self.slenderness {self.slenderness}")
+            limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
+            if self.slenderness > limit:
+                logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+                logger.error("Cannot compute. Given Length does not pass.")
+                local_flag = False
+            else:
+                logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]" )
 
 
             if len(self.allowed_sections) == 0:
@@ -1076,10 +1137,13 @@ class Compression(Member):
                 logger.error("Cannot compute. Selected section classification type is Null.")
                 self.design_status = False
                 self.design_status_list.append(self.design_status)
+                local_flag = False
 
             if self.section_class in self.allowed_sections:
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_class})
+
+        return local_flag
             # print(f"self.section_class{self.section_class}")
 
     #  ======Calculations start here====== #
@@ -1102,7 +1166,7 @@ class Compression(Member):
             self.design_status = False
             self.design_status_list.append(self.design_status)
 
-        elif (self.steel_cost_per_kg == 0.10) or (self.effective_area_factor > 1.0):
+        elif (self.steel_cost_per_kg < 0.10) or (self.effective_area_factor > 1.0):
             # No suggested range in Description
             logger.warning(
                 "The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range.")
@@ -1130,6 +1194,7 @@ class Compression(Member):
         else:
             logger.warning(
                 "The section should be either Angle or Back to Back Angle. ")
+        return self.section_property
 
     def common_checks_1(self, section, step = 1, list_result = [], list_1 = []):
         if step == 1:
@@ -1139,16 +1204,17 @@ class Compression(Member):
 
             # fetching the section properties of the selected section
             self.section_classification_subchecks(self, section)
-
-            # self.material_property(self.material, self.section_property.thickness)
-            self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
-
+            if self.sec_profile in ['Angles', 'Back to Back Angles']:
+                # self.material_property(self.material, self.section_property.thickness)
+                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
+            elif self.sec_profile in ['Channels', 'Back to Back Channels']:
+                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.web_thickness)
             self.epsilon = math.sqrt(250 / self.material_property.fy)
 
             # print(f"Working correct here")
         elif step == 2:
             if self.section_class == 'Slender':
-                logger.warning("The trial section ({}) is Slender. Please add different section.".format(section))
+                logger.warning("The trial section ({}) is Slender. Ignoring section.".format(section))
                 # pass
                 # if (self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[0]) or (self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[1]):  # Angles or Back to Back Angle
                 #     self.effective_area = (2 * ((31.4 * self.epsilon * self.section_property.flange_thickness) *
@@ -1180,10 +1246,7 @@ class Compression(Member):
 
             self.imperfection_factor = IS800_2007.cl_7_1_2_1_imperfection_factor(buckling_class=self.buckling_class)
 
-            # 2.2 - Effective length
-            self.effective_length = IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(self.length,
-                                                                                                      self.sec_profile)  # mm
-            print(f"self.effective_length {self.effective_length} ")
+
         elif step == 4:
             print(f"\n data sent "
                   f" self.material_property.fy {self.material_property.fy}"
@@ -1352,8 +1415,8 @@ class Compression(Member):
     #     return self.section_size_max.tension_yielding_capacity, self.max_length, self.section_size_max.slenderness,self.min_radius_gyration
 
     def design(self, design_dictionary , flag = 0):
-        self.section_classification(self)
-
+        # flag = self.section_classification(self)
+        # print(flag)
         """ Perform design of struct """
         # checking DP inputs
         self.optimization_tab_check(self)
@@ -1376,9 +1439,9 @@ class Compression(Member):
                 self.design_strut(self)
             else:
                 logger.warning(
-                    "Only one section provided and load as well")
+                    "No need for load input.")
                 # logger.error("Cannot compute!")
-                logger.info("No need for load input. Ignoring load and starting design.")
+                logger.info(" Ignoring load and starting design.")
                 design_dictionary[KEY_AXIAL] = ''
 
                 self.strength_of_strut(self)
@@ -1432,11 +1495,7 @@ class Compression(Member):
             list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
 
 
-            # 2.3 - slenderness ratio
-            self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
-            self.slenderness = self.effective_length / self.min_radius_gyration
-            print(f"self.min_radius_gyration {self.min_radius_gyration}"
-                  f"self.slenderness {self.slenderness}")
+
             if self.load_type == 'Concentric Load':
                 print(f"step == 4"
                       f"list_result {list_result}")

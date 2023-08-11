@@ -371,6 +371,45 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """
+
+    @staticmethod
+    def cl_3_8_max_slenderness_ratio(Type = 1):
+        '''
+1)  A member carrying compressive loads
+    resulting from dead loads and imposed
+    loads
+2)  A tension member in which a reversal
+    of direct stress occurs due to loads other
+    than wind or seismic forces
+3)  A member subjected to compression
+    forces resulting only from combination
+    with wind/earthquake actions, provided
+    the deformation of such member does
+    not adversely affect tbe stress in any
+    part of the structure
+4)  Compression flange of a beam against
+    lateral torsional buckling
+5)  A member normally acting m a tie in a
+    roof truss or a bracing system not
+    considered effective when subject to
+    possible reversal of stress into
+    compression resulting from the action
+    of wind or earthquake forces]]
+6)  Members always under tension’) (other
+    than pre-tensioned members)
+        '''
+        if Type == 1:
+            return 180
+        elif Type == 2:
+            return 180
+        elif Type == 3:
+            return 180
+        elif Type == 4:
+            return 180
+        elif Type == 5:
+            return 180
+        elif Type == 6:
+            return 180
     # ==========================================================================
     """    SECTION  4     METHODS OF STRUCTURAL ANALYSIS   """
     # ==========================================================================
@@ -563,8 +602,14 @@ class IS800_2007(object):
             effective_length = 1 * length
         elif section_profile == 'Back to Back Angles':
             effective_length = 0.85 * length
+        elif section_profile == 'Channels':
+            print('NEED TO CHECK AGAIN')
+            effective_length = 0.85 * length
+        elif section_profile == 'Back to Back Channels':
+            print('NEED TO CHECK AGAIN')
+            effective_length = 0.85 * length
         else:
-            pass
+            effective_length = 1 * length
 
         return effective_length
 

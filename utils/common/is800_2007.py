@@ -604,7 +604,7 @@ class IS800_2007(object):
             effective_length = 0.85 * length
         elif section_profile == 'Channels':
             print('NEED TO CHECK AGAIN')
-            effective_length = 0.85 * length
+            effective_length = 1 * length
         elif section_profile == 'Back to Back Channels':
             print('NEED TO CHECK AGAIN')
             effective_length = 0.85 * length

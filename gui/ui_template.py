@@ -832,8 +832,12 @@ class Window(QMainWindow):
                     if key_name == KEY_TABLE:
                         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
                         popup_dialog = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog")
-                        button = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Button")
-                        button.clicked.connect(lambda: popup_dialog.show())
+                        show_table_button = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Button")
+                        material_combo_box = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL)
+                        show_table_button.clicked.connect(lambda: popup_dialog.show())
+                        material_combo_box.currentIndexChanged.connect(
+                            lambda: self.update_all_material_in_table(material_combo_box)
+                        )
                         no_of_members.currentIndexChanged.connect(
                             lambda: self.update_table_widget_popup(key_changed, data_dictionary, popup_dialog,
                                                                    int(no_of_members.currentText()))
@@ -1437,8 +1441,8 @@ class Window(QMainWindow):
                     combo_box.setObjectName(key + str(row))
                     for item in value:
                         combo_box.addItem(item, value)
-                    if key == KEY_MATERIAL:
-                        self.create_custom_material(combo_box)
+                    if key == KEY_DISP_MATERIAL:
+                        combo_box.setCurrentIndex(1)
                     table_widget.setCellWidget(row, col, combo_box)
 
     def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0, table_widget=None):
@@ -1473,6 +1477,16 @@ class Window(QMainWindow):
         table_widget.setColumnCount(index+2)
         popup_window_sizes = [(205,424), (223,424), (240,424), (256,424), (274,424), (291,424), (308,424)]
         self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0, table_widget)
+
+    def update_all_material_in_table(self, main_material):
+        no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
+        table_widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog").findChild(QtWidgets.QTableWidget)
+        for i in range(int(no_of_members.currentText())):
+            material_combo_box = table_widget.findChild(QtWidgets.QComboBox, KEY_DISP_MATERIAL+str(i))
+            material_combo_box.clear()
+            for item in connectdb("Material"):
+                material_combo_box.addItem(item)
+            material_combo_box.setCurrentIndex(main_material.currentIndex())
 
     def create_custom_material(self, combo_box):
         combo_box.currentIndexChanged.connect(lambda: self.update_custom_material(combo_box))

@@ -1477,6 +1477,7 @@ class Window(QMainWindow):
         table_widget.setColumnCount(index+2)
         popup_window_sizes = [(205,424), (223,424), (240,424), (256,424), (274,424), (291,424), (308,424)]
         self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0, table_widget)
+        self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL).setCurrentIndex(1)
 
     def update_all_material_in_table(self, main_material):
         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)

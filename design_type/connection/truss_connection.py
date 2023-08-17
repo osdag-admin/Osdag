@@ -45,7 +45,7 @@ class TrussConnection(Connection):
 
         lst = []
 
-        t1 = ([KEY_TABLE], KEY_TABLE, TYPE_TABLE_IN, self.new_material)
+        t1 = ([KEY_TABLE], KEY_TABLE, TYPE_TABLE_IN, None)
         lst.append(t1)
 
         return lst

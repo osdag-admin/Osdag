@@ -1488,13 +1488,6 @@ class Window(QMainWindow):
                 material_combo_box.addItem(item)
             material_combo_box.setCurrentIndex(main_material.currentIndex())
 
-    def create_custom_material(self, combo_box):
-        combo_box.currentIndexChanged.connect(lambda: self.update_custom_material(combo_box))
-
-    def update_custom_material(self, table_widget_item):
-        if table_widget_item.currentText().lower() == 'custom':
-            self.new_material_dialog(table_widget_item.objectName())
-
     def notification(self):
         update_class = Update()
         msg = update_class.notifi()
@@ -2435,7 +2428,7 @@ class Window(QMainWindow):
         SecProfile = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText()
         return parameters
 
-    def new_material_dialog(self, custom_option_obj=KEY_MATERIAL):
+    def new_material_dialog(self):
         dialog = QtWidgets.QDialog(self)
         self.material_popup_message = ''
         self.invalid_field = ''
@@ -2485,7 +2478,7 @@ class Window(QMainWindow):
         dialog.setFixedSize(350, 250)
         closed = dialog.exec()
         if closed is not None:
-            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, custom_option_obj)
+            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL)
             input_dock_material.clear()
             for item in connectdb("Material"):
                 input_dock_material.addItem(item)

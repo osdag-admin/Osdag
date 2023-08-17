@@ -87,6 +87,9 @@ class TrussConnectionBolted(TrussConnection):
         t0 = (KEY_MEMBERS, KEY_DISP_MEMBERS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_MEMBERS, True, 'No Validator')
         options_list.append(t0)
 
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        options_list.append(t5)
+
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 

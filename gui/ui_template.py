@@ -1169,9 +1169,9 @@ class Window(QMainWindow):
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
 
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
-        # print(f"inside common_function_for_save_and_design ")
+        print(f"inside common_function_for_save_and_design ")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
-        # print(f"outside common_function_for_save_and_design ")
+        print(f"outside common_function_for_save_and_design ")
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
@@ -1929,18 +1929,18 @@ class Window(QMainWindow):
                 data[data_key] = [data_values for data_values in data[data_key]
                                   if data_values not in data_key_tuple[2]]
 
-        # print(f"ui_template.py common_function_for_save_and_design \n")
-        # print(f"option_list {option_list} \n")
-        # print(f"data {data} ")
+        print(f"ui_template.py common_function_for_save_and_design \n")
+        print(f"option_list {option_list} \n")
+        print(f"data {data} ")
 
         self.design_fn(option_list, data, main)
 
         if trigger_type == "Save":
             self.saveDesign_inputs()
         elif trigger_type == "Design_Pref":
-            # print(f"trigger_type == Design_Pref")
+            print(f"trigger_type == Design_Pref")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
-                # print(f"QDialog.Accepted")
+                print(f"QDialog.Accepted")
                 self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
@@ -2448,12 +2448,17 @@ class Window(QMainWindow):
     def combined_design_prefer(self, data, main):
 
         on_change_tab_list = main.tab_value_changed(main)
-        # print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list} \n")
+        print(f"ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list} \n")
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
+            print(f"key_list = {key_list} \n"
+                  f"tab {tab}")
+
             for key_name in key_list:
                 key = tab.findChild(QtWidgets.QWidget, key_name)
+                print(f"key= {key} \n")
+
                 if isinstance(key, QtWidgets.QComboBox):
                     self.connect_combobox_for_tab(key, tab, on_change_tab_list, main)
                 elif isinstance(key, QtWidgets.QLineEdit):

@@ -616,14 +616,17 @@ class ColumnDesign(Member):
         self.design_status_list = []
         self.design_status = False
 
-        self.section_classification(self)
-        self.design_column(self)
-        self.results(self)
+        flag = self.section_classification(self)
+        print(flag)
+        if flag:
+            self.design_column(self)
+            self.results(self)
         print(f"Here[Column/set_input_values]")
 
     # Simulation starts here
     def section_classification(self):
         """ Classify the sections based on Table 2 of IS 800:2007 """
+        local_flag = True
         self.input_section_list = []
         self.input_section_classification = {}
 
@@ -700,6 +703,38 @@ class ColumnDesign(Member):
             logger.info("The flange of the trial section ({}) is {} and web is {}. The section is {} [Reference: Cl 3.7, IS 800:2007].".
                         format(trial_section, self.flange_class, self.web_class, self.section_class))
 
+            # 2.2 - Effective length
+            temp_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+                self.length_yy,
+                end_1=self.end_1,
+                end_2=self.end_2)
+            self.effective_length_yy = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+                self.length_yy,
+                self.sec_profile) / self.length_yy  # mm
+            print(f"self.effective_length {self.effective_length_yy} ")
+
+            temp_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+                self.length_zz,
+                end_1=self.end_1,
+                end_2=self.end_2)
+            self.effective_length_zz = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+                self.length_yy,
+                self.sec_profile) / self.length_yy  # mm
+            print(f"self.effective_length {self.effective_length_zz} ")
+
+            # 2.3 - Effective slenderness ratio
+            self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
+            self.effective_sr_yy = self.effective_length_yy / self.section_property.rad_of_gy_y
+
+            limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
+            if self.effective_sr_zz > limit and self.effective_sr_yy > limit:
+                logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+                logger.error("Cannot compute. Given Length does not pass.")
+                local_flag = False
+            else:
+                logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+
+
             if len(self.allowed_sections) == 0:
                 logger.warning("Select at-least one type of section in the design preferences tab.")
                 logger.error("Cannot compute. Selected section classification type is Null.")
@@ -710,6 +745,7 @@ class ColumnDesign(Member):
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_class})
             # print(f"self.section_class{self.section_class}")
+        return local_flag
 
     def design_column(self):
         """ Perform design of column """

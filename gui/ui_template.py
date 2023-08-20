@@ -658,7 +658,7 @@ class Window(QMainWindow):
 
                 popup_dialog.setLayout(layout)
                 popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-                popup_dialog.resize(996,116)
+                popup_dialog.resize(996,151)
 
                 if option[0] in input_dp_conn_list:
                     self.input_dp_connection(table_widget)
@@ -842,8 +842,8 @@ class Window(QMainWindow):
                             lambda: self.update_all_material_in_table(material_combo_box)
                         )
                         no_of_members.currentIndexChanged.connect(
-                            lambda: self.update_table_widget_popup(key_changed, data_dictionary, popup_dialog,
-                                                                   int(no_of_members.currentText()))
+                            lambda: self.update_input_popup_table_widget(key_changed, data_dictionary, popup_dialog,
+                                                                         int(no_of_members.currentText()))
                         )
                     else:
                         self.on_change_connect(key_changed, updated_list, data, main)
@@ -995,7 +995,7 @@ class Window(QMainWindow):
                 button.clicked.connect(lambda: output_popup_dialog.show())
 
                 no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
-                no_of_members.currentIndexChanged.connect(self.update_output_dock_table_widget)
+                no_of_members.currentIndexChanged.connect(self.update_output_popup_table_widget)
 
                 # if option[0] in input_dp_conn_list:
                 # self.input_dp_connection(table_widget)
@@ -1459,7 +1459,7 @@ class Window(QMainWindow):
         y = popup_window_sizes[index - default_start][1]
         popup_dialog.resize(x, y)
 
-    def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
+    def update_input_popup_table_widget(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
         '''
             Created for updating the table row size and popup window size
             Especially for `type == TYPE_TABLE_IN` in the Input Dock
@@ -1476,9 +1476,9 @@ class Window(QMainWindow):
         table_widget.setColumnCount(6)
         table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
         self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
-        self.resize_popup_dialog(popup_dialog, [(996,116), (996,151), (996,187), (996,221), (996,256), (996,292), (996,326)], no_of_rows, 2)
+        self.resize_popup_dialog(popup_dialog, [(996,151), (996,186), (996,222), (996,256), (996,291), (996,327), (996,361)], no_of_rows, 2)
 
-    def update_output_dock_table_widget(self, index):
+    def update_output_popup_table_widget(self, index):
         popup_dialog = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, "Bolt Design Summary Table")
         table_widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, TYPE_TABLE_OU)
         table_widget.setColumnCount(index+2)

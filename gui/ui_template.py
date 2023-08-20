@@ -639,6 +639,9 @@ class Window(QMainWindow):
                 button = QtWidgets.QPushButton("Open Connecting Members")
                 button.setObjectName("Connecting Members Button")
 
+                close_button = QtWidgets.QPushButton("Save and Close Connecting Members")
+                close_button.setObjectName("Close Connecting Members Button")
+
                 table_widget = QtWidgets.QTableWidget(popup_dialog)
                 table_widget.setObjectName(option[0])
                 table_widget.setRowCount(2)
@@ -651,6 +654,7 @@ class Window(QMainWindow):
                 self.add_widget_to_table_widget(table_widget, data_dictionary, 2)
 
                 layout.addWidget(table_widget)
+                layout.addWidget(close_button)
 
                 popup_dialog.setLayout(layout)
                 popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -830,8 +834,10 @@ class Window(QMainWindow):
                         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
                         popup_dialog = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog")
                         show_table_button = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Button")
+                        close_table_button = popup_dialog.findChild(QtWidgets.QWidget, "Close Connecting Members Button")
                         material_combo_box = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL)
                         show_table_button.clicked.connect(lambda: popup_dialog.show())
+                        close_table_button.clicked.connect(lambda: popup_dialog.reject())
                         material_combo_box.currentIndexChanged.connect(
                             lambda: self.update_all_material_in_table(material_combo_box)
                         )

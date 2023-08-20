@@ -650,14 +650,11 @@ class Window(QMainWindow):
 
                 self.add_widget_to_table_widget(table_widget, data_dictionary, 2)
 
-                table_widget.resizeRowsToContents()
-                table_widget.resizeColumnsToContents()
-
                 layout.addWidget(table_widget)
 
                 popup_dialog.setLayout(layout)
                 popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-                popup_dialog.resize(820,100)
+                popup_dialog.resize(996,116)
 
                 if option[0] in input_dp_conn_list:
                     self.input_dp_connection(table_widget)
@@ -1429,12 +1426,16 @@ class Window(QMainWindow):
             return
         for col, (key, value) in enumerate(data_dictionary.items()):
             if key == 'Connection Location' or value is None:
+                table_widget.setColumnWidth(col, 160)
                 continue
             elif key == 'Section profile':
                 for row in range(row_count):
                     combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(data_dictionary)
                     table_widget.setCellWidget(row, col, combo_box_section_profile)
                     table_widget.setCellWidget(row, col + 1, combo_box_connection_location)
+                    table_widget.setRowHeight(row, 35)
+                    table_widget.setColumnWidth(col, 160)
+                    table_widget.setColumnWidth(col+1, 160)
             else:
                 for row in range(row_count):
                     combo_box = QtWidgets.QComboBox()
@@ -1444,11 +1445,10 @@ class Window(QMainWindow):
                     if key == KEY_DISP_MATERIAL:
                         combo_box.setCurrentIndex(1)
                     table_widget.setCellWidget(row, col, combo_box)
+                    table_widget.setRowHeight(row, 35)
+                table_widget.setColumnWidth(col, 160)
 
     def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0, table_widget=None):
-        if table_widget is not None:
-            table_widget.resizeRowsToContents()
-            table_widget.resizeColumnsToContents()
         popup_dialog.resize(popup_window_sizes[index - default_start][0], popup_window_sizes[index - default_start][1])
 
     def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
@@ -1468,7 +1468,7 @@ class Window(QMainWindow):
         table_widget.setColumnCount(6)
         table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
         self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
-        self.resize_popup_dialog(popup_dialog, [(820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)], no_of_rows, 2, table_widget)
+        self.resize_popup_dialog(popup_dialog, [(996,116), (996,151), (996,187), (996,221), (996,256), (996,292), (996,326)], no_of_rows, 2, table_widget)
 
     def update_output_dock_table_widget(self, index):
         popup_dialog = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, "Bolt Design Summary Table")

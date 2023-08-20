@@ -1443,7 +1443,8 @@ class Window(QMainWindow):
                     for item in value:
                         combo_box.addItem(item, value)
                     if key == KEY_DISP_MATERIAL:
-                        combo_box.setCurrentIndex(1)
+                        material_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL).currentIndex()
+                        combo_box.setCurrentIndex(material_index)
                     table_widget.setCellWidget(row, col, combo_box)
                     table_widget.setRowHeight(row, 35)
                 table_widget.setColumnWidth(col, 160)
@@ -1477,17 +1478,17 @@ class Window(QMainWindow):
         table_widget.setColumnCount(index+2)
         popup_window_sizes = [(205,424), (223,424), (240,424), (256,424), (274,424), (291,424), (308,424)]
         self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0, table_widget)
-        self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL).setCurrentIndex(1)
 
     def update_all_material_in_table(self, main_material):
         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
         table_widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog").findChild(QtWidgets.QTableWidget)
+        current_index = main_material.currentIndex()
         for i in range(int(no_of_members.currentText())):
             material_combo_box = table_widget.findChild(QtWidgets.QComboBox, KEY_DISP_MATERIAL+str(i))
             material_combo_box.clear()
-            for item in connectdb("Material"):
+            for item in connectdb("Material")[:-1]:
                 material_combo_box.addItem(item)
-            material_combo_box.setCurrentIndex(main_material.currentIndex())
+            material_combo_box.setCurrentIndex(current_index)
 
     def notification(self):
         update_class = Update()

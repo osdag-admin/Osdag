@@ -977,15 +977,14 @@ class Window(QMainWindow):
                         item.setTextAlignment(Qt.AlignCenter)
                         item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # Disable editing
                         table_widget.setItem(row, col, item)
-
-                table_widget.resizeRowsToContents()
-                table_widget.resizeColumnsToContents()
+                        table_widget.setColumnWidth(col, 75)
+                    table_widget.setRowHeight(row, 35)
 
                 output_table_layout.addWidget(table_widget)
 
                 output_popup_dialog.setLayout(output_table_layout)
                 output_popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
-                output_popup_dialog.resize(205, 424)
+                output_popup_dialog.resize(322, 676)
 
                 button.clicked.connect(lambda: output_popup_dialog.show())
 
@@ -1449,8 +1448,10 @@ class Window(QMainWindow):
                     table_widget.setRowHeight(row, 35)
                 table_widget.setColumnWidth(col, 160)
 
-    def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0, table_widget=None):
-        popup_dialog.resize(popup_window_sizes[index - default_start][0], popup_window_sizes[index - default_start][1])
+    def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0):
+        x = popup_window_sizes[index - default_start][0]
+        y = popup_window_sizes[index - default_start][1]
+        popup_dialog.resize(x, y)
 
     def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
         '''
@@ -1469,15 +1470,14 @@ class Window(QMainWindow):
         table_widget.setColumnCount(6)
         table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
         self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
-        self.resize_popup_dialog(popup_dialog, [(996,116), (996,151), (996,187), (996,221), (996,256), (996,292), (996,326)], no_of_rows, 2, table_widget)
+        self.resize_popup_dialog(popup_dialog, [(996,116), (996,151), (996,187), (996,221), (996,256), (996,292), (996,326)], no_of_rows, 2)
 
     def update_output_dock_table_widget(self, index):
         popup_dialog = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, "Bolt Design Summary Table")
         table_widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, TYPE_TABLE_OU)
-        table_widget.setColumnCount(0)
         table_widget.setColumnCount(index+2)
-        popup_window_sizes = [(205,424), (223,424), (240,424), (256,424), (274,424), (291,424), (308,424)]
-        self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0, table_widget)
+        popup_window_sizes = [(322,676), (421,676), (522,676), (621,676), (722,676), (821,676), (922,676)]
+        self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0)
 
     def update_all_material_in_table(self, main_material):
         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)

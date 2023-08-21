@@ -1381,15 +1381,14 @@ class Window(QMainWindow):
 
     def create_dependent_QComboBox(self, selectable_options):
         '''
-            Created for creating Dependent QComboBox
-            Especially for `type == TYPE_TABLE_IN` in the Input Dock
-
-            Can be modified by passing more argument to keep the current functionality
-            required for `type == TYPE_TABLE_IN` by adding & changing the current args
-            of this method for future use.
-
-            If you don't know how to do it please don't modify this method as it may affect
-            the truss-connection-bolted module's connecting memeber attribute.
+            parameters:
+                selectable_option - data dictionary containing elements to placed
+            return:
+                a pair of dependent QComboBoxes
+            Functionality:
+                returns a pair of dependent QComboBoxes that are created using data dictionary provided.
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
         '''
         combo_box_section_profile = QtWidgets.QComboBox()
         combo_box_connection_location = QtWidgets.QComboBox()
@@ -1417,15 +1416,16 @@ class Window(QMainWindow):
 
     def add_widget_to_table_widget(self, table_widget, data_dictionary, row_count):
         '''
-            Created for adding QComboBox to Table widget
-            Especially for `type == TYPE_TABLE_IN` in the Input Dock
-
-            Can be modified by passing more argument to keep the current functionality
-            required for `type == TYPE_TABLE_IN` by adding & changing the current args
-            of this method for future use.
-
-            If you don't know how to do it please don't modify this method as it may affect
-            the truss-connection-bolted module's connecting memeber attribute.
+            parameters:
+                table_widget    - Object reference to an empty QtWidgets.QTableWidget.
+                data_dictionary - data dictionary containing elements to be placed.
+                row_count       - number of rows needed to be inserted.
+            return:
+                Nothing
+            Functionality:
+                Adds widgets (QComboBoxes to be specific) to the given QTableWidget object, based on the given data_dictionary.
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
         '''
         if row_count < table_widget.rowCount():
             return
@@ -1455,21 +1455,36 @@ class Window(QMainWindow):
                 table_widget.setColumnWidth(col, 160)
 
     def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0):
+        '''
+            parameters:
+                popup_dialog       - reference object to the QtWidgets.QDialog.
+                popup_window_sizes - list of sizes.
+                index              - determines the size that needed to be used.
+                default_start      - used as offset.
+            return:
+                Nothing
+            Functionality:
+                Resizes the give QDialog object w.r.t the provided sizes and index (offset if required).
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
+        '''
         x = popup_window_sizes[index - default_start][0]
         y = popup_window_sizes[index - default_start][1]
         popup_dialog.resize(x, y)
 
     def update_input_popup_table_widget(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
         '''
-            Created for updating the table row size and popup window size
-            Especially for `type == TYPE_TABLE_IN` in the Input Dock
-
-            Can be modified by passing more argument to keep the current functionality
-            required for `type == TYPE_TABLE_IN` by adding & changing the current args
-            of this method for future use.
-
-            If you don't know how to do it please don't modify this method as it may affect
-            the truss-connection-bolted module's connecting memeber attribute.
+            parameters:
+                table_widget    - reference object to the QtWidgets.QTableWidget.
+                data_dictionary - data dictionary containing elements to be placed.
+                popup_dialog    - reference object to the QtWidgets.QDialog in which QTableWidget is placed.
+                no_of_rows      - determines the number of rows to be updated.
+            return:
+                Nothing
+            Functionality:
+                Resets the given QTableWidget and resizes the QDialog w.r.t the number of rows provided .
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
         '''
         table_widget.clear()
         table_widget.setRowCount(no_of_rows)
@@ -1479,6 +1494,16 @@ class Window(QMainWindow):
         self.resize_popup_dialog(popup_dialog, [(996,151), (996,186), (996,222), (996,256), (996,291), (996,327), (996,361)], no_of_rows, 2)
 
     def update_output_popup_table_widget(self, index):
+        '''
+            parameters:
+                index - index value of the QtWidgets.QComboBox object.
+            return:
+                Nothing
+            Functionality:
+                Resizes the QDialog w.r.t index of the QComboBox ("No. of members" to be specific).
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
+        '''
         popup_dialog = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, "Bolt Design Summary Table")
         table_widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, TYPE_TABLE_OU)
         table_widget.setColumnCount(index+2)
@@ -1486,6 +1511,16 @@ class Window(QMainWindow):
         self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0)
 
     def update_all_material_in_table(self, main_material):
+        '''
+            parameters:
+                main_material - reference of "Material" QtWidgets.QComboBox object.
+            return:
+                Nothing
+            Functionality:
+                Updates the values of all the material attributes within the QTableWidget w.r.t the main_material QComboBox.
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
+        '''
         no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
         table_widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog").findChild(QtWidgets.QTableWidget)
         current_index = main_material.currentIndex()

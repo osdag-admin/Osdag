@@ -1508,7 +1508,7 @@ class Window(QMainWindow):
         table_widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, TYPE_TABLE_OU)
         table_widget.setColumnCount(index+2)
         popup_window_sizes = [(322,676), (421,676), (522,676), (621,676), (722,676), (821,676), (922,676)]
-        self.resize_popup_dialog(popup_dialog, popup_window_sizes, index, 0)
+        self.resize_popup_dialog(popup_dialog, popup_window_sizes, index)
 
     def update_all_material_in_table(self, main_material):
         '''

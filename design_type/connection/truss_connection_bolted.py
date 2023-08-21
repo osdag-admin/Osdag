@@ -113,9 +113,6 @@ class TrussConnectionBolted(TrussConnection):
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t15 = (KEY_COF, KEY_DISP_COF, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t15)
-
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 

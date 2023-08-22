@@ -188,7 +188,11 @@ class IS800_2007(object):
 
         """
         epsilon = math.sqrt(250 / f_y)
-
+        print(f" flange_class"
+              f" width {width}"
+              f" thickness {thickness}"
+              f" epsilon {epsilon}"
+              )
         ratio = width / thickness
 
         if section_type == 'Rolled':
@@ -210,6 +214,8 @@ class IS800_2007(object):
             else:
                 section_class = 'Slender'
 
+        print(f" section_type {section_type}"
+              f" section_class {section_class}")
         return [section_class, ratio]
 
     @staticmethod
@@ -233,6 +239,12 @@ class IS800_2007(object):
 
         ratio = depth / thickness
 
+        print(f" web_class"
+              f" depth {depth}"
+              f" thickness {thickness}"
+              f" epsilon {epsilon}"
+              )
+
         if classification_type == 'Neutral axis at mid-depth':
             ''
         elif classification_type == 'Generally':
@@ -242,6 +254,9 @@ class IS800_2007(object):
                 section_class = 'Slender'
             else:
                 section_class = 'Semi-Compact'
+        print(f" classification_type {classification_type}"
+              f" ")
+
 
         return section_class
 

@@ -356,7 +356,7 @@ class Member(Main):
         "In design preference, it shows other properties of section used "
         if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material' or \
-                input_dictionary[KEY_SEC_PROFILE] not in ['Angles', 'Back to Back Angles', 'Star Angles']:
+                input_dictionary[KEY_SEC_PROFILE] not in VALUES_SEC_PROFILE_Compression_Strut:
             designation = ''
             material_grade = ''
             section_profile = ''
@@ -2522,8 +2522,7 @@ class Member(Main):
 
     def optimization_tab_column_design(self, input_dictionary):
 
-        values = {KEY_ALLOW_CLASS1: 'Yes', KEY_ALLOW_CLASS2: 'Yes', KEY_ALLOW_CLASS3: 'Yes', KEY_ALLOW_CLASS4: 'Yes',
-                  KEY_ALLOW_UR: '1.0', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_STEEL_COST: '50'}
+        values = { KEY_ALLOW_UR: '1.0', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_EFFECTIVE_AREA_PARA: '1.0'} #KEY_ALLOW_CLASS1: 'Yes', KEY_ALLOW_CLASS2: 'Yes', KEY_ALLOW_CLASS3: 'Yes', KEY_ALLOW_CLASS4: 'No', KEY_STEEL_COST: '50'
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -2534,7 +2533,7 @@ class Member(Main):
         t2 = (KEY_ALLOW_UR, KEY_DISP_UR, TYPE_TEXTBOX, None, values[KEY_ALLOW_UR])
         optimum.append(t2)
 
-        t2 = (KEY_OPTIMIZATION_PARA, KEY_DISP_OPTIMIZATION_PARA, TYPE_COMBOBOX, ['Utilization Ratio', 'Cost'], values[KEY_OPTIMIZATION_PARA])
+        t2 = (KEY_OPTIMIZATION_PARA, KEY_DISP_OPTIMIZATION_PARA, TYPE_COMBOBOX, ['Utilization Ratio'], values[KEY_OPTIMIZATION_PARA]) #, 'Cost'
         optimum.append(t2)
 
         t2 = (KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
@@ -2543,29 +2542,29 @@ class Member(Main):
         t4 = (None, None, TYPE_ENTER, None, None)
         optimum.append(t4)
 
-        t5 = (None, KEY_DISP_SECTION_DEFINITION_DP, TYPE_TITLE, None, None)
-        optimum.append(t5)
-
-        t1 = (KEY_ALLOW_CLASS1, KEY_DISP_CLASS1, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS1])
-        optimum.append(t1)
-
-        t1 = (KEY_ALLOW_CLASS2, KEY_DISP_CLASS2, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS2])
-        optimum.append(t1)
-
-        t1 = (KEY_ALLOW_CLASS3, KEY_DISP_CLASS3, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS3])
-        optimum.append(t1)
-
-        t1 = (KEY_ALLOW_CLASS4, KEY_DISP_CLASS4, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS4])
-        optimum.append(t1)
+        # t5 = (None, KEY_DISP_SECTION_DEFINITION_DP, TYPE_TITLE, None, None)
+        # optimum.append(t5)
+        #
+        # t1 = (KEY_ALLOW_CLASS1, KEY_DISP_CLASS1, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS1])
+        # optimum.append(t1)
+        #
+        # t1 = (KEY_ALLOW_CLASS2, KEY_DISP_CLASS2, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS2])
+        # optimum.append(t1)
+        #
+        # t1 = (KEY_ALLOW_CLASS3, KEY_DISP_CLASS3, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS3])
+        # optimum.append(t1)
+        #
+        # t1 = (KEY_ALLOW_CLASS4, KEY_DISP_CLASS4, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS4])
+        # optimum.append(t1)
 
         t4 = (None, None, TYPE_ENTER, None, None)
         optimum.append(t4)
 
-        t5 = (None, KEY_DISP_OPTIMIZATION_STEEL_COST, TYPE_TITLE, None, None)
-        optimum.append(t5)
-
-        t1 = (KEY_STEEL_COST, KEY_DISP_STEEL_COST, TYPE_TEXTBOX, None, values[KEY_STEEL_COST])
-        optimum.append(t1)
+        # t5 = (None, KEY_DISP_OPTIMIZATION_STEEL_COST, TYPE_TITLE, None, None)
+        # optimum.append(t5)
+        #
+        # t1 = (KEY_STEEL_COST, KEY_DISP_STEEL_COST, TYPE_TEXTBOX, None, values[KEY_STEEL_COST])
+        # optimum.append(t1)
 
         t7 = (None, None, TYPE_ENTER, None, None)
         optimum.append(t7)
@@ -2577,9 +2576,9 @@ class Member(Main):
     
     def optimization_tab_strut_design(self, input_dictionary):
         print(f"optimization_tab_strut_design input_dictionary {input_dictionary}")
-        values = {KEY_ALLOW_CLASS: 'Yes',
-                  KEY_ALLOW_UR: '1.0', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_EFFECTIVE_AREA_PARA: '1.0',
-                  KEY_STEEL_COST: '50', KEY_ALLOW_LOAD : 'Concentric Load'}
+        values = {
+                  KEY_ALLOW_UR: '1.0',  KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
+                   KEY_ALLOW_LOAD : Load_type1} #KEY_ALLOW_CLASS: 'Yes', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_STEEL_COST: '50',
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -2590,60 +2589,90 @@ class Member(Main):
         t2 = (KEY_ALLOW_UR, KEY_DISP_UR, TYPE_TEXTBOX, None, values[KEY_ALLOW_UR])
         optimum.append(t2)
 
-        t2 = (KEY_OPTIMIZATION_PARA, KEY_DISP_OPTIMIZATION_PARA, TYPE_COMBOBOX, ['Utilization Ratio', 'Cost'], values[KEY_OPTIMIZATION_PARA])
+        t2 = (
+        KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
         optimum.append(t2)
 
-        t2 = (KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
-        optimum.append(t2)
+        t1 = (None, Buckling_Type, TYPE_TITLE, None, True, 'No Validator')
+        optimum.append(t1)
+
+        if KEY_SEC_PROFILE in input_dictionary:
+            if input_dictionary[KEY_SEC_PROFILE] == Profile_name_1:
+                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, values[KEY_Buckling_Out_plane])
+                optimum.append(t2)
+
+                t2 = (KEY_Buckling_In_plane, Buckling_In_plane, TYPE_TEXTBOX, None, values[KEY_Buckling_In_plane])
+                optimum.append(t2)
+            elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_3:
+                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, '1.0')
+                optimum.append(t2)
+
+                t2 = (KEY_Buckling_In_plane, Buckling_In_plane, TYPE_TEXTBOX, None,
+                      '0.85')
+                optimum.append(t2)
+            elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
+                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, '1.0')
+                optimum.append(t2)
+
+                t2 = (KEY_Buckling_In_plane, Buckling_In_plane, TYPE_TEXTBOX, None,
+                      '0.85')
+                optimum.append(t2)
+
 
         t4 = (None, None, TYPE_ENTER, None, None)
         optimum.append(t4)
 
         if KEY_SEC_PROFILE in input_dictionary:
-            if input_dictionary[KEY_SEC_PROFILE] == 'Angles':
-                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, ['Concentric Load', 'Leg Load'], values[KEY_ALLOW_LOAD])
+            if input_dictionary[KEY_SEC_PROFILE] == Profile_name_1:
+                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, Strut_load, values[KEY_ALLOW_LOAD])
                 optimum.append(t1)
-            else:
-                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, ['Concentric Load'], values[KEY_ALLOW_LOAD])
+
+
+            elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
+                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, [Load_type2], Load_type2)
+                optimum.append(t1)
+
+                t4 = (None, None, TYPE_ENTER, None, None)
+                optimum.append(t4)
+
+                t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
+                optimum.append(t1)
+
+                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, '1')
+                optimum.append(t5)
+
+            elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_3:
+                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, [Load_type1], Load_type1)
+                optimum.append(t1)
+
+                t4 = (None, None, TYPE_ENTER, None, None)
+                optimum.append(t4)
+
+                t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
+                optimum.append(t1)
+
+                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, '1')
+                optimum.append(t5)
         else:
             t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, ['Concentric Load', 'Leg Load'], values[KEY_ALLOW_LOAD])
 
 
-        t5 = (None, KEY_DISP_SECTION_DEFINITION_DP, TYPE_TITLE, None, None)
-        optimum.append(t5)
 
-        t1 = (KEY_ALLOW_CLASS, KEY_DISP_CLASS, TYPE_COMBOBOX, ['Yes'], values[KEY_ALLOW_CLASS])
-        optimum.append(t1)
-
-        # t1 = (KEY_ALLOW_CLASS2, KEY_DISP_CLASS2, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS2])TYPE_NOTE
+        #
+        # t1 = (KEY_STEEL_COST, KEY_DISP_STEEL_COST, TYPE_TEXTBOX, None, values[KEY_STEEL_COST])
         # optimum.append(t1)
-
-        # t1 = (KEY_ALLOW_CLASS3, KEY_DISP_CLASS3, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS3])
-        # optimum.append(t1)
-
-        # t1 = (KEY_ALLOW_CLASS4, KEY_DISP_CLASS4, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS4])
-        # optimum.append(t1)
-
-        t4 = (None, None, TYPE_ENTER, None, None)
-        optimum.append(t4)
-
-        t5 = (None, KEY_DISP_OPTIMIZATION_STEEL_COST, TYPE_TITLE, None, None)
-        optimum.append(t5)
-
-        t1 = (KEY_STEEL_COST, KEY_DISP_STEEL_COST, TYPE_TEXTBOX, None, values[KEY_STEEL_COST])
-        optimum.append(t1)
 
         t7 = (None, None, TYPE_ENTER, None, None)
         optimum.append(t7)
 
 
         if KEY_SEC_PROFILE in input_dictionary:
-            if input_dictionary[KEY_SEC_PROFILE] == 'Angles':
-                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION, None)
+            if input_dictionary[KEY_SEC_PROFILE] == Profile_name_1:
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION , None)
             else:
-                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, COLUMN_OPTIMIZATION_DESCRIPTION, None)
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION, None)
         else:
-            t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, COLUMN_OPTIMIZATION_DESCRIPTION, None)
+            t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION, None)
         optimum.append(t9)
 
         return optimum

@@ -42,20 +42,20 @@ class Compression(Member):
         t1 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_strut_angle_section)
         tabs.append(t1)
 
-        t2 = (DISP_TITLE_CHANNEL, TYPE_TAB_1, self.tab_strut_channel_section)
-        tabs.append(t2)
+        # t2 = (DISP_TITLE_CHANNEL, TYPE_TAB_1, self.tab_strut_channel_section)
+        # tabs.append(t2)
 
         t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_strut_design)
         tabs.append(t2)
 
-        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)#plate_connector_values
-        tabs.append(t6)
+        # t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)#plate_connector_values
+        # tabs.append(t6)
 
-        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t3)
+        # t3 = ("Bolt", TYPE_TAB_2, self.bolt_strut_design)
+        # tabs.append(t3)
 
-        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t4)
+        # t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        # tabs.append(t4)
 
         t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
@@ -96,32 +96,32 @@ class Compression(Member):
               TYPE_TEXTBOX, self.get_Strut_Angle_sec_properties)
         change_tab.append(t2)
 
-        t3 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
-              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14',
-               'Label_4', 'Label_5',
-               'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
-               'Label_19', 'Label_20', 'Label_21',
-               'Label_22', 'Label_23', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
-              self.get_new_channel_section_properties)
-        change_tab.append(t3)
+        # t3 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
+        #       [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14',
+        #        'Label_4', 'Label_5',
+        #        'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
+        #        'Label_19', 'Label_20', 'Label_21',
+        #        'Label_22', 'Label_23', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
+        #       self.get_new_channel_section_properties)
+        # change_tab.append(t3)
+        #
+        # t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14'],
+        #       ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17', 'Label_19',
+        #        'Label_20', 'Label_21', 'Label_22', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
+        #       self.get_Channel_sec_properties)
+        #
+        # change_tab.append(t4)
 
-        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14'],
-              ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17', 'Label_19',
-               'Label_20', 'Label_21', 'Label_22', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
-              self.get_Channel_sec_properties)
-
-        change_tab.append(t4)
-
-        t5 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
-                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
-
-        change_tab.append(t5)
+        # t5 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+        #                                               KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+        #
+        # change_tab.append(t5)
 
         t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
-        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
-        change_tab.append(t7)
+        # t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
+        # change_tab.append(t7)
 
         return change_tab
 
@@ -145,29 +145,29 @@ class Compression(Member):
         t2 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
         design_input.append(t2)
 
-        t2 = (DISP_TITLE_CHANNEL, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        # t2 = (DISP_TITLE_CHANNEL, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        # design_input.append(t2)
+
+        t2 = ("Optimization", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA ]) #KEY_ALLOW_UR, , KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_STEEL_COST])
-        design_input.append(t2)
-
-        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_ALLOW_LOAD])
+        t2 = ("Optimization", TYPE_COMBOBOX, [ KEY_ALLOW_LOAD]) # KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS,
         design_input.append(t2)
 
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        design_input.append(t5)
-
-        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DETAILING_EDGE_TYPE])
-        design_input.append(t5)
+        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        # design_input.append(t5)
+        #
+        # t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DETAILING_EDGE_TYPE])
+        # design_input.append(t5)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
 
-        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
-        design_input.append(t7)
+        # t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        # design_input.append(t7)
 
         return design_input
 
@@ -189,10 +189,10 @@ class Compression(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST,
+        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA,
                      KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD, KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
-                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_CONNECTOR_MATERIAL], '')#,
+                     ], '')#, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
+                     # KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_CONNECTOR_MATERIAL
         design_input.append(t2)
 
         # t2 = (None, [KEY_DP_DESIGN_METHOD], '')
@@ -211,7 +211,7 @@ class Compression(Member):
         add_buttons = []
 
         t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
-              ['Angles', 'Back to Back Angles'], "Angles")
+              ['Angles', 'Back to Back Angles' , 'Star Angles'], "Angles")
         add_buttons.append(t2)
 
         t2 = (DISP_TITLE_CHANNEL, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
@@ -233,18 +233,18 @@ class Compression(Member):
         val = {
             KEY_ALLOW_UR: '1.0',
             KEY_EFFECTIVE_AREA_PARA: '1.0',
-            KEY_OPTIMIZATION_PARA: 'Utilization Ratio',
-            KEY_STEEL_COST: '50',
-            KEY_ALLOW_CLASS:'Yes',
+            # KEY_OPTIMIZATION_PARA: 'Utilization Ratio',
+            # KEY_STEEL_COST: '50',
+            # KEY_ALLOW_CLASS:'Yes',
             KEY_ALLOW_LOAD: 'Concentric Load',
             KEY_DP_BOLT_TYPE: '',
             KEY_DP_BOLT_HOLE_TYPE: 'Yes',
             KEY_DP_BOLT_SLIP_FACTOR: 'Yes',
-            KEY_DP_DETAILING_GAP: 'No',
-            KEY_DP_DETAILING_CORROSIVE_INFLUENCES: '',
-            KEY_DP_DETAILING_EDGE_TYPE: '',
+            # KEY_DP_DETAILING_GAP: 'No',
+            # KEY_DP_DETAILING_CORROSIVE_INFLUENCES: '',
+            # KEY_DP_DETAILING_EDGE_TYPE: '',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
-            KEY_CONNECTOR_MATERIAL:'',
+            # KEY_CONNECTOR_MATERIAL:'',
         }[key]
 
         return val
@@ -296,14 +296,14 @@ class Compression(Member):
 
         t1 = (KEY_SECSIZE, self.fn_profile_section)
         c_lst.append(t1)
-        t2 = (KEY_GRD, self.grdval_customized)
-        c_lst.append(t2)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        c_lst.append(t3)
-        # # t3= (KEY_IMAGE, self.fn_conn_image)
-        # # c_lst.append(t3)
-        t4 = (KEY_PLATETHK, self.plate_thick_customized_IS)
-        c_lst.append(t4)
+        # t2 = (KEY_GRD, self.grdval_customized)
+        # c_lst.append(t2)
+        # t3 = (KEY_D, self.diam_bolt_customized)
+        # c_lst.append(t3)
+        # # # t3= (KEY_IMAGE, self.fn_conn_image)
+        # # # c_lst.append(t3)
+        # t4 = (KEY_PLATETHK, self.plate_thick_customized_IS)
+        # c_lst.append(t4)
 
         # t4 = (KEY_PLATETHK, self.plate_thick_customized)
         # c_lst.append(t4)
@@ -329,7 +329,13 @@ class Compression(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE_Compression_Strut, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
+        # print(f'input_values {self},t2 :{t2} ')
+        # if self[0] == 'Back to Back Angles':
+        #     t2 = (KEY_SEC_TYPE, KEY_DISP_SEC_TYPE, TYPE_COMBOBOX, ['Same Side of Gusset', 'Opposite Side of Gusset'], True,
+        #           'No Validator')
+        #     options_list.append(t2)
+
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_STRUT[0], True, 'No Validator')
         options_list.append(t3)
 
         t3 = (KEY_LOCATION, KEY_DISP_LOCATION_STRUT, TYPE_COMBOBOX, VALUES_LOCATION_1, True, 'No Validator')
@@ -355,7 +361,7 @@ class Compression(Member):
         t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_STRUT_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/3.RFRF.PNG", True, 'No Validator')
+        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
         options_list.append(t12)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -364,27 +370,27 @@ class Compression(Member):
         t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t8)
-
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
-        options_list.append(t10)
-
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
-        options_list.append(t11)
-
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
-        options_list.append(t12)
-
-        t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t13)
-
-        # try:
-        #     if self.sec_profile != 'Back to Back Angles':
-        #         t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_TEXTBOX, ' ', True, 'No Validator')
-
-        t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
-        options_list.append(t14)
+        # t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t8)
+        #
+        # t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
+        # options_list.append(t10)
+        #
+        # t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
+        # options_list.append(t11)
+        #
+        # t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
+        # options_list.append(t12)
+        #
+        # t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t13)
+        #
+        # # try:
+        # #     if self.sec_profile != 'Back to Back Angles':
+        # #         t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_TEXTBOX, ' ', True, 'No Validator')
+        #
+        # t14 = (KEY_PLATETHK, KEY_GUSSET, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
+        # options_list.append(t14)
 
         return options_list
 
@@ -518,36 +524,23 @@ class Compression(Member):
         "Function to populate section images based on the type of section "
         img = self[0]
         if img == VALUES_SEC_PROFILE_Compression_Strut[0]:
-            return VALUES_IMG_TENSIONBOLTED[0]
+            return VALUES_IMG_STRUT[0]
         elif img ==VALUES_SEC_PROFILE_Compression_Strut[1]:
-            return VALUES_IMG_TENSIONBOLTED[1]
+            return VALUES_IMG_STRUT[1]
         elif img == VALUES_SEC_PROFILE_Compression_Strut[2]:
-            return VALUES_IMG_TENSIONBOLTED[2]
+            return VALUES_IMG_STRUT[2]
         elif img == VALUES_SEC_PROFILE_Compression_Strut[3]:
+            print(' fn_conn_image error')
             return VALUES_IMG_TENSIONBOLTED[3]
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
 
-    def out_bolt_bearing(self):
-
-        bolt_type = self[0]
-        if bolt_type != TYP_BEARING:
-            return True
-        else:
-            return False
-
-    def out_intermittent(self):
-
-        sec_type = self[0]
-        if sec_type in [VALUES_SEC_PROFILE_Compression_Strut[0], VALUES_SEC_PROFILE_Compression_Strut[3]]:
-            return True
-        else:
-            return False
 
     def fn_profile_section(self):
         print(f"fn_profile_section self {self}")
         profile = self[0]
-        print(f'profile = {self[0]}')
+        print(f'profile = {self[0]}'
+              f'VALUES_SEC_PROFILE_Compression_Strut {VALUES_SEC_PROFILE_Compression_Strut}')
         if profile == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif profile == 'Columns':
@@ -558,7 +551,8 @@ class Compression(Member):
             return connectdb("SHS", call_type="popup")
         elif profile == 'CHS':
             return connectdb("CHS", call_type="popup")
-        elif profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+        elif profile in VALUES_SEC_PROFILE_Compression_Strut :
+            print('done')
             return connectdb("Angles", call_type="popup")
         elif profile in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type="popup")
@@ -570,6 +564,8 @@ class Compression(Member):
 
         t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
+
+        # if self[0] == 'Back to Back Angles':
 
         t3 = ([KEY_SEC_PROFILE], KEY_LOCATION, TYPE_COMBOBOX, self.fn_conn_type)
         lst.append(t3)
@@ -583,71 +579,6 @@ class Compression(Member):
         t3 = ([KEY_END1, KEY_END2], KEY_IMAGE_two, TYPE_IMAGE, self.fn_end2_image)
         lst.append(t3)
 
-        t4 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
-        lst.append(t4)
-
-        t5 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
-        lst.append(t5)
-
-        t4 = ([KEY_TYP], KEY_REDUCTION_LARGE_GRIP, TYPE_OUT_DOCK, self.out_bolt_bearing)
-        lst.append(t4)
-
-        t5 = ([KEY_TYP], KEY_REDUCTION_LARGE_GRIP, TYPE_OUT_LABEL, self.out_bolt_bearing)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_DOCK, self.out_intermittent)
-        lst.append(t5)
-
-        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_LABEL, self.out_intermittent)
-        lst.append(t5)
-
-        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
-        lst.append(t8)
-
-        t9 = ([KEY_SECSIZE], KEY_SECSIZE, TYPE_CUSTOM_SECTION, self.new_material)
-        lst.append(t9)
         return lst
 
     def output_values(self,flag):
@@ -917,10 +848,10 @@ class Compression(Member):
 
         "Function to populate section size based on the type of section "
         conn = self[0]
-        if conn in ['Angles', 'Back to Back Angles', 'Star Angles']:
+        if conn in VALUES_SEC_PROFILE_Compression_Strut:
             return VALUES_LOCATION_1
-        elif conn in ["Channels", "Back to Back Channels"]:
-            return VALUES_LOCATION_2
+        else:
+            print(f" chevk fn_conn_type ")
 
     # Setting inputs from the input dock GUI
 

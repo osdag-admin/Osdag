@@ -87,10 +87,21 @@ class TrussConnectionBolted(TrussConnection):
         t0 = (KEY_MEMBERS, KEY_DISP_MEMBERS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_MEMBERS, True, 'No Validator')
         options_list.append(t0)
 
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        options_list.append(t5)
+
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t00 = (KEY_TABLE, '', TYPE_TABLE_IN, {'Section profile': VALUES_SEC_PROFILE_2, 'Connection Location': {'Angle': VALUES_LOCATION_1, 'Channel': VALUES_LOCATION_2}, 'Section Size': get_available_cleat_list(all_angles, 45.0, 20.0), 'Material': (VALUES_MATERIAL[:6]+VALUES_MATERIAL[7:9]+VALUES_MATERIAL[10:]), 'Angle with x-axis (Degrees)': None, 'Factored Load (KN)': None}, True, 'No Validator')
+        attributes = {
+                   'Section profile': VALUES_SEC_PROFILE_2,
+                   'Connection Location': {'Angle': VALUES_LOCATION_1, 'Channel': VALUES_LOCATION_2},
+                   'Section Size': get_available_cleat_list(all_angles, 45.0, 20.0),
+                   'Material': VALUES_MATERIAL[:-1],
+                   'Angle with x-axis (Degrees)': None,
+                   'Factored Load (KN)': None
+               }
+        t00 = (KEY_TABLE, '', TYPE_TABLE_IN, attributes, True, 'No Validator')
         options_list.append(t00)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -101,9 +112,6 @@ class TrussConnectionBolted(TrussConnection):
 
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
-
-        t15 = (KEY_COF, KEY_DISP_COF, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t15)
 
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)

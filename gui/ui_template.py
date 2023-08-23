@@ -568,7 +568,6 @@ class Window(QMainWindow):
         i = 0
         j = 1
         maxi_width_left, maxi_width_right = -1, -1
-        no_of_members = QtWidgets.QComboBox()
         for option in option_list:
             lable = option[1]
             type = option[2]
@@ -632,33 +631,34 @@ class Window(QMainWindow):
             if type == TYPE_TABLE_IN:
 
                 popup_dialog = QtWidgets.QDialog(self.dockWidgetContents)
+                popup_dialog.setObjectName("Connecting Members Popup Dialog")
                 popup_dialog.setWindowTitle("Connecting Members")
 
                 layout = QtWidgets.QVBoxLayout(popup_dialog)
 
                 button = QtWidgets.QPushButton("Open Connecting Members")
+                button.setObjectName("Connecting Members Button")
+
+                close_button = QtWidgets.QPushButton("Save and Close Connecting Members")
+                close_button.setObjectName("Close Connecting Members Button")
 
                 table_widget = QtWidgets.QTableWidget(popup_dialog)
                 table_widget.setObjectName(option[0])
                 table_widget.setRowCount(2)
                 table_widget.setColumnCount(6)
 
-                data_dictionary, table_widget_cp, popup_dialog_cp = option[3], table_widget, popup_dialog
+                data_dictionary = option[3]
 
                 table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
 
                 self.add_widget_to_table_widget(table_widget, data_dictionary, 2)
 
-                table_widget.resizeRowsToContents()
-                table_widget.resizeColumnsToContents()
-
                 layout.addWidget(table_widget)
+                layout.addWidget(close_button)
 
                 popup_dialog.setLayout(layout)
                 popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-                popup_dialog.resize(820,100)
-
-                button.clicked.connect(lambda: popup_dialog.show())
+                popup_dialog.resize(996,151)
 
                 if option[0] in input_dp_conn_list:
                     self.input_dp_connection(table_widget)
@@ -666,11 +666,6 @@ class Window(QMainWindow):
                 if option[5] != 'No Validator':
                     table_widget.setValidator(self.get_validator(option[5]))
                 in_layout2.addWidget(button, j, 1, 1, 2)
-
-
-                no_of_members.currentIndexChanged.connect(
-                    lambda: self.update_table_widget_popup(table_widget_cp, data_dictionary, popup_dialog_cp, int(no_of_members.currentText()))
-                )
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -835,7 +830,23 @@ class Window(QMainWindow):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    self.on_change_connect(key_changed, updated_list, data, main)
+                    if key_name == KEY_TABLE:
+                        no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
+                        popup_dialog = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog")
+                        show_table_button = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Button")
+                        close_table_button = popup_dialog.findChild(QtWidgets.QWidget, "Close Connecting Members Button")
+                        material_combo_box = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL)
+                        show_table_button.clicked.connect(lambda: popup_dialog.show())
+                        close_table_button.clicked.connect(lambda: popup_dialog.reject())
+                        material_combo_box.currentIndexChanged.connect(
+                            lambda: self.update_all_material_in_table(material_combo_box)
+                        )
+                        no_of_members.currentIndexChanged.connect(
+                            lambda: self.update_input_popup_table_widget(key_changed, data_dictionary, popup_dialog,
+                                                                         int(no_of_members.currentText()))
+                        )
+                    else:
+                        self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect((maxi_width / 2) - 110, 650, 100, 35))
@@ -940,10 +951,19 @@ class Window(QMainWindow):
                 # b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if output_type == TYPE_TABLE_OU:
-                table_widget = QtWidgets.QTableWidget(self.dockWidgetContents_out)
-                table_widget.setObjectName(option[0])
+                output_popup_dialog = QtWidgets.QDialog(self.dockWidgetContents_out)
+                output_popup_dialog.setObjectName("Bolt Design Summary Table")
+                output_popup_dialog.setWindowTitle("Bolt Design Summary")
+
+                output_table_layout = QtWidgets.QVBoxLayout(output_popup_dialog)
+
+                button = QtWidgets.QPushButton("Open Bolt Design Summary")
+                button.setObjectName("Bolt Design Summary Table Button")
+
+                table_widget = QtWidgets.QTableWidget(output_popup_dialog)
+                table_widget.setObjectName(option[2])
                 table_widget.setRowCount(18)
-                table_widget.setColumnCount(8)
+                table_widget.setColumnCount(2)
 
                 # Set the vertical header labels
                 vertical_labels = ["Bolt Details", "Dia. of Bolt(mm)", "Property Class", "Bolt Hole Dia.(mm)",
@@ -954,7 +974,7 @@ class Window(QMainWindow):
                                    "Capacity Factor(KN)"]
                 table_widget.setVerticalHeaderLabels(vertical_labels)
 
-                table_widget.setHorizontalHeaderLabels(["1", "2", "3", "4", "5", "6", "7", "8"])
+                table_widget.setHorizontalHeaderLabels([str(i+1) for i in range(table_widget.columnCount())])
 
                 # Populate the table with read-only items
                 for row in range(table_widget.rowCount()):
@@ -963,16 +983,26 @@ class Window(QMainWindow):
                         item.setTextAlignment(Qt.AlignCenter)
                         item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # Disable editing
                         table_widget.setItem(row, col, item)
+                        table_widget.setColumnWidth(col, 75)
+                    table_widget.setRowHeight(row, 35)
 
-                table_widget.resizeRowsToContents()
-                table_widget.resizeColumnsToContents()
+                output_table_layout.addWidget(table_widget)
+
+                output_popup_dialog.setLayout(output_table_layout)
+                output_popup_dialog.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
+                output_popup_dialog.resize(322, 676)
+
+                button.clicked.connect(lambda: output_popup_dialog.show())
+
+                no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
+                no_of_members.currentIndexChanged.connect(self.update_output_popup_table_widget)
 
                 # if option[0] in input_dp_conn_list:
                 # self.input_dp_connection(table_widget)
                 table_widget.setEnabled(True if option[4] else False)
                 if option[5] != 'No Validator':
                     table_widget.setValidator(self.get_validator(option[5]))
-                out_layout2.addWidget(table_widget, j, 1, 1, 2)
+                out_layout2.addWidget(button, j, 1, 1, 2)
 
             if output_type == TYPE_TABLE_GUS:
                 table_widget = QtWidgets.QTableWidget(self.dockWidgetContents_out)
@@ -1351,15 +1381,14 @@ class Window(QMainWindow):
 
     def create_dependent_QComboBox(self, selectable_options):
         '''
-            Created for creating Dependent QComboBox
-            Especially for `type == TYPE_TABLE_IN` in the Input Dock
-
-            Can be modified by passing more argument to keep the current functionality
-            required for `type == TYPE_TABLE_IN` by adding & changing the current args
-            of this method for future use.
-
-            If you don't know how to do it please don't modify this method as it may affect
-            the truss-connection-bolted module's connecting memeber attribute.
+            parameters:
+                selectable_option - data dictionary containing elements to placed
+            return:
+                a pair of dependent QComboBoxes
+            Functionality:
+                returns a pair of dependent QComboBoxes that are created using data dictionary provided.
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
         '''
         combo_box_section_profile = QtWidgets.QComboBox()
         combo_box_connection_location = QtWidgets.QComboBox()
@@ -1387,54 +1416,120 @@ class Window(QMainWindow):
 
     def add_widget_to_table_widget(self, table_widget, data_dictionary, row_count):
         '''
-            Created for adding QComboBox to Table widget
-            Especially for `type == TYPE_TABLE_IN` in the Input Dock
-
-            Can be modified by passing more argument to keep the current functionality
-            required for `type == TYPE_TABLE_IN` by adding & changing the current args
-            of this method for future use.
-
-            If you don't know how to do it please don't modify this method as it may affect
-            the truss-connection-bolted module's connecting memeber attribute.
+            parameters:
+                table_widget    - Object reference to an empty QtWidgets.QTableWidget.
+                data_dictionary - data dictionary containing elements to be placed.
+                row_count       - number of rows needed to be inserted.
+            return:
+                Nothing
+            Functionality:
+                Adds widgets (QComboBoxes to be specific) to the given QTableWidget object, based on the given data_dictionary.
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
         '''
         if row_count < table_widget.rowCount():
             return
         for col, (key, value) in enumerate(data_dictionary.items()):
             if key == 'Connection Location' or value is None:
+                table_widget.setColumnWidth(col, 160)
                 continue
             elif key == 'Section profile':
                 for row in range(row_count):
                     combo_box_section_profile, combo_box_connection_location = self.create_dependent_QComboBox(data_dictionary)
                     table_widget.setCellWidget(row, col, combo_box_section_profile)
                     table_widget.setCellWidget(row, col + 1, combo_box_connection_location)
+                    table_widget.setRowHeight(row, 35)
+                    table_widget.setColumnWidth(col, 160)
+                    table_widget.setColumnWidth(col+1, 160)
             else:
                 for row in range(row_count):
                     combo_box = QtWidgets.QComboBox()
+                    combo_box.setObjectName(key + str(row))
                     for item in value:
                         combo_box.addItem(item, value)
+                    if key == KEY_DISP_MATERIAL:
+                        material_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL).currentIndex()
+                        combo_box.setCurrentIndex(material_index)
                     table_widget.setCellWidget(row, col, combo_box)
+                    table_widget.setRowHeight(row, 35)
+                table_widget.setColumnWidth(col, 160)
 
-    def update_table_widget_popup(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
+    def resize_popup_dialog(self, popup_dialog, popup_window_sizes, index, default_start=0):
         '''
-            Created for updating the table row size and popup window size
-            Especially for `type == TYPE_TABLE_IN` in the Input Dock
+            parameters:
+                popup_dialog       - reference object to the QtWidgets.QDialog.
+                popup_window_sizes - list of sizes.
+                index              - determines the size that needed to be used.
+                default_start      - used as offset.
+            return:
+                Nothing
+            Functionality:
+                Resizes the give QDialog object w.r.t the provided sizes and index (offset if required).
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
+        '''
+        x = popup_window_sizes[index - default_start][0]
+        y = popup_window_sizes[index - default_start][1]
+        popup_dialog.resize(x, y)
 
-            Can be modified by passing more argument to keep the current functionality
-            required for `type == TYPE_TABLE_IN` by adding & changing the current args
-            of this method for future use.
-
-            If you don't know how to do it please don't modify this method as it may affect
-            the truss-connection-bolted module's connecting memeber attribute.
+    def update_input_popup_table_widget(self, table_widget, data_dictionary, popup_dialog, no_of_rows):
+        '''
+            parameters:
+                table_widget    - reference object to the QtWidgets.QTableWidget.
+                data_dictionary - data dictionary containing elements to be placed.
+                popup_dialog    - reference object to the QtWidgets.QDialog in which QTableWidget is placed.
+                no_of_rows      - determines the number of rows to be updated.
+            return:
+                Nothing
+            Functionality:
+                Resets the given QTableWidget and resizes the QDialog w.r.t the number of rows provided .
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
         '''
         table_widget.clear()
         table_widget.setRowCount(no_of_rows)
         table_widget.setColumnCount(6)
         table_widget.setHorizontalHeaderLabels(list(data_dictionary.keys()))
         self.add_widget_to_table_widget(table_widget, data_dictionary, no_of_rows)
-        table_widget.resizeRowsToContents()
-        table_widget.resizeColumnsToContents()
-        pop_window_sizes = [ (820,100), (820,125), (820,150), (820,175), (820,205), (820,230), (820,255)]
-        popup_dialog.resize(pop_window_sizes[no_of_rows-2][0],pop_window_sizes[no_of_rows-2][1])
+        self.resize_popup_dialog(popup_dialog, [(996,151), (996,186), (996,222), (996,256), (996,291), (996,327), (996,361)], no_of_rows, 2)
+
+    def update_output_popup_table_widget(self, index):
+        '''
+            parameters:
+                index - index value of the QtWidgets.QComboBox object.
+            return:
+                Nothing
+            Functionality:
+                Resizes the QDialog w.r.t index of the QComboBox ("No. of members" to be specific).
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
+        '''
+        popup_dialog = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, "Bolt Design Summary Table")
+        table_widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, TYPE_TABLE_OU)
+        table_widget.setColumnCount(index+2)
+        popup_window_sizes = [(322,676), (421,676), (522,676), (621,676), (722,676), (821,676), (922,676)]
+        self.resize_popup_dialog(popup_dialog, popup_window_sizes, index)
+
+    def update_all_material_in_table(self, main_material):
+        '''
+            parameters:
+                main_material - reference of "Material" QtWidgets.QComboBox object.
+            return:
+                Nothing
+            Functionality:
+                Updates the values of all the material attributes within the QTableWidget w.r.t the main_material QComboBox.
+            Note:
+                This method was sole designed for truss-connection-bolted, but it can modify further to increase its functionality.
+        '''
+        no_of_members = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MEMBERS)
+        table_widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, "Connecting Members Popup Dialog").findChild(QtWidgets.QTableWidget)
+        current_index = main_material.currentIndex()
+        for i in range(int(no_of_members.currentText())):
+            material_combo_box = table_widget.findChild(QtWidgets.QComboBox, KEY_DISP_MATERIAL+str(i))
+            material_combo_box.clear()
+            for item in connectdb("Material")[:-1]:
+                material_combo_box.addItem(item)
+            material_combo_box.setCurrentIndex(current_index)
 
     def notification(self):
         update_class = Update()
@@ -2426,7 +2521,7 @@ class Window(QMainWindow):
         dialog.setFixedSize(350, 250)
         closed = dialog.exec()
         if closed is not None:
-            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
+            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_DISP_MATERIAL)
             input_dock_material.clear()
             for item in connectdb("Material"):
                 input_dock_material.addItem(item)

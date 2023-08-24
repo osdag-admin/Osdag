@@ -2578,7 +2578,7 @@ class Member(Main):
         print(f"optimization_tab_strut_design input_dictionary {input_dictionary}")
         values = {
                   KEY_ALLOW_UR: '1.0',  KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
-                   KEY_ALLOW_LOAD : Load_type1} #KEY_ALLOW_CLASS: 'Yes', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_STEEL_COST: '50',
+                   KEY_ALLOW_LOAD : Load_type1, KEY_BOLT_Number : '1.0', KEY_PLATETHK : '8'} #KEY_ALLOW_CLASS: 'Yes', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_STEEL_COST: '50',
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -2604,18 +2604,22 @@ class Member(Main):
                 t2 = (KEY_Buckling_In_plane, Buckling_In_plane, TYPE_TEXTBOX, None, values[KEY_Buckling_In_plane])
                 optimum.append(t2)
             elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_3:
-                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, '1.0')
+                values[KEY_Buckling_Out_plane] = '1.0'
+                values[KEY_Buckling_In_plane] = '0.85'
+                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, values[KEY_Buckling_Out_plane])
                 optimum.append(t2)
 
                 t2 = (KEY_Buckling_In_plane, Buckling_In_plane, TYPE_TEXTBOX, None,
-                      '0.85')
+                      values[KEY_Buckling_In_plane])
                 optimum.append(t2)
             elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
-                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, '1.0')
+                values[KEY_Buckling_Out_plane] = '1.0'
+                values[KEY_Buckling_In_plane] = '0.85'
+                t2 = (KEY_Buckling_Out_plane, Buckling_Out_plane, TYPE_TEXTBOX, None, values[KEY_Buckling_Out_plane])
                 optimum.append(t2)
 
                 t2 = (KEY_Buckling_In_plane, Buckling_In_plane, TYPE_TEXTBOX, None,
-                      '0.85')
+                      values[KEY_Buckling_In_plane])
                 optimum.append(t2)
 
 
@@ -2627,31 +2631,45 @@ class Member(Main):
                 t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, Strut_load, values[KEY_ALLOW_LOAD])
                 optimum.append(t1)
 
-
             elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
-                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, [Load_type2], Load_type2)
+                values[KEY_ALLOW_LOAD] = Load_type2
+                t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, [Load_type2], values[KEY_ALLOW_LOAD])
                 optimum.append(t1)
 
                 t4 = (None, None, TYPE_ENTER, None, None)
                 optimum.append(t4)
 
+                t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
+                optimum.append(t13)
+
+                t1 = (KEY_PLATETHK, KEY_GUSSET, TYPE_COMBOBOX, PLATE_THICKNESS_SAIL, values[KEY_PLATETHK])#, KEY_GUSSET, TYPE_COMBOBOX, PLATE_THICKNESS_SAIL, True, 'No Validator'
+                optimum.append(t1)
+
                 t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
                 optimum.append(t1)
 
-                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, '1')
+                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, values[KEY_BOLT_Number])
                 optimum.append(t5)
 
             elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_3:
+                values[KEY_BOLT_Number] = '2'
                 t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, [Load_type1], Load_type1)
                 optimum.append(t1)
 
                 t4 = (None, None, TYPE_ENTER, None, None)
                 optimum.append(t4)
 
+                t13 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, True, 'No Validator')
+                optimum.append(t13)
+
+                t1 = (KEY_PLATETHK, KEY_GUSSET, TYPE_COMBOBOX, PLATE_THICKNESS_SAIL,
+                      values[KEY_PLATETHK])  # , KEY_GUSSET, TYPE_COMBOBOX, PLATE_THICKNESS_SAIL, True, 'No Validator'
+                optimum.append(t1)
+
                 t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
                 optimum.append(t1)
 
-                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, '1')
+                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, values[KEY_BOLT_Number])
                 optimum.append(t5)
         else:
             t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, ['Concentric Load', 'Leg Load'], values[KEY_ALLOW_LOAD])
@@ -2668,9 +2686,13 @@ class Member(Main):
 
         if KEY_SEC_PROFILE in input_dictionary:
             if input_dictionary[KEY_SEC_PROFILE] == Profile_name_1:
-                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION , None)
-            else:
-                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION, None)
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION + Single_Angle_Out_Plane + Single_Angle_In_Plane, None)
+
+            elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION + Double_angle_same_gusset + Same_Side_of_Gusset_Out_Plane + Same_Side_of_Gusset_In_Plane, None)
+
+            elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_3:
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION + Double_angle_opposite_gusset + Opposite_Side_of_Gusset_Out_Plane + Opposite_Side_of_Gusset_In_Plane, None)
         else:
             t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION, None)
         optimum.append(t9)

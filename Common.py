@@ -467,7 +467,8 @@ Strut_Bolt_Number = 'Number of Bolts'
 Profile_name_1 = 'Angles'
 Profile_name_2 = 'Back to Back Angles - Same side of gusset'
 Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
-
+loc_type1 = 'Long Leg'
+loc_type2 = 'Short Leg'
 VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
 
 
@@ -2336,27 +2337,58 @@ Effective_Area_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-
 Type_Load_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Type of Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used to define how the load maybe transferred in a Single Angle section. By default the Section will transfer the load concentrically through end gusset represented by </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Concentric Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Type of Load can be selected based on the Concentric Load plus Leg Load by choosing the '</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Leg Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">' parameter from the drop-down list. </span></p>\n"                          
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
 
-Section_Definition_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
-               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+Section_Definition_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                               "The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                               "Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                               "preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
+                                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
 Single_Angle_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
-                              "The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In the case of members of trusses, buckling in the plane perpendicular to the plane of the truss, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
                               "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
-                              "preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
+                              ", the effective length, KL shall be taken as the distance between the centres of intersection (Cl.7.2.4) of IS 800:2007.</span></p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"
                               )
-# In the case of
-# members of trusses, buckling in the plane perpendicular
-# to the plane of the truss,)
+Single_Angle_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "In the case of members of trusses, buckling in the plane of the truss, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", the effective length, KL shall be taken as 0.7 to 1.0 times the distance between the centres of connections, depending on the degree of end restraint provided (Cl.7.2.4) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
-# Single_Angle_In_Plane =
-#
-# Opposite_Side_of_Gusset_Out_Plane =
-#
-# Opposite_Side_of_Gusset_In_Plane
-#
-# Same_Side_of_Gusset_Out_Plane
-#
-# Same_Side_of_Gusset_In_Plane
+Double_angle_opposite_gusset = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                                    "</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                                    "Double Angle Struts connected back to back, on opposite sides of the gusset</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                                    "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Double_angle_same_gusset = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                                "</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                                "Double Angle Struts connected back to back on one side of a gusset or section</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Opposite_Side_of_Gusset_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane perpendicular to that of the end gusset,, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ",shall be taken as equal to the distance between centres of intersections (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Opposite_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane of end gusset, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", shall be taken as between 0.7 and 0.85 times the distance between intersections, depending on the degree of the restraint provided  (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Same_Side_of_Gusset_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane perpendicular to that of the end gusset,, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ",shall be taken as equal to the distance between centres of intersections (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Same_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane of end gusset, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", shall be taken as between 0.7 and 0.85 times the distance between intersections, depending on the degree of the restraint provided  (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
 
 STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

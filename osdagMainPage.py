@@ -157,6 +157,7 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member import Column
 from design_type.compression_member.compression import Compression
 from design_type.compression_member.Column import ColumnDesign
+from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 import APP_CRASH.Appcrash.api as appcrash
@@ -296,9 +297,9 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Pure Axial Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
-                                       ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
-                                       ('Strut Design', 'ResourceFiles/images/broken.png', 'Strut_Design'),
+                'Compression Member': [('Columns in Frames', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
+                                       # ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
+                                       ('Struts in Trusses', 'ResourceFiles/images/broken.png', 'Strut_Design'),
                                        self.show_compression_module,
                                        ],
                 'Flexural Member' : [
@@ -306,7 +307,10 @@ class OsdagMainWindow(QMainWindow):
                     ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
                     self.show_truss_bolted,
                 ],
-                'Beam-Column' : self.Under_Development,
+                'Beam-Column' :[
+                    ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
+                    self.show_beamcolumn_module,
+                ],
                 'Plate Girder' : self.Under_Development,
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
@@ -684,19 +688,28 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
-            print(f"Here9")
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
-            print(f"Here11.1")
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        # elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+        #     print(f"Here9.2")
+        #     self.hide()
+        #     self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+        #     print(f"Here11.1")
+        #     self.ui2.show()
+        #     self.ui2.closed.connect(self.show)
 
         elif self.findChild(QRadioButton, 'Strut_Design').isChecked():
             print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(Compression, ' ')
             print(f"Here11.2")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+    def show_beamcolumn_module(self):
+        if self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+            # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

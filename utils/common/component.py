@@ -2091,6 +2091,7 @@ class Angle(Material):
         "r = radius of gyration of member"
         slender = (float(K) * float(L)) / float(r)
         self.slenderness = round(slender, 2)
+        return self.slenderness
 
 
     def plastic_moment_capacty(self, beta_b, Z_p, fy):

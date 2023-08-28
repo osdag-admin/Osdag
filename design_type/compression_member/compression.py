@@ -148,14 +148,14 @@ class Compression(Member):
         # t2 = (DISP_TITLE_CHANNEL, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
         # design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane ]) #KEY_ALLOW_UR, , KEY_STEEL_COST
+        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane, KEY_BOLT_Number ]) #KEY_ALLOW_UR, , KEY_STEEL_COST
         design_input.append(t2)
 
         t2 = ("Optimization", TYPE_COMBOBOX, [ KEY_ALLOW_LOAD, Load_type2, Load_type1, KEY_PLATETHK ]) # KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS,
         design_input.append(t2)
 
-        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
-        design_input.append(t3)
+        # t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        # design_input.append(t3)
 
         # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
         # design_input.append(t5)
@@ -959,7 +959,8 @@ class Compression(Member):
         self.design_status_list = []
         self.design_status = False
 
-        # self.design_classification(self)
+        #initial properties of section
+        self.sec_prop_initial_dict = {}
 
         # self.results(self)
 
@@ -984,7 +985,7 @@ class Compression(Member):
         # self.inter_status = False
         # self.thk_count =0
 
-        print("The input values are set. Performing preliminary member check(s).")
+        print("K = {}.The input values are set. Performing preliminary member check(s).".format(self.K))
         # self.i = 0
         # checking input values
         flag = self.section_classification(self)
@@ -1268,7 +1269,7 @@ class Compression(Member):
                 end_2=self.end_2)
             self.effective_length = temp * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
                 self.length,
-                self.sec_profile)/ self.length * self.K # mm
+                self.sec_profile)/ self.length  # mm
             print(f"self.effective_length {self.effective_length} ")
             # 2.3 - slenderness ratio
             # self.section_property.min_rad_gyration_calc(self, self.sec_profile)
@@ -1276,32 +1277,56 @@ class Compression(Member):
                 self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
 
             elif self.sec_profile == Profile_name_2 :
-                pass
+                BBAngle_attributes = BBAngle_Properties()
+                BBAngle_attributes.data(trial_section, self.material)
+                self.effective_area = BBAngle_attributes.calc_Area(self.loc) * 100  # mm2
+                if self.loc == "Long Leg":
+                    cg1 = self.section_property.Cy  # mm
+                    cg2 = self.section_property.Cz  # mm
+                else:
+                    cg1 = self.section_property.Cz  # mm
+                    cg2 = self.section_property.Cy  # mm
+                mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(l=self.loc,
+                                                                      thickness=0) * 10 ** 4  # mm**4
+                mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(l=self.loc,
+                                                                      thickness=0) * 10 ** 4  # mm**4
+                r_zz = BBAngle_attributes.calc_RogZ(l=self.loc, thickness=0) * 10  # mm
+                r_yy = BBAngle_attributes.calc_RogY(l=self.loc, thickness=0) * 10  # mm
+                self.min_radius_gyration = min(r_yy, r_zz)
+                print(
+                    " effective_area {}\n loc {}\n cgyy {}\n cgzz {}\n mom_inertia_y {}\n mom_inertia_z {}\n r_zz{}\n r_yy{}\n min_radius_gyration{} ".format(
+                        self.effective_area, self.loc, cg1, cg2, mom_inertia_y, mom_inertia_z, r_zz, r_yy,
+                        self.min_radius_gyration))
 
             elif self.sec_profile == Profile_name_3 :
                 BBAngle_attributes = BBAngle_Properties()
                 BBAngle_attributes.data(trial_section, self.material)
-                Area = BBAngle_attributes.calc_Area(self.loc) * 100 #mm2
-                mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(l = self.loc, thickness= self.plate_thickness)
-                mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(l=self.loc, thickness= self.plate_thickness)
-                r_zz = BBAngle_attributes.calc_RogZ(l=self.loc, thickness=self.plate_thickness)
-                r_yy = BBAngle_attributes.calc_RogY(l=self.loc, thickness=self.plate_thickness)
-
-                print(f" Area {Area}")
-                print(f" Area {Area}")
-                if self.loc == loc_type1 :
-                    if self.section_property.Cz > self.section_property.Cy :
-                        r_z = self.section_property.rad_of_gy_z
-                        I_yy = 2*(self.section_property.mom_inertia_y + Area(self.section_property.Cy + self.plate_thickness/2)**2)
-                        # r_y =
-                elif self.loc == loc_type2 :
-                    pass
+                self.effective_area = BBAngle_attributes.calc_Area(self.loc) * 100 #mm2
+                if self.loc == "Long Leg":
+                    cg1 = self.section_property.Cy#mm
+                    cg2 = self.section_property.Cz#mm
                 else:
-                    print(f" Connection Location not defined")
-                    local_flag = False
-                    break
+                    cg1 = self.section_property.Cz#mm
+                    cg2 = self.section_property.Cy#mm
+                mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(l = self.loc, thickness= self.plate_thickness) * 10**4#mm**4
+                mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(l=self.loc, thickness= self.plate_thickness) * 10**4#mm**4
+                r_zz = BBAngle_attributes.calc_RogZ(l=self.loc, thickness=self.plate_thickness) * 10 #mm
+                r_yy = BBAngle_attributes.calc_RogY(l=self.loc, thickness=self.plate_thickness) * 10 #mm
+                self.min_radius_gyration = min(r_yy, r_zz)
+                print(" effective_area {}\n loc {}\n cgyy {}\n cgzz {}\n mom_inertia_y {}\n mom_inertia_z {}\n r_zz{}\n r_yy{}\n min_radius_gyration{} ".format(self.effective_area, self.loc, cg1 ,cg2,mom_inertia_y,mom_inertia_z , r_zz, r_yy,  self.min_radius_gyration) )
+                # if self.loc == loc_type1 :
+                #     if self.section_property.Cz > self.section_property.Cy :
+                #         r_z = self.section_property.rad_of_gy_z
+                #         I_yy = 2*(self.section_property.mom_inertia_y + Area(self.section_property.Cy + self.plate_thickness/2)**2)
+                #         # r_y =
+                # elif self.loc == loc_type2 :
+                #     pass
+                # else:
+                #     print(f" Connection Location not defined")
+                #     local_flag = False
+                #     break
 
-            self.slenderness = self.section_property.design_check_for_slenderness(self.K, self.effective_length, self.min_radius_gyration)#(self.effective_length / self.min_radius_gyration)
+            self.slenderness = self.section_property.design_check_for_slenderness(K= self.K, L = self.effective_length, r = self.min_radius_gyration)#(self.effective_length / self.min_radius_gyration)
             print(f"self.min_radius_gyration {self.min_radius_gyration}"
                   f"self.slenderness {self.slenderness}")
             limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
@@ -1323,7 +1348,8 @@ class Compression(Member):
             if self.section_class in self.allowed_sections:
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_class})
-
+                if self.sec_profile != Profile_name_1:
+                    self.sec_prop_initial_dict.update({trial_section : (self.section_class, self.min_radius_gyration, self.slenderness, self.width_thickness_ratio,self.depth_thickness_ratio,self.width_depth_thickness_ratio)})
         return local_flag
             # print(f"self.section_class{self.section_class}")
 
@@ -1405,7 +1431,7 @@ class Compression(Member):
                 # elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):
                 #     self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
             elif self.section_class == 'Semi-Compact':
-                if self.sec_profile == 'Back to Back Angles' or self.sec_profile == 'Back to Back Channels' or self.sec_profile == 'Star Angles':
+                if self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3 :
                     self.effective_area = 2 * self.section_property.area  # mm2
                 else:
                     self.effective_area = self.section_property.area
@@ -1427,7 +1453,7 @@ class Compression(Member):
                         "The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007].")
         elif step == 3:
             # 2.1 - Buckling curve classification and Imperfection factor
-            if self.sec_profile in VALUES_SEC_PROFILE_2:
+            if (self.sec_profile in VALUES_SEC_PROFILE_Compression_Strut[:3]):
                 self.buckling_class = 'c'
             else:
                 print("section not valid")
@@ -1671,9 +1697,9 @@ class Compression(Member):
                   f"list_result {list_result}")
 
             # Step 1 - computing the effective sectional area
-            self.section_class = self.input_section_classification[section]
+            self.section_class = self.input_section_classification[section][0]
 
-            self.common_checks_1(self,section,2)
+            self.common_checks_1(self,section,step =2)
             # if self.loc == "Long Leg":
             #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
             # else:
@@ -1682,7 +1708,7 @@ class Compression(Member):
             list_result.extend([self.section_class, self.effective_area])
 
             # Step 2 - computing the design compressive stress
-            self.common_checks_1(self,section,3)
+            self.common_checks_1(self,section,step=3)
             list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
 
 

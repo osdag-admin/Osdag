@@ -59,6 +59,7 @@ class Main():
 
         return bolt
 
+
     def weld_values(self, input_dictionary):
 
         values = {KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}

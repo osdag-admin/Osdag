@@ -7,7 +7,6 @@ from utils.common.is800_2007 import IS800_2007
 class Material(object):
 
     def __init__(self, material_grade='', thickness=41):
-
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0

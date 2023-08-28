@@ -291,12 +291,16 @@ class MaterialValidator(object):
 ###########################
 TYPE_COMBOBOX = 'ComboBox'
 TYPE_COMBOBOX_FREEZE = 'Disable_ComboBoc'
+TYPE_TABLE_IN = 'Table_Input'
+TYPE_TABLE_OU = 'Table_Output'
+TYPE_TABLE_GUS = 'Gusset_Table'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+TYPE_IN_BUTTON = 'Input_dock_Button'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_OUT_DOCK = 'Output_dock_Item'
 TYPE_OUT_LABEL = 'Output_dock_Label'
@@ -318,6 +322,7 @@ TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
 TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
+KEY_IMAGE_two = 'Imagetwo'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
 
@@ -334,6 +339,7 @@ KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
 KEY_DISP_SEATED_ANGLE = 'Seated Angle Connection'
 KEY_DISP_BASE_PLATE = 'Base Plate Connection'
+KEY_DISP_TRUSS_BOLTED = 'Truss Connection Bolted'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
@@ -344,20 +350,22 @@ KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
 KEY_DISP_TENSION_BOLTED = 'Tension Member Design - Bolted to End Gusset'
 KEY_DISP_TENSION_WELDED = 'Tension Member Design - Welded to End Gusset'
-KEY_DISP_COMPRESSION = 'Compression Member'
 KEY_DISP_BB_EP_SPLICE = 'Beam-to-Beam End Plate Connection'
+KEY_DISP_COMPRESSION = 'Compression Member'
+KEY_DISP_COMPRESSION_STRUT = 'Compression Member Design - Strut Design'
 
 DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
-KEY_DISP_COMPRESSION_COLUMN = 'Column Design'
+KEY_DISP_COMPRESSION_COLUMN = 'Columns in Frames'
+KEY_DISP_COMPRESSION_Strut = 'Struts in Trusses'
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'
 KEY_MEMBER_DATA = 'Member.Data'
 KEY_SECTION_PROFILE = 'Section.Profile'
 KEY_DISP_SECTION_PROFILE = 'Section Profile *'
-VALUES_SEC_PROFILE_COLUMN = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
+VALUES_SEC_PROFILE_COLUMN = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles']
 KEY_SECTION_DEFINITION = 'SectionDefinition'
 KEY_DISP_SECTION_DEFINITION = 'Section Definition*'
 KEY_DISP_MEMBER_DATA = 'Member Data'
@@ -414,6 +422,56 @@ KEY_COMP_STRESS_ZZ = 'MajorDCS'
 KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
 KEY_COMP_STRESS_YY = 'MinorDCS'
 KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
+##Strut Design
+KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
+KEY_DISP_EULER_BUCKLING_STRESS = 'Euler Buckling Stress (MPa)'
+KEY_EFF_SEC_AREA = 'MajorEffSecArea'
+KEY_DISP_EFF_SEC_AREA = 'Effective Sectional Area (mm2)'
+KEY_EFF_LEN = 'Major.Effective_Length'
+KEY_DISP_EFF_LEN = 'Effective Length (m)'
+KEY_BUCKLING_CURVE = 'BucklingCurve'
+KEY_DISP_BUCKLING_CURVE = 'Buckling Curve Classification'
+KEY_IMPERFECTION_FACTOR = 'ImperfectionFactor'
+KEY_DISP_IMPERFECTION_FACTOR = 'Imperfection Factor'
+KEY_SR_FACTOR = 'StressReductionFactor'
+KEY_DISP_SR_FACTOR = 'Stress Reduction Factor'
+KEY_NON_DIM_ESR = 'NDESR'
+KEY_DISP_NON_DIM_ESR = 'Non-dimensional Effective SR'
+KEY_ALLOW_CLASS = 'Optimum.Class'
+KEY_DISP_CLASS = 'Semi-compact sections'
+DISP_TITLE_STRUT_SECTION = 'Section Details'
+KEY_ALLOW_LOAD = 'Load.Type'
+KEY_DISP_LOAD = 'Type of Load'
+KEY_DISP_ESR = 'Effective SR'
+KEY_ESR = 'ESR'
+KEY_SR_lambdavv = 'ESRLambdavv'
+KEY_DISP_SR_lambdavv = 'Lambda v-v'
+KEY_SR_lambdapsi = 'ESRLambdapsi'
+KEY_DISP_SR_lambdapsi = 'Lambda psi'
+Buckling_Type = 'Type of Buckling'
+End_Connection_title = 'End Connection Details'
+
+KEY_Buckling_Out_plane = ' Out_of_Plane'
+KEY_Buckling_In_plane =  ' In_Plane'
+Buckling_Out_plane = ' Out of Plane'
+Buckling_In_plane =  ' In Plane'
+Load_type1 = 'Concentric Load'
+Load_type2 = 'Leg Load'
+Strut_load = list((Load_type1, Load_type2))
+IMG_STRUT_1 = "ResourceFiles/images/bA.png"
+IMG_STRUT_2 = "ResourceFiles/images/bBBA.png"
+IMG_STRUT_3 = "ResourceFiles/images/back_back_same_side_angles.png"
+VALUES_IMG_STRUT = list(( IMG_STRUT_1, IMG_STRUT_2, IMG_STRUT_3))
+KEY_BOLT_Number = 'Bolt.Number'
+Strut_Bolt_Number = 'Number of Bolts'
+Profile_name_1 = 'Angles'
+Profile_name_2 = 'Back to Back Angles - Same side of gusset'
+Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
+loc_type1 = 'Long Leg'
+loc_type2 = 'Short Leg'
+VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
+
+
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'
@@ -438,6 +496,8 @@ KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 ###################################
 KEY_MODULE = 'Module'
 KEY_CONN = 'Connectivity'
+KEY_TABLE = 'Table'
+KEY_MEMBERS = 'No of Members'
 KEY_LOCATION = 'Conn_Location'
 KEY_ENDPLATE_TYPE = 'EndPlateType'
 KEY_MATERIAL = 'Material'
@@ -470,6 +530,7 @@ KEY_SUPTNGSEC_FY = 'Member.Supporting.Section.Fy'   #Extra Keys for DP Display
 
 KEY_LENGTH = 'Member.Length'
 KEY_SEC_PROFILE = 'Member.Profile'
+KEY_SEC_TYPE = 'Member.Type'
 
 KEY_SHEAR = 'Load.Shear'
 KEY_AXIAL = 'Load.Axial'
@@ -477,6 +538,7 @@ KEY_MOMENT = 'Load.Moment'
 
 KEY_D = 'Bolt.Diameter'
 KEY_TYP = 'Bolt.Type'
+KEY_COF = 'Bolt.Coefficient'
 KEY_GRD = 'Bolt.Grade'
 
 # KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
@@ -490,6 +552,8 @@ KEY_CONNECTOR_FY = 'Connector.Fy'               #Extra Keys for DP Display
 KEY_CONNECTOR_FY_20 = 'Connector.Fy_20'         #Extra Keys for DP Display
 KEY_CONNECTOR_FY_20_40 = 'Connector.Fy_20_40'   #Extra Keys for DP Display
 KEY_CONNECTOR_FY_40 = 'Connector.Fy_40'         #Extra Keys for DP Display
+KEY_CONNECTOR_GUSSET = 'Connector.GUSSET'         #Extra Keys for DP Display
+
 
 KEY_PLATETHK = 'Connector.Plate.Thickness_List'
 KEY_FLANGEPLATE_PREFERENCES = 'Connector.Flange_Plate.Preferences'
@@ -556,7 +620,9 @@ VALUES_PLATETHK = ['All', 'Customized']
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ANGLESEC= ['All', 'Customized']
+VALUES_TRUSSBOLT_THK = ['8', '10', '12', '14', '16']
 
+VALUES_MEMBERS = ['2', '3', '4', '5', '6', '7', '8']
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 VALUES_TYP_ANCHOR = ['End Plate Type', 'IS 5624-Type A', 'IS 5624-Type B']
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
@@ -594,6 +660,8 @@ VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_DIAM = connectdb("Bolt")
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
+
+
 VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/bBBA.png","ResourceFiles/images/bSA.png","ResourceFiles/images/bC.png","ResourceFiles/images/bBBC.png"]
 VALUES_IMG_TENSIONWELDED = ["ResourceFiles/images/wA.png","ResourceFiles/images/wBBA.png","ResourceFiles/images/wSA.png","ResourceFiles/images/wC.png","ResourceFiles/images/wBBC.png"]
 VALUES_IMG_TENSIONBOLTED_DF01 = ["ResourceFiles/images/equaldp.png","ResourceFiles/images/bblequaldp.png","ResourceFiles/images/bbsequaldp.png","ResourceFiles/images/salequaldp.png","ResourceFiles/images/sasequaldp.png"]
@@ -684,6 +752,10 @@ DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm2)'
 KEY_DISP_FY_20 = 'Yield Strength, Fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength, Fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield Strength, Fy (MPa) (>40mm)'
+KEY_DISP_GUSSET = 'Gusset Plate'
+KEY_GUSSET = 'Thickness (mm)'
+
+
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
@@ -692,12 +764,14 @@ DISP_TITLE_FOOTING = 'Pedestal/Footing'
 KEY_DISP_CONN = 'Connectivity'
 
 KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
+KEY_DISP_MEMBERS = 'No of Members'
 
 
 # VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
+KEY_DISP_LOCATION_STRUT = 'Connection'
 KEY_DISP_MATERIAL = 'Material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_SUPTNGSEC_REPORT = 'Supporting Section - Mechanical Properties'
@@ -723,7 +797,7 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange Splice Plate '
 DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer Plate '
 DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner Plate '
-KEY_DISP_SLENDER = 'Slenderness'
+KEY_DISP_SLENDER = 'Slenderness ratio'
 
 
 KEY_DISP_PLATETHK = 'Thickness (mm)'
@@ -760,6 +834,7 @@ KEY_DISP_AXIAL = 'Axial Force (kN)'
 KEY_DISP_AXIAL_STAR = 'Axial (kN)* '
 DISP_TITLE_PLATE = 'Plate'
 KEY_DISP_TYP = 'Type'
+KEY_DISP_COF = 'Coefficient of friction'
 KEY_DISP_TYP_ANCHOR = 'Anchor Type'
 KEY_DISP_GRD_ANCHOR = 'Property Class'
 KEY_DISP_GRD_FOOTING = 'Grade*'
@@ -776,6 +851,7 @@ KEY_DISP_APPLIED_SHEAR_LOAD = 'Applied Shear Force (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE = 'Applied Axial Force (kN)'
 KEY_DISP_APPLIED_MOMENT_LOAD = 'Applied Moment (kNm)'
 KEY_DISP_AXIAL_FORCE_CON = 'Axial Load Considered (kN)'
+
 
 # capacity
 
@@ -1975,26 +2051,28 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS']
+KEY_DISP_SEC_TYPE = 'Section Type'
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
-
+#, 'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
-KEY_DISP_LENZZ = 'Length (z-z)'
+KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
 
 KEY_LENYY = 'Member.Length_yy'
-KEY_DISP_LENYY = 'Length (y-y)'
+KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 
 DISP_TITLE_SC = 'Supporting Condition'
-
+DISP_TITLE_STRUT = 'End Condition'
 KEY_END1 = 'End_1'
 KEY_DISP_END1 = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
-
+VALUES_STRUT_END1 = ['Fixed','Hinged']
 
 KEY_END2 = 'End_2'
 KEY_DISP_END2 = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END2 = ['Fixed','Hinged']
 
 KEY_END_CONDITION = 'End Condition'
 KEY_DISP_END_CONDITION = 'End Condition'
@@ -2244,3 +2322,76 @@ COLUMN_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Optimum_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Optimization Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used for selecting the most optimum section as the design output. The default parameter is set as the </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Utilization Ratio (UR)</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Optimum sections can be selected based on the cost plus UR by choosing the '</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Cost</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">' parameter from the drop-down list.</span></p>\n"
+                    "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
+                   )
+
+Allowable_Utilization_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Allowable Utilization Ratio (UR)</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the maximum allowable value of the demand to capacity ratio for performing the design. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.0</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The UR can be re-defined for any particular design session with a maximum allowable value of 1.0 and a minimum of 0.1.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+Effective_Area_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Area Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used to define the reduction in the area of the section due to connection detailing and other such requirements. The default value of this parameter is set at 1.0, which means that the effective area is 100% of the gross area for Plastic, Compact and Semi-compact sections. For Slender sections, the initial area will be computed based on the recommendations in Fig.2B of The National Building Code (2016). The value of the parameter should be defined in terms of the effective area to be considered for design simulation after deducting the area lost. The maximum value of the parameter is 1.0 (effective area is 100% of the gross area) with a minimum value of 0.1.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+
+Type_Load_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Type of Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used to define how the load maybe transferred in a Single Angle section. By default the Section will transfer the load concentrically through end gusset represented by </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Concentric Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Type of Load can be selected based on the Concentric Load plus Leg Load by choosing the '</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Leg Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">' parameter from the drop-down list. </span></p>\n"                          
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+Section_Definition_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                               "The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                               "Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                               "preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
+                                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Single_Angle_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "In the case of members of trusses, buckling in the plane perpendicular to the plane of the truss, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", the effective length, KL shall be taken as the distance between the centres of intersection (Cl.7.2.4) of IS 800:2007.</span></p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"
+                              )
+Single_Angle_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "In the case of members of trusses, buckling in the plane of the truss, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", the effective length, KL shall be taken as 0.7 to 1.0 times the distance between the centres of connections, depending on the degree of end restraint provided (Cl.7.2.4) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Double_angle_opposite_gusset = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                                    "</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                                    "Double Angle Struts connected back to back, on opposite sides of the gusset</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                                    "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Double_angle_same_gusset = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                                "</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                                "Double Angle Struts connected back to back on one side of a gusset or section</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Opposite_Side_of_Gusset_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane perpendicular to that of the end gusset,, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ",shall be taken as equal to the distance between centres of intersections (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Opposite_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane of end gusset, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", shall be taken as between 0.7 and 0.85 times the distance between intersections, depending on the degree of the restraint provided  (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Same_Side_of_Gusset_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane perpendicular to that of the end gusset,, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ",shall be taken as equal to the distance between centres of intersections (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Same_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane of end gusset, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", shall be taken as between 0.7 and 0.85 times the distance between intersections, depending on the degree of the restraint provided  (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+
+STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para

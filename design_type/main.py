@@ -59,6 +59,7 @@ class Main():
 
         return bolt
 
+
     def weld_values(self, input_dictionary):
 
         values = {KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}
@@ -175,6 +176,61 @@ class Main():
         connector.append(t3)
 
         return connector
+    
+    # def gusset_connector_values(self, input_dictionary):
+    #
+    #     if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
+    #         material_grade = ''
+    #         fu = ''
+    #         fy_20 = ''
+    #         fy_20_40 = ''
+    #         fy_40 = ''
+    #     else:
+    #         material_grade = input_dictionary[KEY_MATERIAL]
+    #         material_attributes = Material(material_grade)
+    #         fu = material_attributes.fu
+    #         fy_20 = material_attributes.fy_20
+    #         fy_20_40 = material_attributes.fy_20_40
+    #         fy_40 = material_attributes.fy_40
+    #
+    #     if KEY_CONNECTOR_MATERIAL in input_dictionary.keys():
+    #         material_grade = input_dictionary[KEY_CONNECTOR_MATERIAL]
+    #         material_attributes = Material(material_grade)
+    #         fu = material_attributes.fu
+    #         fy_20 = material_attributes.fy_20
+    #         fy_20_40 = material_attributes.fy_20_40
+    #         fy_40 = material_attributes.fy_40
+    #
+    #     values = {KEY_CONNECTOR_GUSSET: '10'}
+    #     for key in values.keys():
+    #         if key in input_dictionary.keys():
+    #             values[key] = input_dictionary[key]
+    #
+    #     connector = []
+    #
+    #     material = connectdb("Material", call_type="popup")
+    #     t1 = (KEY_CONNECTOR_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
+    #     connector.append(t1)
+    #
+    #     t2 = (KEY_CONNECTOR_FU, KEY_DISP_FU, TYPE_TEXTBOX, None, fu)
+    #     connector.append(t2)
+    #
+    #     t3 = (KEY_CONNECTOR_FY_20, KEY_DISP_FY_20, TYPE_TEXTBOX, None, fy_20)
+    #     connector.append(t3)
+    #
+    #     t3 = (KEY_CONNECTOR_FY_20_40, KEY_DISP_FY_20_40, TYPE_TEXTBOX, None, fy_20_40)
+    #     connector.append(t3)
+    #
+    #     t3 = (KEY_CONNECTOR_FY_40, KEY_DISP_FY_40, TYPE_TEXTBOX, None, fy_40)
+    #     connector.append(t3)
+    #
+    #     t3 = (None, KEY_DISP_GUSSET, TYPE_TITLE, None, None)
+    #     connector.append(t3)
+    #
+    #     t3 = (KEY_CONNECTOR_GUSSET, KEY_GUSSET, TYPE_COMBOBOX, ['8', '10', '12', '14'], values[KEY_CONNECTOR_GUSSET])
+    #     connector.append(t3)
+    #
+    #     return connector
 
 
     # def get_def_I_sec_properties(self):

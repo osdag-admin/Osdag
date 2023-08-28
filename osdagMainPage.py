@@ -141,6 +141,7 @@ from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.base_plate_connection import BasePlateConnection
+from design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
@@ -153,9 +154,10 @@ from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSp
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
-from design_type.compression_member.compression_column import CompressionColumn
+from design_type.compression_member import Column
 from design_type.compression_member.compression import Compression
 from design_type.compression_member.Column import ColumnDesign
+from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 import APP_CRASH.Appcrash.api as appcrash
@@ -284,20 +286,31 @@ class OsdagMainWindow(QMainWindow):
                                         ('Base Plate Connection', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
-                                'Truss Connection' : self.Under_Development,
+                                'Truss Connection' : [
+                                    ('Truss Connection Bolted', 'ResourceFiles/images/broken.png', 'Truss_Bolted'),
+                                    ('Truss Connection Welded', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                                    self.show_truss_bolted,
+                                                   ],
                                 },
                 'Tension Member' : [
                             ('Bolted to End Gusset','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
-                                       ('Beam-Column Design', 'ResourceFiles/images/compression_column.png', 'Beam_Column_Design'),
-                                       ('Strut Design', 'ResourceFiles/images/compression_column.png', 'Strut_Design'),
+                'Compression Member': [('Columns in Frames', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
+                                       # ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
+                                       ('Struts in Trusses', 'ResourceFiles/images/broken.png', 'Strut_Design'),
                                        self.show_compression_module,
                                        ],
-                'Flexural Member' : self.Under_Development,
-                'Beam-Column' : self.Under_Development,
+                'Flexural Member' : [
+                    ('Laterally Supported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    self.show_truss_bolted,
+                ],
+                'Beam-Column' :[
+                    ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
+                    self.show_beamcolumn_module,
+                ],
                 'Plate Girder' : self.Under_Development,
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
@@ -310,13 +323,16 @@ class OsdagMainWindow(QMainWindow):
             Button= LeftPanelButton(ModuleName)
             self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)
             self.ui.verticalLayout.addWidget(Button)
+            # print(f"Here1{ModuleName}")
             if(type(self.Modules[ModuleName])==dict):        #level 2 dictionary handling
                 Page= ModulePage()
                 self.ui.myStackedWidget.addWidget(Page)
                 Current_Module=self.Modules[ModuleName]
                 Tab_Widget=New_Tab_Widget()
                 Page.layout.addWidget(Tab_Widget)
+                # print(f"Here2{self.Modules[ModuleName]}")
                 for Submodule in Current_Module:
+                    # print(f"Here3{Submodule}")
                     if(type(Current_Module[Submodule])==dict):          #Level 3 dictionary handling
                         New_Tab=ModulePage()
                         Tab_Widget.addTab(New_Tab,Submodule)
@@ -325,8 +341,10 @@ class OsdagMainWindow(QMainWindow):
                         Current_SubModule=Current_Module[Submodule]
                         Sub_Tab_Widget=New_Tab_Widget()
                         Sub_Page.layout.addWidget(Sub_Tab_Widget)
+                        # print(f"Here4{Submodule}")
 
                         for Sub_Sub_Module in Current_SubModule:
+                            # print(f"Here5{Sub_Sub_Module}")
                             if(type(Current_SubModule[Sub_Sub_Module]) in [list,tuple]):        # Final List/tuple Handling
                                 New_Sub_Tab=Submodule_Page()
                                 Sub_Tab_Widget.addTab(New_Sub_Tab,Sub_Sub_Module)
@@ -359,6 +377,7 @@ class OsdagMainWindow(QMainWindow):
                         group=QButtonGroup(QWidget(Page))
                         row,col=0,0
                         n=math.floor((len(Current_Module[Submodule])-2)/2)
+                        # print(f"Here6")
 
                         for Selection in Current_Module[Submodule][:-1]:
                             widget=Submodule_Widget(Selection,New_Tab)
@@ -385,6 +404,7 @@ class OsdagMainWindow(QMainWindow):
                 group=QButtonGroup(QWidget(Page))
                 row,col=0,0
                 n=math.floor((len(self.Modules[ModuleName])-2)/2)
+                # print(f"Here7")
 
                 for Selection in self.Modules[ModuleName][:-1]:
                     widget=Submodule_Widget(Selection,Page)
@@ -556,6 +576,20 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
+    def show_truss_bolted(self):
+        if self.findChild(QRadioButton, 'Truss_Bolted').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(TrussConnectionBolted, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        #elif self.findChild(QRadioButton,'Truss_Welded').isChecked():
+        #    self.hide()
+        #    self.ui2 = Ui_ModuleWindow(BasePlateConnection, ' ')
+        #    self.ui2.show()
+        #    self.ui2.closed.connect(self.show)
+        else:
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
     def show_moment_connection_cc(self):
         if self.findChild(QRadioButton,'C2C_Cover_Plate_Bolted').isChecked() :
             self.hide()
@@ -645,21 +679,37 @@ class OsdagMainWindow(QMainWindow):
 
     def show_compression_module(self):
         """ Create radio buttons for the sub-modules under the compression module"""
+        # print(f"Here8")
         if self.findChild(QRadioButton, 'Column_Design').isChecked():
+            # print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(ColumnDesign, ' ')
+            # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        # elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+        #     print(f"Here9.2")
+        #     self.hide()
+        #     self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+        #     print(f"Here11.1")
+        #     self.ui2.show()
+        #     self.ui2.closed.connect(self.show)
 
         elif self.findChild(QRadioButton, 'Strut_Design').isChecked():
+            print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(Compression, ' ')
+            print(f"Here11.2")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+    def show_beamcolumn_module(self):
+        if self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+            # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
@@ -839,6 +889,7 @@ if __name__ == '__main__':
 
     # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
+    # print("Here0")
 
     # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 

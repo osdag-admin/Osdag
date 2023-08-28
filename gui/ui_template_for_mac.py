@@ -2965,7 +2965,7 @@ class Dialog1(QtWidgets.QDialog):
 from . import icons_rc
 if __name__ == '__main__':
     # set_osdaglogger()
-
+    print(f"ui_template mac")
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()

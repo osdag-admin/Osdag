@@ -26,7 +26,7 @@ from design_report.reportGenerator_latex import CreateLatex
 class ColumnDesign(Member):
 
     def __init__(self):
-        # print(f"Here10")
+        print(f"Here10")
         super(ColumnDesign, self).__init__()
 
     ###############################################
@@ -149,11 +149,11 @@ class ColumnDesign(Member):
         t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY])
         design_input.append(t1)
 
-        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA]) #, KEY_STEEL_COST
+        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_STEEL_COST])
         design_input.append(t2)
 
-        # t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS1, KEY_ALLOW_CLASS2, KEY_ALLOW_CLASS3, KEY_ALLOW_CLASS4])
-        # design_input.append(t2)
+        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS1, KEY_ALLOW_CLASS2, KEY_ALLOW_CLASS3, KEY_ALLOW_CLASS4])
+        design_input.append(t2)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
@@ -182,8 +182,8 @@ class ColumnDesign(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA,  KEY_DP_DESIGN_METHOD], '') #KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS1, KEY_ALLOW_CLASS2, KEY_ALLOW_CLASS3, KEY_ALLOW_CLASS4, KEY_STEEL_COST,
-
+        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS1, KEY_ALLOW_CLASS2, KEY_ALLOW_CLASS3,
+                     KEY_ALLOW_CLASS4, KEY_STEEL_COST, KEY_DP_DESIGN_METHOD], '')
         design_input.append(t2)
 
         return design_input
@@ -220,11 +220,11 @@ class ColumnDesign(Member):
             KEY_ALLOW_UR: '1.0',
             KEY_EFFECTIVE_AREA_PARA: '1.0',
             KEY_OPTIMIZATION_PARA: 'Utilization Ratio',
-            # KEY_STEEL_COST: '50',
-            # KEY_ALLOW_CLASS1: 'Yes',
-            # KEY_ALLOW_CLASS2: 'Yes',
-            # KEY_ALLOW_CLASS3: 'Yes',
-            # KEY_ALLOW_CLASS4: 'Yes',
+            KEY_STEEL_COST: '50',
+            KEY_ALLOW_CLASS1: 'Yes',
+            KEY_ALLOW_CLASS2: 'Yes',
+            KEY_ALLOW_CLASS3: 'Yes',
+            KEY_ALLOW_CLASS4: 'Yes',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
         }[key]
 

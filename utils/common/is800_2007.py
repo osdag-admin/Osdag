@@ -188,11 +188,11 @@ class IS800_2007(object):
 
         """
         epsilon = math.sqrt(250 / f_y)
-        print(f" flange_class"
-              f" width {width}"
-              f" thickness {thickness}"
-              f" epsilon {epsilon}"
-              )
+        # print(f" flange_class"
+        #       f" width {width}"
+        #       f" thickness {thickness}"
+        #       f" epsilon {epsilon}"
+        #       )
         ratio = width / thickness
 
         if section_type == 'Rolled':
@@ -214,12 +214,12 @@ class IS800_2007(object):
             else:
                 section_class = 'Slender'
 
-        print(f" section_type {section_type}"
-              f" section_class {section_class}")
+        # print(f" section_type {section_type}"
+        #       f" section_class {section_class}")
         return [section_class, ratio]
 
     @staticmethod
-    def Table2_iii(depth, thickness, f_y, classification_type='Axial compression'):
+    def Table2_iii(depth, thickness, f_y, classification_type='Neutral axis at mid-depth'):
         """ Calculate the limiting width to thickness ratio as per Table 2 for;
                 sr. no iii) Web of an I, H or box section for axial compression
 
@@ -239,24 +239,31 @@ class IS800_2007(object):
 
         ratio = depth / thickness
 
-        print(f" web_class"
-              f" depth {depth}"
-              f" thickness {thickness}"
-              f" epsilon {epsilon}"
+        print(f" web_class \n" 
+              f" depth {depth} \n"
+              f" thickness {thickness} \n"
+              f" epsilon {epsilon} \n"
+               f" classification_type {classification_type}\n"
               )
 
         if classification_type == 'Neutral axis at mid-depth':
-            ''
+            if ratio > (84 * epsilon):
+                section_class = 'Plastic'
+            elif ratio <= (84 * epsilon) and ratio > (105 * epsilon):
+                section_class = 'Compact'
+            elif ratio <= (105 * epsilon) and ratio > (126 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+
         elif classification_type == 'Generally':
-            ''
+            pass
         elif classification_type == 'Axial compression':
             if ratio > (42 * epsilon):
                 section_class = 'Slender'
             else:
                 section_class = 'Semi-Compact'
-        print(f" classification_type {classification_type}"
-              f" ")
-
+        print(f" section_class {section_class}")
 
         return section_class
 
@@ -785,6 +792,13 @@ class IS800_2007(object):
                 k1 = 0.7
                 k2 = 0.6
                 k3 = 5
+            elif fixity == 'Partial':
+                temp = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no , fixity = 'Fixed')
+                temp2 = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no , fixity = 'Hinged')
+                k1 = (temp[3] +temp2[3]) /2
+                k2 = (temp[4] +temp2[4]) /2
+                k3 = (temp[5] +temp2[5]) /2
+
         elif bolt_no == 1:
             if fixity == 'Fixed':
                 k1 = 0.75
@@ -794,6 +808,20 @@ class IS800_2007(object):
                 k1 = 1.25
                 k2 = 0.5
                 k3 = 60
+            elif fixity == 'Partial':
+                temp = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length,
+                                                                                                           r_min, b1,
+                                                                                                           b2, t, f_y,
+                                                                                                           bolt_no,
+                                                                                                           fixity='Fixed')
+                temp2 = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length,
+                                                                                                            r_min, b1,
+                                                                                                            b2, t, f_y,
+                                                                                                            bolt_no,
+                                                                                                            fixity='Hinged')
+                k1 = (temp[3] + temp2[3]) / 2
+                k2 = (temp[4] + temp2[4]) / 2
+                k3 = (temp[5] + temp2[5]) / 2
 
         lambda_vv = (length/ r_min)/(e* math.sqrt(math.pi**2 * E/250))
         lambda_psi = ((b1 + b2)/(2 * t) )/(e* math.sqrt(math.pi**2 * E/250))

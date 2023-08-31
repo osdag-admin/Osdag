@@ -470,8 +470,10 @@ Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
 loc_type1 = 'Long Leg'
 loc_type2 = 'Short Leg'
 VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
-
-
+Profile_2_img1 = "ResourceFiles/images/bblssg_eq.png"# Back to back Long leg on same side of gusset for equal angle
+Profile_2_img2 = "ResourceFiles/images/bbsssg_eq.png"# Back to back short leg on same side of gusset for equal angle
+Profile_2_img3 = "ResourceFiles/images/bblssg_ueq.png"# Back to back Long leg on same side of gusset for unequal angle
+Profile_2_img4 = "ResourceFiles/images/bbsssg_ueq.png"# Back to back short leg on same side of gusset for unequal angle
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'

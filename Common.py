@@ -450,6 +450,8 @@ KEY_SR_lambdapsi = 'ESRLambdapsi'
 KEY_DISP_SR_lambdapsi = 'Lambda psi'
 Buckling_Type = 'Type of Buckling'
 End_Connection_title = 'End Connection Details'
+KEY_COMP_STRESS = 'MinorDCS'
+KEY_DISP_COMP_STRESS = 'Design Compressive Stress (MPa)'
 
 KEY_Buckling_Out_plane = ' Out_of_Plane'
 KEY_Buckling_In_plane =  ' In_Plane'

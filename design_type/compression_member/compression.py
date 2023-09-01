@@ -626,29 +626,30 @@ class Compression(Member):
         t2 = (KEY_SR_FACTOR, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, round(self.result_srf, 2) if flag else '', True)
         out_list.append(t2)
 
-        #
-        # t2 = (KEY_SR_FACTOR, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, round(self.result_srf, 2) if flag else '', True)
-        # out_list.append(t2)
-
         t2 = (KEY_NON_DIM_ESR, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, round(self.result_nd_esr, 2) if flag else '', True)
         out_list.append(t2)
 
         t1 = (None, KEY_DESIGN_COMPRESSION, TYPE_TITLE, None, True)
         out_list.append(t1)
 
+        t1 = (KEY_COMP_STRESS, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+              round(self.result_fcd * 1e-3, 2) if flag else
+              '', True)
+        out_list.append(t1)
+
         t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX, round(self.result_capacity * 1e-3, 2) if flag else
         '', True)
         out_list.append(t1)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
-               int(round(22.02, 0)) if flag else '', True)
-        out_list.append(t19)
-
-        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
-        out_list.append(t8)
-
-        t8 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
-        out_list.append(t8)
+        # t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
+        #        int(round(22.02, 0)) if flag else '', True)
+        # out_list.append(t19)
+        #
+        # t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
+        # out_list.append(t8)
+        #
+        # t8 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
+        # out_list.append(t8)
 
         # t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
         #       int(self.bolt.bolt_diameter_provided) if flag else '', True)
@@ -881,6 +882,7 @@ class Compression(Member):
               f"self.out_plane {self.out_plane} \n"
               f"self.bolts {self.bolts} \n"
             "========Unknown keys==========")
+        print("character",[chr(code) for code in range(945,970)])
 
 
         #'Conn_Location'
@@ -999,7 +1001,8 @@ class Compression(Member):
         # self.i = 0
         # checking input values
         flag = self.section_classification(self)
-        # print(flag)
+        if len(self.input_section_list) == 0:
+            flag == False
         if flag:
             self.design(self, design_dictionary)
             self.results(self, design_dictionary)
@@ -1290,7 +1293,7 @@ class Compression(Member):
             # 2.3 - slenderness ratio
             # self.section_property.min_rad_gyration_calc(self, self.sec_profile)
             if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:
-                self.min_radius_gyration = self.min_rad_gyration_calc_strut(self,designation= self.section_property.designation, material_grade=self.material,
+                min_radius_gyration, effective_area = self.min_rad_gyration_calc_strut(self,designation= self.section_property.designation, material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_property.a,
                                            B_b=self.section_property.b, T_t=self.section_property.thickness)
             #     self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
@@ -1345,11 +1348,11 @@ class Compression(Member):
             #     #     local_flag = False
             #     #     break
 
-            self.slenderness = self.section_property.design_check_for_slenderness(K= self.K, L = self.length, r = self.min_radius_gyration)#(self.effective_length / self.min_radius_gyration)
-            print(f"self.min_radius_gyration {self.min_radius_gyration}"
-                  f"self.slenderness {self.slenderness}")
+            slenderness = self.section_property.design_check_for_slenderness(K= self.K, L = self.length, r = min_radius_gyration)#(self.effective_length / self.min_radius_gyration)
+            print(f"min_radius_gyration {min_radius_gyration}"
+                  f"slenderness {slenderness}")
             limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
-            if self.slenderness > limit:
+            if slenderness > limit:
                 logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
                 logger.error("Cannot compute. Given Length does not pass for this section.")
                 local_flag = False
@@ -1370,7 +1373,7 @@ class Compression(Member):
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_property.section_class})
                 # if self.sec_profile != Profile_name_1:
-                self.sec_prop_initial_dict.update({trial_section : (self.section_property.section_class, self.min_radius_gyration, self.slenderness)}) #, self.width_thickness_ratio,self.depth_thickness_ratio,self.width_depth_thickness_ratio
+                self.sec_prop_initial_dict.update({trial_section : (self.section_property.section_class, min_radius_gyration, slenderness, effective_area)}) #, self.width_thickness_ratio,self.depth_thickness_ratio,self.width_depth_thickness_ratio
         # print(f" sectopn class done {self.sec_list}")
         return local_flag
             # print(f"self.section_property.section_class{self.section_property.section_class}")
@@ -1483,18 +1486,18 @@ class Compression(Member):
 
 
         elif step == 4:
-            print(f"\n data sent "
-                  f" self.material_property.fy {self.material_property.fy}"
-                  f"self.gamma_m0 {self.gamma_m0}"
-                  f"self.slenderness {self.slenderness}"
-                  f" self.imperfection_factor {self.imperfection_factor}"
-                  f"self.section_property.modulus_of_elasticity {self.section_property.modulus_of_elasticity}")
+            # print(f"\n data sent "
+            #       f" self.material_property.fy {self.material_property.fy}"
+            #       f"self.gamma_m0 {self.gamma_m0}"
+            #       f"self.slenderness {self.slenderness}"
+            #       f" self.imperfection_factor {self.imperfection_factor}"
+            #       f"self.section_property.modulus_of_elasticity {self.section_property.modulus_of_elasticity}")
 
             list_cl_7_1_2_1_design_compressisive_stress = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
                 self.material_property.fy, self.gamma_m0, self.slenderness, self.imperfection_factor,
                 self.section_property.modulus_of_elasticity, check_type= list_result)
-            for x in list_cl_7_1_2_1_design_compressisive_stress:
-                print(f"x {x} ")
+            # for x in list_cl_7_1_2_1_design_compressisive_stress:
+            #     print(f"x {x} ")
             self.euler_buckling_stress = list_cl_7_1_2_1_design_compressisive_stress[0]
             self.nondimensional_effective_slenderness_ratio = list_cl_7_1_2_1_design_compressisive_stress[1]
             self.phi = list_cl_7_1_2_1_design_compressisive_stress[2]
@@ -1588,7 +1591,7 @@ class Compression(Member):
             # self.result_fcd_zz = list_result[result_type]['FCD_zz']
             # self.result_fcd_yy = list_result[result_type]['FCD_yy']
 
-            self.result_fcd = list_result[result_type]['FCD']
+            self.result_fcd = list_result[result_type]['FCD'] * 1000
             self.result_capacity = list_result[result_type]['Capacity']
             self.result_cost = list_result[result_type]['Cost']
     # def max_force_length(self,section):
@@ -1672,7 +1675,7 @@ class Compression(Member):
                 logger.info("Provided appropriate input and starting design.")
 
                 self.design_strut(self)
-            else:
+            elif len(self.input_section_list) != 0 :
                 logger.warning(
                     "No need for load input.")
                 # logger.error("Cannot compute!")
@@ -1680,6 +1683,15 @@ class Compression(Member):
                 design_dictionary[KEY_AXIAL] = ''
 
                 self.strength_of_strut(self)
+            else:
+                # logger.warning(
+                #     "More than 1 section given as input without giving Load")
+                logger.warning("Cannot compute!")
+                logger.info("Give 1 valid section as Inputs and/or "
+                            "Change load or Length and re-design.")
+                self.design_status = False
+                # self.design_strut(self)
+                self.design_status_list.append(self.design_status)
 
         else:
             # logger.warning(
@@ -1712,18 +1724,27 @@ class Compression(Member):
             # Yield strength of steel
             # self.common_checks_1(self,section, step=7)
 
-            #Common checks
-            self.common_checks_1(self,section)
+            # Common checks
+            self.common_checks_1(self, section)
             # initialize lists for updating the results dictionary
             list_result = []
             list_result.append(section)
             print(f"Common checks "
                   f"list_result {list_result}")
 
-            # Step 1 - computing the effective sectional area
+
             self.section_property.section_class = self.input_section_classification[section]
 
-            self.common_checks_1(self,section,step =2)
+            # MIN RADIUS OF GYRATION
+            self.min_radius_gyration = self.sec_prop_initial_dict[section][1]
+            self.slenderness = self.sec_prop_initial_dict[section][2]
+            # Step 1 - computing the effective sectional area
+            self.effective_area = self.sec_prop_initial_dict[section][3]
+
+            self.common_checks_1(self, section, step=2)
+
+
+
             # if self.loc == "Long Leg":
             #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
             # else:
@@ -1732,44 +1753,60 @@ class Compression(Member):
             list_result.extend([self.section_property.section_class, self.effective_area])
 
             # Step 2 - computing the design compressive stress
-            self.common_checks_1(self,section,step=3)
+            self.common_checks_1(self, section, step=3)
             list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
-
-
 
             if self.load_type == 'Concentric Load':
                 print(f"step == 4"
                       f"list_result {list_result}")
                 self.lambda_vv = 'NA'
                 self.lambda_psi = 'NA'
-                #step == 4
+                # step == 4
                 self.common_checks_1(self, section, step=4, list_result=['Concentric'])
             else:
                 # self.min_radius_gyration = min(self.section_property.rad_of_gy_y, self.section_property.rad_of_gy_z)
                 returned_list = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
                     self.length, self.min_radius_gyration, self.section_property.leg_a_length,
-                    self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy, bolt_no= self.bolts, fixity=self.fixity)
+                    self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy,
+                    bolt_no=self.bolts, fixity=self.fixity)
 
                 self.equivalent_slenderness = returned_list[0]
-                self.lambda_vv =  round(returned_list[1],2)
-                self.lambda_psi =  round(returned_list[2],2)
-                self.k1 =  returned_list[3]
-                self.k2 =  returned_list[4]
-                self.k3 =  returned_list[5]
-                print(f"self.equivalent_slenderness {self.equivalent_slenderness} "
-                      f" \n self.slenderness {self.slenderness} "
-                      f" \n self.lambda_vv {self.lambda_vv} "
-                      f" \n self.lambda_psi {self.lambda_psi} "
-                      f" \n self.k1 {self.k1} "
-                      f" \n self.k2 {self.k2} "
-                      f" \n self.k3 {self.k3} ")
-                self.common_checks_1(self, section, step=4, list_result=['Leg', self.equivalent_slenderness])
+                self.lambda_vv = round(returned_list[1], 2)
+                self.lambda_psi = round(returned_list[2], 2)
+                self.k1 = returned_list[3]
+                self.k2 = returned_list[4]
+                self.k3 = returned_list[5]
 
+                self.common_checks_1(self, section, step=4, list_result=['Leg', self.equivalent_slenderness])
 
 
             # 2.7 - Capacity of the section
             self.section_capacity = self.design_compressive_stress * self.effective_area  # N
 
+            print("\n data sent ", self.length, self.min_radius_gyration, self.section_property.leg_a_length,
+                  f" \n self.section_property.leg_b_length {self.section_property.leg_b_length}, ",
+                  f"\n  self.section_property.thickness {self.section_property.thickness},",
+                  f" \n self.material_property.fy {self.material_property.fy}, ",
+                  f"\n self.bolts {self.bolts}, ",
+                  f" \n self.fixity {self.fixity}, ",
+                  f"\n self.slenderness {self.slenderness}",
+                  f" \n self.slenderness {self.slenderness}", self.imperfection_factor,
+                  self.section_property.modulus_of_elasticity,
+                  f" \n self.euler_buckling_stress {self.euler_buckling_stress}",
+                  f" \n self.nondimensional_effective_slenderness_ratio {self.nondimensional_effective_slenderness_ratio}",
+                  f" \n self.phi {self.phi}",
+                  f" \n self.stress_reduction_factor {self.stress_reduction_factor}",
+                  f" \n self.design_compressive_stress_fr {self.design_compressive_stress_fr}",
+                  f" \n self.design_compressive_stress {self.design_compressive_stress}",
+                  f" \n self.design_compressive_stress_max {self.design_compressive_stress_max}"
+                  f" \n self.section_capacity {self.section_capacity}", )
+            if self.load_type != 'Concentric Load':
+                print(f" \n self.equivalent_slenderness {self.equivalent_slenderness} "
+                      f" \n self.lambda_vv {self.lambda_vv} "
+                      f" \n self.lambda_psi {self.lambda_psi} "
+                      f" \n self.k1 {self.k1} "
+                      f" \n self.k2 {self.k2} "
+                      f" \n self.k3 {self.k3} ")
             # 2.8 - UR
             self.ur = round(self.load.axial_force / self.section_capacity, 3)
             self.optimum_section_ur.append(self.ur)
@@ -1795,13 +1832,13 @@ class Compression(Member):
                       'Effective_length', 'Effective_SR', 'EBS', 'lambda_vv', 'lambda_psi', 'ND_ESR', 'phi', 'SRF',
                       'FCD_formula', 'FCD_max', 'FCD', 'Capacity', 'UR', 'Cost']
             self.common_checks_1(self, section, 5, list_result, list_1)
-        print(f"\n self.optimum_section_cost_results {self.optimum_section_cost_results}"
+            print(f"\n self.optimum_section_cost_results {self.optimum_section_cost_results}"
               f"\n self.optimum_section_ur_results {self.optimum_section_ur_results}")
 
     def min_rad_gyration_calc_strut(self,designation, material_grade,key,subkey, D_a=0.0,B_b=0.0,T_t=0.0,t=0.0):
         if key == Profile_name_1 and (subkey == loc_type1 or subkey == loc_type2):
             Angle_attributes = Angle(designation, material_grade)
-            self.effective_area = Angle_attributes.area
+            effective_area = Angle_attributes.area
             rad_u = Angle_attributes.rad_of_gy_u
             rad_v = Angle_attributes.rad_of_gy_v
             min_rad = min(rad_u, rad_v)
@@ -1809,32 +1846,40 @@ class Compression(Member):
         elif key == Profile_name_2 and subkey == loc_type1:
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            self.effective_area = BBAngle_attributes.calc_Area() * 100
+            effective_area = BBAngle_attributes.calc_Area() * 100
             rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t,l=loc_type2) * 10
             rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t,l=loc_type2) * 10
+            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a, b, t, l, thickness)
+            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a, b, t, l, thickness)
+            print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z, '\n mom_inertia_y =',mom_inertia_y,'\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         elif key == Profile_name_2 and subkey == loc_type2: #match
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            self.effective_area = BBAngle_attributes.calc_Area() * 100
+            effective_area = BBAngle_attributes.calc_Area() * 100
             rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=0, l=loc_type1) * 10
+            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a, b, t, l, thickness)
             rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=0, l=loc_type1) * 10
+            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a, b, t, l, thickness)
+            print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z, '\n mom_inertia_y =',mom_inertia_y,'\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         elif key == Profile_name_3 and subkey == loc_type1: #match
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            self.effective_area = BBAngle_attributes.calc_Area() * 100
+            effective_area = BBAngle_attributes.calc_Area() * 100
             rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
             rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z)
             min_rad = min(rad_y, rad_z)
         elif key == Profile_name_3 and subkey == loc_type2:
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            self.effective_area = BBAngle_attributes.calc_Area() * 100
+            effective_area = BBAngle_attributes.calc_Area() * 100
             rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
             rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z)
             min_rad = min(rad_y, rad_z)
-        return min_rad
+        return min_rad , effective_area
     def strength_of_strut(self):
         # iterating the design over each section to find the most optimum section
         section = self.input_section_list[0]
@@ -1842,18 +1887,27 @@ class Compression(Member):
         # Yield strength of steel
         # self.common_checks_1(self,section, step=7)
 
+
+
         # Common checks
         self.common_checks_1(self, section)
         # initialize lists for updating the results dictionary
         list_result = []
         list_result.append(section)
-        print(f"Common checks"
-              f"list_result {list_result}")
+        print(f"Common checks "
+              f"section for design {list_result}")
 
         # Step 1 - computing the effective sectional area
         self.section_property.section_class = self.input_section_classification[section]
 
-        self.common_checks_1(self, section, 2)
+        # MIN RADIUS OF GYRATION
+        self.min_radius_gyration = self.sec_prop_initial_dict[section][1]
+        self.slenderness = self.sec_prop_initial_dict[section][2]
+        # Step 1 - computing the effective sectional area
+        self.effective_area = self.sec_prop_initial_dict[section][3]
+        # SAME AS BEFORE
+
+        self.common_checks_1(self, section, step=2)
         # if self.loc == "Long Leg":
         #     self.max_depth =self.section_size_max.max_leg - self.section_size_max.thickness - self.section_size_max.root_radius
         # else:
@@ -1862,17 +1916,12 @@ class Compression(Member):
         list_result.extend([self.section_property.section_class, self.effective_area])
 
         # Step 2 - computing the design compressive stress
-        self.common_checks_1(self, section, 3)
+        self.common_checks_1(self, section, step=3)
         list_result.extend([self.buckling_class, self.imperfection_factor, self.effective_length])
 
-        # 2.3 - slenderness ratio
-        # self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
-        # self.slenderness = self.effective_length / self.min_radius_gyration
-        print(f"self.min_radius_gyration {self.min_radius_gyration}"
-              f" self.slenderness {self.slenderness}")
         if self.load_type == 'Concentric Load':
-            print(f"step == 4"
-                  f"list_result {list_result}")
+            # print(f"step == 4"
+            #       f"list_result {list_result}")
             self.lambda_vv = 'NA'
             self.lambda_psi = 'NA'
             # step == 4
@@ -1880,9 +1929,9 @@ class Compression(Member):
         else:
             # self.min_radius_gyration = min(self.section_property.rad_of_gy_y, self.section_property.rad_of_gy_z)
             returned_list = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
-                self.effective_length, self.min_radius_gyration, self.section_property.leg_a_length,
-                self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy, self.bolts,
-                self.fixity)
+                self.length, self.min_radius_gyration, self.section_property.leg_a_length,
+                self.section_property.leg_b_length, self.section_property.thickness, self.material_property.fy,
+                bolt_no=self.bolts, fixity=self.fixity)
 
             self.equivalent_slenderness = returned_list[0]
             self.lambda_vv = round(returned_list[1], 2)
@@ -1890,17 +1939,36 @@ class Compression(Member):
             self.k1 = returned_list[3]
             self.k2 = returned_list[4]
             self.k3 = returned_list[5]
-            print(f"self.equivalent_slenderness {self.equivalent_slenderness} "
-                  f" \n self.slenderness {self.slenderness} "
+
+
+            self.common_checks_1(self, section, step=4, list_result=['Leg', self.equivalent_slenderness])
+
+        print("\n data sent ", self.length, self.min_radius_gyration, self.section_property.leg_a_length,
+              f" \n self.section_property.leg_b_length {self.section_property.leg_b_length}, ",
+              f"\n  self.section_property.thickness {self.section_property.thickness},",
+              f" \n self.material_property.fy {self.material_property.fy}, ",
+               f"\n self.bolts {self.bolts}, ",
+              f" \n self.fixity {self.fixity}, ",
+               f"\n self.slenderness {self.slenderness}",
+              f" \n self.imperfection_factor {self.imperfection_factor}", self.section_property.modulus_of_elasticity,
+              f" \n self.euler_buckling_stress {self.euler_buckling_stress}",
+              f" \n self.nondimensional_effective_slenderness_ratio {self.nondimensional_effective_slenderness_ratio}",
+              f" \n self.phi {self.phi}",
+              f" \n self.stress_reduction_factor {self.stress_reduction_factor}",
+              f" \n self.design_compressive_stress_fr {self.design_compressive_stress_fr}",
+              f" \n self.design_compressive_stress {self.design_compressive_stress}",
+              f" \n self.design_compressive_stress_max {self.design_compressive_stress_max}", )
+        if self.load_type != 'Concentric Load':
+                  print(f" \n self.equivalent_slenderness {self.equivalent_slenderness} "
                   f" \n self.lambda_vv {self.lambda_vv} "
                   f" \n self.lambda_psi {self.lambda_psi} "
                   f" \n self.k1 {self.k1} "
                   f" \n self.k2 {self.k2} "
                   f" \n self.k3 {self.k3} ")
-            self.common_checks_1(self, section, step=4, list_result=['Leg', self.equivalent_slenderness])
-
         # 2.7 - Capacity of the section
         self.section_capacity = self.design_compressive_stress * self.effective_area  # N
+
+        #SAME AS BEFORE TILL HERE
 
         # 2.9 - Cost of the section in INR
         self.cost = (self.section_property.unit_mass * self.section_property.area * 1e-4) * self.length * \

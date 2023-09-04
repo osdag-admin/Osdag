@@ -1248,9 +1248,14 @@ class Compression(Member):
                 # updating the material property based on thickness of the thickest element
                 self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
                 if self.section_property.type == 'Rolled':
-
-                    list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
+                    if self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[0] or self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[2]:
+                        list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
                                                             self.material_property.fy, "Axial Compression")
+                    elif self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[1]:
+                        list_Table2_vi = IS800_2007.Table2_vii(self.section_property.min_leg,
+                                                              self.section_property.max_leg,
+                                                              self.section_property.thickness,
+                                                              self.material_property.fy, "Axial Compression")
                     # print(f"\n \n \n self.material_property.fy {self.material_property.fy} \n \n \n")
                     self.section_property.section_class = list_Table2_vi[0]
                     self.width_thickness_ratio  = list_Table2_vi[1]
@@ -1295,7 +1300,7 @@ class Compression(Member):
             if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:
                 min_radius_gyration, effective_area = self.min_rad_gyration_calc_strut(self,designation= self.section_property.designation, material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_property.a,
-                                           B_b=self.section_property.b, T_t=self.section_property.thickness)
+                                           B_b=self.section_property.b, T_t=self.section_property.thickness, t = self.plate_thickness)
             #     self.min_radius_gyration = min(self.section_property.rad_of_gy_u, self.section_property.rad_of_gy_v)
             # 
             # elif self.sec_profile == Profile_name_2 :
@@ -1847,37 +1852,45 @@ class Compression(Member):
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
             effective_area = BBAngle_attributes.calc_Area() * 100
-            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t,l=loc_type2) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t,l=loc_type2) * 10
-            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a, b, t, l, thickness)
-            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a, b, t, l, thickness)
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t,l=loc_type2, thickness = 0) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t,l=loc_type2, thickness = 0) * 10
+            # mom_inertia_y_1 = mom_inertia_y = self.Angle_attributes.mom_inertia_y
+            # mom_inertia_z_1 = mom_inertia_y = self.Angle_attributes.mom_inertia_y
+            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a=D_a,b=B_b,t=T_t, l=loc_type2, thickness = 0)
+            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a=D_a,b=B_b,t=T_t, l=loc_type2, thickness = 0)
             print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z, '\n mom_inertia_y =',mom_inertia_y,'\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         elif key == Profile_name_2 and subkey == loc_type2: #match
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
             effective_area = BBAngle_attributes.calc_Area() * 100
-            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=0, l=loc_type1) * 10
-            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a, b, t, l, thickness)
-            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=0, l=loc_type1) * 10
-            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a, b, t, l, thickness)
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=loc_type1, thickness= 0) * 10
+            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a=D_a,b=B_b,t=T_t, l=loc_type1, thickness= 0)
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=loc_type1, thickness= 0) * 10
+            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a=D_a,b=B_b,t=T_t, l=loc_type1, thickness= 0)
             print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z, '\n mom_inertia_y =',mom_inertia_y,'\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         elif key == Profile_name_3 and subkey == loc_type1: #match
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
             effective_area = BBAngle_attributes.calc_Area() * 100
-            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
-            print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z)
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey, thickness= t) * 10
+            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a=D_a,b=B_b,t=0, l=loc_type1, thickness= t)
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey, thickness= t) * 10
+            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a=D_a,b=B_b,t=0, l=loc_type1, thickness= t)
+            print(self.section_property.designation, '\n rad_y =', rad_y, '\n rad_z =', rad_z, '\n mom_inertia_y =',
+                  mom_inertia_y, '\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         elif key == Profile_name_3 and subkey == loc_type2:
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
             effective_area = BBAngle_attributes.calc_Area() * 100
-            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
-            print(self.section_property.designation, '\n rad_y =',rad_y, '\n rad_z =', rad_z)
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey, thickness= t) * 10
+            mom_inertia_y = BBAngle_attributes.calc_MomentOfAreaY(a=D_a,b=B_b,t=0, l=loc_type1, thickness= t)
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey, thickness= t) * 10
+            mom_inertia_z = BBAngle_attributes.calc_MomentOfAreaZ(a=D_a,b=B_b,t=0, l=loc_type1, thickness= t)
+            print(self.section_property.designation, '\n rad_y =', rad_y, '\n rad_z =', rad_z, '\n mom_inertia_y =',
+                  mom_inertia_y, '\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         return min_rad , effective_area
     def strength_of_strut(self):

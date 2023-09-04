@@ -491,6 +491,9 @@ KEY_DISP_SECTION_DEFINITION_DP = 'Section Definition (Table 2)'
 KEY_DISP_OPTIMIZATION_STEEL_COST = 'Cost'
 KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
+
+#Flexure Members
+KEY_DISP_FLEXURE = 'Flexural Members'
 ###################################
 # All Input Keys
 ###################################

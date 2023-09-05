@@ -498,6 +498,31 @@ KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
 #Flexure Members
 KEY_DISP_FLEXURE = 'Flexural Members'
+KEY_DISP_DESIGN_TYPE_FLEXURE = 'Laterally Supported'
+KEY_DESIGN_TYPE_FLEXURE = 'Flexure.Type'
+KEY_DISP_DESIGN_TYPE2_FLEXURE = 'Laterally Unsupported'
+KEY_DESIGN_TYPE2_FLEXURE = 'Laterally.Unsupported'
+KEY_DISP_BENDING1 = 'Major'
+KEY_DISP_BENDING2 = 'Minor'
+KEY_BENDING = 'Bending.type'
+KEY_SUPPORT = 'Flexure.Support'
+KEY_DISP_SUPPORT1 = 'Simply Supported'
+KEY_DISP_SUPPORT2 = 'Cantilever'
+KEY_SUPPORT1 = 'Torsional'
+KEY_SUPPORT2 = 'Warping'
+KEY_LOAD = 'Loading.Condition'
+KEY_DISP_LOAD1 ='Normal'
+KEY_DISP_LOAD2 = 'Destabilizing'
+Torsion_Restraint1 = 'Fully Restrained'
+Torsion_Restraint2 = 'Partially Restrained-support connection'
+Torsion_Restraint3 = 'Partially Restrained-bearing support'
+Warping_Restraint1 = 'Both flanges fully restrained'
+Warping_Restraint2 = 'Compression flange fully restrained'
+Warping_Restraint3 = 'Both flanges fully restrained'
+Warping_Restraint4 = 'Compressicm flange partially restrained'
+Warping_Restraint5 = 'Warping not restrained in both flanges'
+
+
 ###################################
 # All Input Keys
 ###################################

@@ -799,21 +799,34 @@ class Flexure(Member):
         # section properties
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
+
+        self.design_type = KEY_DISP_DESIGN_TYPE_FLEXURE # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+        # self.design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]
+        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+            self.bending_type = KEY_DISP_BENDING1 # or KEY_DISP_BENDING2
+            # self.bending_type = design_dictionary[KEY_BENDING]
+            if self.bending_type == KEY_DISP_BENDING2:
+                self.design_type = KEY_DISP_DESIGN_TYPE_FLEXURE
+            elif self.bending_type == KEY_DISP_BENDING1 :
+                self.lambda_lt = self.lambda_lt_check_member_type
+                if self.lambda_lt <0.4:
+                    self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE
+
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.sec_list = design_dictionary[KEY_SECSIZE]
         self.length = float(design_dictionary[KEY_LENGTH])
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
         # try :
-        self.in_plane = float(design_dictionary[KEY_Buckling_In_plane])
-        self.out_plane = float(design_dictionary[KEY_Buckling_Out_plane])
-        self.bolts = float(design_dictionary[KEY_BOLT_Number])
-        print(f"self.in_plane {self.in_plane}"
-              f"self.out_plane {self.out_plane}"
-              f"self.bolts {self.bolts}")
+        # self.in_plane = float(design_dictionary[KEY_Buckling_In_plane])
+        # self.out_plane = float(design_dictionary[KEY_Buckling_Out_plane])
+        # self.bolts = float(design_dictionary[KEY_BOLT_Number])
+        # print(f"self.in_plane {self.in_plane}"
+        #       f"self.out_plane {self.out_plane}"
+        #       f"self.bolts {self.bolts}")
         # except:
         #     pass
-        print("========Unknown keys==========")
+        # print("========Unknown keys==========")
         # self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
         #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
         # self.plate = Plate(thickness=['10'],
@@ -821,9 +834,14 @@ class Flexure(Member):
         # print(f"self.plate {self.plate}")
 
         #'Conn_Location'
-        self.loc = design_dictionary[KEY_LOCATION]
-
-
+        self.support = design_dictionary[KEY_SUPPORT]
+        if self.support == KEY_DISP_SUPPORT1:
+            self.Torsional_res = design_dictionary[KEY_SUPPORT1]
+            self.Warping = design_dictionary[KEY_SUPPORT2]
+            self.Loading = design_dictionary[KEY_LOAD]
+            self.length = self.effective_length_simply_supported(Torsional= self.Torsional_res, Warping= self.Warping,length=self.length, depth= 0, load = self.Loading)
+        elif self.support == KEY_DISP_SUPPORT2:
+            pass
         # self.load_type = 'Concentric Load'
 
 
@@ -1154,6 +1172,52 @@ class Flexure(Member):
 
         components = []
         return components
+
+    def lambda_lt_check_member_type(self, Mcr = 0, fcrb= 0, Zp = 0, f_y = 0, Ze = 0, beta_b = 0):
+        lambda_lt_1 = math.sqrt(beta_b * Zp * f_y / Mcr)
+        lambda_lt_2 = math.sqrt(f_y/fcrb)
+        lambda_lt_check = math.sqrt(1.2 * Ze * f_y / Mcr)
+        if lambda_lt_1 == lambda_lt_2 :
+            if lambda_lt_1 <= lambda_lt_check:
+                return lambda_lt_1
+        logger.warning(' Issues with the non-dimensional slenderness ratio Lambda_lt')
+
+    def effective_length_simply_supported(self, Torsional, Warping, length, depth, load):
+        if load == KEY_DISP_LOAD1:
+            if Torsional == Torsion_Restraint1:
+                if Warping ==Warping_Restraint1 :
+                    length = 0.70 * length
+                if Warping ==Warping_Restraint2 :
+                    length = 0.75 * length
+                if Warping ==Warping_Restraint3 :
+                    length = 0.80 * length
+                if Warping ==Warping_Restraint4 :
+                    length = 0.85 * length
+                if Warping ==Warping_Restraint5 :
+                    length = 1.00 * length
+            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
+                length = length + 2* depth
+            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
+                length = 1.2 * length + 2 *depth
+        elif load == KEY_DISP_LOAD2:
+            if Torsional == Torsion_Restraint1:
+                if Warping ==Warping_Restraint1 :
+                    length = 0.85 * length
+                if Warping ==Warping_Restraint2 :
+                    length = 0.9 * length
+                if Warping ==Warping_Restraint3 :
+                    length = 0.95 * length
+                if Warping ==Warping_Restraint4 :
+                    length = 1.00 * length
+                if Warping ==Warping_Restraint5 :
+                    length = 1.20 * length
+            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
+                length = 1.2 *length + 2* depth
+            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
+                length = 1.4 * length + 2 *depth
+        return length
+
+
 
     def section_classification(self):
         """ Classify the sections based on Table 2 of IS 800:2007 """

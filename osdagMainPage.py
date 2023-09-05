@@ -306,8 +306,8 @@ class OsdagMainWindow(QMainWindow):
                                        ],
                 'Flexural Member' : [
                     ('Laterally Supported and Unsupported Beam', 'ResourceFiles/images/broken.png', 'Beam_flexure'),
-                    ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
-                    self.show_truss_bolted,
+                    # ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    self.show_flexure_module,
                 ],
                 'Beam-Column' :[
                     ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
@@ -698,6 +698,16 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
+    def show_flexure_module(self):
+        """ Create radio buttons for the sub-modules under the compression module"""
+        # print(f"Here8")
+        if self.findChild(QRadioButton, 'Beam_flexure').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(Flexure, ' ')
+            # print(f"Here11")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
     def show_beamcolumn_module(self):
         if self.findChild(QRadioButton, 'Beam_flexure').isChecked():
             # print(f"Here9")
@@ -706,6 +716,7 @@ class OsdagMainWindow(QMainWindow):
             # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+
 
 ################################# Help Actions ############################################
 

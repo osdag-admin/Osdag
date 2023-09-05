@@ -444,7 +444,7 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF02[0]
 
             else:
-                if section_profile == "Back to Back Angles":
+                if section_profile == Profile_name_3:
                     print(section_profile, "hjcxhf")
                     Angle_attributes = BBAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
@@ -462,6 +462,39 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF02[2]
                         Cy =  "N/A"
                         Cz = str(Angle_attributes.calc_Cz(a, b,thickness, l))
+                    mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
+                    area = str(Angle_attributes.calc_Area(a, b, thickness, l))
+                    mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                    mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                    mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                    mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                    rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                    rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                    rad_of_gy_u = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                    rad_of_gy_v = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                    elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
+                    elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
+                    plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
+                    plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
+                    torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
+                elif section_profile == Profile_name_2:
+                    print(section_profile, "hjcxhf")
+                    Angle_attributes = BBAngle_Properties()
+                    Angle_attributes.data(designation, material_grade)
+                    if l == "Long Leg":
+                        if a == b:
+                            image = Profile_2_img1
+                        else:
+                            image = Profile_2_img3
+                        Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
+                        Cy = "N/A"
+                    else:
+                        if a == b:
+                            image = Profile_2_img2
+                        else:
+                            image = Profile_2_img4
+                        Cy = "N/A"
+                        Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
                     mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
                     area = str(Angle_attributes.calc_Area(a, b, thickness, l))
                     mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
@@ -1340,12 +1373,17 @@ class Member(Main):
 
         return section
     def get_strut_angle_section_properties(self):
-
+        print(f" get_strut_angle_section_properties\n"
+              f" self {self} \n"
+              f" designation {self[0]}\n"
+              f" {self[1]}\n"
+              f"{self[2]}\n"
+              f"{self[3]}\n")
         designation = self[0]
         material_grade = self[1]
-        l = self[3][KEY_LOCATION]
-        section_profile = self[3][KEY_SEC_PROFILE]
-        plate_thk = float(self[2])
+        l = self[2][KEY_LOCATION]
+        section_profile = self[2][KEY_SEC_PROFILE]
+        plate_thk = float(self[2][KEY_PLATETHK])
         Angle_attributes = Angle(designation, material_grade)
         source = str(Angle_attributes.source)
         fu = str(Angle_attributes.fu)
@@ -1360,7 +1398,7 @@ class Member(Main):
         m_o_r = "76.9"
         p_r = "0.3"
         t_e = "12"
-        if section_profile == 'Angles':
+        if section_profile == Profile_name_1:
             mass = str(round((Angle_attributes.mass),2))
             area = str(round((Angle_attributes.area/100),2))
             Cz = str(round((Angle_attributes.Cz/10),2))
@@ -1384,7 +1422,7 @@ class Member(Main):
                 image = VALUES_IMG_TENSIONBOLTED_DF02[0]
         else:
             # Angle_attributes = Angle(designation, material_grade)
-            if section_profile == "Back to Back Angles":
+            if section_profile == Profile_name_3:
                 print(section_profile, "hjcxhf")
                 Angle_attributes = BBAngle_Properties()
                 Angle_attributes.data(designation, material_grade)
@@ -1418,6 +1456,40 @@ class Member(Main):
                 plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
                 plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
                 torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
+            elif section_profile == Profile_name_2:
+                print(section_profile, "hjcxhf")
+                Angle_attributes = BBAngle_Properties()
+                Angle_attributes.data(designation, material_grade)
+                if l == "Long Leg":
+                    if a == b:
+                        image = Profile_2_img1
+                    else:
+                        image = Profile_2_img3
+                    Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
+                    Cy = "N/A"
+                else:
+                    if a == b:
+                        image = Profile_2_img2
+                    else:
+                        image = Profile_2_img4
+                    Cy = "N/A"
+                    Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
+                mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
+                area = str(Angle_attributes.calc_Area(a, b, thickness, l))
+                mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                rad_of_gy_u = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                rad_of_gy_v = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
+                elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
+                plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
+                plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
+                torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
+
             else:  #  "Star Angles":
                 Angle_attributes = SAngle_Properties()
                 Angle_attributes.data(designation, material_grade)
@@ -1452,7 +1524,7 @@ class Member(Main):
 
         d = {
              KEY_SECSIZE_SELECTED:designation,
-            KEY_SEC_MATERIAL: material_grade,
+             KEY_SEC_MATERIAL: material_grade,
              KEY_SEC_FY:fy,
              KEY_SEC_FU:fu,
              'Label_1': a,
@@ -1485,6 +1557,7 @@ class Member(Main):
         return d
 
     def get_Strut_Angle_sec_properties(self):
+        print(f" get_Strut_Angle_sec_properties \n self{self}")
         if '' in self:
             mass = ''
             area = ''
@@ -1509,10 +1582,10 @@ class Member(Main):
             b = float(self[1])
             t = float(self[2])
             plate_thk = float(self[3][KEY_PLATETHK][0])
-            plate_thk = float(self[3])
+            # plate_thk = float(self[3])
 
-            l = self[4][KEY_LOCATION]
-            p = self[4][KEY_SEC_PROFILE]
+            l = self[3][KEY_LOCATION]
+            p = self[3][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -1539,7 +1612,7 @@ class Member(Main):
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF02[0]
 
-            elif p == "Back to Back Angles":
+            elif p == Profile_name_3 or p == Profile_name_2:
                 sec_prop = BBAngle_Properties()
                 mass = sec_prop.calc_Mass(a, b, t, l)
                 area = sec_prop.calc_Area(a, b, t, l)
@@ -2631,6 +2704,12 @@ class Member(Main):
                 t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, Strut_load, values[KEY_ALLOW_LOAD])
                 optimum.append(t1)
 
+                t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
+                optimum.append(t1)
+
+                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, values[KEY_BOLT_Number])
+                optimum.append(t5)
+
             elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
                 values[KEY_ALLOW_LOAD] = Load_type2
                 t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, [Load_type2], values[KEY_ALLOW_LOAD])
@@ -2666,11 +2745,11 @@ class Member(Main):
                       values[KEY_PLATETHK])  # , KEY_GUSSET, TYPE_COMBOBOX, PLATE_THICKNESS_SAIL, True, 'No Validator'
                 optimum.append(t1)
 
-                t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
-                optimum.append(t1)
-
-                t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, values[KEY_BOLT_Number])
-                optimum.append(t5)
+                # t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
+                # optimum.append(t1)
+                #
+                # t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, values[KEY_BOLT_Number])
+                # optimum.append(t5)
         else:
             t1 = (KEY_ALLOW_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, ['Concentric Load', 'Leg Load'], values[KEY_ALLOW_LOAD])
 

@@ -521,8 +521,14 @@ Warping_Restraint2 = 'Compression flange fully restrained'
 Warping_Restraint3 = 'Both flanges fully restrained'
 Warping_Restraint4 = 'Compressicm flange partially restrained'
 Warping_Restraint5 = 'Warping not restrained in both flanges'
-
-
+Support1 = 'Continous, with lateral restraint to top flange'
+Support2 = 'Continous, with partial torsional restraint'
+Support3 = 'Continous, with lateral and torsional restraint'
+Support4 = 'Restrained laterally, torsionally and against rotation on flange'
+Top1 = 'Free'
+Top2 = 'Lateral restraint to top flange'
+Top3 = 'Torsional rwstraint'
+Top4 = 'Lateral and Torsional rwstraint'
 ###################################
 # All Input Keys
 ###################################

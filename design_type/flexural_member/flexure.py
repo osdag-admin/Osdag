@@ -1183,42 +1183,12 @@ class Flexure(Member):
         logger.warning(' Issues with the non-dimensional slenderness ratio Lambda_lt')
 
     def effective_length_simply_supported(self, Torsional, Warping, length, depth, load):
-        if load == KEY_DISP_LOAD1:
-            if Torsional == Torsion_Restraint1:
-                if Warping ==Warping_Restraint1 :
-                    length = 0.70 * length
-                if Warping ==Warping_Restraint2 :
-                    length = 0.75 * length
-                if Warping ==Warping_Restraint3 :
-                    length = 0.80 * length
-                if Warping ==Warping_Restraint4 :
-                    length = 0.85 * length
-                if Warping ==Warping_Restraint5 :
-                    length = 1.00 * length
-            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
-                length = length + 2* depth
-            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
-                length = 1.2 * length + 2 *depth
-        elif load == KEY_DISP_LOAD2:
-            if Torsional == Torsion_Restraint1:
-                if Warping ==Warping_Restraint1 :
-                    length = 0.85 * length
-                if Warping ==Warping_Restraint2 :
-                    length = 0.9 * length
-                if Warping ==Warping_Restraint3 :
-                    length = 0.95 * length
-                if Warping ==Warping_Restraint4 :
-                    length = 1.00 * length
-                if Warping ==Warping_Restraint5 :
-                    length = 1.20 * length
-            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
-                length = 1.2 *length + 2* depth
-            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
-                length = 1.4 * length + 2 *depth
+        length = IS800_2007.cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load)
         return length
 
-
-
+    def effective_length_cantilever(self,Support, Top, length, load):
+        length =  IS800_2007.cl_8_3_3_EffLen_Cantilever(Support, Top, length, load)
+        return length
     def section_classification(self):
         """ Classify the sections based on Table 2 of IS 800:2007 """
         # print(f"Inside section_classification")

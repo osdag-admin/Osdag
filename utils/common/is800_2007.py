@@ -881,7 +881,199 @@ class IS800_2007(object):
     # -------------------------------------------------------------
     #   8.4 Shear
     # -------------------------------------------------------------
+    @staticmethod
+    def cl_8_2_1_web_buckling(d, tw, e):
+        d_tw = d / tw
+        if d_tw <= 67*e:
+            return True
+        return False
 
+    @staticmethod
+    def cl_8_2_1_2_design_bending_strength(section_class, Zp, Ze, fy, gamma_mo, support):
+        beta_b = 1.0 if section_class == 'plastic' or 'compact' else Ze/Zp
+        Md = beta_b * Zp * fy / gamma_mo
+        if support == KEY_DISP_SUPPORT1 and Md < 1.2 * Ze * fy / gamma_mo:
+            return [Md, True]
+
+        elif support == KEY_DISP_SUPPORT2 and Md < 1.5 * Ze * fy / gamma_mo:
+            return [Md, True]
+        return [Md, False]
+
+    @staticmethod
+    def cl_8_2_1_2_high_shear_check(V, Vd):
+        print('High shear') if V > 0.6 * Vd else 'Low shear'
+
+    @staticmethod
+    def cl_8_2_1_4_holes_tension_zone(Anf_Agf, fy, fu, gamma_mo, gamma_m1):
+        return Anf_Agf if Anf_Agf > (fy/fu) * (gamma_m1/gamma_mo) / 0.9 else (fy/fu) * (gamma_m1/gamma_mo) / 0.9
+
+    @staticmethod
+    def cl_8_2_1_5_shear_lag(b0,b1, L0, type):
+        (b0 if b0<= L0/20 else L0/20) if type == 'outstand' else (b1 if b1<= L0/10 else L0/10)
+
+    @staticmethod
+    def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) -> float:
+        """ Calculate the Effective Length for Simply Supported Beams as per Table 15 Cl 8.3.1
+
+        Args:
+            Torsional Restraint: Type of Restraint (string)
+            Warping Restraint: Type of Restraint (string)
+            depth(d): depth of the element in mm (float or int)
+            length(l): length of span in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            load: Type of load in member ('Normal') ('Destabilizing')
+
+
+        Returns:
+            Effective length (float)
+
+        Reference: Table 15 Cl 8.3.1, IS 800:2007
+
+        """
+        if load == KEY_DISP_LOAD1:
+            if Torsional == Torsion_Restraint1:
+                if Warping ==Warping_Restraint1 :
+                    length = 0.70 * length
+                if Warping ==Warping_Restraint2 :
+                    length = 0.75 * length
+                if Warping ==Warping_Restraint3 :
+                    length = 0.80 * length
+                if Warping ==Warping_Restraint4 :
+                    length = 0.85 * length
+                if Warping ==Warping_Restraint5 :
+                    length = 1.00 * length
+            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
+                length = length + 2* depth
+            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
+                length = 1.2 * length + 2 *depth
+        elif load == KEY_DISP_LOAD2:
+            if Torsional == Torsion_Restraint1:
+                if Warping ==Warping_Restraint1 :
+                    length = 0.85 * length
+                if Warping ==Warping_Restraint2 :
+                    length = 0.9 * length
+                if Warping ==Warping_Restraint3 :
+                    length = 0.95 * length
+                if Warping ==Warping_Restraint4 :
+                    length = 1.00 * length
+                if Warping ==Warping_Restraint5 :
+                    length = 1.20 * length
+            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
+                length = 1.2 *length + 2* depth
+            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
+                length = 1.4 * length + 2 *depth
+        return length
+
+    @staticmethod
+    def cl_8_3_3_EffLen_Cantilever(Support, Top, length, load) -> float:
+        """ Calculate the Effective Length for Simply Supported Beams as per Table 16 Cl 8.3.3
+
+        Args:
+            Support Restraint: Type of Restraint (string)
+            Warping Restraint: Type of Restraint (string)
+            depth(d): depth of the element in mm (float or int)
+            length(l): length of span in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            load: Type of load in member ('Normal') ('Destabilizing')
+
+
+        Returns:
+            Effective length (float)
+
+        Reference: Table 15 Cl 8.3.1, IS 800:2007
+
+        """
+        if load == KEY_DISP_LOAD1:
+            if Support == Support1:
+                if Top == Top1:
+                    length = 3.00 * length
+                if Top == Top2:
+                    length = 2.7 * length
+                if Top == Top3:
+                    length = 2.40 * length
+                if Top == Top4:
+                    length = 2.1 * length
+
+            elif Support == Support2:
+                if Top == Top1:
+                    length = 2.00 * length
+                if Top == Top2:
+                    length = 1.8 * length
+                if Top == Top3:
+                    length = 1.60 * length
+                if Top == Top4:
+                    length = 1.4 * length
+
+
+            elif Support == Support3:
+
+                if Top == Top1:
+                    length = 1.00 * length
+
+                if Top == Top2:
+                    length = 0.9 * length
+
+                if Top == Top3:
+                    length = 0.80 * length
+
+                if Top == Top4:
+                    length = 0.7 * length
+
+            elif Support == Support4:
+                if Top == Top1:
+                    length = 0.80 * length
+                if Top == Top2:
+                    length = 0.7 * length
+                if Top == Top3:
+                    length = 0.6 * length
+                if Top == Top4:
+                    length = 0.5 * length
+        elif load == KEY_DISP_LOAD2:
+            if Support == Support1:
+                if Top == Top1:
+                    length = 7.50 * length
+                if Top == Top2:
+                    length = 7.5 * length
+                if Top == Top3:
+                    length = 4.50 * length
+                if Top == Top4:
+                    length = 3.6 * length
+
+            elif Support == Support2:
+                if Top == Top1:
+                    length = 5.00 * length
+                if Top == Top2:
+                    length = 5 * length
+                if Top == Top3:
+                    length = 3.0 * length
+                if Top == Top4:
+                    length = 2.4 * length
+
+
+            elif Support == Support3:
+
+                if Top == Top1:
+                    length = 2.50 * length
+
+                if Top == Top2:
+                    length = 2.5 * length
+
+                if Top == Top3:
+                    length = 1.50 * length
+
+                if Top == Top4:
+                    length = 1.2 * length
+
+            elif Support == Support4:
+                if Top == Top1:
+                    length = 1.40 * length
+                if Top == Top2:
+                    length = 1.4 * length
+                if Top == Top3:
+                    length = 0.6 * length
+                if Top == Top4:
+                    length = 0.5 * length
+        return length
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
     def cl_8_4_design_shear_strength(A_vg, f_y):

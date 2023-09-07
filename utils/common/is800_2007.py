@@ -905,11 +905,52 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_1_4_holes_tension_zone(Anf_Agf, fy, fu, gamma_mo, gamma_m1):
-        return Anf_Agf if Anf_Agf > (fy/fu) * (gamma_m1/gamma_mo) / 0.9 else (fy/fu) * (gamma_m1/gamma_mo) / 0.9
+        if Anf_Agf > (fy/fu) * (gamma_m1/gamma_mo) / 0.9 :
+            return Anf_Agf
+        else :
+            return (fy/fu) * (gamma_m1/gamma_mo) / 0.9
 
     @staticmethod
     def cl_8_2_1_5_shear_lag(b0,b1, L0, type):
-        (b0 if b0<= L0/20 else L0/20) if type == 'outstand' else (b1 if b1<= L0/10 else L0/10)
+        if type == 'outstand':
+            if b0<= L0/20 :
+                return b0
+            else :
+                return L0/20
+        else:
+            if b1<= L0/10 :
+                return b1
+            else :
+                return L0/10
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_strength(Zp, Ze, fcd, section_class):
+        if section_class == 'plastic' or section_class == 'compact':
+            return Zp*fcd
+        else:
+            return Ze * fcd
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_compressive_stress(X_lt, fy, gamma_mo):
+        return X_lt * fy / gamma_mo
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(phi_lt, lambda_lt):
+        return 1 / ( phi_lt + [phi_lt **2 - lambda_lt **2] ** 0.5)
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_phi_lt(alpha_lt, lambda_lt):
+        return 0.5[ 1 + alpha_lt ( lambda_lt - 0.2) + lambda_lt ** 2]
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_non_slenderness( betab, Zp, Ze, fy, Mcr):
+        if (betab * Zp * fy / Mcr)** 0.5 <= (1.2 * Ze * fy / Mcr):
+            return (betab * Zp * fy / Mcr)** 0.5
+
+    @staticmethod
+    def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb):
+        if (betab * Zp * fy / Mcr) ** 0.5 <= (1.2 * Ze * fy / Mcr):
+            return (betab * Zp * fy / Mcr) ** 0.5
 
     @staticmethod
     def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) -> float:

@@ -1198,46 +1198,58 @@ class Flexure(Member):
 
         for section in self.sec_list:
             trial_section = section.strip("'")
-            # print(f"trial_section {trial_section}")
-
-            # section_classification_subchecks(trial_section, self.material)
 
             # fetching the section properties
-            self.section_property = self.section_classification_subchecks(self,trial_section)
+            self.section_property = self.section_conect_database(self,trial_section)
             print(f"Type of section{type(section)}")
 
             # section classification
-            if (self.sec_profile in VALUES_SEC_PROFILE_Compression_Strut[:3]):  # Angles or Back to Back or 'Star Angle'
+            if self.sec_profile != '':  # Angles or Back to Back or 'Star Angle'
 
                 # updating the material property based on thickness of the thickest element
-                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
+                # self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
                 if self.section_property.type == 'Rolled':
-
-                    list_Table2_vi= IS800_2007.Table2_vi(self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
-                                                            self.material_property.fy, "Axial Compression")
                     # print(f"\n \n \n self.material_property.fy {self.material_property.fy} \n \n \n")
-                    self.section_class = list_Table2_vi[0]
-                    self.width_thickness_ratio  = list_Table2_vi[1]
-                    self.depth_thickness_ratio = list_Table2_vi[2]
-                    self.width_depth_thickness_ratio = list_Table2_vi[3]
-                    print(f"DONE {self.section_class} {self.width_thickness_ratio} {self.depth_thickness_ratio} {self.width_depth_thickness_ratio}")
-                    logger.info("The section is {}. The b/t of the trial section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.width_thickness_ratio,2), round_up(self.depth_thickness_ratio), round(self.width_depth_thickness_ratio,2) ))
+                    web_class = IS800_2007.Table2_iii(self.section_property.depth, self.section_property.web_thickness, self.material_property.fy)
+                    flange_class = IS800_2007.Table2_i(self.section_property.flange_width/2, self.section_property.web_thickness, self.material_property.fy)[0]
+
                 else:
-                    print(f"section_classification _ not done")
-                    local_flag = False
-            elif (self.sec_profile in ['Channels', 'Back to Back Channels']):
+                    flange_class = IS800_2007.Table2_i(
+                        ((self.section_property.flange_width / 2) - (self.section_property.web_thickness / 2)),
+                        self.section_property.flange_thickness, self.section_property.fy,
+                        self.section_property.type)[0]
 
-                # updating the material property based on thickness of the thickest element
-                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.web_thickness)
+                    web_class = IS800_2007.Table2_iii(
+                        (self.section_property.depth - (2 * self.section_property.flange_thickness)),
+                        self.section_property.web_thickness, self.material_property.fy,
+                        classification_type='Axial compression')
 
-                list_Table2_iv = IS800_2007.Table2_iv(depth=self.section_property.depth, f_y=self.material_property.fy, thickness_web= self.section_property.web_thickness)
-                print(f"Checking Channel Properties")
-                self.section_class = list_Table2_iv[0]
-                self.depth_thickness_ratio = list_Table2_iv[1]
-                logger.info("The section is {}. The d/t_web of the trial section ({}) is {}.  [Reference: Cl 3.7, IS 800:2007].".format(self.section_class, trial_section, round(self.depth_thickness_ratio,2) ))
+            if flange_class == 'Slender' or web_class == 'Slender':
+                self.section_class = 'Slender'
             else:
-                print(f"section_classification _ cannot do")
-                local_flag = False
+                if flange_class == 'Plastic' and web_class == 'Plastic':
+                    self.section_class = 'Plastic'
+                elif flange_class == 'Plastic' and web_class == 'Compact':
+                    self.section_class = 'Compact'
+                elif flange_class == 'Plastic' and web_class == 'Semi-Compact':
+                    self.section_class = 'Semi-Compact'
+                elif flange_class == 'Compact' and web_class == 'Plastic':
+                    self.section_class = 'Compact'
+                elif flange_class == 'Compact' and web_class == 'Compact':
+                    self.section_class = 'Compact'
+                elif flange_class == 'Compact' and web_class == 'Semi-Compact':
+                    self.section_class = 'Semi-Compact'
+                elif flange_class == 'Semi-Compact' and web_class == 'Plastic':
+                    self.section_class = 'Semi-Compact'
+                elif flange_class == 'Semi-Compact' and web_class == 'Compact':
+                    self.section_class = 'Semi-Compact'
+                elif flange_class == 'Semi-Compact' and web_class == 'Semi-Compact':
+                    self.section_class = 'Semi-Compact'
+
+            logger.info(
+                "The section is {}. The b/tf of the trial section ({}) is {} and d/tw is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(
+                    self.section_class, trial_section, round(flange_class, 2),
+                    round_up(web_class, 2)))
 
             # 2.2 - Effective length
             temp = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
@@ -1362,39 +1374,19 @@ class Flexure(Member):
         else:
             logger.info("Provided appropriate design preference, now checking input.")
 
-    def section_classification_subchecks(self, section):
-        if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:  # Angles
-            self.section_property = Angle(designation = section, material_grade = self.material)
-        # elif self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[1]:  # Back to Back Angles
-        #     self.section_property = Angle(designation=section, material_grade=self.material)
-        elif self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[2] or self.sec_profile == VALUES_SEC_PROFILE_Compression_Strut[3]:  # Channels
-            print(f"section_classification_subchecks error ")
-            # self.section_property = Channel(designation=section, material_grade=self.material)
-        # # elif self.sec_profile == VALUES_SEC_PROFILE[3]:  # Columns
-        # #     self.section_property = SHS(designation=section, material_grade=self.material)
-        # # elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
-        # #     self.section_property = CHS(designation=section, material_grade=self.material)
-        # else:  # Why?
-        #     self.section_property = Column(designation=section, material_grade=self.material)
-        else:
-            logger.warning(
-                "The section should be either Angle or Back to Back Angle. ")
+    def section_conect_database(self, section):
+        print(f"Working correct here{section}")
+        print(section)
+        print(self.sec_profile)
+        if self.sec_profile == VALUES_SECTYPE[1] or self.sec_profile == VALUES_SECTYPE[2] or self.sec_profile == 'I-section':  # I-section
+            self.section_property = ISection(designation = section, material_grade = self.material)
+            self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.web_thickness)
+            self.epsilon = math.sqrt(250 / self.material_property.fy)
         return self.section_property
 
     def common_checks_1(self, section, step = 1, list_result = [], list_1 = []):
         if step == 1:
-            # print(f"Working correct here{section}")
-            print(section)
-            print(self.sec_profile)
-
-            # fetching the section properties of the selected section
-            self.section_classification_subchecks(self, section)
-            if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:
-                # self.material_property(self.material, self.section_property.thickness)
-                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.thickness)
-            elif self.sec_profile in ['Channels', 'Back to Back Channels']:
-                self.material_property.connect_to_database_to_get_fy_fu(self.material, self.section_property.web_thickness)
-            self.epsilon = math.sqrt(250 / self.material_property.fy)
+            pass
 
             # print(f"Working correct here")
         elif step == 2:
@@ -1611,11 +1603,7 @@ class Flexure(Member):
         """ Perform design of struct """
         # checking DP inputs
         self.optimization_tab_check(self)
-        # optimization_tab_check()
-        #
-        # print(f"\n self.input_section_list {self.input_section_list}")
-        # print(f"\n self.input_section_classification {self.input_section_classification}")
-        # print(f"\n self.loc {self.loc}")
+
 
 
         if design_dictionary[KEY_AXIAL] == '' and len(self.input_section_list) == 1 :
@@ -1627,7 +1615,7 @@ class Flexure(Member):
             if len(self.input_section_list) > 1 :
                 logger.info("Provided appropriate input and starting design.")
 
-                self.design_strut(self)
+                self.design_beam(self)
             else:
                 logger.warning(
                     "No need for load input.")
@@ -1646,10 +1634,10 @@ class Flexure(Member):
             # logger.info("Give 1 section as Inputs and/or "
             #             "Give load and re-design.")
             # self.design_status = False
-            self.design_strut(self)
+            self.design_beam(self)
             # self.design_status_list.append(self.design_status)
 
-    def design_strut(self):
+    def design_beam(self):
 
         # initializing lists to store the optimum results based on optimum UR and cost
         # 1- Based on optimum UR
@@ -1662,11 +1650,9 @@ class Flexure(Member):
 
         for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
 
-            # Yield strength of steel
-            # self.common_checks_1(self,section, step=7)
+            # fetching the section properties of the selected section
+            self.section_conect_database(self, section)
 
-            #Common checks
-            self.common_checks_1(self,section)
             # initialize lists for updating the results dictionary
             list_result = []
             list_result.append(section)

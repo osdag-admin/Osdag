@@ -885,8 +885,8 @@ class IS800_2007(object):
     def cl_8_2_1_web_buckling(d, tw, e):
         d_tw = d / tw
         if d_tw <= 67*e:
-            return True
-        return False
+            return False
+        return True
 
     @staticmethod
     def cl_8_2_1_2_design_bending_strength(section_class, Zp, Ze, fy, gamma_mo, support):

@@ -39,12 +39,15 @@ class Flexure(Member):
         """
         tabs = []
 
-        t1 = (DISP_TITLE_ISECTION, TYPE_TAB_1, self.tab_section)
-        tabs.append(t1)
-
-        t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_column_design)
-        tabs.append(t2)
-
+        # t1 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_strut_angle_section)
+        # tabs.append(t1)
+        #
+        # t2 = (DISP_TITLE_CHANNEL, TYPE_TAB_1, self.tab_strut_channel_section)
+        # tabs.append(t2)
+        #
+        # t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_strut_design)
+        # tabs.append(t2)
+        # #
         t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
 
@@ -68,29 +71,29 @@ class Flexure(Member):
          """
         change_tab = []
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
-        change_tab.append(t1)
+        # t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
+        #       [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
+        #        'Label_7', 'Label_8', 'Label_9',
+        #        'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+        #        'Label_18',
+        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24', KEY_IMAGE], TYPE_TEXTBOX,
+        #       self.get_strut_angle_section_properties)
+        # change_tab.append(t1)
+        #
+        # t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3', 'Label_0'],
+        #       ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
+        #        'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
+        #        KEY_IMAGE],
+        #       TYPE_TEXTBOX, self.get_Strut_Angle_sec_properties)
+        # change_tab.append(t2)
 
-        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
-              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
-        change_tab.append(t4)
 
-        t5 = (KEY_DISP_COLSEC, ['Label_HS_1', 'Label_HS_2', 'Label_HS_3'],
-              ['Label_HS_11', 'Label_HS_12', 'Label_HS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_HS_17',
-               'Label_HS_18',
-               'Label_HS_19', 'Label_HS_20', 'Label_HS_21', 'Label_HS_22', KEY_IMAGE], TYPE_TEXTBOX,
-              self.get_SHS_RHS_properties)
-        change_tab.append(t5)
 
-        t6 = (KEY_DISP_COLSEC, ['Label_CHS_1', 'Label_CHS_2', 'Label_CHS_3'],
-              ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_21',
-               'Label_22',
-               KEY_IMAGE], TYPE_TEXTBOX, self.get_CHS_properties)
-        change_tab.append(t6)
+        # t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
+        # change_tab.append(t6)
 
-        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
-        change_tab.append(t6)
+
+
         return change_tab
 
     def edit_tabs(self):
@@ -109,21 +112,18 @@ class Flexure(Member):
 
          """
         design_input = []
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])  # Need to check
-        design_input.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY])
-        design_input.append(t1)
-
-        t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA])  # , KEY_STEEL_COST
-        design_input.append(t2)
         # t2 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
         # design_input.append(t2)
         #
-        # t2 = ("Optimization", TYPE_TEXTBOX, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane, KEY_BOLT_Number ]) #KEY_ALLOW_UR, , KEY_STEEL_COST
+        #
+        # t2 = ("Optimization", TYPE_TEXTBOX,
+        #       [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane,
+        #        KEY_BOLT_Number])  # KEY_ALLOW_UR, , KEY_STEEL_COST
         # design_input.append(t2)
         #
-        # t2 = ("Optimization", TYPE_COMBOBOX, [ KEY_ALLOW_LOAD, Load_type2, Load_type1, KEY_PLATETHK ]) # KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS,
+        # t2 = ("Optimization", TYPE_COMBOBOX,
+        #       [KEY_ALLOW_LOAD, Load_type2, Load_type1, KEY_PLATETHK])  # KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS,
         # design_input.append(t2)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
@@ -149,18 +149,11 @@ class Flexure(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_DP_DESIGN_METHOD],
-              '')  # KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS1, KEY_ALLOW_CLASS2, KEY_ALLOW_CLASS3, KEY_ALLOW_CLASS4, KEY_STEEL_COST,
-
+        t2 = (None, [#KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane,
+                     KEY_DP_DESIGN_METHOD#, KEY_ALLOW_LOAD, KEY_BOLT_Number, KEY_PLATETHK
+                     ],
+              '')
         design_input.append(t2)
-        # t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
-        # design_input.append(t1)
-        #
-        # t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane,
-        #              KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD, KEY_BOLT_Number, KEY_PLATETHK
-        #              ], '')#, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
-        #              # KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_CONNECTOR_MATERIAL , KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
-        # design_input.append(t2)
 
         return design_input
 
@@ -173,11 +166,9 @@ class Flexure(Member):
          [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
         """
         add_buttons = []
-        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
-        add_buttons.append(t2)
-
+        #
         # t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
-        #       VALUES_SEC_PROFILE_Compression_Strut , Profile_name_1)
+        #       VALUES_SEC_PROFILE_Compression_Strut, Profile_name_1)
         # add_buttons.append(t2)
 
         return add_buttons
@@ -193,10 +184,6 @@ class Flexure(Member):
             fy = ''
 
         val = {
-            KEY_ALLOW_UR: '1.0',
-            KEY_EFFECTIVE_AREA_PARA: '1.0',
-            KEY_OPTIMIZATION_PARA: 'Utilization Ratio',
-            KEY_DP_DESIGN_METHOD: "Limit State Design",
             # KEY_ALLOW_UR: '1.0',
             # KEY_EFFECTIVE_AREA_PARA: '1.0',
             # KEY_Buckling_Out_plane: '1.0',
@@ -204,8 +191,8 @@ class Flexure(Member):
             # KEY_ALLOW_LOAD: Load_type1,
             # KEY_BOLT_Number: '1.0',
             # KEY_ALLOW_LOAD: 'Concentric Load',
-            # KEY_DP_DESIGN_METHOD: "Limit State Design",
-            # KEY_PLATETHK : '8'
+            KEY_DP_DESIGN_METHOD: "Limit State Design",
+            # KEY_PLATETHK: '8'
         }[key]
 
         return val
@@ -247,7 +234,8 @@ class Flexure(Member):
         if key is not None:
             handler = OurLog(key)
             # handler.setLevel(logging.DEBUG)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                                          datefmt='%H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -255,9 +243,8 @@ class Flexure(Member):
 
         c_lst = []
 
-        t1 = (KEY_SECSIZE, self.fn_profile_section)
-        c_lst.append(t1)
-
+        # t1 = (KEY_SECSIZE, self.fn_profile_section)
+        # c_lst.append(t1)
 
         return c_lst
 
@@ -268,126 +255,53 @@ class Flexure(Member):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_FLEXURE
+
         options_list = []
 
         t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t1 = (None, KEY_BEAM_SUPP_TYPE, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t1)
-
-        t2 = (KEY_SUPP_TYPE, KEY_BEAM_SUPP_TYPE, TYPE_COMBOBOX, VALUES_SUPP_TYPE, True, 'No Validator')
+        t2 = (KEY_DESIGN_TYPE_FLEXURE, KEY_BEAM_SUPP_TYPE, TYPE_COMBOBOX, VALUES_SUPP_TYPE, True,
+              'No Validator')
         options_list.append(t2)
-
+        #
         # t3 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_STRUT[0], True, 'No Validator')
         # options_list.append(t3)
-
-        t3 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_COMBOBOX, KEY_DISP_SUPPORT_LIST, True, 'No Validator')
-        options_list.append(t3)
-
-
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
-        options_list.append(t4)
-
-        t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
-        options_list.append(t4)
-
-        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
-        options_list.append(t5)
-
-        t9 = (None, DISP_TITLE_STRUT, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t9)
-
-        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_STRUT_END1, True, 'No Validator')
-        options_list.append(t10)
-
-        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_STRUT_END2, True, 'No Validator')
-        options_list.append(t11)
-
-        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
-        options_list.append(t12)
-
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t7)
-
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t8)
+        #
+        # t3 = (KEY_LOCATION, KEY_DISP_LOCATION_STRUT, TYPE_COMBOBOX, VALUES_LOCATION_1, True, 'No Validator')
+        # options_list.append(t3)
+        #
+        #
+        # t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All', 'Customized'], True, 'No Validator')
+        # options_list.append(t4)
+        #
+        # t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        # options_list.append(t4)
+        #
+        # t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
+        # options_list.append(t5)
+        #
+        # t9 = (None, DISP_TITLE_STRUT, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t9)
+        #
+        # t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_STRUT_END1, True, 'No Validator')
+        # options_list.append(t10)
+        #
+        # t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_STRUT_END2, True, 'No Validator')
+        # options_list.append(t11)
+        #
+        # t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        # options_list.append(t12)
+        #
+        # t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t7)
+        #
+        # t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        # options_list.append(t8)
 
         return options_list
 
-    # def spacing(self, status):
-    #
-    #     spacing = []
-    #
-    #     t00 = (None, "", TYPE_NOTE, "Representative image for Spacing Details based on member's depth \n (root radius not included in edge distance)")
-    #     spacing.append(t00)
-    #
-    #     t99 = (None, 'Spacing Details', TYPE_SECTION,
-    #            ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
-    #     spacing.append(t99)
-    #
-    #     if self.sec_profile == 'Star Angles':
-    #         t16 = (KEY_OUT_BOLTS_ONE_LINE_S, KEY_OUT_DISP_BOLTS_ONE_LINE_S, TYPE_TEXTBOX,
-    #                int(self.plate.bolts_one_line/2) if status else '', True)
-    #         spacing.append(t16)
-    #     else:
-    #         pass
-    #
-    #     t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
-    #     spacing.append(t16)
-    #
-    #     t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
-    #     spacing.append(t15)
-    #
-    #     t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
-    #     spacing.append(t9)
-    #
-    #     t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
-    #     spacing.append(t10)
-    #
-    #     t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
-    #     spacing.append(t11)
-    #
-    #     t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
-    #     spacing.append(t12)
-    #
-    #     return spacing
 
-    # def memb_pattern(self, status):
-    #
-    #     if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
-    #         image = './ResourceFiles/images/L.png'
-    #         x, y = 400, 202
-    #
-    #     else:
-    #         image = './ResourceFiles/images/U.png'
-    #         x, y = 400, 202
-    #
-    #
-    #     pattern = []
-    #
-    #     t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
-    #     pattern.append(t00)
-    #
-    #     t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_IMAGE,
-    #            [image, x, y, "Member Block Shear Pattern"])  # [image, width, height, caption]
-    #     pattern.append(t99)
-    #
-    #     return pattern
-
-    # def plate_pattern(self, status):
-    #
-    #     pattern = []
-    #
-    #     t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
-    #     pattern.append(t00)
-    #
-    #     t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
-    #            ['./ResourceFiles/images/L.png',400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
-    #     pattern.append(t99)
-    #
-    #     return pattern
 
     def fn_end1_end2(self):
 
@@ -484,22 +398,20 @@ class Flexure(Member):
 
         lst = []
 
-        t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
-        lst.append(t1)
-
-        # if self[0] == 'Back to Back Angles':
-
-        t3 = ([KEY_SEC_PROFILE], KEY_LOCATION, TYPE_COMBOBOX, self.fn_conn_type)
-        lst.append(t3)
-
-        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
-        lst.append(t3)
-
-        t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
-        lst.append(t2)
-
-        t3 = ([KEY_END1, KEY_END2], KEY_IMAGE_two, TYPE_IMAGE, self.fn_end2_image)
-        lst.append(t3)
+        # t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+        # lst.append(t1)
+        #
+        # t3 = ([KEY_SEC_PROFILE], KEY_LOCATION, TYPE_COMBOBOX, self.fn_conn_type)
+        # lst.append(t3)
+        #
+        # t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        # lst.append(t3)
+        #
+        # t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
+        # lst.append(t2)
+        #
+        # t3 = ([KEY_END1, KEY_END2], KEY_IMAGE_two, TYPE_IMAGE, self.fn_end2_image)
+        # lst.append(t3)
 
         return lst
 
@@ -519,192 +431,59 @@ class Flexure(Member):
         t1 = (KEY_TITLE_OPTIMUM_DESIGNATION, KEY_DISP_TITLE_OPTIMUM_DESIGNATION, TYPE_TEXTBOX, self.result_designation if flag else '', True)
         out_list.append(t1)
 
-        t1 = (KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_OPTIMUM_UR_COMPRESSION, TYPE_TEXTBOX, self.result_UR if flag else '', True)
-        out_list.append(t1)
-
-        t1 = (KEY_OPTIMUM_SC, KEY_DISP_OPTIMUM_SC, TYPE_TEXTBOX, self.result_section_class if flag else '', True)
-        out_list.append(t1)
-
-        t2 = (KEY_EFF_SEC_AREA, KEY_DISP_EFF_SEC_AREA, TYPE_TEXTBOX, round(self.result_effective_area, 2) if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_EFF_LEN, KEY_DISP_EFF_LEN, TYPE_TEXTBOX, round(self.result_eff_len, 2) if flag else '',
-        True)
-        out_list.append(t2)
-
-        t2 = (KEY_ESR, KEY_DISP_ESR, TYPE_TEXTBOX, round(self.result_eff_sr, 2) if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_SR_lambdavv, KEY_DISP_SR_lambdavv, TYPE_TEXTBOX, self.result_lambda_vv if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_SR_lambdapsi, KEY_DISP_SR_lambdapsi, TYPE_TEXTBOX, self.result_lambda_psi if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_EULER_BUCKLING_STRESS, KEY_DISP_EULER_BUCKLING_STRESS, TYPE_TEXTBOX, round(self.result_ebs, 2) if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_BUCKLING_CURVE, KEY_DISP_BUCKLING_CURVE, TYPE_TEXTBOX, self.result_bc if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_IMPERFECTION_FACTOR, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, round(self.result_IF, 2) if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_SR_FACTOR, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, round(self.result_srf, 2) if flag else '', True)
-        out_list.append(t2)
-
+        # t1 = (KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_OPTIMUM_UR_COMPRESSION, TYPE_TEXTBOX, self.result_UR if flag else '', True)
+        # out_list.append(t1)
+        #
+        # t1 = (KEY_OPTIMUM_SC, KEY_DISP_OPTIMUM_SC, TYPE_TEXTBOX, self.result_section_class if flag else '', True)
+        # out_list.append(t1)
+        #
+        # t2 = (KEY_EFF_SEC_AREA, KEY_DISP_EFF_SEC_AREA, TYPE_TEXTBOX, round(self.result_effective_area, 2) if flag else '', True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_EFF_LEN, KEY_DISP_EFF_LEN, TYPE_TEXTBOX, round(self.result_eff_len, 2) if flag else '',
+        # True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_ESR, KEY_DISP_ESR, TYPE_TEXTBOX, round(self.result_eff_sr, 2) if flag else '', True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_SR_lambdavv, KEY_DISP_SR_lambdavv, TYPE_TEXTBOX, self.result_lambda_vv if flag else '', True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_SR_lambdapsi, KEY_DISP_SR_lambdapsi, TYPE_TEXTBOX, self.result_lambda_psi if flag else '', True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_EULER_BUCKLING_STRESS, KEY_DISP_EULER_BUCKLING_STRESS, TYPE_TEXTBOX, round(self.result_ebs, 2) if flag else '', True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_BUCKLING_CURVE, KEY_DISP_BUCKLING_CURVE, TYPE_TEXTBOX, self.result_bc if flag else '', True)
+        # out_list.append(t2)
+        #
+        # t2 = (KEY_IMPERFECTION_FACTOR, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, round(self.result_IF, 2) if flag else '', True)
+        # out_list.append(t2)
         #
         # t2 = (KEY_SR_FACTOR, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, round(self.result_srf, 2) if flag else '', True)
         # out_list.append(t2)
 
-        t2 = (KEY_NON_DIM_ESR, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, round(self.result_nd_esr, 2) if flag else '', True)
-        out_list.append(t2)
-
-        t1 = (None, KEY_DESIGN_COMPRESSION, TYPE_TITLE, None, True)
-        out_list.append(t1)
-
-        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX, round(self.result_capacity * 1e-3, 2) if flag else
-        '', True)
-        out_list.append(t1)
-
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
-               int(round(22.02, 0)) if flag else '', True)
-        out_list.append(t19)
-
-        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
-        out_list.append(t8)
-
-        t8 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
-        out_list.append(t8)
-
-        # t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
-        #       int(self.bolt.bolt_diameter_provided) if flag else '', True)
-        # out_list.append(t9)
+        # t2 = (KEY_NON_DIM_ESR, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, round(self.result_nd_esr, 2) if flag else '', True)
+        # out_list.append(t2)
         #
-        # t10 = (
-        # KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '',
-        # True)
-        # out_list.append(t10)
+        # t1 = (None, KEY_DESIGN_COMPRESSION, TYPE_TITLE, None, True)
+        # out_list.append(t1)
         #
-        # t11 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
-        #        round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
-        # out_list.append(t11)
-        #
-        # bolt_bearing_capacity_disp = ''
-        # if flag is True:
-        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-        #
-        #         pass
-        #     else:
-        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-        #
-        # t5 = (
-        # KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
-        # out_list.append(t5)
-        #
-        # t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION_LONG_JOINT, TYPE_TEXTBOX,
-        #       round(self.plate.beta_lj, 2) if flag else '', True)
-        # out_list.append(t5)
-        #
-        # t5 = (KEY_REDUCTION_LARGE_GRIP, KEY_DISP_REDUCTION_LARGE_GRIP, TYPE_TEXTBOX,
-        #       round(self.plate.beta_lg, 2) if flag else '', True)
-        # out_list.append(t5)
-        #
-        # t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
-        #        round(self.plate.bolt_capacity_red / 1000, 2) if flag else '', True)
-        # out_list.append(t13)
-        #
-        # t14 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX,
-        #        round(self.plate.bolt_force / 1000, 2) if flag else '', True)
-        # out_list.append(t14)
-        #
-        # t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
-        # out_list.append(t17)
-        #
-        # t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
-        # out_list.append(t18)
+        # t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX, round(self.result_capacity * 1e-3, 2) if flag else
+        # '', True)
+        # out_list.append(t1)
         #
         # t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
-        #        int(round(self.plate.thickness_provided, 0)) if flag else '', True)
+        #        int(round(22.02, 0)) if flag else '', True)
         # out_list.append(t19)
         #
-        # t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX,
-        #        int(round(self.plate.height, 0)) if flag else '', True)
-        # out_list.append(t20)
-        #
-        # t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX,
-        #        int(round(self.plate.length, 0)) if flag else '', True)
-        # out_list.append(t21)
-        #
-        # t21 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
-        #        (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
-        # out_list.append(t21)
-        #
-        # t21 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
-        #        (round(self.plate.tension_rupture_capacity / 1000, 2)) if flag else '', True)
-        # out_list.append(t21)
-        #
-        # t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
-        #        (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
-        # out_list.append(t21)
-        #
-        # t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
-        # out_list.append(t17)
-        #
-        # t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
-        #        (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
-        # out_list.append(t21)
-        #
-        # # if KEY_SEC_PROFILE in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
-        #
-        # t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, False)
-        # out_list.append(t18)
-        #
-        # t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, False)
+        # t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
         # out_list.append(t8)
         #
-        # t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
-        #        int(round(self.inter_conn, 0)) if flag else '', False)
-        # out_list.append(t21)
-        #
-        # t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
-        #        (round(self.inter_memb_length, 2)) if flag else '', False)
-        # out_list.append(t21)
-        #
-        # t18 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, False)
-        # out_list.append(t18)
-        #
-        # t9 = (
-        # KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',
-        # False)
-        # out_list.append(t9)
-        #
-        # t10 = (
-        # KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',
-        # False)
-        # out_list.append(t10)
-        #
-        # t15 = (
-        # KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '',
-        # False)
-        # out_list.append(t15)
-        #
-        # t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX,
-        #        self.inter_bolt_one_line if flag else '', False)
-        # out_list.append(t16)
-        #
-        # t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, False)
-        # out_list.append(t18)
-        #
-        # t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,
-        #        int(round(self.inter_plate_height, 0)) if flag else '', False)
-        # out_list.append(t20)
-        #
-        # t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,
-        #        int(round(self.inter_plate_length, 0)) if flag else '', False)
-        # out_list.append(t21)
-
+        # t8 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
+        # out_list.append(t8)
 
         return out_list
     def func_for_validation(self, design_dictionary):

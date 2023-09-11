@@ -892,16 +892,26 @@ class IS800_2007(object):
     def cl_8_2_1_2_design_bending_strength(section_class, Zp, Ze, fy, gamma_mo, support):
         beta_b = 1.0 if section_class == 'plastic' or 'compact' else Ze/Zp
         Md = beta_b * Zp * fy / gamma_mo
-        if support == KEY_DISP_SUPPORT1 and Md < 1.2 * Ze * fy / gamma_mo:
-            return [Md, True]
+        if support == KEY_DISP_SUPPORT1 :
+            if Md < 1.2 * Ze * fy / gamma_mo:
+                return Md
+            else:
+                return 1.2 * Ze * fy / gamma_mo
+        elif support == KEY_DISP_SUPPORT2 :
+            if Md < 1.5 * Ze * fy / gamma_mo:
+                return Md
+            else:
+                return 1.5 * Ze * fy / gamma_mo
 
-        elif support == KEY_DISP_SUPPORT2 and Md < 1.5 * Ze * fy / gamma_mo:
-            return [Md, True]
-        return [Md, False]
 
     @staticmethod
     def cl_8_2_1_2_high_shear_check(V, Vd):
-        print('High shear') if V > 0.6 * Vd else 'Low shear'
+        if V > 0.6 * Vd :
+            print('High shear')
+            return True
+        else:
+            print('Low shear')
+            return False
 
     @staticmethod
     def cl_8_2_1_4_holes_tension_zone(Anf_Agf, fy, fu, gamma_mo, gamma_m1):
@@ -943,9 +953,9 @@ class IS800_2007(object):
         return 0.5[ 1 + alpha_lt ( lambda_lt - 0.2) + lambda_lt ** 2]
 
     @staticmethod
-    def cl_8_2_2_Unsupported_beam_bending_non_slenderness( betab, Zp, Ze, fy, Mcr):
-        if (betab * Zp * fy / Mcr)** 0.5 <= (1.2 * Ze * fy / Mcr):
-            return (betab * Zp * fy / Mcr)** 0.5
+    def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):
+        G = E/(2+2*meu)
+        return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
 
     @staticmethod
     def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb):
@@ -1156,6 +1166,15 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
+
+    @staticmethod
+    def cl_9_2_2_high_shear_moment(Md, Mfd, b, Ze, fy, gamma_mo):
+        Mdv=Md - b(Md-Mfd)
+        if Mdv <= 1.2*Ze*fy/gamma_mo:
+            return Mdv
+        else:
+            print('Reduced elastic buckling moment error')
+            return 0
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """
 

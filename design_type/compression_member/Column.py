@@ -332,14 +332,14 @@ class ColumnDesign(Member):
     def fn_profile_section(self):
 
         profile = self[0]
-        if profile == 'Beams':
-            return connectdb("Beams", call_type="popup")
-        elif profile == 'Columns':
-            return connectdb("Columns", call_type="popup")
-        elif profile == 'RHS':
-            return connectdb("RHS", call_type="popup")
-        elif profile == 'SHS':
-            return connectdb("SHS", call_type="popup")
+        if profile == 'Beams and Columns':
+            res1 = connectdb("Beams", call_type="popup")
+            res2 = connectdb("Columns", call_type="popup")
+            return list(set(res1 + res2))
+        elif profile == 'RHS and SHS':
+            res1 = connectdb("RHS", call_type="popup")
+            res2 = connectdb("SHS", call_type="popup")
+            return list(set(res1 + res2))
         elif profile == 'CHS':
             return connectdb("CHS", call_type="popup")
         elif profile in ['Angles', 'Back to Back Angles', 'Star Angles']:

@@ -157,7 +157,7 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member import Column
 from design_type.compression_member.compression import Compression
 from design_type.compression_member.Column import ColumnDesign
-from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
+#from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 
 from design_type.flexural_member.flexure import Flexure
 #from design_type.tension_member.tension import Tension

@@ -545,7 +545,7 @@ class ColumnDesign(Member):
         global logger
         red_list = red_list_function()
 
-        if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+        if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
             for section in self.sec_list:
                 if section in red_list:
                     logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
@@ -628,21 +628,25 @@ class ColumnDesign(Member):
         """ Classify the sections based on Table 2 of IS 800:2007 """
         local_flag = True
         self.input_section_list = []
-        self.input_section_classification = {}
+        self.input_section_classification = {} 
 
         for section in self.sec_list:
             trial_section = section.strip("'")
 
             # fetching the section properties
-            if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams
-                self.section_property = Beam(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # Columns
-                self.section_property = Column(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # RHS
-                self.section_property = RHS(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[3]:  # SHS
-                self.section_property = SHS(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
+            if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams and columns
+                try:
+                    result = Beam(designation=trial_section, material_grade=self.material)
+                except:
+                    result = Column(designation=trial_section, material_grade=self.material)
+                self.section_property = result
+            elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # RHS and SHS
+                try:
+                    result = RHS(designation=trial_section, material_grade=self.material)
+                except:
+                    result = SHS(designation=trial_section, material_grade=self.material)
+                self.section_property = result
+            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                 self.section_property = CHS(designation=trial_section, material_grade=self.material)
             else:
                 self.section_property = Column(designation=trial_section, material_grade=self.material)
@@ -652,7 +656,7 @@ class ColumnDesign(Member):
                                                                     max(self.section_property.flange_thickness, self.section_property.web_thickness))
 
             # section classification
-            if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+            if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
 
                 if self.section_property.type == 'Rolled':
                     self.flange_class = IS800_2007.Table2_i((self.section_property.flange_width / 2), self.section_property.flange_thickness,
@@ -666,13 +670,13 @@ class ColumnDesign(Member):
                                                        self.section_property.web_thickness, self.material_property.fy,
                                                        classification_type='Axial compression')
 
-            elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):  # RHS or SHS
+            elif (self.sec_profile == VALUES_SEC_PROFILE[1]):  # RHS and SHS
                 self.flange_class = IS800_2007.Table2_iii((self.section_property.depth - (2 * self.section_property.flange_thickness)),
                                                           self.section_property.flange_thickness, self.material_property.fy,
                                                           classification_type='Axial compression')
                 self.web_class = self.flange_class
 
-            elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
+            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                 self.flange_class = IS800_2007.Table2_x(self.section_property.out_diameter, self.section_property.flange_thickness,
                                                         self.material_property.fy, load_type='axial compression')
                 self.web_class = self.flange_class  #Why?
@@ -790,15 +794,19 @@ class ColumnDesign(Member):
             for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
 
                 # fetching the section properties of the selected section
-                if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams
-                    self.section_property = Beam(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # Columns
-                    self.section_property = Column(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # RHS
-                    self.section_property = RHS(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[3]:  # SHS
-                    self.section_property = SHS(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
+                if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams and columns
+                    try:
+                        result = Beam(designation=section, material_grade=self.material)
+                    except:
+                        result = Column(designation=section, material_grade=self.material)
+                    self.section_property = result
+                elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # RHS and SHS
+                    try:
+                        result = RHS(designation=section, material_grade=self.material)
+                    except:
+                        result = SHS(designation=section, material_grade=self.material)
+                    self.section_property = result
+                elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                     self.section_property = CHS(designation=section, material_grade=self.material)
                 else:   #Why?
                     self.section_property = Column(designation=section, material_grade=self.material)
@@ -822,11 +830,11 @@ class ColumnDesign(Member):
                     logger.warning("The trial section ({}) is Slender. Computing the Effective Sectional Area as per Sec. 9.7.2, "
                                    "Fig. 2 (B & C) of The National Building Code of India (NBC), 2016.".format(section))
 
-                    if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+                    if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
                         self.effective_area = (2 * ((31.4 * self.epsilon * self.section_property.flange_thickness) *
                                                     self.section_property.flange_thickness)) + \
                                               (2 * ((21 * self.epsilon * self.section_property.web_thickness) * self.section_property.web_thickness))
-                    elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):
+                    elif (self.sec_profile == VALUES_SEC_PROFILE[1]):
                         self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
                 else:
                     self.effective_area = self.section_property.area  # mm2
@@ -852,7 +860,7 @@ class ColumnDesign(Member):
                 # Step 2 - computing the design compressive stress
 
                 # 2.1 - Buckling curve classification and Imperfection factor
-                if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+                if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
 
                     if self.section_property.type == 'Rolled':
                         self.buckling_class_zz = IS800_2007.cl_7_1_2_2_buckling_class_of_crosssections(self.section_property.flange_width,

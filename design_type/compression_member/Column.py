@@ -324,10 +324,10 @@ class ColumnDesign(Member):
         t1 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t1 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_END1, True, 'No Validator')
+        t1 = (KEY_END1_Y, KEY_DISP_END1_Y, TYPE_COMBOBOX, VALUES_END1_Y, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
+        t2 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
         options_list.append(t2)
 
         t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')

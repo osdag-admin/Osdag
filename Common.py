@@ -2125,14 +2125,22 @@ KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 DISP_TITLE_SC = 'Supporting Condition'
 DISP_TITLE_STRUT = 'End Condition'
 KEY_END1 = 'End_1'
+KEY_END1_Y = 'End_1'
 KEY_DISP_END1 = 'End 1'
+KEY_DISP_END1_Y = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END1 = ['Fixed','Hinged']
+VALUES_END1_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END1_Y = ['Fixed','Hinged']
 
 KEY_END2 = 'End_2'
+KEY_END2_Y = 'End_2'
 KEY_DISP_END2 = 'End 2'
+KEY_DISP_END2_Y = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END2 = ['Fixed','Hinged']
+VALUES_END2_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END2_Y = ['Fixed','Hinged']
 
 KEY_END_CONDITION = 'End Condition'
 KEY_DISP_END_CONDITION = 'End Condition (z-z)'

@@ -2135,7 +2135,8 @@ VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END2 = ['Fixed','Hinged']
 
 KEY_END_CONDITION = 'End Condition'
-KEY_DISP_END_CONDITION = 'End Condition'
+KEY_DISP_END_CONDITION = 'End Condition (z-z)'
+KEY_DISP_END_CONDITION_2 = 'End Condition (y-y)'
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'
 DISP_TITLE_CHANNEL = 'Channel Section'

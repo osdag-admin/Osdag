@@ -321,6 +321,18 @@ class ColumnDesign(Member):
         t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
         options_list.append(t12)
 
+        t1 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t1)
+
+        t1 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_END1, True, 'No Validator')
+        options_list.append(t1)
+
+        t2 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
+        options_list.append(t2)
+
+        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        options_list.append(t12)
+
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 

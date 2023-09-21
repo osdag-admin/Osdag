@@ -497,6 +497,7 @@ KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
 #Flexure Members
+KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
 KEY_SUPP_TYPE = 'Member.Type'
 DISP_TITLE_ISECTION = 'I Sections'
 KEY_DISP_FLEXURE = 'Flexural Members'
@@ -509,7 +510,7 @@ VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLE
 KEY_DISP_BENDING = 'Axis of Bending'
 KEY_DISP_BENDING1 = 'Major'
 KEY_DISP_BENDING2 = 'Minor'
-VALUES_BENDING_TYPE = list((KEY_DISP_BENDING1, KEY_DISP_BENDING2))
+VALUES_BENDING_TYPE = list((KEY_DISP_BENDING2, KEY_DISP_BENDING1))
 KEY_BENDING = 'Bending.type'
 KEY_SUPPORT = 'Flexure.Support'
 KEY_DISP_SUPPORT = 'Beam Conditions'
@@ -520,8 +521,10 @@ KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_
 # KEY_SUPPORT2 = 'SimpSupport.Warping'
 KEY_DISP_LENGTH_BEAM = 'Effective Span (m)'
 KEY_LOAD = 'Loading.Condition'
+KEY_DISP_LOAD = 'Loading Condition'
 KEY_DISP_LOAD1 ='Normal'
 KEY_DISP_LOAD2 = 'Destabilizing'
+KEY_DISP_LOAD_list = list((KEY_DISP_LOAD1, KEY_DISP_LOAD2))
 KEY_TORSIONAL_RES = 'Torsion.restraint'
 DISP_TORSIONAL_RES = 'Torsional restraint'
 Torsion_Restraint1 = 'Fully Restrained'

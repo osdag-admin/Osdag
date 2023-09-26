@@ -2567,10 +2567,11 @@ class Window(QMainWindow):
         key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
     def tab_change(self, key, tab, new, main):
-
+        print("key ", key)
+        print("obj name ", key.objectName())
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
-            if tab_name != tab.objectName() or key.objectName() not in key_list:
+            if tab_name != tab.objectName() or (key and key.objectName()) not in key_list:
                 continue
             arg_list = []
             for key_name in key_list:

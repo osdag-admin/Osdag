@@ -303,10 +303,10 @@ class ColumnDesign(Member):
         t1 = (None, KEY_SECTION_DATA, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t5 = (KEY_ACTUAL_LEN_ZZ, KEY_DISP_ACTUAL_LEN_ZZ, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t5 = (KEY_UNSUPPORTED_LEN_ZZ, KEY_DISP_UNSUPPORTED_LEN_ZZ, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
-        t6 = (KEY_ACTUAL_LEN_YY, KEY_DISP_ACTUAL_LEN_YY, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t6 = (KEY_UNSUPPORTED_LEN_YY, KEY_DISP_UNSUPPORTED_LEN_YY, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t6)
 
         t9 = (None, KEY_DISP_END_CONDITION, TYPE_TITLE, None, True, 'No Validator')
@@ -321,17 +321,17 @@ class ColumnDesign(Member):
         t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
         options_list.append(t12)
 
-        t1 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t1)
+        t13 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t13)
 
-        t1 = (KEY_END1_Y, KEY_DISP_END1_Y, TYPE_COMBOBOX, VALUES_END1_Y, True, 'No Validator')
-        options_list.append(t1)
+        t14 = (KEY_END1_Y, KEY_DISP_END1_Y, TYPE_COMBOBOX, VALUES_END1_Y, True, 'No Validator')
+        options_list.append(t14)
 
-        t2 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
-        options_list.append(t2)
+        t15 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
+        options_list.append(t15)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
-        options_list.append(t12)
+        t16 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        options_list.append(t16)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
@@ -362,6 +362,7 @@ class ColumnDesign(Member):
     def fn_end1_end2(self):
 
         end1 = self[0]
+        print("end1 is {}".format(end1))
         if end1 == 'Fixed':
             return VALUES_END2
         elif end1 == 'Free':
@@ -386,6 +387,7 @@ class ColumnDesign(Member):
 
         end1 = self[0]
         end2 = self[1]
+        print("end 1 and end 2 are {}".format(end1, end2))
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
@@ -423,6 +425,12 @@ class ColumnDesign(Member):
 
         t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         lst.append(t3)
+
+        t4 = ([KEY_END1_Y], KEY_END2_Y, TYPE_COMBOBOX, self.fn_end1_end2)
+        lst.append(t4)
+
+        t5 = ([KEY_END1_Y, KEY_END2_Y], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        lst.append(t5)
 
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
@@ -574,12 +582,15 @@ class ColumnDesign(Member):
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
         # section user data
-        self.length_zz = float(design_dictionary[KEY_ACTUAL_LEN_ZZ])
-        self.length_yy = float(design_dictionary[KEY_ACTUAL_LEN_YY])
+        self.length_zz = float(design_dictionary[KEY_UNSUPPORTED_LEN_ZZ])
+        self.length_yy = float(design_dictionary[KEY_UNSUPPORTED_LEN_YY])
 
         # end condition
-        self.end_1 = design_dictionary[KEY_END1]
-        self.end_2 = design_dictionary[KEY_END2]
+        self.end_1_z = design_dictionary[KEY_END1]
+        self.end_2_z = design_dictionary[KEY_END2]
+
+        self.end_1_y = design_dictionary[KEY_END1_Y]
+        self.end_2_y = design_dictionary[KEY_END2_Y]
 
         # factored loads
         self.load = Load(axial_force=design_dictionary[KEY_AXIAL], shear_force="", moment="", moment_minor="", unit_kNm=True)
@@ -615,7 +626,8 @@ class ColumnDesign(Member):
         print(self.length_yy)
         print(self.length_zz)
         print(self.load)
-        print(self.end_1, self.end_2)
+        print(self.end_1_z, self.end_2_z)
+        print(self.end_1_y, self.end_2_y)
         print("==================")
 
         # safety factors
@@ -722,8 +734,8 @@ class ColumnDesign(Member):
             # 2.2 - Effective length
             temp_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_yy,
-                end_1=self.end_1,
-                end_2=self.end_2)
+                end_1=self.end_1_z,
+                end_2=self.end_2_z)
             self.effective_length_yy = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
                 self.length_yy,
                 self.sec_profile) / self.length_yy  # mm
@@ -731,8 +743,8 @@ class ColumnDesign(Member):
 
             temp_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_zz,
-                end_1=self.end_1,
-                end_2=self.end_2)
+                end_1=self.end_1_z,
+                end_2=self.end_2_z)
             self.effective_length_zz = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
                 self.length_yy,
                 self.sec_profile) / self.length_yy  # mm
@@ -911,11 +923,11 @@ class ColumnDesign(Member):
 
                 # 2.2 - Effective length
                 self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_zz ,
-                                                                                                                 end_1=self.end_1,
-                                                                                                                 end_2=self.end_2)  # mm
+                                                                                                                 end_1=self.end_1_z,
+                                                                                                                 end_2=self.end_2_z)  # mm
                 self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_yy ,
-                                                                                                                 end_1=self.end_1,
-                                                                                                                 end_2=self.end_2)  # mm
+                                                                                                                 end_1=self.end_1_z,
+                                                                                                                 end_2=self.end_2_z)  # mm
 
                 list_zz.append(self.effective_length_zz)
                 list_yy.append(self.effective_length_yy)
@@ -1277,8 +1289,8 @@ class ColumnDesign(Member):
              KEY_MATERIAL: self.material,
              KEY_DISP_ACTUAL_LEN_ZZ: self.length_zz,
              KEY_DISP_ACTUAL_LEN_YY: self.length_yy,
-             KEY_DISP_END1: self.end_1,
-             KEY_DISP_END2: self.end_2,
+             KEY_DISP_END1: self.end_1_z,
+             KEY_DISP_END2: self.end_2_z,
              KEY_DISP_AXIAL: self.load,
              KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE: self.result_section_class,

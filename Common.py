@@ -450,6 +450,8 @@ KEY_SR_lambdapsi = 'ESRLambdapsi'
 KEY_DISP_SR_lambdapsi = 'Lambda psi'
 Buckling_Type = 'Type of Buckling'
 End_Connection_title = 'End Connection Details'
+KEY_COMP_STRESS = 'MinorDCS'
+KEY_DISP_COMP_STRESS = 'Design Compressive Stress (MPa)'
 
 KEY_Buckling_Out_plane = ' Out_of_Plane'
 KEY_Buckling_In_plane =  ' In_Plane'
@@ -470,8 +472,10 @@ Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
 loc_type1 = 'Long Leg'
 loc_type2 = 'Short Leg'
 VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
-
-
+Profile_2_img1 = "ResourceFiles/images/bblssg_eq.png"# Back to back Long leg on same side of gusset for equal angle
+Profile_2_img2 = "ResourceFiles/images/bbsssg_eq.png"# Back to back short leg on same side of gusset for equal angle
+Profile_2_img3 = "ResourceFiles/images/bblssg_ueq.png"# Back to back Long leg on same side of gusset for unequal angle
+Profile_2_img4 = "ResourceFiles/images/bbsssg_ueq.png"# Back to back short leg on same side of gusset for unequal angle
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'
@@ -491,6 +495,62 @@ KEY_DISP_SECTION_DEFINITION_DP = 'Section Definition (Table 2)'
 KEY_DISP_OPTIMIZATION_STEEL_COST = 'Cost'
 KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
+
+#Flexure Members
+KEY_SUPP_TYPE = 'Member.Type'
+DISP_TITLE_ISECTION = 'I Sections'
+KEY_DISP_FLEXURE = 'Flexural Members'
+KEY_DISP_DESIGN_TYPE_FLEXURE = 'Laterally Supported'
+KEY_DESIGN_TYPE_FLEXURE = 'Flexure.Type'
+KEY_BEAM_SUPP_TYPE = 'Support Type'
+KEY_DISP_DESIGN_TYPE2_FLEXURE = 'Laterally Unsupported'
+KEY_DESIGN_TYPE2_FLEXURE = 'Laterally.Unsupported'
+VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
+KEY_DISP_BENDING = 'Axis of Bending'
+KEY_DISP_BENDING1 = 'Major'
+KEY_DISP_BENDING2 = 'Minor'
+VALUES_BENDING_TYPE = list((KEY_DISP_BENDING1, KEY_DISP_BENDING2))
+KEY_BENDING = 'Bending.type'
+KEY_SUPPORT = 'Flexure.Support'
+KEY_DISP_SUPPORT = 'Beam Conditions'
+KEY_DISP_SUPPORT1 = 'Simply Supported'
+KEY_DISP_SUPPORT2 = 'Cantilever'
+KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2]
+# KEY_SUPPORT1 = 'SimpSupport.Torsional'
+# KEY_SUPPORT2 = 'SimpSupport.Warping'
+KEY_DISP_LENGTH_BEAM = 'Effective Span (m)'
+KEY_LOAD = 'Loading.Condition'
+KEY_DISP_LOAD1 ='Normal'
+KEY_DISP_LOAD2 = 'Destabilizing'
+KEY_TORSIONAL_RES = 'Torsion.restraint'
+DISP_TORSIONAL_RES = 'Torsional restraint'
+Torsion_Restraint1 = 'Fully Restrained'
+Torsion_Restraint2 = 'Partially Restrained-support connection'
+Torsion_Restraint3 = 'Partially Restrained-bearing support'
+Torsion_Restraint_list = list(( Torsion_Restraint1, Torsion_Restraint2, Torsion_Restraint3))
+KEY_WARPING_RES = 'Warping.restraint'
+DISP_WARPING_RES = 'Warping restraint'
+Warping_Restraint1 = 'Both flanges fully restrained'
+Warping_Restraint2 = 'Compression flange fully restrained'
+Warping_Restraint3 = 'Both flanges fully restrained'
+Warping_Restraint4 = 'Compressicm flange partially restrained'
+Warping_Restraint5 = 'Warping not restrained in both flanges'
+Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2,Warping_Restraint3, Warping_Restraint4, Warping_Restraint5))
+DISP_SUPPORT_RES = 'Support restraint'
+KEY_SUPPORT_TYPE = 'Cantilever.Support'
+Support1 = 'Continous, with lateral restraint to top flange'
+Support2 = 'Continous, with partial torsional restraint'
+Support3 = 'Continous, with lateral and torsional restraint'
+Support4 = 'Restrained laterally, torsionally and against rotation on flange'
+Supprt_Restraint_list = list(( Torsion_Restraint1, Torsion_Restraint2, Torsion_Restraint3))
+DISP_TOP_RES = 'Top restraint'
+KEY_SUPPORT_TYPE2 = 'Cantilever.Top'
+Top1 = 'Free'
+Top2 = 'Lateral restraint to top flange'
+Top3 = 'Torsional rwstraint'
+Top4 = 'Lateral and Torsional restraint'
+Top_Restraint_list = list(( Top1, Top2, Top3, Top4))
+
 ###################################
 # All Input Keys
 ###################################
@@ -2052,7 +2112,7 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
 KEY_DISP_SEC_TYPE = 'Section Type'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
@@ -2065,17 +2125,26 @@ KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 DISP_TITLE_SC = 'Supporting Condition'
 DISP_TITLE_STRUT = 'End Condition'
 KEY_END1 = 'End_1'
+KEY_END1_Y = 'End_1'
 KEY_DISP_END1 = 'End 1'
+KEY_DISP_END1_Y = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END1 = ['Fixed','Hinged']
+VALUES_END1_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END1_Y = ['Fixed','Hinged']
 
 KEY_END2 = 'End_2'
+KEY_END2_Y = 'End_2'
 KEY_DISP_END2 = 'End 2'
+KEY_DISP_END2_Y = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END2 = ['Fixed','Hinged']
+VALUES_END2_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END2_Y = ['Fixed','Hinged']
 
 KEY_END_CONDITION = 'End Condition'
-KEY_DISP_END_CONDITION = 'End Condition'
+KEY_DISP_END_CONDITION = 'End Condition (z-z)'
+KEY_DISP_END_CONDITION_2 = 'End Condition (y-y)'
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'
 DISP_TITLE_CHANNEL = 'Channel Section'

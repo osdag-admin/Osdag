@@ -22,6 +22,7 @@ from design_type.member import Member
 from Report_functions import *
 from design_report.reportGenerator_latex import CreateLatex
 
+# TODO: change to BeamColumnDesign
 
 class ColumnDesign(Member):
 

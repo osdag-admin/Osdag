@@ -188,11 +188,11 @@ class IS800_2007(object):
 
         """
         epsilon = math.sqrt(250 / f_y)
-        print(f" flange_class"
-              f" width {width}"
-              f" thickness {thickness}"
-              f" epsilon {epsilon}"
-              )
+        # print(f" flange_class"
+        #       f" width {width}"
+        #       f" thickness {thickness}"
+        #       f" epsilon {epsilon}"
+        #       )
         ratio = width / thickness
 
         if section_type == 'Rolled':
@@ -214,12 +214,12 @@ class IS800_2007(object):
             else:
                 section_class = 'Slender'
 
-        print(f" section_type {section_type}"
-              f" section_class {section_class}")
+        # print(f" section_type {section_type}"
+        #       f" section_class {section_class}")
         return [section_class, ratio]
 
     @staticmethod
-    def Table2_iii(depth, thickness, f_y, classification_type='Axial compression'):
+    def Table2_iii(depth, thickness, f_y, classification_type='Neutral axis at mid-depth'):
         """ Calculate the limiting width to thickness ratio as per Table 2 for;
                 sr. no iii) Web of an I, H or box section for axial compression
 
@@ -239,24 +239,31 @@ class IS800_2007(object):
 
         ratio = depth / thickness
 
-        print(f" web_class"
-              f" depth {depth}"
-              f" thickness {thickness}"
-              f" epsilon {epsilon}"
+        print(f" web_class \n" 
+              f" depth {depth} \n"
+              f" thickness {thickness} \n"
+              f" epsilon {epsilon} \n"
+               f" classification_type {classification_type}\n"
               )
 
         if classification_type == 'Neutral axis at mid-depth':
-            ''
+            if ratio > (84 * epsilon):
+                section_class = 'Plastic'
+            elif ratio <= (84 * epsilon) and ratio > (105 * epsilon):
+                section_class = 'Compact'
+            elif ratio <= (105 * epsilon) and ratio > (126 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+
         elif classification_type == 'Generally':
-            ''
+            pass
         elif classification_type == 'Axial compression':
             if ratio > (42 * epsilon):
                 section_class = 'Slender'
             else:
                 section_class = 'Semi-Compact'
-        print(f" classification_type {classification_type}"
-              f" ")
-
+        print(f" section_class {section_class}")
 
         return section_class
 
@@ -327,6 +334,54 @@ class IS800_2007(object):
 
         if force_type == 'Axial Compression':
             if b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon) and  bd_t<= (25 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+        else:
+            if b_t <= (9.4 * epsilon) and d_t<= (9.4 * epsilon):
+                section_class = 'Plastic'
+            elif b_t <= (10.5 * epsilon) and d_t<= (10.5 * epsilon):
+                section_class = 'Compact'
+            elif b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon):
+                section_class = 'Semi-Compact'
+            else:
+                section_class = 'Slender'
+
+        return [section_class, b_t,d_t, bd_t ]
+
+    @staticmethod
+    def Table2_vii(width, depth, thickness, f_y, force_type = "Axial Compression"):
+        """ Calculate the limiting width to thickness ratio as per Table 2 for;
+                sr. no i) Members subjected to Axial Compression
+                sr. no ii)Members subjected to Compression due to bending
+
+        Args:
+            width(b): width of the element in mm (float or int)
+            depth(d): depth of the element in mm (float or int)
+            thickness(t): thickness of the element in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            force_type: Type of failure in member ('Axial') ('Compression')
+            section_type: Type of section ('Angle') (string)
+
+        Returns:
+            A list of values with;
+            1- The class of the section as Semi-compact or Slender on account of the
+             b/t, d/t, (b+d)/t Ratio
+
+            ['Section Class', 'Ratio']
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(250 / int(f_y))
+
+        b_t = width / thickness
+        d_t = depth / thickness
+        bd_t = (width + depth) / thickness
+
+        if force_type == 'Axial Compression':
+            if d_t<= (15.7 * epsilon) :
+                '''When adding more cases, you need to modify Strut angle'''
                 section_class = 'Semi-Compact'
             else:
                 section_class = 'Slender'
@@ -785,6 +840,13 @@ class IS800_2007(object):
                 k1 = 0.7
                 k2 = 0.6
                 k3 = 5
+            elif fixity == 'Partial':
+                temp = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no , fixity = 'Fixed')
+                temp2 = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no , fixity = 'Hinged')
+                k1 = (temp[3] +temp2[3]) /2
+                k2 = (temp[4] +temp2[4]) /2
+                k3 = (temp[5] +temp2[5]) /2
+
         elif bolt_no == 1:
             if fixity == 'Fixed':
                 k1 = 0.75
@@ -794,6 +856,20 @@ class IS800_2007(object):
                 k1 = 1.25
                 k2 = 0.5
                 k3 = 60
+            elif fixity == 'Partial':
+                temp = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length,
+                                                                                                           r_min, b1,
+                                                                                                           b2, t, f_y,
+                                                                                                           bolt_no,
+                                                                                                           fixity='Fixed')
+                temp2 = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length,
+                                                                                                            r_min, b1,
+                                                                                                            b2, t, f_y,
+                                                                                                            bolt_no,
+                                                                                                            fixity='Hinged')
+                k1 = (temp[3] + temp2[3]) / 2
+                k2 = (temp[4] + temp2[4]) / 2
+                k3 = (temp[5] + temp2[5]) / 2
 
         lambda_vv = (length/ r_min)/(e* math.sqrt(math.pi**2 * E/250))
         lambda_psi = ((b1 + b2)/(2 * t) )/(e* math.sqrt(math.pi**2 * E/250))
@@ -805,7 +881,250 @@ class IS800_2007(object):
     # -------------------------------------------------------------
     #   8.4 Shear
     # -------------------------------------------------------------
+    @staticmethod
+    def cl_8_2_1_web_buckling(d, tw, e):
+        d_tw = d / tw
+        if d_tw <= 67*e:
+            return False
+        return True
 
+    @staticmethod
+    def cl_8_2_1_2_design_bending_strength(section_class, Zp, Ze, fy, gamma_mo, support):
+        beta_b = 1.0 if section_class == 'plastic' or 'compact' else Ze/Zp
+        Md = beta_b * Zp * fy / gamma_mo
+        if support == KEY_DISP_SUPPORT1 :
+            if Md < 1.2 * Ze * fy / gamma_mo:
+                return Md
+            else:
+                return 1.2 * Ze * fy / gamma_mo
+        elif support == KEY_DISP_SUPPORT2 :
+            if Md < 1.5 * Ze * fy / gamma_mo:
+                return Md
+            else:
+                return 1.5 * Ze * fy / gamma_mo
+
+
+    @staticmethod
+    def cl_8_2_1_2_high_shear_check(V, Vd):
+        if V > 0.6 * Vd :
+            print('High shear')
+            return True
+        else:
+            print('Low shear')
+            return False
+
+    @staticmethod
+    def cl_8_2_1_4_holes_tension_zone(Anf_Agf, fy, fu, gamma_mo, gamma_m1):
+        if Anf_Agf > (fy/fu) * (gamma_m1/gamma_mo) / 0.9 :
+            return Anf_Agf
+        else :
+            return (fy/fu) * (gamma_m1/gamma_mo) / 0.9
+
+    @staticmethod
+    def cl_8_2_1_5_shear_lag(b0,b1, L0, type):
+        if type == 'outstand':
+            if b0<= L0/20 :
+                return b0
+            else :
+                return L0/20
+        else:
+            if b1<= L0/10 :
+                return b1
+            else :
+                return L0/10
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_strength(Zp, Ze, fcd, section_class):
+        if section_class == 'plastic' or section_class == 'compact':
+            return Zp*fcd
+        else:
+            return Ze * fcd
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_compressive_stress(X_lt, fy, gamma_mo):
+        return X_lt * fy / gamma_mo
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(phi_lt, lambda_lt):
+        return 1 / ( phi_lt + [phi_lt **2 - lambda_lt **2] ** 0.5)
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_phi_lt(alpha_lt, lambda_lt):
+        return 0.5[ 1 + alpha_lt ( lambda_lt - 0.2) + lambda_lt ** 2]
+
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):
+        G = E/(2+2*meu)
+        return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
+
+    @staticmethod
+    def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb):
+        if (betab * Zp * fy / Mcr) ** 0.5 <= (1.2 * Ze * fy / Mcr):
+            return (betab * Zp * fy / Mcr) ** 0.5
+
+    @staticmethod
+    def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) -> float:
+        """ Calculate the Effective Length for Simply Supported Beams as per Table 15 Cl 8.3.1
+
+        Args:
+            Torsional Restraint: Type of Restraint (string)
+            Warping Restraint: Type of Restraint (string)
+            depth(d): depth of the element in mm (float or int)
+            length(l): length of span in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            load: Type of load in member ('Normal') ('Destabilizing')
+
+
+        Returns:
+            Effective length (float)
+
+        Reference: Table 15 Cl 8.3.1, IS 800:2007
+
+        """
+        if load == KEY_DISP_LOAD1:
+            if Torsional == Torsion_Restraint1:
+                if Warping ==Warping_Restraint1 :
+                    length = 0.70 * length
+                if Warping ==Warping_Restraint2 :
+                    length = 0.75 * length
+                if Warping ==Warping_Restraint3 :
+                    length = 0.80 * length
+                if Warping ==Warping_Restraint4 :
+                    length = 0.85 * length
+                if Warping ==Warping_Restraint5 :
+                    length = 1.00 * length
+            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
+                length = length + 2* depth
+            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
+                length = 1.2 * length + 2 *depth
+        elif load == KEY_DISP_LOAD2:
+            if Torsional == Torsion_Restraint1:
+                if Warping ==Warping_Restraint1 :
+                    length = 0.85 * length
+                if Warping ==Warping_Restraint2 :
+                    length = 0.9 * length
+                if Warping ==Warping_Restraint3 :
+                    length = 0.95 * length
+                if Warping ==Warping_Restraint4 :
+                    length = 1.00 * length
+                if Warping ==Warping_Restraint5 :
+                    length = 1.20 * length
+            elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
+                length = 1.2 *length + 2* depth
+            elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
+                length = 1.4 * length + 2 *depth
+        return length
+
+    @staticmethod
+    def cl_8_3_3_EffLen_Cantilever(Support, Top, length, load) -> float:
+        """ Calculate the Effective Length for Simply Supported Beams as per Table 16 Cl 8.3.3
+
+        Args:
+            Support Restraint: Type of Restraint (string)
+            Warping Restraint: Type of Restraint (string)
+            depth(d): depth of the element in mm (float or int)
+            length(l): length of span in mm (float or int)
+            f_y: yield stress of the section material in MPa (float or int)
+            load: Type of load in member ('Normal') ('Destabilizing')
+
+
+        Returns:
+            Effective length (float)
+
+        Reference: Table 15 Cl 8.3.1, IS 800:2007
+
+        """
+        if load == KEY_DISP_LOAD1:
+            if Support == Support1:
+                if Top == Top1:
+                    length = 3.00 * length
+                if Top == Top2:
+                    length = 2.7 * length
+                if Top == Top3:
+                    length = 2.40 * length
+                if Top == Top4:
+                    length = 2.1 * length
+
+            elif Support == Support2:
+                if Top == Top1:
+                    length = 2.00 * length
+                if Top == Top2:
+                    length = 1.8 * length
+                if Top == Top3:
+                    length = 1.60 * length
+                if Top == Top4:
+                    length = 1.4 * length
+
+
+            elif Support == Support3:
+
+                if Top == Top1:
+                    length = 1.00 * length
+
+                if Top == Top2:
+                    length = 0.9 * length
+
+                if Top == Top3:
+                    length = 0.80 * length
+
+                if Top == Top4:
+                    length = 0.7 * length
+
+            elif Support == Support4:
+                if Top == Top1:
+                    length = 0.80 * length
+                if Top == Top2:
+                    length = 0.7 * length
+                if Top == Top3:
+                    length = 0.6 * length
+                if Top == Top4:
+                    length = 0.5 * length
+        elif load == KEY_DISP_LOAD2:
+            if Support == Support1:
+                if Top == Top1:
+                    length = 7.50 * length
+                if Top == Top2:
+                    length = 7.5 * length
+                if Top == Top3:
+                    length = 4.50 * length
+                if Top == Top4:
+                    length = 3.6 * length
+
+            elif Support == Support2:
+                if Top == Top1:
+                    length = 5.00 * length
+                if Top == Top2:
+                    length = 5 * length
+                if Top == Top3:
+                    length = 3.0 * length
+                if Top == Top4:
+                    length = 2.4 * length
+
+
+            elif Support == Support3:
+
+                if Top == Top1:
+                    length = 2.50 * length
+
+                if Top == Top2:
+                    length = 2.5 * length
+
+                if Top == Top3:
+                    length = 1.50 * length
+
+                if Top == Top4:
+                    length = 1.2 * length
+
+            elif Support == Support4:
+                if Top == Top1:
+                    length = 1.40 * length
+                if Top == Top2:
+                    length = 1.4 * length
+                if Top == Top3:
+                    length = 0.6 * length
+                if Top == Top4:
+                    length = 0.5 * length
+        return length
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
     def cl_8_4_design_shear_strength(A_vg, f_y):
@@ -847,6 +1166,15 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
+
+    @staticmethod
+    def cl_9_2_2_high_shear_moment(Md, Mfd, b, Ze, fy, gamma_mo):
+        Mdv=Md - b(Md-Mfd)
+        if Mdv <= 1.2*Ze*fy/gamma_mo:
+            return Mdv
+        else:
+            print('Reduced elastic buckling moment error')
+            return 0
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """
 

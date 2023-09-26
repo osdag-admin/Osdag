@@ -763,7 +763,7 @@ class Window(QMainWindow):
 
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
-        # print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
+        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         data = {}
 
         d = {}
@@ -1306,7 +1306,7 @@ class Window(QMainWindow):
         if os.path.isfile(last_design_file):
             with open(str(last_design_file), 'r') as last_design:
                 last_design_dictionary = yaml.safe_load(last_design)
-                # print(f'last_design_dictionary {last_design_dictionary}')
+                print(f'last_design_dictionary {last_design_dictionary}')
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
             if "out_titles_status" in last_design_dictionary.keys():

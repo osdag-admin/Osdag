@@ -157,7 +157,9 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member import Column
 from design_type.compression_member.compression import Compression
 from design_type.compression_member.Column import ColumnDesign
-from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
+#from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
+
+from design_type.flexural_member.flexure import Flexure
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 import APP_CRASH.Appcrash.api as appcrash
@@ -303,9 +305,9 @@ class OsdagMainWindow(QMainWindow):
                                        self.show_compression_module,
                                        ],
                 'Flexural Member' : [
-                    ('Laterally Supported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
-                    ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
-                    self.show_truss_bolted,
+                    ('Laterally Supported and Unsupported Beam', 'ResourceFiles/images/broken.png', 'Beam_flexure'),
+                    # ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    self.show_flexure_module,
                 ],
                 'Beam-Column' :[
                     ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
@@ -688,14 +690,6 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        # elif self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
-        #     print(f"Here9.2")
-        #     self.hide()
-        #     self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
-        #     print(f"Here11.1")
-        #     self.ui2.show()
-        #     self.ui2.closed.connect(self.show)
-
         elif self.findChild(QRadioButton, 'Strut_Design').isChecked():
             print(f"Here9")
             self.hide()
@@ -704,14 +698,25 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-    def show_beamcolumn_module(self):
-        if self.findChild(QRadioButton, 'Beam_Column_Design').isChecked():
+    def show_flexure_module(self):
+        """ Create radio buttons for the sub-modules under the compression module"""
+        # print(f"Here8")
+        if self.findChild(QRadioButton, 'Beam_flexure').isChecked():
             # print(f"Here9")
             self.hide()
-            self.ui2 = Ui_ModuleWindow(CompressionColumn, ' ')
+            self.ui2 = Ui_ModuleWindow(Flexure, ' ')
             # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+    def show_beamcolumn_module(self):
+        if self.findChild(QRadioButton, 'Beam_flexure').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(Flexure, ' ')
+            # print(f"Here11")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
 
 ################################# Help Actions ############################################
 

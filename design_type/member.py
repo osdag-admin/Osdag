@@ -2781,7 +2781,7 @@ class Member(Main):
     def optimization_tab_flexure_design(self, input_dictionary):
         print(f"optimization_tab_strut_design input_dictionary {input_dictionary}")
         values = {
-                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: '75'} # , KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
+                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA'} # , KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
         #            KEY_ALLOW_LOAD : Load_type1, KEY_BOLT_Number : '1.0', KEY_PLATETHK : '8'
         # KEY_ALLOW_CLASS: 'Yes', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_STEEL_COST: '50',
 

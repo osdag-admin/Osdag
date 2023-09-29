@@ -507,7 +507,12 @@ KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
 #Flexure Members
+KEY_BUCKLING_STRENGTH= 'Buckling.Strength'
+KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'
+KEY_WEB_CRIPPLING= 'Crippling.Strength'
+KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
 KEY_WEB_BUCKLING= 'Web Buckling Details'
+KEY_BEARING_LENGTH = 'Bearing.Length'
 Simply_Supported_img = './ResourceFiles/images/ss_beam.png'
 Cantilever_img = './ResourceFiles/images/c_beam.jpeg'
 KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
@@ -2133,6 +2138,7 @@ KEY_DISP_SEC_TYPE = 'Section Type'
 VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE3 = ['Beams', 'Columns'] #,'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 

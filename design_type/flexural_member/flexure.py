@@ -235,7 +235,7 @@ class Flexure(Member):
         t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
         options_list.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE, True, 'No Validator') #'Beam and Column'
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') #'Beam and Column'
         options_list.append(t2)
 
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
@@ -412,12 +412,6 @@ class Flexure(Member):
         out_list.append(t1)
 
         t2 = (KEY_ESR, KEY_DISP_ESR, TYPE_TEXTBOX, self.result_eff_sr if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_SR_lambdavv, KEY_DISP_SR_lambdavv, TYPE_TEXTBOX, self.result_lambda_vv if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_SR_lambdapsi, KEY_DISP_SR_lambdapsi, TYPE_TEXTBOX, self.result_lambda_psi if flag else '', True)
         out_list.append(t2)
 
         t2 = (KEY_EULER_BUCKLING_STRESS, KEY_DISP_EULER_BUCKLING_STRESS, TYPE_TEXTBOX,
@@ -701,10 +695,10 @@ class Flexure(Member):
             if self.section_property.plast_sec_mod_z >= Zp_req:
                 self.input_modified.append(section)
                 logger.info(
-                    f"Required Zp_req={round(Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section{self.section_property.designation}={round(self.section_property.plast_sec_mod_z* 10**-3,2)}x 10^3 mm^3.Section satisfy Min Zp_req value")
+                    f"Required Zp_req = {round(Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min Zp_req value")
             else:
                 logger.warning(
-                    f"Required Zp_req={round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section{self.section_property.designation}={round(self.section_property.plast_sec_mod_z* 10**-3,2)}x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
+                    f"Required Zp_req = {round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
         print("self.input_modified", self.input_modified)
 
     def section_conect_database(self, section):
@@ -796,10 +790,8 @@ class Flexure(Member):
                         I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
                         A_eff_web = self.bearing_length * self.section_property.web_thickness
                         r = math.sqrt(I_eff_web / A_eff_web)
-                        d_red = 0.7 * (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius))
+                        d_red = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius))
                         self.slenderness = 0.7 * d_red / r
-                        self.lambda_vv = "NA"
-                        self.lambda_psi = "NA"
                         self.common_checks_1(self, section, step=3)
                         # step == 4
                         self.common_checks_1(
@@ -827,8 +819,6 @@ class Flexure(Member):
                                     self.imperfection_factor,
                                     self.slenderness,
                                     self.euler_buckling_stress,
-                                    self.lambda_vv,
-                                    self.lambda_psi,
                                     self.nondimensional_effective_slenderness_ratio,
                                     self.phi,
                                     self.stress_reduction_factor,
@@ -852,8 +842,6 @@ class Flexure(Member):
                                 "IF",
                                 "Effective_SR",
                                 "EBS",
-                                "lambda_vv",
-                                "lambda_psi",
                                 "ND_ESR",
                                 "phi",
                                 "SRF",
@@ -1784,8 +1772,6 @@ class Flexure(Member):
             self.result_bc = self.optimum_section_ur_results[result_type]['Buckling_class']
             self.result_IF = round(list_result[result_type]["IF"], 2)
             self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)
-            self.result_lambda_vv = list_result[result_type]["lambda_vv"]
-            self.result_lambda_psi = list_result[result_type]["lambda_psi"]
             self.result_ebs = round(list_result[result_type]["EBS"], 2)
             self.result_nd_esr = round(list_result[result_type]["ND_ESR"], 2)
             self.result_phi_zz = round(list_result[result_type]["phi"], 2)

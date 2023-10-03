@@ -410,7 +410,31 @@ class Flexure(Member):
               self.result_crippling if flag else
               '', True)
         out_list.append(t1)
-        #
+
+        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, True)
+        out_list.append(t1)
+
+        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_eff_sr if flag else '', True)
+        out_list.append(t2)
+
+        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+              self.result_ebs if flag else '', True)
+        out_list.append(t2)
+
+        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_bc if flag else '', True)
+        out_list.append(t2)
+
+        t2 = (
+            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF if flag else '',
+            True)
+        out_list.append(t2)
+
+        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf if flag else '', True)
+        out_list.append(t2)
+
+        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr if flag else '', True)
+        out_list.append(t2)
+
         t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True)
         out_list.append(t1)
 
@@ -942,105 +966,6 @@ class Flexure(Member):
         self.bending_strength_section = self.bending_strength(self) / 10 ** 6
 
 
-    def common_checks_1(self, section, step=1, list_result=[], list_1=[]):
-        if step == 1:
-            print(f"Working correct here")
-        elif step == 2:
-            # reduction of the area based on the connection requirements (input from design preferences)
-            if self.effective_area_factor < 1.0:
-                self.effective_area = round(
-                    self.effective_area * self.effective_area_factor, 2
-                )
-                logger.info(
-                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
-                        round((self.effective_area / self.effective_area_factor), 2),
-                        self.effective_area,
-                    )
-                )
-
-        elif step == 3:
-            # 2.1 - Buckling curve classification and Imperfection factor
-            if self.section_property.type == 'Rolled':
-                self.buckling_class = 'c'
-            self.imperfection_factor = IS800_2007.cl_7_1_2_1_imperfection_factor(
-                                                                                    buckling_class=self.buckling_class
-                                                                                )
-        elif step == 4:
-            # self.slenderness = self.effective_length / min(self.section_property.rad_of_gy_z, self.section_property.rad_of_gy_y) * 1000
-            print(
-                f"\n data sent "
-                f" self.material_property.fy {self.material_property.fy}"
-                f"self.gamma_m0 {self.gamma_m0}"
-                f"self.slenderness {self.slenderness}"
-                f" self.imperfection_factor {self.imperfection_factor}"
-                f"self.section_property.modulus_of_elasticity {self.section_property.modulus_of_elasticity}"
-            )
-
-            list_cl_7_1_2_1_design_compressisive_stress = (
-                IS800_2007.cl_7_1_2_1_design_compressisive_stress(
-                    self.material_property.fy,
-                    self.gamma_m0,
-                    self.slenderness,
-                    self.imperfection_factor,
-                    self.section_property.modulus_of_elasticity,
-                    check_type=list_result,
-                )
-            )
-            for x in list_cl_7_1_2_1_design_compressisive_stress:
-                print(f"x {x} ")
-            self.euler_buckling_stress = list_cl_7_1_2_1_design_compressisive_stress[0]
-            self.nondimensional_effective_slenderness_ratio = (
-                list_cl_7_1_2_1_design_compressisive_stress[1]
-            )
-            self.phi = list_cl_7_1_2_1_design_compressisive_stress[2]
-            self.stress_reduction_factor = list_cl_7_1_2_1_design_compressisive_stress[
-                3
-            ]
-            self.design_compressive_stress_fr = (
-                list_cl_7_1_2_1_design_compressisive_stress[4]
-            )
-            self.design_compressive_stress = (
-                list_cl_7_1_2_1_design_compressisive_stress[5]
-            )
-            self.design_compressive_stress_max = (
-                list_cl_7_1_2_1_design_compressisive_stress[6]
-            )
-        elif step == 5:
-            # 1- Based on optimum UR
-            self.optimum_section_ur_results[self.ur] = {}
-            list_2 = list_result.copy()
-            for j in list_1:
-                # k = 0
-                for k in list_2:
-                    self.optimum_section_ur_results[self.ur][j] = k
-                    # k += 1
-                    list_2.pop(0)
-                    break
-
-            # 2- Based on optimum cost
-            self.optimum_section_cost_results[self.cost] = {}
-
-            list_2 = list_result.copy()  # Why?
-            for j in list_1:
-                for k in list_2:
-                    self.optimum_section_cost_results[self.cost][j] = k
-                    list_2.pop(0)
-                    break
-            print(
-                f"\n self.optimum_section_cost_results {self.optimum_section_cost_results}"
-                f"\n self.optimum_section_ur_results {self.optimum_section_ur_results}"
-            )
-        elif step == 6:
-            self.single_result[self.sec_profile] = {}
-            list_2 = list_result.copy()
-            for j in list_1:
-                # k = 0
-                for k in list_2:
-                    self.single_result[self.sec_profile][j] = k
-                    # k += 1
-                    list_2.pop(0)
-                    break
-            print(f"\n self.single_result {self.single_result}")    
 
     def bending_strength(self):
         print('Inside bending_strength ')
@@ -1084,8 +1009,9 @@ class Flexure(Member):
                 self.section_property.mom_inertia_y,
                 It,
                 Iw,
-                self.effective_length
+                self.effective_length * 1e3
             )
+
             if self.section_class == "Plastic" or self.section_class == "Compact":
                 beta_b = 1.0
             else:
@@ -1104,46 +1030,56 @@ class Flexure(Member):
                 self.material_property.fy,
                 M_cr
             )
-            print('Inside bending_strength 2.1', It, hf, Iw, M_cr, beta_b, alpha_lt, lambda_lt)
             phi_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_phi_lt(
                 alpha_lt, lambda_lt
             )
             X_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(
                 phi_lt, lambda_lt
             )
-            fcd = IS800_2007.cl_8_2_2_Unsupported_beam_bending_compressive_stress(
+            fbd = IS800_2007.cl_8_2_2_Unsupported_beam_bending_compressive_stress(
                 X_lt, self.material_property.fy, self.gamma_m0
             )
-            bending_strength_section = (
-                IS800_2007.cl_8_2_2_Unsupported_beam_bending_strength(
+            bending_strength_section = IS800_2007.cl_8_2_2_Unsupported_beam_bending_strength(
                     self.section_property.plast_sec_mod_z,
                     self.section_property.elast_sec_mod_z,
-                    fcd=fcd,
-                    section_class=self.section_class,
+                    fcd=fbd,
+                    section_class=self.section_class
                 )
-            )
+            self.It = It
+            self.Iw = Iw
+            self.beta_b_lt = beta_b
+            self.alpha_lt = alpha_lt
+            self.lambda_lt = lambda_lt
+            self.phi_lt = phi_lt
+            self.X_lt = X_lt
+            self.fbd_lt = fbd
+            self.lateral_tb = M_cr
+            print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
             if self.high_shear_check:
                 if self.section_class == "Plastic" or self.section_class == "Compact":
                     bending_strength_section = self.bending_strength_reduction(
-                        bending_strength_section,
+                        bending_strength_section
                     )
                 else:
                     bending_strength_section = (
-                        self.section_property.elast_sec_mod_z
-                        * self.material_property.fy
-                        * self.gamma_m0
+                        beta_b
+                        * self.section_property.plast_sec_mod_z
+                        * fbd
                     )
-            print('Inside bending_strength 2',It,hf,Iw,M_cr ,beta_b,alpha_lt,lambda_lt,phi_lt,X_lt,fcd,bending_strength_section)
+                    self.bending_strength_section_reduced = bending_strength_section
+            print('Inside bending_strength 2',It,hf,Iw,M_cr ,beta_b,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
         return bending_strength_section
     def bending_strength_reduction(self, Md):
         Zfd = (
             self.section_property.plast_sec_mod_z
             - (self.section_property.depth**2 * self.section_property.web_thickness / 4)
         )
-        Mfd = Zfd * self.material_property.fy / self.gamma_m0 / 10**6
+        Mfd = Zfd * self.material_property.fy / self.gamma_m0
         beta = ((2 * self.load.shear_force / (self.V_d * 10**3)) - 1) ** 2
-        Mdv = Md - beta * (Md - Mfd)
+        Mdv = (Md - beta * (Md - Mfd))
         print('Inside bending_strength_reduction',Mdv, Md, beta, Mfd, Zfd)
+        self.bending_strength_section_reducedby = Mfd
+        self.beta_reduced = beta
         if (
             Mdv
             <= 1.2
@@ -1319,6 +1255,105 @@ class Flexure(Member):
                 return lambda_lt_1
         logger.warning(" Issues with the non-dimensional slenderness ratio Lambda_lt")
 
+    def common_checks_1(self, section, step=1, list_result=[], list_1=[]):
+        if step == 1:
+            print(f"Working correct here")
+        elif step == 2:
+            # reduction of the area based on the connection requirements (input from design preferences)
+            if self.effective_area_factor < 1.0:
+                self.effective_area = round(
+                    self.effective_area * self.effective_area_factor, 2
+                )
+                logger.info(
+                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
+                        round((self.effective_area / self.effective_area_factor), 2),
+                        self.effective_area,
+                    )
+                )
+
+        elif step == 3:
+            # 2.1 - Buckling curve classification and Imperfection factor
+            if self.section_property.type == 'Rolled':
+                self.buckling_class = 'c'
+            self.imperfection_factor = IS800_2007.cl_7_1_2_1_imperfection_factor(
+                                                                                    buckling_class=self.buckling_class
+                                                                                )
+        elif step == 4:
+            # self.slenderness = self.effective_length / min(self.section_property.rad_of_gy_z, self.section_property.rad_of_gy_y) * 1000
+            print(
+                f"\n data sent "
+                f" self.material_property.fy {self.material_property.fy}"
+                f"self.gamma_m0 {self.gamma_m0}"
+                f"self.slenderness {self.slenderness}"
+                f" self.imperfection_factor {self.imperfection_factor}"
+                f"self.section_property.modulus_of_elasticity {self.section_property.modulus_of_elasticity}"
+            )
+
+            list_cl_7_1_2_1_design_compressisive_stress = (
+                IS800_2007.cl_7_1_2_1_design_compressisive_stress(
+                    self.material_property.fy,
+                    self.gamma_m0,
+                    self.slenderness,
+                    self.imperfection_factor,
+                    self.section_property.modulus_of_elasticity,
+                    check_type=list_result,
+                )
+            )
+            for x in list_cl_7_1_2_1_design_compressisive_stress:
+                print(f"x {x} ")
+            self.euler_buckling_stress = list_cl_7_1_2_1_design_compressisive_stress[0]
+            self.nondimensional_effective_slenderness_ratio = (
+                list_cl_7_1_2_1_design_compressisive_stress[1]
+            )
+            self.phi = list_cl_7_1_2_1_design_compressisive_stress[2]
+            self.stress_reduction_factor = list_cl_7_1_2_1_design_compressisive_stress[
+                3
+            ]
+            self.design_compressive_stress_fr = (
+                list_cl_7_1_2_1_design_compressisive_stress[4]
+            )
+            self.design_compressive_stress = (
+                list_cl_7_1_2_1_design_compressisive_stress[5]
+            )
+            self.design_compressive_stress_max = (
+                list_cl_7_1_2_1_design_compressisive_stress[6]
+            )
+        elif step == 5:
+            # 1- Based on optimum UR
+            self.optimum_section_ur_results[self.ur] = {}
+            list_2 = list_result.copy()
+            for j in list_1:
+                # k = 0
+                for k in list_2:
+                    self.optimum_section_ur_results[self.ur][j] = k
+                    # k += 1
+                    list_2.pop(0)
+                    break
+
+            # 2- Based on optimum cost
+            self.optimum_section_cost_results[self.cost] = {}
+
+            list_2 = list_result.copy()  # Why?
+            for j in list_1:
+                for k in list_2:
+                    self.optimum_section_cost_results[self.cost][j] = k
+                    list_2.pop(0)
+                    break
+            print(
+                f"\n self.optimum_section_cost_results {self.optimum_section_cost_results}"
+                f"\n self.optimum_section_ur_results {self.optimum_section_ur_results}"
+            )
+        elif step == 6:
+            self.single_result[self.sec_profile] = {}
+            list_2 = list_result.copy()
+            for j in list_1:
+                # k = 0
+                for k in list_2:
+                    self.single_result[self.sec_profile][j] = k
+                    # k += 1
+                    list_2.pop(0)
+                    break
+            print(f"\n self.single_result {self.single_result}")
 
   
     def design_column(self):

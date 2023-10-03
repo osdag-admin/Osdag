@@ -935,8 +935,8 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_strength(Zp, Ze, fcd, section_class):
-        if section_class == 'plastic' or section_class == 'compact':
-            return Zp*fcd
+        if section_class == 'Plastic' or section_class == 'Compact':
+            return Zp * fcd
         else:
             return Ze * fcd
 
@@ -946,11 +946,13 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(phi_lt, lambda_lt):
-        return 1 / ( phi_lt + [phi_lt **2 - lambda_lt **2] ** 0.5)
+        return 1 / ( phi_lt + (phi_lt **2 - lambda_lt **2) ** 0.5)
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_phi_lt(alpha_lt, lambda_lt):
-        return 0.5 * [ 1 + alpha_lt * ( lambda_lt - 0.2) + lambda_lt ** 2]
+        a = 0.5 * ( 1 + alpha_lt * ( lambda_lt - 0.2) + lambda_lt ** 2)
+        print(alpha_lt, lambda_lt, a)
+        return a
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):

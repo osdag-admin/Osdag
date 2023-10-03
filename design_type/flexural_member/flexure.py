@@ -300,6 +300,9 @@ class Flexure(Member):
         if profile == 'Beams': #Beam and Column
             return connectdb("Beams", call_type="popup")
             profile2 = connectdb("Columns", call_type="popup")
+        if profile == 'Columns': #Beam and Column
+            return connectdb("Columns", call_type="popup")
+            # profile2 = connectdb("Columns", call_type="popup")
         # return list(set(profile1 + profile2))
             
 
@@ -516,8 +519,11 @@ class Flexure(Member):
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
         '''
-        TODO change self.web_buckling & self.web_crippling to TAKE input from Design Dictionary
-
+        TODO
+                self.bending_type == KEY_DISP_BENDING1:
+                self.lambda_lt = self.lambda_lt_check_member_type
+                if self.lambda_lt < 0.4:
+                    self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE
         '''
         super(Flexure, self).set_input_values(self, design_dictionary)
 
@@ -536,23 +542,15 @@ class Flexure(Member):
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             pass
         elif self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-            self.bending_type = str(design_dictionary[KEY_BENDING]) if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
+            self.bending_type = str(design_dictionary[KEY_BENDING]) #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
             if self.bending_type == KEY_DISP_BENDING2:
                 self.design_type = KEY_DISP_DESIGN_TYPE_FLEXURE
-            elif self.bending_type == KEY_DISP_BENDING1:
-                self.lambda_lt = self.lambda_lt_check_member_type
-                if self.lambda_lt < 0.4:
-                    self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE
 
         # section user data        
         self.length = float(design_dictionary[KEY_LENGTH])
 
-
         # end condition
         self.support = design_dictionary[KEY_SUPPORT]
-        if self.support == 'Laterally Supported':
-            pass
-
 
         # factored loads
         self.load = Load(
@@ -569,8 +567,9 @@ class Flexure(Member):
         self.optimization_parameter = "Utilization Ratio"
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]  # if 'Semi-Compact' is available
         self.steel_cost_per_kg = 50
-        self.web_buckling = True #TAKE from Design Dictionary
-        self.web_crippling = True #TAKE from Design Dictionary
+        # Step 2 - computing the design compressive stress for web_buckling & web_crippling
+        self.bearing_length = design_dictionary[KEY_BEARING_LENGTH]
+        #TAKE from Design Dictionary
         self.allowed_sections = []
         if self.allow_class == "Yes":
             self.allowed_sections == "Semi-Compact"
@@ -597,13 +596,6 @@ class Flexure(Member):
         self.design_status = False
         self.sec_prop_initial_dict = {}
 
-        # self.K = self.in_plane * self.out_plane
-        # print(
-        #     "K = {}.The input values are set. Performing preliminary member check(s).".format(
-        #         self.K
-        #     )
-        # )
-
         self.design(self, design_dictionary)
         if len(self.input_modified) != 0:
             self.results(self, design_dictionary)
@@ -611,14 +603,16 @@ class Flexure(Member):
     
     # Simulation starts here
     def design(self, design_dictionary, flag=0):
+        '''
+        TODO optimimation_tab_check changes to include self.material_property = Material(material_grade=self.material, thickness=0)
+            for each section
+        '''
         # flag = self.section_classification(self)
         print(f"\n Inside design")
         # self.show_error_message(self)
         """Perform design of struct"""
         # checking DP inputs
-        '''
-        TODO optimimation_tab_check changes to include self.material_property = Material(material_grade=self.material, thickness=0) 
-        for each section'''
+
         self.optimization_tab_check(self)
         # print( "self.material_property",self.material_property.fy)
         self.input_modifier(self)
@@ -629,15 +623,15 @@ class Flexure(Member):
     def optimization_tab_check(self):
         print(f"\n Inside optimization_tab_check")
         if (self.effective_area_factor <= 0.10) or (self.effective_area_factor > 1.0):
-            logger.warning(
+            logger.error(
                 "The defined value of Effective Area Factor in the design preferences tab is out of the suggested range."
             )
             logger.info("Provide an appropriate input and re-design.")
-            logger.info("Assuming a default value of 1.0.")
+            logger.warning("Assuming a default value of 1.0.")
             self.effective_area_factor = 1.0
-            self.design_status = False
-            self.design_status_list.append(self.design_status)
-
+            # self.design_status = False
+            # self.design_status_list.append(self.design_status)
+            self.optimization_tab_check(self)
         elif (self.steel_cost_per_kg < 0.10) or (self.effective_area_factor > 1.0):
             # No suggested range in Description
             logger.warning(
@@ -676,22 +670,22 @@ class Flexure(Member):
         for section in self.sec_list:
             section = section.strip("'")
             self.section_property = self.section_conect_database(self, section)
-            if self.allow_class == "Yes":
-                Zp_req = (
-                    self.load.moment
-                    * self.gamma_m0
-                    / (
-                        self.material_property.fy
-                        * self.section_property.elast_sec_mod_z
-                        / self.section_property.plast_sec_mod_z
-                    )
-                )
-                print('Inside input_modifier allow_class',self.allow_class, self.load.moment, self.gamma_m0, self.material_property.fy
-                        * self.section_property.elast_sec_mod_z
-                        / self.section_property.plast_sec_mod_z)
-            else:
-                Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
-                print('Inside input_modifier not allow_class',self.allow_class,self.load.moment, self.gamma_m0, self.material_property.fy)
+            # if self.allow_class == "Yes":
+            #     Zp_req = (
+            #         self.load.moment
+            #         * self.gamma_m0
+            #         / (
+            #             self.material_property.fy
+            #             * self.section_property.elast_sec_mod_z
+            #             / self.section_property.plast_sec_mod_z
+            #         )
+            #     )
+            #     print('Inside input_modifier allow_class',self.allow_class, self.load.moment, self.gamma_m0, self.material_property.fy
+            #             * self.section_property.elast_sec_mod_z
+            #             / self.section_property.plast_sec_mod_z)
+            # else:
+            Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            print('Inside input_modifier not allow_class',self.allow_class,self.load.moment, self.gamma_m0, self.material_property.fy)
             if self.section_property.plast_sec_mod_z >= Zp_req:
                 self.input_modified.append(section)
                 logger.info(
@@ -750,7 +744,7 @@ class Flexure(Member):
                 self.common_checks_1(self, section, step=2)
                 
                 # 2 - Effective length
-                self.effective_length = self.effective_length_beam(self, design_dictionary, self.length)  # mm
+                self.effective_length_beam(self, design_dictionary, self.length)  # mm
                 print(f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
 
                 list_result = []
@@ -779,14 +773,12 @@ class Flexure(Member):
                 self.optimum_section_cost.append(self.cost)
 
 
-                # Step 2 - computing the design compressive stress for web_buckling & web_crippling
-                self.bearing_length = design_dictionary[KEY_BEARING_LENGTH]
+
                 if self.bearing_length != 'NA': #and self.web_crippling
                     print(f"Check for Web Buckling")
                     try:
                         self.bearing_length = float(design_dictionary[KEY_BEARING_LENGTH])
-                        #WEB BUCKLING
-                        self.bearing_length = float(design_dictionary[KEY_BEARING_LENGTH])
+                        self.web_buckling = True #WEB BUCKLING
                         I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
                         A_eff_web = self.bearing_length * self.section_property.web_thickness
                         r = math.sqrt(I_eff_web / A_eff_web)
@@ -857,6 +849,7 @@ class Flexure(Member):
                     except:
                         logger.warning('Bearing length is invalid.')
                         logger.info('Ignoring web Buckling and Crippling check')
+                        self.web_buckling = False
                         # 2.8 - UR
                         print(self.bending_strength_section, self.V_d)
                         if self.bending_strength_section > self.load.moment * 10 ** -6 and self.V_d > self.load.shear_force * 10 ** -3:
@@ -882,6 +875,7 @@ class Flexure(Member):
                             # Step 3 - Storing the optimum results to a list in a descending order
                             self.common_checks_1(self, section, 5, list_result, list_1)
                 else:
+                    self.web_buckling = False
                     # 2.8 - UR
                     print(self.bending_strength_section, self.V_d)
                     if self.bending_strength_section > self.load.moment * 10**-6 and self.V_d > self.load.shear_force * 10**-3:
@@ -1090,7 +1084,7 @@ class Flexure(Member):
                 self.section_property.mom_inertia_y,
                 It,
                 Iw,
-                self.effective_length,
+                self.effective_length
             )
             if self.section_class == "Plastic" or self.section_class == "Compact":
                 beta_b = 1.0
@@ -1103,13 +1097,14 @@ class Flexure(Member):
                 alpha_lt = 0.21
             else:
                 alpha_lt = 0.49
-            lambda_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
+            lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment(
                 beta_b,
                 self.section_property.plast_sec_mod_z,
                 self.section_property.elast_sec_mod_z,
                 self.material_property.fy,
-                M_cr,
+                M_cr
             )
+            print('Inside bending_strength 2.1', It, hf, Iw, M_cr, beta_b, alpha_lt, lambda_lt)
             phi_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_phi_lt(
                 alpha_lt, lambda_lt
             )
@@ -1176,45 +1171,43 @@ class Flexure(Member):
         for trial_section in self.input_modified:
             self.section_property = self.section_conect_database(self, trial_section)
             print(f"Type of section{self.section_property.designation}")
-            if self.sec_profile != "":  
-                if self.section_property.type == "Rolled":
-                    web_class = IS800_2007.Table2_iii(
-                        self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius),
-                        self.section_property.web_thickness,
-                        self.material_property.fy,
-                    )
-                    flange_class = IS800_2007.Table2_i(
-                        self.section_property.flange_width / 2,
-                        self.section_property.flange_thickness,
-                        self.material_property.fy,
-                    )[0]
-                    web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
-                    flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
-                else:
-                    """Need to check below formula"""
-                    flange_class = IS800_2007.Table2_i(
-                        (
-                            (self.section_property.flange_width / 2)
-                            # - (self.section_property.web_thickness / 2)
-                        ),
-                        self.section_property.flange_thickness,
-                        self.section_property.fy,
-                        self.section_property.type,
-                    )[0]
+            if self.section_property.type == "Rolled":
+                web_class = IS800_2007.Table2_iii(
+                    self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius),
+                    self.section_property.web_thickness,
+                    self.material_property.fy,
+                )
+                flange_class = IS800_2007.Table2_i(
+                    self.section_property.flange_width / 2,
+                    self.section_property.flange_thickness,
+                    self.material_property.fy,
+                )[0]
+                web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
+            else:
+                """Need to check below formula"""
+                flange_class = IS800_2007.Table2_i(
+                    (
+                        (self.section_property.flange_width / 2)
+                        # - (self.section_property.web_thickness / 2)
+                    ),
+                    self.section_property.flange_thickness,
+                    self.section_property.fy,
+                    self.section_property.type,
+                )[0]
 
-                    web_class = IS800_2007.Table2_iii(
-                        (
-                            self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
-                        ),
-                        self.section_property.web_thickness,
-                        self.material_property.fy,
-                        classification_type="Axial compression",
-                    )
-                    web_ratio = (self.section_property.depth - 2 * (
-                                self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
-                    flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
-                print(f"\n \n \n flange_class {flange_class} \n web_class{web_class} \n \n")
-
+                web_class = IS800_2007.Table2_iii(
+                    (
+                        self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
+                    ),
+                    self.section_property.web_thickness,
+                    self.material_property.fy,
+                    classification_type="Axial compression",
+                )
+                web_ratio = (self.section_property.depth - 2 * (
+                            self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
+            print(f"\n \n \n flange_class {flange_class} \n web_class{web_class} \n \n")
             if flange_class == "Slender" or web_class == "Slender":
                 self.section_class = "Slender"
             else:
@@ -1245,8 +1238,8 @@ class Flexure(Member):
                     web_class, round(web_ratio,2)
                 )
             )
-
-            if self.allow_class:
+            print( 'self.allow_class', self.allow_class)
+            if self.allow_class != 'No':
                 if (
                     self.section_class == "Semi-Compact"
                     or self.section_class == "Compact"
@@ -1279,45 +1272,42 @@ class Flexure(Member):
     
     def effective_length_beam(self, design_dictionary, length):
         print(f"Inside effective_length_beam")
+        self.Loading = design_dictionary[KEY_LOAD]  # 'Normal'or 'Destabilizing'
         if design_dictionary[KEY_LENGTH_OVERWRITE] == 'NA':
             if self.support == KEY_DISP_SUPPORT1:
                 self.Torsional_res = design_dictionary[KEY_TORSIONAL_RES]
                 self.Warping = design_dictionary[KEY_WARPING_RES]
-                self.Loading = design_dictionary[KEY_LOAD]  #'Normal'or 'Destabilizing'
-                self.length = IS800_2007.cl_8_3_1_EffLen_Simply_Supported(
+                self.effective_length = IS800_2007.cl_8_3_1_EffLen_Simply_Supported(
                     Torsional=self.Torsional_res,
                     Warping=self.Warping,
                     length=length,
                     depth=self.section_property.depth,
                     load=self.Loading,
                 )
-                print(f"Working 1 {self.length}")
+                print(f"Working 1 {self.effective_length}")
             elif self.support == KEY_DISP_SUPPORT2:
                 self.Support = design_dictionary[KEY_SUPPORT_TYPE]
                 self.Top = design_dictionary[KEY_SUPPORT_TYPE2]
-                self.Loading = design_dictionary[KEY_LOAD]  # 'Normal'or 'Destabilizing'
-                self.length = IS800_2007.cl_8_3_3_EffLen_Cantilever(
+                self.effective_length = IS800_2007.cl_8_3_3_EffLen_Cantilever(
                     Support=self.Support,
                     Top=self.Top,
                     length=length,
                     load=self.Loading,
                 )
-                print(f"Working 2 {self.length}")
+                print(f"Working 2 {self.effective_length}")
         else:
             try:
                 length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
-                self.length = length
-                print(f"Working 3 {self.length}")
+                self.effective_length = length
+                print(f"Working 3 {self.effective_length}")
             except:
                 print(f"Inside effective_length_beam",type(design_dictionary[KEY_LENGTH_OVERWRITE]))
                 logger.warning("Invalid Effective Length Parameter.")
                 logger.info('Effective Length Parameter is set to default: 1.0')
                 design_dictionary[KEY_LENGTH_OVERWRITE] = 'NA'
                 length = self.effective_length_beam(self, design_dictionary, length)
-                print(f"Working 4 {self.length}")
-        print(f"Inside effective_length_beam",length, design_dictionary[KEY_LENGTH_OVERWRITE])
-
-        return length
+                print(f"Working 4 {self.effective_length}")
+        print(f"Inside effective_length_beam",self.effective_length, design_dictionary[KEY_LENGTH_OVERWRITE])
 
 
     def lambda_lt_check_member_type(self, Mcr=0, fcrb=0, Zp=0, f_y=0, Ze=0, beta_b=0):
@@ -1605,20 +1595,88 @@ class Flexure(Member):
 
         # sorting results from the dataset
         # if len(self.input_section_list) > 1:
-                # results based on UR
-                if self.optimization_parameter == "Utilization Ratio":
-                    filter_UR = filter(
-                        lambda x: x <= min(self.allowable_utilization_ratio, 1.0),
-                        self.optimum_section_ur
-                    )
-                    self.optimum_section_ur = list(filter_UR)
+        # results based on UR
+        if self.optimization_parameter == "Utilization Ratio":
+            filter_UR = filter(
+                lambda x: x <= min(self.allowable_utilization_ratio, 1.0),
+                self.optimum_section_ur
+            )
+            self.optimum_section_ur = list(filter_UR)
 
-                    self.optimum_section_ur.sort()
-                    # print(f"self.optimum_section_ur{self.optimum_section_ur}")
-                    # print(f"self.result_UR{self.result_UR}")
+            self.optimum_section_ur.sort()
+            # print(f"self.optimum_section_ur{self.optimum_section_ur}")
+            # print(f"self.result_UR{self.result_UR}")
 
-                    # selecting the section with most optimum UR
-                    if len(self.optimum_section_ur) == 0:  # no design was successful
+            # selecting the section with most optimum UR
+            if len(self.optimum_section_ur) == 0:  # no design was successful
+                logger.warning(
+                    "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                    "criteria"
+                )
+                logger.error(
+                    "The solver did not find any adequate section from the defined list."
+                )
+                logger.info(
+                    "Re-define the list of sections or check the Design Preferences option and re-design."
+                )
+                self.design_status = False
+                self.design_status_list.append(self.design_status)
+
+            else:
+                self.result_UR = self.optimum_section_ur[
+                    -1
+                ]  # optimum section which passes the UR check
+                print(f"self.result_UR{self.result_UR}")
+                self.design_status = True
+
+        else:  # results based on cost
+            self.optimum_section_cost.sort()
+
+            # selecting the section with most optimum cost
+            self.result_cost = self.optimum_section_cost[0]
+
+        # print results
+        if len(self.optimum_section_ur) == 0:
+            logger.warning(
+                "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                "criteria"
+            )
+            logger.error(
+                "The solver did not find any adequate section from the defined list."
+            )
+            logger.info(
+                "Re-define the list of sections or check the Design Preferences option and re-design."
+            )
+            self.design_status = False
+            self.design_status_list.append(self.design_status)
+            pass
+        else:
+            if self.optimization_parameter == "Utilization Ratio":
+                self.common_result(
+                    self,
+                    list_result=self.optimum_section_ur_results,
+                    result_type=self.result_UR,
+                )
+            else:
+                self.result_UR = self.optimum_section_cost_results[
+                    self.result_cost
+                ]["UR"]
+
+                # checking if the selected section based on cost satisfies the UR
+                if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
+                    trial_cost = []
+                    for cost in self.optimum_section_cost:
+                        self.result_UR = self.optimum_section_cost_results[
+                            cost
+                        ]["UR"]
+                        if self.result_UR <= min(
+                            self.allowable_utilization_ratio, 1.0
+                        ):
+                            trial_cost.append(cost)
+
+                    trial_cost.sort()
+
+                    if len(trial_cost) == 0:  # no design was successful
                         logger.warning(
                             "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
                             "criteria"
@@ -1631,133 +1689,28 @@ class Flexure(Member):
                         )
                         self.design_status = False
                         self.design_status_list.append(self.design_status)
-
+                        print(f"design_status_list{self.design_status} \n")
                     else:
-                        self.result_UR = self.optimum_section_ur[
-                            -1
-                        ]  # optimum section which passes the UR check
-                        print(f"self.result_UR{self.result_UR}")
+                        self.result_cost = trial_cost[
+                            0
+                        ]  # optimum section based on cost which passes the UR check
                         self.design_status = True
 
-                else:  # results based on cost
-                    self.optimum_section_cost.sort()
+                # results
+                self.common_result(
+                    self,
+                    list_result=self.optimum_section_cost_results,
+                    result_type=self.result_cost,
+                )
 
-                    # selecting the section with most optimum cost
-                    self.result_cost = self.optimum_section_cost[0]
+                print(f"design_status_list2{self.design_status}")
+        for status in self.design_status_list:
+            if status is False:
+                self.design_status = False
+                break
+            else:
+                self.design_status = True
 
-                # print results
-                if len(self.optimum_section_ur) == 0:
-                    logger.warning(
-                        "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                        "criteria"
-                    )
-                    logger.error(
-                        "The solver did not find any adequate section from the defined list."
-                    )
-                    logger.info(
-                        "Re-define the list of sections or check the Design Preferences option and re-design."
-                    )
-                    self.design_status = False
-                    self.design_status_list.append(self.design_status)
-                    pass
-                else:
-                    if self.optimization_parameter == "Utilization Ratio":
-                        self.common_result(
-                            self,
-                            list_result=self.optimum_section_ur_results,
-                            result_type=self.result_UR,
-                        )
-                    else:
-                        self.result_UR = self.optimum_section_cost_results[
-                            self.result_cost
-                        ]["UR"]
-
-                        # checking if the selected section based on cost satisfies the UR
-                        if self.result_UR > min(self.allowable_utilization_ratio, 1.0):
-                            trial_cost = []
-                            for cost in self.optimum_section_cost:
-                                self.result_UR = self.optimum_section_cost_results[
-                                    cost
-                                ]["UR"]
-                                if self.result_UR <= min(
-                                    self.allowable_utilization_ratio, 1.0
-                                ):
-                                    trial_cost.append(cost)
-
-                            trial_cost.sort()
-
-                            if len(trial_cost) == 0:  # no design was successful
-                                logger.warning(
-                                    "The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
-                                    "criteria"
-                                )
-                                logger.error(
-                                    "The solver did not find any adequate section from the defined list."
-                                )
-                                logger.info(
-                                    "Re-define the list of sections or check the Design Preferences option and re-design."
-                                )
-                                self.design_status = False
-                                self.design_status_list.append(self.design_status)
-                                print(f"design_status_list{self.design_status} \n")
-                            else:
-                                self.result_cost = trial_cost[
-                                    0
-                                ]  # optimum section based on cost which passes the UR check
-                                self.design_status = True
-
-                        # results
-                        self.common_result(
-                            self,
-                            list_result=self.optimum_section_cost_results,
-                            result_type=self.result_cost,
-                        )
-
-                        print(f"design_status_list2{self.design_status}")
-                for status in self.design_status_list:
-                    if status is False:
-                        self.design_status = False
-                        break
-                    else:
-                        self.design_status = True
-            # else:
-            #     logger.warning("More than 1 section given as input without giving Load")
-            #     logger.error("Cannot compute!")
-            #     logger.info(
-            #         "Give 1 section as Inputs and/or " "Give load and re-design."
-            #     )
-            #     self.design_status = False
-            #     self.design_status_list.append(self.design_status)
-            # if self.design_status:
-            #     logger.info(": ========== Design Status ============")
-            #     logger.info(": Overall Column design is SAFE")
-            #     logger.info(": ========== End Of Design ============")
-            # else:
-            #     logger.info(": ========== Design Status ============")
-            #     logger.info(": Overall Column design is UNSAFE")
-            #     logger.info(": ========== End Of Design ============")
-        # else:
-        #     print(f"self.single_result {self.single_result}")
-        #     self.common_result(
-        #         self,
-        #         list_result=self.single_result,
-        #         result_type=self.sec_profile,
-        #         flag=1,
-        #     )
-        #     self.design_status = True
-        #     self.result_UR = self.single_result[self.sec_profile]["UR"]
-        #     if self.design_status:
-        #         logger.info(": ========== Capacity Status ============")
-        #         logger.info(": Section satisfies input")
-        #         logger.info(": Section strength found")
-        #         logger.info(": ========== End Of Status ============")
-        #     else:
-        #         logger.info(": ========== Capacity Status ============")
-        #         logger.info(": Section does not satisfies input")
-        #         logger.info(": Section strength NOT found")
-        #         logger.info(": ========== End Of Status ============")
-        # end of the design simulation
-        # overall design status
     def common_result(self, list_result, result_type, flag=1):
         self.result_designation = list_result[result_type]["Designation"]
         self.result_section_class = list_result[result_type]["Section class"]
@@ -1768,7 +1721,7 @@ class Flexure(Member):
         self.result_eff_len = list_result[result_type]["Effective_length"]
         self.result_cost = list_result[result_type]["Cost"]
 
-        if self.web_buckling and self.web_crippling:
+        if self.web_buckling :
             self.result_bc = self.optimum_section_ur_results[result_type]['Buckling_class']
             self.result_IF = round(list_result[result_type]["IF"], 2)
             self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)

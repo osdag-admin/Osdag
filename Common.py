@@ -751,7 +751,7 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
-VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
+VALUES_SECTYPE = ['Select Type','Beams and Columns','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
@@ -2152,7 +2152,7 @@ KEY_DISP_SEC_TYPE = 'Section Type'
 VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
-VALUES_SEC_PROFILE3 = ['Beams', 'Columns'] #,'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 

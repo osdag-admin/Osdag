@@ -297,13 +297,10 @@ class Flexure(Member):
     def fn_profile_section(self):
 
         profile = self[0]
-        if profile == 'Beams': #Beam and Column
-            return connectdb("Beams", call_type="popup")
-            profile2 = connectdb("Columns", call_type="popup")
-        if profile == 'Columns': #Beam and Column
-            return connectdb("Columns", call_type="popup")
-            # profile2 = connectdb("Columns", call_type="popup")
-        # return list(set(profile1 + profile2))
+        if profile == 'Beams and Columns': #Beam and Column
+            res1 = connectdb("Beams", call_type="popup")
+            res2 = connectdb("Columns", call_type="popup")
+            return list(set(res1 + res2))
             
 
     def fn_supp_image(self):
@@ -543,7 +540,7 @@ class Flexure(Member):
         global logger
         red_list = red_list_function()
 
-        if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+        if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams or Columns
             for section in self.sec_list:
                 if section in red_list:
                     logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
@@ -733,7 +730,6 @@ class Flexure(Member):
         # print(self.sec_profile)
         if (
             self.sec_profile == VALUES_SECTYPE[1]
-            or self.sec_profile == VALUES_SECTYPE[2]
             or self.sec_profile == "I-section"
         ):  # I-section
             self.section_property = ISection(
@@ -1408,7 +1404,11 @@ class Flexure(Member):
 
                 # fetching the section properties of the selected section
                 if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams
-                    self.section_property = Beam(designation=section, material_grade=self.material)
+                    try:
+                        result = Beam(designation=section, material_grade=self.material)
+                    except:
+                        result = Column(designation=section, material_grade=self.material)
+                    self.section_property = result
                 elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # Columns
                     self.section_property = Column(designation=section, material_grade=self.material)
                 elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # RHS
@@ -1439,12 +1439,12 @@ class Flexure(Member):
                     logger.warning("The trial section ({}) is Slender. Computing the Effective Sectional Area as per Sec. 9.7.2, "
                                    "Fig. 2 (B & C) of The National Building Code of India (NBC), 2016.".format(section))
 
-                    if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+                    if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
                         self.effective_area = (2 * ((31.4 * self.epsilon * self.section_property.flange_thickness) *
                                                     self.section_property.flange_thickness)) + \
                                               (2 * ((21 * self.epsilon * self.section_property.web_thickness) * self.section_property.web_thickness))
-                    elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):
-                        self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
+                    #elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):
+                        #self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
                 else:
                     self.effective_area = self.section_property.area  # mm2
                     # print(f"self.effective_area{self.effective_area}")
@@ -1469,7 +1469,7 @@ class Flexure(Member):
                 # Step 2 - computing the design compressive stress
 
                 # 2.1 - Buckling curve classification and Imperfection factor
-                if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+                if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams ans Columns
 
                     if self.section_property.type == 'Rolled':
                         self.buckling_class_zz = IS800_2007.cl_7_1_2_2_buckling_class_of_crosssections(self.section_property.flange_width,

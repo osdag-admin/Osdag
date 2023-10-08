@@ -258,7 +258,7 @@ class Flexure(Member):
         options_list.append(t2)
 
         #
-        t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX, VALUES_BENDING_TYPE, False, 'No Validator')
+        t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX_CUSTOMIZED, VALUES_BENDING_TYPE, False, 'No Validator')
         options_list.append(t3)
         #
         #
@@ -301,7 +301,20 @@ class Flexure(Member):
             res1 = connectdb("Beams", call_type="popup")
             res2 = connectdb("Columns", call_type="popup")
             return list(set(res1 + res2))
-            
+
+    def out_anchor_tension(self):
+        print("SELF: ", self)
+        if self[0] in ['Laterally Supported']:
+            return True
+        else:
+            return False 
+
+    def out_anchor_tension_2(self):
+        print("SELF: ", self)
+        if self[0] in ['Laterally Supported']:
+            return False
+        else:
+            return True         
 
     def fn_supp_image(self):
         print( 'Inside fn_supp_image', self)
@@ -335,6 +348,21 @@ class Flexure(Member):
 
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
+
+        t4 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_BENDING, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
+        lst.append(t4)
+
+        t5 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_SUPPORT_TYPE, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
+        lst.append(t5)
+
+        t6 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_SUPPORT_TYPE2, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
+        lst.append(t6)
+
+        t7 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_TORSIONAL_RES, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension_2)
+        lst.append(t7)
+
+        t8 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_WARPING_RES, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension_2)
+        lst.append(t8)
 
         t18 = ([KEY_BENDING],
                'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.major_bending_warning)

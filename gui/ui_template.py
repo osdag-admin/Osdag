@@ -859,7 +859,6 @@ class Window(QMainWindow):
                 for key_name in t[0]:
                     
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    
                     self.on_change_connect(key_changed, updated_list, data, main)
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 

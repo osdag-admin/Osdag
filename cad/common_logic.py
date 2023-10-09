@@ -2163,6 +2163,10 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+        elif self.mainmodule == 'Flexure Member':
+            self.FObj = self.createTensionCAD()
+
+            self.display_3DModel("Model", "gradient_bg")
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:

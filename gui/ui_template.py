@@ -198,14 +198,14 @@ class Window(QMainWindow):
         return self.ui.get_right_elements()
 
     def open_summary_popup(self, main):
-
+        print('main.module_name',main.module_name(main))
         if not main.design_button_status:
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
-
-        if main.design_status:
+        if main.design_status and main.module_name(main) != KEY_DISP_FLEXURE:
             from osdagMainSettings import backend_name
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
+            print('off_display', off_display)
             self.commLogicObj.display = off_display
             current_component = self.commLogicObj.component
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
@@ -2021,7 +2021,7 @@ class Window(QMainWindow):
             # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
-            # print(f"status{status}")
+            print(f"trigger_type{trigger_type}")
 
             if error is not None:
                 self.show_error_msg(error)
@@ -2080,9 +2080,9 @@ class Window(QMainWindow):
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
-                                                  KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COMPRESSION_COLUMN]:
+                                                  KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COMPRESSION_COLUMN]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
-                # print("common start")
+                print("common start")
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 # print("common start")
                 status = main.design_status

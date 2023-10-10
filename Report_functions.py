@@ -7976,3 +7976,61 @@ def cl_7_1_2_design_comp_strength_provided( Aeff , facd , A_eff_facd ):
 # def dia_plate_thk_provided(t_wc,)
 #     t_wc
 # t_wc = round((1.9 * self.load_moment_effective * 1e6) / (self.column_D * self.beam_D * self.column_fy), 2)
+
+##FLEXURE MEMBERS
+def flexure_section_check_required( section_class , b , tf, d, tw ):
+    """
+    Args:
+        h:Depth of section(mm)                                                                   (float)
+        bf: Breadth of section(mm)                                                               (float)
+        bucklingclass: buckling class                                                             (float)
+    Returns:
+            bucklingclass_eq
+    Note:
+        Reference: IS 800 Cl.7.1.2.2
+        @author:Rutvik Joshi
+    """
+    bucklingclass_eq=Math(inline=True)
+    if bucklingclass==0.34:
+        bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}>1.2\\'))
+        bucklingclass_eq.append(NoEscape(r'                 t_\text{f}<=40\\'))
+        bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+    elif bucklingclass==0.49:
+        if h/bf>1.2:
+            bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}>1.2\\'))
+            bucklingclass_eq.append(NoEscape(r'40 <= t_\text{f} <= 100'))
+            bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+        else:
+            bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}<=1.2\\'))
+            bucklingclass_eq.append(NoEscape(r' t_\text{f} <= 100'))
+            bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+    elif bucklingclass==0.76:
+        bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}<=1.2\\'))
+        bucklingclass_eq.append(NoEscape(r' t_\text{f} > 100'))
+        bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
+    return bucklingclass_eq
+
+
+def comp_column_class_section_check_provided( bucklingclass , h , bf , tf , var_h_bf ):
+    """
+    Args:
+        h:Depth of section(mm)                                                                   (float)
+        bf: Breadth of section(mm)                                                               (float)
+        bucklingclass: buckling class                                                             (float)
+    Returns:
+            bucklingclass_eq
+    Note:
+        Reference: IS 800 Cl.7.1.2.2
+        @author:Rutvik Joshi
+    """
+    bucklingclass_eq=Math(inline=True)
+    h=str(h)
+    bf=str(bf)
+    tf=str(tf)
+    var_h_bf=str(var_h_bf)
+
+    bucklingclass_eq.append(NoEscape(r'\begin{aligned} frac{h}{b_\text{f}}&= frac{'+ h +r'}{' + bf + r'}\\'))
+    bucklingclass_eq.append(NoEscape(r'                                  &='+ var_h_bf +r'\\'))
+    bucklingclass_eq.append(NoEscape(r' t_f =' + tf + r' \\'))
+    bucklingclass_eq.append(NoEscape(r'&[\text{Ref. IS\:800:2007,\:Cl.7.1.2.2}]\end{aligned}'))
+    return bucklingclass_eq

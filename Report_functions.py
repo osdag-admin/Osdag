@@ -443,7 +443,7 @@ def cl_8_2_1_2_plastic_moment_capacity_yy(beta_b, Z_py, f_y, gamma_m0, Pmc):
     return Pmc_eqn
 
 
-def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
+def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc, type = 'cantilever'):
     """
     Calculate moment deformation capacity
     Args:
@@ -460,8 +460,12 @@ def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
     Z_e = str(Z_e)
     Mdc = str(Mdc)
     Mdc_eqn = Math(inline=True)
-    Mdc_eqn.append(NoEscape(r'\begin{aligned} M_{dc} &= \frac{1.5 Z_e fy}{\gamma_{m0} \times 10^6}\\'))
-    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 \times' + Z_e + r'\times' + fy + r'}{1.1\times 10^6}\\'))
+    if type == 'cantilever':
+        Mdc_eqn.append(NoEscape(r'\begin{aligned} M_{dc} &= \frac{1.5 Z_e fy}{\gamma_{m0} \times 10^6}\\'))
+        Mdc_eqn.append(NoEscape(r'&= \frac{1.5 \times' + Z_e + r'\times' + fy + r'}{1.1\times 10^6}\\'))
+    else:
+        Mdc_eqn.append(NoEscape(r'\begin{aligned} M_{dc} &= \frac{1.2 Z_e fy}{\gamma_{m0} \times 10^6}\\'))
+        Mdc_eqn.append(NoEscape(r'&= \frac{1.2 \times' + Z_e + r'\times' + fy + r'}{1.1\times 10^6}\\'))
     Mdc_eqn.append(NoEscape(r'&= ' + Mdc + r'\\ \\'))
     Mdc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
     return Mdc_eqn
@@ -3046,7 +3050,7 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
     return display_eqn
 
 
-def get_pass_fail(required, provided, relation=''):
+def get_pass_fail(required, provided, relation='',M1 = '', M2 = ''):
     if provided == 0 or required == 'N/A' or provided == 'N/A' or required == 0:
         return ''
     else:
@@ -3065,6 +3069,11 @@ def get_pass_fail(required, provided, relation=''):
                 return 'Pass'
             else:
                 return 'Fail'
+        elif relation == 'Warn':
+            if required <= provided:
+                return M1
+            else:
+                return M2
         else:
             if required < provided:
                 return 'Pass'

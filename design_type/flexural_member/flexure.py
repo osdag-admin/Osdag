@@ -1818,7 +1818,7 @@ class Flexure(Member):
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
-
+        super(Flexure, self).save_design(self)
         # if self.connectivity == 'Hollow/Tubular Column Base':
         #     if self.dp_column_designation[1:4] == 'SHS':
         #         select_section_img = 'SHS'
@@ -1889,20 +1889,29 @@ class Flexure(Member):
 
         self.report_check = []
 
+        t1 = ('SubSection', 'Initial Section Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        self.section_property = self.section_conect_database(self, self.result_designation)
+
+        t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR, self.load.shear_force,
+              cl_8_4_shear_yielding_capacity_member(self.section_property.depth, self.section_property.web_thickness, self.material_property.fy, self.gamma_m0, round(a.shear_yielding_capacity / 1000, 2)),
+              get_pass_fail(self.load.shear_force, round(a.shear_yielding_capacity / 1000, 2), relation="lesser"))
+        self.report_check.append(t1)
         # self.h = (self.beam_D - (2 * self.beam_tf))
         #
         # 1.1 Input sections display
-        t1 = ('Section', 'List of Input Sections',self.sec_list),
-        self.report_check.append(t1)
-
-        # 2.2 CHECK: Buckling Class - Compatibility Check
-        t1 = ('SubSection', 'Buckling Class - Compatibility Check', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{2cm}|')
-        self.report_check.append(t1)
-
-        t1 = ("Section Class ", comp_column_class_section_check_required(self.result_section_class, self.h, self.bf),
-              comp_column_class_section_check_provided(self.bucklingclass, self.h, self.bf, self.tf, self.var_h_bf),
-              'Compatible')  # if self.bc_compatibility_status is True else 'Not compatible')
-        self.report_check.append(t1)
+        # t1 = ('SubSection', 'List of Input Sections',self.sec_list),
+        # self.report_check.append(t1)
+        #
+        # # 2.2 CHECK: Buckling Class - Compatibility Check
+        # t1 = ('SubSection', 'Buckling Class - Compatibility Check', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{2cm}|')
+        # self.report_check.append(t1)
+        #
+        # t1 = ("Section Class ", comp_column_class_section_check_required(self.result_section_class, self.h, self.bf),
+        #       comp_column_class_section_check_provided(self.bucklingclass, self.h, self.bf, self.tf, self.var_h_bf),
+        #       'Compatible')  # if self.bc_compatibility_status is True else 'Not compatible')
+        # self.report_check.append(t1)
 
         # t1 = ("h/bf , tf ", comp_column_class_section_check_required(self.bucklingclass, self.h, self.bf),
         #       comp_column_class_section_check_provided(self.bucklingclass, self.h, self.bf, self.tf, self.var_h_bf),

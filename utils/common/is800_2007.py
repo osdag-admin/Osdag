@@ -1131,7 +1131,7 @@ class IS800_2007(object):
         return length
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
-    def cl_8_4_design_shear_strength(A_vg, f_y, gamma_m0):
+    def cl_8_4_design_shear_strength(A_vg, f_y):
         """ Calculate the design shear strength in yielding as per cl. 8.4
 
         Args:
@@ -1142,7 +1142,7 @@ class IS800_2007(object):
              Design shear strength in yielding of the component in N
 
         """
-        # gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         V_d = ((A_vg * f_y) / (math.sqrt(3) * gamma_m0))  # N
 
         return V_d

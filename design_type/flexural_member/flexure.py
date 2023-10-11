@@ -925,7 +925,7 @@ class Flexure(Member):
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = self.section_property.elast_sec_mod_z/self.section_property.plast_sec_mod_z
-        print('M_d ', M_d)
+        self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
                 if self.section_class == "Plastic" or self.section_class == "Compact":
@@ -1302,12 +1302,22 @@ class Flexure(Member):
             print(f"\n self.single_result {self.single_result}")
 
     def list_changer(self, change, list,list_name, check = True):
+        if self.high_shear_check:
+            list.extend(
+                [self.bending_strength_section_reducedby, self.beta_reduced, self.M_d])
+            list_name.extend([
+                "Designation",
+                "Mfd",
+                "Beta_reduced",
+                'M_d'
+            ])
+
         list.extend(
             [self.section_class, self.effective_area, self.V_d, self.high_shear_check,
              self.bending_strength_section, self.effective_length, self.ur,
              self.cost, self.beta_b_lt])
         list_name.extend([
-            "Designation",
+
             "Section class",
             "Effective area",
             "Shear Strength",
@@ -1546,6 +1556,10 @@ class Flexure(Member):
             self.result_fcd = 'NA'
             self.result_capacity = 'NA'
             self.result_crippling = 'NA'
+        if self.result_high_shear:
+            self.result_mfd = list_result[result_type]["Mfd"]
+            self.result_beta_reduced = list_result[result_type]["Beta_reduced"]
+            self.result_Md= list_result[result_type]["M_d"]
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
@@ -1605,51 +1619,72 @@ class Flexure(Member):
                  KEY_MODULE: self.module, #"Axial load on column "
                  KEY_DISP_SECTION_PROFILE: self.sec_profile,
                  KEY_MATERIAL: self.material,
-                 KEY_DISP_ACTUAL_LEN_ZZ: self.length,
+                 KEY_BEAM_SUPP_TYPE: self.design_type}
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                self.report_input.update({
+                    KEY_DISP_BENDING: self.bending_type})
+            self.report_input.update({
+                KEY_DISP_SUPPORT : self.support})
+            if self.support == KEY_DISP_SUPPORT1:
+                self.report_input.update({
+                    DISP_TORSIONAL_RES: self.Torsional_res,
+                    DISP_WARPING_RES:self.Warping })
+            else:
+                self.report_input.update({
+                    DISP_SUPPORT_RES: self.Support,
+                    DISP_TOP_RES: self.Top})
 
-                 KEY_DISP_AXIAL: self.load.shear_force,
+            self.report_input.update({KEY_DISP_LENGTH_BEAM: self.length,
+
+                 KEY_DISP_SHEAR: self.load.shear_force,
+                 KEY_DISP_BEAM_MOMENT:self.load.moment,
                  KEY_DISP_SEC_PROFILE: self.sec_profile,
                  KEY_DISP_SECSIZE: self.result_designation,
                  KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.result_bending,
                  KEY_DISP_YIELD_STRENGTH_REPORT: self.result_shear,
-
-
                  "Column Section - Mechanical Properties": "TITLE",
                  "Section Details": self.report_column,
-                 }
-
+                 })
+            self.report_input.update()
             self.report_check = []
 
-            t1 = ('SubSection', 'Initial Section Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Shear Strength Results', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             self.section_property = self.section_conect_database(self, self.result_designation)
 
-            t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR, self.load.shear_force,
+            t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR, self.load.shear_force*10**-3,
                   cl_8_4_shear_yielding_capacity_member(self.section_property.depth, self.section_property.web_thickness, self.material_property.fy, self.gamma_m0, round(self.result_shear , 2)),
-                  get_pass_fail(self.load.shear_force, round(self.result_shear, 2), relation="lesser"))
+                  get_pass_fail(self.load.shear_force*10**-3, round(self.result_shear, 2), relation="lesser"))
             self.report_check.append(t1)
 
 
-            t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,
+            t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force*10**-3,
                   allow_shear_capacity(round(self.result_shear,2), round(0.6 * self.result_shear,2)),
-                  get_pass_fail(self.load.shear_force, round(0.6 * self.result_shear,2), relation="Warn",M1='Low Shear',M2='High Shear'))
+                  get_pass_fail(self.load.shear_force*10**-3, round(0.6 * self.result_shear,2), relation="Warn",M1='Low Shear',M2='High Shear'))
+            self.report_check.append(t1)
 
+            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
             if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
                 if self.result_high_shear:
-                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment,
-                          cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
-                                                                    self.section_property.plast_sec_mod_z,
-                                                                    self.material_property.fy, self.gamma_m0,
-                                                                    round(self.result_bending, 2)),
-                          get_pass_fail(self.load.moment, round(self.result_bending, 2), relation="lesser"))
+                    temp = cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
+                                                              self.section_property.plast_sec_mod_z,
+                                                              self.material_property.fy, self.gamma_m0,
+                                                              round(self.result_bending, 2))
+                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
+                          cl_9_2_2_combine_shear_bending(self.bending_strength_section,self.section_property.elast_sec_mod_z,
+                                                         self.section_property.plast_sec_mod_z, self.section_property.depth,self.section_property.web_thickness,
+                                                         self.material_property.fy,self.result_section_class,self.load.shear_force, self.result_shear,
+                                                         self.gamma_m0, self.result_betab,self.result_Md,self.result_mfd,temp),
+                          get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                 else:
-                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment,
+                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
                                                                     self.section_property.plast_sec_mod_z,
                                                                     self.material_property.fy, self.gamma_m0,
                                                                     round(self.result_bending, 2)),
-                          get_pass_fail(self.load.moment, round(self.result_bending, 2), relation="lesser"))
+                          get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
             self.report_check.append(t1)
         # else:
         #     t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,
@@ -1710,7 +1745,7 @@ class Flexure(Member):
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                              rel_path, [], [], module=self.module) #
+                              rel_path, [], '', module=self.module) #
 
 
 

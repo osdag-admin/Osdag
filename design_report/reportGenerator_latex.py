@@ -341,7 +341,7 @@ class CreateLatex(Document):
                                 image_5.add_caption('Typical Shear Key Details')
                                 # doc.append(NewPage())
 
-        if does_design_exist and sys.platform != 'darwin':
+        if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '':
             doc.append(NewPage())
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
@@ -372,6 +372,31 @@ class CreateLatex(Document):
                 #     view_3D.add_image(filename=view_3dimg_path,width=NoEscape(r'\linewidth,height=6.5cm'))
                 #
                 #     view_3D.add_caption('3D View')
+        else:
+            doc.append(NewPage())
+            Disp_3d_image = "/ResourceFiles/images/broken.png"
+            Disp_top_image = "/ResourceFiles/images/broken.png"
+            Disp_side_image = "/ResourceFiles/images/broken.png"
+            Disp_front_image = "/ResourceFiles/images/broken.png"
+            view_3dimg_path = rel_path + Disp_3d_image
+            view_topimg_path = rel_path + Disp_top_image
+            view_sideimg_path = rel_path + Disp_side_image
+            view_frontimg_path = rel_path + Disp_front_image
+            with doc.create(Section('3D Views')):
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+                    view_3dimg_path = rel_path + Disp_3d_image
+                    view_topimg_path = rel_path + Disp_top_image
+                    view_sideimg_path = rel_path + Disp_side_image
+                    view_frontimg_path = rel_path + Disp_front_image
+                    table.add_hline()
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_3dimg_path),
+                                   StandAloneGraphic(image_options="height=4cm", filename=view_topimg_path)])
+                    table.add_row('(a) 3D View', '(b) Top View')
+                    table.add_hline()
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
+                                   StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row('(c) Side View', '(d) Front View')
+                    table.add_hline()
 
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))

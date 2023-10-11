@@ -602,6 +602,71 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
 
+def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,beta='',Md='',Mfd='',eq=''):
+    """
+    Calculate shear yielding capacity of  plate (provided)
+    Args:
+        h:  Plate ht in mm (float)
+        t:  Plate thickness in mm (float)
+        f_y:Yeild strength of  plate material in N/mm square (float)
+        gamma: IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  (float)
+        V_dg: Shear yeilding capacity of  plate in N (float)
+        multiple:2 (int)
+    Returns:
+         Shear yielding capacity of  plate
+     Note:
+            Reference:
+            IS 800:2007,  cl 10.4.3
+    """
+    if eq == '':
+        eq = Math(inline=True)
+    Mdv = str(Mdv)
+    Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    if sclass == 'Plastic' or sclass == 'Compact' :
+        beta = str(beta)
+        Md = str(Md)
+        Mfd = str(Mfd)
+        V = str(V)
+        Vd = str(Vd)
+        Zpz= str(Zpz)
+        d= str(d)
+        tw = str(tw)
+        eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
+        eq.append(NoEscape(r'&= (2 \times \frac{' + V + '}{' + Vd + '} - 1)^2 \\'))
+        eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
+        eq.append(NoEscape(r'\begin{aligned} M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq 1.2Z_ef_y*\gamma_{mo}} \\'))
+        eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
+        eq.append(NoEscape(r'&= (2 \times \frac{' + V + '}{' + Vd + '} - 1)^2 \\'))
+        eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
+        eq.append(NoEscape(r'\begin{aligned} M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq 1.2Z_ef_y*\gamma_{mo}} \\'))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' - (' + Zpz + r'-(2 \times'+ d + r'\times'+tw+r'/4))\\'))
+        eq.append(NoEscape(r'&=' + Mdv + r'\\ \\'))
+    elif sclass == 'Semi-Compact' :
+        # beta = str(beta)
+        # Md = str(Md)
+        # Mfd = str(Mfd)
+        # V = str(V)
+        # Vd = str(Vd)
+        # Zpz= str(Zpz)
+        # d= str(d)
+        # tw = str(tw)
+        eq.append(NoEscape(r'\begin{aligned} M_{dv} &= \frac{Z_ef_y}{\gamma_{mo}} \\'))
+        eq.append(NoEscape(r'&= \frac{'+Ze +r'\times'+ f_y + r'}{'+ gamma_m0 + r'} \\'))
+        eq.append(NoEscape(r'&=' + Mdv + r'\\ \\'))
+
+
+
+
+    # eq.append(NoEscape(r'&= ' + Md + r'-' + beta + r'\times(' + Md + r'- ' + Mfd + r'}\\'))
+    #
+    # eq.append(
+    #         # NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
+    #
+    # eq.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
+    eq.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
+    return eq
 
 def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, gamma_m1=1.25, multiple=1):
     """

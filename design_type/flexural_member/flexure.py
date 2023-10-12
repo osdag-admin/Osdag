@@ -1302,11 +1302,12 @@ class Flexure(Member):
             print(f"\n self.single_result {self.single_result}")
 
     def list_changer(self, change, list,list_name, check = True):
+        list_name.extend([
+            "Designation"])
         if self.high_shear_check:
             list.extend(
                 [self.bending_strength_section_reducedby, self.beta_reduced, self.M_d])
             list_name.extend([
-                "Designation",
                 "Mfd",
                 "Beta_reduced",
                 'M_d'
@@ -1615,30 +1616,30 @@ class Flexure(Member):
 
 
             self.report_input = \
-                {KEY_MAIN_MODULE: self.mainmodule,
+                {#KEY_MAIN_MODULE: self.mainmodule,
                  KEY_MODULE: self.module, #"Axial load on column "
                  KEY_DISP_SECTION_PROFILE: self.sec_profile,
                  KEY_MATERIAL: self.material,
                  KEY_BEAM_SUPP_TYPE: self.design_type}
-            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                self.report_input.update({
-                    KEY_DISP_BENDING: self.bending_type})
-            self.report_input.update({
-                KEY_DISP_SUPPORT : self.support})
-            if self.support == KEY_DISP_SUPPORT1:
-                self.report_input.update({
-                    DISP_TORSIONAL_RES: self.Torsional_res,
-                    DISP_WARPING_RES:self.Warping })
-            else:
-                self.report_input.update({
-                    DISP_SUPPORT_RES: self.Support,
-                    DISP_TOP_RES: self.Top})
+            # if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+            #     self.report_input.update({
+            #         KEY_DISP_BENDING: self.bending_type})
+            # self.report_input.update({
+            #     KEY_DISP_SUPPORT : self.support})
+            # if self.support == KEY_DISP_SUPPORT1:
+            #     self.report_input.update({
+            #         DISP_TORSIONAL_RES: self.Torsional_res,
+            #         DISP_WARPING_RES:self.Warping })
+            # else:
+            #     self.report_input.update({
+            #         DISP_SUPPORT_RES: self.Support,
+            #         DISP_TOP_RES: self.Top})
 
             self.report_input.update({KEY_DISP_LENGTH_BEAM: self.length,
 
-                 KEY_DISP_SHEAR: self.load.shear_force,
-                 KEY_DISP_BEAM_MOMENT:self.load.moment,
-                 KEY_DISP_SEC_PROFILE: self.sec_profile,
+                 KEY_DISP_SHEAR: self.load.shear_force*10**-3,
+                 KEY_DISP_BEAM_MOMENT_Latex:self.load.moment*10**-6,
+                 # KEY_DISP_SEC_PROFILE: self.sec_profile,
                  KEY_DISP_SECSIZE: self.result_designation,
                  KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.result_bending,
                  KEY_DISP_YIELD_STRENGTH_REPORT: self.result_shear,
@@ -1676,7 +1677,7 @@ class Flexure(Member):
                           cl_9_2_2_combine_shear_bending(self.bending_strength_section,self.section_property.elast_sec_mod_z,
                                                          self.section_property.plast_sec_mod_z, self.section_property.depth,self.section_property.web_thickness,
                                                          self.material_property.fy,self.result_section_class,self.load.shear_force, self.result_shear,
-                                                         self.gamma_m0, self.result_betab,self.result_Md,self.result_mfd,temp),
+                                                         self.gamma_m0, self.result_betab,self.result_Md,self.result_mfd),
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                 else:
                     t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,

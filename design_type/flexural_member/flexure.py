@@ -1660,34 +1660,54 @@ class Flexure(Member):
             self.report_check.append(t1)
 
 
-            t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force*10**-3,
+            t1 = (KEY_DISP_ALLOW_SHEAR, ' ',
                   allow_shear_capacity(round(self.result_shear,2), round(0.6 * self.result_shear,2)),
                   get_pass_fail(self.load.shear_force*10**-3, round(0.6 * self.result_shear,2), relation="Warn",M1='Low Shear',M2='High Shear'))
             self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
-            # if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
-            #     if self.result_high_shear:
-            #         # temp = cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
-            #         #                                           self.section_property.plast_sec_mod_z,
-            #         #                                           self.material_property.fy, self.gamma_m0,
-            #         #                                           round(self.result_bending, 2))
-            #         # print('tempt',temp)
-            #         t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
-            #               cl_9_2_2_combine_shear_bending(round(self.result_bending,2),self.section_property.elast_sec_mod_z,
-            #                                              self.section_property.plast_sec_mod_z, self.section_property.depth,self.section_property.web_thickness,
-            #                                              self.material_property.fy,self.result_section_class,self.load.shear_force, round(self.result_shear,2),
-            #                                              self.gamma_m0, round(self.result_betab,2),round(self.result_Md,2),round(self.result_mfd,2)),
-            #               get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
-            #     else:
-            #         t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
-            #               cl_8_2_1_2_plastic_moment_capacity_member(round(self.result_betab,2),
-            #                                                         self.section_property.plast_sec_mod_z,
-            #                                                         self.material_property.fy, self.gamma_m0,
-            #                                                         round(self.result_bending, 2)),
-            #               get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
-            # self.report_check.append(t1)
+            if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
+                if self.result_high_shear:
+                    t1 = (KEY_DISP_PLASTIC_STRENGTH_MOMENT,' ',
+                          cl_9_2_2_combine_shear_bending_mfd(
+                                                         self.section_property.plast_sec_mod_z,
+                                                         self.section_property.depth,
+                                                         self.section_property.web_thickness,
+                                                         self.material_property.fy,
+                                                         self.gamma_m0,
+                                                         round(self.result_mfd * 10 ** -6, 2)),
+                          ' ')
+                    self.report_check.append(t1)
+                    t1 = (KEY_DISP_Bending_STRENGTH_MOMENT, ' ',
+                          cl_9_2_2_combine_shear_bending_md_init(
+                                                                 self.section_property.elast_sec_mod_z,
+                                                                 self.section_property.plast_sec_mod_z,
+                                                                 self.material_property.fy, self.support,
+                                                                 self.gamma_m0, round(self.result_betab, 2),
+                                                                 round(self.result_Md * 10 ** -6, 2)
+                                                                ),
+                          ' ')
+                    self.report_check.append(t1)
+                    # temp = cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
+                    #                                           self.section_property.plast_sec_mod_z,
+                    #                                           self.material_property.fy, self.gamma_m0,
+                    #                                           round(self.result_bending, 2))
+                    # print('tempt',temp)
+                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
+                          cl_9_2_2_combine_shear_bending(round(self.result_bending,2),self.section_property.elast_sec_mod_z,
+                                                         self.section_property.plast_sec_mod_z, self.section_property.depth,self.section_property.web_thickness,
+                                                         self.material_property.fy,self.result_section_class,self.load.shear_force*10**-3, round(self.result_shear,2),
+                                                         self.gamma_m0, round(self.result_betab,2),round(self.result_Md*10**-6,2),round(self.result_mfd*10**-6,2)),
+                          get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
+                else:
+                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
+                          cl_8_2_1_2_plastic_moment_capacity_member(round(self.result_betab,2),
+                                                                    self.section_property.plast_sec_mod_z,
+                                                                    self.material_property.fy, self.gamma_m0,
+                                                                    round(self.result_bending, 2)),
+                          get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
+            self.report_check.append(t1)
 
         # else:
         #     t1 = (KEY_DISP_ALLOW_SHEAR, self.load.shear_force,

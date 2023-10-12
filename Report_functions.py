@@ -602,7 +602,72 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
 
-def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,beta='',Md='',Mfd='',eq=''):
+
+def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
+                                   ):
+
+    eq = Math(inline=True)
+    # Mdv = str(Mdv)
+    # Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    # sclass = str(sclass)
+    # if sclass == 'Plastic' or sclass == 'Compact':
+    #     beta = str(beta)
+    #     Md = str(Md)
+    Mfd = str(Mfd)
+    # V = str(V)
+    # Vd = str(Vd)
+    Zpz = str(Zpz)
+    d = str(d)
+    tw = str(tw)
+    eq.append(NoEscape(r'\begin{aligned} M_{fd} &= \frac{fy(Z_{pz}-t_wd^2/4)}{\gamma_{mo}}  \\'))
+    eq.append(NoEscape(
+        r'&= \frac{' + f_y + r'\times(' + Zpz + r'-' + d + r'^2 \times' + tw + r'/4)}{' + gamma_m0 + r'}\\'))
+    eq.append(NoEscape(r'&=' + Mfd + r'\\ \\'))
+    eq.append(NoEscape(r'&  \end{aligned}'))
+    return eq
+
+
+def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
+                                       ):
+    eq = Math(inline=True)
+    if support == KEY_DISP_SUPPORT1:
+        res = str(round(1.2 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    else:
+        res = str(round(1.5 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    support = str(support)
+    beta = str(beta)
+    Md = str(Md)
+    Zpz = str(Zpz)
+    if support == KEY_DISP_SUPPORT1:
+        eq.append(NoEscape(r'\begin{aligned} M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        eq.append(NoEscape(
+            r'&= ' + Md + r'\leq ' + res + r'\\'))
+        # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
+
+    else:
+        eq.append(NoEscape(r'\begin{aligned} M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq 1.5Z_ef_y*\gamma_{mo} \\'))
+        # eq.append(NoEscape(r'\leq 1.5Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        eq.append(NoEscape(
+            r'&= ' + Md + r'\\'))
+        eq.append(NoEscape(r'\leq ' + res + r'\leq ' + res + r'\\ '))
+
+    eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
+    eq.append(NoEscape(r'&  \end{aligned}'))
+    return eq
+
+def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,beta='NA',Md='NA',Mfd='NA',eq=''):
     """
     Calculate shear yielding capacity of  plate (provided)
     Args:
@@ -624,6 +689,7 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,be
     Ze = str(Ze)
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)
+    sclass = str(sclass)
     if sclass == 'Plastic' or sclass == 'Compact' :
         beta = str(beta)
         Md = str(Md)
@@ -634,15 +700,15 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,be
         d= str(d)
         tw = str(tw)
         eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
-        eq.append(NoEscape(r'&= (2 \times \frac{' + V + '}{' + Vd + '} - 1)^2 \\'))
+        eq.append(NoEscape(r'&= (2 \times \frac{' + V + r'}{' + Vd + r'} - 1)^2 \\'))
         eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
-        eq.append(NoEscape(r'\begin{aligned} M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq 1.2Z_ef_y*\gamma_{mo}} \\'))
-        eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
-        eq.append(NoEscape(r'&= (2 \times \frac{' + V + '}{' + Vd + '} - 1)^2 \\'))
-        eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
-        eq.append(NoEscape(r'\begin{aligned} M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq 1.2Z_ef_y*\gamma_{mo}} \\'))
-        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' - (' + Zpz + r'-(2 \times'+ d + r'\times'+tw+r'/4))\\'))
+        eq.append(NoEscape(r'M_{fd} &= \frac{fy(Z_{pz}-t_wd^2/4)}{\gamma_{mo}}  \\'))
+        eq.append(NoEscape(r'&= \frac{' + f_y + r'\times(' + Zpz + r'-'+ d + r'^2 \times'+tw+r'/4)}{' + gamma_m0 + r'}\\'))
+        eq.append(NoEscape(r'&=' + Mfd + r'\\ \\'))
+        eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd})\\ '))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')\\'))
         eq.append(NoEscape(r'&=' + Mdv + r'\\ \\'))
+        eq.append(NoEscape(r'M_{dv} \leq 1.2Z_ef_y*\gamma_{mo} \\ '))
     elif sclass == 'Semi-Compact' :
         # beta = str(beta)
         # Md = str(Md)

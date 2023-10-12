@@ -503,6 +503,9 @@ KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
 #Flexure Members
+KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kN)'
+KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kN)'
+
 KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
 KEY_betab_constatnt= 'Beta.Constant'
 KEY_BUCKLING_STRENGTH= 'Buckling.Strength'

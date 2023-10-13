@@ -594,6 +594,7 @@ class Flexure(Member):
 
         # design preferences
         # self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
+        self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         self.allowable_utilization_ratio = 1.0
         self.optimization_parameter = "Utilization Ratio"
@@ -1564,6 +1565,7 @@ class Flexure(Member):
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
+        self.section_property = self.section_conect_database(self, self.result_designation)
         # super(Flexure, self).save_design(self)
         # if self.connectivity == 'Hollow/Tubular Column Base':
         #     if self.dp_column_designation[1:4] == 'SHS':
@@ -1592,6 +1594,7 @@ class Flexure(Member):
         if self.design_status:
             if self.sec_profile=='Columns' or self.sec_profile=='Beams':
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
+                                      KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
                                       KEY_DISP_COLSEC_REPORT: self.section_property.designation,
                                       KEY_DISP_MATERIAL: self.section_property.material,
      #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
@@ -1618,41 +1621,55 @@ class Flexure(Member):
             self.report_input = \
                 {#KEY_MAIN_MODULE: self.mainmodule,
                  KEY_MODULE: self.module, #"Axial load on column "
-                 KEY_DISP_SECTION_PROFILE: self.sec_profile,
+                    KEY_DISP_SHEAR: self.load.shear_force * 10 ** -3,
+                    KEY_DISP_BEAM_MOMENT_Latex: self.load.moment * 10 ** -6,
+                    KEY_DISP_LENGTH_BEAM: self.length,
+                    KEY_DISP_SEC_PROFILE: self.sec_profile,
+                    KEY_DISP_SECSIZE: str(self.sec_list),
                  KEY_MATERIAL: self.material,
-                 KEY_BEAM_SUPP_TYPE: self.design_type}
-            # if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-            #     self.report_input.update({
-            #         KEY_DISP_BENDING: self.bending_type})
+                    "Selected Section Details": self.report_column,
+                }
+
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                self.report_input.update({
+                    KEY_BEAM_SUPP_TYPE: self.design_type,
+                    KEY_DISP_BENDING: self.bending_type})
+            self.report_input.update({
+                KEY_DISP_SUPPORT : self.support,
+                KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.result_bending,
+                KEY_DISP_YIELD_STRENGTH_REPORT: self.result_shear,
+                "End Conditions - " + str(self.support): "TITLE",
+            })
+            if self.support == KEY_DISP_SUPPORT1:
+                self.report_input.update({
+                    DISP_TORSIONAL_RES: self.Torsional_res,
+                    DISP_WARPING_RES:self.Warping })
+            else:
+                self.report_input.update({
+                    DISP_SUPPORT_RES: self.Support,
+                    DISP_TOP_RES: self.Top})
+            self.report_input.update({
+                "Design Preference" : "TITLE",
+                KEY_DISP_EFFECTIVE_AREA_PARA: self.effective_area_factor,
+                KEY_DISP_CLASS: self.allow_class,
+                KEY_DISP_LOAD: self.Loading,
+                KEY_DISPP_LENGTH_OVERWRITE: self.latex_efp,
+                KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
+
+            })
             # self.report_input.update({
-            #     KEY_DISP_SUPPORT : self.support})
-            # if self.support == KEY_DISP_SUPPORT1:
-            #     self.report_input.update({
-            #         DISP_TORSIONAL_RES: self.Torsional_res,
-            #         DISP_WARPING_RES:self.Warping })
-            # else:
-            #     self.report_input.update({
-            #         DISP_SUPPORT_RES: self.Support,
-            #         DISP_TOP_RES: self.Top})
-
-            self.report_input.update({KEY_DISP_LENGTH_BEAM: self.length,
-
-                 KEY_DISP_SHEAR: self.load.shear_force*10**-3,
-                 KEY_DISP_BEAM_MOMENT_Latex:self.load.moment*10**-6,
-                 # KEY_DISP_SEC_PROFILE: self.sec_profile,
-                 KEY_DISP_SECSIZE: self.result_designation,
-                 KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.result_bending,
-                 KEY_DISP_YIELD_STRENGTH_REPORT: self.result_shear,
-                 "Column Section - Mechanical Properties": "TITLE",
-                 "Section Details": self.report_column,
-                 })
+            #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
+            #      "I Section - Mechanical Properties": "TITLE",
+            #      })
             self.report_input.update()
             self.report_check = []
+
+            t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
+            self.report_check.append(t1)
 
             t1 = ('SubSection', 'Shear Strength Results', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            self.section_property = self.section_conect_database(self, self.result_designation)
 
             t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR, self.load.shear_force*10**-3,
                   cl_8_4_shear_yielding_capacity_member(self.section_property.depth, self.section_property.web_thickness, self.material_property.fy, self.gamma_m0, round(self.result_shear , 2)),

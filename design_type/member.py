@@ -2809,7 +2809,7 @@ class Member(Main):
         optimum.append(t2)
 
         t2 = (
-            KEY_BEARING_LENGTH, KEY_DISP_BEARING_LENGTH + '(mm)', TYPE_TEXTBOX, None, values[KEY_BEARING_LENGTH])
+            KEY_BEARING_LENGTH, KEY_DISP_BEARING_LENGTH + ' (mm)', TYPE_TEXTBOX, None, values[KEY_BEARING_LENGTH])
         optimum.append(t2)
 
         # if KEY_SEC_PROFILE in input_dictionary:

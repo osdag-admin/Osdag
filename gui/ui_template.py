@@ -2021,6 +2021,7 @@ class Window(QMainWindow):
             # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
+            print(f"status{status}")
             print(f"trigger_type{trigger_type}")
 
             if error is not None:
@@ -2042,9 +2043,11 @@ class Window(QMainWindow):
 
             # self.progress_bar.setValue(50)
             self.output_title_change(main)
-
+            print('Output title changed')
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            print(' last design',last_design_folder)
             if not os.path.isdir(last_design_folder):
+                print(' not os.path.isdir')
                 os.mkdir(last_design_folder)
             last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
             last_design_file = os.path.join(last_design_folder, last_design_file)

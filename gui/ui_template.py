@@ -2029,6 +2029,8 @@ class Window(QMainWindow):
                 return
 
             out_list = main.output_values(main, status)
+            print('out_list changed',out_list)
+
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
@@ -2043,7 +2045,7 @@ class Window(QMainWindow):
 
             # self.progress_bar.setValue(50)
             self.output_title_change(main)
-            print('Output title changed')
+            print('Output title changed',self.output_title_change(main))
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
             print(' last design',last_design_folder)
             if not os.path.isdir(last_design_folder):

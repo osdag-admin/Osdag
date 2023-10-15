@@ -27,7 +27,22 @@ def cl_3_7_2_section_classification(class_of_section=None):
         section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
     return section_classification_eqn
 
+def cl_3_7_2_section_classification_with_equation(class_of_section=None):
+    """
+    Author: Rutvik Joshi (EMP-24, intern-23,22)
+    """
 
+    section_classification_eqn = Math(inline=True)
+    if class_of_section == int(1):
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Plastic} \\ \\'))
+        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    elif class_of_section == int(2):
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Compact} \\ \\'))
+        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    else:
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Semi-Compact} \\ \\'))
+        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    return section_classification_eqn
 def cl_5_4_1_table_4_5_gamma_value(v, t):
     """
     Calculate gamma value
@@ -470,7 +485,21 @@ def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc, type = 'cantilev
     Mdc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
     return Mdc_eqn
 
-
+def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
+    V_d = str(V_d)
+    S_c = str(S_c)
+    check = str(check)
+    load = str(load)
+    allow_shear_capacity_eqn = Math(inline=True)
+    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
+    allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
+    if check:
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\\ > \\' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
+    else:
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\\ <\leq\\' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
+    return allow_shear_capacity_eqn
 def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
     """
     Calculate shear capacity of member
@@ -623,7 +652,7 @@ def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
     tw = str(tw)
     eq.append(NoEscape(r'\begin{aligned} M_{fd} &= \frac{fy(Z_{pz}-t_wd^2/4)}{\gamma_{mo}}  \\'))
     eq.append(NoEscape(
-        r'&= \frac{' + f_y + r'\times(' + Zpz + r'-' + d + r'^2 \times' + tw + r'/4)}{' + gamma_m0 + r'}\\'))
+        r'&= \frac{' + f_y + r'\times(' + Zpz + r'-' + d + r'^2 \times' + tw + r'/4)}{' + gamma_m0 + r'\times 10^6 }\\'))
     eq.append(NoEscape(r'&=' + Mfd + r'\\ \\'))
     eq.append(NoEscape(r'&  \end{aligned}'))
     return eq
@@ -654,7 +683,7 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
         # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
 
     else:
-        eq.append(NoEscape(r'\begin{aligned} M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq 1.5Z_ef_y*\gamma_{mo} \\'))
+        eq.append(NoEscape(r'\begin{aligned} M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq \frac{1.5Z_ef_y}{\gamma_{mo}} \\'))
         # eq.append(NoEscape(r'\leq 1.5Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
             r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
@@ -667,7 +696,7 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     eq.append(NoEscape(r'&  \end{aligned}'))
     return eq
 
-def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,beta='NA',Md='NA',Mfd='NA',eq=''):
+def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',Md='NA',Mfd='NA',eq=''):
     """
     Calculate shear yielding capacity of  plate (provided)
     Args:
@@ -681,7 +710,7 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,be
          Shear yielding capacity of  plate
      Note:
             Reference:
-            IS 800:2007,  cl 10.4.3
+            IS 800:2007,  cl 9.2.2
     """
     if eq == '':
         eq = Math(inline=True)
@@ -696,42 +725,18 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze,Zpz,d,tw, f_y,sclass,V,Vd, gamma_m0,be
         Mfd = str(Mfd)
         V = str(V)
         Vd = str(Vd)
-        Zpz= str(Zpz)
-        d= str(d)
-        tw = str(tw)
         eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
-        eq.append(NoEscape(r'&= (2 \times \frac{' + V + r'}{' + Vd + r'} - 1)^2 \\'))
+        eq.append(NoEscape(r'&= ( \frac{2 \times' + V + r'}{' + Vd + r'} - 1)^2 \\'))
         eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
-        eq.append(NoEscape(r'M_{fd} &= \frac{fy(Z_{pz}-t_wd^2/4)}{\gamma_{mo}}  \\'))
-        eq.append(NoEscape(r'&= \frac{' + f_y + r'\times(' + Zpz + r'-'+ d + r'^2 \times'+tw+r'/4)}{' + gamma_m0 + r'}\\'))
-        eq.append(NoEscape(r'&=' + Mfd + r'\\ \\'))
-        eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd})\\ '))
-        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')\\'))
-        eq.append(NoEscape(r'&=' + Mdv + r'\\ \\'))
-        eq.append(NoEscape(r'M_{dv} \leq 1.2Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd} \leq\frac{1.2Z_ef_y}{\gamma_{mo}}\\ '))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        eq.append(NoEscape(r'&=' + Mdv + r'\leq ' + res + r'\\'))
     elif sclass == 'Semi-Compact' :
-        # beta = str(beta)
-        # Md = str(Md)
-        # Mfd = str(Mfd)
-        # V = str(V)
-        # Vd = str(Vd)
-        # Zpz= str(Zpz)
-        # d= str(d)
-        # tw = str(tw)
         eq.append(NoEscape(r'\begin{aligned} M_{dv} &= \frac{Z_ef_y}{\gamma_{mo}} \\'))
         eq.append(NoEscape(r'&= \frac{'+Ze +r'\times'+ f_y + r'}{'+ gamma_m0 + r'} \\'))
         eq.append(NoEscape(r'&=' + Mdv + r'\\ \\'))
 
-
-
-
-    # eq.append(NoEscape(r'&= ' + Md + r'-' + beta + r'\times(' + Md + r'- ' + Mfd + r'}\\'))
-    #
-    # eq.append(
-    #         # NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r'}\\'))
-    #
-    # eq.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
-    eq.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
+    eq.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.9.2.2}] \end{aligned}'))
     return eq
 
 def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, gamma_m1=1.25, multiple=1):

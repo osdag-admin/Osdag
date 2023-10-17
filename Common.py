@@ -2497,8 +2497,64 @@ Same_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0p
                               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
 
-STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-               "p, li { white-space: pre-wrap; }\n"
-               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-               ) + Allowable_Utilization_Para + Effective_Area_Para
+OPTIMIZATION_TABLE_UI = str("""
+<div style="width:100%;">
+<table style="width:70%;" border="0">
+  <tr>
+    <th colspan="3" style="text-align:center;">Conditions of Restraint Supports</th>
+  </tr>
+  <tr>
+    <th>Sl No.</th>
+    <th>Torsional Restraint</th>
+    <th>Warping Restraint</th>
+  </tr>
+  <tr>
+    <td>(i)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(ii)</td>
+    <td>Fully restrained</td>
+    <td>Compression flange fully restrained</td>
+  </tr>
+  <tr>
+    <td>(iii)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(iv)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(v)</td>
+    <td>Fully restrained</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <tr>
+    <td>(vi)</td>
+    <td>Partially restrained by bottom flange support connection</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <tr>
+    <td>(vii)</td>
+    <td>Partially restrained by bottom flange bearing support</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <!-- Add more rows as needed -->
+</table>
+</div>
+</body></html>
+""")
+
+STRUT_OPTIMIZATION_DESCRIPTION = (
+    '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+    '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+    'p, li { white-space: pre-wrap; }\n'
+    '</style></head><body style="font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;">\n'
+) + Allowable_Utilization_Para + Effective_Area_Para + OPTIMIZATION_TABLE_UI
+
+
+

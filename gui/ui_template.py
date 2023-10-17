@@ -1704,7 +1704,7 @@ class Window(QMainWindow):
                 module = op[1]
                 d1 = {op[0]: des_val}
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                des_val = data_list[op[0] + "_customized"]
+                des_val = data_list["Member.Designation" + "_customized"]
                 d1 = {op[0]: des_val}
             elif op[2] == TYPE_TEXTBOX:
                 des_val = widget.text()

@@ -711,9 +711,11 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',M
      Note:
             Reference:
             IS 800:2007,  cl 9.2.2
+    Author: Rutvik Joshi
     """
     if eq == '':
         eq = Math(inline=True)
+    res = str(1.2 * Ze * f_y / gamma_m0)
     Mdv = str(Mdv)
     Ze = str(Ze)
     f_y = str(f_y)

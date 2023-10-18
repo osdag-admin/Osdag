@@ -1677,15 +1677,9 @@ class Flexure(Member):
                   get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_shear, 2), relation="lesser"))
             self.report_check.append(t1)
 
-            t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR, self.load.shear_force*10**-3,
-                  cl_8_4_shear_yielding_capacity_member(self.section_property.depth, self.section_property.web_thickness, self.material_property.fy, self.gamma_m0, round(self.result_shear , 2)),
-                  get_pass_fail(self.load.shear_force*10**-3, round(self.result_shear, 2), relation="lesser"))
-            self.report_check.append(t1)
-
-
             t1 = (KEY_DISP_ALLOW_SHEAR, ' ',
                   cl_8_2_1_2_shear_check(round(self.result_shear,2), round(0.6 * self.result_shear,2), self.result_high_shear,self.load.shear_force*10**-3),
-                  get_pass_fail(self.load.shear_force*10**-3, round(0.6 * self.result_shear,2), relation="Warn",M1='Low Shear',M2='High Shear'))
+                  get_pass_fail(self.load.shear_force*10**-3, round(0.6 * self.result_shear,2), relation="Warn",M1='High Shear',M2='Low Shear'))
             self.report_check.append(t1)
 
             t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
@@ -1719,7 +1713,6 @@ class Flexure(Member):
                     # print('tempt',temp)
                     t1 = (KEY_DISP_REDUCE_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_9_2_2_combine_shear_bending(round(self.result_bending,2),self.section_property.elast_sec_mod_z,
-                                                         self.section_property.plast_sec_mod_z, self.section_property.depth,self.section_property.web_thickness,
                                                          self.material_property.fy,self.result_section_class,self.load.shear_force*10**-3, round(self.result_shear,2),
                                                          self.gamma_m0, round(self.result_betab,2),round(self.result_Md*10**-6,2),round(self.result_mfd*10**-6,2)),
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))

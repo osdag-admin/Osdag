@@ -493,11 +493,11 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
     allow_shear_capacity_eqn = Math(inline=True)
     allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
-    if check:
-        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\\ > \\' + load + r'\\'))
+    if not check:
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
         allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
     else:
-        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\\ <\leq\\' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
         allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
     return allow_shear_capacity_eqn
 def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
@@ -634,7 +634,7 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
 
 def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
                                    ):
-
+    '''Author: Rutvik Joshi '''
     eq = Math(inline=True)
     # Mdv = str(Mdv)
     # Ze = str(Ze)
@@ -658,13 +658,16 @@ def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
     return eq
 
 
-def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
-                                       ):
+def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md,
+                                       sclass):
+    '''Author: Rutvik Joshi '''
+
     eq = Math(inline=True)
     if support == KEY_DISP_SUPPORT1:
         res = str(round(1.2 * Ze * f_y/gamma_m0* 10 ** -6,2))
     else:
         res = str(round(1.5 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    beta_b = str(round(Ze/Zpz,2))
     Ze = str(Ze)
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)
@@ -672,6 +675,12 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     beta = str(beta)
     Md = str(Md)
     Zpz = str(Zpz)
+    sclass = str(sclass)
+    # if sclass == 'Plastic' or sclass == 'Compact':
+    #     eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \\'))#\textit{ \text{Section is Plastic or Compact}
+    # elif sclass == 'Semi-Compact' :
+    #     eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \\'))#\text{Section is Semi-Compact}
+    #     eq.append(NoEscape(r' &='+ beta_b + r'\\'))
     if support == KEY_DISP_SUPPORT1:
         eq.append(NoEscape(r'\begin{aligned} M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
         # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
@@ -715,7 +724,7 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',M
     """
     if eq == '':
         eq = Math(inline=True)
-    res = str(1.2 * Ze * f_y / gamma_m0)
+    res = str(round(1.2 * Ze * f_y / gamma_m0,2))
     Mdv = str(Mdv)
     Ze = str(Ze)
     f_y = str(f_y)
@@ -730,8 +739,8 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',M
         eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
         eq.append(NoEscape(r'&= ( \frac{2 \times' + V + r'}{' + Vd + r'} - 1)^2 \\'))
         eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
-        eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd} \leq\frac{1.2Z_ef_y}{\gamma_{mo}}\\ '))
-        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq\frac{1.2Z_ef_y}{\gamma_{mo}}\\ '))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
         eq.append(NoEscape(r'&=' + Mdv + r'\leq ' + res + r'\\'))
     elif sclass == 'Semi-Compact' :
         eq.append(NoEscape(r'\begin{aligned} M_{dv} &= \frac{Z_ef_y}{\gamma_{mo}} \\'))

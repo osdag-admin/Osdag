@@ -99,6 +99,7 @@ class CreateLatex(Document):
 
         doc.preamble.append(header)
         doc.change_document_style("header")
+        extra_page = False
         with doc.create(Section('Input Parameters')):
             with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
@@ -168,9 +169,28 @@ class CreateLatex(Document):
                     with doc.create(Subsection("List of Input Section")):
                         # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
-                            table.add_hline()
-                            table.add_row((MultiColumn(1, align='|c|', data=i, ),
-                                           MultiColumn(1, align='|X|', data=uiObj[i].strip("[]")),))
+                            list_sec = uiObj[i].strip("['']")
+                            print( 'list_sec', list_sec, list_sec.split("', '"))
+                            # count = 0
+                            # for i in list_sec:
+                            #     print(i)
+                            #     count += 1
+                            str_len = len(list_sec.split("', '"))
+                            print( 'str_len', str_len)
+                            if str_len > 130:
+                                table.add_hline()
+                                table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                                               MultiColumn(1, align='|X|', data=list_sec.split("', '")[0:220] ),))
+                                extra_page = True
+                                list_sec_modified = list_sec.split("', '")[220 :]
+                                # table.add_hline()
+                                # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+                                # doc.append(NewPage())
+
+                            else:
+                                table.add_hline()
+                                table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                                               MultiColumn(1, align='|X|', data=uiObj[i].strip("[]")),))
                             # str_len = len(uiObj[i])
                             # loop_len = round_up((str_len/100),1,1)
                             # table.add_hline()
@@ -186,6 +206,14 @@ class CreateLatex(Document):
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         doc.append(NewPage())
+        if extra_page:
+            with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
+                table.add_hline()
+                table.add_row((MultiColumn(1, align='|c|', data='Section Size*', ),
+                               MultiColumn(1, align='|X|', data=list_sec_modified),))
+                table.add_hline()
+            doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+            doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
             with doc.create(Tabularx(r'|>{\centering}p{12.5cm}|>{\centering\arraybackslash}X|', row_height=1.2)) as table:

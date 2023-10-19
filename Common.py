@@ -504,8 +504,8 @@ KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
 #Flexure Members
-KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kN)'
-KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kN)'
+KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kNm)'
+KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kNm)'
 
 KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
 KEY_betab_constatnt= 'Beta.Constant'
@@ -539,6 +539,7 @@ KEY_DISP_FLEXURE = 'Flexural Members'
 KEY_DISP_DESIGN_TYPE_FLEXURE = 'Laterally Supported'
 KEY_DESIGN_TYPE_FLEXURE = 'Flexure.Type'
 KEY_BEAM_SUPP_TYPE = 'Support Type'
+KEY_BEAM_SUPP_TYPE_DESIGN = 'Design Support Type'
 KEY_DISP_DESIGN_TYPE2_FLEXURE = 'Laterally Unsupported'
 KEY_DESIGN_TYPE2_FLEXURE = 'Laterally.Unsupported'
 VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
@@ -548,7 +549,7 @@ KEY_DISP_BENDING2 = 'Minor'
 VALUES_BENDING_TYPE = list((KEY_DISP_BENDING2, KEY_DISP_BENDING1))
 KEY_BENDING = 'Bending.type'
 KEY_SUPPORT = 'Flexure.Support'
-KEY_DISP_SUPPORT = 'Beam Conditions'
+KEY_DISP_SUPPORT = 'End Conditions'
 KEY_DISP_SUPPORT1 = 'Simply Supported'
 KEY_DISP_SUPPORT2 = 'Cantilever'
 KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2]

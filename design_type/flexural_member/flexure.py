@@ -571,6 +571,7 @@ class Flexure(Member):
 
         # design type
         self.design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+        self.latex_design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             pass
         elif self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
@@ -1566,30 +1567,6 @@ class Flexure(Member):
     ### start writing save_design from here!
     def save_design(self, popup_summary):
         self.section_property = self.section_conect_database(self, self.result_designation)
-        # super(Flexure, self).save_design(self)
-        # if self.connectivity == 'Hollow/Tubular Column Base':
-        #     if self.dp_column_designation[1:4] == 'SHS':
-        #         select_section_img = 'SHS'
-        #     elif self.dp_column_designation[1:4] == 'RHS':
-        #         select_section_img = 'RHS'
-        #     else:
-        #         select_section_img = 'CHS'
-        # else:
-        #     if self.column_properties.flange_slope != 90:
-        #         select_section_img = "Slope_Beam"
-        #     else:
-        #         select_section_img = "Parallel_Beam"
-        #
-        #     # column section properties
-        # if self.connectivity == 'Hollow/Tubular Column Base':
-        #     if self.dp_column_designation[1:4] == 'SHS':
-        #         section_type = 'Square Hollow Section (SHS)'
-        #     elif self.dp_column_designation[1:4] == 'RHS':
-        #         section_type = 'Rectangular Hollow Section (RHS)'
-        #     else:
-        #         section_type = 'Circular Hollow Section (CHS)'
-        # else:
-        #     section_type = 'I Section'
 
         if self.design_status:
             if self.sec_profile=='Columns' or self.sec_profile=='Beams':
@@ -1628,18 +1605,24 @@ class Flexure(Member):
                     KEY_DISP_SECSIZE: str(self.sec_list),
                  KEY_MATERIAL: self.material,
                     "Selected Section Details": self.report_column,
-                    KEY_BEAM_SUPP_TYPE: self.design_type,
+                    KEY_BEAM_SUPP_TYPE: self.latex_design_type,
                 }
 
             if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
                 self.report_input.update({
                     KEY_DISP_BENDING: self.bending_type})
+            elif self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE and self.latex_design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                self.report_input.update({
+                    KEY_BEAM_SUPP_TYPE_DESIGN: self.support,
+                    KEY_DISP_BENDING: self.bending_type,
+                })
             self.report_input.update({
                 KEY_DISP_SUPPORT : self.support,
                 KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.result_bending,
                 KEY_DISP_YIELD_STRENGTH_REPORT: self.result_shear,
                 "End Conditions - " + str(self.support): "TITLE",
             })
+
             if self.support == KEY_DISP_SUPPORT1:
                 self.report_input.update({
                     DISP_TORSIONAL_RES: self.Torsional_res,
@@ -1702,7 +1685,7 @@ class Flexure(Member):
                                                                  self.section_property.plast_sec_mod_z,
                                                                  self.material_property.fy, self.support,
                                                                  self.gamma_m0, round(self.result_betab, 2),
-                                                                 round(self.result_Md * 10 ** -6, 2)
+                                                                 round(self.result_Md * 10 ** -6, 2),self.result_section_class
                                                                 ),
                           ' ')
                     self.report_check.append(t1)
@@ -1711,7 +1694,7 @@ class Flexure(Member):
                     #                                           self.material_property.fy, self.gamma_m0,
                     #                                           round(self.result_bending, 2))
                     # print('tempt',temp)
-                    t1 = (KEY_DISP_REDUCE_STRENGTH_MOMENT, self.load.moment*10**-6,
+                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_9_2_2_combine_shear_bending(round(self.result_bending,2),self.section_property.elast_sec_mod_z,
                                                          self.material_property.fy,self.result_section_class,self.load.shear_force*10**-3, round(self.result_shear,2),
                                                          self.gamma_m0, round(self.result_betab,2),round(self.result_Md*10**-6,2),round(self.result_mfd*10**-6,2)),
@@ -1744,7 +1727,7 @@ class Flexure(Member):
                                                                  self.section_property.plast_sec_mod_z,
                                                                  self.material_property.fy, self.support,
                                                                  self.gamma_m0, round(self.result_betab, 2),
-                                                                 round(self.result_Md * 10 ** -6, 2)
+                                                                 round(self.result_Md * 10 ** -6, 2),self.result_section_class
                                                                 ),
                           ' ')
                     self.report_check.append(t1)
@@ -1753,9 +1736,8 @@ class Flexure(Member):
                     #                                           self.material_property.fy, self.gamma_m0,
                     #                                           round(self.result_bending, 2))
                     # print('tempt',temp)
-                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
+                    t1 = (KEY_DISP_REDUCE_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_9_2_2_combine_shear_bending(round(self.result_bending,2),self.section_property.elast_sec_mod_z,
-                                                         self.section_property.plast_sec_mod_z, self.section_property.depth,self.section_property.web_thickness,
                                                          self.material_property.fy,self.result_section_class,self.load.shear_force*10**-3, round(self.result_shear,2),
                                                          self.gamma_m0, round(self.result_betab,2),round(self.result_Md*10**-6,2),round(self.result_mfd*10**-6,2)),
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))

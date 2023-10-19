@@ -1014,8 +1014,8 @@ class Flexure(Member):
                         * self.section_property.plast_sec_mod_z
                         * fbd
                     )
-                    self.bending_strength_section_reduced = bending_strength_section
             print('Inside bending_strength 2',It,hf,Iw,M_cr ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
+        self.bending_strength_section_reduced = bending_strength_section
         return bending_strength_section
     def bending_strength_reduction(self, Md):
         Zfd = (
@@ -1669,6 +1669,16 @@ class Flexure(Member):
             self.report_check.append(t1)
             if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
                 if self.result_high_shear:
+                    t1 = (KEY_DISP_Bending_STRENGTH_MOMENT, self.load.moment*10**-6,
+                          cl_9_2_2_combine_shear_bending_md_init(
+                              self.section_property.elast_sec_mod_z,
+                              self.section_property.plast_sec_mod_z,
+                              self.material_property.fy, self.support,
+                              self.gamma_m0, round(self.result_betab, 2),
+                              round(self.result_Md * 10 ** -6, 2), self.result_section_class
+                          ),
+                          ' ')
+                    self.report_check.append(t1)
                     t1 = (KEY_DISP_PLASTIC_STRENGTH_MOMENT,' ',
                           cl_9_2_2_combine_shear_bending_mfd(
                                                          self.section_property.plast_sec_mod_z,
@@ -1679,16 +1689,7 @@ class Flexure(Member):
                                                          round(self.result_mfd * 10 ** -6, 2)),
                           ' ')
                     self.report_check.append(t1)
-                    t1 = (KEY_DISP_Bending_STRENGTH_MOMENT, ' ',
-                          cl_9_2_2_combine_shear_bending_md_init(
-                                                                 self.section_property.elast_sec_mod_z,
-                                                                 self.section_property.plast_sec_mod_z,
-                                                                 self.material_property.fy, self.support,
-                                                                 self.gamma_m0, round(self.result_betab, 2),
-                                                                 round(self.result_Md * 10 ** -6, 2),self.result_section_class
-                                                                ),
-                          ' ')
-                    self.report_check.append(t1)
+
                     # temp = cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
                     #                                           self.section_property.plast_sec_mod_z,
                     #                                           self.material_property.fy, self.gamma_m0,
@@ -1711,6 +1712,16 @@ class Flexure(Member):
                     self.report_check.append(t1)
             elif self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
                 if self.result_high_shear:
+                    t1 = (KEY_DISP_LTB_Bending_STRENGTH_MOMENT, self.load.moment*10**-6,
+                          cl_9_2_2_combine_shear_bending_md_init(
+                              self.section_property.elast_sec_mod_z,
+                              self.section_property.plast_sec_mod_z,
+                              self.material_property.fy, self.support,
+                              self.gamma_m0, round(self.result_betab, 2),
+                              round(self.result_Md * 10 ** -6, 2), self.result_section_class
+                          ),
+                          ' ')
+                    self.report_check.append(t1)
                     t1 = (KEY_DISP_PLASTIC_STRENGTH_MOMENT,' ',
                           cl_9_2_2_combine_shear_bending_mfd(
                                                          self.section_property.plast_sec_mod_z,
@@ -1721,16 +1732,7 @@ class Flexure(Member):
                                                          round(self.result_mfd * 10 ** -6, 2)),
                           ' ')
                     self.report_check.append(t1)
-                    t1 = (KEY_DISP_Bending_STRENGTH_MOMENT, ' ',
-                          cl_9_2_2_combine_shear_bending_md_init(
-                                                                 self.section_property.elast_sec_mod_z,
-                                                                 self.section_property.plast_sec_mod_z,
-                                                                 self.material_property.fy, self.support,
-                                                                 self.gamma_m0, round(self.result_betab, 2),
-                                                                 round(self.result_Md * 10 ** -6, 2),self.result_section_class
-                                                                ),
-                          ' ')
-                    self.report_check.append(t1)
+
                     # temp = cl_8_2_1_2_plastic_moment_capacity_member(self.result_betab,
                     #                                           self.section_property.plast_sec_mod_z,
                     #                                           self.material_property.fy, self.gamma_m0,
@@ -1744,7 +1746,7 @@ class Flexure(Member):
                     self.report_check.append(t1)
 
                 else:
-                    t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
+                    t1 = (KEY_DISP_LTB_Bending_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_8_2_1_2_plastic_moment_capacity_member(round(self.result_betab,2),
                                                                     self.section_property.plast_sec_mod_z,
                                                                     self.material_property.fy, self.gamma_m0,

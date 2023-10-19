@@ -704,6 +704,52 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
     eq.append(NoEscape(r'&  \end{aligned}'))
     return eq
+def cl_9_2_2_ltb_moment(Ze,Zpz, f_y,support, gamma_m0,beta,Md,
+                                       sclass):
+    '''Author: Rutvik Joshi '''
+
+    eq = Math(inline=True)
+    if support == KEY_DISP_SUPPORT1:
+        res = str(round(1.2 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    else:
+        res = str(round(1.5 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    beta_b = str(round(Ze/Zpz,2))
+    Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    support = str(support)
+    beta = str(beta)
+    Md = str(Md)
+    Zpz = str(Zpz)
+    sclass = str(sclass)
+    if sclass == 'Plastic' or sclass == 'Compact':
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+    elif sclass == 'Semi-Compact' :
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        eq.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if support == KEY_DISP_SUPPORT1:
+        eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        eq.append(NoEscape(
+            r'&= ' + Md + r'\leq ' + res + r'\\'))
+        # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
+
+    else:
+        eq.append(NoEscape(r' M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq \frac{1.5Z_ef_y}{\gamma_{mo}} \\'))
+        # eq.append(NoEscape(r'\leq 1.5Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        eq.append(NoEscape(
+            r'&= ' + Md + r'\\'))
+        eq.append(NoEscape(r'\leq ' + res + r'\leq ' + res + r'\\ '))
+
+    eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
+    eq.append(NoEscape(r'&  \end{aligned}'))
+    return eq
 
 def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',Md='NA',Mfd='NA',eq=''):
     """

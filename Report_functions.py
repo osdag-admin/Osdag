@@ -676,23 +676,23 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     Md = str(Md)
     Zpz = str(Zpz)
     sclass = str(sclass)
-    # if sclass == 'Plastic' or sclass == 'Compact':
-    #     eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \\'))#\textit{ \text{Section is Plastic or Compact}
-    # elif sclass == 'Semi-Compact' :
-    #     eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \\'))#\text{Section is Semi-Compact}
-    #     eq.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if sclass == 'Plastic' or sclass == 'Compact':
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+    elif sclass == 'Semi-Compact' :
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        eq.append(NoEscape(r' &='+ beta_b + r'\\'))
     if support == KEY_DISP_SUPPORT1:
-        eq.append(NoEscape(r'\begin{aligned} M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
         # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
-            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
         eq.append(NoEscape(
             r'&= ' + Md + r'\leq ' + res + r'\\'))
         # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
 
     else:
-        eq.append(NoEscape(r'\begin{aligned} M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq \frac{1.5Z_ef_y}{\gamma_{mo}} \\'))
+        eq.append(NoEscape(r' M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq \frac{1.5Z_ef_y}{\gamma_{mo}} \\'))
         # eq.append(NoEscape(r'\leq 1.5Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
             r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
@@ -724,7 +724,7 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',M
     """
     if eq == '':
         eq = Math(inline=True)
-    res = str(round(1.2 * Ze * f_y / gamma_m0,2))
+    res = str(round(1.2 * Ze * f_y / gamma_m0 * 10**-6,2))
     Mdv = str(Mdv)
     Ze = str(Ze)
     f_y = str(f_y)
@@ -740,7 +740,7 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',M
         eq.append(NoEscape(r'&= ( \frac{2 \times' + V + r'}{' + Vd + r'} - 1)^2 \\'))
         eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
         eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq\frac{1.2Z_ef_y}{\gamma_{mo}}\\ '))
-        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         eq.append(NoEscape(r'&=' + Mdv + r'\leq ' + res + r'\\'))
     elif sclass == 'Semi-Compact' :
         eq.append(NoEscape(r'\begin{aligned} M_{dv} &= \frac{Z_ef_y}{\gamma_{mo}} \\'))

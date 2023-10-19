@@ -1618,8 +1618,8 @@ class Flexure(Member):
                 })
             self.report_input.update({
                 KEY_DISP_SUPPORT : self.support,
-                KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.result_bending,
-                KEY_DISP_YIELD_STRENGTH_REPORT: self.result_shear,
+                KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.material_property.fu,
+                KEY_DISP_YIELD_STRENGTH_REPORT: self.material_property.fy,
                 "End Conditions - " + str(self.support): "TITLE",
             })
 

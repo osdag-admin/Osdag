@@ -704,16 +704,18 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
     eq.append(NoEscape(r'&  \end{aligned}'))
     return eq
-def cl_9_2_2_ltb_moment(Ze,Zpz, f_y,support, gamma_m0,beta,Md,
+def cl_9_2_2_ltb_moment(E, meu,Iy, It, Iw, Llt, Ze,Zpz, f_y,support, gamma_m0,beta,Md,
                                        sclass):
     '''Author: Rutvik Joshi '''
 
     eq = Math(inline=True)
+    # G = E / (2 + 2 * meu)
+    math.sqrt((math.pi ** 2 * E * Iy / Llt ** 2) * (G * It + (math.pi ** 2 * E * Iw / Llt ** 2)))
     if support == KEY_DISP_SUPPORT1:
         res = str(round(1.2 * Ze * f_y/gamma_m0* 10 ** -6,2))
     else:
         res = str(round(1.5 * Ze * f_y/gamma_m0* 10 ** -6,2))
-    beta_b = str(round(Ze/Zpz,2))
+    G = str(round(E / (2 + 2 * meu),2))
     Ze = str(Ze)
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)

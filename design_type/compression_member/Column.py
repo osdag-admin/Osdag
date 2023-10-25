@@ -330,7 +330,7 @@ class ColumnDesign(Member):
         t15 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
         options_list.append(t15)
 
-        t16 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        t16 = (KEY_IMAGE_Y, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
         options_list.append(t16)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -358,7 +358,7 @@ class ColumnDesign(Member):
             return connectdb('Angles', call_type= "popup")
         elif profile in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type= "popup")
-
+ 
     def fn_end1_end2(self):
 
         end1 = self[0]
@@ -429,7 +429,7 @@ class ColumnDesign(Member):
         t4 = ([KEY_END1_Y], KEY_END2_Y, TYPE_COMBOBOX, self.fn_end1_end2)
         lst.append(t4)
 
-        t5 = ([KEY_END1_Y, KEY_END2_Y], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        t5 = ([KEY_END1_Y, KEY_END2_Y], KEY_IMAGE_Y, TYPE_IMAGE, self.fn_end2_image)
         lst.append(t5)
 
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
@@ -532,6 +532,15 @@ class ColumnDesign(Member):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
+                val = option[3]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1_Y, KEY_END2_Y]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
@@ -1291,6 +1300,8 @@ class ColumnDesign(Member):
              KEY_DISP_ACTUAL_LEN_YY: self.length_yy,
              KEY_DISP_END1: self.end_1_z,
              KEY_DISP_END2: self.end_2_z,
+             KEY_DISP_END1_Y: self.end_1_y,
+             KEY_DISP_END2_Y: self.end_2_y,
              KEY_DISP_AXIAL: self.load,
              KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE: self.result_section_class,

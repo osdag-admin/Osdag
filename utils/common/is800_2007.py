@@ -956,6 +956,9 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):
+        ''' Author : Rutvik Joshi
+        Clauses: 8.2.2.1 and Annex E
+        '''
         G = E/(2+2*meu)
         return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
 
@@ -1168,6 +1171,84 @@ class IS800_2007(object):
 
         return M_d
 
+    @staticmethod
+    def cl_8_4_2_1_web_buckling_stiff(d, tw, e):
+        '''nominal shear strength, Vn,of webs with or without
+        intermediate stiffeners as governed by buckling
+
+        Author: Rutvik Joshi    '''
+        d_tw = d / tw
+        if d_tw <= 67 * e:
+            return False
+        return True
+
+    @staticmethod
+    def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw, e,c,mu,fyw,A_v):
+        '''based on the shear
+            buckling strength can be used for webs of Isection
+            girders, with or without intermediate
+            transverse stiffener, provided that the web has
+            transverse stiffeners at the supports.
+
+        Author: Rutvik Joshi    '''
+        if support == 'only support':
+            K_v = 5.35
+        else:
+            if c/d < 1:
+                K_v = 4 + 5.35/(c/d)**2
+            else:
+                K_v = 5.35 + 4/(c/d)**2
+
+        tau_crc = (K_v * math.pi**2 * E)/(12*(1-mu**2)*(d/tw)**2)
+        lambda_w = math.sqrt(fyw/(math.sqrt(3) * tau_crc))
+
+        if lambda_w <=0.8:
+            tau_b = fyw / math.sqrt(3)
+        elif lambda_w <1.2 and lambda_w > 0.8:
+            tau_b = (1-0.8(lambda_w-0.8 )) * fyw / math.sqrt(3)
+        elif lambda_w >= 1.2 :
+            tau_b =  fyw / (math.sqrt(3) * lambda_w **2)
+        V_cr = A_v * tau_b
+
+        return V_cr
+
+    @staticmethod
+    def cl_8_4_2_2_TensionField(d, tw, e):
+        '''based on the post-shear buckling
+            strength, may be used for webs with
+            intermediate transverse stiffeners, in addition
+            to the transverse stiffeners at supports, provided
+            the panels adjacent to the panel under tension
+            field action, or the end posts provide anchorage
+            for the tension fields
+
+        Author: Rutvik Joshi    '''
+        if support == 'only support':
+            K_v = 5.35
+        else:
+            if c/d < 1:
+                K_v = 4 + 5.35/(c/d)**2
+            else:
+                K_v = 5.35 + 4/(c/d)**2
+
+        tau_crc = (K_v * math.pi**2 * E)/(12*(1-mu**2)*(d/tw)**2)
+        lambda_w = math.sqrt(fyw/(math.sqrt(3) * tau_crc))
+
+        if lambda_w <=0.8:
+            tau_b = fyw / math.sqrt(3)
+        elif lambda_w <1.2 and lambda_w > 0.8:
+            tau_b = (1-0.8(lambda_w-0.8 )) * fyw / math.sqrt(3)
+        elif lambda_w >= 1.2 :
+            tau_b =  fyw / (math.sqrt(3) * lambda_w **2)
+        d_tw = d / tw
+        sai = 1.5 * tau_b * math.sin(2*phi)
+        fv = math.sqrt(fyw**2 - 3 * tau_b**2 + sai**2) - sai
+        V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi)
+        if V_tf <= V_p:
+            pass
+        else:
+            V_tf == V_p
+        return V_tf
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
 

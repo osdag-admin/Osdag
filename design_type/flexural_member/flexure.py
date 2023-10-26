@@ -251,15 +251,15 @@ class Flexure(Member):
             KEY_DESIGN_TYPE_FLEXURE,
             KEY_BEAM_SUPP_TYPE,
             TYPE_COMBOBOX,
-            VALUES_SUPP_TYPE,
+            VALUES_SUPP_TYPE_temp,
             True,
             "No Validator",
         )
         options_list.append(t2)
 
         #
-        t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX, VALUES_BENDING_TYPE, False, 'No Validator')
-        options_list.append(t3)
+        # t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX, VALUES_BENDING_TYPE, False, 'No Validator')
+        # options_list.append(t3)
         #
         #
         t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_COMBOBOX,KEY_DISP_SUPPORT_LIST, True, 'No Validator')
@@ -286,11 +286,13 @@ class Flexure(Member):
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
+        t8 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
+        options_list.append(t8)
+
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t8 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
-        options_list.append(t8)
+
 
         return options_list
 
@@ -339,7 +341,7 @@ class Flexure(Member):
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
 
-        t18 = ([KEY_BENDING],
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
                'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.major_bending_warning)
         lst.append(t18)
 
@@ -347,7 +349,7 @@ class Flexure(Member):
     
     def major_bending_warning(self):
 
-        if self[0] in ['Major']:
+        if self[0] == VALUES_SUPP_TYPE_temp[2]:
             return True
         else:
             return False
@@ -570,14 +572,17 @@ class Flexure(Member):
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
         # design type
-        self.design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+        self.design_type_temp = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
         self.latex_design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
-        if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
-            pass
-        elif self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-            self.bending_type = str(design_dictionary[KEY_BENDING]) #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
-            if self.bending_type == KEY_DISP_BENDING2:
-                self.design_type = KEY_DISP_DESIGN_TYPE_FLEXURE
+        if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
+            self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+
+        elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
+            self.design_type = VALUES_SUPP_TYPE[0]
+            # self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
+        elif self.design_type_temp == VALUES_SUPP_TYPE_temp[2]:
+            self.design_type = VALUES_SUPP_TYPE[1]
+            self.bending_type = KEY_DISP_BENDING1
 
         # section user data        
         self.length = float(design_dictionary[KEY_LENGTH])
@@ -707,29 +712,17 @@ class Flexure(Member):
         for section in self.sec_list:
             section = section.strip("'")
             self.section_property = self.section_conect_database(self, section)
-            # if self.allow_class == "Yes":
-            #     Zp_req = (
-            #         self.load.moment
-            #         * self.gamma_m0
-            #         / (
-            #             self.material_property.fy
-            #             * self.section_property.elast_sec_mod_z
-            #             / self.section_property.plast_sec_mod_z
-            #         )
-            #     )
-            #     print('Inside input_modifier allow_class',self.allow_class, self.load.moment, self.gamma_m0, self.material_property.fy
-            #             * self.section_property.elast_sec_mod_z
-            #             / self.section_property.plast_sec_mod_z)
-            # else:
+
             Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             print('Inside input_modifier not allow_class',self.allow_class,self.load.moment, self.gamma_m0, self.material_property.fy)
             if self.section_property.plast_sec_mod_z >= Zp_req:
                 self.input_modified.append(section)
-                logger.info(
-                    f"Required Zp_req = {round(Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min Zp_req value")
+                # logger.info(
+                #     f"Required Zp_req = {round(Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min Zp_req value")
             else:
-                logger.warning(
-                    f"Required Zp_req = {round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
+                pass
+                # logger.warning(
+                #     f"Required Zp_req = {round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
         print("self.input_modified", self.input_modified)
 
     def section_conect_database(self, section):
@@ -799,7 +792,7 @@ class Flexure(Member):
 
                 # 2.8 - UR
                 self.ur = round(
-                    ((self.load.moment / self.bending_strength_section * 10 ** -6) + (self.load.shear_force / self.V_d * 10 ** -3))/2,
+                    max((self.load.moment / self.bending_strength_section * 10 ** -6),(self.load.shear_force / self.V_d * 10 ** -3)),
                     2)  # ( +  round(self.load.axial_force / self.section_capacity, 3)
                 print("UR", self.ur)
                 # 2.9 - Cost of the section in INR
@@ -889,7 +882,7 @@ class Flexure(Member):
         print(f"Working web_buckling_steps")
         # web_buckling_message = 'Thin web'
         logger.warning("Thin web [Reference: Cl 8.2.1.1, IS 800:2007]")
-        logger.info(f"Ignoring section {self.section_property.designation}")
+        logger.info(f"Considering Transverse stiffeners at support {self.section_property.designation}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
         # if web_buckling:
         #     b1 = input('Enter bearing')
@@ -1114,14 +1107,14 @@ class Flexure(Member):
                 elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
                     self.section_class = "Semi-Compact"
 
-            logger.info(
-                "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
-                    self.section_class,
-                    trial_section,
-                    flange_class, round(flange_ratio,2),
-                    web_class, round(web_ratio,2)
-                )
-            )
+            # logger.info(
+            #     "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
+            #         self.section_class,
+            #         trial_section,
+            #         flange_class, round(flange_ratio,2),
+            #         web_class, round(web_ratio,2)
+            #     )
+            # )
             print( 'self.allow_class', self.allow_class)
             if self.allow_class != 'No':
                 if (
@@ -1130,13 +1123,13 @@ class Flexure(Member):
                     or self.section_class == "Plastic"
                 ):
                     self.input_section_list.append(trial_section)
-                    self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class]})
+                    self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
                 elif self.section_class == "Slender":
                     logger.warning(f"The section.{trial_section} is Slender. Ignoring")
             else:
                 if self.section_class == "Compact" or self.section_class == "Plastic":
                     self.input_section_list.append(trial_section)
-                    self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class]})
+                    self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
                 elif self.section_class == "Slender":
                     logger.warning(f"The section.{trial_section} is Slender. Ignoring")
                     self.design_status = False
@@ -1503,6 +1496,14 @@ class Flexure(Member):
 
     def common_result(self, list_result, result_type, flag=1):
         self.result_designation = list_result[result_type]["Designation"]
+        logger.info(
+            "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
+                self.input_section_classification[self.result_designation][0] ,
+                self.result_designation,
+                self.input_section_classification[self.result_designation][1], round(self.input_section_classification[self.result_designation][3],2),
+                self.input_section_classification[self.result_designation][2], round(self.input_section_classification[self.result_designation][4],2)
+            )
+        )
         self.result_section_class = list_result[result_type]["Section class"]
         self.result_effective_area = round(list_result[result_type]["Effective area"],2)
         self.result_shear = round(list_result[result_type]["Shear Strength"], 2)
@@ -1608,14 +1609,14 @@ class Flexure(Member):
                     KEY_BEAM_SUPP_TYPE: self.latex_design_type,
                 }
 
-            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                self.report_input.update({
-                    KEY_DISP_BENDING: self.bending_type})
-            elif self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE and self.latex_design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                self.report_input.update({
-                    KEY_BEAM_SUPP_TYPE_DESIGN: self.support,
-                    KEY_DISP_BENDING: self.bending_type,
-                })
+            # if self.latex_design_type == VALUES_SUPP_TYPE_temp[0]:
+            #     self.report_input.update({
+            #         KEY_DISP_BENDING: self.bending_type})
+            # elif self.latex_design_type == VALUES_SUPP_TYPE_temp[1]:
+            #     self.report_input.update({
+            #         KEY_BEAM_SUPP_TYPE_DESIGN: self.support,
+            #         # KEY_DISP_BENDING: self.bending_type,
+            #     })
             self.report_input.update({
                 KEY_DISP_SUPPORT : self.support,
                 KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.material_property.fu,

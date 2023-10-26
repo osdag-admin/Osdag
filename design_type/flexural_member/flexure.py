@@ -125,7 +125,7 @@ class Flexure(Member):
         t2 = ("Optimization", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH]) #, KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD]) #, KEY_STEEL_COST
+        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD, KEY_ShearBucklingOption]) #, KEY_STEEL_COST
         design_input.append(t2)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
@@ -140,7 +140,7 @@ class Flexure(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD], '')
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_ShearBucklingOption], '')
         design_input.append(t2)
 
         return design_input
@@ -170,6 +170,7 @@ class Flexure(Member):
             KEY_BEARING_LENGTH : 'NA',
             KEY_LOAD : 'Normal',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
+            KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
         }[key]
 
         return val
@@ -576,7 +577,7 @@ class Flexure(Member):
         self.latex_design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
         if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
             self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
-
+            self.support_cndition_shear_buckling = design_dictionary[KEY_ShearBucklingOption]
         elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
             self.design_type = VALUES_SUPP_TYPE[0]
             # self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
@@ -628,6 +629,9 @@ class Flexure(Member):
         self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
         self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]
         self.material_property = Material(material_grade=self.material, thickness=0)
+        self.fyf = self.material_property.fy
+        self.fyw = self.material_property.fy
+
         print(f"self.material_property {self.material_property}]")
         # print( "self.material_property",self.material_property.fy)
         # initialize the design status
@@ -685,9 +689,7 @@ class Flexure(Member):
             self.design_status = False
             self.design_status_list.append(self.design_status)
         else:
-            if (
-                self.effective_area_factor >= self.material_property.fy * self.gamma_m0 / (self.material_property.fu * 0.9 * self.gamma_m1)
-            ):
+            if self.effective_area_factor >= (self.material_property.fy * self.gamma_m0 / (self.material_property.fu * 0.9 * self.gamma_m1)):
                 pass
             else:
                 self.effective_area_factor = (
@@ -764,6 +766,11 @@ class Flexure(Member):
             logger.info(
                 "The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007]."
             )
+        # 2 - Effective length
+        self.effective_length_beam(self, design_dictionary, self.length)  # mm
+        print(
+            f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
+
         if flag:
             for section in self.input_section_list:
                 # initialize lists for updating the results dictionary
@@ -773,9 +780,6 @@ class Flexure(Member):
                 self.effective_area = self.section_property.area
                 self.common_checks_1(self, section, step=2)
                 
-                # 2 - Effective length
-                self.effective_length_beam(self, design_dictionary, self.length)  # mm
-                print(f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
 
                 list_result = []
                 list_1 = []
@@ -882,7 +886,8 @@ class Flexure(Member):
         print(f"Working web_buckling_steps")
         # web_buckling_message = 'Thin web'
         logger.warning("Thin web [Reference: Cl 8.2.1.1, IS 800:2007]")
-        logger.info(f"Considering Transverse stiffeners at support {self.section_property.designation}")
+
+        logger.info(f"Considering  {self.support_cndition_shear_buckling}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
         # if web_buckling:
         #     b1 = input('Enter bearing')
@@ -1174,6 +1179,8 @@ class Flexure(Member):
                 print(f"Working 2 {self.effective_length}")
         else:
             try:
+                if float(design_dictionary[KEY_LENGTH_OVERWRITE]) <= 0:
+                    design_dictionary[KEY_LENGTH_OVERWRITE] = 'NA'
                 length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
                 self.effective_length = length
                 print(f"Working 3 {self.effective_length}")
@@ -1181,8 +1188,8 @@ class Flexure(Member):
                 print(f"Inside effective_length_beam",type(design_dictionary[KEY_LENGTH_OVERWRITE]))
                 logger.warning("Invalid Effective Length Parameter.")
                 logger.info('Effective Length Parameter is set to default: 1.0')
-                design_dictionary[KEY_LENGTH_OVERWRITE] = 'NA'
-                length = self.effective_length_beam(self, design_dictionary, length)
+                design_dictionary[KEY_LENGTH_OVERWRITE] = '1.0'
+                self.effective_length_beam(self, design_dictionary, length)
                 print(f"Working 4 {self.effective_length}")
         print(f"Inside effective_length_beam",self.effective_length, design_dictionary[KEY_LENGTH_OVERWRITE])
 
@@ -1205,12 +1212,7 @@ class Flexure(Member):
                 self.effective_area = round(
                     self.effective_area * self.effective_area_factor, 2
                 )
-                logger.info(
-                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
-                        round((self.effective_area / self.effective_area_factor), 2),
-                        self.effective_area,
-                    )
-                )
+
 
         elif step == 3:
             # 2.1 - Buckling curve classification and Imperfection factor
@@ -1504,8 +1506,17 @@ class Flexure(Member):
                 self.input_section_classification[self.result_designation][2], round(self.input_section_classification[self.result_designation][4],2)
             )
         )
+
         self.result_section_class = list_result[result_type]["Section class"]
         self.result_effective_area = round(list_result[result_type]["Effective area"],2)
+        if self.effective_area_factor < 1.0:
+            logger.info(
+                "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
+                    round((self.result_effective_area / self.effective_area_factor), 2),
+                    self.result_effective_area,
+                )
+            )
+
         self.result_shear = round(list_result[result_type]["Shear Strength"], 2)
         self.result_high_shear = list_result[result_type]["High Shear check"]
         self.result_bending = round(list_result[result_type]["Bending Strength"], 2)

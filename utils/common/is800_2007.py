@@ -1183,7 +1183,7 @@ class IS800_2007(object):
         return True
 
     @staticmethod
-    def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw, e,c,mu,fyw,A_v):
+    def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw, e,c,mu,fyw,A_v,support):
         '''based on the shear
             buckling strength can be used for webs of Isection
             girders, with or without intermediate
@@ -1213,7 +1213,7 @@ class IS800_2007(object):
         return V_cr
 
     @staticmethod
-    def cl_8_4_2_2_TensionField(d, tw, e):
+    def cl_8_4_2_2_TensionField(support, c, d, K_v, mu, tw, fyw, bf,tf, fyf,Nf, gamma_mo, A_v):
         '''based on the post-shear buckling
             strength, may be used for webs with
             intermediate transverse stiffeners, in addition
@@ -1241,6 +1241,14 @@ class IS800_2007(object):
         elif lambda_w >= 1.2 :
             tau_b =  fyw / (math.sqrt(3) * lambda_w **2)
         d_tw = d / tw
+        phi = np.arctan(d/c)
+        M_fr = 0.25 * bf * tf**3 * fyf*(1-Nf/(bf * tf * fyf / gamma_mo))**2
+        s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi)
+        if s <= c:
+            pass
+        else:
+            s == c
+        w_tf = d * math.cos(phi) + (c-2*s)*math.sin(phi)
         sai = 1.5 * tau_b * math.sin(2*phi)
         fv = math.sqrt(fyw**2 - 3 * tau_b**2 + sai**2) - sai
         V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi)

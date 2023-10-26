@@ -591,7 +591,9 @@ Top2 = 'Lateral restraint to top flange'
 Top3 = 'Torsional rwstraint'
 Top4 = 'Lateral and Torsional restraint'
 Top_Restraint_list = list(( Top1, Top2, Top3, Top4))
-
+KEY_ShearBuckling = 'Shear Buckling Design Method '
+KEY_ShearBucklingOption = 'S.B.Methods'
+KEY_DISP_SB_Option = ['Simple Post Critical', 'Tension Field Test']
 ###################################
 # All Input Keys
 ###################################

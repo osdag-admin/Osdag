@@ -160,6 +160,8 @@ from design_type.compression_member.Column import ColumnDesign
 from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 
 from design_type.flexural_member.flexure import Flexure
+from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from design_type.flexural_member.flexure_othersupp import Flexure_Misc
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 import APP_CRASH.Appcrash.api as appcrash
@@ -305,7 +307,9 @@ class OsdagMainWindow(QMainWindow):
                                        self.show_compression_module,
                                        ],
                 'Flexural Member' : [
-                    ('Laterally Supported and Unsupported Beam', 'ResourceFiles/images/broken.png', 'Beam_flexure'),
+                    ('Simply Supported Beam', 'ResourceFiles/images/broken.png', 'Beam_flexure'),
+                    ('Cantilever Beam', 'ResourceFiles/images/broken.png', 'Beam_flexure2'),
+                    ('Other Beam Supports', 'ResourceFiles/images/broken.png', 'Beam_flexure3'),
                     # ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
                     self.show_flexure_module,
                 ],
@@ -705,6 +709,20 @@ class OsdagMainWindow(QMainWindow):
             # print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(Flexure, ' ')
+            # print(f"Here11")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton, 'Beam_flexure2').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(Flexure_Cantilever, ' ')
+            # print(f"Here11")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton, 'Beam_flexure3').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(Flexure_Misc, ' ')
             # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)

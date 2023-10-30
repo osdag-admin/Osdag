@@ -2,7 +2,7 @@
 
 @Author:    Rutvik Joshi - Osdag Team, IIT Bombay [(P) rutvikjoshi63@gmail.com / 30005086@iitb.ac.in]
 
-@Module - Beam Design- Simply Supported member
+@Module - Beam Design - Other Supports
            - Laterally Supported Beam [Moment + Shear]
            - Laterally Unsupported Beam [Moment + Shear]
 
@@ -36,11 +36,11 @@ from utils.common import is800_2007
 from utils.common.component import *
 
 
-class Flexure(Member):
+class Flexure_Misc(Member):
 
     def __init__(self):
         # print(f"Here10")
-        super(Flexure, self).__init__()
+        super(Flexure_Misc, self).__init__()
 
     ###############################################
     # Design Preference Functions Start
@@ -261,9 +261,9 @@ class Flexure(Member):
         #
         # t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX, VALUES_BENDING_TYPE, False, 'No Validator')
         # options_list.append(t3)
-
         #
-        t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT1, True, 'No Validator')
+        #
+        t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT2, True, 'No Validator')
         options_list.append(t4)
 
         t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
@@ -274,12 +274,12 @@ class Flexure(Member):
         
         t11 = (KEY_WARPING_RES, DISP_WARPING_RES, TYPE_COMBOBOX, Warping_Restraint_list, True, 'No Validator')
         options_list.append(t11)
-        #
-        # t11 = (KEY_SUPPORT_TYPE, DISP_SUPPORT_RES, TYPE_COMBOBOX, Supprt_Restraint_list, True, 'No Validator')
-        # options_list.append(t11)
-        #
-        # t11 = (KEY_SUPPORT_TYPE2, DISP_TOP_RES, TYPE_COMBOBOX, Top_Restraint_list, False, 'No Validator')
-        # options_list.append(t11)
+
+        t11 = (KEY_SUPPORT_TYPE, DISP_SUPPORT_RES, TYPE_COMBOBOX, Supprt_Restraint_list, True, 'No Validator')
+        options_list.append(t11)
+
+        t11 = (KEY_SUPPORT_TYPE2, DISP_TOP_RES, TYPE_COMBOBOX, Top_Restraint_list, False, 'No Validator')
+        options_list.append(t11)
 
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH_BEAM, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
@@ -560,7 +560,7 @@ class Flexure(Member):
                 if self.lambda_lt < 0.4:
                     self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE
         '''
-        super(Flexure, self).set_input_values(self, design_dictionary)
+        super(Flexure_Misc, self).set_input_values(self, design_dictionary)
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
@@ -886,11 +886,7 @@ class Flexure(Member):
         print(f"Working web_buckling_steps")
         # web_buckling_message = 'Thin web'
         logger.warning("Thin web [Reference: Cl 8.2.1.1, IS 800:2007]")
-        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
-            self.V_d = IS800_2007.cl_8_4_2_2_ShearBuckling_Simple_postcritical((self.section_property.depth - 2 *(self.section_property.flange_thickness + self.section_property.root_radius),
-                                                                                self.section_property.web_thickness,space,0.3, self.fyw))
-        elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
-            pass
+
         logger.info(f"Considering  {self.support_cndition_shear_buckling}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
         # if web_buckling:
@@ -1305,7 +1301,7 @@ class Flexure(Member):
     def list_changer(self, change, list,list_name, check = True):
         list_name.extend([
             "Designation"])
-        if self.high_shear_check and self.section_class != 'Semi-Compact':
+        if self.high_shear_check:
             list.extend(
                 [self.bending_strength_section_reducedby, self.beta_reduced, self.M_d])
             list_name.extend([
@@ -1575,7 +1571,7 @@ class Flexure(Member):
             self.result_fcd = 'NA'
             self.result_capacity = 'NA'
             self.result_crippling = 'NA'
-        if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
+        if self.result_high_shear:
             self.result_mfd = list_result[result_type]["Mfd"]
             self.result_beta_reduced = list_result[result_type]["Beta_reduced"]
             self.result_Md= list_result[result_type]["M_d"]

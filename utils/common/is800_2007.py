@@ -946,7 +946,10 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(phi_lt, lambda_lt):
-        return 1 / ( phi_lt + (phi_lt **2 - lambda_lt **2) ** 0.5)
+        si = 1 / ( phi_lt + (phi_lt **2 - lambda_lt **2) ** 0.5)
+        if si > 1.0:
+            si = 1.0
+        return si
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_phi_lt(alpha_lt, lambda_lt):
@@ -1183,7 +1186,7 @@ class IS800_2007(object):
         return True
 
     @staticmethod
-    def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw, e,c,mu,fyw,A_v,support):
+    def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw,c,mu,fyw,A_v,support):
         '''based on the shear
             buckling strength can be used for webs of Isection
             girders, with or without intermediate

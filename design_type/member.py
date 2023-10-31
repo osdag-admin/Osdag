@@ -2812,6 +2812,9 @@ class Member(Main):
             KEY_BEARING_LENGTH, KEY_DISP_BEARING_LENGTH + ' (mm)', TYPE_TEXTBOX, None, values[KEY_BEARING_LENGTH])
         optimum.append(t2)
 
+        t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
+        optimum.append(t1)
+
         if KEY_DESIGN_TYPE_FLEXURE in input_dictionary:
             if input_dictionary[KEY_DESIGN_TYPE_FLEXURE] == VALUES_SUPP_TYPE_temp[0]:
                 t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
@@ -2888,8 +2891,7 @@ class Member(Main):
         #               values[KEY_PLATETHK])  # , KEY_GUSSET, TYPE_COMBOBOX, PLATE_THICKNESS_SAIL, True, 'No Validator'
         #         optimum.append(t1)
 
-        #         # t1 = (None, End_Connection_title, TYPE_TITLE, None, True, 'No Validator')
-        #         # optimum.append(t1)
+        #
         #         #
         #         # t5 = (KEY_BOLT_Number, Strut_Bolt_Number, TYPE_TEXTBOX, None, values[KEY_BOLT_Number])
         #         # optimum.append(t5)

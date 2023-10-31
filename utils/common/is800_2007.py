@@ -1185,15 +1185,19 @@ class IS800_2007(object):
             return False
         return True
 
-    @staticmethod
-    def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw,c,mu,fyw,A_v,support):
-        '''based on the shear
-            buckling strength can be used for webs of Isection
-            girders, with or without intermediate
-            transverse stiffener, provided that the web has
-            transverse stiffeners at the supports.
+    # @staticmethod
+    # def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw,c,mu,fyw,A_v,support):
+    #     '''based on the shear
+    #         buckling strength can be used for webs of Isection
+    #         girders, with or without intermediate
+    #         transverse stiffener, provided that the web has
+    #         transverse stiffeners at the supports.
+    #
+    #     Author: Rutvik Joshi    '''
 
-        Author: Rutvik Joshi    '''
+    @staticmethod
+    def cl_8_4_2_2_K_v_Simple_postcritical(support, c, d):
+
         if support == 'only support':
             K_v = 5.35
         else:
@@ -1201,16 +1205,37 @@ class IS800_2007(object):
                 K_v = 4 + 5.35/(c/d)**2
             else:
                 K_v = 5.35 + 4/(c/d)**2
+        return K_v
+
+    @staticmethod
+    def cl_8_4_2_2_tau_crc_Simple_postcritical(K_v, E,mu, d, tw):
 
         tau_crc = (K_v * math.pi**2 * E)/(12*(1-mu**2)*(d/tw)**2)
+
+        return tau_crc
+
+    @staticmethod
+    def cl_8_4_2_2_lambda_w_Simple_postcritical(fyw, tau_crc):
+
         lambda_w = math.sqrt(fyw/(math.sqrt(3) * tau_crc))
 
-        if lambda_w <=0.8:
+        return lambda_w
+
+    @staticmethod
+    def cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fyw):
+
+        if lambda_w <= 0.8:
             tau_b = fyw / math.sqrt(3)
-        elif lambda_w <1.2 and lambda_w > 0.8:
-            tau_b = (1-0.8(lambda_w-0.8 )) * fyw / math.sqrt(3)
-        elif lambda_w >= 1.2 :
-            tau_b =  fyw / (math.sqrt(3) * lambda_w **2)
+        elif lambda_w < 1.2 and lambda_w > 0.8:
+            tau_b = (1 - 0.8(lambda_w - 0.8)) * fyw / math.sqrt(3)
+        elif lambda_w >= 1.2:
+            tau_b = fyw / (math.sqrt(3) * lambda_w ** 2)
+
+        return tau_b
+
+    @staticmethod
+    def cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_v):
+
         V_cr = A_v * tau_b
 
         return V_cr

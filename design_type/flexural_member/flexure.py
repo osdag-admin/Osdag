@@ -268,7 +268,11 @@ class Flexure(Member):
 
         t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
         options_list.append(t12)
-        
+
+
+        t3 = (KEY_BUCKLING_METHOD, KEY_WEB_BUCKLING, TYPE_COMBOBOX, KEY_WEB_BUCKLING_option, False, 'No Validator')
+        options_list.append(t3)
+
         t10 = (KEY_TORSIONAL_RES, DISP_TORSIONAL_RES, TYPE_COMBOBOX, Torsion_Restraint_list, True, 'No Validator')
         options_list.append(t10)
         
@@ -1380,6 +1384,16 @@ class Flexure(Member):
             ])
         return  list,list_name
 
+    def plate_girder_design(self, section):
+        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+            pass
+        d_red = self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
+        tau_b = self.load.shear_force / (d_red * self.section_property.web_thickness)
+        if tau_b == self.fyw / math.sqrt(3):
+            lambda_w = 0.8
+        else:
+            lambda_w = min((tau_b*(math.sqrt(3)/self.fyw) - 1.64) / (-0.8), math.sqrt(tau_b*(math.sqrt(3)/self.fyw)))
+        tau_crc = self.fyw / (math.sqrt(3) * lambda_w ** 2)
     def results(self, design_dictionary):
 
         # sorting results from the dataset

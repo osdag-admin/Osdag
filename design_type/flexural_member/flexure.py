@@ -420,7 +420,6 @@ class Flexure(Member):
               '', True)
         out_list.append(t1)
 
-
         t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, True)
         out_list.append(t1)
 
@@ -448,6 +447,35 @@ class Flexure(Member):
         out_list.append(t1)
 
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
+        out_list.append(t2)
+
+        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
+        out_list.append(t1)
+
+        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+              self.result_tc if flag else '', False)
+        out_list.append(t2)
+
+        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', False)
+        out_list.append(t2)
+
+        t2 = (
+            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
+            False)
+        out_list.append(t2)
+
+        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', False)
+        out_list.append(t2)
+
+        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', False)
+        out_list.append(t2)
+
+        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+              self.result_nd_esr_lt if flag else
+              '', False)
+        out_list.append(t1)
+
+        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', False)
         out_list.append(t2)
 
         t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True)

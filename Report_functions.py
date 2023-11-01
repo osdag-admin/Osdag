@@ -2,7 +2,38 @@ from utils.common.is800_2007 import *
 from pylatex import Math
 from pylatex.utils import NoEscape
 
+def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter):  # same as #todo anjali
+    """
+    Author: Rutvik J
 
+    """
+    temp1 = str(round(given/provided,3))
+    temp2 = str(round(given2/provided2,3))
+    given = str(given)
+    provided = str(provided)
+    given2 = str(given2)
+    provided2 = str(provided2)
+    answer = str(parameter)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}} )\\'))
+    Pmc_eqn.append(NoEscape(r'&=\text{MAX}(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'})\\'))
+    Pmc_eqn.append(NoEscape(r'&=\text{MAX}(' + temp1 + r',' + temp2 + r')\\' ))
+    Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}\\' ))
+    return Pmc_eqn
+def sectional_area_change(given, provided, parameter):  # same as #todo anjali
+    """
+    Author: Rutvik J
+
+    """
+
+    given = str(given)
+    provided = str(provided)
+    parameter = str(parameter)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \text{Effective Area Parameter} \times \text{Area of Section}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + parameter + r'\times' + given + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + provided + r' \end{aligned}'))
+    return Pmc_eqn
 def cl_3_7_2_section_classification(class_of_section=None):
     """
     Find class of the section
@@ -367,8 +398,56 @@ def cl_8_2_moment_capacity_member(Pmc, Mdc, M_c):
     M_c_eqn.append(NoEscape(r'&=' + M_c + r'\\ \\'))
     M_c_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2}] \end{aligned}'))
     return M_c_eqn
+def cl_8_2_1web_buckling(d, tw, e,T):
+    """
+    Author: Rutvik J
 
+    """
 
+    d = str(d)
+    tw = str(tw)
+    e = str(e)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{d_{web}}{t_{web}}= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    # Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + d + r'}{' + tw + r'}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + e + r' \\'))
+    if T:
+        Pmc_eqn.append(NoEscape(r'& [\text{Section is susceptible to Web Buckling }] \end{aligned}'))
+    else:
+        Pmc_eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] \end{aligned}'))
+
+    return Pmc_eqn
+def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc):  # same as #todo anjali
+    """
+    Calculate member design moment capacity
+    Args:
+
+          beta_b:1 for plastic and compact sections & Ze/Zp for semi compact section (int)
+          Z_p:Plastic section modulus of cross section mm^3 (float)
+          f_y:Yield stress of the material in N/mm square  (float)
+          gamma_m0:partial safety factor (float)
+          Pmc:Plastic moment capacity in  N-mm (float)
+    Returns:
+        Plastic moment capacity in  N-mm (float)
+
+    Note:
+                Author: Rutvik J
+              IS 800:2007,  cl 8.2.1.2
+
+    """
+
+    beta_b = str(beta_b)
+    Z_p = str(Z_p)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    Pmc = str(Pmc)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}} &= \frac{\beta_b Z_p fy}{\gamma_{m0}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\\ \\'))
+    Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
+    return Pmc_eqn
 def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc):  # same as #todo anjali
     """
     Calculate member design moment capacity
@@ -493,13 +572,30 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
     allow_shear_capacity_eqn = Math(inline=True)
     allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
-    if not check:
+    if check:
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
-        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
+
     else:
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
-        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
     return allow_shear_capacity_eqn
+def sectional_area_change(given, provided, parameter):  # same as #todo anjali
+    """
+    Author: Rutvik J
+
+    """
+
+    given = str(given)
+    provided = str(provided)
+    parameter = str(parameter)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \text{Effective Area Parameter} \times \text{Area of Section}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + parameter + r'\times' + given + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + provided + r' \end{aligned}'))
+    # Pmc_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
+
+    return Pmc_eqn
 def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
     """
     Calculate shear capacity of member
@@ -3265,10 +3361,10 @@ def get_pass_fail(required, provided, relation='',M1 = '', M2 = ''):
             else:
                 return 'Fail'
         elif relation == 'Warn':
-            if required <= provided:
-                return M1
+            if M1:
+                return 'High Shear'
             else:
-                return M2
+                return 'Low Shear'
         else:
             if required < provided:
                 return 'Pass'

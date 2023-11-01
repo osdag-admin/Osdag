@@ -299,13 +299,58 @@ class CreateLatex(Document):
                             table.add_hline()
                         count = count + 1
                 else:
-
+                    # if module != KEY_DISP_FLEXURE:
                     if check[3] == 'Fail':
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
                     else:
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("OsdagGreen", bold(check[3])))
                     table.add_hline()
-
+        # if module == KEY_DISP_FLEXURE:
+        #     doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        #     doc.append(NewPage())
+        #     # if extra_page:
+        #     #     with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
+        #     #         table.add_hline()
+        #     #         table.add_row((MultiColumn(1, align='|c|', data='Section Size*', ),
+        #     #                        MultiColumn(1, align='|X|', data=list_sec_modified),))
+        #     #         table.add_hline()
+        #     #     doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        #     #     doc.append(NewPage())
+        #     count = 0
+        #     with doc.create(Section('Input Data Checks')):
+        #         with doc.create(
+        #                 Tabularx(r'|>{\centering}p{12.5cm}|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+        #             table.add_hline()
+        #             # Fail = TextColor("FailColor", bold("Fail"))
+        #             # Pass = TextColor("PassColor", bold("Pass"))
+        #
+        #             if does_design_exist != True:
+        #                 table.add_row(bold('Design Status'), color_cell("Red", bold("Fail")))
+        #             else:
+        #                 table.add_row(bold('Design Status'), color_cell("OsdagGreen", bold("Pass")))
+        #             table.add_hline()
+        #
+        #         for check in Design_Check:
+        #
+        #             if check[0] == 'SubSection2':
+        #                 if count >= 1:
+        #                     # doc.append(NewPage())
+        #                     doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        #                 with doc.create(Subsection(check[1])):
+        #                     #########################
+        #                     # if uiObj== "WELDImage":
+        #                     #     table.add_hline()
+        #                     #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+        #                     #     table.add_hline()
+        #                     # else:
+        #                     #########################
+        #                     with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
+        #                         table.add_hline()
+        #                         table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
+        #                         table.add_hline()
+        #                         table.end_table_header()
+        #                         table.add_hline()
+        #                         count = count + 1
         # 2D images
         if len(Disp_2d_image) != 0:
 

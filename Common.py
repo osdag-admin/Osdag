@@ -598,6 +598,9 @@ KEY_BUCKLING_METHOD = 'Buckling.Method'
 KEY_ShearBuckling = 'Shear Buckling Design Method '
 KEY_ShearBucklingOption = 'S.B.Methods'
 KEY_DISP_SB_Option = ['Simple Post Critical', 'Tension Field Test']
+KEY_DISP_TENSION_HOLES = 'Tension Zone'
+KEY_DISP_Web_Buckling = 'Web Buckling'
+KEY_DISP_Utilization_Ratio = 'Utilization Ratio'
 ###################################
 # All Input Keys
 ###################################

@@ -15,10 +15,10 @@ def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter):  # s
     provided2 = str(provided2)
     answer = str(parameter)
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}} )\\'))
-    Pmc_eqn.append(NoEscape(r'&=\text{MAX}(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'})\\'))
-    Pmc_eqn.append(NoEscape(r'&=\text{MAX}(' + temp1 + r',' + temp2 + r')\\' ))
-    Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}\\' ))
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}\right)\\'))
+    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'}\right)\\'))
+    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r'\right)\\' ))
+    Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
     return Pmc_eqn
 def sectional_area_change(given, provided, parameter):  # same as #todo anjali
     """
@@ -344,7 +344,28 @@ def slenderness_req():
 
     return slenderlimit_eqn
 
+def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
+    """
+    Author: Rutvik J
 
+    """
+    temp = True if Pd > P else False
+    Pd = str(Pd)
+    A = str(A)
+    fcd = str(fcd)
+    P = str(P)
+    sub = str(sub)
+    # slender = str(slender)
+    slender_eqn = Math(inline=True)
+    slenderlimit_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}'))
+    slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\\'))
+    if temp:
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r' \\'))
+    else:
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r' \\'))
+
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2}] \end{aligned}'))
+    return slender_eqn
 def cl_7_1_2_effective_slenderness_ratio(K, L, r, slender):
     """
     Calculate effective selenderness ratio

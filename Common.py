@@ -601,6 +601,7 @@ KEY_DISP_SB_Option = ['Simple Post Critical', 'Tension Field Test']
 KEY_DISP_TENSION_HOLES = 'Tension Zone'
 KEY_DISP_Web_Buckling = 'Web Buckling'
 KEY_DISP_Utilization_Ratio = 'Utilization Ratio'
+KEY_DISP_Web_Buckling_Support = 'Web Buckling @Support'
 ###################################
 # All Input Keys
 ###################################

@@ -844,18 +844,17 @@ class Flexure(Member):
                         * self.steel_cost_per_kg
                 )
                 self.optimum_section_cost.append(self.cost)
-
-
+                self.web_buckling = False
 
                 if self.bearing_length != 'NA': #and self.web_crippling
                     print(f"Check for Web Buckling")
                     try:
                         self.bearing_length = float(design_dictionary[KEY_BEARING_LENGTH])
                         self.web_buckling = True #WEB BUCKLING
-                        I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
-                        A_eff_web = self.bearing_length * self.section_property.web_thickness
-                        r = math.sqrt(I_eff_web / A_eff_web)
-                        self.slenderness = 0.7 * d_red / r
+                        self.I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
+                        self.A_eff_web = self.bearing_length * self.section_property.web_thickness
+                        self.r = math.sqrt(self.I_eff_web / self.A_eff_web)
+                        self.slenderness = 0.7 * d_red / self.r
                         self.common_checks_1(self, section, step=3)
                         # step == 4
                         self.common_checks_1(
@@ -1358,13 +1357,14 @@ class Flexure(Member):
             ])
         #Latex para also
         list.extend(
-            [self.latex_tension_zone,self.web_buckling_check,self.d_red, self.section_class, self.effective_area, self.V_d, self.high_shear_check,
+            [self.latex_tension_zone,self.web_buckling_check,self.d_red, self.web_buckling, self.section_class, self.effective_area, self.V_d, self.high_shear_check,
              self.bending_strength_section, self.effective_length, self.ur,
              self.cost, self.beta_b_lt])
         list_name.extend([
             'latex.tension_zone',
             'Web.Buckling',
             'Reduced.depth',
+            'Buckling.crippling',
             "Section class",
             "Effective area",
             "Shear Strength",
@@ -1376,7 +1376,7 @@ class Flexure(Member):
             "Beta_b"
         ])
         if change == 'Web Buckling':
-            list.extend([self.buckling_class,
+            list.extend([self.I_eff_web, self.A_eff_web, self.r, self.buckling_class,
                             self.imperfection_factor,
                             self.slenderness,
                             self.euler_buckling_stress,
@@ -1390,6 +1390,9 @@ class Flexure(Member):
                             self.F_wb])
 
             list_name.extend ([
+                "WebBuckling.I_eff",
+                "WebBuckling.A_eff",
+                "WebBuckling.r_eff",
                 "Buckling_class",
                 "IF",
                 "Effective_SR",
@@ -1568,7 +1571,8 @@ class Flexure(Member):
         self.result_latex_tension_zone = list_result[result_type]["latex.tension_zone"]
         self.result_web_buckling_check = list_result[result_type]["Web.Buckling"]
         self.result_eff_d = list_result[result_type]["Reduced.depth"]
-
+        self.result_buckling_crippling = list_result[result_type]["Buckling.crippling"]
+        
         self.result_section_class = list_result[result_type]["Section class"]
         self.result_effective_area = round(list_result[result_type]["Effective area"],2)
         if self.effective_area_factor < 1.0:
@@ -1606,6 +1610,10 @@ class Flexure(Member):
             self.result_fcd__lt = 'NA'
 
         if self.web_buckling :
+
+            self.result_bcI_eff = list_result[result_type]['WebBuckling.I_eff']
+            self.result_bcA_eff = list_result[result_type]['WebBuckling.A_eff']
+            self.result_bcr_eff = list_result[result_type]['WebBuckling.r_eff']
             self.result_bc = list_result[result_type]['Buckling_class']
             self.result_IF = round(list_result[result_type]["IF"], 2)
             self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)
@@ -1857,7 +1865,7 @@ class Flexure(Member):
                               get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                         self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Utilization', '|p{4cm}|p{3.5cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Utilization', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
             self.report_check.append(t1)
 
             t1 = (KEY_DISP_Utilization_Ratio, 1.0,
@@ -1866,6 +1874,17 @@ class Flexure(Member):
                                                          round(self.result_UR, 2)),
                   get_pass_fail(1.0, round(self.result_UR, 2), relation="greater"))
             self.report_check.append(t1)
+
+            if self.result_buckling_crippling:
+                t1 = ('SubSection', 'Web Buckling and Web Crippling', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_Web_Buckling_Support, self.load.shear_force * 10 ** -3,
+                      cl_7_1_2_design_compressive_strength(self.load.shear_force * 10 ** -3, round(self.result_shear, 2),
+                                              self.load.moment * 10 ** -6, round(self.result_bending, 2),
+                                              round(self.result_UR, 2)),
+                      get_pass_fail(1.0, round(self.result_UR, 2), relation="greater"))
+                self.report_check.append(t1)
             # if self.latex_tension_zone == True :
             #     t1 = (KEY_DISP_TENSION_HOLES, ' ',
             #           sectional_area_change(self.result_effective_area, self.section_property.area,

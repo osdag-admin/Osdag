@@ -357,7 +357,7 @@ def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
     sub = str(sub)
     # slender = str(slender)
     slender_eqn = Math(inline=True)
-    slenderlimit_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}'))
+    slender_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}\\'))
     slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\\'))
     if temp:
         slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r' \\'))

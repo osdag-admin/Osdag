@@ -850,30 +850,7 @@ class Flexure(Member):
                     print(f"Check for Web Buckling")
                     try:
                         self.bearing_length = float(design_dictionary[KEY_BEARING_LENGTH])
-                        self.web_buckling = True #WEB BUCKLING
-                        self.I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
-                        self.A_eff_web = self.bearing_length * self.section_property.web_thickness
-                        self.r = math.sqrt(self.I_eff_web / self.A_eff_web)
-                        self.slenderness = 0.7 * d_red / self.r
-                        self.common_checks_1(self, section, step=3)
-                        # step == 4
-                        self.common_checks_1(
-                            self, section, step=4, list_result=["Concentric"]
-                        )
-                        # 2.7 - Capacity of the section for web_buckling
-                        self.section_capacity = (
-                                self.design_compressive_stress * (self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness
-                                * 10**-3)  # N
-                        print(self.design_compressive_stress, self.bearing_length, self.section_property.depth, self.section_property.web_thickness)
 
-                        print(self.bending_strength_section, self.V_d, self.section_capacity)
-
-                        self.F_wb = (self.bearing_length + 2.5 * (self.section_property.root_radius + self.section_property.flange_thickness)) * self.section_property.web_thickness * self.material_property.fy / (self.gamma_m0 * 10**3)
-                        if self.bending_strength_section > self.load.moment* 10**-6 and self.V_d > self.load.shear_force * 10**-3 and self.section_capacity > self.load.shear_force * 10**-3 and self.F_wb > self.load.shear_force* 10**-3:
-                            list_result, list_1 = self.list_changer(self,change='Web Buckling',check=True,list=list_result, list_name=list_1)
-                            self.optimum_section_ur.append(self.ur)
-                            # Step 3 - Storing the optimum results to a list in a descending order
-                            self.common_checks_1(self, section, 5, list_result, list_1)
                     except:
                         logger.warning('Bearing length is invalid.')
                         logger.info('Ignoring web Buckling and Crippling check')
@@ -887,6 +864,36 @@ class Flexure(Member):
 
                             # Step 3 - Storing the optimum results to a list in a descending order
                             self.common_checks_1(self, section, 5, list_result, list_1)
+                        continue
+                    self.web_buckling = True  # WEB BUCKLING
+                    self.I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
+                    self.A_eff_web = self.bearing_length * self.section_property.web_thickness
+                    self.r = math.sqrt(self.I_eff_web / self.A_eff_web)
+                    self.slenderness = 0.7 * self.d_red / self.r
+                    self.common_checks_1(self, section, step=3)
+                    # step == 4
+                    self.common_checks_1(
+                        self, section, step=4, list_result=["Concentric"]
+                    )
+                    # 2.7 - Capacity of the section for web_buckling
+                    self.section_capacity = (
+                            self.design_compressive_stress * (
+                                self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness
+                            * 10 ** -3)  # N
+                    print(self.design_compressive_stress, self.bearing_length, self.section_property.depth,
+                          self.section_property.web_thickness)
+
+                    print(self.bending_strength_section, self.V_d, self.section_capacity)
+
+                    self.F_wb = (self.bearing_length + 2.5 * (
+                                self.section_property.root_radius + self.section_property.flange_thickness)) * self.section_property.web_thickness * self.material_property.fy / (
+                                            self.gamma_m0 * 10 ** 3)
+                    if self.bending_strength_section > self.load.moment * 10 ** -6 and self.V_d > self.load.shear_force * 10 ** -3 and self.section_capacity > self.load.shear_force * 10 ** -3 and self.F_wb > self.load.shear_force * 10 ** -3:
+                        list_result, list_1 = self.list_changer(self, change='Web Buckling', check=True,
+                                                                list=list_result, list_name=list_1)
+                        self.optimum_section_ur.append(self.ur)
+                        # Step 3 - Storing the optimum results to a list in a descending order
+                        self.common_checks_1(self, section, 5, list_result, list_1)
                 else:
                     self.web_buckling = False
                     # 2.8 - UR
@@ -1431,8 +1438,8 @@ class Flexure(Member):
     def plate_girder_design(self, section):
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
             pass
-        d_red = self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
-        tau_b = self.load.shear_force / (d_red * self.section_property.web_thickness)
+        # d_red = self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
+        tau_b = self.load.shear_force / (self.d_red * self.section_property.web_thickness)
         if tau_b == self.fyw / math.sqrt(3):
             lambda_w = 0.8
         else:
@@ -1872,7 +1879,7 @@ class Flexure(Member):
                   Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
                                                         self.load.moment*10**-6, round(self.result_bending, 2),
                                                          round(self.result_UR, 2)),
-                  get_pass_fail(1.0, round(self.result_UR, 2), relation="greater"))
+                  get_pass_fail(1.0, round(self.result_UR, 2), relation="geq"))
             self.report_check.append(t1)
 
             if self.result_buckling_crippling:
@@ -1880,10 +1887,9 @@ class Flexure(Member):
                 self.report_check.append(t1)
 
                 t1 = (KEY_DISP_Web_Buckling_Support, self.load.shear_force * 10 ** -3,
-                      cl_7_1_2_design_compressive_strength(self.load.shear_force * 10 ** -3, round(self.result_shear, 2),
-                                              self.load.moment * 10 ** -6, round(self.result_bending, 2),
-                                              round(self.result_UR, 2)),
-                      get_pass_fail(1.0, round(self.result_UR, 2), relation="greater"))
+                      cl_7_1_2_design_compressive_strength(self.result_capacity,  round((self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness,2),
+                                              self.result_fcd, self.load.shear_force * 10 ** -3, 'b'),
+                      get_pass_fail(self.load.shear_force * 10 ** -3, self.result_capacity, relation="leq"))
                 self.report_check.append(t1)
             # if self.latex_tension_zone == True :
             #     t1 = (KEY_DISP_TENSION_HOLES, ' ',

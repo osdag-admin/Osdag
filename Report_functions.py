@@ -358,7 +358,7 @@ def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
     # slender = str(slender)
     slender_eqn = Math(inline=True)
     slender_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}\\'))
-    slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\\'))
+    slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\times 10^-3 \\'))
     if temp:
         slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r' \\'))
     else:
@@ -747,8 +747,70 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
+def cl_8_7_1_5_slenderness(r, d, l,sub = 'length'):
+    """
+    Author: Rutvik J
 
+    """
+    # temp = True if Pd > P else False
+    r = str(r)
+    d = str(d)
+    l = str(l)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}\lambda &= \frac{d_{eff}web} {r_{eff}web}\\'))
+    eqn.append(NoEscape(r' &= \frac{' + d + r' } {' + r + r'}\\'))
+    eqn.append(NoEscape(r'&= ' + l + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return eqn
+def cl_8_7_3_Ieff_web_check(b, t, I,sub = 'length'):
+    """
+    Author: Rutvik J
 
+    """
+    # temp = True if Pd > P else False
+    b = str(b)
+    t = str(t)
+    I = str(I)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}I_{eff}web &= \frac{bearing_' + sub + r'\times t_{web} ^ 3}{12}\\'))
+    eqn.append(NoEscape(r' &= \frac{' + b + r'\times' + t + r'^ 3}{12}\\'))
+    eqn.append(NoEscape(r'&= ' + I + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return eqn
+def cl_8_7_3_Aeff_web_check(b, t, A,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    b = str(b)
+    t = str(t)
+    A = str(A)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= bearing_' + sub + r'\times t_web \\'))
+    eqn.append(NoEscape(r' &= ' + b + r'\times' + t + r'\\'))
+    eqn.append(NoEscape(r'&= ' + A + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return eqn
+def cl_8_7_3_reff_web_check(r, I, A,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    r = str(r)
+    I = str(I)
+    A = str(A)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}r_{web} &= \frac{I_{eff}web} {A_{eff}web}\\'))
+    eqn.append(NoEscape(r' &= \frac{' + I + r' } {' + A + r'}\\'))
+    eqn.append(NoEscape(r'&= ' + r + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return eqn
 def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
                                    ):
     '''Author: Rutvik Joshi '''

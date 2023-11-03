@@ -1579,7 +1579,7 @@ class Flexure(Member):
         self.result_web_buckling_check = list_result[result_type]["Web.Buckling"]
         self.result_eff_d = list_result[result_type]["Reduced.depth"]
         self.result_buckling_crippling = list_result[result_type]["Buckling.crippling"]
-        
+
         self.result_section_class = list_result[result_type]["Section class"]
         self.result_effective_area = round(list_result[result_type]["Effective area"],2)
         if self.effective_area_factor < 1.0:
@@ -1884,6 +1884,30 @@ class Flexure(Member):
 
             if self.result_buckling_crippling:
                 t1 = ('SubSection', 'Web Buckling and Web Crippling', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_I_eff_latex, ' ',
+                      cl_8_7_3_Ieff_web_check(self.bearing_length, self.section_property.web_thickness,
+                                                           round(self.result_bcI_eff,2)),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_A_eff_latex, ' ',
+                      cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
+                                                           self.result_bcA_eff),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_r_eff_latex, ' ',
+                      cl_8_7_3_reff_web_check(round(self.result_bcr_eff,2), round(self.result_bcI_eff,2),
+                                                           self.result_bcA_eff),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_SLENDER, ' ',
+                      cl_8_7_1_5_slenderness(round(self.result_bcr_eff, 2), round(self.result_eff_d, 2),
+                                              self.result_eff_sr),
+                      ' ')
                 self.report_check.append(t1)
 
                 t1 = (KEY_DISP_Web_Buckling_Support, self.load.shear_force * 10 ** -3,

@@ -747,6 +747,83 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
+
+def cl_8_7_1_5_buckling_stress(E,slender,fcc):
+    """
+    Author: Rutvik J
+
+    """
+
+    E = str(E)
+    slender = str(slender)
+    fcc = str(fcc)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{\pi^2 E}{\lambda^2} \\'))
+    slender_eqn.append(NoEscape(r' &= \frac{3.14^2 \times' +  E + r'}{' + slender + r'^2} \\'))
+    slender_eqn.append(NoEscape(r' &= ' + fcc + r' \end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+
+def cl_8_7_1_5_phi(al, lm,phi):
+    """
+    Author: Rutvik J
+
+    """
+
+    al = str(al)
+    lm = str(lm)
+    phi = str(phi)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= 0.5(1 + \alpha(\lambda - 0.2) + \lambda ^ 2) \\'))
+    slender_eqn.append(NoEscape(r' &= 0.5(1+' +  al + r'(' + lm + r'-0.2) +' + lm +  r'^2)\\'))
+    slender_eqn.append(NoEscape(r' &= ' + phi + r' \end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+
+def cl_8_7_1_5_buckling_curve(sub = 'c'):
+    """
+    Author: Rutvik J
+
+    """
+
+    sub = str(sub)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= c \\'))
+
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return slender_eqn
+
+
+def cl_8_7_1_5_imperfection_factor(sub='0.49'):
+    """
+    Author: Rutvik J
+
+    """
+
+    sub = str(sub)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &='+ sub + r'\\'))
+
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return slender_eqn
+def cl_8_7_1_5_Buckling(f_y,gamma_,lambd,phi,sub1,sub='0.49'):
+    """
+    Author: Rutvik J
+
+    """
+
+    f_y = str(f_y)
+    gamma_ = str(gamma_)
+    phi = str(phi)
+    lambd = str(lambd)
+    sub = str(sub)
+    sub1 = str(sub1)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y \gamma_{mo}}{\phi + \sqrt{\phi^2 - \lambda^2}} \leq f_y / \gamma_{mo} \\'))
+    slender_eqn.append(NoEscape(r' &= \frac{' + f_y + r'\times' + gamma_+ r'}{' + phi + r'+\sqrt{'+phi+r'^2 - '+ lambd+r'^2}} \leq ' + f_y + r'/' + gamma_+r' \\'))
+    slender_eqn.append(NoEscape(r'&='+ sub + r'\leq ' + sub1 + r'\end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return slender_eqn
 def cl_8_7_1_5_slenderness(r, d, l,sub = 'length'):
     """
     Author: Rutvik J
@@ -774,7 +851,7 @@ def cl_8_7_3_Ieff_web_check(b, t, I,sub = 'length'):
     I = str(I)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}I_{eff}web &= \frac{bearing_' + sub + r'\times t_{web} ^ 3}{12}\\'))
+    eqn.append(NoEscape(r'\begin{aligned}I_{eff}web &= \frac{bearing_{' + sub + r'}\times t_{web} ^ 3}{12}\\'))
     eqn.append(NoEscape(r' &= \frac{' + b + r'\times' + t + r'^ 3}{12}\\'))
     eqn.append(NoEscape(r'&= ' + I + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
@@ -790,7 +867,7 @@ def cl_8_7_3_Aeff_web_check(b, t, A,sub = 'length'):
     A = str(A)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= bearing_' + sub + r'\times t_web \\'))
+    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= bearing_{' + sub + r'}\times t_web \\'))
     eqn.append(NoEscape(r' &= ' + b + r'\times' + t + r'\\'))
     eqn.append(NoEscape(r'&= ' + A + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
@@ -806,11 +883,33 @@ def cl_8_7_3_reff_web_check(r, I, A,sub = 'length'):
     A = str(A)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}r_{web} &= \frac{I_{eff}web} {A_{eff}web}\\'))
-    eqn.append(NoEscape(r' &= \frac{' + I + r' } {' + A + r'}\\'))
+    eqn.append(NoEscape(r'\begin{aligned}r_{web} &= \sqrt{\frac{I_{eff}web} {A_{eff}web}}\\'))
+    eqn.append(NoEscape(r' &= \sqrt{\frac{' + I + r' } {' + A + r'}}\\'))
     eqn.append(NoEscape(r'&= ' + r + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
     return eqn
+def cl_8_7_4_Bearing_stiffener_check(b,n, t, fy,gama,fw,r1,T):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    b = str(b)
+    t = str(t)
+    n = str(n)
+    fy = str(fy)
+    gama = str(gama)
+    fw = str(fw)
+    r1 = str(r1)
+    T = str(T)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}n_2 &= 2.5 (R1 + T)\\'))
+    eqn.append(NoEscape(r'&= 2.5 ('+ r1 + r'+'+ T + r')\\'))
+    eqn.append(NoEscape(r'&= '+ n + r'\\'))
+    eqn.append(NoEscape(r'F_w &= \frac{(bearing_{length} + n_2)t_{web}f_{yw}}{\gamma_mo}\\'))
+    eqn.append(NoEscape(r' &= \frac{' + b + r'+' + n + r')\times' + t + r'\times' + fy + r'}{'+ gama + r'}\\'))
+    eqn.append(NoEscape(r'&= ' + fw + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.4}] \end{aligned}'))
 def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
                                    ):
     '''Author: Rutvik Joshi '''

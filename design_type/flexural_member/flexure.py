@@ -1741,7 +1741,7 @@ class Flexure(Member):
 
             t1 = ('SubSection', 'Effective Area', '|p{4cm}|p{1.5cm}|p{9.5cm}|p{1cm}|')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_EFFECTIVE_AREA_PARA, ' ',
+            t1 = ('Effective Area (mm^2)', ' ',
                   sectional_area_change(self.result_effective_area, self.section_property.area,
                                         self.effective_area_factor),
                   ' ')
@@ -1783,7 +1783,7 @@ class Flexure(Member):
 
                 # t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
 
-                t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{2.5cm}|p{8cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
                     if self.result_high_shear:
@@ -1883,22 +1883,22 @@ class Flexure(Member):
             self.report_check.append(t1)
 
             if self.result_buckling_crippling:
-                t1 = ('SubSection', 'Web Buckling and Web Crippling', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+                t1 = ('SubSection', 'Web Buckling Checks ', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_I_eff_latex, ' ',
+                t1 = (KEY_DISP_I_eff_latex + '(mm^4)', ' ',
                       cl_8_7_3_Ieff_web_check(self.bearing_length, self.section_property.web_thickness,
                                                            round(self.result_bcI_eff,2)),
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_A_eff_latex, ' ',
+                t1 = (KEY_DISP_A_eff_latex+ '(mm^2)', ' ',
                       cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
                                                            self.result_bcA_eff),
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_r_eff_latex, ' ',
+                t1 = (KEY_DISP_r_eff_latex+ '(mm)', ' ',
                       cl_8_7_3_reff_web_check(round(self.result_bcr_eff,2), round(self.result_bcI_eff,2),
                                                            self.result_bcA_eff),
                       ' ')
@@ -1910,11 +1910,58 @@ class Flexure(Member):
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_Web_Buckling_Support, self.load.shear_force * 10 ** -3,
-                      cl_7_1_2_design_compressive_strength(self.result_capacity,  round((self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness,2),
-                                              self.result_fcd, self.load.shear_force * 10 ** -3, 'b'),
-                      get_pass_fail(self.load.shear_force * 10 ** -3, self.result_capacity, relation="leq"))
+                # t1 = (KEY_DISP_SLENDER, ' ',
+                #       cl_8_7_1_5_slenderness(round(self.result_bcr_eff, 2), round(self.result_eff_d, 2),
+                #                              self.result_eff_sr),
+                #       ' ')
+                # self.report_check.append(t1)
+
+                t1 = (KEY_DISP_BUCKLING_CURVE_ZZ, ' ',
+                      cl_8_7_1_5_buckling_curve(),
+                      ' ')
                 self.report_check.append(t1)
+
+                t1 = (KEY_DISP_IMPERFECTION_FACTOR_ZZ, ' ',
+                      cl_8_7_1_5_imperfection_factor(self.result_IF),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_EULER_BUCKLING_STRESS_ZZ + '(N/mm^2)', ' ',
+                      cl_8_7_1_5_buckling_stress(self.section_property.modulus_of_elasticity,self.result_eff_sr,self.result_ebs),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = ('\phi', ' ',
+                      cl_8_7_1_5_phi(0.49,self.result_eff_sr, self.result_phi_zz),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = ('Buckling stress(N/mm^2)', ' ',
+                      cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_eff_sr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = (KEY_DISP_BUCKLING_STRENGTH, self.load.shear_force * 10 ** -3,
+                      cl_7_1_2_design_compressive_strength(self.result_capacity,round((
+                                self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness,2), self.result_fcd,self.load.shear_force * 10 ** -3),
+                      get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_capacity, 2), relation="leq"))
+                self.report_check.append(t1)
+
+                t1 = ('SubSection', 'Web Bearing Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+                self.report_check.append(t1)
+
+                t1 = ('Bearing Strength' + '(kN)', ' ',
+                      cl_8_7_4_Bearing_stiffener_check(self.bearing_length, round(2.5 * (
+                                self.section_property.root_radius + self.section_property.flange_thickness),2),self.section_property.web_thickness,
+                                              self.material_property.fy,self.gamma_m0,round(self.result_crippling, 2),self.section_property.root_radius, self.section_property.flange_thickness),
+                      ' ')
+                self.report_check.append(t1)
+
+                # t1 = (KEY_DISP_A_eff_latex + '(mm^2)', ' ',
+                #       cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
+                #                               self.result_bcA_eff),
+                #       ' ')
+                # self.report_check.append(t1)
             # if self.latex_tension_zone == True :
             #     t1 = (KEY_DISP_TENSION_HOLES, ' ',
             #           sectional_area_change(self.result_effective_area, self.section_property.area,

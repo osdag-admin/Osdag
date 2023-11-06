@@ -247,11 +247,11 @@ class IS800_2007(object):
               )
 
         if classification_type == 'Neutral axis at mid-depth':
-            if ratio > (84 * epsilon):
+            if ratio < (84 * epsilon):
                 section_class = 'Plastic'
-            elif ratio <= (84 * epsilon) and ratio > (105 * epsilon):
+            elif ratio < (105 * epsilon):
                 section_class = 'Compact'
-            elif ratio <= (105 * epsilon) and ratio > (126 * epsilon):
+            elif ratio < (126 * epsilon):
                 section_class = 'Semi-Compact'
             else:
                 section_class = 'Slender'
@@ -935,8 +935,8 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_strength(Zp, Ze, fcd, section_class):
-        if section_class == 'plastic' or section_class == 'compact':
-            return Zp*fcd
+        if section_class == 'Plastic' or section_class == 'Compact':
+            return Zp * fcd
         else:
             return Ze * fcd
 
@@ -946,11 +946,13 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(phi_lt, lambda_lt):
-        return 1 / ( phi_lt + [phi_lt **2 - lambda_lt **2] ** 0.5)
+        return 1 / ( phi_lt + (phi_lt **2 - lambda_lt **2) ** 0.5)
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_phi_lt(alpha_lt, lambda_lt):
-        return 0.5[ 1 + alpha_lt ( lambda_lt - 0.2) + lambda_lt ** 2]
+        a = 0.5 * ( 1 + alpha_lt * ( lambda_lt - 0.2) + lambda_lt ** 2)
+        print(alpha_lt, lambda_lt, a)
+        return a
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):
@@ -958,12 +960,14 @@ class IS800_2007(object):
         return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
 
     @staticmethod
-    def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb):
-        if (betab * Zp * fy / Mcr) ** 0.5 <= (1.2 * Ze * fy / Mcr):
+    def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb = 0):
+        if (betab * Zp * fy / Mcr) ** 0.5 <= (1.2 * Ze * fy / Mcr) ** 0.5:
             return (betab * Zp * fy / Mcr) ** 0.5
+        else:
+            return (1.2 * Ze * fy / Mcr) ** 0.5
 
     @staticmethod
-    def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) -> float:
+    def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) :
         """ Calculate the Effective Length for Simply Supported Beams as per Table 15 Cl 8.3.1
 
         Args:
@@ -983,9 +987,9 @@ class IS800_2007(object):
         """
         if load == KEY_DISP_LOAD1:
             if Torsional == Torsion_Restraint1:
-                if Warping ==Warping_Restraint1 :
+                if Warping == Warping_Restraint1 :
                     length = 0.70 * length
-                if Warping ==Warping_Restraint2 :
+                if Warping == Warping_Restraint2 :
                     length = 0.75 * length
                 if Warping ==Warping_Restraint3 :
                     length = 0.80 * length
@@ -994,9 +998,9 @@ class IS800_2007(object):
                 if Warping ==Warping_Restraint5 :
                     length = 1.00 * length
             elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
-                length = length + 2* depth
+                length = length + 2* depth /1000
             elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
-                length = 1.2 * length + 2 *depth
+                length = 1.2 * length + 2 *depth /1000
         elif load == KEY_DISP_LOAD2:
             if Torsional == Torsion_Restraint1:
                 if Warping ==Warping_Restraint1 :
@@ -1010,9 +1014,9 @@ class IS800_2007(object):
                 if Warping ==Warping_Restraint5 :
                     length = 1.20 * length
             elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
-                length = 1.2 *length + 2* depth
+                length = 1.2 *length + 2* depth /1000
             elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
-                length = 1.4 * length + 2 *depth
+                length = 1.4 * length + 2 *depth /1000
         return length
 
     @staticmethod
@@ -1127,7 +1131,7 @@ class IS800_2007(object):
         return length
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
-    def cl_8_4_design_shear_strength(A_vg, f_y):
+    def cl_8_4_design_shear_strength(A_vg, f_y, gamma_m0):
         """ Calculate the design shear strength in yielding as per cl. 8.4
 
         Args:
@@ -1138,7 +1142,7 @@ class IS800_2007(object):
              Design shear strength in yielding of the component in N
 
         """
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        # gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         V_d = ((A_vg * f_y) / (math.sqrt(3) * gamma_m0))  # N
 
         return V_d

@@ -198,14 +198,14 @@ class Window(QMainWindow):
         return self.ui.get_right_elements()
 
     def open_summary_popup(self, main):
-
+        print('main.module_name',main.module_name(main))
         if not main.design_button_status:
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
-
-        if main.design_status:
+        if main.design_status and main.module_name(main) != KEY_DISP_FLEXURE:
             from osdagMainSettings import backend_name
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
+            print('off_display', off_display)
             self.commLogicObj.display = off_display
             current_component = self.commLogicObj.component
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
@@ -555,8 +555,8 @@ class Window(QMainWindow):
         in_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
         input_dp_conn_list = main.input_dictionary_without_design_pref(main)
-        # print(f'input_dp_conn_list {input_dp_conn_list}')
         input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
+        print(f'input_dp_conn_list {input_dp_conn_list}')
 
 
         """
@@ -564,7 +564,7 @@ class Window(QMainWindow):
         and creates the specified QT widgets, [Ref input_values function is any module for details]
         """
         option_list = main.input_values(self)
-        # print(f'setupui option_list {option_list}')
+        print(f'setupui option_list {option_list}')
 
         _translate = QtCore.QCoreApplication.translate
 
@@ -629,6 +629,48 @@ class Window(QMainWindow):
                     for disabled in option[6]:
                         combo.model().item(disabled).setEnabled(False)
 
+            if type == TYPE_COMBOBOX_FREEZE:
+                combo = QtWidgets.QComboBox(self.dockWidgetContents)
+                combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                combo.setMaxVisibleItems(1)
+                combo.setObjectName(option[0])
+                if option[0] in input_dp_conn_list:
+                    self.input_dp_connection(combo)
+                metrices = QtGui.QFontMetrics(font)
+                combo.setEnabled(False)
+
+                # item_width = 10
+                # (object_name, k2_key, typ, f, f1, f2) = option
+                # k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                # arg_list = []
+                # for ob_name in object_name:
+                #     key = self.dockWidgetContents.findChild(QtWidgets.QWidget, ob_name)
+
+                # k2.setEnabled(False)
+
+                # else:
+                #     k2.setEnabled(True)
+
+                # for item in option[3]:
+
+                #     combo.addItem(item)
+                   
+
+                #     item_width = max(item_width, metrices.boundingRect(item).width())
+                
+
+                # in_layout2.addWidget(combo, j, 2, 1, 1)
+
+                # if lable == 'Material':
+                #     combo.setCurrentIndex(1)
+                #     maxi_width_right = max(maxi_width_right+8, item_width)
+                # combo.view().setMinimumWidth(item_width + 25)
+
+                # if len(option) == 6:
+                #     for disabled in option[3]:
+                #         combo.model().item(disabled).setEnabled(False)
+                        
             if type == TYPE_TABLE_IN:
                 table_widget = QtWidgets.QTableWidget(self.dockWidgetContents)
                 table_widget.setObjectName(option[0])
@@ -790,7 +832,7 @@ class Window(QMainWindow):
                     data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                   if all_values_available not in disabled_values]
             try:
-                # print(f"<class 'AttributeError'>: {d} \n {new_list}")
+                print(f"<class 'AttributeError'>: {d} \n {new_list}")
                 d.get(new_list[0][0]).activated.connect(lambda: self.popup(d.get(new_list[0][0]), new_list,updated_list,data))
                 d.get(new_list[1][0]).activated.connect(lambda: self.popup(d.get(new_list[1][0]), new_list,updated_list,data))
                 d.get(new_list[2][0]).activated.connect(lambda: self.popup(d.get(new_list[2][0]), new_list,updated_list,data))
@@ -815,8 +857,10 @@ class Window(QMainWindow):
         else:
             for t in updated_list:
                 for key_name in t[0]:
+                    
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
                     self.on_change_connect(key_changed, updated_list, data, main)
+                    print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
@@ -1456,6 +1500,8 @@ class Window(QMainWindow):
         """
         for tup in new:
             (object_name, k2_key, typ, f) = tup
+            
+
             if k1.objectName() not in object_name:
                 continue
             if typ in [TYPE_LABEL, TYPE_OUT_LABEL]:
@@ -1477,7 +1523,10 @@ class Window(QMainWindow):
                 arg_list.append(key.currentText())
 
             val = f(arg_list)
-
+            print(f"\n object_name {object_name}")
+            print(f"\n k2_key {k2_key}")
+            print(f"\n typ {typ}")
+            print(f"\n k2 {k2}")
             if typ == TYPE_COMBOBOX:
                 k2.clear()
                 for values in val:
@@ -1643,6 +1692,8 @@ class Window(QMainWindow):
     def design_fn(self, op_list, data_list, main):
         design_dictionary = {}
         self.input_dock_inputs = {}
+        print(f"\n op_list {op_list}")
+        print(f"\n data_list{data_list}")
         for op in op_list:
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX:
@@ -1653,7 +1704,7 @@ class Window(QMainWindow):
                 module = op[1]
                 d1 = {op[0]: des_val}
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                des_val = data_list[op[0] + "_customized"]
+                des_val = data_list["Member.Designation" + "_customized"]
                 d1 = {op[0]: des_val}
             elif op[2] == TYPE_TEXTBOX:
                 des_val = widget.text()
@@ -1667,6 +1718,7 @@ class Window(QMainWindow):
             design_dictionary.update(d1)
 
             self.input_dock_inputs.update(d1)
+            print(f"\n self.input_dock_inputs{self.input_dock_inputs}")     
 
 
         for design_pref_key in self.design_pref_inputs.keys():
@@ -1698,23 +1750,23 @@ class Window(QMainWindow):
             else:
                 des_pref_input_list_updated = des_pref_input_list
 
-            # print(f"design_fn des_pref_input_list_updated = {des_pref_input_list_updated}\n")
+            print(f"design_fn des_pref_input_list_updated = {des_pref_input_list_updated}\n")
             for des_pref in des_pref_input_list_updated:
                 tab_name = des_pref[0]
                 input_type = des_pref[1]
                 input_list = des_pref[2]
                 tab = self.designPrefDialog.ui.findChild(QtWidgets.QWidget, tab_name)
-                # print(f"design_fn tab_name = {tab_name}\n")
-                # print(f"design_fn input_type = {input_type}\n")
-                # print(f"design_fn input_list = {input_list}\n")
-                # print(f"design_fn tab = {tab}\n")
+                print(f"design_fn tab_name = {tab_name}\n")
+                print(f"design_fn input_type = {input_type}\n")
+                print(f"design_fn input_list = {input_list}\n")
+                print(f"design_fn tab = {tab}\n")
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
                     if key is None:
                         continue
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
-                        # print(f"design_fn val = {val}\n")
+                        print(f"design_fn val = {val}\n")
                         design_dictionary.update({key_name: val})
                     elif input_type == TYPE_COMBOBOX:
                         val = key.currentText()
@@ -1725,8 +1777,8 @@ class Window(QMainWindow):
                 input_dock_key = without_des_pref[0]
                 input_list = without_des_pref[1]
                 input_source = without_des_pref[2]
-                # print(f"\n ========================Check===========================")
-                # print(f"\n self.design_pref_inputs.keys() {self.design_pref_inputs.keys()}")
+                print(f"\n ========================Check===========================")
+                print(f"\n self.design_pref_inputs.keys() {self.design_pref_inputs.keys()}")
                 for key_name in input_list:
                     if input_source == 'Input Dock':
                         design_dictionary.update({key_name: design_dictionary[input_dock_key]})
@@ -1740,9 +1792,9 @@ class Window(QMainWindow):
 
         self.design_inputs = design_dictionary
         self.design_inputs = design_dictionary
-        # print(f"\n self.input_dock_inputs {self.input_dock_inputs}")
-        # print(f"\n design_fn design_dictionary{self.design_inputs}")
-        # print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
+        print(f"\n self.input_dock_inputs {self.input_dock_inputs}")
+        print(f"\n design_fn design_dictionary{self.design_inputs}")
+        print(f"\n main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref(main)}")
 
     '''
     @author: Umair
@@ -1968,7 +2020,7 @@ class Window(QMainWindow):
             # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
-            # print(f"status{status}")
+            print(f"trigger_type{trigger_type}")
 
             if error is not None:
                 self.show_error_msg(error)
@@ -2027,9 +2079,9 @@ class Window(QMainWindow):
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
-                                                  KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COMPRESSION_COLUMN]:
+                                                  KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COMPRESSION_COLUMN]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
-                # print("common start")
+                print("common start")
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 # print("common start")
                 status = main.design_status
@@ -2514,10 +2566,11 @@ class Window(QMainWindow):
         key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
     def tab_change(self, key, tab, new, main):
-
+        print("key ", key)
+        print("obj name ", key.objectName())
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
-            if tab_name != tab.objectName() or key.objectName() not in key_list:
+            if tab_name != tab.objectName() or (key and key.objectName()) not in key_list:
                 continue
             arg_list = []
             for key_name in key_list:

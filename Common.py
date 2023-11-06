@@ -322,6 +322,7 @@ TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
 TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
+KEY_IMAGE_Y = 'Image_Y'
 KEY_IMAGE_two = 'Imagetwo'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
@@ -427,10 +428,16 @@ KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
 KEY_COMP_STRESS_YY = 'MinorDCS'
 KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
 ##Strut Design
+KEY_SHEAR_STRENGTH = 'Shear.Strength'
+KEY_MOMENT_STRENGTH = 'Moment.Strength'
+KEY_DISP_HIGH_SHEAR= 'High Shear Check'
+KEY_HIGH_SHEAR = 'Shear.High'
+KEY_DISP_DESIGN_STRENGTH_SHEAR = 'Design Shear Strength (kN)'
+KEY_DISP_DESIGN_STRENGTH_MOMENT = 'Design Moment Strength (kN)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Euler Buckling Stress (MPa)'
 KEY_EFF_SEC_AREA = 'MajorEffSecArea'
-KEY_DISP_EFF_SEC_AREA = 'Effective Sectional Area (mm2)'
+KEY_DISP_EFF_SEC_AREA = 'Effective Sectional Area (mm<sup>2</sup>)'
 KEY_EFF_LEN = 'Major.Effective_Length'
 KEY_DISP_EFF_LEN = 'Effective Length (m)'
 KEY_BUCKLING_CURVE = 'BucklingCurve'
@@ -501,6 +508,31 @@ KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
 #Flexure Members
+KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
+KEY_betab_constatnt= 'Beta.Constant'
+KEY_BUCKLING_STRENGTH= 'Buckling.Strength'
+KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'
+KEY_WEB_CRIPPLING= 'Crippling.Strength'
+KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
+KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
+KEY_DISP_Elastic_CM= 'Elastic Critical Moment (M<sub>cr</sub>)'
+KEY_DISP_T_constatnt= 'Torsional Constant (I<sub>t</sub>)(mm<sup>4</sup>)'
+KEY_DISP_W_constatnt= 'Warping Constant (I<sub>w</sub>)(mm<sup>6</sup>)'
+KEY_LTB= 'L.T.B.Details'
+KEY_Elastic_CM= 'Elastic.Moment'
+KEY_T_constatnt= 'T.Constant'
+KEY_W_constatnt= 'W.Constant'
+KEY_IMPERFECTION_FACTOR_LTB = 'Imperfection.LTB'
+KEY_SR_FACTOR_LTB = 'SR.LTB'
+KEY_NON_DIM_ESR_LTB = 'NDESR.LTB'
+# KEY_LTB= 'Lateral Torsional Buckling Details'
+KEY_WEB_BUCKLING= 'Web Buckling Details'
+KEY_BEARING_LENGTH = 'Bearing.Length'
+Simply_Supported_img = './ResourceFiles/images/ss_beam.png'
+Cantilever_img = './ResourceFiles/images/c_beam.jpeg'
+KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
+KEY_DISPP_LENGTH_OVERWRITE = 'Effective Length Parameter'
+KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
 KEY_SUPP_TYPE = 'Member.Type'
 DISP_TITLE_ISECTION = 'I Sections'
 KEY_DISP_FLEXURE = 'Flexural Members'
@@ -513,7 +545,7 @@ VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLE
 KEY_DISP_BENDING = 'Axis of Bending'
 KEY_DISP_BENDING1 = 'Major'
 KEY_DISP_BENDING2 = 'Minor'
-VALUES_BENDING_TYPE = list((KEY_DISP_BENDING1, KEY_DISP_BENDING2))
+VALUES_BENDING_TYPE = list((KEY_DISP_BENDING2, KEY_DISP_BENDING1))
 KEY_BENDING = 'Bending.type'
 KEY_SUPPORT = 'Flexure.Support'
 KEY_DISP_SUPPORT = 'Beam Conditions'
@@ -524,8 +556,10 @@ KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_
 # KEY_SUPPORT2 = 'SimpSupport.Warping'
 KEY_DISP_LENGTH_BEAM = 'Effective Span (m)'
 KEY_LOAD = 'Loading.Condition'
+KEY_DISP_LOAD = 'Loading Condition'
 KEY_DISP_LOAD1 ='Normal'
 KEY_DISP_LOAD2 = 'Destabilizing'
+KEY_DISP_LOAD_list = list((KEY_DISP_LOAD1, KEY_DISP_LOAD2))
 KEY_TORSIONAL_RES = 'Torsion.restraint'
 DISP_TORSIONAL_RES = 'Torsional restraint'
 Torsion_Restraint1 = 'Fully Restrained'
@@ -546,7 +580,7 @@ Support1 = 'Continous, with lateral restraint to top flange'
 Support2 = 'Continous, with partial torsional restraint'
 Support3 = 'Continous, with lateral and torsional restraint'
 Support4 = 'Restrained laterally, torsionally and against rotation on flange'
-Supprt_Restraint_list = list(( Torsion_Restraint1, Torsion_Restraint2, Torsion_Restraint3))
+Supprt_Restraint_list = list(( Support1, Support2, Support3, Support4))
 DISP_TOP_RES = 'Top restraint'
 KEY_SUPPORT_TYPE2 = 'Cantilever.Top'
 Top1 = 'Free'
@@ -718,7 +752,7 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
-VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
+VALUES_SECTYPE = ['Select Type','Beams and Columns','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
@@ -2119,6 +2153,7 @@ KEY_DISP_SEC_TYPE = 'Section Type'
 VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
@@ -2129,7 +2164,7 @@ KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 DISP_TITLE_SC = 'Supporting Condition'
 DISP_TITLE_STRUT = 'End Condition'
 KEY_END1 = 'End_1'
-KEY_END1_Y = 'End_1'
+KEY_END1_Y = 'End_1_Y'
 KEY_DISP_END1 = 'End 1'
 KEY_DISP_END1_Y = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
@@ -2138,7 +2173,7 @@ VALUES_END1_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END1_Y = ['Fixed', 'Hinged']
 
 KEY_END2 = 'End_2'
-KEY_END2_Y = 'End_2'
+KEY_END2_Y = 'End_2_Y'
 KEY_DISP_END2 = 'End 2'
 KEY_DISP_END2_Y = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
@@ -2463,8 +2498,64 @@ Same_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0p
                               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
 
-STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-               "p, li { white-space: pre-wrap; }\n"
-               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-               ) + Allowable_Utilization_Para + Effective_Area_Para
+OPTIMIZATION_TABLE_UI = str("""
+<div style="width:100%;">
+<table style="width:70%;" border="0">
+  <tr>
+    <th colspan="3" style="text-align:center;">Conditions of Restraint Supports</th>
+  </tr>
+  <tr>
+    <th>Sl No.</th>
+    <th>Torsional Restraint</th>
+    <th>Warping Restraint</th>
+  </tr>
+  <tr>
+    <td>(i)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(ii)</td>
+    <td>Fully restrained</td>
+    <td>Compression flange fully restrained</td>
+  </tr>
+  <tr>
+    <td>(iii)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(iv)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(v)</td>
+    <td>Fully restrained</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <tr>
+    <td>(vi)</td>
+    <td>Partially restrained by bottom flange support connection</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <tr>
+    <td>(vii)</td>
+    <td>Partially restrained by bottom flange bearing support</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <!-- Add more rows as needed -->
+</table>
+</div>
+</body></html>
+""")
+
+STRUT_OPTIMIZATION_DESCRIPTION = (
+    '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+    '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+    'p, li { white-space: pre-wrap; }\n'
+    '</style></head><body style="font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;">\n'
+) + Allowable_Utilization_Para + Effective_Area_Para + OPTIMIZATION_TABLE_UI
+
+
+

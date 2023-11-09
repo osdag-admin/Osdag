@@ -1175,13 +1175,15 @@ class IS800_2007(object):
         return M_d
 
     @staticmethod
-    def cl_8_4_2_1_web_buckling_stiff(d, tw, e):
+    def cl_8_4_2_1_web_buckling_stiff(d, tw, e,type = 1, kv = None):
         '''nominal shear strength, Vn,of webs with or without
         intermediate stiffeners as governed by buckling
 
         Author: Rutvik Joshi    '''
         d_tw = d / tw
-        if d_tw <= 67 * e:
+        if type == 1 and d_tw <= 67 * e:
+            return False
+        elif type == 2 and d_tw <= 67 * e * math.sqrt(kv/5.35):
             return False
         return True
 
@@ -1196,7 +1198,7 @@ class IS800_2007(object):
     #     Author: Rutvik Joshi    '''
 
     @staticmethod
-    def cl_8_4_2_2_K_v_Simple_postcritical(support, c, d):
+    def cl_8_4_2_2_K_v_Simple_postcritical(support, c = 0, d = 1):
 
         if support == 'only support':
             K_v = 5.35
@@ -1227,7 +1229,7 @@ class IS800_2007(object):
         if lambda_w <= 0.8:
             tau_b = fyw / math.sqrt(3)
         elif lambda_w < 1.2 and lambda_w > 0.8:
-            tau_b = (1 - 0.8(lambda_w - 0.8)) * fyw / math.sqrt(3)
+            tau_b = (1 - 0.8*(lambda_w - 0.8)) * fyw / math.sqrt(3)
         elif lambda_w >= 1.2:
             tau_b = fyw / (math.sqrt(3) * lambda_w ** 2)
 
@@ -1241,7 +1243,7 @@ class IS800_2007(object):
         return V_cr
 
     @staticmethod
-    def cl_8_4_2_2_TensionField(support, c, d, K_v, mu, tw, fyw, bf,tf, fyf,Nf, gamma_mo, A_v):
+    def cl_8_4_2_2_Mfr_TensionField(bf, tf, fyf, Nf, gamma_mo):
         '''based on the post-shear buckling
             strength, may be used for webs with
             intermediate transverse stiffeners, in addition
@@ -1251,40 +1253,66 @@ class IS800_2007(object):
             for the tension fields
 
         Author: Rutvik Joshi    '''
-        if support == 'only support':
-            K_v = 5.35
-        else:
-            if c/d < 1:
-                K_v = 4 + 5.35/(c/d)**2
-            else:
-                K_v = 5.35 + 4/(c/d)**2
 
-        tau_crc = (K_v * math.pi**2 * E)/(12*(1-mu**2)*(d/tw)**2)
-        lambda_w = math.sqrt(fyw/(math.sqrt(3) * tau_crc))
+        M_fr = 0.25 * bf * tf ** 3 * fyf * (1 - (Nf / (bf * tf * fyf / gamma_mo)) ** 2)
+        print(M_fr, 'M_fr')
+        return  M_fr
+    @staticmethod
+    def cl_8_4_2_2_TensionField( c, d, tw, fyw, bf,tf, fyf,Nf, gamma_mo, A_v,tau_b,V_p):
+        '''based on the post-shear buckling
+            strength, may be used for webs with
+            intermediate transverse stiffeners, in addition
+            to the transverse stiffeners at supports, provided
+            the panels adjacent to the panel under tension
+            field action, or the end posts provide anchorage
+            for the tension fields
 
-        if lambda_w <=0.8:
-            tau_b = fyw / math.sqrt(3)
-        elif lambda_w <1.2 and lambda_w > 0.8:
-            tau_b = (1-0.8(lambda_w-0.8 )) * fyw / math.sqrt(3)
-        elif lambda_w >= 1.2 :
-            tau_b =  fyw / (math.sqrt(3) * lambda_w **2)
-        d_tw = d / tw
-        phi = np.arctan(d/c)
-        M_fr = 0.25 * bf * tf**3 * fyf*(1-Nf/(bf * tf * fyf / gamma_mo))**2
-        s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi)
+        Author: Rutvik Joshi    '''
+
+        phi = math.atan(d/c) * 180/math.pi
+        M_fr = 0.25 * bf * tf**3 * fyf*(1-(Nf/(bf * tf * fyf / gamma_mo))**2)
+        print('phi',phi,'\n Nf',Nf,M_fr,'M_fr',phi*math.pi/180)
+        s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi*math.pi/180)
         if s <= c:
             pass
         else:
             s == c
-        w_tf = d * math.cos(phi) + (c-2*s)*math.sin(phi)
-        sai = 1.5 * tau_b * math.sin(2*phi)
+        w_tf = d * math.cos(phi*math.pi/180) + (c-2*s)*math.sin(phi*math.pi/180)
+        sai = 1.5 * tau_b * math.sin(2*phi*math.pi/180)
         fv = math.sqrt(fyw**2 - 3 * tau_b**2 + sai**2) - sai
-        V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi)
+        V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi*math.pi/180)/ 10 ** 3
         if V_tf <= V_p:
             pass
         else:
             V_tf == V_p
-        return V_tf
+        return phi,M_fr,s, w_tf,sai,fv,V_tf
+
+    @staticmethod
+    def cl_8_5_1_EndPanel(c, d, tw, fyw, bf, tf, fyf, Nf, gamma_mo, A_v, tau_b, V_p):
+        '''The design of end panels in girders in which the interior
+        panel (panel A) is designed using tension field action
+        shall be carried in accordance with the provisions given
+        herein.
+        only simple post critical method design
+        Author: Rutvik Joshi    '''
+
+        phi = math.atan(d / c) * 180 / math.pi
+        M_fr = 0.25 * bf * tf ** 3 * fyf * (1 - (Nf / (bf * tf * fyf / gamma_mo)) ** 2)
+        print('phi', phi, '\n Nf', Nf, M_fr, 'M_fr', phi * math.pi / 180)
+        s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi * math.pi / 180)
+        if s <= c:
+            pass
+        else:
+            s == c
+        w_tf = d * math.cos(phi * math.pi / 180) + (c - 2 * s) * math.sin(phi * math.pi / 180)
+        sai = 1.5 * tau_b * math.sin(2 * phi * math.pi / 180)
+        fv = math.sqrt(fyw ** 2 - 3 * tau_b ** 2 + sai ** 2) - sai
+        V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi * math.pi / 180) / 10 ** 3
+        if V_tf <= V_p:
+            pass
+        else:
+            V_tf == V_p
+        return phi, M_fr, s, w_tf, sai, fv, V_tf
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
 

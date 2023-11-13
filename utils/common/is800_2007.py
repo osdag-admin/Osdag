@@ -1211,13 +1211,14 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_4_2_2_tau_crc_Simple_postcritical(K_v, E,mu, d, tw):
-
+        print('K_v',K_v,'\n E',E,'\nmu',mu,' d',d,' tw',tw)
         tau_crc = (K_v * math.pi**2 * E)/(12*(1-mu**2)*(d/tw)**2)
 
         return tau_crc
 
     @staticmethod
     def cl_8_4_2_2_lambda_w_Simple_postcritical(fyw, tau_crc):
+        print('fyw',fyw,'\n tau_crc',tau_crc)
 
         lambda_w = math.sqrt(fyw/(math.sqrt(3) * tau_crc))
 
@@ -1225,7 +1226,7 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fyw):
-
+        print('fyw',fyw,' lambda_w',lambda_w)
         if lambda_w <= 0.8:
             tau_b = fyw / math.sqrt(3)
         elif lambda_w < 1.2 and lambda_w > 0.8:
@@ -1237,6 +1238,7 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_v):
+        print('tau_b',tau_b,'\n A_v',A_v)
 
         V_cr = A_v * tau_b
 
@@ -1254,7 +1256,7 @@ class IS800_2007(object):
 
         Author: Rutvik Joshi    '''
 
-        M_fr = 0.25 * bf * tf ** 3 * fyf * (1 - (Nf / (bf * tf * fyf / gamma_mo)) ** 2)
+        M_fr = 0.25 * bf * tf ** 2 * fyf * (1 - (Nf / (bf * tf * fyf / gamma_mo)) ** 2)
         print(M_fr, 'M_fr')
         return  M_fr
     @staticmethod
@@ -1270,7 +1272,7 @@ class IS800_2007(object):
         Author: Rutvik Joshi    '''
 
         phi = math.atan(d/c) * 180/math.pi
-        M_fr = 0.25 * bf * tf**3 * fyf*(1-(Nf/(bf * tf * fyf / gamma_mo))**2)
+        M_fr = 0.25 * bf * tf**2 * fyf*(1-(Nf/(bf * tf * fyf / gamma_mo))**2)
         print('phi',phi,'\n Nf',Nf,M_fr,'M_fr',phi*math.pi/180)
         s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi*math.pi/180)
         if s <= c:
@@ -1285,6 +1287,7 @@ class IS800_2007(object):
             pass
         else:
             V_tf == V_p
+            print('phi',phi,'\n M_fr',M_fr,'\n s',s, '\n c',c, '\n w_tf', w_tf, '\n sai',sai,'\n fv',fv,'\n V_tf',V_tf,'\n V_p',V_p)
         return phi,M_fr,s, w_tf,sai,fv,V_tf
 
     @staticmethod

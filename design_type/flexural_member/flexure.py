@@ -839,9 +839,14 @@ class Flexure(Member):
                      self.lambda_lt = self.input_section_classification[section][ 10 ]
                 self.beam_web_buckling(self)
                 if self.web_buckling_check:
-                    self.web_buckling_steps(self)
-                    continue
-                print(f"Common result {list_result, self.section_class, self.V_d, self.high_shear_check, self.bending_strength_section}")
+                    check = self.web_buckling_steps(self)
+                    if not check:
+                        continue
+                    else:
+                        self.high_shear_check = False
+                        self.bending_strength_section = self.bending_strength(self) / 10 ** 6
+
+                # print(f"Common result {list_result, self.section_class, self.V_d, self.high_shear_check, self.bending_strength_section}")
 
                 # 2.8 - UR
                 self.ur = round(
@@ -934,15 +939,14 @@ class Flexure(Member):
         if not self.web_buckling_check:
             self.web_not_buckling_steps(self)
     def web_buckling_steps(self):
-        print(f"Working web_buckling_steps")
+        # print(f"Working web_buckling_steps")
         # web_buckling_message = 'Thin web'
-        logger.warning("Thin web [Reference: Cl 8.2.1.1, IS 800:2007]")
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
             self.K_v = IS800_2007.cl_8_4_2_2_K_v_Simple_postcritical('only support')
             self.plate_girder_strength(self)
             logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
             if self.V_cr > self.load.shear_force * 10**-3:
-                logger.info('Intermediate Stiffeners not required')
+                self.V_d = self.V_cr
                 return True
             else:
                 return False
@@ -967,8 +971,9 @@ class Flexure(Member):
                     logger.info('Intermediate Stiffeners required c = {}, Section = {}, V_cr = {}'.format(self.c,
                                                                                                           self.section_property.designation,self.V_tf_girder))
                     if self.V_tf_girder > self.load.shear_force * 10**-3:
-                        break
-                return True
+                        self.V_d = self.V_tf_girder
+                        return True
+                return False
 
         logger.info(f"Considering  {self.support_cndition_shear_buckling}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
@@ -1539,10 +1544,10 @@ class Flexure(Member):
         self.lambda_w = IS800_2007.cl_8_4_2_2_lambda_w_Simple_postcritical(self.fyw,self.tau_crc)
         self.tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(self.lambda_w, self.fyw)
         self.V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(self.tau_b, self.effective_depth * self.section_property.web_thickness) / 10**3
+        print('\n plate_girder_strength', '\n tau_crc',self.tau_crc,'\n self.lambda_w',self.lambda_w,'\n self.tau_b',self.tau_b,'\n self.V_cr',self.V_cr)
     def plate_girder_strength2(self):
 
             self.plate_girder_strength(self)
-
             self.phi_girder, self.M_fr_girder ,self.s_girder ,self.wtf_girder,self.sai_girder, self.fv_girder, self.V_tf_girder= IS800_2007.cl_8_4_2_2_TensionField(self.c,
                                                                              self.effective_depth,self.section_property.web_thickness,
                                                                              self.fyw,self.section_property.flange_width,
@@ -1709,6 +1714,12 @@ class Flexure(Member):
         self.result_eff_len = round(list_result[result_type]["Effective_length"], 2)
         self.result_cost = list_result[result_type]["Cost"]
         self.result_betab = list_result[result_type]["Beta_b"]
+
+        if self.result_web_buckling_check :
+            logger.warning(
+                "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
+            if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+                logger.info('Transverse Stiffeners at supports required. Design not done for them')
 
         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
             self.result_mcr = round(list_result[result_type]['Mcr'], 2)

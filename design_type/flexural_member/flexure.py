@@ -844,7 +844,7 @@ class Flexure(Member):
                         continue
                     else:
                         self.high_shear_check = False
-                        self.bending_strength_section = self.bending_strength(self) / 10 ** 6
+                        self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
 
                 # print(f"Common result {list_result, self.section_class, self.V_d, self.high_shear_check, self.bending_strength_section}")
 
@@ -945,8 +945,9 @@ class Flexure(Member):
             self.K_v = IS800_2007.cl_8_4_2_2_K_v_Simple_postcritical('only support')
             self.plate_girder_strength(self)
             logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
-            if self.V_cr > self.load.shear_force * 10**-3:
-                self.V_d = self.V_cr
+            self.V_d = self.V_cr / self.gamma_m0
+            if self.V_d > self.load.shear_force * 10**-3:
+
                 return True
             else:
                 return False
@@ -970,8 +971,8 @@ class Flexure(Member):
                     self.plate_girder_strength2(self)
                     logger.info('Intermediate Stiffeners required c = {}, Section = {}, V_cr = {}'.format(self.c,
                                                                                                           self.section_property.designation,self.V_tf_girder))
-                    if self.V_tf_girder > self.load.shear_force * 10**-3:
-                        self.V_d = self.V_tf_girder
+                    self.V_d = self.V_tf_girder / self.gamma_m0
+                    if self.V_d > self.load.shear_force * 10**-3:
                         return True
                 return False
 
@@ -999,7 +1000,7 @@ class Flexure(Member):
 
     def bending_strength(self):
         print('Inside bending_strength ')
-        # 4 - design bending strength -preliminary
+        # 4 - design bending strength
         M_d = IS800_2007.cl_8_2_1_2_design_bending_strength(
             self.section_class,
             self.section_property.plast_sec_mod_z,
@@ -1008,7 +1009,7 @@ class Flexure(Member):
             self.gamma_m0,
             self.support,
         )
-        if self.section_class == 'plastic' or 'compact' :
+        if self.section_class == 'Plastic' or 'Compact' :
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = self.section_property.elast_sec_mod_z/self.section_property.plast_sec_mod_z
@@ -1021,7 +1022,7 @@ class Flexure(Member):
                     bending_strength_section = (
                         self.section_property.elast_sec_mod_z
                         * self.material_property.fy
-                        * self.gamma_m0
+                        / self.gamma_m0
                     )
             else:
                 bending_strength_section = M_d
@@ -1100,6 +1101,139 @@ class Flexure(Member):
                         * fbd
                     )
             print('Inside bending_strength 2',It,self.hf,self.Iw,self.M_cr ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
+        self.bending_strength_section_reduced = bending_strength_section
+        return bending_strength_section
+    def bending_strength_girder(self):
+        print('Inside bending_strength of girder ')
+        web_class = IS800_2007.Table2_i(
+            (self.section_property.flange_width - self.section_property.web_thickness)/2,
+            self.section_property.flange_thickness,
+            self.material_property.fy, self.section_property.type
+        )[0]
+        flange_class = IS800_2007.Table2_i(
+            self.section_property.depth - 2 * self.section_property.flange_thickness,
+            self.section_property.web_thickness,
+            self.material_property.fy,self.section_property.type
+        )[0]
+        if flange_class == "Slender" or web_class == "Slender":
+            self.section_class_girder = "Slender"
+        else:
+            if flange_class == "Plastic" and web_class == "Plastic":
+                self.section_class_girder = "Plastic"
+            elif flange_class == "Plastic" and web_class == "Compact":
+                self.section_class_girder = "Compact"
+            elif flange_class == "Plastic" and web_class == "Semi-Compact":
+                self.section_class_girder = "Semi-Compact"
+            elif flange_class == "Compact" and web_class == "Plastic":
+                self.section_class_girder = "Compact"
+            elif flange_class == "Compact" and web_class == "Compact":
+                self.section_class_girder = "Compact"
+            elif flange_class == "Compact" and web_class == "Semi-Compact":
+                self.section_class_girder = "Semi-Compact"
+            elif flange_class == "Semi-Compact" and web_class == "Plastic":
+                self.section_class_girder = "Semi-Compact"
+            elif flange_class == "Semi-Compact" and web_class == "Compact":
+                self.section_class_girder = "Semi-Compact"
+            elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
+                self.section_class_girder = "Semi-Compact"
+        # 4 - design bending strength
+        I_flange = 2 * (self.section_property.flange_width * self.section_property.flange_thickness**3/12 + self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth/2 - self.section_property.flange_thickness/2)**2)
+        Zez_flange = I_flange / self.section_property.depth /2
+        y_top = (self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth - self.section_property.flange_thickness)/2) / (self.section_property.flange_width * self.section_property.flange_thickness)
+        Zpz_flange = 2 * self.section_property.flange_width * self.section_property.flange_thickness * y_top
+        M_d = IS800_2007.cl_8_2_1_2_design_bending_strength(
+            self.section_class_girder,
+            Zpz_flange,
+            Zez_flange,
+            self.material_property.fy,
+            self.gamma_m0,
+            self.support,
+        )
+        if self.section_class_girder == 'Plastic' or 'Compact' :
+            self.beta_b_lt = 1
+        else :
+            self.beta_b_lt = Zez_flange/Zpz_flange
+        self.M_d = M_d
+        if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
+            if self.high_shear_check:
+                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                    bending_strength_section = self.bending_strength_reduction(self, M_d)
+                else:
+                    bending_strength_section = (
+                        self.section_property.elast_sec_mod_z
+                        * self.material_property.fy
+                        / self.gamma_m0
+                    )
+            else:
+                bending_strength_section = M_d
+            print('Inside bending_strength 1', M_d, self.high_shear_check, bending_strength_section)
+        else:
+            # self.It = (
+            #     2
+            #     * self.section_property.flange_width
+            #     * self.section_property.flange_thickness**3
+            # ) / 3 + (
+            #     (self.section_property.depth - self.section_property.flange_thickness)
+            #     * self.section_property.web_thickness**3
+            # ) / 3
+            self.hf = self.section_property.depth - self.section_property.flange_thickness
+            # self.Iw = 0.5**2 * self.section_property.mom_inertia_y * self.hf**2
+            self.fcrb = IS800_2007.cl_8_2_2_Unsupported_beam_bending_fcrb(
+                self.material_property.modulus_of_elasticity,
+                self.effective_length/self.section_property.rad_of_gy_y,
+                self.hf/self.section_property.flange_thickness
+            )
+
+            if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                self.beta_b_lt = 1.0
+            else:
+                self.beta_b_lt = (
+                    self.section_property.elast_sec_mod_z
+                    / self.section_property.plast_sec_mod_z
+                )
+            if self.section_property.type == "Rolled":
+                alpha_lt = 0.21
+            else:
+                alpha_lt = 0.49
+            lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment_fcrb(
+                self.material_property.fy, self.fcrb
+            )
+            phi_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_phi_lt(
+                alpha_lt, lambda_lt
+            )
+            X_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(
+                phi_lt, lambda_lt
+            )
+            fbd = IS800_2007.cl_8_2_2_Unsupported_beam_bending_compressive_stress(
+                X_lt, self.material_property.fy, self.gamma_m0
+            )
+            bending_strength_section = IS800_2007.cl_8_2_2_Unsupported_beam_bending_strength(
+                    self.section_property.plast_sec_mod_z,
+                    self.section_property.elast_sec_mod_z,
+                    fcd=fbd,
+                    section_class=self.section_class_girder
+                )
+
+
+            # self.beta_b_lt = beta_b
+            self.alpha_lt = alpha_lt
+            # self.lambda_lt = lambda_lt
+            self.phi_lt = phi_lt
+            self.X_lt = X_lt
+            self.fbd_lt = fbd
+            self.lateral_tb = self.fcrb * 10**-6
+            print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
+            if self.high_shear_check:
+                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                    bending_strength_section = self.bending_strength_reduction(self,Md=bending_strength_section
+                    )
+                else:
+                    bending_strength_section = (
+                        self.beta_b_lt
+                        * self.section_property.plast_sec_mod_z
+                        * fbd
+                    )
+            print('Inside bending_strength 2',It,self.hf,self.Iw,self.fcrb ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
         self.bending_strength_section_reduced = bending_strength_section
         return bending_strength_section
     def bending_strength_reduction(self, Md):

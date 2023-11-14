@@ -188,11 +188,11 @@ class IS800_2007(object):
 
         """
         epsilon = math.sqrt(250 / f_y)
-        # print(f" flange_class"
-        #       f" width {width}"
-        #       f" thickness {thickness}"
-        #       f" epsilon {epsilon}"
-        #       )
+        print(f" flange_class"
+              f" width {width}"
+              f" thickness {thickness}"
+              f" epsilon {epsilon}"
+              )
         ratio = width / thickness
 
         if section_type == 'Rolled':
@@ -966,12 +966,23 @@ class IS800_2007(object):
         return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
 
     @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_fcrb(E, Llt_ry, hf_tf):
+        ''' Author : Rutvik Joshi
+        Clauses: 8.2.2.1 and Annex E
+        '''
+        fcrb = 1.1 * math.pi**2 * E * (1 + (Llt_ry/hf_tf)**2/20)**0.5 / Llt_ry
+        return fcrb
+    @staticmethod
     def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb = 0):
         if (betab * Zp * fy / Mcr) ** 0.5 <= (1.2 * Ze * fy / Mcr) ** 0.5:
             return (betab * Zp * fy / Mcr) ** 0.5
         else:
             return (1.2 * Ze * fy / Mcr) ** 0.5
 
+    @staticmethod
+    def cl_8_2_2_1_elastic_buckling_moment_fcrb( fy, fcrb=0):
+
+        return math.sqrt(fy/fcrb)
     @staticmethod
     def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) :
         """ Calculate the Effective Length for Simply Supported Beams as per Table 15 Cl 8.3.1

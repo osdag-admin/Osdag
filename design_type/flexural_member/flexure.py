@@ -931,11 +931,12 @@ class Flexure(Member):
         print(f"Working web_buckling_check")
         # 3 - web buckling under shear
         self.web_buckling_check = IS800_2007.cl_8_2_1_web_buckling(
-            d=self.section_property.depth,
+            d=self.effective_depth,
             tw=self.section_property.web_thickness,
             e=self.epsilon,
         )
-        print(self.web_buckling_check)
+        print(self.web_buckling_check, self.section_property.designation)
+
         if not self.web_buckling_check:
             self.web_not_buckling_steps(self)
     def web_buckling_steps(self):
@@ -2000,25 +2001,23 @@ class Flexure(Member):
             t1 = ('SubSection', 'Effective Area', '|p{4cm}|p{1.5cm}|p{9.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t1 = ('Effective Area (mm^2)', ' ',
-                  sectional_area_change(self.result_effective_area, self.section_property.area,
+                  sectional_area_change(round(self.result_effective_area,2), round(self.section_property.area,2),
                                         self.effective_area_factor),
                   ' ')
             self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Web Slenderness Check', '|p{4cm}|p{4cm}|p{7cm}|p{1 cm}|')
+            t1 = ('SubSection', 'Web Slenderness Check', '|p{3cm}|p{4cm}|p{6cm}|p{3 cm}|')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_Web_Buckling, 67 * self.epsilon,
-                  cl_8_2_1web_buckling(self.result_eff_d, self.section_property.web_thickness,
+            t1 = (KEY_DISP_Web_Buckling, cl_8_2_1web_buckling_required(round(self.epsilon,2),round(67 * self.epsilon,2)),
+                  cl_8_2_1web_buckling_1(self.result_eff_d, self.section_property.web_thickness,
                                        round(self.result_eff_d / self.section_property.web_thickness,2), self.result_web_buckling_check),
-                  get_pass_fail(67 * self.epsilon, round(self.result_eff_d / self.section_property.web_thickness,2), relation="greater"))
+                  get_pass_fail(67 * self.epsilon, round(self.result_eff_d / self.section_property.web_thickness,2), relation="Custom"))
             self.report_check.append(t1)
             if self.result_web_buckling_check:
                 t1 = (KEY_DISP_Web_Buckling, 67 * self.epsilon,
-                      cl_8_2_1web_buckling(self.section_property.depth - 2(
-                          self.section_property.flange_thickness + self.section_property.root_radius),
+                      cl_8_2_1web_buckling(self.effective_depth,
                                            self.section_property.web_thickness,
-                                           (self.section_property.depth - 2(
-                                               self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness,
+                                           self.effective_depth / self.section_property.web_thickness,
                                            self.result_web_buckling_check),
                       ' ')
                 self.report_check.append(t1)

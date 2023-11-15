@@ -419,6 +419,46 @@ def cl_8_2_moment_capacity_member(Pmc, Mdc, M_c):
     M_c_eqn.append(NoEscape(r'&=' + M_c + r'\\ \\'))
     M_c_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2}] \end{aligned}'))
     return M_c_eqn
+def cl_8_2_1web_buckling_required(e,e1):
+    """
+    Author: Rutvik J
+
+    """
+
+
+    e = str(e)
+    e1 = str(e1)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= 67 \times \epsilon\\'))
+    # Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=67 \times' + e + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + e1 + r' \end{aligned}'))
+    # Pmc_eqn.append(NoEscape(r'[\text{Ref. IS 800:2007, Cl.8.2.1.1 }]'))
+
+
+    return Pmc_eqn
+def cl_8_2_1web_buckling_1(d, tw, e,T):
+    """
+    Author: Rutvik J
+
+    """
+
+    d = str(d)
+    tw = str(tw)
+    e = str(e)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{d_{web}}{t_{web}} = \frac{(D - 2(T + R1))}{t_{web}}\\'))
+    # Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + d + r'}{' + tw + r'}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + e + r'\\'))
+    # if T:
+    Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.1 }] '))
+    # else:
+    #     Pmc_eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] '))
+
+    Pmc_eqn.append(NoEscape(r'\end{aligned}'))
+
+    return Pmc_eqn
 def cl_8_2_1web_buckling(d, tw, e,T):
     """
     Author: Rutvik J
@@ -601,7 +641,7 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
         allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
     return allow_shear_capacity_eqn
-def sectional_area_change(given, provided, parameter):  # same as #todo anjali
+def sectional_area_change(given, provided, parameter):
     """
     Author: Rutvik J
 
@@ -612,8 +652,8 @@ def sectional_area_change(given, provided, parameter):  # same as #todo anjali
     parameter = str(parameter)
     Pmc_eqn = Math(inline=True)
     Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \text{Effective Area Parameter} \times \text{Area of Section}\\'))
-    Pmc_eqn.append(NoEscape(r'&=' + parameter + r'\times' + given + r'\\'))
-    Pmc_eqn.append(NoEscape(r'&=' + provided + r' \end{aligned}'))
+    Pmc_eqn.append(NoEscape(r'&=' + parameter + r'\times' + provided + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + given + r' \end{aligned}'))
     # Pmc_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
 
     return Pmc_eqn
@@ -3550,6 +3590,11 @@ def get_pass_fail(required, provided, relation='',M1 = '', M2 = ''):
                 return 'High Shear'
             else:
                 return 'Low Shear'
+        elif relation == 'Custom':
+            if required >= provided:
+                return 'Pass'
+            else:
+                return 'Method A'
         else:
             if required < provided:
                 return 'Pass'

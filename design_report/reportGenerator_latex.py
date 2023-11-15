@@ -302,6 +302,8 @@ class CreateLatex(Document):
                     # if module != KEY_DISP_FLEXURE:
                     if check[3] == 'Fail':
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
+                    elif check[3] == 'Method A':
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
                     else:
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("OsdagGreen", bold(check[3])))
                     table.add_hline()

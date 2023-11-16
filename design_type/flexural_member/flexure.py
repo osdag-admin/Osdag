@@ -955,10 +955,10 @@ class Flexure(Member):
             # self.V_d = IS800_2007.cl_8_4_2_2_ShearBuckling_Simple_postcritical((self.section_property.depth - 2 *(self.section_property.flange_thickness + self.section_property.root_radius),
             #                                                                     self.section_property.web_thickness,space,0.3, self.fyw))
         elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
-            # self.V_d = IS800_2007.cl_8_4_design_shear_strength(
-            #     self.shear_area,
-            #     self.material_property.fy
-            # ) / 10 ** 3
+            self.V_d = IS800_2007.cl_8_4_design_shear_strength(
+                self.shear_area,
+                self.material_property.fy
+            ) / 10 ** 3
             self.Mfr = IS800_2007.cl_8_4_2_2_Mfr_TensionField(self.section_property.flange_width,
                                                      self.section_property.flange_thickness, self.fyf,
                                                      self.load.moment / (
@@ -2067,23 +2067,35 @@ class Flexure(Member):
                   get_pass_fail(67 * self.epsilon, round(self.result_eff_d / self.section_property.web_thickness,2), relation="Custom"))
             self.report_check.append(t1)
             if self.result_web_buckling_check:
-                t1 = ('SubSection', 'Shear Strength Results: ' + self.support_cndition_shear_buckling, '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Shear Strength Results: ' + self.support_cndition_shear_buckling, '|p{5cm}|p{4cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
-                    t1 = (KEY_DISP_K_v_latex, cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling),
-                          ' ',
+                    t1 = (KEY_DISP_K_v_latex , ' ',cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling),
+
                           ' ')
                 elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
-                    t1 = (KEY_DISP_K_v_latex, cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling, self.result_web_buckling_simple_c,self.result_eff_d ),
-                          ' ',
+                    t1 = (KEY_DISP_K_v_latex, ' ',cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling, self.result_web_buckling_simple_c,self.result_eff_d ),
                           ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_Web_Buckling, 67 * self.epsilon,
-                      cl_8_2_1web_buckling(self.effective_depth,
-                                           self.section_property.web_thickness,
-                                           self.effective_depth / self.section_property.web_thickness,
-                                           self.result_web_buckling_check),
+                t1 = (KEY_DISP_Elastic_Critical_shear_stress_web, ' ',
+                      cl_8_4_2_2_taucrc(self.result_web_buckling_simple_kv, 2 * 10 ** 5, 0.3,
+                                        self.result_eff_d,
+                                        self.section_property.web_thickness,
+                                        self.result_web_buckling_simple_tau_crc),
+                      ' ')
+                self.report_check.append(t1)
+
+
+
+                t1 = (KEY_DISP_slenderness_ratio_web, ' ',
+                      cl_8_4_2_2_slenderness_ratio(self.fyw, self.result_web_buckling_simple_lambda_w,
+                                           self.result_web_buckling_simple_tau_crc),
+                      ' ')
+                self.report_check.append(t1)
+
+                t1 = (KEY_OUT_DISP_WELD_SHEAR_STRESS, ' ',
+                      cl_8_4_2_2_shearstress_web(self.fyw, self.result_web_buckling_simple_lambda_w, self.result_web_buckling_simple_tau_b),
                       ' ')
                 self.report_check.append(t1)
             else:

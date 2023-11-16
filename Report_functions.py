@@ -808,14 +808,67 @@ def cl_8_4_2_2_KV(kv, design = '', c=0,d=1):
             eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
             eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
         eqn.append(NoEscape(r'&=' + kv + r' \\'))
-
-    # eqn.append(NoEscape(r'&=\frac{0.7 \times' + d + r'}{' + tw + r'}\\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
-    # else:
-    #     eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] \end{aligned}'))
 
     return eqn
+def cl_8_4_2_2_taucrc(K_v, E,mu, d, tw,tau_crc ):
+    """
+    Author: Rutvik J
 
+    """
+    d = str(d)
+    mu = str(mu)
+    tw = str(tw)
+    tau_crc = str(tau_crc)
+    E = str(E)
+    K_v = str(K_v)
+    eqn = Math(inline=True)
+
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2} \\'))
+    eqn.append(NoEscape(r'&= \frac{'+K_v+ r'\pi^2 '+E+r'}{12(1-'+mu+r'^2)('+d+r'/'+tw+r')^2} \\'))
+    # eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')**2} \\'))
+        # else:
+        #     eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
+        #     eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
+    eqn.append(NoEscape(r'&=' + tau_crc + r' \end{aligned}'))
+    # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
+
+    return eqn
+def cl_8_4_2_2_slenderness_ratio(fyw, lamba,tau_crc ):
+    """
+    Author: Rutvik J
+
+    """
+    fyw = str(fyw)
+    lamba = str(lamba)
+    tau_crc = str(tau_crc)
+    eqn = Math(inline=True)
+
+    eqn.append(NoEscape(r'\begin{aligned} &= \sqrt{\frac{f_{yw}}{\sqrt{3}\tau_{crc}}} \\'))
+    eqn.append(NoEscape(r'&= \sqrt{\frac{'+ fyw + r'}{\sqrt{3}'+ tau_crc + r'}} \\'))
+    eqn.append(NoEscape(r'&=' + lamba + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_shearstress_web(fyw, lamba,tau_b ):
+    """
+    Author: Rutvik J
+
+    """
+    type = lamba
+    fyw = str(fyw)
+    lamba = str(lamba)
+    tau_b = str(tau_b)
+    eqn = Math(inline=True)
+    if type <= 0.8:
+        eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \\'))
+        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
+    elif type > 0.8 and type < 1.2:
+        eqn.append(NoEscape(r'\begin{aligned} &= (1 - 0.8(\lambda_w - 0.8))\frac{f_{yw}}{\sqrt{3}} \\'))
+        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
+    elif typ>= 1.2:
+        eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \lambda_w**2 \\'))
+        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3} \lambda_w^2} \\'))
+    eqn.append(NoEscape(r'&=' + tau_b + r' \end{aligned}'))
+    return eqn
 def cl_8_7_1_5_buckling_stress(E,slender,fcc):
     """
     Author: Rutvik J

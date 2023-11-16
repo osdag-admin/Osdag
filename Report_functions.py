@@ -788,6 +788,34 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
 
+def cl_8_4_2_2_KV(kv, design = '', c=0,d=1):
+    """
+    Author: Rutvik J
+
+    """
+    T = True if c/d < 1.0 else False
+    d = str(d)
+    c = str(c)
+    kv = str(kv)
+    eqn = Math(inline=True)
+    if design == KEY_DISP_SB_Option[0]:
+        eqn.append(NoEscape(r'\begin{aligned} &= 5.35\\'))
+    elif design == KEY_DISP_SB_Option[1]:
+        if T:
+            eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)**2} \\'))
+            eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')**2} \\'))
+        else:
+            eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
+            eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
+        eqn.append(NoEscape(r'&=' + kv + r' \\'))
+
+    # eqn.append(NoEscape(r'&=\frac{0.7 \times' + d + r'}{' + tw + r'}\\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
+    # else:
+    #     eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] \end{aligned}'))
+
+    return eqn
+
 def cl_8_7_1_5_buckling_stress(E,slender,fcc):
     """
     Author: Rutvik J

@@ -955,16 +955,16 @@ class Flexure(Member):
             # self.V_d = IS800_2007.cl_8_4_2_2_ShearBuckling_Simple_postcritical((self.section_property.depth - 2 *(self.section_property.flange_thickness + self.section_property.root_radius),
             #                                                                     self.section_property.web_thickness,space,0.3, self.fyw))
         elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
-            self.V_d = IS800_2007.cl_8_4_design_shear_strength(
-                self.shear_area,
-                self.material_property.fy
-            ) / 10 ** 3
-            Mfr = IS800_2007.cl_8_4_2_2_Mfr_TensionField(self.section_property.flange_width,
+            # self.V_d = IS800_2007.cl_8_4_design_shear_strength(
+            #     self.shear_area,
+            #     self.material_property.fy
+            # ) / 10 ** 3
+            self.Mfr = IS800_2007.cl_8_4_2_2_Mfr_TensionField(self.section_property.flange_width,
                                                      self.section_property.flange_thickness, self.fyf,
                                                      self.load.moment / (
                                                              self.section_property.depth - self.section_property.flange_thickness),
                                                      self.gamma_m0)
-            if Mfr > 0:
+            if self.Mfr > 0:
                 for c_d in range(3,26):
                     c_d = c_d/10 + 0.1
                     self.c = round(c_d * self.effective_depth, -1)
@@ -975,6 +975,8 @@ class Flexure(Member):
                     self.V_d = self.V_tf_girder / self.gamma_m0
                     if self.V_d > self.load.shear_force * 10**-3:
                         return True
+                return False
+            else:
                 return False
 
         logger.info(f"Considering  {self.support_cndition_shear_buckling}")
@@ -1601,6 +1603,33 @@ class Flexure(Member):
             "Cost",
             "Beta_b"
         ])
+        #Web buckling parameters
+        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+            list.extend(
+                [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
+                 self.V_cr])
+            list_name.extend([
+                'Kv',
+                'tau_crc',
+                'lambda_w',
+                'tau_b',
+                "V_cr"
+            ])
+        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+            list.extend(
+                [self.Mfr, self.load.moment / (
+                                                             self.section_property.depth - self.section_property.flange_thickness)
+                    , self.c, self.phi_girder,self.s_girder ,self.wtf_girder,self.sai_girder, self.fv_girder])
+            list_name.extend([
+                'Mfr',
+                'Nf',
+                'c',
+                'phi_girder',
+                "s_girder",
+                'wtf_girder',
+                'sai_girder',
+                'fv_girder',
+            ])
         if change == 'Web Buckling':
             list.extend([self.I_eff_web, self.A_eff_web, self.r, self.buckling_class,
                             self.imperfection_factor,
@@ -1855,6 +1884,26 @@ class Flexure(Member):
                 "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
             if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
                 logger.info('Transverse Stiffeners at supports required. Design not done for them')
+                self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
+                self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
+                self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
+                self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
+                self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
+            elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+                logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
+                self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
+                self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
+                self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
+                self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
+                self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
+                self.result_web_buckling_simple_Mfr = round(list_result[result_type]['Mfr'], 2)
+                self.result_web_buckling_simple_Nf = round(list_result[result_type]['Nf'], 2)
+                self.result_web_buckling_simple_c = round(list_result[result_type]['c'], 2)
+                self.result_web_buckling_simple_phi_girder = round(list_result[result_type]['phi_girder'], 2)
+                self.result_web_buckling_simple_s_girder = round(list_result[result_type]['s_girder'], 2)
+                self.result_web_buckling_simple_wtf_girder = round(list_result[result_type]['wtf_girder'], 2)
+                self.result_web_buckling_simple_sai_girder = round(list_result[result_type]['sai_girder'], 2)
+                self.result_web_buckling_simple_fv_girder = round(list_result[result_type]['fv_girder'], 2)
 
         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
             self.result_mcr = round(list_result[result_type]['Mcr'], 2)
@@ -1988,6 +2037,10 @@ class Flexure(Member):
                 KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
 
             })
+            if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
+                self.report_input.update({
+                    KEY_ShearBuckling: self.support_cndition_shear_buckling
+                })
             # self.report_input.update({
             #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
             #      "I Section - Mechanical Properties": "TITLE",
@@ -2014,6 +2067,18 @@ class Flexure(Member):
                   get_pass_fail(67 * self.epsilon, round(self.result_eff_d / self.section_property.web_thickness,2), relation="Custom"))
             self.report_check.append(t1)
             if self.result_web_buckling_check:
+                t1 = ('SubSection', 'Shear Strength Results: ' + self.support_cndition_shear_buckling, '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                self.report_check.append(t1)
+                if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+                    t1 = (KEY_DISP_K_v_latex, cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling),
+                          ' ',
+                          ' ')
+                elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+                    t1 = (KEY_DISP_K_v_latex, cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling, self.result_web_buckling_simple_c,self.result_eff_d ),
+                          ' ',
+                          ' ')
+                self.report_check.append(t1)
+
                 t1 = (KEY_DISP_Web_Buckling, 67 * self.epsilon,
                       cl_8_2_1web_buckling(self.effective_depth,
                                            self.section_property.web_thickness,

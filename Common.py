@@ -605,6 +605,8 @@ KEY_DISP_Web_Buckling_Support = 'Web Buckling @Support'
 KEY_DISP_I_eff_latex = 'I_{eff}web'
 KEY_DISP_A_eff_latex = 'A_{eff}web'
 KEY_DISP_r_eff_latex = 'r_{eff}web'
+KEY_DISP_K_v_latex = 'K_{v}'
+
 ###################################
 # All Input Keys
 ###################################

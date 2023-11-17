@@ -787,7 +787,62 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
+def cl_8_4_1_plastic_shear_resistance_Vp(h, t, f_y, V_p, multiple=1):
+    """
+    Calculate shear yielding capacity of  plate (provided)
+    Args:
+        h:  Plate ht in mm (float)
+        t:  Plate thickness in mm (float)
+        f_y:Yeild strength of  plate material in N/mm square (float)
+        gamma: IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  (float)
+        V_dg: Shear yeilding capacity of  plate in N (float)
+        multiple:2 (int)
+    Returns:
+         Shear yielding capacity of  plate
+     Note:
+            Reference:
+            IS 800:2007,  cl 10.4.3
+    """
 
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    V_dg = str(V_p)
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{p} &= \frac{A_v f_{y_w}}{\sqrt{3}} \\'))
+    if multiple == 1:
+        shear_yield_eqn.append(NoEscape(r'&=\frac{' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3}}\\'))
+    else:
+        multiple = str(multiple)
+        shear_yield_eqn.append(
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3}}\\'))
+
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
+    shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
+    return shear_yield_eqn
+def cl_8_4_2_2_Transverse_Stiffener_spacing(c):
+    """
+    Author: Rutvik J
+
+    """
+    # T = True if c/d < 1.0 else False
+    # d = str(d)
+    c = str(c)
+    # kv = str(kv)
+    eqn = Math(inline=True)
+    # if design == KEY_DISP_SB_Option[0]:
+    eqn.append(NoEscape(r'\begin{aligned} &=' + c + r' \end{aligned}'))
+    # elif design == KEY_DISP_SB_Option[1]:
+    #     if T:
+    #         eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)^22} \\'))
+    #         eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')^2} \\'))
+    #     else:
+    #         eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
+    #         eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
+    #     eqn.append(NoEscape(r'&=' + kv + r' \\'))
+    # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
+
+    return eqn
 def cl_8_4_2_2_KV(kv, design = '', c=0,d=1):
     """
     Author: Rutvik J
@@ -802,8 +857,8 @@ def cl_8_4_2_2_KV(kv, design = '', c=0,d=1):
         eqn.append(NoEscape(r'\begin{aligned} &= 5.35\\'))
     elif design == KEY_DISP_SB_Option[1]:
         if T:
-            eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)**2} \\'))
-            eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')**2} \\'))
+            eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)^22} \\'))
+            eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')^2} \\'))
         else:
             eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
             eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
@@ -825,7 +880,7 @@ def cl_8_4_2_2_taucrc(K_v, E,mu, d, tw,tau_crc ):
     eqn = Math(inline=True)
 
     eqn.append(NoEscape(r'\begin{aligned} &= \frac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2} \\'))
-    eqn.append(NoEscape(r'&= \frac{'+K_v+ r'\pi^2 '+E+r'}{12(1-'+mu+r'^2)('+d+r'/'+tw+r')^2} \\'))
+    eqn.append(NoEscape(r'&= \frac{'+K_v+ r'\times\pi^2 \times'+E+r'}{12(1-'+mu+r'^2)('+d+r'/'+tw+r')^2} \\'))
     # eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')**2} \\'))
         # else:
         #     eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
@@ -844,8 +899,8 @@ def cl_8_4_2_2_slenderness_ratio(fyw, lamba,tau_crc ):
     tau_crc = str(tau_crc)
     eqn = Math(inline=True)
 
-    eqn.append(NoEscape(r'\begin{aligned} &= \sqrt{\frac{f_{yw}}{\sqrt{3}\tau_{crc}}} \\'))
-    eqn.append(NoEscape(r'&= \sqrt{\frac{'+ fyw + r'}{\sqrt{3}'+ tau_crc + r'}} \\'))
+    eqn.append(NoEscape(r'\begin{aligned} &= \sqrt{\frac{f_{yw}}{\sqrt{3} \tau_{crc}}} \\'))
+    eqn.append(NoEscape(r'&= \sqrt{\frac{'+ fyw + r'}{\sqrt{3} \times '+ tau_crc + r'}} \\'))
     eqn.append(NoEscape(r'&=' + lamba + r' \end{aligned}'))
     return eqn
 def cl_8_4_2_2_shearstress_web(fyw, lamba,tau_b ):
@@ -863,11 +918,79 @@ def cl_8_4_2_2_shearstress_web(fyw, lamba,tau_b ):
         eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
     elif type > 0.8 and type < 1.2:
         eqn.append(NoEscape(r'\begin{aligned} &= (1 - 0.8(\lambda_w - 0.8))\frac{f_{yw}}{\sqrt{3}} \\'))
-        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
+        eqn.append(NoEscape(r' &= (1 - 0.8(' + lamba + r'- 0.8))\frac{'+fyw+r'}}{\sqrt{3}} \\'))
+        # eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
     elif typ>= 1.2:
-        eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \lambda_w**2 \\'))
-        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3} \lambda_w^2} \\'))
+        eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \lambda_w^2 \\'))
+        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}\times'+ lamba+r'^2} \\'))
     eqn.append(NoEscape(r'&=' + tau_b + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_shearstrength(d,t,Vcr,tau_b ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    t = str(t)
+    d = str(d)
+    Vcr = str(Vcr)
+    tau_b = str(tau_b)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
+    eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+
+    eqn.append(NoEscape(r'&=' + Vcr + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_TensionField_reduced_moment(Mfr,b,t,fy,Nf ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    Mfr = str(Mfr)
+    b = str(b)
+    t = str(t)
+    fy = str(fy)
+    Nf = str(Nf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} Mfr&= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+
+    eqn.append(NoEscape(r'&=' + Mfr + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_TensionField_phi(s ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    s = str(s)
+    # b = str(b)
+    # t = str(t)
+    # fy = str(fy)
+    # Nf = str(Nf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} s&= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+
+    eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_TensionField_anchorage_length(s ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    s = str(s)
+    # b = str(b)
+    # t = str(t)
+    # fy = str(fy)
+    # Nf = str(Nf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} s&= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+
+    eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
     return eqn
 def cl_8_7_1_5_buckling_stress(E,slender,fcc):
     """

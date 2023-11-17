@@ -606,8 +606,11 @@ KEY_DISP_I_eff_latex = 'I_{eff}web'
 KEY_DISP_A_eff_latex = 'A_{eff}web'
 KEY_DISP_r_eff_latex = 'r_{eff}web'
 KEY_DISP_K_v_latex = 'K_{v}'
-KEY_DISP_Elastic_Critical_shear_stress_web = '\text{Elastic Critical Shear Stress Web}(N/mm^2)'
+KEY_DISP_Elastic_Critical_shear_stress_web = 'Elastic Critical Shear Stress Web(N/mm^2)'
+KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners((mm^2)'
 KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio(\lambda_w)'
+KEY_DISP_BUCKLING_STRENGTH= 'Plastic Shear Strength (kN)'
+KEY_DISP_reduced_moment= 'Reduced moment (kNm)'
 
 ###################################
 # All Input Keys

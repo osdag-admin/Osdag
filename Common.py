@@ -611,6 +611,10 @@ KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners((mm^2)
 KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio(\lambda_w)'
 KEY_DISP_BUCKLING_STRENGTH= 'Plastic Shear Strength (kN)'
 KEY_DISP_reduced_moment= 'Reduced moment (kNm)'
+KEY_DISP_tension_field_incline= 'Tension field inclination(\phi)'
+KEY_DISP_tension_field_incline= 'Tension field inclination(\phi)'
+KEY_DISP_AnchoragelengthTensionField= 'Anchorage length of Tension Field(s)'
+KEY_DISP_WidthTensionField= 'Width of Tension Field(w_{tf})'
 
 ###################################
 # All Input Keys

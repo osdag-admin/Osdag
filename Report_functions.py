@@ -628,17 +628,17 @@ def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc, type = 'cantilev
 def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
     V_d = str(V_d)
     S_c = str(S_c)
-    check = str(check)
+    # check = str(check)
     load = str(load)
     allow_shear_capacity_eqn = Math(inline=True)
     allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
     if check:
-        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
         allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
 
     else:
-        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
         allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
     return allow_shear_capacity_eqn
 def sectional_area_change(given, provided, parameter):
@@ -918,14 +918,14 @@ def cl_8_4_2_2_shearstress_web(fyw, lamba,tau_b ):
         eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
     elif type > 0.8 and type < 1.2:
         eqn.append(NoEscape(r'\begin{aligned} &= (1 - 0.8(\lambda_w - 0.8))\frac{f_{yw}}{\sqrt{3}} \\'))
-        eqn.append(NoEscape(r' &= (1 - 0.8(' + lamba + r'- 0.8))\frac{'+fyw+r'}}{\sqrt{3}} \\'))
+        eqn.append(NoEscape(r' &= (1 - 0.8(' + lamba + r'- 0.8))\frac{'+fyw+r'}{\sqrt{3}} \\'))
         # eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
     elif typ>= 1.2:
         eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \lambda_w^2 \\'))
         eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}\times'+ lamba+r'^2} \\'))
     eqn.append(NoEscape(r'&=' + tau_b + r' \end{aligned}'))
     return eqn
-def cl_8_4_2_2_shearstrength(d,t,Vcr,tau_b ):
+def cl_8_4_2_2_shearstrength(d,t,Vcr,tau_b,strength ):
     """
     Author: Rutvik J
 
@@ -934,12 +934,13 @@ def cl_8_4_2_2_shearstrength(d,t,Vcr,tau_b ):
     t = str(t)
     d = str(d)
     Vcr = str(Vcr)
+    strength = str(strength)
     tau_b = str(tau_b)
     eqn = Math(inline=True)
     eqn.append(NoEscape(r'\begin{aligned} &= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
     eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
-
-    eqn.append(NoEscape(r'&=' + Vcr + r' \end{aligned}'))
+    eqn.append(NoEscape(r'&= \frac{'+Vcr+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&=' + strength + r' \end{aligned}'))
     return eqn
 def cl_8_4_2_2_TensionField_reduced_moment(Mfr,b,t,fy,Nf ):
     """
@@ -953,25 +954,24 @@ def cl_8_4_2_2_TensionField_reduced_moment(Mfr,b,t,fy,Nf ):
     fy = str(fy)
     Nf = str(Nf)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned} Mfr&= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
-    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
-
+    eqn.append(NoEscape(r'\begin{aligned} Mfr&= 0.25b_ft_f^2f_{yf}[1-\left\{ \frac{N_t}{b_ft_ff_{yf}/\gamma_{mo}}\right\}^2] \\'))
+    eqn.append(NoEscape(r'&= 0.25'+b+r'\times'+t+r'^2 \times'+ fy+r'\times[1-\left\{ \frac{'+Nf+r'}{'+b+r'\times'+t+r'\times'+ fy+r'/1.1}\right\}^2] \\'))
     eqn.append(NoEscape(r'&=' + Mfr + r' \end{aligned}'))
     return eqn
-def cl_8_4_2_2_TensionField_phi(s ):
+def cl_8_4_2_2_TensionField_phi(s,c,d ):
     """
     Author: Rutvik J
 
     """
     # Area = str(d * t)
     s = str(s)
-    # b = str(b)
-    # t = str(t)
+    c = str(c)
+    d = str(d)
     # fy = str(fy)
     # Nf = str(Nf)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned} s&= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
-    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'\begin{aligned} s&=\tan^{-1}(\frac{c}{d})\\'))
+    eqn.append(NoEscape(r'&= \tan^{-1}(\frac{'+c+r'}{'+d+r'}) \\'))
 
     eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
     return eqn

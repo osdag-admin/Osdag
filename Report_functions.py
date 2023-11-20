@@ -857,11 +857,11 @@ def cl_8_4_2_2_KV(kv, design = '', c=0,d=1):
         eqn.append(NoEscape(r'\begin{aligned} &= 5.35\\'))
     elif design == KEY_DISP_SB_Option[1]:
         if T:
-            eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)^22} \\'))
+            eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)^2} \\'))
             eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')^2} \\'))
         else:
-            eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
-            eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
+            eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)^2} \\'))
+            eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')^2} \\'))
         eqn.append(NoEscape(r'&=' + kv + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
 
@@ -992,6 +992,25 @@ def cl_8_4_2_2_TensionField_anchorage_length(s ):
 
     eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
     return eqn
+def cl_8_4_2_2_KEY_DISP_WidthTensionField(d,phi,c, s,wtf):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    d = str(d)
+    phi = str(phi)
+    c = str(c)
+    s = str(s)
+    wtf = str(wtf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}&= d\cos\phi+(c-2s)\sin\phi \\'))
+    eqn.append(NoEscape(r'&= '+d+r'\cos'+phi+r'+('+c+r'-2'+s+r')\sin'+phi+r' \\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&=' + wtf + r' \end{aligned}'))
+    return eqn
+
+
 def cl_8_7_1_5_buckling_stress(E,slender,fcc):
     """
     Author: Rutvik J

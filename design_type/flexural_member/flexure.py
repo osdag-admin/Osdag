@@ -2078,7 +2078,7 @@ class Flexure(Member):
                   get_pass_fail(67 * self.epsilon, round(self.result_eff_d / self.section_property.web_thickness,2), relation="Custom"))
             self.report_check.append(t1)
             if self.result_web_buckling_check:
-                t1 = ('SubSection', 'Shear Strength Results: ' + self.support_cndition_shear_buckling, '|p{5cm}|p{4cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Shear Strength Results: ' + self.support_cndition_shear_buckling, '|p{3.5cm}|p{1.5cm}|p{10cm}|p{1cm}|')
                 self.report_check.append(t1)
                 if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
                     t1 = (KEY_DISP_K_v_latex , ' ',cl_8_4_2_2_KV(self.result_web_buckling_simple_kv,self.support_cndition_shear_buckling),
@@ -2157,21 +2157,20 @@ class Flexure(Member):
 
 
                     t1 = (KEY_DISP_WidthTensionField , ' ',
-                          cl_8_4_2_2_KEY_DISP_WidthTensionField(self.result_web_buckling_simple_Mfr,
-                                                                 self.section_property.flange_width,
-                                                                 self.section_property.flange_thickness,
-                                                                 self.fyf, 0
+                          cl_8_4_2_2_KEY_DISP_WidthTensionField(self.result_eff_d,self.result_web_buckling_simple_phi_girder,
+                                                                 self.result_web_buckling_simple_c,
+                                                                 self.result_web_buckling_simple_s_girder,self.result_web_buckling_simple_wtf_girder
                                                                  ),
                           ' ')
                     self.report_check.append(t1)
-                    t1 = (KEY_DISP_reduced_moment + '(M_{fr}', ' ',
-                          cl_8_4_2_2_TensionField_reduced_moment(self.result_web_buckling_simple_Mfr,
-                                                                 self.section_property.flange_width,
-                                                                 self.section_property.flange_thickness,
-                                                                 self.fyf, 0
-                                                                 ),
-                          ' ')
-                    self.report_check.append(t1)
+                    # t1 = (KEY_DISP_reduced_moment + '(M_{fr}', ' ',
+                    #       cl_8_4_2_2_TensionField_reduced_moment(self.result_eff_d,
+                    #                                              self.result_web_buckling_simple_phi_girder,
+                    #                                              self.result_web_buckling_simple_c,
+                    #                                              self.result_web_buckling_simple_s_girder,self.result_web_buckling_simple_wtf_girder
+                    #                                              ),
+                    #       ' ')
+                    # self.report_check.append(t1)
                     t1 = (KEY_DISP_reduced_moment + '(M_{fr}', ' ',
                           cl_8_4_2_2_TensionField_reduced_moment(self.result_web_buckling_simple_Mfr,
                                                                  self.section_property.flange_width,

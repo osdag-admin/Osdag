@@ -2136,6 +2136,16 @@ class Flexure(Member):
                           ' ')
                     self.report_check.append(t1)
 
+                    t1 = ('N_f (N)', ' ',
+                          cl_8_4_2_2_N_f(self.section_property.depth,
+                                                                 self.section_property.flange_thickness,
+                                                                 self.section_property.depth - self.section_property.flange_thickness,
+                                         self.load.moment / (
+                                                 self.section_property.depth - self.section_property.flange_thickness), self.load.moment
+                                                                 ) * 10**-3,
+                          ' ')
+                    self.report_check.append(t1)
+
                     t1 = (KEY_DISP_reduced_moment + '(M_{fr})', ' ',
                           cl_8_4_2_2_TensionField_reduced_moment(self.result_web_buckling_simple_Mfr, self.section_property.flange_width,self.section_property.flange_thickness,
                                                                self.fyf, 0
@@ -2143,14 +2153,15 @@ class Flexure(Member):
                           ' ')
                     self.report_check.append(t1)
 
-                    t1 = (KEY_DISP_reduced_moment , ' ',
+                    t1 = (KEY_DISP_tension_field_incline , ' ',
                           cl_8_4_2_2_TensionField_phi(self.result_web_buckling_simple_phi_girder, self.result_web_buckling_simple_c,self.result_eff_d
                                                                  ),
                           ' ')
                     self.report_check.append(t1)
 
                     t1 = (KEY_DISP_AnchoragelengthTensionField, ' ',
-                          cl_8_4_2_2_TensionField_anchorage_length(self.result_web_buckling_simple_s_girder
+                          cl_8_4_2_2_TensionField_anchorage_length(self.result_web_buckling_simple_s_girder, self.result_web_buckling_simple_phi_girder,
+                          self.result_web_buckling_simple_Mfr, self.fyw, self.section_property.web_thickness
                                                                  ),
                           ' ')
                     self.report_check.append(t1)
@@ -2171,11 +2182,11 @@ class Flexure(Member):
                     #                                              ),
                     #       ' ')
                     # self.report_check.append(t1)
-                    t1 = (KEY_DISP_reduced_moment + '(M_{fr}', ' ',
-                          cl_8_4_2_2_TensionField_reduced_moment(self.result_web_buckling_simple_Mfr,
-                                                                 self.section_property.flange_width,
-                                                                 self.section_property.flange_thickness,
-                                                                 self.fyf, 0
+                    t1 = (KEY_DISP_Yield_Strength_Tension_field, ' ',
+                          cl_8_4_2_2_Yield_Strength_Tension_field(self.fyw,
+                                                                 self.result_web_buckling_simple_tau_b,
+                                                                 self.result_web_buckling_simple_phi_girder,
+                                                                 self.result_web_buckling_simple_fv_girder
                                                                  ),
                           ' ')
                     self.report_check.append(t1)

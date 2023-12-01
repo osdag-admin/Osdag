@@ -971,9 +971,9 @@ def cl_8_4_2_2_TensionField_reduced_moment(Mfr,b,t,fy,Nf ):
     fy = str(fy)
     Nf = str(Nf)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned} &= 0.25b_ft_f^2f_{yf}\left(1-\left\{ \frac{N_t}{b_ft_ff_{yf}/\gamma_{mo}}\right\}^2] \\'))
-    eqn.append(NoEscape(r'&= 0.25\times'+b+r'\times'+t+r'^2 \times'+ fy+r'\times\left(1-\left\{ \frac{'+Nf+r'}{'+b+r'\times'+t+r'\times'+ fy+r'/1.1}\right\}^2] \\'))
-    eqn.append(NoEscape(r'&=' + Mfr + r' \end{aligned}'))
+    eqn.append(NoEscape(r'\begin{aligned} &= 0.25b_ft_f^2f_{yf}\left\{1 - \left[\frac{N_f}{b_ft_ff_{yf}/\gamma_{mo}}\right]^2\right\} \\'))
+    eqn.append(NoEscape(r'&= 0.25\times'+b+r'\times'+t+r'^2 \times'+ fy+r'\times\left\{1-\left[\frac{'+Nf+r'}{'+b+r'\times'+t+r'\times'+ fy+r'/1.1}\right]^2\right\} \\'))
+    eqn.append(NoEscape(r'&=' + Mfr + r'\times 10^6 \end{aligned}'))
     return eqn
 def cl_8_4_2_2_TensionField_phi(s,c,d ):
     """
@@ -1004,7 +1004,7 @@ def cl_8_4_2_2_TensionField_anchorage_length(s,phi, Mfr ,fyw,tw):
     fyw = str(fyw)
     tw = str(tw)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned} &= \frac{2}{\sin\phi} \left(  \sqrt{\frac{M_{fr}}{f_{yw}t_w}} \right)\\'))
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{2}{\sin\phi} \left(  \sqrt{\frac{M_{fr}\times10^6}{f_{yw}t_w}} \right)\\'))
     eqn.append(NoEscape(r'&= \frac{2}{\sin'+phi+r'} \left(  \sqrt{\frac{'+Mfr+r'}{'+fyw+r'\times'+tw+r'}} \right)\\'))
     # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
     eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
@@ -1043,6 +1043,31 @@ def cl_8_4_2_2_Yield_Strength_Tension_field(fyw,taub,psi, fv):
     eqn.append(NoEscape(r'&= \sqrt{'+ fyw + r'^2 - 3'+ taub + r'^2 + '+ psi + r'^2} - '+ psi+ r'\\'))
     # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
     eqn.append(NoEscape(r'&=' + fv + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_shearstrength_tensionfield(A_v,tau_b,V_p,strength,tw, wtf,fv,phi,Vtf ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    temp = str(round(A_v * tau_b + 0.9 * wtf * tw * fv * math.sin(phi*math.pi/180)/ 10 ** 3,2))
+    A_v = str(A_v)
+    tau_b = str(tau_b)
+    V_p = str(V_p)
+    strength = str(strength)
+    tw = str(tw)
+    wtf = str(wtf)
+    fv = str(fv)
+    phi = str(phi)
+    Vtf = str(Vtf)
+
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}V_{tf} &= \left[ A_v\tau_b+0.9w_{tf}t_wf_v\sin\phi \right] \le V_p \\'))
+    eqn.append(NoEscape(r'&= \left[ '+A_v+r'\times'+tau_b+r'+0.9\times'+wtf+r'\times'+tw+r'\times'+fv+r'\times\sin'+phi+r'\right] \le '+V_p+r' \\'))
+    eqn.append(NoEscape(r'&='+Vtf+r'\le '+V_p+r' \\'))
+    eqn.append(NoEscape(r'V_d&=V_{tf}/ \gamma_{mo} \\'))
+    eqn.append(NoEscape(r'V_d&='+Vtf+r'/ 1.1 \\'))
+    eqn.append(NoEscape(r'&=' + strength + r' \end{aligned}'))
     return eqn
 def cl_8_7_1_5_buckling_stress(E,slender,fcc):
     """

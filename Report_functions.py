@@ -47,33 +47,70 @@ def cl_3_7_2_section_classification(class_of_section=None):
     """
 
     section_classification_eqn = Math(inline=True)
-    if class_of_section == int(1):
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Plastic} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
-    elif class_of_section == int(2):
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Compact} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    if class_of_section == int(1) or class_of_section == "Plastic":
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Plastic} \\ '))
+    elif class_of_section == int(2) or class_of_section == "Compact":
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Compact} \\ '))
+    elif class_of_section == int(3) or class_of_section == "Semi-Compact":
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Semi-Compact} \\ '))
     else:
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Semi-Compact} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \\ '))
+    section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
     return section_classification_eqn
 
-def cl_3_7_2_section_classification_with_equation(class_of_section=None):
+def cl_3_7_2_section_classification_web(d,t,result,epsilon,class_of_section=None):
     """
     Author: Rutvik Joshi (EMP-24, intern-23,22)
     """
-
-    section_classification_eqn = Math(inline=True)
-    if class_of_section == int(1):
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Plastic} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
-    elif class_of_section == int(2):
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Compact} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
-    else:
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Semi-Compact} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
-    return section_classification_eqn
+    d = str(d)
+    t = str(t)
+    # ratio = str(ratio)
+    result = str(result)
+    epsilon = str(epsilon)
+    class_of_section = str(class_of_section)
+    eqn = Math(inline=True)
+    if class_of_section == "Plastic":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 84\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(84*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
+    elif class_of_section == "Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 105\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(105*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
+    elif class_of_section == "Semi-Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 126\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(126*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
+    else :
+        eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \end{aligned}'))
+    return eqn
+def cl_3_7_2_section_classification_flange(d,t,result,epsilon,class_of_section=None):
+    """
+    Author: Rutvik Joshi (EMP-24, intern-23,22)
+    """
+    d = str(d)
+    t = str(t)
+    # ratio = str(ratio)
+    result = str(result)
+    epsilon = str(epsilon)
+    class_of_section = str(class_of_section)
+    eqn = Math(inline=True)
+    if class_of_section == "Plastic":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 9.4\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(9.4*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
+    elif class_of_section == "Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 10.5\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(10.5*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
+    elif class_of_section == "Semi-Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 15.7\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(15.7*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
+    else :
+        eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \end{aligned}'))
+    # eqn.append(NoEscape(r'& [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    return eqn
 def cl_5_4_1_table_4_5_gamma_value(v, t):
     """
     Calculate gamma value

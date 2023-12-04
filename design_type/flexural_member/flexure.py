@@ -777,7 +777,7 @@ class Flexure(Member):
                 designation=section, material_grade=self.material
             )
             self.material_property.connect_to_database_to_get_fy_fu(
-                self.material, max(self.section_property.flange_thickness, max(self.section_property.web_thickness, self.section_property.flange_thickness))
+                self.material, max(self.section_property.flange_thickness, self.section_property.web_thickness)
             )
             print(f"section_conect_database material_property.fy{self.material_property.fy}")
             self.epsilon = math.sqrt(250 / self.material_property.fy)
@@ -1611,7 +1611,7 @@ class Flexure(Member):
             "Beta_b"
         ])
         #Web buckling parameters
-        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+        if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
             list.extend(
                 [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
                  self.V_cr])
@@ -1622,7 +1622,7 @@ class Flexure(Member):
                 'tau_b',
                 "V_cr"
             ])
-        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+        if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] and self.web_buckling_check:
             list.extend(
                 [self.Mfr, self.load.moment / (
                                                              self.section_property.depth - self.section_property.flange_thickness)
@@ -2070,11 +2070,25 @@ class Flexure(Member):
                   ' ')
             self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Section Classification', '|p{4cm}|p{1.5cm}|p{9.5cm}|p{1cm}|')
+            t1 = ('SubSection', 'Section Classification', '|p{3cm}|p{3.5cm}|p{8.5cm}|p{1cm}|')
             self.report_check.append(t1)
-            t1 = ('Effective Area (mm^2)', ' ',
-                  sectional_area_change(round(self.result_effective_area, 2), round(self.section_property.area, 2),
-                                        self.effective_area_factor),
+            t1 = ('Web Class', 'Neutral Axis at Mid-Depth',
+                  cl_3_7_2_section_classification_web(round(self.effective_depth, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
+                                         self.epsilon,
+                                        self.input_section_classification[self.result_designation][2]),
+                  ' ')
+            self.report_check.append(t1)
+            t1 = ('Flange Class', self.section_property.type,
+                  cl_3_7_2_section_classification_flange(round(self.section_property.flange_width/2, 2),
+                                                      round(self.section_property.flange_thickness, 2), round(
+                          self.input_section_classification[self.result_designation][3], 2),
+                                                      self.epsilon,
+                                                      self.input_section_classification[self.result_designation][1]),
+                  ' ')
+            self.report_check.append(t1)
+            t1 = ('Section Class', ' ',
+                  cl_3_7_2_section_classification(
+                                                      self.input_section_classification[self.result_designation][0]),
                   ' ')
             self.report_check.append(t1)
 
@@ -2202,7 +2216,7 @@ class Flexure(Member):
                     t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR + '(V_{d})', self.load.shear_force * 10 ** -3,
                           cl_8_4_2_2_shearstrength_tensionfield(self.effective_depth * self.section_property.web_thickness, self.result_web_buckling_simple_tau_b,self.result_web_buckling_simple_V_p_girder,
                                                      self.result_shear,self.section_property.web_thickness, self.result_web_buckling_simple_wtf_girder, self.result_web_buckling_simple_fv_girder,
-                                                                self.result_web_buckling_simple_phi_girder, round(self.result_web_buckling_simple_fV_tf_girder * 10**-3),2),
+                                                                self.result_web_buckling_simple_phi_girder, round(self.result_web_buckling_simple_fV_tf_girder * 10**-3,2)),
                           ' ')
                     self.report_check.append(t1)
 

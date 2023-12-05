@@ -516,7 +516,7 @@ def cl_8_2_1web_buckling(d, tw, e,T):
         Pmc_eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] \end{aligned}'))
 
     return Pmc_eqn
-def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc):  # same as #todo anjali
+def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass,support):  # same as #todo anjali
     """
     Calculate member design moment capacity
     Args:
@@ -535,15 +535,34 @@ def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc):  # same 
 
     """
 
-    beta_b = str(beta_b)
+    if support == KEY_DISP_SUPPORT1:
+        res = str(round(1.2 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
+    else:
+        res = str(round(1.5 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
+    beta_actual = str(beta_b)
+    beta_b = str(round(Ze/Z_p,2))
+    Ze = str(Ze)
+    sclass = str(sclass)
     Z_p = str(Z_p)
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}} &= \frac{\beta_b Z_p fy}{\gamma_{m0}}\\'))
-    Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
-    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\\ \\'))
+    if sclass == 'Plastic' or sclass == 'Compact':
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+    elif sclass == 'Semi-Compact' :
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        Pmc_eqn.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if support == KEY_DISP_SUPPORT1:
+        Pmc_eqn.append(NoEscape(r'{M_{d}} &= \frac{\beta_b Z_p f_y}{\gamma_{m0}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_actual + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}  \leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+    else:
+        Pmc_eqn.append(NoEscape(
+            r' {M_{d}} &= \frac{\beta_b Z_p f_y}{\gamma_{m0}} \leq \frac{1.5Z_ef_y}{\gamma_{mo}}\\'))
+        Pmc_eqn.append(NoEscape(
+            r'&=\frac{' + beta_actual + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}  \leq \frac{1.5 \times' + Ze + r'\times' + f_y + r'}{' + gamma_m0 + r'\times 10^6}\\'))
+
+    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\leq ' + res + r' \\'))
     Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
     return Pmc_eqn
 def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc):  # same as #todo anjali
@@ -672,11 +691,11 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
     if check:
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
-        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
 
     else:
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
-        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
     return allow_shear_capacity_eqn
 def sectional_area_change(given, provided, parameter):
     """
@@ -1209,7 +1228,7 @@ def cl_8_7_3_Ieff_web_check(b, t, I,sub = 'length'):
     I = str(I)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}I_{eff}web &= \frac{bearing_{' + sub + r'}\times t_{web} ^ 3}{12}\\'))
+    eqn.append(NoEscape(r'\begin{aligned}I_{eff}web &= \frac{\text{bearing}_{' + sub + r'}\times t_{web} ^ 3}{12}\\'))
     eqn.append(NoEscape(r' &= \frac{' + b + r'\times' + t + r'^ 3}{12}\\'))
     eqn.append(NoEscape(r'&= ' + I + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
@@ -1225,7 +1244,7 @@ def cl_8_7_3_Aeff_web_check(b, t, A,sub = 'length'):
     A = str(A)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= bearing_{' + sub + r'}\times t_{web} \\'))
+    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= text{bearing}_{' + sub + r'}\times t_{web} \\'))
     eqn.append(NoEscape(r' &= ' + b + r'\times' + t + r'\\'))
     eqn.append(NoEscape(r'&= ' + A + r' \end{aligned}'))
     # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
@@ -1326,8 +1345,8 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
         eq.append(NoEscape(
             r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
-        eq.append(NoEscape(
-            r'&= ' + Md + r'\leq ' + res + r'\\'))
+        # eq.append(NoEscape(
+        #     r'&= ' + Md + r'\leq ' + res + r'\\'))
         # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
 
     else:
@@ -1336,10 +1355,11 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
         eq.append(NoEscape(
             r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
-        eq.append(NoEscape(
-            r'&= ' + Md + r'\\'))
-        eq.append(NoEscape(r'\leq ' + res + r'\leq ' + res + r'\\ '))
-
+        # eq.append(NoEscape(
+        #     r'&= ' + Md + r'\\'))
+        # eq.append(NoEscape(r'\leq ' + res + r'\leq ' + res + r'\\ '))
+    eq.append(NoEscape(
+        r'&= ' + Md + r'\leq ' + res + r'\\'))
     eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
     eq.append(NoEscape(r'&  \end{aligned}'))
     return eq

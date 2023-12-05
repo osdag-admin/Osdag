@@ -596,7 +596,7 @@ class Flexure(Member):
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = 'Flexure Member'
+        self.mainmodule = KEY_Flexure_Member_MAIN_MODULE
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.sec_list = design_dictionary[KEY_SECSIZE]
         print(f"\n Inside set_input_values{self.sec_profile}")
@@ -2064,7 +2064,7 @@ class Flexure(Member):
 
             t1 = ('SubSection', 'Effective Area', '|p{4cm}|p{1.5cm}|p{9.5cm}|p{1cm}|')
             self.report_check.append(t1)
-            t1 = ('Effective Area (mm^2)', ' ',
+            t1 = ('Effective Area ($mm^2$)', ' ',
                   sectional_area_change(round(self.result_effective_area,2), round(self.section_property.area,2),
                                         self.effective_area_factor),
                   ' ')
@@ -2282,7 +2282,7 @@ class Flexure(Member):
                           cl_8_2_1_2_moment_capacity_member(round(self.result_betab,2),
                                                                     self.section_property.plast_sec_mod_z,
                                                                     self.material_property.fy, self.gamma_m0,
-                                                                    round(self.result_bending, 2)),
+                                                                    round(self.result_bending, 2), self.section_property.elast_sec_mod_z,self.result_section_class,self.support),
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                     self.report_check.append(t1)
             elif self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
@@ -2325,7 +2325,7 @@ class Flexure(Member):
                           cl_8_2_1_2_moment_capacity_member(round(self.result_betab,2),
                                                                     self.section_property.plast_sec_mod_z,
                                                                     self.material_property.fy, self.gamma_m0,
-                                                                    round(self.result_bending, 2)),
+                                                                    round(self.result_bending, 2),self.section_property.elast_sec_mod_z,self.result_section_class,self.support),
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                     self.report_check.append(t1)
 
@@ -2343,13 +2343,13 @@ class Flexure(Member):
                 t1 = ('SubSection', 'Web Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_I_eff_latex + '(mm^4)', ' ',
+                t1 = (KEY_DISP_I_eff_latex + '($mm^4$)', ' ',
                       cl_8_7_3_Ieff_web_check(self.bearing_length, self.section_property.web_thickness,
                                                            round(self.result_bcI_eff,2)),
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_A_eff_latex+ '(mm^2)', ' ',
+                t1 = (KEY_DISP_A_eff_latex+ '($mm^2$)', ' ',
                       cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
                                                            self.result_bcA_eff),
                       ' ')
@@ -2361,7 +2361,7 @@ class Flexure(Member):
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_SLENDER + '(\lambda)', ' ',
+                t1 = (KEY_DISP_SLENDER + '($\lambda$)', ' ',
                       cl_8_7_1_5_slenderness(round(self.result_bcr_eff, 2), round(self.result_eff_d, 2),
                                               self.result_eff_sr),
                       ' ')
@@ -2378,7 +2378,7 @@ class Flexure(Member):
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_IMPERFECTION_FACTOR_ZZ + '(\alpha)', ' ',
+                t1 = (KEY_DISP_IMPERFECTION_FACTOR_ZZ + r'($\alpha$)', ' ',
                       cl_8_7_1_5_imperfection_factor(self.result_IF),
                       ' ')
                 self.report_check.append(t1)
@@ -2388,12 +2388,12 @@ class Flexure(Member):
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = ('\phi', ' ',
+                t1 = ('$\phi$', ' ',
                       cl_8_7_1_5_phi(0.49,self.result_eff_sr, self.result_phi_zz),
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = ('Buckling stress(N/mm^2)', ' ',
+                t1 = ('Buckling stress($N/mm^2$)', ' ',
                       cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_eff_sr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
                       ' ')
                 self.report_check.append(t1)

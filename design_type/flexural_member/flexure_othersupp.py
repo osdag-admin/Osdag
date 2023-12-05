@@ -182,7 +182,7 @@ class Flexure_Misc(Member):
     # Setting up logger and Input and Output Docks
     ####################################
     def module_name(self):
-        return KEY_DISP_FLEXURE
+        return KEY_DISP_FLEXURE3
 
     def set_osdaglogger(key):
         """
@@ -227,13 +227,13 @@ class Flexure_Misc(Member):
  
         '''
 
-        self.module = KEY_DISP_FLEXURE
+        self.module = KEY_DISP_FLEXURE3
         options_list = []
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
+        t1 = (KEY_MODULE, KEY_DISP_FLEXURE3, TYPE_MODULE, None, True, "No Validator")
         options_list.append(t1)
 
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') #'Beam and Column'

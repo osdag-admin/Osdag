@@ -51,6 +51,9 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.compression_member.Column import ColumnDesign
+from design_type.flexural_member.flexure import Flexure
+from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from design_type.flexural_member.flexure_othersupp import Flexure_Misc
 from gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -1846,6 +1849,12 @@ class Window(QMainWindow):
             return Tension_welded
         elif name == KEY_DISP_COMPRESSION_COLUMN:
             return ColumnDesign
+        elif name == KEY_DISP_FLEXURE:
+            return Flexure
+        elif name == KEY_DISP_FLEXURE2:
+            return Flexure_Cantilever
+        elif name == KEY_DISP_FLEXURE3:
+            return Flexure_Misc
         else:
             return GussetConnection
 # Function for getting inputs from a file

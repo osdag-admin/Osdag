@@ -2779,7 +2779,7 @@ class Member(Main):
         return optimum
     
     def optimization_tab_flexure_design(self, input_dictionary):
-        print(f"optimization_tab_strut_design input_dictionary {input_dictionary}")
+        print(f"optimization_tab_flexure_design input_dictionary {input_dictionary}")
         values = {
                    KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA',# , KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
                    KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]}#, KEY_BOLT_Number : '1.0', KEY_PLATETHK : '8'
@@ -2905,7 +2905,7 @@ class Member(Main):
 
         # if KEY_SEC_PROFILE in input_dictionary:
         #     if input_dictionary[KEY_SEC_PROFILE] == Profile_name_1:
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION , None)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
 
         #     elif input_dictionary[KEY_SEC_PROFILE] == Profile_name_2:
         #         t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, STRUT_OPTIMIZATION_DESCRIPTION + Double_angle_same_gusset + Same_Side_of_Gusset_Out_Plane + Same_Side_of_Gusset_In_Plane, None)

@@ -317,7 +317,10 @@ class OsdagMainWindow(QMainWindow):
                     ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
                     self.show_beamcolumn_module,
                 ],
-                'Plate Girder' : self.Under_Development,
+                'Plate Girder' : [ #TODO: Check number of sub modules required
+                    ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
+                    self.show_beamcolumn_module,
+                ],
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
                 '3D Frame' : self.Under_Development,

@@ -162,7 +162,7 @@ from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 from design_type.flexural_member.flexure import Flexure
 from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from design_type.flexural_member.flexure_othersupp import Flexure_Misc
-#from design_type.tension_member.tension import Tension
+from design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 # from cad.cad_common import call_3DBeam
 import APP_CRASH.Appcrash.api as appcrash
 import configparser
@@ -318,8 +318,8 @@ class OsdagMainWindow(QMainWindow):
                     self.show_beamcolumn_module,
                 ],
                 'Plate Girder' : [ #TODO: Check number of sub modules required
-                    ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
-                    self.show_beamcolumn_module,
+                    ('Welded Girder Design', 'ResourceFiles/images/broken.png', 'Welded_Girder_Design'),
+                    self.Show_Girder_Design,
                 ],
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
@@ -737,7 +737,12 @@ class OsdagMainWindow(QMainWindow):
             # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-
+    def Show_Girder_Design(self):
+        if self.findChild(QRadioButton, 'Welded_Girder_Design').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(PlateGirderWelded, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
 
 ################################# Help Actions ############################################
 

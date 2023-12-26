@@ -422,7 +422,10 @@ KEY_COMP_STRESS_ZZ = 'MajorDCS'
 KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
 KEY_COMP_STRESS_YY = 'MinorDCS'
 KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
+
+###################################
 ##Strut Design
+###################################
 KEY_SHEAR_STRENGTH = 'Shear.Strength'
 KEY_MOMENT_STRENGTH = 'Moment.Strength'
 KEY_DISP_HIGH_SHEAR= 'High Shear Check'
@@ -503,7 +506,9 @@ KEY_DISP_OPTIMIZATION_STEEL_COST = 'Cost'
 KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
+###################################
 #Flexure Members
+###################################
 KEY_Flexure_Member_MAIN_MODULE = 'Flexure Member'
 KEY_DISP_FLEXURE = 'Flexural Members - Simply Supported'
 KEY_DISP_FLEXURE2 = 'Flexural Members - Cantilever'
@@ -620,6 +625,19 @@ KEY_DISP_Yield_Strength_Tension_field = 'Yield Strength of Tension field(f_v)($N
 KEY_DISP_AnchoragelengthTensionField= 'Anchorage length of Tension Field(s)(mm)'
 KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
 
+###################################
+# Plate Girder
+###################################
+KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
+KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER - WELDED'
+KEY_tf = 'TF.Data'
+KEY_tw = 'TW.Data'
+KEY_dw = 'DW.Data'
+KEY_bf = 'BF.Data'
+KEY_DISP_tf = 'TF(mm)'
+KEY_DISP_tw = 'TW(mm)'
+KEY_DISP_dw = 'DW(mm)'
+KEY_DISP_bf = 'BF(mm)'
 ###################################
 # All Input Keys
 ###################################

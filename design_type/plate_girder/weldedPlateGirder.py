@@ -31,7 +31,28 @@ from design_type.tension_member import *
 from utils.common.Section_Properties_Calculator import BBAngle_Properties
 from utils.common import is800_2007
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import I_sectional_Properties
 
+class Custom_Girder(Material):
+    def __init__(self, material_grade, design_dictionary):
+        super(Custom_Girder,self).__init__(material_grade)
+        self.flange_thickness = float(design_dictionary[KEY_tf])
+        self.depth = float(design_dictionary[KEY_dw]) + 2* self.flange_thickness
+        self.flange_width = float(design_dictionary[KEY_bf])
+        self.web_thickness = float(design_dictionary[KEY_tw])
+        self.flange_slope = 90
+        self.root_radius = 0
+        self.toe_radius = 0
+        self.mass = round(I_sectional_Properties().calc_Mass(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.area = round(I_sectional_Properties().calc_Area(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.mom_inertia_z = round(I_sectional_Properties().calc_MomentOfAreaZ(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.mom_inertia_y = round(I_sectional_Properties().calc_MomentOfAreaY(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.rad_of_gy_z = round(I_sectional_Properties().calc_RogZ(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.rad_of_gy_y = round(I_sectional_Properties().calc_RogY(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.elast_sec_mod_z = round(I_sectional_Properties().calc_ElasticModulusZz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.elast_sec_mod_y = round(I_sectional_Properties().calc_ElasticModulusZy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.plast_sec_mod_y = round(I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
 
 class PlateGirderWelded(Member):
 
@@ -85,7 +106,7 @@ class PlateGirderWelded(Member):
          It returns list of tuple which contains, tab name, input widget type of keys, keys whose values to be saved,
 
          [(Tab Name, input widget type of keys, [List of keys to be saved])]
-
+        TODO : Material pop-up
          """
         design_input = []
 
@@ -98,17 +119,19 @@ class PlateGirderWelded(Member):
         design_input = []
         t2 = (None, [KEY_DP_DESIGN_METHOD], '')
         design_input.append(t2)
-
+        
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
         return design_input
     
     def get_values_for_design_pref(self, key, design_dictionary):
-        # if design_dictionary[KEY_MATERIAL] != 'Select Material':
-        #     material = Material(design_dictionary[KEY_MATERIAL], 41)
-        #     fu = material.fu
-        #     fy = material.fy
-        # else:
-        #     fu = ''
-        #     fy = ''
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            material = Material(design_dictionary[KEY_MATERIAL], 41)
+            fu = material.fu
+            fy = material.fy
+        else:
+            fu = ''
+            fy = ''
 
         val = {
         
@@ -174,7 +197,9 @@ class PlateGirderWelded(Member):
         options_list.append(t1)
         t1 = (KEY_bf, KEY_DISP_bf, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t1)
-
+        
+        t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        options_list.append(t4)
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH_BEAM, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
@@ -187,12 +212,16 @@ class PlateGirderWelded(Member):
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
+        t8 = (KEY_IntermediateStiffener, KEY_DISP_IntermediateStiffener, TYPE_COMBOBOX, ['Yes','No'], True, 'No Validator')
+        options_list.append(t8)
+
         return options_list
 
     def input_value_changed(self):
 
         lst = []
-
+        t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t3)
         return lst
 
     def output_values(self, flag):
@@ -214,34 +243,33 @@ class PlateGirderWelded(Member):
         print(f'func_for_validation option_list {option_list}'
             f"\n  design_dictionary {design_dictionary}"
               )
-        # for option in option_list:
-        #     if option[2] == TYPE_TEXTBOX or option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
-        #         if design_dictionary[option[0]] == '':
-        #             missing_fields_list.append(option[1])
-        #             continue
-        #         if option[0] == KEY_LENGTH:
-        #             if float(design_dictionary[option[0]]) <= 0.0:
-        #                 print("Input value(s) cannot be equal or less than zero.")
-        #                 error = "Input value(s) cannot be equal or less than zero."
-        #                 all_errors.append(error)
-        #             else:
-        #                 flag1 = True
-        #         elif option[0] == KEY_SHEAR:
-        #             if float(design_dictionary[option[0]]) <= 0.0:
-        #                 print("Input value(s) cannot be equal or less than zero.")
-        #                 error = "Input value(s) cannot be equal or less than zero."
-        #                 all_errors.append(error)
-        #             else:
-        #                 flag2 = True
-        #         elif option[0] == KEY_MOMENT:
-        #             if float(design_dictionary[option[0]]) <= 0.0:
-        #                 print("Input value(s) cannot be equal or less than zero.")
-        #                 error = "Input value(s) cannot be equal or less than zero."
-        #                 all_errors.append(error)
-        #             else:
-        #                 flag3 = True
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+                    continue
+                if option[0] == KEY_LENGTH:
+                    if float(design_dictionary[option[0]]) <= 0.0:
+                        print("Input value(s) cannot be equal or less than zero.")
+                        error = "Input value(s) cannot be equal or less than zero."
+                        all_errors.append(error)
+                    else:
+                        flag1 = True
+                elif option[0] == KEY_SHEAR:
+                    if float(design_dictionary[option[0]]) < 0.0:
+                        print("Input value(s) cannot be less than zero.")
+                        error = "Input value(s) cannot be less than zero."
+                        all_errors.append(error)
+                    else:
+                        flag2 = True
+                elif option[0] == KEY_MOMENT:
+                    if float(design_dictionary[option[0]]) < 0.0:
+                        print("Input value(s) cannot be less than zero.")
+                        error = "Input value(s) cannot be less than zero."
+                        all_errors.append(error)
+                    else:
+                        flag3 = True
   
-
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
@@ -257,6 +285,16 @@ class PlateGirderWelded(Member):
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
         out_list = []
+        self.length = float(design_dictionary[KEY_LENGTH])
+        self.material = design_dictionary[KEY_SEC_MATERIAL]
+
+        self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT])
+        self.section_property = Custom_Girder(self.material,design_dictionary)
+        self.length = design_dictionary[KEY_LENGTH]
+        def design():
+            pass
+
+
 
     def results(self, design_dictionary):
 

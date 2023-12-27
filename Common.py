@@ -638,6 +638,9 @@ KEY_DISP_tf = 'TF(mm)'
 KEY_DISP_tw = 'TW(mm)'
 KEY_DISP_dw = 'DW(mm)'
 KEY_DISP_bf = 'BF(mm)'
+KEY_IntermediateStiffener = 'IntermediateStiffener.Data'
+KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
+
 ###################################
 # All Input Keys
 ###################################

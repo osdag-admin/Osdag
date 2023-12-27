@@ -1632,7 +1632,7 @@ class Window(QMainWindow):
             self.output_title_fields[no_field_title][0].setVisible(False)
 
     def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
-
+        print(f"key={key} \n titles={titles} ")
         if visible_fields == 0:
             if key in titles:
                 self.output_title_fields[key + str(title_repeat)][0].setVisible(False)

@@ -43,16 +43,16 @@ class Custom_Girder(Material):
         self.flange_slope = 90
         self.root_radius = 0
         self.toe_radius = 0
-        self.mass = round(I_sectional_Properties().calc_Mass(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.area = round(I_sectional_Properties().calc_Area(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.mom_inertia_z = round(I_sectional_Properties().calc_MomentOfAreaZ(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.mom_inertia_y = round(I_sectional_Properties().calc_MomentOfAreaY(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.rad_of_gy_z = round(I_sectional_Properties().calc_RogZ(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.rad_of_gy_y = round(I_sectional_Properties().calc_RogY(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.elast_sec_mod_z = round(I_sectional_Properties().calc_ElasticModulusZz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.elast_sec_mod_y = round(I_sectional_Properties().calc_ElasticModulusZy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
-        self.plast_sec_mod_y = round(I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius))
+        self.mass = round(I_sectional_Properties().calc_Mass(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**1)
+        self.area = round(I_sectional_Properties().calc_Area(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**2)
+        self.mom_inertia_z = round(I_sectional_Properties().calc_MomentOfAreaZ(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**4)
+        self.mom_inertia_y = round(I_sectional_Properties().calc_MomentOfAreaY(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**4)
+        self.rad_of_gy_z = round(I_sectional_Properties().calc_RogZ(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**1)
+        self.rad_of_gy_y = round(I_sectional_Properties().calc_RogY(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**1)
+        self.elast_sec_mod_z = round(I_sectional_Properties().calc_ElasticModulusZz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
+        self.elast_sec_mod_y = round(I_sectional_Properties().calc_ElasticModulusZy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
+        self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
+        self.plast_sec_mod_y = round(I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
 
 class PlateGirderWelded(Member):
 
@@ -227,7 +227,12 @@ class PlateGirderWelded(Member):
     def output_values(self, flag):
 
         out_list = []
+        t1 = (None, DISP_TITLE_STRUT_SECTION, TYPE_TITLE, None, True)
 
+        out_list.append(t1)
+        t2 = (KEY_betab_constatnt, KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
+              'NA', True)
+        out_list.append(t2)
         return out_list
 
     def func_for_validation(self, design_dictionary):
@@ -244,6 +249,7 @@ class PlateGirderWelded(Member):
             f"\n  design_dictionary {design_dictionary}"
               )
         for option in option_list:
+            print(option_list)
             if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
@@ -269,6 +275,8 @@ class PlateGirderWelded(Member):
                         all_errors.append(error)
                     else:
                         flag3 = True
+            # if option[0] == KEY_tf or option[0] == KEY_tw or option[0] == KEY_dw or option[0] == KEY_bf:
+            #     if design_dictionary[option[0]]
   
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -281,18 +289,48 @@ class PlateGirderWelded(Member):
             self.set_input_values(self, design_dictionary)
         else:
             return all_errors
-
+    def isfloat(input_list):
+        for i in range(1,5):
+            try:
+                print(input_list[i])
+                yield isinstance(float(input_list[i]),float)
+            except:
+                yield False
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
         out_list = []
         self.length = float(design_dictionary[KEY_LENGTH])
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
-        self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT])
-        self.section_property = Custom_Girder(self.material,design_dictionary)
+        self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT],unit_kNm=True)
+        temp_section_list = list(design_dictionary.values())#[1,4]
+        print(f'temp_section_list = {temp_section_list}')
+        section_list = [i for i in self.isfloat(temp_section_list)]
+        print(f'section_list = {section_list}')
+        # if isinstance(float(design_dictionary[KEY_tf]),float) and 
+        if all(section_list):
+            self.section_property = Custom_Girder(self.material,design_dictionary)
         self.length = design_dictionary[KEY_LENGTH]
         def design():
-            pass
+            print(self.section_property.flange_thickness,
+                  self.section_property.depth,
+                  self.section_property.flange_width,
+                  self.section_property.web_thickness,
+                  self.section_property.flange_slope,
+                  self.section_property.root_radius,
+                  self.section_property.toe_radius,
+                  self.section_property.mass,
+                  self.section_property.area, #cm
+                  self.section_property.mom_inertia_z,
+                  self.section_property.mom_inertia_y,
+                  self.section_property.rad_of_gy_z,
+                  self.section_property.rad_of_gy_y,
+                  self.section_property.elast_sec_mod_z,
+                  self.section_property.elast_sec_mod_y,
+                  self.section_property.plast_sec_mod_z,
+                  self.section_property.plast_sec_mod_y)
+        
+        return design()
 
 
 

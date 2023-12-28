@@ -32,10 +32,13 @@ from utils.common.Section_Properties_Calculator import BBAngle_Properties
 from utils.common import is800_2007
 from utils.common.component import *
 from utils.common.Section_Properties_Calculator import I_sectional_Properties
+from design_type.flexural_member.flexure import Flexure
 
-class Custom_Girder(Material):
-    def __init__(self, material_grade, design_dictionary):
-        super(Custom_Girder,self).__init__(material_grade)
+class Custom_Girder():#Material
+    # def __new__(self,design_dictionary):
+    def __init__(self, design_dictionary):
+        # super(Custom_Girder,self).__init__()#material_grade
+        print("Girder Object Initialised")
         self.flange_thickness = float(design_dictionary[KEY_tf])
         self.depth = float(design_dictionary[KEY_dw]) + 2* self.flange_thickness
         self.flange_width = float(design_dictionary[KEY_bf])
@@ -53,7 +56,10 @@ class Custom_Girder(Material):
         self.elast_sec_mod_y = round(I_sectional_Properties().calc_ElasticModulusZy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
         self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
         self.plast_sec_mod_y = round(I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,self.web_thickness,self.flange_thickness,self.flange_slope,self.root_radius,self.toe_radius)*10**3)
+        # print(self.flange_thickness)
 
+    def __str__(self) -> str:
+        return "Customised Girder generated"
 class PlateGirderWelded(Member):
 
     def __init__(self):
@@ -83,7 +89,7 @@ class PlateGirderWelded(Member):
         # t2 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
         # tabs.append(t2)
 
-        t5 = ("Under Development", TYPE_TAB_2, self.design_values)
+        t5 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
         tabs.append(t5)
         # t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
         # tabs.append(t1)
@@ -110,6 +116,11 @@ class PlateGirderWelded(Member):
          """
         design_input = []
 
+        t2 = ("Under Development", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH]) #, KEY_STEEL_COST
+        design_input.append(t2)
+
+        t2 = ("Under Development", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD]) #, KEY_STEEL_COST
+        design_input.append(t2)
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
 
@@ -120,8 +131,9 @@ class PlateGirderWelded(Member):
         t2 = (None, [KEY_DP_DESIGN_METHOD], '')
         design_input.append(t2)
         
-        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
-        design_input.append(t1)
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD], '')
+        design_input.append(t2)
+
         return design_input
     
     def get_values_for_design_pref(self, key, design_dictionary):
@@ -134,8 +146,13 @@ class PlateGirderWelded(Member):
             fy = ''
 
         val = {
-        
+            KEY_ALLOW_CLASS: 'Yes',
+            KEY_EFFECTIVE_AREA_PARA: '1.0',
+            KEY_LENGTH_OVERWRITE :'NA',
+            KEY_BEARING_LENGTH : 'NA',
+            KEY_LOAD : 'Normal',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
+            KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
         }[key]
 
         return val
@@ -146,6 +163,7 @@ class PlateGirderWelded(Member):
     # Setting up logger and Input and Output Docks
     ####################################
     def module_name(self):
+        # self.mainmodule = KEY_PLATE_GIRDER_MAIN_MODULE
         return KEY_DISP_PLATE_GIRDER_WELDED
 
     def set_osdaglogger(key):
@@ -180,7 +198,7 @@ class PlateGirderWelded(Member):
         return c_lst
     def input_values(self):
 
-        self.module = KEY_DISP_PLATE_GIRDER_WELDED
+        self.module = PlateGirderWelded.module_name(self)
         options_list = []
 
         t1 = (KEY_MODULE, self.module, TYPE_MODULE, None, True, "No Validator")
@@ -188,6 +206,9 @@ class PlateGirderWelded(Member):
 
         t1 = (KEY_SECTION_PROFILE, KEY_SECTION_DATA, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
+
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_Plate_Girder_PROFILE, TYPE_NOTE, KEY_PLATE_GIRDER_MAIN_MODULE, True, 'No Validator') #'Beam and Column'
+        options_list.append(t2)
 
         t1 = (KEY_tf, KEY_DISP_tf, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t1)
@@ -215,6 +236,14 @@ class PlateGirderWelded(Member):
         t8 = (KEY_IntermediateStiffener, KEY_DISP_IntermediateStiffener, TYPE_COMBOBOX, ['Yes','No'], True, 'No Validator')
         options_list.append(t8)
 
+        t8 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX, None, True, 'Int Validator')
+        options_list.append(t8)
+
+        t8 = (KEY_BUCKLING_STRENGTH, KEY_DISP_BUCKLING_STRENGTH, TYPE_COMBOBOX, ['Yes','No'], True, 'No Validator')
+        options_list.append(t8)
+
+        t8 = (KEY_WEB_CRIPPLING, KEY_DISP_CRIPPLING_STRENGTH, TYPE_COMBOBOX, ['Yes','No'], True, 'No Validator')
+        options_list.append(t8)
         return options_list
 
     def input_value_changed(self):
@@ -249,7 +278,7 @@ class PlateGirderWelded(Member):
             f"\n  design_dictionary {design_dictionary}"
               )
         for option in option_list:
-            print(option_list)
+            # print(option_list)
             if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
@@ -298,42 +327,92 @@ class PlateGirderWelded(Member):
                 yield False
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
-        out_list = []
-        self.length = float(design_dictionary[KEY_LENGTH])
-        self.material = design_dictionary[KEY_SEC_MATERIAL]
+        # out_list = []
+        ### INPUT FROM INPUT DOCK ####
+        self.length = float(design_dictionary[KEY_LENGTH])*10**3 #m -> mm
+        self.material = design_dictionary[KEY_MATERIAL]
+        self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT],unit_kNm=True) #KN -> N
+        self.temp_section_list = list(design_dictionary.values())#[1,4]
+        self.section_list = [i for i in self.isfloat(self.temp_section_list)]
+        # self.material = design_dictionary[KEY_MATERIAL]
+        self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
+        # safety factors
+        self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
+        self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]
+        self.material_property = Material(material_grade=self.material, thickness=0)
+ 
 
-        self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT],unit_kNm=True)
-        temp_section_list = list(design_dictionary.values())#[1,4]
-        print(f'temp_section_list = {temp_section_list}')
-        section_list = [i for i in self.isfloat(temp_section_list)]
-        print(f'section_list = {section_list}')
+        ### INPUT FROM DESIGN PREFERENCE ###
+        # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
+        # self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
+        # self.allowable_utilization_ratio = 1.0
+        # self.optimization_parameter = "Utilization Ratio"
+        # self.allow_class = design_dictionary[KEY_ALLOW_CLASS]  # if 'Semi-Compact' is available
+        # self.steel_cost_per_kg = 50
+        # # Step 2 - computing the design compressive stress for web_buckling & web_crippling
+        # self.bearing_length = design_dictionary[KEY_BEARING_LENGTH]
+        # #TAKE from Design Dictionary
+        # self.allowed_sections = []
+        # if self.allow_class == "Yes":
+        #     self.allowed_sections == "Semi-Compact"
+
+        #############
+        # LATEX VARIABLES
+        #############
+
+        def design(design_dictionary):
+            # Assign custom section def to calulate properties
+            self.Girder_SectionProperty(self)
+            
+            
+            
+    
+        return design(design_dictionary)
+
+    def Girder_SectionProperty(self):
+        print(Custom_Girder)
+        print(f'temp_section_list = {self.temp_section_list}')
+
+        print(f'section_list = {self.section_list}')
         # if isinstance(float(design_dictionary[KEY_tf]),float) and 
-        if all(section_list):
-            self.section_property = Custom_Girder(self.material,design_dictionary)
-        self.length = design_dictionary[KEY_LENGTH]
-        def design():
+        if all(self.section_list):
+            self.optimization_tab_check(self)
+            self.design = False
+            self.section_property = Custom_Girder(design_dictionary)
             print(self.section_property.flange_thickness,
-                  self.section_property.depth,
-                  self.section_property.flange_width,
-                  self.section_property.web_thickness,
-                  self.section_property.flange_slope,
-                  self.section_property.root_radius,
-                  self.section_property.toe_radius,
-                  self.section_property.mass,
-                  self.section_property.area, #cm
-                  self.section_property.mom_inertia_z,
-                  self.section_property.mom_inertia_y,
-                  self.section_property.rad_of_gy_z,
-                  self.section_property.rad_of_gy_y,
-                  self.section_property.elast_sec_mod_z,
-                  self.section_property.elast_sec_mod_y,
-                  self.section_property.plast_sec_mod_z,
-                  self.section_property.plast_sec_mod_y)
+                self.section_property.depth,
+                self.section_property.flange_width,
+                self.section_property.web_thickness,
+                self.section_property.flange_slope,
+                self.section_property.root_radius,
+                self.section_property.toe_radius,
+                self.section_property.mass,
+                self.section_property.area, #mm
+                self.section_property.mom_inertia_z,
+                self.section_property.mom_inertia_y,
+                self.section_property.rad_of_gy_z,
+                self.section_property.rad_of_gy_y,
+                self.section_property.elast_sec_mod_z,
+                self.section_property.elast_sec_mod_y,
+                self.section_property.plast_sec_mod_z,
+                self.section_property.plast_sec_mod_y)
+        else:
+            self.design = True
+
+    def optimization_tab_check(self):
+        print(f"\n Inside optimization_tab_check")
+        # self.latex_tension_zone = False
+        if (self.effective_area_factor <= 0.10) or (self.effective_area_factor > 1.0):
+            logger.error(
+                "The defined value of Effective Area Factor in the design preferences tab is out of the suggested range."
+            )
+            logger.info("Provide an appropriate input and re-design.")
+            logger.warning("Assuming a default value of 1.0.")
+            self.effective_area_factor = 1.0
+            # self.design_status = False
+            # self.design_status_list.append(self.design_status)
+            self.optimization_tab_check(self)
         
-        return design()
-
-
-
     def results(self, design_dictionary):
 
         # sorting results from the dataset

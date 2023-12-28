@@ -640,7 +640,9 @@ KEY_DISP_dw = 'DW(mm)'
 KEY_DISP_bf = 'BF(mm)'
 KEY_IntermediateStiffener = 'IntermediateStiffener.Data'
 KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
-
+KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
+KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
+KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 ###################################
 # All Input Keys
 ###################################

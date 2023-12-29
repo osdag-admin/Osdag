@@ -89,7 +89,10 @@ class PlateGirderWelded(Member):
         # t2 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
         # tabs.append(t2)
 
-        t5 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
+        t5 = ("Under Development", TYPE_TAB_2, self.optimization_tab_flexure_design)
+        tabs.append(t5)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
         # t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
         # tabs.append(t1)
@@ -119,7 +122,7 @@ class PlateGirderWelded(Member):
         t2 = ("Under Development", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH]) #, KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Under Development", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD]) #, KEY_STEEL_COST
+        t2 = ("Under Development", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD, KEY_ShearBucklingOption]) #, KEY_STEEL_COST
         design_input.append(t2)
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
@@ -128,10 +131,10 @@ class PlateGirderWelded(Member):
     def input_dictionary_without_design_pref(self):
 
         design_input = []
-        t2 = (None, [KEY_DP_DESIGN_METHOD], '')
+        t2 = (None, [KEY_DP_DESIGN_METHOD], 'Input Dock')
         design_input.append(t2)
         
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD], '')
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_ShearBucklingOption], '')
         design_input.append(t2)
 
         return design_input
@@ -272,6 +275,7 @@ class PlateGirderWelded(Member):
         flag1 = False
         flag2 = False
         flag3 = False
+        flag4 = False
         option_list = self.input_values(self)
         missing_fields_list = []
         print(f'func_for_validation option_list {option_list}'
@@ -304,8 +308,16 @@ class PlateGirderWelded(Member):
                         all_errors.append(error)
                     else:
                         flag3 = True
-            # if option[0] == KEY_tf or option[0] == KEY_tw or option[0] == KEY_dw or option[0] == KEY_bf:
-            #     if design_dictionary[option[0]]
+            if option[0] == KEY_tf :
+                if design_dictionary[KEY_tf] != "" and design_dictionary[KEY_tw] != "" and design_dictionary[KEY_dw] != "" and design_dictionary[KEY_bf] != "":
+                    flag4 = True
+                elif design_dictionary[KEY_tf] == "" and design_dictionary[KEY_tw] == "" and design_dictionary[KEY_dw] == "" and design_dictionary[KEY_bf] == "":
+                    flag4 = True
+                else:
+                    list_adder = lambda x,y: missing_fields_list.append(x) if design_dictionary[y] == "" else False
+                    for i in [(KEY_tf,KEY_DISP_tf),(KEY_tw,KEY_DISP_tw),(KEY_dw,KEY_DISP_dw),(KEY_bf,KEY_DISP_bf)]:
+                        list_adder(i[1],i[0])
+
   
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -343,6 +355,8 @@ class PlateGirderWelded(Member):
  
 
         ### INPUT FROM DESIGN PREFERENCE ###
+        self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
+        self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
         # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
         # self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         # self.allowable_utilization_ratio = 1.0

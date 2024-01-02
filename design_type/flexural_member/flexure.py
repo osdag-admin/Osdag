@@ -449,8 +449,8 @@ class Flexure(Member):
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
         out_list.append(t2)
 
-        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
-        out_list.append(t1)
+        # t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
+        # out_list.append(t1)
 
         t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
               self.result_tc if flag else '', False)
@@ -2073,7 +2073,7 @@ class Flexure(Member):
             t1 = ('SubSection', 'Section Classification', '|p{3cm}|p{3.5cm}|p{8.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t1 = ('Web Class', 'Neutral Axis at Mid-Depth',
-                  cl_3_7_2_section_classification_web(round(self.effective_depth, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
+                  cl_3_7_2_section_classification_web(round(self.result_eff_d, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
                                          self.epsilon,
                                         self.input_section_classification[self.result_designation][2]),
                   ' ')

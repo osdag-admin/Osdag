@@ -502,20 +502,32 @@ class PlateGirderWelded(Member):
         self.k = 180 # d/tw or take span/20 and go on increasing
         self.section_property.depth_web = int(round((self.load.moment * self.k / (self.material_property.fy)) ** 0.33, -1))
         self.section_property.web_thickness = int(round((self.load.moment / (self.material_property.fy * self.k**2)) ** 0.33,-1))
-        while True:
-            
-            print('depth & web_thickness1',self.section_property.depth_web, self.section_property.web_thickness)
+        print('depth & web_thickness0',self.section_property.depth_web, self.section_property.web_thickness)
+        i=15
+        while i>0:
+            print('i =',i)
+            i = i-1
+
             self.checks(self,type=1)
-            if not self.checks(self,type=2) or not self.checks(self,type=3):
-                self.section_property.depth_web -= 10
-                self.section_property.web_thickness += 10
+            check2 = self.checks(self,type=2)
+            check3 = self.checks(self,type=3)
+            print('depth & web_thickness before',self.section_property.depth_web, self.section_property.web_thickness,'check2',check2,'check3',check3)
+            if self.section_property.depth_web % 5 != 0 or self.section_property.web_thickness % 5 !=0:
+                self.section_property.depth_web=self.myround(self.section_property.depth_web,5,'low')
+                self.section_property.web_thickness = self.myround(self.section_property.web_thickness,5,'high')
+            print('depth & web_thickness after',self.section_property.depth_web, self.section_property.web_thickness)
+            if check2 or check3:
+                print('depth & web_thickness1',self.section_property.depth_web, self.section_property.web_thickness)
+                if i%2==1:
+                    self.section_property.depth_web -= 10
+                else:
+                    self.section_property.web_thickness += 10
                 continue
-            elif self.checks(self,type=2) and self.checks(self,type=3):
+            elif check2 and check3:
                 print('depth & web_thickness2',self.section_property.depth_web, self.section_property.web_thickness)
             # self.section_classification(self)
             # print("self.section_class_girder",self.section_class_girder)
                 break
-
     def optimum_depth_thickness_flange(self):
         self.section_property.flange_width = 0.3 * self.section_property.depth_web
         while True:
@@ -533,7 +545,7 @@ class PlateGirderWelded(Member):
         print('depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness)
         if type == 1:
             if self.web_type_needed == "Thick":
-                self.section_property.web_thickness = math.ceil(self.section_property.depth_web / (67 * self.epsilon))
+                self.section_property.web_thickness = self.myround(self.section_property.depth_web / (67 * self.epsilon),10,'high')#math.ceil()
                 print('new web_thickness', self.section_property.web_thickness)
         if type == 2:
             print('ratio 2', self.section_property.depth_web/self.section_property.web_thickness)

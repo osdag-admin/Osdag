@@ -58,6 +58,7 @@ class Custom_Girder():#Material
             self.elast_sec_mod_y = 0
             self.plast_sec_mod_z = 0
             self.plast_sec_mod_y = 0
+            self.type = 'Welded'
             # print(self.flange_thickness)
         else :
             self.section_defined(design_dictionary)
@@ -71,6 +72,8 @@ class Custom_Girder():#Material
         self.flange_slope = 90
         self.root_radius = 0
         self.toe_radius = 0
+        self.type = 'Welded'
+
         self.mass = round(
             I_sectional_Properties().calc_Mass(self.depth_section, self.flange_width, self.web_thickness, self.flange_thickness,
                                                self.flange_slope, self.root_radius, self.toe_radius) * 10 ** 1)
@@ -441,8 +444,9 @@ class PlateGirderWelded(Member):
                 #  3. Compression Buckling requirement
                 #
                 self.optimum_depth_thickness_web(self)
-
+            self.optimum_depth_thickness_web(self)
             self.section_classification(self)
+            print("self.section_class_girder",self.section_class_girder)
             
             
     
@@ -461,7 +465,8 @@ class PlateGirderWelded(Member):
             self.design = True
         self.section_property = Custom_Girder(design_dictionary, self.design)
         print(self.section_property.flange_thickness,
-              self.section_property.depth,
+              self.section_property.depth_web,
+              self.section_property.depth_section,
               self.section_property.flange_width,
               self.section_property.web_thickness,
               self.section_property.flange_slope,
@@ -495,53 +500,63 @@ class PlateGirderWelded(Member):
 
     def optimum_depth_thickness_web(self):
         self.k = 180 # d/tw or take span/20 and go on increasing
-        self.section_property.depth = int(round((self.load.moment * self.k / (self.material_property.fy)) ** 0.33, -1))
+        self.section_property.depth_web = int(round((self.load.moment * self.k / (self.material_property.fy)) ** 0.33, -1))
+        self.section_property.web_thickness = int(round((self.load.moment / (self.material_property.fy * self.k**2)) ** 0.33,-1))
         while True:
-            self.section_property.web_thickness = int(round((self.load.moment / (self.material_property.fy * self.k**2)) ** 0.33,-1))
-            print(self.section_property.depth, self.section_property.web_thickness)
+            
+            print('depth & web_thickness1',self.section_property.depth_web, self.section_property.web_thickness)
             self.checks(self,type=1)
             if not self.checks(self,type=2) or not self.checks(self,type=3):
-                self.section_property.depth - 10
+                self.section_property.depth_web -= 10
+                self.section_property.web_thickness += 10
                 continue
-            self.section_classification(self)
-            print("self.section_class_girder",self.section_class_girder)
-            break
+            elif self.checks(self,type=2) and self.checks(self,type=3):
+                print('depth & web_thickness2',self.section_property.depth_web, self.section_property.web_thickness)
+            # self.section_classification(self)
+            # print("self.section_class_girder",self.section_class_girder)
+                break
 
     def optimum_depth_thickness_flange(self):
         self.section_property.flange_width = 0.3 * self.section_property.depth_web
         while True:
             if self.section_class_req == "Plastic":
-                self.section_property.flange_thickness = self.section_property.flange_width / (2 * 8.4 * self.epsilon)
+                self.section_property.flange_thickness = self.myround(self.section_property.flange_width / (2 * 8.4 * self.epsilon),5,'high')
             elif self.section_class_req == "Compact":
-                self.section_property.flange_thickness = self.section_property.flange_width / (2 * 9.4 * self.epsilon)
+                self.section_property.flange_thickness = self.myround(self.section_property.flange_width / (2 * 9.4 * self.epsilon),5,'high')
             else: #Semi-Compact
-                self.section_property.flange_thickness = math.ceil(myround(self.section_property.flange_width / (2 * 13.6 * self.epsilon)),5)
+                self.section_property.flange_thickness = math.ceil(myround(self.section_property.flange_width / (2 * 13.6 * self.epsilon),5,'high'))
 
-            self.section_classification(self)
-            print("self.section_class_girder",self.section_class_girder)
+            # self.section_classification(self)
+            
             break
     def checks(self,type):
+        print('depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness)
         if type == 1:
             if self.web_type_needed == "Thick":
-                self.section_property.web_thickness = math.ceil(self.section_property.depth / (67 * self.epsilon))
+                self.section_property.web_thickness = math.ceil(self.section_property.depth_web / (67 * self.epsilon))
+                print('new web_thickness', self.section_property.web_thickness)
         if type == 2:
+            print('ratio 2', self.section_property.depth_web/self.section_property.web_thickness)
             if self.servicibility_check:
-                return True if self.section_property.depth/self.section_property.web_thickness < 200 * self.epsilon else False
+                return True if self.section_property.depth_web/self.section_property.web_thickness < 200 * self.epsilon else False
         if type == 3:
+            print('ratio 3', self.section_property.depth_web/self.section_property.web_thickness)
             if self.compression_flange_buckling:
-                return True if self.section_property.depth / self.section_property.web_thickness <= 345 * self.epsilon**2 else False
+                return True if self.section_property.depth_web / self.section_property.web_thickness <= 345 * self.epsilon**2 else False
 
     def section_classification(self):
-        self.web_class = IS800_2007.Table2_i(
+        self.web_class_list = IS800_2007.Table2_i(
             (self.section_property.flange_width - self.section_property.web_thickness) / 2,
             self.section_property.flange_thickness,
             self.material_property.fy, self.section_property.type
-        )[0]
-        self.flange_class = IS800_2007.Table2_i(
-            self.section_property.depth - 2 * self.section_property.flange_thickness,
+        )
+        self.flange_class_list = IS800_2007.Table2_i(
+            self.section_property.depth_web ,
             self.section_property.web_thickness,
             self.material_property.fy, self.section_property.type
-        )[0]
+        )
+        self.web_class = self.web_class_list[0]
+        self.flange_class = self.flange_class_list[0]
         if self.flange_class == "Slender" or self.web_class == "Slender":
             self.section_class_girder = "Slender"
         else:
@@ -564,8 +579,11 @@ class PlateGirderWelded(Member):
             elif self.flange_class == "Semi-Compact" and self.web_class == "Semi-Compact":
                 self.section_class_girder = "Semi-Compact"
 
-    def myround(x, base=5):
-        return base * round(x / base)
+    def myround(x, base,type):
+        if type == 'high':
+            return base * math.ceil(x / base)
+        else:
+            return base * round(x / base)
     def results(self, design_dictionary):
 
         # sorting results from the dataset

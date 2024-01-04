@@ -214,8 +214,8 @@ class IS800_2007(object):
             else:
                 section_class = 'Slender'
 
-        # print(f" section_type {section_type}"
-        #       f" section_class {section_class}")
+        print(f" section_type {section_type}"
+              f" section_class {section_class}")
         return [section_class, ratio]
 
     @staticmethod

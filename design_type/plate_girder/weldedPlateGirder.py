@@ -410,6 +410,8 @@ class PlateGirderWelded(Member):
         ### INPUT FROM DESIGN PREFERENCE ###
         self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
         self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
+        print("Intermediate Stiffener",self.IntermediateStiffener)
+
         # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         # self.allowable_utilization_ratio = 1.0
@@ -443,10 +445,7 @@ class PlateGirderWelded(Member):
                 #  2. Servicibility requirement
                 #  3. Compression Buckling requirement
                 #
-                self.optimum_depth_thickness_web(self)
-            self.optimum_depth_thickness_web(self)
-            self.section_classification(self)
-            print("self.section_class_girder",self.section_class_girder)
+                self.section_design(self)
             
             
     
@@ -498,55 +497,71 @@ class PlateGirderWelded(Member):
             self.optimization_tab_check(self)
         logger.info("Provided appropriate design preference, now checking input.")
 
-    def optimum_depth_thickness_web(self):
+    def section_design(self):
+        
+        self.section_class_girder = ""
+        i = 25
         self.k = 180 # d/tw or take span/20 and go on increasing
-        self.section_property.depth_web = int(round((self.load.moment * self.k / (self.material_property.fy)) ** 0.33, -1))
-        self.section_property.web_thickness = int(round((self.load.moment / (self.material_property.fy * self.k**2)) ** 0.33,-1))
-        print('depth & web_thickness0',self.section_property.depth_web, self.section_property.web_thickness)
-        i=15
-        while i>0:
-            print('i =',i)
-            i = i-1
 
-            self.checks(self,type=1)
-            check2 = self.checks(self,type=2)
-            check3 = self.checks(self,type=3)
-            print('depth & web_thickness before',self.section_property.depth_web, self.section_property.web_thickness,'check2',check2,'check3',check3)
+        while self.section_class_girder != self.section_class_req and i >0:
+            self.section_property.depth_web = int(round((self.load.moment * self.k / (self.material_property.fy)) ** 0.33, -1))
+            self.section_property.web_thickness = int(round((self.load.moment / (self.material_property.fy * self.k**2)) ** 0.33,-1))
+            if self.IntermediateStiffener =="Yes":
+                self.optimum_depth_thickness_web(self,self.checks,[1])
+            else:
+                self.optimum_depth_thickness_web(self,self.checks,[1,2,3])
+
+            self.section_property.flange_width = 0.3 * self.section_property.depth_web
+            self.optimum_depth_thickness_flange(self)
+            self.section_classification(self)
+            i = i-1
+            self.k = self.k - 5
+            print(i,'depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness,self.section_property.flange_width,self.section_property.flange_thickness, "self.section_class_girder",self.section_class_girder)
+
+
+    def optimum_depth_thickness_web(self,func,var_list):
+        
+        
+        print('depth & web_thickness0',self.section_property.depth_web, self.section_property.web_thickness)
+        while True:
+            check = []
+            for j in var_list:
+                check.append(func(self,j)) 
+            # check3 = self.checks(self,type=3)
+            # print('depth & web_thickness before',self.section_property.depth_web, self.section_property.web_thickness,'check',all(check))
             if self.section_property.depth_web % 5 != 0 or self.section_property.web_thickness % 5 !=0:
                 self.section_property.depth_web=self.myround(self.section_property.depth_web,5,'low')
                 self.section_property.web_thickness = self.myround(self.section_property.web_thickness,5,'high')
             print('depth & web_thickness after',self.section_property.depth_web, self.section_property.web_thickness)
-            if check2 or check3:
+            
+            if all(check):
                 print('depth & web_thickness1',self.section_property.depth_web, self.section_property.web_thickness)
+            # self.section_classification(self)
+            # print("self.section_class_girder",self.section_class_girder)
+                break
+            else :
+                print('depth & web_thickness2',self.section_property.depth_web, self.section_property.web_thickness)
                 if i%2==1:
                     self.section_property.depth_web -= 10
                 else:
                     self.section_property.web_thickness += 10
                 continue
-            elif check2 and check3:
-                print('depth & web_thickness2',self.section_property.depth_web, self.section_property.web_thickness)
-            # self.section_classification(self)
-            # print("self.section_class_girder",self.section_class_girder)
-                break
     def optimum_depth_thickness_flange(self):
-        self.section_property.flange_width = 0.3 * self.section_property.depth_web
-        while True:
-            if self.section_class_req == "Plastic":
-                self.section_property.flange_thickness = self.myround(self.section_property.flange_width / (2 * 8.4 * self.epsilon),5,'high')
-            elif self.section_class_req == "Compact":
-                self.section_property.flange_thickness = self.myround(self.section_property.flange_width / (2 * 9.4 * self.epsilon),5,'high')
-            else: #Semi-Compact
-                self.section_property.flange_thickness = math.ceil(myround(self.section_property.flange_width / (2 * 13.6 * self.epsilon),5,'high'))
+        if self.section_class_req == "Plastic":
+            self.section_property.flange_thickness = self.myround(self.section_property.flange_width / (2 * 8.4 * self.epsilon),5,'high')
+        elif self.section_class_req == "Compact":
+            self.section_property.flange_thickness = self.myround(self.section_property.flange_width / (2 * 9.4 * self.epsilon),5,'high')
+        else: #Semi-Compact
+            self.section_property.flange_thickness = math.ceil(myround(self.section_property.flange_width / (2 * 13.6 * self.epsilon),5,'high'))
+        # print(self.section_property.flange_thickness, self.section_property.flange_width)
 
-            # self.section_classification(self)
-            
-            break
     def checks(self,type):
-        print('depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness)
+        # print('depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness)
         if type == 1:
             if self.web_type_needed == "Thick":
                 self.section_property.web_thickness = self.myround(self.section_property.depth_web / (67 * self.epsilon),10,'high')#math.ceil()
-                print('new web_thickness', self.section_property.web_thickness)
+                print(self.section_property.depth_web / (67 * self.epsilon),'new web_thickness', self.section_property.web_thickness)
+                return True
         if type == 2:
             print('ratio 2', self.section_property.depth_web/self.section_property.web_thickness)
             if self.servicibility_check:

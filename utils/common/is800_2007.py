@@ -188,11 +188,7 @@ class IS800_2007(object):
 
         """
         epsilon = math.sqrt(250 / f_y)
-        print(f" flange_class"
-              f" width {width}"
-              f" thickness {thickness}"
-              f" epsilon {epsilon}"
-              )
+        
         ratio = width / thickness
 
         if section_type == 'Rolled':
@@ -213,7 +209,11 @@ class IS800_2007(object):
                 section_class = 'Semi-Compact'
             else:
                 section_class = 'Slender'
-
+        print(f" flange_class"
+                    f" width {width}"
+                    f" thickness {thickness}"
+                    f" epsilon {epsilon}"
+                    )
         print(f" section_type {section_type}"
               f" section_class {section_class}")
         return [section_class, ratio]

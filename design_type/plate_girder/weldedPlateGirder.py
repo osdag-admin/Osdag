@@ -354,13 +354,23 @@ class PlateGirderWelded(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_Plate_Girder_PROFILE, TYPE_NOTE, KEY_PLATE_GIRDER_MAIN_MODULE, True) #'Beam and Column'
         out_list.append(t2)
 
-        t1 = (KEY_tf, KEY_DISP_tf, TYPE_TEXTBOX, self.result_tf, True)
+        t1 = (KEY_tf, KEY_DISP_tf, TYPE_TEXTBOX, self.result_tf if flag else '', True) # "NA"
         out_list.append(t1)
-        t1 = (KEY_tw, KEY_DISP_tw, TYPE_TEXTBOX, self.result_tw, True)
+        t1 = (KEY_tw, KEY_DISP_tw, TYPE_TEXTBOX, self.result_tw if flag else '', True) # "NA"
         out_list.append(t1)
-        t1 = (KEY_dw, KEY_DISP_dw, TYPE_TEXTBOX, self.result_dw, True)
+        t1 = (KEY_dw, KEY_DISP_dw, TYPE_TEXTBOX, self.result_dw if flag else '', True) # "NA"
         out_list.append(t1)
-        t1 = (KEY_bf, KEY_DISP_bf, TYPE_TEXTBOX, self.result_bf, True)
+        t1 = (KEY_bf, KEY_DISP_bf, TYPE_TEXTBOX, self.result_bf if flag else '', True) # "NA"
+        out_list.append(t1)
+
+        t1 = (KEY_SHEAR_STRENGTH, KEY_DISP_DESIGN_STRENGTH_SHEAR, TYPE_TEXTBOX,
+              self.result_shear if flag else
+              '', True)
+        out_list.append(t1)
+        #
+        t1 = (KEY_MOMENT_STRENGTH, KEY_DISP_DESIGN_STRENGTH_MOMENT, TYPE_TEXTBOX,
+              self.result_bending if flag else
+              '', True)
         out_list.append(t1)
 
         return out_list
@@ -425,7 +435,8 @@ class PlateGirderWelded(Member):
 
         if flag and flag1 and flag2 and flag3:
             ic(f"\n design_dictionary{design_dictionary}")
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(self, design_dictionary) #
+            self.results(self, design_dictionary) #
         else:
             return all_errors
     def isfloat(input_list):
@@ -485,7 +496,12 @@ class PlateGirderWelded(Member):
             list_result = []
             list_1 = []
             self.optimization_tab_check(self)
-            self.Girder_SectionProperty(self,design_dictionary)
+            if all(self.section_list):
+                # self.optimization_tab_check(self)
+                self.design = False
+            else:
+                self.design = True
+            self.Girder_SectionProperty(self,design_dictionary,self.design)
 
             if self.design:
                 # TODO:
@@ -495,30 +511,27 @@ class PlateGirderWelded(Member):
                 #  3. Compression Buckling requirement
                 #
                 self.section_design(self)
+                self.section_check_validator(self,True,True, design_dictionary)
             else:
                 self.section_classification(self)
-            
-            self.Shear_Strenth(self)
-            
+                self.section_check_validator(self,True,False, design_dictionary)
 
 
 
-            list_result, list_1 = self.list_changer(self, change=' ', check=True, list=list_result, list_name=list_1)    
+
+
+            # list_result, list_1 = self.list_changer(self, change=' ', check=True, list=list_result, list_name=list_1)
     
         return design(design_dictionary)
 
-    def Girder_SectionProperty(self,design_dictionary):
+    def Girder_SectionProperty(self,design_dictionary,var):
         ic(Custom_Girder)
         ic(f'temp_section_list = {self.temp_section_list}')
 
         ic(f'section_list = {self.section_list}')
         # if isinstance(float(design_dictionary[KEY_tf]),float) and 
-        if all(self.section_list):
-            self.optimization_tab_check(self)
-            self.design = False
-        else:
-            self.design = True
-        self.section_property = Custom_Girder(design_dictionary, self.design)
+
+        self.section_property = Custom_Girder(design_dictionary, var)
         # print(self.section_property.flange_thickness,
         #       self.section_property.depth_web,
         #       self.section_property.depth_section,
@@ -576,7 +589,10 @@ class PlateGirderWelded(Member):
             count = count+1
             self.k = self.k + 5
             ic(count,'depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness,self.section_property.flange_width,self.section_property.flange_thickness, "self.section_class_girder",self.section_class_girder)
-
+        self.designed_dict = { KEY_tf  : self.section_property.flange_thickness  ,
+                            KEY_dw:  self.section_property.depth_web ,
+                            KEY_bf: self.section_property.flange_width  ,
+                            KEY_tw:  self.section_property.web_thickness ,}
 
     def optimum_depth_thickness_web(self,func,var_list):
         
@@ -669,8 +685,8 @@ class PlateGirderWelded(Member):
 
     def Shear_Strenth(self):
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(
-            self.section_property.shear_area,
-            self.material_property.fy
+            ic(self.section_property.shear_area),
+            ic(self.material_property.fy)
         ) / 10 ** 3
         self.shear_strength = self.V_d    
         
@@ -679,11 +695,26 @@ class PlateGirderWelded(Member):
             return base * math.ceil(x / base)
         else:
             return base * round(x / base)
+    def section_check_validator(self,var1,var2,var3):
+        if var1 == var2:
+            self.section_list = [True]
+            self.Girder_SectionProperty(self, self.designed_dict,False) # var3 = design_dictionary
+        while var1:
+            self.Shear_Strenth(self)
+
+            var1 = var2
+            break
+
     def results(self, design_dictionary):
 
         # sorting results from the dataset
         # if len(self.input_section_list) > 1:
         # results based on UR
+        self.common_result(self,self.section_list,"NA")
+        self.design_status = True
+
+        return 0
+
         if self.optimization_parameter == "Utilization Ratio":
             filter_UR = filter(
                 lambda x: x <= min(self.allowable_utilization_ratio, 1.0),
@@ -716,11 +747,11 @@ class PlateGirderWelded(Member):
                 ]  # optimum section which passes the UR check
                 print(f"self.result_UR{self.result_UR}")
                 self.design_status = True
-                self.common_result(
-                    self,
-                    list_result=self.optimum_section_ur_results,
-                    result_type=self.result_UR,
-                )
+                # self.common_result(
+                #     self,
+                #     list_result=self.optimum_section_ur_results,
+                #     result_type=self.result_UR,
+                # )
 
         else:  # results based on cost
             self.optimum_section_cost.sort()
@@ -738,11 +769,14 @@ class PlateGirderWelded(Member):
             else:
                 self.design_status = True
     def common_result(self, list_result, result_type, flag=1):
-        self.result_designation = list_result[result_type]["Designation"]
-        self.result_tf
-        self.result_tw
-        self.result_dw
-        self.result_bf
+        # self.result_designation = list_result[result_type]["Designation"]
+        ic()
+        self.result_tf =  self.section_property.flange_thickness
+        self.result_tw = self.section_property.web_thickness
+        self.result_dw = self.section_property.depth_web
+        self.result_bf = self.section_property.flange_width
+        self.result_shear = self.shear_strength
+        self.result_bending = "NA"
 
     def list_changer(self, change, list,list_name, check = True):
         list_name.extend([

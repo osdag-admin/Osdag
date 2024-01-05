@@ -44,14 +44,14 @@ class Custom_Girder():#Material
         # super(Custom_Girder,self).__init__()#material_grade
         ic("Girder Object Initialised")
         if design:
-            self.flange_thickness = 0
-            self.depth_section = 0
-            self.depth_web = 0
-            self.flange_width = 0
-            self.web_thickness = 0
+            self.flange_thickness = 1e-3
+            self.depth_section = 1e-3
+            self.depth_web = 1e-3
+            self.flange_width = 1e-3
+            self.web_thickness = 1e-3
             self.flange_slope = 90
-            self.root_radius = 0
-            self.toe_radius = 0
+            self.root_radius = 1e-3
+            self.toe_radius = 1e-3
             self.type = 'Welded'
             self.shear_area = self.depth_web * self.web_thickness
             self.mass = round(
@@ -350,6 +350,19 @@ class PlateGirderWelded(Member):
         t2 = (KEY_betab_constatnt, KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
               'NA', True)
         out_list.append(t2)
+
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_Plate_Girder_PROFILE, TYPE_NOTE, KEY_PLATE_GIRDER_MAIN_MODULE, True) #'Beam and Column'
+        out_list.append(t2)
+
+        t1 = (KEY_tf, KEY_DISP_tf, TYPE_TEXTBOX, self.result_tf, True)
+        out_list.append(t1)
+        t1 = (KEY_tw, KEY_DISP_tw, TYPE_TEXTBOX, self.result_tw, True)
+        out_list.append(t1)
+        t1 = (KEY_dw, KEY_DISP_dw, TYPE_TEXTBOX, self.result_dw, True)
+        out_list.append(t1)
+        t1 = (KEY_bf, KEY_DISP_bf, TYPE_TEXTBOX, self.result_bf, True)
+        out_list.append(t1)
+
         return out_list
 
     def func_for_validation(self, design_dictionary):
@@ -469,6 +482,8 @@ class PlateGirderWelded(Member):
             # Assign custom section def to calulate properties
             self.optimum_section_ur_results = {}
             self.optimum_section_ur = []
+            list_result = []
+            list_1 = []
             self.optimization_tab_check(self)
             self.Girder_SectionProperty(self,design_dictionary)
 
@@ -485,7 +500,10 @@ class PlateGirderWelded(Member):
             
             self.Shear_Strenth(self)
             
-            
+
+
+
+            list_result, list_1 = self.list_changer(self, change=' ', check=True, list=list_result, list_name=list_1)    
     
         return design(design_dictionary)
 
@@ -719,6 +737,26 @@ class PlateGirderWelded(Member):
                 break
             else:
                 self.design_status = True
+    def common_result(self, list_result, result_type, flag=1):
+        self.result_designation = list_result[result_type]["Designation"]
+        self.result_tf
+        self.result_tw
+        self.result_dw
+        self.result_bf
+
+    def list_changer(self, change, list,list_name, check = True):
+        list_name.extend([
+            "Designation"])
+        list.extend(
+            [self.result_tf,
+        self.result_tw,
+        self.result_dw,
+        self.result_bf])
+        list_name.extend([
+                "Mfd",
+                "Beta_reduced",
+                'M_d'
+            ])
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):

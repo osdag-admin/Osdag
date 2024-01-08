@@ -510,7 +510,8 @@ class PlateGirderWelded(Member):
                 #  2. Servicibility requirement
                 #  3. Compression Buckling requirement
                 #
-                self.section_design(self)
+                self.section_design(self,0, 150)
+                self.optimum_section_ur_results['Section Dimension'] = self.designed_dict
                 self.section_check_validator(self,True,True, design_dictionary)
             else:
                 self.section_classification(self)
@@ -566,15 +567,13 @@ class PlateGirderWelded(Member):
             self.optimization_tab_check(self)
         logger.info("Provided appropriate design preference, now checking input.")
 
-    def section_design(self):
-        
+    def section_design(self,count, k= 150):
         self.section_class_girder = ""
-        count = 0
-        self.k = 150 # 180, d/tw or take span/20 and go on increasing
-
+        
+          # 180, d/tw or take span/20 and go on increasing
         while self.section_class_girder != self.section_class_req and count <25:
-            self.section_property.depth_web = int(round((self.load.moment * self.k / (self.material_property.fy)) ** 0.33, -1))
-            self.section_property.web_thickness = int(round((self.load.moment / (self.material_property.fy * self.k**2)) ** 0.33,-1))
+            self.section_property.depth_web = ic(int(round((self.load.moment * k / (self.material_property.fy)) ** 0.33, -1))) + count * 5
+            self.section_property.web_thickness = ic(int(round((self.load.moment / (self.material_property.fy * k**2)) ** 0.33,-1))) + count * 5
             if self.IntermediateStiffener =="Yes":
                 self.optimum_depth_thickness_web(self,self.checks,[1])
             else:
@@ -586,8 +585,8 @@ class PlateGirderWelded(Member):
                 self.optimum_depth_thickness_flange(self,i)
                 i+=1
                 self.section_classification(self)
-            count = count+1
-            self.k = self.k + 5
+            # count = count+1
+            # k = k + 5
             ic(count,'depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness,self.section_property.flange_width,self.section_property.flange_thickness, "self.section_class_girder",self.section_class_girder)
         self.designed_dict = { KEY_tf  : self.section_property.flange_thickness  ,
                             KEY_dw:  self.section_property.depth_web ,
@@ -637,14 +636,17 @@ class PlateGirderWelded(Member):
                 self.section_property.web_thickness = self.myround(self.section_property.depth_web / (67 * self.epsilon),10,'high')#math.ceil()
                 print(self.section_property.depth_web / (67 * self.epsilon),'new web_thickness', self.section_property.web_thickness)
                 return True
-        if type == 2:
+        elif type == 2:
             print('ratio 2', self.section_property.depth_web/self.section_property.web_thickness)
             if self.servicibility_check:
                 return True if self.section_property.depth_web/self.section_property.web_thickness < 200 * self.epsilon else False
-        if type == 3:
+        elif type == 3:
             print('ratio 3', self.section_property.depth_web/self.section_property.web_thickness)
             if self.compression_flange_buckling:
                 return True if self.section_property.depth_web / self.section_property.web_thickness <= 345 * self.epsilon**2 else False
+        elif type == 4:
+            ic('check 4', self.shear_strength,self.load.shear_force )
+            return True if self.shear_strength > self.load.shear_force  else False
 
     def section_classification(self):
         self.web_class_list = IS800_2007.Table2_i(
@@ -683,12 +685,145 @@ class PlateGirderWelded(Member):
                 self.section_class_girder = "Semi-Compact"
         print(self.web_class_list,self.flange_class_list,self.section_class_girder)
 
-    def Shear_Strenth(self):
+    def Shear_Strength(self):
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(
             ic(self.section_property.shear_area),
             ic(self.material_property.fy)
         ) / 10 ** 3
-        self.shear_strength = self.V_d    
+        self.shear_strength = self.myround(self.V_d,5,'low')
+    def bending_strength_girder(self):
+        # print('Inside bending_strength of girder ')
+        # web_class = IS800_2007.Table2_i(
+        #     (self.section_property.flange_width - self.section_property.web_thickness)/2,
+        #     self.section_property.flange_thickness,
+        #     self.material_property.fy, self.section_property.type
+        # )[0]
+        # flange_class = IS800_2007.Table2_i(
+        #     self.section_property.depth - 2 * self.section_property.flange_thickness,
+        #     self.section_property.web_thickness,
+        #     self.material_property.fy,self.section_property.type
+        # )[0]
+        # if flange_class == "Slender" or web_class == "Slender":
+        #     self.section_class_girder = "Slender"
+        # else:
+        #     if flange_class == "Plastic" and web_class == "Plastic":
+        #         self.section_class_girder = "Plastic"
+        #     elif flange_class == "Plastic" and web_class == "Compact":
+        #         self.section_class_girder = "Compact"
+        #     elif flange_class == "Plastic" and web_class == "Semi-Compact":
+        #         self.section_class_girder = "Semi-Compact"
+        #     elif flange_class == "Compact" and web_class == "Plastic":
+        #         self.section_class_girder = "Compact"
+        #     elif flange_class == "Compact" and web_class == "Compact":
+        #         self.section_class_girder = "Compact"
+        #     elif flange_class == "Compact" and web_class == "Semi-Compact":
+        #         self.section_class_girder = "Semi-Compact"
+        #     elif flange_class == "Semi-Compact" and web_class == "Plastic":
+        #         self.section_class_girder = "Semi-Compact"
+        #     elif flange_class == "Semi-Compact" and web_class == "Compact":
+        #         self.section_class_girder = "Semi-Compact"
+        #     elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
+        #         self.section_class_girder = "Semi-Compact"
+        # 4 - design bending strength
+        I_flange = 2 * (self.section_property.flange_width * self.section_property.flange_thickness**3/12 + self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth/2 - self.section_property.flange_thickness/2)**2)
+        Zez_flange = I_flange / self.section_property.depth /2
+        y_top = (self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth - self.section_property.flange_thickness)/2) / (self.section_property.flange_width * self.section_property.flange_thickness)
+        Zpz_flange = 2 * self.section_property.flange_width * self.section_property.flange_thickness * y_top
+        M_d = IS800_2007.cl_8_2_1_2_design_bending_strength(
+            self.section_class_girder,
+            Zpz_flange,
+            Zez_flange,
+            self.material_property.fy,
+            self.gamma_m0,
+            self.support,
+        )
+        if self.section_class_girder == 'Plastic' or 'Compact' :
+            self.beta_b_lt = 1
+        else :
+            self.beta_b_lt = Zez_flange/Zpz_flange
+        self.M_d = M_d
+        if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
+            if self.high_shear_check:
+                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                    bending_strength_section = self.bending_strength_reduction(self, M_d)
+                else:
+                    bending_strength_section = (
+                        self.section_property.elast_sec_mod_z
+                        * self.material_property.fy
+                        / self.gamma_m0
+                    )
+            else:
+                bending_strength_section = M_d
+            print('Inside bending_strength 1', M_d, self.high_shear_check, bending_strength_section)
+        else:
+            # self.It = (
+            #     2
+            #     * self.section_property.flange_width
+            #     * self.section_property.flange_thickness**3
+            # ) / 3 + (
+            #     (self.section_property.depth - self.section_property.flange_thickness)
+            #     * self.section_property.web_thickness**3
+            # ) / 3
+            self.hf = self.section_property.depth - self.section_property.flange_thickness
+            # self.Iw = 0.5**2 * self.section_property.mom_inertia_y * self.hf**2
+            self.fcrb = IS800_2007.cl_8_2_2_Unsupported_beam_bending_fcrb(
+                self.material_property.modulus_of_elasticity,
+                self.effective_length/self.section_property.rad_of_gy_y,
+                self.hf/self.section_property.flange_thickness
+            )
+
+            if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                self.beta_b_lt = 1.0
+            else:
+                self.beta_b_lt = (
+                    self.section_property.elast_sec_mod_z
+                    / self.section_property.plast_sec_mod_z
+                )
+            if self.section_property.type == "Rolled":
+                alpha_lt = 0.21
+            else:
+                alpha_lt = 0.49
+            lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment_fcrb(
+                self.material_property.fy, self.fcrb
+            )
+            phi_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_phi_lt(
+                alpha_lt, lambda_lt
+            )
+            X_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(
+                phi_lt, lambda_lt
+            )
+            fbd = IS800_2007.cl_8_2_2_Unsupported_beam_bending_compressive_stress(
+                X_lt, self.material_property.fy, self.gamma_m0
+            )
+            bending_strength_section = IS800_2007.cl_8_2_2_Unsupported_beam_bending_strength(
+                    self.section_property.plast_sec_mod_z,
+                    self.section_property.elast_sec_mod_z,
+                    fcd=fbd,
+                    section_class=self.section_class_girder
+                )
+
+
+            # self.beta_b_lt = beta_b
+            self.alpha_lt = alpha_lt
+            # self.lambda_lt = lambda_lt
+            self.phi_lt = phi_lt
+            self.X_lt = X_lt
+            self.fbd_lt = fbd
+            self.lateral_tb = self.fcrb * 10**-6
+            print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
+            if self.high_shear_check:
+                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                    bending_strength_section = self.bending_strength_reduction(self,Md=bending_strength_section
+                    )
+                else:
+                    bending_strength_section = (
+                        self.beta_b_lt
+                        * self.section_property.plast_sec_mod_z
+                        * fbd
+                    )
+            print('Inside bending_strength 2',It,self.hf,self.Iw,self.fcrb ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
+        self.bending_strength_section_reduced = bending_strength_section
+        return bending_strength_section
         
     def myround(x, base,type):
         if type == 'high':
@@ -699,8 +834,10 @@ class PlateGirderWelded(Member):
         if var1 == var2:
             self.section_list = [True]
             self.Girder_SectionProperty(self, self.designed_dict,False) # var3 = design_dictionary
-        while var1:
-            self.Shear_Strenth(self)
+        check_list = []
+        while var1 and (len(check_list)== 0 or all(check_list)):
+            self.Shear_Strength(self)
+            ic(check_list.append( self.checks(self,4)))
 
             var1 = var2
             break

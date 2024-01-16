@@ -739,13 +739,13 @@ class PlateGirderWelded(Member):
         )
         if self.section_class_girder == 'Plastic' or 'Compact' :
             self.beta_b_lt = 1
-        else :
-            self.beta_b_lt = Zez_flange/Zpz_flange
+        else :            self.beta_b_lt = Zez_flange/Zpz_flange
         self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
                 if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
-                    bending_strength_section = self.bending_strength_reduction(self, M_d)
+                    bending_strength_section
+                    # TODO = self.bending_strength_reduction(self, M_d)
                 else:
                     bending_strength_section = (
                         self.section_property.elast_sec_mod_z

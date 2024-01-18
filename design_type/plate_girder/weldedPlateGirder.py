@@ -169,8 +169,8 @@ class PlateGirderWelded(Member):
 
         """
         tabs = []
-        # t1 = ("Under Development", TYPE_TAB_1, self.tab_section)
-        # tabs.append(t1)
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
+        tabs.append(t1)
         # t2 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
         # tabs.append(t2)
 
@@ -191,7 +191,34 @@ class PlateGirderWelded(Member):
         return tabs
     def tab_value_changed(self):
         change_tab = []
+        
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        change_tab.append(t1)
+
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t5 = (KEY_DISP_COLSEC, ['Label_HS_1', 'Label_HS_2', 'Label_HS_3'],
+              ['Label_HS_11', 'Label_HS_12', 'Label_HS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_HS_17', 'Label_HS_18',
+               'Label_HS_19', 'Label_HS_20', 'Label_HS_21', 'Label_HS_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_SHS_RHS_properties)
+        change_tab.append(t5)
+
+        t6 = (KEY_DISP_COLSEC, ['Label_CHS_1', 'Label_CHS_2', 'Label_CHS_3'],
+              ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_21', 'Label_22',
+               KEY_IMAGE], TYPE_TEXTBOX, self.get_CHS_properties)
+        change_tab.append(t6)
+
+        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
         return change_tab
+    
+    def edit_tabs(self):
+        """ This function is required if the tab name changes based on connectivity or profile or any other key.
+                Not required for this module but empty list should be passed"""
+        return []
     def input_dictionary_design_pref(self):
         """
 
@@ -203,6 +230,12 @@ class PlateGirderWelded(Member):
         TODO : Material pop-up
          """
         design_input = []
+        
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])#Need to check
+        design_input.append(t1)
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY])
+        design_input.append(t1)
 
         t2 = ("Under Development", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH]) #, KEY_STEEL_COST
         design_input.append(t2)
@@ -223,6 +256,15 @@ class PlateGirderWelded(Member):
         design_input.append(t2)
 
         return design_input
+    
+    def refresh_input_dock(self):
+    
+        add_buttons = []
+
+        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        add_buttons.append(t2)
+
+        return add_buttons
     
     def get_values_for_design_pref(self, key, design_dictionary):
         if design_dictionary[KEY_MATERIAL] != 'Select Material':
@@ -282,12 +324,33 @@ class PlateGirderWelded(Member):
     def customized_input(self):
 
         c_lst = []
+        t1 = (KEY_SECSIZE, self.fn_profile_section)
+        c_lst.append(t1)
 
         return c_lst
+    
+    def fn_profile_section(self):
+
+        profile = self[0]
+        if profile == 'Beams': #Beam and Column
+            return connectdb("Beams", call_type="popup")
+            profile2 = connectdb("Columns", call_type="popup")
+        if profile == 'Columns': #Beam and Column
+            return connectdb("Columns", call_type="popup")
+        
     def input_values(self):
 
         self.module = PlateGirderWelded.module_name(self)
         options_list = []
+        
+        t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
+        options_list.append(t1)
+
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') #'Beam and Column'
+        options_list.append(t2)
+
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
+        options_list.append(t4)
 
         t1 = (KEY_MODULE, self.module, TYPE_MODULE, None, True, "No Validator")
         options_list.append(t1)
@@ -337,6 +400,9 @@ class PlateGirderWelded(Member):
     def input_value_changed(self):
 
         lst = []
+        
+        t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+        lst.append(t1)
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
         return lst

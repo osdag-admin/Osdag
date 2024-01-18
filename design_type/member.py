@@ -2862,6 +2862,11 @@ class Member(Main):
         # optimum.append(t1)
 
         return optimum
+    
+    def Stiffener_design(self, input_dictionary):
+        optimum = []
+        return optimum
+        
     ########################################
     # Design Preference Functions End
     ########################################

@@ -179,8 +179,9 @@ class PlateGirderWelded(Member):
 
         t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
-        # t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
-        # tabs.append(t1)
+        
+        t1 = ("Stiffeners", TYPE_TAB_2, self.Stiffener_design)
+        tabs.append(t1)
         
         # t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_flexure_design)
         # tabs.append(t2)

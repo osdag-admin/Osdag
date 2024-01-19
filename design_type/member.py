@@ -2781,9 +2781,8 @@ class Member(Main):
     def optimization_tab_flexure_design(self, input_dictionary):
         print(f"optimization_tab_flexure_design input_dictionary {input_dictionary}")
         values = {
-                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA',# , KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
-                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]}#, KEY_BOLT_Number : '1.0', KEY_PLATETHK : '8'
-        # KEY_ALLOW_CLASS: 'Yes', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_STEEL_COST: '50',
+                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA',
+                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]}
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -2827,9 +2826,8 @@ class Member(Main):
     def optimization_tab_plate_girder_design(self, input_dictionary):
         print(f"optimization_tab_flexure_design input_dictionary {input_dictionary}")
         values = {
-                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA',# , KEY_Buckling_Out_plane: '1.0', KEY_Buckling_In_plane: '1.0',
-                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]}#, KEY_BOLT_Number : '1.0', KEY_PLATETHK : '8'
-        # KEY_ALLOW_CLASS: 'Yes', KEY_OPTIMIZATION_PARA: 'Utilization Ratio', KEY_STEEL_COST: '50',
+                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA',
+                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]}
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -2865,6 +2863,19 @@ class Member(Main):
     
     def Stiffener_design(self, input_dictionary):
         optimum = []
+        values = {KEY_IntermediateStiffener:'Yes',
+                  KEY_IntermediateStiffener_spacing:'NA'
+                   }
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+        t8 = (KEY_IntermediateStiffener, KEY_DISP_IntermediateStiffener, TYPE_COMBOBOX, ['Yes','No'],  values[KEY_IntermediateStiffener])
+        optimum.append(t8)
+
+        t8 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX, None, values[KEY_IntermediateStiffener_spacing])
+        optimum.append(t8)
+        
         return optimum
         
     ########################################

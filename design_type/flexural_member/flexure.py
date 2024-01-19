@@ -347,12 +347,12 @@ class Flexure(Member):
         lst.append(t3)
 
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.major_bending_warning)
+               'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
         lst.append(t18)
 
         return lst
     
-    def major_bending_warning(self):
+    def warning_majorbending(self):
 
         if self[0] == VALUES_SUPP_TYPE_temp[2]:
             return True
@@ -592,7 +592,7 @@ class Flexure(Member):
                 if self.lambda_lt < 0.4:
                     self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE
         '''
-        super(Flexure, self).set_input_values(self, design_dictionary)
+        # super(Flexure, self).set_input_values(self, design_dictionary)
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
@@ -683,16 +683,8 @@ class Flexure(Member):
         TODO optimimation_tab_check changes to include self.material_property = Material(material_grade=self.material, thickness=0)
             for each section
         '''
-        # flag = self.section_classification(self)
-        print(f"\n Inside design")
-        # self.show_error_message(self)
-        """Perform design of struct"""
-        # checking DP inputs
-
+        
         self.optimization_tab_check(self)
-        # print( "self.material_property",self.material_property.fy)
-        # self.input_modifier(self)
-        # print( "self.material_property",self.material_property.fy)
 
         self.design_beam(self, design_dictionary)
 
@@ -749,7 +741,7 @@ class Flexure(Member):
 
         for section in self.sec_list:
             section = section.strip("'")
-            self.section_property = self.section_conect_database(self, section)
+            self.section_property = self.section_connect_database(self, section)
 
             Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             print('Inside input_modifier not allow_class',self.allow_class,self.load.moment, self.gamma_m0, self.material_property.fy)
@@ -764,8 +756,8 @@ class Flexure(Member):
                 #     f"Required Zp_req = {round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
         print("self.input_modified", self.input_modified)
 
-    def section_conect_database(self, section):
-        print(f"section_conect_database{section}")
+    def section_connect_database(self, section):
+        print(f"section_connect_database{section}")
         print(section)
         # print(self.sec_profile)
         if (
@@ -779,7 +771,7 @@ class Flexure(Member):
             self.material_property.connect_to_database_to_get_fy_fu(
                 self.material, max(self.section_property.flange_thickness, self.section_property.web_thickness)
             )
-            print(f"section_conect_database material_property.fy{self.material_property.fy}")
+            print(f"section_connect_database material_property.fy{self.material_property.fy}")
             self.epsilon = math.sqrt(250 / self.material_property.fy)
         return self.section_property
 
@@ -793,7 +785,7 @@ class Flexure(Member):
         self.optimum_section_cost_results = {}
         self.optimum_section_cost = []
 
-        # 1 - section classification
+        # section classification
         flag = self.section_classification(self)
         if self.effective_area_factor < 1.0:
             logger.warning(
@@ -803,7 +795,7 @@ class Flexure(Member):
             logger.info(
                 "The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007]."
             )
-        # 2 - Effective length
+        # Effective length
         self.effective_length_beam(self, design_dictionary, self.length)  # mm
         print(
             f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
@@ -811,7 +803,7 @@ class Flexure(Member):
         if flag:
             for section in self.input_section_list:
                 # initialize lists for updating the results dictionary
-                self.section_property = self.section_conect_database(self, section)
+                self.section_property = self.section_connect_database(self, section)
                 self.effective_depth = (self.section_property.depth - 2 * (
                             self.section_property.flange_thickness + self.section_property.root_radius))
                 if self.sec_profile == 'Beams' or self.sec_profile == 'Columns':
@@ -1284,7 +1276,7 @@ class Flexure(Member):
 
         for trial_section in self.sec_list:
             trial_section = trial_section.strip("'")
-            self.section_property = self.section_conect_database(self, trial_section)
+            self.section_property = self.section_connect_database(self, trial_section)
             print(f"Type of section{self.section_property.designation}")
             if self.section_property.type == "Rolled":
                 web_class = IS800_2007.Table2_iii(
@@ -1974,7 +1966,7 @@ class Flexure(Member):
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
-        self.section_property = self.section_conect_database(self, self.result_designation)
+        self.section_property = self.section_connect_database(self, self.result_designation)
 
         if self.design_status:
             if self.sec_profile=='Columns' or self.sec_profile=='Beams':

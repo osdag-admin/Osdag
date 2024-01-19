@@ -177,17 +177,11 @@ class PlateGirderWelded(Member):
         t5 = ("Under Development", TYPE_TAB_2, self.optimization_tab_flexure_design)
         tabs.append(t5)
 
-        t5 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t5)
-        
         t1 = ("Stiffeners", TYPE_TAB_2, self.Stiffener_design)
         tabs.append(t1)
         
-        # t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_flexure_design)
-        # tabs.append(t2)
-
-        # t5 = ("Design", TYPE_TAB_2, self.design_values)
-        # tabs.append(t5)
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
 
         return tabs
     def tab_value_changed(self):
@@ -243,6 +237,13 @@ class PlateGirderWelded(Member):
 
         t2 = ("Under Development", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD, KEY_ShearBucklingOption]) #, KEY_STEEL_COST
         design_input.append(t2)
+        
+        t2 = ("Stiffeners", TYPE_COMBOBOX, [KEY_IntermediateStiffener]) 
+        design_input.append(t2)
+        
+        t2 = ("Stiffeners", TYPE_TEXTBOX, [KEY_IntermediateStiffener_spacing]) 
+        design_input.append(t2)
+        
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
 
@@ -253,7 +254,7 @@ class PlateGirderWelded(Member):
         t2 = (KEY_MATERIAL, [KEY_DP_DESIGN_METHOD], 'Input Dock')
         design_input.append(t2)
         
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_ShearBucklingOption], '')
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_ShearBucklingOption, KEY_IntermediateStiffener_spacing, KEY_IntermediateStiffener], '')
         design_input.append(t2)
 
         return design_input
@@ -284,6 +285,8 @@ class PlateGirderWelded(Member):
             KEY_LOAD : 'Normal',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
             KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
+            KEY_IntermediateStiffener:'Yes',
+            KEY_IntermediateStiffener_spacing:'NA'
         }[key]
 
         return val
@@ -344,8 +347,8 @@ class PlateGirderWelded(Member):
         self.module = PlateGirderWelded.module_name(self)
         options_list = []
         
-        t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
-        options_list.append(t1)
+        # t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
+        # options_list.append(t1)
 
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') #'Beam and Column'
         options_list.append(t2)
@@ -385,11 +388,7 @@ class PlateGirderWelded(Member):
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t8 = (KEY_IntermediateStiffener, KEY_DISP_IntermediateStiffener, TYPE_COMBOBOX, ['Yes','No'], True, 'No Validator')
-        options_list.append(t8)
-
-        t8 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX, None, True, 'Int Validator')
-        options_list.append(t8)
+        
 
         t8 = (KEY_BUCKLING_STRENGTH, KEY_DISP_BUCKLING_STRENGTH, TYPE_COMBOBOX, ['Yes','No'], True, 'No Validator')
         options_list.append(t8)
@@ -584,12 +583,6 @@ class PlateGirderWelded(Member):
                 self.section_classification(self)
                 self.section_check_validator(self,True,False, design_dictionary)
 
-
-
-
-
-            # list_result, list_1 = self.list_changer(self, change=' ', check=True, list=list_result, list_name=list_1)
-    
         return design(design_dictionary)
 
     def Girder_SectionProperty(self,design_dictionary,var):
@@ -648,7 +641,7 @@ class PlateGirderWelded(Member):
 
             self.section_property.flange_width = self.myround(0.3 * self.section_property.depth_web - count,5 ,'low')
             i = 0
-            while self.section_class_girder != self.section_class_req and self.section_property.flange_thickness<40:
+            while self.section_class_girder != self.section_class_req and self.section_property.flange_thickness<60:
                 self.optimum_depth_thickness_flange(self,i)
                 i+=1
                 self.section_classification(self)
@@ -661,8 +654,6 @@ class PlateGirderWelded(Member):
                             KEY_tw:  self.section_property.web_thickness ,}
 
     def optimum_depth_thickness_web(self,func,var_list):
-        
-        
         print('depth & web_thickness0',self.section_property.depth_web, self.section_property.web_thickness)
         while True:
             check = []

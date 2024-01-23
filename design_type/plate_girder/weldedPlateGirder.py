@@ -329,9 +329,10 @@ class PlateGirderWelded(Member):
 
         c_lst = []
         t1 = (KEY_SECSIZE, self.fn_profile_section)
-        c_lst.append(t1)
+        c_lst.append(t1) # 'TEMP2'
 
         return c_lst
+        # return []
     
     def fn_profile_section(self):
 
@@ -350,10 +351,10 @@ class PlateGirderWelded(Member):
         # t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
         # options_list.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') #'Beam and Column'
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') # 'TEMP1'
         options_list.append(t2)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator') #'TEMP2'
         options_list.append(t4)
 
         t1 = (KEY_MODULE, self.module, TYPE_MODULE, None, True, "No Validator")
@@ -403,6 +404,7 @@ class PlateGirderWelded(Member):
         
         t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
+        
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
         return lst
@@ -453,8 +455,7 @@ class PlateGirderWelded(Member):
         option_list = self.input_values(self)
         missing_fields_list = []
         ic(f'func_for_validation option_list {option_list}'
-            f"\n  design_dictionary {design_dictionary}"
-              )
+            f"\n  design_dictionary {design_dictionary}")
         for option in option_list:
             # ic(option_list)
             if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
@@ -485,8 +486,8 @@ class PlateGirderWelded(Member):
             if option[0] == KEY_tf :
                 if design_dictionary[KEY_tf] != "" and design_dictionary[KEY_tw] != "" and design_dictionary[KEY_dw] != "" and design_dictionary[KEY_bf] != "":
                     flag4 = True
-                elif design_dictionary[KEY_tf] == "" and design_dictionary[KEY_tw] == "" and design_dictionary[KEY_dw] == "" and design_dictionary[KEY_bf] == "":
-                    flag4 = True
+                # TODO elif design_dictionary[KEY_tf] == "" and design_dictionary[KEY_tw] == "" and design_dictionary[KEY_dw] == "" and design_dictionary[KEY_bf] == "":
+                #     flag4 = True
                 else:
                     list_adder = lambda x,y: missing_fields_list.append(x) if design_dictionary[y] == "" else False
                     for i in [(KEY_tf,KEY_DISP_tf),(KEY_tw,KEY_DISP_tw),(KEY_dw,KEY_DISP_dw),(KEY_bf,KEY_DISP_bf)]:
@@ -499,14 +500,14 @@ class PlateGirderWelded(Member):
         else:
             flag = True
 
-        if flag and flag1 and flag2 and flag3:
+        if flag and flag1 and flag2 and flag3 and flag4:
             ic(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary) #
             self.results(self, design_dictionary) #
         else:
             return all_errors
     def isfloat(input_list):
-        for i in range(2,6):
+        for i in range(len(input_list)):
             try:
                 ic(input_list[i])
                 yield isinstance(float(input_list[i]),float)
@@ -519,11 +520,10 @@ class PlateGirderWelded(Member):
         self.length = float(design_dictionary[KEY_LENGTH])*10**3 #m -> mm
         self.material = design_dictionary[KEY_MATERIAL]
         self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT],unit_kNm=True) #KN -> N
-        self.temp_section_list = list(design_dictionary.values())#[1,4]
-        self.section_list = [i for i in self.isfloat(self.temp_section_list)]
-        # self.material = design_dictionary[KEY_MATERIAL]
+        ic()
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
-        # safety factors
+        
+        # Safety Factors
         self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
         self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]
         self.material_property = Material(material_grade=self.material, thickness=0)
@@ -533,57 +533,78 @@ class PlateGirderWelded(Member):
         self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
         self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
         ic("Intermediate Stiffener",self.IntermediateStiffener)
-
-        # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
+        #TODO : future inputs add to design preference
+        self.web_type_needed = "Thick" # or "Slim"
+        self.servicibility_check = True
+        self.compression_flange_buckling = True
+        self.section_class_req = "Plastic" # or "Compact"  
+        
+        
+        ## Calculation Variables
+        self.steel_cost_per_kg = 50
+        self.temp_section_list = [design_dictionary[KEY_tf], design_dictionary[KEY_tw],design_dictionary[KEY_dw],design_dictionary[KEY_bf]]#[1,4]
+        self.section_list = [i for i in self.isfloat(self.temp_section_list)]
+        ic(self.section_list)
+        
+        # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
+        
+        
         # self.allowable_utilization_ratio = 1.0
         # self.optimization_parameter = "Utilization Ratio"
         # self.allow_class = design_dictionary[KEY_ALLOW_CLASS]  # if 'Semi-Compact' is available
-        self.steel_cost_per_kg = 50
         # # Step 2 - computing the design compressive stress for web_buckling & web_crippling
         # self.bearing_length = design_dictionary[KEY_BEARING_LENGTH]
         # #TAKE from Design Dictionary
         # self.allowed_sections = []
         # if self.allow_class == "Yes":
         #     self.allowed_sections == "Semi-Compact"
-        #TODO : future inputs add to design preference
-        self.web_type_needed = "Thick" # or "Slim"
-        self.servicibility_check = True
-        self.compression_flange_buckling = True
-        self.section_class_req = "Plastic" # or "Compact"  "Semi-Compact"
+        # "Semi-Compact" 
         #############
         # LATEX VARIABLES
         #############
 
-        def design(design_dictionary):
+        def main_controller(design_dictionary):
             # Assign custom section def to calulate properties
             self.optimum_section_ur_results = {}
             self.optimum_section_ur = []
             list_result = []
             list_1 = []
+            # 1. optimization_tab_check from Design preference
             self.optimization_tab_check(self)
+            # 2. Check if user has provided a section or wants us to find optimised section
             if all(self.section_list):
+                ic()
                 # self.optimization_tab_check(self)
                 self.design = False
             else:
                 self.design = True
+            # 3. Loop starts to check a sections strength and utilization
+            while True:
+                if self.design: 
+                    # TODO:
+                    # Must return tuples of Section Sizes in the set of 10.. meaning if the most optmised section is at the end of the this list...find section...stronger or weaker  
+                    #  Find depth of web
+                    #  1. d/tw and Kv determination
+                    #  2. Servicibility requirement
+                    #  3. Compression Buckling requirement
+                    #
+                    self.section_design(self,0, 150)
+                    self.optimum_section_ur_results['Section Dimension'] = self.designed_dict
+                    self.section_check_validator(self,True,True, design_dictionary)
+                else:
+                    self.section_classification(self)
+                    self.section_check_validator(self,True,False, design_dictionary)
+                break
+            
+            # 3. Finding other parameters of the section
             self.Girder_SectionProperty(self,design_dictionary,self.design)
 
-            if self.design:
-                # TODO:
-                #  Find depth of web
-                #  1. d/tw and Kv determination
-                #  2. Servicibility requirement
-                #  3. Compression Buckling requirement
-                #
-                self.section_design(self,0, 150)
-                self.optimum_section_ur_results['Section Dimension'] = self.designed_dict
-                self.section_check_validator(self,True,True, design_dictionary)
-            else:
-                self.section_classification(self)
-                self.section_check_validator(self,True,False, design_dictionary)
+            
 
-        return design(design_dictionary)
+        return main_controller(design_dictionary)
+
+
 
     def Girder_SectionProperty(self,design_dictionary,var):
         ic(Custom_Girder)
@@ -619,7 +640,7 @@ class PlateGirderWelded(Member):
             logger.error(
                 "The defined value of Effective Area Factor in the design preferences tab is out of the suggested range."
             )
-            logger.info("Provide an appropriate input and re-design.")
+            # logger.info("Provide an appropriate input and re-design.")
             logger.warning("Assuming a default value of 1.0.")
             self.effective_area_factor = 1.0
             # self.design_status = False
@@ -632,8 +653,8 @@ class PlateGirderWelded(Member):
         
           # 180, d/tw or take span/20 and go on increasing
         while self.section_class_girder != self.section_class_req and count <25:
-            self.section_property.depth_web = ic(int(round((self.load.moment * k / (self.material_property.fy)) ** 0.33, -1))) + count * 5
-            self.section_property.web_thickness = ic(int(round((self.load.moment / (self.material_property.fy * k**2)) ** 0.33,-1))) + count * 5
+            self.section_property.depth_web = int(round((self.load.moment * k / (self.material_property.fy)) ** 0.33, -1)) + count * 5
+            self.section_property.web_thickness = int(min(round((self.load.moment / (self.material_property.fy * k**2)) ** 0.33,-1)),self.section_property.depth_web/k) + count * 5
             if self.IntermediateStiffener =="Yes":
                 self.optimum_depth_thickness_web(self,self.checks,[1])
             else:
@@ -653,6 +674,9 @@ class PlateGirderWelded(Member):
                             KEY_bf: self.section_property.flange_width  ,
                             KEY_tw:  self.section_property.web_thickness ,}
 
+    def section_design_web(self,count, k= 150):
+        # TODO
+        self.section_property.web_thickness = ic(int(min(round((self.load.moment / (self.material_property.fy * k**2)) ** 0.33,-1)),self.section_property.depth_web/k)) + count * 5
     def optimum_depth_thickness_web(self,func,var_list):
         print('depth & web_thickness0',self.section_property.depth_web, self.section_property.web_thickness)
         while True:

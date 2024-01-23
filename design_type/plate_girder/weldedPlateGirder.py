@@ -577,6 +577,7 @@ class PlateGirderWelded(Member):
                 ic()
                 # self.optimization_tab_check(self)
                 self.design = False
+                N_sections_list = [tuple(self.temp_section_list)]
             else:
                 self.design = True
             # 3. Loop starts to check a sections strength and utilization

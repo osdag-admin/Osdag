@@ -543,6 +543,7 @@ class PlateGirderWelded(Member):
         
         ## Calculation Variables
         self.steel_cost_per_kg = 50
+        self.section_parameters = [KEY_tf,KEY_tw,KEY_dw,KEY_bf]
         self.temp_section_list = [design_dictionary[KEY_tf], design_dictionary[KEY_tw],design_dictionary[KEY_dw],design_dictionary[KEY_bf]]#[1,4]
         self.section_list = [i for i in self.isfloat(self.temp_section_list)]
         ic(self.section_list)
@@ -580,8 +581,13 @@ class PlateGirderWelded(Member):
                 N_sections_list = [tuple(self.temp_section_list)]
             else:
                 self.design = True
-            # 3. Loop starts to check a sections strength and utilization
-            while True:
+                self.section_design(self,0, 150)
+                self.optimum_section_ur_results['Section Dimension'] = self.designed_dict
+                self.section_check_validator(self,True,True, design_dictionary)
+                # TODO Get the section list
+                
+            # TODO 3. Loop starts to check a sections strength and utilization
+            for section in range(len(N_sections_list)):
                 if self.design: 
                     # TODO:
                     # Must return tuples of Section Sizes in the set of 10.. meaning if the most optmised section is at the end of the this list...find section...stronger or weaker  
@@ -593,19 +599,25 @@ class PlateGirderWelded(Member):
                     self.section_design(self,0, 150)
                     self.optimum_section_ur_results['Section Dimension'] = self.designed_dict
                     self.section_check_validator(self,True,True, design_dictionary)
-                else:
-                    self.section_classification(self)
-                    self.section_check_validator(self,True,False, design_dictionary)
+                # TODO else:
+                #     self.section_classification(self)
+                #     self.section_check_validator(self,True,False, design_dictionary)
+                ic(section )
+                self.girder_checks(self,section=section)
                 break
             
-            # 3. Finding other parameters of the section
+            # 4. Finding other parameters of the section
             self.Girder_SectionProperty(self,design_dictionary,self.design)
 
             
 
         return main_controller(design_dictionary)
 
-
+    def girder_checks(self,section):
+        # Tuple to Dictionary Converter
+        single_section_dictionary = {section[i]:self.section_parameters[i] for i,_ in enumerate(self.section_parameters)}
+        ic(single_section_dictionary)
+        
 
     def Girder_SectionProperty(self,design_dictionary,var):
         ic(Custom_Girder)

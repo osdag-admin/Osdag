@@ -43,6 +43,7 @@ class Custom_Girder():#Material
     def __init__(self, design_dictionary,design):
         # super(Custom_Girder,self).__init__()#material_grade
         ic("Girder Object Initialised")
+        self.designation = 'User Defined'
         if design:
             self.flange_thickness = 1e-3
             self.depth_section = 1e-3
@@ -530,6 +531,11 @@ class PlateGirderWelded(Member):
         self.epsilon = math.sqrt(250 / self.material_property.fy)
 
         ### INPUT FROM DESIGN PREFERENCE ###
+        # Tab2
+        self.support_cndition_shear_buckling = design_dictionary[KEY_ShearBucklingOption]
+        self.section_class_req = "Plastic" # or "Compact"  
+        
+        # Tab3
         self.EndStiffener = 'Yes'
         self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
         self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
@@ -539,7 +545,6 @@ class PlateGirderWelded(Member):
         self.web_type_needed = "Thick" # or "Slim"
         self.servicibility_check = True
         self.compression_flange_buckling = True
-        self.section_class_req = "Plastic" # or "Compact"  
         
         
         ## Calculation Variables
@@ -622,7 +627,36 @@ class PlateGirderWelded(Member):
         ic(single_section_dictionary)
         # 4. Finding other parameters of the section
         self.Girder_SectionProperty(self,single_section_dictionary,self.design)
-        single_section_dictionary['Check1'] = self.checks(self,1)
+        
+        # 5. Checks
+        # 5.1 Web needed by User Thick or thin 
+        if 'Check1' not in single_section_dictionary:
+            single_section_dictionary['Check1'] = self.checks(self,1)
+        # 5.2 servicibility_check
+        single_section_dictionary['Check2'] = self.checks(self,2)
+        # 5.3 compression_flange_buckling
+        single_section_dictionary['Check3'] = self.checks(self,3)
+        
+        # 6 Section Classification
+        _ = self.section_classification(self)
+        single_section_dictionary.update(_)
+        
+        # 6 Shear Strength 
+        # 6.1 Shear Strength without any Stiffeners
+        self.Shear_Strength(self)
+        single_section_dictionary['Shear_Strength'] = self.V_d
+        single_section_dictionary['V_d'] = self.V_d
+        ic(self.V_d)
+        
+        # 6.2 Shear Strength with end Stiffeners
+        if single_section_dictionary['Shear_Strength'] < self.load.shear_force:
+            if self.EndStiffener and self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] :#or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1])
+        # Variables needed for to work
+                self.effective_depth = self.section_property.depth_web
+                self.fyw = self.material_property.fy
+                Flexure.web_buckling_steps(self)
+                single_section_dictionary['Shear_Strength']
+        ic(single_section_dictionary)
 
     def Girder_SectionProperty(self,design_dictionary,var):
         ic(Custom_Girder)
@@ -784,6 +818,7 @@ class PlateGirderWelded(Member):
             elif self.flange_class == "Semi-Compact" and self.web_class == "Semi-Compact":
                 self.section_class_girder = "Semi-Compact"
         print(self.web_class_list,self.flange_class_list,self.section_class_girder)
+        return (('web_class',self.web_class),('flange_class',self.flange_class),('section_class_girder',self.section_class_girder))
 
     def Shear_Strength(self):
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(

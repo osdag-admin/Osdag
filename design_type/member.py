@@ -2835,9 +2835,6 @@ class Member(Main):
 
         optimum = []
 
-        # t2 = (KEY_ALLOW_UR, KEY_DISP_UR, TYPE_TEXTBOX, None, values[KEY_ALLOW_UR])
-        # optimum.append(t2)
-
         t2 = (
         KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
         optimum.append(t2)
@@ -2856,8 +2853,12 @@ class Member(Main):
             KEY_BEARING_LENGTH, KEY_DISP_BEARING_LENGTH + ' (mm)', TYPE_TEXTBOX, None, values[KEY_BEARING_LENGTH])
         optimum.append(t2)
 
-        # t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
-        # optimum.append(t1)
+        t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
+        optimum.append(t1)
+        t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
+        optimum.append(t2)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
+        optimum.append(t9)
 
         return optimum
     

@@ -174,7 +174,7 @@ class PlateGirderWelded(Member):
         # t2 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
         # tabs.append(t2)
 
-        t5 = ("Under Development", TYPE_TAB_2, self.optimization_tab_flexure_design)
+        t5 = ("Under Development", TYPE_TAB_2, self.optimization_tab_plate_girder_design)
         tabs.append(t5)
 
         t1 = ("Stiffeners", TYPE_TAB_2, self.Stiffener_design)
@@ -351,10 +351,10 @@ class PlateGirderWelded(Member):
         # t1 = (KEY_MODULE, KEY_DISP_FLEXURE, TYPE_MODULE, None, True, "No Validator")
         # options_list.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') # 'TEMP1'
+        t2 = (KEY_SEC_PROFILE, 'Section Profile', TYPE_COMBOBOX, VALUES_SEC_PROFILE3, True, 'No Validator') # 'TEMP1'
         options_list.append(t2)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator') #'TEMP2'
+        t4 = (KEY_SECSIZE, 'Section Size', TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator') #'TEMP2'
         options_list.append(t4)
 
         t1 = (KEY_MODULE, self.module, TYPE_MODULE, None, True, "No Validator")
@@ -366,13 +366,13 @@ class PlateGirderWelded(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_Plate_Girder_PROFILE, TYPE_NOTE, KEY_PLATE_GIRDER_MAIN_MODULE, True, 'No Validator') #'Beam and Column'
         options_list.append(t2)
 
-        t1 = (KEY_tf, KEY_DISP_tf, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t1 = (KEY_tf, KEY_DISP_tf + '*', TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t1)
-        t1 = (KEY_tw, KEY_DISP_tw, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t1 = (KEY_tw, KEY_DISP_tw + '*', TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t1)
-        t1 = (KEY_dw, KEY_DISP_dw, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t1 = (KEY_dw, KEY_DISP_dw + '*', TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t1)
-        t1 = (KEY_bf, KEY_DISP_bf, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t1 = (KEY_bf, KEY_DISP_bf + '*', TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t1)
         
         t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
@@ -530,6 +530,7 @@ class PlateGirderWelded(Member):
         self.epsilon = math.sqrt(250 / self.material_property.fy)
 
         ### INPUT FROM DESIGN PREFERENCE ###
+        self.EndStiffener = 'Yes'
         self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
         self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
         ic("Intermediate Stiffener",self.IntermediateStiffener)
@@ -587,7 +588,7 @@ class PlateGirderWelded(Member):
                 # TODO Get the section list
                 
             # TODO 3. Loop starts to check a sections strength and utilization
-            for section in range(len(N_sections_list)):
+            for section in N_sections_list:
                 if self.design: 
                     # TODO:
                     # Must return tuples of Section Sizes in the set of 10.. meaning if the most optmised section is at the end of the this list...find section...stronger or weaker  
@@ -603,11 +604,11 @@ class PlateGirderWelded(Member):
                 #     self.section_classification(self)
                 #     self.section_check_validator(self,True,False, design_dictionary)
                 ic(section )
+                
                 self.girder_checks(self,section=section)
-                break
+             
             
-            # 4. Finding other parameters of the section
-            self.Girder_SectionProperty(self,design_dictionary,self.design)
+            
 
             
 
@@ -615,9 +616,13 @@ class PlateGirderWelded(Member):
 
     def girder_checks(self,section):
         # Tuple to Dictionary Converter
-        single_section_dictionary = {section[i]:self.section_parameters[i] for i,_ in enumerate(self.section_parameters)}
+        ic(type(section))
+        ic(dict(zip(self.section_parameters,section)))
+        single_section_dictionary = dict(zip(self.section_parameters,section))
         ic(single_section_dictionary)
-        
+        # 4. Finding other parameters of the section
+        self.Girder_SectionProperty(self,single_section_dictionary,self.design)
+        single_section_dictionary['Check1'] = self.checks(self,1)
 
     def Girder_SectionProperty(self,design_dictionary,var):
         ic(Custom_Girder)
@@ -1007,8 +1012,12 @@ class PlateGirderWelded(Member):
         self.result_tw = self.section_property.web_thickness
         self.result_dw = self.section_property.depth_web
         self.result_bf = self.section_property.flange_width
-        self.result_shear = self.shear_strength
-        self.result_bending = "NA"
+        try:
+            self.result_shear = self.shear_strength
+            self.result_bending = "NA"
+        except:
+            self.result_shear = "NA"
+            self.result_bending = "NA"
 
     def list_changer(self, change, list,list_name, check = True):
         list_name.extend([

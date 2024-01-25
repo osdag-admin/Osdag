@@ -1722,7 +1722,7 @@ class Window(QMainWindow):
             design_dictionary.update(d1)
 
             self.input_dock_inputs.update(d1)
-            print(f"\n self.input_dock_inputs{self.input_dock_inputs}")     
+            # print(f"\n self.input_dock_inputs{self.input_dock_inputs}")     
 
 
         for design_pref_key in self.design_pref_inputs.keys():

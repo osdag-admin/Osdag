@@ -664,7 +664,7 @@ class PlateGirderWelded(Member):
                 self.single_section_dictionary.update(_)
                 
                 self.single_section_dictionary['Shear_Strength'] = self.single_section_dictionary["V_cr"]
-        elif:
+        # TODO START here elif:
             
             
         ic(self.single_section_dictionary)

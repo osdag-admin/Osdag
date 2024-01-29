@@ -35,3 +35,4 @@ ResourceFiles/Osi_Files/*
 *.xlsx
 ResourceFiles/last_designs/*
 ResourceFiles/html_page/*
+*.code-workspace

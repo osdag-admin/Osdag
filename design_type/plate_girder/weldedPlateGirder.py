@@ -654,6 +654,7 @@ class PlateGirderWelded(Member):
         # Variables needed for to work
                 self.effective_depth = self.section_property.depth_web
                 self.fyw = self.material_property.fy
+                Flexure.set_osdaglogger(None)
                 Flexure.web_buckling_steps(self)
                 single_section_dictionary['Shear_Strength']
         ic(single_section_dictionary)
@@ -826,6 +827,9 @@ class PlateGirderWelded(Member):
             ic(self.material_property.fy)
         ) / 10 ** 3
         self.shear_strength = self.myround(self.V_d,5,'low')
+    def plate_girder_strength(self):
+        Flexure.plate_girder_strength(self)
+        
     def bending_strength_girder(self):
         # print('Inside bending_strength of girder ')
         # web_class = IS800_2007.Table2_i(

@@ -548,6 +548,7 @@ class PlateGirderWelded(Member):
         
         
         ## Calculation Variables
+        self.web_siffened = False
         self.steel_cost_per_kg = 50
         self.section_parameters = [KEY_tf,KEY_tw,KEY_dw,KEY_bf]
         self.temp_section_list = [design_dictionary[KEY_tf], design_dictionary[KEY_tw],design_dictionary[KEY_dw],design_dictionary[KEY_bf]]#[1,4]
@@ -623,41 +624,51 @@ class PlateGirderWelded(Member):
         # Tuple to Dictionary Converter
         ic(type(section))
         ic(dict(zip(self.section_parameters,section)))
-        single_section_dictionary = dict(zip(self.section_parameters,section))
-        ic(single_section_dictionary)
+        self.single_section_dictionary = dict(zip(self.section_parameters,section))
+        ic(self.single_section_dictionary)
         # 4. Finding other parameters of the section
-        self.Girder_SectionProperty(self,single_section_dictionary,self.design)
+        self.Girder_SectionProperty(self,self.single_section_dictionary,self.design)
         
         # 5. Checks
         # 5.1 Web needed by User Thick or thin 
-        if 'Check1' not in single_section_dictionary:
-            single_section_dictionary['Check1'] = self.checks(self,1)
+        if 'Check1' not in self.single_section_dictionary:
+            self.single_section_dictionary['Check1'] = self.checks(self,1)
         # 5.2 servicibility_check
-        single_section_dictionary['Check2'] = self.checks(self,2)
+        self.single_section_dictionary['Check2'] = self.checks(self,2)
         # 5.3 compression_flange_buckling
-        single_section_dictionary['Check3'] = self.checks(self,3)
+        self.single_section_dictionary['Check3'] = self.checks(self,3)
         
         # 6 Section Classification
         _ = self.section_classification(self)
-        single_section_dictionary.update(_)
+        self.single_section_dictionary.update(_)
         
         # 6 Shear Strength 
         # 6.1 Shear Strength without any Stiffeners
         self.Shear_Strength(self)
-        single_section_dictionary['Shear_Strength'] = self.V_d
-        single_section_dictionary['V_d'] = self.V_d
-        ic(self.V_d)
+        self.single_section_dictionary['Shear_Strength'] = self.V_d
+        self.single_section_dictionary['V_d'] = self.V_d
+        ic(self.V_d,self.load.shear_force)
         
-        # 6.2 Shear Strength with end Stiffeners
-        if single_section_dictionary['Shear_Strength'] < self.load.shear_force:
+        # 6.2 Shear Strength with end Stiffeners only
+        if self.single_section_dictionary['Shear_Strength'] < self.load.shear_force:
             if self.EndStiffener and self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] :#or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1])
         # Variables needed for to work
                 self.effective_depth = self.section_property.depth_web
                 self.fyw = self.material_property.fy
                 Flexure.set_osdaglogger(None)
                 Flexure.web_buckling_steps(self)
-                single_section_dictionary['Shear_Strength']
-        ic(single_section_dictionary)
+                _ = (('Kv',self.K_v),
+                ('tau_crc',self.tau_crc),
+                ('lambda_w', self.lambda_w),
+                ('tau_b', self.tau_b),
+                ("V_cr",self.V_cr))
+                self.single_section_dictionary.update(_)
+                
+                self.single_section_dictionary['Shear_Strength'] = self.single_section_dictionary["V_cr"]
+        # TODO START here elif:
+            
+            
+        ic(self.single_section_dictionary)
 
     def Girder_SectionProperty(self,design_dictionary,var):
         ic(Custom_Girder)
@@ -767,7 +778,12 @@ class PlateGirderWelded(Member):
     def checks(self,type):
         # print('depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness)
         if type == 1:
-            if self.web_type_needed == "Thick":
+            if self.web_type_needed == "Thick": # CL 8.4.2.1
+                if not self.web_siffened:
+                     self.single_section_dictionary['Web_Shear_Buckling_validator'] = IS800_2007.cl_8_4_2_1_web_buckling_stiff(self.section_property.depth_web, self.section_property.web_thickness,self.epsilon,1)
+                else:
+                     self.single_section_dictionary['Web_Shear_Buckling_validator'] = IS800_2007.cl_8_4_2_1_web_buckling_stiff(self.section_property.depth_web, self.section_property.web_thickness,self.epsilon,2, self.single_section_dictionary['Kv'])
+            else:    
                 self.section_property.web_thickness = self.myround(self.section_property.depth_web / (67 * self.epsilon),10,'high')#math.ceil()
                 print(self.section_property.depth_web / (67 * self.epsilon),'new web_thickness', self.section_property.web_thickness)
                 return True
@@ -775,6 +791,7 @@ class PlateGirderWelded(Member):
             print('ratio 2', self.section_property.depth_web/self.section_property.web_thickness)
             if self.servicibility_check:
                 return True if self.section_property.depth_web/self.section_property.web_thickness < 200 * self.epsilon else False
+            # TODO No transverse stiffener web connected to flanges along both longitudinal edges CL 8.6.1.1
         elif type == 3:
             print('ratio 3', self.section_property.depth_web/self.section_property.web_thickness)
             if self.compression_flange_buckling:
@@ -830,6 +847,7 @@ class PlateGirderWelded(Member):
     def plate_girder_strength(self):
         Flexure.plate_girder_strength(self)
         
+        # self.shear_strength = self.myround(self.V_d,5,'low')
     def bending_strength_girder(self):
         # print('Inside bending_strength of girder ')
         # web_class = IS800_2007.Table2_i(
@@ -964,11 +982,16 @@ class PlateGirderWelded(Member):
         self.bending_strength_section_reduced = bending_strength_section
         return bending_strength_section
         
+    def plate_girder_strength(self):
+        Flexure.plate_girder_strength(self)
+        
     def myround(x, base,type):
         if type == 'high':
             return base * math.ceil(x / base)
         else:
             return base * round(x / base)
+    
+    
     def section_check_validator(self,var1,var2,var3):
         if var1 == var2:
             self.section_list = [True]
@@ -1047,10 +1070,13 @@ class PlateGirderWelded(Member):
     def common_result(self, list_result, result_type, flag=1):
         # self.result_designation = list_result[result_type]["Designation"]
         ic()
+        # TODO take dictionary of most optmised output and add here
         self.result_tf =  self.section_property.flange_thickness
         self.result_tw = self.section_property.web_thickness
         self.result_dw = self.section_property.depth_web
         self.result_bf = self.section_property.flange_width
+        self.shear_strength = self.single_section_dictionary['Shear_Strength']
+        
         try:
             self.result_shear = self.shear_strength
             self.result_bending = "NA"

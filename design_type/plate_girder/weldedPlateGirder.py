@@ -540,6 +540,7 @@ class PlateGirderWelded(Member):
         self.effective_length = self.length
         
         # Tab3
+        # No option for End Post
         self.EndStiffener = 'Yes'
         self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
         self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
@@ -547,6 +548,7 @@ class PlateGirderWelded(Member):
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         #TODO : future inputs add to design preference
         self.web_type_needed = "Thick" # or "Slim"
+        # TODO self.servicibility_check CL: 8.6.1.1
         self.servicibility_check = True
         self.compression_flange_buckling = True
         
@@ -640,7 +642,7 @@ class PlateGirderWelded(Member):
         # 5.1 Web needed by User Thick or thin 
         if 'Check1' not in self.single_section_dictionary:
             self.single_section_dictionary['Check1'] = self.checks(self,1)
-        # 5.2 servicibility_check
+        # 5.2 servicibility_check Only for Intermediate Transverse stiffener
         self.single_section_dictionary['Check2'] = self.checks(self,2)
         # 5.3 compression_flange_buckling
         self.single_section_dictionary['Check3'] = self.checks(self,3)

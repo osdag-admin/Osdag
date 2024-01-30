@@ -776,7 +776,6 @@ class Flexure(Member):
         return self.section_property
 
     def design_beam(self, design_dictionary):
-        print(f"Inside design_beam")
         # 1- Based on optimum UR
         self.optimum_section_ur_results = {}
         self.optimum_section_ur = []
@@ -787,6 +786,8 @@ class Flexure(Member):
 
         # section classification
         flag = self.section_classification(self)
+        print(f"Inside design_beam flag:{flag}")
+        
         if self.effective_area_factor < 1.0:
             logger.warning(
                 "Reducing the effective sectional area as per the definition in the Design Preferences tab."
@@ -822,6 +823,8 @@ class Flexure(Member):
                 list_1 = []
                 list_result.append(section)
                 self.section_class = self.input_section_classification[section][0]
+                print(f"Inside design_beam self.design_type:{self.design_type}")
+                
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
                      self.It = self.input_section_classification[section][ 5 ]
                      self.hf = self.input_section_classification[section][ 6 ]

@@ -634,13 +634,15 @@ KEY_tf = 'TF.Data'
 KEY_tw = 'TW.Data'
 KEY_dw = 'DW.Data'
 KEY_bf = 'BF.Data'
-KEY_DISP_tf = 'TF(mm)'
-KEY_DISP_tw = 'TW(mm)'
-KEY_DISP_dw = 'DW(mm)'
-KEY_DISP_bf = 'BF(mm)'
+KEY_DISP_tf = 'Flange Thickness(mm)'
+KEY_DISP_tw = 'Web Thickness(mm)'
+KEY_DISP_dw = 'Web Depth(mm)'
+KEY_DISP_bf = 'Flange Width(mm)'
 KEY_IntermediateStiffener = 'IntermediateStiffener.Data'
 KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
-
+KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
+KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
+KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 ###################################
 # All Input Keys
 ###################################

@@ -611,9 +611,12 @@ class Flexure_Cantilever(Member):
         elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
             self.design_type = VALUES_SUPP_TYPE[0]
             self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
+            self.support_cndition_shear_buckling = 'NA'
+            
         elif self.design_type_temp == VALUES_SUPP_TYPE_temp[2]:
             self.design_type = VALUES_SUPP_TYPE[1]
             self.bending_type = KEY_DISP_BENDING1
+            self.support_cndition_shear_buckling = 'NA'
 
         # section user data        
         self.length = float(design_dictionary[KEY_LENGTH])
@@ -790,7 +793,7 @@ class Flexure_Cantilever(Member):
         self.optimum_section_cost = []
 
         # 1 - section classification
-        flag = self.section_classification(self)
+        flag = self.section_classification(self,design_dictionary)
         if self.effective_area_factor < 1.0:
             logger.warning(
                 "Reducing the effective sectional area as per the definition in the Design Preferences tab."
@@ -941,7 +944,7 @@ class Flexure_Cantilever(Member):
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
             self.K_v = IS800_2007.cl_8_4_2_2_K_v_Simple_postcritical('only support')
             self.plate_girder_strength(self)
-            logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
+            # logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
             self.shear_strength = self.V_cr / self.gamma_m0
             # if self.V_d > self.load.shear_force * 10**-3:
             #
@@ -1072,10 +1075,10 @@ class Flexure_Cantilever(Member):
             #     self.M_cr
             # )
             phi_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_phi_lt(
-                alpha_lt, lambda_lt
+                alpha_lt, self.lambda_lt
             )
             X_lt = IS800_2007.cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(
-                phi_lt, lambda_lt
+                phi_lt, self.lambda_lt
             )
             fbd = IS800_2007.cl_8_2_2_Unsupported_beam_bending_compressive_stress(
                 X_lt, self.material_property.fy, self.gamma_m0
@@ -1106,7 +1109,7 @@ class Flexure_Cantilever(Member):
                         * self.section_property.plast_sec_mod_z
                         * fbd
                     )
-            print('Inside bending_strength 2',It,self.hf,self.Iw,self.M_cr ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
+            print('Inside bending_strength 2',self.It,self.hf,self.Iw,self.M_cr ,self.beta_b_lt,alpha_lt,self.lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
         self.bending_strength_section_reduced = bending_strength_section
         return bending_strength_section
     def bending_strength_girder(self):
@@ -1239,7 +1242,7 @@ class Flexure_Cantilever(Member):
                         * self.section_property.plast_sec_mod_z
                         * fbd
                     )
-            print('Inside bending_strength 2',It,self.hf,self.Iw,self.fcrb ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
+            print('Inside bending_strength 2',self.It,self.hf,self.Iw,self.fcrb ,self.beta_b_lt,alpha_lt,lambda_lt,phi_lt,X_lt,fbd,bending_strength_section)
         self.bending_strength_section_reduced = bending_strength_section
         return bending_strength_section
     def bending_strength_reduction(self, Md):
@@ -1270,7 +1273,7 @@ class Flexure_Cantilever(Member):
             )
 
     
-    def section_classification(self, trial_section=""):
+    def section_classification(self, design_dictionary,trial_section=""):
         """Classify the sections based on Table 2 of IS 800:2007"""
         print(f"Inside section_classification")
         local_flag = True
@@ -1342,6 +1345,7 @@ class Flexure_Cantilever(Member):
                     self.section_class = "Semi-Compact"
 
             Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            self.effective_length_beam(self, design_dictionary, self.length)  # mm
 
             # print( 'self.allow_class', self.allow_class)
             if self.section_property.plast_sec_mod_z >= Zp_req:
@@ -2069,7 +2073,7 @@ class Flexure_Cantilever(Member):
             t1 = ('SubSection', 'Section Classification', '|p{3cm}|p{3.5cm}|p{8.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t1 = ('Web Class', 'Neutral Axis at Mid-Depth',
-                  cl_3_7_2_section_classification_web(round(self.effective_depth, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
+                  cl_3_7_2_section_classification_web(round(self.result_eff_d, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
                                          self.epsilon,
                                         self.input_section_classification[self.result_designation][2]),
                   ' ')

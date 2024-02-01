@@ -621,6 +621,13 @@ class PlateGirderWelded(Member):
                 ic(section )
                 
                 self.girder_checks(self,section=section)
+                
+                # UR Check
+                self.UR_ratio = max(self.single_section_dictionary['Shear_Strength']/self.load.shear_force*10**3,0)
+                self.optimum_section_ur_results[self.UR_ratio] = self.single_section_dictionary
+                
+                print(self.optimum_section_ur_results)
+                
              
             
             
@@ -640,7 +647,7 @@ class PlateGirderWelded(Member):
         
         # 5. Checks
         # 5.1 Web needed by User Thick or thin 
-        if 'Check1' not in self.single_section_dictionary:
+        if 'Check1' not in self.single_section_dictionary :# TODO check if required -> or self.single_section_dictionary['Check1'] == None
             self.single_section_dictionary['Check1'] = self.checks(self,1)
         # 5.2 servicibility_check Only for Intermediate Transverse stiffener
         self.single_section_dictionary['Check2'] = self.checks(self,2)
@@ -699,8 +706,7 @@ class PlateGirderWelded(Member):
 
                         self.shear_strength = self.V_tf_girder / self.gamma_m0 * 10**-3
                         logger.info('Intermediate Stiffeners required d ={}, c = {}, Section = {}, V_tf = {}, V_d = {}'.format(self.effective_depth,self.c,
-                                                                                                            self.section_property.designation,
-                                                                                                            self.V_tf_girder,self.shear_strength))
+                        self.section_property.designation,self.V_tf_girder,self.shear_strength))
                         if self.shear_strength > self.load.shear_force * 10**-3:
                             return
                 
@@ -872,7 +878,7 @@ class PlateGirderWelded(Member):
             elif self.flange_class == "Semi-Compact" and self.web_class == "Semi-Compact":
                 self.section_class_girder = "Semi-Compact"
         print(self.web_class_list,self.flange_class_list,self.section_class_girder)
-        return (('web_class',self.web_class),('flange_class',self.flange_class),('section_class_girder',self.section_class_girder))
+        return (('web_class',self.web_class),('flange_class',self.flange_class),('section_class_girder',self.section_class_girder),('Class Ratio',self.web_class_list[1]))
 
     def Shear_Strength(self):
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(

@@ -313,6 +313,16 @@ class Flexure(Member):
         # return list(set(profile1 + profile2))
             
 
+    def fn_torsion_warping(self):
+        print( 'Inside fn_torsion_warping', self)
+        if self[0] == Torsion_Restraint1:
+            return Warping_Restraint_list
+        elif self[0] == Torsion_Restraint2:
+            return [Warping_Restraint5]
+        else:
+            return [Warping_Restraint5]        
+
+
     def fn_supp_image(self):
         print( 'Inside fn_supp_image', self)
         if self[0] == KEY_DISP_SUPPORT1:
@@ -337,10 +347,10 @@ class Flexure(Member):
         t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
 
-        # t3 = ([KEY_SUPPORT], KEY_IMAGE, TYPE_IMAGE, self.fn_supp_image)
-        # lst.append(t3)
+        t3 = ([KEY_TORSIONAL_RES], KEY_WARPING_RES, TYPE_COMBOBOX, self.fn_torsion_warping)
+        lst.append(t3)
 
-        # t3 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_BENDING, TYPE_COMBOBOX, self.axis_bending_change)
+        # t3 = ([KEY_WARPING_RES], KEY_TORSIONAL_RES, TYPE_COMBOBOX, self.fn_warping_torsion)
         # lst.append(t3)
 
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
@@ -1478,7 +1488,9 @@ class Flexure(Member):
             try:
                 if float(design_dictionary[KEY_LENGTH_OVERWRITE]) <= 0:
                     design_dictionary[KEY_LENGTH_OVERWRITE] = 'NA'
-                length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
+                else:
+                    length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
+                    
                 self.effective_length = length
                 print(f"Working 3 {self.effective_length}")
             except:
@@ -2024,7 +2036,7 @@ class Flexure(Member):
                  KEY_MODULE: self.module, #"Axial load on column "
                     KEY_DISP_SHEAR: self.load.shear_force * 10 ** -3,
                     KEY_DISP_BEAM_MOMENT_Latex: self.load.moment * 10 ** -6,
-                    KEY_DISP_LENGTH_BEAM: self.length,
+                    KEY_DISP_LENGTH_BEAM: self.result_eff_len,
                     KEY_DISP_SEC_PROFILE: self.sec_profile,
                     KEY_DISP_SECSIZE: str(self.sec_list),
                  KEY_MATERIAL: self.material,
@@ -2434,7 +2446,86 @@ class Flexure(Member):
                       get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_crippling, 2), relation="leq"))
 
                 self.report_check.append(t1)
+# TODO
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                t1 = ('SubSection', 'Lateral Torsional Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+                self.report_check.append(t1)
 
+                # t1 = (KEY_DISP_I_eff_latex + '($mm^4$)', ' ',
+                #       cl_8_7_3_Ieff_web_check(self.bearing_length, self.section_property.web_thickness,
+                #                                            round(self.result_bcI_eff,2)),
+                #       ' ')
+            #     self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_A_eff_latex+ '($mm^2$)', ' ',
+            #           cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
+            #                                                self.result_bcA_eff),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_r_eff_latex+ '(mm)', ' ',
+            #           cl_8_7_3_reff_web_check(round(self.result_bcr_eff,2), round(self.result_bcI_eff,2),
+            #                                                self.result_bcA_eff),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_SLENDER + '($\lambda$)', ' ',
+            #           cl_8_7_1_5_slenderness(round(self.result_bcr_eff, 2), round(self.result_eff_d, 2),
+            #                                   self.result_eff_sr),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+            #     # t1 = (KEY_DISP_SLENDER, ' ',
+            #     #       cl_8_7_1_5_slenderness(round(self.result_bcr_eff, 2), round(self.result_eff_d, 2),
+            #     #                              self.result_eff_sr),
+            #     #       ' ')
+            #     # self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_BUCKLING_CURVE_ZZ, ' ',
+            #           cl_8_7_1_5_buckling_curve(),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_IMPERFECTION_FACTOR_ZZ + r'($\alpha$)', ' ',
+            #           cl_8_7_1_5_imperfection_factor(self.result_IF),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_EULER_BUCKLING_STRESS_ZZ, ' ',
+            #           cl_8_7_1_5_buckling_stress(self.section_property.modulus_of_elasticity,self.result_eff_sr,self.result_ebs),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+                t1 = ('$\phi$', ' ',
+                      cl_8_2_2_phi(self.result_IF_lt,self.result_nd_esr_lt, self.result_phi_lt),
+                      ' ')
+                self.report_check.append(t1)
+
+            #     t1 = ('Buckling stress($N/mm^2$)', ' ',
+            #           cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_eff_sr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
+            #           ' ')
+            #     self.report_check.append(t1)
+
+            #     t1 = (KEY_DISP_BUCKLING_STRENGTH, self.load.shear_force * 10 ** -3,
+            #           cl_7_1_2_design_compressive_strength(self.result_capacity,round((
+            #                     self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness,2), self.result_fcd,self.load.shear_force * 10 ** -3),
+            #           get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_capacity, 2), relation="leq"))
+            #     self.report_check.append(t1)
+
+            #     t1 = ('SubSection', 'Web Bearing Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+            #     self.report_check.append(t1)
+
+            #     t1 = ('Bearing Strength(kN)', self.load.shear_force * 10 ** -3,
+            #           cl_8_7_4_Bearing_stiffener_check(self.bearing_length, round(2.5 * (
+            #                                         self.section_property.root_radius + self.section_property.flange_thickness), 2),
+            #                                            self.section_property.web_thickness,
+            #                                            self.material_property.fy, self.gamma_m0,
+            #                                            round(self.result_crippling, 2),
+            #                                            self.section_property.root_radius,
+            #                                            self.section_property.flange_thickness),
+            #           get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_crippling, 2), relation="leq"))
+
+            #     self.report_check.append(t1)
                 # t1 = (KEY_DISP_A_eff_latex + '(mm^2)', ' ',
                 #       cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
                 #                               self.result_bcA_eff),

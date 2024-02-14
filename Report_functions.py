@@ -697,6 +697,24 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
         allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
     return allow_shear_capacity_eqn
+
+def cl_8_2_2_phi(al, lm,phi):
+    """
+    Author: Rutvik J
+
+    """
+
+    al = str(al)
+    lm = str(lm)
+    phi = str(phi)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= 0.5(1 + \alpha_{lt}(\lambda_{lt} - 0.2) + \lambda_{lt} ^ 2) \\'))
+    slender_eqn.append(NoEscape(r' &= 0.5(1+' +  al + r'(' + lm + r'-0.2) +' + lm +  r'^2)\\'))
+    slender_eqn.append(NoEscape(r' &= ' + phi + r' \end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+
+
 def sectional_area_change(given, provided, parameter):
     """
     Author: Rutvik J

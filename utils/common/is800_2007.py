@@ -1008,7 +1008,7 @@ class IS800_2007(object):
                     length = 0.70 * length
                 if Warping == Warping_Restraint2 :
                     length = 0.75 * length
-                if Warping ==Warping_Restraint3 :
+                if Warping ==Warping_Restraint1 :
                     length = 0.80 * length
                 if Warping ==Warping_Restraint4 :
                     length = 0.85 * length
@@ -1024,7 +1024,7 @@ class IS800_2007(object):
                     length = 0.85 * length
                 if Warping ==Warping_Restraint2 :
                     length = 0.9 * length
-                if Warping ==Warping_Restraint3 :
+                if Warping ==Warping_Restraint1 :
                     length = 0.95 * length
                 if Warping ==Warping_Restraint4 :
                     length = 1.00 * length

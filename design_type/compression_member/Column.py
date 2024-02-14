@@ -759,6 +759,16 @@ class ColumnDesign(Member):
                 self.sec_profile) / self.length_yy  # mm
             print(f"self.effective_length {self.effective_length_zz} ")
 
+            print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            print(self.end_1_z)
+            print(self.end_2_z)
+            print(self.end_1_y)
+            print(self.end_2_y)
+
+            print(f"factor y-y {self.effective_length_yy/self.length_yy}")
+            print(f"factor z-z {self.effective_length_yy / self.length_yy}")
+            print("+++++++++++++++++++++++++++++++++++++++++++++++")
+
             # 2.3 - Effective slenderness ratio
             self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
             self.effective_sr_yy = self.effective_length_yy / self.section_property.rad_of_gy_y
@@ -1021,7 +1031,7 @@ class ColumnDesign(Member):
                 self.optimum_section_cost.append(self.cost)
                 # print(f"list_zz{list_zz},list_yy{list_yy} ")
 
-                # Step 3 - Storing the optimum results to a list in a descending order
+                # Step 3 - Storing the optimum results to a list in descending order
 
                 list_1 = ['Designation', 'Section class', 'Effective area', 'Buckling_curve_zz', 'IF_zz', 'Effective_length_zz', 'Effective_SR_zz',
                           'EBS_zz', 'ND_ESR_zz', 'phi_zz', 'SRF_zz', 'FCD_1_zz', 'FCD_2', 'FCD_zz', 'FCD', 'Capacity', 'UR', 'Cost', 'Designation',

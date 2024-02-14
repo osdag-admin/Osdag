@@ -1304,7 +1304,7 @@ def cl_8_7_4_Bearing_stiffener_check(b,n, t, fy,gama,fw,r1,T):
     eqn.append(NoEscape(r'&= 2.5 ('+ r1 + r'+' + T + r')\\'))
     eqn.append(NoEscape(r'&= '+ n + r'\\'))
     eqn.append(NoEscape(r'F_w &= \frac{(bearing_{length} + n_2)t_{web}f_{yw}}{\gamma_mo}\\'))
-    eqn.append(NoEscape(r' &= \frac{' + b + r'+' + n + r')\times' + t + r'\times' + fy + r'}{'+ gama + r'}\\'))
+    eqn.append(NoEscape(r' &= \frac{(' + b + r'+' + n + r')\times' + t + r'\times' + fy + r'}{'+ gama + r'}\\'))
     eqn.append(NoEscape(r'&= ' + fw + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.4}] \end{aligned}'))
     return eqn

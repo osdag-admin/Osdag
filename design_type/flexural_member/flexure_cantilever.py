@@ -985,7 +985,7 @@ class Flexure_Cantilever(Member):
             else:
                 self.shear_strength = 0.1
 
-        logger.info(f"Considering  {self.support_cndition_shear_buckling}")
+        #TODO logger.info(f"Considering  {self.support_cndition_shear_buckling}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
         # if web_buckling:
         #     b1 = input('Enter bearing')
@@ -2008,7 +2008,7 @@ class Flexure_Cantilever(Member):
                  KEY_MODULE: self.module, #"Axial load on column "
                     KEY_DISP_SHEAR: self.load.shear_force * 10 ** -3,
                     KEY_DISP_BEAM_MOMENT_Latex: self.load.moment * 10 ** -6,
-                    KEY_DISP_LENGTH_BEAM: self.length,
+                    KEY_DISP_LENGTH_BEAM: self.result_eff_len,
                     KEY_DISP_SEC_PROFILE: self.sec_profile,
                     KEY_DISP_SECSIZE: str(self.sec_list),
                  KEY_MATERIAL: self.material,

@@ -1005,14 +1005,14 @@ class IS800_2007(object):
         if load == KEY_DISP_LOAD1:
             if Torsional == Torsion_Restraint1:
                 if Warping == Warping_Restraint1 :
-                    length = 0.70 * length
-                if Warping == Warping_Restraint2 :
-                    length = 0.75 * length
-                if Warping ==Warping_Restraint1 :
                     length = 0.80 * length
-                if Warping ==Warping_Restraint4 :
+                elif Warping == Warping_Restraint2 :
+                    length = 0.75 * length
+                # elif Warping ==Warping_Restraint1 :
+                #     length = 0.80 * length
+                elif Warping ==Warping_Restraint4 :
                     length = 0.85 * length
-                if Warping ==Warping_Restraint5 :
+                elif Warping ==Warping_Restraint5 :
                     length = 1.00 * length
             elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
                 length = length + 2* depth /1000

@@ -459,6 +459,7 @@ class Flexure(Member):
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
         out_list.append(t2)
 
+        # TODO
         # t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
         # out_list.append(t1)
 
@@ -1376,16 +1377,18 @@ class Flexure(Member):
                 print( 'self.section_property.plast_sec_mod_z More than Requires')
                 
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                    self.It = (
-                                      2
-                                      * self.section_property.flange_width
-                                      * self.section_property.flange_thickness ** 3
-                              ) / 3 + (
-                                      (self.section_property.depth - self.section_property.flange_thickness)
-                                      * self.section_property.web_thickness ** 3
-                              ) / 3
+                    self.It = self.section_property.It
+                    # (
+                    #                   2
+                    #                   * self.section_property.flange_width
+                    #                   * self.section_property.flange_thickness ** 3
+                    #           ) / 3 + (
+                    #                   (self.section_property.depth - self.section_property.flange_thickness)
+                    #                   * self.section_property.web_thickness ** 3
+                    #           ) / 3
                     self.hf = self.section_property.depth - self.section_property.flange_thickness
-                    self.Iw = 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
+                    self.Iw = self.section_property.Iw
+                    # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
                     self.M_cr = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
                         self.material_property.modulus_of_elasticity,
                         0.3,

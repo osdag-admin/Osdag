@@ -1299,7 +1299,7 @@ class Flexure_Cantilever(Member):
                 web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
                 flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
             else:
-                """Need to check below formula"""
+                """TODO Need to check below formula"""
                 flange_class = IS800_2007.Table2_i(
                     (
                         (self.section_property.flange_width / 2)
@@ -1350,16 +1350,18 @@ class Flexure_Cantilever(Member):
             # print( 'self.allow_class', self.allow_class)
             if self.section_property.plast_sec_mod_z >= Zp_req:
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                    self.It = (
-                                      2
-                                      * self.section_property.flange_width
-                                      * self.section_property.flange_thickness ** 3
-                              ) / 3 + (
-                                      (self.section_property.depth - self.section_property.flange_thickness)
-                                      * self.section_property.web_thickness ** 3
-                              ) / 3
+                    self.It = self.section_property.It
+                    # (
+                    #                   2
+                    #                   * self.section_property.flange_width
+                    #                   * self.section_property.flange_thickness ** 3
+                    #           ) / 3 + (
+                    #                   (self.section_property.depth - self.section_property.flange_thickness)
+                    #                   * self.section_property.web_thickness ** 3
+                    #           ) / 3
                     self.hf = self.section_property.depth - self.section_property.flange_thickness
-                    self.Iw = 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
+                    self.Iw = self.section_property.Iw
+                    # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
                     self.M_cr = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
                         self.material_property.modulus_of_elasticity,
                         0.3,

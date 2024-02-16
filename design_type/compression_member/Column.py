@@ -480,8 +480,13 @@ class ColumnDesign(Member):
         t2 = (KEY_NON_DIM_ESR_ZZ, KEY_DISP_NON_DIM_ESR_ZZ, TYPE_TEXTBOX, round(self.result_nd_esr_zz, 2) if flag else '', True)
         out_list.append(t2)
 
-        t2 = (KEY_COMP_STRESS_ZZ, KEY_DISP_COMP_STRESS_ZZ, TYPE_TEXTBOX, round(self.result_fcd_zz, 2) if flag else '', True)
+        t2 = (KEY_COMP_STRESS_ZZ, KEY_DISP_COMP_STRESS_ZZ, TYPE_TEXTBOX, round(self.result_fcd_1_zz, 2) if flag else '', True)
         out_list.append(t2)
+
+        # t2 = (
+        #     KEY_DESIGN_STRENGTH_ZZ, KEY_DISP_DESIGN_STRENGTH_ZZ, TYPE_TEXTBOX, round(self.pd_zz, 2) if flag else '',
+        #     True)
+        # out_list.append(t2)
 
         t10 = (None, DISP_TITLE_YY, TYPE_TITLE, None, True)
         out_list.append(t10)
@@ -507,14 +512,33 @@ class ColumnDesign(Member):
         # t2 = (KEY_EFF_SEC_AREA_YY, KEY_DISP_EFF_SEC_AREA_YY, TYPE_TEXTBOX, round(self.effective_area, 2) if flag else '', True)
         # out_list.append(t2)
 
-        t2 = (KEY_COMP_STRESS_YY, KEY_DISP_COMP_STRESS_YY, TYPE_TEXTBOX, round(self.result_fcd_yy, 2) if flag else '', True)
+        t2 = (KEY_COMP_STRESS_YY, KEY_DISP_COMP_STRESS_YY, TYPE_TEXTBOX, round(self.result_fcd_1_yy, 2) if flag else '', True)
         out_list.append(t2)
+
+        # t2 = (
+        # KEY_COMP_STRESS_YY, KEY_DISP_COMP_STRESS_YY, TYPE_TEXTBOX, round(self.result_fcd_1_yy, 2) if flag else '', True)
+        # out_list.append(t2)
+
+        # t2 = (
+        # KEY_DESIGN_STRENGTH_YY, KEY_DISP_DESIGN_STRENGTH_YY, TYPE_TEXTBOX, round(self.pd_yy, 2) if flag else '', True)
+        # out_list.append(t2)
 
         t1 = (None, KEY_DESIGN_COMPRESSION, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX, round(self.result_capacity * 1e-3, 2) if flag else
-        '', True)
+        t1 = (KEY_MIN_DESIGN_COMP_STRESS, KEY_MIN_DESIGN_COMP_STRESS_VAL, TYPE_TEXTBOX,
+              round(min(self.result_fcd_1_yy, self.result_fcd_1_zz), 2) if flag else
+              '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_MAT_STRESS, KEY_DISP_MAT_STRESS, TYPE_TEXTBOX, round(self.f_cd_2, 2) if flag else '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_FCD, KEY_DISP_FCD, TYPE_TEXTBOX, round(self.result_fcd, 2) if flag else '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX,
+              round(self.result_capacity * 1e-3, 2) if flag else '', True)
         out_list.append(t1)
 
         return out_list
@@ -741,23 +765,35 @@ class ColumnDesign(Member):
                         format(trial_section, self.flange_class, self.web_class, self.section_class))
 
             # 2.2 - Effective length
-            temp_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
-                self.length_yy,
-                end_1=self.end_1_z,
-                end_2=self.end_2_z)
-            self.effective_length_yy = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
-                self.length_yy,
-                self.sec_profile) / self.length_yy  # mm
-            print(f"self.effective_length {self.effective_length_yy} ")
-
-            temp_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+            self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_zz,
                 end_1=self.end_1_z,
                 end_2=self.end_2_z)
-            self.effective_length_zz = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+
+            # self.effective_length_yy = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+            #     self.length_yy,
+            #     self.sec_profile) / self.length_yy  # mm
+            # print(f"self.effective_length {self.effective_length_yy} ")
+
+            self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_yy,
-                self.sec_profile) / self.length_yy  # mm
-            print(f"self.effective_length {self.effective_length_zz} ")
+                end_1=self.end_1_y,
+                end_2=self.end_2_y)
+
+            # self.effective_length_zz = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+            #     self.length_yy,
+            #     self.sec_profile) / self.length_yy  # mm
+            # print(f"self.effective_length {self.effective_length_zz} ")
+
+            # print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            # print(self.end_1_z)
+            # print(self.end_2_z)
+            # print(self.end_1_y)
+            # print(self.end_2_y)
+            #
+            # print(f"factor y-y {self.effective_length_yy/self.length_yy}")
+            # print(f"factor z-z {self.effective_length_yy / self.length_yy}")
+            # print("+++++++++++++++++++++++++++++++++++++++++++++++")
 
             # 2.3 - Effective slenderness ratio
             self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
@@ -770,7 +806,6 @@ class ColumnDesign(Member):
                 local_flag = False
             else:
                 logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
-
 
             if len(self.allowed_sections) == 0:
                 logger.warning("Select at-least one type of section in the design preferences tab.")
@@ -935,8 +970,8 @@ class ColumnDesign(Member):
                                                                                                                  end_1=self.end_1_z,
                                                                                                                  end_2=self.end_2_z)  # mm
                 self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_yy ,
-                                                                                                                 end_1=self.end_1_z,
-                                                                                                                 end_2=self.end_2_z)  # mm
+                                                                                                                 end_1=self.end_1_y,
+                                                                                                                 end_2=self.end_2_y)  # mm
 
                 list_zz.append(self.effective_length_zz)
                 list_yy.append(self.effective_length_yy)
@@ -1000,6 +1035,7 @@ class ColumnDesign(Member):
                 list_yy.append(self.f_cd)
 
                 # 2.7 - Capacity of the section
+
                 self.section_capacity = self.f_cd * self.effective_area  # N
 
                 list_zz.append(self.section_capacity)
@@ -1021,7 +1057,7 @@ class ColumnDesign(Member):
                 self.optimum_section_cost.append(self.cost)
                 # print(f"list_zz{list_zz},list_yy{list_yy} ")
 
-                # Step 3 - Storing the optimum results to a list in a descending order
+                # Step 3 - Storing the optimum results to a list in descending order
 
                 list_1 = ['Designation', 'Section class', 'Effective area', 'Buckling_curve_zz', 'IF_zz', 'Effective_length_zz', 'Effective_SR_zz',
                           'EBS_zz', 'ND_ESR_zz', 'phi_zz', 'SRF_zz', 'FCD_1_zz', 'FCD_2', 'FCD_zz', 'FCD', 'Capacity', 'UR', 'Cost', 'Designation',

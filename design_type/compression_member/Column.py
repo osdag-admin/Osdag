@@ -526,27 +526,20 @@ class ColumnDesign(Member):
         flag = False
         option_list = self.input_values(self)
         missing_fields_list = []
-        print(f'func_for_validation option_list {option_list}')
+        #print(f'func_for_validation option_list {option_list}')
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
+                    print(option[1], option[2], option[0], design_dictionary[option[0]])
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_END1_Y, KEY_END2_Y]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
-
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1_Y, KEY_END2_Y]:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
+                    print(option[1], option[2], option[0], design_dictionary[option[0]])
 
         if len(missing_fields_list) > 0:
-
+            print(design_dictionary)
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
             # flag = False

@@ -299,7 +299,7 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Columns in Frames', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
+                'Compression Member': [('Columns in Frames', 'ResourceFiles/images/CompressionMembers_ColumnsInFrames', 'Column_Design'),
                                        # ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
                                        ('Struts in Trusses', 'ResourceFiles/images/broken.png', 'Strut_Design'),
                                        self.show_compression_module,

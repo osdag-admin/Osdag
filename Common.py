@@ -322,6 +322,7 @@ TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
 TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
+KEY_IMAGE_Y = 'Image_Y'
 KEY_IMAGE_two = 'Imagetwo'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
@@ -378,8 +379,18 @@ KEY_ACTUAL_LEN_ZZ = 'Actual.Length_zz'
 KEY_DISP_ACTUAL_LEN_ZZ = 'Actual Length (z-z), mm'
 KEY_ACTUAL_LEN_YY = 'Actual.Length_yy'
 KEY_DISP_ACTUAL_LEN_YY = 'Actual Length (y-y), mm'
+KEY_UNSUPPORTED_LEN_ZZ = 'Unsupported.Length_zz'
+KEY_DISP_UNSUPPORTED_LEN_ZZ = 'Unsupported Length (z-z), mm'
+KEY_UNSUPPORTED_LEN_YY = 'Unsupported.Length_yy'
+KEY_DISP_UNSUPPORTED_LEN_YY = 'Unsupported Length (y-y), mm'
 KEY_DESIGN_COMPRESSION = 'Design Results'
 KEY_DESIGN_STRENGTH_COMPRESSION = 'Design.Strength'
+KEY_MIN_DESIGN_COMP_STRESS = 'MinCompStress'
+KEY_MIN_DESIGN_COMP_STRESS_VAL = 'Min. Design Comp.Stress (MPa)'
+KEY_MAT_STRESS = 'MaterialStress'
+KEY_DISP_MAT_STRESS = 'fy/gamma_m0'
+KEY_FCD = 'Fcd'
+KEY_DISP_FCD = 'f_cd'
 KEY_DISP_DESIGN_STRENGTH_COMPRESSION = 'Design Strength (kN)'
 DISP_TITLE_OPTIMUM_SECTION = 'Optimum Section'
 KEY_TITLE_OPTIMUM_DESIGNATION = 'Optimum.Designation'
@@ -422,8 +433,10 @@ KEY_COMP_STRESS_ZZ = 'MajorDCS'
 KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
 KEY_COMP_STRESS_YY = 'MinorDCS'
 KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
-
-###################################
+KEY_DISP_DESIGN_STRENGTH_YY = 'Pd (kN)'
+KEY_DISP_DESIGN_STRENGTH_ZZ = 'Pd (kN)'
+KEY_DESIGN_STRENGTH_YY = 'DesignStrength.y-y'
+KEY_DESIGN_STRENGTH_ZZ = 'DesignStrength.z-z'
 ##Strut Design
 ###################################
 KEY_SHEAR_STRENGTH = 'Shear.Strength'
@@ -806,7 +819,7 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
-VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
+VALUES_SECTYPE = ['Select Type','Beams and Columns','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
@@ -2204,10 +2217,10 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
 KEY_DISP_SEC_TYPE = 'Section Type'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
-VALUES_SEC_PROFILE3 = ['Beams', 'Columns'] #,'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
@@ -2218,17 +2231,26 @@ KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 DISP_TITLE_SC = 'Supporting Condition'
 DISP_TITLE_STRUT = 'End Condition'
 KEY_END1 = 'End_1'
+KEY_END1_Y = 'End_1_Y'
 KEY_DISP_END1 = 'End 1'
+KEY_DISP_END1_Y = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
-VALUES_STRUT_END1 = ['Fixed','Hinged']
+VALUES_STRUT_END1 = ['Fixed', 'Hinged']
+VALUES_END1_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END1_Y = ['Fixed', 'Hinged']
 
 KEY_END2 = 'End_2'
+KEY_END2_Y = 'End_2_Y'
 KEY_DISP_END2 = 'End 2'
+KEY_DISP_END2_Y = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
-VALUES_STRUT_END2 = ['Fixed','Hinged']
+VALUES_STRUT_END2 = ['Fixed', 'Hinged']
+VALUES_END2_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END2_Y = ['Fixed', 'Hinged']
 
 KEY_END_CONDITION = 'End Condition'
-KEY_DISP_END_CONDITION = 'End Condition'
+KEY_DISP_END_CONDITION = 'End Condition (about z-z axis)'
+KEY_DISP_END_CONDITION_2 = 'End Condition (about y-y axis)'
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'
 DISP_TITLE_CHANNEL = 'Channel Section'
@@ -2560,3 +2582,62 @@ FLEXURE_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + Bearing_Length_Para
+
+OPTIMIZATION_TABLE_UI = str("""
+<div style="width:100%;">
+<table style="width:70%;" border="0">
+  <tr>
+    <th colspan="3" style="text-align:center;">Conditions of Restraint Supports</th>
+  </tr>
+  <tr>
+    <th>Sl No.</th>
+    <th>Torsional Restraint</th>
+    <th>Warping Restraint</th>
+  </tr>
+  <tr>
+    <td>(i)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(ii)</td>
+    <td>Fully restrained</td>
+    <td>Compression flange fully restrained</td>
+  </tr>
+  <tr>
+    <td>(iii)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(iv)</td>
+    <td>Fully restrained</td>
+    <td>Both flanges fully restrained</td>
+  </tr>
+  <tr>
+    <td>(v)</td>
+    <td>Fully restrained</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <tr>
+    <td>(vi)</td>
+    <td>Partially restrained by bottom flange support connection</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <tr>
+    <td>(vii)</td>
+    <td>Partially restrained by bottom flange bearing support</td>
+    <td>Warping not restrained in both flanges</td>
+  </tr>
+  <!-- Add more rows as needed -->
+</table>
+</div>
+</body></html>
+""")
+
+STRUT_OPTIMIZATION_DESCRIPTION = (
+    '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+    '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+    'p, li { white-space: pre-wrap; }\n'
+    '</style></head><body style="font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;">\n'
+) + Allowable_Utilization_Para + Effective_Area_Para + OPTIMIZATION_TABLE_UI

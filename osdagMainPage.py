@@ -157,7 +157,7 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member import Column
 from design_type.compression_member.compression import Compression
 from design_type.compression_member.Column import ColumnDesign
-from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
+#from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 
 from design_type.flexural_member.flexure import Flexure
 from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
@@ -301,7 +301,7 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Columns in Frames', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Column_Design'),
+                'Compression Member': [('Columns in Frames', 'ResourceFiles/images/CompressionMembers_ColumnsInFrames', 'Column_Design'),
                                        # ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
                                        ('Struts in Trusses', 'ResourceFiles/images/broken.png', 'Strut_Design'),
                                        self.show_compression_module,

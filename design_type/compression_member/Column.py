@@ -303,10 +303,10 @@ class ColumnDesign(Member):
         t1 = (None, KEY_SECTION_DATA, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t5 = (KEY_ACTUAL_LEN_ZZ, KEY_DISP_ACTUAL_LEN_ZZ, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t5 = (KEY_UNSUPPORTED_LEN_ZZ, KEY_DISP_UNSUPPORTED_LEN_ZZ, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
-        t6 = (KEY_ACTUAL_LEN_YY, KEY_DISP_ACTUAL_LEN_YY, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t6 = (KEY_UNSUPPORTED_LEN_YY, KEY_DISP_UNSUPPORTED_LEN_YY, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t6)
 
         t9 = (None, KEY_DISP_END_CONDITION, TYPE_TITLE, None, True, 'No Validator')
@@ -321,6 +321,18 @@ class ColumnDesign(Member):
         t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
         options_list.append(t12)
 
+        t13 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t13)
+
+        t14 = (KEY_END1_Y, KEY_DISP_END1_Y, TYPE_COMBOBOX, VALUES_END1_Y, True, 'No Validator')
+        options_list.append(t14)
+
+        t15 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
+        options_list.append(t15)
+
+        t16 = (KEY_IMAGE_Y, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        options_list.append(t16)
+
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
@@ -332,24 +344,25 @@ class ColumnDesign(Member):
     def fn_profile_section(self):
 
         profile = self[0]
-        if profile == 'Beams':
-            return connectdb("Beams", call_type="popup")
-        elif profile == 'Columns':
-            return connectdb("Columns", call_type="popup")
-        elif profile == 'RHS':
-            return connectdb("RHS", call_type="popup")
-        elif profile == 'SHS':
-            return connectdb("SHS", call_type="popup")
+        if profile == 'Beams and Columns':
+            res1 = connectdb("Beams", call_type="popup")
+            res2 = connectdb("Columns", call_type="popup")
+            return list(set(res1 + res2))
+        elif profile == 'RHS and SHS':
+            res1 = connectdb("RHS", call_type="popup")
+            res2 = connectdb("SHS", call_type="popup")
+            return list(set(res1 + res2))
         elif profile == 'CHS':
             return connectdb("CHS", call_type="popup")
         elif profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
             return connectdb('Angles', call_type= "popup")
         elif profile in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type= "popup")
-
+ 
     def fn_end1_end2(self):
 
         end1 = self[0]
+        print("end1 is {}".format(end1))
         if end1 == 'Fixed':
             return VALUES_END2
         elif end1 == 'Free':
@@ -374,6 +387,7 @@ class ColumnDesign(Member):
 
         end1 = self[0]
         end2 = self[1]
+        print("end 1 and end 2 are {}".format(end1, end2))
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
@@ -411,6 +425,12 @@ class ColumnDesign(Member):
 
         t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         lst.append(t3)
+
+        t4 = ([KEY_END1_Y], KEY_END2_Y, TYPE_COMBOBOX, self.fn_end1_end2)
+        lst.append(t4)
+
+        t5 = ([KEY_END1_Y, KEY_END2_Y], KEY_IMAGE_Y, TYPE_IMAGE, self.fn_end2_image)
+        lst.append(t5)
 
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
@@ -460,8 +480,13 @@ class ColumnDesign(Member):
         t2 = (KEY_NON_DIM_ESR_ZZ, KEY_DISP_NON_DIM_ESR_ZZ, TYPE_TEXTBOX, round(self.result_nd_esr_zz, 2) if flag else '', True)
         out_list.append(t2)
 
-        t2 = (KEY_COMP_STRESS_ZZ, KEY_DISP_COMP_STRESS_ZZ, TYPE_TEXTBOX, round(self.result_fcd_zz, 2) if flag else '', True)
+        t2 = (KEY_COMP_STRESS_ZZ, KEY_DISP_COMP_STRESS_ZZ, TYPE_TEXTBOX, round(self.result_fcd_1_zz, 2) if flag else '', True)
         out_list.append(t2)
+
+        # t2 = (
+        #     KEY_DESIGN_STRENGTH_ZZ, KEY_DISP_DESIGN_STRENGTH_ZZ, TYPE_TEXTBOX, round(self.pd_zz, 2) if flag else '',
+        #     True)
+        # out_list.append(t2)
 
         t10 = (None, DISP_TITLE_YY, TYPE_TITLE, None, True)
         out_list.append(t10)
@@ -487,14 +512,33 @@ class ColumnDesign(Member):
         # t2 = (KEY_EFF_SEC_AREA_YY, KEY_DISP_EFF_SEC_AREA_YY, TYPE_TEXTBOX, round(self.effective_area, 2) if flag else '', True)
         # out_list.append(t2)
 
-        t2 = (KEY_COMP_STRESS_YY, KEY_DISP_COMP_STRESS_YY, TYPE_TEXTBOX, round(self.result_fcd_yy, 2) if flag else '', True)
+        t2 = (KEY_COMP_STRESS_YY, KEY_DISP_COMP_STRESS_YY, TYPE_TEXTBOX, round(self.result_fcd_1_yy, 2) if flag else '', True)
         out_list.append(t2)
+
+        # t2 = (
+        # KEY_COMP_STRESS_YY, KEY_DISP_COMP_STRESS_YY, TYPE_TEXTBOX, round(self.result_fcd_1_yy, 2) if flag else '', True)
+        # out_list.append(t2)
+
+        # t2 = (
+        # KEY_DESIGN_STRENGTH_YY, KEY_DISP_DESIGN_STRENGTH_YY, TYPE_TEXTBOX, round(self.pd_yy, 2) if flag else '', True)
+        # out_list.append(t2)
 
         t1 = (None, KEY_DESIGN_COMPRESSION, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX, round(self.result_capacity * 1e-3, 2) if flag else
-        '', True)
+        t1 = (KEY_MIN_DESIGN_COMP_STRESS, KEY_MIN_DESIGN_COMP_STRESS_VAL, TYPE_TEXTBOX,
+              round(min(self.result_fcd_1_yy, self.result_fcd_1_zz), 2) if flag else
+              '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_MAT_STRESS, KEY_DISP_MAT_STRESS, TYPE_TEXTBOX, round(self.f_cd_2, 2) if flag else '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_FCD, KEY_DISP_FCD, TYPE_TEXTBOX, round(self.result_fcd, 2) if flag else '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_DESIGN_STRENGTH_COMPRESSION, TYPE_TEXTBOX,
+              round(self.result_capacity * 1e-3, 2) if flag else '', True)
         out_list.append(t1)
 
         return out_list
@@ -506,18 +550,20 @@ class ColumnDesign(Member):
         flag = False
         option_list = self.input_values(self)
         missing_fields_list = []
-        print(f'func_for_validation option_list {option_list}')
+        #print(f'func_for_validation option_list {option_list}')
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
+                    print(option[1], option[2], option[0], design_dictionary[option[0]])
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_END1_Y, KEY_END2_Y]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
+                    print(option[1], option[2], option[0], design_dictionary[option[0]])
 
         if len(missing_fields_list) > 0:
-
+            print(design_dictionary)
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
             # flag = False
@@ -545,7 +591,7 @@ class ColumnDesign(Member):
         global logger
         red_list = red_list_function()
 
-        if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+        if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
             for section in self.sec_list:
                 if section in red_list:
                     logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
@@ -562,12 +608,15 @@ class ColumnDesign(Member):
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
         # section user data
-        self.length_zz = float(design_dictionary[KEY_ACTUAL_LEN_ZZ])
-        self.length_yy = float(design_dictionary[KEY_ACTUAL_LEN_YY])
+        self.length_zz = float(design_dictionary[KEY_UNSUPPORTED_LEN_ZZ])
+        self.length_yy = float(design_dictionary[KEY_UNSUPPORTED_LEN_YY])
 
         # end condition
-        self.end_1 = design_dictionary[KEY_END1]
-        self.end_2 = design_dictionary[KEY_END2]
+        self.end_1_z = design_dictionary[KEY_END1]
+        self.end_2_z = design_dictionary[KEY_END2]
+
+        self.end_1_y = design_dictionary[KEY_END1_Y]
+        self.end_2_y = design_dictionary[KEY_END2_Y]
 
         # factored loads
         self.load = Load(axial_force=design_dictionary[KEY_AXIAL], shear_force="", moment="", moment_minor="", unit_kNm=True)
@@ -603,7 +652,8 @@ class ColumnDesign(Member):
         print(self.length_yy)
         print(self.length_zz)
         print(self.load)
-        print(self.end_1, self.end_2)
+        print(self.end_1_z, self.end_2_z)
+        print(self.end_1_y, self.end_2_y)
         print("==================")
 
         # safety factors
@@ -628,21 +678,25 @@ class ColumnDesign(Member):
         """ Classify the sections based on Table 2 of IS 800:2007 """
         local_flag = True
         self.input_section_list = []
-        self.input_section_classification = {}
+        self.input_section_classification = {} 
 
         for section in self.sec_list:
             trial_section = section.strip("'")
 
             # fetching the section properties
-            if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams
-                self.section_property = Beam(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # Columns
-                self.section_property = Column(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # RHS
-                self.section_property = RHS(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[3]:  # SHS
-                self.section_property = SHS(designation=trial_section, material_grade=self.material)
-            elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
+            if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams and columns
+                try:
+                    result = Beam(designation=trial_section, material_grade=self.material)
+                except:
+                    result = Column(designation=trial_section, material_grade=self.material)
+                self.section_property = result
+            elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # RHS and SHS
+                try:
+                    result = RHS(designation=trial_section, material_grade=self.material)
+                except:
+                    result = SHS(designation=trial_section, material_grade=self.material)
+                self.section_property = result
+            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                 self.section_property = CHS(designation=trial_section, material_grade=self.material)
             else:
                 self.section_property = Column(designation=trial_section, material_grade=self.material)
@@ -652,7 +706,7 @@ class ColumnDesign(Member):
                                                                     max(self.section_property.flange_thickness, self.section_property.web_thickness))
 
             # section classification
-            if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+            if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
 
                 if self.section_property.type == 'Rolled':
                     self.flange_class = IS800_2007.Table2_i((self.section_property.flange_width / 2), self.section_property.flange_thickness,
@@ -666,13 +720,13 @@ class ColumnDesign(Member):
                                                        self.section_property.web_thickness, self.material_property.fy,
                                                        classification_type='Axial compression')
 
-            elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):  # RHS or SHS
+            elif (self.sec_profile == VALUES_SEC_PROFILE[1]):  # RHS and SHS
                 self.flange_class = IS800_2007.Table2_iii((self.section_property.depth - (2 * self.section_property.flange_thickness)),
                                                           self.section_property.flange_thickness, self.material_property.fy,
                                                           classification_type='Axial compression')
                 self.web_class = self.flange_class
 
-            elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
+            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                 self.flange_class = IS800_2007.Table2_x(self.section_property.out_diameter, self.section_property.flange_thickness,
                                                         self.material_property.fy, load_type='axial compression')
                 self.web_class = self.flange_class  #Why?
@@ -704,23 +758,35 @@ class ColumnDesign(Member):
                         format(trial_section, self.flange_class, self.web_class, self.section_class))
 
             # 2.2 - Effective length
-            temp_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
-                self.length_yy,
-                end_1=self.end_1,
-                end_2=self.end_2)
-            self.effective_length_yy = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
-                self.length_yy,
-                self.sec_profile) / self.length_yy  # mm
-            print(f"self.effective_length {self.effective_length_yy} ")
-
-            temp_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+            self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_zz,
-                end_1=self.end_1,
-                end_2=self.end_2)
-            self.effective_length_zz = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+                end_1=self.end_1_z,
+                end_2=self.end_2_z)
+
+            # self.effective_length_yy = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+            #     self.length_yy,
+            #     self.sec_profile) / self.length_yy  # mm
+            # print(f"self.effective_length {self.effective_length_yy} ")
+
+            self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_yy,
-                self.sec_profile) / self.length_yy  # mm
-            print(f"self.effective_length {self.effective_length_zz} ")
+                end_1=self.end_1_y,
+                end_2=self.end_2_y)
+
+            # self.effective_length_zz = temp_yy * IS800_2007.cl_7_2_4_effective_length_of_truss_compression_members(
+            #     self.length_yy,
+            #     self.sec_profile) / self.length_yy  # mm
+            # print(f"self.effective_length {self.effective_length_zz} ")
+
+            # print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            # print(self.end_1_z)
+            # print(self.end_2_z)
+            # print(self.end_1_y)
+            # print(self.end_2_y)
+            #
+            # print(f"factor y-y {self.effective_length_yy/self.length_yy}")
+            # print(f"factor z-z {self.effective_length_yy / self.length_yy}")
+            # print("+++++++++++++++++++++++++++++++++++++++++++++++")
 
             # 2.3 - Effective slenderness ratio
             self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
@@ -733,7 +799,6 @@ class ColumnDesign(Member):
                 local_flag = False
             else:
                 logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
-
 
             if len(self.allowed_sections) == 0:
                 logger.warning("Select at-least one type of section in the design preferences tab.")
@@ -790,15 +855,19 @@ class ColumnDesign(Member):
             for section in self.input_section_list:  # iterating the design over each section to find the most optimum section
 
                 # fetching the section properties of the selected section
-                if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams
-                    self.section_property = Beam(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # Columns
-                    self.section_property = Column(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # RHS
-                    self.section_property = RHS(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[3]:  # SHS
-                    self.section_property = SHS(designation=section, material_grade=self.material)
-                elif self.sec_profile == VALUES_SEC_PROFILE[4]:  # CHS
+                if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams and columns
+                    try:
+                        result = Beam(designation=section, material_grade=self.material)
+                    except:
+                        result = Column(designation=section, material_grade=self.material)
+                    self.section_property = result
+                elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # RHS and SHS
+                    try:
+                        result = RHS(designation=section, material_grade=self.material)
+                    except:
+                        result = SHS(designation=section, material_grade=self.material)
+                    self.section_property = result
+                elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                     self.section_property = CHS(designation=section, material_grade=self.material)
                 else:   #Why?
                     self.section_property = Column(designation=section, material_grade=self.material)
@@ -822,11 +891,11 @@ class ColumnDesign(Member):
                     logger.warning("The trial section ({}) is Slender. Computing the Effective Sectional Area as per Sec. 9.7.2, "
                                    "Fig. 2 (B & C) of The National Building Code of India (NBC), 2016.".format(section))
 
-                    if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+                    if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
                         self.effective_area = (2 * ((31.4 * self.epsilon * self.section_property.flange_thickness) *
                                                     self.section_property.flange_thickness)) + \
                                               (2 * ((21 * self.epsilon * self.section_property.web_thickness) * self.section_property.web_thickness))
-                    elif (self.sec_profile == VALUES_SEC_PROFILE[2]) or (self.sec_profile == VALUES_SEC_PROFILE[3]):
+                    elif (self.sec_profile == VALUES_SEC_PROFILE[1]):
                         self.effective_area = (2 * 21 * self.epsilon * self.section_property.flange_thickness) * 2
                 else:
                     self.effective_area = self.section_property.area  # mm2
@@ -852,7 +921,7 @@ class ColumnDesign(Member):
                 # Step 2 - computing the design compressive stress
 
                 # 2.1 - Buckling curve classification and Imperfection factor
-                if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
+                if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
 
                     if self.section_property.type == 'Rolled':
                         self.buckling_class_zz = IS800_2007.cl_7_1_2_2_buckling_class_of_crosssections(self.section_property.flange_width,
@@ -891,11 +960,11 @@ class ColumnDesign(Member):
 
                 # 2.2 - Effective length
                 self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_zz ,
-                                                                                                                 end_1=self.end_1,
-                                                                                                                 end_2=self.end_2)  # mm
+                                                                                                                 end_1=self.end_1_z,
+                                                                                                                 end_2=self.end_2_z)  # mm
                 self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_yy ,
-                                                                                                                 end_1=self.end_1,
-                                                                                                                 end_2=self.end_2)  # mm
+                                                                                                                 end_1=self.end_1_y,
+                                                                                                                 end_2=self.end_2_y)  # mm
 
                 list_zz.append(self.effective_length_zz)
                 list_yy.append(self.effective_length_yy)
@@ -959,6 +1028,7 @@ class ColumnDesign(Member):
                 list_yy.append(self.f_cd)
 
                 # 2.7 - Capacity of the section
+
                 self.section_capacity = self.f_cd * self.effective_area  # N
 
                 list_zz.append(self.section_capacity)
@@ -980,7 +1050,7 @@ class ColumnDesign(Member):
                 self.optimum_section_cost.append(self.cost)
                 # print(f"list_zz{list_zz},list_yy{list_yy} ")
 
-                # Step 3 - Storing the optimum results to a list in a descending order
+                # Step 3 - Storing the optimum results to a list in descending order
 
                 list_1 = ['Designation', 'Section class', 'Effective area', 'Buckling_curve_zz', 'IF_zz', 'Effective_length_zz', 'Effective_SR_zz',
                           'EBS_zz', 'ND_ESR_zz', 'phi_zz', 'SRF_zz', 'FCD_1_zz', 'FCD_2', 'FCD_zz', 'FCD', 'Capacity', 'UR', 'Cost', 'Designation',
@@ -1257,8 +1327,10 @@ class ColumnDesign(Member):
              KEY_MATERIAL: self.material,
              KEY_DISP_ACTUAL_LEN_ZZ: self.length_zz,
              KEY_DISP_ACTUAL_LEN_YY: self.length_yy,
-             KEY_DISP_END1: self.end_1,
-             KEY_DISP_END2: self.end_2,
+             KEY_DISP_END1: self.end_1_z,
+             KEY_DISP_END2: self.end_2_z,
+             KEY_DISP_END1_Y: self.end_1_y,
+             KEY_DISP_END2_Y: self.end_2_y,
              KEY_DISP_AXIAL: self.load,
              KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE: self.result_section_class,

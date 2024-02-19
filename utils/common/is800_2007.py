@@ -444,30 +444,30 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_3_8_max_slenderness_ratio(Type = 1):
-        '''
-1)  A member carrying compressive loads
-    resulting from dead loads and imposed
-    loads
-2)  A tension member in which a reversal
-    of direct stress occurs due to loads other
-    than wind or seismic forces
-3)  A member subjected to compression
-    forces resulting only from combination
-    with wind/earthquake actions, provided
-    the deformation of such member does
-    not adversely affect tbe stress in any
-    part of the structure
-4)  Compression flange of a beam against
-    lateral torsional buckling
-5)  A member normally acting m a tie in a
-    roof truss or a bracing system not
-    considered effective when subject to
-    possible reversal of stress into
-    compression resulting from the action
-    of wind or earthquake forces]]
-6)  Members always under tension’) (other
-    than pre-tensioned members)
-        '''
+        """
+            1)  A member carrying compressive loads
+                resulting from dead loads and imposed
+                loads
+            2)  A tension member in which a reversal
+                of direct stress occurs due to loads other
+                than wind or seismic forces
+            3)  A member subjected to compression
+                forces resulting only from combination
+                with wind/earthquake actions, provided
+                the deformation of such member does
+                not adversely affect tbe stress in any
+                part of the structure
+            4)  Compression flange of a beam against
+                lateral torsional buckling
+            5)  A member normally acting m a tie in a
+                roof truss or a bracing system not
+                considered effective when subject to
+                possible reversal of stress into
+                compression resulting from the action
+                of wind or earthquake forces]]
+            6)  Members always under tension’) (other
+                than pre-tensioned members)
+        """
         if Type == 1:
             return 180
         elif Type == 2:
@@ -629,7 +629,7 @@ class IS800_2007(object):
         Calculate the effective length of the member as per Cl. 7.2.2 (Table 11) of IS 800:2007
 
         Args:
-            unsupported_length: actula length of the member about any axis in mm (float)
+            unsupported_length: unsupported length of the member about any axis in mm (float)
             end_1: End condition at end 1 of the member (string)
             end_2: End condition at end 2 of the member (string)
 
@@ -660,7 +660,7 @@ class IS800_2007(object):
         Calculate the effective length of the member as per Cl. 7.5.2.1 (Table 11) of IS 800:2007
 
         Args:
-            unsupported_length: actula length of the member about any axis in mm (float)
+            unsupported_length: actual length of the member about any axis in mm (float)
             end_1: End condition at end 1 of the member (string)
             end_2: End condition at end 2 of the member (string)
 

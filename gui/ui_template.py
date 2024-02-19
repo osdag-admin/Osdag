@@ -51,6 +51,9 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from design_type.compression_member.Column import ColumnDesign
+from design_type.flexural_member.flexure import Flexure
+from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from design_type.flexural_member.flexure_othersupp import Flexure_Misc
 from gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -202,7 +205,7 @@ class Window(QMainWindow):
         if not main.design_button_status:
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
-        if main.design_status and main.module_name(main) != KEY_DISP_FLEXURE:
+        if main.design_status and main.module_name(main) != KEY_DISP_FLEXURE and main.module_name(main) != KEY_DISP_FLEXURE2:
             from osdagMainSettings import backend_name
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             print('off_display', off_display)
@@ -1628,7 +1631,7 @@ class Window(QMainWindow):
             self.output_title_fields[no_field_title][0].setVisible(False)
 
     def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
-
+        print(f"key={key} \n titles={titles} ")
         if visible_fields == 0:
             if key in titles:
                 self.output_title_fields[key + str(title_repeat)][0].setVisible(False)
@@ -1722,7 +1725,7 @@ class Window(QMainWindow):
             design_dictionary.update(d1)
 
             self.input_dock_inputs.update(d1)
-            print(f"\n self.input_dock_inputs{self.input_dock_inputs}")     
+            # print(f"\n self.input_dock_inputs{self.input_dock_inputs}")     
 
 
         for design_pref_key in self.design_pref_inputs.keys():
@@ -1849,6 +1852,12 @@ class Window(QMainWindow):
             return Tension_welded
         elif name == KEY_DISP_COMPRESSION_COLUMN:
             return ColumnDesign
+        elif name == KEY_DISP_FLEXURE:
+            return Flexure
+        elif name == KEY_DISP_FLEXURE2:
+            return Flexure_Cantilever
+        elif name == KEY_DISP_FLEXURE3:
+            return Flexure_Misc
         else:
             return GussetConnection
 # Function for getting inputs from a file
@@ -2024,6 +2033,7 @@ class Window(QMainWindow):
             # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
+            print(f"status{status}")
             print(f"trigger_type{trigger_type}")
 
             if error is not None:
@@ -2031,6 +2041,8 @@ class Window(QMainWindow):
                 return
 
             out_list = main.output_values(main, status)
+            print('out_list changed',out_list)
+
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
@@ -2045,9 +2057,11 @@ class Window(QMainWindow):
 
             # self.progress_bar.setValue(50)
             self.output_title_change(main)
-
+            print('Output title changed',self.output_title_change(main))
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            print(' last design',last_design_folder)
             if not os.path.isdir(last_design_folder):
+                print(' not os.path.isdir')
                 os.mkdir(last_design_folder)
             last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
             last_design_file = os.path.join(last_design_folder, last_design_file)

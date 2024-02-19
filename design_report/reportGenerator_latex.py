@@ -99,6 +99,7 @@ class CreateLatex(Document):
 
         doc.preamble.append(header)
         doc.change_document_style("header")
+        extra_page = False
         with doc.create(Section('Input Parameters')):
             with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
@@ -168,9 +169,28 @@ class CreateLatex(Document):
                     with doc.create(Subsection("List of Input Section")):
                         # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
-                            table.add_hline()
-                            table.add_row((MultiColumn(1, align='|c|', data=i, ),
-                                           MultiColumn(1, align='|X|', data=uiObj[i].strip("[]")),))
+                            list_sec = uiObj[i].strip("['']")
+                            print( 'list_sec', list_sec, list_sec.split("', '"))
+                            # count = 0
+                            # for i in list_sec:
+                            #     print(i)
+                            #     count += 1
+                            str_len = len(list_sec.split("', '"))
+                            print( 'str_len', str_len)
+                            if str_len > 130:
+                                table.add_hline()
+                                table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                                               MultiColumn(1, align='|X|', data=list_sec.split("', '")[0:220] ),))
+                                extra_page = True
+                                list_sec_modified = list_sec.split("', '")[220 :]
+                                # table.add_hline()
+                                # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+                                # doc.append(NewPage())
+
+                            else:
+                                table.add_hline()
+                                table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                                               MultiColumn(1, align='|X|', data=uiObj[i].strip("[]")),))
                             # str_len = len(uiObj[i])
                             # loop_len = round_up((str_len/100),1,1)
                             # table.add_hline()
@@ -186,6 +206,14 @@ class CreateLatex(Document):
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         doc.append(NewPage())
+        if extra_page:
+            with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
+                table.add_hline()
+                table.add_row((MultiColumn(1, align='|c|', data='Section Size*', ),
+                               MultiColumn(1, align='|X|', data=list_sec_modified),))
+                table.add_hline()
+            doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+            doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
             with doc.create(Tabularx(r'|>{\centering}p{12.5cm}|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
@@ -271,13 +299,60 @@ class CreateLatex(Document):
                             table.add_hline()
                         count = count + 1
                 else:
-
+                    # if module != KEY_DISP_FLEXURE:
                     if check[3] == 'Fail':
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
+                    elif check[3] == 'Method A':
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("Red", bold(check[3])))
                     else:
                         table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("OsdagGreen", bold(check[3])))
                     table.add_hline()
-
+        # if module == KEY_DISP_FLEXURE:
+        #     doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        #     doc.append(NewPage())
+        #     # if extra_page:
+        #     #     with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
+        #     #         table.add_hline()
+        #     #         table.add_row((MultiColumn(1, align='|c|', data='Section Size*', ),
+        #     #                        MultiColumn(1, align='|X|', data=list_sec_modified),))
+        #     #         table.add_hline()
+        #     #     doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        #     #     doc.append(NewPage())
+        #     count = 0
+        #     with doc.create(Section('Input Data Checks')):
+        #         with doc.create(
+        #                 Tabularx(r'|>{\centering}p{12.5cm}|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+        #             table.add_hline()
+        #             # Fail = TextColor("FailColor", bold("Fail"))
+        #             # Pass = TextColor("PassColor", bold("Pass"))
+        #
+        #             if does_design_exist != True:
+        #                 table.add_row(bold('Design Status'), color_cell("Red", bold("Fail")))
+        #             else:
+        #                 table.add_row(bold('Design Status'), color_cell("OsdagGreen", bold("Pass")))
+        #             table.add_hline()
+        #
+        #         for check in Design_Check:
+        #
+        #             if check[0] == 'SubSection2':
+        #                 if count >= 1:
+        #                     # doc.append(NewPage())
+        #                     doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        #                 with doc.create(Subsection(check[1])):
+        #                     #########################
+        #                     # if uiObj== "WELDImage":
+        #                     #     table.add_hline()
+        #                     #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+        #                     #     table.add_hline()
+        #                     # else:
+        #                     #########################
+        #                     with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
+        #                         table.add_hline()
+        #                         table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
+        #                         table.add_hline()
+        #                         table.end_table_header()
+        #                         table.add_hline()
+        #                         count = count + 1
         # 2D images
         if len(Disp_2d_image) != 0:
 
@@ -341,7 +416,7 @@ class CreateLatex(Document):
                                 image_5.add_caption('Typical Shear Key Details')
                                 # doc.append(NewPage())
 
-        if does_design_exist and sys.platform != 'darwin':
+        if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '':
             doc.append(NewPage())
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
@@ -372,6 +447,31 @@ class CreateLatex(Document):
                 #     view_3D.add_image(filename=view_3dimg_path,width=NoEscape(r'\linewidth,height=6.5cm'))
                 #
                 #     view_3D.add_caption('3D View')
+        else:
+            doc.append(NewPage())
+            Disp_3d_image = "/ResourceFiles/images/broken.png"
+            Disp_top_image = "/ResourceFiles/images/broken.png"
+            Disp_side_image = "/ResourceFiles/images/broken.png"
+            Disp_front_image = "/ResourceFiles/images/broken.png"
+            view_3dimg_path = rel_path + Disp_3d_image
+            view_topimg_path = rel_path + Disp_top_image
+            view_sideimg_path = rel_path + Disp_side_image
+            view_frontimg_path = rel_path + Disp_front_image
+            with doc.create(Section('3D Views')):
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+                    view_3dimg_path = rel_path + Disp_3d_image
+                    view_topimg_path = rel_path + Disp_top_image
+                    view_sideimg_path = rel_path + Disp_side_image
+                    view_frontimg_path = rel_path + Disp_front_image
+                    table.add_hline()
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_3dimg_path),
+                                   StandAloneGraphic(image_options="height=4cm", filename=view_topimg_path)])
+                    table.add_row('(a) 3D View', '(b) Top View')
+                    table.add_hline()
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
+                                   StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row('(c) Side View', '(d) Front View')
+                    table.add_hline()
 
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))

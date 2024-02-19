@@ -438,12 +438,14 @@ KEY_DISP_DESIGN_STRENGTH_ZZ = 'Pd (kN)'
 KEY_DESIGN_STRENGTH_YY = 'DesignStrength.y-y'
 KEY_DESIGN_STRENGTH_ZZ = 'DesignStrength.z-z'
 ##Strut Design
+###################################
 KEY_SHEAR_STRENGTH = 'Shear.Strength'
 KEY_MOMENT_STRENGTH = 'Moment.Strength'
 KEY_DISP_HIGH_SHEAR= 'High Shear Check'
 KEY_HIGH_SHEAR = 'Shear.High'
 KEY_DISP_DESIGN_STRENGTH_SHEAR = 'Design Shear Strength (kN)'
-KEY_DISP_DESIGN_STRENGTH_MOMENT = 'Design Moment Strength (kN)'
+KEY_DISP_DESIGN_STRENGTH_MOMENT = 'Design Moment Strength (kNm)'
+KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Euler Buckling Stress (MPa)'
 KEY_EFF_SEC_AREA = 'MajorEffSecArea'
@@ -517,7 +519,18 @@ KEY_DISP_OPTIMIZATION_STEEL_COST = 'Cost'
 KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 
+###################################
 #Flexure Members
+###################################
+KEY_Flexure_Member_MAIN_MODULE = 'Flexure Member'
+KEY_DISP_FLEXURE = 'Flexural Members - Simply Supported'
+KEY_DISP_FLEXURE2 = 'Flexural Members - Cantilever'
+KEY_DISP_FLEXURE3 = 'Flexural Members'
+
+KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kNm)'
+KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kNm)'
+KEY_DISP_LTB_Bending_STRENGTH_MOMENT = 'Lateral Torsional Buckling Strength (kNm)'
+
 KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
 KEY_betab_constatnt= 'Beta.Constant'
 KEY_BUCKLING_STRENGTH= 'Buckling.Strength'
@@ -543,28 +556,31 @@ Cantilever_img = './ResourceFiles/images/c_beam.jpeg'
 KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
 KEY_DISPP_LENGTH_OVERWRITE = 'Effective Length Parameter'
 KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
+KEY_DISP_BEAM_MOMENT_Latex = 'Bending Moment (kNm)($M_{z-z}$)'
 KEY_SUPP_TYPE = 'Member.Type'
 DISP_TITLE_ISECTION = 'I Sections'
-KEY_DISP_FLEXURE = 'Flexural Members'
+
 KEY_DISP_DESIGN_TYPE_FLEXURE = 'Laterally Supported'
 KEY_DESIGN_TYPE_FLEXURE = 'Flexure.Type'
 KEY_BEAM_SUPP_TYPE = 'Support Type'
+KEY_BEAM_SUPP_TYPE_DESIGN = 'Design Support Type'
 KEY_DISP_DESIGN_TYPE2_FLEXURE = 'Laterally Unsupported'
 KEY_DESIGN_TYPE2_FLEXURE = 'Laterally.Unsupported'
-VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
 KEY_DISP_BENDING = 'Axis of Bending'
 KEY_DISP_BENDING1 = 'Major'
 KEY_DISP_BENDING2 = 'Minor'
 VALUES_BENDING_TYPE = list((KEY_DISP_BENDING2, KEY_DISP_BENDING1))
+VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
+VALUES_SUPP_TYPE_temp = list((KEY_DISP_BENDING1 + " " + KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_BENDING2 + " " + KEY_DISP_DESIGN_TYPE2_FLEXURE, KEY_DISP_BENDING1 + " " + KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
 KEY_BENDING = 'Bending.type'
 KEY_SUPPORT = 'Flexure.Support'
-KEY_DISP_SUPPORT = 'Beam Conditions'
+KEY_DISP_SUPPORT = 'End Conditions'
 KEY_DISP_SUPPORT1 = 'Simply Supported'
 KEY_DISP_SUPPORT2 = 'Cantilever'
 KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2]
 # KEY_SUPPORT1 = 'SimpSupport.Torsional'
 # KEY_SUPPORT2 = 'SimpSupport.Warping'
-KEY_DISP_LENGTH_BEAM = 'Effective Span (m)'
+KEY_DISP_LENGTH_BEAM = 'Effective Span (m)*'
 KEY_LOAD = 'Loading.Condition'
 KEY_DISP_LOAD = 'Loading Condition'
 KEY_DISP_LOAD1 ='Normal'
@@ -580,10 +596,10 @@ KEY_WARPING_RES = 'Warping.restraint'
 DISP_WARPING_RES = 'Warping restraint'
 Warping_Restraint1 = 'Both flanges fully restrained'
 Warping_Restraint2 = 'Compression flange fully restrained'
-Warping_Restraint3 = 'Both flanges fully restrained'
+# Warping_Restraint3 = 'Both flanges fully restrained'
 Warping_Restraint4 = 'Compressicm flange partially restrained'
 Warping_Restraint5 = 'Warping not restrained in both flanges'
-Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2,Warping_Restraint3, Warping_Restraint4, Warping_Restraint5))
+Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2, Warping_Restraint4, Warping_Restraint5))
 DISP_SUPPORT_RES = 'Support restraint'
 KEY_SUPPORT_TYPE = 'Cantilever.Support'
 Support1 = 'Continous, with lateral restraint to top flange'
@@ -598,7 +614,48 @@ Top2 = 'Lateral restraint to top flange'
 Top3 = 'Torsional rwstraint'
 Top4 = 'Lateral and Torsional restraint'
 Top_Restraint_list = list(( Top1, Top2, Top3, Top4))
+KEY_WEB_BUCKLING_option = ['Method A','Method B']
+KEY_BUCKLING_METHOD = 'Buckling.Method'
+KEY_ShearBuckling = 'Shear Buckling Design Method '
+KEY_ShearBucklingOption = 'S.B.Methods'
+KEY_DISP_SB_Option = ['Simple Post Critical', 'Tension Field Test']
+KEY_DISP_TENSION_HOLES = 'Tension Zone'
+KEY_DISP_Web_Buckling = 'Web Buckling'
+KEY_DISP_Utilization_Ratio = 'Utilization Ratio'
+KEY_DISP_Web_Buckling_Support = 'Web Buckling @Support'
+KEY_DISP_I_eff_latex = '$I_{eff}$web'
+KEY_DISP_A_eff_latex = '$A_{eff}$web'
+KEY_DISP_r_eff_latex = '$r_{eff}$web'
+KEY_DISP_K_v_latex = '$K_{v}$'
+KEY_DISP_Elastic_Critical_shear_stress_web = 'Elastic Critical Shear Stress Web($N/mm^2$)' #(\tau_{crc})
+KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners(c)(mm)'
+KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio($\lambda_w$)'
+KEY_DISP_BUCKLING_STRENGTH= 'Plastic Shear Strength (kN)'
+KEY_DISP_reduced_moment= 'Reduced moment (Nmm)'
+# KEY_DISP_reduced_moment= 'Reduced moment (N_f)'
+KEY_DISP_tension_field_incline= 'Tension field inclination($\phi$)'
+KEY_DISP_Yield_Strength_Tension_field = 'Yield Strength of Tension field(f_v)($N/mm^2$)'
+KEY_DISP_AnchoragelengthTensionField= 'Anchorage length of Tension Field(s)(mm)'
+KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
 
+###################################
+# Plate Girder
+###################################
+KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
+KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER - WELDED'
+KEY_tf = 'TF.Data'
+KEY_tw = 'TW.Data'
+KEY_dw = 'DW.Data'
+KEY_bf = 'BF.Data'
+KEY_DISP_tf = 'Flange Thickness(mm)'
+KEY_DISP_tw = 'Web Thickness(mm)'
+KEY_DISP_dw = 'Web Depth(mm)'
+KEY_DISP_bf = 'Flange Width(mm)'
+KEY_IntermediateStiffener = 'IntermediateStiffener.Data'
+KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
+KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
+KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
+KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 ###################################
 # All Input Keys
 ###################################
@@ -2508,6 +2565,24 @@ Same_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0p
                               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
 
+STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para
+Effective_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Length Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter to </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Overwrite</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> the Length multiplyer. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The value can be re-defined for any particular design session with a minimum of 0.1. If invalid value given then it is set to NA or 1.0.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+Bearing_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Bearing Length Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the length of Bearing stiffener provided for webs. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. If invalid value given then it is set to NA.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+FLEXURE_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + Bearing_Length_Para
+
 OPTIMIZATION_TABLE_UI = str("""
 <div style="width:100%;">
 <table style="width:70%;" border="0">
@@ -2566,6 +2641,3 @@ STRUT_OPTIMIZATION_DESCRIPTION = (
     'p, li { white-space: pre-wrap; }\n'
     '</style></head><body style="font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;">\n'
 ) + Allowable_Utilization_Para + Effective_Area_Para + OPTIMIZATION_TABLE_UI
-
-
-

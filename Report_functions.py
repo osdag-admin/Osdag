@@ -2,7 +2,38 @@ from utils.common.is800_2007 import *
 from pylatex import Math
 from pylatex.utils import NoEscape
 
+def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter):  # same as #todo anjali
+    """
+    Author: Rutvik J
 
+    """
+    temp1 = str(round(given/provided,3))
+    temp2 = str(round(given2/provided2,3))
+    given = str(given)
+    provided = str(provided)
+    given2 = str(given2)
+    provided2 = str(provided2)
+    answer = str(parameter)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}\right)\\'))
+    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'}\right)\\'))
+    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r'\right)\\' ))
+    Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
+    return Pmc_eqn
+def sectional_area_change(given, provided, parameter):  # same as #todo anjali
+    """
+    Author: Rutvik J
+
+    """
+
+    given = str(given)
+    provided = str(provided)
+    parameter = str(parameter)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \text{Effective Area Parameter} \times \text{Area of Section}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + parameter + r'\times' + given + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + provided + r' \end{aligned}'))
+    return Pmc_eqn
 def cl_3_7_2_section_classification(class_of_section=None):
     """
     Find class of the section
@@ -16,18 +47,70 @@ def cl_3_7_2_section_classification(class_of_section=None):
     """
 
     section_classification_eqn = Math(inline=True)
-    if class_of_section == int(1):
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Plastic} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
-    elif class_of_section == int(2):
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Compact} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    if class_of_section == int(1) or class_of_section == "Plastic":
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Plastic} \\ '))
+    elif class_of_section == int(2) or class_of_section == "Compact":
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Compact} \\ '))
+    elif class_of_section == int(3) or class_of_section == "Semi-Compact":
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Semi-Compact} \\ '))
     else:
-        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \text{Semi-Compact} \\ \\'))
-        section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+        section_classification_eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \\ '))
+    section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
     return section_classification_eqn
 
-
+def cl_3_7_2_section_classification_web(d,t,result,epsilon,class_of_section=None):
+    """
+    Author: Rutvik Joshi (EMP-24, intern-23,22)
+    """
+    d = str(d)
+    t = str(t)
+    # ratio = str(ratio)
+    result = str(result)
+    epsilon = str(epsilon)
+    class_of_section = str(class_of_section)
+    eqn = Math(inline=True)
+    if class_of_section == "Plastic":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 84\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(84*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
+    elif class_of_section == "Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 105\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(105*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
+    elif class_of_section == "Semi-Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 126\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(126*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
+    else :
+        eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \end{aligned}'))
+    return eqn
+def cl_3_7_2_section_classification_flange(d,t,result,epsilon,class_of_section=None):
+    """
+    Author: Rutvik Joshi (EMP-24, intern-23,22)
+    """
+    d = str(d)
+    t = str(t)
+    # ratio = str(ratio)
+    result = str(result)
+    epsilon = str(epsilon)
+    class_of_section = str(class_of_section)
+    eqn = Math(inline=True)
+    if class_of_section == "Plastic":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 9.4\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(9.4*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
+    elif class_of_section == "Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 10.5\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(10.5*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
+    elif class_of_section == "Semi-Compact":
+        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 15.7\varepsilon\\'))
+        eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(15.7*float(epsilon),2))+r'\\'))
+        eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
+    else :
+        eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \end{aligned}'))
+    # eqn.append(NoEscape(r'& [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
+    return eqn
 def cl_5_4_1_table_4_5_gamma_value(v, t):
     """
     Calculate gamma value
@@ -298,7 +381,28 @@ def slenderness_req():
 
     return slenderlimit_eqn
 
+def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
+    """
+    Author: Rutvik J
 
+    """
+    temp = True if Pd > P else False
+    Pd = str(Pd)
+    A = str(A)
+    fcd = str(fcd)
+    P = str(P)
+    sub = str(sub)
+    # slender = str(slender)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}\\'))
+    slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\times 10^{-3} \\'))
+    if temp:
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r' \\'))
+    else:
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r' \\'))
+
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2}] \end{aligned}'))
+    return slender_eqn
 def cl_7_1_2_effective_slenderness_ratio(K, L, r, slender):
     """
     Calculate effective selenderness ratio
@@ -352,8 +456,115 @@ def cl_8_2_moment_capacity_member(Pmc, Mdc, M_c):
     M_c_eqn.append(NoEscape(r'&=' + M_c + r'\\ \\'))
     M_c_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2}] \end{aligned}'))
     return M_c_eqn
+def cl_8_2_1web_buckling_required(e,e1):
+    """
+    Author: Rutvik J
+
+    """
 
 
+    e = str(e)
+    e1 = str(e1)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= 67 \times \epsilon\\'))
+    # Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=67 \times' + e + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + e1 + r' \end{aligned}'))
+    # Pmc_eqn.append(NoEscape(r'[\text{Ref. IS 800:2007, Cl.8.2.1.1 }]'))
+
+
+    return Pmc_eqn
+def cl_8_2_1web_buckling_1(d, tw, e,T):
+    """
+    Author: Rutvik J
+
+    """
+
+    d = str(d)
+    tw = str(tw)
+    e = str(e)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{d_{web}}{t_{web}} = \frac{(D - 2(T + R1))}{t_{web}}\\'))
+    # Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + d + r'}{' + tw + r'}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + e + r'\\'))
+    # if T:
+    Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.1 }] '))
+    # else:
+    #     Pmc_eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] '))
+
+    Pmc_eqn.append(NoEscape(r'\end{aligned}'))
+
+    return Pmc_eqn
+def cl_8_2_1web_buckling(d, tw, e,T):
+    """
+    Author: Rutvik J
+
+    """
+
+    d = str(d)
+    tw = str(tw)
+    e = str(e)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{0.7 d_{web}}{t_{web}}= \frac{0.7(D - 2(T + R1))}{t_{web}}\\'))
+    # Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \frac{D - 2(T + R1)}{t_{web}}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{0.7 \times' + d + r'}{' + tw + r'}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + e + r' \\'))
+    if T:
+        Pmc_eqn.append(NoEscape(r'& [\text{Section is susceptible to Web Buckling }] \end{aligned}'))
+    else:
+        Pmc_eqn.append(NoEscape(r'& [\text{Section is NOT susceptible to Web Buckling }] \end{aligned}'))
+
+    return Pmc_eqn
+def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass,support):  # same as #todo anjali
+    """
+    Calculate member design moment capacity
+    Args:
+
+          beta_b:1 for plastic and compact sections & Ze/Zp for semi compact section (int)
+          Z_p:Plastic section modulus of cross section mm^3 (float)
+          f_y:Yield stress of the material in N/mm square  (float)
+          gamma_m0:partial safety factor (float)
+          Pmc:Plastic moment capacity in  N-mm (float)
+    Returns:
+        Plastic moment capacity in  N-mm (float)
+
+    Note:
+                Author: Rutvik J
+              IS 800:2007,  cl 8.2.1.2
+
+    """
+
+    if support == KEY_DISP_SUPPORT1:
+        res = str(round(1.2 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
+    else:
+        res = str(round(1.5 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
+    beta_actual = str(beta_b)
+    beta_b = str(round(Ze/Z_p,2))
+    Ze = str(Ze)
+    sclass = str(sclass)
+    Z_p = str(Z_p)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    Pmc = str(Pmc)
+    Pmc_eqn = Math(inline=True)
+    if sclass == 'Plastic' or sclass == 'Compact':
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+    elif sclass == 'Semi-Compact' :
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        Pmc_eqn.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if support == KEY_DISP_SUPPORT1:
+        Pmc_eqn.append(NoEscape(r'{M_{d}} &= \frac{\beta_b Z_p f_y}{\gamma_{m0}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_actual + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}  \leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+    else:
+        Pmc_eqn.append(NoEscape(
+            r' {M_{d}} &= \frac{\beta_b Z_p f_y}{\gamma_{m0}} \leq \frac{1.5Z_ef_y}{\gamma_{mo}}\\'))
+        Pmc_eqn.append(NoEscape(
+            r'&=\frac{' + beta_actual + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}  \leq \frac{1.5 \times' + Ze + r'\times' + f_y + r'}{' + gamma_m0 + r'\times 10^6}\\'))
+
+    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\leq ' + res + r' \\'))
+    Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
+    return Pmc_eqn
 def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc):  # same as #todo anjali
     """
     Calculate member design moment capacity
@@ -379,7 +590,7 @@ def cl_8_2_1_2_plastic_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc): 
     gamma_m0 = str(gamma_m0)
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{\text{z}} &= \frac{\beta_b Z_p fy}{\gamma_{m0} \times 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} {M_{d}}_{\text{z}} &= \frac{\beta_b Z_p fy}{\gamma_{m0}}\\'))
     Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
     Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\\ \\'))
     Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
@@ -443,7 +654,7 @@ def cl_8_2_1_2_plastic_moment_capacity_yy(beta_b, Z_py, f_y, gamma_m0, Pmc):
     return Pmc_eqn
 
 
-def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
+def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc, type = 'cantilever'):
     """
     Calculate moment deformation capacity
     Args:
@@ -460,13 +671,66 @@ def cl_8_2_1_2_deformation_moment_capacity_member(fy, Z_e, Mdc):
     Z_e = str(Z_e)
     Mdc = str(Mdc)
     Mdc_eqn = Math(inline=True)
-    Mdc_eqn.append(NoEscape(r'\begin{aligned} M_{dc} &= \frac{1.5 Z_e fy}{\gamma_{m0} \times 10^6}\\'))
-    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 \times' + Z_e + r'\times' + fy + r'}{1.1\times 10^6}\\'))
+    if type == 'cantilever':
+        Mdc_eqn.append(NoEscape(r'\begin{aligned} M_{dc} &= \frac{1.5 Z_e fy}{\gamma_{m0} \times 10^6}\\'))
+        Mdc_eqn.append(NoEscape(r'&= \frac{1.5 \times' + Z_e + r'\times' + fy + r'}{1.1\times 10^6}\\'))
+    else:
+        Mdc_eqn.append(NoEscape(r'\begin{aligned} M_{dc} &= \frac{1.2 Z_e fy}{\gamma_{m0} \times 10^6}\\'))
+        Mdc_eqn.append(NoEscape(r'&= \frac{1.2 \times' + Z_e + r'\times' + fy + r'}{1.1\times 10^6}\\'))
     Mdc_eqn.append(NoEscape(r'&= ' + Mdc + r'\\ \\'))
     Mdc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.1.2}] \end{aligned}'))
     return Mdc_eqn
 
+def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
+    V_d = str(V_d)
+    S_c = str(S_c)
+    # check = str(check)
+    load = str(load)
+    allow_shear_capacity_eqn = Math(inline=True)
+    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
+    allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
+    if check:
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
 
+    else:
+        allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'>' + load + r'\\'))
+        allow_shear_capacity_eqn.append(NoEscape(r'& [\text{Limited to low shear}] \end{aligned}'))
+    return allow_shear_capacity_eqn
+
+def cl_8_2_2_phi(al, lm,phi):
+    """
+    Author: Rutvik J
+
+    """
+
+    al = str(al)
+    lm = str(lm)
+    phi = str(phi)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= 0.5(1 + \alpha_{lt}(\lambda_{lt} - 0.2) + \lambda_{lt} ^ 2) \\'))
+    slender_eqn.append(NoEscape(r' &= 0.5(1+' +  al + r'(' + lm + r'-0.2) +' + lm +  r'^2)\\'))
+    slender_eqn.append(NoEscape(r' &= ' + phi + r' \end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+
+
+def sectional_area_change(given, provided, parameter):
+    """
+    Author: Rutvik J
+
+    """
+
+    given = str(given)
+    provided = str(provided)
+    parameter = str(parameter)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} &= \text{Effective Area Parameter} \times \text{Area of Section}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + parameter + r'\times' + provided + r'\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + given + r' \end{aligned}'))
+    # Pmc_eqn.append(NoEscape(r'& [\text{Further checks for High shear}] \end{aligned}'))
+
+    return Pmc_eqn
 def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
     """
     Calculate shear capacity of member
@@ -597,7 +861,619 @@ def cl_8_4_1_plastic_shear_resistance(h, t, f_y, gamma_m0, V_dg, multiple=1):
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
     return shear_yield_eqn
+def cl_8_4_1_plastic_shear_resistance_Vp(h, t, f_y, V_p, multiple=1):
+    """
+    Calculate shear yielding capacity of  plate (provided)
+    Args:
+        h:  Plate ht in mm (float)
+        t:  Plate thickness in mm (float)
+        f_y:Yeild strength of  plate material in N/mm square (float)
+        gamma: IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  (float)
+        V_dg: Shear yeilding capacity of  plate in N (float)
+        multiple:2 (int)
+    Returns:
+         Shear yielding capacity of  plate
+     Note:
+            Reference:
+            IS 800:2007,  cl 10.4.3
+    """
 
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    V_dg = str(V_p)
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{p} &= \frac{A_v f_{y_w}}{\sqrt{3}} \\'))
+    if multiple == 1:
+        shear_yield_eqn.append(NoEscape(r'&=\frac{' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3}}\\'))
+    else:
+        multiple = str(multiple)
+        shear_yield_eqn.append(
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3}}\\'))
+
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\ \\'))
+    shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.1}] \end{aligned}'))
+    return shear_yield_eqn
+def cl_8_4_2_2_Transverse_Stiffener_spacing(c):
+    """
+    Author: Rutvik J
+
+    """
+    # T = True if c/d < 1.0 else False
+    # d = str(d)
+    c = str(c)
+    # kv = str(kv)
+    eqn = Math(inline=True)
+    # if design == KEY_DISP_SB_Option[0]:
+    eqn.append(NoEscape(r'\begin{aligned} &=' + c + r' \end{aligned}'))
+    # elif design == KEY_DISP_SB_Option[1]:
+    #     if T:
+    #         eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)^22} \\'))
+    #         eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')^2} \\'))
+    #     else:
+    #         eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
+    #         eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
+    #     eqn.append(NoEscape(r'&=' + kv + r' \\'))
+    # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
+
+    return eqn
+def cl_8_4_2_2_KV(kv, design = '', c=0,d=1):
+    """
+    Author: Rutvik J
+
+    """
+    T = True if c/d < 1.0 else False
+    d = str(d)
+    c = str(c)
+    kv = str(kv)
+    eqn = Math(inline=True)
+    if design == KEY_DISP_SB_Option[0]:
+        eqn.append(NoEscape(r'\begin{aligned} &= 5.35\\'))
+    elif design == KEY_DISP_SB_Option[1]:
+        if T:
+            eqn.append(NoEscape(r'\begin{aligned} &= 4.0 + \frac{5.35}{(c/d)^2} \\'))
+            eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')^2} \\'))
+        else:
+            eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)^2} \\'))
+            eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')^2} \\'))
+        eqn.append(NoEscape(r'&=' + kv + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
+
+    return eqn
+def cl_8_4_2_2_taucrc(K_v, E,mu, d, tw,tau_crc ):
+    """
+    Author: Rutvik J
+
+    """
+    d = str(d)
+    mu = str(mu)
+    tw = str(tw)
+    tau_crc = str(tau_crc)
+    E = str(E)
+    K_v = str(K_v)
+    eqn = Math(inline=True)
+
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2} \\'))
+    eqn.append(NoEscape(r'&= \frac{'+K_v+ r'\times\pi^2 \times'+E+r'}{12(1-'+mu+r'^2)('+d+r'/'+tw+r')^2} \\'))
+    # eqn.append(NoEscape(r'&= 4.0 + \frac{5.35}{(' + c + r'/' + d + r')**2} \\'))
+        # else:
+        #     eqn.append(NoEscape(r'\begin{aligned} &= 5.35 + \frac{4.0}{(c/d)**2} \\'))
+        #     eqn.append(NoEscape(r'&= 5.35 + \frac{4.0}{(' + c + r'/' + d + r')**2} \\'))
+    eqn.append(NoEscape(r'&=' + tau_crc + r' \end{aligned}'))
+    # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.4.2.2 }] \end{aligned}'))
+
+    return eqn
+def cl_8_4_2_2_slenderness_ratio(fyw, lamba,tau_crc ):
+    """
+    Author: Rutvik J
+
+    """
+    fyw = str(fyw)
+    lamba = str(lamba)
+    tau_crc = str(tau_crc)
+    eqn = Math(inline=True)
+
+    eqn.append(NoEscape(r'\begin{aligned} &= \sqrt{\frac{f_{yw}}{\sqrt{3} \tau_{crc}}} \\'))
+    eqn.append(NoEscape(r'&= \sqrt{\frac{'+ fyw + r'}{\sqrt{3} \times '+ tau_crc + r'}} \\'))
+    eqn.append(NoEscape(r'&=' + lamba + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_shearstress_web(fyw, lamba,tau_b ):
+    """
+    Author: Rutvik J
+
+    """
+    type = lamba
+    fyw = str(fyw)
+    lamba = str(lamba)
+    tau_b = str(tau_b)
+    eqn = Math(inline=True)
+    if type <= 0.8:
+        eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \\'))
+        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
+    elif type > 0.8 and type < 1.2:
+        eqn.append(NoEscape(r'\begin{aligned} &= (1 - 0.8(\lambda_w - 0.8))\frac{f_{yw}}{\sqrt{3}} \\'))
+        eqn.append(NoEscape(r' &= (1 - 0.8(' + lamba + r'- 0.8))\frac{'+fyw+r'}{\sqrt{3}} \\'))
+        # eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}} \\'))
+    elif typ>= 1.2:
+        eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_{yw}}{\sqrt{3}} \lambda_w^2 \\'))
+        eqn.append(NoEscape(r'&= \frac{'+ fyw + r'}{\sqrt{3}\times'+ lamba+r'^2} \\'))
+    eqn.append(NoEscape(r'&=' + tau_b + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_shearstrength(d,t,Vcr,tau_b,strength ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    t = str(t)
+    d = str(d)
+    Vcr = str(Vcr)
+    strength = str(strength)
+    tau_b = str(tau_b)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{V_{cr}}{\gamma_{mo}} = \frac{A_v \tau_b}{\gamma_{mo}} \\'))
+    eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&= \frac{'+Vcr+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&=' + strength + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_N_f(D,tf,d,Nf,M ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    D = str(D)
+    tf = str(tf)
+    d = str(d)
+    M = str(M)
+    Nf = str(Nf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{\text{Bending Moment}}{D - t_f}\\'))
+    eqn.append(NoEscape(r'&= \frac{'+ M + r'}{'+D+r' - '+ tf+ r'}\\'))
+    eqn.append(NoEscape(r'&= \frac{'+ M + r'}{'+d+ r'}\\'))
+    eqn.append(NoEscape(r'&=' + Nf + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_TensionField_reduced_moment(Mfr,b,t,fy,Nf ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    Mfr = str(Mfr)
+    b = str(b)
+    t = str(t)
+    fy = str(fy)
+    Nf = str(Nf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} &= 0.25b_ft_f^2f_{yf}\left\{1 - \left[\frac{N_f}{b_ft_ff_{yf}/\gamma_{mo}}\right]^2\right\} \\'))
+    eqn.append(NoEscape(r'&= 0.25\times'+b+r'\times'+t+r'^2 \times'+ fy+r'\times\left\{1-\left[\frac{'+Nf+r'}{'+b+r'\times'+t+r'\times'+ fy+r'/1.1}\right]^2\right\} \\'))
+    eqn.append(NoEscape(r'&=' + Mfr + r'\times 10^6 \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_TensionField_phi(s,c,d ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    s = str(s)
+    c = str(c)
+    d = str(d)
+    # fy = str(fy)
+    # Nf = str(Nf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} &=\tan^{-1}(\frac{c}{d})\\'))
+    eqn.append(NoEscape(r'&= \tan^{-1}(\frac{'+c+r'}{'+d+r'}) \\'))
+
+    eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_TensionField_anchorage_length(s,phi, Mfr ,fyw,tw):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    s = str(s)
+    phi = str(phi)
+    Mfr = str(Mfr)
+    fyw = str(fyw)
+    tw = str(tw)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned} &= \frac{2}{\sin\phi} \left(  \sqrt{\frac{M_{fr}\times10^6}{f_{yw}t_w}} \right)\\'))
+    eqn.append(NoEscape(r'&= \frac{2}{\sin'+phi+r'} \left(  \sqrt{\frac{'+Mfr+r'}{'+fyw+r'\times'+tw+r'}} \right)\\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&=' + s + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_KEY_DISP_WidthTensionField(d,phi,c, s,wtf):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    d = str(d)
+    phi = str(phi)
+    c = str(c)
+    s = str(s)
+    wtf = str(wtf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}&= d\cos\phi+(c-s_c - s_t)\sin\phi \\'))
+    eqn.append(NoEscape(r'&= '+d+r'\cos'+phi+r'+('+c+r'-2 \times'+s+r')\sin'+phi+r' \\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&=' + wtf + r' \end{aligned}'))
+    return eqn
+
+def cl_8_4_2_2_Yield_Strength_Tension_field(fyw,taub,psi, fv):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    fyw = str(fyw)
+    taub = str(taub)
+    psi = str(psi)
+    fv = str(fv)
+    # wtf = str(wtf)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}&= \sqrt{f_{yw}^2 - 3\tau_b^2 + \psi^2} - \psi \\'))
+    eqn.append(NoEscape(r'&= \sqrt{'+ fyw + r'^2 - 3'+ taub + r'^2 + '+ psi + r'^2} - '+ psi+ r'\\'))
+    # eqn.append(NoEscape(r'&= \frac{'+d+r'\times'+t+r'\times'+tau_b+r'}{1.1} \\'))
+    eqn.append(NoEscape(r'&=' + fv + r' \end{aligned}'))
+    return eqn
+def cl_8_4_2_2_shearstrength_tensionfield(A_v,tau_b,V_p,strength,tw, wtf,fv,phi,Vtf ):
+    """
+    Author: Rutvik J
+
+    """
+    # Area = str(d * t)
+    temp = str(round(A_v * tau_b + 0.9 * wtf * tw * fv * math.sin(phi*math.pi/180)/ 10 ** 3,2))
+    A_v = str(A_v)
+    tau_b = str(tau_b)
+    V_p = str(V_p)
+    strength = str(strength)
+    tw = str(tw)
+    wtf = str(wtf)
+    fv = str(fv)
+    phi = str(phi)
+    Vtf = str(Vtf)
+
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}V_{tf} &= \left[ A_v\tau_b+0.9w_{tf}t_wf_v\sin\phi \right] \le V_p \\'))
+    eqn.append(NoEscape(r'&= \left[ '+A_v+r'\times'+tau_b+r'+0.9\times'+wtf+r'\times'+tw+r'\times'+fv+r'\times\sin'+phi+r'\right] \le '+V_p+r' \\'))
+    eqn.append(NoEscape(r'&='+Vtf+r'\le '+V_p+r' \\'))
+    eqn.append(NoEscape(r'V_d&=V_{tf}/ \gamma_{mo} \\'))
+    eqn.append(NoEscape(r'V_d&='+Vtf+r'/ 1.1 \\'))
+    eqn.append(NoEscape(r'&=' + strength + r' \end{aligned}'))
+    return eqn
+def cl_8_7_1_5_buckling_stress(E,slender,fcc):
+    """
+    Author: Rutvik J
+
+    """
+
+    E = str(E)
+    slender = str(slender)
+    fcc = str(fcc)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{\pi^2 E}{\lambda^2} \\'))
+    slender_eqn.append(NoEscape(r' &= \frac{3.14^2 \times' +  E + r'}{' + slender + r'^2} \\'))
+    slender_eqn.append(NoEscape(r' &= ' + fcc + r' \\'))
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+
+def cl_8_7_1_5_phi(al, lm,phi):
+    """
+    Author: Rutvik J
+
+    """
+
+    al = str(al)
+    lm = str(lm)
+    phi = str(phi)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= 0.5(1 + \alpha(\lambda - 0.2) + \lambda ^ 2) \\'))
+    slender_eqn.append(NoEscape(r' &= 0.5(1+' +  al + r'(' + lm + r'-0.2) +' + lm +  r'^2)\\'))
+    slender_eqn.append(NoEscape(r' &= ' + phi + r' \end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+
+def cl_8_7_1_5_buckling_curve(sub = 'c'):
+    """
+    Author: Rutvik J
+
+    """
+
+    sub = str(sub)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= c \\'))
+
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return slender_eqn
+
+
+def cl_8_7_1_5_imperfection_factor(sub='0.49'):
+    """
+    Author: Rutvik J
+
+    """
+
+    sub = str(sub)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &='+ sub + r'\\'))
+
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.2}] \end{aligned}'))
+    return slender_eqn
+def cl_8_7_1_5_Buckling(f_y,gamma_,lambd,phi,sub1,sub='0.49'):
+    """
+    Author: Rutvik J
+
+    """
+
+    f_y = str(f_y)
+    gamma_ = str(gamma_)
+    phi = str(phi)
+    lambd = str(lambd)
+    sub = str(sub)
+    sub1 = str(sub1)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y \gamma_{mo}}{\phi + \sqrt{\phi^2 - \lambda^2}} \leq f_y / \gamma_{mo} \\'))
+    slender_eqn.append(NoEscape(r' &= \frac{' + f_y + r'\times' + gamma_+ r'}{' + phi + r'+\sqrt{'+phi+r'^2 - '+ lambd+r'^2}} \leq ' + f_y + r'/' + gamma_+r' \\'))
+    slender_eqn.append(NoEscape(r'&='+ sub + r'\leq ' + sub1 + r'\end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return slender_eqn
+def cl_8_7_1_5_slenderness(r, d, l,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    r = str(r)
+    d = str(d)
+    l = str(l)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}\lambda &= \frac{0.7 d_{eff}web} {r_{eff}web}\\'))
+    eqn.append(NoEscape(r' &= \frac{0.7 \times' + d + r' } {' + r + r'}\\'))
+    eqn.append(NoEscape(r'&= ' + l + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return eqn
+def cl_8_7_3_Ieff_web_check(b, t, I,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    b = str(b)
+    t = str(t)
+    I = str(I)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}I_{eff}web &= \frac{\text{bearing}_{' + sub + r'}\times t_{web} ^ 3}{12}\\'))
+    eqn.append(NoEscape(r' &= \frac{' + b + r'\times' + t + r'^ 3}{12}\\'))
+    eqn.append(NoEscape(r'&= ' + I + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return eqn
+def cl_8_7_3_Aeff_web_check(b, t, A,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    b = str(b)
+    t = str(t)
+    A = str(A)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= text{bearing}_{' + sub + r'}\times t_{web} \\'))
+    eqn.append(NoEscape(r' &= ' + b + r'\times' + t + r'\\'))
+    eqn.append(NoEscape(r'&= ' + A + r' \end{aligned}'))
+    # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return eqn
+def cl_8_7_3_reff_web_check(r, I, A,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    r = str(r)
+    I = str(I)
+    A = str(A)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}r_{web} &= \sqrt{\frac{I_{eff}web} {A_{eff}web}}\\'))
+    eqn.append(NoEscape(r' &= \sqrt{\frac{' + I + r' } {' + A + r'}}\\'))
+    eqn.append(NoEscape(r'&= ' + r + r' \end{aligned}'))
+    # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
+    return eqn
+def cl_8_7_4_Bearing_stiffener_check(b,n, t, fy,gama,fw,r1,T):
+    """
+    Author: Rutvik J
+
+    """
+
+    # temp = True if Pd > P else False
+    b = str(b)
+    t = str(t)
+    n = str(n)
+    fy = str(fy)
+    gama = str(gama)
+    fw = str(fw)
+    r1 = str(r1)
+    T = str(T)
+    eqn = Math(inline=True)
+    # eqn.append(NoEscape(r'\begin{aligned} n_2 &= 2.5 (R1 + T)\end{aligned}'))
+    eqn.append(NoEscape(r'\begin{aligned} n_2 &= 2.5 (R1 + T)\\'))
+    eqn.append(NoEscape(r'&= 2.5 ('+ r1 + r'+' + T + r')\\'))
+    eqn.append(NoEscape(r'&= '+ n + r'\\'))
+    eqn.append(NoEscape(r'F_w &= \frac{(bearing_{length} + n_2)t_{web}f_{yw}}{\gamma_mo}\\'))
+    eqn.append(NoEscape(r' &= \frac{(' + b + r'+' + n + r')\times' + t + r'\times' + fy + r'}{'+ gama + r'}\\'))
+    eqn.append(NoEscape(r'&= ' + fw + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.4}] \end{aligned}'))
+    return eqn
+def cl_9_2_2_combine_shear_bending_mfd(Zpz, d, tw, f_y, gamma_m0, Mfd='NA'
+                                   ):
+    '''Author: Rutvik Joshi '''
+    eq = Math(inline=True)
+    # Mdv = str(Mdv)
+    # Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    # sclass = str(sclass)
+    # if sclass == 'Plastic' or sclass == 'Compact':
+    #     beta = str(beta)
+    #     Md = str(Md)
+    Mfd = str(Mfd)
+    # V = str(V)
+    # Vd = str(Vd)
+    Zpz = str(Zpz)
+    d = str(d)
+    tw = str(tw)
+    eq.append(NoEscape(r'\begin{aligned} M_{fd} &= \frac{fy(Z_{pz}-t_wd^2/4)}{\gamma_{mo}}  \\'))
+    eq.append(NoEscape(
+        r'&= \frac{' + f_y + r'\times(' + Zpz + r'-' + d + r'^2 \times' + tw + r'/4)}{' + gamma_m0 + r'\times 10^6 }\\'))
+    eq.append(NoEscape(r'&=' + Mfd + r'\\ \\'))
+    eq.append(NoEscape(r'&  \end{aligned}'))
+    return eq
+
+
+def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md,
+                                       sclass):
+    '''Author: Rutvik Joshi '''
+
+    eq = Math(inline=True)
+    if support == KEY_DISP_SUPPORT1:
+        res = str(round(1.2 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    else:
+        res = str(round(1.5 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    beta_b = str(round(Ze/Zpz,2))
+    Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    support = str(support)
+    beta = str(beta)
+    Md = str(Md)
+    Zpz = str(Zpz)
+    sclass = str(sclass)
+    if sclass == 'Plastic' or sclass == 'Compact':
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+    elif sclass == 'Semi-Compact' :
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        eq.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if support == KEY_DISP_SUPPORT1:
+        eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        # eq.append(NoEscape(
+        #     r'&= ' + Md + r'\leq ' + res + r'\\'))
+        # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
+
+    else:
+        eq.append(NoEscape(r' M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq \frac{1.5Z_ef_y}{\gamma_{mo}} \\'))
+        # eq.append(NoEscape(r'\leq 1.5Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        # eq.append(NoEscape(
+        #     r'&= ' + Md + r'\\'))
+        # eq.append(NoEscape(r'\leq ' + res + r'\leq ' + res + r'\\ '))
+    eq.append(NoEscape(
+        r'&= ' + Md + r'\leq ' + res + r'\\'))
+    eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
+    eq.append(NoEscape(r'&  \end{aligned}'))
+    return eq
+def cl_9_2_2_ltb_moment(E, meu,Iy, It, Iw, Llt, Ze,Zpz, f_y,support, gamma_m0,beta,Md,
+                                       sclass):
+    '''Author: Rutvik Joshi '''
+
+    eq = Math(inline=True)
+    # G = E / (2 + 2 * meu)
+    math.sqrt((math.pi ** 2 * E * Iy / Llt ** 2) * (G * It + (math.pi ** 2 * E * Iw / Llt ** 2)))
+    if support == KEY_DISP_SUPPORT1:
+        res = str(round(1.2 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    else:
+        res = str(round(1.5 * Ze * f_y/gamma_m0* 10 ** -6,2))
+    G = str(round(E / (2 + 2 * meu),2))
+    Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    support = str(support)
+    beta = str(beta)
+    Md = str(Md)
+    Zpz = str(Zpz)
+    sclass = str(sclass)
+    if sclass == 'Plastic' or sclass == 'Compact':
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+    elif sclass == 'Semi-Compact' :
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        eq.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if support == KEY_DISP_SUPPORT1:
+        eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
+        # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        eq.append(NoEscape(
+            r'&= ' + Md + r'\leq ' + res + r'\\'))
+        # eq.append(NoEscape(r'\leq ' + res + r'\\ '))
+
+    else:
+        eq.append(NoEscape(r' M_{d} &= \frac{\beta f_yZ_p}{\gamma_{mo}}  \leq \frac{1.5Z_ef_y}{\gamma_{mo}} \\'))
+        # eq.append(NoEscape(r'\leq 1.5Z_ef_y*\gamma_{mo} \\ '))
+        eq.append(NoEscape(
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\'))
+        # eq.append(NoEscape(r'\leq \frac{1.5 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
+        eq.append(NoEscape(
+            r'&= ' + Md + r'\\'))
+        eq.append(NoEscape(r'\leq ' + res + r'\leq ' + res + r'\\ '))
+
+    eq.append(NoEscape(r'M_{d}&=' + Md + r' \\'))
+    eq.append(NoEscape(r'&  \end{aligned}'))
+    return eq
+
+def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',Md='NA',Mfd='NA',eq=''):
+    """
+    Calculate shear yielding capacity of  plate (provided)
+    Args:
+        h:  Plate ht in mm (float)
+        t:  Plate thickness in mm (float)
+        f_y:Yeild strength of  plate material in N/mm square (float)
+        gamma: IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  (float)
+        V_dg: Shear yeilding capacity of  plate in N (float)
+        multiple:2 (int)
+    Returns:
+         Shear yielding capacity of  plate
+     Note:
+            Reference:
+            IS 800:2007,  cl 9.2.2
+    Author: Rutvik Joshi
+    """
+    if eq == '':
+        eq = Math(inline=True)
+    res = str(round(1.2 * Ze * f_y / gamma_m0 * 10**-6,2))
+    Mdv = str(Mdv)
+    Ze = str(Ze)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    sclass = str(sclass)
+    if sclass == 'Plastic' or sclass == 'Compact' :
+        beta = str(beta)
+        Md = str(Md)
+        Mfd = str(Mfd)
+        V = str(V)
+        Vd = str(Vd)
+        eq.append(NoEscape(r'\begin{aligned} \beta &= (2\frac{V}{V_d} - 1)^2 \\'))
+        eq.append(NoEscape(r'&= ( \frac{2 \times' + V + r'}{' + Vd + r'} - 1)^2 \\'))
+        eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
+        eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq\frac{1.2Z_ef_y}{\gamma_{mo}}\\ '))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+        eq.append(NoEscape(r'&=' + Mdv + r'\leq ' + res + r'\\'))
+    elif sclass == 'Semi-Compact' :
+        eq.append(NoEscape(r'\begin{aligned} M_{dv} &= \frac{Z_ef_y}{\gamma_{mo}} \\'))
+        eq.append(NoEscape(r'&= \frac{'+Ze +r'\times'+ f_y + r'}{'+ gamma_m0 + r'} \\'))
+        eq.append(NoEscape(r'&=' + Mdv + r'\\ \\'))
+
+    eq.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.9.2.2}] \end{aligned}'))
+    return eq
 
 def AISC_J4_shear_rupture_capacity_member(h, t, n_r, d_o, fu, v_dn, gamma_m1=1.25, multiple=1):
     """
@@ -3046,7 +3922,7 @@ def lever_arm_end_plate(lever_arm, bolt_row, ep_type=''):
     return display_eqn
 
 
-def get_pass_fail(required, provided, relation=''):
+def get_pass_fail(required, provided, relation='',M1 = '', M2 = ''):
     if provided == 0 or required == 'N/A' or provided == 'N/A' or required == 0:
         return ''
     else:
@@ -3065,6 +3941,16 @@ def get_pass_fail(required, provided, relation=''):
                 return 'Pass'
             else:
                 return 'Fail'
+        elif relation == 'Warn':
+            if M1:
+                return 'High Shear'
+            else:
+                return 'Low Shear'
+        elif relation == 'Custom':
+            if required >= provided:
+                return 'Pass'
+            else:
+                return 'Method A'
         else:
             if required < provided:
                 return 'Pass'

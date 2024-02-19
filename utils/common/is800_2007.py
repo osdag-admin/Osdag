@@ -188,11 +188,7 @@ class IS800_2007(object):
 
         """
         epsilon = math.sqrt(250 / f_y)
-        # print(f" flange_class"
-        #       f" width {width}"
-        #       f" thickness {thickness}"
-        #       f" epsilon {epsilon}"
-        #       )
+        
         ratio = width / thickness
 
         if section_type == 'Rolled':
@@ -213,9 +209,13 @@ class IS800_2007(object):
                 section_class = 'Semi-Compact'
             else:
                 section_class = 'Slender'
-
-        # print(f" section_type {section_type}"
-        #       f" section_class {section_class}")
+        print(f" flange_class"
+                    f" width {width}"
+                    f" thickness {thickness}"
+                    f" epsilon {epsilon}"
+                    )
+        print(f" section_type {section_type}"
+              f" section_class {section_class}")
         return [section_class, ratio]
 
     @staticmethod
@@ -946,7 +946,10 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_stress_reduction_factor(phi_lt, lambda_lt):
-        return 1 / ( phi_lt + (phi_lt **2 - lambda_lt **2) ** 0.5)
+        si = 1 / ( phi_lt + (phi_lt **2 - lambda_lt **2) ** 0.5)
+        if si > 1.0:
+            si = 1.0
+        return si
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_phi_lt(alpha_lt, lambda_lt):
@@ -956,9 +959,19 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):
+        ''' Author : Rutvik Joshi
+        Clauses: 8.2.2.1 and Annex E
+        '''
         G = E/(2+2*meu)
         return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
 
+    @staticmethod
+    def cl_8_2_2_Unsupported_beam_bending_fcrb(E, Llt_ry, hf_tf):
+        ''' Author : Rutvik Joshi
+        Clauses: 8.2.2.1 and Annex E
+        '''
+        fcrb = 1.1 * math.pi**2 * E * (1 + (Llt_ry/hf_tf)**2/20)**0.5 / Llt_ry
+        return fcrb
     @staticmethod
     def cl_8_2_2_1_elastic_buckling_moment(betab, Zp, Ze, fy, Mcr, fcrb = 0):
         if (betab * Zp * fy / Mcr) ** 0.5 <= (1.2 * Ze * fy / Mcr) ** 0.5:
@@ -966,6 +979,10 @@ class IS800_2007(object):
         else:
             return (1.2 * Ze * fy / Mcr) ** 0.5
 
+    @staticmethod
+    def cl_8_2_2_1_elastic_buckling_moment_fcrb( fy, fcrb=0):
+
+        return math.sqrt(fy/fcrb)
     @staticmethod
     def cl_8_3_1_EffLen_Simply_Supported(Torsional, Warping, length, depth, load) :
         """ Calculate the Effective Length for Simply Supported Beams as per Table 15 Cl 8.3.1
@@ -988,14 +1005,14 @@ class IS800_2007(object):
         if load == KEY_DISP_LOAD1:
             if Torsional == Torsion_Restraint1:
                 if Warping == Warping_Restraint1 :
-                    length = 0.70 * length
-                if Warping == Warping_Restraint2 :
-                    length = 0.75 * length
-                if Warping ==Warping_Restraint3 :
                     length = 0.80 * length
-                if Warping ==Warping_Restraint4 :
+                elif Warping == Warping_Restraint2 :
+                    length = 0.75 * length
+                # elif Warping ==Warping_Restraint1 :
+                #     length = 0.80 * length
+                elif Warping ==Warping_Restraint4 :
                     length = 0.85 * length
-                if Warping ==Warping_Restraint5 :
+                elif Warping ==Warping_Restraint5 :
                     length = 1.00 * length
             elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
                 length = length + 2* depth /1000
@@ -1007,7 +1024,7 @@ class IS800_2007(object):
                     length = 0.85 * length
                 if Warping ==Warping_Restraint2 :
                     length = 0.9 * length
-                if Warping ==Warping_Restraint3 :
+                if Warping ==Warping_Restraint1 :
                     length = 0.95 * length
                 if Warping ==Warping_Restraint4 :
                     length = 1.00 * length
@@ -1131,7 +1148,7 @@ class IS800_2007(object):
         return length
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
-    def cl_8_4_design_shear_strength(A_vg, f_y, gamma_m0):
+    def cl_8_4_design_shear_strength(A_vg, f_y):
         """ Calculate the design shear strength in yielding as per cl. 8.4
 
         Args:
@@ -1142,7 +1159,7 @@ class IS800_2007(object):
              Design shear strength in yielding of the component in N
 
         """
-        # gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         V_d = ((A_vg * f_y) / (math.sqrt(3) * gamma_m0))  # N
 
         return V_d
@@ -1168,6 +1185,148 @@ class IS800_2007(object):
 
         return M_d
 
+    @staticmethod
+    def cl_8_4_2_1_web_buckling_stiff(d, tw, e,type = 1, kv = None):
+        '''nominal shear strength, Vn,of webs with or without
+        intermediate stiffeners as governed by buckling
+
+        Author: Rutvik Joshi    '''
+        d_tw = d / tw
+        if type == 1 and d_tw <= 67 * e:
+            return False
+        elif type == 2 and d_tw <= 67 * e * math.sqrt(kv/5.35):
+            return False
+        return True
+
+    # @staticmethod
+    # def cl_8_4_2_2_ShearBuckling_Simple_postcritical(d, tw,c,mu,fyw,A_v,support):
+    #     '''based on the shear
+    #         buckling strength can be used for webs of Isection
+    #         girders, with or without intermediate
+    #         transverse stiffener, provided that the web has
+    #         transverse stiffeners at the supports.
+    #
+    #     Author: Rutvik Joshi    '''
+
+    @staticmethod
+    def cl_8_4_2_2_K_v_Simple_postcritical(support, c = 0, d = 1):
+
+        if support == 'only support':
+            K_v = 5.35
+        else:
+            if c/d < 1:
+                K_v = 4 + 5.35/(c/d)**2
+            else:
+                K_v = 5.35 + 4/(c/d)**2
+        return K_v
+
+    @staticmethod
+    def cl_8_4_2_2_tau_crc_Simple_postcritical(K_v, E,mu, d, tw):
+        print('K_v',K_v,'\n E',E,'\nmu',mu,' d',d,' tw',tw)
+        tau_crc = (K_v * math.pi**2 * E)/(12*(1-mu**2)*(d/tw)**2)
+
+        return tau_crc
+
+    @staticmethod
+    def cl_8_4_2_2_lambda_w_Simple_postcritical(fyw, tau_crc):
+        print('fyw',fyw,'\n tau_crc',tau_crc)
+
+        lambda_w = math.sqrt(fyw/(math.sqrt(3) * tau_crc))
+
+        return lambda_w
+
+    @staticmethod
+    def cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fyw):
+        print('fyw',fyw,' lambda_w',lambda_w)
+        if lambda_w <= 0.8:
+            tau_b = fyw / math.sqrt(3)
+        elif lambda_w < 1.2 and lambda_w > 0.8:
+            tau_b = (1 - 0.8*(lambda_w - 0.8)) * fyw / math.sqrt(3)
+        elif lambda_w >= 1.2:
+            tau_b = fyw / (math.sqrt(3) * lambda_w ** 2)
+
+        return tau_b
+
+    @staticmethod
+    def cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_v):
+        print('tau_b',tau_b,'\n A_v',A_v)
+
+        V_cr = A_v * tau_b
+
+        return V_cr
+
+    @staticmethod
+    def cl_8_4_2_2_Mfr_TensionField(bf, tf, fyf, Nf, gamma_mo):
+        '''based on the post-shear buckling
+            strength, may be used for webs with
+            intermediate transverse stiffeners, in addition
+            to the transverse stiffeners at supports, provided
+            the panels adjacent to the panel under tension
+            field action, or the end posts provide anchorage
+            for the tension fields
+
+        Author: Rutvik Joshi    '''
+
+        M_fr = 0.25 * bf * tf ** 2 * fyf * (1 - (Nf / (bf * tf * fyf / gamma_mo)) ** 2)
+        print(M_fr, 'M_fr')
+        return  M_fr
+    @staticmethod
+    def cl_8_4_2_2_TensionField( c, d, tw, fyw, bf,tf, fyf,Nf, gamma_mo, A_v,tau_b,V_p):
+        '''based on the post-shear buckling
+            strength, may be used for webs with
+            intermediate transverse stiffeners, in addition
+            to the transverse stiffeners at supports, provided
+            the panels adjacent to the panel under tension
+            field action, or the end posts provide anchorage
+            for the tension fields
+
+        Author: Rutvik Joshi    '''
+
+        phi = math.atan(d/c) * 180/math.pi
+        M_fr = 0.25 * bf * tf**2 * fyf*(1-(Nf/(bf * tf * fyf / gamma_mo))**2)
+        print('phi',phi,'\n Nf',Nf,M_fr,'M_fr',phi*math.pi/180)
+        s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi*math.pi/180)
+        if s <= c:
+            pass
+        else:
+            s == c
+        w_tf = d * math.cos(phi*math.pi/180) + (c-2*s)*math.sin(phi*math.pi/180)
+        sai = 1.5 * tau_b * math.sin(2*phi*math.pi/180)
+        fv = math.sqrt(fyw**2 - 3 * tau_b**2 + sai**2) - sai
+        V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi*math.pi/180)/ 10 ** 3
+        if V_tf <= V_p:
+            pass
+        else:
+            V_tf == V_p
+            print('phi',phi,'\n M_fr',M_fr,'\n s',s, '\n c',c, '\n w_tf', w_tf, '\n sai',sai,'\n fv',fv,'\n V_tf',V_tf,'\n V_p',V_p)
+        return phi,M_fr,s, w_tf,sai,fv,V_tf
+
+    @staticmethod
+    def cl_8_5_1_EndPanel(c, d, tw, fyw, bf, tf, fyf, Nf, gamma_mo, A_v, tau_b, V_p):
+        '''The design of end panels in girders in which the interior
+        panel (panel A) is designed using tension field action
+        shall be carried in accordance with the provisions given
+        herein.
+        only simple post critical method design
+        Author: Rutvik Joshi    '''
+
+        phi = math.atan(d / c) * 180 / math.pi
+        M_fr = 0.25 * bf * tf ** 3 * fyf * (1 - (Nf / (bf * tf * fyf / gamma_mo)) ** 2)
+        print('phi', phi, '\n Nf', Nf, M_fr, 'M_fr', phi * math.pi / 180)
+        s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi * math.pi / 180)
+        if s <= c:
+            pass
+        else:
+            s == c
+        w_tf = d * math.cos(phi * math.pi / 180) + (c - 2 * s) * math.sin(phi * math.pi / 180)
+        sai = 1.5 * tau_b * math.sin(2 * phi * math.pi / 180)
+        fv = math.sqrt(fyw ** 2 - 3 * tau_b ** 2 + sai ** 2) - sai
+        V_tf = A_v * tau_b + 0.9 * w_tf * tw * fv * math.sin(phi * math.pi / 180) / 10 ** 3
+        if V_tf <= V_p:
+            pass
+        else:
+            V_tf == V_p
+        return phi, M_fr, s, w_tf, sai, fv, V_tf
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
 

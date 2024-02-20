@@ -304,10 +304,22 @@ class Flexure_Cantilever(Member):
             return connectdb("Beams", call_type="popup")
             profile2 = connectdb("Columns", call_type="popup")
         if profile == 'Columns': #Beam and Column
-            return connectdb("Columns", call_type="popup")
+            return connectdb("Columns", call_type="popup")   
             # profile2 = connectdb("Columns", call_type="popup")
-        # return list(set(profile1 + profile2))
-            
+        if profile == 'Beams and Columns': #Beam and Column
+            res1 = connectdb("Beams", call_type="popup")
+            res2 = connectdb("Columns", call_type="popup")
+            return list(set(res1 + res2))
+
+    def fn_torsion_warping(self):
+        print( 'Inside fn_torsion_warping', self)
+        if self[0] == Torsion_Restraint1:
+            return Warping_Restraint_list
+        elif self[0] == Torsion_Restraint2:
+            return [Warping_Restraint5]
+        else:
+            return [Warping_Restraint5]        
+
 
     def fn_supp_image(self):
         print( 'Inside fn_supp_image', self)
@@ -446,8 +458,9 @@ class Flexure_Cantilever(Member):
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
         out_list.append(t2)
 
-        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
-        out_list.append(t1)
+        # TODO
+        # t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
+        # out_list.append(t1)
 
         t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
               self.result_tc if flag else '', False)
@@ -769,7 +782,6 @@ class Flexure_Cantilever(Member):
         # print(self.sec_profile)
         if (
             self.sec_profile == VALUES_SECTYPE[1]
-            or self.sec_profile == VALUES_SECTYPE[2]
             or self.sec_profile == "I-section"
         ):  # I-section
             self.section_property = ISection(
@@ -813,7 +825,7 @@ class Flexure_Cantilever(Member):
                 self.section_property = self.section_conect_database(self, section)
                 self.effective_depth = (self.section_property.depth - 2 * (
                             self.section_property.flange_thickness + self.section_property.root_radius))
-                if self.sec_profile == 'Beams' or self.sec_profile == 'Columns':
+                if self.sec_profile == 'Beams' or self.sec_profile == 'Columns' or self.sec_profile == VALUES_SECTYPE[1]:
                     if self.section_property.type == "Rolled" and self.bending_type == KEY_DISP_BENDING1:
                         self.shear_area = self.section_property.depth * self.section_property.web_thickness
                     elif self.section_property.type != "Rolled" and self.bending_type == KEY_DISP_BENDING1:
@@ -1464,7 +1476,9 @@ class Flexure_Cantilever(Member):
             try:
                 if float(design_dictionary[KEY_LENGTH_OVERWRITE]) <= 0:
                     design_dictionary[KEY_LENGTH_OVERWRITE] = 'NA'
-                length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
+                else:
+                    length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
+                    
                 self.effective_length = length
                 print(f"Working 3 {self.effective_length}")
             except:
@@ -1979,7 +1993,7 @@ class Flexure_Cantilever(Member):
         self.section_property = self.section_conect_database(self, self.result_designation)
 
         if self.design_status:
-            if self.sec_profile=='Columns' or self.sec_profile=='Beams':
+            if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
                                       KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
                                       KEY_DISP_COLSEC_REPORT: self.section_property.designation,
@@ -2420,7 +2434,10 @@ class Flexure_Cantilever(Member):
                       get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_crippling, 2), relation="leq"))
 
                 self.report_check.append(t1)
-
+# TODO
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                t1 = ('SubSection', 'Lateral Torsional Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+                self.report_check.append(t1)
                 # t1 = (KEY_DISP_A_eff_latex + '(mm^2)', ' ',
                 #       cl_8_7_3_Aeff_web_check(self.bearing_length, self.section_property.web_thickness,
                 #                               self.result_bcA_eff),

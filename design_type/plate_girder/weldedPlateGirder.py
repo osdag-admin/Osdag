@@ -36,13 +36,13 @@ from design_type.flexural_member.flexure import Flexure
 '''
 Debugging tools
 '''
-from icecream import ic
+# from icecream import ic
 
 class Custom_Girder():#Material
     # def __new__(self,design_dictionary):
     def __init__(self, design_dictionary,design):
         # super(Custom_Girder,self).__init__()#material_grade
-        ic("Girder Object Initialised")
+        print("Girder Object Initialised")
         self.designation = 'User Defined'
         if design:
             self.flange_thickness = 1e-3
@@ -91,7 +91,7 @@ class Custom_Girder():#Material
                 I_sectional_Properties().calc_PlasticModulusZpy(self.depth, self.flange_width, self.web_thickness,
                                                                 self.flange_thickness, self.flange_slope, self.root_radius,
                                                                 self.toe_radius) * 10 ** 3)
-                # ic(self.flange_thickness)
+                # print(self.flange_thickness)
         else :
             self.section_defined(design_dictionary)
 
@@ -143,7 +143,7 @@ class Custom_Girder():#Material
             I_sectional_Properties().calc_PlasticModulusZpy(self.depth, self.flange_width, self.web_thickness,
                                                             self.flange_thickness, self.flange_slope, self.root_radius,
                                                             self.toe_radius) * 10 ** 3)
-        # ic(self.flange_thickness)
+        # print(self.flange_thickness)
     def __str__(self) -> str:
         return "Customised Girder generated"
 class PlateGirderWelded(Member):
@@ -445,7 +445,7 @@ class PlateGirderWelded(Member):
         return out_list
 
     def func_for_validation(self, design_dictionary):
-        ic(f"func_for_validation here")
+        print(f"func_for_validation here")
         all_errors = []
         self.design_status = False
         flag = False
@@ -455,31 +455,31 @@ class PlateGirderWelded(Member):
         flag4 = False
         option_list = self.input_values(self)
         missing_fields_list = []
-        ic(f'func_for_validation option_list {option_list}'
+        print(f'func_for_validation option_list {option_list}'
             f"\n  design_dictionary {design_dictionary}")
         for option in option_list:
-            # ic(option_list)
+            # print(option_list)
             if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
                     continue
                 if option[0] == KEY_LENGTH:
                     if float(design_dictionary[option[0]]) <= 0.0:
-                        ic("Input value(s) cannot be equal or less than zero.")
+                        print("Input value(s) cannot be equal or less than zero.")
                         error = "Input value(s) cannot be equal or less than zero."
                         all_errors.append(error)
                     else:
                         flag1 = True
                 elif option[0] == KEY_SHEAR:
                     if float(design_dictionary[option[0]]) < 0.0:
-                        ic("Input value(s) cannot be less than zero.")
+                        print("Input value(s) cannot be less than zero.")
                         error = "Input value(s) cannot be less than zero."
                         all_errors.append(error)
                     else:
                         flag2 = True
                 elif option[0] == KEY_MOMENT:
                     if float(design_dictionary[option[0]]) < 0.0:
-                        ic("Input value(s) cannot be less than zero.")
+                        print("Input value(s) cannot be less than zero.")
                         error = "Input value(s) cannot be less than zero."
                         all_errors.append(error)
                     else:
@@ -502,7 +502,7 @@ class PlateGirderWelded(Member):
             flag = True
 
         if flag and flag1 and flag2 and flag3 and flag4:
-            ic(f"\n design_dictionary{design_dictionary}")
+            print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary) #
             self.results(self, design_dictionary) #
         else:
@@ -510,7 +510,7 @@ class PlateGirderWelded(Member):
     def isfloat(input_list):
         for i in range(len(input_list)):
             try:
-                ic(input_list[i])
+                print(input_list[i])
                 yield isinstance(float(input_list[i]),float)
             except:
                 yield False
@@ -521,7 +521,7 @@ class PlateGirderWelded(Member):
         self.length = float(design_dictionary[KEY_LENGTH])*10**3 #m -> mm
         self.material = design_dictionary[KEY_MATERIAL]
         self.load = Load(0,design_dictionary[KEY_SHEAR],design_dictionary[KEY_MOMENT],unit_kNm=True) #KN -> N
-        ic()
+        print()
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         
         # Safety Factors
@@ -544,7 +544,7 @@ class PlateGirderWelded(Member):
         self.EndStiffener = 'Yes'
         self.IntermediateStiffener = design_dictionary[KEY_IntermediateStiffener]
         self.IntermediateStiffener_spacing=  design_dictionary[KEY_IntermediateStiffener_spacing] if self.IntermediateStiffener else "NA"
-        ic("Intermediate Stiffener",self.IntermediateStiffener)
+        print("Intermediate Stiffener",self.IntermediateStiffener)
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
         #TODO : future inputs add to design preference
         self.web_type_needed = "Thick" # or "Slim"
@@ -562,7 +562,7 @@ class PlateGirderWelded(Member):
         self.section_parameters = [KEY_tf,KEY_tw,KEY_dw,KEY_bf]
         self.temp_section_list = [design_dictionary[KEY_tf], design_dictionary[KEY_tw],design_dictionary[KEY_dw],design_dictionary[KEY_bf]]#[1,4]
         self.section_list = [i for i in self.isfloat(self.temp_section_list)]
-        ic(self.section_list)
+        print(self.section_list)
         
         # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
         
@@ -591,7 +591,7 @@ class PlateGirderWelded(Member):
             self.optimization_tab_check(self)
             # 2. Check if user has provided a section or wants us to find optimised section
             if all(self.section_list):
-                ic()
+                # print()
                 # self.optimization_tab_check(self)
                 self.design = False
                 N_sections_list = [tuple(self.temp_section_list)]
@@ -618,7 +618,7 @@ class PlateGirderWelded(Member):
                 # TODO else:
                 #     self.section_classification(self)
                 #     self.section_check_validator(self,True,False, design_dictionary)
-                ic(section )
+                print(section )
                 
                 self.girder_checks(self,section=section)
                 
@@ -638,10 +638,10 @@ class PlateGirderWelded(Member):
 
     def girder_checks(self,section):
         # Tuple to Dictionary Converter
-        ic(type(section))
-        ic(dict(zip(self.section_parameters,section)))
+        print(type(section))
+        print(dict(zip(self.section_parameters,section)))
         self.single_section_dictionary = dict(zip(self.section_parameters,section))
-        ic(self.single_section_dictionary)
+        print(self.single_section_dictionary)
         # 4. Finding other parameters of the section
         self.Girder_SectionProperty(self,self.single_section_dictionary,self.design)
         
@@ -666,7 +666,7 @@ class PlateGirderWelded(Member):
         self.Shear_Strength(self)
         self.single_section_dictionary['Shear_Strength'] = self.V_d
         self.single_section_dictionary['V_d'] = self.V_d
-        ic(self.V_d,self.load.shear_force)
+        print(self.V_d,self.load.shear_force)
         
         # 6.2 Shear Strength with end Stiffeners only
         if self.single_section_dictionary['Shear_Strength'] < self.load.shear_force/1000:
@@ -710,13 +710,13 @@ class PlateGirderWelded(Member):
                         if self.shear_strength > self.load.shear_force * 10**-3:
                             return
                 
-        ic(self.single_section_dictionary)
+        print(self.single_section_dictionary)
 
     def Girder_SectionProperty(self,design_dictionary,var):
-        ic(Custom_Girder)
-        ic(f'temp_section_list = {self.temp_section_list}')
+        print(Custom_Girder)
+        print(f'temp_section_list = {self.temp_section_list}')
 
-        ic(f'section_list = {self.section_list}')
+        print(f'section_list = {self.section_list}')
         # if isinstance(float(design_dictionary[KEY_tf]),float) and 
 
         self.section_property = Custom_Girder(design_dictionary, var)
@@ -740,7 +740,7 @@ class PlateGirderWelded(Member):
         #       self.section_property.plast_sec_mod_y)
 
     def optimization_tab_check(self):
-        ic()
+        print()
         # self.latex_tension_zone = False
         if (self.effective_area_factor <= 0.10) or (self.effective_area_factor > 1.0):
             logger.error(
@@ -774,7 +774,7 @@ class PlateGirderWelded(Member):
                 self.section_classification(self)
             # count = count+1
             # k = k + 5
-            ic(count,'depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness,self.section_property.flange_width,self.section_property.flange_thickness, "self.section_class_girder",self.section_class_girder)
+            print(count,'depth & web_thickness',self.section_property.depth_web, self.section_property.web_thickness,self.section_property.flange_width,self.section_property.flange_thickness, "self.section_class_girder",self.section_class_girder)
         self.designed_dict = { KEY_tf  : self.section_property.flange_thickness  ,
                             KEY_dw:  self.section_property.depth_web ,
                             KEY_bf: self.section_property.flange_width  ,

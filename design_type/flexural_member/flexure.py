@@ -259,14 +259,8 @@ class Flexure(Member):
         options_list.append(t2)
 
         #
-
         # t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX, VALUES_BENDING_TYPE, False, 'No Validator')
         # options_list.append(t3)
-
-
-        t3 = (KEY_BENDING, KEY_DISP_BENDING, TYPE_COMBOBOX_CUSTOMIZED, VALUES_BENDING_TYPE, False, 'No Validator')
-        options_list.append(t3)
-        #
 
         #
         t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT1, True, 'No Validator')
@@ -310,24 +304,16 @@ class Flexure(Member):
     def fn_profile_section(self):
 
         profile = self[0]
+        if profile == 'Beams': #Beam and Column
+            return connectdb("Beams", call_type="popup")
+            profile2 = connectdb("Columns", call_type="popup")
+        if profile == 'Columns': #Beam and Column
+            return connectdb("Columns", call_type="popup")   
+            # profile2 = connectdb("Columns", call_type="popup")
         if profile == 'Beams and Columns': #Beam and Column
             res1 = connectdb("Beams", call_type="popup")
             res2 = connectdb("Columns", call_type="popup")
             return list(set(res1 + res2))
-
-    def out_anchor_tension(self):
-        print("SELF: ", self)
-        if self[0] in ['Laterally Supported']:
-            return True
-        else:
-            return False 
-
-    def out_anchor_tension_2(self):
-        print("SELF: ", self)
-        if self[0] in ['Laterally Supported']:
-            return False
-        else:
-            return True         
 
     def fn_torsion_warping(self):
         print( 'Inside fn_torsion_warping', self)
@@ -376,26 +362,6 @@ class Flexure(Member):
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
                'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
         lst.append(t18)
-
-        t4 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_BENDING, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
-        lst.append(t4)
-
-        t5 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_SUPPORT_TYPE, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
-        lst.append(t5)
-
-        t6 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_SUPPORT_TYPE2, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension)
-        lst.append(t6)
-
-        t7 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_TORSIONAL_RES, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension_2)
-        lst.append(t7)
-
-        t8 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_WARPING_RES, TYPE_COMBOBOX_FREEZE, self.out_anchor_tension_2)
-        lst.append(t8)
-        
-        #TODO: @rutvik: test t18 
-#         t18 = ([KEY_BENDING],
-#                'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.major_bending_warning)
-#         lst.append(t18)
 
         return lst
     
@@ -859,7 +825,7 @@ class Flexure(Member):
                             self.section_property.flange_thickness + self.section_property.root_radius))
                 print('self.section_property.type:',self.section_property.type, self.bending_type)
                 
-                if self.sec_profile == 'Beams' or self.sec_profile == 'Columns':
+                if self.sec_profile == 'Beams' or self.sec_profile == 'Columns' or self.sec_profile == VALUES_SECTYPE[1]:
                     if self.section_property.type == "Rolled" and self.bending_type == KEY_DISP_BENDING1:
                         self.shear_area = self.section_property.depth * self.section_property.web_thickness
                     elif self.section_property.type != "Rolled" and self.bending_type == KEY_DISP_BENDING1:
@@ -2274,7 +2240,7 @@ class Flexure(Member):
         self.section_property = self.section_connect_database(self, self.result_designation)
 
         if self.design_status:
-            if self.sec_profile=='Columns' or self.sec_profile=='Beams':
+            if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
                                       KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
                                       KEY_DISP_COLSEC_REPORT: self.section_property.designation,

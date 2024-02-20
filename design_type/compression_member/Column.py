@@ -624,23 +624,32 @@ class ColumnDesign(Member):
         # design preferences
         self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
         self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
-        self.optimization_parameter = design_dictionary[KEY_OPTIMIZATION_PARA]
-        self.allow_class1 = design_dictionary[KEY_ALLOW_CLASS1]
-        self.allow_class2 = design_dictionary[KEY_ALLOW_CLASS2]
-        self.allow_class3 = design_dictionary[KEY_ALLOW_CLASS3]
-        self.allow_class4 = design_dictionary[KEY_ALLOW_CLASS4]
-        self.steel_cost_per_kg = float(design_dictionary[KEY_STEEL_COST])
 
-        self.allowed_sections = []
+        #TODO: @danish this should be handeled dynamically at run-time
+        try:
+            self.optimization_parameter = design_dictionary[KEY_OPTIMIZATION_PARA]
+        except:
+            self.optimization_parameter = 'Utilization Ratio'
+        # self.allow_class1 = design_dictionary[KEY_ALLOW_CLASS1]
+        # self.allow_class2 = design_dictionary[KEY_ALLOW_CLASS2]
+        # self.allow_class3 = design_dictionary[KEY_ALLOW_CLASS3]
+        # self.allow_class4 = design_dictionary[KEY_ALLOW_CLASS4]
+        try:
+            self.steel_cost_per_kg = float(design_dictionary[KEY_STEEL_COST])
+        except:
+            self.steel_cost_per_kg = 50
 
-        if self.allow_class1 == "Yes":
-            self.allowed_sections.append('Plastic')
-        if self.allow_class2 == "Yes":
-            self.allowed_sections.append('Compact')
-        if self.allow_class3 == "Yes":
-            self.allowed_sections.append('Semi-Compact')
-        if self.allow_class4 == "Yes":
-            self.allowed_sections.append('Slender')
+        self.allowed_sections = ['Plastic', 'Compact', 'Semi-Compact', 'Slender']
+
+        #TODO: @danish check this part if it is needed here
+        # if self.allow_class1 == "Yes":
+        #     self.allowed_sections.append('Plastic')
+        # if self.allow_class2 == "Yes":
+        #     self.allowed_sections.append('Compact')
+        # if self.allow_class3 == "Yes":
+        #     self.allowed_sections.append('Semi-Compact')
+        # if self.allow_class4 == "Yes":
+        #     self.allowed_sections.append('Slender')
 
         print(self.allowed_sections)
 
@@ -800,16 +809,19 @@ class ColumnDesign(Member):
             else:
                 logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
 
-            if len(self.allowed_sections) == 0:
-                logger.warning("Select at-least one type of section in the design preferences tab.")
-                logger.error("Cannot compute. Selected section classification type is Null.")
-                self.design_status = False
-                self.design_status_list.append(self.design_status)
+            # if len(self.allowed_sections) == 0:
+            #     logger.warning("Select at-least one type of section in the design preferences tab.")
+            #     logger.error("Cannot compute. Selected section classification type is Null.")
+            #     self.design_status = False
+            #     self.design_status_list.append(self.design_status)
 
-            if self.section_class in self.allowed_sections:
-                self.input_section_list.append(trial_section)
-                self.input_section_classification.update({trial_section: self.section_class})
+            #TODO: @danish check this part
+            # if self.section_class in self.allowed_sections:
+            #     self.input_section_list.append(trial_section)
+            #     self.input_section_classification.update({trial_section: self.section_class})
             # print(f"self.section_class{self.section_class}")
+            self.input_section_list.append(trial_section)
+            self.input_section_classification.update({trial_section: self.section_class})
         return local_flag
 
     def design_column(self):
@@ -831,13 +843,13 @@ class ColumnDesign(Member):
             self.design_status = False
             self.design_status_list.append(self.design_status)
 
-        if (self.steel_cost_per_kg == 0.10) or (self.effective_area_factor > 1.0):
-            logger.warning("The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range.")
-            logger.info("Provide an appropriate input and re-design.")
-            logger.info("Assuming a default rate of 50 (INR/kg).")
-            self.steel_cost_per_kg = 50
-            self.design_status = False
-            self.design_status_list.append(self.design_status)
+        # if (self.steel_cost_per_kg == 0.10) or (self.effective_area_factor > 1.0):
+        #     logger.warning("The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range.")
+        #     logger.info("Provide an appropriate input and re-design.")
+        #     logger.info("Assuming a default rate of 50 (INR/kg).")
+        #     self.steel_cost_per_kg = 50
+        #     self.design_status = False
+        #     self.design_status_list.append(self.design_status)
 
         if len(self.input_section_list) > 0:
 

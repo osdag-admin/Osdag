@@ -1375,7 +1375,7 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     Zpz = str(Zpz)
     sclass = str(sclass)
     if sclass == 'Plastic' or sclass == 'Compact':
-        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is }'+sclass+r'\\'))# Plastic or Compact
     elif sclass == 'Semi-Compact' :
         eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
         eq.append(NoEscape(r' &='+ beta_b + r'\\'))
@@ -1383,7 +1383,7 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
         eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
         # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
-            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'))}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
         # eq.append(NoEscape(
         #     r'&= ' + Md + r'\leq ' + res + r'\\'))

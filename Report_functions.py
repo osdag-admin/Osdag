@@ -96,15 +96,15 @@ def cl_3_7_2_section_classification_flange(d,t,result,epsilon,class_of_section=N
     class_of_section = str(class_of_section)
     eqn = Math(inline=True)
     if class_of_section == "Plastic":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 9.4\varepsilon\\'))
+        eqn.append(NoEscape(r'\begin{aligned} \frac{b}{t_f} &= \frac{' + d + r'}{' + t + r'} \le 9.4\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(9.4*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
     elif class_of_section == "Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 10.5\varepsilon\\'))
+        eqn.append(NoEscape(r'\begin{aligned} \frac{b}{t_f} &= \frac{' + d + r'}{' + t + r'} \le 10.5\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(10.5*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
     elif class_of_section == "Semi-Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 15.7\varepsilon\\'))
+        eqn.append(NoEscape(r'\begin{aligned} \frac{b}{t_f} &= \frac{' + d + r'}{' + t + r'} \le 15.7\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(15.7*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
     else :
@@ -534,7 +534,6 @@ def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass
               IS 800:2007,  cl 8.2.1.2
 
     """
-
     if support == KEY_DISP_SUPPORT1:
         res = str(round(1.2 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
     else:
@@ -549,7 +548,7 @@ def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
     if sclass == 'Plastic' or sclass == 'Compact':
-        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is}' + sclass + r'\\'))#
     elif sclass == 'Semi-Compact' :
         Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
         Pmc_eqn.append(NoEscape(r' &='+ beta_b + r'\\'))
@@ -687,7 +686,7 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
     # check = str(check)
     load = str(load)
     allow_shear_capacity_eqn = Math(inline=True)
-    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
+    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} &= 0.6~V_{d}\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
     if check:
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
@@ -787,6 +786,29 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
 
     return shear_capacity_eqn
 
+def cl_8_4_shear_yielding_capacity_member_(h, t, f_y, gamma_m0, V_dg, multiple=1):
+    """
+    Similar to cl_8_4_shear_yielding_capacity_member without the y axis mentioned
+    """
+
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+
+    V_dg = str(V_dg)
+
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= \frac{A_vf_y}{\sqrt{3}\gamma_{m0}}\\'))
+    if multiple == 1:
+        shear_yield_eqn.append(NoEscape(r'&=\frac{' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r' \times 1000}\\'))
+    else:
+        multiple = str(multiple)
+        shear_yield_eqn.append(
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r' \times 1000} \\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r' \\ \\'))
+    shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS ~800:2007,~Cl.10.4.3}] \end{aligned}'))
+    return shear_yield_eqn
 
 def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1):
     """

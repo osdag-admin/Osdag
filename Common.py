@@ -539,6 +539,7 @@ KEY_WEB_CRIPPLING= 'Crippling.Strength'
 KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
 KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
 KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)' # Elastic 
+KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' # 
 KEY_DISP_T_constatnt= 'Torsional Constant (mm<sup>4</sup>)' #  (I<sub>t</sub>)
 KEY_DISP_W_constatnt= 'Warping Constant (mm<sup>6</sup>)' # (I<sub>w</sub>)
 KEY_LTB= 'L.T.B.Details'

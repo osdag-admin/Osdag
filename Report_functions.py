@@ -548,7 +548,7 @@ def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
     if sclass == 'Plastic' or sclass == 'Compact':
-        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is}' + sclass + r'\\'))#
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is }' + sclass + r'\\'))#
     elif sclass == 'Semi-Compact' :
         Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
         Pmc_eqn.append(NoEscape(r' &='+ beta_b + r'\\'))
@@ -1284,7 +1284,7 @@ def cl_8_7_3_Aeff_web_check(b, t, A,sub = 'length'):
     A = str(A)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= text{bearing}_{' + sub + r'}\times t_{web} \\'))
+    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= \text{bearing}_{' + sub + r'}\times t_{web} \\'))
     eqn.append(NoEscape(r' &= ' + b + r'\times' + t + r'\\'))
     eqn.append(NoEscape(r'&= ' + A + r' \end{aligned}'))
     # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))

@@ -535,30 +535,40 @@ class Flexure(Member):
               )
         for option in option_list:
             if option[2] == TYPE_TEXTBOX or option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-                    continue
-                if option[0] == KEY_LENGTH:
-                    if float(design_dictionary[option[0]]) <= 0.0:
-                        print("Input value(s) cannot be equal or less than zero.")
-                        error = "Input value(s) cannot be equal or less than zero."
-                        all_errors.append(error)
-                    else:
-                        flag1 = True
-                elif option[0] == KEY_SHEAR:
-                    if float(design_dictionary[option[0]]) <= 0.0:
-                        print("Input value(s) cannot be equal or less than zero.")
-                        error = "Input value(s) cannot be equal or less than zero."
-                        all_errors.append(error)
-                    else:
-                        flag2 = True
-                elif option[0] == KEY_MOMENT:
-                    if float(design_dictionary[option[0]]) <= 0.0:
-                        print("Input value(s) cannot be equal or less than zero.")
-                        error = "Input value(s) cannot be equal or less than zero."
-                        all_errors.append(error)
-                    else:
-                        flag3 = True
+                try:
+                    if design_dictionary[option[0]] == '':
+                        missing_fields_list.append(option[1])
+                        continue
+                    if option[0] == KEY_LENGTH:
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        
+                        else:
+                            flag1 = True
+                    elif option[0] == KEY_SHEAR:
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag2 = True
+                    elif option[0] == KEY_MOMENT:
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag3 = True
+                except:
+                        error = "Input value(s) are not valid"
+                        all_errors.append(error)         
+            # elif type(design_dictionary[option[0]]) != 'float':
+            #             print("Input value(s) are not valid")
+            #             error = "Input value(s) are not valid"
+            #             all_errors.append(error)
+            
             # elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_DESIGN_TYPE_FLEXURE, KEY_BENDING, KEY_SUPPORT]:
             #     val = option[3]
             #     if design_dictionary[option[0]] == val[0]:

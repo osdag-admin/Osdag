@@ -481,7 +481,7 @@ class Flexure_Cantilever(Member):
         out_list.append(t2)
 
         t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
-              self.result_nd_esr_lt if flag else
+              self.result_fcd__lt if flag else
               '', False)
         out_list.append(t1)
 
@@ -531,30 +531,35 @@ class Flexure_Cantilever(Member):
               )
         for option in option_list:
             if option[2] == TYPE_TEXTBOX or option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-                    continue
-                if option[0] == KEY_LENGTH:
-                    if float(design_dictionary[option[0]]) <= 0.0:
-                        print("Input value(s) cannot be equal or less than zero.")
-                        error = "Input value(s) cannot be equal or less than zero."
-                        all_errors.append(error)
-                    else:
-                        flag1 = True
-                elif option[0] == KEY_SHEAR:
-                    if float(design_dictionary[option[0]]) <= 0.0:
-                        print("Input value(s) cannot be equal or less than zero.")
-                        error = "Input value(s) cannot be equal or less than zero."
-                        all_errors.append(error)
-                    else:
-                        flag2 = True
-                elif option[0] == KEY_MOMENT:
-                    if float(design_dictionary[option[0]]) <= 0.0:
-                        print("Input value(s) cannot be equal or less than zero.")
-                        error = "Input value(s) cannot be equal or less than zero."
-                        all_errors.append(error)
-                    else:
-                        flag3 = True
+                try:
+                
+                    if design_dictionary[option[0]] == '':
+                        missing_fields_list.append(option[1])
+                        continue
+                    if option[0] == KEY_LENGTH:
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag1 = True
+                    elif option[0] == KEY_SHEAR:
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag2 = True
+                    elif option[0] == KEY_MOMENT:
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            print("Input value(s) cannot be equal or less than zero.")
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag3 = True
+                except:
+                        error = "Input value(s) are not valid"
+                        all_errors.append(error)                             
             # elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_DESIGN_TYPE_FLEXURE, KEY_BENDING, KEY_SUPPORT]:
             #     val = option[3]
             #     if design_dictionary[option[0]] == val[0]:
@@ -2022,8 +2027,8 @@ class Flexure_Cantilever(Member):
             self.report_input = \
                 {#KEY_MAIN_MODULE: self.mainmodule,
                  KEY_MODULE: self.module, #"Axial load on column "
-                    KEY_DISP_SHEAR: self.load.shear_force * 10 ** -3,
-                    KEY_DISP_BEAM_MOMENT_Latex: self.load.moment * 10 ** -6,
+                    KEY_DISP_SHEAR+'*': self.load.shear_force * 10 ** -3,
+                    KEY_DISP_BEAM_MOMENT_Latex+'*': self.load.moment * 10 ** -6,
                     KEY_DISP_LENGTH_BEAM: self.result_eff_len,
                     KEY_DISP_SEC_PROFILE: self.sec_profile,
                     KEY_DISP_SECSIZE: str(self.sec_list),
@@ -2243,7 +2248,7 @@ class Flexure_Cantilever(Member):
                 self.report_check.append(t1)
 
                 t1 = (KEY_DISP_DESIGN_STRENGTH_SHEAR, self.load.shear_force * 10 ** -3,
-                      cl_8_4_shear_yielding_capacity_member(self.section_property.depth,
+                      cl_8_4_shear_yielding_capacity_member_(self.section_property.depth,
                                                             self.section_property.web_thickness, self.material_property.fy,
                                                             self.gamma_m0, round(self.result_shear, 2)),
                       get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_shear, 2), relation="lesser"))

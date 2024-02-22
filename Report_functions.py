@@ -96,15 +96,15 @@ def cl_3_7_2_section_classification_flange(d,t,result,epsilon,class_of_section=N
     class_of_section = str(class_of_section)
     eqn = Math(inline=True)
     if class_of_section == "Plastic":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 9.4\varepsilon\\'))
+        eqn.append(NoEscape(r'\begin{aligned} \frac{b}{t_f} &= \frac{' + d + r'}{' + t + r'} \le 9.4\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(9.4*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
     elif class_of_section == "Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 10.5\varepsilon\\'))
+        eqn.append(NoEscape(r'\begin{aligned} \frac{b}{t_f} &= \frac{' + d + r'}{' + t + r'} \le 10.5\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(10.5*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
     elif class_of_section == "Semi-Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 15.7\varepsilon\\'))
+        eqn.append(NoEscape(r'\begin{aligned} \frac{b}{t_f} &= \frac{' + d + r'}{' + t + r'} \le 15.7\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(15.7*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
     else :
@@ -534,7 +534,6 @@ def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass
               IS 800:2007,  cl 8.2.1.2
 
     """
-
     if support == KEY_DISP_SUPPORT1:
         res = str(round(1.2 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
     else:
@@ -549,7 +548,7 @@ def cl_8_2_1_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
     if sclass == 'Plastic' or sclass == 'Compact':
-        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is }' + sclass + r'\\'))#
     elif sclass == 'Semi-Compact' :
         Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
         Pmc_eqn.append(NoEscape(r' &='+ beta_b + r'\\'))
@@ -687,7 +686,7 @@ def cl_8_2_1_2_shear_check(V_d, S_c,check,load):
     # check = str(check)
     load = str(load)
     allow_shear_capacity_eqn = Math(inline=True)
-    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= 0.6~V_{dy}\\'))
+    allow_shear_capacity_eqn.append(NoEscape(r'\begin{aligned} &= 0.6~V_{d}\\'))
     allow_shear_capacity_eqn.append(NoEscape(r'&=0.6 \times' + V_d + r'\\'))
     if check:
         allow_shear_capacity_eqn.append(NoEscape(r'&=' + S_c + r'\leq' + load + r'\\'))
@@ -714,7 +713,112 @@ def cl_8_2_2_phi(al, lm,phi):
     # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
     return slender_eqn
 
+def cl_8_2_2_1_Mcr(M_cr, E,I_y,KL,G,I_t,I_w,):
+    """
+    Author: Rutvik J
 
+    """
+
+    M_cr = str(round(M_cr,2))
+    E = str(round(E*10**-5,2))
+    I_y = str(round(I_y*10**-4,2))
+    KL = str(round(KL*10**3,2))
+    G = str(round(G*10**-3,2))
+    I_t = str(round(I_t*10**-5,2))
+    I_w = str(round(I_w*10**-11,2))
+   
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned}M_{cr}&= \sqrt{\frac{\pi^{2}EI_y}{(KL)^2}\left( GI_t+\frac{\pi^{2}EI_w}{(KL)^2} \right)} \\'))
+    slender_eqn.append(NoEscape(r' &= \sqrt{\frac{\pi^{2}\times'+ E+r'\times 10^5 \times'+I_y+r'\times 10^4}{('+KL+r')^2}}\\'))  #   \sqrt{\left('+G+r'10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\
+    slender_eqn.append(NoEscape(r' &\times\sqrt{\left('+G+r'\times 10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\'))
+    slender_eqn.append(NoEscape(r' &= ' + M_cr + r' \end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
+    return slender_eqn
+def cl_8_2_2_slenderness(beta_b,Z_e, Z_p, M_cr, f_y, l,sub = 'length'):
+    """
+    Author: Rutvik J
+
+    """
+    # temp = True if Pd > P else False
+    beta_b = str(beta_b)
+    Z_e = str(Z_e)
+    Z_p = str(Z_p)
+    M_cr = str(M_cr)
+    f_y = str(f_y)
+    l = str(l)
+    sub = str(sub)
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}\lambda_{LT} &= \sqrt{\frac{\beta_bZ_pf_y}{M_{cr}}} \le \sqrt{\frac{1.2 Z_e f_y}{M_{cr}}}\\'))
+    eqn.append(NoEscape(r' &= \sqrt{\frac{'+beta_b+r'\times'+Z_p+r'\times'+f_y+r'}{'+M_cr+r'}} \le \sqrt{\frac{1.2'+ r'\times'+ Z_e+r'\times ' +f_y+r'}{'+r'\times'+M_cr+r'}}\\'))
+    eqn.append(NoEscape(r'&= ' + l + r' \\'))
+    eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
+    return eqn
+
+def cl_8_2_2_Bending_Compressive(f_y,gamma_,lambd,phi,sub='0.49'):
+    """
+    Author: Rutvik J
+
+    """
+
+    f_y = str(f_y)
+    gamma_ = str(gamma_)
+    phi = str(phi)
+    lambd = str(lambd)
+    sub = str(sub)
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y }{\gamma_{mo}\left(\phi_{LT} + \sqrt{\phi_{LT}^2 - \lambda_{LT}^2}\right)} \\'))
+    slender_eqn.append(NoEscape(r' &= \frac{' + f_y + r'}{\left('+gamma_+ r'\times'+ phi + r'+\sqrt{'+phi+r'^2 - '+ lambd+r'^2}\right)} \\'))
+    slender_eqn.append(NoEscape(r'&='+ sub + r'\end{aligned}'))
+    # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
+    return slender_eqn
+def cl_8_2_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass,support):  # same as #todo anjali
+    """
+    Calculate member design moment capacity
+    Args:
+
+          beta_b:1 for plastic and compact sections & Ze/Zp for semi compact section (int)
+          Z_p:Plastic section modulus of cross section mm^3 (float)
+          f_y:Yield stress of the material in N/mm square  (float)
+          gamma_m0:partial safety factor (float)
+          Pmc:Plastic moment capacity in  N-mm (float)
+    Returns:
+        Plastic moment capacity in  N-mm (float)
+
+    Note:
+                Author: Rutvik J
+              IS 800:2007,  cl 8.2.1.2
+
+    """
+    # if support == KEY_DISP_SUPPORT1:
+    #     res = str(round(1.2 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
+    # else:
+    #     res = str(round(1.5 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
+    beta_actual = str(beta_b)
+    beta_b = str(round(Ze/Z_p,2))
+    Ze = str(Ze)
+    sclass = str(sclass)
+    Z_p = str(Z_p)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    Pmc = str(Pmc)
+    Pmc_eqn = Math(inline=True)
+    if sclass == 'Plastic' or sclass == 'Compact':
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is }' + sclass + r'\\'))#
+    elif sclass == 'Semi-Compact' :
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        Pmc_eqn.append(NoEscape(r' &='+ beta_b + r'\\'))
+    if support == KEY_DISP_SUPPORT1:
+        Pmc_eqn.append(NoEscape(r'{M_{d}} &= \frac{\beta_b Z_p f_y}{\gamma_{m0}}\\'))
+        Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_actual + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6}\\'))
+    else:
+        Pmc_eqn.append(NoEscape(
+            r' {M_{d}} &= \frac{\beta_b Z_p f_y}{\gamma_{m0}}\\'))
+        Pmc_eqn.append(NoEscape(
+            r'&=\frac{' + beta_actual + r'\times' + Z_p + r'\times' + f_y + r'}{' + gamma_m0 + r' \times 10^6} \\'))
+
+    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r' \\'))
+    Pmc_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
+    return Pmc_eqn
 def sectional_area_change(given, provided, parameter):
     """
     Author: Rutvik J
@@ -787,6 +891,29 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
 
     return shear_capacity_eqn
 
+def cl_8_4_shear_yielding_capacity_member_(h, t, f_y, gamma_m0, V_dg, multiple=1):
+    """
+    Similar to cl_8_4_shear_yielding_capacity_member without the y axis mentioned
+    """
+
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+
+    V_dg = str(V_dg)
+
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{d} &= \frac{A_vf_y}{\sqrt{3}\gamma_{m0}}\\'))
+    if multiple == 1:
+        shear_yield_eqn.append(NoEscape(r'&=\frac{' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r' \times 1000}\\'))
+    else:
+        multiple = str(multiple)
+        shear_yield_eqn.append(
+            NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r' \times 1000} \\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r' \\ \\'))
+    shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS ~800:2007,~Cl.10.4.3}] \end{aligned}'))
+    return shear_yield_eqn
 
 def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1):
     """
@@ -1262,7 +1389,7 @@ def cl_8_7_3_Aeff_web_check(b, t, A,sub = 'length'):
     A = str(A)
     sub = str(sub)
     eqn = Math(inline=True)
-    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= text{bearing}_{' + sub + r'}\times t_{web} \\'))
+    eqn.append(NoEscape(r'\begin{aligned}A_{eff}web &= \text{bearing}_{' + sub + r'}\times t_{web} \\'))
     eqn.append(NoEscape(r' &= ' + b + r'\times' + t + r'\\'))
     eqn.append(NoEscape(r'&= ' + A + r' \end{aligned}'))
     # eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.3.1}] \end{aligned}'))
@@ -1353,15 +1480,15 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
     Zpz = str(Zpz)
     sclass = str(sclass)
     if sclass == 'Plastic' or sclass == 'Compact':
-        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\textit{Section is Plastic or Compact}\\'))#
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= 1.0 \hspace{1 cm}\text{Section is }'+sclass+r'\\'))# Plastic or Compact
     elif sclass == 'Semi-Compact' :
-        eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\textit{Section is Semi-Compact}\\'))#
+        eq.append(NoEscape(r'\begin{aligned} \beta_b &= \frac{Z_e}{Z_p} \hspace{1 cm}\text{Section is Semi-Compact}\\'))#
         eq.append(NoEscape(r' &='+ beta_b + r'\\'))
     if support == KEY_DISP_SUPPORT1:
         eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
         # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
-            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'))}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
         # eq.append(NoEscape(
         #     r'&= ' + Md + r'\leq ' + res + r'\\'))
@@ -1465,7 +1592,7 @@ def cl_9_2_2_combine_shear_bending(Mdv,Ze, f_y,sclass,V,Vd, gamma_m0,beta='NA',M
         eq.append(NoEscape(r'&= ( \frac{2 \times' + V + r'}{' + Vd + r'} - 1)^2 \\'))
         eq.append(NoEscape(r'&=' + beta + r'\\ \\'))
         eq.append(NoEscape(r'M_{dv} &= M_d - \beta(M_d - M_{fd}) \leq\frac{1.2Z_ef_y}{\gamma_{mo}}\\ '))
-        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+        eq.append(NoEscape(r'&= '+Md +r' - '+ beta + r'('+ Md + r' -' + Mfd+r')\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         eq.append(NoEscape(r'&=' + Mdv + r'\leq ' + res + r'\\'))
     elif sclass == 'Semi-Compact' :
         eq.append(NoEscape(r'\begin{aligned} M_{dv} &= \frac{Z_ef_y}{\gamma_{mo}} \\'))

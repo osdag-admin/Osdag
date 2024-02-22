@@ -65,6 +65,8 @@ from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import Nut
 from cad.BasePlateCad.baseplateconnection import BasePlateCad, HollowBasePlateCad
 from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 
+from cad.CompressionMembers.column import CompressionMemberCAD
+
 from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
 from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
@@ -1700,6 +1702,39 @@ class CommonDesignLogic(object):
 
         return tensionCAD
 
+    def createColumnInFrameCAD(self):
+        """
+            :return: The calculated values/parameters to create 3D CAD model of individual components.
+        """
+
+        Col = self.module_class
+
+        if 'RHS' in Col.result_designation or 'SHS' in Col.result_designation:  # hollow sections 'RHS and SHS'
+            sec = RectHollow(L=float(Col.section_property.flange_width), W=float(Col.section_property.depth),
+                             H=1000, T=float(Col.section_property.flange_thickness))
+            col = CompressionMemberCAD(sec)
+        elif 'CHS' in Col.result_designation:  # CHS
+            sec = CircularHollow(r=float(Col.section_property.depth) / 2, T=float(Col.section_property.flange_thickness),
+                                 H=1500)
+            col = CompressionMemberCAD(sec)
+        else:  # Beams and Columns (rolled sections)
+            column_tw = float(Col.section_property.web_thickness)
+            column_T = float(Col.section_property.flange_thickness)
+            column_d = float(Col.section_property.depth)
+            column_B = float(Col.section_property.flange_width)
+            column_R1 = float(Col.section_property.root_radius)
+            column_R2 = float(Col.section_property.toe_radius)
+            column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
+            column_length = 1500
+
+            sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
+                              alpha=column_alpha, length=column_length, notchObj=None)
+            col = CompressionMemberCAD(sec)
+
+        col.create_3DModel()
+
+        return sec
+
     def display_3DModel(self, component, bgcolor):
 
         self.component = component
@@ -2011,6 +2046,13 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, weld, color=Quantity_NOC_RED, update=True)
                     osdag_display_shape(self.display, nut_bolt, color=Quantity_NOC_YELLOW, update=True)
 
+        elif self.mainmodule == 'Columns with known support conditions':
+            self.col = self.module_class()
+            self.ColObj = self.createColumnInFrameCAD()
+
+            # if self.component == "Model":
+            #     osdag_display_shape(self.display, self.ColObj, update=True)
+
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_class()
@@ -2083,6 +2125,7 @@ class CommonDesignLogic(object):
     def call_3DModel(self, flag, module_class):  # Done
 
         self.module_class = module_class
+        print(self.mainmodule)
 
         if self.mainmodule == "Shear Connection":
 
@@ -2167,7 +2210,14 @@ class CommonDesignLogic(object):
             self.FObj = self.createTensionCAD()
 
             self.display_3DModel("Model", "gradient_bg")
+        elif self.mainmodule == 'Columns with known support conditions':
+            if flag is True:
+                self.ColObj = self.createColumnInFrameCAD()
 
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
 

@@ -580,6 +580,9 @@ class ColumnDesign(Member):
 
         components = []
 
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
         # t3 = ('Column', self.call_3DColumn)
         # components.append(t3)
 
@@ -602,7 +605,7 @@ class ColumnDesign(Member):
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = 'Member'
+        self.mainmodule = 'Columns with known support conditions'
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.sec_list = design_dictionary[KEY_SECSIZE]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
@@ -879,6 +882,7 @@ class ColumnDesign(Member):
                     except:
                         result = SHS(designation=section, material_grade=self.material)
                     self.section_property = result
+
                 elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                     self.section_property = CHS(designation=section, material_grade=self.material)
                 else:   #Why?

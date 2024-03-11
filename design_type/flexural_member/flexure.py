@@ -731,22 +731,24 @@ class Flexure(Member):
             # self.design_status = False
             # self.design_status_list.append(self.design_status)
             self.optimization_tab_check(self)
-        elif (self.steel_cost_per_kg < 0.10) or (self.effective_area_factor > 1.0):
+        elif (self.steel_cost_per_kg < 0.10) or (self.effective_area_factor > 1.0) or (self.effective_area_factor < 0):
             # No suggested range in Description
             logger.warning(
-                "The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range."
+                "The defined value of the effective area factor in the design preferences tab is out of the suggested range."
             )
-            logger.info("Provide an appropriate input and re-design.")
-            logger.info("Assuming a default rate of 50 (INR/kg).")
+            # logger.info("Provide an appropriate input and re-design.")
+            logger.info("Assuming a default value of 1.0")
             self.steel_cost_per_kg = 50
+            self.effective_area_factor = 1
             self.design_status = False
             # self.design_status_list.append(self.design_status)
         else:
-            if self.effective_area_factor >= (self.material_property.fy * self.gamma_m0 / (self.material_property.fu * 0.9 * self.gamma_m1)):
-                pass
-            else:
-                self.latex_tension_zone = True
-                print(f'self.latex_tension_zone: {self.latex_tension_zone}')
+            if self.latex_tension_zone:
+                if self.effective_area_factor >= (self.material_property.fy * self.gamma_m0 / (self.material_property.fu * 0.9 * self.gamma_m1)):
+                    pass
+                else:
+                    self.latex_tension_zone = True
+                    print(f'self.latex_tension_zone: {self.latex_tension_zone}')
                 # self.effective_area_factor = (
                 #     self.material_property.fy
                 #     * self.gamma_m0
@@ -756,7 +758,7 @@ class Flexure(Member):
                 #     f"The effect of holes in the tension flange is considered on the design bending strength. The ratio of net to gross area of the flange in tension is considered {self.effective_area_factor}"
                 # )
 
-            logger.info("Provided appropriate design preference, now checking input.")
+        logger.info("Provided appropriate design preference, now checking input.")
     
     def input_modifier(self):
         """Classify the sections based on Table 2 of IS 800:2007"""
@@ -1332,7 +1334,7 @@ class Flexure(Member):
                 flange_class = IS800_2007.Table2_i(
                     self.section_property.flange_width / 2,
                     self.section_property.flange_thickness,
-                    self.material_property.fy,
+                    self.material_property.fy,self.section_property.type
                 )[0]
                 web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
                 flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
@@ -1352,8 +1354,7 @@ class Flexure(Member):
                         self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
                     ),
                     self.section_property.web_thickness,
-                    self.material_property.fy,
-                    classification_type="Axial compression",
+                    self.material_property.fy, # classification_type="Axial compression",
                 )
                 web_ratio = (self.section_property.depth - 2 * (
                             self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
@@ -1425,6 +1426,7 @@ class Flexure(Member):
                         self.M_cr
                     )
                     if lambda_lt < 0.4:
+                        print('Ignoring section, lambda_lt<0.4', lambda_lt)
                         continue
                 if self.allow_class != 'No':
                     if (

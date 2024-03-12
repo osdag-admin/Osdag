@@ -58,7 +58,7 @@ def cl_3_7_2_section_classification(class_of_section=None):
     section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
     return section_classification_eqn
 
-def cl_3_7_2_section_classification_web(d,t,result,epsilon,class_of_section=None):
+def cl_3_7_2_section_classification_web(d,t,result,epsilon,type, class_of_section=None):
     """
     Author: Rutvik Joshi (EMP-24, intern-23,22)
     """
@@ -69,20 +69,24 @@ def cl_3_7_2_section_classification_web(d,t,result,epsilon,class_of_section=None
     epsilon = str(epsilon)
     class_of_section = str(class_of_section)
     eqn = Math(inline=True)
+    if type == 'Rolled':
+        eqn.append(NoEscape(r'\begin{aligned} d &= D - 2(T + R1) = ' + d + r'\\'))
+    else:
+        eqn.append(NoEscape(r'\begin{aligned} d &= D - 2(T) = ' + d + r'\\'))
     if class_of_section == "Plastic":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 84\varepsilon\\'))
+        eqn.append(NoEscape(r'\frac{d}{t_w} &=\frac{' + d + r'}{' + t + r'} \le 84\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(84*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
     elif class_of_section == "Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 105\varepsilon\\'))
+        eqn.append(NoEscape(r'\frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 105\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(105*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
     elif class_of_section == "Semi-Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 126\varepsilon\\'))
+        eqn.append(NoEscape(r'\frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 126\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(126*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
     else :
-        eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \end{aligned}'))
+        eqn.append(NoEscape(r'& \textbf{Slender} \end{aligned}'))
     return eqn
 def cl_3_7_2_section_classification_flange(d,t,result,epsilon,class_of_section=None):
     """

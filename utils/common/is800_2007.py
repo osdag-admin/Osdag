@@ -958,12 +958,16 @@ class IS800_2007(object):
         return a
 
     @staticmethod
-    def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt):
+    def cl_8_2_2_Unsupported_beam_bending_non_slenderness( E, meu,Iy, It, Iw, Llt,beta_b, Zp, hf,ry, tf):
         ''' Author : Rutvik Joshi
         Clauses: 8.2.2.1 and Annex E
         '''
         G = E/(2+2*meu)
-        return math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
+        fcrb = (1.1 * math.pi**2 * E/(Llt/ry)**2) * math.sqrt(1 + (((Llt/ry)/(hf/tf))**2) / 20)
+        _ = math.sqrt((math.pi**2 * E * Iy/Llt**2)*(G *It + (math.pi**2 * E * Iw/Llt**2) ))
+        __ = beta_b * Zp * fcrb
+        ___ = (math.pi**2 * E * Iy * hf/Llt**2)/2 * math.sqrt(1 + (((Llt/ry)/(hf/tf))**2) / 20 )
+        return [min(_,__,___), fcrb]
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_fcrb(E, Llt_ry, hf_tf):

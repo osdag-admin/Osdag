@@ -833,8 +833,11 @@ class Flexure(Member):
             for section in self.input_section_list:
                 # initialize lists for updating the results dictionary
                 self.section_property = self.section_connect_database(self, section)
-                self.effective_depth = (self.section_property.depth - 2 * (
+                if self.section_property.type == 'Rolled':
+                    self.effective_depth = (self.section_property.depth - 2 * (
                             self.section_property.flange_thickness + self.section_property.root_radius))
+                else:
+                    self.effective_depth = (self.section_property.depth - 2 *self.section_property.flange_thickness )
                 print('self.section_property.type:',self.section_property.type, self.bending_type)
                 
                 if self.sec_profile == 'Beams' or self.sec_profile == 'Columns' or self.sec_profile == VALUES_SECTYPE[1]:
@@ -1402,14 +1405,7 @@ class Flexure(Member):
                     self.hf = self.section_property.depth - self.section_property.flange_thickness
                     self.Iw = self.section_property.Iw
                     # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
-                    self.M_cr = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
-                        self.material_property.modulus_of_elasticity,
-                        0.3,
-                        self.section_property.mom_inertia_y,
-                        self.It,
-                        self.Iw,
-                        self.effective_length * 1e3
-                    )
+                    
 
                     if self.section_class == "Plastic" or self.section_class == "Compact":
                         self.beta_b_lt = 1.0
@@ -1418,6 +1414,16 @@ class Flexure(Member):
                                 self.section_property.elast_sec_mod_z
                                 / self.section_property.plast_sec_mod_z
                         )
+                    _ = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
+                        self.material_property.modulus_of_elasticity,
+                        0.3,
+                        self.section_property.mom_inertia_y,
+                        self.It,
+                        self.Iw,
+                        self.effective_length * 1e3, self.beta_b_lt, self.section_property.plast_sec_mod_z, self.hf, self.section_property.rad_of_gy_y, self.section_property.flange_thickness
+                    )
+                    self.M_cr = _[0]
+                    self.fcrb = _[1]
                     lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment(
                         self.beta_b_lt,
                         self.section_property.plast_sec_mod_z,
@@ -1437,7 +1443,7 @@ class Flexure(Member):
 
                         self.input_section_list.append(trial_section)
                         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt]})
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt,self.fcrb]})
                         else:
                             self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
 
@@ -1447,7 +1453,7 @@ class Flexure(Member):
                     if self.section_class == "Compact" or self.section_class == "Plastic":
                         self.input_section_list.append(trial_section)
                         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt]})
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt, self.fcrb]})
                         else:
                             self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
                     elif self.section_class == "Slender":
@@ -2114,12 +2120,20 @@ class Flexure(Member):
                                         self.effective_area_factor),
                   ' ')
             self.report_check.append(t1)
+            
+            # t1 = ('SubSection', 'Section parameters', '|p{4cm}|p{1.5cm}|p{9.5cm}|p{1cm}|')
+            # self.report_check.append(t1)
+            # t1 = ('d_{web}', ' ',
+            #       sectional_area_change(round(self.result_effective_area,2), round(self.section_property.area,2),
+            #                             self.effective_area_factor),
+            #       ' ')
+            # self.report_check.append(t1)
 
             t1 = ('SubSection', 'Section Classification', '|p{3cm}|p{3.5cm}|p{8.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t1 = ('Web Class', 'Neutral Axis at Mid-Depth',
                   cl_3_7_2_section_classification_web(round(self.result_eff_d, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
-                                         self.epsilon,
+                                         self.epsilon, self.section_property.type,
                                         self.input_section_classification[self.result_designation][2]),
                   ' ')
             self.report_check.append(t1)

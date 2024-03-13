@@ -220,11 +220,7 @@ class Flexure(Member):
 
     def input_values(self):
         '''
-        TODO : Make seperate sub-functions to add??
-            At support & At Top restraints should be inactive
-            Depending on Support Conditions : if cantilever  then active and Torsional &
-            Warping Restraint be inactive.
- 
+        TODO : Make seperate sub-functions to add
         '''
 
         self.module = KEY_DISP_FLEXURE
@@ -672,7 +668,7 @@ class Flexure(Member):
         #TAKE from Design Dictionary
         self.allowed_sections = []
         if self.allow_class == "Yes":
-            self.allowed_sections == "Semi-Compact"
+            self.allowed_sections == KEY_SemiCompact
 
         print(f"self.allowed_sections {self.allowed_sections}")
         print("==================")
@@ -865,6 +861,7 @@ class Flexure(Member):
                      self.M_cr = self.input_section_classification[section][ 8 ]
                      self.beta_b_lt = self.input_section_classification[section][ 9 ]
                      self.lambda_lt = self.input_section_classification[section][ 10 ]
+                     self.fcrb = self.input_section_classification[section][ 11 ]
                      print('self.design_type:',self.design_type, self.It,
                             self.hf,
                             self.Iw,
@@ -875,9 +872,7 @@ class Flexure(Member):
                 self.beam_web_buckling(self)
                 if self.web_buckling_check:
                     self.web_buckling_steps(self)
-                    # if not check:
-                    #     continue
-                    # else:
+                    # TODO
                     self.high_shear_check = False
                     self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
 
@@ -1055,14 +1050,14 @@ class Flexure(Member):
             self.gamma_m0,
             self.support,
         )
-        if self.section_class == 'Plastic' or 'Compact' :
+        if self.section_class == KEY_Plastic or KEY_Compact :
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = self.section_property.elast_sec_mod_z/self.section_property.plast_sec_mod_z
         self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
-                if self.section_class == "Plastic" or self.section_class == "Compact":
+                if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self, M_d)
                 else:
                     bending_strength_section = (
@@ -1079,7 +1074,7 @@ class Flexure(Member):
                             self.Iw,
                             self.M_cr,
                             self.beta_b_lt,
-                            self.lambda_lt)
+                            self.lambda_lt, self.fcrb)
             # self.It = (
             #     2
             #     * self.section_property.flange_width
@@ -1099,7 +1094,7 @@ class Flexure(Member):
             #     self.effective_length * 1e3
             # )
             #
-            # if self.section_class == "Plastic" or self.section_class == "Compact":
+            # if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
             #     self.beta_b_lt = 1.0
             # else:
             #     self.beta_b_lt = (
@@ -1132,8 +1127,6 @@ class Flexure(Member):
                     fcd=fbd,
                     section_class=self.section_class
                 )
-
-
             # self.beta_b_lt = beta_b
             self.alpha_lt = alpha_lt
             # self.lambda_lt = lambda_lt
@@ -1143,7 +1136,7 @@ class Flexure(Member):
             self.lateral_tb = self.M_cr * 10**-6
             print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
             if self.high_shear_check:
-                if self.section_class == "Plastic" or self.section_class == "Compact":
+                if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self,Md=bending_strength_section
                     )
                 else:
@@ -1170,24 +1163,24 @@ class Flexure(Member):
         if flange_class == "Slender" or web_class == "Slender":
             self.section_class_girder = "Slender"
         else:
-            if flange_class == "Plastic" and web_class == "Plastic":
-                self.section_class_girder = "Plastic"
-            elif flange_class == "Plastic" and web_class == "Compact":
-                self.section_class_girder = "Compact"
-            elif flange_class == "Plastic" and web_class == "Semi-Compact":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Compact" and web_class == "Plastic":
-                self.section_class_girder = "Compact"
-            elif flange_class == "Compact" and web_class == "Compact":
-                self.section_class_girder = "Compact"
-            elif flange_class == "Compact" and web_class == "Semi-Compact":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Semi-Compact" and web_class == "Plastic":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Semi-Compact" and web_class == "Compact":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
-                self.section_class_girder = "Semi-Compact"
+            if flange_class == KEY_Plastic and web_class == KEY_Plastic:
+                self.section_class_girder = KEY_Plastic
+            elif flange_class == KEY_Plastic and web_class == KEY_Compact:
+                self.section_class_girder = KEY_Compact
+            elif flange_class == KEY_Plastic and web_class == KEY_SemiCompact:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_Compact and web_class == KEY_Plastic:
+                self.section_class_girder = KEY_Compact
+            elif flange_class == KEY_Compact and web_class == KEY_Compact:
+                self.section_class_girder = KEY_Compact
+            elif flange_class == KEY_Compact and web_class == KEY_SemiCompact:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_SemiCompact and web_class == KEY_Plastic:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_SemiCompact and web_class == KEY_Compact:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
+                self.section_class_girder = KEY_SemiCompact
         # 4 - design bending strength
         I_flange = 2 * (self.section_property.flange_width * self.section_property.flange_thickness**3/12 + self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth/2 - self.section_property.flange_thickness/2)**2)
         Zez_flange = I_flange / self.section_property.depth /2
@@ -1208,7 +1201,7 @@ class Flexure(Member):
         self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
-                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self, M_d)
                 else:
                     bending_strength_section = (
@@ -1236,7 +1229,7 @@ class Flexure(Member):
                 self.hf/self.section_property.flange_thickness
             )
 
-            if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+            if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact:
                 self.beta_b_lt = 1.0
             else:
                 self.beta_b_lt = (
@@ -1276,7 +1269,7 @@ class Flexure(Member):
             self.lateral_tb = self.fcrb * 10**-6
             print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
             if self.high_shear_check:
-                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self,Md=bending_strength_section
                     )
                 else:
@@ -1366,24 +1359,24 @@ class Flexure(Member):
             if flange_class == "Slender" or web_class == "Slender":
                 self.section_class = "Slender"
             else:
-                if flange_class == "Plastic" and web_class == "Plastic":
-                    self.section_class = "Plastic"
-                elif flange_class == "Plastic" and web_class == "Compact":
-                    self.section_class = "Compact"
-                elif flange_class == "Plastic" and web_class == "Semi-Compact":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Compact" and web_class == "Plastic":
-                    self.section_class = "Compact"
-                elif flange_class == "Compact" and web_class == "Compact":
-                    self.section_class = "Compact"
-                elif flange_class == "Compact" and web_class == "Semi-Compact":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Semi-Compact" and web_class == "Plastic":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Semi-Compact" and web_class == "Compact":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
-                    self.section_class = "Semi-Compact"
+                if flange_class == KEY_Plastic and web_class == KEY_Plastic:
+                    self.section_class = KEY_Plastic
+                elif flange_class == KEY_Plastic and web_class == KEY_Compact:
+                    self.section_class = KEY_Compact
+                elif flange_class == KEY_Plastic and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_Compact and web_class == KEY_Plastic:
+                    self.section_class = KEY_Compact
+                elif flange_class == KEY_Compact and web_class == KEY_Compact:
+                    self.section_class = KEY_Compact
+                elif flange_class == KEY_Compact and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_SemiCompact and web_class == KEY_Plastic:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_SemiCompact and web_class == KEY_Compact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
 
             Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             self.effective_length_beam(self, design_dictionary, self.length)  # mm
@@ -1407,7 +1400,7 @@ class Flexure(Member):
                     # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
                     
 
-                    if self.section_class == "Plastic" or self.section_class == "Compact":
+                    if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
                         self.beta_b_lt = 1.0
                     else:
                         self.beta_b_lt = (
@@ -1436,9 +1429,9 @@ class Flexure(Member):
                         continue
                 if self.allow_class != 'No':
                     if (
-                        self.section_class == "Semi-Compact"
-                        or self.section_class == "Compact"
-                        or self.section_class == "Plastic"
+                        self.section_class == KEY_SemiCompact
+                        or self.section_class == KEY_Compact
+                        or self.section_class == KEY_Plastic
                     ):
 
                         self.input_section_list.append(trial_section)
@@ -1450,7 +1443,7 @@ class Flexure(Member):
                     elif self.section_class == "Slender":
                         logger.warning(f"The section.{trial_section} is Slender. Ignoring")
                 else:
-                    if self.section_class == "Compact" or self.section_class == "Plastic":
+                    if self.section_class == KEY_Compact or self.section_class == KEY_Plastic:
                         self.input_section_list.append(trial_section)
                         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
                             self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt, self.fcrb]})
@@ -1460,7 +1453,7 @@ class Flexure(Member):
                         logger.warning(f"The section.{trial_section} is Slender. Ignoring")
                         # self.design_status = False
                         # self.design_status_list.append(self.design_status)
-                    elif self.section_class == "Semi-Compact":
+                    elif self.section_class == KEY_SemiCompact:
                         logger.warning(
                             f"The section.{trial_section} is Semi-Compact. Ignoring"
                         )

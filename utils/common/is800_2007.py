@@ -248,11 +248,11 @@ class IS800_2007(object):
 
         if classification_type == 'Neutral axis at mid-depth':
             if ratio < (84 * epsilon):
-                section_class = 'Plastic'
+                section_class = KEY_Plastic
             elif ratio < (105 * epsilon):
-                section_class = 'Compact'
+                section_class = KEY_Compact
             elif ratio < (126 * epsilon):
-                section_class = 'Semi-Compact'
+                section_class = KEY_SemiCompact
             else:
                 section_class = 'Slender'
 
@@ -295,7 +295,7 @@ class IS800_2007(object):
         d_t = depth / thickness_web
 
         if d_t <= (42 * epsilon) :
-            section_class = 'Semi-Compact'
+            section_class = KEY_SemiCompact
         else:
             section_class = 'Slender'
 
@@ -334,16 +334,16 @@ class IS800_2007(object):
 
         if force_type == 'Axial Compression':
             if b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon) and  bd_t<= (25 * epsilon):
-                section_class = 'Semi-Compact'
+                section_class = KEY_SemiCompact
             else:
                 section_class = 'Slender'
         else:
             if b_t <= (9.4 * epsilon) and d_t<= (9.4 * epsilon):
-                section_class = 'Plastic'
+                section_class = KEY_Plastic
             elif b_t <= (10.5 * epsilon) and d_t<= (10.5 * epsilon):
-                section_class = 'Compact'
+                section_class = KEY_Compact
             elif b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon):
-                section_class = 'Semi-Compact'
+                section_class = KEY_SemiCompact
             else:
                 section_class = 'Slender'
 
@@ -382,16 +382,16 @@ class IS800_2007(object):
         if force_type == 'Axial Compression':
             if d_t<= (15.7 * epsilon) :
                 '''When adding more cases, you need to modify Strut angle'''
-                section_class = 'Semi-Compact'
+                section_class = KEY_SemiCompact
             else:
                 section_class = 'Slender'
         else:
             if b_t <= (9.4 * epsilon) and d_t<= (9.4 * epsilon):
-                section_class = 'Plastic'
+                section_class = KEY_Plastic
             elif b_t <= (10.5 * epsilon) and d_t<= (10.5 * epsilon):
-                section_class = 'Compact'
+                section_class = KEY_Compact
             elif b_t <= (15.7 * epsilon) and d_t<= (15.7 * epsilon):
-                section_class = 'Semi-Compact'
+                section_class = KEY_SemiCompact
             else:
                 section_class = 'Slender'
 
@@ -890,7 +890,7 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_1_2_design_bending_strength(section_class, Zp, Ze, fy, gamma_mo, support):
-        beta_b = 1.0 if section_class == 'plastic' or 'compact' else Ze/Zp
+        beta_b = 1.0 if section_class == KEY_Plastic or KEY_Compact else Ze/Zp
         Md = beta_b * Zp * fy / gamma_mo
         if support == KEY_DISP_SUPPORT1 :
             if Md < 1.2 * Ze * fy / gamma_mo:
@@ -935,7 +935,7 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_8_2_2_Unsupported_beam_bending_strength(Zp, Ze, fcd, section_class):
-        if section_class == 'Plastic' or section_class == 'Compact':
+        if section_class == KEY_Plastic or section_class == KEY_Compact:
             return Zp * fcd
         else:
             return Ze * fcd

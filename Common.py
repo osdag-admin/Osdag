@@ -522,6 +522,9 @@ KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
 ###################################
 #Flexure Members
 ###################################
+KEY_Plastic = "Plastic"
+KEY_Compact = "Compact"
+KEY_SemiCompact = "Semi-Compact"
 KEY_Flexure_Member_MAIN_MODULE = 'Flexure Member'
 KEY_DISP_FLEXURE = 'Flexural Members - Simply Supported'
 KEY_DISP_FLEXURE2 = 'Flexural Members - Cantilever'

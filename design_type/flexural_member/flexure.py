@@ -389,7 +389,7 @@ class Flexure(Member):
 
 
         t2 = (KEY_betab_constatnt, KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
-              self.result_betab if flag else '', True)
+              round(self.result_betab,2) if flag else '', True)
         out_list.append(t2)
 
 
@@ -630,6 +630,7 @@ class Flexure(Member):
         if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
             self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
             self.bending_type = KEY_DISP_BENDING1
+            # TODO self.support_cndition_shear_buckling
             self.support_cndition_shear_buckling = design_dictionary[KEY_ShearBucklingOption]
         elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
             self.design_type = VALUES_SUPP_TYPE[0]
@@ -695,6 +696,8 @@ class Flexure(Member):
         self.design_status = False
         self.sec_prop_initial_dict = {}
 
+        self.failed_design_dict = {}
+        
         self.design(self, design_dictionary)
         # if len(self.input_modified) != 0:
         self.results(self, design_dictionary)
@@ -870,11 +873,23 @@ class Flexure(Member):
                             self.lambda_lt)
                      
                 self.beam_web_buckling(self)
+                #  TODO @Eutvik today
                 if self.web_buckling_check:
-                    self.web_buckling_steps(self)
-                    # TODO
-                    self.high_shear_check = False
-                    self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
+                    self.web_not_buckling_steps(self)
+                    
+                    # self.shear_strength = IS800_2007.cl_8_4_design_shear_strength(
+                    #     self.shear_area,
+                    #     self.material_property.fy
+                    # ) / 10 ** 3
+                    # self.high_shear_check = IS800_2007.cl_8_2_1_2_high_shear_check(
+                    #     self.load.shear_force / 1000, self.shear_strength
+                    # )
+                    # self.bending_strength_section = self.bending_strength() / 10 ** 6
+                    
+                    # self.web_buckling_steps(self)
+                    # # TODO
+                    # self.high_shear_check = False
+                    # self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
 
                 # print(f"Common result {list_result, self.section_class, self.V_d, self.high_shear_check, self.bending_strength_section}")
                 print('self.bending_strength_section',self.bending_strength_section,'self.shear_strength',self.shear_strength, 'self.load.moment',self.load.moment,'self.load.shear_force',self.load.shear_force)
@@ -894,7 +909,7 @@ class Flexure(Member):
                         * self.steel_cost_per_kg
                 )
                 self.optimum_section_cost.append(self.cost)
-                self.web_buckling = False
+                self.web_buckling = False  # When Bearing length is provided
 
                 if self.bearing_length != 'NA': #and self.web_crippling
                     print(f"Check for Web Buckling")
@@ -971,6 +986,12 @@ class Flexure(Member):
             self.web_not_buckling_steps(self)
     def web_buckling_steps(self):
         print(f"Working web_buckling_steps")
+        # TODO logger.info(f"Considering  {self.support_cndition_shear_buckling}")
+        # 5 - Web Buckling check(when high shear) -If user wants then only
+        # if web_buckling:
+        #     b1 = input('Enter bearing')
+        #     self.web_buckling_strength = self.section_property.web_thickness * (b1 + 1.25 * self.section_property.depth)
+        # self.V_d = pass
         # web_buckling_message = 'Thin web'
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
             self.K_v = IS800_2007.cl_8_4_2_2_K_v_Simple_postcritical('only support')
@@ -1016,12 +1037,7 @@ class Flexure(Member):
             else:
                 self.shear_strength = 0.1
 
-        # TODO logger.info(f"Considering  {self.support_cndition_shear_buckling}")
-        # 5 - Web Buckling check(when high shear) -If user wants then only
-        # if web_buckling:
-        #     b1 = input('Enter bearing')
-        #     self.web_buckling_strength = self.section_property.web_thickness * (b1 + 1.25 * self.section_property.depth)
-        # self.V_d = pass
+        
     def web_not_buckling_steps(self):
         print(f"Working web_not_buckling_steps")
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(
@@ -1039,7 +1055,7 @@ class Flexure(Member):
 
 
     def bending_strength(self):
-        print('Inside bending_strength ')
+        print('Inside bending_strength ','\n self.section_class', self.section_class)
         
         # 4 - design bending strength
         M_d = IS800_2007.cl_8_2_1_2_design_bending_strength(
@@ -1050,10 +1066,11 @@ class Flexure(Member):
             self.gamma_m0,
             self.support,
         )
-        if self.section_class == KEY_Plastic or KEY_Compact :
+        if self.section_class == KEY_Plastic or self.section_class == KEY_Compact :
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = self.section_property.elast_sec_mod_z/self.section_property.plast_sec_mod_z
+            print('self.beta_b_lt: ',self.beta_b_lt)
         self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
@@ -1655,17 +1672,17 @@ class Flexure(Member):
             "Beta_b"
         ])
         #Web buckling parameters
-        if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
-            list.extend(
-                [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
-                 self.V_cr])
-            list_name.extend([
-                'Kv',
-                'tau_crc',
-                'lambda_w',
-                'tau_b',
-                "V_cr"
-            ])
+        # TODO if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
+        #     list.extend(
+        #         [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
+        #          self.V_cr])
+        #     list_name.extend([
+        #         'Kv',
+        #         'tau_crc',
+        #         'lambda_w',
+        #         'tau_b',
+        #         "V_cr"
+        #     ])
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] and self.web_buckling_check:
             list.extend(
                 [self.Mfr, self.load.moment / (
@@ -1786,7 +1803,7 @@ class Flexure(Member):
             self.optimum_section_ur = list(filter_UR)
 
             self.optimum_section_ur.sort()
-            # print(f"self.optimum_section_ur{self.optimum_section_ur}")
+            print(f"self.optimum_section_ur{self.optimum_section_ur}")
             # print(f"self.result_UR{self.result_UR}")
 
             # selecting the section with most optimum UR
@@ -2332,7 +2349,7 @@ class Flexure(Member):
 
                 else:
                     t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
-                          cl_8_2_1_2_moment_capacity_member(round(self.result_betab,2),
+                          cl_8_2_1_2_moment_capacity_member(round(self.result_betab,3),
                                                                     self.section_property.plast_sec_mod_z,
                                                                     self.material_property.fy, self.gamma_m0,
                                                                     round(self.result_bending, 2), self.section_property.elast_sec_mod_z,self.result_section_class,self.support),

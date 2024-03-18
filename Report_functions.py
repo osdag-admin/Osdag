@@ -798,7 +798,7 @@ def cl_8_2_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass,s
     # else:
     #     res = str(round(1.5 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
     beta_actual = str(beta_b)
-    beta_b = str(round(Ze/Z_p,2))
+    beta_b = str(round(Ze/Z_p,3))
     Ze = str(Ze)
     sclass = str(sclass)
     Z_p = str(Z_p)

@@ -219,9 +219,6 @@ class Flexure(Member):
         return c_lst
 
     def input_values(self):
-        '''
-        TODO : Make seperate sub-functions to add
-        '''
 
         self.module = KEY_DISP_FLEXURE
         options_list = []
@@ -458,9 +455,7 @@ class Flexure(Member):
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
         out_list.append(t2)
 
-        # TODO
-        # t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
-        # out_list.append(t1)
+        # TODO @Rutvik: can add tab button for asthetics
 
         t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
               self.result_tc if flag else '', False)
@@ -580,6 +575,12 @@ class Flexure(Member):
         if flag and flag1 and flag2 and flag3:
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
+            if self.design_status ==False and self.failed_design_dict:
+                pass
+            elif self.design_status:
+                pass
+            else:
+                return ['Design Failed']
         else:
             return all_errors
 
@@ -695,12 +696,21 @@ class Flexure(Member):
         self.design_status_list = []
         self.design_status = False
         self.sec_prop_initial_dict = {}
-
-        self.failed_design_dict = {}
+        self.failed_design_dict = {}    
         
         self.design(self, design_dictionary)
-        # if len(self.input_modified) != 0:
         self.results(self, design_dictionary)
+        
+        if self.flag:
+            self.results(self, design_dictionary)
+        
+            
+        # else:
+        #     pass
+        #     # logger.warning(
+        #     #         "Plastic section modulus of selected sections is less than required."
+        #     #     )
+        #     return 
 
     
     # Simulation starts here
@@ -812,9 +822,9 @@ class Flexure(Member):
         self.optimum_section_cost = []
 
         # 1 - section classification
-        flag = self.section_classification(self,design_dictionary)
+        self.flag = self.section_classification(self,design_dictionary)
         
-        print('flag:',flag)
+        print('self.flag:',self.flag)
         if self.effective_area_factor < 1.0:
             logger.warning(
                 "Reducing the effective sectional area as per the definition in the Design Preferences tab."
@@ -828,7 +838,7 @@ class Flexure(Member):
         print(
             f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
         print('self.input_section_list:',self.input_section_list)
-        if flag:
+        if self.flag:
             for section in self.input_section_list:
                 # initialize lists for updating the results dictionary
                 self.section_property = self.section_connect_database(self, section)
@@ -873,7 +883,6 @@ class Flexure(Member):
                             self.lambda_lt)
                      
                 self.beam_web_buckling(self)
-                #  TODO @Eutvik today
                 if self.web_buckling_check:
                     self.web_not_buckling_steps(self)
                     
@@ -887,7 +896,6 @@ class Flexure(Member):
                     # self.bending_strength_section = self.bending_strength() / 10 ** 6
                     
                     # self.web_buckling_steps(self)
-                    # # TODO
                     # self.high_shear_check = False
                     # self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
 
@@ -942,11 +950,16 @@ class Flexure(Member):
                             list_result, list_1 = self.list_changer(self, change='Web Buckling', check=True,
                                                                     list=list_result, list_name=list_1)
                             self.optimum_section_ur.append(self.ur)
+                        else:
+                            list_result, list_1 = self.list_changer(self, change='Web Buckling', check=True,
+                                                                    list=list_result, list_name=list_1)
+                            self.optimum_section_ur.append(self.ur)
                         # Step 3 - Storing the optimum results to a list in a descending order
                         self.common_checks_1(self, section, 5, list_result, list_1)
                     except:
                         logger.warning('Bearing length is invalid.')
                         logger.info('Ignoring web Buckling and Crippling check')
+                        self.bearing_length = 'NA'
                         self.web_buckling = False
                         # 2.8 - UR
                         print(self.bending_strength_section, self.shear_strength)
@@ -957,7 +970,11 @@ class Flexure(Member):
 
                             # Step 3 - Storing the optimum results to a list in a descending order
                             self.common_checks_1(self, section, 5, list_result, list_1)
-                        continue
+                        else:
+                            list_result, list_1 = self.list_changer(self, change='', check=True,list=list_result, list_name=list_1)
+                            self.optimum_section_ur.append(self.ur)
+                            # Step 3 - Storing the optimum results to a list in a descending order
+                            self.common_checks_1(self, section, 5, list_result, list_1)
                     
                 else:
                     self.web_buckling = False
@@ -970,6 +987,13 @@ class Flexure(Member):
 
                         # Step 3 - Storing the optimum results to a list in a descending order
                         self.common_checks_1(self, section, 5, list_result, list_1)
+                    else:
+                        self.optimum_section_ur.append(self.ur)
+                        list_result, list_1 = self.list_changer(self, change=' ', check=True, list=list_result, list_name=list_1)
+
+                        # Step 3 - Storing the optimum results to a list in a descending order
+                        self.common_checks_1(self, section, 5, list_result, list_1)
+                print('self.optimum_section_ur', self.optimum_section_ur)
 
     def beam_web_buckling(self):
 
@@ -986,7 +1010,7 @@ class Flexure(Member):
             self.web_not_buckling_steps(self)
     def web_buckling_steps(self):
         print(f"Working web_buckling_steps")
-        # TODO logger.info(f"Considering  {self.support_cndition_shear_buckling}")
+        # logger.info(f"Considering  {self.support_cndition_shear_buckling}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
         # if web_buckling:
         #     b1 = input('Enter bearing')
@@ -996,7 +1020,7 @@ class Flexure(Member):
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
             self.K_v = IS800_2007.cl_8_4_2_2_K_v_Simple_postcritical('only support')
             self.plate_girder_strength(self)
-            # TODO logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
+            # logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
             self.shear_strength = self.V_cr / self.gamma_m0
             # if self.V_d > self.load.shear_force * 10**-3:
             #
@@ -1791,7 +1815,17 @@ class Flexure(Member):
 
 
     def results(self, design_dictionary):
-
+        _ = [i for i in self.optimum_section_ur if i > 1.0]
+        print( '_ ',_)
+        if len(_)==1:
+            temp = _[0] 
+        elif len(_)==0:
+            temp = None
+        else:
+            temp = sorted(_)[0]
+        self.failed_design_dict = self.optimum_section_ur_results[temp] if temp is not None else None
+        print('self.failed_design_dict ',self.failed_design_dict)
+        
         # sorting results from the dataset
         # if len(self.input_section_list) > 1:
         # results based on UR
@@ -1803,7 +1837,7 @@ class Flexure(Member):
             self.optimum_section_ur = list(filter_UR)
 
             self.optimum_section_ur.sort()
-            print(f"self.optimum_section_ur{self.optimum_section_ur}")
+            print(f"self.optimum_section_ur{self.optimum_section_ur} \n self.optimum_section_ur_results{self.optimum_section_ur_results}")
             # print(f"self.result_UR{self.result_UR}")
 
             # selecting the section with most optimum UR
@@ -1815,10 +1849,22 @@ class Flexure(Member):
                 logger.error(
                     "The solver did not find any adequate section from the defined list."
                 )
-                logger.info(
+                
+                self.design_status = False
+                if self.failed_design_dict:
+                    self.common_result(
+                        self,
+                        list_result=self.failed_design_dict,
+                        result_type=self.result_UR,
+                    )
+                    logger.info(
                     "Re-define the list of sections or check the Design Preferences option and re-design."
                 )
-                self.design_status = False
+                else:
+                    logger.warning(
+                    "Plastic section modulus of selected sections is less than required."
+                )
+                    return 
                 # self.design_status_list.append(self.design_status)
 
             else:
@@ -2035,9 +2081,9 @@ class Flexure(Member):
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
-        self.section_property = self.section_connect_database(self, self.result_designation)
-
-        if self.design_status:
+        if self.design_status or not self.failed_design_dict:# TODO @Rutvik
+            self.section_property = self.section_connect_database(self, self.result_designation)
+            
             if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
                                       KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
@@ -2648,6 +2694,53 @@ class Flexure(Member):
         #
         # t1 = ('', '', '', '')
         # self.report_check.append(t1)
+        else:
+            self.report_input = \
+                {#KEY_MAIN_MODULE: self.mainmodule,
+                 KEY_MODULE: self.module, #"Axial load on column "
+                    KEY_DISP_SHEAR+'*': self.load.shear_force * 10 ** -3,
+                    KEY_DISP_BEAM_MOMENT_Latex+'*': self.load.moment * 10 ** -6,
+                    KEY_DISP_LENGTH_BEAM: self.result_eff_len,
+                    KEY_DISP_SEC_PROFILE: self.sec_profile,
+                    KEY_DISP_SECSIZE: str(self.sec_list),
+                 KEY_MATERIAL: self.material,
+                    # "Selected Section Details": self.report_column,
+                    KEY_BEAM_SUPP_TYPE: self.latex_design_type,
+                }
+            self.report_input.update({
+                KEY_DISP_SUPPORT : self.support,
+                KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.material_property.fu,
+                KEY_DISP_YIELD_STRENGTH_REPORT: self.material_property.fy,
+                "End Conditions - " + str(self.support): "TITLE",
+            })
+            # if self.Latex_length == 'NA':
+            if self.support == KEY_DISP_SUPPORT1:
+                self.report_input.update({
+                    DISP_TORSIONAL_RES: self.Torsional_res,
+                    DISP_WARPING_RES:self.Warping })
+            else:
+                self.report_input.update({
+                    DISP_SUPPORT_RES: self.Support,
+                    DISP_TOP_RES: self.Top})
+            self.report_input.update({
+                "Design Preference" : "TITLE",
+                KEY_DISP_EFFECTIVE_AREA_PARA: self.effective_area_factor,
+                KEY_DISP_CLASS: self.allow_class,
+                KEY_DISP_LOAD: self.Loading,
+                KEY_DISPP_LENGTH_OVERWRITE: self.latex_efp,
+                KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
+
+            })
+            if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
+                self.report_input.update({
+                    KEY_ShearBuckling: self.support_cndition_shear_buckling
+                })
+            # self.report_input.update({
+            #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
+            #      "I Section - Mechanical Properties": "TITLE",
+            #      })
+            self.report_input.update()
+            self.report_check = []
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

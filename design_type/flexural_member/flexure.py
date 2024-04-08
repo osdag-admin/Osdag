@@ -575,8 +575,8 @@ class Flexure(Member):
         if flag and flag1 and flag2 and flag3:
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
-            if self.design_status ==False and self.failed_design_dict:
-                pass
+            if self.design_status ==False and len(self.failed_design_dict)>0:
+                return ['Design Failed, Check Design Report']
             elif self.design_status:
                 pass
             else:
@@ -699,7 +699,7 @@ class Flexure(Member):
         self.failed_design_dict = {}    
         
         self.design(self, design_dictionary)
-        self.results(self, design_dictionary)
+        # self.results(self, design_dictionary)
         
         if self.flag:
             self.results(self, design_dictionary)
@@ -1851,11 +1851,14 @@ class Flexure(Member):
                 )
                 
                 self.design_status = False
-                if self.failed_design_dict:
+                if len(self.failed_design_dict)>0:
+                    logger.info(
+                    "The details for the best section provided is being shown"
+                )
                     self.common_result(
                         self,
                         list_result=self.failed_design_dict,
-                        result_type=self.result_UR,
+                        result_type=None,
                     )
                     logger.info(
                     "Re-define the list of sections or check the Design Preferences option and re-design."
@@ -1964,7 +1967,11 @@ class Flexure(Member):
                 self.design_status = True
 
     def common_result(self, list_result, result_type, flag=1):
-        self.result_designation = list_result[result_type]["Designation"]
+        try:
+            self.result_designation = list_result[result_type]["Designation"] # TODO debug
+        except:
+            self.result_designation = list_result["Designation"]
+            
         logger.info(
             "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
                 self.input_section_classification[self.result_designation][0] ,

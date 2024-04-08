@@ -902,9 +902,7 @@ class Flexure(Member):
                 # print(f"Common result {list_result, self.section_class, self.V_d, self.high_shear_check, self.bending_strength_section}")
                 print('self.bending_strength_section',self.bending_strength_section,'self.shear_strength',self.shear_strength, 'self.load.moment',self.load.moment,'self.load.shear_force',self.load.shear_force)
                 # 2.8 - UR
-                self.ur = round(
-                    max((self.load.moment / self.bending_strength_section * 10 ** -6),(self.load.shear_force / self.shear_strength * 10 ** -3)),
-                    2)  # ( +  round(self.load.axial_force / self.section_capacity, 3)
+                self.ur = max((self.load.moment / self.bending_strength_section * 10 ** -6),(self.load.shear_force / self.shear_strength * 10 ** -3))# ( +  round(self.load.axial_force / self.section_capacity, 3)
                 print("UR", self.ur)
                 # 2.9 - Cost of the section in INR
                 self.cost = (
@@ -1855,12 +1853,13 @@ class Flexure(Member):
                     logger.info(
                     "The details for the best section provided is being shown"
                 )
+                    self.result_UR = self.failed_design_dict[temp] # TODO @Rutvik
                     self.common_result(
                         self,
                         list_result=self.failed_design_dict,
                         result_type=None,
                     )
-                    logger.info(
+                    logger.warning(
                     "Re-define the list of sections or check the Design Preferences option and re-design."
                 )
                 else:
@@ -2202,8 +2201,8 @@ class Flexure(Member):
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
-        print('self.design_status', self.design_status,'len(self.failed_design_dict)', len(self.failed_design_dict))
-        if self.design_status or len(self.failed_design_dict)>0:# TODO @Rutvik
+        # print('self.design_status', self.design_status,'len(self.failed_design_dict)', len(self.failed_design_dict))
+        if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):# TODO @Rutvik
             self.section_property = self.section_connect_database(self, self.result_designation)
             
             if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
@@ -2648,8 +2647,8 @@ class Flexure(Member):
             t1 = (KEY_DISP_Utilization_Ratio, 1.0,
                   Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
                                                         self.load.moment*10**-6, round(self.result_bending, 2),
-                                                         round(self.result_UR, 2)),
-                  get_pass_fail(1.0, round(self.result_UR, 2), relation="geq"))
+                                                         self.result_UR),
+                  get_pass_fail(1.0, self.result_UR, relation="geq"))
             self.report_check.append(t1)
 
             if self.result_buckling_crippling:

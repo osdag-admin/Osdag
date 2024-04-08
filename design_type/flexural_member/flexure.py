@@ -580,7 +580,7 @@ class Flexure(Member):
             elif self.design_status:
                 pass
             else:
-                return ['Design Failed']
+                return ['Design Failed. Selender Sections Selected']
         else:
             return all_errors
 
@@ -781,17 +781,17 @@ class Flexure(Member):
             section = section.strip("'")
             self.section_property = self.section_connect_database(self, section)
 
-            Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            self.Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             print('Inside input_modifier not allow_class',self.allow_class,self.load.moment, self.gamma_m0, self.material_property.fy)
-            if self.section_property.plast_sec_mod_z >= Zp_req:
+            if self.section_property.plast_sec_mod_z >= self.Zp_req:
 
                 self.input_modified.append(section)
                 # logger.info(
-                #     f"Required Zp_req = {round(Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min Zp_req value")
+                #     f"Required self.Zp_req = {round(self.Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min self.Zp_req value")
             else:
                 pass
                 # logger.warning(
-                #     f"Required Zp_req = {round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
+                #     f"Required self.Zp_req = {round(self.Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min self.Zp_req value")
         print("self.input_modified", self.input_modified)
 
     def section_connect_database(self, section):
@@ -1419,11 +1419,11 @@ class Flexure(Member):
                 elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
                     self.section_class = KEY_SemiCompact
 
-            Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            self.Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             self.effective_length_beam(self, design_dictionary, self.length)  # mm
 
             print( 'self.allow_class', self.allow_class)
-            if self.section_property.plast_sec_mod_z >= Zp_req:
+            if self.section_property.plast_sec_mod_z >= self.Zp_req:
                 print( 'self.section_property.plast_sec_mod_z More than Requires')
                 
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
@@ -1969,10 +1969,7 @@ class Flexure(Member):
     def common_result(self, list_result, result_type, flag=1):
         try:
             self.result_designation = list_result[result_type]["Designation"] # TODO debug
-        except:
-            self.result_designation = list_result["Designation"]
-            
-        logger.info(
+            logger.info(
             "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
                 self.input_section_classification[self.result_designation][0] ,
                 self.result_designation,
@@ -1980,115 +1977,233 @@ class Flexure(Member):
                 self.input_section_classification[self.result_designation][2], round(self.input_section_classification[self.result_designation][4],2)
             )
         )
-        self.result_latex_tension_zone = list_result[result_type]["latex.tension_zone"]
-        self.result_web_buckling_check = list_result[result_type]["Web.Buckling"]
-        self.result_eff_d = list_result[result_type]["Reduced.depth"]
-        self.result_buckling_crippling = list_result[result_type]["Buckling.crippling"]
+            self.result_latex_tension_zone = list_result[result_type]["latex.tension_zone"]
+            self.result_web_buckling_check = list_result[result_type]["Web.Buckling"]
+            self.result_eff_d = list_result[result_type]["Reduced.depth"]
+            self.result_buckling_crippling = list_result[result_type]["Buckling.crippling"]
 
-        self.result_section_class = list_result[result_type]["Section class"]
-        self.result_effective_area = round(list_result[result_type]["Effective area"],2)
-        if self.effective_area_factor < 1.0:
-            logger.info(
-                "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
-                    round((self.result_effective_area / self.effective_area_factor), 2),
-                    self.result_effective_area,
+            self.result_section_class = list_result[result_type]["Section class"]
+            self.result_effective_area = round(list_result[result_type]["Effective area"],2)
+            if self.effective_area_factor < 1.0:
+                logger.info(
+                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
+                        round((self.result_effective_area / self.effective_area_factor), 2),
+                        self.result_effective_area,
+                    )
                 )
+
+            self.result_shear = round(list_result[result_type]["Shear Strength"], 2)
+            self.result_high_shear = list_result[result_type]["High Shear check"]
+            self.result_bending = round(list_result[result_type]["Bending Strength"], 2)
+            self.result_eff_len = round(list_result[result_type]["Effective_length"], 2)
+            self.result_cost = list_result[result_type]["Cost"]
+            self.result_betab = list_result[result_type]["Beta_b"]
+
+            if self.result_web_buckling_check :
+                logger.warning(
+                    "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
+                if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+                    logger.info('Transverse Stiffeners at supports required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
+                elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+                    logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
+                    self.result_web_buckling_simple_Mfr = round(list_result[result_type]['Mfr']*10**-6, 2)
+                    self.result_web_buckling_simple_Nf = round(list_result[result_type]['Nf'], 2)
+                    self.result_web_buckling_simple_c = round(list_result[result_type]['c'], 2)
+                    self.result_web_buckling_simple_phi_girder = round(list_result[result_type]['phi_girder'], 2)
+                    self.result_web_buckling_simple_s_girder = round(list_result[result_type]['s_girder'], 2)
+                    self.result_web_buckling_simple_wtf_girder = round(list_result[result_type]['wtf_girder'], 2)
+                    self.result_web_buckling_simple_sai_girder = round(list_result[result_type]['sai_girder'], 2)
+                    self.result_web_buckling_simple_fv_girder = round(list_result[result_type]['fv_girder'], 2)
+                    self.result_web_buckling_simple_V_p_girder = round(list_result[result_type]['V_p'], 2)
+                    self.result_web_buckling_simple_fV_tf_girder = round(list_result[result_type]['V_tf_girder'], 2)
+
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
+                self.result_mcr = round(list_result[result_type]['Mcr'], 2)
+                self.result_IF_lt = round(list_result[result_type]["IF_lt"], 2)
+                self.result_tc = round(list_result[result_type]["It"], 2)
+                self.result_wc = round(list_result[result_type]["Iw"], 2)
+                self.result_nd_esr_lt = round(list_result[result_type]["ND_ESR_lt"], 2)
+                self.result_phi_lt = round(list_result[result_type]["phi_lt"], 2)
+                self.result_srf_lt = round(list_result[result_type]["SRF_lt"], 2)
+                self.result_fcd__lt = round(list_result[result_type]["FCD_lt"], 2)
+            else:
+                self.result_mcr = 'NA'
+                self.result_IF_lt = 'NA'
+                self.result_tc = 'NA'
+                self.result_wc = 'NA'
+                self.result_nd_esr_lt = 'NA'
+                self.result_phi_lt = 'NA'
+                self.result_srf_lt = 'NA'
+                self.result_fcd__lt = 'NA'
+
+            if self.web_buckling :
+
+                self.result_bcI_eff = list_result[result_type]['WebBuckling.I_eff']
+                self.result_bcA_eff = list_result[result_type]['WebBuckling.A_eff']
+                self.result_bcr_eff = list_result[result_type]['WebBuckling.r_eff']
+                self.result_bc = list_result[result_type]['Buckling_class']
+                self.result_IF = round(list_result[result_type]["IF"], 2)
+                self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)
+                self.result_ebs = round(list_result[result_type]["EBS"], 2)
+                self.result_nd_esr = round(list_result[result_type]["ND_ESR"], 2)
+                self.result_phi_zz = round(list_result[result_type]["phi"], 2)
+                self.result_srf = round(list_result[result_type]["SRF"], 2)
+                self.result_fcd_1_zz = round(list_result[result_type]["FCD_formula"], 2)
+                self.result_fcd_2 = round(list_result[result_type]["FCD_max"], 2)
+                self.result_fcd = round(list_result[result_type]["FCD"], 2)
+                self.result_capacity = round(list_result[result_type]["Capacity"], 2)
+                self.result_crippling = round(list_result[result_type]["Web_crippling"], 2)
+            else:
+                self.result_bc = 'NA'
+                self.result_IF = 'NA'
+                self.result_eff_sr = 'NA'
+                self.result_lambda_vv = 'NA'
+                self.result_lambda_psi = 'NA'
+                self.result_ebs = 'NA'
+                self.result_nd_esr = 'NA'
+                self.result_phi_zz = 'NA'
+                self.result_srf = 'NA'
+                self.result_fcd_1_zz = 'NA'
+                self.result_fcd_2 = 'NA'
+                self.result_fcd = 'NA'
+                self.result_capacity = 'NA'
+                self.result_crippling = 'NA'
+            if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
+                self.result_mfd = list_result[result_type]["Mfd"]
+                self.result_beta_reduced = list_result[result_type]["Beta_reduced"]
+                self.result_Md= list_result[result_type]["M_d"]
+        except:
+            self.result_designation = list_result["Designation"]
+            logger.info(
+            "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
+                self.input_section_classification[self.result_designation][0] ,
+                self.result_designation,
+                self.input_section_classification[self.result_designation][1], round(self.input_section_classification[self.result_designation][3],2),
+                self.input_section_classification[self.result_designation][2], round(self.input_section_classification[self.result_designation][4],2)
             )
+        )
+            self.result_latex_tension_zone = list_result["latex.tension_zone"]
+            self.result_web_buckling_check = list_result["Web.Buckling"]
+            self.result_eff_d = list_result["Reduced.depth"]
+            self.result_buckling_crippling = list_result["Buckling.crippling"]
 
-        self.result_shear = round(list_result[result_type]["Shear Strength"], 2)
-        self.result_high_shear = list_result[result_type]["High Shear check"]
-        self.result_bending = round(list_result[result_type]["Bending Strength"], 2)
-        self.result_eff_len = round(list_result[result_type]["Effective_length"], 2)
-        self.result_cost = list_result[result_type]["Cost"]
-        self.result_betab = list_result[result_type]["Beta_b"]
+            self.result_section_class = list_result["Section class"]
+            self.result_effective_area = round(list_result["Effective area"],2)
+            if self.effective_area_factor < 1.0:
+                logger.info(
+                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
+                        round((self.result_effective_area / self.effective_area_factor), 2),
+                        self.result_effective_area,
+                    )
+                )
 
-        if self.result_web_buckling_check :
-            logger.warning(
-                "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
-            if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
-                logger.info('Transverse Stiffeners at supports required. Design not done for them')
-                self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
-                self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
-                self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
-                self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
-                self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
-            elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
-                logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
-                self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
-                self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
-                self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
-                self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
-                self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
-                self.result_web_buckling_simple_Mfr = round(list_result[result_type]['Mfr']*10**-6, 2)
-                self.result_web_buckling_simple_Nf = round(list_result[result_type]['Nf'], 2)
-                self.result_web_buckling_simple_c = round(list_result[result_type]['c'], 2)
-                self.result_web_buckling_simple_phi_girder = round(list_result[result_type]['phi_girder'], 2)
-                self.result_web_buckling_simple_s_girder = round(list_result[result_type]['s_girder'], 2)
-                self.result_web_buckling_simple_wtf_girder = round(list_result[result_type]['wtf_girder'], 2)
-                self.result_web_buckling_simple_sai_girder = round(list_result[result_type]['sai_girder'], 2)
-                self.result_web_buckling_simple_fv_girder = round(list_result[result_type]['fv_girder'], 2)
-                self.result_web_buckling_simple_V_p_girder = round(list_result[result_type]['V_p'], 2)
-                self.result_web_buckling_simple_fV_tf_girder = round(list_result[result_type]['V_tf_girder'], 2)
+            self.result_shear = round(list_result["Shear Strength"], 2)
+            self.result_high_shear = list_result["High Shear check"]
+            self.result_bending = round(list_result["Bending Strength"], 2)
+            self.result_eff_len = round(list_result["Effective_length"], 2)
+            self.result_cost = list_result["Cost"]
+            self.result_betab = list_result["Beta_b"]
 
-        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
-            self.result_mcr = round(list_result[result_type]['Mcr'], 2)
-            self.result_IF_lt = round(list_result[result_type]["IF_lt"], 2)
-            self.result_tc = round(list_result[result_type]["It"], 2)
-            self.result_wc = round(list_result[result_type]["Iw"], 2)
-            self.result_nd_esr_lt = round(list_result[result_type]["ND_ESR_lt"], 2)
-            self.result_phi_lt = round(list_result[result_type]["phi_lt"], 2)
-            self.result_srf_lt = round(list_result[result_type]["SRF_lt"], 2)
-            self.result_fcd__lt = round(list_result[result_type]["FCD_lt"], 2)
-        else:
-            self.result_mcr = 'NA'
-            self.result_IF_lt = 'NA'
-            self.result_tc = 'NA'
-            self.result_wc = 'NA'
-            self.result_nd_esr_lt = 'NA'
-            self.result_phi_lt = 'NA'
-            self.result_srf_lt = 'NA'
-            self.result_fcd__lt = 'NA'
+            if self.result_web_buckling_check :
+                logger.warning(
+                    "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
+                if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+                    logger.info('Transverse Stiffeners at supports required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result['V_cr'], 2)
+                elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+                    logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result['V_cr'], 2)
+                    self.result_web_buckling_simple_Mfr = round(list_result['Mfr']*10**-6, 2)
+                    self.result_web_buckling_simple_Nf = round(list_result['Nf'], 2)
+                    self.result_web_buckling_simple_c = round(list_result['c'], 2)
+                    self.result_web_buckling_simple_phi_girder = round(list_result['phi_girder'], 2)
+                    self.result_web_buckling_simple_s_girder = round(list_result['s_girder'], 2)
+                    self.result_web_buckling_simple_wtf_girder = round(list_result['wtf_girder'], 2)
+                    self.result_web_buckling_simple_sai_girder = round(list_result['sai_girder'], 2)
+                    self.result_web_buckling_simple_fv_girder = round(list_result['fv_girder'], 2)
+                    self.result_web_buckling_simple_V_p_girder = round(list_result['V_p'], 2)
+                    self.result_web_buckling_simple_fV_tf_girder = round(list_result['V_tf_girder'], 2)
 
-        if self.web_buckling :
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
+                self.result_mcr = round(list_result['Mcr'], 2)
+                self.result_IF_lt = round(list_result["IF_lt"], 2)
+                self.result_tc = round(list_result["It"], 2)
+                self.result_wc = round(list_result["Iw"], 2)
+                self.result_nd_esr_lt = round(list_result["ND_ESR_lt"], 2)
+                self.result_phi_lt = round(list_result["phi_lt"], 2)
+                self.result_srf_lt = round(list_result["SRF_lt"], 2)
+                self.result_fcd__lt = round(list_result["FCD_lt"], 2)
+            else:
+                self.result_mcr = 'NA'
+                self.result_IF_lt = 'NA'
+                self.result_tc = 'NA'
+                self.result_wc = 'NA'
+                self.result_nd_esr_lt = 'NA'
+                self.result_phi_lt = 'NA'
+                self.result_srf_lt = 'NA'
+                self.result_fcd__lt = 'NA'
 
-            self.result_bcI_eff = list_result[result_type]['WebBuckling.I_eff']
-            self.result_bcA_eff = list_result[result_type]['WebBuckling.A_eff']
-            self.result_bcr_eff = list_result[result_type]['WebBuckling.r_eff']
-            self.result_bc = list_result[result_type]['Buckling_class']
-            self.result_IF = round(list_result[result_type]["IF"], 2)
-            self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)
-            self.result_ebs = round(list_result[result_type]["EBS"], 2)
-            self.result_nd_esr = round(list_result[result_type]["ND_ESR"], 2)
-            self.result_phi_zz = round(list_result[result_type]["phi"], 2)
-            self.result_srf = round(list_result[result_type]["SRF"], 2)
-            self.result_fcd_1_zz = round(list_result[result_type]["FCD_formula"], 2)
-            self.result_fcd_2 = round(list_result[result_type]["FCD_max"], 2)
-            self.result_fcd = round(list_result[result_type]["FCD"], 2)
-            self.result_capacity = round(list_result[result_type]["Capacity"], 2)
-            self.result_crippling = round(list_result[result_type]["Web_crippling"], 2)
-        else:
-            self.result_bc = 'NA'
-            self.result_IF = 'NA'
-            self.result_eff_sr = 'NA'
-            self.result_lambda_vv = 'NA'
-            self.result_lambda_psi = 'NA'
-            self.result_ebs = 'NA'
-            self.result_nd_esr = 'NA'
-            self.result_phi_zz = 'NA'
-            self.result_srf = 'NA'
-            self.result_fcd_1_zz = 'NA'
-            self.result_fcd_2 = 'NA'
-            self.result_fcd = 'NA'
-            self.result_capacity = 'NA'
-            self.result_crippling = 'NA'
-        if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
-            self.result_mfd = list_result[result_type]["Mfd"]
-            self.result_beta_reduced = list_result[result_type]["Beta_reduced"]
-            self.result_Md= list_result[result_type]["M_d"]
+            if self.web_buckling :
+
+                self.result_bcI_eff = list_result['WebBuckling.I_eff']
+                self.result_bcA_eff = list_result['WebBuckling.A_eff']
+                self.result_bcr_eff = list_result['WebBuckling.r_eff']
+                self.result_bc = list_result['Buckling_class']
+                self.result_IF = round(list_result["IF"], 2)
+                self.result_eff_sr = round(list_result["Effective_SR"], 2)
+                self.result_ebs = round(list_result["EBS"], 2)
+                self.result_nd_esr = round(list_result["ND_ESR"], 2)
+                self.result_phi_zz = round(list_result["phi"], 2)
+                self.result_srf = round(list_result["SRF"], 2)
+                self.result_fcd_1_zz = round(list_result["FCD_formula"], 2)
+                self.result_fcd_2 = round(list_result["FCD_max"], 2)
+                self.result_fcd = round(list_result["FCD"], 2)
+                self.result_capacity = round(list_result["Capacity"], 2)
+                self.result_crippling = round(list_result["Web_crippling"], 2)
+            else:
+                self.result_bc = 'NA'
+                self.result_IF = 'NA'
+                self.result_eff_sr = 'NA'
+                self.result_lambda_vv = 'NA'
+                self.result_lambda_psi = 'NA'
+                self.result_ebs = 'NA'
+                self.result_nd_esr = 'NA'
+                self.result_phi_zz = 'NA'
+                self.result_srf = 'NA'
+                self.result_fcd_1_zz = 'NA'
+                self.result_fcd_2 = 'NA'
+                self.result_fcd = 'NA'
+                self.result_capacity = 'NA'
+                self.result_crippling = 'NA'
+            if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
+                self.result_mfd = list_result["Mfd"]
+                self.result_beta_reduced = list_result["Beta_reduced"]
+                self.result_Md= list_result["M_d"]
+            
+        
 
     ### start writing save_design from here!
     def save_design(self, popup_summary):
-        if self.design_status or not self.failed_design_dict:# TODO @Rutvik
+        print('self.design_status', self.design_status,'len(self.failed_design_dict)', len(self.failed_design_dict))
+        if self.design_status or len(self.failed_design_dict)>0:# TODO @Rutvik
             self.section_property = self.section_connect_database(self, self.result_designation)
             
             if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
@@ -2617,6 +2732,48 @@ class Flexure(Member):
 
                 self.report_check.append(t1)
 # TODO
+    #     elif not self.design_status or len(self.failed_design_dict)>0:
+    #         self.section_property = self.section_connect_database(self, self.result_designation)
+            
+    #         if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
+    #             self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
+    #                                   KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
+    #                                   KEY_DISP_COLSEC_REPORT: self.section_property.designation,
+    #                                   KEY_DISP_MATERIAL: self.section_property.material,
+    #  #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
+    #                                   KEY_REPORT_MASS: self.section_property.mass,
+    #                                   KEY_REPORT_AREA: round(self.section_property.area * 1e-2, 2),
+    #                                   KEY_REPORT_DEPTH: self.section_property.depth,
+    #                                   KEY_REPORT_WIDTH: self.section_property.flange_width,
+    #                                   KEY_REPORT_WEB_THK: self.section_property.web_thickness,
+    #                                   KEY_REPORT_FLANGE_THK: self.section_property.flange_thickness,
+    #                                   KEY_DISP_FLANGE_S_REPORT: self.section_property.flange_slope,
+    #                                   KEY_REPORT_R1: self.section_property.root_radius,
+    #                                   KEY_REPORT_R2: self.section_property.toe_radius,
+    #                                   KEY_REPORT_IZ: round(self.section_property.mom_inertia_z * 1e-4, 2),
+    #                                   KEY_REPORT_IY: round(self.section_property.mom_inertia_y * 1e-4, 2),
+    #                                   KEY_REPORT_RZ: round(self.section_property.rad_of_gy_z * 1e-1, 2),
+    #                                   KEY_REPORT_RY: round(self.section_property.rad_of_gy_y * 1e-1, 2),
+    #                                   KEY_REPORT_ZEZ: round(self.section_property.elast_sec_mod_z * 1e-3, 2),
+    #                                   KEY_REPORT_ZEY: round(self.section_property.elast_sec_mod_y * 1e-3, 2),
+    #                                   KEY_REPORT_ZPZ: round(self.section_property.plast_sec_mod_z * 1e-3, 2),
+    #                                   KEY_REPORT_ZPY: round(self.section_property.plast_sec_mod_y * 1e-3, 2)}
+
+
+
+    #         self.report_input = \
+    #             {#KEY_MAIN_MODULE: self.mainmodule,
+    #              KEY_MODULE: self.module, #"Axial load on column "
+    #                 KEY_DISP_SHEAR+'*': self.load.shear_force * 10 ** -3,
+    #                 KEY_DISP_BEAM_MOMENT_Latex+'*': self.load.moment * 10 ** -6,
+    #                 KEY_DISP_LENGTH_BEAM: self.result_eff_len,
+    #                 KEY_DISP_SEC_PROFILE: self.sec_profile,
+    #                 KEY_DISP_SECSIZE: str(self.sec_list),
+    #              KEY_MATERIAL: self.material,
+    #                 "Selected Section Details": self.report_column,
+    #                 KEY_BEAM_SUPP_TYPE: self.latex_design_type,
+    #             }
+                
             # if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
             #     t1 = ('SubSection', 'Lateral Torsional Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
             #     self.report_check.append(t1)
@@ -2707,11 +2864,11 @@ class Flexure(Member):
                  KEY_MODULE: self.module, #"Axial load on column "
                     KEY_DISP_SHEAR+'*': self.load.shear_force * 10 ** -3,
                     KEY_DISP_BEAM_MOMENT_Latex+'*': self.load.moment * 10 ** -6,
-                    KEY_DISP_LENGTH_BEAM: self.result_eff_len,
+                    KEY_DISP_LENGTH_BEAM: self.length,
                     KEY_DISP_SEC_PROFILE: self.sec_profile,
                     KEY_DISP_SECSIZE: str(self.sec_list),
                  KEY_MATERIAL: self.material,
-                    # "Selected Section Details": self.report_column,
+                    # "Failed Section Details": self.report_column,
                     KEY_BEAM_SUPP_TYPE: self.latex_design_type,
                 }
             self.report_input.update({
@@ -2738,16 +2895,27 @@ class Flexure(Member):
                 KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
 
             })
-            if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
-                self.report_input.update({
-                    KEY_ShearBuckling: self.support_cndition_shear_buckling
-                })
+            # if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
+            #     self.report_input.update({
+            #         KEY_ShearBuckling: self.support_cndition_shear_buckling
+            #     })
             # self.report_input.update({
             #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
             #      "I Section - Mechanical Properties": "TITLE",
             #      })
             self.report_input.update()
             self.report_check = []
+            
+            t1 = ('Selected', 'All Members Failed', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
+            self.report_check.append(t1)
+
+            t1 = ('SubSection', 'Plastic Section Modulus', '|p{4cm}|p{1.5cm}|p{2.5cm}|p{8cm}|')
+            self.report_check.append(t1)
+            t1 = ('Plastic Section Modulus($mm^3$)', round(self.Zp_req,2),
+                  ' ',
+                  'Select Sections with atleast required Plastic Section Modulus ')
+            self.report_check.append(t1)
+            
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

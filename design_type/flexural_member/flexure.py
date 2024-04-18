@@ -555,7 +555,7 @@ class Flexure(Member):
                             flag3 = True
                 except:
                         error = "Input value(s) are not valid"
-                        all_errors.append(error)         
+                        all_errors.append(error)   
             # elif type(design_dictionary[option[0]]) != 'float':
             #             print("Input value(s) are not valid")
             #             error = "Input value(s) are not valid"
@@ -606,7 +606,7 @@ class Flexure(Member):
         global logger
         red_list = red_list_function()
 
-        if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams or Columns
+        if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
             for section in self.sec_list:
                 if section in red_list:
                     logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
@@ -704,10 +704,7 @@ class Flexure(Member):
         self.design_status = False
         self.sec_prop_initial_dict = {}
         self.failed_design_dict = {}    
-        
         self.design(self, design_dictionary)
-        # self.results(self, design_dictionary)
-        
         if self.flag:
             self.results(self, design_dictionary)
         
@@ -1064,9 +1061,7 @@ class Flexure(Member):
                         return
                 return
             else:
-                self.shear_strength = 0.1
-
-        
+                self.shear_strength = 0.1 
     def web_not_buckling_steps(self):
         print(f"Working web_not_buckling_steps")
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(
@@ -1085,7 +1080,6 @@ class Flexure(Member):
 
     def bending_strength(self):
         print('Inside bending_strength ','\n self.section_class', self.section_class)
-        
         # 4 - design bending strength
         M_d = IS800_2007.cl_8_2_1_2_design_bending_strength(
             self.section_class,
@@ -1240,7 +1234,7 @@ class Flexure(Member):
             self.gamma_m0,
             self.support,
         )
-        if self.section_class_girder == 'Plastic' or 'Compact' :
+        if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact :
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = Zez_flange/Zpz_flange
@@ -1701,7 +1695,7 @@ class Flexure(Member):
             "Beta_b"
         ])
         #Web buckling parameters
-        # TODO if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
+        # if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
         #     list.extend(
         #         [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
         #          self.V_cr])
@@ -1757,7 +1751,7 @@ class Flexure(Member):
                 "FCD_formula",
                 "FCD_max",
                 "FCD",
-                "Capacity", # Buckling Resistance
+                "Capacity",
                 "Web_crippling"
             ])
         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
@@ -2204,14 +2198,11 @@ class Flexure(Member):
                 self.result_beta_reduced = list_result["Beta_reduced"]
                 self.result_Md= list_result["M_d"]
             
-        
-
     ### start writing save_design from here!
     def save_design(self, popup_summary):
         # print('self.design_status', self.design_status,'len(self.failed_design_dict)', len(self.failed_design_dict))
         if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):# TODO @Rutvik
             self.section_property = self.section_connect_database(self, self.result_designation)
-            
             if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
                                       KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
@@ -2648,8 +2639,6 @@ class Flexure(Member):
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                     self.report_check.append(t1)
 
-            
-
             if self.result_buckling_crippling:
                 t1 = ('SubSection', 'Web Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
                 self.report_check.append(t1)
@@ -2930,7 +2919,6 @@ class Flexure(Member):
                   ' ',
                   'Select Sections with atleast required Plastic Section Modulus ')
             self.report_check.append(t1)
-            
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

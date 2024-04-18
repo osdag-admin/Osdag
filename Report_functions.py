@@ -2,7 +2,7 @@ from utils.common.is800_2007 import *
 from pylatex import Math
 from pylatex.utils import NoEscape
 
-def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter):  # same as #todo anjali
+def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter, type = 1,Pd = None,fw = None):  # same as #todo anjali
     """
     Author: Rutvik J
 
@@ -13,12 +13,25 @@ def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter):  # s
     provided = str(round(provided,3))
     given2 = str(round(given2,3))
     provided2 = str(round(provided2,3))
-    answer = str(parameter)
+    answer = str(round(parameter,3))
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}\right)\\'))
-    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'}\right)\\'))
-    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r'\right)\\' ))
-    Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
+    if type == 1:
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r'\right)\\' ))
+        Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
+    elif type == 2:
+        temp3 = str(round(float(given)/Pd,3))
+        temp4 = str(round(float(given)/fw,3))
+        Pd = str(round(Pd,3))
+        fw = str(round(fw,3))
+        # Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}, \frac{\text{Shear Force}}{\text{Buckling Resistance}}, \frac{\text{Shear Force}}{\text{Bearing Strength}}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}},\right. \\ &\left. \frac{\text{Shear Force}}{\text{Buckling Resistance}}, \frac{\text{Shear Force}}{\text{Bearing Strength}}\right)\\'))
+        # Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}},\\'))
+        # Pmc_eqn.append(NoEscape(r'&\frac{\text{Shear Force}}{\text{Buckling Resistance}}, \frac{\text{Shear Force}}{\text{Bearing Strength}}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'},\frac{' + given + r'}{' + Pd + r'},\frac{' + given + r'}{' + fw + r'}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r','+temp3+r','+temp4+r'\right)\\' ))
+        Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
     return Pmc_eqn
 def sectional_area_change(given, provided, parameter):  # same as #todo anjali
     """

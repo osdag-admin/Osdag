@@ -2733,11 +2733,18 @@ class Flexure(Member):
             t1 = ('SubSection', 'Utilization', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
             self.report_check.append(t1)
             # TODO
-            t1 = (KEY_DISP_Utilization_Ratio, 1.0,   
-                  Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
-                                                        self.load.moment*10**-6, round(self.result_bending, 2),
-                                                         self.result_UR),
-                  get_pass_fail(1.0, self.result_UR, relation="geq"))
+            if self.result_buckling_crippling:
+                t1 = (KEY_DISP_Utilization_Ratio, 1.0,   
+                    Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
+                                                            self.load.moment*10**-6, round(self.result_bending, 2),
+                                                            self.result_UR,type=2,Pd=self.result_capacity, fw=self.result_crippling),
+                    get_pass_fail(1.0, self.result_UR, relation="geq"))
+            else:
+                t1 = (KEY_DISP_Utilization_Ratio, 1.0,   
+                    Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
+                                                            self.load.moment*10**-6, round(self.result_bending, 2),
+                                                            self.result_UR),
+                    get_pass_fail(1.0, self.result_UR, relation="geq"))
             self.report_check.append(t1)    
 # 
     #     elif not self.design_status or len(self.failed_design_dict)>0:

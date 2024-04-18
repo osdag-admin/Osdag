@@ -516,6 +516,7 @@ class Flexure(Member):
         all_errors = []
         self.design_status = False
         flag = False
+        self.output_values(self, flag)
         flag1 = False
         flag2 = False
         flag3 = False
@@ -576,11 +577,17 @@ class Flexure(Member):
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
             if self.design_status ==False and len(self.failed_design_dict)>0:
-                return ['Design Failed, Check Design Report']
+                logger.error(
+                    "Design Failed, Check Design Report"
+                )
+                return # ['Design Failed, Check Design Report'] @TODO
             elif self.design_status:
                 pass
             else:
-                return ['Design Failed. Selender Sections Selected']
+                logger.error(
+                    "Design Failed. Selender Sections Selected"
+                )
+                return # ['Design Failed. Selender Sections Selected']
         else:
             return all_errors
 
@@ -1853,7 +1860,7 @@ class Flexure(Member):
                     logger.info(
                     "The details for the best section provided is being shown"
                 )
-                    self.result_UR = self.failed_design_dict[temp] # TODO @Rutvik
+                    self.result_UR = self.failed_design_dict['UR'] #temp  TODO @Rutvik
                     self.common_result(
                         self,
                         list_result=self.failed_design_dict,
@@ -2641,15 +2648,7 @@ class Flexure(Member):
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                     self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Utilization', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
-            self.report_check.append(t1)
-
-            t1 = (KEY_DISP_Utilization_Ratio, 1.0,
-                  Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
-                                                        self.load.moment*10**-6, round(self.result_bending, 2),
-                                                         self.result_UR),
-                  get_pass_fail(1.0, self.result_UR, relation="geq"))
-            self.report_check.append(t1)
+            
 
             if self.result_buckling_crippling:
                 t1 = ('SubSection', 'Web Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
@@ -2730,7 +2729,17 @@ class Flexure(Member):
                       get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_crippling, 2), relation="leq"))
 
                 self.report_check.append(t1)
-# TODO
+                
+            t1 = ('SubSection', 'Utilization', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+            self.report_check.append(t1)
+            # TODO
+            t1 = (KEY_DISP_Utilization_Ratio, 1.0,   
+                  Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
+                                                        self.load.moment*10**-6, round(self.result_bending, 2),
+                                                         self.result_UR),
+                  get_pass_fail(1.0, self.result_UR, relation="geq"))
+            self.report_check.append(t1)    
+# 
     #     elif not self.design_status or len(self.failed_design_dict)>0:
     #         self.section_property = self.section_connect_database(self, self.result_designation)
             

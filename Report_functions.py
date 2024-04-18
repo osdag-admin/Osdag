@@ -734,7 +734,7 @@ def cl_8_2_2_1_Mcr(M_cr, E,I_y,KL,G,I_t,I_w,):
     slender_eqn = Math(inline=True)
     slender_eqn.append(NoEscape(r'\begin{aligned}M_{cr}&= \sqrt{\frac{\pi^{2}EI_y}{(KL)^2}\left( GI_t+\frac{\pi^{2}EI_w}{(KL)^2} \right)} \\'))
     slender_eqn.append(NoEscape(r' &= \sqrt{\frac{\pi^{2}\times'+ E+r'\times 10^5 \times'+I_y+r'\times 10^4}{('+KL+r')^2}}\\'))  #   \sqrt{\left('+G+r'10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\
-    slender_eqn.append(NoEscape(r' &\times\sqrt{\left('+G+r'\times 10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\'))
+    slender_eqn.append(NoEscape(r' &\times\sqrt{\left('+G+r'\times 10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2} \times'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\'))
     slender_eqn.append(NoEscape(r' &= ' + M_cr + r' \end{aligned}'))
     # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
     return slender_eqn

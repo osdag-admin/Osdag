@@ -170,19 +170,22 @@ class CreateLatex(Document):
                         # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
                             list_sec = uiObj[i].strip("['']")
-                            print( 'list_sec', list_sec, list_sec.split("', '"))
+                            print( 'list_sec', list_sec,'\n', list_sec.split("', '"))
                             # count = 0
                             # for i in list_sec:
                             #     print(i)
                             #     count += 1
                             str_len = len(list_sec.split("', '"))
                             print( 'str_len', str_len)
-                            if str_len > 130:
+                            print(f"list_sec.split("', '")[0:220].strip("")", list_sec.split("', '")[0:220])
+                            print('\n',','.join(f"'{x}'" for x in list_sec.split("', '")[0:220]))
+                            # list_sec.split("', '")[0:220]
+                            if str_len > 200: # 130
                                 table.add_hline()
                                 table.add_row((MultiColumn(1, align='|c|', data=i, ),
-                                               MultiColumn(1, align='|X|', data=list_sec.split("', '")[0:220] ),))
+                                               MultiColumn(1, align='|X|', data=','.join(f"'{x}'" for x in list_sec.split("', '")[0:220])),))
                                 extra_page = True
-                                list_sec_modified = list_sec.split("', '")[220 :]
+                                list_sec_modified = ','.join(f"'{x}'" for x in list_sec.split("', '")[220:])
                                 # table.add_hline()
                                 # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                                 # doc.append(NewPage())

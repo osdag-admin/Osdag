@@ -2781,8 +2781,7 @@ class Member(Main):
     def optimization_tab_flexure_design(self, input_dictionary):
         print(f"optimization_tab_flexure_design input_dictionary {input_dictionary}")
         values = {
-                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA',
-                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]}
+                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA', KEY_BEARING_LENGTH: 'NA'} # , KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -2813,12 +2812,12 @@ class Member(Main):
 
 
 
-        if KEY_DESIGN_TYPE_FLEXURE in input_dictionary:
-            if input_dictionary[KEY_DESIGN_TYPE_FLEXURE] == VALUES_SUPP_TYPE_temp[0]:
-                t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
-                optimum.append(t1)
-                t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
-                optimum.append(t2)
+        # if KEY_DESIGN_TYPE_FLEXURE in input_dictionary:
+        #     if input_dictionary[KEY_DESIGN_TYPE_FLEXURE] == VALUES_SUPP_TYPE_temp[0]:
+        #         t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
+        #         optimum.append(t1)
+        #         t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
+        #         optimum.append(t2)
         t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
         optimum.append(t9)
 

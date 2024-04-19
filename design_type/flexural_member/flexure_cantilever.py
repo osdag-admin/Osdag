@@ -35,7 +35,7 @@ from utils.common.Section_Properties_Calculator import BBAngle_Properties
 from utils.common import is800_2007
 from utils.common.component import *
 
-
+# TODO DEBUG
 class Flexure_Cantilever(Member):
 
     def __init__(self):
@@ -125,7 +125,7 @@ class Flexure_Cantilever(Member):
         t2 = ("Optimization", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH]) #, KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD, KEY_ShearBucklingOption]) #, KEY_STEEL_COST
+        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD]) #, KEY_STEEL_COST, KEY_ShearBucklingOption
         design_input.append(t2)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
@@ -140,7 +140,7 @@ class Flexure_Cantilever(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_ShearBucklingOption], '')
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD], '') # KEY_ShearBucklingOption
         design_input.append(t2)
 
         return design_input
@@ -170,7 +170,7 @@ class Flexure_Cantilever(Member):
             KEY_BEARING_LENGTH : 'NA',
             KEY_LOAD : 'Normal',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
-            KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
+            # KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
         }[key]
 
         return val
@@ -644,7 +644,8 @@ class Flexure_Cantilever(Member):
         if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
             self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
             self.bending_type = KEY_DISP_BENDING1
-            self.support_cndition_shear_buckling = design_dictionary[KEY_ShearBucklingOption]
+            # TODO self.support_cndition_shear_buckling
+            self.support_cndition_shear_buckling = 'NA'#design_dictionary[KEY_ShearBucklingOption]
         elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
             self.design_type = VALUES_SUPP_TYPE[0]
             self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
@@ -1006,7 +1007,7 @@ class Flexure_Cantilever(Member):
         if not self.web_buckling_check:
             self.web_not_buckling_steps(self)
     def web_buckling_steps(self):
-        print(f"Working web_buckling_steps")
+        print(f"Not using web_buckling_steps")
         # logger.info(f"Considering  {self.support_cndition_shear_buckling}")
         # 5 - Web Buckling check(when high shear) -If user wants then only
         # if web_buckling:
@@ -1866,6 +1867,7 @@ class Flexure_Cantilever(Member):
                 # self.design_status_list.append(self.design_status)
 
             else:
+                self.failed_design_dict = None
                 self.result_UR = self.optimum_section_ur[
                     -1
                 ]  # optimum section which passes the UR check
@@ -2269,10 +2271,10 @@ class Flexure_Cantilever(Member):
                 KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
 
             })
-            if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
-                self.report_input.update({
-                    KEY_ShearBuckling: self.support_cndition_shear_buckling
-                })
+            # if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
+            #     self.report_input.update({
+            #         KEY_ShearBuckling: self.support_cndition_shear_buckling
+            #     })
             # self.report_input.update({
             #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
             #      "I Section - Mechanical Properties": "TITLE",
@@ -2469,7 +2471,7 @@ class Flexure_Cantilever(Member):
 
                 # t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
 
-            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{2cm}|p{8.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{1.5cm}|p{9cm}|p{1.5cm}|')
             self.report_check.append(t1)
             if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
                 if self.result_high_shear:

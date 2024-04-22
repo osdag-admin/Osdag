@@ -353,9 +353,17 @@ class Flexure(Member):
 
 
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+               KEY_OUT_SPACING, TYPE_OUT_LABEL, self.warning_majorbending)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_OUT_SPACING, TYPE_OUT_BUTTON, self.warning_majorbending)
         lst.append(t18)
 
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+        lst.append(t18)
+        
         return lst
     
     def warning_majorbending(self):
@@ -426,62 +434,65 @@ class Flexure(Member):
               '', True)
         out_list.append(t1)
 
-        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, True)
+        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
         out_list.append(t1)
 
-        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
-              self.result_tc if flag else '', True)
-        out_list.append(t2)
+        t17 = (KEY_OUT_SPACING, 'LTB', TYPE_OUT_BUTTON, ['Details', self.spacing], False)
+        out_list.append(t17)
+        
+        # t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+        #       self.result_tc if flag else '', True)
+        # out_list.append(t2)
 
-        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', True)
-        out_list.append(t2)
+        # t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', True)
+        # out_list.append(t2)
 
-        t2 = (
-            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
-            True)
-        out_list.append(t2)
+        # t2 = (
+        #     KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
+        #     True)
+        # out_list.append(t2)
 
-        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', True)
-        out_list.append(t2)
+        # t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', True)
+        # out_list.append(t2)
 
-        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', True)
-        out_list.append(t2)
+        # t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', True)
+        # out_list.append(t2)
 
-        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
-              self.result_nd_esr_lt if flag else
-              '', True)
-        out_list.append(t1)
+        # t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+        #       self.result_nd_esr_lt if flag else
+        #       '', True)
+        # out_list.append(t1)
 
-        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
-        out_list.append(t2)
+        # t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
+        # out_list.append(t2)
 
         # TODO @Rutvik: can add tab button for asthetics
 
-        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
-              self.result_tc if flag else '', False)
-        out_list.append(t2)
+        # t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+        #       self.result_tc if flag else '', False)
+        # out_list.append(t2)
 
-        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', False)
-        out_list.append(t2)
+        # t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', False)
+        # out_list.append(t2)
 
-        t2 = (
-            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
-            False)
-        out_list.append(t2)
+        # t2 = (
+        #     KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
+        #     False)
+        # out_list.append(t2)
 
-        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', False)
-        out_list.append(t2)
+        # t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', False)
+        # out_list.append(t2)
 
-        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', False)
-        out_list.append(t2)
+        # t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', False)
+        # out_list.append(t2)
 
-        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
-              self.result_fcd__lt if flag else
-              '', False)
-        out_list.append(t1)
+        # t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+        #       self.result_fcd__lt if flag else
+        #       '', False)
+        # out_list.append(t1)
 
-        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', False)
-        out_list.append(t2)
+        # t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', False)
+        # out_list.append(t2)
 
         t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True)
         out_list.append(t1)
@@ -510,7 +521,69 @@ class Flexure(Member):
 
 
         return out_list
+    def spacing(self, status):
 
+        spacing = []
+
+        # t00 = (None, "", TYPE_NOTE, "Representative image for Spacing Details based on member's depth \n (root radius not included in edge distance)")
+        # spacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION,
+        #        ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
+        # spacing.append(t99)
+
+        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+              self.result_tc if status else '', False)
+        spacing.append(t2)
+
+        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if status else '', False)
+        spacing.append(t2)
+        
+        t2 = (
+            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if status else '',
+            False)
+        spacing.append(t2)
+
+        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if status else '', False)
+        spacing.append(t2)
+
+        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if status else '', False)
+        spacing.append(t2)
+
+        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+              self.result_fcd__lt if status else
+              '', False)
+        spacing.append(t1)
+
+        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if status else '', False)
+        spacing.append(t2)
+        
+        # if self.sec_profile == 'Star Angles':
+        #     t16 = (KEY_OUT_BOLTS_ONE_LINE_S, KEY_OUT_DISP_BOLTS_ONE_LINE_S, TYPE_TEXTBOX,
+        #            int(self.plate.bolts_one_line/2) if status else '', True)
+        #     spacing.append(t16)
+        # else:
+        #     pass
+
+        # t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
+        # spacing.append(t16)
+
+        # t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
+        # spacing.append(t15)
+
+        # t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
+        # spacing.append(t9)
+
+        # t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
+        # spacing.append(t10)
+
+        # t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
+        # spacing.append(t11)
+
+        # t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
+        # spacing.append(t12)
+
+        return spacing
     def func_for_validation(self, design_dictionary):
         print(f"func_for_validation here")
         all_errors = []

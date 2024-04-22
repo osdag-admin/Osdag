@@ -351,18 +351,19 @@ class Flexure(Member):
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
 
-
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               'After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+        lst.append(t18)
+        
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
                KEY_OUT_SPACING, TYPE_OUT_LABEL, self.warning_majorbending)
         lst.append(t18)
         
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               KEY_OUT_SPACING, TYPE_OUT_BUTTON, self.warning_majorbending)
+               KEY_OUT_SPACING, TYPE_OUT_DOCK, self.warning_majorbending)
         lst.append(t18)
 
-        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
-        lst.append(t18)
+       
         
         return lst
     
@@ -434,7 +435,7 @@ class Flexure(Member):
               '', True)
         out_list.append(t1)
 
-        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
+        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, True)
         out_list.append(t1)
 
         t17 = (KEY_OUT_SPACING, 'LTB', TYPE_OUT_BUTTON, ['Details', self.spacing], False)

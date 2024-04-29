@@ -352,28 +352,106 @@ class Flexure(Member):
         lst.append(t3)
 
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               'After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+               KEY_T_constatnt, TYPE_OUT_LABEL, self.output_modifier)
         lst.append(t18)
         
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               KEY_OUT_SPACING, TYPE_OUT_LABEL, self.warning_majorbending)
+               KEY_T_constatnt, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)       
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_W_constatnt, TYPE_OUT_LABEL, self.output_modifier)
         lst.append(t18)
         
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               KEY_OUT_SPACING, TYPE_OUT_DOCK, self.warning_majorbending)
+               KEY_W_constatnt, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18) 
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_IMPERFECTION_FACTOR_LTB, TYPE_OUT_LABEL, self.output_modifier)
         lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_IMPERFECTION_FACTOR_LTB, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)         
 
-       
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_SR_FACTOR_LTB, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
         
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_SR_FACTOR_LTB, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)       
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_NON_DIM_ESR_LTB, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_NON_DIM_ESR_LTB, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18) 
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_DESIGN_STRENGTH_COMPRESSION, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_DESIGN_STRENGTH_COMPRESSION, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)    
+ 
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_Elastic_CM, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_Elastic_CM, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)   
+        
+        ###############################
+        # t18 = ([KEY_BEARING_LENGTH],
+        # KEY_ESR, TYPE_OUT_LABEL, self.Design_pref_modifier)
+        # lst.append(t18)
+        
+        # t18 = ([KEY_BEARING_LENGTH],
+        #        KEY_ESR, TYPE_OUT_DOCK, self.Design_pref_modifier)
+        # lst.append(t18)       
+        
+        
+        # t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+        #        'After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+        # lst.append(t18)
+        
+        # t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+        #        KEY_OUT_SPACING, TYPE_OUT_LABEL, self.warning_majorbending)
+        # lst.append(t18)
+        
+        # t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+        #        KEY_OUT_SPACING, TYPE_OUT_DOCK, self.warning_majorbending)
+        # lst.append(t18)
         return lst
     
     def warning_majorbending(self):
-
+        print(self)
         if self[0] == VALUES_SUPP_TYPE_temp[2]:
             return True
+        # elif self[0] == VALUES_SUPP_TYPE_temp[0] or self[0] == VALUES_SUPP_TYPE_temp[1] :
+        #     return True
         else:
             return False
 
+    def output_modifier(self):
+        print(self)
+        if self[0] == VALUES_SUPP_TYPE_temp[2]:
+            return False
+        # elif self[0] == VALUES_SUPP_TYPE_temp[0] or self[0] == VALUES_SUPP_TYPE_temp[1] :
+        #     return True
+        else:
+            return True
+        
+    def Design_pref_modifier(self):
+        print("Design_pref_modifier",self)
+        
+        
     def output_values(self, flag):
 
         out_list = []
@@ -435,37 +513,37 @@ class Flexure(Member):
               '', True)
         out_list.append(t1)
 
-        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, True)
+        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
         out_list.append(t1)
 
-        t17 = (KEY_OUT_SPACING, 'LTB', TYPE_OUT_BUTTON, ['Details', self.spacing], False)
-        out_list.append(t17)
+        # t17 = (KEY_OUT_SPACING, 'LTB', TYPE_OUT_BUTTON, ['Details', self.spacing], False)
+        # out_list.append(t17)
         
-        # t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
-        #       self.result_tc if flag else '', True)
-        # out_list.append(t2)
+        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+              self.result_tc if flag else '', False)
+        out_list.append(t2)
 
-        # t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', True)
-        # out_list.append(t2)
+        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', False)
+        out_list.append(t2)
 
-        # t2 = (
-        #     KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
-        #     True)
-        # out_list.append(t2)
+        t2 = (
+            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
+            False)
+        out_list.append(t2)
 
-        # t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', True)
-        # out_list.append(t2)
+        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', False)
+        out_list.append(t2)
 
-        # t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', True)
-        # out_list.append(t2)
+        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', False)
+        out_list.append(t2)
 
-        # t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
-        #       self.result_nd_esr_lt if flag else
-        #       '', True)
-        # out_list.append(t1)
+        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+              self.result_nd_esr_lt if flag else
+              '', False)
+        out_list.append(t1)
 
-        # t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
-        # out_list.append(t2)
+        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', False)
+        out_list.append(t2)
 
         # TODO @Rutvik: can add tab button for asthetics
 
@@ -866,10 +944,12 @@ class Flexure(Member):
                 self.input_modified.append(section)
                 # logger.info(
                 #     f"Required self.Zp_req = {round(self.Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min self.Zp_req value")
-            else:
-                pass
+            # else:
+                # local_flag = False
+
                 # logger.warning(
                 #     f"Required self.Zp_req = {round(self.Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min self.Zp_req value")
+        # logger.info("")
         print("self.input_modified", self.input_modified)
 
     def section_connect_database(self, section):
@@ -1430,7 +1510,7 @@ class Flexure(Member):
         self.input_modified = []
         self.input_section_list = []
         self.input_section_classification = {}
-
+        lambda_check = False
         for trial_section in self.sec_list:
             trial_section = trial_section.strip("'")
             self.section_property = self.section_connect_database(self, trial_section)
@@ -1539,7 +1619,7 @@ class Flexure(Member):
                         self.M_cr
                     )
                     if lambda_lt < 0.4:
-                        print('Ignoring section, lambda_lt<0.4', lambda_lt)
+                        lambda_check = True
                         continue
                 if self.allow_class != 'No':
                     if (
@@ -1573,7 +1653,8 @@ class Flexure(Member):
                         )
                         # self.design_status = False
                         # self.design_status_list.append(self.design_status)
-
+        if lambda_check:
+            logger.info("After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ")
         if len(self.input_section_list) == 0:
             local_flag = False
         else:

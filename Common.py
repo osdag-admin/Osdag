@@ -2574,66 +2574,121 @@ STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                ) + Allowable_Utilization_Para + Effective_Area_Para
-Effective_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Length Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter to </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Overwrite</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> the Length multiplyer. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The value can be re-defined for any particular design session with a minimum of 0.1. If invalid value given then it is set to NA or 1.0.</span></p>\n"
+Effective_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Length</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter to </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Overwrite</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> the Length multiplyer. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The value can be re-defined for any particular design session with a minimum of 0.1. If invalid value given then it is set to NA or 1.0.</span></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">For simply supported beams of overall depth D and span length L, the effective length L<sub>LT</sub> is given by below Table</span></p>\n"             
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
 Bearing_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Bearing Length Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the length of Bearing stiffener provided for webs. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. If invalid value given then it is set to NA.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
-Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
+Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
 
-FLEXURE_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-               "p, li { white-space: pre-wrap; }\n"
-               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-               ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + Bearing_Length_Para
-
 OPTIMIZATION_TABLE_UI = str("""
-<div style="width:100%;">
-<table style="width:70%;" border="0">
-  <tr>
-    <th colspan="3" style="text-align:center;">Conditions of Restraint Supports</th>
-  </tr>
-  <tr>
-    <th>Sl No.</th>
-    <th>Torsional Restraint</th>
-    <th>Warping Restraint</th>
-  </tr>
-  <tr>
-    <td>(i)</td>
-    <td>Fully restrained</td>
-    <td>Both flanges fully restrained</td>
-  </tr>
-  <tr>
-    <td>(ii)</td>
-    <td>Fully restrained</td>
-    <td>Compression flange fully restrained</td>
-  </tr>
-  <tr>
-    <td>(iii)</td>
-    <td>Fully restrained</td>
-    <td>Both flanges fully restrained</td>
-  </tr>
-  <tr>
-    <td>(iv)</td>
-    <td>Fully restrained</td>
-    <td>Both flanges fully restrained</td>
-  </tr>
-  <tr>
-    <td>(v)</td>
-    <td>Fully restrained</td>
-    <td>Warping not restrained in both flanges</td>
-  </tr>
-  <tr>
-    <td>(vi)</td>
-    <td>Partially restrained by bottom flange support connection</td>
-    <td>Warping not restrained in both flanges</td>
-  </tr>
-  <tr>
-    <td>(vii)</td>
-    <td>Partially restrained by bottom flange bearing support</td>
-    <td>Warping not restrained in both flanges</td>
-  </tr>
-  <!-- Add more rows as needed -->
+<div style="width:100%;" style="overflow-x:auto;">
+    <table style="width:100%;" border="1">
+      <tr>
+      <th colspan="5" style="text-align:center;">Effective Length for Cantilever Beams </th>
+    </tr>
+    <tr>
+        <th>Sl No.</th>
+        <th colspan="2" style="text-align:center;">Conditions of Restraint</th>
+        <th colspan="2" style="text-align:center;">Loading Condition</th>
+      </tr>
+      <tr >
+        <th> </th>
+        <th>Support</th>
+        <th>Top</th>
+        <th>Normal</th>
+        <th>Destabilizing</th>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(i)</td>
+        <td rowspan="4">Continous, with lateral restraint to top flange</td>
+        <td>Free</td>
+        <td>3.0 L</td>
+        <td>7.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>2.7 L</td>
+        <td>7.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>2.4 L</td>
+        <td>4.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>2.1 L</td>
+        <td>3.6 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(ii)</td>
+        <td rowspan="4">Continous, with partial torsional restraint</td>
+        <td>Free</td>
+        <td>2.0 L</td>
+        <td>5.0 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>1.8 L</td>
+        <td>5.0 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>1.6 L</td>
+        <td>3.0 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>1.4 L</td>
+        <td>2.4 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(iii)</td>
+        <td rowspan="4">Continous, with lateral and torsional restraint</td>
+        <td>Free</td>
+        <td>1.0 L</td>
+        <td>2.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>0.9 L</td>
+        <td>2.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>0.8 L</td>
+        <td>1.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>0.7 L</td>
+        <td>1.2 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(iv)</td>
+        <td rowspan="4">Restrained laterally, torsionally and against rotation</td>
+        <td>Free</td>
+        <td>0.8 L</td>
+        <td>1.4 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>0.7 L</td>
+        <td>1.4 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>0.6 L</td>
+        <td>0.6 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>0.5 L</td>
+        <td>0.5 L</td>
+      </tr>
+        <!-- Add more rows as needed -->
 </table>
 </div>
 </body></html>
@@ -2644,4 +2699,88 @@ STRUT_OPTIMIZATION_DESCRIPTION = (
     '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
     'p, li { white-space: pre-wrap; }\n'
     '</style></head><body style="font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;">\n'
-) + Allowable_Utilization_Para + Effective_Area_Para + OPTIMIZATION_TABLE_UI
+) + Allowable_Utilization_Para + Effective_Area_Para # + OPTIMIZATION_TABLE_UI
+
+OPTIMIZATION_TABLE_UI2 = str("""
+<div style="width:100%;" style="overflow-x:auto;">
+    <table style="width:100%;" border="1">
+      <tr>
+        <th colspan="5" style="text-align:center;">Effective Length for Simply Supported Beams </th>
+    </tr>
+    <tr>
+        <th>Sl No.</th>
+        <th colspan="2" style="text-align:center;">Conditions of Restraint Supports</th>
+        <th colspan="2" style="text-align:center;">Loading Condition</th>
+      </tr>
+      <tr style="text-align:center;">
+        <th> </th>
+        <th>Torsional Restraint</th>
+        <th>Warping Restraint</th>
+        <th>Normal</th>
+        <th>Destabilizing</th>
+      </tr>
+      <tr style="text-align:center;">
+        <td>(i)</td>
+        <td>Fully restrained</td>
+        <td>Both flanges fully restrained</td>
+        <td>0.7 L</td>
+        <td>0.85 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>(ii)</td>
+        <td>Fully restrained</td>
+        <td>Compression flange fully restrained</td>
+        <td>0.75 L</td>
+        <td>0.9 L</td>        
+      </tr>
+      <tr style="text-align:center;">
+        <td>(iii)</td>
+        <td>Fully restrained</td>
+        <td>Both flanges fully restrained</td>
+        <td>0.8 L</td>
+        <td>0.95 L</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(iv)</td>
+        <td>Fully restrained</td>
+        <td>Both flanges fully restrained</td>
+        <td>0.85 L</td>
+        <td>1.0 L</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(v)</td>
+        <td>Fully restrained</td>
+        <td>Warping not restrained in both flanges</td>
+        <td>1.0 L</td>
+        <td>1.2 L</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(vi)</td>
+        <td>Partially restrained by bottom flange support connection</td>
+        <td>Warping not restrained in both flanges</td>
+        <td>1.0 + 2 D</td>
+        <td>1.2 L + 2 D</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(vii)</td>
+        <td>Partially restrained by bottom flange bearing support</td>
+        <td>Warping not restrained in both flanges</td>
+        <td>1.2 L + 2 D</td>
+        <td>1.4 L + 2 D</td>  
+      </tr>
+        <!-- Add more rows as needed -->
+</table>
+</div>
+""")+str("<p>\n</p>")
+# </body></html>
+FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI2 + Bearing_Length_Para
+
+FLEXURE_OPTIMIZATION_DESCRIPTION_Canti = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI + Bearing_Length_Para

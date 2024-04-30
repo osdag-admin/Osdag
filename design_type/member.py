@@ -2810,16 +2810,23 @@ class Member(Main):
             KEY_BEARING_LENGTH, KEY_DISP_BEARING_LENGTH + ' (mm)', TYPE_TEXTBOX, None, values[KEY_BEARING_LENGTH])
         optimum.append(t2)
 
+        print("input_dictionary",input_dictionary)
 
 
-        # if KEY_DESIGN_TYPE_FLEXURE in input_dictionary:
-        #     if input_dictionary[KEY_DESIGN_TYPE_FLEXURE] == VALUES_SUPP_TYPE_temp[0]:
+        if KEY_MODULE in input_dictionary:
+            if input_dictionary[KEY_MODULE] == KEY_DISP_FLEXURE:
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp , None)
+                optimum.append(t9)
+            else:
+                t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION_Canti , None)
+                optimum.append(t9)
+                
         #         t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
         #         optimum.append(t1)
         #         t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
         #         optimum.append(t2)
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
-        optimum.append(t9)
+        # t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
+        
 
         return optimum
     def optimization_tab_plate_girder_design(self, input_dictionary):

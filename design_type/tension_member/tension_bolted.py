@@ -92,7 +92,7 @@ class Tension_bolted(Member):
          """
         change_tab = []
 
-        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL,'Label_0'],
+        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
                'Label_7', 'Label_8', 'Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
@@ -729,9 +729,15 @@ class Tension_bolted(Member):
         option_list = self.input_values(self)
         missing_fields_list = []
 
+        print(f'\n func_for_validation option list = {option_list}'
+              f'\n  design_dictionary {design_dictionary}')
+
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
+
+                    print(f"\n option {option}")
+
                     missing_fields_list.append(option[1])
                 else:
                     if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
@@ -830,6 +836,7 @@ class Tension_bolted(Member):
         "selecting components class based on the section passed "
         print(f" \n select_section started \n")
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            print(f"\n selectedsize {selectedsize},\n design_dictionary[KEY_SEC_MATERIAL]{design_dictionary[KEY_SEC_MATERIAL]}")
             self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
             self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
@@ -1036,9 +1043,9 @@ class Tension_bolted(Member):
             else:
                 pass
 
-
+        print(f" self.sizelist {self.sizelist}")
         for selectedsize in self.sizelist:
-            # print('selectedsize',self.sizelist)
+
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             self.bolt_diameter_min= min(self.bolt.bolt_diameter)
 

@@ -625,6 +625,7 @@ class GussetConnection(Connection,Member):
     def show_error_message(self):
         QMessageBox.about(self, 'information', "Your message!")
 
+
     def get_3d_components(self):
         components = []
 

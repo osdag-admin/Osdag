@@ -322,6 +322,8 @@ TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
 TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
+KEY_IMAGE_Y = 'Image_Y'
+KEY_IMAGE_two = 'Imagetwo'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
 
@@ -349,14 +351,15 @@ KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
 KEY_DISP_TENSION_BOLTED = 'Tension Member Design - Bolted to End Gusset'
 KEY_DISP_TENSION_WELDED = 'Tension Member Design - Welded to End Gusset'
-KEY_DISP_COMPRESSION = 'Compression Member'
 KEY_DISP_BB_EP_SPLICE = 'Beam-to-Beam End Plate Connection'
+KEY_DISP_COMPRESSION = 'Compression Member'
+KEY_DISP_COMPRESSION_STRUT = 'Compression Member Design - Strut Design'
 
 DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
-KEY_DISP_COMPRESSION_COLUMN = 'Pure Axial Column Design'
-KEY_DISP_COMPRESSION_Strut = 'Strut Design'
+KEY_DISP_COMPRESSION_COLUMN = 'Columns with known support conditions'
+KEY_DISP_COMPRESSION_Strut = 'Struts in Trusses'
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'
@@ -376,8 +379,18 @@ KEY_ACTUAL_LEN_ZZ = 'Actual.Length_zz'
 KEY_DISP_ACTUAL_LEN_ZZ = 'Actual Length (z-z), mm'
 KEY_ACTUAL_LEN_YY = 'Actual.Length_yy'
 KEY_DISP_ACTUAL_LEN_YY = 'Actual Length (y-y), mm'
+KEY_UNSUPPORTED_LEN_ZZ = 'Unsupported.Length_zz'
+KEY_DISP_UNSUPPORTED_LEN_ZZ = 'Unsupported Length (z-z), mm'
+KEY_UNSUPPORTED_LEN_YY = 'Unsupported.Length_yy'
+KEY_DISP_UNSUPPORTED_LEN_YY = 'Unsupported Length (y-y), mm'
 KEY_DESIGN_COMPRESSION = 'Design Results'
 KEY_DESIGN_STRENGTH_COMPRESSION = 'Design.Strength'
+KEY_MIN_DESIGN_COMP_STRESS = 'MinCompStress'
+KEY_MIN_DESIGN_COMP_STRESS_VAL = 'Min. Design Comp.Stress (MPa)'
+KEY_MAT_STRESS = 'MaterialStress'
+KEY_DISP_MAT_STRESS = 'fy/gamma_m0'
+KEY_FCD = 'Fcd'
+KEY_DISP_FCD = 'f_cd'
 KEY_DISP_DESIGN_STRENGTH_COMPRESSION = 'Design Strength (kN)'
 DISP_TITLE_OPTIMUM_SECTION = 'Optimum Section'
 KEY_TITLE_OPTIMUM_DESIGNATION = 'Optimum.Designation'
@@ -420,6 +433,72 @@ KEY_COMP_STRESS_ZZ = 'MajorDCS'
 KEY_DISP_COMP_STRESS_ZZ = 'Design Compressive Stress (MPa)'
 KEY_COMP_STRESS_YY = 'MinorDCS'
 KEY_DISP_COMP_STRESS_YY = 'Design Compressive Stress (MPa)'
+KEY_DISP_DESIGN_STRENGTH_YY = 'Pd (kN)'
+KEY_DISP_DESIGN_STRENGTH_ZZ = 'Pd (kN)'
+KEY_DESIGN_STRENGTH_YY = 'DesignStrength.y-y'
+KEY_DESIGN_STRENGTH_ZZ = 'DesignStrength.z-z'
+##Strut Design
+###################################
+KEY_SHEAR_STRENGTH = 'Shear.Strength'
+KEY_MOMENT_STRENGTH = 'Moment.Strength'
+KEY_DISP_HIGH_SHEAR= 'High Shear Check'
+KEY_HIGH_SHEAR = 'Shear.High'
+KEY_DISP_DESIGN_STRENGTH_SHEAR = 'Shear Strength (kN)' # Design 
+KEY_DISP_DESIGN_STRENGTH_MOMENT = 'Moment Strength (kNm)' # Design 
+KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
+KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
+KEY_DISP_EULER_BUCKLING_STRESS = 'Buckling Stress (MPa)' # Euler 
+KEY_EFF_SEC_AREA = 'MajorEffSecArea'
+KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (mm<sup>2</sup>)' # ective
+KEY_EFF_LEN = 'Major.Effective_Length'
+KEY_DISP_EFF_LEN = 'Eff. Length (m)' # ective
+KEY_BUCKLING_CURVE = 'BucklingCurve'
+KEY_DISP_BUCKLING_CURVE = 'Buckling Curve' #  Classification
+KEY_IMPERFECTION_FACTOR = 'ImperfectionFactor'
+KEY_DISP_IMPERFECTION_FACTOR = 'Imperfection' # Factor
+KEY_SR_FACTOR = 'StressReductionFactor'
+KEY_DISP_SR_FACTOR = 'Stress Reduction' # Factor
+KEY_NON_DIM_ESR = 'NDESR'
+KEY_DISP_NON_DIM_ESR = 'ND Eff. Senderness'
+KEY_ALLOW_CLASS = 'Optimum.Class'
+KEY_DISP_CLASS = 'Semi-compact sections'
+DISP_TITLE_STRUT_SECTION = 'Section Details'
+KEY_ALLOW_LOAD = 'Load.Type'
+KEY_DISP_LOAD = 'Type of Load'
+KEY_DISP_ESR = 'Effective SR'
+KEY_ESR = 'ESR'
+KEY_SR_lambdavv = 'ESRLambdavv'
+KEY_DISP_SR_lambdavv = 'Lambda v-v'
+KEY_SR_lambdapsi = 'ESRLambdapsi'
+KEY_DISP_SR_lambdapsi = 'Lambda psi'
+Buckling_Type = 'Type of Buckling'
+End_Connection_title = 'End Connection Details'
+KEY_COMP_STRESS = 'MinorDCS'
+KEY_DISP_COMP_STRESS = 'Compressive Stress (MPa)'
+
+KEY_Buckling_Out_plane = ' Out_of_Plane'
+KEY_Buckling_In_plane =  ' In_Plane'
+Buckling_Out_plane = ' Out of Plane'
+Buckling_In_plane =  ' In Plane'
+Load_type1 = 'Concentric Load'
+Load_type2 = 'Leg Load'
+Strut_load = list((Load_type1, Load_type2))
+IMG_STRUT_1 = "ResourceFiles/images/bA.png"
+IMG_STRUT_2 = "ResourceFiles/images/bBBA.png"
+IMG_STRUT_3 = "ResourceFiles/images/back_back_same_side_angles.png"
+VALUES_IMG_STRUT = list(( IMG_STRUT_1, IMG_STRUT_2, IMG_STRUT_3))
+KEY_BOLT_Number = 'Bolt.Number'
+Strut_Bolt_Number = 'Number of Bolts'
+Profile_name_1 = 'Angles'
+Profile_name_2 = 'Back to Back Angles - Same side of gusset'
+Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
+loc_type1 = 'Long Leg'
+loc_type2 = 'Short Leg'
+VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
+Profile_2_img1 = "ResourceFiles/images/bblssg_eq.png"# Back to back Long leg on same side of gusset for equal angle
+Profile_2_img2 = "ResourceFiles/images/bbsssg_eq.png"# Back to back short leg on same side of gusset for equal angle
+Profile_2_img3 = "ResourceFiles/images/bblssg_ueq.png"# Back to back Long leg on same side of gusset for unequal angle
+Profile_2_img4 = "ResourceFiles/images/bbsssg_ueq.png"# Back to back short leg on same side of gusset for unequal angle
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'
@@ -439,6 +518,148 @@ KEY_DISP_SECTION_DEFINITION_DP = 'Section Definition (Table 2)'
 KEY_DISP_OPTIMIZATION_STEEL_COST = 'Cost'
 KEY_STEEL_COST = 'Steel.Cost'
 KEY_DISP_STEEL_COST = 'Steel cost (INR / per kg)'
+
+###################################
+#Flexure Members
+###################################
+KEY_Plastic = "Plastic"
+KEY_Compact = "Compact"
+KEY_SemiCompact = "Semi-Compact"
+KEY_Flexure_Member_MAIN_MODULE = 'Flexure Member'
+KEY_DISP_FLEXURE = 'Flexural Members - Simply Supported'
+KEY_DISP_FLEXURE2 = 'Flexural Members - Cantilever'
+KEY_DISP_FLEXURE3 = 'Flexural Members'
+
+KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kNm)'
+KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kNm)'
+KEY_DISP_LTB_Bending_STRENGTH_MOMENT = 'Lateral Torsional Buckling Strength (kNm)'
+
+KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
+KEY_betab_constatnt= 'Beta.Constant'
+KEY_BUCKLING_STRENGTH= 'Buckling.Strength'
+KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'
+KEY_WEB_CRIPPLING= 'Crippling.Strength'
+KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
+KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
+KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)' # Elastic 
+KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' # 
+KEY_DISP_T_constatnt= 'Torsional Constant (mm<sup>4</sup>)' #  (I<sub>t</sub>)
+KEY_DISP_W_constatnt= 'Warping Constant (mm<sup>6</sup>)' # (I<sub>w</sub>)
+KEY_LTB= 'L.T.B.Details'
+KEY_Elastic_CM= 'Elastic.Moment'
+KEY_T_constatnt= 'T.Constant'
+KEY_W_constatnt= 'W.Constant'
+KEY_IMPERFECTION_FACTOR_LTB = 'Imperfection.LTB'
+KEY_SR_FACTOR_LTB = 'SR.LTB'
+KEY_NON_DIM_ESR_LTB = 'NDESR.LTB'
+# KEY_LTB= 'Lateral Torsional Buckling Details'
+KEY_WEB_BUCKLING= 'Web Buckling Details'
+KEY_BEARING_LENGTH = 'Bearing.Length'
+Simply_Supported_img = './ResourceFiles/images/ss_beam.png'
+Cantilever_img = './ResourceFiles/images/c_beam.jpeg'
+KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
+KEY_DISPP_LENGTH_OVERWRITE = 'Effective Length Parameter'
+KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
+KEY_DISP_BEAM_MOMENT_Latex = 'Bending Moment (kNm)' # ($M_{z-z}$)
+KEY_SUPP_TYPE = 'Member.Type'
+DISP_TITLE_ISECTION = 'I Sections'
+
+KEY_DISP_DESIGN_TYPE_FLEXURE = 'Laterally Supported'
+KEY_DESIGN_TYPE_FLEXURE = 'Flexure.Type'
+KEY_BEAM_SUPP_TYPE = 'Support Type'
+KEY_BEAM_SUPP_TYPE_DESIGN = 'Design Support Type'
+KEY_DISP_DESIGN_TYPE2_FLEXURE = 'Laterally Unsupported'
+KEY_DESIGN_TYPE2_FLEXURE = 'Laterally.Unsupported'
+KEY_DISP_BENDING = 'Axis of Bending'
+KEY_DISP_BENDING1 = 'Major'
+KEY_DISP_BENDING2 = 'Minor'
+VALUES_BENDING_TYPE = list((KEY_DISP_BENDING2, KEY_DISP_BENDING1))
+VALUES_SUPP_TYPE = list((KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
+VALUES_SUPP_TYPE_temp = list((KEY_DISP_BENDING1 + " " + KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_BENDING2 + " " + KEY_DISP_DESIGN_TYPE2_FLEXURE, KEY_DISP_BENDING1 + " " + KEY_DISP_DESIGN_TYPE2_FLEXURE)) #[KEY_DISP_DESIGN_TYPE_FLEXURE, KEY_DISP_DESIGN_TYPE2_FLEXURE]
+KEY_BENDING = 'Bending.type'
+KEY_SUPPORT = 'Flexure.Support'
+KEY_DISP_SUPPORT = 'End Conditions'
+KEY_DISP_SUPPORT1 = 'Simply Supported'
+KEY_DISP_SUPPORT2 = 'Cantilever'
+KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2]
+# KEY_SUPPORT1 = 'SimpSupport.Torsional'
+# KEY_SUPPORT2 = 'SimpSupport.Warping'
+KEY_DISP_LENGTH_BEAM = 'Effective Span (m)*'
+KEY_LOAD = 'Loading.Condition'
+KEY_DISP_LOAD = 'Loading Condition'
+KEY_DISP_LOAD1 ='Normal'
+KEY_DISP_LOAD2 = 'Destabilizing'
+KEY_DISP_LOAD_list = list((KEY_DISP_LOAD1, KEY_DISP_LOAD2))
+KEY_TORSIONAL_RES = 'Torsion.restraint'
+DISP_TORSIONAL_RES = 'Torsional restraint'
+Torsion_Restraint1 = 'Fully Restrained'
+Torsion_Restraint2 = 'Partially Restrained-support connection'
+Torsion_Restraint3 = 'Partially Restrained-bearing support'
+Torsion_Restraint_list = list(( Torsion_Restraint1, Torsion_Restraint2, Torsion_Restraint3))
+KEY_WARPING_RES = 'Warping.restraint'
+DISP_WARPING_RES = 'Warping restraint'
+Warping_Restraint1 = 'Both flanges fully restrained'
+Warping_Restraint2 = 'Compression flange fully restrained'
+# Warping_Restraint3 = 'Both flanges fully restrained'
+Warping_Restraint4 = 'Compressicm flange partially restrained'
+Warping_Restraint5 = 'Warping not restrained in both flanges'
+Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2, Warping_Restraint4, Warping_Restraint5))
+DISP_SUPPORT_RES = 'Support restraint'
+KEY_SUPPORT_TYPE = 'Cantilever.Support'
+Support1 = 'Continous, with lateral restraint to top flange'
+Support2 = 'Continous, with partial torsional restraint'
+Support3 = 'Continous, with lateral and torsional restraint'
+Support4 = 'Restrained laterally, torsionally and against rotation on flange'
+Supprt_Restraint_list = list(( Support1, Support2, Support3, Support4))
+DISP_TOP_RES = 'Top restraint'
+KEY_SUPPORT_TYPE2 = 'Cantilever.Top'
+Top1 = 'Free'
+Top2 = 'Lateral restraint to top flange'
+Top3 = 'Torsional rwstraint'
+Top4 = 'Lateral and Torsional restraint'
+Top_Restraint_list = list(( Top1, Top2, Top3, Top4))
+KEY_WEB_BUCKLING_option = ['Method A','Method B']
+KEY_BUCKLING_METHOD = 'Buckling.Method'
+KEY_ShearBuckling = 'Shear Buckling Design Method '
+KEY_ShearBucklingOption = 'S.B.Methods'
+KEY_DISP_SB_Option = ['Simple Post Critical', 'Tension Field Test']
+KEY_DISP_TENSION_HOLES = 'Tension Zone'
+KEY_DISP_Web_Buckling = 'Web Buckling'
+KEY_DISP_Utilization_Ratio = 'Utilization Ratio'
+KEY_DISP_Web_Buckling_Support = 'Web Buckling @Support'
+KEY_DISP_I_eff_latex = '$I_{eff}$web'
+KEY_DISP_A_eff_latex = '$A_{eff}$web'
+KEY_DISP_r_eff_latex = '$r_{eff}$web'
+KEY_DISP_K_v_latex = '$K_{v}$'
+KEY_DISP_Elastic_Critical_shear_stress_web = 'Elastic Critical Shear Stress Web($N/mm^2$)' #(\tau_{crc})
+KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners(c)(mm)'
+KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio($\lambda_w$)'
+KEY_DISP_BUCKLING_STRENGTH= 'Buckling Resistance (kN)'
+KEY_DISP_reduced_moment= 'Reduced moment (Nmm)'
+# KEY_DISP_reduced_moment= 'Reduced moment (N_f)'
+KEY_DISP_tension_field_incline= 'Tension field inclination($\phi$)'
+KEY_DISP_Yield_Strength_Tension_field = 'Yield Strength of Tension field(f_v)($N/mm^2$)'
+KEY_DISP_AnchoragelengthTensionField= 'Anchorage length of Tension Field(s)(mm)'
+KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
+
+###################################
+# Plate Girder
+###################################
+KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
+KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER - WELDED'
+KEY_tf = 'TF.Data'
+KEY_tw = 'TW.Data'
+KEY_dw = 'DW.Data'
+KEY_bf = 'BF.Data'
+KEY_DISP_tf = 'Flange Thickness(mm)'
+KEY_DISP_tw = 'Web Thickness(mm)'
+KEY_DISP_dw = 'Web Depth(mm)'
+KEY_DISP_bf = 'Flange Width(mm)'
+KEY_IntermediateStiffener = 'IntermediateStiffener.Data'
+KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
+KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
+KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
+KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 ###################################
 # All Input Keys
 ###################################
@@ -478,6 +699,7 @@ KEY_SUPTNGSEC_FY = 'Member.Supporting.Section.Fy'   #Extra Keys for DP Display
 
 KEY_LENGTH = 'Member.Length'
 KEY_SEC_PROFILE = 'Member.Profile'
+KEY_SEC_TYPE = 'Member.Type'
 
 KEY_SHEAR = 'Load.Shear'
 KEY_AXIAL = 'Load.Axial'
@@ -499,6 +721,8 @@ KEY_CONNECTOR_FY = 'Connector.Fy'               #Extra Keys for DP Display
 KEY_CONNECTOR_FY_20 = 'Connector.Fy_20'         #Extra Keys for DP Display
 KEY_CONNECTOR_FY_20_40 = 'Connector.Fy_20_40'   #Extra Keys for DP Display
 KEY_CONNECTOR_FY_40 = 'Connector.Fy_40'         #Extra Keys for DP Display
+KEY_CONNECTOR_GUSSET = 'Connector.GUSSET'         #Extra Keys for DP Display
+
 
 KEY_PLATETHK = 'Connector.Plate.Thickness_List'
 KEY_FLANGEPLATE_PREFERENCES = 'Connector.Flange_Plate.Preferences'
@@ -599,12 +823,14 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = PLATE_THICKNESS_SAIL
 VALUES_FLANGEPLATE_PREFERENCES = ['Outside','Outside + Inside']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
-VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
+VALUES_SECTYPE = ['Select Type','Beams and Columns','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_DIAM = connectdb("Bolt")
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
+
+
 VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/bBBA.png","ResourceFiles/images/bSA.png","ResourceFiles/images/bC.png","ResourceFiles/images/bBBC.png"]
 VALUES_IMG_TENSIONWELDED = ["ResourceFiles/images/wA.png","ResourceFiles/images/wBBA.png","ResourceFiles/images/wSA.png","ResourceFiles/images/wC.png","ResourceFiles/images/wBBC.png"]
 VALUES_IMG_TENSIONBOLTED_DF01 = ["ResourceFiles/images/equaldp.png","ResourceFiles/images/bblequaldp.png","ResourceFiles/images/bbsequaldp.png","ResourceFiles/images/salequaldp.png","ResourceFiles/images/sasequaldp.png"]
@@ -695,6 +921,10 @@ DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm2)'
 KEY_DISP_FY_20 = 'Yield Strength, Fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength, Fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield Strength, Fy (MPa) (>40mm)'
+KEY_DISP_GUSSET = 'Gusset Plate'
+KEY_GUSSET = 'Thickness (mm)'
+
+
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
@@ -710,6 +940,7 @@ KEY_DISP_MEMBERS = 'No of Members'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
+KEY_DISP_LOCATION_STRUT = 'Connection'
 KEY_DISP_MATERIAL = 'Material'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_SUPTNGSEC_REPORT = 'Supporting Section - Mechanical Properties'
@@ -735,7 +966,7 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange Splice Plate '
 DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer Plate '
 DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner Plate '
-KEY_DISP_SLENDER = 'Slenderness'
+KEY_DISP_SLENDER = 'Slenderness ratio'
 
 
 KEY_DISP_PLATETHK = 'Thickness (mm)'
@@ -1989,10 +2220,11 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
-VALUES_SEC_PROFILE = ['Beams', 'Columns', 'RHS', 'SHS', 'CHS','Channels', 'Back to Back Channels']
+KEY_DISP_SEC_TYPE = 'Section Type'
+VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
-VALUES_SEC_PROFILE_Compression_Strut = ['Angles', 'Back to Back Angles'] #other sections can be added later the elements and not before
 #, 'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
@@ -2001,19 +2233,28 @@ KEY_LENYY = 'Member.Length_yy'
 KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 
 DISP_TITLE_SC = 'Supporting Condition'
-
+DISP_TITLE_STRUT = 'End Condition'
 KEY_END1 = 'End_1'
+KEY_END1_Y = 'End_1_Y'
 KEY_DISP_END1 = 'End 1'
+KEY_DISP_END1_Y = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
-VALUES_STRUT_END1 = 'Hinged'
+VALUES_STRUT_END1 = ['Fixed', 'Hinged']
+VALUES_END1_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END1_Y = ['Fixed', 'Hinged']
 
 KEY_END2 = 'End_2'
+KEY_END2_Y = 'End_2_Y'
 KEY_DISP_END2 = 'End 2'
+KEY_DISP_END2_Y = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
-VALUES_STRUT_END2 = 'Hinged'
+VALUES_STRUT_END2 = ['Fixed', 'Hinged']
+VALUES_END2_Y = ['Fixed', 'Free', 'Hinged', 'Roller']
+VALUES_STRUT_END2_Y = ['Fixed', 'Hinged']
 
 KEY_END_CONDITION = 'End Condition'
-KEY_DISP_END_CONDITION = 'End Condition'
+KEY_DISP_END_CONDITION = 'End Condition (about z-z axis)'
+KEY_DISP_END_CONDITION_2 = 'End Condition (about y-y axis)'
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'
 DISP_TITLE_CHANNEL = 'Channel Section'
@@ -2260,3 +2501,286 @@ COLUMN_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Optimum_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Optimization Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used for selecting the most optimum section as the design output. The default parameter is set as the </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Utilization Ratio (UR)</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Optimum sections can be selected based on the cost plus UR by choosing the '</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Cost</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">' parameter from the drop-down list.</span></p>\n"
+                    "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
+                   )
+
+Allowable_Utilization_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Allowable Utilization Ratio (UR)</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the maximum allowable value of the demand to capacity ratio for performing the design. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.0</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The UR can be re-defined for any particular design session with a maximum allowable value of 1.0 and a minimum of 0.1.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+Effective_Area_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Area Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used to define the reduction in the area of the section due to connection detailing and other such requirements. The default value of this parameter is set at 1.0, which means that the effective area is 100% of the gross area for Plastic, Compact and Semi-compact sections. For Slender sections, the initial area will be computed based on the recommendations in Fig.2B of The National Building Code (2016). The value of the parameter should be defined in terms of the effective area to be considered for design simulation after deducting the area lost. The maximum value of the parameter is 1.0 (effective area is 100% of the gross area) with a minimum value of 0.1.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+
+Type_Load_Para = str("<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Type of Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter used to define how the load maybe transferred in a Single Angle section. By default the Section will transfer the load concentrically through end gusset represented by </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Concentric Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Type of Load can be selected based on the Concentric Load plus Leg Load by choosing the '</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Leg Load</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">' parameter from the drop-down list. </span></p>\n"                          
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+Section_Definition_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                               "The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                               "Section Definition</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                               "preference allows to choose the type of section to be considered in the design as per the classification listed in Table 2 (Cl.3.7.2 and Cl.3.7.4) of IS 800:2007. Choosing 'Yes' for a particular section type will allow the solver to choose that section when it performs the design checks. Choosing 'No' will simply discard the section from the list of sections as a possible output.</span></p>\n"
+                                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Single_Angle_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "In the case of members of trusses, buckling in the plane perpendicular to the plane of the truss, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", the effective length, KL shall be taken as the distance between the centres of intersection (Cl.7.2.4) of IS 800:2007.</span></p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"
+                              )
+Single_Angle_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "In the case of members of trusses, buckling in the plane of the truss, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", the effective length, KL shall be taken as 0.7 to 1.0 times the distance between the centres of connections, depending on the degree of end restraint provided (Cl.7.2.4) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Double_angle_opposite_gusset = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                                    "</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                                    "Double Angle Struts connected back to back, on opposite sides of the gusset</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                                    "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Double_angle_same_gusset = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                                "</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                                "Double Angle Struts connected back to back on one side of a gusset or section</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Opposite_Side_of_Gusset_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane perpendicular to that of the end gusset,, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ",shall be taken as equal to the distance between centres of intersections (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Opposite_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane of end gusset, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", shall be taken as between 0.7 and 0.85 times the distance between intersections, depending on the degree of the restraint provided  (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Same_Side_of_Gusset_Out_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane perpendicular to that of the end gusset,, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "Out of Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ",shall be taken as equal to the distance between centres of intersections (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+Same_Side_of_Gusset_In_Plane = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">"
+                              "The effective length, KL, in the plane of end gusset, </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">"
+                              "In Plane</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> "
+                              ", shall be taken as between 0.7 and 0.85 times the distance between intersections, depending on the degree of the restraint provided  (Cl.7.5.2.1) of IS 800:2007.</span></p>\n"
+                              "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+
+STRUT_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para
+Effective_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Effective Length</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the parameter to </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Overwrite</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> the Length multiplyer. The default value of this ratio is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. The value can be re-defined for any particular design session with a minimum of 0.1. If invalid value given then it is set to NA or 1.0.</span></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">For simply supported beams of overall depth D and span length L, the effective length L<sub>LT</sub> is given by below Table</span></p>\n"             
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+Bearing_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Bearing Length Parameter</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is the length of Bearing stiffener provided for webs. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">NA</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. If invalid value given then it is set to NA.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+
+OPTIMIZATION_TABLE_UI = str("""
+<div style="width:100%;" style="overflow-x:auto;">
+    <table style="width:100%;" border="1">
+      <tr>
+      <th colspan="5" style="text-align:center;">Effective Length for Cantilever Beams </th>
+    </tr>
+    <tr>
+        <th>Sl No.</th>
+        <th colspan="2" style="text-align:center;">Conditions of Restraint</th>
+        <th colspan="2" style="text-align:center;">Loading Condition</th>
+      </tr>
+      <tr >
+        <th> </th>
+        <th>Support</th>
+        <th>Top</th>
+        <th>Normal</th>
+        <th>Destabilizing</th>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(i)</td>
+        <td rowspan="4">Continous, with lateral restraint to top flange</td>
+        <td>Free</td>
+        <td>3.0 L</td>
+        <td>7.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>2.7 L</td>
+        <td>7.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>2.4 L</td>
+        <td>4.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>2.1 L</td>
+        <td>3.6 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(ii)</td>
+        <td rowspan="4">Continous, with partial torsional restraint</td>
+        <td>Free</td>
+        <td>2.0 L</td>
+        <td>5.0 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>1.8 L</td>
+        <td>5.0 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>1.6 L</td>
+        <td>3.0 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>1.4 L</td>
+        <td>2.4 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(iii)</td>
+        <td rowspan="4">Continous, with lateral and torsional restraint</td>
+        <td>Free</td>
+        <td>1.0 L</td>
+        <td>2.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>0.9 L</td>
+        <td>2.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>0.8 L</td>
+        <td>1.5 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>0.7 L</td>
+        <td>1.2 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td rowspan="4">(iv)</td>
+        <td rowspan="4">Restrained laterally, torsionally and against rotation</td>
+        <td>Free</td>
+        <td>0.8 L</td>
+        <td>1.4 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral restraint to top flange</td>
+        <td>0.7 L</td>
+        <td>1.4 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Torsional restraint</td>
+        <td>0.6 L</td>
+        <td>0.6 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>Lateral and Torsional restraint</td>
+        <td>0.5 L</td>
+        <td>0.5 L</td>
+      </tr>
+        <!-- Add more rows as needed -->
+</table>
+</div>
+</body></html>
+""")
+
+STRUT_OPTIMIZATION_DESCRIPTION = (
+    '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+    '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+    'p, li { white-space: pre-wrap; }\n'
+    '</style></head><body style="font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;">\n'
+) + Allowable_Utilization_Para + Effective_Area_Para # + OPTIMIZATION_TABLE_UI
+
+OPTIMIZATION_TABLE_UI2 = str("""
+<div style="width:100%;" style="overflow-x:auto;">
+    <table style="width:100%;" border="1">
+      <tr>
+        <th colspan="5" style="text-align:center;">Effective Length for Simply Supported Beams </th>
+    </tr>
+    <tr>
+        <th>Sl No.</th>
+        <th colspan="2" style="text-align:center;">Conditions of Restraint Supports</th>
+        <th colspan="2" style="text-align:center;">Loading Condition</th>
+      </tr>
+      <tr style="text-align:center;">
+        <th> </th>
+        <th>Torsional Restraint</th>
+        <th>Warping Restraint</th>
+        <th>Normal</th>
+        <th>Destabilizing</th>
+      </tr>
+      <tr style="text-align:center;">
+        <td>(i)</td>
+        <td>Fully restrained</td>
+        <td>Both flanges fully restrained</td>
+        <td>0.7 L</td>
+        <td>0.85 L</td>
+      </tr>
+      <tr style="text-align:center;">
+        <td>(ii)</td>
+        <td>Fully restrained</td>
+        <td>Compression flange fully restrained</td>
+        <td>0.75 L</td>
+        <td>0.9 L</td>        
+      </tr>
+      <tr style="text-align:center;">
+        <td>(iii)</td>
+        <td>Fully restrained</td>
+        <td>Both flanges fully restrained</td>
+        <td>0.8 L</td>
+        <td>0.95 L</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(iv)</td>
+        <td>Fully restrained</td>
+        <td>Both flanges fully restrained</td>
+        <td>0.85 L</td>
+        <td>1.0 L</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(v)</td>
+        <td>Fully restrained</td>
+        <td>Warping not restrained in both flanges</td>
+        <td>1.0 L</td>
+        <td>1.2 L</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(vi)</td>
+        <td>Partially restrained by bottom flange support connection</td>
+        <td>Warping not restrained in both flanges</td>
+        <td>1.0 + 2 D</td>
+        <td>1.2 L + 2 D</td>  
+      </tr>
+      <tr style="text-align:center;">
+        <td>(vii)</td>
+        <td>Partially restrained by bottom flange bearing support</td>
+        <td>Warping not restrained in both flanges</td>
+        <td>1.2 L + 2 D</td>
+        <td>1.4 L + 2 D</td>  
+      </tr>
+        <!-- Add more rows as needed -->
+</table>
+</div>
+""")+str("<p>\n</p>")
+# </body></html>
+FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI2 + Bearing_Length_Para
+
+FLEXURE_OPTIMIZATION_DESCRIPTION_Canti = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI + Bearing_Length_Para

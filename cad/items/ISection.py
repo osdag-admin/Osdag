@@ -98,7 +98,6 @@ class ISection(object):
         extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
 
-
         if self.notchObj is not None:
             uDir = numpy.array([-1.0, 0.0, 0])
             wDir = numpy.array([0.0, 1.0, 0.0])

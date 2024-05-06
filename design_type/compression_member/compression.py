@@ -901,14 +901,7 @@ class Compression(Member):
             self.fixity = 'Partial'
         else:
             self.fixity = 'Hinged'
-
-        # 'Bolt.Diameter'
-        # self.bolt_list = design_dictionary[KEY_D]
-        # self.bolt_type = design_dictionary[KEY_TYP]
-        # self.bolt_grade = design_dictionary[KEY_GRD]
-        # print(f"bolt_list {self.bolt_list}")
-
-
+            
         # factored loads
         self.load = Load(shear_force="", axial_force=design_dictionary[KEY_AXIAL],moment="",unit_kNm=True)
 
@@ -924,13 +917,6 @@ class Compression(Member):
         # else:
         #     self.load_type = 'Concentric Load'
         self.steel_cost_per_kg = 50
-        #
-        # print(f"set_input_values design_dictionary {design_dictionary}")
-        # print(f"set_input_values self.module {self.module}")
-        # print(f"set_input_values self.sec_profile {self.sec_profile}")
-        # print(f"set_input_values self.material {self.material}")
-        # print(f"set_input_values self.load {self.load}")
-
         self.allowed_sections = []
 
         # if self.allow_class == "Yes":

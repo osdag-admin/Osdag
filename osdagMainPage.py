@@ -290,11 +290,12 @@ class OsdagMainWindow(QMainWindow):
                                         ('Base Plate Connection', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
-                                'Truss Connection' : [
-                                    ('Truss Connection Bolted', 'ResourceFiles/images/broken.png', 'Truss_Bolted'),
-                                    ('Truss Connection Welded', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
-                                    self.show_truss_bolted,
-                                                   ],
+                                'Truss Connection' : self.Under_Development,
+                                    # [
+                                    # ('Truss Connection Bolted', 'ResourceFiles/images/broken.png', 'Truss_Bolted'),
+                                    # ('Truss Connection Welded', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                                    # self.show_truss_bolted,
+                                    #                ],
                                 },
                 'Tension Member' : [
                             ('Bolted to End Gusset','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
@@ -309,7 +310,8 @@ class OsdagMainWindow(QMainWindow):
                 'Flexural Member' : [
                     ('Simply Supported Beam', 'ResourceFiles/images/simply-supported-beam.jpg', 'Beam_flexure'),
                     ('Cantilever Beam', 'ResourceFiles/images/cantilever-beam.jpg', 'Beam_flexure2'),
-                    ('Other Beams', 'ResourceFiles/images/fixed-beam.png', 'Beam_flexure3'),
+                    # ('Other Beams', 'ResourceFiles/images/fixed-beam.png', 'Beam_flexure3'),
+                    
                     # ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
                     self.show_flexure_module,
                 ],

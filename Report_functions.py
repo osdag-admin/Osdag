@@ -2,23 +2,36 @@ from utils.common.is800_2007 import *
 from pylatex import Math
 from pylatex.utils import NoEscape
 
-def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter):  # same as #todo anjali
+def Utilization_Ratio_Latex(given, provided, given2, provided2, parameter, type = 1,Pd = None,fw = None):  # same as #todo anjali
     """
     Author: Rutvik J
 
     """
     temp1 = str(round(given/provided,3))
     temp2 = str(round(given2/provided2,3))
-    given = str(given)
-    provided = str(provided)
-    given2 = str(given2)
-    provided2 = str(provided2)
-    answer = str(parameter)
+    given = str(round(given,3))
+    provided = str(round(provided,3))
+    given2 = str(round(given2,3))
+    provided2 = str(round(provided2,3))
+    answer = str(round(parameter,3))
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}\right)\\'))
-    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'}\right)\\'))
-    Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r'\right)\\' ))
-    Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
+    if type == 1:
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r'\right)\\' ))
+        Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
+    elif type == 2:
+        temp3 = str(round(float(given)/Pd,3))
+        temp4 = str(round(float(given)/fw,3))
+        Pd = str(round(Pd,3))
+        fw = str(round(fw,3))
+        # Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}}, \frac{\text{Shear Force}}{\text{Buckling Resistance}}, \frac{\text{Shear Force}}{\text{Bearing Strength}}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}},\right. \\ &\left. \frac{\text{Shear Force}}{\text{Buckling Resistance}}, \frac{\text{Shear Force}}{\text{Bearing Strength}}\right)\\'))
+        # Pmc_eqn.append(NoEscape(r'\begin{aligned} UR &= \text{MAX}\left(\frac{\text{Shear Force}}{\text{Shear Strength}},\frac{\text{Bending Moment}}{\text{Bending Strength}},\\'))
+        # Pmc_eqn.append(NoEscape(r'&\frac{\text{Shear Force}}{\text{Buckling Resistance}}, \frac{\text{Shear Force}}{\text{Bearing Strength}}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(\frac{' + given + r'}{' + provided + r'},\frac{' + given2 + r'}{' + provided2 + r'},\frac{' + given + r'}{' + Pd + r'},\frac{' + given + r'}{' + fw + r'}\right)\\'))
+        Pmc_eqn.append(NoEscape(r'&=\text{MAX}\left(' + temp1 + r',' + temp2 + r','+temp3+r','+temp4+r'\right)\\' ))
+        Pmc_eqn.append(NoEscape(r'&=' + answer + r'\end{aligned}' ))
     return Pmc_eqn
 def sectional_area_change(given, provided, parameter):  # same as #todo anjali
     """
@@ -58,7 +71,7 @@ def cl_3_7_2_section_classification(class_of_section=None):
     section_classification_eqn.append(NoEscape(r' & [\text{Ref: Table 2, Cl.3.7.2 and 3.7.4, IS 800:2007}] \end{aligned}'))
     return section_classification_eqn
 
-def cl_3_7_2_section_classification_web(d,t,result,epsilon,class_of_section=None):
+def cl_3_7_2_section_classification_web(d,t,result,epsilon,type, class_of_section=None):
     """
     Author: Rutvik Joshi (EMP-24, intern-23,22)
     """
@@ -69,20 +82,24 @@ def cl_3_7_2_section_classification_web(d,t,result,epsilon,class_of_section=None
     epsilon = str(epsilon)
     class_of_section = str(class_of_section)
     eqn = Math(inline=True)
+    if type == 'Rolled':
+        eqn.append(NoEscape(r'\begin{aligned} d &= D - 2(T + R1) = ' + d + r'\\'))
+    else:
+        eqn.append(NoEscape(r'\begin{aligned} d &= D - 2(T) = ' + d + r'\\'))
     if class_of_section == "Plastic":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 84\varepsilon\\'))
+        eqn.append(NoEscape(r'\frac{d}{t_w} &=\frac{' + d + r'}{' + t + r'} \le 84\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(84*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Plastic} \end{aligned}'))
     elif class_of_section == "Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 105\varepsilon\\'))
+        eqn.append(NoEscape(r'\frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 105\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(105*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Compact} \end{aligned}'))
     elif class_of_section == "Semi-Compact":
-        eqn.append(NoEscape(r'\begin{aligned} \frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 126\varepsilon\\'))
+        eqn.append(NoEscape(r'\frac{d}{t_w} &= \frac{' + d + r'}{' + t + r'} \le 126\varepsilon\\'))
         eqn.append(NoEscape(r'&= ' + result + r'\le'+str(round(126*float(epsilon),2))+r'\\'))
         eqn.append(NoEscape(r'& \textbf{Semi-Compact} \end{aligned}'))
     else :
-        eqn.append(NoEscape(r'\begin{aligned} & \textbf{Slender} \end{aligned}'))
+        eqn.append(NoEscape(r'& \textbf{Slender} \end{aligned}'))
     return eqn
 def cl_3_7_2_section_classification_flange(d,t,result,epsilon,class_of_section=None):
     """
@@ -730,7 +747,7 @@ def cl_8_2_2_1_Mcr(M_cr, E,I_y,KL,G,I_t,I_w,):
     slender_eqn = Math(inline=True)
     slender_eqn.append(NoEscape(r'\begin{aligned}M_{cr}&= \sqrt{\frac{\pi^{2}EI_y}{(KL)^2}\left( GI_t+\frac{\pi^{2}EI_w}{(KL)^2} \right)} \\'))
     slender_eqn.append(NoEscape(r' &= \sqrt{\frac{\pi^{2}\times'+ E+r'\times 10^5 \times'+I_y+r'\times 10^4}{('+KL+r')^2}}\\'))  #   \sqrt{\left('+G+r'10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\
-    slender_eqn.append(NoEscape(r' &\times\sqrt{\left('+G+r'\times 10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\'))
+    slender_eqn.append(NoEscape(r' &\times\sqrt{\left('+G+r'\times 10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2} \times'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\'))
     slender_eqn.append(NoEscape(r' &= ' + M_cr + r' \end{aligned}'))
     # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
     return slender_eqn
@@ -794,7 +811,7 @@ def cl_8_2_2_moment_capacity_member(beta_b, Z_p, f_y, gamma_m0, Pmc,Ze, sclass,s
     # else:
     #     res = str(round(1.5 * Ze * f_y / gamma_m0 * 10 ** -6, 2))
     beta_actual = str(beta_b)
-    beta_b = str(round(Ze/Z_p,2))
+    beta_b = str(round(Ze/Z_p,3))
     Ze = str(Ze)
     sclass = str(sclass)
     Z_p = str(Z_p)

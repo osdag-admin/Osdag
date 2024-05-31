@@ -125,7 +125,7 @@ class Flexure(Member):
         t2 = ("Optimization", TYPE_TEXTBOX, [ KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH]) #, KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD, KEY_ShearBucklingOption]) #, KEY_STEEL_COST
+        t2 = ("Optimization", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD]) #, KEY_STEEL_COST, KEY_ShearBucklingOption
         design_input.append(t2)
 
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
@@ -140,7 +140,7 @@ class Flexure(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_ShearBucklingOption], '')
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,KEY_BEARING_LENGTH, KEY_LOAD, KEY_DP_DESIGN_METHOD], '') # KEY_ShearBucklingOption
         design_input.append(t2)
 
         return design_input
@@ -170,7 +170,7 @@ class Flexure(Member):
             KEY_BEARING_LENGTH : 'NA',
             KEY_LOAD : 'Normal',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
-            KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
+            # KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
         }[key]
 
         return val
@@ -219,13 +219,6 @@ class Flexure(Member):
         return c_lst
 
     def input_values(self):
-        '''
-        TODO : Make seperate sub-functions to add??
-            At support & At Top restraints should be inactive
-            Depending on Support Conditions : if cantilever  then active and Torsional &
-            Warping Restraint be inactive.
- 
-        '''
 
         self.module = KEY_DISP_FLEXURE
         options_list = []
@@ -358,20 +351,107 @@ class Flexure(Member):
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
 
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_T_constatnt, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_T_constatnt, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)       
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_W_constatnt, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_W_constatnt, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18) 
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_IMPERFECTION_FACTOR_LTB, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_IMPERFECTION_FACTOR_LTB, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)         
 
         t18 = ([KEY_DESIGN_TYPE_FLEXURE],
-               'After checking Non-dimensional slenderness ratio for given section, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+               KEY_SR_FACTOR_LTB, TYPE_OUT_LABEL, self.output_modifier)
         lst.append(t18)
-
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_SR_FACTOR_LTB, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)       
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_NON_DIM_ESR_LTB, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_NON_DIM_ESR_LTB, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18) 
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_DESIGN_STRENGTH_COMPRESSION, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_DESIGN_STRENGTH_COMPRESSION, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)    
+ 
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_Elastic_CM, TYPE_OUT_LABEL, self.output_modifier)
+        lst.append(t18)
+        
+        t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+               KEY_Elastic_CM, TYPE_OUT_DOCK, self.output_modifier)
+        lst.append(t18)   
+        
+        ###############################
+        # t18 = ([KEY_BEARING_LENGTH],
+        # KEY_ESR, TYPE_OUT_LABEL, self.Design_pref_modifier)
+        # lst.append(t18)
+        
+        # t18 = ([KEY_BEARING_LENGTH],
+        #        KEY_ESR, TYPE_OUT_DOCK, self.Design_pref_modifier)
+        # lst.append(t18)       
+        
+        
+        # t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+        #        'After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ', TYPE_WARNING, self.warning_majorbending)
+        # lst.append(t18)
+        
+        # t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+        #        KEY_OUT_SPACING, TYPE_OUT_LABEL, self.warning_majorbending)
+        # lst.append(t18)
+        
+        # t18 = ([KEY_DESIGN_TYPE_FLEXURE],
+        #        KEY_OUT_SPACING, TYPE_OUT_DOCK, self.warning_majorbending)
+        # lst.append(t18)
         return lst
     
     def warning_majorbending(self):
-
+        print(self)
         if self[0] == VALUES_SUPP_TYPE_temp[2]:
             return True
+        # elif self[0] == VALUES_SUPP_TYPE_temp[0] or self[0] == VALUES_SUPP_TYPE_temp[1] :
+        #     return True
         else:
             return False
 
+    def output_modifier(self):
+        print(self)
+        if self[0] == VALUES_SUPP_TYPE_temp[2]:
+            return False
+        # elif self[0] == VALUES_SUPP_TYPE_temp[0] or self[0] == VALUES_SUPP_TYPE_temp[1] :
+        #     return True
+        else:
+            return True
+        
+    def Design_pref_modifier(self):
+        print("Design_pref_modifier",self)
+        
+        
     def output_values(self, flag):
 
         out_list = []
@@ -385,7 +465,7 @@ class Flexure(Member):
         out_list.append(t1)
 
         t1 = (
-        KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_OPTIMUM_UR_COMPRESSION, TYPE_TEXTBOX, self.result_UR if flag else '', True)
+        KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_OPTIMUM_UR_COMPRESSION, TYPE_TEXTBOX, round(self.result_UR,3) if flag else '', True)
         out_list.append(t1)
 
         t1 = (KEY_OPTIMUM_SC, KEY_DISP_OPTIMUM_SC, TYPE_TEXTBOX, self.result_section_class if flag else '', True)
@@ -393,7 +473,7 @@ class Flexure(Member):
 
 
         t2 = (KEY_betab_constatnt, KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
-              self.result_betab if flag else '', True)
+              round(self.result_betab,2) if flag else '', True)
         out_list.append(t2)
 
 
@@ -433,39 +513,12 @@ class Flexure(Member):
               '', True)
         out_list.append(t1)
 
-        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, True)
+        t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
         out_list.append(t1)
 
-        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
-              self.result_tc if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (
-            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
-            True)
-        out_list.append(t2)
-
-        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', True)
-        out_list.append(t2)
-
-        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', True)
-        out_list.append(t2)
-
-        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
-              self.result_nd_esr_lt if flag else
-              '', True)
-        out_list.append(t1)
-
-        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', True)
-        out_list.append(t2)
-
-        # TODO
-        # t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
-        # out_list.append(t1)
-
+        # t17 = (KEY_OUT_SPACING, 'LTB', TYPE_OUT_BUTTON, ['Details', self.spacing], False)
+        # out_list.append(t17)
+        
         t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
               self.result_tc if flag else '', False)
         out_list.append(t2)
@@ -485,12 +538,40 @@ class Flexure(Member):
         out_list.append(t2)
 
         t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
-              self.result_fcd__lt if flag else
+              self.result_nd_esr_lt if flag else
               '', False)
         out_list.append(t1)
 
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', False)
         out_list.append(t2)
+
+        # TODO @Rutvik: can add tab button for asthetics
+
+        # t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+        #       self.result_tc if flag else '', False)
+        # out_list.append(t2)
+
+        # t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', False)
+        # out_list.append(t2)
+
+        # t2 = (
+        #     KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if flag else '',
+        #     False)
+        # out_list.append(t2)
+
+        # t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if flag else '', False)
+        # out_list.append(t2)
+
+        # t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if flag else '', False)
+        # out_list.append(t2)
+
+        # t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+        #       self.result_fcd__lt if flag else
+        #       '', False)
+        # out_list.append(t1)
+
+        # t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if flag else '', False)
+        # out_list.append(t2)
 
         t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True)
         out_list.append(t1)
@@ -519,12 +600,75 @@ class Flexure(Member):
 
 
         return out_list
+    def spacing(self, status):
 
+        spacing = []
+
+        # t00 = (None, "", TYPE_NOTE, "Representative image for Spacing Details based on member's depth \n (root radius not included in edge distance)")
+        # spacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION,
+        #        ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
+        # spacing.append(t99)
+
+        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+              self.result_tc if status else '', False)
+        spacing.append(t2)
+
+        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if status else '', False)
+        spacing.append(t2)
+        
+        t2 = (
+            KEY_IMPERFECTION_FACTOR_LTB, KEY_DISP_IMPERFECTION_FACTOR, TYPE_TEXTBOX, self.result_IF_lt if status else '',
+            False)
+        spacing.append(t2)
+
+        t2 = (KEY_SR_FACTOR_LTB, KEY_DISP_SR_FACTOR, TYPE_TEXTBOX, self.result_srf_lt if status else '', False)
+        spacing.append(t2)
+
+        t2 = (KEY_NON_DIM_ESR_LTB, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr_lt if status else '', False)
+        spacing.append(t2)
+
+        t1 = (KEY_DESIGN_STRENGTH_COMPRESSION, KEY_DISP_COMP_STRESS, TYPE_TEXTBOX,
+              self.result_fcd__lt if status else
+              '', False)
+        spacing.append(t1)
+
+        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.result_mcr if status else '', False)
+        spacing.append(t2)
+        
+        # if self.sec_profile == 'Star Angles':
+        #     t16 = (KEY_OUT_BOLTS_ONE_LINE_S, KEY_OUT_DISP_BOLTS_ONE_LINE_S, TYPE_TEXTBOX,
+        #            int(self.plate.bolts_one_line/2) if status else '', True)
+        #     spacing.append(t16)
+        # else:
+        #     pass
+
+        # t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
+        # spacing.append(t16)
+
+        # t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
+        # spacing.append(t15)
+
+        # t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
+        # spacing.append(t9)
+
+        # t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
+        # spacing.append(t10)
+
+        # t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
+        # spacing.append(t11)
+
+        # t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
+        # spacing.append(t12)
+
+        return spacing
     def func_for_validation(self, design_dictionary):
         print(f"func_for_validation here")
         all_errors = []
         self.design_status = False
         flag = False
+        self.output_values(self, flag)
         flag1 = False
         flag2 = False
         flag3 = False
@@ -563,7 +707,7 @@ class Flexure(Member):
                             flag3 = True
                 except:
                         error = "Input value(s) are not valid"
-                        all_errors.append(error)         
+                        all_errors.append(error)   
             # elif type(design_dictionary[option[0]]) != 'float':
             #             print("Input value(s) are not valid")
             #             error = "Input value(s) are not valid"
@@ -584,6 +728,18 @@ class Flexure(Member):
         if flag and flag1 and flag2 and flag3:
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
+            if self.design_status ==False and len(self.failed_design_dict)>0:
+                logger.error(
+                    "Design Failed, Check Design Report"
+                )
+                return # ['Design Failed, Check Design Report'] @TODO
+            elif self.design_status:
+                pass
+            else:
+                logger.error(
+                    "Design Failed. Selender Sections Selected"
+                )
+                return # ['Design Failed. Selender Sections Selected']
         else:
             return all_errors
 
@@ -602,7 +758,7 @@ class Flexure(Member):
         global logger
         red_list = red_list_function()
 
-        if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams or Columns
+        if (self.sec_profile == VALUES_SEC_PROFILE[0]) or (self.sec_profile == VALUES_SEC_PROFILE[1]):  # Beams or Columns
             for section in self.sec_list:
                 if section in red_list:
                     logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
@@ -634,7 +790,8 @@ class Flexure(Member):
         if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
             self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
             self.bending_type = KEY_DISP_BENDING1
-            self.support_cndition_shear_buckling = design_dictionary[KEY_ShearBucklingOption]
+            # TODO self.support_cndition_shear_buckling
+            self.support_cndition_shear_buckling = 'NA'#design_dictionary[KEY_ShearBucklingOption]
         elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
             self.design_type = VALUES_SUPP_TYPE[0]
             self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
@@ -672,7 +829,7 @@ class Flexure(Member):
         #TAKE from Design Dictionary
         self.allowed_sections = []
         if self.allow_class == "Yes":
-            self.allowed_sections == "Semi-Compact"
+            self.allowed_sections == KEY_SemiCompact
 
         print(f"self.allowed_sections {self.allowed_sections}")
         print("==================")
@@ -698,10 +855,18 @@ class Flexure(Member):
         self.design_status_list = []
         self.design_status = False
         self.sec_prop_initial_dict = {}
-
+        self.failed_design_dict = {}    
         self.design(self, design_dictionary)
-        # if len(self.input_modified) != 0:
-        self.results(self, design_dictionary)
+        if self.flag:
+            self.results(self, design_dictionary)
+        
+            
+        # else:
+        #     pass
+        #     # logger.warning(
+        #     #         "Plastic section modulus of selected sections is less than required."
+        #     #     )
+        #     return 
 
     
     # Simulation starts here
@@ -731,22 +896,24 @@ class Flexure(Member):
             # self.design_status = False
             # self.design_status_list.append(self.design_status)
             self.optimization_tab_check(self)
-        elif (self.steel_cost_per_kg < 0.10) or (self.effective_area_factor > 1.0):
+        elif (self.steel_cost_per_kg < 0.10) or (self.effective_area_factor > 1.0) or (self.effective_area_factor < 0):
             # No suggested range in Description
             logger.warning(
-                "The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range."
+                "The defined value of the effective area factor in the design preferences tab is out of the suggested range."
             )
-            logger.info("Provide an appropriate input and re-design.")
-            logger.info("Assuming a default rate of 50 (INR/kg).")
+            # logger.info("Provide an appropriate input and re-design.")
+            logger.info("Assuming a default value of 1.0")
             self.steel_cost_per_kg = 50
+            self.effective_area_factor = 1
             self.design_status = False
             # self.design_status_list.append(self.design_status)
         else:
-            if self.effective_area_factor >= (self.material_property.fy * self.gamma_m0 / (self.material_property.fu * 0.9 * self.gamma_m1)):
-                pass
-            else:
-                self.latex_tension_zone = True
-                print(f'self.latex_tension_zone: {self.latex_tension_zone}')
+            if self.latex_tension_zone:
+                if self.effective_area_factor >= (self.material_property.fy * self.gamma_m0 / (self.material_property.fu * 0.9 * self.gamma_m1)):
+                    pass
+                else:
+                    self.latex_tension_zone = True
+                    print(f'self.latex_tension_zone: {self.latex_tension_zone}')
                 # self.effective_area_factor = (
                 #     self.material_property.fy
                 #     * self.gamma_m0
@@ -756,7 +923,7 @@ class Flexure(Member):
                 #     f"The effect of holes in the tension flange is considered on the design bending strength. The ratio of net to gross area of the flange in tension is considered {self.effective_area_factor}"
                 # )
 
-            logger.info("Provided appropriate design preference, now checking input.")
+        logger.info("Provided appropriate design preference, now checking input.")
     
     def input_modifier(self):
         """Classify the sections based on Table 2 of IS 800:2007"""
@@ -770,17 +937,19 @@ class Flexure(Member):
             section = section.strip("'")
             self.section_property = self.section_connect_database(self, section)
 
-            Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            self.Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             print('Inside input_modifier not allow_class',self.allow_class,self.load.moment, self.gamma_m0, self.material_property.fy)
-            if self.section_property.plast_sec_mod_z >= Zp_req:
+            if self.section_property.plast_sec_mod_z >= self.Zp_req:
 
                 self.input_modified.append(section)
                 # logger.info(
-                #     f"Required Zp_req = {round(Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min Zp_req value")
-            else:
-                pass
+                #     f"Required self.Zp_req = {round(self.Zp_req * 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section satisfy Min self.Zp_req value")
+            # else:
+                # local_flag = False
+
                 # logger.warning(
-                #     f"Required Zp_req = {round(Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min Zp_req value")
+                #     f"Required self.Zp_req = {round(self.Zp_req* 10**-3,2)} x 10^3 mm^3 and Zp of section {self.section_property.designation} = {round(self.section_property.plast_sec_mod_z* 10**-3,2)} x 10^3 mm^3.Section dosen't satisfy Min self.Zp_req value")
+        # logger.info("")
         print("self.input_modified", self.input_modified)
 
     def section_connect_database(self, section):
@@ -811,9 +980,9 @@ class Flexure(Member):
         self.optimum_section_cost = []
 
         # 1 - section classification
-        flag = self.section_classification(self,design_dictionary)
+        self.flag = self.section_classification(self,design_dictionary)
         
-        print('flag:',flag)
+        print('self.flag:',self.flag)
         if self.effective_area_factor < 1.0:
             logger.warning(
                 "Reducing the effective sectional area as per the definition in the Design Preferences tab."
@@ -827,12 +996,15 @@ class Flexure(Member):
         print(
             f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
         print('self.input_section_list:',self.input_section_list)
-        if flag:
+        if self.flag:
             for section in self.input_section_list:
                 # initialize lists for updating the results dictionary
                 self.section_property = self.section_connect_database(self, section)
-                self.effective_depth = (self.section_property.depth - 2 * (
+                if self.section_property.type == 'Rolled':
+                    self.effective_depth = (self.section_property.depth - 2 * (
                             self.section_property.flange_thickness + self.section_property.root_radius))
+                else:
+                    self.effective_depth = (self.section_property.depth - 2 *self.section_property.flange_thickness )
                 print('self.section_property.type:',self.section_property.type, self.bending_type)
                 
                 if self.sec_profile == 'Beams' or self.sec_profile == 'Columns' or self.sec_profile == VALUES_SECTYPE[1]:
@@ -860,6 +1032,7 @@ class Flexure(Member):
                      self.M_cr = self.input_section_classification[section][ 8 ]
                      self.beta_b_lt = self.input_section_classification[section][ 9 ]
                      self.lambda_lt = self.input_section_classification[section][ 10 ]
+                     self.fcrb = self.input_section_classification[section][ 11 ]
                      print('self.design_type:',self.design_type, self.It,
                             self.hf,
                             self.Iw,
@@ -869,19 +1042,25 @@ class Flexure(Member):
                      
                 self.beam_web_buckling(self)
                 if self.web_buckling_check:
-                    self.web_buckling_steps(self)
-                    # if not check:
-                    #     continue
-                    # else:
-                    self.high_shear_check = False
-                    self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
+                    self.web_not_buckling_steps(self)
+                    
+                    # self.shear_strength = IS800_2007.cl_8_4_design_shear_strength(
+                    #     self.shear_area,
+                    #     self.material_property.fy
+                    # ) / 10 ** 3
+                    # self.high_shear_check = IS800_2007.cl_8_2_1_2_high_shear_check(
+                    #     self.load.shear_force / 1000, self.shear_strength
+                    # )
+                    # self.bending_strength_section = self.bending_strength() / 10 ** 6
+                    
+                    # self.web_buckling_steps(self)
+                    # self.high_shear_check = False
+                    # self.bending_strength_section = self.bending_strength_girder(self) / 10 ** 6
 
                 # print(f"Common result {list_result, self.section_class, self.V_d, self.high_shear_check, self.bending_strength_section}")
                 print('self.bending_strength_section',self.bending_strength_section,'self.shear_strength',self.shear_strength, 'self.load.moment',self.load.moment,'self.load.shear_force',self.load.shear_force)
                 # 2.8 - UR
-                self.ur = round(
-                    max((self.load.moment / self.bending_strength_section * 10 ** -6),(self.load.shear_force / self.shear_strength * 10 ** -3)),
-                    2)  # ( +  round(self.load.axial_force / self.section_capacity, 3)
+                self.ur = max((self.load.moment / self.bending_strength_section * 10 ** -6),(self.load.shear_force / self.shear_strength * 10 ** -3))# ( +  round(self.load.axial_force / self.section_capacity, 3)
                 print("UR", self.ur)
                 # 2.9 - Cost of the section in INR
                 self.cost = (
@@ -894,16 +1073,49 @@ class Flexure(Member):
                         * self.steel_cost_per_kg
                 )
                 self.optimum_section_cost.append(self.cost)
-                self.web_buckling = False
+                self.web_buckling = False  # When Bearing length is provided
 
                 if self.bearing_length != 'NA': #and self.web_crippling
                     print(f"Check for Web Buckling")
                     try:
                         self.bearing_length = float(design_dictionary[KEY_BEARING_LENGTH])
+                        self.web_buckling = True  # WEB BUCKLING
+                        self.I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
+                        self.A_eff_web = self.bearing_length * self.section_property.web_thickness
+                        self.r = math.sqrt(self.I_eff_web / self.A_eff_web)
+                        self.slenderness = 0.7 * self.effective_depth / self.r
+                        self.common_checks_1(self, section, step=3)
+                        # step == 4
+                        self.common_checks_1(
+                            self, section, step=4, list_result=["Concentric"]
+                        )
+                        # 2.7 - Capacity of the section for web_buckling
+                        self.section_capacity = (
+                                self.design_compressive_stress * (
+                                    self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness
+                                * 10 ** -3)  # N
+                        print(self.design_compressive_stress, self.bearing_length, self.section_property.depth,
+                            self.section_property.web_thickness)
 
+                        print(self.bending_strength_section, self.shear_strength, self.section_capacity)
+
+                        self.F_wb = (self.bearing_length + 2.5 * (
+                                    self.section_property.root_radius + self.section_property.flange_thickness)) * self.section_property.web_thickness * self.material_property.fy / (
+                                                self.gamma_m0 * 10 ** 3)
+                        if self.bending_strength_section > self.load.moment * 10 ** -6 and self.shear_strength > self.load.shear_force * 10 ** -3 and self.section_capacity > self.load.shear_force * 10 ** -3 and self.F_wb > self.load.shear_force * 10 ** -3:
+                            list_result, list_1 = self.list_changer(self, change='Web Buckling', check=True,
+                                                                    list=list_result, list_name=list_1)
+                            self.optimum_section_ur.append(self.ur)
+                        else:
+                            list_result, list_1 = self.list_changer(self, change='Web Buckling', check=True,
+                                                                    list=list_result, list_name=list_1)
+                            self.optimum_section_ur.append(self.ur)
+                        # Step 3 - Storing the optimum results to a list in a descending order
+                        self.common_checks_1(self, section, 5, list_result, list_1)
                     except:
                         logger.warning('Bearing length is invalid.')
                         logger.info('Ignoring web Buckling and Crippling check')
+                        self.bearing_length = 'NA'
                         self.web_buckling = False
                         # 2.8 - UR
                         print(self.bending_strength_section, self.shear_strength)
@@ -914,36 +1126,12 @@ class Flexure(Member):
 
                             # Step 3 - Storing the optimum results to a list in a descending order
                             self.common_checks_1(self, section, 5, list_result, list_1)
-                        continue
-                    self.web_buckling = True  # WEB BUCKLING
-                    self.I_eff_web = self.bearing_length * self.section_property.web_thickness ** 3 / 12
-                    self.A_eff_web = self.bearing_length * self.section_property.web_thickness
-                    self.r = math.sqrt(self.I_eff_web / self.A_eff_web)
-                    self.slenderness = 0.7 * self.effective_depth / self.r
-                    self.common_checks_1(self, section, step=3)
-                    # step == 4
-                    self.common_checks_1(
-                        self, section, step=4, list_result=["Concentric"]
-                    )
-                    # 2.7 - Capacity of the section for web_buckling
-                    self.section_capacity = (
-                            self.design_compressive_stress * (
-                                self.bearing_length + self.section_property.depth / 2) * self.section_property.web_thickness
-                            * 10 ** -3)  # N
-                    print(self.design_compressive_stress, self.bearing_length, self.section_property.depth,
-                          self.section_property.web_thickness)
-
-                    print(self.bending_strength_section, self.shear_strength, self.section_capacity)
-
-                    self.F_wb = (self.bearing_length + 2.5 * (
-                                self.section_property.root_radius + self.section_property.flange_thickness)) * self.section_property.web_thickness * self.material_property.fy / (
-                                            self.gamma_m0 * 10 ** 3)
-                    if self.bending_strength_section > self.load.moment * 10 ** -6 and self.shear_strength > self.load.shear_force * 10 ** -3 and self.section_capacity > self.load.shear_force * 10 ** -3 and self.F_wb > self.load.shear_force * 10 ** -3:
-                        list_result, list_1 = self.list_changer(self, change='Web Buckling', check=True,
-                                                                list=list_result, list_name=list_1)
-                        self.optimum_section_ur.append(self.ur)
-                        # Step 3 - Storing the optimum results to a list in a descending order
-                        self.common_checks_1(self, section, 5, list_result, list_1)
+                        else:
+                            list_result, list_1 = self.list_changer(self, change='', check=True,list=list_result, list_name=list_1)
+                            self.optimum_section_ur.append(self.ur)
+                            # Step 3 - Storing the optimum results to a list in a descending order
+                            self.common_checks_1(self, section, 5, list_result, list_1)
+                    
                 else:
                     self.web_buckling = False
                     # 2.8 - UR
@@ -955,6 +1143,13 @@ class Flexure(Member):
 
                         # Step 3 - Storing the optimum results to a list in a descending order
                         self.common_checks_1(self, section, 5, list_result, list_1)
+                    else:
+                        self.optimum_section_ur.append(self.ur)
+                        list_result, list_1 = self.list_changer(self, change=' ', check=True, list=list_result, list_name=list_1)
+
+                        # Step 3 - Storing the optimum results to a list in a descending order
+                        self.common_checks_1(self, section, 5, list_result, list_1)
+                print('self.optimum_section_ur', self.optimum_section_ur)
 
     def beam_web_buckling(self):
 
@@ -970,12 +1165,18 @@ class Flexure(Member):
         if not self.web_buckling_check:
             self.web_not_buckling_steps(self)
     def web_buckling_steps(self):
-        print(f"Working web_buckling_steps")
+        print(f"Not using web_buckling_steps")
+        # logger.info(f"Considering  {self.support_cndition_shear_buckling}")
+        # 5 - Web Buckling check(when high shear) -If user wants then only
+        # if web_buckling:
+        #     b1 = input('Enter bearing')
+        #     self.web_buckling_strength = self.section_property.web_thickness * (b1 + 1.25 * self.section_property.depth)
+        # self.V_d = pass
         # web_buckling_message = 'Thin web'
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
             self.K_v = IS800_2007.cl_8_4_2_2_K_v_Simple_postcritical('only support')
             self.plate_girder_strength(self)
-            # TODO logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
+            # logger.info('Section = {}, V_cr = {}'.format(self.section_property.designation, round(self.V_cr,2)))
             self.shear_strength = self.V_cr / self.gamma_m0
             # if self.V_d > self.load.shear_force * 10**-3:
             #
@@ -1014,14 +1215,7 @@ class Flexure(Member):
                         return
                 return
             else:
-                self.shear_strength = 0.1
-
-        # TODO logger.info(f"Considering  {self.support_cndition_shear_buckling}")
-        # 5 - Web Buckling check(when high shear) -If user wants then only
-        # if web_buckling:
-        #     b1 = input('Enter bearing')
-        #     self.web_buckling_strength = self.section_property.web_thickness * (b1 + 1.25 * self.section_property.depth)
-        # self.V_d = pass
+                self.shear_strength = 0.1 
     def web_not_buckling_steps(self):
         print(f"Working web_not_buckling_steps")
         self.V_d = IS800_2007.cl_8_4_design_shear_strength(
@@ -1039,8 +1233,7 @@ class Flexure(Member):
 
 
     def bending_strength(self):
-        print('Inside bending_strength ')
-        
+        print('Inside bending_strength ','\n self.section_class', self.section_class)
         # 4 - design bending strength
         M_d = IS800_2007.cl_8_2_1_2_design_bending_strength(
             self.section_class,
@@ -1050,14 +1243,15 @@ class Flexure(Member):
             self.gamma_m0,
             self.support,
         )
-        if self.section_class == 'Plastic' or 'Compact' :
+        if self.section_class == KEY_Plastic or self.section_class == KEY_Compact :
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = self.section_property.elast_sec_mod_z/self.section_property.plast_sec_mod_z
+            print('self.beta_b_lt: ',self.beta_b_lt)
         self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
-                if self.section_class == "Plastic" or self.section_class == "Compact":
+                if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self, M_d)
                 else:
                     bending_strength_section = (
@@ -1074,7 +1268,7 @@ class Flexure(Member):
                             self.Iw,
                             self.M_cr,
                             self.beta_b_lt,
-                            self.lambda_lt)
+                            self.lambda_lt, self.fcrb)
             # self.It = (
             #     2
             #     * self.section_property.flange_width
@@ -1094,7 +1288,7 @@ class Flexure(Member):
             #     self.effective_length * 1e3
             # )
             #
-            # if self.section_class == "Plastic" or self.section_class == "Compact":
+            # if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
             #     self.beta_b_lt = 1.0
             # else:
             #     self.beta_b_lt = (
@@ -1127,8 +1321,6 @@ class Flexure(Member):
                     fcd=fbd,
                     section_class=self.section_class
                 )
-
-
             # self.beta_b_lt = beta_b
             self.alpha_lt = alpha_lt
             # self.lambda_lt = lambda_lt
@@ -1138,7 +1330,7 @@ class Flexure(Member):
             self.lateral_tb = self.M_cr * 10**-6
             print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
             if self.high_shear_check:
-                if self.section_class == "Plastic" or self.section_class == "Compact":
+                if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self,Md=bending_strength_section
                     )
                 else:
@@ -1165,24 +1357,24 @@ class Flexure(Member):
         if flange_class == "Slender" or web_class == "Slender":
             self.section_class_girder = "Slender"
         else:
-            if flange_class == "Plastic" and web_class == "Plastic":
-                self.section_class_girder = "Plastic"
-            elif flange_class == "Plastic" and web_class == "Compact":
-                self.section_class_girder = "Compact"
-            elif flange_class == "Plastic" and web_class == "Semi-Compact":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Compact" and web_class == "Plastic":
-                self.section_class_girder = "Compact"
-            elif flange_class == "Compact" and web_class == "Compact":
-                self.section_class_girder = "Compact"
-            elif flange_class == "Compact" and web_class == "Semi-Compact":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Semi-Compact" and web_class == "Plastic":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Semi-Compact" and web_class == "Compact":
-                self.section_class_girder = "Semi-Compact"
-            elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
-                self.section_class_girder = "Semi-Compact"
+            if flange_class == KEY_Plastic and web_class == KEY_Plastic:
+                self.section_class_girder = KEY_Plastic
+            elif flange_class == KEY_Plastic and web_class == KEY_Compact:
+                self.section_class_girder = KEY_Compact
+            elif flange_class == KEY_Plastic and web_class == KEY_SemiCompact:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_Compact and web_class == KEY_Plastic:
+                self.section_class_girder = KEY_Compact
+            elif flange_class == KEY_Compact and web_class == KEY_Compact:
+                self.section_class_girder = KEY_Compact
+            elif flange_class == KEY_Compact and web_class == KEY_SemiCompact:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_SemiCompact and web_class == KEY_Plastic:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_SemiCompact and web_class == KEY_Compact:
+                self.section_class_girder = KEY_SemiCompact
+            elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
+                self.section_class_girder = KEY_SemiCompact
         # 4 - design bending strength
         I_flange = 2 * (self.section_property.flange_width * self.section_property.flange_thickness**3/12 + self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth/2 - self.section_property.flange_thickness/2)**2)
         Zez_flange = I_flange / self.section_property.depth /2
@@ -1196,14 +1388,14 @@ class Flexure(Member):
             self.gamma_m0,
             self.support,
         )
-        if self.section_class_girder == 'Plastic' or 'Compact' :
+        if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact :
             self.beta_b_lt = 1
         else :
             self.beta_b_lt = Zez_flange/Zpz_flange
         self.M_d = M_d
         if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
             if self.high_shear_check:
-                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self, M_d)
                 else:
                     bending_strength_section = (
@@ -1231,7 +1423,7 @@ class Flexure(Member):
                 self.hf/self.section_property.flange_thickness
             )
 
-            if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+            if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact:
                 self.beta_b_lt = 1.0
             else:
                 self.beta_b_lt = (
@@ -1271,7 +1463,7 @@ class Flexure(Member):
             self.lateral_tb = self.fcrb * 10**-6
             print('Inside bending_strength 2.1', fbd, self.section_property.plast_sec_mod_z )
             if self.high_shear_check:
-                if self.section_class_girder == "Plastic" or self.section_class_girder == "Compact":
+                if self.section_class_girder == KEY_Plastic or self.section_class_girder == KEY_Compact:
                     bending_strength_section = self.bending_strength_reduction(self,Md=bending_strength_section
                     )
                 else:
@@ -1318,7 +1510,7 @@ class Flexure(Member):
         self.input_modified = []
         self.input_section_list = []
         self.input_section_classification = {}
-
+        lambda_check = False
         for trial_section in self.sec_list:
             trial_section = trial_section.strip("'")
             self.section_property = self.section_connect_database(self, trial_section)
@@ -1332,7 +1524,7 @@ class Flexure(Member):
                 flange_class = IS800_2007.Table2_i(
                     self.section_property.flange_width / 2,
                     self.section_property.flange_thickness,
-                    self.material_property.fy,
+                    self.material_property.fy,self.section_property.type
                 )[0]
                 web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
                 flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
@@ -1352,8 +1544,7 @@ class Flexure(Member):
                         self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
                     ),
                     self.section_property.web_thickness,
-                    self.material_property.fy,
-                    classification_type="Axial compression",
+                    self.material_property.fy, # classification_type="Axial compression",
                 )
                 web_ratio = (self.section_property.depth - 2 * (
                             self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
@@ -1362,30 +1553,30 @@ class Flexure(Member):
             if flange_class == "Slender" or web_class == "Slender":
                 self.section_class = "Slender"
             else:
-                if flange_class == "Plastic" and web_class == "Plastic":
-                    self.section_class = "Plastic"
-                elif flange_class == "Plastic" and web_class == "Compact":
-                    self.section_class = "Compact"
-                elif flange_class == "Plastic" and web_class == "Semi-Compact":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Compact" and web_class == "Plastic":
-                    self.section_class = "Compact"
-                elif flange_class == "Compact" and web_class == "Compact":
-                    self.section_class = "Compact"
-                elif flange_class == "Compact" and web_class == "Semi-Compact":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Semi-Compact" and web_class == "Plastic":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Semi-Compact" and web_class == "Compact":
-                    self.section_class = "Semi-Compact"
-                elif flange_class == "Semi-Compact" and web_class == "Semi-Compact":
-                    self.section_class = "Semi-Compact"
+                if flange_class == KEY_Plastic and web_class == KEY_Plastic:
+                    self.section_class = KEY_Plastic
+                elif flange_class == KEY_Plastic and web_class == KEY_Compact:
+                    self.section_class = KEY_Compact
+                elif flange_class == KEY_Plastic and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_Compact and web_class == KEY_Plastic:
+                    self.section_class = KEY_Compact
+                elif flange_class == KEY_Compact and web_class == KEY_Compact:
+                    self.section_class = KEY_Compact
+                elif flange_class == KEY_Compact and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_SemiCompact and web_class == KEY_Plastic:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_SemiCompact and web_class == KEY_Compact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
 
-            Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            self.Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
             self.effective_length_beam(self, design_dictionary, self.length)  # mm
 
             print( 'self.allow_class', self.allow_class)
-            if self.section_property.plast_sec_mod_z >= Zp_req:
+            if self.section_property.plast_sec_mod_z >= self.Zp_req:
                 print( 'self.section_property.plast_sec_mod_z More than Requires')
                 
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
@@ -1401,22 +1592,25 @@ class Flexure(Member):
                     self.hf = self.section_property.depth - self.section_property.flange_thickness
                     self.Iw = self.section_property.Iw
                     # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
-                    self.M_cr = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
-                        self.material_property.modulus_of_elasticity,
-                        0.3,
-                        self.section_property.mom_inertia_y,
-                        self.It,
-                        self.Iw,
-                        self.effective_length * 1e3
-                    )
+                    
 
-                    if self.section_class == "Plastic" or self.section_class == "Compact":
+                    if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
                         self.beta_b_lt = 1.0
                     else:
                         self.beta_b_lt = (
                                 self.section_property.elast_sec_mod_z
                                 / self.section_property.plast_sec_mod_z
                         )
+                    _ = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
+                        self.material_property.modulus_of_elasticity,
+                        0.3,
+                        self.section_property.mom_inertia_y,
+                        self.It,
+                        self.Iw,
+                        self.effective_length * 1e3, self.beta_b_lt, self.section_property.plast_sec_mod_z, self.hf, self.section_property.rad_of_gy_y, self.section_property.flange_thickness
+                    )
+                    self.M_cr = _[0]
+                    self.fcrb = _[1]
                     lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment(
                         self.beta_b_lt,
                         self.section_property.plast_sec_mod_z,
@@ -1425,40 +1619,42 @@ class Flexure(Member):
                         self.M_cr
                     )
                     if lambda_lt < 0.4:
+                        lambda_check = True
                         continue
                 if self.allow_class != 'No':
                     if (
-                        self.section_class == "Semi-Compact"
-                        or self.section_class == "Compact"
-                        or self.section_class == "Plastic"
+                        self.section_class == KEY_SemiCompact
+                        or self.section_class == KEY_Compact
+                        or self.section_class == KEY_Plastic
                     ):
 
                         self.input_section_list.append(trial_section)
                         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt]})
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt,self.fcrb]})
                         else:
                             self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
 
                     elif self.section_class == "Slender":
                         logger.warning(f"The section.{trial_section} is Slender. Ignoring")
                 else:
-                    if self.section_class == "Compact" or self.section_class == "Plastic":
+                    if self.section_class == KEY_Compact or self.section_class == KEY_Plastic:
                         self.input_section_list.append(trial_section)
                         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt]})
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt, self.fcrb]})
                         else:
                             self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
                     elif self.section_class == "Slender":
                         logger.warning(f"The section.{trial_section} is Slender. Ignoring")
                         # self.design_status = False
                         # self.design_status_list.append(self.design_status)
-                    elif self.section_class == "Semi-Compact":
+                    elif self.section_class == KEY_SemiCompact:
                         logger.warning(
                             f"The section.{trial_section} is Semi-Compact. Ignoring"
                         )
                         # self.design_status = False
                         # self.design_status_list.append(self.design_status)
-
+        if lambda_check:
+            logger.info("After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ")
         if len(self.input_section_list) == 0:
             local_flag = False
         else:
@@ -1654,17 +1850,17 @@ class Flexure(Member):
             "Beta_b"
         ])
         #Web buckling parameters
-        if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
-            list.extend(
-                [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
-                 self.V_cr])
-            list_name.extend([
-                'Kv',
-                'tau_crc',
-                'lambda_w',
-                'tau_b',
-                "V_cr"
-            ])
+        # if self.web_buckling_check and (self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0] or self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] ) :
+        #     list.extend(
+        #         [self.K_v, self.tau_crc, self.lambda_w, self.tau_b,
+        #          self.V_cr])
+        #     list_name.extend([
+        #         'Kv',
+        #         'tau_crc',
+        #         'lambda_w',
+        #         'tau_b',
+        #         "V_cr"
+        #     ])
         if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1] and self.web_buckling_check:
             list.extend(
                 [self.Mfr, self.load.moment / (
@@ -1710,7 +1906,7 @@ class Flexure(Member):
                 "FCD_formula",
                 "FCD_max",
                 "FCD",
-                "Capacity", # Buckling Resistance
+                "Capacity",
                 "Web_crippling"
             ])
         if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
@@ -1773,7 +1969,17 @@ class Flexure(Member):
 
 
     def results(self, design_dictionary):
-
+        _ = [i for i in self.optimum_section_ur if i > 1.0]
+        print( '_ ',_)
+        if len(_)==1:
+            temp = _[0] 
+        elif len(_)==0:
+            temp = None
+        else:
+            temp = sorted(_)[0]
+        self.failed_design_dict = self.optimum_section_ur_results[temp] if temp is not None else None
+        print('self.failed_design_dict ',self.failed_design_dict)
+        
         # sorting results from the dataset
         # if len(self.input_section_list) > 1:
         # results based on UR
@@ -1785,7 +1991,7 @@ class Flexure(Member):
             self.optimum_section_ur = list(filter_UR)
 
             self.optimum_section_ur.sort()
-            # print(f"self.optimum_section_ur{self.optimum_section_ur}")
+            print(f"self.optimum_section_ur{self.optimum_section_ur} \n self.optimum_section_ur_results{self.optimum_section_ur_results}")
             # print(f"self.result_UR{self.result_UR}")
 
             # selecting the section with most optimum UR
@@ -1797,13 +2003,30 @@ class Flexure(Member):
                 logger.error(
                     "The solver did not find any adequate section from the defined list."
                 )
-                logger.info(
+                
+                self.design_status = False
+                if len(self.failed_design_dict)>0:
+                    logger.info(
+                    "The details for the best section provided is being shown"
+                )
+                    self.result_UR = self.failed_design_dict['UR'] #temp  TODO @Rutvik
+                    self.common_result(
+                        self,
+                        list_result=self.failed_design_dict,
+                        result_type=None,
+                    )
+                    logger.warning(
                     "Re-define the list of sections or check the Design Preferences option and re-design."
                 )
-                self.design_status = False
+                else:
+                    logger.warning(
+                    "Plastic section modulus of selected sections is less than required."
+                )
+                    return 
                 # self.design_status_list.append(self.design_status)
 
             else:
+                self.failed_design_dict = None
                 self.result_UR = self.optimum_section_ur[
                     -1
                 ]  # optimum section which passes the UR check
@@ -1900,8 +2123,9 @@ class Flexure(Member):
                 self.design_status = True
 
     def common_result(self, list_result, result_type, flag=1):
-        self.result_designation = list_result[result_type]["Designation"]
-        logger.info(
+        try:
+            self.result_designation = list_result[result_type]["Designation"] # TODO debug
+            logger.info(
             "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
                 self.input_section_classification[self.result_designation][0] ,
                 self.result_designation,
@@ -1909,117 +2133,232 @@ class Flexure(Member):
                 self.input_section_classification[self.result_designation][2], round(self.input_section_classification[self.result_designation][4],2)
             )
         )
-        self.result_latex_tension_zone = list_result[result_type]["latex.tension_zone"]
-        self.result_web_buckling_check = list_result[result_type]["Web.Buckling"]
-        self.result_eff_d = list_result[result_type]["Reduced.depth"]
-        self.result_buckling_crippling = list_result[result_type]["Buckling.crippling"]
+            self.result_latex_tension_zone = list_result[result_type]["latex.tension_zone"]
+            self.result_web_buckling_check = list_result[result_type]["Web.Buckling"]
+            self.result_eff_d = list_result[result_type]["Reduced.depth"]
+            self.result_buckling_crippling = list_result[result_type]["Buckling.crippling"]
 
-        self.result_section_class = list_result[result_type]["Section class"]
-        self.result_effective_area = round(list_result[result_type]["Effective area"],2)
-        if self.effective_area_factor < 1.0:
-            logger.info(
-                "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
-                    round((self.result_effective_area / self.effective_area_factor), 2),
-                    self.result_effective_area,
+            self.result_section_class = list_result[result_type]["Section class"]
+            self.result_effective_area = round(list_result[result_type]["Effective area"],2)
+            if self.effective_area_factor < 1.0:
+                logger.info(
+                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
+                        round((self.result_effective_area / self.effective_area_factor), 2),
+                        self.result_effective_area,
+                    )
                 )
+
+            self.result_shear = round(list_result[result_type]["Shear Strength"], 2)
+            self.result_high_shear = list_result[result_type]["High Shear check"]
+            self.result_bending = round(list_result[result_type]["Bending Strength"], 2)
+            self.result_eff_len = round(list_result[result_type]["Effective_length"], 2)
+            self.result_cost = list_result[result_type]["Cost"]
+            self.result_betab = list_result[result_type]["Beta_b"]
+
+            if self.result_web_buckling_check :
+                logger.warning(
+                    "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
+                if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+                    logger.info('Transverse Stiffeners at supports required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
+                elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+                    logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
+                    self.result_web_buckling_simple_Mfr = round(list_result[result_type]['Mfr']*10**-6, 2)
+                    self.result_web_buckling_simple_Nf = round(list_result[result_type]['Nf'], 2)
+                    self.result_web_buckling_simple_c = round(list_result[result_type]['c'], 2)
+                    self.result_web_buckling_simple_phi_girder = round(list_result[result_type]['phi_girder'], 2)
+                    self.result_web_buckling_simple_s_girder = round(list_result[result_type]['s_girder'], 2)
+                    self.result_web_buckling_simple_wtf_girder = round(list_result[result_type]['wtf_girder'], 2)
+                    self.result_web_buckling_simple_sai_girder = round(list_result[result_type]['sai_girder'], 2)
+                    self.result_web_buckling_simple_fv_girder = round(list_result[result_type]['fv_girder'], 2)
+                    self.result_web_buckling_simple_V_p_girder = round(list_result[result_type]['V_p'], 2)
+                    self.result_web_buckling_simple_fV_tf_girder = round(list_result[result_type]['V_tf_girder'], 2)
+
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
+                self.result_mcr = round(list_result[result_type]['Mcr'], 2)
+                self.result_IF_lt = round(list_result[result_type]["IF_lt"], 2)
+                self.result_tc = round(list_result[result_type]["It"], 2)
+                self.result_wc = round(list_result[result_type]["Iw"], 2)
+                self.result_nd_esr_lt = round(list_result[result_type]["ND_ESR_lt"], 2)
+                self.result_phi_lt = round(list_result[result_type]["phi_lt"], 2)
+                self.result_srf_lt = round(list_result[result_type]["SRF_lt"], 2)
+                self.result_fcd__lt = round(list_result[result_type]["FCD_lt"], 2)
+            else:
+                self.result_mcr = 'NA'
+                self.result_IF_lt = 'NA'
+                self.result_tc = 'NA'
+                self.result_wc = 'NA'
+                self.result_nd_esr_lt = 'NA'
+                self.result_phi_lt = 'NA'
+                self.result_srf_lt = 'NA'
+                self.result_fcd__lt = 'NA'
+
+            if self.web_buckling :
+
+                self.result_bcI_eff = list_result[result_type]['WebBuckling.I_eff']
+                self.result_bcA_eff = list_result[result_type]['WebBuckling.A_eff']
+                self.result_bcr_eff = list_result[result_type]['WebBuckling.r_eff']
+                self.result_bc = list_result[result_type]['Buckling_class']
+                self.result_IF = round(list_result[result_type]["IF"], 2)
+                self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)
+                self.result_ebs = round(list_result[result_type]["EBS"], 2)
+                self.result_nd_esr = round(list_result[result_type]["ND_ESR"], 2)
+                self.result_phi_zz = round(list_result[result_type]["phi"], 2)
+                self.result_srf = round(list_result[result_type]["SRF"], 2)
+                self.result_fcd_1_zz = round(list_result[result_type]["FCD_formula"], 2)
+                self.result_fcd_2 = round(list_result[result_type]["FCD_max"], 2)
+                self.result_fcd = round(list_result[result_type]["FCD"], 2)
+                self.result_capacity = round(list_result[result_type]["Capacity"], 2)
+                self.result_crippling = round(list_result[result_type]["Web_crippling"], 2)
+            else:
+                self.result_bc = 'NA'
+                self.result_IF = 'NA'
+                self.result_eff_sr = 'NA'
+                self.result_lambda_vv = 'NA'
+                self.result_lambda_psi = 'NA'
+                self.result_ebs = 'NA'
+                self.result_nd_esr = 'NA'
+                self.result_phi_zz = 'NA'
+                self.result_srf = 'NA'
+                self.result_fcd_1_zz = 'NA'
+                self.result_fcd_2 = 'NA'
+                self.result_fcd = 'NA'
+                self.result_capacity = 'NA'
+                self.result_crippling = 'NA'
+            if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
+                self.result_mfd = list_result[result_type]["Mfd"]
+                self.result_beta_reduced = list_result[result_type]["Beta_reduced"]
+                self.result_Md= list_result[result_type]["M_d"]
+        except:
+            self.result_designation = list_result["Designation"]
+            logger.info(
+            "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
+                self.input_section_classification[self.result_designation][0] ,
+                self.result_designation,
+                self.input_section_classification[self.result_designation][1], round(self.input_section_classification[self.result_designation][3],2),
+                self.input_section_classification[self.result_designation][2], round(self.input_section_classification[self.result_designation][4],2)
             )
+        )
+            self.result_latex_tension_zone = list_result["latex.tension_zone"]
+            self.result_web_buckling_check = list_result["Web.Buckling"]
+            self.result_eff_d = list_result["Reduced.depth"]
+            self.result_buckling_crippling = list_result["Buckling.crippling"]
 
-        self.result_shear = round(list_result[result_type]["Shear Strength"], 2)
-        self.result_high_shear = list_result[result_type]["High Shear check"]
-        self.result_bending = round(list_result[result_type]["Bending Strength"], 2)
-        self.result_eff_len = round(list_result[result_type]["Effective_length"], 2)
-        self.result_cost = list_result[result_type]["Cost"]
-        self.result_betab = list_result[result_type]["Beta_b"]
+            self.result_section_class = list_result["Section class"]
+            self.result_effective_area = round(list_result["Effective area"],2)
+            if self.effective_area_factor < 1.0:
+                logger.info(
+                    "The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".format(
+                        round((self.result_effective_area / self.effective_area_factor), 2),
+                        self.result_effective_area,
+                    )
+                )
 
-        if self.result_web_buckling_check :
-            logger.warning(
-                "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
-            if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
-                logger.info('Transverse Stiffeners at supports required. Design not done for them')
-                self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
-                self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
-                self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
-                self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
-                self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
-            elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
-                logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
-                self.result_web_buckling_simple_kv = round(list_result[result_type]['Kv'], 2)
-                self.result_web_buckling_simple_tau_crc = round(list_result[result_type]['tau_crc'], 2)
-                self.result_web_buckling_simple_lambda_w = round(list_result[result_type]['lambda_w'], 2)
-                self.result_web_buckling_simple_tau_b = round(list_result[result_type]['tau_b'], 2)
-                self.result_web_buckling_simple_V_cr = round(list_result[result_type]['V_cr'], 2)
-                self.result_web_buckling_simple_Mfr = round(list_result[result_type]['Mfr']*10**-6, 2)
-                self.result_web_buckling_simple_Nf = round(list_result[result_type]['Nf'], 2)
-                self.result_web_buckling_simple_c = round(list_result[result_type]['c'], 2)
-                self.result_web_buckling_simple_phi_girder = round(list_result[result_type]['phi_girder'], 2)
-                self.result_web_buckling_simple_s_girder = round(list_result[result_type]['s_girder'], 2)
-                self.result_web_buckling_simple_wtf_girder = round(list_result[result_type]['wtf_girder'], 2)
-                self.result_web_buckling_simple_sai_girder = round(list_result[result_type]['sai_girder'], 2)
-                self.result_web_buckling_simple_fv_girder = round(list_result[result_type]['fv_girder'], 2)
-                self.result_web_buckling_simple_V_p_girder = round(list_result[result_type]['V_p'], 2)
-                self.result_web_buckling_simple_fV_tf_girder = round(list_result[result_type]['V_tf_girder'], 2)
+            self.result_shear = round(list_result["Shear Strength"], 2)
+            self.result_high_shear = list_result["High Shear check"]
+            self.result_bending = round(list_result["Bending Strength"], 2)
+            self.result_eff_len = round(list_result["Effective_length"], 2)
+            self.result_cost = list_result["Cost"]
+            self.result_betab = list_result["Beta_b"]
 
-        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
-            self.result_mcr = round(list_result[result_type]['Mcr'], 2)
-            self.result_IF_lt = round(list_result[result_type]["IF_lt"], 2)
-            self.result_tc = round(list_result[result_type]["It"], 2)
-            self.result_wc = round(list_result[result_type]["Iw"], 2)
-            self.result_nd_esr_lt = round(list_result[result_type]["ND_ESR_lt"], 2)
-            self.result_phi_lt = round(list_result[result_type]["phi_lt"], 2)
-            self.result_srf_lt = round(list_result[result_type]["SRF_lt"], 2)
-            self.result_fcd__lt = round(list_result[result_type]["FCD_lt"], 2)
-        else:
-            self.result_mcr = 'NA'
-            self.result_IF_lt = 'NA'
-            self.result_tc = 'NA'
-            self.result_wc = 'NA'
-            self.result_nd_esr_lt = 'NA'
-            self.result_phi_lt = 'NA'
-            self.result_srf_lt = 'NA'
-            self.result_fcd__lt = 'NA'
+            if self.result_web_buckling_check :
+                logger.warning(
+                    "Thin web so take flange to resist moment and web to resist shear[Reference: Cl 8.2.1.1, IS 800:2007]")
+                if self.support_cndition_shear_buckling == KEY_DISP_SB_Option[0]:
+                    logger.info('Transverse Stiffeners at supports required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result['V_cr'], 2)
+                elif self.support_cndition_shear_buckling == KEY_DISP_SB_Option[1]:
+                    logger.info('Transverse Stiffeners at supports  and intermediate transverse stiffener required. Design not done for them')
+                    self.result_web_buckling_simple_kv = round(list_result['Kv'], 2)
+                    self.result_web_buckling_simple_tau_crc = round(list_result['tau_crc'], 2)
+                    self.result_web_buckling_simple_lambda_w = round(list_result['lambda_w'], 2)
+                    self.result_web_buckling_simple_tau_b = round(list_result['tau_b'], 2)
+                    self.result_web_buckling_simple_V_cr = round(list_result['V_cr'], 2)
+                    self.result_web_buckling_simple_Mfr = round(list_result['Mfr']*10**-6, 2)
+                    self.result_web_buckling_simple_Nf = round(list_result['Nf'], 2)
+                    self.result_web_buckling_simple_c = round(list_result['c'], 2)
+                    self.result_web_buckling_simple_phi_girder = round(list_result['phi_girder'], 2)
+                    self.result_web_buckling_simple_s_girder = round(list_result['s_girder'], 2)
+                    self.result_web_buckling_simple_wtf_girder = round(list_result['wtf_girder'], 2)
+                    self.result_web_buckling_simple_sai_girder = round(list_result['sai_girder'], 2)
+                    self.result_web_buckling_simple_fv_girder = round(list_result['fv_girder'], 2)
+                    self.result_web_buckling_simple_V_p_girder = round(list_result['V_p'], 2)
+                    self.result_web_buckling_simple_fV_tf_girder = round(list_result['V_tf_girder'], 2)
 
-        if self.web_buckling :
+            if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE :
+                self.result_mcr = round(list_result['Mcr'], 2)
+                self.result_IF_lt = round(list_result["IF_lt"], 2)
+                self.result_tc = round(list_result["It"], 2)
+                self.result_wc = round(list_result["Iw"], 2)
+                self.result_nd_esr_lt = round(list_result["ND_ESR_lt"], 2)
+                self.result_phi_lt = round(list_result["phi_lt"], 2)
+                self.result_srf_lt = round(list_result["SRF_lt"], 2)
+                self.result_fcd__lt = round(list_result["FCD_lt"], 2)
+            else:
+                self.result_mcr = 'NA'
+                self.result_IF_lt = 'NA'
+                self.result_tc = 'NA'
+                self.result_wc = 'NA'
+                self.result_nd_esr_lt = 'NA'
+                self.result_phi_lt = 'NA'
+                self.result_srf_lt = 'NA'
+                self.result_fcd__lt = 'NA'
 
-            self.result_bcI_eff = list_result[result_type]['WebBuckling.I_eff']
-            self.result_bcA_eff = list_result[result_type]['WebBuckling.A_eff']
-            self.result_bcr_eff = list_result[result_type]['WebBuckling.r_eff']
-            self.result_bc = list_result[result_type]['Buckling_class']
-            self.result_IF = round(list_result[result_type]["IF"], 2)
-            self.result_eff_sr = round(list_result[result_type]["Effective_SR"], 2)
-            self.result_ebs = round(list_result[result_type]["EBS"], 2)
-            self.result_nd_esr = round(list_result[result_type]["ND_ESR"], 2)
-            self.result_phi_zz = round(list_result[result_type]["phi"], 2)
-            self.result_srf = round(list_result[result_type]["SRF"], 2)
-            self.result_fcd_1_zz = round(list_result[result_type]["FCD_formula"], 2)
-            self.result_fcd_2 = round(list_result[result_type]["FCD_max"], 2)
-            self.result_fcd = round(list_result[result_type]["FCD"], 2)
-            self.result_capacity = round(list_result[result_type]["Capacity"], 2)
-            self.result_crippling = round(list_result[result_type]["Web_crippling"], 2)
-        else:
-            self.result_bc = 'NA'
-            self.result_IF = 'NA'
-            self.result_eff_sr = 'NA'
-            self.result_lambda_vv = 'NA'
-            self.result_lambda_psi = 'NA'
-            self.result_ebs = 'NA'
-            self.result_nd_esr = 'NA'
-            self.result_phi_zz = 'NA'
-            self.result_srf = 'NA'
-            self.result_fcd_1_zz = 'NA'
-            self.result_fcd_2 = 'NA'
-            self.result_fcd = 'NA'
-            self.result_capacity = 'NA'
-            self.result_crippling = 'NA'
-        if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
-            self.result_mfd = list_result[result_type]["Mfd"]
-            self.result_beta_reduced = list_result[result_type]["Beta_reduced"]
-            self.result_Md= list_result[result_type]["M_d"]
+            if self.web_buckling :
 
+                self.result_bcI_eff = list_result['WebBuckling.I_eff']
+                self.result_bcA_eff = list_result['WebBuckling.A_eff']
+                self.result_bcr_eff = list_result['WebBuckling.r_eff']
+                self.result_bc = list_result['Buckling_class']
+                self.result_IF = round(list_result["IF"], 2)
+                self.result_eff_sr = round(list_result["Effective_SR"], 2)
+                self.result_ebs = round(list_result["EBS"], 2)
+                self.result_nd_esr = round(list_result["ND_ESR"], 2)
+                self.result_phi_zz = round(list_result["phi"], 2)
+                self.result_srf = round(list_result["SRF"], 2)
+                self.result_fcd_1_zz = round(list_result["FCD_formula"], 2)
+                self.result_fcd_2 = round(list_result["FCD_max"], 2)
+                self.result_fcd = round(list_result["FCD"], 2)
+                self.result_capacity = round(list_result["Capacity"], 2)
+                self.result_crippling = round(list_result["Web_crippling"], 2)
+            else:
+                self.result_bc = 'NA'
+                self.result_IF = 'NA'
+                self.result_eff_sr = 'NA'
+                self.result_lambda_vv = 'NA'
+                self.result_lambda_psi = 'NA'
+                self.result_ebs = 'NA'
+                self.result_nd_esr = 'NA'
+                self.result_phi_zz = 'NA'
+                self.result_srf = 'NA'
+                self.result_fcd_1_zz = 'NA'
+                self.result_fcd_2 = 'NA'
+                self.result_fcd = 'NA'
+                self.result_capacity = 'NA'
+                self.result_crippling = 'NA'
+            if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
+                self.result_mfd = list_result["Mfd"]
+                self.result_beta_reduced = list_result["Beta_reduced"]
+                self.result_Md= list_result["M_d"]
+            
     ### start writing save_design from here!
     def save_design(self, popup_summary):
-        self.section_property = self.section_connect_database(self, self.result_designation)
-
-        if self.design_status:
+        # print('self.design_status', self.design_status,'len(self.failed_design_dict)', len(self.failed_design_dict))
+        if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):# TODO @Rutvik
+            self.section_property = self.section_connect_database(self, self.result_designation)
             if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
                                       KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
@@ -2091,10 +2430,10 @@ class Flexure(Member):
                 KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
 
             })
-            if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
-                self.report_input.update({
-                    KEY_ShearBuckling: self.support_cndition_shear_buckling
-                })
+            # if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
+            #     self.report_input.update({
+            #         KEY_ShearBuckling: self.support_cndition_shear_buckling
+            #     })
             # self.report_input.update({
             #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
             #      "I Section - Mechanical Properties": "TITLE",
@@ -2112,12 +2451,20 @@ class Flexure(Member):
                                         self.effective_area_factor),
                   ' ')
             self.report_check.append(t1)
+            
+            # t1 = ('SubSection', 'Section parameters', '|p{4cm}|p{1.5cm}|p{9.5cm}|p{1cm}|')
+            # self.report_check.append(t1)
+            # t1 = ('d_{web}', ' ',
+            #       sectional_area_change(round(self.result_effective_area,2), round(self.section_property.area,2),
+            #                             self.effective_area_factor),
+            #       ' ')
+            # self.report_check.append(t1)
 
             t1 = ('SubSection', 'Section Classification', '|p{3cm}|p{3.5cm}|p{8.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t1 = ('Web Class', 'Neutral Axis at Mid-Depth',
                   cl_3_7_2_section_classification_web(round(self.result_eff_d, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4],2),
-                                         self.epsilon,
+                                         self.epsilon, self.section_property.type,
                                         self.input_section_classification[self.result_designation][2]),
                   ' ')
             self.report_check.append(t1)
@@ -2283,7 +2630,7 @@ class Flexure(Member):
 
                 # t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')
 
-            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{2cm}|p{8.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{1.5cm}|p{9cm}|p{1.5cm}|')
             self.report_check.append(t1)
             if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
                 if self.result_high_shear:
@@ -2323,7 +2670,7 @@ class Flexure(Member):
 
                 else:
                     t1 = (KEY_DISP_DESIGN_STRENGTH_MOMENT, self.load.moment*10**-6,
-                          cl_8_2_1_2_moment_capacity_member(round(self.result_betab,2),
+                          cl_8_2_1_2_moment_capacity_member(round(self.result_betab,3),
                                                                     self.section_property.plast_sec_mod_z,
                                                                     self.material_property.fy, self.gamma_m0,
                                                                     round(self.result_bending, 2), self.section_property.elast_sec_mod_z,self.result_section_class,self.support),
@@ -2448,16 +2795,6 @@ class Flexure(Member):
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                     self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Utilization', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
-            self.report_check.append(t1)
-
-            t1 = (KEY_DISP_Utilization_Ratio, 1.0,
-                  Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
-                                                        self.load.moment*10**-6, round(self.result_bending, 2),
-                                                         round(self.result_UR, 2)),
-                  get_pass_fail(1.0, round(self.result_UR, 2), relation="geq"))
-            self.report_check.append(t1)
-
             if self.result_buckling_crippling:
                 t1 = ('SubSection', 'Web Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
                 self.report_check.append(t1)
@@ -2537,7 +2874,66 @@ class Flexure(Member):
                       get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_crippling, 2), relation="leq"))
 
                 self.report_check.append(t1)
-# TODO
+                
+            t1 = ('SubSection', 'Utilization', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+            self.report_check.append(t1)
+            # TODO
+            if self.result_buckling_crippling:
+                t1 = (KEY_DISP_Utilization_Ratio, 1.0,   
+                    Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
+                                                            self.load.moment*10**-6, round(self.result_bending, 2),
+                                                            self.result_UR,type=2,Pd=self.result_capacity, fw=self.result_crippling),
+                    get_pass_fail(1.0, self.result_UR, relation="geq"))
+            else:
+                t1 = (KEY_DISP_Utilization_Ratio, 1.0,   
+                    Utilization_Ratio_Latex(self.load.shear_force * 10 ** -3,round(self.result_shear, 2),
+                                                            self.load.moment*10**-6, round(self.result_bending, 2),
+                                                            self.result_UR),
+                    get_pass_fail(1.0, self.result_UR, relation="geq"))
+            self.report_check.append(t1)    
+# 
+    #     elif not self.design_status or len(self.failed_design_dict)>0:
+    #         self.section_property = self.section_connect_database(self, self.result_designation)
+            
+    #         if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SECTYPE[1]:
+    #             self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
+    #                                   KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
+    #                                   KEY_DISP_COLSEC_REPORT: self.section_property.designation,
+    #                                   KEY_DISP_MATERIAL: self.section_property.material,
+    #  #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
+    #                                   KEY_REPORT_MASS: self.section_property.mass,
+    #                                   KEY_REPORT_AREA: round(self.section_property.area * 1e-2, 2),
+    #                                   KEY_REPORT_DEPTH: self.section_property.depth,
+    #                                   KEY_REPORT_WIDTH: self.section_property.flange_width,
+    #                                   KEY_REPORT_WEB_THK: self.section_property.web_thickness,
+    #                                   KEY_REPORT_FLANGE_THK: self.section_property.flange_thickness,
+    #                                   KEY_DISP_FLANGE_S_REPORT: self.section_property.flange_slope,
+    #                                   KEY_REPORT_R1: self.section_property.root_radius,
+    #                                   KEY_REPORT_R2: self.section_property.toe_radius,
+    #                                   KEY_REPORT_IZ: round(self.section_property.mom_inertia_z * 1e-4, 2),
+    #                                   KEY_REPORT_IY: round(self.section_property.mom_inertia_y * 1e-4, 2),
+    #                                   KEY_REPORT_RZ: round(self.section_property.rad_of_gy_z * 1e-1, 2),
+    #                                   KEY_REPORT_RY: round(self.section_property.rad_of_gy_y * 1e-1, 2),
+    #                                   KEY_REPORT_ZEZ: round(self.section_property.elast_sec_mod_z * 1e-3, 2),
+    #                                   KEY_REPORT_ZEY: round(self.section_property.elast_sec_mod_y * 1e-3, 2),
+    #                                   KEY_REPORT_ZPZ: round(self.section_property.plast_sec_mod_z * 1e-3, 2),
+    #                                   KEY_REPORT_ZPY: round(self.section_property.plast_sec_mod_y * 1e-3, 2)}
+
+
+
+    #         self.report_input = \
+    #             {#KEY_MAIN_MODULE: self.mainmodule,
+    #              KEY_MODULE: self.module, #"Axial load on column "
+    #                 KEY_DISP_SHEAR+'*': self.load.shear_force * 10 ** -3,
+    #                 KEY_DISP_BEAM_MOMENT_Latex+'*': self.load.moment * 10 ** -6,
+    #                 KEY_DISP_LENGTH_BEAM: self.result_eff_len,
+    #                 KEY_DISP_SEC_PROFILE: self.sec_profile,
+    #                 KEY_DISP_SECSIZE: str(self.sec_list),
+    #              KEY_MATERIAL: self.material,
+    #                 "Selected Section Details": self.report_column,
+    #                 KEY_BEAM_SUPP_TYPE: self.latex_design_type,
+    #             }
+                
             # if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
             #     t1 = ('SubSection', 'Lateral Torsional Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
             #     self.report_check.append(t1)
@@ -2622,6 +3018,63 @@ class Flexure(Member):
         #
         # t1 = ('', '', '', '')
         # self.report_check.append(t1)
+        else:
+            self.report_input = \
+                {#KEY_MAIN_MODULE: self.mainmodule,
+                 KEY_MODULE: self.module, #"Axial load on column "
+                    KEY_DISP_SHEAR+'*': self.load.shear_force * 10 ** -3,
+                    KEY_DISP_BEAM_MOMENT_Latex+'*': self.load.moment * 10 ** -6,
+                    KEY_DISP_LENGTH_BEAM: self.length,
+                    KEY_DISP_SEC_PROFILE: self.sec_profile,
+                    KEY_DISP_SECSIZE: str(self.sec_list),
+                 KEY_MATERIAL: self.material,
+                    # "Failed Section Details": self.report_column,
+                    KEY_BEAM_SUPP_TYPE: self.latex_design_type,
+                }
+            self.report_input.update({
+                KEY_DISP_SUPPORT : self.support,
+                KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.material_property.fu,
+                KEY_DISP_YIELD_STRENGTH_REPORT: self.material_property.fy,
+                "End Conditions - " + str(self.support): "TITLE",
+            })
+            # if self.Latex_length == 'NA':
+            if self.support == KEY_DISP_SUPPORT1:
+                self.report_input.update({
+                    DISP_TORSIONAL_RES: self.Torsional_res,
+                    DISP_WARPING_RES:self.Warping })
+            else:
+                self.report_input.update({
+                    DISP_SUPPORT_RES: self.Support,
+                    DISP_TOP_RES: self.Top})
+            self.report_input.update({
+                "Design Preference" : "TITLE",
+                KEY_DISP_EFFECTIVE_AREA_PARA: self.effective_area_factor,
+                KEY_DISP_CLASS: self.allow_class,
+                KEY_DISP_LOAD: self.Loading,
+                KEY_DISPP_LENGTH_OVERWRITE: self.latex_efp,
+                KEY_DISP_BEARING_LENGTH + ' (mm)': self.bearing_length,
+
+            })
+            # if self.latex_design_type == VALUES_SUPP_TYPE_temp[0] and self.result_web_buckling_check:
+            #     self.report_input.update({
+            #         KEY_ShearBuckling: self.support_cndition_shear_buckling
+            #     })
+            # self.report_input.update({
+            #      # KEY_DISP_SEC_PROFILE: self.sec_profile,
+            #      "I Section - Mechanical Properties": "TITLE",
+            #      })
+            self.report_input.update()
+            self.report_check = []
+            
+            t1 = ('Selected', 'All Members Failed', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
+            self.report_check.append(t1)
+
+            t1 = ('SubSection', 'Plastic Section Modulus', '|p{4cm}|p{1.5cm}|p{2.5cm}|p{8cm}|')
+            self.report_check.append(t1)
+            t1 = ('Plastic Section Modulus($mm^3$)', round(self.Zp_req,2),
+                  ' ',
+                  'Select Sections with atleast required Plastic Section Modulus ')
+            self.report_check.append(t1)
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

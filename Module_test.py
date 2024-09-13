@@ -60,7 +60,7 @@ from Common import *
 if not is_travis:
     from cad.common_logic import CommonDesignLogic
     from texlive .Design_wrapper import init_display
-    display, start_display, add_menu, add_function_to_menu = init_display(backend_str="qt-pyqt5")
+    display, start_display, add_menu, add_function_to_menu = init_display(backend_str="pyqt5")
 
 
 

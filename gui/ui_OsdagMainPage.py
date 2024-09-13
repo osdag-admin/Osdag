@@ -6,10 +6,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from .toggle_button import Switch
+# from .draw_rectangular_prism import DisplayHandling
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):

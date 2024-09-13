@@ -83,6 +83,9 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 import os
 from pathlib import Path
 import re
+import io
+import traceback
+import time
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
 from update_version_check import Update
@@ -119,11 +122,11 @@ if sqlpath.exists():
             print('Error: ', e)
 #########################################################################################
 
+from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize, QFile, QTextStream, QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5 import uic
 import math
 import sys
 from gui.ui_tutorial import Ui_Tutorial
@@ -174,9 +177,6 @@ if sys.platform == 'darwin':
 else:
     from gui.ui_template import Ui_ModuleWindow
 # from gui.ui_template import Ui_ModuleWindow
-import io
-import traceback
-import time
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -962,6 +962,6 @@ if __name__ == '__main__':
         #update.notifi()
 
         sys.excepthook = hook_exception
-        QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
+        QCoreApplication.exit(app.exec()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

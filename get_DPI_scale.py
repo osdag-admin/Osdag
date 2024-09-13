@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtWidgets
 import sys
 
-app = QApplication(sys.argv)
+# app = QApplication(sys.argv)
 
 # screen = app.screens()[0]
 # dpi = screen.physicalDotsPerInch()
@@ -12,10 +12,11 @@ app = QApplication(sys.argv)
 # dpi = screen.physicalDotsPerInch()
 refHeight = 1080
 refWidth = 1920
+# FIXME: This hardcoding now because starting app appears to cause issues
 # QRect rect = QGuiApplication::primaryScreen()->geometry();
-resolution = QtWidgets.QDesktopWidget().screenGeometry()
-width = resolution.width()
-height = resolution.height()
+# resolution = QtWidgets.QDesktopWidget().screenGeometry()
+width = refWidth
+height = refHeight
 print(width,height)
 # height = max(width,height)
 # width = min(width, height)

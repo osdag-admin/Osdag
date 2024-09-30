@@ -12,13 +12,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_LPButton(object):
     def setupUi(self, Form,scale):
         Form.setObjectName("Form")
-        Form.resize(scale*300, 30)
+        Form.resize(int(scale*300), 30)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
         Form.setSizePolicy(sizePolicy)
-        Form.setMinimumSize(QtCore.QSize(scale*300, 30))
+        Form.setMinimumSize(QtCore.QSize(int(scale*300), 30))
         Form.setMaximumSize(QtCore.QSize(16777215, 30))
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

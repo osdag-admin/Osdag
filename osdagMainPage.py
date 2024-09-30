@@ -225,7 +225,7 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
 
-        self.rdbtn.setIconSize(QSize(scale*300, scale*300))
+        self.rdbtn.setIconSize(QSize(int(scale*300), int(scale*300)))
 
         layout.addWidget(self.rdbtn)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
@@ -439,7 +439,7 @@ class OsdagMainWindow(QMainWindow):
             else:
                 raise ValueError
 
-        self.resize(width * (0.85), height * (0.75))
+        self.resize(int(width*(0.85)), int(height*(0.75)))
         self.center()
         self.show()
 

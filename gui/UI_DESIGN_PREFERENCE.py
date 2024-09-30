@@ -88,8 +88,8 @@ class Window(QDialog):
 
     def initUI(self,main,input_dictionary):
 
-        button_size_x = scale*190
-        button_size_y = scale*30
+        button_size_x = int(scale*190)
+        button_size_y = int(scale*30)
         #self.statusBar().showMessage('')
         #self.setGeometry(300, 300, 1170, 710)
         self.setObjectName("DesignPreferences")
@@ -1446,7 +1446,7 @@ class DesignPreferences():
         width = resolution.width()
         height = resolution.height()
         # self.ui.resize(width*(0.67),height*(0.60))
-        self.ui.resize(width * 0.7, height * 0.6)
+        self.ui.resize(int(width * 0.7), int(height * 0.6))
         # self.ui.center()
         # self.ui.tabWidget.resize(width * (0.67), height * (0.60))
         self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)

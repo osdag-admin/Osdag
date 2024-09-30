@@ -102,7 +102,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width*(0.75),height*(0.7))
+        self.resize(int(width*(0.75)),int(height*(0.7)))
         self.ui = Window()
         self.ui.setupUi(self,main,folder)
         #self.showMaximized()
@@ -125,8 +125,8 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         if event.type() == QEvent.WindowStateChange:
             if event.oldState() == Qt.WindowNoState or self.windowState() == Qt.WindowMaximized:
                 print("WindowMaximized")
-                x = width/2
-                y = height/2
+                x = width//2
+                y = height//2
                 mouse = Controller()
                 original = mouse.position
                 mouse.position = (x, y)
@@ -135,26 +135,26 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
 
     def resize_dockComponents(self):
 
-        posi = (3/4)*(self.height())
+        posi = int((3/4)*(self.height()))
 
         # Input Dock
         width = self.ui.inputDock.width()
         self.ui.inputDock.resize(width,self.height())
         self.ui.in_widget.resize(width,posi)
 
-        self.ui.btn_Reset.move((width/2)-110,posi+8)
-        self.ui.btn_Design.move((width/2)+17,posi+8)
+        self.ui.btn_Reset.move((width//2)-110,posi+8)
+        self.ui.btn_Design.move((width//2)+17,posi+8)
         #self.ui.btn_Design.move(,posi+10)
 
         # Output Dock
         width = self.ui.outputDock.width()
-        self.ui.outputDock.resize(width,self.height())
-        self.ui.out_widget.resize(width,posi)
-        self.ui.btn_CreateDesign.move((width/2)-(186/2),posi+8)
-        self.ui.save_outputDock.move((width/2)-(186/2),posi+52)
+        self.ui.outputDock.resize(int(width),int(self.height()))
+        self.ui.out_widget.resize(int(width),int(posi))
+        self.ui.btn_CreateDesign.move(int((width/2)-(186/2)), int(posi+8))
+        self.ui.save_outputDock.move(int((width/2)-(186/2)), int(posi+52))
 
         # Designed model
-        self.ui.splitter.setSizes([0.85 * posi, 0.15 * posi])
+        self.ui.splitter.setSizes([int(0.85 * posi), int(0.15 * posi)])
         self.ui.modelTab.setFocus()
         self.ui.display.FitAll()
 
@@ -329,16 +329,16 @@ class Window(QMainWindow):
 
     def start_loadingWindow(self, main, data):
         loading_widget = QDialog(self)
-        window_width = self.width() / 2
-        window_height = self.height() / 10
-        loading_widget.setFixedSize(window_width, 1.5 * window_height)
+        window_width = self.width() // 2
+        window_height = self.height() // 10
+        loading_widget.setFixedSize(window_width, int(1.5 * window_height))
         loading_widget.setWindowFlag(Qt.FramelessWindowHint)
 
         self.progress_bar = QProgressBar(loading_widget)
         self.progress_bar.setMaximum(100)
-        self.progress_bar.setGeometry(QRect(0, 0, window_width, window_height / 2))
+        self.progress_bar.setGeometry(QRect(0, 0, window_width, window_height // 2))
         loading_label = QLabel(loading_widget)
-        loading_label.setGeometry(QRect(0, window_height / 2, window_width, window_height))
+        loading_label.setGeometry(QRect(0, window_height // 2, window_width, window_height))
         loading_label.setFixedSize(window_width, window_height)
         loading_label.setAlignment(Qt.AlignCenter)
         loading_label.setText("<p style='font-weight:500'>Please Wait...</p>")
@@ -866,12 +866,12 @@ class Window(QMainWindow):
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width//2)-110, 650, 100, 35))
         self.btn_Reset.setAutoDefault(True)
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width//2)+10, 650, 100, 35))
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
         self.inputDock.setWidget(self.dockWidgetContents)
@@ -2723,8 +2723,8 @@ class Window(QMainWindow):
         def centerOnScreen(self):
             '''Centers the window on the screen.'''
             resolution = QtGui.QDesktopWidget().screenGeometry()
-            self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                      (resolution.height() / 2) - (self.frameSize().height() / 2))
+            self.move((resolution.width() // 2) - (self.frameSize().width() // 2),
+                      (resolution.height() // 2) - (self.frameSize().height() // 2))
 
         def start_display():
             self.modelTab.raise_()
@@ -3005,8 +3005,8 @@ class Window(QMainWindow):
             else:
                 dialog.resize(900,700)
             mysize = dialog.geometry()
-            hpos = (screen_resolution.width() - mysize.width() ) / 2
-            vpos = (screen_resolution.height() - mysize.height() ) / 2
+            hpos = (screen_resolution.width() - mysize.width() ) // 2
+            vpos = (screen_resolution.height() - mysize.height() ) // 2
             dialog.move(hpos, vpos)
             # dialog.resize(900,900)
             # self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)

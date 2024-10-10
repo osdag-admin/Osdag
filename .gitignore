@@ -17,6 +17,8 @@
 *.tex
 .project
 .pydevproject
+build/*
+**/*.egg-info/*
 venv/*
 Osdag_Workspace/*
 /Osdag.config

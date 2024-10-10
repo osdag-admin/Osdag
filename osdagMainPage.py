@@ -904,7 +904,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
 
-if __name__ == '__main__':
+def do_stuff():
     # from cad.common_logic import CommonDesignLogic
     from multiprocessing import Pool
     import multiprocessing
@@ -965,3 +965,6 @@ if __name__ == '__main__':
         QCoreApplication.exit(app.exec()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)
+
+if __name__ == '__main__':
+    do_stuff()

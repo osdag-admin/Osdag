@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "osdag"
 dynamic = ["version"]
-dependencies = ["PyQt5", "requests"]
+dependencies = ["PyQt5", "requests", "pylatex", "numpy", "PyYaml", "PyGithub"]
 requires-python = ">= 3.8"
 description = "Open steel design and graphics"
 readme = "README.md"

@@ -12,12 +12,5 @@ readme = "README.md"
 license = {file = "LICENSE"}
 keywords = ["steel design", "civil engineering", "engineering"]
 
-# [tool.setuptools]
-# py-modules = ["bc_endplate_test", "Command_line", "Common", "get_DPI_scale", "gusset_connection", "gusset_connection_template", "__init__", "is800_2007exp", "main_controller", "Module_test", "osdagMainPage", "osdagMainSettings", "Report_functions_a", "Report_functions", "SectionModeller_Latex", "update_version_check", "_version", "write_to_excel"]
-# packages = ["cad", "gui", "themes", "texlive", "APP_CRASH", "utilities", "drawing_2D", "design_type", "ResourceFiles", "design_report"]
-
-# [tool.setuptools.packages]
-# find = {}
-
 [project.gui-scripts]
 osdag = "osdag.osdagMainPage:do_stuff"

@@ -16,7 +16,7 @@ import sqlite3
 import math
 import os
 import sys
-PATH_TO_DATABASE = os.path.join(sys.path[0],'ResourceFiles','Database','Intg_osdag.sqlite')
+PATH_TO_DATABASE = os.path.join('ResourceFiles','Database','Intg_osdag.sqlite')
 
 
 

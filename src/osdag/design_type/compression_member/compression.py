@@ -1,15 +1,15 @@
 # noinspection PyInterpreter
-from design_type.member import Member
-from Common import *
-from utils.common.component import ISection, Material
-from utils.common.common_calculation import *
-from utils.common.load import Load
-from design_type.tension_member import *
-from utils.common.Section_Properties_Calculator import BBAngle_Properties
+from ..member import Member
+from ...Common import *
+from ...utils.common.component import ISection, Material
+from ...utils.common.common_calculation import *
+from ...utils.common.load import Load
+from ..tension_member import *
+from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
 import math
 import numpy as np
-from utils.common import is800_2007
-from utils.common.component import *
+from ...utils.common import is800_2007
+from ...utils.common.component import *
 
 
 

@@ -1,8 +1,8 @@
-from Common import *
-from utils.common.load import Load
-from utils.common.component import *
-from utils.common.Section_Properties_Calculator import *
-from design_type.main import Main
+from ..Common import *
+from ..utils.common.load import Load
+from ..utils.common.component import *
+from ..utils.common.Section_Properties_Calculator import *
+from .main import Main
 
 class Member(Main):
 

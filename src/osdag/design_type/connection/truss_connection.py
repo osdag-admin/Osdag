@@ -1,11 +1,11 @@
-from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
-from utils.common.Section_Properties_Calculator import Single_Angle_Properties
-from Common import *
-from utils.common.load import Load
-from utils.common.material import Material
-from utils.common.common_calculation import *
-from utils.common.is800_2007 import IS800_2007
+from .connection import Connection
+from ...utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
+from ...utils.common.Section_Properties_Calculator import Single_Angle_Properties
+from ...Common import *
+from ...utils.common.load import Load
+from ...utils.common.material import Material
+from ...utils.common.common_calculation import *
+from ...utils.common.is800_2007 import IS800_2007
 
 
 class TrussConnection(Connection):

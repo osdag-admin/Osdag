@@ -1,6 +1,6 @@
 
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
 from OCC.Core.gp import gp_Dir, gp_Circ, gp_Ax2
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut

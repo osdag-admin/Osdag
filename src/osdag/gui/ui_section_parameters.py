@@ -9,7 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sqlite3
-from Common import PATH_TO_DATABASE
+from ..Common import PATH_TO_DATABASE
 
 class Ui_SectionParameters(QtWidgets.QDialog):
     def __init__(self,index_type,index_template):

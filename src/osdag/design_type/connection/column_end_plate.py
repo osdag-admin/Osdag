@@ -7,17 +7,17 @@ Reference:
             1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
             2) Design of Steel Structures by N. Subramanian
 """
-from design_type.connection.moment_connection import MomentConnection
-from design_report.reportGenerator_latex import CreateLatex
+from .moment_connection import MomentConnection
+from ...design_report.reportGenerator_latex import CreateLatex
 
-from utils.common.component import *
-from utils.common.material import *
-from Common import *
-from Common import *
-from Report_functions import *
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...Common import *
+from ...Common import *
+from ...Report_functions import *
 
 import logging
-from utils.common.load import Load
+from ...utils.common.load import Load
 
 
 class ColumnEndPlate(MomentConnection):

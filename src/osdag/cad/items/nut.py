@@ -7,7 +7,7 @@ NUT COMMENT
 import math
 import numpy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
-from cad.items.ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
+from .ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
 from OCC.Core.gp import gp_Ax2
 

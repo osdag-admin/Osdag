@@ -5,7 +5,7 @@ Created on 27-May-2015
 modified : Darshan Vishwakarma (12-10-2020)
 '''
 import numpy
-from cad.items.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
+from .ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 from OCC.Core.gp import (gp_Vec, gp_Pnt, gp_Trsf, gp_OX, gp_OY,
                          gp_OZ, gp_XYZ, gp_Ax2, gp_Dir, gp_GTrsf, gp_Mat)
 from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,

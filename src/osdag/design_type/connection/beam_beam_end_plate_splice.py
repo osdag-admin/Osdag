@@ -22,21 +22,21 @@
 
 # Importing modules from the project directory
 
-from design_type.connection.moment_connection import MomentConnection
-from design_type.connection.end_plate_splice_helper import EndPlateSpliceHelper
-from design_type.connection import end_plate_splice_helper
-from design_type.connection.shear_connection import ShearConnection
-from utils.common.is800_2007 import IS800_2007
-from utils.common.other_standards import IS_5624_1993
-from utils.common.component import *
-from utils.common.material import *
-from utils.common.common_calculation import *
-from Common import *
-from utils.common.load import Load
-from utils.common.other_standards import *
-from design_report.reportGenerator import save_html
-from Report_functions import *
-from design_report.reportGenerator_latex import CreateLatex
+from .moment_connection import MomentConnection
+from .end_plate_splice_helper import EndPlateSpliceHelper
+from . import end_plate_splice_helper
+from .shear_connection import ShearConnection
+from ...utils.common.is800_2007 import IS800_2007
+from ...utils.common.other_standards import IS_5624_1993
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...utils.common.common_calculation import *
+from ...Common import *
+from ...utils.common.load import Load
+from ...utils.common.other_standards import *
+from ...design_report.reportGenerator import save_html
+from ...Report_functions import *
+from ...design_report.reportGenerator_latex import CreateLatex
 
 import logging
 import math

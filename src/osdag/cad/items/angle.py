@@ -6,7 +6,7 @@ Created on 14-Oct-2015
 '''
 import numpy
 import math
-from cad.items.ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
+from .ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
     makeFaceFromWire, makePrismFromFace,makeEdgesFromPoints
 
 """
@@ -48,14 +48,12 @@ A   |       X           X
 Created on 14-Oct-2015
 @author: Deepa
 '''
-import numpy
-import math
 from OCC.Core.BRepFilletAPI import BRepFilletAPI_MakeFillet
 from OCC.Core.GC import GC_MakeArcOfCircle
 from OCC.Core.TopExp import TopExp_Explorer
 from OCC.Core.TopoDS import topods
 from OCC.Core.TopAbs import TopAbs_EDGE
-from cad.items.ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
+from .ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
     makeFaceFromWire, makePrismFromFace
 
 

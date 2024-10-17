@@ -50,4 +50,4 @@ class Ui_Tutorial(object):
         self.label_3.setText(_translate("Dialog", "<html><head/><body><p><a href=\"https://www.youtube.com/channel/UCnSZ7EjhDwNi3eCPcSKpgJg\"><span style=\" text-decoration: underline; color:#0000ff;\">https://www.youtube.com/channel</span></a></p></body></html>"))
         self.label_2.setText(_translate("Dialog", "<html><head/><body><p><a href=\"https://osdag.fossee.in/resources/videos\"><span style=\" text-decoration: underline; color:#0000ff;\">https://osdag.fossee.in/resources/videos</span></a></p></body></html>"))
 
-import gui.osdagMainPageIcons_rc
+from . import osdagMainPageIcons_rc

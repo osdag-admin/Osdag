@@ -12,15 +12,15 @@ Reference:
 import logging
 import math
 import numpy as np
-from Common import *
-from design_type.connection.moment_connection import MomentConnection
-from utils.common.material import *
-from utils.common.load import Load
-from utils.common.component import ISection, Material
-from utils.common.component import *
-from design_type.member import Member
-from Report_functions import *
-from design_report.reportGenerator_latex import CreateLatex
+from ...Common import *
+from ..connection.moment_connection import MomentConnection
+from ...utils.common.material import *
+from ...utils.common.load import Load
+from ...utils.common.component import ISection, Material
+from ...utils.common.component import *
+from ..member import Member
+from ...Report_functions import *
+from ...design_report.reportGenerator_latex import CreateLatex
 
 
 class ColumnDesign(Member):

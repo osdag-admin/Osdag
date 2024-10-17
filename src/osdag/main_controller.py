@@ -1,9 +1,9 @@
-from design_type.connection.fin_plate_connection import FinPlateConnection
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import sys
 import os.path
-from gui.ui_template import Ui_ModuleWindow
+from .design_type.connection.fin_plate_connection import FinPlateConnection
+from .gui.ui_template import Ui_ModuleWindow
 
 class MainController(QMainWindow):
     closed = pyqtSignal()

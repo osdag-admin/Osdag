@@ -2,63 +2,63 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *   
-from gui.ui_tutorial import Ui_Tutorial
-from gui.ui_aboutosdag import Ui_AboutOsdag
-from gui.ui_ask_question import Ui_AskQuestion
-from texlive.Design_wrapper import init_display as init_display_off_screen
+from .ui_tutorial import Ui_Tutorial
+from .ui_aboutosdag import Ui_AboutOsdag
+from .ui_ask_question import Ui_AskQuestion
+from ..texlive.Design_wrapper import init_display as init_display_off_screen
 import yaml
 import shutil
 import time
-from update_version_check import Update
+from ..update_version_check import Update
 import pandas as pd
 
 
 
-from Common import *
-from utils.common.component import *
-from utils.common.Section_Properties_Calculator import *
+from ..Common import *
+from ..utils.common.component import *
+from ..utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 #from .ui_design_preferences import Ui_Dialog
 
-from gui.ui_summary_popup import Ui_Dialog1
-from design_report.reportGenerator import save_html
+from .ui_summary_popup import Ui_Dialog1
+from ..design_report.reportGenerator import save_html
 from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
 #from .ui_design_preferences import DesignPreferences
 from .UI_DESIGN_PREFERENCE import DesignPreferences
-from design_type.connection.shear_connection import ShearConnection
-from cad.common_logic import CommonDesignLogic
+from ..design_type.connection.shear_connection import ShearConnection
+from ..cad.common_logic import CommonDesignLogic
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.Interface import Interface_Static_SetCVal
 from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
-from cad.cad3dconnection import cadconnection
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.column_cover_plate import ColumnCoverPlate
-from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
-from design_type.connection.beam_cover_plate import BeamCoverPlate
-from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
-from design_type.connection.column_end_plate import ColumnEndPlate
-from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from design_type.connection.base_plate_connection import BasePlateConnection
-from design_type.tension_member.tension_bolted import Tension_bolted
-from design_type.tension_member.tension_welded import Tension_welded
-from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
-from design_type.compression_member.Column import ColumnDesign
-from design_type.flexural_member.flexure import Flexure
-from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
-from design_type.flexural_member.flexure_othersupp import Flexure_Misc
-from gusset_connection import GussetConnection
+from ..cad.cad3dconnection import cadconnection
+from ..design_type.connection.fin_plate_connection import FinPlateConnection
+from ..design_type.connection.column_cover_plate import ColumnCoverPlate
+from ..design_type.connection.cleat_angle_connection import CleatAngleConnection
+from ..design_type.connection.seated_angle_connection import SeatedAngleConnection
+from ..design_type.connection.end_plate_connection import EndPlateConnection
+from ..design_type.connection.end_plate_connection import EndPlateConnection
+from ..design_type.connection.beam_cover_plate import BeamCoverPlate
+from ..design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from ..design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from ..design_type.connection.column_end_plate import ColumnEndPlate
+from ..design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from ..design_type.connection.base_plate_connection import BasePlateConnection
+from ..design_type.tension_member.tension_bolted import Tension_bolted
+from ..design_type.tension_member.tension_welded import Tension_welded
+from ..design_type.connection.beam_column_end_plate import BeamColumnEndPlate
+from ..design_type.compression_member.Column import ColumnDesign
+from ..design_type.flexural_member.flexure import Flexure
+from ..design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from ..design_type.flexural_member.flexure_othersupp import Flexure_Misc
+from ..gusset_connection import GussetConnection
 import logging
 import subprocess
-from get_DPI_scale import scale,height,width
-from cad.cad3dconnection import cadconnection
+from ..get_DPI_scale import scale,height,width
+from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
 
 class MyTutorials(QDialog):
@@ -206,7 +206,7 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
         if main.design_status and main.module_name(main) != KEY_DISP_FLEXURE and main.module_name(main) != KEY_DISP_FLEXURE2:
-            from osdagMainSettings import backend_name
+            from ..osdagMainSettings import backend_name
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             print('off_display', off_display)
             self.commLogicObj.display = off_display
@@ -1374,7 +1374,7 @@ class Window(QMainWindow):
         self.ui_loaded = True
 
         # print("\n outside now")
-        from osdagMainSettings import backend_name
+        from ..osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None

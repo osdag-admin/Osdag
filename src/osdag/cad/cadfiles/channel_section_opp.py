@@ -1,8 +1,8 @@
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.channel import Channel
-from cad.items.plate import Plate
+from ..items.channel import Channel
+from ..items.plate import Plate
 
 class ChannelSectionOpposite(object):
 
@@ -63,7 +63,7 @@ class ChannelSectionOpposite(object):
 
     def rotateY(self, points):
         rotated_points = []
-        rmatrix = numpy.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]]) 
+        rmatrix = numpy.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]])
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -81,7 +81,7 @@ class ChannelSectionOpposite(object):
 
         y_points = [numpy.array([0.,-offset+self.D/2,self.H/2]), numpy.array([0,offset+self.D/2,self.H/2])]
         line.append(makeEdgesFromPoints(y_points))
-        
+
         u_points = [numpy.array([-uvoffset,uvoffset+self.D/2,self.H/2]), numpy.array([uvoffset,-uvoffset+self.D/2,self.H/2])]
         line.append(makeEdgesFromPoints(u_points))
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
             display.DisplayShape(l, update=True)
             display.DisplayMessage(getGpPt(p1), n, height=24,message_color=(0,0,0))
             display.DisplayMessage(getGpPt(p2), n, height=24,message_color=(0,0,0))
-    
+
     B = 20
     T = 4
     D = 40

@@ -1,15 +1,15 @@
-from design_type.connection.shear_connection import ShearConnection
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.tension_member.tension_bolted import Tension_bolted
-from design_type.tension_member.tension_welded import Tension_welded
-from design_type.connection.beam_cover_plate import BeamCoverPlate
-from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.column_cover_plate import ColumnCoverPlate
-from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from design_type.connection.column_end_plate import ColumnEndPlate
+from .design_type.connection.shear_connection import ShearConnection
+from .design_type.connection.fin_plate_connection import FinPlateConnection
+from .design_type.tension_member.tension_bolted import Tension_bolted
+from .design_type.tension_member.tension_welded import Tension_welded
+from .design_type.connection.beam_cover_plate import BeamCoverPlate
+from .design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from .design_type.connection.column_cover_plate import ColumnCoverPlate
+from .design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from .design_type.connection.column_end_plate import ColumnEndPlate
 import yaml
-from utils.common.component import Bolt, Plate, Weld
-from Common import *
+from .utils.common.component import Bolt, Plate, Weld
+from .Common import *
 import os
 import xlsxwriter
 # import pandas as pd

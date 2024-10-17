@@ -1,8 +1,8 @@
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.cadfiles.anglebar import Angle
-from cad.items.plate import Plate
+from .anglebar import Angle
+from ..items.plate import Plate
 
 class StarAngleOpposite(object):
     def __init__(self, a, b, t, l, t1, H):
@@ -46,12 +46,12 @@ class StarAngleOpposite(object):
         prism3 = self.plate1.create_model()
 
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
-        # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()      
+        # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
         return prism, [prism3]
 
     def rotate(self, points):
         rotated_points = []
-        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]]) 
+        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]])
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -69,7 +69,7 @@ class StarAngleOpposite(object):
 
         y_points = [numpy.array([0.,-offset+self.t/2,self.H/2]), numpy.array([0,offset+self.t/2,self.H/2])]
         line.append(makeEdgesFromPoints(y_points))
-        
+
         u_points = [numpy.array([-uvoffset,uvoffset+self.t/2,self.H/2]), numpy.array([uvoffset,-uvoffset+self.t/2,self.H/2])]
         line.append(makeEdgesFromPoints(u_points))
 
@@ -116,4 +116,4 @@ if __name__ == '__main__':
     display.View_Top()
     display.FitAll()
     display.DisableAntiAliasing()
-    start_display()    
+    start_display()

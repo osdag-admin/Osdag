@@ -1491,28 +1491,28 @@ class HollowBasePlateCad(object):
 
 if __name__ == '__main__':
 
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
-    from cad.items.plate import Plate
-    from cad.items.ISection import ISection
-    from cad.items.filletweld import FilletWeld
-    from cad.items.groove_weld import GrooveWeld
-    from cad.items.concrete import Concrete
-    from cad.BasePlateCad.test_nb import NutBoltArray
-    from cad.items.anchor_bolt import *
-    from cad.items.nut import Nut
-    from cad.items.stiffener_plate import StiffenerPlate
-    from cad.items.stiffener_flange import Stiffener_flange
-    from cad.items.grout import Grout
-    from cad.items.rect_hollow import RectHollow
-    from cad.items.circular_hollow import CircularHollow
-    from cad.items.washer import Washer
+    from ..items.bolt import Bolt
+    from ..items.nut import Nut
+    from ..items.plate import Plate
+    from ..items.ISection import ISection
+    from ..items.filletweld import FilletWeld
+    from ..items.groove_weld import GrooveWeld
+    from ..items.concrete import Concrete
+    from ..BasePlateCad.test_nb import NutBoltArray
+    from ..items.anchor_bolt import *
+    from ..items.nut import Nut
+    from ..items.stiffener_plate import StiffenerPlate
+    from ..items.stiffener_flange import Stiffener_flange
+    from ..items.grout import Grout
+    from ..items.rect_hollow import RectHollow
+    from ..items.circular_hollow import CircularHollow
+    from ..items.washer import Washer
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
     from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
     from utilities import osdag_display_shape
-    # from cad.common_logic import CommonDesignLogic
+    # from ..common_logic import CommonDesignLogic
     from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 
     from OCC.gp import gp_Pnt

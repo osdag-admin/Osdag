@@ -23,12 +23,12 @@ Hst    | |                           X
 
 """
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 
 class Stiffener_CAD(object):
     def __init__(self, Hst, Lst, Tst):
         """
-        :param Hst: Height of stiffener 
+        :param Hst: Height of stiffener
         :param Lst: Length of stiffener
         :param Tst: Thickness of stiffener
         """
@@ -43,7 +43,7 @@ class Stiffener_CAD(object):
 
     def place(self, sec_origin, uDir, wDir):
         """
-        :param sec_origin: Section origin as mentioned above in figure 
+        :param sec_origin: Section origin as mentioned above in figure
         :param uDir: Directional component in X -direction
         :param wDir: Directional component in Z -direction
         :return: Vertices of stiffener

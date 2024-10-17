@@ -1,12 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
-from gui.ui_template import Ui_ModuleWindow
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-
-
-
-
-
+from ..gui.ui_template import Ui_ModuleWindow
 
 class Cadcontroller(QMainWindow):
     closed = pyqtSignal()

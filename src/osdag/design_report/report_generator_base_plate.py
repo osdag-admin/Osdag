@@ -26,11 +26,11 @@ Design report generator for the Base Plate Connection Module
 """
 
 # Import modules and classes
-from design_type.connection.base_plate_connection import BasePlateConnection
+from ..design_type.connection.base_plate_connection import BasePlateConnection
 # from design_type.connection.base_plate_connection import *
-from Common import *
-from Report_functions import *
-from design_report.reportGenerator_latex import CreateLatex
+from ..Common import *
+from ..Report_functions import *
+from .reportGenerator_latex import CreateLatex
 self = BasePlateConnection
 
 

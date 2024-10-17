@@ -1,4 +1,4 @@
-from app.utils.common.is800_2007 import IS800_2007
+from .common.is800_2007 import IS800_2007
 
 
 class Validator (object):

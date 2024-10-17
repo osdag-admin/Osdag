@@ -88,9 +88,9 @@ import traceback
 import time
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
-from update_version_check import Update
+from .update_version_check import Update
 #from Thread import timer
-from get_DPI_scale import scale
+from .get_DPI_scale import scale
 
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
@@ -129,54 +129,54 @@ from PyQt5.QtGui import QIcon
 from PyQt5 import QtWidgets, QtCore, QtGui
 import math
 import sys
-from gui.ui_tutorial import Ui_Tutorial
-from gui.ui_aboutosdag import Ui_AboutOsdag
-from gui.ui_ask_question import Ui_AskQuestion
-from gui.ui_design_summary import Ui_DesignReport
-from gui.LeftPanel_Button import Ui_LPButton
-from gui.Submodule_Page import Ui_Submodule_Page
-from gui.ui_OsdagMainPage import Ui_MainWindow
-from gui.ExceptionDialog import CriticalExceptionDialog
-# from design_type.connection.fin_plate_connection import design_report_show
-# from design_type.connection.fin_plate_connection import DesignReportDialog
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
-from design_type.connection.base_plate_connection import BasePlateConnection
-from design_type.connection.truss_connection_bolted import TrussConnectionBolted
+from .gui.ui_tutorial import Ui_Tutorial
+from .gui.ui_aboutosdag import Ui_AboutOsdag
+from .gui.ui_ask_question import Ui_AskQuestion
+from .gui.ui_design_summary import Ui_DesignReport
+from .gui.LeftPanel_Button import Ui_LPButton
+from .gui.Submodule_Page import Ui_Submodule_Page
+from .gui.ui_OsdagMainPage import Ui_MainWindow
+from .gui.ExceptionDialog import CriticalExceptionDialog
+# from .design_type.connection.fin_plate_connection import design_report_show
+# from .design_type.connection.fin_plate_connection import DesignReportDialog
+from .design_type.connection.fin_plate_connection import FinPlateConnection
+from .design_type.connection.cleat_angle_connection import CleatAngleConnection
+from .design_type.connection.seated_angle_connection import SeatedAngleConnection
+from .design_type.connection.end_plate_connection import EndPlateConnection
+from .design_type.connection.base_plate_connection import BasePlateConnection
+from .design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
-from design_type.connection.beam_cover_plate import BeamCoverPlate
-from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
-from design_type.tension_member.tension_bolted import Tension_bolted
-from design_type.tension_member.tension_welded import Tension_welded
+from .design_type.connection.beam_cover_plate import BeamCoverPlate
+from .design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from .design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from .design_type.connection.beam_column_end_plate import BeamColumnEndPlate
+from .design_type.tension_member.tension_bolted import Tension_bolted
+from .design_type.tension_member.tension_welded import Tension_welded
 
-from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from .design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 
-from design_type.connection.column_cover_plate import ColumnCoverPlate
-from design_type.connection.column_end_plate import ColumnEndPlate
-from design_type.compression_member import Column
-from design_type.compression_member.compression import Compression
-from design_type.compression_member.Column import ColumnDesign
-#from design_type.beam_column.Beam_Colum_Compression import ColumnDesign
+from .design_type.connection.column_cover_plate import ColumnCoverPlate
+from .design_type.connection.column_end_plate import ColumnEndPlate
+from .design_type.compression_member import Column
+from .design_type.compression_member.compression import Compression
+from .design_type.compression_member.Column import ColumnDesign
+#from .design_type.beam_column.Beam_Colum_Compression import ColumnDesign
 
-from design_type.flexural_member.flexure import Flexure
-from design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
-from design_type.flexural_member.flexure_othersupp import Flexure_Misc
-# from design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
-# from cad.cad_common import call_3DBeam
-import APP_CRASH.Appcrash.api as appcrash
+from .design_type.flexural_member.flexure import Flexure
+from .design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from .design_type.flexural_member.flexure_othersupp import Flexure_Misc
+# from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
+# from .cad.cad_common import call_3DBeam
+from .APP_CRASH.Appcrash import api as appcrash
 import configparser
 import os.path
 import subprocess
 if sys.platform == 'darwin':
     print('its mac')
-    from gui.ui_template_for_mac import Ui_ModuleWindow
+    from .gui.ui_template_for_mac import Ui_ModuleWindow
 else:
-    from gui.ui_template import Ui_ModuleWindow
-# from gui.ui_template import Ui_ModuleWindow
+    from .gui.ui_template import Ui_ModuleWindow
+# from .gui.ui_template import Ui_ModuleWindow
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -905,7 +905,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
 def do_stuff():
-    # from cad.common_logic import CommonDesignLogic
+    # from .cad.common_logic import CommonDesignLogic
     from multiprocessing import Pool
     import multiprocessing
 

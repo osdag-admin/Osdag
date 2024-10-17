@@ -10,16 +10,16 @@ Reference:
             2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
 
 """
-from design_report.reportGenerator_latex import CreateLatex
-from Report_functions import *
-from utils.common.component import *
-# from cad.common_logic import CommonDesignLogic
-from Common import *
-from utils.common.load import Load
-from design_type.member import Member
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...Report_functions import *
+from ...utils.common.component import *
+# from ...cad.common_logic import CommonDesignLogic
+from ...Common import *
+from ...utils.common.load import Load
+from ..member import Member
 import logging
-from utils.common.Section_Properties_Calculator import *
-from design_type.main import Main
+from ...utils.common.Section_Properties_Calculator import *
+from ..main import Main
 
 
 class Tension_welded(Member):
@@ -1614,7 +1614,7 @@ class Tension_welded(Member):
             # row = 1
             # # if self.loc == "Long Leg":
             # depth = 2 * self.edge_dist_min_round
-            
+
 
         # if self.sec_profile in ["Channels", "Back to Back Channels"]:
         #     image = "Channel"
@@ -2149,5 +2149,3 @@ class Tension_welded(Member):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-
-

@@ -4,10 +4,10 @@ Created on 19-March-2020
 @author : Anand Swaroop
 '''
 
-from cad.items.anchor_bolt import *
-from cad.items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from cad.items.ModelUtils import getGpPt
+from ..items.anchor_bolt import *
+from ..items.nut import Nut
+from ..items.ModelUtils import getGpPt
 import copy
 
 
@@ -510,10 +510,10 @@ class NutBoltArray():
 
 if __name__ == '__main__':
 
-    from cad.items.anchor_bolt import *
-    from cad.items.nut import Nut
-    from cad.items.ISection import ISection
-    from cad.items.plate import Plate
+    from ..items.anchor_bolt import *
+    from ..items.nut import Nut
+    from ..items.ISection import ISection
+    from ..items.plate import Plate
 
     from OCC.Display.SimpleGui import init_display
 

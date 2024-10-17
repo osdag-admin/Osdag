@@ -1,9 +1,9 @@
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-#from cad.items.angle import Angle
-from cad.cadfiles.anglebar import Angle
-from cad.items.plate import Plate
+#from ..items.angle import Angle
+from .anglebar import Angle
+from ..items.plate import Plate
 
 class StarAngle4(object):
     def __init__(self, a, b, t, l, t1, H):

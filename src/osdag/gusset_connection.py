@@ -1,14 +1,14 @@
-from design_type.connection.connection import Connection
-from design_type.member import Member
-from Common import *
+from .design_type.connection.connection import Connection
+from .design_type.member import Member
+from .Common import *
 import sqlite3
 import logging
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QMessageBox
 import sys
 
-from utils.common.component import Bolt
-from design_report.reportGenerator_latex import CreateLatex
+from .utils.common.component import Bolt
+from .design_report.reportGenerator_latex import CreateLatex
 
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
@@ -656,7 +656,7 @@ class GussetConnection(Connection,Member):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    from gui.ui_template import Ui_ModuleWindow
+    from .gui.ui_template import Ui_ModuleWindow
     window = Ui_ModuleWindow(GussetConnection,'')
     window.show()
     try:

@@ -6,7 +6,7 @@ from OCC.Core.GC import GC_MakeArcOfCircle
 from OCC.Core.TopExp import TopExp_Explorer
 from OCC.Core.TopoDS import topods
 from OCC.Core.TopAbs import TopAbs_EDGE
-from cad.items.ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
+from ..items.ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
     makeFaceFromWire, makePrismFromFace, makeEdgesFromPoints
 
 class Angle(object):

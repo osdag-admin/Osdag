@@ -1,6 +1,6 @@
 
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 

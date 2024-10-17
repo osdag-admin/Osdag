@@ -315,13 +315,13 @@ class CCEndPlateCAD(object):
 
 
 if __name__ == '__main__':
-    from cad.items.ISection import ISection
-    from cad.items.plate import Plate
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
-    from cad.items.filletweld import FilletWeld
-    from cad.items.groove_weld import GrooveWeld
-    from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray
+    from ...items.ISection import ISection
+    from ...items.plate import Plate
+    from ...items.bolt import Bolt
+    from ...items.nut import Nut
+    from ...items.filletweld import FilletWeld
+    from ...items.groove_weld import GrooveWeld
+    from ...MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray
 
     import OCC.Core.V3d
 

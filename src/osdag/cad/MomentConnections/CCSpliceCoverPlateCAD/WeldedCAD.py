@@ -5,7 +5,7 @@ created on 14-04-2020
 
 import numpy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse, BRepAlgoAPI_Cut
-from cad.items.plate import Plate
+from ...items.plate import Plate
 import copy
 
 
@@ -549,9 +549,9 @@ class CCSpliceCoverPlateWeldedCAD(object):
         return CAD
 
 if __name__ == '__main__':
-    from cad.items.ISection import ISection
-    from cad.items.plate import Plate
-    from cad.items.filletweld import FilletWeld
+    from ...items.ISection import ISection
+    from ...items.plate import Plate
+    from ...items.filletweld import FilletWeld
 
     import OCC.Core.V3d
 

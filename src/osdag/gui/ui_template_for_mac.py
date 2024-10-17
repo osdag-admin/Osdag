@@ -7,15 +7,15 @@
 # WARNING! All changes made in this file will be lost!\
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from design_report import reportGenerator
+from ..design_report import reportGenerator
 
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *   
-from gui.ui_tutorial import Ui_Tutorial
-from gui.ui_aboutosdag import Ui_AboutOsdag
-from gui.ui_ask_question import Ui_AskQuestion
+from .ui_tutorial import Ui_Tutorial
+from .ui_aboutosdag import Ui_AboutOsdag
+from .ui_ask_question import Ui_AskQuestion
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 # from PIL import Image
@@ -35,52 +35,52 @@ import configparser
 import pickle
 # import cairosvg
 
-from update_version_check import Update
+from ..update_version_check import Update
 import pandas as pd
 
 
 
-from Common import *
-from utils.common.component import *
-from utils.common.Section_Properties_Calculator import *
+from ..Common import *
+from ..utils.common.component import *
+from ..utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 #from .ui_design_preferences import Ui_Dialog
 
-from gui.ui_summary_popup import Ui_Dialog1
-from design_report.reportGenerator import save_html
+from .ui_summary_popup import Ui_Dialog1
+from ..design_report.reportGenerator import save_html
 from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
 #from .ui_design_preferences import DesignPreferences
 from .UI_DESIGN_PREFERENCE import DesignPreferences
-from design_type.connection.shear_connection import ShearConnection
-from cad.common_logic import CommonDesignLogic
+from ..design_type.connection.shear_connection import ShearConnection
+from ..cad.common_logic import CommonDesignLogic
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.Interface import Interface_Static_SetCVal
 from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
-from cad.cad3dconnection import cadconnection
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.column_cover_plate import ColumnCoverPlate
-from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
-from design_type.connection.beam_cover_plate import BeamCoverPlate
-from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.beam_end_plate import BeamEndPlate
-from design_type.connection.column_end_plate import ColumnEndPlate
-from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from design_type.connection.base_plate_connection import BasePlateConnection
-from design_type.tension_member.tension_bolted import Tension_bolted
-from design_type.tension_member.tension_welded import Tension_welded
+from ..cad.cad3dconnection import cadconnection
+from ..design_type.connection.fin_plate_connection import FinPlateConnection
+from ..design_type.connection.column_cover_plate import ColumnCoverPlate
+from ..design_type.connection.cleat_angle_connection import CleatAngleConnection
+from ..design_type.connection.seated_angle_connection import SeatedAngleConnection
+from ..design_type.connection.end_plate_connection import EndPlateConnection
+from ..design_type.connection.end_plate_connection import EndPlateConnection
+from ..design_type.connection.beam_cover_plate import BeamCoverPlate
+from ..design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from ..design_type.connection.beam_end_plate import BeamEndPlate
+from ..design_type.connection.column_end_plate import ColumnEndPlate
+from ..design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from ..design_type.connection.base_plate_connection import BasePlateConnection
+from ..design_type.tension_member.tension_bolted import Tension_bolted
+from ..design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
-from get_DPI_scale import scale
-from cad.cad3dconnection import cadconnection
+from ..get_DPI_scale import scale
+from ..cad.cad3dconnection import cadconnection
 from OCC.Display.backend import load_backend, get_qt_modules
-from osdagMainSettings import backend_name
+from ..osdagMainSettings import backend_name
 used_backend = load_backend(backend_name())
 
 global display, start_display, app, _, USED_BACKEND

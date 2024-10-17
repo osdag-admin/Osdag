@@ -4,8 +4,8 @@ Created on 07-Jun-2015
 @author: deepa
 '''
 import numpy
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
+from ...items.bolt import Bolt
+from ...items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from .ModelUtils import get_gp_pt
 import copy

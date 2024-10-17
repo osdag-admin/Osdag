@@ -13,14 +13,14 @@ Reference:
 
 """
 
-from design_type.connection.moment_connection import MomentConnection
-from utils.common.component import *
-from utils.common.is800_2007 import *
-from Common import *
-from design_report.reportGenerator_latex import CreateLatex
-from Report_functions import *
+from .moment_connection import MomentConnection
+from ...utils.common.component import *
+from ...utils.common.is800_2007 import *
+from ...Common import *
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...Report_functions import *
 
-from utils.common.load import Load
+from ...utils.common.load import Load
 import logging
 
 

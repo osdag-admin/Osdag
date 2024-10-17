@@ -6,9 +6,9 @@ created on 02-06-2020
 import numpy as np
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.ModelUtils import getGpPt
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
+from ...items.ModelUtils import getGpPt
+from ...items.bolt import Bolt
+from ...items.nut import Nut
 
 
 class NutBoltArray(object):
@@ -349,8 +349,8 @@ class NutBoltArray(object):
 
 
 if __name__ == '__main__':
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
+    from ...items.bolt import Bolt
+    from ...items.nut import Nut
     import numpy
 
     from OCC.gp import gp_Pnt

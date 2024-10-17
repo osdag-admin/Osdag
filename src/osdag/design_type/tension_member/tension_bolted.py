@@ -12,17 +12,17 @@ Reference:
 
 """
 
-from design_report.reportGenerator_latex import CreateLatex
-from utils.common.Section_Properties_Calculator import *
-from utils.common.component import *
-# from cad.common_logic import CommonDesignLogic
-from utils.common.material import *
-from Report_functions import *
-from utils.common.load import Load
-from utils.common.Section_Properties_Calculator import *
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...utils.common.Section_Properties_Calculator import *
+from ...utils.common.component import *
+# from ...cad.common_logic import CommonDesignLogic
+from ...utils.common.material import *
+from ...Report_functions import *
+from ...utils.common.load import Load
+from ...utils.common.Section_Properties_Calculator import *
 
 import logging
-from design_type.member import Member
+from ..member import Member
 
 
 

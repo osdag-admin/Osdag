@@ -5,7 +5,7 @@ Created on 20-Jan-2020
 '''
 import numpy
 from numpy import sqrt, square
-from cad.items.ModelUtils import *  # getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
+from .ModelUtils import *  # getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
 import math
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeWire, BRepBuilderAPI_MakeFace
 

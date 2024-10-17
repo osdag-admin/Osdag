@@ -1,8 +1,8 @@
 from builtins import str
 import time
-from Report_functions import *
+from ..Report_functions import *
 import math
-from utils.common.common_calculation import *
+from ..utils.common.common_calculation import *
 # from Common import *
 import os
 # from utils.common import component

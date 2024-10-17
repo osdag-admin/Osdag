@@ -158,4 +158,4 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_help.setItemText(3, _translate("MainWindow", "Ask Us a Question"))
         self.comboBox_help.setItemText(4, _translate("MainWindow", "Check for Update"))
         self.comboBox_help.setItemText(5, _translate("MainWindow", "About Osdag"))
-import gui.osdagMainPageIcons_rc
+from . import osdagMainPageIcons_rc

@@ -5,7 +5,7 @@ Created on 14-Mar-2016
 '''
 from OCC.Core.gp import gp_Circ, gp_Ax2
 import numpy
-from cad.items.ModelUtils import make_edge, getGpPt, getGpDir, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
+from .ModelUtils import make_edge, getGpPt, getGpDir, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 
 '''
 
@@ -24,7 +24,7 @@ from cad.items.ModelUtils import make_edge, getGpPt, getGpDir, makeWireFromEdges
               |            XX   X                  |        X
               |              XX                    |     X
               |                 XX                 |  X
-              v          X          XX-------------X  
+              v          X          XX-------------X
                        a9           a5              a4
 
                         <---------- width -------->
@@ -62,7 +62,7 @@ class Notch(object):
         self.b = self.sec_origin + (self.width / 2.0) * self.uDir + self.height * (-self.vDir)
         self.b2 = self.b + self.R1 * (-self.uDir)
 
-        self.d = self.sec_origin + (-self.width / 2.0) * self.uDir 
+        self.d = self.sec_origin + (-self.width / 2.0) * self.uDir
         self.c1 = self.d + (self.height - self.R1) * (-self.vDir)
         self.o2 = self.c1 + self.R1 * self.uDir
         self.c = self.sec_origin + (self.width / 2.0) * (-self.uDir) + self.height * (-self.vDir)

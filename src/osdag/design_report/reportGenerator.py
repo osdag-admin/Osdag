@@ -8,9 +8,9 @@ Created on Dec 10, 2015
 from builtins import str
 import time
 import math
-from Common import *
+from ..Common import *
 import os
-from utils.common import component
+from ..utils.common import component
 # from Connections.connection_calculations import ConnectionCalculations
 
 def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):

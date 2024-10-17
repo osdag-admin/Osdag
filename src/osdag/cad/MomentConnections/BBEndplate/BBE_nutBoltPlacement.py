@@ -4,10 +4,10 @@ modified: Darshan Vishwakarma (12-09-2020)
 """
 import numpy as np
 
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
+from ...items.bolt import Bolt
+from ...items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from cad.items.ModelUtils import getGpPt
+from ...items.ModelUtils import getGpPt
 
 
 class BBENutBoltArray(object):

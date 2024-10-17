@@ -1,4 +1,4 @@
-from utils.common.is800_2007 import *
+from .utils.common.is800_2007 import *
 from pylatex import Math
 from pylatex.utils import NoEscape
 

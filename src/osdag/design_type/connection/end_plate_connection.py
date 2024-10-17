@@ -40,12 +40,12 @@ ASCII diagram
             +-+-------------+-+
 
 """
-from design_type.connection.shear_connection import ShearConnection
-from utils.common.component import *
-from utils.common.material import *
-from Common import *
-from design_report.reportGenerator_latex import CreateLatex
-from Report_functions import *
+from .shear_connection import ShearConnection
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...Common import *
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...Report_functions import *
 import logging
 
 

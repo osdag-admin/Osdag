@@ -1,7 +1,7 @@
 import sqlite3
-from Common import *
+from ...Common import *
 import logging
-from utils.common.is800_2007 import IS800_2007
+from .is800_2007 import IS800_2007
 
 
 class Material(object):

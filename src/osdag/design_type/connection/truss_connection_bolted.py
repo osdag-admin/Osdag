@@ -1,8 +1,8 @@
-from design_type.connection.truss_connection import TrussConnection
-from design_report.reportGenerator_latex import CreateLatex
-from utils.common.component import *
-from utils.common.material import *
-from Report_functions import *
+from .truss_connection import TrussConnection
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...Report_functions import *
 import logging
 
 

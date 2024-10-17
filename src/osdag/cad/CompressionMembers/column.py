@@ -1,7 +1,7 @@
 import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.ISection import *
+from ..items.ISection import *
 
 
 class CompressionMemberCAD(object):

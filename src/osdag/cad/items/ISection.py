@@ -4,10 +4,9 @@ Created on 29-Nov-2014
 @author: deepa
 '''
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
-#from notch import Notch
-from cad.items.notch import Notch
+from .notch import Notch
 from OCC.Core.gp import (gp_Vec, gp_Pnt, gp_Trsf, gp_OX, gp_OY,
                          gp_OZ, gp_XYZ, gp_Ax2, gp_Dir, gp_GTrsf, gp_Mat)
 """

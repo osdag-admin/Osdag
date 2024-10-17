@@ -4,20 +4,20 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-from Common import *
-from utils.common.Section_Properties_Calculator import *
-from utils.common.component import *
-from utils.common.other_standards import *
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.connection import Connection
+from ..Common import *
+from ..utils.common.Section_Properties_Calculator import *
+from ..utils.common.component import *
+from ..utils.common.other_standards import *
+from ..design_type.connection.fin_plate_connection import FinPlateConnection
+from ..design_type.connection.connection import Connection
 
 import os
-from drawing_2D.Svg_Window import SvgWindow
+from ..drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
 import shutil
 import openpyxl
-from get_DPI_scale import scale,width,height
+from ..get_DPI_scale import scale, width, height
 
 
 class MyTableWidget(QWidget):

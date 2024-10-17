@@ -1,10 +1,10 @@
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
-from cad.cadfiles.anglebar import Angle
+from ..cadfiles.anglebar import Angle
 
-from cad.items.plate import Plate
+from ..items.plate import Plate
 
 class Box(object):
     def __init__(self, A, B, t, H, s, s1):

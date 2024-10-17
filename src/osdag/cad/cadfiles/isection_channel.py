@@ -1,9 +1,9 @@
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.channel import Channel
-from cad.items.plate import Plate
-from cad.items.ISection import ISection
+from ..items.channel import Channel
+from ..items.plate import Plate
+from ..items.ISection import ISection
 
 class ISectionChannel(object):
 

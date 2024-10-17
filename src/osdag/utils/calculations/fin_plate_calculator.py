@@ -1,11 +1,11 @@
-from app.utils.common.fin_plate_output import FinPlateOutputObject
+from ..common.output import FinPlateConnectionOutput
 
 
 def calculate(input_object, design_preferences):
     a = input_object.a
     b = input_object.b
 
-    fpoo = FinPlateOutputObject()
+    fpoo = FinPlateConnectionOutput()
     fpoo.c = a + b
 
     return fpoo

@@ -1,11 +1,11 @@
 
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut, BRepAlgoAPI_Fuse
 
 class Stiffener_flange(object):
     def __init__(self, H, L, T, t_f, L_h, L_v, to_left=True):
-       
+
         self.H = H
         self.L = L
         self.T = T
@@ -22,14 +22,14 @@ class Stiffener_flange(object):
         self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
-       
+
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
         self.compute_params()
 
     def compute_params(self):
-       
+
         self.vDir = numpy.cross(self.wDir, self.uDir)   # Cross product of vector wDir and uDir
         self.a1 = self.sec_origin + self.H * self.wDir
         self.a2 = self.a1 + self.L_h * self.uDir
@@ -41,15 +41,15 @@ class Stiffener_flange(object):
         self.b1 = self.sec_origin
         self.b2 = self.sec_origin + (self.T - self.t) * self.vDir - 0.001 * self.vDir
         self.b3 = self.sec_origin + self.t_l * self.uDir
-        self.points2 = [self.b1, self.b2, self.b3] 
+        self.points2 = [self.b1, self.b2, self.b3]
 
         self.c1 = self.sec_origin + self.T * self.vDir
         self.c2 = self.c1 + (self.t - self.T) * self.vDir - 0.01 * self.vDir
         self.c3 = self.c1 + self.t_l * self.uDir
-        self.points3 = [self.c1, self.c2, self.c3]  
+        self.points3 = [self.c1, self.c2, self.c3]
 
     def create_model(self):
-        
+
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)

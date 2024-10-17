@@ -1,7 +1,7 @@
 import yaml
-from design_type.connection.beam_column_end_plate import BeamColumnEndPlate
-from utils.common.component import *
-from utils.common.load import Load
+from .design_type.connection.beam_column_end_plate import BeamColumnEndPlate
+from .utils.common.component import *
+from .utils.common.load import Load
 
 
 

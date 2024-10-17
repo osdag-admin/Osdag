@@ -1,10 +1,10 @@
 
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 
 
 class TISection(object):
-   
+
 
     def __init__(self, D, B, T, t, P, Q, H):
         self.B = B
@@ -14,7 +14,7 @@ class TISection(object):
         self.d = P
         self.b = Q
         self.length = H
-        
+
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -44,14 +44,14 @@ class TISection(object):
         self.d4 = self.sec_origin + ((self.B / 2.0) - self.b) * self.uDir + -((self.D / 2.0) -self.T - self.d) * self.vDir
         self.b4 = self.sec_origin + (self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T - self.d) * self.vDir
         self.c4 = self.sec_origin + (self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
-        
-        
-        
-        
+
+
+
+
         self.points = [self.a1, self.b1, self.c1,
                        self.c2, self.b2, self.a2,
                        self.a3, self.d7, self.d5,
-                       self.b3, self.c3, self.c4, 
+                       self.b3, self.c3, self.c4,
                        self.b4, self.d4, self.d6,
                        self.a4]
 
@@ -62,7 +62,7 @@ class TISection(object):
         aFace = makeFaceFromWire(wire)
         extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
-                
+
         return prism
 
     def create_marking(self):
@@ -77,7 +77,7 @@ class TISection(object):
 
         y_points = [numpy.array([0.,-offset,self.length/2]), numpy.array([0,offset,self.length/2])]
         line.append(makeEdgesFromPoints(y_points))
-        
+
         u_points = [numpy.array([-uvoffset,uvoffset,self.length/2]), numpy.array([uvoffset,-uvoffset,self.length/2])]
         line.append(makeEdgesFromPoints(u_points))
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     P = 8
     Q = 4
     H = 100
-    
+
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])

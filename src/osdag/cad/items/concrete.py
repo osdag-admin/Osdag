@@ -4,7 +4,7 @@ Created on 29-March-2020
 @author: Anand Swaroop
 '''
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeWedge
 from OCC.Core.gp import gp_Dir, gp_Circ, gp_Ax2, gp_Ax1
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse

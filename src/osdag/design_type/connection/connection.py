@@ -1,7 +1,7 @@
-from utils.common.component import ISection, Material, Beam
-from utils.common.Section_Properties_Calculator import I_sectional_Properties
-from design_type.main import Main
-from Common import *
+from ...utils.common.component import ISection, Material, Beam
+from ...utils.common.Section_Properties_Calculator import I_sectional_Properties
+from ..main import Main
+from ...Common import *
 import numpy as np
 
 

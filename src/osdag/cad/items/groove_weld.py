@@ -6,7 +6,7 @@ Created on 15-May-2019
 
 '''
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 
 '''
                                                 X---------------X

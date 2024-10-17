@@ -5,7 +5,7 @@ Created on 15-May-2020
 '''
 import numpy
 import math
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 
 
 class GassetPlate(object):

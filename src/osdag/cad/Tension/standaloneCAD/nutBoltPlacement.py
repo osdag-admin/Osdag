@@ -4,12 +4,12 @@ Created on 19-April-2020
 @author : Anand Swaroop
 '''
 
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
+from ...items.bolt import Bolt
+from ...items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from cad.items.ModelUtils import getGpPt
+from ...items.ModelUtils import getGpPt
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.plate import Plate
+from ...items.plate import Plate
 
 
 class NutBoltArray():
@@ -131,9 +131,9 @@ class NutBoltArray():
 
 
 if __name__ == '__main__':
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
-    from cad.items.plate import Plate
+    from ...items.bolt import Bolt
+    from ...items.nut import Nut
+    from ...items.plate import Plate
     import numpy
 
     from OCC.gp import gp_Pnt

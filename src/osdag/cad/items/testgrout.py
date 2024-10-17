@@ -384,24 +384,24 @@ class BasePlateCad(object):
 
 if __name__ == '__main__':
 
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
-    from cad.items.plate import Plate
-    from cad.items.ISection import ISection
-    from cad.items.filletweld import FilletWeld
-    from cad.items.groove_weld import GrooveWeld
-    from cad.items.concrete import Concrete
+    from .bolt import Bolt
+    from .nut import Nut
+    from .plate import Plate
+    from .ISection import ISection
+    from .filletweld import FilletWeld
+    from .groove_weld import GrooveWeld
+    from .concrete import Concrete
     from cad.BasePlateCad.nutBoltPlacement import NutBoltArray
-    from cad.items.anchor_bolt import *
-    from cad.items.nut import Nut
-    from cad.items.stiffener_plate import StiffenerPlate
-    from cad.items.concrete import Concrete
-    from cad.items.grout import Grout
+    from .anchor_bolt import *
+    from .nut import Nut
+    from .stiffener_plate import StiffenerPlate
+    from .concrete import Concrete
+    from .grout import Grout
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
     from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-    from utilities import osdag_display_shape
+    from ...utilities import osdag_display_shape
     # from cad.common_logic import CommonDesignLogic
 
     # from OCC.Core.Graphic3d import Quantity_NOC_GRAY as GRAY

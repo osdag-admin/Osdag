@@ -1,5 +1,5 @@
 import math
-from utils.common.component import Angle, Column,Beam,Channel
+from .component import Angle, Column,Beam,Channel
 from abc import ABC, abstractmethod
 
 

@@ -9,10 +9,10 @@ W is for bolting over Web.
 
 """""
 
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
+from ...items.bolt import Bolt
+from ...items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from cad.items.ModelUtils import getGpPt
+from ...items.ModelUtils import getGpPt
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
@@ -183,8 +183,8 @@ class NutBoltArray_AF():
 
 
 if __name__ == '__main__':
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
+    from ...items.bolt import Bolt
+    from ...items.nut import Nut
     import numpy
 
     from OCC.gp import gp_Pnt

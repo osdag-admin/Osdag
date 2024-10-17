@@ -24,18 +24,18 @@
 
 # Importing modules from the project directory
 
-from design_type.connection.moment_connection import MomentConnection
-from utils.common.is800_2007 import IS800_2007
-from utils.common.other_standards import IS_5624_1993
-from utils.common.component import *
-from utils.common.material import *
-from utils.common.common_calculation import *
-from Common import *
-from utils.common.load import Load
-from utils.common.other_standards import *
-from design_report.reportGenerator import save_html
-from Report_functions import *
-from design_report.reportGenerator_latex import CreateLatex
+from .moment_connection import MomentConnection
+from ...utils.common.is800_2007 import IS800_2007
+from ...utils.common.other_standards import IS_5624_1993
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...utils.common.common_calculation import *
+from ...Common import *
+from ...utils.common.load import Load
+from ...utils.common.other_standards import *
+from ...design_report.reportGenerator import save_html
+from ...Report_functions import *
+from ...design_report.reportGenerator_latex import CreateLatex
 
 import logging
 

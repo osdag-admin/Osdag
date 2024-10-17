@@ -226,13 +226,13 @@ class CCSpliceCoverPlateBoltedCAD(object):
         return CAD
 
 if __name__ == '__main__':
-    from cad.items.ISection import ISection
-    from cad.items.plate import Plate
-    from cad.items.bolt import Bolt
-    from cad.items.nut import Nut
-    from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutBoltArray_AF
-    from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_BF import NutBoltArray_BF
-    from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import NutBoltArray_Web
+    from ...items.ISection import ISection
+    from ...items.plate import Plate
+    from ...items.bolt import Bolt
+    from ...items.nut import Nut
+    from .nutBoltPlacement_AF import NutBoltArray_AF
+    from .nutBoltPlacement_BF import NutBoltArray_BF
+    from .nutBoltPlacement_Web import NutBoltArray_Web
     import numpy
 
     import OCC.Core.V3d

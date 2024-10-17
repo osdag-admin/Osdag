@@ -6,7 +6,7 @@ Created on 10-Mar-2016
 import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
-from design_type.connection import fin_plate_connection
+from ....design_type.connection import fin_plate_connection
 
 
 
@@ -64,8 +64,8 @@ class BeamWebBeamWeb():
 #         # plateThickness = 10
 #         # uDir3 = numpy.array([0, 1.0, 0])
 #         # wDir3 = numpy.array([1.0, 0, 0.0])
-#         # origin3 = (self.column.sec_origin + 
-#         #            self.column.t/2.0 * self.column.uDir + 
+#         # origin3 = (self.column.sec_origin +
+#         #            self.column.t/2.0 * self.column.uDir +
 #         #            self.column.length/2.0 * self.column.wDir +
 #         #            self.beam.t/2.0 * (-self.beam.uDir)+
 #         #            self.weld.W/2.0 * (-self.beam.uDir))
@@ -96,7 +96,7 @@ class BeamWebBeamWeb():
 
     def create_nut_bolt_array(self):
 
-        nutboltArrayOrigin = self.plate.sec_origin 
+        nutboltArrayOrigin = self.plate.sec_origin
         nutboltArrayOrigin = nutboltArrayOrigin - self.plate.T / 2.0 * self.plate.uDir
         nutboltArrayOrigin = nutboltArrayOrigin + self.plate.L / 2.0 * self.plate.vDir
 

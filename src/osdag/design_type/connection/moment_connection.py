@@ -1,10 +1,10 @@
-from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection, RHS, SHS, CHS
-from Common import *
-from utils.common.load import Load
-from utils.common.material import Material
-from utils.common import common_calculation
-from utils.common.is800_2007 import IS800_2007
+from .connection import Connection
+from ...utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection, RHS, SHS, CHS
+from ...Common import *
+from ...utils.common.load import Load
+from ...utils.common.material import Material
+from ...utils.common import common_calculation
+from ...utils.common.is800_2007 import IS800_2007
 import numpy as np
 
 import logging
@@ -563,4 +563,3 @@ class MomentConnection(Connection, IS800_2007):
         weld_size = common_calculation.round_up(weld_size, 2, weld_size_minimum)  # mm
 
         return weld_size
-

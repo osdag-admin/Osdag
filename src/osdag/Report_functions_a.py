@@ -1,8 +1,8 @@
 from builtins import str
 import time
 import math
-from Common import *
-from utils.common.is800_2007 import *
+from .Common import *
+from .utils.common.is800_2007 import *
 import os
 # from utils.common import component
 from pylatex import Document, Section, Subsection

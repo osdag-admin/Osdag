@@ -34,23 +34,23 @@ import sys
 import os
 import pprint
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Common import *
-from gui.ui_section_parameters import Ui_SectionParameters
-from gui.ui_SectionModeller_SummaryPopUp import Ui_Dialog1 as SummaryDialog
-from SectionModeller_Latex import CreateLatex
-from cad.cadfiles.isection_coverplate import IsectionCoverPlate
-from cad.cadfiles.isection_channel import ISectionChannel
-from cad.cadfiles.star_angle2 import StarAngle2
-from cad.cadfiles.star_angle4 import StarAngle4
-from cad.cadfiles.star_angle_opp import StarAngleOpposite
-from cad.cadfiles.star_angle_same import StarAngleSame
-from cad.cadfiles.TIsection import TISection
-from cad.cadfiles.channel_section import ChannelSection
-from cad.cadfiles.channel_section_opp import ChannelSectionOpposite
-from cad.cadfiles.box import Box
-from cad.cadfiles.box_angle import BoxAngle
-from cad.cadfiles.cross_isection import cross_isection
-from cad.items.ModelUtils import getGpPt
+from ..Common import *
+from .ui_section_parameters import Ui_SectionParameters
+from .ui_SectionModeller_SummaryPopUp import Ui_Dialog1 as SummaryDialog
+from ..SectionModeller_Latex import CreateLatex
+from ..cad.cadfiles.isection_coverplate import IsectionCoverPlate
+from ..cad.cadfiles.isection_channel import ISectionChannel
+from ..cad.cadfiles.star_angle2 import StarAngle2
+from ..cad.cadfiles.star_angle4 import StarAngle4
+from ..cad.cadfiles.star_angle_opp import StarAngleOpposite
+from ..cad.cadfiles.star_angle_same import StarAngleSame
+from ..cad.cadfiles.TIsection import TISection
+from ..cad.cadfiles.channel_section import ChannelSection
+from ..cad.cadfiles.channel_section_opp import ChannelSectionOpposite
+from ..cad.cadfiles.box import Box
+from ..cad.cadfiles.box_angle import BoxAngle
+from ..cad.cadfiles.cross_isection import cross_isection
+from ..cad.items.ModelUtils import getGpPt
 
 
 class Ui_OsdagSectionModeller(object):
@@ -630,8 +630,8 @@ class Ui_OsdagSectionModeller(object):
                         self.disable_usability(True)
                 else:
                         self.disable_usability(False)
-                        self.update_section_properties(index_type,index_template)                        
-        
+                        self.update_section_properties(index_type,index_template)
+
         def display_lines(self, lines, points, labels):
                 for l,p1,p2,n in zip(lines,points[0],points[1], labels):
                         display.DisplayShape(l, update=True)
@@ -735,7 +735,7 @@ class Ui_OsdagSectionModeller(object):
                                 self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
-                        
+
 
                         elif(index_template==5):
                                 l = 40
@@ -759,7 +759,7 @@ class Ui_OsdagSectionModeller(object):
                                 self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
-                                
+
 
                 elif(index_type==4):
                         if(index_template==1):
@@ -814,7 +814,7 @@ class Ui_OsdagSectionModeller(object):
                                 self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
-                                
+
                 elif(index_type==5):
                         B = 20
                         T = 2
@@ -1186,7 +1186,7 @@ class Ui_OsdagSectionModeller(object):
                                 B/=10
                                 T/=10
                                 t/=10
-                                Db=D-(2*T)                                
+                                Db=D-(2*T)
                                 Ab=A+(2*P*ta)
                                 Ybottom=(
                                         (B*T*T/2)+
@@ -1501,11 +1501,11 @@ class Ui_OsdagSectionModeller(object):
                         parameters['Section_Parameters']=self.Parameters
                         parameters['Section_Designation']=designation
                         parameters['Section_Properties']=self.get_section_properties()
-                        
+
                         with open(folder+'/'+designation+'.osm','w') as file:
-                                file.write(pprint.pformat(parameters))    
+                                file.write(pprint.pformat(parameters))
                         QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(),'INFO','File Succesfully saved.')
-                                                                                          
+
 
 
         def export_to_pdf(self):

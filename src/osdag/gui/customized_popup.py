@@ -14,7 +14,7 @@ import sqlite3
 from PyQt5.QtCore import pyqtSlot
 #from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog
-from get_DPI_scale import scale
+from ..get_DPI_scale import scale
 #from .ui_template import *
 
 

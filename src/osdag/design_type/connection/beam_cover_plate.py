@@ -12,13 +12,13 @@ Reference:
 
 """
 
-from design_type.connection.moment_connection import MomentConnection
-from utils.common.component import *
-# from cad.common_logic import CommonDesignLogic
-from Common import *
-from utils.common.load import Load
-from design_report.reportGenerator_latex import CreateLatex
-from Report_functions import *
+from .moment_connection import MomentConnection
+from ...utils.common.component import *
+# from ...cad.common_logic import CommonDesignLogic
+from ...Common import *
+from ...utils.common.load import Load
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...Report_functions import *
 import logging
 
 

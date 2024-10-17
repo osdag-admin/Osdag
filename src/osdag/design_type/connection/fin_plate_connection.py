@@ -1,8 +1,8 @@
-from design_type.connection.shear_connection import ShearConnection
-from design_report.reportGenerator_latex import CreateLatex
-from utils.common.component import *
-from utils.common.material import *
-from Report_functions import *
+from . shear_connection import ShearConnection
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...Report_functions import *
 import logging
 
 

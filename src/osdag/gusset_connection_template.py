@@ -1,5 +1,5 @@
-from design_type.connection.connection import Connection
-from Common import *
+from .design_type.connection.connection import Connection
+from .Common import *
 import logging
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog

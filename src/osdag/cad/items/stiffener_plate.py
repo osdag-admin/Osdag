@@ -5,7 +5,7 @@ Created on 16-May-2019
 '''
 
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.gp import (gp_Vec, gp_Pnt, gp_Trsf, gp_OX, gp_OY,
                          gp_OZ, gp_XYZ, gp_Ax2, gp_Dir, gp_GTrsf, gp_Mat)
 from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
 
     display, start_display, add_menu, add_function_to_menu = init_display()
-    
+
     L = 10
     W = 10
     T = 1

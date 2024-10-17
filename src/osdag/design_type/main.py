@@ -1,7 +1,7 @@
-from Common import *
-from utils.common.load import Load
-from utils.common.component import *
-from utils.common.Section_Properties_Calculator import *
+from ..Common import *
+from ..utils.common.load import Load
+from ..utils.common.component import *
+from ..utils.common.Section_Properties_Calculator import *
 
 class Main():
 

@@ -426,19 +426,19 @@ class TensionChannelWeldCAD(TensionAngleWeldCAD):
 
 if __name__ == '__main__':
     import math
-    from cad.items.plate import Plate
-    from cad.items.filletweld import FilletWeld
-    from cad.items.channel import Channel
-    from cad.items.angle import Angle
-    from cad.items.stiffener_plate import StiffenerPlate
-    from cad.items.Gasset_plate import GassetPlate
-    from cad.Tension.standaloneCAD.IntermittentConnections import IntermittentWelds
+    from ...items.plate import Plate
+    from ...items.filletweld import FilletWeld
+    from ...items.channel import Channel
+    from ...items.angle import Angle
+    from ...items.stiffener_plate import StiffenerPlate
+    from ...items.Gasset_plate import GassetPlate
+    from .IntermittentConnections import IntermittentWelds
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
     from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-    from utilities import osdag_display_shape
-    # from cad.common_logic import CommonDesignLogic
+    from ....utilities import osdag_display_shape
+    # from ...common_logic import CommonDesignLogic
 
     from OCC.gp import gp_Pnt
     from OCC.Display.SimpleGui import init_display

@@ -18,8 +18,8 @@
 
 # Importing modules from the project directory
 
-from utils.common.component import *
-from utils.common.common_calculation import *
+from ...utils.common.component import *
+from ...utils.common.common_calculation import *
 
 import logging
 import math

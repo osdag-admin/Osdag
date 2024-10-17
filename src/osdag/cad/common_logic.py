@@ -6,90 +6,90 @@ modified : Sourabh Das, Darshan Vishwakarma
 '''
 
 # from utils.common.component import Bolt,Beam,Section,Angle,Plate,Nut,Column,Weld
-from cad.items.notch import Notch
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
-from cad.items.plate import Plate
-from cad.items.washer import Washer
-from cad.items.ISection import ISection
-from cad.items.filletweld import FilletWeld
-from cad.items.groove_weld import GrooveWeld
-from cad.items.angle import Angle
-from cad.items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
-from cad.items.stiffener_plate import StiffenerPlate
-from cad.items.grout import Grout
-from cad.items.angle import Angle
-from cad.items.channel import Channel
-from cad.items.Gasset_plate import GassetPlate
-from cad.items.stiffener_flange import Stiffener_flange
-from cad.items.rect_hollow import RectHollow
-from cad.items.circular_hollow import CircularHollow
+from .items.notch import Notch
+from .items.bolt import Bolt
+from .items.nut import Nut
+from .items.plate import Plate
+from .items.washer import Washer
+from .items.ISection import ISection
+from .items.filletweld import FilletWeld
+from .items.groove_weld import GrooveWeld
+from .items.angle import Angle
+from .items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
+from .items.stiffener_plate import StiffenerPlate
+from .items.grout import Grout
+from .items.angle import Angle
+from .items.channel import Channel
+from .items.Gasset_plate import GassetPlate
+from .items.stiffener_flange import Stiffener_flange
+from .items.rect_hollow import RectHollow
+from .items.circular_hollow import CircularHollow
 
-from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
-from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
-from cad.ShearConnections.FinPlate.colWebBeamWebConnectivity import ColWebBeamWeb as FinColWebBeamWeb
-from cad.ShearConnections.FinPlate.nutBoltPlacement import NutBoltArray as finNutBoltArray
+from .ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
+from .ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
+from .ShearConnections.FinPlate.colWebBeamWebConnectivity import ColWebBeamWeb as FinColWebBeamWeb
+from .ShearConnections.FinPlate.nutBoltPlacement import NutBoltArray as finNutBoltArray
 
-from cad.ShearConnections.CleatAngle.beamWebBeamWebConnectivity import BeamWebBeamWeb as cleatBeamWebBeamWeb
-from cad.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
-from cad.ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
-from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
+from .ShearConnections.CleatAngle.beamWebBeamWebConnectivity import BeamWebBeamWeb as cleatBeamWebBeamWeb
+from .ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
+from .ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
+from .ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
 
-from cad.ShearConnections.EndPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as EndBeamWebBeamWeb
-from cad.ShearConnections.EndPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as EndColFlangeBeamWeb
-from cad.ShearConnections.EndPlate.colWebBeamWebConnectivity import ColWebBeamWeb as EndColWebBeamWeb
-from cad.ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNutBoltArray
+from .ShearConnections.EndPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as EndBeamWebBeamWeb
+from .ShearConnections.EndPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as EndColFlangeBeamWeb
+from .ShearConnections.EndPlate.colWebBeamWebConnectivity import ColWebBeamWeb as EndColWebBeamWeb
+from .ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNutBoltArray
 
-from cad.ShearConnections.SeatedAngle.CAD_col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
-from cad.ShearConnections.SeatedAngle.CAD_col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
-from cad.ShearConnections.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
-# from cad.ShearConnections.SeatedAngle.seat_angle_calc import SeatAngleCalculation
+from .ShearConnections.SeatedAngle.CAD_col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
+from .ShearConnections.SeatedAngle.CAD_col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
+from .ShearConnections.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
+# from .ShearConnections.SeatedAngle.seat_angle_calc import SeatAngleCalculation
 
-from cad.BBCad.nutBoltPlacement_AF import NutBoltArray_AF
-from cad.BBCad.nutBoltPlacement_BF import NutBoltArray_BF
-from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
-from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+from .BBCad.nutBoltPlacement_AF import NutBoltArray_AF
+from .BBCad.nutBoltPlacement_BF import NutBoltArray_BF
+from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
+from .BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 
-from cad.MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
-from cad.MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
-from cad.MomentConnections.BBEndplate.BBEndplate_cadFile import CADGroove
-from cad.MomentConnections.BCEndplate.BCEndplate_cadfile import CADGroove as BCECADGroove
-from cad.MomentConnections.BCEndplate.BCEndplate_cadfile import CADcolwebGroove
+from .MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
+from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
+from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADGroove
+from .MomentConnections.BCEndplate.BCEndplate_cadfile import CADGroove as BCECADGroove
+from .MomentConnections.BCEndplate.BCEndplate_cadfile import CADcolwebGroove
 
-from cad.MomentConnections.CCSpliceCoverPlateCAD.WeldedCAD import CCSpliceCoverPlateWeldedCAD
-from cad.MomentConnections.CCSpliceCoverPlateCAD.BoltedCAD import CCSpliceCoverPlateBoltedCAD
-from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutBoltArray_AF as CCSpliceNutBolt_AF
-from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_BF import NutBoltArray_BF as CCSpliceNutBolt_BF
-from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import NutBoltArray_Web as CCSpliceNutBolt_Web
+from .MomentConnections.CCSpliceCoverPlateCAD.WeldedCAD import CCSpliceCoverPlateWeldedCAD
+from .MomentConnections.CCSpliceCoverPlateCAD.BoltedCAD import CCSpliceCoverPlateBoltedCAD
+from .MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutBoltArray_AF as CCSpliceNutBolt_AF
+from .MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_BF import NutBoltArray_BF as CCSpliceNutBolt_BF
+from .MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import NutBoltArray_Web as CCSpliceNutBolt_Web
 
-from cad.BasePlateCad.baseplateconnection import BasePlateCad, HollowBasePlateCad
-from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
+from .BasePlateCad.baseplateconnection import BasePlateCad, HollowBasePlateCad
+from .BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 
-from cad.CompressionMembers.column import CompressionMemberCAD
+from .CompressionMembers.column import CompressionMemberCAD
 
-from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
-from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
-from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
-from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
+from .Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
+from .Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
+from .Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
+from .Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
-from cad.MomentConnections.CCEndPlateCAD.CAD import CCEndPlateCAD
-from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as CEPNutBoltArray
+from .MomentConnections.CCEndPlateCAD.CAD import CCEndPlateCAD
+from .MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as CEPNutBoltArray
 
-# from design_type.connection.fin_plate_connection import FinPlateConnection
-# from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.beam_cover_plate import BeamCoverPlate
-# from design_type.connection.base_plate_connection import BasePlateConnection
-from utilities import osdag_display_shape, DisplayMsg
+# from ..design_type.connection.fin_plate_connection import FinPlateConnection
+# from ..design_type.connection.cleat_angle_connection import CleatAngleConnection
+from ..design_type.connection.beam_cover_plate import BeamCoverPlate
+# from ..design_type.connection.base_plate_connection import BasePlateConnection
+from ..utilities import osdag_display_shape, DisplayMsg
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import copy
 
-from cad.BBCad.nutBoltPlacement_AF import NutBoltArray_AF
-from cad.BBCad.nutBoltPlacement_BF import NutBoltArray_BF
-from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
-from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
-from cad.MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
-from cad.MomentConnections.BCEndplate.BCE_nutBoltPlacement import BCE_NutBoltArray
-from Common import *
+from .BBCad.nutBoltPlacement_AF import NutBoltArray_AF
+from .BBCad.nutBoltPlacement_BF import NutBoltArray_BF
+from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
+from .BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+from .MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
+from .MomentConnections.BCEndplate.BCE_nutBoltPlacement import BCE_NutBoltArray
+from ..Common import *
 from math import *
 
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb

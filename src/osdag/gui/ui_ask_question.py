@@ -33,7 +33,7 @@ class Ui_AskQuestion(object):
         self.label.setText(_translate("Dialog", "Please visit :"))
         self.label_2.setText(_translate("Dialog", "<html><head/><body><p><a href=\"https://osdag.fossee.in/forum\"><span style=\" text-decoration: underline; color:#0000ff;\">https://osdag.fossee.in/forum</span></a></p></body></html>"))
 
-import gui.osdagMainPageIcons_rc
+from . import osdagMainPageIcons_rc
 
 if __name__ == "__main__":
     import sys

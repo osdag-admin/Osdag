@@ -12,28 +12,28 @@
                                 it's subsequent revision(s)
                3) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
                4) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
-                     
-other          8) 
+
+other          8)
 references     9)
 
 """
 import logging
 import math
 import numpy as np
-from Common import *
-# from design_type.connection.moment_connection import MomentConnection
-from utils.common.material import *
-from utils.common.load import Load
-from utils.common.component import ISection, Material
-from utils.common.component import *
-from design_type.member import Member
-from Report_functions import *
-from design_report.reportGenerator_latex import CreateLatex
-from utils.common.common_calculation import *
-from design_type.tension_member import *
-from utils.common.Section_Properties_Calculator import BBAngle_Properties
-from utils.common import is800_2007
-from utils.common.component import *
+from ...Common import *
+# from ..connection.moment_connection import MomentConnection
+from ...utils.common.material import *
+from ...utils.common.load import Load
+from ...utils.common.component import ISection, Material
+from ...utils.common.component import *
+from ..member import Member
+from ...Report_functions import *
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...utils.common.common_calculation import *
+from ..tension_member import *
+from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
+from ...utils.common import is800_2007
+from ...utils.common.component import *
 
 
 class Flexure_Misc(Member):
@@ -64,7 +64,7 @@ class Flexure_Misc(Member):
 
         t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
         tabs.append(t1)
-        
+
         t2 = ("Optimization", TYPE_TAB_2, self.optimization_tab_flexure_design)
         tabs.append(t2)
 
@@ -146,7 +146,7 @@ class Flexure_Misc(Member):
         return design_input
 
     def refresh_input_dock(self):
-    
+
         add_buttons = []
 
         t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
@@ -224,7 +224,7 @@ class Flexure_Misc(Member):
             At support & At Top restraints should be inactive
             Depending on Support Conditions : if cantilever  then active and Torsional &
             Warping Restraint be inactive.
- 
+
         '''
 
         self.module = KEY_DISP_FLEXURE3
@@ -268,10 +268,10 @@ class Flexure_Misc(Member):
 
         t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
         options_list.append(t12)
-        
+
         t10 = (KEY_TORSIONAL_RES, DISP_TORSIONAL_RES, TYPE_COMBOBOX, Torsion_Restraint_list, True, 'No Validator')
         options_list.append(t10)
-        
+
         t11 = (KEY_WARPING_RES, DISP_WARPING_RES, TYPE_COMBOBOX, Warping_Restraint_list, True, 'No Validator')
         options_list.append(t11)
 
@@ -307,7 +307,7 @@ class Flexure_Misc(Member):
             return connectdb("Columns", call_type="popup")
             # profile2 = connectdb("Columns", call_type="popup")
         # return list(set(profile1 + profile2))
-            
+
 
     def fn_supp_image(self):
         print( 'Inside fn_supp_image', self)
@@ -347,7 +347,7 @@ class Flexure_Misc(Member):
         lst.append(t18)
 
         return lst
-    
+
     def major_bending_warning(self):
 
         if self[0] == VALUES_SUPP_TYPE_temp[2]:
@@ -517,7 +517,7 @@ class Flexure_Misc(Member):
             #     val = option[3]
             #     if design_dictionary[option[0]] == val[0]:
             #         missing_fields_list.append(option[1])
-                   
+
 
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -585,7 +585,7 @@ class Flexure_Misc(Member):
             self.design_type = VALUES_SUPP_TYPE[1]
             self.bending_type = KEY_DISP_BENDING1
 
-        # section user data        
+        # section user data
         self.length = float(design_dictionary[KEY_LENGTH])
 
         # end condition
@@ -643,7 +643,7 @@ class Flexure_Misc(Member):
         if len(self.input_modified) != 0:
             self.results(self, design_dictionary)
 
-    
+
     # Simulation starts here
     def design(self, design_dictionary, flag=0):
         '''
@@ -702,7 +702,7 @@ class Flexure_Misc(Member):
                 )
 
             logger.info("Provided appropriate design preference, now checking input.")
-    
+
     def input_modifier(self):
         """Classify the sections based on Table 2 of IS 800:2007"""
         print(f"Inside input_modifier")
@@ -779,7 +779,7 @@ class Flexure_Misc(Member):
                 # Step 1.1 - computing the effective sectional area
                 self.effective_area = self.section_property.area
                 self.common_checks_1(self, section, step=2)
-                
+
 
                 list_result = []
                 list_1 = []
@@ -1042,7 +1042,7 @@ class Flexure_Misc(Member):
                 / self.gamma_m0
             )
 
-    
+
     def section_classification(self, trial_section=""):
         """Classify the sections based on Table 2 of IS 800:2007"""
         print(f"Inside section_classification")
@@ -1151,7 +1151,7 @@ class Flexure_Misc(Member):
         else:
             local_flag = True
         return local_flag
-    
+
     def effective_length_beam(self, design_dictionary, length):
         print(f"Inside effective_length_beam")
         self.Loading = design_dictionary[KEY_LOAD]  # 'Normal'or 'Destabilizing'
@@ -1826,6 +1826,3 @@ class Flexure_Misc(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, [], '', module=self.module) #
-
-
-

@@ -4,10 +4,9 @@ Created on 29-Nov-2014
 @author: Anand Swaroop
 '''
 import numpy
-from cad.items.ModelUtils import *
+from .ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
-#from notch import Notch
-from cad.items.notch import Notch
+from .notch import Notch
 """
 
 
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
 
     display, start_display, add_menu, add_function_to_menu = init_display()
-    
+
     B = 20
     T = 2
     D = 40

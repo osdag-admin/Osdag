@@ -1,18 +1,18 @@
-from utils.common.is800_2007 import IS800_2007
-from utils.common.is800_2007 import IS800_2007
-from utils.common.material import *
-from utils.common.other_standards import *
-from Common import connectdb
+from .is800_2007 import IS800_2007
+from .is800_2007 import IS800_2007
+from .material import *
+from .other_standards import *
+from ...Common import connectdb
 import sqlite3
 import logging
-from utils.common.material import Material
+from .material import Material
 from builtins import str
-from Common import *
+from ...Common import *
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
 import math
 import numpy as np
-from utils.common.common_calculation import *
+from .common_calculation import *
 
 
 class Bolt:
@@ -1329,7 +1329,7 @@ class ISection(Material):
         self.elast_sec_mod_z = round(row[15] * 1000, 2)
         self.elast_sec_mod_y = round(row[16] * 1000, 2)
         self.plast_sec_mod_z = round(row[17], 2)
-        from utils.common.Section_Properties_Calculator import I_sectional_Properties
+        from Section_Properties_Calculator import I_sectional_Properties
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth, self.flange_width,
                                                                                          self.web_thickness,
@@ -2183,7 +2183,7 @@ class CHS(Material):
         self.toe_radius = 0
         super(CHS, self).__init__(material_grade, self.flange_thickness)
 
-        from utils.common.Section_Properties_Calculator import CHS_Properties
+        from .Section_Properties_Calculator import CHS_Properties
 
         self.internal_vol = row[7]  # cm^3/m
         if self.internal_vol is None:

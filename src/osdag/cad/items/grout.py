@@ -7,7 +7,7 @@ Created on 08-May-2020
 import numpy
 import copy
 from numpy import sqrt, square
-from cad.items.ModelUtils import *  # getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
+from .ModelUtils import *  # getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
 import math
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeWire, BRepBuilderAPI_MakeFace
 
@@ -18,8 +18,8 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.BRepPrimAPI import *
 
-from cad.items.plate import Plate
-from cad.items.filletweld import FilletWeld
+from .plate import Plate
+from .filletweld import FilletWeld
 
 
 class Grout(object):

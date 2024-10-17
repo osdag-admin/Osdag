@@ -10,10 +10,10 @@ W is for bolting over Web.
 """""
 
 
-from cad.items.bolt import Bolt
-from cad.items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from cad.items.ModelUtils import getGpPt
+from ..items.bolt import Bolt
+from ..items.nut import Nut
+from ..items.ModelUtils import getGpPt
 
 
 class NutBoltArray_Web():

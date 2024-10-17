@@ -30,14 +30,14 @@ ASCII diagram
             +-+-------------+-+
 """
 
-from design_type.connection.shear_connection import ShearConnection
-from utils.common.component import *
-from utils.common.material import *
-from utils.common.component import Bolt, Plate, Weld
-from design_report.reportGenerator_latex import CreateLatex
-from Report_functions import *
-from Common import *
-from utils.common.load import Load
+from .shear_connection import ShearConnection
+from ...utils.common.component import *
+from ...utils.common.material import *
+from ...utils.common.component import Bolt, Plate, Weld
+from ...design_report.reportGenerator_latex import CreateLatex
+from ...Report_functions import *
+from ...Common import *
+from ...utils.common.load import Load
 import logging
 
 

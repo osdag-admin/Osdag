@@ -1,10 +1,10 @@
 
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 #from notch import Notch
-from cad.items.plate import Plate
-from cad.items.ISection import ISection
+from ..items.plate import Plate
+from ..items.ISection import ISection
 
 class cross_isection(object):
 
@@ -19,13 +19,13 @@ class cross_isection(object):
 
         self.Isection1 = ISection(2*s+t+2*T, T, 2*d+2*T+t, t, 0, 0, None, H, None)
         self.Isection2 = ISection(2*d+t, T, 2*s+t+2*T, t, 0, 0, None, H, None)
-    
-        
+
+
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        
+
         self.Isection1.place(self.sec_origin, self.uDir, self.wDir)
         self.Isection2.place(self.sec_origin, self.uDir, self.wDir)
 
@@ -33,19 +33,19 @@ class cross_isection(object):
         self.Isection1.compute_params()
         self.Isection2.compute_params()
         self.Isection2.points = self.retate(self.Isection2.points)
-        
+
 
     def create_model(self):
-        
+
         prism1 = self.Isection1.create_model()
         prism2 = self.Isection2.create_model()
-        
+
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         return prism
 
     def retate(self, points):
         rotated_points = []
-        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]]) 
+        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]])
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -63,7 +63,7 @@ class cross_isection(object):
 
         y_points = [numpy.array([0.,-offset,self.H/2]), numpy.array([0,offset,self.H/2])]
         line.append(makeEdgesFromPoints(y_points))
-        
+
         u_points = [numpy.array([-uvoffset,uvoffset,self.H/2]), numpy.array([uvoffset,-uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(u_points))
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     H = 100
     d = (B - 2*T - t)/2
     s = (D - t)/2
-    
+
     CrossISec = cross_isection(D, B, T, t, H, s, d)
 
     origin = numpy.array([0.,0.,0.])

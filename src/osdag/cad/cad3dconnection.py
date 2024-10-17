@@ -4,13 +4,9 @@ Created on 18-Nov-2016
 @author: deepa
 '''
 
-
-from cad.common_logic import CommonDesignLogic
-
-
+from .common_logic import CommonDesignLogic
 
 class cadconnection(object):
-
 
     def commonfile(self, mainmodule, display, folder, module):
         self.display = display

@@ -1,9 +1,9 @@
 import numpy
-from cad.items.ModelUtils import *
+from ..items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 #from notch import Notch
-from cad.items.plate import Plate
-from cad.items.ISection import ISection
+from ..items.plate import Plate
+from ..items.ISection import ISection
 
 class IsectionCoverPlate(object):
 
@@ -21,12 +21,12 @@ class IsectionCoverPlate(object):
         self.Isection2 = ISection(B, T, D, t, 0, 0, 0, H, None)
         self.Plate1 = Plate(t1, H, l)
         self.Plate2 = Plate(t1, H, l)
-        
+
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        
+
         origin = numpy.array([-self.s/2.,0.,0.])
         self.Isection1.place(origin, self.uDir, self.wDir)
         origin1 = numpy.array([self.s/2.,0.,0.])
@@ -44,13 +44,13 @@ class IsectionCoverPlate(object):
         self.Plate2.compute_params()
 
     def create_model(self):
-        
+
         prism1 = self.Isection1.create_model()
         prism2 = self.Isection2.create_model()
 
         prism3 = self.Plate1.create_model()
         prism4 = self.Plate2.create_model()
-        
+
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
         # prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()
@@ -69,7 +69,7 @@ class IsectionCoverPlate(object):
 
         y_points = [numpy.array([0,-offset,self.H/2]), numpy.array([0,offset,self.H/2])]
         line.append(makeEdgesFromPoints(y_points))
-        
+
         u_points = [numpy.array([-uvoffset,uvoffset,self.H/2]), numpy.array([uvoffset,-uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(u_points))
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     l = B + s
     t2 = 3
     H = 50
-    
+
     ISecPlate = IsectionCoverPlate(D, B, T, t, s, l, t2, H)
 
     origin = numpy.array([0.,0.,0.])

@@ -1,14 +1,14 @@
 import numpy, math
-from cad.items.ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire
+from .ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeRevol
 
 '''
-                             
-                                 a3                                  
-               -----               X  XX                               ^ 
-                 /                X|       XX                          |     
-                /                X |           XX                      |      
+
+                                 a3
+               -----               X  XX                               ^
+                 /                X|       XX                          |
+                /                X |           XX                      |
                /                X  |              XX                   |
               /                X   |                 XX                |
              /                X    |                   XX              b
@@ -17,12 +17,12 @@ from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeRevol
           /                X       |__  90                  XX         |
          /                X        |  |                       X        |
         /                X         X---------------------------X a1    V
-       /                X       X  a2                  X       
-      /                X     X               X          
+       /                X       X  a2                  X
+      /                X     X               X
      /                X   X         X
-    /                X X    X                                                                 
+    /                X X    X
  -----              XX             <------------ b ------------>
-          
+
 
 '''
 

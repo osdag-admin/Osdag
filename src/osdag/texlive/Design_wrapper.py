@@ -15,7 +15,7 @@ def check_callable(_callable):
 
 
 def init_display(backend_str=None, size=(1024, 768)):
-   
+
     if os.getenv("PYTHONOCC_SHUNT_GUI") == "1":
         # define a dumb class and an empty method
         from OCC.Display import OCCViewer
@@ -65,10 +65,10 @@ def init_display(backend_str=None, size=(1024, 768)):
                     return Dumb
                 else:
                     return do_nothing
-        
+
         return BlindViewer(), do_nothing, do_nothing, call_function
     used_backend = load_backend(backend_str)
-    
+
     if used_backend == 'wx':
         import wx
         from wxDisplay import wxViewer3d
@@ -90,7 +90,7 @@ def init_display(backend_str=None, size=(1024, 768)):
                 self._menus[menu_name] = _menu
 
             def add_function_to_menu(self, menu_name, _callable):
-                
+
                 _id = wx.NewId()
                 check_callable(_callable)
                 try:
@@ -117,7 +117,7 @@ def init_display(backend_str=None, size=(1024, 768)):
         def start_display():
             app.MainLoop()
 
-   
+
     elif 'qt' in used_backend:
         from OCC.Display.qtDisplay import qtViewer3d
         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
@@ -141,8 +141,8 @@ def init_display(backend_str=None, size=(1024, 768)):
             def centerOnScreen(self):
                 '''Centers the window on the screen.'''
                 resolution = QtWidgets.QDesktopWidget().screenGeometry()
-                self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                          (resolution.height() / 2) - (self.frameSize().height() / 2))
+                self.move((resolution.width() // 2) - (self.frameSize().width() // 2),
+                          (resolution.height() // 2) - (self.frameSize().height() // 2))
 
             def add_menu(self, menu_name):
                 _menu = self.menu_bar.addMenu("&" + menu_name)
@@ -159,8 +159,8 @@ def init_display(backend_str=None, size=(1024, 768)):
                 except KeyError:
                     raise ValueError('the menu item %s does not exist' % menu_name)
 
-        app = QtWidgets.QApplication.instance()  
-        if not app:  
+        app = QtWidgets.QApplication.instance()
+        if not app:
             app = QtWidgets.QApplication(sys.argv)
         win = MainWindow()
         win.showMinimized()
@@ -180,6 +180,6 @@ def init_display(backend_str=None, size=(1024, 768)):
             win.add_function_to_menu(*args, **kwargs)
 
         def start_display():
-            win.raise_() 
+            win.raise_()
             app.exec_()
     return display, start_display, add_menu, add_function_to_menu

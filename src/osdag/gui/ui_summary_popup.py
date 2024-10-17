@@ -42,7 +42,7 @@ class Ui_Dialog1(object):
         self.Dialog = Dialog
         self.module_window = module_window
         self.Dialog.setObjectName("Dialog")
-        self.Dialog.resize(scale * 600, scale * 550)
+        self.Dialog.resize(int(scale * 600), int(scale * 550))
         self.Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
         self.gridLayout = QtWidgets.QGridLayout(self.Dialog)
         self.gridLayout.setObjectName("gridLayout")
@@ -204,16 +204,16 @@ class Ui_Dialog1(object):
         #     self.pdf_file_message(filename)
 
         loading_widget = QDialog(self.module_window)
-        window_width = self.module_window.width() / 2
-        window_height = self.module_window.height() / 10
-        loading_widget.setFixedSize(window_width, 1.5 * window_height)
+        window_width = self.module_window.width() // 2
+        window_height = self.module_window.height() // 10
+        loading_widget.setFixedSize(window_width, int(1.5 * window_height))
         loading_widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
         self.progress_bar = QtWidgets.QProgressBar(loading_widget)
         self.progress_bar.setMaximum(100)
-        self.progress_bar.setGeometry(QtCore.QRect(0, 0, window_width, window_height / 2))
+        self.progress_bar.setGeometry(QtCore.QRect(0, 0, window_width, window_height // 2))
         loading_label = QtWidgets.QLabel(loading_widget)
-        loading_label.setGeometry(QtCore.QRect(0, window_height / 2, window_width, window_height))
+        loading_label.setGeometry(QtCore.QRect(0, window_height // 2, window_width, window_height))
         loading_label.setFixedSize(window_width, window_height)
         loading_label.setAlignment(QtCore.Qt.AlignCenter)
         loading_label.setText("<p style='font-weight:500'>Please Wait...</p>")

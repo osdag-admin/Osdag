@@ -5,10 +5,19 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
+import sys
+import os
+
+# Add the src/osdag directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ..design_report import reportGenerator
-
+from PyQt5.QtWidgets import (
+    QMainWindow, QVBoxLayout, QLabel, 
+    QComboBox, QWidget, QMessageBox
+)
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -16,16 +25,19 @@ from PyQt5.QtCore import *
 from .ui_tutorial import Ui_Tutorial
 from .ui_aboutosdag import Ui_AboutOsdag
 from .ui_ask_question import Ui_AskQuestion
+from ..texlive.Design_wrapper import init_display as init_display_off_screen
 
-from design_type.connection.column_cover_plate import ColumnCoverPlate
+from ..design_type.connection.column_cover_plate import ColumnCoverPlate
 # from PIL import Image
-from texlive.Design_wrapper import init_display as init_display_off_screen
+
+
+from ..texlive.Design_wrapper import init_display as init_display_off_screen
 # from OCC.Display.backend import off
 import os
 import yaml
 import json
 import logging
-from drawing_2D.Svg_Window import SvgWindow
+from ..drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
 import shutil
@@ -69,7 +81,7 @@ from ..design_type.connection.end_plate_connection import EndPlateConnection
 from ..design_type.connection.end_plate_connection import EndPlateConnection
 from ..design_type.connection.beam_cover_plate import BeamCoverPlate
 from ..design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from ..design_type.connection.beam_end_plate import BeamEndPlate
+from ..design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 from ..design_type.connection.column_end_plate import ColumnEndPlate
 from ..design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from ..design_type.connection.base_plate_connection import BasePlateConnection
@@ -78,7 +90,6 @@ from ..design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
 from ..get_DPI_scale import scale
-from ..cad.cad3dconnection import cadconnection
 from OCC.Display.backend import load_backend, get_qt_modules
 from ..osdagMainSettings import backend_name
 used_backend = load_backend(backend_name())
@@ -121,7 +132,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width * (0.75), height * (0.7))
+        self.resize(int(width * 0.75), int(height * 0.7))
         self.ui = Window()
         self.ui.setupUi(self, main, folder)
         # self.showMaximized()
@@ -146,21 +157,22 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         # Input Dock
         width = self.ui.inputDock.width()
         self.ui.inputDock.resize(width, self.height())
-        self.ui.in_widget.resize(width, posi)
+        self.ui.in_widget.resize(int(width), int(posi))
 
-        self.ui.btn_Reset.move((width / 2) - 110, posi + 8)
-        self.ui.btn_Design.move((width / 2) + 17, posi + 8)
+
+        self.ui.btn_Reset.move(int((width / 2)) - 110, int(posi + 8))
+        self.ui.btn_Design.move(int((width / 2)) + 17, int(posi + 8))
         # self.ui.btn_Design.move(,posi+10)
 
         # Output Dock
         width = self.ui.outputDock.width()
         self.ui.outputDock.resize(width, self.height())
-        self.ui.out_widget.resize(width, posi)
-        self.ui.btn_CreateDesign.move((width / 2) - (186 / 2), posi + 8)
-        self.ui.save_outputDock.move((width / 2) - (186 / 2), posi + 52)
+        self.ui.out_widget.resize(int(width), int(posi))
+        self.ui.btn_CreateDesign.move(int((width / 2) - (186 / 2)), int(posi + 8))
+        self.ui.save_outputDock.move(int((width / 2) - (186 / 2)), int(posi + 52))
 
         # Designed model
-        self.ui.splitter.setSizes([0.85 * posi, 0.15 * posi])
+        self.ui.splitter.setSizes([int(0.85 * posi), int(0.15 * posi)])
         self.ui.modelTab.setFocus()
         self.ui.display.FitAll()
 
@@ -235,7 +247,7 @@ class Window(QMainWindow):
 
         self.new_window = QtWidgets.QDialog(self)
         self.new_ui = Ui_Dialog1(main.design_status,loggermsg=self.textEdit.toPlainText())
-        self.new_ui.setupUi(self.new_window, main)
+        self.new_ui.setupUi(self.new_window, main, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
         self.new_ui.btn_useProfile.clicked.connect(lambda: self.useUserProfile(self.new_window))
@@ -733,8 +745,9 @@ class Window(QMainWindow):
         maxi_width += 82
         print('maxiwidth',maxi_width)
         maxi_width = max(maxi_width, scale*350)    # In case there is no widget
-        self.inputDock.setFixedWidth(maxi_width)
-        self.in_widget.setFixedWidth( maxi_width)
+        self.inputDock.setFixedWidth(int(maxi_width))
+
+        self.in_widget.setFixedWidth(int(maxi_width))
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
@@ -812,7 +825,7 @@ class Window(QMainWindow):
                     self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
+        self.btn_Reset.setGeometry(QtCore.QRect(int((maxi_width / 2) - 110), 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -822,7 +835,7 @@ class Window(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
+        self.btn_Design.setGeometry(QtCore.QRect(int((maxi_width / 2) + 10), 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -995,8 +1008,8 @@ class Window(QMainWindow):
         out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
-        self.outputDock.setFixedWidth(maxi_width)
-        self.out_widget.setFixedWidth(maxi_width)
+        self.outputDock.setFixedWidth(int(maxi_width))
+        self.out_widget.setFixedWidth(int(maxi_width))
         self.outputDock.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
         self.out_widget.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
         # common_button = QtWidgets.QPushButton()
@@ -1052,7 +1065,7 @@ class Window(QMainWindow):
         self.save_outputDock.setObjectName("save_outputDock")
         self.save_outputDock.setText("Save Output")
         self.save_outputDock.clicked.connect(self.save_output_to_csv(main))
-        # self.btn_CreateDesign.clicked.connect(self.createDesignReport(main))
+        #self.btn_CreateDesign.clicked.connect(self.createDesignReport(main))
 
         ##################################
         # Menu UI
@@ -1407,7 +1420,7 @@ class Window(QMainWindow):
                         out_titles.append(title_name)
         self.ui_loaded = True
 
-        from osdagMainSettings import backend_name
+        from ..osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name(),window=MainWindow)
         self.connectivity = None
         self.fuse_model = None
@@ -1816,8 +1829,8 @@ class Window(QMainWindow):
             return BeamCoverPlate
         elif name == KEY_DISP_BEAMCOVERPLATEWELD:
             return BeamCoverPlateWeld
-        elif name == KEY_DISP_BEAMENDPLATE:
-            return BeamEndPlate
+        elif name == KEY_DISP_BB_EP_SPLICE:
+            return BeamBeamEndPlateSplice
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate
         elif name == KEY_DISP_BASE_PLATE:

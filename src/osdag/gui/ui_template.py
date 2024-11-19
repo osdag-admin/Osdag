@@ -1,18 +1,17 @@
+import os
+import yaml
+import shutil
+import time
+import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *   
+from PyQt5.QtCore import *
 from .ui_tutorial import Ui_Tutorial
 from .ui_aboutosdag import Ui_AboutOsdag
 from .ui_ask_question import Ui_AskQuestion
 from ..texlive.Design_wrapper import init_display as init_display_off_screen
-import yaml
-import shutil
-import time
 from ..update_version_check import Update
-import pandas as pd
-
-
 
 from ..Common import *
 from ..utils.common.component import *
@@ -1349,7 +1348,7 @@ class Window(QMainWindow):
         last_design_file = os.path.join(last_design_folder, last_design_file)
         last_design_dictionary = {}
         if not os.path.isdir(last_design_folder):
-            os.mkdir(last_design_folder)
+            os.makedirs(last_design_folder)
         if os.path.isfile(last_design_file):
             with open(str(last_design_file), 'r') as last_design:
                 last_design_dictionary = yaml.safe_load(last_design)
@@ -2062,7 +2061,7 @@ class Window(QMainWindow):
             print(' last design',last_design_folder)
             if not os.path.isdir(last_design_folder):
                 print(' not os.path.isdir')
-                os.mkdir(last_design_folder)
+                os.makedirs(last_design_folder)
             last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
             last_design_file = os.path.join(last_design_folder, last_design_file)
             out_titles_status = []

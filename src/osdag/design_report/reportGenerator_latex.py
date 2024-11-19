@@ -12,10 +12,10 @@ from pylatex.basic import TextColor
 from pylatex import Document, Section, Subsection, Tabular, Tabularx, MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor, SubFigure
 #from pdflatex import PDFLaTeX
-import os
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, MediumText, LineBreak, simple_page_number, NewPage
+from importlib.resources import files
 from ..Report_functions import *
 from ..utils.common.common_calculation import *
 # from ..Common import *
@@ -37,7 +37,7 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
-        osdagheader = '/ResourceFiles/images/Osdag_header_report.png'
+        imgpath_osdagheader = files("osdag.data.ResourceFiles.images").joinpath("Osdag_header_report.png")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options, indent=False)
@@ -61,7 +61,7 @@ class CreateLatex(Document):
                 table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is '' else StandAloneGraphic(image_options="height=0.95cm",
                                                                                                                filename=companylogo))),
                                MultiColumn(2, align='|c|', data=['Created with',StandAloneGraphic(image_options="width=4.0cm,height=1cm",
-                                                                                                  filename=rel_path + osdagheader)]),))
+                                                                                                  filename=imgpath_osdagheader)]),))
                 table.add_hline()
                 table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
                 table.add_hline()
@@ -101,7 +101,7 @@ class CreateLatex(Document):
                         sectiondetails = uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
 
-                        Img_path = '/ResourceFiles/images/'+image_name+'.png'
+                        Img_path = files("osdag.data.ResourceFiles.images").joinpath(image_name + ".png")
                         if (len(sectiondetails))% 2 == 0:
                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                             merge_rows = int((len(sectiondetails)/2)) +2
@@ -117,7 +117,7 @@ class CreateLatex(Document):
                             if x == 1:
                                 table.add_row(
                                     (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                                                                 filename=rel_path + Img_path)),
+                                                                                 filename=Img_path)),
                                      MultiColumn(2, align='|c|', data=a[x]),
                                      MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                             elif x <= 4:
@@ -257,7 +257,7 @@ class CreateLatex(Document):
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
                                     image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                                    Img_path = '/ResourceFiles/images/' + image_name + '.png'
+                                    Img_path = files("osdag.data.ResourceFiles.images").joinpath(image_name + ".png")
                                     if (len(sectiondetails)) % 2 == 0:
                                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
@@ -275,7 +275,7 @@ class CreateLatex(Document):
                                             table.add_row(
                                                 (MultiRow(merge_rows,
                                                           data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                                                                 filename=rel_path + Img_path)),
+                                                                                 filename=Img_path)),
                                                  MultiColumn(2, align='|c|', data=NoEscape(a[x])),
                                                  MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
                                         elif x <= 4:

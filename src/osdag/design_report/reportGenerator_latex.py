@@ -1,40 +1,30 @@
-from builtins import str
-import time
-from ..Report_functions import *
-import math
-from ..utils.common.common_calculation import *
-# from Common import *
 import os
-# from utils.common import component
+import sys
+import time
+import datetime
+import math
+from builtins import str
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
 #import pdflatex
-import sys
-import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
-from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
-from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
-    MultiRow, StandAloneGraphic
-from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, SubFigure
-from pylatex.utils import italic
+from pylatex import Document, Section, Subsection, Tabular, Tabularx, MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor, SubFigure
 #from pdflatex import PDFLaTeX
 import os
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
-from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
-    MediumText, LineBreak, simple_page_number, NewPage
-
-from pylatex.utils import bold
+from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, MediumText, LineBreak, simple_page_number, NewPage
+from ..Report_functions import *
+from ..utils.common.common_calculation import *
+# from ..Common import *
+# from ..utils.common import component
 
 class CreateLatex(Document):
 
     def __init__(self):
         super().__init__()
-
 
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_2d_image, Disp_3d_image, module=''):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
@@ -50,13 +40,12 @@ class CreateLatex(Document):
         osdagheader = '/ResourceFiles/images/Osdag_header_report.png'
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
-        doc = Document(geometry_options=geometry_options,indent=False)
+        doc = Document(geometry_options=geometry_options, indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
         doc.packages.append(Package('needspace'))
         doc.append(pyl.Command('fontsize', arguments= [8,12]))
         doc.append(pyl.Command('selectfont'))
-
 
         doc.add_color('OsdagGreen', 'RGB', '153,169,36')
         doc.add_color('PassColor','RGB', '153,169,36')
@@ -69,11 +58,10 @@ class CreateLatex(Document):
             with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
-                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="height=0.95cm",
-                                                                                 filename=companylogo))),
-                                               MultiColumn(2, align='|c|',
-                                                           data=['Created with',StandAloneGraphic(image_options="width=4.0cm,height=1cm",
-                                                                                 filename=rel_path + osdagheader)]),))
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is '' else StandAloneGraphic(image_options="height=0.95cm",
+                                                                                                               filename=companylogo))),
+                               MultiColumn(2, align='|c|', data=['Created with',StandAloneGraphic(image_options="width=4.0cm,height=1cm",
+                                                                                                  filename=rel_path + osdagheader)]),))
                 table.add_hline()
                 table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
                 table.add_hline()

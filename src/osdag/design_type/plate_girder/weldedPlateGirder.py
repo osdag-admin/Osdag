@@ -1151,6 +1151,7 @@ class PlateGirderWelded(Member):
 
         print(sys.path[0])
         rel_path = str(sys.path[0])
+        rel_path = "." # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,

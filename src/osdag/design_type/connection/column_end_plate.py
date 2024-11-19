@@ -2348,6 +2348,7 @@ class ColumnEndPlate(MomentConnection):
         # print("desk:", desktop_path)
         print(sys.path[0])
         rel_path = str(sys.path[0])
+        rel_path = "." # TEMP
         rel_path = rel_path.replace("\\", "/")
 
         fname_no_ext = popup_summary['filename']

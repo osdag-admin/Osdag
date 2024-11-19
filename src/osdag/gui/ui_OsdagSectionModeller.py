@@ -1530,6 +1530,7 @@ class Ui_OsdagSectionModeller(object):
                         }
                         input_summary['Section Properties']=self.get_section_properties()
                         rel_path = str(sys.path[0])
+                        rel_path = "." # TEMP
                         rel_path = rel_path.replace("\\", "/")
                         Disp_3D_image = "/ResourceFiles/images/3DSectionfromSectionModeller.png"
                         latex=CreateLatex()

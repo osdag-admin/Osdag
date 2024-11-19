@@ -8678,6 +8678,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         Disp_2d_image = [sketch_path, detailing_path, weld_path, bolt_path, key_path]
         display_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
+        rel_path = "." # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
 

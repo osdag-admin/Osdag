@@ -615,7 +615,8 @@ class GussetConnection(Connection,Member):
 
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"
-        rel_path = str(sys.path[0])
+        rel_path = "."
+        # rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
         fname_no_ext = popup_summary['filename']

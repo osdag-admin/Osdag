@@ -4,17 +4,15 @@
 
 import operator
 import math
-from .utils.common.other_standards import *
-import os
+import logging
+from importlib.resources import files
 
-PATH_TO_DATABASE = os.path.join('ResourceFiles', 'Database', 'Intg_osdag.sqlite')
-
+PATH_TO_DATABASE = files("osdag.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 
 import sqlite3
 
+from .utils.common.other_standards import *
 from .utils.common.component import *
-from .utils.common.component import *
-import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate
 

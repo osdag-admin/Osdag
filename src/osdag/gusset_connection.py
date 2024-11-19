@@ -1,16 +1,17 @@
+import sqlite3
+import logging
+import sys
+from importlib.resources import files
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QMessageBox
 from .design_type.connection.connection import Connection
 from .design_type.member import Member
 from .Common import *
-import sqlite3
-import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QMessageBox
-import sys
 
 from .utils.common.component import Bolt
 from .design_report.reportGenerator_latex import CreateLatex
 
-PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
+PATH_TO_DATABASE = files("osdag.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 
 def connectdb(table_name, call_type="dropdown"):
     """

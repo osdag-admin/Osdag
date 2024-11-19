@@ -901,8 +901,8 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def exit(self):
         QCoreApplication.exit()
 
-
-
+# FIXME: This is created in `do_stuff` and used above. Find better alternatives.
+error_box = None
 
 def do_stuff():
     # from .cad.common_logic import CommonDesignLogic
@@ -931,6 +931,7 @@ def do_stuff():
 
     ############################     Exception Dialog and Error Reporting  ###################
 
+    global error_box
     error_box = CriticalExceptionDialog()
 
     GITHUB_OWNER = 'osdag-admin'    # username of the github account where crash report is to be submitted

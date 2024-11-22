@@ -91,6 +91,7 @@ import urllib.request
 from .update_version_check import Update
 #from Thread import timer
 from .get_DPI_scale import scale
+from importlib.resources import files
 
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
@@ -261,69 +262,69 @@ class OsdagMainWindow(QMainWindow):
         self.Modules={
                 'Connection' : {
                                 'Shear Connection' : [
-                                    ('Fin Plate','ResourceFiles/images/finplate.png','Fin_Plate'),
-                                    ('Cleat Angle','ResourceFiles/images/cleatAngle.png','Cleat_Angle'),
-                                    ('End Plate','ResourceFiles/images/endplate.png','End_Plate'),
-                                    ('Seated Angle','ResourceFiles/images/seatedAngle1.png','Seated_Angle'),
+                                    ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
+                                    ('Cleat Angle',str(files("osdag.data.ResourceFiles.images").joinpath("cleatAngle.png")),'Cleat_Angle'),
+                                    ('End Plate',str(files("osdag.data.ResourceFiles.images").joinpath("endplate.png")),'End_Plate'),
+                                    ('Seated Angle',str(files("osdag.data.ResourceFiles.images").joinpath("seatedAngle1.png")),'Seated_Angle'),
                                     self.show_shear_connection,
                                                     ],
                                 'Moment Connection' :{
                                                     'Beam-to-Beam Splice' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
-                                                                ('End Plate', 'ResourceFiles/images/bb_splice.png', 'B2B_End_Plate_Splice'),
+                                                                ('Cover Plate Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("bbcoverplatebolted.png")),'B2B_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("bbcoverplatewelded.png")),'B2B_Cover_Plate_Welded'),
+                                                                ('End Plate', str(files("osdag.data.ResourceFiles.images").joinpath("bb_splice.png")), 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam-to-Column': [
-                                                                ('End Plate', 'ResourceFiles/images/BC-EBW_GUI.png','BC_End_Plate'),
+                                                                ('End Plate', str(files("osdag.data.ResourceFiles.images").joinpath("BC-EBW_GUI.png")),'BC_End_Plate'),
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column-to-Column Splice' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/cccoverplatebolted.png','C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/cccoverplatewelded.png','C2C_Cover_Plate_Welded'),
-                                                                ('End Plate','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
+                                                                ('Cover Plate Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatebolted.png")),'C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatewelded.png")),'C2C_Cover_Plate_Welded'),
+                                                                ('End Plate',str(files("osdag.data.ResourceFiles.images").joinpath("ccep_flush.png")),'C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,
                                                     },
                                 'Base Plate':[
-                                        ('Base Plate Connection', 'ResourceFiles/images/base_plate.png', 'Base_Plate'),
+                                        ('Base Plate Connection', str(files("osdag.data.ResourceFiles.images").joinpath("base_plate.png")), 'Base_Plate'),
                                         self.show_base_plate,
                                             ],
                                 'Truss Connection' : self.Under_Development,
                                     # [
-                                    # ('Truss Connection Bolted', 'ResourceFiles/images/broken.png', 'Truss_Bolted'),
-                                    # ('Truss Connection Welded', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                                    # ('Truss Connection Bolted', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Truss_Bolted'),
+                                    # ('Truss Connection Welded', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Truss_Welded'),
                                     # self.show_truss_bolted,
                                     #                ],
                                 },
                 'Tension Member' : [
-                            ('Bolted to End Gusset','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
-                            ('Welded to End Gusset','ResourceFiles/images/welded_ten.png','Tension_Welded'),
+                            ('Bolted to End Gusset',str(files("osdag.data.ResourceFiles.images").joinpath("bolted_ten.png")),'Tension_Bolted'),
+                            ('Welded to End Gusset',str(files("osdag.data.ResourceFiles.images").joinpath("welded_ten.png")),'Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Columns with known support conditions', 'ResourceFiles/images/CompressionMembers_ColumnsInFrames', 'Column_Design'),
-                                       # ('Beam-Column Design', 'ResourceFiles/images/BC_CF-BW-Flush.png', 'Beam_Column_Design'),
-                                       ('Struts in Trusses', 'ResourceFiles/images/strut.jpg', 'Strut_Design'),
+                'Compression Member': [('Columns with known support conditions', str(files("osdag.data.ResourceFiles.images").joinpath("CompressionMembers_ColumnsInFrames")), 'Column_Design'),
+                                       # ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("BC_CF-BW-Flush.png")), 'Beam_Column_Design'),
+                                       ('Struts in Trusses', str(files("osdag.data.ResourceFiles.images").joinpath("strut.jpg")), 'Strut_Design'),
                                        self.show_compression_module,
                                        ],
                 'Flexural Member' : [
-                    ('Simply Supported Beam', 'ResourceFiles/images/simply-supported-beam.jpg', 'Beam_flexure'),
-                    ('Cantilever Beam', 'ResourceFiles/images/cantilever-beam.jpg', 'Beam_flexure2'),
-                    # ('Other Beams', 'ResourceFiles/images/fixed-beam.png', 'Beam_flexure3'),
+                    ('Simply Supported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("simply-supported-beam.jpg")), 'Beam_flexure'),
+                    ('Cantilever Beam', str(files("osdag.data.ResourceFiles.images").joinpath("cantilever-beam.jpg")), 'Beam_flexure2'),
+                    # ('Other Beams', str(files("osdag.data.ResourceFiles.images").joinpath("fixed-beam.png")), 'Beam_flexure3'),
                     
-                    # ('Laterally Unsupported Beam', 'ResourceFiles/images/broken.png', 'Truss_Welded'),
+                    # ('Laterally Unsupported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Truss_Welded'),
                     self.show_flexure_module,
                 ],
                 'Beam-Column' : self.Under_Development,
                 'Plate Girder' : self.Under_Development,
                 # TODO @rutvik
                 # 'Beam-Column' :[
-                #     ('Beam-Column Design', 'ResourceFiles/images/broken.png', 'Beam_Column_Design'),
+                #     ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Beam_Column_Design'),
                 #     self.show_beamcolumn_module,
                 # ],
                 # 'Plate Girder' : [ #TODO: Check number of sub modules required
-                #     ('Welded Girder Design', 'ResourceFiles/images/broken.png', 'Welded_Girder_Design'),
+                #     ('Welded Girder Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Welded_Girder_Design'),
                 #     self.Show_Girder_Design,
                 # ],
                 'Truss' : self.Under_Development,

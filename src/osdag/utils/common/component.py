@@ -22,10 +22,10 @@ class Bolt:
                  bolt_tensioning=""):
 
         if grade is not None:
-            self.bolt_grade = list(np.float_(grade))
+            self.bolt_grade = list(np.float64(grade))
             self.bolt_grade.sort(key=float)
         if diameter is not None:
-            self.bolt_diameter = list(np.float_(diameter))
+            self.bolt_diameter = list(np.float64(diameter))
             self.bolt_diameter.sort(key=float)
         self.bolt_type = bolt_type
         self.bolt_hole_type = bolt_hole_type
@@ -467,7 +467,7 @@ class Plate(Material):
         self.design_status_capacity = False
         self.reason = ""
         if thickness:
-            self.thickness = list(np.float_(thickness))
+            self.thickness = list(np.float64(thickness))
             self.thickness.sort(key=float)
         else:
             self.thickness = 0.0

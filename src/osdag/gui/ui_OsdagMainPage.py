@@ -9,6 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from .toggle_button import Switch
+from importlib.resources import files
 # from .draw_rectangular_prism import DisplayHandling
 
 class Ui_MainWindow(QMainWindow):
@@ -19,7 +20,9 @@ class Ui_MainWindow(QMainWindow):
         MainWindow.setWindowModality(QtCore.Qt.NonModal)
         MainWindow.resize(1466, 857)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("ResourceFiles/images/Osdag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+
+        icon.addPixmap(QtGui.QPixmap(str(files("osdag.data.ResourceFiles.images").joinpath("Osdag.png"))), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+
         MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("QWidget::showMaximised()")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -104,7 +107,7 @@ class Ui_MainWindow(QMainWindow):
         #self.lbl_OsdagHeader.setMinimumSize(QtCore.QSize(0, 0))
         #self.lbl_OsdagHeader.setMaximumSize(QtCore.QSize(1200, 300))
         #self.lbl_OsdagHeader.setText("")
-        self.lbl_OsdagHeader.setPixmap(QtGui.QPixmap("ResourceFiles/images/Osdag_header.png"))
+        self.lbl_OsdagHeader.setPixmap(QtGui.QPixmap(str(files("osdag.data.ResourceFiles.images").joinpath("Osdag_header.png"))))
         #self.lbl_OsdagHeader.setScaledContents(True)
         self.lbl_OsdagHeader.setAlignment(QtCore.Qt.AlignCenter|QtCore.Qt.AlignTop)
         self.lbl_OsdagHeader.setWordWrap(False)

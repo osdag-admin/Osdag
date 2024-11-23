@@ -10,6 +10,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "osdag.data.ResourceFiles.images" = ["*.png", "*.PNG", "*.jpg", "*.jpeg"]
 "osdag.data.ResourceFiles.Database" = ["*"]
+"osdag.data.themes" = ["*"]
 
 [project]
 name = "osdag"

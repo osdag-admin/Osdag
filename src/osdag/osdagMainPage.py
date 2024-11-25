@@ -86,16 +86,17 @@ import re
 import io
 import traceback
 import time
-from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+from importlib.resources import files
 import urllib.request
+from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 from .update_version_check import Update
 #from Thread import timer
 from .get_DPI_scale import scale
-from importlib.resources import files
 
 ############################ Pre-Build Database Updation/Creation #################
-sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
-sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
+# TODO: Is there a better way to create and use the sqlite file rather than directly in the installation?
+sqlpath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag.sql')
+sqlitepath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag.sqlite')
 
 if sqlpath.exists():
     if not sqlitepath.exists():
@@ -829,7 +830,7 @@ def toggle_stylesheet(state):
         path = 'darkstyle.qss'
     else:
         path = 'light.qss'
-    theme_path = os.path.join(os.path.dirname(__file__), 'themes', path)
+    theme_path = str(files("osdag.data.themes").joinpath(path))
     file = QFile(theme_path)
     file.open(QFile.ReadOnly | QFile.Text)
     stream = QTextStream(file)
@@ -916,7 +917,7 @@ def do_stuff():
     # scale = round(dpi/140.0,1)
     #
     # print('scale', dpi, scale,scale*300)
-    path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
+    path = str(files("osdag.data.themes").joinpath('light.qss'))
     file = QFile(path)
     file.open(QFile.ReadOnly | QFile.Text)
     stream = QTextStream(file)

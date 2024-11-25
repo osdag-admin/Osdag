@@ -6,10 +6,12 @@ import unittest
 from pathlib import Path
 import ast
 import logging
+from importlib.resources import files
 is_travis = 'TRAVIS' in os.environ
 ############################ Pre-Build Database Updation/Creation #################
-sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
-sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
+# TODO: Is there a better way to create and use the sqlite file rather than directly in the installation?
+sqlpath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag.sql')
+sqlitepath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag.sqlite')
 
 if sqlpath.exists():
     if not sqlitepath.exists():

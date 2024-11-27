@@ -7,12 +7,11 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, qApp, QListWidget, QListWidgetItem, QApplication
 import sys
 import sqlite3
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox, qApp, QListWidget, QListWidgetItem, QApplication
 from PyQt5.QtCore import pyqtSlot
-#from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog
 from ..get_DPI_scale import scale
 #from .ui_template import *
@@ -44,18 +43,18 @@ class Ui_Popup(object):
 
     def setupUi(self, MainWindow, disabled_values, note):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(scale*540, scale*470)
+        MainWindow.resize(int(scale*540), int(scale*470))
         self.disabled_values = disabled_values
         self.note = note
         self.label = QtWidgets.QLabel(MainWindow)
         self.label.setGeometry(QtCore.QRect(20, 20, 150, 30))
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(MainWindow)
-        self.label_2.setGeometry(QtCore.QRect(scale*320, 20, 150, 30))
+        self.label_2.setGeometry(QtCore.QRect(int(scale*32), 20, 150, 30))
         self.label_2.setObjectName("label_2")
         # self.listWidget = QtWidgets.QListWidget(MainWindow)
         self.listWidget = My_ListWidget(MainWindow)
-        self.listWidget.setGeometry(QtCore.QRect(20, 50, scale*180, scale*300))
+        self.listWidget.setGeometry(QtCore.QRect(20, 50, int(scale*180), int(scale*300)))
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setSortingEnabled(True)
         self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -63,39 +62,39 @@ class Ui_Popup(object):
         # self.listWidget_2 = QtWidgets.QListWidget(MainWindow)
         self.listWidget_2 = My_ListWidget(MainWindow)
 
-        self.listWidget_2.setGeometry(QtCore.QRect(scale*320, 50, scale*180, scale*300))
+        self.listWidget_2.setGeometry(QtCore.QRect(int(scale*320), 50, int(scale*180), int(scale*300)))
         self.listWidget_2.setObjectName("listWidget_2")
         self.listWidget_2.setSortingEnabled(True)
         self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
         self.pushButton = QtWidgets.QPushButton(MainWindow)
-        self.pushButton.setGeometry(QtCore.QRect(scale*225, scale*140, scale*70, scale*30))
+        self.pushButton.setGeometry(QtCore.QRect(int(scale*225), int(scale*140), int(scale*70), int(scale*30)))
         self.pushButton.setObjectName("pushButton")
         self.pushButton.setAutoDefault(False)
         self.pushButton_2 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_2.setGeometry(QtCore.QRect(scale*225, scale*180, scale*70, scale*30))
+        self.pushButton_2.setGeometry(QtCore.QRect(int(scale*225), int(scale*180), int(scale*70), int(scale*30)))
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.setAutoDefault(False)
         self.pushButton_3 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_3.setGeometry(QtCore.QRect(scale*225, scale*220, scale*70, scale*30))
+        self.pushButton_3.setGeometry(QtCore.QRect(int(scale*225), int(scale*220), int(scale*70), int(scale*30)))
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_3.setAutoDefault(False)
         self.pushButton_4 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_4.setGeometry(QtCore.QRect(scale*225, scale*260, scale*70, scale*30))
+        self.pushButton_4.setGeometry(QtCore.QRect(int(scale*225), int(scale*260), int(scale*70), int(scale*30)))
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.setAutoDefault(False)
         self.pushButton_5 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_5.setGeometry(QtCore.QRect(scale*190, scale*400, scale*140, scale*35))
+        self.pushButton_5.setGeometry(QtCore.QRect(int(scale*190), int(scale*400), int(scale*140), int(scale*35)))
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_5.setDefault(True)
         if self.note != "":
             self.note_label = QtWidgets.QLabel(MainWindow)
-            self.note_label.setGeometry(QtCore.QRect(20, scale * 450, scale * 320, scale * 150))
+            self.note_label.setGeometry(QtCore.QRect(20, int(scale * 450), int(scale * 320), int(scale * 150)))
             self.note_label.setObjectName("note_label")
             self.note_label.setText("<b>Note</b>: "+self.note)
             self.note_label.setStyleSheet("background-color: white;")
             self.note_label.resize(QtCore.QSize(self.note_label.sizeHint()))
-            MainWindow.resize(scale * 540, scale * 550)
+            MainWindow.resize(int(scale * 540), int(scale * 550))
         self.connections(MainWindow)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -194,32 +193,12 @@ class Ui_Popup(object):
             if all_items.text() in self.disabled_values:
                 all_items.setFlags(QtCore.Qt.NoItemFlags)
 
-            # self.listWidget_2.addItems(items)
-    # def addAvailableItems1(self,items1,KEY_EXISTINGVAL_CUSTOMIZED):
-    #     self.listWidget_2.clear()
-    #     if items1 != KEY_EXISTINGVAL_CUSTOMIZED and KEY_EXISTINGVAL_CUSTOMIZED != []:
-    #         self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
-    #     else:
-    #         self.listWidget_2.addItems(items1)
-
-    # def get_left_elements(self):
-    #     r = []
-    #     for i in range(self.listWidget.count()):
-    #         it = self.listWidget.item(i)
-    #
-    #         r.append(it.text())
-    #         r[i] = int(r[i])
-    #     r.sort()
-    #     return r
-
     def get_right_elements(self):
+        """
+        Function to get the selected (i.e. the right elements) elements
 
-        # Function to get the selected (i.e. thr right elements) elements
-
-        # @author: Amir
-
-
-
+        @author: Amir
+        """
 
         r = []
         for i in range(self.listWidget_2.count()):

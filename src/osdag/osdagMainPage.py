@@ -107,7 +107,7 @@ if sqlpath.exists():
 
     elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
         try:
-            sqlitenewpath = Path('ResourceFiles/Database/Intg_osdag_new.sqlite')
+            sqlitenewpath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag_new.sqlite')
             cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
             error = os.system(cmd)
             print(error)

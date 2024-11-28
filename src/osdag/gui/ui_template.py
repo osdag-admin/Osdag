@@ -211,17 +211,22 @@ class Window(QMainWindow):
             self.commLogicObj.display = off_display
             current_component = self.commLogicObj.component
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
+
+            image_folder_path = "./ResourceFiles/images"
+            if not os.path.exists(image_folder_path):
+                os.makedirs(image_folder_path)
+
             off_display.set_bg_gradient_color([255,255,255],[255,255,255])
-            off_display.ExportToImage('./ResourceFiles/images/3d.png')
+            off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
             off_display.View_Front()
             off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/front.png')
+            off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
             off_display.View_Top()
             off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/top.png')
+            off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
             off_display.View_Right()
             off_display.FitAll()
-            off_display.ExportToImage('./ResourceFiles/images/side.png')
+            off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
             self.commLogicObj.display = self.display
             self.commLogicObj.component = current_component
 
@@ -2013,7 +2018,6 @@ class Window(QMainWindow):
                 else:
                     self.designPrefDialog.flag = True
                 print(f"QDialog done")
-                
 
                 # if self.prev_inputs != {}:
                 #     self.design_pref_inputs = {}
@@ -2028,7 +2032,7 @@ class Window(QMainWindow):
             self.textEdit.clear()
             with open("logging_text.log", 'w') as log_file:
                 pass
-            
+
             # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status

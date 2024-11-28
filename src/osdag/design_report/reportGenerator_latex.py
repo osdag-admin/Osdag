@@ -37,6 +37,7 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
+        pkg_images = files("osdag.data.ResourceFiles.images")
         imgpath_osdagheader = files("osdag.data.ResourceFiles.images").joinpath("Osdag_header_report.png")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
@@ -228,13 +229,6 @@ class CreateLatex(Document):
                         # doc.append(NewPage())
                         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                     with doc.create(Subsection(check[1])):
-#########################
-                        # if uiObj== "WELDImage":
-                        #     table.add_hline()
-                        #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
-                        #     table.add_hline()
-                        # else:
-#########################
                         with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
@@ -440,20 +434,17 @@ class CreateLatex(Document):
                 #     view_3D.add_caption('3D View')
         else:
             doc.append(NewPage())
-            Disp_3d_image = "/ResourceFiles/images/broken.png"
-            Disp_top_image = "/ResourceFiles/images/broken.png"
-            Disp_side_image = "/ResourceFiles/images/broken.png"
-            Disp_front_image = "/ResourceFiles/images/broken.png"
-            view_3dimg_path = rel_path + Disp_3d_image
-            view_topimg_path = rel_path + Disp_top_image
-            view_sideimg_path = rel_path + Disp_side_image
-            view_frontimg_path = rel_path + Disp_front_image
+            imgpath_broken = pkg_images.joinpath("broken.png")
+            view_3dimg_path = imgpath_broken
+            view_topimg_path = imgpath_broken
+            view_sideimg_path = imgpath_broken
+            view_frontimg_path = imgpath_broken
             with doc.create(Section('3D Views')):
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
-                    view_3dimg_path = rel_path + Disp_3d_image
-                    view_topimg_path = rel_path + Disp_top_image
-                    view_sideimg_path = rel_path + Disp_side_image
-                    view_frontimg_path = rel_path + Disp_front_image
+                    view_3dimg_path = imgpath_broken
+                    view_topimg_path = imgpath_broken
+                    view_sideimg_path = imgpath_broken
+                    view_frontimg_path = imgpath_broken
                     table.add_hline()
                     table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_3dimg_path),
                                    StandAloneGraphic(image_options="height=4cm", filename=view_topimg_path)])

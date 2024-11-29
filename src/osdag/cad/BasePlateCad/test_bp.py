@@ -1510,7 +1510,7 @@ if __name__ == '__main__':
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
-    from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
+    from OCC.Core.Graphic3d import Graphic3d_NOM_ALUMINIUM
     from utilities import osdag_display_shape
     # from ..common_logic import CommonDesignLogic
     from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY

@@ -1772,7 +1772,7 @@ class CommonDesignLogic(object):
             if self.component == "Column":
                 osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)
             elif self.component == "Beam":
-                osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
+                osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOM_ALUMINIUM,
                                     update=True)
             elif component == "cleatAngle":
 
@@ -1802,7 +1802,7 @@ class CommonDesignLogic(object):
             elif self.component == "Model":
 
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
-                osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
+                osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOM_ALUMINIUM,
                                     update=True)
                 if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=Quantity_NOC_RED, update=True)
@@ -1948,7 +1948,7 @@ class CommonDesignLogic(object):
                 elif component == "Beam":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.beamModel, update=True,
-                                        material=Graphic3d_NOT_2D_ALUMINUM)
+                                        material=Graphic3d_NOM_ALUMINIUM)
                     # Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
                     # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                     # , color = 'Dark Gray'
@@ -1965,7 +1965,7 @@ class CommonDesignLogic(object):
 
                     osdag_display_shape(self.display, self.ExtObj.get_column_models(), update=True)
                     osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True,
-                                        material=Graphic3d_NOT_2D_ALUMINUM)
+                                        material=Graphic3d_NOM_ALUMINIUM)
                     osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
                                         color='Blue')
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')

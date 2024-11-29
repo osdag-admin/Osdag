@@ -57,8 +57,8 @@ def color_the_edges(shp, display, color, width):
 def set_default_edge_style(shp, display):
     color_the_edges(shp, display, Quantity_NOC_BLACK, 0.5)
     # return shps
-    
-    
+
+
 def osdag_display_shape(display, shapes, material=None, texture=None, color=None, transparency=None, update=False):
     set_default_edge_style(shapes, display)
     display.DisplayShape(shapes, material, texture, color, transparency, update=update)

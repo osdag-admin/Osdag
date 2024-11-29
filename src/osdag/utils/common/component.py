@@ -1329,7 +1329,7 @@ class ISection(Material):
         self.elast_sec_mod_z = round(row[15] * 1000, 2)
         self.elast_sec_mod_y = round(row[16] * 1000, 2)
         self.plast_sec_mod_z = round(row[17], 2)
-        from Section_Properties_Calculator import I_sectional_Properties
+        from .Section_Properties_Calculator import I_sectional_Properties
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth, self.flange_width,
                                                                                          self.web_thickness,

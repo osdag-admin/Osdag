@@ -776,12 +776,12 @@ class Window(QMainWindow):
         in_layout2.setRowStretch(j+1, 10)
         in_scroll.setWidget(in_scrollcontent)
 
-        maxi_width = maxi_width_left + maxi_width_right
+        maxi_width = int(maxi_width_left + maxi_width_right)
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 200
-        maxi_width = max(maxi_width, scale*350)    # In case there is no widget
+        maxi_width = max(maxi_width, int(scale*350))    # In case there is no widget
         self.inputDock.setFixedWidth(maxi_width)
-        self.in_widget.setFixedWidth( maxi_width)
+        self.in_widget.setFixedWidth(maxi_width)
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
@@ -1055,10 +1055,10 @@ class Window(QMainWindow):
             j = j + 1
         out_layout2.setRowStretch(j+1, 10)
         out_scroll.setWidget(out_scrollcontent)
-        maxi_width = maxi_width_left + maxi_width_right
 
+        maxi_width = int(maxi_width_left + maxi_width_right)
         maxi_width += 80    # +73 coz of whitespaces
-        maxi_width = max(maxi_width, scale*350) # in case no widget
+        maxi_width = max(maxi_width, int(scale*350)) # in case no widget
         out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 

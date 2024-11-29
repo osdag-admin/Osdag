@@ -38,7 +38,7 @@ class CreateLatex(Document):
 
         does_design_exist = reportsummary['does_design_exist']
         pkg_images = files("osdag.data.ResourceFiles.images")
-        imgpath_osdagheader = files("osdag.data.ResourceFiles.images").joinpath("Osdag_header_report.png")
+        imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options, indent=False)
@@ -102,7 +102,7 @@ class CreateLatex(Document):
                         sectiondetails = uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
 
-                        Img_path = files("osdag.data.ResourceFiles.images").joinpath(image_name + ".png")
+                        Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
                         if (len(sectiondetails))% 2 == 0:
                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                             merge_rows = int((len(sectiondetails)/2)) +2
@@ -156,7 +156,6 @@ class CreateLatex(Document):
             for i in uiObj:
                 if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
-                        # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
                             list_sec = uiObj[i].strip("['']")
                             print( 'list_sec', list_sec,'\n', list_sec.split("', '"))
@@ -220,10 +219,7 @@ class CreateLatex(Document):
                     table.add_row(bold('Design Status'),color_cell("OsdagGreen",bold("Pass")))
                 table.add_hline()
 
-
-
             for check in Design_Check:
-
                 if check[0] == 'SubSection':
                     if count >=1:
                         # doc.append(NewPage())
@@ -251,7 +247,7 @@ class CreateLatex(Document):
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
                                     image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                                    Img_path = files("osdag.data.ResourceFiles.images").joinpath(image_name + ".png")
+                                    Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
                                     if (len(sectiondetails)) % 2 == 0:
                                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)

@@ -591,7 +591,7 @@ class Connection(Main):
             else:
                 flag1 = True
             if design_dictionary[KEY_MODULE] == KEY_DISP_FINPLATE:
-                selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
+                selected_plate_thk = list(np.float64(design_dictionary[KEY_PLATETHK]))
                 supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
                 available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
                 if not available_plates:

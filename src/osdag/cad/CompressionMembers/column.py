@@ -16,13 +16,22 @@ class CompressionMemberCAD(object):
 
     def createcolumnGeometry(self):
         """
+        Ensures the column is always vertical along the z-axis.
 
-        :return: Geometric Orientation of this component
+        :return: Geometric orientation of this component
         """
+        # The origin of the column
         columnOriginL = numpy.array([0.0, 0.0, 0.0])
-        columnL_uDir = numpy.array([1.0, 0.0, 0.0])
-        columnL_wDir = numpy.array([0.0, 0.0, 1.0])
-        self.sec.place(columnOriginL, columnL_uDir, columnL_wDir)
 
+        # Set the column's local u-direction and w-direction
+        # Since the column is vertical along z-axis, its w-direction is along z-axis
+        # The u-direction must be perpendicular to w-direction, choose x-axis
+        uDir = numpy.array([1.0, 0.0, 0.0])  # Along x-axis
+        wDir = numpy.array([0.0, 0.0, 1.0])  # Along z-axis (vertical)
+
+        # Place the section at the specified origin with the orientation defined
+        self.sec.place(columnOriginL, uDir, wDir)
+
+        # Create the column model based on the section and orientation
         self.columnModel = self.sec.create_model()
 

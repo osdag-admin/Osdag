@@ -1725,11 +1725,13 @@ class CommonDesignLogic(object):
             column_R1 = float(Col.section_property.root_radius)
             column_R2 = float(Col.section_property.toe_radius)
             column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
-            column_length = 1500
+            column_length = float(Col.length_zz)
 
             sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
                               alpha=column_alpha, length=column_length, notchObj=None)
             col = CompressionMemberCAD(sec)
+
+            sec=sec.create_model()
 
         col.create_3DModel()
 
@@ -2050,8 +2052,8 @@ class CommonDesignLogic(object):
             self.col = self.module_class()
             self.ColObj = self.createColumnInFrameCAD()
 
-            # if self.component == "Model":
-            #     osdag_display_shape(self.display, self.ColObj, update=True)
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.ColObj, update=True)
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:

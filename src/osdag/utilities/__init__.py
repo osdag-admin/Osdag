@@ -39,19 +39,70 @@ from OCC.Core.Graphic3d import (Graphic3d_NOM_NEON_GNC, Graphic3d_NOT_ENV_CLOUDS
                                 Graphic3d_StereoMode_QuadBuffer,
                                 Graphic3d_RenderingParams)
 from OCC.Core.Aspect import Aspect_TOTP_RIGHT_LOWER, Aspect_FM_STRETCH, Aspect_FM_NONE
-
+import traceback
 
 def color_the_edges(shp, display, color, width):
+    """
+    Colors the edges of a given shape.
+
+    :param shp: The shape to color (TopoDS_Shape).
+    :param display: The display context for rendering the shape.
+    :param color: The color to apply to the edges (Quantity_Color or predefined constant like Quantity_NOC_BLACK).
+    :param width: The width of the edges.
+    """
+    if not isinstance(shp, TopoDS_Shape):
+        raise TypeError("The 'shp' parameter must be a valid TopoDS_Shape.")
+
     shapeList = []
-    Ex = TopExp_Explorer(shp, TopAbs_EDGE)
-    ctx = display.Context
-    while Ex.More():
-        aEdge = topods.Edge(Ex.Current())
-        # ais_shape = AIS_Shape(aEdge)
-        # ctx.SetColor(ais_shape, color, True)
-        # ctx.SetWidth(ais_shape, width, False)
-        # ctx.Display(ais_shape, False)
-        Ex.Next()
+    try:
+        # Initialize the edge explorer for the given shape
+        Ex = TopExp_Explorer(shp, TopAbs_EDGE)
+
+        # Get the display context
+        ctx = display.Context
+
+        # If the color is a predefined constant (like Quantity_NOC_BLACK), convert to Quantity_Color
+        if isinstance(color, int):  # Quantity_NOC_BLACK is an int, so check if color is an int
+            color = Quantity_Color(color)
+
+        # If the color is already a Quantity_Color, do nothing
+        elif isinstance(color, Quantity_Color):
+            pass  
+        elif isinstance(color, tuple):
+            # If color is a tuple (r, g, b), convert to Quantity_Color
+            color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
+        else:
+            raise TypeError(f"Unsupported color type: {type(color)}")
+
+        # Iterate over the edges in the shape
+        while Ex.More():
+            # Extract the current edge
+            aEdge = topods.Edge(Ex.Current())
+
+            # Create an AIS_Shape for the edge
+            ais_shape = AIS_Shape(aEdge)
+
+            # Set the color and width for the edge
+            ctx.SetColor(ais_shape, color, True)
+            ctx.SetWidth(ais_shape, width, False)
+
+            # Display the edge
+            ctx.Display(ais_shape, False)
+
+            # Store the edge for tracking
+            shapeList.append(aEdge)
+
+            # Move to the next edge
+            Ex.Next()
+
+    except Exception as e:
+        # Print the error and traceback for more detail
+        print(f"An error occurred: {e}")
+        traceback.print_exc()  # This will print the full traceback
+
+        raise RuntimeError(f"Error while coloring edges: {e}")
+        
+    return shapeList
 
 
 def set_default_edge_style(shp, display):

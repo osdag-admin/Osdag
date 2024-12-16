@@ -16,6 +16,7 @@ class RectHollow(object):
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         self.vDir = self.wDir * self.uDir
+        self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin

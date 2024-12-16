@@ -16,6 +16,7 @@ class CircularHollow(object):
         self.uDir = numpy.array([1.0, 0, 0])
         self.shaftDir = numpy.array([0.0, 0, 1.0])
         self.vDir = self.shaftDir * self.uDir
+        self.compute_params()
 
     def place(self, sec_origin, uDir, shaftDir):
         self.sec_origin = sec_origin

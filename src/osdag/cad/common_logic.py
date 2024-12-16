@@ -1711,12 +1711,14 @@ class CommonDesignLogic(object):
 
         if 'RHS' in Col.result_designation or 'SHS' in Col.result_designation:  # hollow sections 'RHS and SHS'
             sec = RectHollow(L=float(Col.section_property.flange_width), W=float(Col.section_property.depth),
-                             H=1000, T=float(Col.section_property.flange_thickness))
+                             H=float(Col.length_zz), T=float(Col.section_property.flange_thickness))
             col = CompressionMemberCAD(sec)
+            sec=sec.create_model()
         elif 'CHS' in Col.result_designation:  # CHS
             sec = CircularHollow(r=float(Col.section_property.depth) / 2, T=float(Col.section_property.flange_thickness),
-                                 H=1500)
+                                 H=float(Col.length_zz))
             col = CompressionMemberCAD(sec)
+            sec=sec.create_model()
         else:  # Beams and Columns (rolled sections)
             column_tw = float(Col.section_property.web_thickness)
             column_T = float(Col.section_property.flange_thickness)

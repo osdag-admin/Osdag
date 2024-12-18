@@ -7,11 +7,12 @@
 # WARNING! All changes made in this file will be lost!
 
 
-import sys
-import sqlite3
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, qApp, QListWidget, QListWidgetItem, QApplication
+import sys
+import sqlite3
 from PyQt5.QtCore import pyqtSlot
+#from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog
 from ..get_DPI_scale import scale
 #from .ui_template import *
@@ -50,7 +51,8 @@ class Ui_Popup(object):
         self.label.setGeometry(QtCore.QRect(20, 20, 150, 30))
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(MainWindow)
-        self.label_2.setGeometry(QtCore.QRect(int(scale*32), 20, 150, 30))
+        self.label_2.setGeometry(QtCore.QRect(int(scale * 320), 20, 150, 30))
+
         self.label_2.setObjectName("label_2")
         # self.listWidget = QtWidgets.QListWidget(MainWindow)
         self.listWidget = My_ListWidget(MainWindow)
@@ -193,12 +195,32 @@ class Ui_Popup(object):
             if all_items.text() in self.disabled_values:
                 all_items.setFlags(QtCore.Qt.NoItemFlags)
 
-    def get_right_elements(self):
-        """
-        Function to get the selected (i.e. the right elements) elements
+            # self.listWidget_2.addItems(items)
+    # def addAvailableItems1(self,items1,KEY_EXISTINGVAL_CUSTOMIZED):
+    #     self.listWidget_2.clear()
+    #     if items1 != KEY_EXISTINGVAL_CUSTOMIZED and KEY_EXISTINGVAL_CUSTOMIZED != []:
+    #         self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
+    #     else:
+    #         self.listWidget_2.addItems(items1)
 
-        @author: Amir
-        """
+    # def get_left_elements(self):
+    #     r = []
+    #     for i in range(self.listWidget.count()):
+    #         it = self.listWidget.item(i)
+    #
+    #         r.append(it.text())
+    #         r[i] = int(r[i])
+    #     r.sort()
+    #     return r
+
+    def get_right_elements(self):
+
+        # Function to get the selected (i.e. thr right elements) elements
+
+        # @author: Amir
+
+
+
 
         r = []
         for i in range(self.listWidget_2.count()):

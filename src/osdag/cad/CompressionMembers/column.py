@@ -35,3 +35,4 @@ class CompressionMemberCAD(object):
         # Create the column model based on the section and orientation
         self.columnModel = self.sec.create_model()
 
+        

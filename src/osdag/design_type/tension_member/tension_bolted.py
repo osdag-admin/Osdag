@@ -2364,8 +2364,8 @@ class Tension_bolted(Member):
              KEY_DISP_YIELD_STRENGTH_REPORT: round(section_size.fy, 2),
 
              "Bolt Details - Input and Design Preference": "TITLE",
-             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
-             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
+             KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              # KEY_DISP_DP_BOLT_FU: round(self.bolt.bolt_fu,2),
@@ -2379,7 +2379,7 @@ class Tension_bolted(Member):
              KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM: self.bolt.corrosive_influences,
 
              "Plate Details - Input and Design Preference": "TITLE",
-             KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
+             KEY_DISP_PLATETHK: str([int(d) for d in self.plate.thickness]),
              KEY_DISP_MATERIAL: self.plate.material,
              KEY_DISP_ULTIMATE_STRENGTH_REPORT: round(self.plate.fu, 2),
              KEY_DISP_YIELD_STRENGTH_REPORT: round(self.plate.fy, 2),
@@ -2758,5 +2758,3 @@ class Tension_bolted(Member):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-
-

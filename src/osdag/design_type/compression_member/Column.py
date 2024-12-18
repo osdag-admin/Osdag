@@ -21,7 +21,7 @@ from ...utils.common.component import *
 from ..member import Member
 from ...Report_functions import *
 from ...design_report.reportGenerator_latex import CreateLatex
-
+from pylatex.utils import NoEscape
 
 class ColumnDesign(Member):
 
@@ -731,19 +731,28 @@ class ColumnDesign(Member):
                 self.web_class = IS800_2007.Table2_iii((self.section_property.depth - (2 * self.section_property.flange_thickness)),
                                                        self.section_property.web_thickness, self.material_property.fy,
                                                        classification_type='Axial compression')
+                web_ratio = (self.section_property.depth - 2 * (
+                            self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
 
             elif (self.sec_profile == VALUES_SEC_PROFILE[1]):  # RHS and SHS
                 self.flange_class = IS800_2007.Table2_iii((self.section_property.depth - (2 * self.section_property.flange_thickness)),
                                                           self.section_property.flange_thickness, self.material_property.fy,
                                                           classification_type='Axial compression')
                 self.web_class = self.flange_class
+                web_ratio = (self.section_property.depth - 2 * (
+                            self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
 
             elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
                 self.flange_class = IS800_2007.Table2_x(self.section_property.out_diameter, self.section_property.flange_thickness,
                                                         self.material_property.fy, load_type='axial compression')
                 self.web_class = self.flange_class  #Why?
+                web_ratio = (self.section_property.depth - 2 * (
+                            self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
                 # print(f"self.web_class{self.web_class}")
-
+            
             if self.flange_class == 'Slender' or self.web_class == 'Slender':
                 self.section_class = 'Slender'
             else:
@@ -766,11 +775,11 @@ class ColumnDesign(Member):
                 elif self.flange_class == 'Semi-Compact' and self.web_class == 'Semi-Compact':
                     self.section_class = 'Semi-Compact'
 
-            logger.info("The flange of the trial section ({}) is {} and web is {}. The section is {} [Reference: Cl 3.7, IS 800:2007].".
-                        format(trial_section, self.flange_class, self.web_class, self.section_class))
+        logger.info("The flange of the trial section ({}) is {} and web is {}. The section is {} [Reference: Cl 3.7, IS 800:2007].".
+                    format(trial_section, self.flange_class, self.web_class, self.section_class))
 
             # 2.2 - Effective length
-            self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+        self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_zz,
                 end_1=self.end_1_z,
                 end_2=self.end_2_z)
@@ -780,7 +789,7 @@ class ColumnDesign(Member):
             #     self.sec_profile) / self.length_yy  # mm
             # print(f"self.effective_length {self.effective_length_yy} ")
 
-            self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
+        self.effective_length_yy = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(
                 self.length_yy,
                 end_1=self.end_1_y,
                 end_2=self.end_2_y)
@@ -801,15 +810,15 @@ class ColumnDesign(Member):
             # print("+++++++++++++++++++++++++++++++++++++++++++++++")
 
             # 2.3 - Effective slenderness ratio
-            self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
-            self.effective_sr_yy = self.effective_length_yy / self.section_property.rad_of_gy_y
+        self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
+        self.effective_sr_yy = self.effective_length_yy / self.section_property.rad_of_gy_y
 
-            limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
-            if self.effective_sr_zz > limit and self.effective_sr_yy > limit:
+        limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
+        if self.effective_sr_zz > limit and self.effective_sr_yy > limit:
                 logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
                 logger.error("Cannot compute. Given Length does not pass.")
                 local_flag = False
-            else:
+        else:
                 logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
 
             # if len(self.allowed_sections) == 0:
@@ -823,8 +832,10 @@ class ColumnDesign(Member):
             #     self.input_section_list.append(trial_section)
             #     self.input_section_classification.update({trial_section: self.section_class})
             # print(f"self.section_class{self.section_class}")
-            self.input_section_list.append(trial_section)
-            self.input_section_classification.update({trial_section: self.section_class})
+
+        self.input_section_list.append(trial_section)
+        self.input_section_classification.update({trial_section: [self.section_class, self.flange_class, self.web_class, flange_ratio, web_ratio]})
+
         return local_flag
 
     def design_column(self):
@@ -853,7 +864,7 @@ class ColumnDesign(Member):
         #     self.steel_cost_per_kg = 50
         #     self.design_status = False
         #     self.design_status_list.append(self.design_status)
-
+        self.epsilon = math.sqrt(250 / self.material_property.fy)
         if len(self.input_section_list) > 0:
 
             # initializing lists to store the optimum results based on optimum UR and cost
@@ -891,14 +902,14 @@ class ColumnDesign(Member):
                 self.material_property.connect_to_database_to_get_fy_fu(self.material, max(self.section_property.flange_thickness,
                                                                                            self.section_property.web_thickness))
 
-                self.epsilon = math.sqrt(250 / self.material_property.fy)
+                
 
                 # initialize lists for updating the results dictionary
-                list_zz = []
-                list_yy = []
+                self.list_zz = []
+                self.list_yy = []
 
-                list_zz.append(section)
-                list_yy.append(section)
+                self.list_zz.append(section)
+                self.list_yy.append(section)
 
                 # Step 1 - computing the effective sectional area
                 self.section_class = self.input_section_classification[section]
@@ -928,11 +939,11 @@ class ColumnDesign(Member):
                     if self.section_class != 'Slender':
                         logger.info("The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007].")
 
-                list_zz.append(self.section_class)
-                list_yy.append(self.section_class)
+                self.list_zz.append(self.section_class)
+                self.list_yy.append(self.section_class)
 
-                list_zz.append(self.effective_area)
-                list_yy.append(self.effective_area)
+                self.list_zz.append(self.effective_area)
+                self.list_yy.append(self.effective_area)
 
                 # Step 2 - computing the design compressive stress
 
@@ -968,11 +979,11 @@ class ColumnDesign(Member):
                 self.imperfection_factor_zz = IS800_2007.cl_7_1_2_1_imperfection_factor(buckling_class=self.buckling_class_zz)
                 self.imperfection_factor_yy = IS800_2007.cl_7_1_2_1_imperfection_factor(buckling_class=self.buckling_class_yy)
 
-                list_zz.append(self.buckling_class_zz)
-                list_yy.append(self.buckling_class_yy)
+                self.list_zz.append(self.buckling_class_zz)
+                self.list_yy.append(self.buckling_class_yy)
 
-                list_zz.append(self.imperfection_factor_zz)
-                list_yy.append(self.imperfection_factor_yy)
+                self.list_zz.append(self.imperfection_factor_zz)
+                self.list_yy.append(self.imperfection_factor_yy)
 
                 # 2.2 - Effective length
                 self.effective_length_zz = IS800_2007.cl_7_2_2_effective_length_of_prismatic_compression_members(self.length_zz ,
@@ -982,45 +993,45 @@ class ColumnDesign(Member):
                                                                                                                  end_1=self.end_1_y,
                                                                                                                  end_2=self.end_2_y)  # mm
 
-                list_zz.append(self.effective_length_zz)
-                list_yy.append(self.effective_length_yy)
+                self.list_zz.append(self.effective_length_zz)
+                self.list_yy.append(self.effective_length_yy)
 
                 # 2.3 - Effective slenderness ratio
                 self.effective_sr_zz = self.effective_length_zz / self.section_property.rad_of_gy_z
                 self.effective_sr_yy = self.effective_length_yy / self.section_property.rad_of_gy_y
 
-                list_zz.append(self.effective_sr_zz)
-                list_yy.append(self.effective_sr_yy)
+                self.list_zz.append(self.effective_sr_zz)
+                self.list_yy.append(self.effective_sr_yy)
 
                 # 2.4 - Euler buckling stress
                 self.euler_bs_zz = (math.pi ** 2 * self.section_property.modulus_of_elasticity) / self.effective_sr_zz ** 2
                 self.euler_bs_yy = (math.pi ** 2 * self.section_property.modulus_of_elasticity) / self.effective_sr_yy ** 2
 
-                list_zz.append(self.euler_bs_zz)
-                list_yy.append(self.euler_bs_yy)
+                self.list_zz.append(self.euler_bs_zz)
+                self.list_yy.append(self.euler_bs_yy)
 
                 # 2.5 - Non-dimensional effective slenderness ratio
                 self.non_dim_eff_sr_zz = math.sqrt(self.material_property.fy / self.euler_bs_zz)
                 self.non_dim_eff_sr_yy = math.sqrt(self.material_property.fy / self.euler_bs_yy)
                 # print(f"self.non_dim_eff_sr_zz{self.non_dim_eff_sr_yy},self.phi_yy{self.non_dim_eff_sr_yy}/n")
 
-                list_zz.append(self.non_dim_eff_sr_zz)
-                list_yy.append(self.non_dim_eff_sr_yy)
+                self.list_zz.append(self.non_dim_eff_sr_zz)
+                self.list_yy.append(self.non_dim_eff_sr_yy)
 
                 # 2.5 - phi
                 self.phi_zz = 0.5 * (1 + (self.imperfection_factor_zz * (self.non_dim_eff_sr_zz - 0.2)) + self.non_dim_eff_sr_zz ** 2)
                 self.phi_yy = 0.5 * (1 + (self.imperfection_factor_yy * (self.non_dim_eff_sr_yy - 0.2)) + self.non_dim_eff_sr_yy ** 2)
                 # print(f"self.phi_zz{self.phi_zz},self.phi_yy{self.phi_yy}, self.imperfection_factor_zz{self.imperfection_factor_zz}")
 
-                list_zz.append(self.phi_zz)
-                list_yy.append(self.phi_yy)
+                self.list_zz.append(self.phi_zz)
+                self.list_yy.append(self.phi_yy)
 
                 # 2.6 - Design compressive stress
                 self.stress_reduction_factor_zz = 1 / (self.phi_zz + (self.phi_zz ** 2 - self.non_dim_eff_sr_zz ** 2) ** 0.5)
                 self.stress_reduction_factor_yy = 1 / (self.phi_yy + (self.phi_yy ** 2 - self.non_dim_eff_sr_yy ** 2) ** 0.5)
 
-                list_zz.append(self.stress_reduction_factor_zz)
-                list_yy.append(self.stress_reduction_factor_yy)
+                self.list_zz.append(self.stress_reduction_factor_zz)
+                self.list_yy.append(self.stress_reduction_factor_yy)
 
                 self.f_cd_1_zz = (self.stress_reduction_factor_zz * self.material_property.fy) / self.gamma_m0
                 self.f_cd_1_yy = (self.stress_reduction_factor_yy * self.material_property.fy) / self.gamma_m0
@@ -1031,38 +1042,38 @@ class ColumnDesign(Member):
 
                 self.f_cd = min(self.f_cd_zz, self.f_cd_yy)
 
-                list_zz.append(self.f_cd_1_zz)
-                list_yy.append(self.f_cd_1_yy)
+                self.list_zz.append(self.f_cd_1_zz)
+                self.list_yy.append(self.f_cd_1_yy)
 
-                list_zz.append(self.f_cd_2)
-                list_yy.append(self.f_cd_2)
+                self.list_zz.append(self.f_cd_2)
+                self.list_yy.append(self.f_cd_2)
 
-                list_zz.append(self.f_cd_zz)
-                list_yy.append(self.f_cd_yy)
+                self.list_zz.append(self.f_cd_zz)
+                self.list_yy.append(self.f_cd_yy)
 
-                list_zz.append(self.f_cd)
-                list_yy.append(self.f_cd)
+                self.list_zz.append(self.f_cd)
+                self.list_yy.append(self.f_cd)
 
                 # 2.7 - Capacity of the section
 
                 self.section_capacity = self.f_cd * self.effective_area  # N
 
-                list_zz.append(self.section_capacity)
-                list_yy.append(self.section_capacity)
+                self.list_zz.append(self.section_capacity)
+                self.list_yy.append(self.section_capacity)
 
                 # 2.8 - UR
                 self.ur = round(self.load.axial_force / self.section_capacity, 3)
 
-                list_zz.append(self.ur)
-                list_yy.append(self.ur)
+                self.list_zz.append(self.ur)
+                self.list_yy.append(self.ur)
                 self.optimum_section_ur.append(self.ur)
 
                 # 2.9 - Cost of the section in INR
                 self.cost = (self.section_property.unit_mass * self.section_property.area * 1e-4) * min(self.length_zz, self.length_yy) * \
                             self.steel_cost_per_kg
 
-                list_zz.append(self.cost)
-                list_yy.append(self.cost)
+                self.list_zz.append(self.cost)
+                self.list_yy.append(self.cost)
                 self.optimum_section_cost.append(self.cost)
                 # print(f"list_zz{list_zz},list_yy{list_yy} ")
 
@@ -1076,7 +1087,7 @@ class ColumnDesign(Member):
                 # 1- Based on optimum UR
                 self.optimum_section_ur_results[self.ur] = {}
 
-                list_2 = list_zz + list_yy
+                list_2 = self.list_zz + self.list_yy
                 for j in list_1:
                     # k = 0
                     for k in list_2:
@@ -1088,7 +1099,7 @@ class ColumnDesign(Member):
                 # 2- Based on optimum cost
                 self.optimum_section_cost_results[self.cost] = {}
 
-                list_2 = list_zz + list_yy                                  #Why?
+                list_2 = self.list_zz + self.list_yy                                  #Why?
                 for j in list_1:
                     for k in list_2:
                         self.optimum_section_cost_results[self.cost][j] = k
@@ -1274,7 +1285,7 @@ class ColumnDesign(Member):
             logger.info(": ========== End Of Design ============")
 
     ### start writing save_design from here!
-    def save_design(self, popup_summary):
+    """def save_design(self, popup_summary):
 
         if self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
@@ -1287,22 +1298,12 @@ class ColumnDesign(Member):
             if self.column_properties.flange_slope != 90:
                 select_section_img = "Slope_Beam"
             else:
-                select_section_img = "Parallel_Beam"
+                select_section_img = "Parallel_Beam" """
+    def save_design(self, popup_summary):
 
-            # column section properties
-        if self.connectivity == 'Hollow/Tubular Column Base':
-            if self.dp_column_designation[1:4] == 'SHS':
-                section_type = 'Square Hollow Section (SHS)'
-            elif self.dp_column_designation[1:4] == 'RHS':
-                section_type = 'Rectangular Hollow Section (RHS)'
-            else:
-                section_type = 'Circular Hollow Section (CHS)'
-        else:
-            section_type = 'I Section'
-
-
-        if self.section_property=='Columns' or self.section_property=='Beams':
+        if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SEC_PROFILE[0]:
             self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
                                   KEY_DISP_COLSEC_REPORT: self.section_property.designation,
                                   KEY_DISP_MATERIAL: self.section_property.material,
  #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
@@ -1324,6 +1325,7 @@ class ColumnDesign(Member):
                                   KEY_REPORT_ZPZ: round(self.section_property.plast_sec_mod_z * 1e-3, 2),
                                   KEY_REPORT_ZPY: round(self.section_property.plast_sec_mod_y * 1e-3, 2)}
         else:
+            #Update for section profiles RHS and SHS, CHS by making suitable elif condition.
             self.report_column = {KEY_DISP_COLSEC_REPORT: self.section_property.designation,
                                   KEY_DISP_MATERIAL: self.section_property.material,
                                   #                                 KEY_DISP_APPLIED_AXIAL_FORCE: self.section_property.,
@@ -1337,77 +1339,146 @@ class ColumnDesign(Member):
 
 
         self.report_input = \
-            {KEY_MAIN_MODULE: self.mainmodule,
+            {#KEY_MAIN_MODULE: self.mainmodule,
              KEY_MODULE: self.module, #"Axial load on column "
-             KEY_DISP_SECTION_PROFILE: self.sec_profile,
+                KEY_DISP_AXIAL: self.load.axial_force * 10 ** -3,
+                KEY_DISP_ACTUAL_LEN_ZZ: self.length_zz,
+                KEY_DISP_ACTUAL_LEN_YY: self.length_yy,
+                KEY_DISP_SEC_PROFILE: self.sec_profile,
+                KEY_DISP_SECSIZE: self.result_section_class,
+                KEY_DISP_END1: self.end_1_z,
+                KEY_DISP_END2: self.end_2_z,
+                KEY_DISP_END1_Y: self.end_1_y,
+                KEY_DISP_END2_Y: self.end_2_y,
+                "Column Section - Mechanical Properties": "TITLE",
              KEY_MATERIAL: self.material,
-             KEY_DISP_ACTUAL_LEN_ZZ: self.length_zz,
-             KEY_DISP_ACTUAL_LEN_YY: self.length_yy,
-             KEY_DISP_END1: self.end_1_z,
-             KEY_DISP_END2: self.end_2_z,
-             KEY_DISP_END1_Y: self.end_1_y,
-             KEY_DISP_END2_Y: self.end_2_y,
-             KEY_DISP_AXIAL: self.load,
-             KEY_DISP_SEC_PROFILE: self.sec_profile,
-             KEY_DISP_SECSIZE: self.result_section_class,
-             KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.euler_bs_yy,
-             KEY_DISP_YIELD_STRENGTH_REPORT: self.result_bc_yy,
-
-
-             "Column Section - Mechanical Properties": "TITLE",
-             "Section Details": self.report_column,
+                KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.material_property.fu,
+                KEY_DISP_YIELD_STRENGTH_REPORT: self.material_property.fy,
+                KEY_DISP_EFFECTIVE_AREA_PARA: self.effective_area_factor, #To Check
+                KEY_DISP_SECSIZE:  str(self.sec_list),
+                "Selected Section Details": self.report_column,
              }
 
         self.report_check = []
-
-        self.h = (self.beam_D - (2 * self.beam_tf))
-
-        #1.1 Input sections display
-        t1 = ('SubSection', 'List of Input Sections',self.input_section_list),
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
         self.report_check.append(t1)
+
+        self.h = (self.section_property.depth - 2 * (self.section_property.flange_thickness + self.section_property.root_radius))
+        self.h_bf_ratio = self.h / self.section_property.flange_width
+
 
         # 2.2 CHECK: Buckling Class - Compatibility Check
         t1 = ('SubSection', 'Buckling Class - Compatibility Check', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{2cm}|')
         self.report_check.append(t1)
 
-        t1 = ("h/bf , tf ", comp_column_class_section_check_required(self.bucklingclass, self.h, self.bf),
-              comp_column_class_section_check_provided(self.bucklingclass, self.h, self.bf, self.tf, self.var_h_bf),
-              'Compatible')  # if self.bc_compatibility_status is True else 'Not compatible')
+        # YY axis row
+        t1 = (
+            "h/bf and tf for YY Axis", 
+            comp_column_class_section_check_required(self.h, self.section_property.flange_width, self.section_property.flange_thickness, "YY"),  
+            comp_column_class_section_check_provided(self.h, self.section_property.flange_width, self.section_property.flange_thickness, round(self.h_bf_ratio, 2), "YY"), 'Compatible'  
+        )
         self.report_check.append(t1)
 
-        # 2.3 CHECK: Cross-section classification
-        t1 = ('SubSection', 'Cross-section classification', '|p{4.5cm}|p{3cm}|p{6.5cm}|p{1.5cm}|')
+        # ZZ axis row
+        t1 = (
+            "h/bf and tf for ZZ Axis", 
+            comp_column_class_section_check_required(self.h, self.section_property.flange_width, self.section_property.flange_thickness, "ZZ"), 
+            comp_column_class_section_check_provided(self.h, self.section_property.flange_width, self.section_property.flange_thickness, round(self.h_bf_ratio, 2), "ZZ"), 'Compatible'  
+        )
         self.report_check.append(t1)
 
-        t1 = ("b/tf and d/tw ", cross_section_classification_required(self.section),
-              cross_section_classification_provided(self.tf, self.b1, self.epsilon, self.section, self.b1_tf,
-                                                    self.d1_tw, self.ep1, self.ep2, self.ep3, self.ep4),
-              'b = bf / 2,d = h – 2 ( T + R1),έ = (250 / Fy )^0.5,Compatible')  # if self.bc_compatibility_status is True else 'Not compatible')
+        t1 = ('SubSection', 'Section Classification', '|p{3cm}|p{3.5cm}|p{8.5cm}|p{1cm}|')
         self.report_check.append(t1)
+        t1 = ('Web Class', 'Axial Compression',
+                  cl_3_7_2_section_classification_web(round(self.h, 2), round(self.section_property.web_thickness, 2), round(self.input_section_classification[self.result_designation][4], 2),
+                                         self.epsilon, self.section_property.type,
+                                        self.input_section_classification[self.result_designation][2]),
+                  ' ')
+        self.report_check.append(t1)
+        t1 = ('Flange Class', self.section_property.type,
+                  cl_3_7_2_section_classification_flange(round(self.section_property.flange_width/2, 2),
+                                                      round(self.section_property.flange_thickness, 2),
+                            round(self.input_section_classification[self.result_designation][3], 2),
+                                                      self.epsilon,
+                                                      self.input_section_classification[self.result_designation][1]),
+                  ' ')
+        self.report_check.append(t1)
+        t1 = ('Section Class', ' ',
+                  cl_3_7_2_section_classification(
+                                                      self.input_section_classification[self.result_designation][0]),
+                  ' ')
+        self.report_check.append(t1)
+        
 
-        # 2.4 CHECK : Member Check
-        t1 = ("Slenderness", cl_7_2_2_slenderness_required(self.KL, self.ry, self.lamba),
-              cl_7_2_2_slenderness_provided(self.KL, self.ry, self.lamba), 'PASS')
+        t1 = ('NewTable', 'Imperfection Factor', '|p{3cm}|p{5 cm}|p{5cm}|p{3 cm}|')
         self.report_check.append(t1)
 
         t1 = (
-        "Design Compressive stress (fcd)", cl_7_1_2_1_fcd_check_required(self.gamma_mo, self.f_y, self.f_y_gamma_mo),
-        cl_7_1_2_1_fcd_check_provided(self.facd), 'PASS')
+            'YY',
+            self.list_yy[3].upper(),
+            self.list_yy[4], ''
+        )
         self.report_check.append(t1)
 
-        t1 = ("Design Compressive strength (Pd)", cl_7_1_2_design_comp_strength_required(self.axial),
-              cl_7_1_2_design_comp_strength_provided(self.Aeff, self.facd, self.A_eff_facd), "PASS")
+        t1 = (
+            'ZZ',
+            self.list_zz[3].upper(),
+            self.list_zz[4], ''
+        )
         self.report_check.append(t1)
 
-        t1 = ('', '', '', '')
+
+        K_yy = self.result_eff_len_yy / self.length_yy
+        K_zz= self.result_eff_len_zz / self.length_zz
+        t1 = ('SubSection', 'Slenderness Ratio', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
         self.report_check.append(t1)
+        t1 = ("Effective Slenderness Ratio (For YY Axis)", ' ',
+                            cl_7_1_2_effective_slenderness_ratio(K_yy,self.length_yy, self.section_property.rad_of_gy_y, round(self.result_eff_sr_yy, 2)),
+                            ' ')
+        self.report_check.append(t1)
+        t1 = ("Effective Slenderness Ratio (For ZZ Axis)", ' ',
+                            cl_7_1_2_effective_slenderness_ratio(K_zz,self.length_zz, self.section_property.rad_of_gy_z, round(self.result_eff_sr_zz, 2)),
+                            ' ')
+        self.report_check.append(t1)
+
+
+
+        t1 = ('SubSection', 'Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
+        self.report_check.append(t1)
+                           
+        t1 = (r'$\phi_{yy}$', ' ',
+            cl_8_7_1_5_phi(self.result_IF_yy, round(self.non_dim_eff_sr_yy, 2), round(self.result_phi_yy, 2)),
+            ' ')
+        self.report_check.append(t1)
+
+        t1 = (r'$\phi_{zz}$', ' ',
+            cl_8_7_1_5_phi(self.result_IF_zz, round(self.non_dim_eff_sr_zz, 2), round(self.result_phi_zz, 2)),
+            ' ')
+        self.report_check.append(t1)
+
+        t1 = (r'$F_{cd,yy} \, \left( \frac{N}{\text{mm}^2} \right)$', ' ',
+            cl_8_7_1_5_Buckling(self.material_property.fy, self.gamma_m0, round(self.non_dim_eff_sr_yy, 2), round(self.result_phi_yy, 2), round(self.result_fcd_2, 2), round(self.result_fcd_yy, 2)),
+            ' ')
+        self.report_check.append(t1)
+
+        t1 = (r'$F_{cd,zz} \, \left( \frac{N}{\text{mm}^2} \right)$', ' ',
+            cl_8_7_1_5_Buckling(self.material_property.fy, self.gamma_m0, round(self.non_dim_eff_sr_zz, 2), round(self.result_phi_zz, 2), round(self.result_fcd_2, 2), round(self.result_fcd_zz, 2)),
+            ' ')
+        self.report_check.append(t1)
+
+        t1 = (r'Design Compressive Strength (\( P_d \)) (For the most critical value of \( F_{cd} \))', self.load.axial_force * 10 ** -3,
+                      cl_7_1_2_design_compressive_strength(round(self.result_capacity / 1000, 2), self.section_property.area, round(self.result_fcd, 2),self.load.axial_force * 10 ** -3),
+                      get_pass_fail(self.load.axial_force * 10 ** -3, round(self.result_capacity, 2), relation="leq"))
+        self.report_check.append(t1)
+
+
+        Disp_2d_image = []
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                              rel_path, module=self.module)
-
-
-
+                              rel_path, Disp_2d_image, Disp_3D_image, module=self.module) 

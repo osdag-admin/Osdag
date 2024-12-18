@@ -1719,6 +1719,7 @@ class CommonDesignLogic(object):
                                  H=float(Col.length_zz))
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
+
         else:  # Beams and Columns (rolled sections)
             column_tw = float(Col.section_property.web_thickness)
             column_T = float(Col.section_property.flange_thickness)
@@ -1732,7 +1733,6 @@ class CommonDesignLogic(object):
             sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
                               alpha=column_alpha, length=column_length, notchObj=None)
             col = CompressionMemberCAD(sec)
-
             sec=sec.create_model()
 
         col.create_3DModel()
@@ -2056,6 +2056,12 @@ class CommonDesignLogic(object):
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True)
+        elif self.mainmodule == 'Struts in Trusses':
+            self.Strut = self.module_class()
+            #self.StrutObj = self.createColumnInFrameCAD()
+
+            # if self.component == "Model":
+            #     osdag_display_shape(self.display, self.ColObj, update=True)
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
@@ -2217,6 +2223,14 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Columns with known support conditions':
             if flag is True:
                 self.ColObj = self.createColumnInFrameCAD()
+
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
+        elif self.mainmodule == 'Struts in Trusses':
+            if flag is True:
+                #self.StrutObj = self.createColumnInFrameCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
 
@@ -2484,6 +2498,5 @@ class CommonDesignLogic(object):
 # if __name__!= "__main__":
 #
 #     CommonDesignLogic()
-
 
 

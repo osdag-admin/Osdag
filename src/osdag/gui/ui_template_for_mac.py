@@ -201,7 +201,7 @@ class Window(QMainWindow):
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
-    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
+    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED, disabled_values=None, note=""):
         """
         Function to connect the customized_popup with the ui_template file
         on clicking the customized option
@@ -210,9 +210,11 @@ class Window(QMainWindow):
         # @author : Amir
 
 
+        if disabled_values is None:
+            disabled_values = []
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
-        self.ui.setupUi(self.window)
+        self.ui.setupUi(self.window, disabled_values, note)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.window.exec()
         return self.ui.get_right_elements()
@@ -1397,7 +1399,7 @@ class Window(QMainWindow):
         last_design_file = os.path.join(last_design_folder, last_design_file)
         last_design_dictionary = {}
         if not os.path.isdir(last_design_folder):
-            os.mkdir(last_design_folder)
+            os.makedirs(last_design_folder)
         if os.path.isfile(last_design_file):
             with open(str(last_design_file), 'r') as last_design:
                 last_design_dictionary = yaml.safe_load(last_design)
@@ -2006,7 +2008,7 @@ class Window(QMainWindow):
 
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
             if not os.path.isdir(last_design_folder):
-                os.mkdir(last_design_folder)
+                os.makedirs(last_design_folder)
             last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
             last_design_file = os.path.join(last_design_folder, last_design_file)
             out_titles_status = []

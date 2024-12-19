@@ -2733,16 +2733,16 @@ class ColumnCoverPlate(MomentConnection):
     #     # else:
     #     #     self.display.EraseAll()
     #
-    # def call_3DColumn(self, ui, bgcolor):
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-    #     if ui.chkBxCol.isChecked():
-    #         ui.btn3D.setChecked(Qt.Unchecked)
-    #         ui.chkBxCol.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #     # self.display_3DModel("Beam", bgcolor)
-    #     ui.commLogicObj.display_3DModel("Column", bgcolor)
+    def call_3DColumn(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
+        if ui.chkBxCol.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Beam", bgcolor)
+        ui.commLogicObj.display_3DModel("Column", bgcolor)
     #
     # def call_3DConnector(self, ui, bgcolor):
     #     # status = self.resultObj['Bolt']['status']

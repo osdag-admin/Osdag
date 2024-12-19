@@ -50,6 +50,7 @@ from ..design_type.tension_member.tension_bolted import Tension_bolted
 from ..design_type.tension_member.tension_welded import Tension_welded
 from ..design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from ..design_type.compression_member.Column import ColumnDesign
+from ..design_type.compression_member.compression import Compression
 from ..design_type.flexural_member.flexure import Flexure
 from ..design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from ..design_type.flexural_member.flexure_othersupp import Flexure_Misc
@@ -204,7 +205,7 @@ class Window(QMainWindow):
         if not main.design_button_status:
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
-        if main.design_status and main.module_name(main) != KEY_DISP_FLEXURE and main.module_name(main) != KEY_DISP_FLEXURE2:
+        if main.design_status: # and main.module_name(main) != KEY_DISP_FLEXURE and main.module_name(main) != KEY_DISP_FLEXURE2
             from ..osdagMainSettings import backend_name
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             print('off_display', off_display)
@@ -1856,6 +1857,8 @@ class Window(QMainWindow):
             return Tension_welded
         elif name == KEY_DISP_COMPRESSION_COLUMN:
             return ColumnDesign
+        elif name == KEY_DISP_COMPRESSION_Strut:
+            return Compression
         elif name == KEY_DISP_FLEXURE:
             return Flexure
         elif name == KEY_DISP_FLEXURE2:
@@ -2101,9 +2104,13 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
-                                                  KEY_DISP_COMPRESSION_COLUMN]: # , KEY_DISP_FLEXURE
+                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
+                print(f"main object type: {type(main)}")
+                print(f"main attributes: {dir(main)}")
+                print("main.mainmodule",main.mainmodule)
+
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 print(main.module)
                 print(main.mainmodule)

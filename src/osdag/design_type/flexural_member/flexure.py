@@ -34,7 +34,7 @@ from ..tension_member import *
 from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
 from ...utils.common import is800_2007
 from ...utils.common.component import *
-
+from osdag.cad.items.plate import Plate
 
 class Flexure(Member):
 
@@ -746,6 +746,8 @@ class Flexure(Member):
     def get_3d_components(self):
 
         components = []
+        t3 = ('Model', self.call_3DModel)
+        components.append(t3)
 
         # t3 = ('Column', self.call_3DColumn)
         # components.append(t3)

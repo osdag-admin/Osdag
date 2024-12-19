@@ -24,6 +24,7 @@ class Compression(Member):
     def __init__(self):
         # print(f"Here Compression")
         super(Compression, self).__init__()
+        # self.mainmodule = "Struts in Trusses"
 
     ###############################################
     # Design Preference Functions Start
@@ -871,6 +872,7 @@ class Compression(Member):
         super(Compression,self).set_input_values(self, design_dictionary)
         #self.sizelist == self.sec_list
         # section properties
+        self.mainmodule = 'Struts in Trusses'
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = 'Struts in Trusses'
         self.sizelist = design_dictionary[KEY_SECSIZE]
@@ -1222,7 +1224,6 @@ class Compression(Member):
     #         self.design_status = False
     #         logger.error(": Design is unsafe. \n ")
     #         logger.info(" :=========End Of design===========")
-
 
     def section_classification(self):
         """ Classify the sections based on Table 2 of IS 800:2007 """

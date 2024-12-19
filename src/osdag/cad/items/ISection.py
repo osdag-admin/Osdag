@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
-    shaftDir = numpy.array([0.,0.,1.])
+    shaftDir = numpy.array([0.,1.,0.])
 
     ISec = ISection(B, T, D, t, R1, R2, alpha, length, notchObj)
     _place = ISec.place(origin, uDir, shaftDir)

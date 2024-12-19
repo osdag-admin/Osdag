@@ -658,6 +658,9 @@ class Flexure_Cantilever(Member):
     def get_3d_components(self):
 
         components = []
+        
+        t3 = ('Model', self.call_3DModel)
+        components.append(t3)
 
         # t3 = ('Column', self.call_3DColumn)
         # components.append(t3)

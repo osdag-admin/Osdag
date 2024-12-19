@@ -13,6 +13,11 @@ class CompressionMemberCAD(object):
 
         """
         self.createcolumnGeometry()
+    def create_Flex3DModel(self):
+        """
+
+        """
+        self.createcolumnFlexGeometry()
 
     def createcolumnGeometry(self):
         """
@@ -35,4 +40,23 @@ class CompressionMemberCAD(object):
         # Create the column model based on the section and orientation
         self.columnModel = self.sec.create_model()
 
-        
+    def createcolumnFlexGeometry(self):
+        """
+        Ensures the column is always horizontal along the x-axis.
+
+        :return: Geometric orientation of this component
+        """
+        # The origin of the column
+        columnOriginL = numpy.array([0.0, 0.0, 0.0])
+
+        # Set the column's local u-direction and w-direction
+        # Since the column is horizontal along x-axis, its w-direction should be along y-axis
+        # The u-direction must be perpendicular to w-direction, so we choose z-axis
+        uDir = numpy.array([1.0, 0.0, 0.0])  # Along y-axis
+        wDir = numpy.array([0.0, 1.0, 0.0])  # Along x-axis (horizontal)
+
+        # Place the section at the specified origin with the new orientation
+        self.sec.place(columnOriginL, uDir, wDir)
+
+        # Create the column model based on the section and orientation
+        self.columnModel = self.sec.create_model()

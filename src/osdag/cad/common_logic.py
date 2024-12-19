@@ -150,8 +150,9 @@ import multiprocessing
 # from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
 # from Connections.Shear.SeatedAngle.design_report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
-
-
+from osdag.cad.items.plate import Plate
+from osdag.cad.items.angle import Angle
+import numpy
 class CommonDesignLogic(object):
     # --------------------------------------------- def __init__(self, **kwargs):
     # -------------------------------------------- self.uiObj = kwargs[uiObj]
@@ -1708,18 +1709,37 @@ class CommonDesignLogic(object):
         """
 
         Col = self.module_class
+        print("COL_DESIGINATION :",Col.result_designation)
 
         if 'RHS' in Col.result_designation or 'SHS' in Col.result_designation:  # hollow sections 'RHS and SHS'
             sec = RectHollow(L=float(Col.section_property.flange_width), W=float(Col.section_property.depth),
                              H=float(Col.length_zz), T=float(Col.section_property.flange_thickness))
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
+            col.create_3DModel()
         elif 'CHS' in Col.result_designation:  # CHS
             sec = CircularHollow(r=float(Col.section_property.depth) / 2, T=float(Col.section_property.flange_thickness),
                                  H=float(Col.length_zz))
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
+            col.create_3DModel()
+        elif Col.result_designation=="JB 150" or "WPB" in Col.result_designation or "UB" in Col.result_designation or "PBP" in Col.result_designation or Col.result_designation=="LB 275": # Simply Supported Flexure Beam
+            column_tw = float(Col.section_property.web_thickness)
+            column_T = float(Col.section_property.flange_thickness)
+            column_d = float(Col.section_property.depth)
+            column_B = float(Col.section_property.flange_width)
+            column_R1 = float(Col.section_property.root_radius)
+            column_R2 = float(Col.section_property.toe_radius)
+            column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
+            column_length = float(Col.result_eff_len)*1000
 
+            sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
+                              alpha=column_alpha, length=column_length, notchObj=None)
+            _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
+            col = CompressionMemberCAD(sec)
+
+            sec=sec.create_model()
+            col.create_Flex3DModel()
         else:  # Beams and Columns (rolled sections)
             column_tw = float(Col.section_property.web_thickness)
             column_T = float(Col.section_property.flange_thickness)
@@ -1735,9 +1755,30 @@ class CommonDesignLogic(object):
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
 
-        col.create_3DModel()
+            col.create_3DModel()
 
         return sec
+    
+    def createStrutsInTrusses(self):
+        Col = self.module_class
+        L = float(Col.length)
+        A = 15
+        B = 15
+        T = 2
+        R1 = 8
+        R2 = 5
+
+        origin = numpy.array([0.,0.,0.])
+        uDir = numpy.array([1.,0.,0.])
+        wDir = numpy.array([0.,1.,0.])
+
+        angle = Angle(L, A, B, T, R1, R2)
+        _place = angle.place(origin, uDir, wDir)
+        point = angle.computeParams()
+        prism = angle.create_model()
+
+        return prism
+
 
     def display_3DModel(self, component, bgcolor):
 
@@ -2056,12 +2097,27 @@ class CommonDesignLogic(object):
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True)
-        elif self.mainmodule == 'Struts in Trusses':
-            self.Strut = self.module_class()
-            #self.StrutObj = self.createColumnInFrameCAD()
 
-            # if self.component == "Model":
-            #     osdag_display_shape(self.display, self.ColObj, update=True)
+        elif self.mainmodule == 'Flexure Member':
+            self.col = self.module_class()
+            self.ColObj = self.createColumnInFrameCAD()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.ColObj, update=True)
+
+        elif self.mainmodule == 'Flexural Members - Cantilever':
+            self.col = self.module_class()
+            self.ColObj = self.createColumnInFrameCAD()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.ColObj, update=True)
+
+        elif self.mainmodule == 'Struts in Trusses':
+            self.col = self.module_class()
+            self.ColObj = self.createStrutsInTrusses()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.ColObj, update=True)
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
@@ -2217,9 +2273,21 @@ class CommonDesignLogic(object):
                 else:
                     self.display.EraseAll()
         elif self.mainmodule == 'Flexure Member':
-            self.FObj = self.createTensionCAD()
+            if flag is True:
+                self.FObj = self.createColumnInFrameCAD()
 
-            self.display_3DModel("Model", "gradient_bg")
+                self.display_3DModel("Model", "gradient_bg")
+            else:
+                self.display.EraseAll()
+
+        elif self.mainmodule == 'Flexural Members - Cantilever':
+            if flag is True:
+                self.FObj = self.createColumnInFrameCAD()
+
+                self.display_3DModel("Model", "gradient_bg")
+            else:
+                self.display.EraseAll()
+
         elif self.mainmodule == 'Columns with known support conditions':
             if flag is True:
                 self.ColObj = self.createColumnInFrameCAD()
@@ -2230,7 +2298,7 @@ class CommonDesignLogic(object):
                 self.display.EraseAll()
         elif self.mainmodule == 'Struts in Trusses':
             if flag is True:
-                #self.StrutObj = self.createColumnInFrameCAD()
+                self.ColObj = self.createStrutsInTrusses()
 
                 self.display_3DModel("Model", "gradient_bg")
 

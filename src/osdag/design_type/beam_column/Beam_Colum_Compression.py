@@ -535,8 +535,8 @@ class ColumnDesign(Member):
 
         components = []
 
-        # t3 = ('Column', self.call_3DColumn)
-        # components.append(t3)
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
 
         return components
 

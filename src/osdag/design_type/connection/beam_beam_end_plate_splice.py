@@ -672,8 +672,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t2 = ('Beam', self.call_3DBeam)
         components.append(t2)
 
-        # t3 = ('Column', self.call_3DColumn)
-        # components.append(t3)
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
 
         t4 = ('End Plate', self.call_3DPlate)
         components.append(t4)

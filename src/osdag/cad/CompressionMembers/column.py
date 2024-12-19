@@ -29,8 +29,7 @@ class CompressionMemberCAD(object):
         columnOriginL = numpy.array([0.0, 0.0, 0.0])
 
         # Set the column's local u-direction and w-direction
-        # Since the column is vertical along z-axis, its w-direction is along z-axis
-        # The u-direction must be perpendicular to w-direction, choose x-axis
+
         uDir = numpy.array([1.0, 0.0, 0.0])  # Along x-axis
         wDir = numpy.array([0.0, 0.0, 1.0])  # Along z-axis (vertical)
 
@@ -50,10 +49,9 @@ class CompressionMemberCAD(object):
         columnOriginL = numpy.array([0.0, 0.0, 0.0])
 
         # Set the column's local u-direction and w-direction
-        # Since the column is horizontal along x-axis, its w-direction should be along y-axis
-        # The u-direction must be perpendicular to w-direction, so we choose z-axis
-        uDir = numpy.array([1.0, 0.0, 0.0])  # Along y-axis
-        wDir = numpy.array([0.0, 1.0, 0.0])  # Along x-axis (horizontal)
+
+        uDir = numpy.array([1.0, 0.0, 0.0])  # Along x-axis
+        wDir = numpy.array([0.0, 1.0, 0.0])  # Along y-axis (horizontal)
 
         # Place the section at the specified origin with the new orientation
         self.sec.place(columnOriginL, uDir, wDir)

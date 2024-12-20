@@ -403,7 +403,7 @@ class BeamCoverPlateWeld(MomentConnection):
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
-               ['./ResourceFiles/images/Uw.png', 400, 202, "Web Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("Uw.png")), 400, 202, "Web Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int((self.web_plate.length-self.flange_plate.gap - (4 *self.web_weld.size))/2),2) if status else '')
@@ -2090,7 +2090,7 @@ class BeamCoverPlateWeld(MomentConnection):
              KEY_DISP_YIELD_STRENGTH_REPORT: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
              KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
-             KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
+             KEY_DISP_WEBPLATE_THICKNESS: str([int(d) for d in self.web_plate.thickness]),
              }
 
         self.report_check = []

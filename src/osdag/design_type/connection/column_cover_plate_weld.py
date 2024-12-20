@@ -462,7 +462,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern Due to Tension Force in the Member', TYPE_SECTION,
-               ['./ResourceFiles/images/U_Vw.png', 202, 400, "Web Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("U_Vw.png")), 202, 400, "Web Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int((self.web_plate.length-self.flange_plate.gap - (4 *self.web_weld.size))/2),2) if status else '')
@@ -2156,8 +2156,8 @@ class ColumnCoverPlateWeld(MomentConnection):
              KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.flange_plate.fu,
              KEY_DISP_YIELD_STRENGTH_REPORT: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
-             KEY_DISP_FLANGESPLATE_THICKNESS: str(list(np.int_(self.flange_plate.thickness))),
-             KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str([int(d) for d in self.flange_plate.thickness]),
+             KEY_DISP_WEBPLATE_THICKNESS: str([int(d) for d in self.web_plate.thickness]),
              }
 
         self.report_check = []
@@ -2894,3 +2894,5 @@ class ColumnCoverPlateWeld(MomentConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        
+        

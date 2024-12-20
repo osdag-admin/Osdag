@@ -366,7 +366,7 @@ class ColumnEndPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_4.png', 400, 411, "Web Bolt Spacing for (n) Bolts"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_4.png")), 400, 411, "Web Bolt Spacing for (n) Bolts"])  # [image, width, height, caption]
         web_bolt_spacing.append(t99)
         # t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
         # web_bolt_spacing.append(t2)
@@ -403,11 +403,11 @@ class ColumnEndPlate(MomentConnection):
         flange_bolt_spacing = []
 
         if self.connection == 'Flush End Plate':
-            image = './ResourceFiles/images/spacing_5.png'
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("spacing_5.png"))
             x,y = 401,248
             bolts = int(self.n_bf_output/4)
         else:
-            image = './ResourceFiles/images/spacing_6.png'
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("spacing_6.png"))
             x, y = 401, 321
             bolts = int(self.n_bf_output / 8)
 
@@ -1209,42 +1209,42 @@ class ColumnEndPlate(MomentConnection):
 
             if self.n_bw % 2 == 0:
                 if self.n_bw == 2:
-                    self.image_web = './ResourceFiles/images/flush_2rows.png'
+                    self.image_web = str(files("osdag.data.ResourceFiles.images").joinpath("flush_2rows.png"))
                 else:
-                    self.image_web = './ResourceFiles/images/flush_n_even.png'
+                    self.image_web = str(files("osdag.data.ResourceFiles.images").joinpath("flush_n_even.png"))
             else:
                 if self.n_bw == 3:
-                    self.image_web = './ResourceFiles/images/flush_3_rows.png'
+                    self.image_web = str(files("osdag.data.ResourceFiles.images").joinpath("flush_3_rows.png"))
                 else:
-                    self.image_web = './ResourceFiles/images/flush_n_odd.png'
+                    self.image_web = str(files("osdag.data.ResourceFiles.images").joinpath("flush_n_odd.png"))
 
 
             if self.connection == 'Flush End Plate':
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:
-                        self.image_flange = './ResourceFiles/images/flange_2_bolt_flush.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_2_bolt_flush.png"))
                     else:
-                        self.image_flange = './ResourceFiles/images/flange_even_bolt_flush.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_even_bolt_flush.png"))
                 else:
                     if self.n_bf == 1:
-                        self.image_flange = './ResourceFiles/images/flange_1_bolt.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_1_bolt.png"))
                     elif self.n_bf == 3:
-                        self.image_flange = './ResourceFiles/images/flange_3_bolt_flush.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_3_bolt_flush.png"))
                     else:
-                        self.image_flange = './ResourceFiles/images/flange_odd_bolt_flush.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_odd_bolt_flush.png"))
             else:
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:
-                        self.image_flange = './ResourceFiles/images/flange_2_bolt_extended.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_2_bolt_extended.png"))
                     else:
-                        self.image_flange = './ResourceFiles/images/flange_even_bolt_extended.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_even_bolt_extended.png"))
                 else:
                     if self.n_bf == 1:
-                        self.image_flange = './ResourceFiles/images/flange_1_bolt_extended.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_1_bolt_extended.png"))
                     elif self.n_bf == 3:
-                        self.image_flange = './ResourceFiles/images/flange_3_bolt_extended.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_3_bolt_extended.png"))
                     else:
-                        self.image_flange = './ResourceFiles/images/flange_odd_bolt_extended.png'
+                        self.image_flange = str(files("osdag.data.ResourceFiles.images").joinpath("flange_odd_bolt_extended.png"))
 
             if self.connection == 'Flush End Plate':
                 # if self.n_bf == 1:
@@ -1955,8 +1955,8 @@ class ColumnEndPlate(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Bolt Details - Input and Design Preference": "TITLE",
-             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
-             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
+             KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,

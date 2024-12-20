@@ -740,8 +740,8 @@ class Connection(Main):
                      "Supported Section Details": self.report_supported,
 
                      "Bolt Details - Input and Design Preference": "TITLE",
-                     KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
-                     KEY_DISP_GRD: str(self.bolt.bolt_grade),
+                     KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
+                     KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
                      KEY_DISP_TYP: self.bolt.bolt_type,
                      KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
                      KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
@@ -753,7 +753,7 @@ class Connection(Main):
                      KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM: self.bolt.corrosive_influences,
 
                      "Plate Details - Input and Design Preference": "TITLE",
-                     KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
+                     KEY_DISP_PLATETHK: str([int(d) for d in self.plate.thickness]),
                      KEY_DISP_MATERIAL: self.plate.material,
                      KEY_DISP_FU: self.plate.fu,
                      KEY_DISP_FY: self.plate.fy,
@@ -768,3 +768,4 @@ if __name__ == "__main__":
     connection = Connection()
     connection.test()
     connection.design()
+    

@@ -355,7 +355,7 @@ class BeamCoverPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 278, ""])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_1.png")), 400, 278, ""])  # [image, width, height, caption]
         flangespacing.append(t99)
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
                self.flange_plate.pitch_provided )
@@ -384,7 +384,7 @@ class BeamCoverPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 278, ""])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_1.png")), 400, 278, ""])  # [image, width, height, caption]
         webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
@@ -412,7 +412,7 @@ class BeamCoverPlate(MomentConnection):
         #        ['./ResourceFiles/images/L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         # flangecapacity.append(t99)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               ['./ResourceFiles/images/2L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("2L.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         flangecapacity.append(t99)
         t30 =(KEY_FLANGE_TEN_CAPACITY,KEY_DISP_FLANGE_TEN_CAPACITY,TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange/1000, 2) if flag else '')
@@ -438,7 +438,7 @@ class BeamCoverPlate(MomentConnection):
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/U.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
@@ -454,7 +454,7 @@ class BeamCoverPlate(MomentConnection):
         webcapacity.append(t30)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/L_shear.png', 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("L_shear.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
@@ -2961,7 +2961,7 @@ class BeamCoverPlate(MomentConnection):
 
              "Bolt Details - Input and Design Preference": "TITLE",
              # KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
-             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
+             KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
@@ -2976,7 +2976,7 @@ class BeamCoverPlate(MomentConnection):
              KEY_DISP_YIELD_STRENGTH_REPORT: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
              KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
-             KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
+             KEY_DISP_WEBPLATE_THICKNESS: str([int(d) for d in self.web_plate.thickness]),
              }
         self.report_check = []
 

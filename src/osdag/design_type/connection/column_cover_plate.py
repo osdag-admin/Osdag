@@ -385,7 +385,7 @@ class ColumnCoverPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_2.png', 400, 352, ""])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
         flangespacing.append(t99)
 
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
@@ -417,7 +417,7 @@ class ColumnCoverPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_2.png', 400, 352, ""])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
         webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
@@ -445,7 +445,7 @@ class ColumnCoverPlate(MomentConnection):
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)- 2 x 3 Bolts pattern considered")
         flangecapacity.append(t00)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               ['./ResourceFiles/images/2L_V.png', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
         flangecapacity.append(t99)
         # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
         #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
@@ -470,7 +470,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/U_V.png', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("U_V.png")), 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
 
@@ -483,7 +483,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity.append(t30)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/L_Vshear.png', 239 , 350,
+               [str(files("osdag.data.ResourceFiles.images").joinpath("L_Vshear.png")), 239 , 350,
                 "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
@@ -2935,8 +2935,8 @@ class ColumnCoverPlate(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Bolt Details - Input and Design Preference": "TITLE",
-             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
-             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
+             KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
@@ -2952,8 +2952,8 @@ class ColumnCoverPlate(MomentConnection):
              KEY_DISP_MATERIAL: self.flange_plate.material,
              KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.flange_plate.fu,
              KEY_DISP_YIELD_STRENGTH_REPORT: self.flange_plate.fy,
-             KEY_DISP_FLANGESPLATE_THICKNESS: str(list(np.int_(self.flange_plate.thickness))),
-             KEY_DISP_WEBPLATE_THICKNESS: str(list(np.int_(self.web_plate.thickness))),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str([int(d) for d in self.flange_plate.thickness]),
+             KEY_DISP_WEBPLATE_THICKNESS: str([int(d) for d in self.web_plate.thickness]),
              }
 
         self.report_check = []
@@ -4039,3 +4039,4 @@ class ColumnCoverPlate(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        

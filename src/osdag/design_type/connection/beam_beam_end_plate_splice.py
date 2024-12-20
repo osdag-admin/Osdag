@@ -37,6 +37,7 @@ from ...utils.common.other_standards import *
 from ...design_report.reportGenerator import save_html
 from ...Report_functions import *
 from ...design_report.reportGenerator_latex import CreateLatex
+from importlib.resources import files
 
 import logging
 import math
@@ -224,7 +225,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/flush_ep.png", True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag.data.ResourceFiles.images").joinpath("flush_ep.png")), True, 'No Validator')
         options_list.append(t15)
 
         t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, connectdb("Beams"), True, 'No Validator')
@@ -284,18 +285,20 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         return lst
 
+
     def fn_conn_image(self):
-        """ display representative images of end plate type """
+        """ Display representative images of end plate type """
 
         ep_type = self[0]
         if ep_type == VALUES_ENDPLATE_TYPE[0]:
-            return './ResourceFiles/images/flush_ep.png'
+            return str(files("osdag.data.ResourceFiles.images").joinpath("flush_ep.png"))
         elif ep_type == VALUES_ENDPLATE_TYPE[1]:
-            return './ResourceFiles/images/owe_ep.png'
+            return str(files("osdag.data.ResourceFiles.images").joinpath("owe_ep.png"))
         elif ep_type == VALUES_ENDPLATE_TYPE[2]:
-            return './ResourceFiles/images/extended.png'
+            return str(files("osdag.data.ResourceFiles.images").joinpath("extended.png"))
         else:
             return ''
+
 
     # create customized input for UI
     def customized_input(self):
@@ -483,15 +486,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
         detailing = []
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            detailing_path = './ResourceFiles/images/BB_Stiffener_FP.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_FP.png"))
             width = 979
             height = 363
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            detailing_path = './ResourceFiles/images/BB_Stiffener_OWE.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_OWE.png"))
             width = 636
             height = 562
         else:  # Both-way
-            detailing_path = './ResourceFiles/images/BB_Stiffener_BWE.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_BWE.png"))
             width = 586
             height = 579
 
@@ -506,7 +509,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         weld = []
 
         t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
-               ['./ResourceFiles/images/BB-BC-single_bevel_groove.png', 575, 520,
+               [str(files("osdag.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png")), 575, 520,
                 'Weld Detail - beam to end plate connection'])
         weld.append(t99)
 
@@ -517,15 +520,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
         detailing = []
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path = './ResourceFiles/images/Detailing-Flush.png'
+            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
             width = 502
             height = 551
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path = './ResourceFiles/images/Detailing-OWE.png'
+            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
             width = 437
             height = 552
         else:  # Both-way
-            path = './ResourceFiles/images/Detailing-BWE.png'
+            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
             width = 387
             height = 551
 
@@ -1607,14 +1610,14 @@ class BeamBeamEndPlateSplice(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Plate Details - Input and Design Preference": "TITLE",
-             KEY_DISP_PLATETHK: str(list(np.int_(self.plate.thickness))),
+             KEY_DISP_PLATETHK: str([int(d) for d in self.plate.thickness]),
              KEY_DISP_MATERIAL: self.plate.material,
              KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.plate.fu,
              KEY_DISP_YIELD_STRENGTH_REPORT: self.plate.fy,
 
              "Bolt Details - Input and Design Preference": "TITLE",
-             KEY_DISP_D: str(list(np.int_(self.bolt.bolt_diameter))),
-             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
+             KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
@@ -2053,20 +2056,20 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # End of design report functions
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path_detailing = '/ResourceFiles/images/Detailing-Flush.png'
+            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path_detailing = '/ResourceFiles/images/Detailing-OWE.png'
+            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
         else:  # Both-way
-            path_detailing = '/ResourceFiles/images/Detailing-BWE.png'
+            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path_stiffener = '/ResourceFiles/images/BB_Stiffener_FP.png'
+            path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_FP.png"))
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path_stiffener = '/ResourceFiles/images/BB_Stiffener_OWE.png'
+            path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_OWE.png"))
         else:  # Both-way
-            path_stiffener = '/ResourceFiles/images/BB_Stiffener_BWE.png'
+            path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_BWE.png"))
 
-        path_weld = "/ResourceFiles/images/BB-BC-single_bevel_groove.png"
+        path_weld = str(files("osdag.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png"))
 
         Disp_2d_image = [path_weld, path_detailing, path_stiffener]
         Disp_3d_image = "/ResourceFiles/images/3d.png"
@@ -2081,3 +2084,4 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                Disp_3d_image, module=self.module)
 
         # End of design report
+        

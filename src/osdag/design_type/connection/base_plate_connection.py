@@ -1038,15 +1038,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if self.connectivity == 'Moment Base Plate':
             if self.moment_bp_case == 'Case1':
-                sketch_path = './ResourceFiles/images/Moment_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP.png"))
                 width = 870
                 height = 525
             elif self.moment_bp_case == 'Case2':
-                sketch_path = './ResourceFiles/images/Moment_BP_C2.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_C2.png"))
                 width = 852
                 height = 541
             elif self.moment_bp_case == 'Case3':
-                sketch_path = './ResourceFiles/images/Moment_BP_C3.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_C3.png"))
                 width = 852
                 height = 541
             else:
@@ -1055,17 +1055,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 height = 541
 
         elif self.connectivity == 'Welded Column Base':
-            sketch_path = './ResourceFiles/images/Welded_BP.png'
+            sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP.png"))
             width = 852
             height = 541
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
-                sketch_path = './ResourceFiles/images/SHS_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP.png"))
             elif self.dp_column_designation[1:4] == 'RHS':
-                sketch_path = './ResourceFiles/images/RHS_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP.png"))
             elif self.dp_column_designation[1:4] == 'CHS':
-                sketch_path = './ResourceFiles/images/CHS_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP.png"))
             else:
                 sketch_path = ''
             width = 854
@@ -1086,26 +1086,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         detailing = []
 
         if self.connectivity == 'Moment Base Plate':
-            detailing_path = './ResourceFiles/images/Moment_BP_Detailing.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_Detailing.png"))
             width = 702
             height = 518
 
         elif self.connectivity == 'Welded Column Base':
-            detailing_path = './ResourceFiles/images/Welded_BP_Detailing.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP_Detailing.png"))
             width = 747
             height = 552
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
-                detailing_path = './ResourceFiles/images/SHS_BP_Detailing.png'
+                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP_Detailing.png"))
                 width = 670
                 height = 600
             elif self.dp_column_designation[1:4] == 'RHS':
-                detailing_path = './ResourceFiles/images/RHS_BP_Detailing.png'
+                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP_Detailing.png"))
                 width = 771
                 height = 570
             elif self.dp_column_designation[1:4] == 'CHS':
-                detailing_path = './ResourceFiles/images/CHS_BP_Detailing.png'
+                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP_Detailing.png"))
                 width = 644
                 height = 577
             else:
@@ -1190,11 +1190,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.dp_column_designation[1:4] == 'SHS':
                 if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                    key_path = './ResourceFiles/images/Key_SHS.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_SHS.png"))
                 elif self.shear_key_along_ColDepth == 'Yes':
-                    key_path = './ResourceFiles/images/Key_SHS_D.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_SHS_D.png"))
                 elif self.shear_key_along_ColWidth == 'Yes':
-                    key_path = './ResourceFiles/images/Key_SHS_B.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_SHS_B.png"))
                 else:
                     key_path = ''
 
@@ -1203,11 +1203,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             elif self.dp_column_designation[1:4] == 'RHS':
                 if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                    key_path = './ResourceFiles/images/Key_RHS.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_RHS.png"))
                 elif self.shear_key_along_ColDepth == 'Yes':
-                    key_path = './ResourceFiles/images/Key_RHS_D.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_RHS_D.png"))
                 elif self.shear_key_along_ColWidth == 'Yes':
-                    key_path = './ResourceFiles/images/Key_RHS_B.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_RHS_B.png"))
                 else:
                     key_path = ''
 
@@ -1216,11 +1216,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             elif self.dp_column_designation[1:4] == 'CHS':
                 if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                    key_path = './ResourceFiles/images/Key_CHS.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_CHS.png"))
                 elif self.shear_key_along_ColDepth == 'Yes':
-                    key_path = './ResourceFiles/images/Key_CHS_key1.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_CHS_key1.png"))
                 elif self.shear_key_along_ColWidth == 'Yes':
-                    key_path = './ResourceFiles/images/Key_CHS_key2.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_CHS_key2.png"))
                 else:
                     key_path = ''
 
@@ -1234,11 +1234,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         else:
             if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                key_path = './ResourceFiles/images/shear_key.png'
+                key_path = str(files("osdag.data.ResourceFiles.images").joinpath("shear_key.png"))
             elif self.shear_key_along_ColDepth == 'Yes':
-                key_path = './ResourceFiles/images/shear_key_colD.png'
+                key_path = str(files("osdag.data.ResourceFiles.images").joinpath("shear_key_colD.png"))
             elif self.shear_key_along_ColWidth == 'Yes':
-                key_path = './ResourceFiles/images/shear_key_colB.png'
+                key_path = str(files("osdag.data.ResourceFiles.images").joinpath("shear_key_colB.png"))
             else:
                 key_path = ''
 
@@ -1268,25 +1268,25 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     web_groove_weld = 'No'
 
             if (self.column_tf < 40.0) and (web_groove_weld == 'No'):
-                weld_path = './ResourceFiles/images/Moment_BP_weld_details_1-1.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_weld_details_1-1.png"))
             elif (self.column_tf < 40.0) and (web_groove_weld == 'Yes'):
-                weld_path = './ResourceFiles/images/Moment_BP_weld_details_1-2.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_weld_details_1-2.png"))
             elif self.column_tf > 40.0:
-                weld_path = './ResourceFiles/images/Moment_BP_weld_details_2.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_weld_details_2.png"))
 
             width = 878
             height = 565
 
         elif self.connectivity == 'Welded Column Base':
             if self.weld_bp_groove == 'No':
-                weld_path = './ResourceFiles/images/BP_welded_weld_details.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("BP_welded_weld_details.png"))
             else:
                 if self.column_tf < 40.0:
-                    weld_path = './ResourceFiles/images/Welded_BP_single_bevel.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP_single_bevel.png"))
                 if self.column_tf >= 40.0:
-                    weld_path = './ResourceFiles/images/Welded_BP_double_J.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP_double_J.png"))
                 else:
-                    weld_path = './ResourceFiles/images/BP_welded_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("BP_welded_weld_details.png"))
 
             width = 915
             height = 545
@@ -1294,23 +1294,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
                 if self.weld_bp_groove == 'Yes':
-                    weld_path = './ResourceFiles/images/SHS_BP_groove_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP_groove_weld_details.png"))
                 else:
-                    weld_path = './ResourceFiles/images/SHS_BP_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP_weld_details.png"))
                 width = 890
                 height = 590
             elif self.dp_column_designation[1:4] == 'RHS':
                 if self.weld_bp_groove == 'Yes':
-                    weld_path = './ResourceFiles/images/RHS_BP_groove_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP_groove_weld_details.png"))
                 else:
-                    weld_path = './ResourceFiles/images/RHS_BP_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP_weld_details.png"))
                 width = 880
                 height = 470
             elif self.dp_column_designation[1:4] == 'CHS':
                 if self.weld_bp_groove == 'Yes':
-                    weld_path = './ResourceFiles/images/CHS_BP_groove_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP_groove_weld_details.png"))
                 else:
-                    weld_path = './ResourceFiles/images/CHS_BP_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP_weld_details.png"))
                 width = 785
                 height = 602
             else:
@@ -8540,23 +8540,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # typical sketch
         if self.connectivity == 'Moment Base Plate':
             if self.moment_bp_case == 'Case1':
-                sketch_path = '/ResourceFiles/images/Moment_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP.png"))
             elif self.moment_bp_case == 'Case2':
-                sketch_path = '/ResourceFiles/images/Moment_BP_C2.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_C2.png"))
             elif self.moment_bp_case == 'Case3':
-                sketch_path = '/ResourceFiles/images/Moment_BP_C3.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_C3.png"))
             else:
                 sketch_path = ''
         elif self.connectivity == 'Welded Column Base':
-            sketch_path = '/ResourceFiles/images/Welded_BP.png'
+            sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP.png"))
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
-                sketch_path = '/ResourceFiles/images/SHS_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP.png"))
             elif self.dp_column_designation[1:4] == 'RHS':
-                sketch_path = '/ResourceFiles/images/RHS_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP.png"))
             elif self.dp_column_designation[1:4] == 'CHS':
-                sketch_path = '/ResourceFiles/images/CHS_BP.png'
+                sketch_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP.png"))
             else:
                 sketch_path = ''
         else:
@@ -8564,16 +8564,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # typical detailing
         if self.connectivity == 'Moment Base Plate':
-            detailing_path = '/ResourceFiles/images/Moment_BP_Detailing.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_Detailing.png"))
         elif self.connectivity == 'Welded Column Base':
-            detailing_path = '/ResourceFiles/images/Welded_BP_Detailing.png'
+            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP_Detailing.png"))
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
-                detailing_path = '/ResourceFiles/images/SHS_BP_Detailing.png'
+                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP_Detailing.png"))
             elif self.dp_column_designation[1:4] == 'RHS':
-                detailing_path = '/ResourceFiles/images/RHS_BP_Detailing.png'
+                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP_Detailing.png"))
             elif self.dp_column_designation[1:4] == 'CHS':
-                detailing_path = '/ResourceFiles/images/CHS_BP_Detailing.png'
+                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP_Detailing.png"))
             else:
                 detailing_path = ''
         else:
@@ -8583,40 +8583,40 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
                 if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                    key_path = '/ResourceFiles/images/Key_SHS.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_SHS.png"))
                 elif self.shear_key_along_ColDepth == 'Yes':
-                    key_path = '/ResourceFiles/images/Key_SHS_D.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_SHS_D.png"))
                 elif self.shear_key_along_ColWidth == 'Yes':
-                    key_path = '/ResourceFiles/images/Key_SHS_B.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_SHS_B.png"))
                 else:
                     key_path = ''
             elif self.dp_column_designation[1:4] == 'RHS':
                 if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                    key_path = '/ResourceFiles/images/Key_RHS.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_RHS.png"))
                 elif self.shear_key_along_ColDepth == 'Yes':
-                    key_path = '/ResourceFiles/images/Key_RHS_D.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_RHS_D.png"))
                 elif self.shear_key_along_ColWidth == 'Yes':
-                    key_path = '/ResourceFiles/images/Key_RHS_B.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_RHS_B.png"))
                 else:
                     key_path = ''
             elif self.dp_column_designation[1:4] == 'CHS':
                 if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                    key_path = '/ResourceFiles/images/Key_CHS.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_CHS.png"))
                 elif self.shear_key_along_ColDepth == 'Yes':
-                    key_path = '/ResourceFiles/images/Key_CHS_key1.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_CHS_key1.png"))
                 elif self.shear_key_along_ColWidth == 'Yes':
-                    key_path = '/ResourceFiles/images/Key_CHS_key2.png'
+                    key_path = str(files("osdag.data.ResourceFiles.images").joinpath("Key_CHS_key2.png"))
                 else:
                     key_path = ''
             else:
                 key_path = ''
         else:
             if (self.shear_key_along_ColDepth == 'Yes') and (self.shear_key_along_ColWidth == 'Yes'):
-                key_path = '/ResourceFiles/images/shear_key.png'
+                key_path = str(files("osdag.data.ResourceFiles.images").joinpath("shear_key.png"))
             elif self.shear_key_along_ColDepth == 'Yes':
-                key_path = '/ResourceFiles/images/shear_key_colD.png'
+                key_path = str(files("osdag.data.ResourceFiles.images").joinpath("shear_key_colD.png"))
             elif self.shear_key_along_ColWidth == 'Yes':
-                key_path = '/ResourceFiles/images/shear_key_colB.png'
+                key_path = str(files("osdag.data.ResourceFiles.images").joinpath("shear_key_colB.png"))
             else:
                 key_path = ''
 
@@ -8634,46 +8634,46 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     web_groove_weld = 'No'
 
             if (self.column_tf < 40.0) and (web_groove_weld == 'No'):
-                weld_path = '/ResourceFiles/images/Moment_BP_weld_details_1-1.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_weld_details_1-1.png"))
             elif (self.column_tf < 40.0) and (web_groove_weld == 'Yes'):
-                weld_path = '/ResourceFiles/images/Moment_BP_weld_details_1-2.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_weld_details_1-2.png"))
             elif self.column_tf > 40.0:
-                weld_path = '/ResourceFiles/images/Moment_BP_weld_details_2.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Moment_BP_weld_details_2.png"))
 
         elif self.connectivity == 'Welded Column Base':
             if self.weld_bp_groove == 'No':
-                weld_path = '/ResourceFiles/images/BP_welded_weld_details.png'
+                weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("BP_welded_weld_details.png"))
             else:
                 if self.column_tf < 40.0:
-                    weld_path = '/ResourceFiles/images/Welded_BP_single_bevel.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP_single_bevel.png"))
                 if self.column_tf >= 40.0:
-                    weld_path = '/ResourceFiles/images/Welded_BP_double_J.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("Welded_BP_double_J.png"))
                 else:
-                    weld_path = '/ResourceFiles/images/BP_welded_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("BP_welded_weld_details.png"))
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
                 if self.weld_bp_groove == 'Yes':
-                    weld_path = '/ResourceFiles/images/SHS_BP_groove_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP_groove_weld_details.png"))
                 else:
-                    weld_path = '/ResourceFiles/images/SHS_BP_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("SHS_BP_weld_details.png"))
             elif self.dp_column_designation[1:4] == 'RHS':
                 if self.weld_bp_groove == 'Yes':
-                    weld_path = '/ResourceFiles/images/RHS_BP_groove_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP_groove_weld_details.png"))
                 else:
-                    weld_path = '/ResourceFiles/images/RHS_BP_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("RHS_BP_weld_details.png"))
             elif self.dp_column_designation[1:4] == 'CHS':
                 if self.weld_bp_groove == 'Yes':
-                    weld_path = '/ResourceFiles/images/CHS_BP_groove_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP_groove_weld_details.png"))
                 else:
-                    weld_path = '/ResourceFiles/images/CHS_BP_weld_details.png'
+                    weld_path = str(files("osdag.data.ResourceFiles.images").joinpath("CHS_BP_weld_details.png"))
             else:
                 weld_path = ''
         else:
             weld_path = ''
 
         # anchor bolt
-        bolt_path = '/ResourceFiles/images/Anchor_bolt.png'
+        bolt_path = str(files("osdag.data.ResourceFiles.images").joinpath("Anchor_bolt.png"))
 
         Disp_2d_image = [sketch_path, detailing_path, weld_path, bolt_path, key_path]
         display_3D_image = "/ResourceFiles/images/3d.png"
@@ -8684,3 +8684,4 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
                                display_3D_image, module=self.module)
+        

@@ -2273,7 +2273,7 @@ class Window(QMainWindow):
 
                         if value is not None and value != "":
                             im = QtWidgets.QLabel(image_widget)
-                            im.setFixedSize(value[1], value[2])
+                            im.setFixedSize(int(value[1]), int(value[2]))
                             pmap = QPixmap(value[0])
                             im.setScaledContents(1)
                             im.setStyleSheet("background-color: white;")
@@ -2282,7 +2282,7 @@ class Window(QMainWindow):
                             caption = QtWidgets.QLabel(image_widget)
                             caption.setAlignment(Qt.AlignCenter)
                             caption.setText(value[3])
-                            caption.setFixedSize(value[1], caption.sizeHint().height())
+                            caption.setFixedSize(int(value[1]), caption.sizeHint().height())
                             image_layout.addWidget(caption)
                             max_image_width = max(max_image_width, value[1])
                             max_image_height = max(max_image_height, value[2])
@@ -2312,7 +2312,7 @@ class Window(QMainWindow):
                     if option_type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(image_widget)
                         im.setScaledContents(True)
-                        im.setFixedSize(value[1], value[2])
+                        im.setFixedSize(int(value[1]), int(value[2]))
                         pmap = QPixmap(value[0])
                         im.setStyleSheet("background-color: white;")
                         im.setPixmap(pmap)
@@ -2320,7 +2320,7 @@ class Window(QMainWindow):
                         caption = QtWidgets.QLabel(image_widget)
                         caption.setAlignment(Qt.AlignCenter)
                         caption.setText(value[3])
-                        caption.setFixedSize(value[1], 12)
+                        caption.setFixedSize(int(value[1]), 12)
                         image_layout.addWidget(caption)
                         max_image_width = max(max_image_width, value[1])
                         max_image_height = max(max_image_height, value[2])
@@ -2344,8 +2344,8 @@ class Window(QMainWindow):
                 dialog_height = max(dialog_height, max_image_height+125)
                 if not no_note:
                     dialog_height += 40
-                dialog.resize(dialog_width, dialog_height)
-                dialog.setMinimumSize(dialog_width, dialog_height)
+                dialog.resize(int(dialog_width), int(dialog_height))
+                dialog.setMinimumSize(int(dialog_width), int(dialog_height))
 
                 if no_note:
                     layout1.removeWidget(note_widget)

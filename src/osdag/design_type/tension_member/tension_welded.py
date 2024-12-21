@@ -599,7 +599,7 @@ class Tension_welded(Member):
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern Due to Tension Force in the Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/Lw.png', 400, 202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("Lw.png")), 400, 202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int(self.plate.length-max((2 * self.weld.size),15)),2) if status else '')
@@ -1803,7 +1803,7 @@ class Tension_welded(Member):
              # "Section": "TITLE",
              "Selected Section Details": self.report_supporting,
              # "Supported Section Details": "TITLE",
-             # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             # "Beam Details": str(files("osdag.data.ResourceFiles.images").joinpath("ColumnsBeams.png")),
              KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE: str(self.sizelist),
 

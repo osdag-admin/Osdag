@@ -448,7 +448,7 @@ class GussetConnection(Connection,Member):
         t2 = (KEY_MEMBER_COUNT, KEY_DISP_MEMBER_COUNT, TYPE_COMBOBOX, VALUES_MEM_COUNT, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/sample_gusset.png", True, 'No Validator')
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag.data.ResourceFiles.images").joinpath("sample_gusset.png")), True, 'No Validator')
         options_list.append(t3)
 
         t4 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE, True, 'No Validator')
@@ -622,7 +622,7 @@ class GussetConnection(Connection,Member):
 
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image, module=self.module)
+                               rel_path, '', Disp_3D_image, module=self.module)
 
     def show_error_message(self):
         QMessageBox.about(self, 'information', "Your message!")

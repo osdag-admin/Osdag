@@ -363,7 +363,7 @@ class Compression(Member):
         t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_STRUT_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t12)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -404,7 +404,7 @@ class Compression(Member):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_1.png")), 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
         spacing.append(t99)
 
         if self.sec_profile == 'Star Angles':
@@ -437,11 +437,11 @@ class Compression(Member):
     def memb_pattern(self, status):
 
         if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
-            image = './ResourceFiles/images/L.png'
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("L.png"))
             x, y = 400, 202
 
         else:
-            image = './ResourceFiles/images/U.png'
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("U.png"))
             x, y = 400, 202
 
 
@@ -464,7 +464,7 @@ class Compression(Member):
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
-               ['./ResourceFiles/images/L.png',400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("L.png")),400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         return pattern
@@ -484,13 +484,13 @@ class Compression(Member):
     def fn_end1_image(self):
 
         if self == 'Fixed':
-            return "./ResourceFiles/images/6.RRRR.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
         elif self == 'Free':
-            return "./ResourceFiles/images/1.RRFF.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
         elif self == 'Hinged':
-            return "./ResourceFiles/images/5.RRRF.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
         elif self == 'Roller':
-            return "./ResourceFiles/images/4.RRFR.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
 
     def fn_end2_image(self):
 
@@ -499,27 +499,27 @@ class Compression(Member):
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
-                return "./ResourceFiles/images/6.RRRR.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
             elif end2 == 'Free':
-                return "./ResourceFiles/images/1.RRFF_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF_rotated.PNG"))
             elif end2 == 'Hinged':
-                return "./ResourceFiles/images/5.RRRF_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF_rotated.PNG"))
             elif end2 == 'Roller':
-                return "./ResourceFiles/images/4.RRFR_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR_rotated.PNG"))
         elif end1 == 'Free':
-            return "./ResourceFiles/images/1.RRFF.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
         elif end1 == 'Hinged':
             if end2 == 'Fixed':
-                return "./ResourceFiles/images/5.RRRF.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
             elif end2 == 'Hinged':
-                return "./ResourceFiles/images/3.RFRF.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("3.RFRF.PNG"))
             elif end2 == 'Roller':
-                return "./ResourceFiles/images/2.FRFR_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("2.FRFR_rotated.PNG"))
         elif end1 == 'Roller':
             if end2 == 'Fixed':
-                return "./ResourceFiles/images/4.RRFR.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
             elif end2 == 'Hinged':
-                return "./ResourceFiles/images/2.FRFR.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("2.FRFR.PNG"))
 
     def fn_conn_image(self):
 
@@ -2361,11 +2361,11 @@ class Compression(Member):
     # def memb_pattern(self, status):
     #
     #     if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
-    #         image = './ResourceFiles/images/L.png'
+    #         image = str(files("osdag.data.ResourceFiles.images").joinpath("L.png"))
     #         x, y = 400, 202
     #
     #     else:
-    #         image = './ResourceFiles/images/U.png'
+    #         image = str(files("osdag.data.ResourceFiles.images").joinpath("U.png"))
     #         x, y = 400, 202
     #
     #
@@ -2388,7 +2388,7 @@ class Compression(Member):
     #     pattern.append(t00)
     #
     #     t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
-    #            ['./ResourceFiles/images/L.png',400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+    #            [str(files("osdag.data.ResourceFiles.images").joinpath("L.png")),400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
     #     pattern.append(t99)
     #
     #     return pattern

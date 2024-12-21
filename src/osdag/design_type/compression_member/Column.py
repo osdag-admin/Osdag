@@ -279,7 +279,7 @@ class ColumnDesign(Member):
 
         Fuction to return a list of tuples to be displayed as the UI (Input Dock)
         
-        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), (None, 'Section Data', 'Title', None, True, 'No Validator'), ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), (None, 'End Condition', 'Title', None, True, 'No Validator'), ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('Image', None, 'Image_compression', './ResourceFiles/images/6.RRRR.PNG', True, 'No Validator'), (None, 'Factored Loads', 'Title', None, True, 'No Validator'), ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
+        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), (None, 'Section Data', 'Title', None, True, 'No Validator'), ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), (None, 'End Condition', 'Title', None, True, 'No Validator'), ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('Image', None, 'Image_compression', str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), (None, 'Factored Loads', 'Title', None, True, 'No Validator'), ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
         """
 
         self.module = KEY_DISP_COMPRESSION_COLUMN
@@ -318,7 +318,7 @@ class ColumnDesign(Member):
         t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t12)
 
         t13 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
@@ -330,7 +330,7 @@ class ColumnDesign(Member):
         t15 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
         options_list.append(t15)
 
-        t16 = (KEY_IMAGE_Y, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        t16 = (KEY_IMAGE_Y, None, TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t16)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -375,13 +375,13 @@ class ColumnDesign(Member):
     def fn_end1_image(self):
 
         if self == 'Fixed':
-            return "./ResourceFiles/images/6.RRRR.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
         elif self == 'Free':
-            return "./ResourceFiles/images/1.RRFF.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
         elif self == 'Hinged':
-            return "./ResourceFiles/images/5.RRRF.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
         elif self == 'Roller':
-            return "./ResourceFiles/images/4.RRFR.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
 
     def fn_end2_image(self):
 
@@ -391,27 +391,27 @@ class ColumnDesign(Member):
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
-                return "./ResourceFiles/images/6.RRRR.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
             elif end2 == 'Free':
-                return "./ResourceFiles/images/1.RRFF_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF_rotated.PNG"))
             elif end2 == 'Hinged':
-                return "./ResourceFiles/images/5.RRRF_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF_rotated.PNG"))
             elif end2 == 'Roller':
-                return "./ResourceFiles/images/4.RRFR_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR_rotated.PNG"))
         elif end1 == 'Free':
-            return "./ResourceFiles/images/1.RRFF.PNG"
+            return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
         elif end1 == 'Hinged':
             if end2 == 'Fixed':
-                return "./ResourceFiles/images/5.RRRF.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
             elif end2 == 'Hinged':
-                return "./ResourceFiles/images/3.RFRF.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("3.RFRF.PNG"))
             elif end2 == 'Roller':
-                return "./ResourceFiles/images/2.FRFR_rotated.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("2.FRFR_rotated.PNG"))
         elif end1 == 'Roller':
             if end2 == 'Fixed':
-                return "./ResourceFiles/images/4.RRFR.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
             elif end2 == 'Hinged':
-                return "./ResourceFiles/images/2.FRFR.PNG"
+                return str(files("osdag.data.ResourceFiles.images").joinpath("2.FRFR.PNG"))
 
     def input_value_changed(self):
 

@@ -487,7 +487,7 @@ class Tension_bolted(Member):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_1.png")), 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
         spacing.append(t99)
 
         if self.sec_profile == 'Star Angles':
@@ -520,11 +520,11 @@ class Tension_bolted(Member):
     def memb_pattern(self, status):
 
         if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
-            image = './ResourceFiles/images/L.png'
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("L.png"))
             x, y = 400, 202
 
         else:
-            image = './ResourceFiles/images/U.png'
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("U.png"))
             x, y = 400, 202
 
 
@@ -547,7 +547,7 @@ class Tension_bolted(Member):
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
-               ['./ResourceFiles/images/L.png',400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+               [str(files("osdag.data.ResourceFiles.images").joinpath("L.png")),400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         return pattern
@@ -2356,7 +2356,7 @@ class Tension_bolted(Member):
              # "Section": "TITLE",
              "Selected Section Details":self.report_supporting,
              # "Supported Section Details": "TITLE",
-             # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             # "Beam Details": str(files("osdag.data.ResourceFiles.images").joinpath("ColumnsBeams".png")),
              KEY_DISP_SEC_PROFILE: self.sec_profile,
              KEY_DISP_SECSIZE : str(self.sizelist),
              "Section Material": section_size.material,

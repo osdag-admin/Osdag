@@ -1820,10 +1820,15 @@ class Flexure_Misc(Member):
         #
         # t1 = ('', '', '', '')
         # self.report_check.append(t1)
+
+
+        Disp_2d_image = []
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                              rel_path, [], '', module=self.module) #
+                              rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #

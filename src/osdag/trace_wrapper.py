@@ -24,7 +24,7 @@ def trace_calls(frame, event, arg):
 
         with open(TRACE_OUTPUT_FILE, "a") as f:
             f.write(f"Calling function: {frame.f_code.co_name} in {file_path}\n")
-            f.write(f"  Called from: {caller_file}, line {caller_line}\n")
+            f.write(f"  Called from: {caller_file}, line {caller_line}\n\n")
     return trace_calls
 
 # Clear the output file before starting

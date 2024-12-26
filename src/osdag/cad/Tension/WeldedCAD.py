@@ -452,7 +452,7 @@ if __name__ == '__main__':
     from ...utilities import osdag_display_shape
     # from ..common_logic import CommonDesignLogic
 
-    from OCC.gp import gp_Pnt
+    from OCC.Core.gp import gp_Pnt
     from OCC.Display.SimpleGui import init_display
 
     display, start_display, add_menu, add_function_to_menu = init_display()

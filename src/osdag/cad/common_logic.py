@@ -24,6 +24,8 @@ from .items.Gasset_plate import GassetPlate
 from .items.stiffener_flange import Stiffener_flange
 from .items.rect_hollow import RectHollow
 from .items.circular_hollow import CircularHollow
+from .items.double_angles import BackToBackAnglesWithGussets_same_side
+from .items.double_angles import BackToBackAnglesWithGussets_opp_side
 
 from .ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from .ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -1723,7 +1725,9 @@ class CommonDesignLogic(object):
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
             col.create_3DModel()
-        elif Col.result_designation=="JB 150" or "WPB" in Col.result_designation or "UB" in Col.result_designation or "PBP" in Col.result_designation or Col.result_designation=="LB 275": # Simply Supported Flexure Beam
+        elif hasattr(Col, 'support') and getattr(Col, 'support') == "Simply Supported" or hasattr(Col, 'support') and getattr(Col, 'support') == "Cantilever":
+             # Simply Supported and Cantilever Flexure Beam
+            print(f"COL.SUPPORT {Col.support}")
             column_tw = float(Col.section_property.web_thickness)
             column_T = float(Col.section_property.flange_thickness)
             column_d = float(Col.section_property.depth)
@@ -1761,23 +1765,102 @@ class CommonDesignLogic(object):
     
     def createStrutsInTrusses(self):
         Col = self.module_class
-        L = float(Col.length)
-        A = 15
-        B = 15
-        T = 2
-        R1 = 8
-        R2 = 5
+        print("COL_DESIGINATION :",Col.result_designation)
+        print("All attributes and methods of Col:")
+        print(dir(Col))
 
-        origin = numpy.array([0.,0.,0.])
-        uDir = numpy.array([1.,0.,0.])
-        wDir = numpy.array([0.,1.,0.])
 
-        angle = Angle(L, A, B, T, R1, R2)
-        _place = angle.place(origin, uDir, wDir)
-        point = angle.computeParams()
-        prism = angle.create_model()
+        if Col.sec_profile=="Angles":
 
-        return prism
+            L = float(Col.length)
+            A = float(Col.section_property.max_leg)
+            B = float(Col.section_property.min_leg)
+            T = float(Col.section_property.thickness)
+            R1 = float(Col.section_property.root_radius)
+            R2 = float(Col.section_property.toe_radius)
+            print("Length (L):", L)
+            print("Max Leg (A):", A)
+            print("Min Leg (B):", B)
+            print("Thickness (T):", T)
+            print("Root Radius (R1):", R1)
+            print("Toe Radius (R2):", R2)
+
+            origin = numpy.array([0.,0.,0.])
+            uDir = numpy.array([1.,0.,0.])
+            wDir = numpy.array([0.,1.,0.])
+
+            angle = Angle(L, A, B, T, R1, R2)
+            _place = angle.place(origin, uDir, wDir)
+            point = angle.computeParams()
+            prism = angle.create_model()
+
+            return prism
+        elif Col.sec_profile=="Back to Back Angles - Same side of gusset":
+                   
+            L = float(Col.length)
+            A = float(Col.section_property.max_leg)
+            B = float(Col.section_property.min_leg)
+            T = float(Col.section_property.thickness)
+            R1 = float(Col.section_property.root_radius)
+            R2 = float(Col.section_property.toe_radius)
+            spacing = 40  # Gap between angles
+            print("Length (L):", L)
+            print("Max Leg (A):", A)
+            print("Min Leg (B):", B)
+            print("Thickness (T):", T)
+            print("Root Radius (R1):", R1)
+            print("Toe Radius (R2):", R2)
+
+            # Example dimensions for gusset plates
+            gusset_L = 200  # Length
+            gusset_H = 200  # Height
+            gusset_T = float(Col.plate_thickness)    # Thickness
+            print("Gusset Thickness : ", Col.plate_thickness)
+            gusset_degree = 30  # Angle in degrees
+
+            # Create and display the assembly
+            origin = numpy.array([0., 0., 0.])
+            uDir = numpy.array([1., 0., 0.])
+            wDir = numpy.array([0., 0., 1.])
+            assembly = BackToBackAnglesWithGussets_same_side(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
+            assembly.place(origin, uDir, wDir)
+            shape = assembly.create_model()
+
+            return shape
+        
+        elif Col.sec_profile=="Back to Back Angles - Opposite side of gusset":
+                   
+            L = float(Col.length)
+            A = float(Col.section_property.max_leg)
+            B = float(Col.section_property.min_leg)
+            T = float(Col.section_property.thickness)
+            R1 = float(Col.section_property.root_radius)
+            R2 = float(Col.section_property.toe_radius)
+            spacing = 40  # Gap between angles
+            print("Length (L):", L)
+            print("Max Leg (A):", A)
+            print("Min Leg (B):", B)
+            print("Thickness (T):", T)
+            print("Root Radius (R1):", R1)
+            print("Toe Radius (R2):", R2)
+
+
+            # Example dimensions for gusset plates
+            gusset_L = 200  # Length
+            gusset_H = 200 # Height
+            gusset_T =  float(Col.plate_thickness)   # Thickness
+            print("Gusset Thickness : ", Col.plate_thickness)
+            gusset_degree = 30  # Angle in degrees
+
+            # Create and display the assembly
+            origin = numpy.array([0., 0., 0.])
+            uDir = numpy.array([1., 0., 0.])
+            wDir = numpy.array([0., 0., 1.])
+            assembly = BackToBackAnglesWithGussets_opp_side(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
+            assembly.place(origin, uDir, wDir)
+            shape = assembly.create_model()
+
+            return shape
 
 
     def display_3DModel(self, component, bgcolor):

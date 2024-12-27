@@ -82,7 +82,7 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
 
     display, start_display, add_menu, add_function_to_menu = init_display()
-    # from OCC.gp import gp_Pnt
+    from OCC.Core.gp import gp_Pnt
 
     b = 10
     h = 10

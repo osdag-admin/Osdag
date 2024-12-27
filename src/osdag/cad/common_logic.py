@@ -24,8 +24,8 @@ from .items.Gasset_plate import GassetPlate
 from .items.stiffener_flange import Stiffener_flange
 from .items.rect_hollow import RectHollow
 from .items.circular_hollow import CircularHollow
-from .items.double_angles import BackToBackAnglesWithGussets_same_side
-from .items.double_angles import BackToBackAnglesWithGussets_opp_side
+from .items.double_angles import BackToBackAnglesWithGussetsSameSide
+from .items.double_angles import BackToBackAnglesWithGussetsOppSide
 
 from .ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from .ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -1803,7 +1803,7 @@ class CommonDesignLogic(object):
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
             R2 = float(Col.section_property.toe_radius)
-            spacing = 40  # Gap between angles
+            spacing = 6.0  # Gap between angles
             print("Length (L):", L)
             print("Max Leg (A):", A)
             print("Min Leg (B):", B)
@@ -1822,7 +1822,7 @@ class CommonDesignLogic(object):
             origin = numpy.array([0., 0., 0.])
             uDir = numpy.array([1., 0., 0.])
             wDir = numpy.array([0., 0., 1.])
-            assembly = BackToBackAnglesWithGussets_same_side(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
+            assembly = BackToBackAnglesWithGussetsSameSide(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
             assembly.place(origin, uDir, wDir)
             shape = assembly.create_model()
 
@@ -1836,7 +1836,7 @@ class CommonDesignLogic(object):
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
             R2 = float(Col.section_property.toe_radius)
-            spacing = 40  # Gap between angles
+            spacing = float(Col.plate_thickness)   # Gap between angles
             print("Length (L):", L)
             print("Max Leg (A):", A)
             print("Min Leg (B):", B)
@@ -1856,7 +1856,7 @@ class CommonDesignLogic(object):
             origin = numpy.array([0., 0., 0.])
             uDir = numpy.array([1., 0., 0.])
             wDir = numpy.array([0., 0., 1.])
-            assembly = BackToBackAnglesWithGussets_opp_side(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
+            assembly = BackToBackAnglesWithGussetsOppSide(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
             assembly.place(origin, uDir, wDir)
             shape = assembly.create_model()
 

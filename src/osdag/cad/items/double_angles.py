@@ -3,7 +3,7 @@ from .angle import Angle
 from .Gasset_plate import GassetPlate
 import numpy
 
-class BackToBackAnglesWithGussets_same_side:
+class BackToBackAnglesWithGussetsSameSide:
     def __init__(self, L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing=2):
         """
         Creates back-to-back angles with gusset plates automatically positioned at the ends
@@ -19,14 +19,17 @@ class BackToBackAnglesWithGussets_same_side:
             gusset_degree: Angle of gusset plate
             spacing: Gap between angles
         """
-        self.angle1 = Angle(L, B, A, T, R1, R2)
-        self.angle2 = Angle(L, A, B, T, R1, R2)
+        self.angle1 = Angle(L, A, B, T, R1, R2)
+        self.angle2 = Angle(L, B, A, T, R1, R2)
         self.gusset1 = GassetPlate(gusset_L, gusset_H, gusset_T, gusset_degree)
         self.gusset2 = GassetPlate(gusset_L, gusset_H, gusset_T, gusset_degree)
         self.spacing = spacing
         
         # Store dimensions for later use
         self.L = L
+        self.A = A  # Vertical leg length
+        self.B = B  # Horizontal leg length
+        self.T = T  # Angle thickness
         self.gusset_L = gusset_L
         self.gusset_H = gusset_H
         self.gusset_T = gusset_T
@@ -50,13 +53,25 @@ class BackToBackAnglesWithGussets_same_side:
         self.wDir = wDir
         self.vDir = numpy.cross(self.wDir, self.uDir)
         
-        # Place angles
-        self.angle1.place(self.sec_origin, self.uDir, self.wDir)
+        self.sec_origin = sec_origin
+        self.uDir = uDir
+        self.wDir = wDir
+        self.vDir = numpy.cross(self.wDir, self.uDir)
         
-        origin2 = self.sec_origin + self.spacing * self.vDir
-        rotated_uDir = -self.vDir
-        rotated_vDir = self.uDir
-        self.angle2.place(origin2, rotated_uDir, self.wDir)
+        # Calculate the offset needed to center angles on gusset plate
+        x_center_offset = (self.gusset_H - self.A)/2
+        
+        # Place first angle with offset to center on gusset
+        angle1_origin = self.sec_origin + x_center_offset * self.uDir
+        rotated_uDir_angle1 = -self.vDir  # Point the horizontal leg towards negative y
+        rotated_vDir_angle1 = -self.uDir  # Adjust vertical direction accordingly
+        self.angle1.place(angle1_origin, rotated_uDir_angle1, self.wDir)
+        
+        # Place second angle with spacing
+        angle2_origin = angle1_origin + self.spacing * self.vDir
+        rotated_uDir = self.uDir
+        rotated_vDir = -self.vDir
+        self.angle2.place(angle2_origin, rotated_uDir, self.wDir)
         
         # Calculate center point between angles
         center_point = self.sec_origin + (self.spacing / 2) * self.vDir
@@ -100,7 +115,7 @@ class BackToBackAnglesWithGussets_same_side:
         
         return final_shape
 
-class BackToBackAnglesWithGussets_opp_side:
+class BackToBackAnglesWithGussetsOppSide:
     def __init__(self, L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing=2):
         """
         Creates back-to-back angles with gusset plates automatically positioned at the ends and perfectly centered
@@ -116,8 +131,8 @@ class BackToBackAnglesWithGussets_opp_side:
             gusset_degree: Angle of gusset plate
             spacing: Gap between angles (including both angle thicknesses)
         """
-        self.angle1 = Angle(L, B, A, T, R1, R2)
-        self.angle2 = Angle(L, A, B, T, R1, R2)
+        self.angle1 = Angle(L, A, B, T, R1, R2)
+        self.angle2 = Angle(L, B, A, T, R1, R2)
         self.gusset1 = GassetPlate(gusset_L, gusset_H, gusset_T, gusset_degree)
         self.gusset2 = GassetPlate(gusset_L, gusset_H, gusset_T, gusset_degree)
         self.spacing = spacing
@@ -164,12 +179,14 @@ class BackToBackAnglesWithGussets_opp_side:
         
         # Place first angle with offset to center on gusset
         angle1_origin = self.sec_origin + x_center_offset * self.uDir
-        self.angle1.place(angle1_origin, self.uDir, self.wDir)
+        rotated_uDir_angle1 = -self.vDir  # Point the horizontal leg towards negative y
+        rotated_vDir_angle1 = -self.uDir  # Adjust vertical direction accordingly
+        self.angle1.place(angle1_origin, rotated_uDir_angle1, self.wDir)
         
         # Place second angle with spacing
         angle2_origin = angle1_origin + self.spacing * self.vDir
-        rotated_uDir = -self.vDir
-        rotated_vDir = self.uDir
+        rotated_uDir = self.uDir
+        rotated_vDir = -self.vDir
         self.angle2.place(angle2_origin, rotated_uDir, self.wDir)
         
         # Place first gusset plate
@@ -203,9 +220,9 @@ class BackToBackAnglesWithGussets_opp_side:
         gusset2_prism = self.gusset2.create_model()
         
         # Combine all shapes
-        combined_angles = BRepAlgoAPI_Fuse(angle1_prism, angle2_prism).Shape()
-        combined_with_gusset2 = BRepAlgoAPI_Fuse(combined_angles, gusset2_prism).Shape()
-        final_shape = BRepAlgoAPI_Fuse(combined_with_gusset2, gusset1_prism).Shape()
+        angle1_with_gusset = BRepAlgoAPI_Fuse(angle1_prism, gusset1_prism).Shape()
+        angle2_with_gusset = BRepAlgoAPI_Fuse(angle2_prism, gusset2_prism).Shape()
+        final_shape = BRepAlgoAPI_Fuse(angle1_with_gusset, angle2_with_gusset).Shape()
         
         return final_shape
     
@@ -236,7 +253,7 @@ if __name__ == '__main__':
     wDir = numpy.array([0., 0., 1.])
 
     print("Creating back-to-back angles with symmetric gusset plates...")
-    assembly = BackToBackAnglesWithGussets_opp_side(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
+    assembly = BackToBackAnglesWithGussetsOppSide(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
     assembly.place(origin, uDir, wDir)
     shape = assembly.create_model()
     display.DisplayShape(shape, update=True)

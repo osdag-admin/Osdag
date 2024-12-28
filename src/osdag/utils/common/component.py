@@ -1266,7 +1266,10 @@ class ISection(Material):
     def __init__(self, designation, material_grade="", table=""):
         if table == "":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-        self.connect_to_database_update_other_attributes(table, designation, material_grade)
+        if table == "Channels":
+            self.connect_to_database_update_other_attributes_channels(table, designation, material_grade)
+        else:
+            self.connect_to_database_update_other_attributes(table, designation, material_grade)
         self.design_status = True
         self.designation = designation
         self.type = "Rolled"
@@ -1356,6 +1359,61 @@ class ISection(Material):
             if row[20] is None else round(row[20] * 10 ** 6, 2)
         self.source = row[21]
         self.type = 'Rolled' if row[22] is None else row[22]
+
+        conn.close()
+
+    def connect_to_database_update_other_attributes_channels(self, table, designation, material_grade=""):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (designation,))
+        row = cur.fetchone()
+        self.mass = row[2]
+        self.area = row[3] * 100
+        self.depth = row[4]
+        self.flange_width = row[5]
+        self.web_thickness = row[6]
+        self.flange_thickness = row[7]
+        max_thickness = max(self.flange_thickness, self.web_thickness)
+        super(ISection, self).__init__(material_grade, max_thickness)
+        self.flange_slope = row[8]
+        self.root_radius = round(row[9], 2)
+        self.toe_radius = round(row[10], 2)
+        self.centre_of_greavity = round(row[11], 2)
+        self.mom_inertia_z = round(row[12] * 10000, 2)
+        self.mom_inertia_y = round(row[13] * 10000, 2)
+        self.rad_of_gy_z = round(row[14] * 10, 2)
+        self.rad_of_gy_y = round(row[15] * 10, 2)
+        self.elast_sec_mod_z = round(row[16] * 1000, 2)
+        self.elast_sec_mod_y = round(row[17] * 1000, 2)
+        self.plast_sec_mod_z = round(row[18], 2)
+        from utils.common.Section_Properties_Calculator import I_sectional_Properties
+        if self.plast_sec_mod_z is None:  # Todo: add in database
+            self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth, self.flange_width,
+                                                                                         self.web_thickness,
+                                                                                         self.flange_thickness) * 1000,
+                                         2)
+        else:
+            self.plast_sec_mod_z = round(row[18] * 1000, 2)
+
+        self.plast_sec_mod_y = round(row[19] * 1000, 2)
+        if self.plast_sec_mod_y is None:  # Todo: add in database
+            self.plast_sec_mod_y = round(I_sectional_Properties().calc_PlasticModulusZpy(self.depth, self.flange_width,
+                                                                                         self.web_thickness,
+                                                                                         self.flange_thickness) * 1000,
+                                         2)
+        else:
+            self.plast_sec_mod_y = round(row[19] * 1000, 2)
+
+        self.It = round(I_sectional_Properties().calc_TorsionConstantIt(self.depth, self.flange_width,
+                                                                    self.web_thickness,
+                                                                    self.flange_thickness) * 10 ** 4, 2) \
+            if row[19] is None else round(row[20] * 10 ** 4, 2)
+        self.Iw = I_sectional_Properties().calc_WarpingConstantIw(self.depth, self.flange_width,
+                                                              self.web_thickness, self.flange_thickness) * 10 ** 6 \
+            if row[20] is None else round(row[21] * 10 ** 6, 2)
+        self.source = row[22]
+        self.type = 'Rolled' if row[23] is None else row[23]
 
         conn.close()
 

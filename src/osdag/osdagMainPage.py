@@ -166,6 +166,7 @@ from .design_type.compression_member.Column import ColumnDesign
 
 from .design_type.flexural_member.flexure import Flexure
 from .design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from .design_type.flexural_member.flexure_othersupp import Flexure_Misc
 # from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 # from .cad.cad_common import call_3DBeam
@@ -312,6 +313,7 @@ class OsdagMainWindow(QMainWindow):
                 'Flexural Member' : [
                     ('Simply Supported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("simply-supported-beam.jpg")), 'Beam_flexure'),
                     ('Cantilever Beam', str(files("osdag.data.ResourceFiles.images").joinpath("cantilever-beam.jpg")), 'Beam_flexure2'),
+                    ('Purlin', str(files("osdag.data.ResourceFiles.images").joinpath("purlin.jpg")), 'Beam_flexure4'),
                     # ('Other Beams', str(files("osdag.data.ResourceFiles.images").joinpath("fixed-beam.png")), 'Beam_flexure3'),
                     
                     # ('Laterally Unsupported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Truss_Welded'),
@@ -733,6 +735,13 @@ class OsdagMainWindow(QMainWindow):
             # print(f"Here9")
             self.hide()
             self.ui2 = Ui_ModuleWindow(Flexure_Misc, ' ')
+            # print(f"Here11")
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton, 'Beam_flexure4').isChecked():
+            # print(f"Here9")
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(Flexure_Purlin, ' ')
             # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)

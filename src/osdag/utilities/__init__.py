@@ -2,7 +2,6 @@ from OCC.Core.AIS import AIS_Shape
 from OCC.Core.TopAbs import TopAbs_EDGE
 from OCC.Core.TopExp import TopExp_Explorer
 from OCC.Core.TopoDS import topods, TopoDS_Shape
-from OCC.Core.Quantity import Quantity_NOC_BLACK
 
 import os
 import os.path
@@ -37,7 +36,8 @@ from OCC.Core.Graphic3d import (Graphic3d_NOM_NEON_GNC, Graphic3d_NOT_ENV_CLOUDS
                                 Graphic3d_Camera, Graphic3d_RM_RAYTRACING,
                                 Graphic3d_RM_RASTERIZATION,
                                 Graphic3d_StereoMode_QuadBuffer,
-                                Graphic3d_RenderingParams)
+                                Graphic3d_RenderingParams,
+                                Graphic3d_AspectLine3d)
 from OCC.Core.Aspect import Aspect_TOTP_RIGHT_LOWER, Aspect_FM_STRETCH, Aspect_FM_NONE
 import traceback
 
@@ -52,28 +52,12 @@ def color_the_edges(shp, display, color, width):
     """
     if not isinstance(shp, TopoDS_Shape):
         raise TypeError("The 'shp' parameter must be a valid TopoDS_Shape.")
-
-    shapeList = []
+    # shapeList = []
     try:
         # Initialize the edge explorer for the given shape
         Ex = TopExp_Explorer(shp, TopAbs_EDGE)
-
         # Get the display context
         ctx = display.Context
-
-        # If the color is a predefined constant (like Quantity_NOC_BLACK), convert to Quantity_Color
-        if isinstance(color, int):  # Quantity_NOC_BLACK is an int, so check if color is an int
-            color = Quantity_Color(color)
-
-        # If the color is already a Quantity_Color, do nothing
-        elif isinstance(color, Quantity_Color):
-            pass  
-        elif isinstance(color, tuple):
-            # If color is a tuple (r, g, b), convert to Quantity_Color
-            color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
-        else:
-            raise TypeError(f"Unsupported color type: {type(color)}")
-
         # Iterate over the edges in the shape
         while Ex.More():
             # Extract the current edge
@@ -81,16 +65,13 @@ def color_the_edges(shp, display, color, width):
 
             # Create an AIS_Shape for the edge
             ais_shape = AIS_Shape(aEdge)
-
-            # Set the color and width for the edge
-            ctx.SetColor(ais_shape, color, True)
-            ctx.SetWidth(ais_shape, width, False)
-
+            # Set the color
+            ais_shape.SetColor(color)
             # Display the edge
             ctx.Display(ais_shape, False)
 
             # Store the edge for tracking
-            shapeList.append(aEdge)
+            # shapeList.append(aEdge)
 
             # Move to the next edge
             Ex.Next()
@@ -102,11 +83,11 @@ def color_the_edges(shp, display, color, width):
 
         raise RuntimeError(f"Error while coloring edges: {e}")
         
-    return shapeList
+    # return shapeList
 
 
 def set_default_edge_style(shp, display):
-    color_the_edges(shp, display, Quantity_NOC_BLACK, 0.5)
+    color_the_edges(shp, display, Quantity_Color(Quantity_NOC_BLACK), 0.5)
     # return shps
 
 

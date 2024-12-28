@@ -57,12 +57,9 @@ class BackToBackAnglesWithGussetsSameSide:
         self.uDir = uDir
         self.wDir = wDir
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        
-        # Calculate the offset needed to center angles on gusset plate
-        x_center_offset = (self.gusset_H - self.A)/2
-        
+
         # Place first angle with offset to center on gusset
-        angle1_origin = self.sec_origin + x_center_offset * self.uDir
+        angle1_origin = self.sec_origin
         rotated_uDir_angle1 = -self.vDir  # Point the horizontal leg towards negative y
         rotated_vDir_angle1 = -self.uDir  # Adjust vertical direction accordingly
         self.angle1.place(angle1_origin, rotated_uDir_angle1, self.wDir)
@@ -235,11 +232,11 @@ if __name__ == '__main__':
     # Example dimensions for angles
     L = 2000   # Length
     A = 200   # Vertical leg length
-    B = 150   # Horizontal leg length
+    B = 300   # Horizontal leg length
     T = 18    # Thickness
     R1 = 15   # Inner corner radius
     R2 = 4.8  # Outer corner radius
-    spacing = 40  # Gap between angles
+    spacing = 8  # Gap between angles
 
     # Example dimensions for gusset plates
     gusset_L = 200  # Length

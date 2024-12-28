@@ -1765,10 +1765,6 @@ class CommonDesignLogic(object):
     
     def createStrutsInTrusses(self):
         Col = self.module_class
-        print("COL_DESIGINATION :",Col.result_designation)
-        print("All attributes and methods of Col:")
-        print(dir(Col))
-
 
         if Col.sec_profile=="Angles":
 
@@ -1798,15 +1794,11 @@ class CommonDesignLogic(object):
         elif Col.sec_profile=="Back to Back Angles - Same side of gusset":
                    
             L = float(Col.length)
-            A = float(Col.section_property.max_leg)
-            B = float(Col.section_property.min_leg)
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
             R2 = float(Col.section_property.toe_radius)
             spacing = 6.0  # Gap between angles
             print("Length (L):", L)
-            print("Max Leg (A):", A)
-            print("Min Leg (B):", B)
             print("Thickness (T):", T)
             print("Root Radius (R1):", R1)
             print("Toe Radius (R2):", R2)
@@ -1822,6 +1814,14 @@ class CommonDesignLogic(object):
             origin = numpy.array([0., 0., 0.])
             uDir = numpy.array([1., 0., 0.])
             wDir = numpy.array([0., 0., 1.])
+            if Col.loc == "Long Leg":
+                B = float(Col.section_property.max_leg)
+                A = float(Col.section_property.min_leg)
+            elif Col.loc == "Short Leg":
+                A = float(Col.section_property.max_leg)
+                B = float(Col.section_property.min_leg)
+            print("Vertical Leg :", A)
+            print("Horizontal Leg :", B)
             assembly = BackToBackAnglesWithGussetsSameSide(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
             assembly.place(origin, uDir, wDir)
             shape = assembly.create_model()
@@ -1831,15 +1831,11 @@ class CommonDesignLogic(object):
         elif Col.sec_profile=="Back to Back Angles - Opposite side of gusset":
                    
             L = float(Col.length)
-            A = float(Col.section_property.max_leg)
-            B = float(Col.section_property.min_leg)
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
             R2 = float(Col.section_property.toe_radius)
             spacing = float(Col.plate_thickness)   # Gap between angles
             print("Length (L):", L)
-            print("Max Leg (A):", A)
-            print("Min Leg (B):", B)
             print("Thickness (T):", T)
             print("Root Radius (R1):", R1)
             print("Toe Radius (R2):", R2)
@@ -1856,6 +1852,14 @@ class CommonDesignLogic(object):
             origin = numpy.array([0., 0., 0.])
             uDir = numpy.array([1., 0., 0.])
             wDir = numpy.array([0., 0., 1.])
+            if Col.loc == "Long Leg":
+                A = float(Col.section_property.max_leg)
+                B = float(Col.section_property.min_leg)
+            elif Col.loc == "Short Leg":
+                B = float(Col.section_property.max_leg)
+                A = float(Col.section_property.min_leg)
+            print("Vertical Leg :", A)
+            print("Horizontal Leg :", B)
             assembly = BackToBackAnglesWithGussetsOppSide(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
             assembly.place(origin, uDir, wDir)
             shape = assembly.create_model()

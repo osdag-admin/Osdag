@@ -1014,30 +1014,30 @@ class IS800_2007(object):
                     length = 0.75 * length
                 # elif Warping ==Warping_Restraint1 :
                 #     length = 0.80 * length
-                elif Warping ==Warping_Restraint4 :
+                elif Warping == Warping_Restraint4 :
                     length = 0.85 * length
-                elif Warping ==Warping_Restraint5 :
+                elif Warping == Warping_Restraint5 :
                     length = 1.00 * length
             elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
-                length = length + 2* depth /1000
+                length = length + 2 * depth
             elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
-                length = 1.2 * length + 2 *depth /1000
+                length = 1.2 * length + 2 * depth
         elif load == KEY_DISP_LOAD2:
             if Torsional == Torsion_Restraint1:
-                if Warping ==Warping_Restraint1 :
+                if Warping == Warping_Restraint1 :
                     length = 0.85 * length
-                if Warping ==Warping_Restraint2 :
+                if Warping == Warping_Restraint2 :
                     length = 0.9 * length
-                if Warping ==Warping_Restraint1 :
+                if Warping == Warping_Restraint1 :
                     length = 0.95 * length
-                if Warping ==Warping_Restraint4 :
+                if Warping == Warping_Restraint4 :
                     length = 1.00 * length
-                if Warping ==Warping_Restraint5 :
+                if Warping == Warping_Restraint5 :
                     length = 1.20 * length
             elif Torsional == Torsion_Restraint2 and Warping == Warping_Restraint5 :
-                length = 1.2 *length + 2* depth /1000
+                length = 1.2 * length + 2 * depth
             elif Torsional == Torsion_Restraint3 and Warping == Warping_Restraint5 :
-                length = 1.4 * length + 2 *depth /1000
+                length = 1.4 * length + 2 * depth
         return length
 
     @staticmethod
@@ -2108,3 +2108,4 @@ class IS800_2007(object):
     """    ANNEX  H       PLASTIC PROPERTIES OF BEAMS   """
     # ==========================================================================
     """     ------------------END------------------     """
+    

@@ -994,7 +994,6 @@ class Flexure(Member):
                 "The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007]."
             )
         # Effective length
-        self.effective_length_beam(self, design_dictionary, self.length)  # mm
         print(
             f"self.effective_length {self.effective_length} \n self.input_section_classification{self.input_section_classification} ")
         print('self.input_section_list:',self.input_section_list)
@@ -1016,6 +1015,9 @@ class Flexure(Member):
                         self.shear_area = self.effective_depth * self.section_property.web_thickness
                     elif self.bending_type == KEY_DISP_BENDING2:
                         self.shear_area = 2 * self.section_property.flange_width * self.section_property.flange_thickness
+
+                self.effective_length_beam(self, design_dictionary, self.length)  # mm
+
                 # Step 1.1 - computing the effective sectional area
                 self.effective_area = self.section_property.area
                 self.common_checks_1(self, section, step=2)
@@ -3087,4 +3089,4 @@ class Flexure(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #
-        
+

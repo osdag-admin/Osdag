@@ -2253,6 +2253,8 @@ class Compression(Member):
                 image = "unequaldp"
         
         if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):
+            if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:  # Angles and Back to Back Angles
+                self.section_property = Angle(designation = self.result_designation, material_grade = self.material)
             if self.sec_profile == "Angles" or self.sec_profile == VALUES_SEC_PROFILE_2[0]:
                 self.report_column = {KEY_DISP_SEC_PROFILE: image,
                                         KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
@@ -2326,30 +2328,30 @@ class Compression(Member):
             self.report_check.append(t1)
             self.h = (self.section_property.leg_a_length - 2 * (self.section_property.thickness + self.section_property.root_radius))
             t1 = ('Single Angle',
-                cl_3_7_2_section_classification_angle_required("b/t", self.section_property.section_class),
+                cl_3_7_2_section_classification_angle_required("b/t", self.input_section_classification[self.result_designation]),
                 cl_3_7_2_section_classification_angle_provided(
                     self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
-                    round(self.width_thickness_ratio, 2), "b/t", self.epsilon, self.section_property.section_class),
+                    round(self.width_thickness_ratio, 2), "b/t", self.epsilon, self.input_section_classification[self.result_designation]),
                 get_pass_fail(15.7 * self.epsilon, round(self.width_thickness_ratio, 2), relation="geq")
             )
             self.report_check.append(t1)
 
             t1 = (
                 'Double Angles with the components separated',
-                cl_3_7_2_section_classification_angle_required("d/t", self.section_property.section_class),
+                cl_3_7_2_section_classification_angle_required("d/t", self.input_section_classification[self.result_designation]),
                 cl_3_7_2_section_classification_angle_provided(
                     self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
-                    round(self.depth_thickness_ratio, 2), "d/t", self.epsilon, self.section_property.section_class),
+                    round(self.depth_thickness_ratio, 2), "d/t", self.epsilon, self.input_section_classification[self.result_designation]),
                 get_pass_fail(15.7 * self.epsilon, round(self.depth_thickness_ratio, 2), relation="geq")
             )
             self.report_check.append(t1)
 
             t1 = (
                 'Axial Compression',
-                cl_3_7_2_section_classification_angle_required("(b+d)/t", self.section_property.section_class),
+                cl_3_7_2_section_classification_angle_required("(b+d)/t", self.input_section_classification[self.result_designation]),
                 cl_3_7_2_section_classification_angle_provided(
                     self.section_property.min_leg, self.section_property.max_leg, self.section_property.thickness,
-                    round(self.width_depth_thickness_ratio, 2), "(b+d)/t", self.epsilon, self.section_property.section_class),
+                    round(self.width_depth_thickness_ratio, 2), "(b+d)/t", self.epsilon, self.input_section_classification[self.result_designation]),
                 get_pass_fail(25 * self.epsilon, round(self.width_depth_thickness_ratio, 2), relation="geq")
             )
             self.report_check.append(t1)
@@ -2359,9 +2361,7 @@ class Compression(Member):
 
 
             t1 = ('Section Class', ' ',
-                            cl_3_7_2_section_classification(
-                                                                self.section_property.section_class),
-                            ' ')
+                cl_3_7_2_section_classification(self.input_section_classification[self.result_designation]), ' ')
             self.report_check.append(t1)
 
             t1 = ('SubSection', 'Effective Slenderness Ratio', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')

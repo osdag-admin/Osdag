@@ -887,16 +887,6 @@ class ColumnDesign(Member):
         self.flag = self.section_classification(self)
 
         print('self.flag:',self.flag)
-        # reduction of the area based on the connection requirements (input from design preferences)
-        if self.effective_area_factor < 1.0:
-            self.effective_area = round(self.effective_area * self.effective_area_factor, 2)
-
-            #logger.warning("Reducing the effective sectional area as per the definition in the Design Preferences tab.")
-            #logger.info("The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".
-            #            format(round((self.effective_area / self.effective_area_factor), 2), self.effective_area))
-        #else:
-            #if self.section_class != 'Slender':
-            #    logger.info("The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007].")
 
         #print('self.input_section_list:',self.input_section_list)
         if self.flag:
@@ -923,7 +913,7 @@ class ColumnDesign(Member):
 
                 self.material_property.connect_to_database_to_get_fy_fu(self.material, max(self.section_property.flange_thickness,
                                                                                         self.section_property.web_thickness))
-
+                self.epsilon = math.sqrt(250 / self.material_property.fy)
                 
 
                 # initialize lists for updating the results dictionary
@@ -937,9 +927,6 @@ class ColumnDesign(Member):
                 self.section_class = self.input_section_classification[section][0]
 
                 if self.section_class == 'Slender':
-                    #logger.warning("The trial section ({}) is Slender. Computing the Effective Sectional Area as per Sec. 9.7.2, "
-                    #            "Fig. 2 (B & C) of The National Building Code of India (NBC), 2016.".format(section))
-
                     if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
                         self.effective_area = (2 * ((31.4 * self.epsilon * self.section_property.flange_thickness) *
                                                     self.section_property.flange_thickness)) + \
@@ -949,6 +936,9 @@ class ColumnDesign(Member):
                 else:
                     self.effective_area = self.section_property.area  # mm2
                     # print(f"self.effective_area{self.effective_area}")
+
+                if self.effective_area_factor < 1.0:
+                    self.effective_area = round(self.effective_area * self.effective_area_factor, 2)
 
                 self.list_zz.append(self.section_class)
                 self.list_yy.append(self.section_class)
@@ -1416,6 +1406,11 @@ class ColumnDesign(Member):
 
         if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):
             if self.sec_profile=='Columns' or self.sec_profile=='Beams' or self.sec_profile == VALUES_SEC_PROFILE[0]:
+                try:
+                    result = Beam(designation=self.result_designation, material_grade=self.material)
+                except:
+                    result = Column(designation=self.result_designation, material_grade=self.material)
+                self.section_property = result
                 self.report_column = {KEY_DISP_SEC_PROFILE: "ISection",
                                     KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
                                     KEY_DISP_COLSEC_REPORT: self.section_property.designation,

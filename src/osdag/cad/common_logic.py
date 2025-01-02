@@ -154,6 +154,13 @@ import multiprocessing
 # ----------------------------------------- from reportGenerator import save_html
 from osdag.cad.items.plate import Plate
 from osdag.cad.items.angle import Angle
+from ..utils.common.component import ISection as ISectionComponent
+from ..utils.common.component import Column
+from ..utils.common.component import Beam
+from ..utils.common.component import CHS
+from ..utils.common.component import RHS
+from ..utils.common.component import SHS
+from ..utils.common.component import Angle as AngleComponent
 import numpy
 class CommonDesignLogic(object):
     # --------------------------------------------- def __init__(self, **kwargs):
@@ -1714,43 +1721,56 @@ class CommonDesignLogic(object):
         print("COL_DESIGINATION :",Col.result_designation)
 
         if 'RHS' in Col.result_designation or 'SHS' in Col.result_designation:  # hollow sections 'RHS and SHS'
+            if 'RHS' in Col.result_designation:
+                result = RHS(designation=Col.result_designation, material_grade=Col.material)
+            else:
+                result = SHS(designation=Col.result_designation, material_grade=Col.material)
+            Col.section_property = result
+            print(f"Parameter L (flange width): {float(Col.section_property.flange_width)}")
+            print(f"Parameter W (depth): {float(Col.section_property.depth)}")
+            print(f"Parameter H (length/height): {float(Col.length_zz)}")
+            print(f"Parameter T (flange thickness): {float(Col.section_property.flange_thickness)}")
             sec = RectHollow(L=float(Col.section_property.flange_width), W=float(Col.section_property.depth),
                              H=float(Col.length_zz), T=float(Col.section_property.flange_thickness))
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
             col.create_3DModel()
         elif 'CHS' in Col.result_designation:  # CHS
+            result = CHS(designation=Col.result_designation, material_grade=Col.material)
+            Col.section_property = result
+            print(f"Parameter r (radius): {float(Col.section_property.depth) / 2}")
+            print(f"Parameter T (thickness): {float(Col.section_property.flange_thickness)}")
+            print(f"Parameter H (height/length): {float(Col.length_zz)}")
             sec = CircularHollow(r=float(Col.section_property.depth) / 2, T=float(Col.section_property.flange_thickness),
                                  H=float(Col.length_zz))
             col = CompressionMemberCAD(sec)
             sec=sec.create_model()
             col.create_3DModel()
-        elif hasattr(Col, 'support') and getattr(Col, 'support') == "Simply Supported" or hasattr(Col, 'support') and getattr(Col, 'support') == "Cantilever":
-             # Simply Supported and Cantilever Flexure Beam
-            print(f"COL.SUPPORT {Col.support}")
-            column_tw = float(Col.section_property.web_thickness)
-            column_T = float(Col.section_property.flange_thickness)
-            column_d = float(Col.section_property.depth)
-            column_B = float(Col.section_property.flange_width)
-            column_R1 = float(Col.section_property.root_radius)
-            column_R2 = float(Col.section_property.toe_radius)
-            column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
-            column_length = float(Col.result_eff_len)*1000
+        else: # Beams and Columns (rolled sections)
+            try:
+                result = Beam(designation=Col.result_designation, material_grade=Col.material)
+            except:
+                result = Column(designation=Col.result_designation, material_grade=Col.material)
+            Col.section_property = result
 
-            sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
-                              alpha=column_alpha, length=column_length, notchObj=None)
-            _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
-            col = CompressionMemberCAD(sec)
-
-            sec=sec.create_model()
-            col.create_Flex3DModel()
-        else:  # Beams and Columns (rolled sections)
             column_tw = float(Col.section_property.web_thickness)
+            print(f"column_tw (Web Thickness): {column_tw}")
+
             column_T = float(Col.section_property.flange_thickness)
+            print(f"column_T (Flange Thickness): {column_T}")
+
             column_d = float(Col.section_property.depth)
+            print(f"column_d (Depth): {column_d}")
+
             column_B = float(Col.section_property.flange_width)
+            print(f"column_B (Flange Width): {column_B}")
+
             column_R1 = float(Col.section_property.root_radius)
+            print(f"column_R1 (Root Radius): {column_R1}")
+
             column_R2 = float(Col.section_property.toe_radius)
+            print(f"column_R2 (Toe Radius): {column_R2}")
+          
             column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
             column_length = float(Col.length_zz)
 
@@ -1762,10 +1782,74 @@ class CommonDesignLogic(object):
             col.create_3DModel()
 
         return sec
+
+    def createSimplySupportedBeam(self):
+
+        Flex = self.module_class
+
+        print(f"Flex.support {Flex.support}")
+
+        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        column_tw = float(Flex.section_property.web_thickness)
+        print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
+        column_T = float(Flex.section_property.flange_thickness)
+        print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
+        column_d = float(Flex.section_property.depth)
+        print(f"Flex.section_property.depth : {Flex.section_property.depth}")
+        column_B = float(Flex.section_property.flange_width)
+        print(f"Flex.section_property.flange_width : {Flex.section_property.flange_width}")
+        column_R1 = float(Flex.section_property.root_radius)
+        print(f"Flex.section_property.root_radius : {Flex.section_property.root_radius}")
+        column_R2 = float(Flex.section_property.toe_radius)
+        print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
+        column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
+        column_length = float(Flex.result_eff_len)*1000
+
+        sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
+                              alpha=column_alpha, length=column_length, notchObj=None)
+        _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
+        col = CompressionMemberCAD(sec)
+
+        sec=sec.create_model()
+        col.create_Flex3DModel() 
+
+        return sec 
+
+    def createCantileverBeam(self):
+
+        Flex = self.module_class
+
+        print(f"Flex.support {Flex.support}")
+        
+        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        column_tw = float(Flex.section_property.web_thickness)
+        print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
+        column_T = float(Flex.section_property.flange_thickness)
+        print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
+        column_d = float(Flex.section_property.depth)
+        print(f"Flex.section_property.depth : {Flex.section_property.depth}")
+        column_B = float(Flex.section_property.flange_width)
+        print(f"Flex.section_property.flange_width : {Flex.section_property.flange_width}")
+        column_R1 = float(Flex.section_property.root_radius)
+        print(f"Flex.section_property.root_radius : {Flex.section_property.root_radius}")
+        column_R2 = float(Flex.section_property.toe_radius)
+        print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
+        column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
+        column_length = float(Flex.result_eff_len)*1000
+
+        sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
+                              alpha=column_alpha, length=column_length, notchObj=None)
+        _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
+        col = CompressionMemberCAD(sec)
+
+        sec=sec.create_model()
+        col.create_Flex3DModel() 
+
+        return sec 
     
     def createStrutsInTrusses(self):
         Col = self.module_class
-
+        Col.section_property = AngleComponent(designation = Col.result_designation, material_grade = Col.material)
         if Col.sec_profile=="Angles":
 
             L = float(Col.length)
@@ -1804,8 +1888,8 @@ class CommonDesignLogic(object):
             print("Toe Radius (R2):", R2)
 
             # Example dimensions for gusset plates
-            gusset_L = 200  # Length
-            gusset_H = 200  # Height
+            gusset_L = 100  # Length
+            gusset_H = 100  # Height
             gusset_T = float(Col.plate_thickness)    # Thickness
             print("Gusset Thickness : ", Col.plate_thickness)
             gusset_degree = 30  # Angle in degrees
@@ -1842,8 +1926,8 @@ class CommonDesignLogic(object):
 
 
             # Example dimensions for gusset plates
-            gusset_L = 200  # Length
-            gusset_H = 200 # Height
+            gusset_L = 100  # Length
+            gusset_H = 100 # Height
             gusset_T =  float(Col.plate_thickness)   # Thickness
             print("Gusset Thickness : ", Col.plate_thickness)
             gusset_degree = 30  # Angle in degrees
@@ -2186,18 +2270,18 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.ColObj, update=True)
 
         elif self.mainmodule == 'Flexure Member':
-            self.col = self.module_class()
-            self.ColObj = self.createColumnInFrameCAD()
+            self.flex = self.module_class()
+            self.FObj = self.createSimplySupportedBeam()
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.ColObj, update=True)
+                osdag_display_shape(self.display, self.FObj, update=True)
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
-            self.col = self.module_class()
-            self.ColObj = self.createColumnInFrameCAD()
+            self.flex = self.module_class()
+            self.FObj = self.createCantileverBeam()
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.ColObj, update=True)
+                osdag_display_shape(self.display, self.FObj, update=True)
 
         elif self.mainmodule == 'Struts in Trusses':
             self.col = self.module_class()
@@ -2361,7 +2445,7 @@ class CommonDesignLogic(object):
                     self.display.EraseAll()
         elif self.mainmodule == 'Flexure Member':
             if flag is True:
-                self.FObj = self.createColumnInFrameCAD()
+                self.FObj = self.createSimplySupportedBeam()
 
                 self.display_3DModel("Model", "gradient_bg")
             else:
@@ -2369,7 +2453,7 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             if flag is True:
-                self.FObj = self.createColumnInFrameCAD()
+                self.FObj = self.createCantileverBeam()
 
                 self.display_3DModel("Model", "gradient_bg")
             else:

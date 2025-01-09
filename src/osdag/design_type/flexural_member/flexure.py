@@ -256,11 +256,11 @@ class Flexure(Member):
         # options_list.append(t3)
 
         #
-        t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT1, True, 'No Validator')
-        options_list.append(t4)
+        #t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT1, True, 'No Validator')
+        #options_list.append(t4)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
-        options_list.append(t12)
+        #t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
+        #options_list.append(t12)
 
 
         # t3 = (KEY_BUCKLING_METHOD, KEY_WEB_BUCKLING, TYPE_COMBOBOX, KEY_WEB_BUCKLING_option, False, 'No Validator')
@@ -284,10 +284,10 @@ class Flexure(Member):
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_MOMENT, KEY_DISP_MOMENT+'*', TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t8 = (KEY_SHEAR, KEY_DISP_SHEAR+'*', TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
 

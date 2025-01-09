@@ -256,11 +256,11 @@ class Flexure_Cantilever(Member):
         # options_list.append(t3)
         #
         #
-        t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT2, True, 'No Validator')
-        options_list.append(t4)
+        #t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT2, True, 'No Validator')
+        #options_list.append(t4)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE, Cantilever_img, True, 'No Validator')
-        options_list.append(t12)
+        #t12 = (KEY_IMAGE, None, TYPE_IMAGE, Cantilever_img, True, 'No Validator')
+        #options_list.append(t12)
         #
         # t10 = (KEY_TORSIONAL_RES, DISP_TORSIONAL_RES, TYPE_COMBOBOX, Torsion_Restraint_list, True, 'No Validator')
         # options_list.append(t10)
@@ -280,10 +280,10 @@ class Flexure_Cantilever(Member):
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_MOMENT, KEY_DISP_MOMENT+'*', TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t8 = (KEY_SHEAR, KEY_DISP_SHEAR+'*', TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
 

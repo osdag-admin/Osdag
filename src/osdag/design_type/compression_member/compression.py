@@ -483,13 +483,13 @@ class Compression(Member):
     def fn_end1_image(self):
 
         if self == 'Fixed':
-            return str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
+            return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
         elif self == 'Free':
-            return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
+            return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
         elif self == 'Hinged':
-            return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
+            return str(files("osdag.data.ResourceFiles.images").joinpath("RRRFstrut.png"))
         elif self == 'Roller':
-            return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
+            return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
 
     def fn_end2_image(self):
 
@@ -498,27 +498,27 @@ class Compression(Member):
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
             elif end2 == 'Free':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF_rotated.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
             elif end2 == 'Hinged':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF_rotated.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RFRFstrut.png"))
             elif end2 == 'Roller':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR_rotated.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
         elif end1 == 'Free':
-            return str(files("osdag.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
+            return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
         elif end1 == 'Hinged':
             if end2 == 'Fixed':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRFstrut.png"))
             elif end2 == 'Hinged':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("3.RFRF.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RFRFstrut.png"))
             elif end2 == 'Roller':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("2.FRFR_rotated.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
         elif end1 == 'Roller':
             if end2 == 'Fixed':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
             elif end2 == 'Hinged':
-                return str(files("osdag.data.ResourceFiles.images").joinpath("2.FRFR.PNG"))
+                return str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
 
     def fn_conn_image(self):
 

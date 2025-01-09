@@ -664,7 +664,7 @@ KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 # All Input Keys
 ###################################
 KEY_MODULE = 'Module'
-KEY_CONN = 'Connectivity'
+KEY_CONN = 'Connectivity *'
 KEY_TABLE = 'Table'
 KEY_MEMBERS = 'No of Members'
 KEY_LOCATION = 'Conn_Location'
@@ -930,9 +930,9 @@ DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_FOOTING = 'Pedestal/Footing'
 
-KEY_DISP_CONN = 'Connectivity'
+KEY_DISP_CONN = 'Connectivity *'
 
-KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
+KEY_DISP_ENDPLATE_TYPE = 'End Plate Type *'
 KEY_DISP_MEMBERS = 'No of Members'
 
 
@@ -940,8 +940,8 @@ KEY_DISP_MEMBERS = 'No of Members'
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
-KEY_DISP_LOCATION_STRUT = 'Connection'
-KEY_DISP_MATERIAL = 'Material'
+KEY_DISP_LOCATION_STRUT = 'Connection *'
+KEY_DISP_MATERIAL = 'Material *'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_SUPTNGSEC_REPORT = 'Supporting Section - Mechanical Properties'
 KEY_DISP_COLSEC = 'Column Section *'
@@ -953,11 +953,11 @@ KEY_DISP_BEAMSEC = 'Beam Section *'
 KEY_DISP_BEAMSEC_REPORT = 'Beam Section'
 KEY_DISP_SECBM = 'Secondary Beam *'
 DISP_TITLE_FSL = 'Factored Loads'
-KEY_DISP_MOMENT = 'Bending Moment (kNm)'
+KEY_DISP_MOMENT = 'Bending Moment (kNm) *'
 
 KEY_DISP_TOP_ANGLE = 'Top Angle'
 
-KEY_DISP_DIA_ANCHOR = 'Diameter(mm)'
+KEY_DISP_DIA_ANCHOR = 'Diameter(mm) *'
 DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_CRITICAL_BOLT = 'Critical Bolt Design'
 DISP_TITLE_CRITICAL_BOLT_SHEAR = 'Critical Bolt - Shear Design'
@@ -969,12 +969,12 @@ DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner Plate '
 KEY_DISP_SLENDER = 'Slenderness ratio'
 
 
-KEY_DISP_PLATETHK = 'Thickness (mm)'
+KEY_DISP_PLATETHK = 'Thickness (mm) *'
 KEY_DISP_DPPLATETHK = 'Endplate thickness, T (mm)'
 KEY_DISP_DPPLATETHK01 = 'Endplate thickness, Tp (mm)'
 
 DISP_TITLE_TENSION = 'Tension Capacity'
-KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preference'
+KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preference *'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)'
 KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness (mm)'
 
@@ -997,17 +997,17 @@ DISP_TITLE_SECTION = 'Section Details'
 DISP_TITLE_TENSION_SECTION = 'Section Details'
 SECTION_CLASSIFICATION = "Section Classification"
 
-KEY_DISP_D = 'Diameter (mm)'
-KEY_DISP_SHEAR = 'Shear Force (kN)'
+KEY_DISP_D = 'Diameter (mm) *'
+KEY_DISP_SHEAR = 'Shear Force (kN) *'
 KEY_DISP_AXIAL = 'Axial Force (kN)'
-KEY_DISP_AXIAL_STAR = 'Axial (kN)* '
+KEY_DISP_AXIAL_STAR = 'Axial Force (kN)* '
 DISP_TITLE_PLATE = 'Plate'
-KEY_DISP_TYP = 'Type'
+KEY_DISP_TYP = 'Type *'
 KEY_DISP_COF = 'Coefficient of friction'
-KEY_DISP_TYP_ANCHOR = 'Anchor Type'
-KEY_DISP_GRD_ANCHOR = 'Property Class'
+KEY_DISP_TYP_ANCHOR = 'Anchor Type *'
+KEY_DISP_GRD_ANCHOR = 'Property Class *'
 KEY_DISP_GRD_FOOTING = 'Grade*'
-KEY_DISP_GRD = 'Property Class'
+KEY_DISP_GRD = 'Property Class *'
 KEY_DISP_BOLT_PRE_TENSIONING = 'Bolt Tension'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
@@ -1256,7 +1256,7 @@ KEY_DISP_DP_BOLT_TYPE = 'Bolt tensioning type'
 
 
 KEY_SHEAR_BP = 'Load.Shear_BP'
-KEY_DISP_SHEAR_BP = 'Shear Force (kN)'
+KEY_DISP_SHEAR_BP = 'Shear Force (kN) *'
 KEY_SHEAR_MAJOR = 'Load.Shear.Major'
 KEY_DISP_SHEAR_MAJOR = ' - Along major axis (z-z)'
 KEY_SHEAR_MINOR = 'Load.Shear.Minor'
@@ -1266,13 +1266,13 @@ KEY_DISP_SHEAR_MINOR = ' - Along minor axis (y-y)'
 ###################################
 # Key for Storing Axial sub-key of Load
 KEY_AXIAL_BP = 'Load.Axial_Compression'
-KEY_DISP_AXIAL_BP = 'Axial Compression (kN)'
+KEY_DISP_AXIAL_BP = 'Axial Compression (kN) *'
 KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
 KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN)'
 KEY_DISP_DP_BOLT_HOLE_TYPE = 'Hole Type'
 
 # KEY_PC = 'Bolt.PC'
-KEY_DISP_PC = 'Property Class'
+KEY_DISP_PC = 'Property Class *'
 KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
@@ -1508,7 +1508,7 @@ KEY_SLENDER = "Member.Slenderness"
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 KEY_OUT_FLANGESPLATE_THICKNESS = 'flange_plate.Thickness'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm) *'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
@@ -1606,7 +1606,7 @@ KEY_INNERFLANGE_WELD_DETAILS = "Inner Flange detail"
 KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
 
 KEY_WELD_TYPE = 'Weld.Type'
-KEY_DISP_WELD_TYPE = 'Type'
+KEY_DISP_WELD_TYPE = 'Type *'
 VALUES_WELD_TYPE = ["Fillet Weld", "Groove Weld"]
 VALUES_WELD_TYPE_EP = ["Groove Weld", "Fillet Weld"]
 VALUES_WELD_TYPE_BB_FLUSH = ["Groove Weld"]
@@ -1697,7 +1697,7 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Width'
 KEY_OUT_WEBPLATE_THICKNESS = 'Web_Plate.Thickness'
-KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm) *'
 KEY_DISP_WEB_PLATE_LENGTH ='Width (mm)'
 DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
 KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'
@@ -1777,7 +1777,7 @@ KEY_OUT_DISP_RED_WELD_STRENGTH = 'Weld Strength (N/mm)'
 DISP_TITLE_ENDPLATE = 'End Plate'
 
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
-KEY_DISP_ENDPLATE_THICKNESS = 'Thickness (mm)'
+KEY_DISP_ENDPLATE_THICKNESS = 'Thickness (mm) *'
 
 KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
 KEY_ST_KEY_MATERIAL = 'Stiffener_Key.Material'
@@ -2233,10 +2233,10 @@ KEY_LENYY = 'Member.Length_yy'
 KEY_DISP_LENYY = 'Length (y-y)(mm)*'
 
 DISP_TITLE_SC = 'Supporting Condition'
-DISP_TITLE_STRUT = 'End Condition'
+DISP_TITLE_STRUT = 'End Condition *'
 KEY_END1 = 'End_1'
 KEY_END1_Y = 'End_1_Y'
-KEY_DISP_END1 = 'End 1'
+KEY_DISP_END1 = 'End 1 *'
 KEY_DISP_END1_Y = 'End 1'
 VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END1 = ['Fixed', 'Hinged']
@@ -2245,7 +2245,7 @@ VALUES_STRUT_END1_Y = ['Fixed', 'Hinged']
 
 KEY_END2 = 'End_2'
 KEY_END2_Y = 'End_2_Y'
-KEY_DISP_END2 = 'End 2'
+KEY_DISP_END2 = 'End 2 *'
 KEY_DISP_END2_Y = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 VALUES_STRUT_END2 = ['Fixed', 'Hinged']

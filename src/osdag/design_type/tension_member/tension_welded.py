@@ -410,7 +410,7 @@ class Tension_welded(Member):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL_STAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True, 'No Validator')

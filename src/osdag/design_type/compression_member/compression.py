@@ -368,7 +368,7 @@ class Compression(Member):
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL_STAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
         # t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')

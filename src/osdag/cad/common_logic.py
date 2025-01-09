@@ -1881,7 +1881,7 @@ class CommonDesignLogic(object):
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
             R2 = float(Col.section_property.toe_radius)
-            spacing = 6.0  # Gap between angles
+            spacing = 0.0  # Gap between angles
             print("Length (L):", L)
             print("Thickness (T):", T)
             print("Root Radius (R1):", R1)

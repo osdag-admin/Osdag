@@ -304,7 +304,7 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded to End Gusset',str(files("osdag.data.ResourceFiles.images").joinpath("welded_ten.png")),'Tension_Welded'),
                             self.show_tension_module,
                                    ],
-                'Compression Member': [('Columns with known support conditions', str(files("osdag.data.ResourceFiles.images").joinpath("CompressionMembers_ColumnsInFrames")), 'Column_Design'),
+                'Compression Member': [('Axially Loaded Columns', str(files("osdag.data.ResourceFiles.images").joinpath("CompressionMembers_ColumnsInFrames")), 'Column_Design'),
                                        # ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("BC_CF-BW-Flush.png")), 'Beam_Column_Design'),
                                        ('Struts in Trusses', str(files("osdag.data.ResourceFiles.images").joinpath("strut.jpg")), 'Strut_Design'),
                                        self.show_compression_module,

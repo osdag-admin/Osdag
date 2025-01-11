@@ -575,7 +575,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(BeamColumnEndPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-        else
+        else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     def show_base_plate(self):
@@ -585,7 +585,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(BasePlateConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-        else
+        else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     def show_truss_bolted(self):

@@ -9,22 +9,19 @@ class Update():
     def __init__(self):
         super().__init__()
         self.old_version=self.get_current_version()
-        # msg = self.notifi()
 
     def notifi(self):
         try:
-            url = "https://raw.githubusercontent.com/osdag-admin/Osdag/master/README.md"
+            url = "https://raw.githubusercontent.com/osdag-admin/Osdag/master/src/osdag/_version.py"
             file = urllib.request.urlopen(url)
             version = 'not found'
             for line in file:
                 decoded_line = line.decode("utf-8")
-                match = re.search(r'Download the latest release version (\S+)', decoded_line)
+                match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", decoded_line, re.M)
                 if match:
                     version = match.group(1)
                     version = version.split("<")[0]
                     break
-            # decoded_line = line.decode("utf-8")
-            # new_version = decoded_line.split("=")[1]
             if version != self.old_version:
                 msg = 'Current version: '+ self.old_version+'<br>'+'Latest version '+ str(version)+'<br>'+\
                       'Update will be available <a href=\"https://osdag.fossee.in/resources/downloads\"> here <a/>'

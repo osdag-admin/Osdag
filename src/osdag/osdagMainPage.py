@@ -753,7 +753,7 @@ class OsdagMainWindow(QMainWindow):
         self.ask_question()
 
     def design_examples(self):
-        root_path = os.path.join('ResourceFiles', 'html_page', '_build', 'html')
+        root_path = files('osdag.data.ResourceFiles.html_page._build').joinpath('html')
         for html_file in os.listdir(root_path):
             # if html_file.startswith('index'):
             print(os.path.splitext(html_file)[1])

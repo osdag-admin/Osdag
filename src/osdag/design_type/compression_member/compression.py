@@ -1572,63 +1572,67 @@ class Compression(Member):
 
     def common_result(self, list_result,result_type):
 
-            self.result_designation = list_result[result_type]["Designation"] # TODO debug
-            limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
-            if self.sec_prop_initial_dict[self.result_designation][2] > limit:
-                logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
-                logger.error("Cannot compute. Given Length does not pass for this section.")
-                # self.sec_list.remove(self.section_property.designation )
-            else:
-                logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]" )
+        if result_type is None:
+            return
+
+        self.result_designation = list_result[result_type]["Designation"] # TODO debug
+        limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
+        if self.sec_prop_initial_dict[self.result_designation][2] > limit:
+            logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+            logger.error("Cannot compute. Given Length does not pass for this section.")
+            # self.sec_list.remove(self.section_property.designation )
+        else:
+            logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]" )
             logger.info(
-                            "The section is {}. The b/t of the section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(
-                               self.input_section_classification[self.result_designation], self.result_designation,
-                                round(self.width_thickness_ratio, 2), round_up(self.depth_thickness_ratio),
-                                round(self.width_depth_thickness_ratio, 2)))
+                "The section is {}. The b/t of the section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(
+                    self.input_section_classification[self.result_designation], self.result_designation,
+                    round(self.width_thickness_ratio, 2), round_up(self.depth_thickness_ratio),
+                    round(self.width_depth_thickness_ratio, 2)))
 
 
-            self.result_section_class = list_result[result_type]['Section class']
-            self.result_effective_area = list_result[result_type]['Effective area']
+        self.result_section_class = list_result[result_type]['Section class']
+        self.result_effective_area = list_result[result_type]['Effective area']
 
-            self.result_bc = list_result[result_type]['Buckling_class']
-            # self.result_bc_yy = list_result[result_type]['Buckling_curve_yy']
+        self.result_bc = list_result[result_type]['Buckling_class']
+        # self.result_bc_yy = list_result[result_type]['Buckling_curve_yy']
 
-            self.result_IF = list_result[result_type]['IF']
-            # self.result_IF_yy = list_result[result_type]['IF_yy']
+        self.result_IF = list_result[result_type]['IF']
+        # self.result_IF_yy = list_result[result_type]['IF_yy']
 
-            self.result_eff_len = list_result[result_type]['Effective_length']
-            # self.result_eff_len_yy = list_result[result_type]['Effective_length_yy']
+        self.result_eff_len = list_result[result_type]['Effective_length']
+        # self.result_eff_len_yy = list_result[result_type]['Effective_length_yy']
 
-            self.result_eff_sr = list_result[result_type]['Effective_SR']
-            # self.result_eff_sr_yy = list_result[result_type]['Effective_SR_yy']
-            self.result_lambda_vv = list_result[result_type]['lambda_vv']
+        self.result_eff_sr = list_result[result_type]['Effective_SR']
+        # self.result_eff_sr_yy = list_result[result_type]['Effective_SR_yy']
+        self.result_lambda_vv = list_result[result_type]['lambda_vv']
 
-            self.result_lambda_psi = list_result[result_type]['lambda_psi']
+        self.result_lambda_psi = list_result[result_type]['lambda_psi']
 
 
-            self.result_ebs = list_result[result_type]['EBS']
-            # self.result_ebs_yy = list_result[result_type]['EBS_yy']
+        self.result_ebs = list_result[result_type]['EBS']
+        # self.result_ebs_yy = list_result[result_type]['EBS_yy']
 
-            self.result_nd_esr = list_result[result_type]['ND_ESR']
-#                 self.result_nd_esr_yy = list_result[result_type]['ND_ESR_yy']
+        self.result_nd_esr = list_result[result_type]['ND_ESR']
+        #                 self.result_nd_esr_yy = list_result[result_type]['ND_ESR_yy']
 
-            self.result_phi_zz = list_result[result_type]['phi']
-#                 self.result_phi_yy = list_result[result_type]['phi_yy']
+        self.result_phi_zz = list_result[result_type]['phi']
+        #                 self.result_phi_yy = list_result[result_type]['phi_yy']
 
-            self.result_srf = list_result[result_type]['SRF']
-#                 self.result_srf_yy = list_result[result_type]['SRF_yy']
+        self.result_srf = list_result[result_type]['SRF']
+        #                 self.result_srf_yy = list_result[result_type]['SRF_yy']
 
-            self.result_fcd_1_zz = list_result[result_type]['FCD_formula']
-#                 self.result_fcd_1_yy = list_result[result_type]['FCD_1_yy']
+        self.result_fcd_1_zz = list_result[result_type]['FCD_formula']
+        #                 self.result_fcd_1_yy = list_result[result_type]['FCD_1_yy']
 
-            self.result_fcd_2 = list_result[result_type]['FCD_max']
+        self.result_fcd_2 = list_result[result_type]['FCD_max']
 
-            # self.result_fcd_zz = list_result[result_type]['FCD_zz']
-            # self.result_fcd_yy = list_result[result_type]['FCD_yy']
+        # self.result_fcd_zz = list_result[result_type]['FCD_zz']
+        # self.result_fcd_yy = list_result[result_type]['FCD_yy']
 
-            self.result_fcd = list_result[result_type]['FCD'] * 1000
-            self.result_capacity = list_result[result_type]['Capacity']
-            self.result_cost = list_result[result_type]['Cost']
+        self.result_fcd = list_result[result_type]['FCD'] * 1000
+        self.result_capacity = list_result[result_type]['Capacity']
+        self.result_cost = list_result[result_type]['Cost']
+
     # def max_force_length(self,section):
     #
     #     "calculated max force and length based on the maximum section size avaialble for diff section type"

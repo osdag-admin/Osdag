@@ -539,29 +539,24 @@ class OsdagMainWindow(QMainWindow):
 #################################### Module Launchers ##########################################
 
     @pyqtSlot()
-    def show_shear_connection(self):
-        if self.findChild(QRadioButton,'Fin_Plate').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(CleatAngleConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'Seated_Angle').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow( SeatedAngleConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'End_Plate').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(EndPlateConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+    def show_simple_connection(self):
+        if self.findChild(QRadioButton, 'Lap_Joint_Bolted').isChecked():
+            module_class = SimpleConnection  # Import from simple_connection.py
+        elif self.findChild(QRadioButton, 'Lap_Joint_Welded').isChecked():
+            module_class = SimpleConnection  # You might adjust parameters if needed
+        elif self.findChild(QRadioButton, 'Butt_Joint_Bolted').isChecked():
+            module_class = SimpleConnection
+        elif self.findChild(QRadioButton, 'Butt_Joint_Welded').isChecked():
+            module_class = SimpleConnection
         else:
-            QMessageBox.about(self, "INFO", "Please select appropriate connection")
+            QMessageBox.about(self, "INFO", "Please select an appropriate variant")
+            return
+
+        # Launch the module's UI window using the corresponding design class.
+        self.hide()
+        self.ui2 = Ui_ModuleWindow(module_class, ' ')
+        self.ui2.show()
+        self.ui2.closed.connect(self.show)
             
     @pyqtSlot()
     def show_shear_connection(self):

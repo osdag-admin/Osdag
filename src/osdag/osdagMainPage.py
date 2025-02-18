@@ -262,6 +262,13 @@ class OsdagMainWindow(QMainWindow):
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
                 'Connection' : {
+                                'Simple Connection' : [
+                                    ('Lap Joint Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("LapJointBolted.png")),'Lap_Joint_Bolted'),
+                                    ('Lap Joint Welded',str(files("osdag.data.ResourceFiles.images").joinpath("LapJointWelded.png")),'Lap_Joint_Welded'),
+                                    ('Butt Joint Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointBolted.png")),'Butt_Joint_Bolted'),
+                                    ('Butt Joint Welded',str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointWelded.png")),'Butt_Joint_Welded'),
+                                    self.show_simple_connection,
+                                                    ],
                                 'Shear Connection' : [
                                     ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
                                     ('Cleat Angle',str(files("osdag.data.ResourceFiles.images").joinpath("cleatAngle.png")),'Cleat_Angle'),
@@ -531,6 +538,31 @@ class OsdagMainWindow(QMainWindow):
 
 #################################### Module Launchers ##########################################
 
+    @pyqtSlot()
+    def show_shear_connection(self):
+        if self.findChild(QRadioButton,'Fin_Plate').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(CleatAngleConnection, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton,'Seated_Angle').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow( SeatedAngleConnection, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.findChild(QRadioButton,'End_Plate').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow(EndPlateConnection, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        else:
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
+            
     @pyqtSlot()
     def show_shear_connection(self):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():

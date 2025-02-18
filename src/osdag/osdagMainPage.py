@@ -313,21 +313,19 @@ class OsdagMainWindow(QMainWindow):
                     ('Simply Supported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("simply-supported-beam.jpg")), 'Beam_flexure'),
                     ('Cantilever Beam', str(files("osdag.data.ResourceFiles.images").joinpath("cantilever-beam.jpg")), 'Beam_flexure2'),
                     # ('Other Beams', str(files("osdag.data.ResourceFiles.images").joinpath("fixed-beam.png")), 'Beam_flexure3'),
-                    
                     # ('Laterally Unsupported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Truss_Welded'),
                     self.show_flexure_module,
                 ],
                 'Beam-Column' : self.Under_Development,
-                'Plate Girder' : self.Under_Development,
                 # TODO @rutvik
                 # 'Beam-Column' :[
                 #     ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Beam_Column_Design'),
                 #     self.show_beamcolumn_module,
                 # ],
-                # 'Plate Girder' : [ #TODO: Check number of sub modules required
-                #     ('Welded Girder Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Welded_Girder_Design'),
-                #     self.show_girder_design,
-                # ],
+                'Plate Girder' : [ #TODO: Check number of sub modules required
+                    ('Simply Supported', str(files('osdag.data.ResourceFiles.images').joinpath('simply-supported-beam.jpg')), 'Welded_Girder_Design'),
+                    self.show_girder_design,
+                ],
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
                 '3D Frame' : self.Under_Development,

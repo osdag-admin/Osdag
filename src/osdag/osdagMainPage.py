@@ -261,7 +261,13 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
-                'Connection' : {
+                'Connection' : {'Simple Connection' : [
+                                    ('Lap Joint Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("LapJointBolted.png")),'Lap_Joint_Bolted'),
+                                    ('Lap Joint Welded',str(files("osdag.data.ResourceFiles.images").joinpath("LapJointWelded.png")),'Lap_Joint_Welded'),
+                                    ('Butt Joint Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointBolted.png")),'Butt_Joint_Bolted'),
+                                    ('Butt Joint Welded',str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointWelded.png")),'Butt_Joint_Welded'),
+                                    self.show_simple_connection,
+                                                    ],
                                 'Shear Connection' : [
                                     ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
                                     ('Cleat Angle',str(files("osdag.data.ResourceFiles.images").joinpath("cleatAngle.png")),'Cleat_Angle'),
@@ -530,7 +536,26 @@ class OsdagMainWindow(QMainWindow):
         Button.ui.LP_Button.clicked.connect(lambda : self.ui.myStackedWidget.setCurrentIndex(Modules.index(ModuleName)+1))
 
 #################################### Module Launchers ##########################################
+    @pyqtSlot()
+    def show_simple_connection(self):
+        if self.findChild(QRadioButton, 'Lap_Joint_Bolted').isChecked():
+            module_class = SimpleConnection  # Import from simple_connection.py
+        elif self.findChild(QRadioButton, 'Lap_Joint_Welded').isChecked():
+            module_class = SimpleConnection  # You might adjust parameters if needed
+        elif self.findChild(QRadioButton, 'Butt_Joint_Bolted').isChecked():
+            module_class = SimpleConnection
+        elif self.findChild(QRadioButton, 'Butt_Joint_Welded').isChecked():
+            module_class = SimpleConnection
+        else:
+            QMessageBox.about(self, "INFO", "Please select an appropriate variant")
+            return
 
+        # Launch the module's UI window using the corresponding design class.
+        self.hide()
+        self.ui2 = Ui_ModuleWindow(module_class, ' ')
+        self.ui2.show()
+        self.ui2.closed.connect(self.show)
+        
     @pyqtSlot()
     def show_shear_connection(self):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():

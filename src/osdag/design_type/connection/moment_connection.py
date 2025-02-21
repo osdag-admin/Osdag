@@ -24,6 +24,7 @@ class MomentConnection(Connection, IS800_2007):
 
         if not input_dictionary or input_dictionary[KEY_SECSIZE] == 'Select Section' or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
+            
             designation = ''
             material_grade = ''
             source = 'Custom'

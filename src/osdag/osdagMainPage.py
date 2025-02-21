@@ -148,6 +148,7 @@ from .design_type.connection.end_plate_connection import EndPlateConnection
 from .design_type.connection.base_plate_connection import BasePlateConnection
 from .design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
+from .design_type.connection.lap_joint_bolted import LapJointBolted
 from .design_type.connection.beam_cover_plate import BeamCoverPlate
 from .design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from .design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
@@ -537,7 +538,7 @@ class OsdagMainWindow(QMainWindow):
     @pyqtSlot()
     def show_simple_connection(self):
         if self.findChild(QRadioButton, 'Lap_Joint_Bolted').isChecked():
-            module_class = SimpleConnection  # Import from simple_connection.py
+            module_class =LapJointBolted  # Import from simple_connection.py
         elif self.findChild(QRadioButton, 'Lap_Joint_Welded').isChecked():
             module_class = SimpleConnection  # You might adjust parameters if needed
         elif self.findChild(QRadioButton, 'Butt_Joint_Bolted').isChecked():

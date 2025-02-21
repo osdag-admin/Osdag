@@ -346,6 +346,7 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam-to-Beam Cover Plate Welded Connection'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column Cover Plate Welded Connection'
+KEY_DISP_LAPJOINTBOLTED = 'Lap Joint Bolted Connection'
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
@@ -885,6 +886,7 @@ DISP_MIN_CLEAT_HEIGHT = 'Min. Cleat Angle Height'
 DISP_MAX_CLEAT_HEIGHT = 'Max. Cleat Angle Height'
 DISP_MIN_CLEAT_THK = 'Min. Cleat Angle Thickness (mm)'
 DISP_MIN_WIDTH = 'Minimum Width (mm)'
+
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####
@@ -937,6 +939,16 @@ KEY_DISP_MEMBERS = 'No of Members'
 
 
 # VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+
+#lapjointbolted
+KEY_PLATE1_THICKNESS = "Plate1Thickness"
+KEY_PLATE2_THICKNESS = "Plate2Thickness" 
+KEY_PLATE_WIDTH = "PlateWidth"
+KEY_DISP_PLATE1_THICKNESS = "Thickness of Plate-1 (mm) *"
+KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *"
+KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *"
+KEY_TENSILE_FORCE = "TensileForce*"
+KEY_DISP_TENSILE_FORCE = "Tensile Force (kN) *"
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
@@ -1310,6 +1322,7 @@ KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Edge Preparation Method'  # added by Danish A
 
 DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
 DISP_TITLE_BOLTD = 'Bolt Details'
+DISP_TITLE_BOLTDS = 'Bolt Design'
 DISP_TITLE_PLATED = 'Plate Details'
 
 KEY_DISP_DP_DETAILING_GAP = 'Gap Between Beam and <br>Support (mm)'
@@ -1799,6 +1812,8 @@ KEY_OUT_DISP_INTER_D_PROVIDED = 'Diameter (mm)'
 
 
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade_Provided'
+KEY_OUT_DISP_TYP_PROVIDED = 'Type'
+KEY_OUT_TYP_PROVIDED = 'Bolt.Type_Provided'
 KEY_OUT_DISP_GRD_PROVIDED = 'Property Class'
 KEY_OUT_INTER_GRD_PROVIDED = 'Bolt.InterGrade'
 KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'

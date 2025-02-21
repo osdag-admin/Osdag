@@ -261,7 +261,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
-                'Connection' : {
+                'Aum' : {
                                 'Shear Connection' : [
                                     ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
                                     ('Cleat Angle',str(files("osdag.data.ResourceFiles.images").joinpath("cleatAngle.png")),'Cleat_Angle'),

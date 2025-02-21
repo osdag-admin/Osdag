@@ -10,6 +10,8 @@ import logging
 from importlib.resources import files
 
 PATH_TO_DATABASE = files("osdag.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+#PATH_TO_DATABASE = "D:/Internship/My Forked Clone for CLI/Osdag/src/osdag/data/ResourceFiles/Database/Intg_osdag.sqlite"
+
 
 import sqlite3
 

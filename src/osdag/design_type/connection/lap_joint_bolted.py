@@ -101,7 +101,7 @@ class LapJointBolted(MomentConnection):
             ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
-        t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION, None)
+        t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
 
         return detailing

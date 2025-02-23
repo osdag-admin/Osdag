@@ -38,13 +38,24 @@ class CreateLatex(Document):
 
         does_design_exist = reportsummary['does_design_exist']
         pkg_images = files("osdag.data.ResourceFiles.images")
+        #change1
+        pkg_latex = files("osdag.data.ResourceFiles.latex-packages")
+        latex_pkg_path = str(pkg_latex).replace("\\","/")
+        #end of change
         imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options, indent=False)
-        doc.packages.append(Package('amsmath'))
-        doc.packages.append(Package('graphicx'))
-        doc.packages.append(Package('needspace'))
+        #doc.packages.append(Package('amsmath'))
+        #doc.packages.append(Package('graphicx'))
+        #doc.packages.append(Package('needspace'))
+
+        #change 2:
+        doc.packages.append(Package('amsmath',options = {'texpath':f'{latex_pkg_path}/amsmath/'}))
+        doc.packages.append(Package('graphicx',options = {'texpath':f'{latex_pkg_path}/graphics/'}))
+        doc.packages.append(Package('needspace', options={'texpath':f'{latex_pkg_path}/needspace/'}))
+        #end of change
+        
         doc.append(pyl.Command('fontsize', arguments= [8,12]))
         doc.append(pyl.Command('selectfont'))
 

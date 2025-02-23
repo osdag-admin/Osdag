@@ -21,9 +21,9 @@ class MomentConnection(Connection, IS800_2007):
     def tab_section(self, input_dictionary):
 
         "In design preference, it shows other properties of section used "
-
-        if not input_dictionary or input_dictionary[KEY_SECSIZE] == 'Select Section' or \
-                input_dictionary[KEY_MATERIAL] == 'Select Material':
+        section_value = input_dictionary.get(KEY_SECSIZE, 'Select Section')
+        material_value = input_dictionary.get(KEY_MATERIAL, 'Select Material')
+        if not input_dictionary or section_value == 'Select Section' or material_value == 'Select Material':
             
             designation = ''
             material_grade = ''
@@ -55,8 +55,8 @@ class MomentConnection(Connection, IS800_2007):
             warping_const = ''
             image = VALUES_IMG_BEAM[0]
         else:
-            designation = str(input_dictionary[KEY_SECSIZE])
-            material_grade = str(input_dictionary[KEY_MATERIAL])
+            designation = str(input_dictionary.get(KEY_SECSIZE, ''))
+            material_grade = str(input_dictionary.get(KEY_MATERIAL, ''))
             m_o_e = "200"
             m_o_r = "76.9"
             p_r = "0.3"

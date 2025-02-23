@@ -45,7 +45,6 @@ from ..design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from ..design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 from ..design_type.connection.column_end_plate import ColumnEndPlate
 from ..design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from ..design_type.connection.lap_joint_bolted import LapJointBolted
 from ..design_type.connection.base_plate_connection import BasePlateConnection
 from ..design_type.tension_member.tension_bolted import Tension_bolted
 from ..design_type.tension_member.tension_welded import Tension_welded
@@ -1850,8 +1849,6 @@ class Window(QMainWindow):
             return ColumnEndPlate
         elif name == KEY_DISP_BCENDPLATE:
             return BeamColumnEndPlate
-        elif name == KEY_DISP_LAPJOINTBOLTED:
-            return LapJointBolted
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
         elif name == KEY_DISP_TENSION_BOLTED:

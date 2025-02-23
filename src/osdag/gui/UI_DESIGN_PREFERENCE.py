@@ -479,7 +479,7 @@ class Window(QDialog):
                 pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Download_Angle.clicked.connect(lambda: self.download_Database(table="Angles", call_type="header"))
 
-        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE or KEY_DISP_LAPJOINTBOLTED:
+        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
@@ -619,7 +619,6 @@ class Window(QDialog):
         shs = connectdb("SHS", call_type="popup")
         chs = connectdb("CHS", call_type="popup")
         hs = rhs + shs
-        
         input_section = self.input_dictionary[KEY_SECSIZE]
 
         if input_section in hs:

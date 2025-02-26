@@ -5,6 +5,30 @@ import sys
 import os
 #import readline
 
+###############################       ALL FUNCTIONS        ################################
+
+VALID_MODULES = ["Fin Plate Connection", "End Plate Connection"]
+
+
+def validate_module_name(module_name):
+    if module_name.lower() in [mod.lower() for mod in VALID_MODULES]:  # Case-insensitive check
+        return True
+    else:
+        raise ValueError(f"Invalid module name: {module_name}.")
+
+
+
+
+#################################              END OF ALL FUNCTIONS     ##################################
+
+
+
+
+##################################      ALL COMMANDS                    ####################################
+
+
+
+
 @click.group()
 def cli():
     """Osdag CLI tool with interactive shell"""
@@ -28,9 +52,14 @@ def find_module(input_file):
         for line in file:
             if line.strip().startswith('Module:'):
                 module_name = line.split('Module:')[1].strip()
-                click.echo(f"Found module: {module_name}")
-                return
-        click.echo("No Module line found in the file")
+                try:
+                    validate_module_name(module_name)
+                    click.echo(f"Found module: {module_name}")
+                except ValueError as e:
+                    print(e)
+
+        #         return
+        # click.echo("No Module line found in the file")
 
 @cli.command()
 @click.option('-i', '--input-file', required=True, type=click.Path(exists=True), help='Input YAML file path')
@@ -54,3 +83,4 @@ def quit():
 
 if __name__ == '__main__':
     cli()
+

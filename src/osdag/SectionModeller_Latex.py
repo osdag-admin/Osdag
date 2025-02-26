@@ -6,6 +6,11 @@ import sys
 import datetime
 import os
 
+#change 1
+from importlib.resources import files
+from pylatex.utils import Noescape
+#end of change
+
 class CreateLatex(Document):
     def __init__(self):
         super().__init__()
@@ -36,12 +41,28 @@ class CreateLatex(Document):
         # Create right footer
         with header.create(Foot("R")):
             header.append(NoEscape(r'Page \thepage'))
+        #change 2
+        pkg_latex = files("osdag.data.ResourceFiles.latex-packages")
+        latex_pkg_path = str(pkg_latex).replace("\\","/")
+        package_dirs = [f"{latex_pkg_path}/amsmath",f"{latex_pkg_path}/graphics",f"{latex_pkg_path}/needspace"]
+        current_textinputs = os.environ.get('TEXINPUTS','')
+        separator = ";"
+        package_paths = separator.join(package_dirs)
+        os.environ['TEXINPUTS'] = f"{package_paths}{separator}{current_textinputs}"
+        #end of change2
         
         geometry_options = {"top": "1.2in", "bottom": "1in", "left": "0.6in", "right": "0.6in", "headsep": "0.8in"}
         doc = Document(geometry_options=geometry_options, indent=False)
-        doc.packages.append(Package('amsmath'))
-        doc.packages.append(Package('graphicx'))
-        doc.packages.append(Package('needspace'))
+        #doc.packages.append(Package('amsmath'))
+        #doc.packages.append(Package('graphicx'))
+        #doc.packages.append(Package('needspace'))
+
+        #change 3
+        doc.packages.append(Package('amsmath' ,options = NoEscape('')))
+        doc.packages.append(Package('graphicx', options = NoEscape('')))
+        doc.packages.append(Package('needspace',options = NoEscape('')))
+        #end of change 3
+
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
         doc.preamble.append(header)
         doc.change_document_style("header")

@@ -42,9 +42,12 @@ class CreateLatex(Document):
         #change1: location declaration , path setting
         pkg_latex = files("osdag.data.ResourceFiles.latex-packages")
         latex_pkg_path = str(pkg_latex).replace("\\","/")
+        package_dirs = [f"{latex_pkg_path}/amsmath",f"{latex_pkg_path}/graphics",",f"{latex_pkg_path}/needspace"]
         current_texinputs = os.environ.get('TEXINPUTS','')
-        os.environ['TEXINPUTS']= f"{latex_pkg_path}:"+current_texinputs
-        #end of change
+        seperator = ";"
+        package_paths = seperator.join(package_dirs)
+        os.environ['TEXINPUTS']= f"{package_paths}{seperator}{current_textinputs}"
+        #end of change 1
         
         imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")
         # Add document header

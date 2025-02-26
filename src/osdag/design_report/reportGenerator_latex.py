@@ -38,10 +38,14 @@ class CreateLatex(Document):
 
         does_design_exist = reportsummary['does_design_exist']
         pkg_images = files("osdag.data.ResourceFiles.images")
-        #change1
+        
+        #change1: location declaration , path setting
         pkg_latex = files("osdag.data.ResourceFiles.latex-packages")
         latex_pkg_path = str(pkg_latex).replace("\\","/")
+        current_texinputs = os.environ.get('TEXINPUTS','')
+        os.environ['TEXINPUTS']= f"{latex_pkg_path}:"+current_texinputs
         #end of change
+        
         imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
@@ -50,10 +54,11 @@ class CreateLatex(Document):
         #doc.packages.append(Package('graphicx'))
         #doc.packages.append(Package('needspace'))
 
-        #change 2:
-        doc.packages.append(Package('amsmath',options = {'texpath':f'{latex_pkg_path}/amsmath/'}))
-        doc.packages.append(Package('graphicx',options = {'texpath':f'{latex_pkg_path}/graphics/'}))
-        doc.packages.append(Package('needspace', options={'texpath':f'{latex_pkg_path}/needspace/'}))
+        #change 2: Noescape to prevent automatic texpath addition
+        from pylatex.utils import NoEscape
+        doc.packages.append(Package('amsmath',options = NoEscape('')))
+        doc.packages.append(Package('graphicx',options = NoEscape('')))
+        doc.packages.append(Package('needspace', options = NoEscape('')))
         #end of change
         
         doc.append(pyl.Command('fontsize', arguments= [8,12]))

@@ -108,7 +108,7 @@ class ButtJointBolted(MomentConnection):
         detailing.append(t1)
 
         t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
-              ['No', 'Yes'], values[KEY_DP_DETAILING_PACKING_PLATE])
+              ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
         detailing.append(t3)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)

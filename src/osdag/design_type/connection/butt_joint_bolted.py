@@ -1,10 +1,10 @@
 """
-Module: lap_joint_bolted.py
+Module: butt_joint_bolted.py
 Author: Aman
-Date: 2025-02-18
+Date: 2025-02-26
 
 Description:
-    LapJointBolted is a moment connection module that represents a bolted lap joint connection.
+    ButtJointBolted is a moment connection module that represents a bolted butt joint connection.
     It inherits from MomentConnection and follows the same structure and design logic as other
     connection modules (e.g., BeamCoverPlate, ColumnCoverPlate) used in Osdag.
     
@@ -23,9 +23,9 @@ import logging
 
 import math
 
-class LapJointBolted(MomentConnection):
+class ButtJointBolted(MomentConnection):
     def __init__(self):
-        super(LapJointBolted, self).__init__()
+        super(ButtJointBolted, self).__init__()
         self.design_status = False
         self.spacing = None 
 
@@ -58,7 +58,9 @@ class LapJointBolted(MomentConnection):
         
         # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE  # For edge preparation method
+            KEY_DP_DETAILING_EDGE_TYPE,
+            KEY_DP_DETAILING_PACKING_PLATE
+                # For edge preparation method
         ]))
         
         return design_input
@@ -71,7 +73,7 @@ class LapJointBolted(MomentConnection):
             KEY_DP_BOLT_TYPE,
             KEY_DP_BOLT_HOLE_TYPE, 
             KEY_DP_BOLT_SLIP_FACTOR,
-            KEY_DP_DETAILING_EDGE_TYPE
+            KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_PACKING_PLATE
         ], ''))
         
         return design_input
@@ -82,13 +84,15 @@ class LapJointBolted(MomentConnection):
             KEY_DP_BOLT_TYPE: "Non Pre-tensioned",
             KEY_DP_BOLT_HOLE_TYPE: "Standard",
             KEY_DP_BOLT_SLIP_FACTOR: "0.3",
-            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut"
+            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+            KEY_DP_DETAILING_PACKING_PLATE: "Yes"
         }
         return defaults.get(key)
 
     def detailing_values(self, input_dictionary):
         values = {
-            KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut'
+            KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
+            KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
         }
 
         for key in values.keys():
@@ -102,6 +106,11 @@ class LapJointBolted(MomentConnection):
             ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
+
+        t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
+              ['No', 'Yes'], values[KEY_DP_DETAILING_PACKING_PLATE])
+        detailing.append(t3)
+
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
 
@@ -189,7 +198,7 @@ class LapJointBolted(MomentConnection):
 
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_LAPJOINTBOLTED, TYPE_MODULE, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_BUTTJOINTBOLTED, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
@@ -206,6 +215,9 @@ class LapJointBolted(MomentConnection):
 
         t35 = (KEY_PLATE_WIDTH, KEY_DISP_PLATE_WIDTH, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t35)
+
+        t36 = (KEY_COVER_PLATE, KEY_DISP_COVER_PLATE, TYPE_COMBOBOX, VALUES_COVER_PLATE, True, 'No Validator')
+        options_list.append(t36)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
@@ -297,6 +309,10 @@ class LapJointBolted(MomentConnection):
         out_list.append(t17)
         t17 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, '', True)
         out_list.append(t17)
+        
+        t11 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX, '', True) 
+        out_list.append(t11)
+
         t18 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX,'', True)
         out_list.append(t18)
 
@@ -306,14 +322,14 @@ class LapJointBolted(MomentConnection):
         t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True)
         out_list.append(t20)
         
-        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
-        out_list.append(t21)
+        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
+        # out_list.append(t21)
 
         return out_list
 
     def module_name(self):
 
-        return KEY_DISP_LAPJOINTBOLTED
+        return KEY_DISP_BUTTJOINTBOLTED
 
     def call_3DColumn(self, ui, bgcolor):
         # status = self.resultObj['Bolt']['status']

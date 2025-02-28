@@ -347,6 +347,8 @@ KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam-to-Beam Cover Plate Welded Connection'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column Cover Plate Welded Connection'
 KEY_DISP_LAPJOINTBOLTED = 'Lap Joint Bolted Connection'
+KEY_DISP_LAPJOINTWELDED = 'Lap Joint Welded Connection'
+KEY_DISP_BUTTJOINTBOLTED = 'Butt Joint Bolted Connection'
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
@@ -804,7 +806,7 @@ KEY_DP_WELD_TYPE = 'Weld.Type'
 KEY_DP_DETAILING_EDGE_TYPE = 'Detailing.Edge_type'
 KEY_DP_DETAILING_GAP = 'Detailing.Gap'
 KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences'
-
+KEY_DP_DETAILING_PACKING_PLATE  = 'Detailing.Packing_Plate'
 KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 
 ###################
@@ -823,6 +825,7 @@ VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irrev
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
+VALUES_COVER_PLATE = ['Single-Cover', 'Double-Cover']
 
 # TODO: Every one is requested to use VALUES_ALL_CUSTOMIZED key instead of all other keys
 VALUES_ALL_CUSTOMIZED = ['All', 'Customized']
@@ -995,6 +998,9 @@ KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *"
 KEY_TENSILE_FORCE = "TensileForce*"
 KEY_DISP_TENSILE_FORCE = "Tensile Force (kN) *"
 
+KEY_COVER_PLATE = "ButtJoint.CoverPlate"
+KEY_DISP_COVER_PLATE = "Cover Plate"
+
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
 KEY_DISP_LOCATION_STRUT = 'Connection *'
@@ -1028,7 +1034,7 @@ DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner Plate '
 KEY_DISP_SLENDER = 'Slenderness ratio'
 
 
-KEY_DISP_PLATETHK = 'Thickness (mm) *'
+KEY_DISP_PLATE = 'Thickness (mm) *'
 KEY_DISP_DPPLATETHK = 'Endplate thickness, T (mm)'
 KEY_DISP_DPPLATETHK01 = 'Endplate thickness, Tp (mm)'
 
@@ -1381,6 +1387,7 @@ KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the Members Exposed to <br> Co
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the Members Exposed to Corrosive Influences?'
 KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
+KEY_DISP_DP_DETAILING_PACKING_PLATE = 'Packing Plate'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate Analysis'
 KEY_DISP_GAP = 'Gap Between Members (mm)'
@@ -1882,6 +1889,9 @@ KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
+KEY_OUT_BOLT_CONN_LEN = 'Bolt.ConnLength'
+KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
+
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
@@ -2343,7 +2353,9 @@ DISP_TITLE_FL = 'Factored loads'
 KEY_AXFOR = 'Axial Force'
 KEY_DISP_AXFOR = 'Axial Force (kN)*'
 KEY_PLTHK = 'Plate thk'
+KEY_PK_PLTHK = 'PackingPlate thk'
 KEY_DISP_PLTHK = 'Plate thk (mm)'
+KEY_DISP_PK_PLTHK = 'Packing Plate thickness (mm)'
 KEY_PLTHICK = 'Plate thk'
 KEY_DISP_PLTHICK = 'Plate Thickness (mm)'
 KEY_DISP_PLATE_THICK = 'Plate Thickness (mm)'

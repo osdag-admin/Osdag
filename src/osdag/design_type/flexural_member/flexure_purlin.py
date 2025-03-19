@@ -233,13 +233,13 @@ class Flexure_Purlin(Member):
             Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
         '''
 
-        self.module = KEY_DISP_FLEXURE3
+        self.module = KEY_DISP_FLEXURE4
         options_list = []
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t1 = (KEY_MODULE, KEY_DISP_FLEXURE2, TYPE_MODULE, None, True, "No Validator")
+        t1 = (KEY_MODULE, KEY_DISP_FLEXURE4, TYPE_MODULE, None, True, "No Validator")
         options_list.append(t1)
 
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE4, True,
@@ -804,7 +804,7 @@ class Flexure_Purlin(Member):
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = KEY_Flexure_Member_MAIN_MODULE
+        self.mainmodule = KEY_DISP_FLEXURE4
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.sec_list = design_dictionary[KEY_SECSIZE]
         print(f"\n Inside set_input_values{self.sec_profile}")

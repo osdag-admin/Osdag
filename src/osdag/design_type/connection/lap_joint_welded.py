@@ -23,12 +23,11 @@ import logging
 
 import math
 
-class LapJointBolted(MomentConnection):
+class LapJointWelded(MomentConnection):
     def __init__(self):
-        super(LapJointBolted, self).__init__()
+        super(LapJointWelded, self).__init__()
         self.design_status = False
         self.spacing = None 
-        self.bolt_type = None
 
     ###############################################
     # Design Preference Functions Start
@@ -281,7 +280,7 @@ class LapJointBolted(MomentConnection):
         out_list.append(t3)
 
         t31 = (KEY_OUT_TYP_PROVIDED, KEY_OUT_DISP_TYP_PROVIDED, TYPE_TEXTBOX,
-              "Hello" if flag else '' , True)
+              '', True)
         out_list.append(t31)
 
         t8 = (KEY_OUT_BOLT_SHEAR,KEY_OUT_DISP_BOLT_SHEAR , TYPE_TEXTBOX, '', True)
@@ -293,10 +292,6 @@ class LapJointBolted(MomentConnection):
         t5 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
               '', True)
         out_list.append(t5)
-
-        t500 = (KEY_OUT_BOLT_SLIP, KEY_OUT_DISP_BOLT_SLIP, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t500)
 
         t17 = (None, DISP_TITLE_BOLTDS, TYPE_TITLE, None, True)
         out_list.append(t17)
@@ -310,14 +305,9 @@ class LapJointBolted(MomentConnection):
 
         t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True)
         out_list.append(t20)
-
-        t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,'', True)
-        out_list.append(t29)
         
         t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         out_list.append(t21)
-
-
 
         return out_list
 
@@ -378,57 +368,12 @@ class LapJointBolted(MomentConnection):
         else:
             flag = True
         if flag  and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            # self.set_input_values(self, design_dictionary)
             # print("DESIGN DICT" + str(design_dictionary))
-            # print("succsess")
+            print("succsess")
         else:
             return all_errors
 
-
-    def set_input_values(self, design_dictionary):
-
-        "initialisation of components required to design a tension member along with connection"
-
-        # super(LapJointBolted,self).set_input_values(self, design_dictionary)
-        # self.module = design_dictionary[KEY_MODULE]
-        # # self.loc = design_dictionary[KEY_LOCATION]
-        # self.main_material = design_dictionary[KEY_MATERIAL]
-        # self.material = design_dictionary[KEY_SEC_MATERIAL]
-
-        self.bolt_type = design_dictionary[KEY_TYP]
-        print("self.bolt_type", self.bolt_type)
-
-        # self.width = float(design_dictionary[KEY_LENGTH])
-        # # print(self.bolt)
-        # self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
-        self.efficiency = 0.0
-        self.K = 1
-        # self.previous_size = []
-        # self.plate1 = Plate(thickness=design_dictionary.get(KEY_PLATE1_THICKNESS, None),
-        #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-        
-        # self.plate2 = Plate(thickness=design_dictionary.get(KEY_PLATE2_THICKNESS, None),
-        #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-
-        # self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
-        #                  bolt_type=design_dictionary[KEY_TYP],
-        #                  bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-        #                  edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-        #                  mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
-        #                  corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
-        self.count = 0
-        self.member_design_status = False
-        self.max_limit_status_1 = False
-        self.max_limit_status_2 = False
-        self.bolt_design_status = False
-        self.plate_design_status = False
-        # self.inter_status = False
-        self.thk_count =0
-
-        print("The input values are set. Performing preliminary member check(s).")
-        # self.i = 0
-        print("passed")
-        # self.initial_member_capacity(self,design_dictionary)
 
     def call_3DColumn(self, ui, bgcolor):
         # status = self.resultObj['Bolt']['status']

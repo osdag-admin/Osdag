@@ -1034,7 +1034,7 @@ DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner Plate '
 KEY_DISP_SLENDER = 'Slenderness ratio'
 
 
-KEY_DISP_PLATE = 'Thickness (mm) *'
+KEY_DISP_PLATETHK = 'Thickness (mm) *'
 KEY_DISP_DPPLATETHK = 'Endplate thickness, T (mm)'
 KEY_DISP_DPPLATETHK01 = 'Endplate thickness, Tp (mm)'
 
@@ -1890,6 +1890,8 @@ KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
 KEY_OUT_BOLT_CONN_LEN = 'Bolt.ConnLength'
+KEY_UTILIZATION_RATIO = 'Bolt.UtilizationRatio'
+KEY_DISP_UTILIZATION_RATIO = 'Utilization Ratio'
 KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
 
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
@@ -1910,6 +1912,7 @@ KEY_OUT_DISP_BETA_LG = 'β<sub>lg</sub>'
 KEY_OUT_BETA_PK = 'Bolt.Betapk'
 KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
+KEY_OUT_BOLT_SLIP = 'Bolt.Slip'
 KEY_OUT_DISP_BOLT_SLIP_DR = 'Slip Resistance (kN)'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_BOLT_CAPACITY_SPTD = 'Bolt.Capacity_sptd'

@@ -26,6 +26,7 @@ from .items.rect_hollow import RectHollow
 from .items.circular_hollow import CircularHollow
 from .items.double_angles import BackToBackAnglesWithGussetsSameSide
 from .items.double_angles import BackToBackAnglesWithGussetsOppSide
+from .items.purlin import *
 
 from .ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from .ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -1847,6 +1848,30 @@ class CommonDesignLogic(object):
 
         return sec 
     
+    def createPurlin(self):
+
+        Flex = self.module_class
+        print(f"This is the module name {Flex}")
+        
+        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
+        print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
+        print(f"Flex.section_property.depth : {Flex.section_property.depth}")
+        print(f"Flex.section_property.flange_width : {Flex.section_property.flange_width}")
+        print(f"Flex.section_property.root_radius : {Flex.section_property.root_radius}")
+        print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
+        print(f"Flex.support : {Flex.support}")
+        print(dir(Flex.section_property))
+        purlin=create_c_section(length = Flex.length*1000, 
+        depth = Flex.section_property.depth, 
+        flange_width = Flex.section_property.flange_width, 
+        web_thickness = Flex.section_property.web_thickness,
+        flange_thickness = Flex.section_property.flange_thickness)
+
+        return purlin
+
+
+    
     def createStrutsInTrusses(self):
         Col = self.module_class
         Col.section_property = AngleComponent(designation = Col.result_designation, material_grade = Col.material)
@@ -2283,6 +2308,14 @@ class CommonDesignLogic(object):
             if self.component == "Model":
                 osdag_display_shape(self.display, self.FObj, update=True)
 
+        elif self.mainmodule == 'Flexural Members - Purlins':
+            self.flex = self.module_class()
+            print(f"THIS IS SELF.MODULE_CLASS {self.flex}")
+            self.FObj = self.createPurlin()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.FObj, update=True)
+
         elif self.mainmodule == 'Struts in Trusses':
             self.col = self.module_class()
             self.ColObj = self.createStrutsInTrusses()
@@ -2454,6 +2487,14 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Flexural Members - Cantilever':
             if flag is True:
                 self.FObj = self.createCantileverBeam()
+
+                self.display_3DModel("Model", "gradient_bg")
+            else:
+                self.display.EraseAll()
+        
+        elif self.mainmodule == 'Flexural Members - Purlins':
+            if flag is True:
+                self.FObj = self.createPurlin()
 
                 self.display_3DModel("Model", "gradient_bg")
             else:

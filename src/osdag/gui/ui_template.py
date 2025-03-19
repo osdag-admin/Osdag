@@ -3,6 +3,8 @@ import yaml
 import shutil
 import time
 import pandas as pd
+import subprocess
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -54,6 +56,7 @@ from ..design_type.compression_member.compression import Compression
 from ..design_type.flexural_member.flexure import Flexure
 from ..design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from ..design_type.flexural_member.flexure_othersupp import Flexure_Misc
+from ..design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from ..gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -1865,6 +1868,8 @@ class Window(QMainWindow):
             return Flexure_Cantilever
         elif name == KEY_DISP_FLEXURE3:
             return Flexure_Misc
+        elif name == KEY_DISP_FLEXURE4:
+            return Flexure_Purlin
         else:
             return GussetConnection
 # Function for getting inputs from a file
@@ -2104,7 +2109,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
-                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut]: # , KEY_DISP_FLEXURE
+                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_FLEXURE3,KEY_DISP_FLEXURE4,KEY_DISP_COMPRESSION_Strut]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
                 print(f"main object type: {type(main)}")
@@ -2112,7 +2117,7 @@ class Window(QMainWindow):
                 print("main.mainmodule",main.mainmodule)
 
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                print(main.module)
+                print(f"This is MAIN.MODULE {main.module}")
                 print(main.mainmodule)
                 # print("common start")
                 status = main.design_status
@@ -2171,8 +2176,17 @@ class Window(QMainWindow):
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
         shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
 
+    # def output_button_connect(self, main, button_list, b):
+    #     b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
     def output_button_connect(self, main, button_list, b):
-        b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
+        b.clicked.connect(lambda: self.run_spacing_script())
+
+    def run_spacing_script(self):
+        script_path = os.path.join(os.path.dirname(__file__), "spacing.py")
+        if os.path.exists(script_path):
+            subprocess.Popen([sys.executable, script_path], shell=True)
+        else:
+            print("spacing.py not found!")
 
     def output_button_dialog(self, main, button_list, button):
 

@@ -948,5 +948,49 @@ def do_stuff():
     except BaseException as e:
         print("ERROR", e)
 
+
+import cProfile
+import pstats
+import threading
+import keyboard  # Install with `pip install keyboard`
+
+profiler = cProfile.Profile()
+
+def start_profiling():
+    print("Profiling started...")
+    profiler.enable()
+
+def stop_profiling():
+    print("Profiling stopped...")
+    profiler.disable()
+    profiler.dump_stats("profile_output")
+    
+    stats = pstats.Stats("profile_output")
+    stats.sort_stats("time")
+    
+    # Print to console
+    stats.print_stats(50)
+    
+    # Save output to a text file
+    with open("profile_output.txt", "w") as f:
+        stats.stream = f
+        stats.print_stats(50)
+
+    print("Profile output saved to profile_output.txt")
+
+
+# Run profiling triggers in a separate thread to avoid blocking Osdag
+def listen_for_keys():
+    keyboard.add_hotkey('p', start_profiling)  # Press 'p' to start
+    keyboard.add_hotkey('s', stop_profiling)   # Press 's' to stop
+    keyboard.wait('esc')  # Keep listening until 'esc' is pressed
+
+# Start the keyboard listener in the background
+threading.Thread(target=listen_for_keys, daemon=True).start()
+
+def main():
+    while True:
+        do_stuff()  # Your main Osdag loop
+
 if __name__ == '__main__':
-    do_stuff()
+    main()

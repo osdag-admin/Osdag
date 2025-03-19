@@ -149,8 +149,9 @@ from .design_type.connection.base_plate_connection import BasePlateConnection
 from .design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
 from .design_type.connection.lap_joint_bolted import LapJointBolted
-# from .design_type.connection.lap_joint_welded import LapJointWelded
+from .design_type.connection.lap_joint_welded import LapJointWelded
 from .design_type.connection.butt_joint_bolted import ButtJointBolted
+from .design_type.connection.butt_joint_welded import ButtJointWelded
 from .design_type.connection.beam_cover_plate import BeamCoverPlate
 from .design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from .design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
@@ -548,7 +549,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.findChild(QRadioButton, 'Butt_Joint_Bolted').isChecked():
             module_class = ButtJointBolted
         elif self.findChild(QRadioButton, 'Butt_Joint_Welded').isChecked():
-            module_class = SimpleConnection
+            module_class = ButtJointWelded
         else:
             QMessageBox.about(self, "INFO", "Please select an appropriate variant")
             return

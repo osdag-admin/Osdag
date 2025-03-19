@@ -1,10 +1,10 @@
 """
-Module: lap_joint_bolted.py
+Module: butt_joint_bolted.py
 Author: Aman
-Date: 2025-02-18
+Date: 2025-02-26
 
 Description:
-    LapJointBolted is a moment connection module that represents a bolted lap joint connection.
+    ButtJointBolted is a moment connection module that represents a bolted butt joint connection.
     It inherits from MomentConnection and follows the same structure and design logic as other
     connection modules (e.g., BeamCoverPlate, ColumnCoverPlate) used in Osdag.
     
@@ -23,12 +23,11 @@ import logging
 
 import math
 
-class LapJointBolted(MomentConnection):
+class ButtJointWelded(MomentConnection):
     def __init__(self):
-        super(LapJointBolted, self).__init__()
+        super(ButtJointWelded, self).__init__()
         self.design_status = False
         self.spacing = None 
-        self.bolt_type = None
 
     ###############################################
     # Design Preference Functions Start
@@ -59,7 +58,9 @@ class LapJointBolted(MomentConnection):
         
         # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE  # For edge preparation method
+            KEY_DP_DETAILING_EDGE_TYPE,
+            KEY_DP_DETAILING_PACKING_PLATE
+                # For edge preparation method
         ]))
         
         return design_input
@@ -72,7 +73,7 @@ class LapJointBolted(MomentConnection):
             KEY_DP_BOLT_TYPE,
             KEY_DP_BOLT_HOLE_TYPE, 
             KEY_DP_BOLT_SLIP_FACTOR,
-            KEY_DP_DETAILING_EDGE_TYPE
+            KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_PACKING_PLATE
         ], ''))
         
         return design_input
@@ -83,13 +84,15 @@ class LapJointBolted(MomentConnection):
             KEY_DP_BOLT_TYPE: "Non Pre-tensioned",
             KEY_DP_BOLT_HOLE_TYPE: "Standard",
             KEY_DP_BOLT_SLIP_FACTOR: "0.3",
-            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut"
+            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+            KEY_DP_DETAILING_PACKING_PLATE: "Yes"
         }
         return defaults.get(key)
 
     def detailing_values(self, input_dictionary):
         values = {
-            KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut'
+            KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
+            KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
         }
 
         for key in values.keys():
@@ -103,6 +106,11 @@ class LapJointBolted(MomentConnection):
             ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
+
+        t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
+              ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
+        detailing.append(t3)
+
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
 
@@ -190,7 +198,7 @@ class LapJointBolted(MomentConnection):
 
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_LAPJOINTBOLTED, TYPE_MODULE, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_BUTTJOINTBOLTED, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
@@ -207,6 +215,9 @@ class LapJointBolted(MomentConnection):
 
         t35 = (KEY_PLATE_WIDTH, KEY_DISP_PLATE_WIDTH, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t35)
+
+        t36 = (KEY_COVER_PLATE, KEY_DISP_COVER_PLATE, TYPE_COMBOBOX, VALUES_COVER_PLATE, True, 'No Validator')
+        options_list.append(t36)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
@@ -281,7 +292,7 @@ class LapJointBolted(MomentConnection):
         out_list.append(t3)
 
         t31 = (KEY_OUT_TYP_PROVIDED, KEY_OUT_DISP_TYP_PROVIDED, TYPE_TEXTBOX,
-              "Hello" if flag else '' , True)
+              '', True)
         out_list.append(t31)
 
         t8 = (KEY_OUT_BOLT_SHEAR,KEY_OUT_DISP_BOLT_SHEAR , TYPE_TEXTBOX, '', True)
@@ -294,14 +305,14 @@ class LapJointBolted(MomentConnection):
               '', True)
         out_list.append(t5)
 
-        t500 = (KEY_OUT_BOLT_SLIP, KEY_OUT_DISP_BOLT_SLIP, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t500)
-
         t17 = (None, DISP_TITLE_BOLTDS, TYPE_TITLE, None, True)
         out_list.append(t17)
         t17 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, '', True)
         out_list.append(t17)
+        
+        t11 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX, '', True) 
+        out_list.append(t11)
+
         t18 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX,'', True)
         out_list.append(t18)
 
@@ -310,125 +321,15 @@ class LapJointBolted(MomentConnection):
 
         t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True)
         out_list.append(t20)
-
-        t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,'', True)
-        out_list.append(t29)
         
-        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
-        out_list.append(t21)
-
-
+        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
+        # out_list.append(t21)
 
         return out_list
 
     def module_name(self):
 
-        return KEY_DISP_LAPJOINTBOLTED
-    
-    def func_for_validation(self, design_dictionary):
-
-        all_errors = []
-        "check valid inputs and empty inputs in input dock"
-        # print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
-        self.design_status = False
-
-        flag = False
-        flag1 = False
-        flag2 = False
-        # self.include_status = True
-
-        option_list = self.input_values(self)
-        missing_fields_list = []
-
-        print(f'\n func_for_validation option list = {option_list}'
-              f'\n  design_dictionary {design_dictionary}')
-
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-
-                    print(f"\n option {option}")
-
-                    missing_fields_list.append(option[1])
-                else:
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_PLATE_WIDTH:
-                        # val = option[4]
-                        # print(design_dictionary[option[0]], "jhvhj")
-                        if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Input value(s) cannot be equal or less than zero."
-                            all_errors.append(error)
-                        else:
-                            flag1 = True
-
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
-
-                        if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Input value(s) cannot be equal or less than zero."
-                            all_errors.append(error)
-                        else:
-                            flag2 = True
-            else:
-                pass
-
-
-        if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            # flag = False
-        else:
-            flag = True
-        if flag  and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
-            # print("DESIGN DICT" + str(design_dictionary))
-            # print("succsess")
-        else:
-            return all_errors
-
-
-    def set_input_values(self, design_dictionary):
-
-        "initialisation of components required to design a tension member along with connection"
-
-        # super(LapJointBolted,self).set_input_values(self, design_dictionary)
-        # self.module = design_dictionary[KEY_MODULE]
-        # # self.loc = design_dictionary[KEY_LOCATION]
-        # self.main_material = design_dictionary[KEY_MATERIAL]
-        # self.material = design_dictionary[KEY_SEC_MATERIAL]
-
-        self.bolt_type = design_dictionary[KEY_TYP]
-        print("self.bolt_type", self.bolt_type)
-
-        # self.width = float(design_dictionary[KEY_LENGTH])
-        # # print(self.bolt)
-        # self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
-        self.efficiency = 0.0
-        self.K = 1
-        # self.previous_size = []
-        # self.plate1 = Plate(thickness=design_dictionary.get(KEY_PLATE1_THICKNESS, None),
-        #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-        
-        # self.plate2 = Plate(thickness=design_dictionary.get(KEY_PLATE2_THICKNESS, None),
-        #                    material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-
-        # self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
-        #                  bolt_type=design_dictionary[KEY_TYP],
-        #                  bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-        #                  edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-        #                  mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
-        #                  corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
-        self.count = 0
-        self.member_design_status = False
-        self.max_limit_status_1 = False
-        self.max_limit_status_2 = False
-        self.bolt_design_status = False
-        self.plate_design_status = False
-        # self.inter_status = False
-        self.thk_count =0
-
-        print("The input values are set. Performing preliminary member check(s).")
-        # self.i = 0
-        print("passed")
-        # self.initial_member_capacity(self,design_dictionary)
+        return KEY_DISP_BUTTJOINTBOLTED
 
     def call_3DColumn(self, ui, bgcolor):
         # status = self.resultObj['Bolt']['status']
@@ -464,21 +365,6 @@ class LapJointBolted(MomentConnection):
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
-    
-    def warn_text(self):
-
-        """
-        Function to give logger warning when any old value is selected from Column and Beams table.
-        """
-
-        # @author Arsil Zunzunia
-        global logger
-        red_list = red_list_function()
-        if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
-            logger.warning(
-                " : You are using a section (in red color) that is not available in latest version of IS 808")
-            logger.info(
-                " : You are using a section (in red color) that is not available in latest version of IS 808")
 
 
     ################################ Outlist Dict #####################################################################################

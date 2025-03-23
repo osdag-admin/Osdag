@@ -89,6 +89,7 @@ import time
 from importlib.resources import files
 import urllib.request
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QPushButton, QWidget # added by aumghelani for automation
 from .update_version_check import Update
 #from Thread import timer
 from .get_DPI_scale import scale
@@ -246,13 +247,15 @@ class LeftPanelButton(QWidget):          # Custom Button widget for the Left Pan
         self.ui.setupUi(self,scale)
         self.ui.LP_Button.setText(text)  #LP_Button is the QPushButton widget inside the LeftPanelButton Widget
 
-
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
+        
+        # Add folder attribute 
+        self.folder = os.path.join(os.path.dirname(__file__), '')
 
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
@@ -261,6 +264,10 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
+                'Input' : [
+                    ('Load Input File', str(files("osdag.data.ResourceFiles.images").joinpath("input.png")), 'Input_File'),
+                    self.show_input_dialog
+                ],  #Input is added by @aumghelani
                 'Connections' : {
                                 'Shear Connection' : [
                                     ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
@@ -750,6 +757,76 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(PlateGirderWelded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+#@aumghelani added this function
+    def show_input_dialog(self):
+        # Define the key locally if imports aren't working
+        from osdag.Common import KEY_MODULE
+        import yaml
+        from PyQt5.QtCore import QTimer
+        
+        fileName, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open Input File",
+            os.path.join(str(self.folder)),
+            "Input Files (*.osi);;All Files (*.*)"
+        )
+
+        if not fileName:
+            return None  # No file selected
+
+        try:
+            # Read the file to determine the module
+            with open(fileName, 'r') as fileObject:
+                uiObj = yaml.safe_load(fileObject)
+                module_name = uiObj[KEY_MODULE]
+
+            module_map = {
+                'Fin Plate Connection': FinPlateConnection,
+                'Cleat Angle Connection': CleatAngleConnection,
+                'End Plate Connection': EndPlateConnection,
+                'Seated Angle Connection': SeatedAngleConnection,
+                'Base Plate Connection': BasePlateConnection
+            }
+
+            if module_name in module_map:
+                self.hide()
+                
+                # Create module instance without any arguments
+                module_instance = module_map[module_name]()
+                
+                # Store the filename for later use
+                self.temp_filename = fileName
+                
+                # Create UI without additional setup that might trigger the problematic method
+                self.ui2 = Ui_ModuleWindow(main=module_instance, folder=self.folder)
+                
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                
+                # Set up a one-time event handler that runs after the UI is fully loaded
+                def delayed_loading():
+                    try:
+                        if hasattr(self.ui2.ui, 'loadDesign_inputs_from_existing_file'):
+                            # Directly call the method without passing module reference
+                            # The method should access its own module reference
+                            self.ui2.ui.loadDesign_inputs_from_existing_file(self.temp_filename, None)
+                    except Exception as e:
+                        print(f"Error loading inputs: {str(e)}")
+                
+                # Use a timer to ensure UI is fully loaded before attempting to load inputs
+                QTimer.singleShot(500, delayed_loading)
+                
+                return module_name
+            else:
+                QMessageBox.warning(self, "Warning", f"Module '{module_name}' not recognized or not implemented yet.")
+                    
+            return module_name
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Could not process file: {str(e)}")
+            return None
+
+
 
 ################################# Help Actions ############################################
 

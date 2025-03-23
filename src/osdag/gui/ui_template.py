@@ -97,7 +97,7 @@ class DummyThread(QThread):
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
     resized = QtCore.pyqtSignal()
     closed = pyqtSignal()
-    def  __init__(self, main,folder,parent=None):
+    def __init__(self, main,folder,parent=None):
         super(Ui_ModuleWindow, self).__init__(parent=parent)
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
@@ -451,6 +451,7 @@ class Window(QMainWindow):
             self.chkbox_connect(main, checkBox, function_name)
             checkBox.resize(checkBox.sizeHint())
             i += (checkBox.sizeHint().width() + 5)
+            
 
         self.verticalLayout_2.addWidget(self.frame)
         self.splitter = QtWidgets.QSplitter(self.centralwidget)
@@ -1868,6 +1869,48 @@ class Window(QMainWindow):
             return Flexure_Misc
         else:
             return GussetConnection
+        
+#Function for getting inputs from a existing file which is passed in input 
+
+    '''
+    @author: aumghelani
+    '''
+
+    def loadDesign_inputs_from_existing_file(self, fileName, main):
+        try:
+            with open(fileName, 'r') as fileObject:
+                uiObj = yaml.safe_load(fileObject)
+
+            module = uiObj[KEY_MODULE]
+
+            # ✅ Get module name from `main`, ensuring it's the correct module instance
+            if hasattr(main, 'module_name'):
+                selected_module = main.module_name()
+            else:
+                selected_module = None
+
+            if selected_module == module:
+                self.ui_loaded = False
+                self.setDictToUserInputs(uiObj, [], {}, [])  # Populate fields
+                self.ui_loaded = True
+                self.output_title_change(main)
+                print(f"🔍 Expected Module: '{module}'")
+                print(f"🔍 Detected Module: '{selected_module}'")
+                print(f"🔍 Match Status: {selected_module == module}")
+                print(f"🔍 self.module: {self.module}")
+                print(f"🔍 module_name: {self.module.module_name()}")
+
+
+            else:
+                QMessageBox.information(self, "Information", "Please load the appropriate Input")
+                return
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file", f"There was an error opening \"{fileName}\"")
+            return
+
+
+
 # Function for getting inputs from a file
     '''
     @author: Umair

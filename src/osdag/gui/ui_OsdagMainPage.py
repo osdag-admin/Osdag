@@ -65,6 +65,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_help.setAutoFillBackground(False)
         self.comboBox_help.setFrame(True)
         self.comboBox_help.setObjectName("comboBox_help")
+        self.comboBox_help.addItem("") #@aumghelani edit
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")

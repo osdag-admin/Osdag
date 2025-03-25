@@ -757,7 +757,13 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(PlateGirderWelded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-#@aumghelani added this function
+  
+  
+#Function for getting inputs from main page in application  
+    '''
+    @author: aumghelani
+    '''
+    
     def show_input_dialog(self):
         # Define the key locally if imports aren't working
         from osdag.Common import KEY_MODULE

@@ -1889,25 +1889,32 @@ class Window(QMainWindow):
             else:
                 selected_module = None
 
+            # ✅ Debugging Prints
+            print(" Function Called: loadDesign_inputs_from_existing_file()")
+            print(f" File Name: {fileName}")
+            print(f" Parsed Module: '{module}'")
+            print(f" Selected Module: '{selected_module}'")
+            print(f" Match Status: {selected_module == module}")
+
+            QMessageBox.information(self, "Debug", f"Module from file: {module}\nDetected module: {selected_module}\nMatch: {selected_module == module}")
+
             if selected_module == module:
                 self.ui_loaded = False
                 self.setDictToUserInputs(uiObj, [], {}, [])  # Populate fields
                 self.ui_loaded = True
                 self.output_title_change(main)
-                print(f"🔍 Expected Module: '{module}'")
-                print(f"🔍 Detected Module: '{selected_module}'")
-                print(f"🔍 Match Status: {selected_module == module}")
-                print(f"🔍 self.module: {self.module}")
-                print(f"🔍 module_name: {self.module.module_name()}")
 
+                print(f"🎯 self.module: {self.module}")
+                print(f"🎯 module_name: {self.module.module_name()}")
 
             else:
-                QMessageBox.information(self, "Information", "Please load the appropriate Input")
+                QMessageBox.information(self, "Information", "❌ Please load the appropriate Input")
                 return
 
         except IOError:
-            QMessageBox.information(self, "Unable to open file", f"There was an error opening \"{fileName}\"")
+            QMessageBox.information(self, "Error", f"⚠️ Unable to open file: {fileName}")
             return
+
 
 
 

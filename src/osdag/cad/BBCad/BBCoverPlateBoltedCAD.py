@@ -254,10 +254,25 @@ class BBCoverPlateBoltedCAD(object):
         Getting the bolt arrangement of top flange and forming a group or array out of it.
         '''
         nut_bolts = self.nut_bolt_array_AF.get_modelsAF()
+        if not nut_bolts:
+            return None
+            
+        # Use a more efficient approach to fuse multiple shapes
         array = nut_bolts[0]
-        for comp in nut_bolts:
-            array = BRepAlgoAPI_Fuse(comp, array).Shape()
-
+        if len(nut_bolts) > 1:
+            # Create a compound first, then fuse only once
+            from OCC.Core.TopoDS import TopoDS_Compound
+            from OCC.Core.BRep import BRep_Builder
+            
+            compound = TopoDS_Compound()
+            builder = BRep_Builder()
+            builder.MakeCompound(compound)
+            
+            for comp in nut_bolts:
+                builder.Add(compound, comp)
+                
+            array = BRepAlgoAPI_Fuse(nut_bolts[0], compound).Shape()
+        
         return array
 
     def get_nutboltmodelsBF(self):
@@ -265,26 +280,47 @@ class BBCoverPlateBoltedCAD(object):
         Getting the bolt arrangement of bottom flange and forming a group or array out of it.
         '''
         nut_bolts = self.nut_bolt_array_BF.get_modelsBF()
-        array = nut_bolts[0]
-        for comp in nut_bolts:
-            array = BRepAlgoAPI_Fuse(comp, array).Shape()
-
+        if not nut_bolts:
+            return None
+            
+        # Use a more efficient approach to fuse multiple shapes
+        from OCC.Core.TopoDS import TopoDS_Compound
+        from OCC.Core.BRep import BRep_Builder
+        
+        compound = TopoDS_Compound()
+        builder = BRep_Builder()
+        builder.MakeCompound(compound)
+        
+        for comp in nut_bolts[1:]:  # Add all but the first to compound
+            builder.Add(compound, comp)
+            
+        array = BRepAlgoAPI_Fuse(nut_bolts[0], compound).Shape()
+        
         return array
-
-
 
     def get_nutboltmodelsWeb(self):
         '''
         Getting the bolt arrangement of web and forming a group or array out of it.
         '''
         nut_bolts = self.nut_bolt_array_Web.get_modelsW()
-        array = nut_bolts[0]
-        for comp in nut_bolts:
-            array = BRepAlgoAPI_Fuse(comp, array).Shape()
-
+        if not nut_bolts:
+            return None
+            
+        # Use a more efficient approach to fuse multiple shapes
+        from OCC.Core.TopoDS import TopoDS_Compound
+        from OCC.Core.BRep import BRep_Builder
+        
+        compound = TopoDS_Compound()
+        builder = BRep_Builder()
+        builder.MakeCompound(compound)
+        
+        for comp in nut_bolts[1:]:  # Add all but the first to compound
+            builder.Add(compound, comp)
+            
+        array = BRepAlgoAPI_Fuse(nut_bolts[0], compound).Shape()
+        
         return array
-
-
+    
     # Below methods are for creating holes in flange and web
     def get_beam_models(self):
         '''
@@ -312,19 +348,37 @@ class BBCoverPlateBoltedCAD(object):
 
     def get_models(self):
         '''
-
         Returns: Returns model related to complete model (beams, plates and bolts)
-
         '''
-
+        # First collect all models
+        models = []
+        
+        # Add beam models
+        models.append(self.beamLModel)
+        models.append(self.beamRModel)
+        
+        # Add plate models
+        models.append(self.WebPlateLeftModel)
+        models.append(self.WebPlateRightModel)
+        models.append(self.plateAbvFlangeModel)
+        models.append(self.plateBelwFlangeModel)
+        
+        # Add inner plate models if needed
         if self.flange_splice_preference != 'Outside':
-            return [self.beamLModel, self.beamRModel, self.WebPlateLeftModel, self.WebPlateRightModel,
-                    self.innerplateAbvFlangeBackModel, self.innerplateAbvFlangeFrontModel,
-                    self.innerplateBelwFlangeBackModel, self.innerplateBelwFlangeFrontModel, self.plateAbvFlangeModel,
-                    self.plateBelwFlangeModel] + self.nut_bolt_array_AF.get_modelsAF() + self.nut_bolt_array_BF.get_modelsBF() + self.nut_bolt_array_Web.get_modelsW()
-        else:
-            return [self.beamLModel, self.beamRModel, self.WebPlateLeftModel, self.WebPlateRightModel,
-                    self.plateAbvFlangeModel, self.plateBelwFlangeModel] + self.nut_bolt_array_AF.get_modelsAF() + self.nut_bolt_array_BF.get_modelsBF() + self.nut_bolt_array_Web.get_modelsW()
+            models.append(self.innerplateAbvFlangeBackModel)
+            models.append(self.innerplateAbvFlangeFrontModel) 
+            models.append(self.innerplateBelwFlangeBackModel)
+            models.append(self.innerplateBelwFlangeFrontModel)
+        
+        # Add bolt models
+        models.extend(self.nut_bolt_array_AF.get_modelsAF())
+        models.extend(self.nut_bolt_array_BF.get_modelsBF())
+        models.extend(self.nut_bolt_array_Web.get_modelsW())
+        
+        # Filter out None values
+        models = [model for model in models if model]
+        
+        return models
 
 
     def get_beamLModel(self):
@@ -437,12 +491,21 @@ class BBCoverPlateBoltedCAD(object):
         WebPlateLeft = self.get_WebPlateLeftModel()
         WebPlateRight = self.get_WebPlateRightModel()
 
-        CAD_list = [plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight]
-        CAD = CAD_list[0]
-
-        for model in CAD_list[1:]:
-            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
-
+        # Create a compound of all plates
+        from OCC.Core.TopoDS import TopoDS_Compound
+        from OCC.Core.BRep import BRep_Builder
+        
+        compound = TopoDS_Compound()
+        builder = BRep_Builder()
+        builder.MakeCompound(compound)
+        
+        for model in [plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight]:
+            if model:
+                builder.Add(compound, model)
+        
+        # Perform a single fuse operation
+        CAD = BRepAlgoAPI_Fuse(plateAbvFlange, compound).Shape()
+        
         return CAD
 
     def get_innetplatesModels(self):
@@ -454,12 +517,23 @@ class BBCoverPlateBoltedCAD(object):
         plateBelwFlangeFront = self.get_innerplateBelwFlangeFront()
         plateBelwFlangeBack = self.get_innerplateBelwFlangeBack()
 
-        CAD_list = [plateAbvFlangeFront, plateAbvFlangeBack, plateBelwFlangeFront, plateBelwFlangeBack]
-        CAD = CAD_list[0]
-
-        for model in CAD_list[1:]:
-            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
-
+        # Create a compound
+        from OCC.Core.TopoDS import TopoDS_Compound
+        from OCC.Core.BRep import BRep_Builder
+        
+        compound = TopoDS_Compound()
+        builder = BRep_Builder()
+        builder.MakeCompound(compound)
+        
+        # Add all but the first model to the compound
+        models = [plateAbvFlangeBack, plateBelwFlangeFront, plateBelwFlangeBack]
+        for model in models:
+            if model:
+                builder.Add(compound, model)
+        
+        # Perform a single fuse operation
+        CAD = BRepAlgoAPI_Fuse(plateAbvFlangeFront, compound).Shape()
+        
         return CAD
 
     def get_nut_bolt_arrayModels(self):
@@ -468,14 +542,28 @@ class BBCoverPlateBoltedCAD(object):
         '''
         nutboltmodelsAF = self.get_nutboltmodelsAF()
         nutboltmodelsBF = self.get_nutboltmodelsBF()
-        nutboltmodelsWeb =  self.get_nutboltmodelsWeb()
+        nutboltmodelsWeb = self.get_nutboltmodelsWeb()
 
-        CAD_list = [nutboltmodelsAF, nutboltmodelsBF, nutboltmodelsWeb]
-        CAD = CAD_list[0]
-
-        for model in CAD_list[1:]:
-            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
-
+        if not nutboltmodelsAF or not nutboltmodelsBF or not nutboltmodelsWeb:
+            return None
+            
+        # Create a compound
+        from OCC.Core.TopoDS import TopoDS_Compound
+        from OCC.Core.BRep import BRep_Builder
+        
+        compound = TopoDS_Compound()
+        builder = BRep_Builder()
+        builder.MakeCompound(compound)
+        
+        # Add other models to the compound
+        models = [nutboltmodelsBF, nutboltmodelsWeb]
+        for model in models:
+            if model:
+                builder.Add(compound, model)
+        
+        # Perform a single fuse operation
+        CAD = BRepAlgoAPI_Fuse(nutboltmodelsAF, compound).Shape()
+        
         return CAD
 
     def get_only_beams_Models(self):

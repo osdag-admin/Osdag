@@ -267,7 +267,7 @@ class LapJointBolted(MomentConnection):
         t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX, self.len_conn if flag else '', True)
         out_list.append(t20)
 
-        t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,'', True)
+        t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,self.utilization_ratio if flag else '', True)
         out_list.append(t29)
         
         t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
@@ -361,6 +361,7 @@ class LapJointBolted(MomentConnection):
         self.len_conn = 0
         self.max_gauge_round = 0
         self.max_pitch_round = 0
+        self.utilization_ratio = 0
         self.bij = 0
         self.blg = 0
         self.select_bolt_dia_and_grade(self,design_dictionary)
@@ -403,8 +404,12 @@ class LapJointBolted(MomentConnection):
                                               p=float(self.bolt.min_pitch_round))
                     # self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                     #                                               bolt_grade_provided=self.bolt.bolt_grade_provided)
+                    # print("fnafnafan",self.bolt.bolt_capacity)
+
+                    num_bolts = float(self.tensile_force) / ( self.bolt.bolt_capacity / 1000)
+                    # print("num_bolts",num_bolts)    
                     
-                    if self.bolt.bolt_capacity > float(self.tensile_force) * 1000:
+                    if num_bolts <= 2:
                         self.bolt_dia_grade_status = True
                         break
                     
@@ -420,10 +425,14 @@ class LapJointBolted(MomentConnection):
             logger.error(": Design is not safe. \n ")
             logger.info(" :=========End Of design===========")
 
-        elif self.dia_available == True and self.bolt_dia_grade_status == False:
-            self.design_status = False
-            logger.error(": Design is not safe. \n ")
-            logger.info(" :=========End Of design===========")
+        # elif self.dia_available == True and self.bolt_dia_grade_status == False:
+        #     self.design_status = True
+        #     if self.bolt.bolt_type == 'Bearing Bolt':
+        #         self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
+        #     self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
+        #     self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
+        #     print(self.bolt)
+        #     self.number_r_c_bolts(self, design_dictionary)
 
         
         else:
@@ -438,7 +447,7 @@ class LapJointBolted(MomentConnection):
 
     def number_r_c_bolts(self,design_dictionary,count=0):
         
-        bolt_cap = float(self.bolt.bolt_capacity)
+        bolt_cap = self.bolt.bolt_capacity
         if self.bolt.bolt_type == 'Bearing Bolt':
             self.slip_res = 'N/A'
         else:
@@ -446,7 +455,7 @@ class LapJointBolted(MomentConnection):
             self.bolt.bolt_bearing_capacity = 'N/A'
             self.bolt.bolt_shear_capacity = 'N/A'
             
-        
+        # print("fafafa",bolt_cap)
         self.number_bolts = float(self.tensile_force) /( bolt_cap / 1000)
 
         
@@ -510,8 +519,9 @@ class LapJointBolted(MomentConnection):
     def check_capacity_reduction_2(self,design_dictionary):
         if self.plate1thk + self.plate2thk > 5 * self.bolt.bolt_diameter_provided:
             self.blg = 8 / (3 + (self.plate1thk + self.plate2thk / self.bolt.bolt_diameter_provided))
-        if self.blg < self.bij:
+        if self.blg < self.bij and self.blg != 0:
             self.cap_red = True
+            # print("blg",self.blg)
             self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.blg
             if self.bolt.bolt_type == 'Bearing Bolt':
                 self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
@@ -540,6 +550,9 @@ class LapJointBolted(MomentConnection):
             self.slip_res = round(self.slip_res, 2)
             self.bolt.bolt_capacity = self.bolt.bolt_capacity / 1000
             self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
+        
+        self.utilization_ratio = float(self.tensile_force) / (self.bolt.bolt_capacity * self.number_bolts)
+        self.utilization_ratio = round(self.utilization_ratio, 2)
 
         self.design_status = True
 

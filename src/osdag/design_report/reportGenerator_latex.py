@@ -46,7 +46,7 @@ class CreateLatex(Document):
         current_texinputs = os.environ.get('TEXINPUTS','')
         seperator = ";"
         package_paths = seperator.join(package_dirs)
-        os.environ['TEXINPUTS']= f"{package_paths}{seperator}{current_textinputs}"
+        os.environ['TEXINPUTS']= f"{package_paths}{seperator}{current_texinputs}"
         #end of change 1
         
         imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")

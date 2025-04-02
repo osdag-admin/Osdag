@@ -226,63 +226,77 @@ class BoltPatternGenerator(QMainWindow):
         gauge1 = params['gauge1']
         gauge2 = params['gauge2']
         edge = params['edge']
-
+        
         # Calculate dimensions
         width = gauge1 + gauge2 + edge
-
-        # Pitch dimension (vertical) with two-sided arrow
-        msp.add_linear_dim(
+        height = 2 * end + 2 * pitch
+        
+        # Create dimension style override
+        dim_style = {
+            'dimtsz': 0,       # Set tick size to 0 to enable arrows
+            'dimasz': 2.5,      # Arrow size
+            'dimblk': 'OPEN30', # Correct arrow block name (no underscore)
+            'dimtxt': 5.0,      # Text height
+            'dimgap': 1.0       # Gap between dimension line and text
+        }
+        
+        # Pitch dimension (vertical)
+        pitch_dim = msp.add_linear_dim(
             base=(width + 20, end + pitch/2),
             p1=(width + 10, end + pitch),
             p2=(width + 10, end),
             angle=90,
             dimstyle='STANDARD',
-            override={'dimtad': 1, 'dimtxt': 2.5, 'dimtsz': 2.0, 'dimgap': 1.0}
+            override=dim_style
         )
-        msp.add_text(f"{pitch}", dxfattribs={'height': 2.5, 'insert': (width + 25, end + pitch/2)})
-
-        # End dimension (vertical) with two-sided arrow
-        msp.add_linear_dim(
+        pitch_dim.render()
+        
+        # End dimension (vertical)
+        end_dim = msp.add_linear_dim(
             base=(width + 20, end/2),
             p1=(width + 10, 0),
             p2=(width + 10, end),
             angle=90,
             dimstyle='STANDARD',
-            override={'dimtad': 1, 'dimtxt': 2.5, 'dimtsz': 2.0, 'dimgap': 1.0}
+            override=dim_style
         )
-        msp.add_text(f"{end}", dxfattribs={'height': 2.5, 'insert': (width + 25, end/2)})
-
-        # Gauge dimensions (horizontal) with two-sided arrows
-        msp.add_linear_dim(
+        end_dim.render()
+        
+        # Gauge1 dimension (horizontal)
+        gauge1_dim = msp.add_linear_dim(
             base=(gauge1/2, -20),
             p1=(0, -10),
             p2=(gauge1, -10),
             angle=0,
             dimstyle='STANDARD',
-            override={'dimtad': 1, 'dimtxt': 2.5, 'dimtsz': 2.0, 'dimgap': 1.0}
+            override=dim_style
         )
-        msp.add_text(f"{gauge1}", dxfattribs={'height': 2.5, 'insert': (gauge1/2, -25)})
-
-        msp.add_linear_dim(
+        gauge1_dim.render()
+        
+        # Gauge2 dimension (horizontal)
+        gauge2_dim = msp.add_linear_dim(
             base=(gauge1 + gauge2/2, -20),
             p1=(gauge1, -10),
             p2=(gauge1 + gauge2, -10),
             angle=0,
             dimstyle='STANDARD',
-            override={'dimtad': 1, 'dimtxt': 2.5, 'dimtsz': 2.0, 'dimgap': 1.0}
+            override=dim_style
         )
-        msp.add_text(f"{gauge2}", dxfattribs={'height': 2.5, 'insert': (gauge1 + gauge2/2, -25)})
-
-        # Edge dimension (horizontal) with two-sided arrow
-        msp.add_linear_dim(
+        gauge2_dim.render()
+        
+        # Edge dimension (horizontal)
+        edge_dim = msp.add_linear_dim(
             base=(gauge1 + gauge2 + edge/2, -20),
             p1=(gauge1 + gauge2, -10),
             p2=(width, -10),
             angle=0,
             dimstyle='STANDARD',
-            override={'dimtad': 1, 'dimtxt': 2.5, 'dimtsz': 2.0, 'dimgap': 1.0}
+            override=dim_style
         )
-        msp.add_text(f"{edge}", dxfattribs={'height': 2.5, 'insert': (gauge1 + gauge2 + edge/2, -25)})
+        edge_dim.render()
+        
+        # You can remove the separate text entities if you want the dimension to display its measurement automatically
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

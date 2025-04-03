@@ -353,6 +353,7 @@ class LapJointBolted(MomentConnection):
         self.planes = 1
         self.count = 0
         self.slip_res = None
+        self.yield_stress = None
         self.number_bolts = 0
         self.cap_red = False
         self.bolt_dia_grade_status = False
@@ -384,9 +385,11 @@ class LapJointBolted(MomentConnection):
         if float(self.plate1thk) < float(self.plate2thk):
             self.plate = self.plate1
             self.pltthk = float(self.plate1thk)
+            self.yield_stress = self.plate1.fy
         else:
             self.plate = self.plate2
             self.pltthk = float(self.plate2thk)
+            self.yield_stress = self.plate2.fy
 
         for self.bolt.bolt_diameter_provided in self.bolt.bolt_diameter:
             if 8 * float(self.bolt.bolt_diameter_provided) > (float(self.plate1thk) + float(self.plate2thk)):
@@ -406,6 +409,19 @@ class LapJointBolted(MomentConnection):
                     # self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                     #                                               bolt_grade_provided=self.bolt.bolt_grade_provided)
                     # print("fnafnafan",self.bolt.bolt_capacity)
+                    self.bolt.min_pitch_round = min(self.bolt.min_pitch_round, 2.5 * float(self.bolt.bolt_diameter_provided))
+                    self.bolt.min_gauge_round = min(self.bolt.min_gauge_round, 2.5 * float(self.bolt.bolt_diameter_provided))
+
+                    if design_dictionary[KEY_DP_DETAILING_EDGE_TYPE] == 'Sheared or hand flame cut':
+                        self.bolt.min_edge_dist_round = max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round)
+                        self.bolt.min_end_dist_round = max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round)
+                    else:
+                        self.bolt.min_edge_dist_round = max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round)
+                        self.bolt.min_end_dist_round = max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round)
+
+                    self.max_pitch_round = self.max_gauge_round = min(32 * self.pltthk , 300)
+
+                    self.bolt.max_edge_dist_round = self.bolt.max_end_dist_round = min(self.bolt.max_edge_dist_round , 12 * self.pltthk * ((250 / self.yield_stress)** 0.5 ))                   
 
                     num_bolts = float(self.tensile_force) / ( self.bolt.bolt_capacity / 1000)
                     # print("num_bolts",num_bolts)    

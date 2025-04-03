@@ -35,7 +35,7 @@ def detect_imported_modules():
     relevant_modules = set()
     
     if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding="utf-8") as file:
             for line in file:
                 match = pattern.match(line.strip())
                 if match:

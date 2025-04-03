@@ -172,7 +172,7 @@ from .design_type.flexural_member.flexure import Flexure
 from .design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from .design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from .design_type.flexural_member.flexure_othersupp import Flexure_Misc
-# from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
+from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 # from .cad.cad_common import call_3DBeam
 from .APP_CRASH.Appcrash import api as appcrash
 import configparser
@@ -329,15 +329,13 @@ class OsdagMainWindow(QMainWindow):
                     self.show_flexure_module,
                 ],
                 'Beam-Column' : self.Under_Development,
+                'Plate Girder' : [('Simply Supported', str(files('osdag.data.ResourceFiles.images').joinpath('simply-supported-beam.jpg')), 'Welded_Girder_Design'),
+                    self.show_girder_design,],
                 # TODO @rutvik
                 # 'Beam-Column' :[
                 #     ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Beam_Column_Design'),
                 #     self.show_beamcolumn_module,
                 # ],
-                'Plate Girder' : [ #TODO: Check number of sub modules required
-                    ('Simply Supported', str(files('osdag.data.ResourceFiles.images').joinpath('simply-supported-beam.jpg')), 'Welded_Girder_Design'),
-                    self.show_girder_design,
-                ],
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
                 '3D Frame' : self.Under_Development,
@@ -758,6 +756,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(PlateGirderWelded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+            return
 
 ################################# Help Actions ############################################
 

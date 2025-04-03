@@ -38,6 +38,15 @@ class OurLog(logging.Handler):
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
 
+    def emit(self, record):
+        log_entry = self.format(record)
+        try:
+            if hasattr(self.key, 'append'):
+                # Append log entry to the QTextEdit widget
+                self.key.append(log_entry)
+        except Exception:
+            pass
+
 
 def connectdb1():
     """

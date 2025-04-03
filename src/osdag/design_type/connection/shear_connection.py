@@ -12,6 +12,20 @@ from importlib.resources import files
 class ShearConnection(Connection):
     def __init__(self):
         super(ShearConnection, self).__init__()
+        # Initialize common attributes for connection classes
+        self._3d_components = []
+
+        def get_3d_components(self):
+            """Base implementation with safety checks"""
+            if not hasattr(self, '_3d_components'):
+                self._3d_components = []
+
+            # Validate component format
+            for comp in self._3d_components:
+                if len(comp) != 2 or not callable(comp[1]):
+                    raise ValueError("Invalid 3D component format")
+            
+            return self._3d_components
 
     ############################
     # Design Preferences functions
@@ -420,8 +434,10 @@ class ShearConnection(Connection):
         c = connectdb1()
         return c
 
-    def customized_input(self):
+    def customized_input(self, *args):
 
+        if args:
+            raise ValueError(f"Unexpected arguments passed to customized_input: {args}")
         list1 = []
         t1 = (KEY_GRD, self.grdval_customized)
         list1.append(t1)
@@ -481,7 +497,10 @@ class ShearConnection(Connection):
             return ''
 
 
-    def input_value_changed(self):
+    def input_value_changed(self, *args):
+        
+        if args:
+            raise ValueError(f"Unexpected arguments passed to input_value_changed: {args}")
 
         lst = []
 
@@ -508,6 +527,8 @@ class ShearConnection(Connection):
 
         t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t8)
+
+        print("input_value_changed() called successfully!")
 
         return lst
 

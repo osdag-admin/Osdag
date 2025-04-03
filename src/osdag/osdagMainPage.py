@@ -769,7 +769,7 @@ class OsdagMainWindow(QMainWindow):
         from osdag.Common import KEY_MODULE
         import yaml
         from PyQt5.QtCore import QTimer
-        
+
         fileName, _ = QFileDialog.getOpenFileName(
             self,
             "Open Input File",
@@ -784,7 +784,12 @@ class OsdagMainWindow(QMainWindow):
             # Read the file to determine the module
             with open(fileName, 'r') as fileObject:
                 uiObj = yaml.safe_load(fileObject)
-                module_name = uiObj[KEY_MODULE]
+
+            # ✅ Debug: Print parsed .osi data before doing anything else
+            print("✅ Parsed .osi Data:", uiObj)
+            QMessageBox.information(self, "Debug Info", f"Parsed Data:\n{uiObj}")
+
+            module_name = uiObj[KEY_MODULE]
 
             module_map = {
                 'Fin Plate Connection': FinPlateConnection,
@@ -796,41 +801,47 @@ class OsdagMainWindow(QMainWindow):
 
             if module_name in module_map:
                 self.hide()
-                
+
                 # Create module instance without any arguments
                 module_instance = module_map[module_name]()
-                
+
                 # Store the filename for later use
                 self.temp_filename = fileName
-                
+
+                # ✅ Debug: Print module instance
+                print(f"✅ Detected Module: {module_name}")
+                print(f"✅ Module Instance: {module_instance}")
+
                 # Create UI without additional setup that might trigger the problematic method
                 self.ui2 = Ui_ModuleWindow(main=module_instance, folder=self.folder)
-                
+
                 self.ui2.show()
                 self.ui2.closed.connect(self.show)
-                
+
                 # Set up a one-time event handler that runs after the UI is fully loaded
                 def delayed_loading():
                     try:
                         if hasattr(self.ui2.ui, 'loadDesign_inputs_from_existing_file'):
-                            # Directly call the method without passing module reference
-                            # The method should access its own module reference
-                            self.ui2.ui.loadDesign_inputs_from_existing_file(self.temp_filename, None)
+                            print("✅ Calling loadDesign_inputs_from_existing_file...")
+                            # Pass the filename but NOT the module itself as second argument
+                            self.ui2.ui.loadDesign_inputs_from_existing_file(self.temp_filename, self.ui2.ui.main)
                     except Exception as e:
-                        print(f"Error loading inputs: {str(e)}")
-                
-                # Use a timer to ensure UI is fully loaded before attempting to load inputs
-                QTimer.singleShot(500, delayed_loading)
-                
+                        print(f"❌ Error loading inputs: {str(e)}")
+                        traceback.print_exc()  # Add this line to see the full stack trace
+                        QMessageBox.warning(self, "Warning", f"Error populating fields: {str(e)}")
+
+
                 return module_name
             else:
                 QMessageBox.warning(self, "Warning", f"Module '{module_name}' not recognized or not implemented yet.")
-                    
+
             return module_name
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Could not process file: {str(e)}")
+            print(f"❌ Error in show_input_dialog: {str(e)}")
             return None
+
 
 
 

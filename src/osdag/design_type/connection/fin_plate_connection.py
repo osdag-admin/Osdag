@@ -7,7 +7,6 @@ import logging
 
 
 class FinPlateConnection(ShearConnection):
-    
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
@@ -16,19 +15,6 @@ class FinPlateConnection(ShearConnection):
         self.res_force = 0.0
         self.weld_connecting_plates=[]
         self.design_status = False
-
-        # In FinPlateConnection class
-        self.fixes_applied = {
-            '3d_component_fix': True,
-            'loading_handler_v2': True,
-            'design_pref_initialization_fix': True
-        }
-
-        def get_3d_components(self):
-            """Return Fin Plate-specific 3D components."""
-            return self._3d_components
-
-        self.bolt = Bolt()
 
     ###############################################
     # Design Preference Functions Start
@@ -129,11 +115,7 @@ class FinPlateConnection(ShearConnection):
 
         return design_input
 
-    def input_dictionary_without_design_pref(self, *args):
-
-        if args:
-            raise ValueError("Unexpected arguments passed to input_dictionary_without_design_pref.")
-
+    def input_dictionary_without_design_pref(self):
         design_input = []
         t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
@@ -151,7 +133,7 @@ class FinPlateConnection(ShearConnection):
     # Setting up logger and Input and Output Docks
     ####################################
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(key):
 
         """
         Function to set Logger for FinPlate Module
@@ -182,7 +164,7 @@ class FinPlateConnection(ShearConnection):
     def module_name(self):
         return KEY_DISP_FINPLATE
 
-    def input_values(self, *args):
+    def input_values(self):
 
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
@@ -365,13 +347,10 @@ class FinPlateConnection(ShearConnection):
 
         return capacities
 
-    def output_values(self, flag, *args):
+    def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
         '''
-
-        if args:
-            raise ValueError(f"Unexpected arguments passed to output_values: {args}")
 
         # @author: Umair
 
@@ -1297,24 +1276,6 @@ class FinPlateConnection(ShearConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
                                Disp_3D_image, module=self.module)
-        
-
-    """ @aumghelani added this function"""
-
-    def validate_3d_components(self): 
-        """Verify 3D component initialization"""
-        components = self.get_3d_components()
-        if not components:
-            raise ValueError("No 3D components found")
-        
-        valid_components = ['Model', 'Beam', 'Column', 'Fin Plate']
-        for comp in components:
-            if comp[0] not in valid_components:
-                print(f"Unexpected component: {comp[0]}")
-        
-        return all(comp[0] in valid_components for comp in components)
-
-
 
     ######################################
     # Function for individual component calls in 3D view
@@ -1345,5 +1306,3 @@ class FinPlateConnection(ShearConnection):
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Plate", bgcolor)
-        
-        

@@ -97,7 +97,7 @@ class DummyThread(QThread):
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
     resized = QtCore.pyqtSignal()
     closed = pyqtSignal()
-    def __init__(self, main,folder,parent=None):
+    def  __init__(self, main,folder,parent=None):
         super(Ui_ModuleWindow, self).__init__(parent=parent)
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
@@ -440,7 +440,7 @@ class Window(QMainWindow):
             To get 3d component checkbox details from modules
         """
         i = 0
-        for component in main.get_3d_components():
+        for component in main.get_3d_components(main):
             checkBox = QtWidgets.QCheckBox(self.frame)
             checkBox.setGeometry(QtCore.QRect(230 + i, 0, 110, 29))
             checkBox.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -451,7 +451,6 @@ class Window(QMainWindow):
             self.chkbox_connect(main, checkBox, function_name)
             checkBox.resize(checkBox.sizeHint())
             i += (checkBox.sizeHint().width() + 5)
-            
 
         self.verticalLayout_2.addWidget(self.frame)
         self.splitter = QtWidgets.QSplitter(self.centralwidget)
@@ -563,8 +562,7 @@ class Window(QMainWindow):
         in_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         in_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
-        print(f"Calling input_dictionary_without_design_pref for {main}...")
-        input_dp_conn_list = main.input_dictionary_without_design_pref()
+        input_dp_conn_list = main.input_dictionary_without_design_pref(main)
         input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
         print(f'input_dp_conn_list {input_dp_conn_list}')
 
@@ -573,7 +571,7 @@ class Window(QMainWindow):
         This routine takes the returned list from input_values function of corresponding module
         and creates the specified QT widgets, [Ref input_values function is any module for details]
         """
-        option_list = main.input_values()
+        option_list = main.input_values(self)
         print(f'setupui option_list {option_list}')
 
         _translate = QtCore.QCoreApplication.translate
@@ -813,8 +811,8 @@ class Window(QMainWindow):
          "triggered.connect" for up to 10 customized popups
         """
 
-        new_list = main.customized_input()
-        updated_list = main.input_value_changed()
+        new_list = main.customized_input(main)
+        updated_list = main.input_value_changed(main)
         print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         data = {}
 
@@ -892,7 +890,7 @@ class Window(QMainWindow):
         @author: Umair
 
         """
-        out_list = main.output_values(main)
+        out_list = main.output_values(main, False)
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
@@ -1396,7 +1394,7 @@ class Window(QMainWindow):
     def save_output_to_csv(self, main):
         def save_fun():
             status = main.design_status
-            out_list = main.output_values(status)
+            out_list = main.output_values(main, status)
             in_list = main.input_values(main)
             to_Save = {}
             flag = 0
@@ -1597,7 +1595,7 @@ class Window(QMainWindow):
     def output_title_change(self, main):
 
         status = main.design_status
-        out_list = main.output_values(status)
+        out_list = main.output_values(main, status)
         key = None
         no_field_titles = []
         titles = []
@@ -1870,91 +1868,6 @@ class Window(QMainWindow):
             return Flexure_Misc
         else:
             return GussetConnection
-        
-#Function for getting inputs from a existing file which is passed in input 
-
-    '''
-    @author: aumghelani
-    '''
-
-    def loadDesign_inputs_from_existing_file(self, fileName, main):
-        """
-        Load design inputs from an existing .osi file.
-
-        Args:
-            fileName (str): Path to the .osi file.
-            main: The module instance.
-
-        Returns:
-            bool: True if successful, False otherwise.
-        """
-        try:
-            import traceback
-            # Open the .osi file and parse its contents
-            print(f"Attempting to load file: {fileName}")
-            with open(fileName, 'r') as fileObject:
-                uiObj = yaml.safe_load(fileObject)
-
-            # Extract module type from the file
-            module = uiObj.get(KEY_MODULE, "")
-            print(f"File specifies module: {module}")
-
-            # Determine the current module's name for comparison
-            selected_module = None
-            if hasattr(main, 'module_name'):
-                selected_module = main.module_name() if callable(main.module_name) else main.module_name
-            print(f"Current module: {selected_module}")
-
-            # Check if the loaded file matches the active module
-            if selected_module != module:
-                print(f"Module mismatch detected (File module: {module}, Current module: {selected_module})")
-                QMessageBox.warning(
-                    self, 
-                    "Module Mismatch", 
-                    f"The file specifies '{module}' but the current module is '{selected_module}'."
-                )
-                return False
-
-            # Temporarily disable UI updates
-            self.ui_loaded = False
-            
-            # Clear existing output fields before loading new inputs
-            self.clear_output_fields()
-
-            # Populate the UI fields with values from the file
-            option_list = []
-            data = {}
-            new_list = []
-            self.setDictToUserInputs(uiObj, option_list, data, new_list)
-
-            # Re-enable UI updates
-            self.ui_loaded = True
-
-            # Update output title fields based on loaded values
-            if hasattr(self, 'output_title_change'):
-                self.output_title_change(main)
-
-            print(f"✅ File loaded successfully")
-            return True
-
-        except Exception as e:
-            # Handle any errors that occur during file loading
-            print(f"❌ Error loading file: {e}")
-            traceback.print_exc()
-            QMessageBox.critical(self, "Error", f"Failed to load file: {str(e)}")
-            return False
-
-
-    def handle_design_prefs(self, main):
-        """Handle design preference initialization"""
-        self.designPrefDialog = DesignPreferences(
-            main, 
-            self,
-            input_dictionary=self.input_dock_inputs
-        )
-        self.designPrefDialog.ui.setupDesignPref(main)
-
-
 # Function for getting inputs from a file
     '''
     @author: Umair
@@ -2082,7 +1995,7 @@ class Window(QMainWindow):
 
         # @author: Amir
 
-        option_list = main.input_values()
+        option_list = main.input_values(self)
         for data_key_tuple in main.customized_input(main):
             data_key = data_key_tuple[0] + "_customized"
             if data_key in data.keys() and len(data_key_tuple) == 4:
@@ -2134,7 +2047,7 @@ class Window(QMainWindow):
                 self.show_error_msg(error)
                 return
 
-            out_list = main.output_values(status)
+            out_list = main.output_values(main, status)
             print('out_list changed',out_list)
 
             for option in out_list:

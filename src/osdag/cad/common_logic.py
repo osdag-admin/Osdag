@@ -1839,15 +1839,15 @@ class CommonDesignLogic(object):
         print(f"Bolt Columns: {Conn.cols}")
         print(f"Bolt Rows: {Conn.rows}")
         print(f"Number of Bolts: {Conn.number_bolts}")
-        print(f"Pitch (Min Pitch Round): {Conn.bolt.min_pitch_round}")
-        print(f"Gauge (Min Gauge Round): {Conn.bolt.min_gauge_round}")
-        print(f"Edge Distance (Min Edge Distance): {Conn.bolt.min_edge_dist}")
-        print(f"End Distance (Min End Distance): {Conn.bolt.min_end_dist}")
+        print(f"Pitch: {Conn.final_pitch}")
+        print(f"Gauge: {Conn.final_gauge}")
+        print(f"Edge Distance: {Conn.final_edge_dist}")
+        print(f"End Distance: {Conn.final_end_dist}")
 
         lap_joint, plate1, plate2, bolts, nuts = create_bolted_lap_joint(plate1_thickness = float(Conn.plate1thk), plate2_thickness = float(Conn.plate2thk), plate_width = float(Conn.width), bolt_dia = Conn.bolt.bolt_diameter_provided,
                                                                          actual_overlap_length=Conn.len_conn,bolt_cols=Conn.cols,bolt_rows=Conn.rows, number_bolts=Conn.number_bolts,
-                                                                         pitch=Conn.bolt.min_pitch_round,gauge=Conn.bolt.min_gauge_round,
-                                                                         edge=Conn.bolt.min_edge_dist,end=Conn.bolt.min_end_dist)
+                                                                         pitch=Conn.final_pitch,gauge=Conn.final_gauge,
+                                                                         edge=Conn.final_edge_dist,end=Conn.final_end_dist)
         return lap_joint, plate1, plate2, bolts, nuts
 
 

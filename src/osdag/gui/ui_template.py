@@ -174,6 +174,27 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         else:
             event.ignore()
 
+    # Add this method to your Ui_ModuleWindow class
+    def module_name(self, *args):            
+        """Return the name of the current module"""
+        if hasattr(self, 'module') and self.module:
+            # Get the class name of the module
+            class_name = self.module.__class__.__name__
+            
+            # Map class names to module names
+            class_to_module = {
+                'FinPlateConnection': 'Fin Plate Connection',
+                'CleatAngleConnection': 'Cleat Angle Connection',
+                'EndPlateConnection': 'End Plate Connection',
+                'SeatedAngleConnection': 'Seated Angle Connection',
+                'BasePlateConnection': 'Base Plate Connection'
+                # Add other mappings as needed
+            }
+            
+            return class_to_module.get(class_name, class_name)
+            
+        return None
+
 class Window(QMainWindow):
     closed = QtCore.pyqtSignal()
     def center(self):
@@ -1876,6 +1897,7 @@ class Window(QMainWindow):
     def loadDesign_inputs(self, op_list, data, new, main):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)),
                                                   "InputFiles(*.osi)")
+        
         if not fileName:
             return
         try:

@@ -764,25 +764,24 @@ class OsdagMainWindow(QMainWindow):
     @author: aumghelani
     '''
     
+   # In main page's show_input_dialog function
     def show_input_dialog(self):
+        from PyQt5.QtCore import QTimer
         fileName, _ = QFileDialog.getOpenFileName(
-            self,
-            "Open Input File",
-            os.path.join(str(self.folder)),
+            self, "Open Input File", os.path.join(str(self.folder)),
             "Input Files (*.osi);;All Files (*.*)"
         )
-
         if not fileName:
             return None  # No file selected
-
+        
         try:
-            module_name = None  
+            # Open file and get module name
             with open(fileName, 'r') as file:
                 for line in file:
                     if line.strip().startswith('Module:'):
                         module_name = line.split('Module:')[1].strip()
-                        break  
-
+                        break
+                        
             module_map = {
                 'Fin Plate Connection': FinPlateConnection,
                 'Cleat Angle Connection': CleatAngleConnection,
@@ -790,28 +789,55 @@ class OsdagMainWindow(QMainWindow):
                 'Seated Angle Connection': SeatedAngleConnection,
                 'Base Plate Connection': BasePlateConnection
             }
-
+            
             if module_name in module_map:
                 self.hide()
-                self.ui2 = Ui_ModuleWindow(module_map[module_name], fileName)
+                # Create module window with correct module class and folder
+                self.ui2 = Ui_ModuleWindow(module_map[module_name], self.folder)
                 self.ui2.show()
                 self.ui2.closed.connect(self.show)
-
-                # Auto-load input fields using Window instance inside ui2
-                if hasattr(self.ui2.ui, 'loadDesign_inputs'):
-                    op_list = []  # Populate based on module requirements
-                    data = {}  # Placeholder dictionary
-                    new = []  # Placeholder for additional configurations
-                    #self.ui2.ui.loadDesign_inputs(op_list, data, new, self.ui2)
-
+                
+                # Store the file path for later use
+                file_dir = os.path.dirname(fileName)
+                file_name = os.path.basename(fileName)
+                
+                # Use QTimer to delay the execution until the UI is fully loaded
+                QTimer.singleShot(100, lambda: self.load_file_in_module(self.ui2, fileName))
+                
             else:
-                QMessageBox.warning(self, "Warning", f"Module '{module_name}' not recognized or not implemented yet.")
-                    
+                QMessageBox.warning(self, "Warning", f"Module '{module_name}' not recognized.")
+                
             return module_name
-
+            
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Could not process file: {str(e)}")
             return None
+
+    def load_file_in_module(self, module_window, file_path):
+        """Helper function to load the file in the module window"""
+        if hasattr(module_window.ui, 'loadDesign_inputs'):
+            # Prepare the parameters
+            op_list = []
+            data = {}
+            new = []
+            
+            # Store the original getOpenFileName function
+            original_dialog = QFileDialog.getOpenFileName
+            
+            # Create a replacement function that returns our file path
+            def custom_get_open_file_name(*args, **kwargs):
+                return file_path, "InputFiles(*.osi)"
+            
+            try:
+                # Replace the function
+                QFileDialog.getOpenFileName = custom_get_open_file_name
+                
+                # Call loadDesign_inputs
+                module_window.ui.loadDesign_inputs(op_list, data, new, module_window)
+                
+            finally:
+                # Restore the original function even if an error occurs
+                QFileDialog.getOpenFileName = original_dialog
 
 
 

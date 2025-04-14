@@ -79,7 +79,7 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 
 7) Any further Levels will result in an error .
 '''
-
+import yaml
 import os
 from pathlib import Path
 import re
@@ -802,7 +802,7 @@ class OsdagMainWindow(QMainWindow):
                 file_name = os.path.basename(fileName)
                 
                 # Use QTimer to delay the execution until the UI is fully loaded
-                QTimer.singleShot(100, lambda: self.load_file_in_module(self.ui2, fileName))
+                QTimer.singleShot(500, lambda: self.load_file_in_module(self.ui2, fileName))
                 
             else:
                 QMessageBox.warning(self, "Warning", f"Module '{module_name}' not recognized.")
@@ -816,28 +816,41 @@ class OsdagMainWindow(QMainWindow):
     def load_file_in_module(self, module_window, file_path):
         """Helper function to load the file in the module window"""
         if hasattr(module_window.ui, 'loadDesign_inputs'):
-            # Prepare the parameters
-            op_list = []
-            data = {}
-            new = []
-            
-            # Store the original getOpenFileName function
-            original_dialog = QFileDialog.getOpenFileName
-            
-            # Create a replacement function that returns our file path
-            def custom_get_open_file_name(*args, **kwargs):
-                return file_path, "InputFiles(*.osi)"
-            
             try:
-                # Replace the function
-                QFileDialog.getOpenFileName = custom_get_open_file_name
+                # Read the file to get the content
+                with open(file_path, 'r') as file:
+                    uiObj = yaml.safe_load(file)
                 
-                # Call loadDesign_inputs
-                module_window.ui.loadDesign_inputs(op_list, data, new, module_window)
+                print("File content keys:", uiObj.keys())
                 
-            finally:
-                # Restore the original function even if an error occurs
-                QFileDialog.getOpenFileName = original_dialog
+                # Directly set values to UI elements by finding them by name
+                for key, value in uiObj.items():
+                    # Skip the module key
+                    if key == 'Module':
+                        continue
+                    
+                    # Try to find the widget with this name
+                    widget = module_window.ui.dockWidgetContents.findChild(QtWidgets.QWidget, key)
+                    if widget:
+                        if isinstance(widget, QtWidgets.QComboBox):
+                            index = widget.findText(str(value), QtCore.Qt.MatchFixedString)
+                            if index >= 0:
+                                widget.setCurrentIndex(index)
+                                print(f"Set {key} to {value}")
+                        elif isinstance(widget, QtWidgets.QLineEdit):
+                            widget.setText(str(value))
+                            print(f"Set {key} to {value}")
+                        # Add more widget types as needed
+                
+                # Force UI update
+                QtWidgets.QApplication.processEvents()
+                
+                print("Direct UI update completed")
+                
+            except Exception as e:
+                print(f"Error processing file: {str(e)}")
+                import traceback
+                traceback.print_exc()
 
 
 

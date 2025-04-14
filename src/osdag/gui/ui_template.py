@@ -1909,6 +1909,9 @@ class Window(QMainWindow):
             # module_class = self.return_class(module)
             # print('loading inputs',uiObj, op_list, data, new)
             selected_module = main.module_name(main)
+            # Add these debug prints in loadDesign_inputs
+            print("Selected module:", selected_module)
+            print("File module:", module)
             if selected_module == module:
                 # print(uiObj, op_list, data, new)
                 self.ui_loaded = False

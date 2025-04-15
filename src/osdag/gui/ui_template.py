@@ -63,6 +63,7 @@ import subprocess
 from ..get_DPI_scale import scale,height,width
 from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
+from osdag.gui.spacing import BoltPatternGenerator
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -2176,19 +2177,58 @@ class Window(QMainWindow):
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
         shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
 
-    # def output_button_connect(self, main, button_list, b):
-    #     b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
     def output_button_connect(self, main, button_list, b):
-        b.clicked.connect(lambda: self.run_spacing_script())
+        b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
+    # def output_button_connect(self, main, button_list, b):
+    #     self.Obj = CleatAngleConnection()
+    #     b.clicked.connect(lambda: self.run_spacing_script())
 
     def run_spacing_script(self):
-        script_path = os.path.join(os.path.dirname(__file__), "spacing.py")
-        if os.path.exists(script_path):
-            subprocess.Popen([sys.executable, script_path], shell=True)
+        import os
+        import sys
+
+        # Get the directory of this script
+        current_file_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Navigate up to the 'src' folder (the project root)
+        project_root_path = os.path.abspath(os.path.join(current_file_dir, '..', '..'))  # Adjust depth as needed
+
+        # Confirm the spacing.py path
+        spacing_script_path = os.path.join(project_root_path, 'osdag', 'gui', 'spacing.py')
+
+        if os.path.exists(spacing_script_path):
+            if project_root_path not in sys.path:
+                sys.path.insert(0, project_root_path)
+
+            env = os.environ.copy()
+            env["PYTHONPATH"] = project_root_path
+
+            print("Launching spacing.py...")
+            print("Project root path:", project_root_path)
+            print("PYTHONPATH:", env["PYTHONPATH"])
+
+            # subprocess.Popen(
+            #     [sys.executable, "-m", "osdag.gui.spacing"],
+            #     cwd=project_root_path,
+            #     env=env
+            # )
+            if not hasattr(self, 'Obj'):
+                print("Object (self.Obj) not found.")
+                return
+
+            # Create and show the spacing window using the existing connection object
+            print("Creating spacing window...")
+            self.spacing_window = BoltPatternGenerator(self.Obj)
+            self.spacing_window.setWindowTitle("Spacing Viewer")
+            self.spacing_window.raise_()
+            self.spacing_window.activateWindow()
+            self.spacing_window.show()
         else:
-            print("spacing.py not found!")
+            print("spacing.py not found at:", spacing_script_path)
+
 
     def output_button_dialog(self, main, button_list, button):
+        import inspect
 
         dialog = QtWidgets.QDialog()
         dialog.setObjectName("Dialog")
@@ -2230,9 +2270,18 @@ class Window(QMainWindow):
         for op in button_list:
 
             if op[0] == button.objectName():
+                print(op)
                 tup = op[3]
                 title = tup[0]
                 fn = tup[1]
+                cls = fn.__qualname__.split('.')[0]
+                if op[0] == 'spacing':
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj()                 # Instantiate it
+                            self.run_spacing_script()
+                            break
+
                 dialog.setWindowTitle(title)
                 j = 1
                 _translate = QtCore.QCoreApplication.translate

@@ -387,11 +387,11 @@ class LapJointBolted(MomentConnection):
 
         if float(self.plate1thk) < float(self.plate2thk):
             self.plate = self.plate1
-            self.pltthk = float(self.plate1thk)
+            self.minpltthk = float(self.plate1thk)
             self.yield_stress = self.plate1.fy
         else:
             self.plate = self.plate2
-            self.pltthk = float(self.plate2thk)
+            self.minminpltthk = float(self.plate2thk)
             self.yield_stress = self.plate2.fy
 
         for self.bolt.bolt_diameter_provided in self.bolt.bolt_diameter:
@@ -404,27 +404,11 @@ class LapJointBolted(MomentConnection):
                                                         conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
                     
                     # self.max_pitch_round = self.max_gauge_round = 
-                    self.bolt.calculate_bolt_capacity(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
-                                              bolt_grade_provided=float(self.bolt.bolt_grade_provided),
-                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                              n_planes=self.planes, e=float(self.bolt.min_end_dist_round),
-                                              p=float(self.bolt.min_pitch_round))
+                    
                     # self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                     #                                               bolt_grade_provided=self.bolt.bolt_grade_provided)
                     # print("fnafnafan",self.bolt.bolt_capacity)
-                    self.bolt.min_pitch_round = min(self.bolt.min_pitch_round, 2.5 * float(self.bolt.bolt_diameter_provided))
-                    self.bolt.min_gauge_round = min(self.bolt.min_gauge_round, 2.5 * float(self.bolt.bolt_diameter_provided))
-
-                    if design_dictionary[KEY_DP_DETAILING_EDGE_TYPE] == 'Sheared or hand flame cut':
-                        self.bolt.min_edge_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
-                        self.bolt.min_end_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
-                    else:
-                        self.bolt.min_edge_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
-                        self.bolt.min_end_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
-
-                    self.max_pitch_round = self.max_gauge_round = min(32 * self.pltthk , 300)
-
-                    self.bolt.max_edge_dist_round = self.bolt.max_end_dist_round = round(min(self.bolt.max_edge_dist_round , 12 * self.pltthk * ((250 / self.yield_stress)** 0.5 )),0)                
+                    self.maxmin_and_capacitycalc(self,design_dictionary)               
 
                     num_bolts = float(self.tensile_force) / ( self.bolt.bolt_capacity / 1000)
                     # print("num_bolts",num_bolts)    
@@ -457,14 +441,35 @@ class LapJointBolted(MomentConnection):
         
         else:
             self.design_status = True
-            if self.bolt.bolt_type == 'Bearing Bolt':
-                self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
-            self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
-            self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
-            print(self.bolt)
+                 
+            # print(self.bolt)
             self.number_r_c_bolts(self, design_dictionary)
 
+    def maxmin_and_capacitycalc(self,design_dictionary):
+        self.bolt.min_pitch_round = min(self.bolt.min_pitch_round, 2.5 * float(self.bolt.bolt_diameter_provided))
+        self.bolt.min_gauge_round = min(self.bolt.min_gauge_round, 2.5 * float(self.bolt.bolt_diameter_provided))
 
+        if design_dictionary[KEY_DP_DETAILING_EDGE_TYPE] == 'Sheared or hand flame cut':
+            self.bolt.min_edge_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
+            self.bolt.min_end_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
+        else:
+            self.bolt.min_edge_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
+            self.bolt.min_end_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
+
+        self.max_pitch_round = min(16 * self.minpltthk , 200)
+        self.max_gauge_round = min(100 + 4*self.minpltthk , 200)
+
+        self.bolt.max_edge_dist_round = self.bolt.max_end_dist_round = round(min(self.bolt.max_edge_dist_round , 12 * self.minpltthk * ((250 / self.yield_stress)** 0.5 )),0) 
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
+                                    bolt_grade_provided=float(self.bolt.bolt_grade_provided),
+                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                    n_planes=self.planes, e=float(self.bolt.min_end_dist_round),
+                                    p=float(self.bolt.min_pitch_round))
+        if self.bolt.bolt_type == 'Bearing Bolt':
+            self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
+        self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
+        self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)     
+    
     def number_r_c_bolts(self,design_dictionary,count=0):
         
         bolt_cap = self.bolt.bolt_capacity
@@ -575,7 +580,13 @@ class LapJointBolted(MomentConnection):
         self.utilization_ratio = round(self.utilization_ratio, 2)
         print(self.bolt)
 
-        enddist = float(self.width) - self.bolt.min_pitch_round*(self.rows - 1) - self.rows*float(self.bolt.bolt_diameter_provided)
+        # print(self)
+        print("faahfnafanfaf")
+        print("Max and min end edge dist ",self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
+        print("Max min gauge pitch dist",self.max_gauge_round,self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
+
+        enddist = float(self.width) - self.bolt.min_pitch_round*(self.rows - 1)
+        print(enddist)
         if enddist/2 <= self.bolt.max_edge_dist_round:
             if enddist/2 >= self.bolt.min_edge_dist_round:
 
@@ -589,7 +600,7 @@ class LapJointBolted(MomentConnection):
         else:
             self.final_edge_dist = self.bolt.max_edge_dist_round
             self.final_end_dist = self.bolt.max_edge_dist_round
-            widdist = float(self.width) - 2 * self.final_edge_dist - self.rows*float(self.bolt.bolt_diameter_provided)
+            widdist = float(self.width) - 2 * self.final_edge_dist
             if widdist/(self.rows - 1) <= self.max_pitch_round:
                 self.final_pitch = widdist/(self.rows - 1)
                 self.final_pitch = round(self.final_pitch, 0)
@@ -597,7 +608,7 @@ class LapJointBolted(MomentConnection):
             else:
                 self.final_pitch = self.max_pitch_round
                 self.final_gauge = self.max_pitch_round
-                self.final_edge_dist = self.final_end_dist = float(self.width) - self.final_pitch*(self.rows - 1) - self.rows*float(self.bolt.bolt_diameter_provided)
+                self.final_edge_dist = self.final_end_dist = float(self.width) - self.final_pitch*(self.rows - 1)
 
 
         # print("fafafafafa",self.final_edge_dist, self.final_end_dist, self.final_pitch, self.final_gauge)
@@ -635,11 +646,11 @@ class LapJointBolted(MomentConnection):
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
         for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
+            if chkbox.objectName() == 'Lap Joint':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
+        ui.commLogicObj.display_3DModel("Lap Joint", bgcolor)
     
     def warn_text(self):
 

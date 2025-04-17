@@ -583,7 +583,7 @@ class Window(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION,TYPE_IMAGE_BIGGER]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
@@ -753,6 +753,17 @@ class Window(QMainWindow):
                 i = i + 30
                 im.setFixedSize(im.size())
                 in_layout2.addWidget(im, j, 2, 1, 1)
+            
+            if type == TYPE_IMAGE_BIGGER:
+                im = QtWidgets.QLabel(self.dockWidgetContents)
+                im.setGeometry(QtCore.QRect(190, 10 + i, 420, 400))
+                im.setObjectName(option[0])
+                im.setScaledContents(True)
+                pixmap = QPixmap(option[3])
+                im.setPixmap(pixmap)
+                i = i + 30
+                im.setFixedSize(im.size())
+                in_layout2.addWidget(im, j, 1, 1, 1)
 
             if type == TYPE_IMAGE_COMPRESSION:
                 imc = QtWidgets.QLabel(self.dockWidgetContents)

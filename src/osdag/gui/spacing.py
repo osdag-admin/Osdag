@@ -108,7 +108,7 @@ class BoltPatternGenerator(QMainWindow):
         
         # Set up pens
         outline_pen = QPen(Qt.black, 2)
-        dimension_pen = QPen(Qt.blue, 1.5)
+        dimension_pen = QPen(Qt.black, 1.5)  # Changed from blue to black
         
         # Dimension offsets
         h_offset = 40
@@ -176,10 +176,21 @@ class BoltPatternGenerator(QMainWindow):
             
         self.addHorizontalDimension(gauge1 + gauge2, -h_offset, width, -h_offset, str(edge), pen)
         
+        # Add bottom horizontal dimension (edge_distance + gauge1 + gauge2)
+        self.addHorizontalDimension(0, height + h_offset, width, height + h_offset, 
+                                   str(edge + gauge1 + gauge2), pen)
+        
         # Add vertical dimensions
         self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
         self.addVerticalDimension(width + v_offset, end, width + v_offset, end + pitch, str(pitch), pen)
         self.addVerticalDimension(width + v_offset, end + pitch, width + v_offset, end + 2*pitch, str(pitch), pen)
+        
+        # Add bottom end distance dimension
+        self.addVerticalDimension(width + v_offset, height, width + v_offset, height - end, str(end), pen)
+        
+        # Add left side dimension (2*(edge_distance + pitch_distance))
+        self.addVerticalDimension(-v_offset, 0, -v_offset, height, 
+                                 str(2 * (end + pitch)), pen)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         # Draw dimension line

@@ -336,6 +336,7 @@ class LapJointBolted(MomentConnection):
         "initialisation of components required to design a tension member along with connection"
 
         self.module = design_dictionary[KEY_MODULE]
+        self.mainmodule = "Lap Joint Bolted Connection"
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
         self.width = design_dictionary[KEY_PLATE_WIDTH]

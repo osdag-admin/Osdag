@@ -80,30 +80,39 @@ class PlateGirderWelded(Member):
         t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
 
+        t6 = ("Deflection"  , TYPE_TAB_2, self.deflection_values)
+        tabs.append(t6)
+
         return tabs
+    
     def tab_value_changed(self):
         change_tab = []
-        """ You can take a cue from the commented out code below."""
 
+        t1 = (KEY_DISP_GIRDERSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        change_tab.append(t1)
 
-        # t1 = (KEY_DISP_GIRDERSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
-        # change_tab.append(t1)
-        #
-        # t4 = (KEY_DISP_GIRDERSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
-        #       ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
-        # change_tab.append(t4)
-        #
+        t4 = (KEY_DISP_GIRDERSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t9 = ("Deflection", [KEY_STR_TYPE], [KEY_MEMBER_OPTIONS], TYPE_COMBOBOX, self.member_options_change)
+        change_tab.append(t9)
+        t9 = ("Deflection", [KEY_MEMBER_OPTIONS], [KEY_SUPPORTING_OPTIONS], TYPE_COMBOBOX, self.supp_options_change)
+        change_tab.append(t9)
+        t9 = ("Deflection", [KEY_STR_TYPE,KEY_DESIGN_LOAD,KEY_MEMBER_OPTIONS,KEY_SUPPORTING_OPTIONS], [KEY_MAX_DEFL], TYPE_TEXTBOX, self.max_defl_change)
+        change_tab.append(t9)
+
         # t5 = (KEY_DISP_GIRDERSEC, ['Label_HS_1', 'Label_HS_2', 'Label_HS_3'],
         #       ['Label_HS_11', 'Label_HS_12', 'Label_HS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_HS_17', 'Label_HS_18',
         #        'Label_HS_19', 'Label_HS_20', 'Label_HS_21', 'Label_HS_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_SHS_RHS_properties)
         # change_tab.append(t5)
-        #
+
         # t6 = (KEY_DISP_GIRDERSEC, ['Label_CHS_1', 'Label_CHS_2', 'Label_CHS_3'],
         #       ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_21', 'Label_22',
         #        KEY_IMAGE], TYPE_TEXTBOX, self.get_CHS_properties)
         # change_tab.append(t6)
-        #
+
         # t6 = (KEY_DISP_GIRDERSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         # change_tab.append(t6)
 
@@ -126,25 +135,25 @@ class PlateGirderWelded(Member):
          """
         design_input = []
 
-        # t1 = (KEY_DISP_GIRDERSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])#Need to check
-        # design_input.append(t1)
-        #
-        # t1 = (KEY_DISP_GIRDERSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY])
-        # design_input.append(t1)
+        t1 = (KEY_DISP_GIRDERSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])#Need to check
+        design_input.append(t1)
+        
+        t1 = (KEY_DISP_GIRDERSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY])
+        design_input.append(t1)
 
         t2 = ("Optimisation", TYPE_TEXTBOX, [KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE])  # , KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Optimisation", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD, KEY_ShearBucklingOption])  # , KEY_STEEL_COST
+        t2 = ("Optimisation", TYPE_COMBOBOX, [KEY_ALLOW_CLASS, KEY_LOAD])  # , KEY_STEEL_COST
         design_input.append(t2)
 
-        t2 = ("Stiffeners", TYPE_COMBOBOX, [KEY_IntermediateStiffener])
+        t2 = ("Stiffeners", TYPE_COMBOBOX, [KEY_IntermediateStiffener,KEY_LongitudnalStiffener])
         design_input.append(t2)
 
         t2 = ("Stiffeners", TYPE_TEXTBOX, [KEY_IntermediateStiffener_spacing])
         design_input.append(t2)
 
-        t2 = ("Stiffeners", TYPE_TEXTBOX, [KEY_IntermediateStiffener_thickness])
+        t2 = ("Stiffeners", TYPE_COMBOBOX, [KEY_IntermediateStiffener_thickness,KEY_LongitudnalStiffener_thickness,KEY_ShearBucklingOption])
         design_input.append(t2)
 
         t2 = ("Additional Girder Data", TYPE_COMBOBOX, [KEY_IS_IT_SYMMETRIC])
@@ -153,18 +162,23 @@ class PlateGirderWelded(Member):
         t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
         design_input.append(t6)
 
+        t7 = ("Deflection",TYPE_COMBOBOX, [KEY_STR_TYPE,KEY_DESIGN_LOAD,KEY_MEMBER_OPTIONS,KEY_SUPPORTING_OPTIONS]) 
+        design_input.append(t7)
+        t7 = ("Deflection",TYPE_TEXTBOX, [KEY_MAX_DEFL])
+        design_input.append(t7)
+
         return design_input
 
     def input_dictionary_without_design_pref(self):
 
         design_input = []
 
-        # t2 = (KEY_MATERIAL, [KEY_DP_DESIGN_METHOD], 'Input Dock')
-        # design_input.append(t2)
+        t2 = (KEY_MATERIAL, [KEY_DP_DESIGN_METHOD], 'Input Dock')
+        design_input.append(t2)
 
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_LOAD, KEY_DP_DESIGN_METHOD,
-                     KEY_ShearBucklingOption, KEY_IntermediateStiffener_spacing, KEY_IntermediateStiffener,
-                     KEY_IntermediateStiffener_thickness, KEY_IS_IT_SYMMETRIC], '')
+        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_LOAD, KEY_DP_DESIGN_METHOD,KEY_STR_TYPE,KEY_DESIGN_LOAD,KEY_MEMBER_OPTIONS,KEY_MAX_DEFL,
+                     KEY_SUPPORTING_OPTIONS,KEY_ShearBucklingOption, KEY_IntermediateStiffener_spacing, KEY_IntermediateStiffener,KEY_LongitudnalStiffener,
+                     KEY_IntermediateStiffener_thickness,KEY_LongitudnalStiffener_thickness, KEY_IS_IT_SYMMETRIC], '')
         design_input.append(t2)
 
         return design_input
@@ -173,19 +187,19 @@ class PlateGirderWelded(Member):
 
         add_buttons = []
 
-        # t2 = (KEY_DISP_GIRDERSEC, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        # t2 = (KEY_DISP_GIRDERSEC,KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
         # add_buttons.append(t2)
 
         return add_buttons
 
     def get_values_for_design_pref(self, key, design_dictionary):
-        # if design_dictionary[KEY_MATERIAL] != 'Select Material':
-        #     material = Material(design_dictionary[KEY_MATERIAL], 41)
-        #     fu = material.fu
-        #     fy = material.fy
-        # else:
-        #     fu = ''
-        #     fy = ''
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            material = Material(design_dictionary[KEY_MATERIAL], 41)
+            fu = material.fu
+            fy = material.fy
+        else:
+            fu = ''
+            fy = ''
 
         val = {
             KEY_ALLOW_CLASS: 'Yes',
@@ -197,10 +211,101 @@ class PlateGirderWelded(Member):
             KEY_IS_IT_SYMMETRIC: 'Symmetrical',
             KEY_IntermediateStiffener: 'Yes',
             KEY_IntermediateStiffener_spacing: 'NA',
-            KEY_IntermediateStiffener_thickness: '6'
+            KEY_IntermediateStiffener_thickness: '6',
+            KEY_LongitudnalStiffener: 'Yes',
+            KEY_LongitudnalStiffener_thickness:'6',
+            KEY_STR_TYPE:'Highway Bridge',
+            KEY_DESIGN_LOAD:'Live Load',
+            KEY_MEMBER_OPTIONS :'Simple Span',
+            KEY_SUPPORTING_OPTIONS: 'NA',
+            KEY_MAX_DEFL : 'Span/600'
         }[key]
 
         return val
+    def member_options_change(self):
+        if self[0] == KEY_DISP_STR_TYP3:
+            return {KEY_MEMBER_OPTIONS : VALUES_MEMBER_OPTIONS[1]}
+        elif self[0] == KEY_DISP_STR_TYP4:
+            return {KEY_MEMBER_OPTIONS :VALUES_MEMBER_OPTIONS[2]}
+        else:
+            return {KEY_MEMBER_OPTIONS : VALUES_MEMBER_OPTIONS[0]}
+        
+
+    def supp_options_change(self):
+        if self[0] in ['Purlin and Girts', 'Simple span', 'Cantilever span']:
+            return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_PSC}
+        elif self[0]  == 'Rafter Supporting':
+            return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_RS}
+        elif self[0]  == 'Gantry':
+            return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_GNT}
+        elif self[0] in  ['Floor and roof', 'Cantilever']:
+            return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_FRC}
+        else:
+            return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_DEF}
+
+    def max_defl_change(self):
+        if self[0] in ['Highway Bridge','Railway Bridge']:
+            if self[2] == 'Simple Span':
+                if self[1] == 'Live load':
+                    return {KEY_MAX_DEFL :VALUES_MAX_DEFL[0]}
+                elif self[1] == 'Dead load':
+                    return  {KEY_MAX_DEFL : VALUES_MAX_DEFL[1]}
+                else:
+                    return {KEY_MAX_DEFL : 'NA'}
+                    
+            else:
+                if self[1] == 'Live load':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[2]}
+                elif self[1] == 'Dead load':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[1]}
+                else:
+                    return {KEY_MAX_DEFL : 'NA'}
+                
+        elif self[0] == 'Other Building':
+            if self[1] == 'Live load':
+                if self[2] == 'Floor and roof':
+                    if self[3] == 'Elements not susceptible to cracking':
+                        return {KEY_MAX_DEFL : VALUES_MAX_DEFL[3]}
+                    else:
+                        return {KEY_MAX_DEFL : VALUES_MAX_DEFL[4]}
+                else:
+                    if self[3] == 'Elements not susceptible to cracking':
+                        return {KEY_MAX_DEFL : VALUES_MAX_DEFL[5]}
+                    else:
+                        return {KEY_MAX_DEFL : VALUES_MAX_DEFL[6]}
+            else:
+                return {KEY_MAX_DEFL : 'NA'}
+        else:
+            if self[2] == 'Purlin and Girts' and self[1] == 'Live load':
+                if self[3] == 'Elastic cladding':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[5]}
+                else:
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[6]}
+            elif self[2] == 'Simple span' and self[1] == 'Live load':
+                if self[3] == 'Elastic cladding':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[7]}
+                else:
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[3]}
+            elif self[2] == 'Cantilever span' and self[1] == 'Live load':
+                if self[3] == 'Elastic cladding':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[8]}
+                else:
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[5]}
+            elif self[2] == 'Rafter Supporting' and self[1] == 'Live load':
+                if self[3] == 'Profiled Metal sheeting':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[6]}
+                else:
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[7]}
+            elif self[2] == 'Gantry' and self[1] == 'Live load':
+                if self[1] == 'Crane Load(Manual operation)':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[9]}
+                elif self[1] == 'Crane load(Electric operation up to 50t)':
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[10]}
+                else:
+                    return {KEY_MAX_DEFL : VALUES_MAX_DEFL[11]}
+            else:
+                return {KEY_MAX_DEFL : 'NA'}
+
 
     ####################################
     # Design Preference Functions End
@@ -240,8 +345,19 @@ class PlateGirderWelded(Member):
     def customized_input(self):
 
         c_lst = []
+        # t1 = (KEY_SECSIZE, self.fn_profile_section)
+        # c_lst.append(t1)
+        t1 = (KEY_TOP_FLANGE_THICKNESS_PG, self.plate_thick_customized)
+        c_lst.append(t1)
 
+        t2 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, self.plate_thick_customized)
+        c_lst.append(t2)
+
+        t3= (KEY_WEB_THICKNESS_PG, self.plate_thick_customized)
+        c_lst.append(t3)
         return c_lst
+
+
 
     def input_values(self):
 
@@ -257,23 +373,30 @@ class PlateGirderWelded(Member):
         t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t4)
 
-        t2 = (KEY_OVERALL_DEPTH_PG, KEY_DISP_OVERALL_DEPTH_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t2 = (KEY_OVERALL_DEPTH_PG_TYPE, KEY_DISP_OVERALL_DEPTH_PG_TYPE, TYPE_COMBOBOX, VALUES_DEPTH_PG, True, 'No Validator')
         options_list.append(t2)
+        t33 = (KEY_OVERALL_DEPTH_PG, KEY_DISP_OVERALL_DEPTH_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
+        options_list.append(t33)
 
-        t4 = (KEY_WEB_THICKNESS_PG, KEY_WEB_THICKNESS_PG, TYPE_COMBOBOX, VALUES_PLATETHK, True,
-              'No Validator')
+        t4 = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True,
+              'Int Validator')
         options_list.append(t4)
+
+        # t2 = (KEY_TOP_Bflange_PG_Type, KEY_DISP_TOP_Bflange_PG_Type, TYPE_COMBOBOX, VALUES_DEPTH_PG, True, 'No Validator')
+        # options_list.append(t2)
 
         t2 = (KEY_TOP_Bflange_PG, KEY_DISP_TOP_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t2)
 
-        t4 = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, VALUES_PLATETHK, True, 'No Validator')
+        t4 = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'Int Validator')
         options_list.append(t4)
 
-        t2 = (KEY_BOTTOM_Bflange_PG, KEY_DISP_BOTTOM_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
-        options_list.append(t2)
+        # t2 = (KEY_BOTTOM_Bflange_PG_Type, KEY_DISP_BOTTOM_Bflange_PG_Type, TYPE_COMBOBOX, VALUES_DEPTH_PG, True, 'No Validator')
+        # options_list.append(t2)
+        t22 = (KEY_BOTTOM_Bflange_PG, KEY_DISP_BOTTOM_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
+        options_list.append(t22)
 
-        t4 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, VALUES_PLATETHK, True,
+        t4 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True,
               'No Validator')
         options_list.append(t4)
 
@@ -293,8 +416,8 @@ class PlateGirderWelded(Member):
         )
         options_list.append(t2)
 
-        t4 = (KEY_STR_TYPE, KEY_DISP_STR_TYPE, TYPE_COMBOBOX, KEY_DISP_STR_TYPE_list, True, 'No Validator')
-        options_list.append(t4)
+        #t4 = (KEY_STR_TYPE, KEY_DISP_STR_TYPE, TYPE_COMBOBOX, KEY_DISP_STR_TYPE_list, True, 'No Validator')
+        #options_list.append(t4)
 
         t4 = (KEY_WEB_PHILOSOPHY, KEY_DISP_WEB_PHILOSOPHY, TYPE_COMBOBOX, WEB_PHILOSOPHY_list, True, 'No Validator')
         options_list.append(t4)
@@ -314,6 +437,12 @@ class PlateGirderWelded(Member):
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
+        t8= (KEY_BENDING_MOMENT_SHAPE, KEY_DISP_BENDING_MOMENT_SHAPE, TYPE_COMBOBOX, Bending_moment_shape_list, True,
+             'No Validator' )
+        options_list.append(t8)
+
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE_BIGGER, VALUES_IMAGE_PLATEGIRDER[0], True,'No Validator')
+        options_list.append(t15)
         return options_list
 
     def fn_torsion_warping(self):
@@ -332,13 +461,87 @@ class PlateGirderWelded(Member):
             return ['NA']
         else:
             return VALUES_BENDING_TYPE
+        
+    def fn_conn_image(self):
+
+        "Function to populate section images based on the type of section "
+        img = self[0]
+        if img == Bending_moment_shape_list[0]:
+            return VALUES_IMAGE_PLATEGIRDER[0]
+        elif img ==Bending_moment_shape_list[1]:
+            return VALUES_IMAGE_PLATEGIRDER[1]
+        elif img ==Bending_moment_shape_list[2]:
+            return VALUES_IMAGE_PLATEGIRDER[2]
+        elif img ==Bending_moment_shape_list[3]:
+            return VALUES_IMAGE_PLATEGIRDER[3]
+        else:
+            return VALUES_IMAGE_PLATEGIRDER[4]
+        
+    def customized_dimensions(self):
+        conn = self[0]
+        if conn == "Customized":
+            return KEY_DISP_OVERALL_DEPTH_PG
+        else:
+            return ''
+    
+    def customized_dimensions_1(self):
+        conn = self[0]
+        if conn == "Customized":
+            return KEY_DISP_TOP_Bflange_PG
+        else:
+            return ''
+        
+    def customized_dimensions_2(self):
+        conn = self[0]
+        if conn == "Customized":
+            return KEY_DISP_BOTTOM_Bflange_PG
+        else:
+            return ''
+
+    def customized_dims(self):
+        conn = self[0]
+        if conn == "Customized":
+            return TYPE_TEXTBOX
+        else:
+            return ''
+        
+    def customized_options(self):
+        conn = self[0]
+        if conn == "Customized":
+            return VALUES_PLATETHK
+        else:
+            return VALUES_OPT
+        
 
     def input_value_changed(self):
 
         lst = []
+        t1 = ([KEY_BENDING_MOMENT_SHAPE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        lst.append(t1)
 
         t3 = ([KEY_TORSIONAL_RES], KEY_WARPING_RES, TYPE_COMBOBOX, self.fn_torsion_warping)
         lst.append(t3)
+
+        t44 = ([KEY_OVERALL_DEPTH_PG_TYPE],KEY_OVERALL_DEPTH_PG, TYPE_LABEL, self.customized_dimensions)
+        lst.append(t44)
+        t45 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_OVERALL_DEPTH_PG, TYPE_TEXTBOX, self.customized_dims)
+        lst.append(t45)
+        t46 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_WEB_THICKNESS_PG, TYPE_COMBOBOX, self.customized_options)
+        lst.append(t46)
+
+        t2 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_TOP_Bflange_PG, TYPE_LABEL, self.customized_dimensions_1)
+        lst.append(t2)
+        t3 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_TOP_Bflange_PG, TYPE_TEXTBOX, self.customized_dims)
+        lst.append(t3)
+        t47 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, self.customized_options)
+        lst.append(t47)
+
+        t23 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_BOTTOM_Bflange_PG, TYPE_LABEL, self.customized_dimensions_2)
+        lst.append(t23)
+        t24 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_BOTTOM_Bflange_PG, TYPE_TEXTBOX, self.customized_dims)
+        lst.append(t24)
+        t47 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, self.customized_options)
+        lst.append(t47)
 
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
@@ -479,6 +682,18 @@ class PlateGirderWelded(Member):
         t1 = (KEY_MOMENT_STRENGTH, KEY_DISP_MOMENT, TYPE_TEXTBOX,
               self.result_bending  if flag else
               '', True)
+
+        t1 = (None, KEY_DISP_WELD_DESIGN, TYPE_TITLE, None, True)
+        out_list.append(t1)
+
+        t1 = (KEY_WeldWebtoflange, KEY_DISP_WeldWebtoflange, TYPE_TEXTBOX,
+              self.result_bending if flag else
+              '', True)
+        out_list.append(t1)
+
+        t1 = (KEY_WeldStiffenertoweb, KEY_DISP_WeldStiffenertoweb, TYPE_TEXTBOX,
+              self.result_bending if flag else
+              '', True)
         out_list.append(t1)
 
         t1 = (None, KEY_DISP_LTB, TYPE_TITLE, None, False)
@@ -602,8 +817,16 @@ class PlateGirderWelded(Member):
             if option[2] == TYPE_TEXTBOX or option[0] == KEY_LENGTH or option[0] == KEY_SHEAR or option[0] == KEY_MOMENT:
                 try:
                     if design_dictionary[option[0]] == '':
-                        missing_fields_list.append(option[1])
-                        continue
+                        if design_dictionary['Total.Design_Type'] == 'Optimized':
+                            if design_dictionary[KEY_OVERALL_DEPTH_PG] == '' or design_dictionary[KEY_TOP_Bflange_PG] == '' or design_dictionary[KEY_BOTTOM_Bflange_PG] == '':
+                                pass
+                            else:
+                                missing_fields_list.append(option[1])
+                                continue
+                                
+                        else:
+                            missing_fields_list.append(option[1])
+                            continue
                     if option[0] == KEY_LENGTH:
                         if float(design_dictionary[option[0]]) <= 0.0:
                             print("Input value(s) cannot be equal or less than zero.")
@@ -629,15 +852,6 @@ class PlateGirderWelded(Member):
                 except:
                         error = "Input value(s) are not valid"
                         all_errors.append(error)
-            # elif type(design_dictionary[option[0]]) != 'float':
-            #             print("Input value(s) are not valid")
-            #             error = "Input value(s) are not valid"
-            #             all_errors.append(error)
-
-            # elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_DESIGN_TYPE_FLEXURE, KEY_BENDING, KEY_SUPPORT]:
-            #     val = option[3]
-            #     if design_dictionary[option[0]] == val[0]:
-            #         missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -648,18 +862,19 @@ class PlateGirderWelded(Member):
         if flag and flag1 and flag2 and flag3:
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
-            if self.design_status ==False and len(self.failed_design_dict)>0:
-                logger.error(
-                    "Design Failed, Check Design Report"
-                )
-                return # ['Design Failed, Check Design Report'] @TODO
-            elif self.design_status:
-                pass
-            else:
-                logger.error(
-                    "Design Failed. Selender Sections Selected"
-                )
-                return # ['Design Failed. Selender Sections Selected']
+            print("WORKING VALIDATION")
+            # if self.design_status ==False and len(self.failed_design_dict)>0:
+            #     logger.error(
+            #         "Design Failed, Check Design Report"
+            #     )
+            #     return # ['Design Failed, Check Design Report'] @TODO
+            # elif self.design_status:
+            #     pass
+            # else:
+            #     logger.error(
+            #         "Design Failed. Selender Sections Selected"
+            #     )
+            #     return # ['Design Failed. Selender Sections Selected']
         else:
             return all_errors
 
@@ -687,100 +902,112 @@ class PlateGirderWelded(Member):
 
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
-        '''
-        TODO
-                self.bending_type == KEY_DISP_BENDING1:
-                self.lambda_lt = self.lambda_lt_check_member_type
-                if self.lambda_lt < 0.4:
-                    self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE
-        '''
-        # super(Flexure, self).set_input_values(self, design_dictionary)
-
-        # section properties
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = KEY_Flexure_Member_MAIN_MODULE
-        self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
-        self.sec_list = design_dictionary[KEY_SECSIZE]
-        print(f"\n Inside set_input_values{self.sec_profile}")
-        print(f"\n sec_profile{self.sec_list}")
-        self.main_material = design_dictionary[KEY_MATERIAL]
-        self.material = design_dictionary[KEY_SEC_MATERIAL]
+        self.design_type = design_dictionary[KEY_OVERALL_DEPTH_PG_TYPE]
+        self.section_class = None
+        if self.design_type == 'Optimized':
+            self.total_depth = 1
+            self.web_thickness = 1
+            self.top_flange_width = 1
+            self.top_flange_thickness = 1
+            self.bottom_flange_width = 1
+            self.bottom_flange_thickness = 1
+        
+        else:
 
+            self.total_depth = float(design_dictionary[KEY_OVERALL_DEPTH_PG])
+            self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG][0])
+            self.top_flange_width = float(design_dictionary[KEY_TOP_Bflange_PG])
+            self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG][0])
+            self.bottom_flange_width = float(design_dictionary[KEY_BOTTOM_Bflange_PG])
+            self.bottom_flange_thickness = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG][0])
+
+            #3 list loops for V inp<V_d and M inp < Md criteria for not considering thickness (3)
+        
+        
+        thickness_for_mat = max(self.web_thickness,self.top_flange_thickness, self.bottom_flange_thickness)
+        self.material = Material(design_dictionary[KEY_MATERIAL],thickness_for_mat)
+        self.support_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]
+        self.loading_condition = design_dictionary[KEY_LOAD]
+        self.torsional_res = design_dictionary[KEY_TORSIONAL_RES]
+        self.warping = design_dictionary[KEY_WARPING_RES]
+        self.length = float(design_dictionary[KEY_LENGTH])
+        self.effective_length = None
+        self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
+
+        self.beta_b_lt = None
         # design type
-        self.design_type_temp = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
-        self.latex_design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
-        if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
-            self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
-            self.bending_type = KEY_DISP_BENDING1
-            # TODO self.support_cndition_shear_buckling
-            self.support_cndition_shear_buckling = 'NA'#design_dictionary[KEY_ShearBucklingOption]
-        elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
-            self.design_type = VALUES_SUPP_TYPE[0]
-            self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
-            self.support_cndition_shear_buckling = 'NA'
+        # self.design_type_temp = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+        # self.latex_design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+        # if self.design_type_temp == VALUES_SUPP_TYPE_temp[0]:
+        #     self.design_type = VALUES_SUPP_TYPE[0]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
+        #     self.bending_type = KEY_DISP_BENDING1
+        #     # TODO self.support_cndition_shear_buckling
+        #     self.support_cndition_shear_buckling = 'NA'#design_dictionary[KEY_ShearBucklingOption]
+        # elif self.design_type_temp == VALUES_SUPP_TYPE_temp[1]:
+        #     self.design_type = VALUES_SUPP_TYPE[0]
+        #     self.bending_type = KEY_DISP_BENDING2 #if design_dictionary[KEY_BENDING] != 'Disabled' else 'NA'
+        #     self.support_cndition_shear_buckling = 'NA'
 
-        elif self.design_type_temp == VALUES_SUPP_TYPE_temp[2]:
-            self.design_type = VALUES_SUPP_TYPE[1]
-            self.bending_type = KEY_DISP_BENDING1
-            self.support_cndition_shear_buckling = 'NA'
+        # elif self.design_type_temp == VALUES_SUPP_TYPE_temp[2]:
+        #     self.design_type = VALUES_SUPP_TYPE[1]
+        #     self.bending_type = KEY_DISP_BENDING1
+        #     self.support_cndition_shear_buckling = 'NA'
 
         # section user data
-        self.length = float(design_dictionary[KEY_LENGTH])
+        # self.length = float(design_dictionary[KEY_LENGTH])
 
         # end condition
-        self.support = design_dictionary[KEY_SUPPORT]
+        # self.support = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]
 
         # factored loads
-        self.load = Load(
-            shear_force=design_dictionary[KEY_SHEAR],
-            axial_force="",
-            moment=design_dictionary[KEY_MOMENT],
-            unit_kNm=True,
-        )
+        self.load = Load(shear_force=design_dictionary[KEY_SHEAR],axial_force="",moment=design_dictionary[KEY_MOMENT],unit_kNm=True,)
+
+        
 
         # design preferences
         # self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
-        self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
-        self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
-        self.allowable_utilization_ratio = 1.0
-        self.optimization_parameter = "Utilization Ratio"
-        self.allow_class = design_dictionary[KEY_ALLOW_CLASS]  # if 'Semi-Compact' is available
-        self.steel_cost_per_kg = 50
-        # Step 2 - computing the design compressive stress for web_buckling & web_crippling
-        self.bearing_length = design_dictionary[KEY_BEARING_LENGTH]
-        #TAKE from Design Dictionary
-        self.allowed_sections = []
-        if self.allow_class == "Yes":
-            self.allowed_sections == KEY_SemiCompact
+        # self.latex_efp = design_dictionary[KEY_LENGTH_OVERWRITE]
+        # self.effective_area_factor = float(design_dictionary[KEY_EFFECTIVE_AREA_PARA])
+        # self.allowable_utilization_ratio = 1.0
+        # self.optimization_parameter = "Utilization Ratio"
+        # if 'Semi-Compact' is available
+        # self.steel_cost_per_kg = 50
+        # # Step 2 - computing the design compressive stress for web_buckling & web_crippling
+        # self.bearing_length = design_dictionary[KEY_BEARING_LENGTH]
+        # #TAKE from Design Dictionary
+        # self.allowed_sections = []
+        # if self.allow_class == "Yes":
+        #     self.allowed_sections == KEY_SemiCompact
 
-        print(f"self.allowed_sections {self.allowed_sections}")
-        print("==================")
-        # print(f"self.load_type {self.load_type}")
+        # print(f"self.allowed_sections {self.allowed_sections}")
+        # print("==================")
+        # # print(f"self.load_type {self.load_type}")
 
-        print(f"self.module{self.module}")
-        print(f"self.sec_list {self.sec_list}")
-        print(f"self.material {self.material}")
-        print(f"self.length {self.length}")
-        print(f"self.load {self.load}")
-        print("==================")
+        # print(f"self.module{self.module}")
+        # print(f"self.sec_list {self.sec_list}")
+        # print(f"self.material {self.material}")
+        # print(f"self.length {self.length}")
+        # print(f"self.load {self.load}")
+        # print("==================")
 
-        # safety factors
+        # # safety factors
         self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]["yielding"]
-        self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]
-        self.material_property = Material(material_grade=self.material, thickness=0)
-        self.fyf = self.material_property.fy
-        self.fyw = self.material_property.fy
+        # self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]
+        # self.material_property = Material(material_grade=self.material, thickness=0)
+        # self.fyf = self.material_property.fy
+        # self.fyw = self.material_property.fy
 
-        print(f"self.material_property {self.material_property}]")
+        # print(f"self.material_property {self.material_property}]")
         # print( "self.material_property",self.material_property.fy)
         # initialize the design status
-        self.design_status_list = []
+        # self.design_status_list = []
         self.design_status = False
-        self.sec_prop_initial_dict = {}
-        self.failed_design_dict = {}
-        self.design(self, design_dictionary)
-        if self.flag:
-            self.results(self, design_dictionary)
+        # self.sec_prop_initial_dict = {}
+        # self.failed_design_dict = {}
+        self.section_classification(self, design_dictionary)
+        # if self.flag:
+        #     self.results(self, design_dictionary)
 
 
         # else:
@@ -792,6 +1019,354 @@ class PlateGirderWelded(Member):
 
 
     # Simulation starts here
+    def section_classification(self,design_dictionary):
+        flange_class_top = IS800_2007.Table2_i(((self.top_flange_width / 2)),self.top_flange_thickness,self.material.fy,'Welded')[0]
+        flange_class_bottom = IS800_2007.Table2_i(((self.bottom_flange_width / 2)),self.bottom_flange_thickness,self.material.fy,'Welded')[0]
+        web_class = IS800_2007.Table2_iii((self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness),self.web_thickness,self.material.fy)
+        web_ratio = (self.total_depth - (self.top_flange_thickness + self.bottom_flange_thickness)) / self.web_thickness
+        flange_ratio_top = self.top_flange_width / (2 *self.top_flange_thickness)
+        flange_ratio_bottom = self.bottom_flange_width / (2 *self.bottom_flange_thickness)
+        print("fafafafafafafafaf",flange_class_top, flange_class_bottom,web_class,web_ratio,flange_ratio_top,flange_ratio_bottom)
+        if flange_class_bottom == "Slender" or web_class == "Slender" or flange_class_top == 'Slender':
+                self.section_class = "Slender"
+        else:
+            if flange_class_bottom == KEY_Plastic and web_class == KEY_Plastic and flange_class_top == KEY_Plastic:
+                self.section_class = KEY_Plastic
+            elif flange_class_bottom == KEY_Plastic and web_class == KEY_Compact and flange_class_top == KEY_Plastic:
+                self.section_class = KEY_Compact
+            elif flange_class_bottom == KEY_Plastic and web_class == KEY_SemiCompact and flange_class_top == KEY_Plastic:
+                self.section_class = KEY_SemiCompact
+            elif flange_class_bottom == KEY_Compact and web_class == KEY_Plastic and flange_class_top == KEY_Compact:
+                self.section_class = KEY_Compact
+            elif flange_class_bottom == KEY_Compact and web_class == KEY_Compact and flange_class_top == KEY_Compact:
+                self.section_class = KEY_Compact
+            elif flange_class_bottom == KEY_Compact and web_class == KEY_SemiCompact and flange_class_top == KEY_Compact:
+                self.section_class = KEY_SemiCompact
+            elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_Plastic and flange_class_top == KEY_SemiCompact:
+                self.section_class = KEY_SemiCompact
+            elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_Compact and flange_class_top == KEY_SemiCompact:
+                self.section_class = KEY_SemiCompact
+            elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_SemiCompact and flange_class_top == KEY_SemiCompact:
+                self.section_class = KEY_SemiCompact
+        print("fafafahjahfhabnfahf", self.section_class)
+        self.Zp_req = self.load.moment * self.gamma_m0 / self.material.fy
+        self.effective_length_beam(self, design_dictionary, self.length)
+
+        print( 'self.allow_class', self.allow_class)
+        self.plast_sec_mod_z = self.calc_PlasticModulusZ(self,self.total_depth,self.top_flange_width,self.bottom_flange_width,
+                                                    self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness)
+        self.elast_sec_mod_z = self.calc_ElasticModulusZz(self,self.total_depth,self.top_flange_width,self.bottom_flange_width,
+                                                    self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness)
+        self.Zp_req = self.load.moment * self.gamma_m0 / self.material.fy
+        if self.plast_sec_mod_z >= self.Zp_req:
+            print( 'self.section_property.plast_sec_mod_z More than Requires',self.plast_sec_mod_z,self.Zp_req)
+            if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
+                self.beta_b_lt = 1.0
+            else:
+                self.beta_b_lt = (self.elast_sec_mod_z/ self.plast_sec_mod_z)
+        print("Fafavsfqf",self.beta_b_lt)  
+        A_vg = (self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness) * self.web_thickness    
+        self.V_d = ((A_vg * self.material.fy) / (math.sqrt(3) * self.gamma_m0))
+        print("Shear check",self.V_d)
+        print("shear force ",self.load.shear_force)  #V value self.load.shear_force
+        if self.cl_8_2_1_2_high_shear_check(self,self.load.shear_force,self.V_d): #high shear
+            if self.support_type == 'Major Laterally Supported':
+                self.Mdv = self.calc_Mdv(self,self.load.shear_force,self.V_d, self.plast_sec_mod_z,self.elast_sec_mod_z, self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                print("fafafamfm a",self.Mdv)
+            else:
+                print("Not Lat supp")
+        else:
+            if self.support_type == 'Major Laterally Supported':  #low shear
+                self.Md =self.plast_sec_mod_z * self.material.fy / self.gamma_m0
+                print("sefafafaf c",self.Md)
+            
+            else:
+                print("Not Lat supp")
+         
+
+
+
+
+
+    
+    def effective_length_beam(self, design_dictionary, length):
+        if design_dictionary[KEY_LENGTH_OVERWRITE] == 'NA':
+            self.effective_length = IS800_2007.cl_8_3_1_EffLen_Simply_Supported(Torsional=self.torsional_res,Warping=self.warping,
+                                                                                length=length,depth=(self.total_depth/1000),load=self.loading_condition)
+            print(f"Working 1 {self.effective_length}")
+        else:
+            try:
+                if float(design_dictionary[KEY_LENGTH_OVERWRITE]) <= 0:
+                    design_dictionary[KEY_LENGTH_OVERWRITE] = 'NA'
+                else:
+                    length = length * float(design_dictionary[KEY_LENGTH_OVERWRITE])
+
+                self.effective_length = length
+                print(f"Working 2 {self.effective_length}")
+            except:
+                print(f"Inside effective_length_beam",type(design_dictionary[KEY_LENGTH_OVERWRITE]))
+                logger.warning("Invalid Effective Length Parameter.")
+                logger.info('Effective Length Parameter is set to default: 1.0')
+                design_dictionary[KEY_LENGTH_OVERWRITE] = '1.0'
+                self.effective_length_beam(self, design_dictionary, length)
+                print(f"Working 3 {self.effective_length}")
+        print(f"Inside effective_length_beam",self.effective_length, design_dictionary[KEY_LENGTH_OVERWRITE])
+
+    def cl_8_2_1_2_high_shear_check(self,V, V_d):
+            if V  > 0.6 * V_d :
+                print('High shear')
+                return True
+            else:
+                print('Low shear')
+                return False
+            
+    def calc_Centroid(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        A_top = B_top * t_f_top
+        A_bot = B_bot * t_f_bot
+        A_web = (D - t_f_top - t_f_bot) * t_w
+
+        y_top = D - t_f_top / 2
+        y_bot = t_f_bot / 2
+        y_web = t_f_bot + (D - t_f_top - t_f_bot) / 2
+
+        y_neutral = (A_top * y_top + A_bot * y_bot + A_web * y_web) / (A_top + A_bot + A_web)
+        return y_neutral
+    
+    def calc_PlasticModulusZ(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        y_neutral = self.calc_Centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
+        A_top = B_top * t_f_top
+        A_bot = B_bot * t_f_bot
+        A_web_top = t_w * (D - y_neutral - t_f_top)
+        A_web_bot = t_w * (y_neutral - t_f_bot)
+
+        Zpz = (A_top * (D - y_neutral - t_f_top / 2) + A_web_top * (D - y_neutral - t_f_top - (D - y_neutral - t_f_top) / 2) +
+            A_bot * (y_neutral - t_f_bot / 2) + A_web_bot * ((y_neutral - t_f_bot) / 2)) / 1000
+
+        return round(Zpz, 2)
+    
+    def calc_MomentOfAreaZ(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        y_neutral = self.calc_Centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
+
+        I_top = (B_top * t_f_top ** 3) / 12 + B_top * t_f_top * (D - t_f_top / 2 - y_neutral) ** 2
+        I_bot = (B_bot * t_f_bot ** 3) / 12 + B_bot * t_f_bot * (y_neutral - t_f_bot / 2) ** 2
+        I_web = (t_w * (D - t_f_top - t_f_bot) ** 3) / 12 + t_w * (D - t_f_top - t_f_bot) * (y_neutral - (t_f_bot + (D - t_f_top - t_f_bot) / 2)) ** 2
+
+        I_zz = (I_top + I_bot + I_web) / 10000
+        return round(I_zz, 2)
+    
+    def calc_ElasticModulusZz(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        I_zz = self.calc_MomentOfAreaZ(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
+        y_neutral = self.calc_Centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
+        Z_ez_top = I_zz * 10 / (D - y_neutral)
+        Z_ez_bot = I_zz * 10 / y_neutral
+        return round(min(Z_ez_top, Z_ez_bot), 2)
+
+    def calc_Mdv(self,V, Vd, Zp, Ze, Fy, gamma_m0, D, tw, tf_top, tf_bot):  #only for major laterally supp
+        """
+        Calculate Mdv for high shear conditions.
+        
+        Parameters:
+        V         : Factored applied shear force
+        Vd        : Design shear strength governed by web yielding/buckling
+        Zp        : Plastic section modulus of the section (Z-axis)
+        Ze        : Elastic section modulus of the section (Z-axis)
+        Fy        : Yield strength of material
+        gamma_m0  : Partial safety factor for material
+        D         : Total depth of section
+        tw        : Thickness of the web
+        tf_top    : Thickness of the top flange
+        tf_bot    : Thickness of the bottom flange
+        
+        Returns:
+        Mdv : Design bending strength under high shear condition
+        """
+
+        # Calculating beta
+        beta = (2 * V / Vd - 1) ** 2
+
+        # Calculating Aw and Zfd
+        d = D - (tf_top + tf_bot)
+        Aw = d * tw
+        Zfd = Zp - (Aw * D / 4) / 1000  # convert mm^3 to cm^3 if necessary
+
+        # Calculating Mfd
+        Mfd = beta * Zfd * Fy / gamma_m0
+
+        # Calculating Md (Plastic Design Moment)
+        Md = Zp * Fy / gamma_m0
+
+        # Calculating Mdv
+        Mdv = Md - beta * (Md - Mfd)
+
+        # Limiting value as per the provided formula
+        Mdv_limit = (1.2 * Ze * Fy) / gamma_m0
+
+        return round(min(Mdv, Mdv_limit), 2)
+
+                         
+
+
+
+    #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    def section_classification1(self, design_dictionary,trial_section=""):
+        """Classify the sections based on Table 2 of IS 800:2007"""
+        print(f"Inside section_classification")
+        local_flag = True
+        self.input_modified = []
+        self.input_section_list = []
+        self.input_section_classification = {}
+        lambda_check = False
+        for trial_section in self.sec_list:
+            trial_section = trial_section.strip("'")
+            self.section_property = self.section_connect_database(self, trial_section)
+            print(f"Type of section{self.section_property.designation}")
+            if self.section_property.type == "Rolled":
+                web_class = IS800_2007.Table2_iii(
+                    self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius),
+                    self.section_property.web_thickness,
+                    self.material_property.fy,
+                )
+                flange_class_bottom = IS800_2007.Table2_i(
+                    self.section_property.flange_width / 2,
+                    self.section_property.flange_thickness,
+                    self.material_property.fy,self.section_property.type
+                )[0]
+                web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
+            else:
+                flange_class_bottom = IS800_2007.Table2_i(
+                    (
+                        (self.section_property.flange_width / 2)
+                        # - (self.section_property.web_thickness / 2)
+                    ),
+                    self.section_property.flange_thickness,
+                    self.section_property.fy,
+                    self.section_property.type,
+                )[0]
+
+                web_class = IS800_2007.Table2_iii(
+                    (
+                        self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
+                    ),
+                    self.section_property.web_thickness,
+                    self.material_property.fy, # classification_type="Axial compression",
+                )
+                web_ratio = (self.section_property.depth - 2 * (
+                            self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
+                flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
+            print(f"\n \n \n flange_class_bottom {flange_class_bottom} \n web_class{web_class} \n \n")
+            if flange_class_bottom == "Slender" or web_class == "Slender":
+                self.section_class = "Slender"
+            else:
+                if flange_class_bottom == KEY_Plastic and web_class == KEY_Plastic:
+                    self.section_class = KEY_Plastic
+                elif flange_class_bottom == KEY_Plastic and web_class == KEY_Compact:
+                    self.section_class = KEY_Compact
+                elif flange_class_bottom == KEY_Plastic and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class_bottom == KEY_Compact and web_class == KEY_Plastic:
+                    self.section_class = KEY_Compact
+                elif flange_class_bottom == KEY_Compact and web_class == KEY_Compact:
+                    self.section_class = KEY_Compact
+                elif flange_class_bottom == KEY_Compact and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_Plastic:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_Compact:
+                    self.section_class = KEY_SemiCompact
+                elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_SemiCompact:
+                    self.section_class = KEY_SemiCompact
+
+            self.Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
+            self.effective_length_beam(self, design_dictionary, self.length)  # mm
+
+            print( 'self.allow_class', self.allow_class)
+            if self.section_property.plast_sec_mod_z >= self.Zp_req:
+                print( 'self.section_property.plast_sec_mod_z More than Requires')
+
+                if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                    self.It = self.section_property.It
+                    # (
+                    #                   2
+                    #                   * self.section_property.flange_width
+                    #                   * self.section_property.flange_thickness ** 3
+                    #           ) / 3 + (
+                    #                   (self.section_property.depth - self.section_property.flange_thickness)
+                    #                   * self.section_property.web_thickness ** 3
+                    #           ) / 3
+                    self.hf = self.section_property.depth - self.section_property.flange_thickness
+                    self.Iw = self.section_property.Iw
+                    # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
+
+
+                    if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
+                        self.beta_b_lt = 1.0
+                    else:
+                        self.beta_b_lt = (
+                                self.section_property.elast_sec_mod_z
+                                / self.section_property.plast_sec_mod_z
+                        )
+                    _ = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
+                        self.material_property.modulus_of_elasticity,
+                        0.3,
+                        self.section_property.mom_inertia_y,
+                        self.It,
+                        self.Iw,
+                        self.effective_length * 1e3, self.beta_b_lt, self.section_property.plast_sec_mod_z, self.hf, self.section_property.rad_of_gy_y, self.section_property.flange_thickness
+                    )
+                    self.M_cr = _[0]
+                    self.fcrb = _[1]
+                    lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment(
+                        self.beta_b_lt,
+                        self.section_property.plast_sec_mod_z,
+                        self.section_property.elast_sec_mod_z,
+                        self.material_property.fy,
+                        self.M_cr
+                    )
+                    if lambda_lt < 0.4:
+                        lambda_check = True
+                        continue
+                if self.allow_class != 'No':
+                    if (
+                        self.section_class == KEY_SemiCompact
+                        or self.section_class == KEY_Compact
+                        or self.section_class == KEY_Plastic
+                    ):
+
+                        self.input_section_list.append(trial_section)
+                        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class_bottom, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt,self.fcrb]})
+                        else:
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class_bottom, web_class, flange_ratio, web_ratio]})
+
+                    elif self.section_class == "Slender":
+                        logger.warning(f"The section.{trial_section} is Slender. Ignoring")
+                else:
+                    if self.section_class == KEY_Compact or self.section_class == KEY_Plastic:
+                        self.input_section_list.append(trial_section)
+                        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class_bottom, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt, self.fcrb]})
+                        else:
+                            self.input_section_classification.update({trial_section: [self.section_class, flange_class_bottom, web_class, flange_ratio, web_ratio]})
+                    elif self.section_class == "Slender":
+                        logger.warning(f"The section.{trial_section} is Slender. Ignoring")
+                        # self.design_status = False
+                        # self.design_status_list.append(self.design_status)
+                    elif self.section_class == KEY_SemiCompact:
+                        logger.warning(
+                            f"The section.{trial_section} is Semi-Compact. Ignoring"
+                        )
+                        # self.design_status = False
+                        # self.design_status_list.append(self.design_status)
+        if lambda_check:
+            logger.info("After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ")
+        if len(self.input_section_list) == 0:
+            local_flag = False
+        else:
+            local_flag = True
+        return local_flag
+    
     def design(self, design_dictionary, flag=0):
         '''
         TODO optimimation_tab_check changes to include self.material_property = Material(material_grade=self.material, thickness=0)
@@ -1273,31 +1848,31 @@ class PlateGirderWelded(Member):
             self.section_property.flange_thickness,
             self.material_property.fy, self.section_property.type
         )[0]
-        flange_class = IS800_2007.Table2_i(
+        flange_class_bottom = IS800_2007.Table2_i(
             self.section_property.depth - 2 * self.section_property.flange_thickness,
             self.section_property.web_thickness,
             self.material_property.fy,self.section_property.type
         )[0]
-        if flange_class == "Slender" or web_class == "Slender":
+        if flange_class_bottom == "Slender" or web_class == "Slender":
             self.section_class_girder = "Slender"
         else:
-            if flange_class == KEY_Plastic and web_class == KEY_Plastic:
+            if flange_class_bottom == KEY_Plastic and web_class == KEY_Plastic:
                 self.section_class_girder = KEY_Plastic
-            elif flange_class == KEY_Plastic and web_class == KEY_Compact:
+            elif flange_class_bottom == KEY_Plastic and web_class == KEY_Compact:
                 self.section_class_girder = KEY_Compact
-            elif flange_class == KEY_Plastic and web_class == KEY_SemiCompact:
+            elif flange_class_bottom == KEY_Plastic and web_class == KEY_SemiCompact:
                 self.section_class_girder = KEY_SemiCompact
-            elif flange_class == KEY_Compact and web_class == KEY_Plastic:
+            elif flange_class_bottom == KEY_Compact and web_class == KEY_Plastic:
                 self.section_class_girder = KEY_Compact
-            elif flange_class == KEY_Compact and web_class == KEY_Compact:
+            elif flange_class_bottom == KEY_Compact and web_class == KEY_Compact:
                 self.section_class_girder = KEY_Compact
-            elif flange_class == KEY_Compact and web_class == KEY_SemiCompact:
+            elif flange_class_bottom == KEY_Compact and web_class == KEY_SemiCompact:
                 self.section_class_girder = KEY_SemiCompact
-            elif flange_class == KEY_SemiCompact and web_class == KEY_Plastic:
+            elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_Plastic:
                 self.section_class_girder = KEY_SemiCompact
-            elif flange_class == KEY_SemiCompact and web_class == KEY_Compact:
+            elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_Compact:
                 self.section_class_girder = KEY_SemiCompact
-            elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
+            elif flange_class_bottom == KEY_SemiCompact and web_class == KEY_SemiCompact:
                 self.section_class_girder = KEY_SemiCompact
         # 4 - design bending strength
         I_flange = 2 * (self.section_property.flange_width * self.section_property.flange_thickness**3/12 + self.section_property.flange_width * self.section_property.flange_thickness * (self.section_property.depth/2 - self.section_property.flange_thickness/2)**2)
@@ -1427,172 +2002,17 @@ class PlateGirderWelded(Member):
             )
 
 
-    def section_classification(self, design_dictionary,trial_section=""):
-        """Classify the sections based on Table 2 of IS 800:2007"""
-        print(f"Inside section_classification")
-        local_flag = True
-        self.input_modified = []
-        self.input_section_list = []
-        self.input_section_classification = {}
-        lambda_check = False
-        for trial_section in self.sec_list:
-            trial_section = trial_section.strip("'")
-            self.section_property = self.section_connect_database(self, trial_section)
-            print(f"Type of section{self.section_property.designation}")
-            if self.section_property.type == "Rolled":
-                web_class = IS800_2007.Table2_iii(
-                    self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius),
-                    self.section_property.web_thickness,
-                    self.material_property.fy,
-                )
-                flange_class = IS800_2007.Table2_i(
-                    self.section_property.flange_width / 2,
-                    self.section_property.flange_thickness,
-                    self.material_property.fy,self.section_property.type
-                )[0]
-                web_ratio = (self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
-                flange_ratio = self.section_property.flange_width / 2  /self.section_property.flange_thickness
-            else:
-                flange_class = IS800_2007.Table2_i(
-                    (
-                        (self.section_property.flange_width / 2)
-                        # - (self.section_property.web_thickness / 2)
-                    ),
-                    self.section_property.flange_thickness,
-                    self.section_property.fy,
-                    self.section_property.type,
-                )[0]
-
-                web_class = IS800_2007.Table2_iii(
-                    (
-                        self.section_property.depth - 2*(self.section_property.flange_thickness + self.section_property.root_radius)
-                    ),
-                    self.section_property.web_thickness,
-                    self.material_property.fy, # classification_type="Axial compression",
-                )
-                web_ratio = (self.section_property.depth - 2 * (
-                            self.section_property.flange_thickness + self.section_property.root_radius)) / self.section_property.web_thickness
-                flange_ratio = self.section_property.flange_width / 2 / self.section_property.flange_thickness
-            print(f"\n \n \n flange_class {flange_class} \n web_class{web_class} \n \n")
-            if flange_class == "Slender" or web_class == "Slender":
-                self.section_class = "Slender"
-            else:
-                if flange_class == KEY_Plastic and web_class == KEY_Plastic:
-                    self.section_class = KEY_Plastic
-                elif flange_class == KEY_Plastic and web_class == KEY_Compact:
-                    self.section_class = KEY_Compact
-                elif flange_class == KEY_Plastic and web_class == KEY_SemiCompact:
-                    self.section_class = KEY_SemiCompact
-                elif flange_class == KEY_Compact and web_class == KEY_Plastic:
-                    self.section_class = KEY_Compact
-                elif flange_class == KEY_Compact and web_class == KEY_Compact:
-                    self.section_class = KEY_Compact
-                elif flange_class == KEY_Compact and web_class == KEY_SemiCompact:
-                    self.section_class = KEY_SemiCompact
-                elif flange_class == KEY_SemiCompact and web_class == KEY_Plastic:
-                    self.section_class = KEY_SemiCompact
-                elif flange_class == KEY_SemiCompact and web_class == KEY_Compact:
-                    self.section_class = KEY_SemiCompact
-                elif flange_class == KEY_SemiCompact and web_class == KEY_SemiCompact:
-                    self.section_class = KEY_SemiCompact
-
-            self.Zp_req = self.load.moment * self.gamma_m0 / self.material_property.fy
-            self.effective_length_beam(self, design_dictionary, self.length)  # mm
-
-            print( 'self.allow_class', self.allow_class)
-            if self.section_property.plast_sec_mod_z >= self.Zp_req:
-                print( 'self.section_property.plast_sec_mod_z More than Requires')
-
-                if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                    self.It = self.section_property.It
-                    # (
-                    #                   2
-                    #                   * self.section_property.flange_width
-                    #                   * self.section_property.flange_thickness ** 3
-                    #           ) / 3 + (
-                    #                   (self.section_property.depth - self.section_property.flange_thickness)
-                    #                   * self.section_property.web_thickness ** 3
-                    #           ) / 3
-                    self.hf = self.section_property.depth - self.section_property.flange_thickness
-                    self.Iw = self.section_property.Iw
-                    # 0.5 ** 2 * self.section_property.mom_inertia_y * self.hf ** 2
+    
 
 
-                    if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
-                        self.beta_b_lt = 1.0
-                    else:
-                        self.beta_b_lt = (
-                                self.section_property.elast_sec_mod_z
-                                / self.section_property.plast_sec_mod_z
-                        )
-                    _ = IS800_2007.cl_8_2_2_Unsupported_beam_bending_non_slenderness(
-                        self.material_property.modulus_of_elasticity,
-                        0.3,
-                        self.section_property.mom_inertia_y,
-                        self.It,
-                        self.Iw,
-                        self.effective_length * 1e3, self.beta_b_lt, self.section_property.plast_sec_mod_z, self.hf, self.section_property.rad_of_gy_y, self.section_property.flange_thickness
-                    )
-                    self.M_cr = _[0]
-                    self.fcrb = _[1]
-                    lambda_lt = IS800_2007.cl_8_2_2_1_elastic_buckling_moment(
-                        self.beta_b_lt,
-                        self.section_property.plast_sec_mod_z,
-                        self.section_property.elast_sec_mod_z,
-                        self.material_property.fy,
-                        self.M_cr
-                    )
-                    if lambda_lt < 0.4:
-                        lambda_check = True
-                        continue
-                if self.allow_class != 'No':
-                    if (
-                        self.section_class == KEY_SemiCompact
-                        or self.section_class == KEY_Compact
-                        or self.section_class == KEY_Plastic
-                    ):
-
-                        self.input_section_list.append(trial_section)
-                        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt,self.fcrb]})
-                        else:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
-
-                    elif self.section_class == "Slender":
-                        logger.warning(f"The section.{trial_section} is Slender. Ignoring")
-                else:
-                    if self.section_class == KEY_Compact or self.section_class == KEY_Plastic:
-                        self.input_section_list.append(trial_section)
-                        if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio,self.It,self.hf,self.Iw,self.M_cr,self.beta_b_lt,lambda_lt, self.fcrb]})
-                        else:
-                            self.input_section_classification.update({trial_section: [self.section_class, flange_class, web_class, flange_ratio, web_ratio]})
-                    elif self.section_class == "Slender":
-                        logger.warning(f"The section.{trial_section} is Slender. Ignoring")
-                        # self.design_status = False
-                        # self.design_status_list.append(self.design_status)
-                    elif self.section_class == KEY_SemiCompact:
-                        logger.warning(
-                            f"The section.{trial_section} is Semi-Compact. Ignoring"
-                        )
-                        # self.design_status = False
-                        # self.design_status_list.append(self.design_status)
-        if lambda_check:
-            logger.info("After checking Non-dimensional slenderness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ")
-        if len(self.input_section_list) == 0:
-            local_flag = False
-        else:
-            local_flag = True
-        return local_flag
-
-    def effective_length_beam(self, design_dictionary, length):
+    def effective_length_beam1(self, design_dictionary, length):
         print(f"Inside effective_length_beam")
         self.Loading = design_dictionary[KEY_LOAD]  # 'Normal'or 'Destabilizing'
         # self.Latex_length = design_dictionary[KEY_LENGTH_OVERWRITE]
         if design_dictionary[KEY_LENGTH_OVERWRITE] == 'NA':
             if self.support == KEY_DISP_SUPPORT1:
-                self.Torsional_res = design_dictionary[KEY_TORSIONAL_RES]
-                self.Warping = design_dictionary[KEY_WARPING_RES]
+                self.torsional_res = design_dictionary[KEY_TORSIONAL_RES]
+                self.warping = design_dictionary[KEY_WARPING_RES]
                 self.effective_length = IS800_2007.cl_8_3_1_EffLen_Simply_Supported(
                     Torsional=self.Torsional_res,
                     Warping=self.Warping,
@@ -2630,7 +3050,7 @@ class PlateGirderWelded(Member):
             #           ' ')
             #     self.report_check.append(t1)
 
-                t1 = (KEY_DISP_SLENDER + '($\lambda_{LT}$)', ' ',
+                t1 = (KEY_DISP_SLENDER + r'($\lambda_{LT}$)', ' ',
                       cl_8_2_2_slenderness(round(self.result_betab, 2),self.section_property.elast_sec_mod_z,
                               self.section_property.plast_sec_mod_z,self.result_mcr,self.material_property.fy,
                                               self.result_nd_esr_lt),
@@ -2658,7 +3078,7 @@ class PlateGirderWelded(Member):
             #           ' ')
             #     self.report_check.append(t1)
 
-                t1 = ('$\phi_{LT}$', ' ',
+                t1 = (r'$\phi_{LT}$', ' ',
                       cl_8_2_2_phi(self.result_IF_lt,self.result_nd_esr_lt, self.result_phi_lt),
                       ' ')
                 self.report_check.append(t1)
@@ -2739,7 +3159,7 @@ class PlateGirderWelded(Member):
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = (KEY_DISP_SLENDER + '($\lambda$)', ' ',
+                t1 = (KEY_DISP_SLENDER + r'($\lambda$)', ' ',
                       cl_8_7_1_5_slenderness(round(self.result_bcr_eff, 2), round(self.result_eff_d, 2),
                                               self.result_eff_sr),
                       ' ')
@@ -2766,7 +3186,7 @@ class PlateGirderWelded(Member):
                       ' ')
                 self.report_check.append(t1)
 
-                t1 = ('$\phi$', ' ',
+                t1 = (r'$\phi$', ' ',
                       cl_8_7_1_5_phi(0.49,self.result_eff_sr, self.result_phi_zz),
                       ' ')
                 self.report_check.append(t1)
@@ -3009,3 +3429,4 @@ class PlateGirderWelded(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #
+        

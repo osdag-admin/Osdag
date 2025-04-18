@@ -40,6 +40,8 @@ from OCC.Core.Graphic3d import (Graphic3d_NOM_NEON_GNC, Graphic3d_NOT_ENV_CLOUDS
                                 Graphic3d_AspectLine3d)
 from OCC.Core.Aspect import Aspect_TOTP_RIGHT_LOWER, Aspect_FM_STRETCH, Aspect_FM_NONE
 import traceback
+from OCC.Core.AIS import AIS_TextLabel
+
 
 def color_the_edges(shp, display, color, width):
     """
@@ -106,27 +108,63 @@ def DisplayMsg(display, point, text_to_write, height=None, message_color=None, u
     """
     :point: a gp_Pnt or gp_Pnt2d instance
     :text_to_write: a string
-    :message_color: triple with the range 0-1
+    :message_color: triple with the range 0-1, e.g., (1.0, 0.0, 0.0) for red
+    :height: float, text height
+    :update: bool, whether to repaint the display
     """
-    aPresentation = Prs3d_Presentation(display._struc_mgr)
-    text_aspect = Prs3d_TextAspect()
+    # Handle point
+    if isinstance(point, gp_Pnt):
+        pnt = point
+    elif isinstance(point, gp_Pnt2d):
+        pnt = gp_Pnt(point.X(), point.Y(), 0.0)
+    else:
+        raise TypeError("point must be gp_Pnt or gp_Pnt2d")
 
+    # Get the AIS_InteractiveContext from the display
+    # Try different ways to access the context
+    if hasattr(display, 'Context'):
+        ais_context = display.Context  # Access as attribute
+    elif hasattr(display, '_context'):
+        ais_context = display._context
+    elif hasattr(display, 'GetContext'):
+        ais_context = display.GetContext()  # Some implementations use methods
+    else:
+        # Fallback: try to create a text directly with the display object
+        return display.DisplayMessage(pnt, text_to_write, message_color or (0,0,0), height or 10)
+
+    # Set color
     if message_color is not None:
-        text_aspect.SetColor(rgb_color("RED"))
-    # if height is not None:
-    text_aspect.Aspect()
-    # if isinstance(point, None):
-    point = gp_Pnt(point.X(), point.Y(), point.Z())
-    Prs3d_Text.Draw(aPresentation,
-                    text_aspect,
-                    to_string(text_to_write),
-                    point)
-    aPresentation.Display()
-    # @TODO: it would be more coherent if a AIS_InteractiveObject
-    # is be returned
+        if len(message_color) != 3:
+            raise ValueError("message_color must be a tuple of three floats between 0 and 1")
+        r, g, b = message_color
+        if not (0 <= r <= 1 and 0 <= g <= 1 and 0 <= b <= 1):
+            raise ValueError("message_color values must be between 0 and 1")
+        color = Quantity_Color(r, g, b, Quantity_TOC_RGB)
+    else:
+        # Default color: black
+        color = Quantity_Color(0.0, 0.0, 0.0, Quantity_TOC_RGB)
+
+    # Create AIS_Text label
+    text_label = AIS_TextLabel()
+    text_label.SetText(text_to_write)
+    text_label.SetPosition(pnt)
+    text_label.SetColor(color)
+    
+    # Set height
+    if height is not None:
+        text_label.SetHeight(height)
+    else:
+        # Default height: 10
+        text_label.SetHeight(20)
+    
+    # Display the text
+    ais_context.Display(text_label, True)
+    
+    # Update display if needed
     if update:
         display.Repaint()
-    return aPresentation
+
+    return text_label
 
 # def osdag_display_msg(display, shapes, material=None, texture=None, color=None, transparency=None, update=False):
 #     set_default_edge_style(shapes, display)

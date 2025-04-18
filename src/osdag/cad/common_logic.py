@@ -2172,26 +2172,26 @@ class CommonDesignLogic(object):
 
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
                 c_length = self.column_length
-                # Point1 = gp_Pnt(0.0, 0.0, c_length)
-                # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
+                Point1 = gp_Pnt(0.0, 0.0, c_length)
+                DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                 b_length = self.beam_length + self.Bc.supporting_section.depth/2+100
-                # Point2 = gp_Pnt(0.0,-b_length, c_length/2)
-                # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
+                Point2 = gp_Pnt(0.0,-b_length, c_length/2)
+                DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
-                    # Point1 = gp_Pnt(-self.Bc.supporting_section.flange_width/2, 0, c_length)
-                    # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
-                    # Point = gp_Pnt(0.0, 0.0, 10)
-                    # DisplayMsg(self.display,Point, "Column")
+                    Point1 = gp_Pnt(-self.Bc.supporting_section.flange_width/2, 0, c_length)
+                    DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
+                    Point = gp_Pnt(0.0, 0.0, 10)
+                    DisplayMsg(self.display,Point, "Column")
 
                 elif component == "Beam":
                     self.display.View_Iso()
                     osdag_display_shape(self.display, self.ExtObj.beamModel, update=True,
                                         material=Graphic3d_NOM_ALUMINIUM)
-                    # Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
-                    # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
+                    Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
+                    DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                     # , color = 'Dark Gray'
 
                 elif component == "Connector":

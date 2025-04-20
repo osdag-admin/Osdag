@@ -262,12 +262,17 @@ class OsdagMainWindow(QMainWindow):
         self.ui.switch.toggled.connect(self.change_theme)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
         self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
+
+        # my_button = LeftPanelButton("Input for Auto-Detection")
+        # self.ui.verticalLayout.addWidget(my_button)
+        # my_button.ui.LP_Button.clicked.connect(self.show_input_dialog)
+
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
-                'Input' : [
-                    ('Load Input File', str(files("osdag.data.ResourceFiles.images").joinpath("input.png")), 'Input_File'),
-                    self.show_input_dialog
-                ],  #Input is added by @aumghelani
+                # 'Input' : [
+                #     ('Load Input File', str(files("osdag.data.ResourceFiles.images").joinpath("input.png")), 'Input_File'),
+                #     self.show_input_dialog
+                # ],  #Input is added by @aumghelani
                 'Connections' : {
                                 'Shear Connection' : [
                                     ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
@@ -339,7 +344,22 @@ class OsdagMainWindow(QMainWindow):
                 '2D Frame' : self.Under_Development,
                 '3D Frame' : self.Under_Development,
                 'Group Design' : self.Under_Development,
+
+                
                 }
+        
+        self.mySpecialButton = LeftPanelButton("Input for Auto-Detection from OSI Files")
+        self.mySpecialButton.ui.LP_Button.setStyleSheet("""
+            background-color: #FFD700;
+            color: #000;
+            font-weight: bold;
+            border: 2px solid #FF8C00;
+            border-radius: 8px;
+            padding: 2px;                                                    
+        """)
+        #self.mySpecialButton.ui.LP_Button.setIcon(QIcon(":/newPrefix/images/special_icon.png"))  # Use your own icon path
+        self.ui.verticalLayout.addWidget(self.mySpecialButton)
+        self.mySpecialButton.ui.LP_Button.clicked.connect(self.show_input_dialog)
 
 ####################################### UI Formation ################################
         for ModuleName in self.Modules:                      #Level 1 dictionary handling
@@ -787,7 +807,8 @@ class OsdagMainWindow(QMainWindow):
                 'Cleat Angle Connection': CleatAngleConnection,
                 'End Plate Connection': EndPlateConnection,
                 'Seated Angle Connection': SeatedAngleConnection,
-                'Base Plate Connection': BasePlateConnection
+                'Base Plate Connection': BasePlateConnection,
+                'Beam-to-Beam Cover Plate Bolted Connection' : BeamCoverPlate,
             }
             
             if module_name in module_map:

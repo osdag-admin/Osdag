@@ -27,6 +27,7 @@ class LapJointBolted(MomentConnection):
     def __init__(self):
         super(LapJointBolted, self).__init__()
         self.design_status = False
+        
         # self.spacing = None
 
     ###############################################
@@ -354,14 +355,14 @@ class LapJointBolted(MomentConnection):
         self.count = 0
         self.slip_res = None
         self.yield_stress = None
-        self.number_bolts = 0
+        # self.number_bolts = 0
         self.cap_red = False
         self.bolt_dia_grade_status = False
         self.dia_available = False
-        self.final_pitch = None
-        self.final_end_dist = None
-        self.final_edge_dist = None
-        self.final_gauge = None
+        self.final_pitch = 0
+        self.final_end_dist = 0
+        self.final_edge_dist = 0
+        self.final_gauge = 0
         self.rows = 0
         self.cols = 0
         self.len_conn = 0
@@ -388,11 +389,11 @@ class LapJointBolted(MomentConnection):
 
         if float(self.plate1thk) < float(self.plate2thk):
             self.plate = self.plate1
-            self.minpltthk = float(self.plate1thk)
+            self.pltthk = float(self.plate1thk)
             self.yield_stress = self.plate1.fy
         else:
             self.plate = self.plate2
-            self.minminpltthk = float(self.plate2thk)
+            self.pltthk = float(self.plate2thk)
             self.yield_stress = self.plate2.fy
 
         for self.bolt.bolt_diameter_provided in self.bolt.bolt_diameter:
@@ -405,12 +406,32 @@ class LapJointBolted(MomentConnection):
                                                         conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
                     
                     # self.max_pitch_round = self.max_gauge_round = 
-                    
+                    # self.bolt.calculate_bolt_capacity(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
+                    #                           bolt_grade_provided=float(self.bolt.bolt_grade_provided),
+                    #                           conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                    #                           n_planes=self.planes, e=float(self.bolt.min_end_dist_round),
+                    #                           p=float(self.bolt.min_pitch_round))
                     # self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                     #                                               bolt_grade_provided=self.bolt.bolt_grade_provided)
                     # print("fnafnafan",self.bolt.bolt_capacity)
-                    self.maxmin_and_capacitycalc(self,design_dictionary)               
+                    self.bolt.min_pitch_round = min(self.bolt.min_pitch_round, 2.5 * float(self.bolt.bolt_diameter_provided))
+                    self.bolt.min_gauge_round = min(self.bolt.min_gauge_round, 2.5 * float(self.bolt.bolt_diameter_provided))
 
+                    if design_dictionary[KEY_DP_DETAILING_EDGE_TYPE] == 'Sheared or hand flame cut':
+                        self.bolt.min_edge_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
+                        self.bolt.min_end_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
+                    else:
+                        self.bolt.min_edge_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
+                        self.bolt.min_end_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
+
+                    self.max_pitch_round = self.max_gauge_round = min(32 * self.pltthk , 300)
+
+                    self.bolt.max_edge_dist_round = self.bolt.max_end_dist_round = round(min(self.bolt.max_edge_dist_round , 12 * self.pltthk * ((250 / self.yield_stress)** 0.5 )),0)                
+                    self.bolt.calculate_bolt_capacity(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
+                                              bolt_grade_provided=float(self.bolt.bolt_grade_provided),
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                              n_planes=self.planes, e=float(self.bolt.min_end_dist_round),
+                                              p=float(self.bolt.min_pitch_round))
                     num_bolts = float(self.tensile_force) / ( self.bolt.bolt_capacity / 1000)
                     # print("num_bolts",num_bolts)    
                     
@@ -442,36 +463,15 @@ class LapJointBolted(MomentConnection):
         
         else:
             self.design_status = True
-                 
+            if self.bolt.bolt_type == 'Bearing Bolt':
+                self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
+            self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
+            self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
             # print(self.bolt)
-            self.number_r_c_bolts(self, design_dictionary)
+            self.number_r_c_bolts(self, design_dictionary,0,0)
 
-    def maxmin_and_capacitycalc(self,design_dictionary):
-        self.bolt.min_pitch_round = min(self.bolt.min_pitch_round, 2.5 * float(self.bolt.bolt_diameter_provided))
-        self.bolt.min_gauge_round = min(self.bolt.min_gauge_round, 2.5 * float(self.bolt.bolt_diameter_provided))
 
-        if design_dictionary[KEY_DP_DETAILING_EDGE_TYPE] == 'Sheared or hand flame cut':
-            self.bolt.min_edge_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
-            self.bolt.min_end_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
-        else:
-            self.bolt.min_edge_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
-            self.bolt.min_end_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
-
-        self.max_pitch_round = min(16 * self.minpltthk , 200)
-        self.max_gauge_round = min(100 + 4*self.minpltthk , 200)
-
-        self.bolt.max_edge_dist_round = self.bolt.max_end_dist_round = round(min(self.bolt.max_edge_dist_round , 12 * self.minpltthk * ((250 / self.yield_stress)** 0.5 )),0) 
-        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
-                                    bolt_grade_provided=float(self.bolt.bolt_grade_provided),
-                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                    n_planes=self.planes, e=float(self.bolt.min_end_dist_round),
-                                    p=float(self.bolt.min_pitch_round))
-        if self.bolt.bolt_type == 'Bearing Bolt':
-            self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
-        self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
-        self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)     
-    
-    def number_r_c_bolts(self,design_dictionary,count=0):
+    def number_r_c_bolts(self,design_dictionary,count=0,hit=0):
         
         bolt_cap = self.bolt.bolt_capacity
         if self.bolt.bolt_type == 'Bearing Bolt':
@@ -482,8 +482,13 @@ class LapJointBolted(MomentConnection):
             self.bolt.bolt_shear_capacity = 'N/A'
             
         # print("fafafa",bolt_cap)
-        self.number_bolts = float(self.tensile_force) /( bolt_cap / 1000)
-
+        
+        if hit == 0:
+            self.number_bolts = float(self.tensile_force) /( bolt_cap / 1000)
+        else:
+            self.number_bolts += 1
+        
+        print("Hit",hit,self.number_bolts)
         
         self.number_bolts = math.ceil(self.number_bolts)
         if self.number_bolts < 2:
@@ -513,6 +518,7 @@ class LapJointBolted(MomentConnection):
             self.len_conn = self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
         if self.number_bolts >= 2 and count == 0:
             self.design_status = True
+            # print("Num bolts leaving",self.number_bolts)
             self.check_capacity_reduction_1(self, design_dictionary)
         elif self.number_bolts>=2 and count == 1:
             self.design_status = True
@@ -524,13 +530,14 @@ class LapJointBolted(MomentConnection):
 
 
     def check_capacity_reduction_1(self,design_dictionary):
-        
+        # print("Capacity red check 1")
         if self.number_bolts > 2:
             lg = (self.rows - 1)*self.bolt.min_pitch_round
             if  lg > 15 * self.bolt.bolt_diameter_provided:
                 self.bij = 1.075 - (lg / (200 * self.bolt.bolt_diameter_provided))
         if self.bij >= 0.75 and self.bij <= 1.0:
             self.cap_red = True
+            # print("1 cap red")
             self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.bij
             if self.bolt.bolt_type == 'Bearing Bolt':
                 self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
@@ -543,11 +550,14 @@ class LapJointBolted(MomentConnection):
         self.check_capacity_reduction_2(self,design_dictionary)
 
     def check_capacity_reduction_2(self,design_dictionary):
+        self.cap_red = False
+        # print("Capacity red check 2")
         if self.plate1thk + self.plate2thk > 5 * self.bolt.bolt_diameter_provided:
             self.blg = 8 / (3 + (self.plate1thk + self.plate2thk / self.bolt.bolt_diameter_provided))
         if self.blg < self.bij and self.blg != 0:
             self.cap_red = True
             # print("blg",self.blg)
+            # print("2 cap red")
             self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.blg
             if self.bolt.bolt_type == 'Bearing Bolt':
                 self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
@@ -555,15 +565,54 @@ class LapJointBolted(MomentConnection):
                 self.slip_res = self.bolt.bolt_shear_capacity
                 self.bolt.bolt_capacity = self.slip_res
             
-            self.number_r_c_bolts(self,design_dictionary,1)
+            self.number_r_c_bolts(self,design_dictionary,1,0)
         
         if self.cap_red == False:
             self.design_status = True
+            # print("Going to formatting")
+            # print("After checks 2 numbolts",self.number_bolts)
             self.final_formatting(self,design_dictionary)
 
 
 
     def final_formatting(self,design_dictionary):
+        # print("I am herefa fafjafjafjafjajfjafajf")
+        # print(self.bolt)
+
+        gauge_dist = (float(self.width) - 2*self.bolt.min_end_dist_round)/(self.rows - 1)
+
+        if gauge_dist > self.max_gauge_round:
+            self.final_gauge = self.max_gauge_round
+            self.final_pitch = self.bolt.min_pitch_round
+
+            enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
+            if enddist > self.bolt.max_end_dist_round:
+                self.design_status = False
+                self.number_r_c_bolts(self,design_dictionary,0,1)
+                # print("okay")
+                
+                # self.design_status = True
+            else:
+                self.final_end_dist = enddist
+                self.final_edge_dist = enddist
+                self.design_status = True
+        else:
+            self.final_gauge = gauge_dist
+            self.final_pitch = self.bolt.min_pitch_round
+            enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
+            if enddist > self.bolt.max_end_dist_round:
+                # self.loop_helper_func(self,design_dictionary)
+                # print("okay")
+                # self.design_status = False
+                self.design_status = False
+                self.number_r_c_bolts(self,design_dictionary,0,1)
+
+                
+            else:
+                self.final_end_dist = enddist
+                self.final_edge_dist = enddist
+                self.design_status = True
+        # print("I got here")
         if self.bolt.bolt_type == 'Bearing Bolt':
             self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity/ 1000
             self.bolt.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity / 1000
@@ -577,44 +626,26 @@ class LapJointBolted(MomentConnection):
             self.bolt.bolt_capacity = self.bolt.bolt_capacity / 1000
             self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
         
-        self.utilization_ratio = float(self.tensile_force) / (self.bolt.bolt_capacity * self.number_bolts)
+        # print("Going for util ratio")
+        # print("Still here")
+        # print("Numbolts",self.number_bolts)
+        bltcap = self.bolt.bolt_capacity
+        if bltcap < 1:
+            bltcap = 1
+        self.utilization_ratio = float(self.tensile_force) / (bltcap * self.number_bolts)
         self.utilization_ratio = round(self.utilization_ratio, 2)
-        print(self.bolt)
+
+        self.final_gauge = round(self.final_gauge,0)
+        self.final_pitch = round(self.final_pitch,0)
+        # print("fafafafafa",self.final_edge_dist, self.final_end_dist, self.final_pitch, self.final_gauge)
+        print("FINAL FINAL",self.bolt)
+        print("Final Edge/End/Gauge/Pitch",self.final_edge_dist,self.final_end_dist,self.final_gauge,self.final_pitch)
 
         # print(self)
-        print("faahfnafanfaf")
+        # print("faahfnafanfaf")
         print("Max and min end edge dist ",self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
         print("Max min gauge pitch dist",self.max_gauge_round,self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
-
-        enddist = float(self.width) - self.bolt.min_pitch_round*(self.rows - 1)
-        print(enddist)
-        if enddist/2 <= self.bolt.max_edge_dist_round:
-            if enddist/2 >= self.bolt.min_edge_dist_round:
-
-                self.final_end_dist = enddist/2
-                self.final_edge_dist = enddist/2
-                self.final_gauge = self.final_pitch = round(self.bolt.min_pitch_round,0)
-            else:
-                self.final_edge_dist = self.bolt.min_edge_dist_round
-                self.final_end_dist = self.bolt.min_edge_dist_round
-                self.final_gauge = self.final_pitch = round(self.bolt.min_pitch_round,0)
-        else:
-            self.final_edge_dist = self.bolt.max_edge_dist_round
-            self.final_end_dist = self.bolt.max_edge_dist_round
-            widdist = float(self.width) - 2 * self.final_edge_dist
-            if widdist/(self.rows - 1) <= self.max_pitch_round:
-                self.final_pitch = widdist/(self.rows - 1)
-                self.final_pitch = round(self.final_pitch, 0)
-                self.final_gauge = self.final_pitch
-            else:
-                self.final_pitch = self.max_pitch_round
-                self.final_gauge = self.max_pitch_round
-                self.final_edge_dist = self.final_end_dist = float(self.width) - self.final_pitch*(self.rows - 1)
-
-
-        # print("fafafafafa",self.final_edge_dist, self.final_end_dist, self.final_pitch, self.final_gauge)
-
-        self.design_status = True
+        # self.design_status = True
 
 
 
@@ -647,11 +678,11 @@ class LapJointBolted(MomentConnection):
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
         for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Lap Joint':
+            if chkbox.objectName() == 'Cover Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Lap Joint", bgcolor)
+        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
     
     def warn_text(self):
 

@@ -37,7 +37,7 @@ from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
 from ...utils.common import is800_2007
 from ...utils.common.component import *
 from osdag.cad.items.plate import Plate
-
+from ...utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
 class PlateGirderWelded(Member):
 
 
@@ -88,12 +88,12 @@ class PlateGirderWelded(Member):
     def tab_value_changed(self):
         change_tab = []
 
-        t1 = (KEY_DISP_GIRDERSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        t1 = (KEY_DISP_GIRDERSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section_plate_girder)
         change_tab.append(t1)
 
-        t4 = (KEY_DISP_GIRDERSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
-              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
+        t4 = (KEY_DISP_GIRDERSEC, ['Label_6', 'Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11'],
+              ['Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22'], TYPE_TEXTBOX, self.Unsymm_I_Section_properties)
         change_tab.append(t4)
 
         t9 = ("Deflection", [KEY_STR_TYPE], [KEY_MEMBER_OPTIONS], TYPE_COMBOBOX, self.member_options_change)
@@ -103,18 +103,7 @@ class PlateGirderWelded(Member):
         t9 = ("Deflection", [KEY_STR_TYPE,KEY_DESIGN_LOAD,KEY_MEMBER_OPTIONS,KEY_SUPPORTING_OPTIONS], [KEY_MAX_DEFL], TYPE_TEXTBOX, self.max_defl_change)
         change_tab.append(t9)
 
-        # t5 = (KEY_DISP_GIRDERSEC, ['Label_HS_1', 'Label_HS_2', 'Label_HS_3'],
-        #       ['Label_HS_11', 'Label_HS_12', 'Label_HS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_HS_17', 'Label_HS_18',
-        #        'Label_HS_19', 'Label_HS_20', 'Label_HS_21', 'Label_HS_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_SHS_RHS_properties)
-        # change_tab.append(t5)
 
-        # t6 = (KEY_DISP_GIRDERSEC, ['Label_CHS_1', 'Label_CHS_2', 'Label_CHS_3'],
-        #       ['Label_CHS_11', 'Label_CHS_12', 'Label_CHS_13', 'Label_HS_14', 'Label_HS_15', 'Label_HS_16', 'Label_21', 'Label_22',
-        #        KEY_IMAGE], TYPE_TEXTBOX, self.get_CHS_properties)
-        # change_tab.append(t6)
-
-        # t6 = (KEY_DISP_GIRDERSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
-        # change_tab.append(t6)
 
         return change_tab
 
@@ -187,19 +176,19 @@ class PlateGirderWelded(Member):
 
         add_buttons = []
 
-        # t2 = (KEY_DISP_GIRDERSEC,KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
-        # add_buttons.append(t2)
-
         return add_buttons
 
     def get_values_for_design_pref(self, key, design_dictionary):
-        if design_dictionary[KEY_MATERIAL] != 'Select Material':
-            material = Material(design_dictionary[KEY_MATERIAL], 41)
-            fu = material.fu
-            fy = material.fy
-        else:
-            fu = ''
-            fy = ''
+        # if design_dictionary[KEY_MATERIAL] != 'Select Material':
+        #     material = Material(design_dictionary[KEY_MATERIAL], 41)
+        #     material_grade = design_dictionary[KEY_MATERIAL]
+        #     fu = material.fu
+        #     fy = material.fy
+        # else:
+        #     fu = ''
+        #     fy = ''
+
+            
 
         val = {
             KEY_ALLOW_CLASS: 'Yes',
@@ -418,6 +407,8 @@ class PlateGirderWelded(Member):
 
         #t4 = (KEY_STR_TYPE, KEY_DISP_STR_TYPE, TYPE_COMBOBOX, KEY_DISP_STR_TYPE_list, True, 'No Validator')
         #options_list.append(t4)
+        t5 = (KEY_SUPPORT_WIDTH, KEY_DISP_SUPPORT_WIDTH, TYPE_TEXTBOX, None, True, 'Int Validator')
+        options_list.append(t5)
 
         t4 = (KEY_WEB_PHILOSOPHY, KEY_DISP_WEB_PHILOSOPHY, TYPE_COMBOBOX, WEB_PHILOSOPHY_list, True, 'No Validator')
         options_list.append(t4)
@@ -923,6 +914,12 @@ class PlateGirderWelded(Member):
             self.bottom_flange_thickness = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG][0])
 
             #3 list loops for V inp<V_d and M inp < Md criteria for not considering thickness (3)
+            # self.total_depth = float(design_dictionary[KEY_OVERALL_DEPTH_PG])
+            # self.web_thickness_list = float(design_dictionary[KEY_WEB_THICKNESS_PG])
+            # self.top_flange_width = float(design_dictionary[KEY_TOP_Bflange_PG])
+            # self.top_flange_thickness_list = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG])
+            # self.bottom_flange_width = float(design_dictionary[KEY_BOTTOM_Bflange_PG])
+            # self.bottom_flange_thickness_list = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG])
         
         
         thickness_for_mat = max(self.web_thickness,self.top_flange_thickness, self.bottom_flange_thickness)
@@ -934,8 +931,11 @@ class PlateGirderWelded(Member):
         self.length = float(design_dictionary[KEY_LENGTH])
         self.effective_length = None
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
-
+        self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]
         self.beta_b_lt = None
+        self.web_philosophy = design_dictionary[KEY_WEB_PHILOSOPHY]
+        self.epsilon = math.sqrt(250 / self.material.fy)
+        self.b1 = float(design_dictionary[KEY_SUPPORT_WIDTH])
         # design type
         # self.design_type_temp = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
         # self.latex_design_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]  # or KEY_DISP_DESIGN_TYPE2_FLEXURE
@@ -1008,7 +1008,9 @@ class PlateGirderWelded(Member):
         self.section_classification(self, design_dictionary)
         # if self.flag:
         #     self.results(self, design_dictionary)
-
+        self.shear_force_optimal = False
+        self.moment_optimal = False
+        self.min_mass = False   
 
         # else:
         #     pass
@@ -1020,6 +1022,9 @@ class PlateGirderWelded(Member):
 
     # Simulation starts here
     def section_classification(self,design_dictionary):
+        # for self.web_thickness in self.web_thickness_list:
+        #     for self.top_flange_thickness in self.top_flange_thickness_list:
+        #         for
         flange_class_top = IS800_2007.Table2_i(((self.top_flange_width / 2)),self.top_flange_thickness,self.material.fy,'Welded')[0]
         flange_class_bottom = IS800_2007.Table2_i(((self.bottom_flange_width / 2)),self.bottom_flange_thickness,self.material.fy,'Welded')[0]
         web_class = IS800_2007.Table2_iii((self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness),self.web_thickness,self.material.fy)
@@ -1053,9 +1058,9 @@ class PlateGirderWelded(Member):
         self.effective_length_beam(self, design_dictionary, self.length)
 
         print( 'self.allow_class', self.allow_class)
-        self.plast_sec_mod_z = self.calc_PlasticModulusZ(self,self.total_depth,self.top_flange_width,self.bottom_flange_width,
+        self.plast_sec_mod_z = Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(self,self.total_depth,self.top_flange_width,self.bottom_flange_width,
                                                     self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness)
-        self.elast_sec_mod_z = self.calc_ElasticModulusZz(self,self.total_depth,self.top_flange_width,self.bottom_flange_width,
+        self.elast_sec_mod_z =Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(self,self.total_depth,self.top_flange_width,self.bottom_flange_width,
                                                     self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness)
         self.Zp_req = self.load.moment * self.gamma_m0 / self.material.fy
         if self.plast_sec_mod_z >= self.Zp_req:
@@ -1069,23 +1074,204 @@ class PlateGirderWelded(Member):
         self.V_d = ((A_vg * self.material.fy) / (math.sqrt(3) * self.gamma_m0))
         print("Shear check",self.V_d)
         print("shear force ",self.load.shear_force)  #V value self.load.shear_force
-        if self.cl_8_2_1_2_high_shear_check(self,self.load.shear_force,self.V_d): #high shear
+        if IS800_2007.cl_8_2_1_2_high_shear_check(self.load.shear_force,self.V_d): #high shear
             if self.support_type == 'Major Laterally Supported':
-                self.Mdv = self.calc_Mdv(self,self.load.shear_force,self.V_d, self.plast_sec_mod_z,self.elast_sec_mod_z, self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
-                print("fafafamfm a",self.Mdv)
-            else:
-                print("Not Lat supp")
-        else:
-            if self.support_type == 'Major Laterally Supported':  #low shear
-                self.Md =self.plast_sec_mod_z * self.material.fy / self.gamma_m0
-                print("sefafafaf c",self.Md)
+                if self.web_philosophy == 'Thick Web without ITS':
+                    if IS800_2007.cl_8_6_1_1_plate_girder_minimum_web_a(self.total_depth,self.web_thickness,self.epsilon,self.top_flange_thickness,self.bottom_flange_thickness):
+                        self.Mdv = self.calc_Mdv(self,self.load.shear_force,self.V_d, self.plast_sec_mod_z,self.elast_sec_mod_z, self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                        self.web_buckling_check(self)
+                        print("fafafamfm a",self.Mdv)
+                        self.eff_depth = self.total_depth - (self.top_flange_thickness + self.bottom_flange_thickness)
+                        dataframe = IS800_2007.cl_7_1_2_1_design_compressisive_stress_fcd_buckling_class_c()
+                        n1 = self.eff_depth / 2
+                        Ac = (self.b1 + n1) * self.web_thickness
+                        slenderness_input = 2.5 * self.eff_depth / self.web_thickness
+                        interp_val = self.interpolate_value(self,slenderness_input, self.material.fy,dataframe)
+                        if interp_val != None:
+                            self.fcd = round(interp_val, 2)
+                            print("Web Buckling at ")
+                            print(f"fcd: {self.fcd}N/mm2")
+                            Critical_buckling_load = round(Ac * self.fcd / 1000, 2)
+                            print(f"Critical buckling load: {Critical_buckling_load}kN")
+
+                            #Web Crippling
+                            print("Web Crippling")
+                            n2= 2.5*self.top_flange_thickness
+                            Critical_crippling_load= round((self.b1+n2)*self.web_thickness*self.material.fy/(1.1*1000),2)
+                            print(f"Critical crippling load: {Critical_crippling_load}kN")
+                        else:
+                            logger.error("Change materrial grade. Minimum Grade is E 250")
+
+
+                        if design_dictionary[KEY_ShearBucklingOption] == 'Simple Post Critical':       #buckling method
+                            c = 0
+                            if design_dictionary[KEY_IntermediateStiffener_spacing] != 'NA':
+                                c = float(design_dictionary[KEY_IntermediateStiffener_spacing])
+                            if self.shear_buckling_check_simple_postcritical(self,self.eff_depth,A_vg,self.load.shear_force,c):
+                                print("Check passed")
+                            else:
+                                print("Check Failed")
+                        else:
+                            pass
+
+
+                    
+                            
+                    else:
+                        logger.error("Web thickness is not sufficient\n Re-enter new thickness")
+                else:
+                    # print("To include thin web condition")
+                    if design_dictionary[KEY_ShearBucklingOption] == 'Simple Post Critical':
+                        pass
+                    else:
+                    
+                        lever_arm = self.total_depth - (self.top_flange_thickness / 2) - (self.bottom_flange_thickness / 2)  # in mm
+                        Nf = self.load.moment * 1_000_000 / lever_arm
+                        if design_dictionary[KEY_IntermediateStiffener_spacing] == 'NA':
+                            logger.error("Intermediate Stiffner Spacing cannot be 'NA'")
+                        c = float(design_dictionary[KEY_IntermediateStiffener_spacing])
+                        if self.shear_buckling_check_tension_field(self,self.eff_depth,A_vg,c,Nf):
+                            print("Check passed")
+                        else:
+                            print("Check Failed")
+                    
+            else: #unsupported
+                if self.web_philosophy == 'Thick Web without ITS':
+                    self.eff_depth = self.total_depth - (self.top_flange_thickness + self.bottom_flange_thickness)
+                    dataframe = IS800_2007.cl_7_1_2_1_design_compressisive_stress_fcd_buckling_class_c()
+                    n1 = self.eff_depth / 2
+                    Ac = (self.b1 + n1) * self.web_thickness
+                    slenderness_input = 2.5 * self.eff_depth / self.web_thickness
+                    interp_val = self.interpolate_value(self,slenderness_input, self.material.fy,dataframe)
+                    if interp_val != None:
+                        self.fcd = round(interp_val, 2)
+                        print("Web Buckling at ")
+                        print(f"fcd: {self.fcd}N/mm2")
+                        Critical_buckling_load = round(Ac * self.fcd / 1000, 2)
+                        print(f"Critical buckling load: {Critical_buckling_load}kN")
+
+                        #Web Crippling
+                        print("Web Crippling")
+                        n2= 2.5*self.top_flange_thickness
+                        Critical_crippling_load= round((self.b1+n2)*self.web_thickness*self.material.fy/(1.1*1000),2)
+                        print(f"Critical crippling load: {Critical_crippling_load}kN")
+                    else:
+                        logger.error("Change materrial grade. Minimum Grade is E 250")
+                else: #thin web
+                    pass
+                G = 0.769 * 10**5
+                Kw = self.get_K_from_warping_restraint(self,self.warping)
+                Iy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(self, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                It = Unsymmetrical_I_Section_Properties.calc_TorsionConstantIt(self, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                Iw = Unsymmetrical_I_Section_Properties.calc_WarpingConstantIw(self, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                self.M_cr = self.calc_Mcr_LoadingCase(self,self.material.modulus_of_elasticity, G, Iy, It, Iw, self.effective_length, Kw, self.total_depth,
+                            self.top_flange_thickness, self.bottom_flange_thickness, self.top_flange_width, self.bottom_flange_width,
+                            self.loading_case, self.warping)
+                print("Input moment",self.load.moment)
+                print("MCR VAL",self.M_cr)
+                if self.M_cr < self.load.moment:
+                    print("Passed Moment check")
+
+                else:
+                    logger.error("Moment check failed! Need to increase flange size")
+        else: #low shear
+            if self.support_type == 'Major Laterally Supported':  
+                if self.web_philosophy == 'Thick Web without ITS':
+                    if IS800_2007.cl_8_6_1_1_plate_girder_minimum_web_a(self.total_depth,self.web_thickness,self.epsilon,self.top_flange_thickness,self.bottom_flange_thickness):
+                        self.Md =self.plast_sec_mod_z * self.material.fy / self.gamma_m0                                                                                            
+                        print("sefafafaf c",self.Md)
+                        self.web_buckling_check(self)
+                        self.eff_depth = self.total_depth - (self.top_flange_thickness + self.bottom_flange_thickness)
+                        dataframe = IS800_2007.cl_7_1_2_1_design_compressisive_stress_fcd_buckling_class_c()
+                        n1 = self.eff_depth / 2
+                        Ac = (self.b1 + n1) * self.web_thickness
+                        slenderness_input = 2.5 * self.eff_depth / self.web_thickness
+                        interp_val = self.interpolate_value(self,slenderness_input, self.material.fy,dataframe)
+                        if interp_val != None:
+                            self.fcd = round(interp_val, 2)
+                            print("Web Buckling at ")
+                            print(f"fcd: {self.fcd}N/mm2")
+                            Critical_buckling_load = round(Ac * self.fcd / 1000, 2)
+                            print(f"Critical buckling load: {Critical_buckling_load}kN")
+
+                            #Web Crippling
+                            print("Web Crippling")
+                            n2= 2.5*self.top_flange_thickness
+                            Critical_crippling_load= round((self.b1+n2)*self.web_thickness*self.material.fy/(1.1*1000),2)
+                            print(f"Critical crippling load: {Critical_crippling_load}kN")
+                        else:
+                            logger.error("Change materrial grade. Minimum Grade is E 250")
+                        
+                        if design_dictionary[KEY_ShearBucklingOption] == 'Simple Post Critical':                    #bukling method
+                            c = 0
+                            lever_arm = self.total_depth - (self.top_flange_thickness / 2) - (self.bottom_flange_thickness / 2)  # in mm
+                            Nf = self.load.moment * 1_000_000 / lever_arm
+                            if design_dictionary[KEY_IntermediateStiffener_spacing] != 'NA':
+                                c = float(design_dictionary[KEY_IntermediateStiffener_spacing])
+                            if self.shear_buckling_check_simple_postcritical(self,self.eff_depth,A_vg,self.load.shear_force,c):
+                                print("Check passed")
+                            else:
+                                print("Check Failed")
+                        else:
+                            pass
+                    else:
+                        logger.error("Web thickness is not sufficient\n Re-enter new thickness")
+                
+                else: #thin web condition
+                    if design_dictionary[KEY_ShearBucklingOption] == 'Simple Post Critical':
+                        pass
+                    else:
+                        lever_arm = self.total_depth - (self.top_flange_thickness / 2) - (self.bottom_flange_thickness / 2)  # in mm
+                        Nf = self.load.moment * 1_000_000 / lever_arm
+                        if design_dictionary[KEY_IntermediateStiffener_spacing] == 'NA':
+                            logger.error("Intermediate Stiffner Spacing cannot be 'NA'")
+                        c = float(design_dictionary[KEY_IntermediateStiffener_spacing])
+                        if self.shear_buckling_check_tension_field(self,self.eff_depth,A_vg,c,Nf):
+                            print("Check passed")
+                        else:
+                            print("Check Failed")
             
-            else:
-                print("Not Lat supp")
+            else: #unsupported
+                if self.web_philosophy == 'Thick Web without ITS':
+                    self.eff_depth = self.total_depth - (self.top_flange_thickness + self.bottom_flange_thickness)
+                    dataframe = IS800_2007.cl_7_1_2_1_design_compressisive_stress_fcd_buckling_class_c()
+                    n1 = self.eff_depth / 2
+                    Ac = (self.b1 + n1) * self.web_thickness
+                    slenderness_input = 2.5 * self.eff_depth / self.web_thickness
+                    interp_val = self.interpolate_value(self,slenderness_input, self.material.fy,dataframe)
+                    if interp_val != None:
+                        self.fcd = round(interp_val, 2)
+                        print("Web Buckling at ")
+                        print(f"fcd: {self.fcd}N/mm2")
+                        Critical_buckling_load = round(Ac * self.fcd / 1000, 2)
+                        print(f"Critical buckling load: {Critical_buckling_load}kN")
+
+                        #Web Crippling
+                        print("Web Crippling")
+                        n2= 2.5*self.top_flange_thickness
+                        Critical_crippling_load= round((self.b1+n2)*self.web_thickness*self.material.fy/(1.1*1000),2)
+                        print(f"Critical crippling load: {Critical_crippling_load}kN")
+                    else:
+                        logger.error("Change materrial grade. Minimum Grade is E 250")
+                else: #thin web
+                    pass
+
+                G = 0.769 * 10**5
+                Kw = self.get_K_from_warping_restraint(self,self.warping)
+                Iy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(self, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                It = Unsymmetrical_I_Section_Properties.calc_TorsionConstantIt(self, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                Iw = Unsymmetrical_I_Section_Properties.calc_WarpingConstantIw(self, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+                self.M_cr = self.calc_Mcr_LoadingCase(self,self.material.modulus_of_elasticity, G, Iy, It, Iw, self.effective_length, Kw, self.total_depth,
+                            self.top_flange_thickness, self.bottom_flange_thickness, self.top_flange_width, self.bottom_flange_width,
+                            self.loading_case, self.warping)
+                print("Input moment",self.load.moment)
+                print("MCR VAL",self.M_cr)
+                if self.M_cr > self.load.moment:
+                    print("Passed Moment check")
+
+                else:
+                    logger.error("Moment check failed! Need to increase flange size")
          
-
-
-
 
 
     
@@ -1112,54 +1298,56 @@ class PlateGirderWelded(Member):
                 print(f"Working 3 {self.effective_length}")
         print(f"Inside effective_length_beam",self.effective_length, design_dictionary[KEY_LENGTH_OVERWRITE])
 
-    def cl_8_2_1_2_high_shear_check(self,V, V_d):
-            if V  > 0.6 * V_d :
-                print('High shear')
-                return True
+
+    
+    def web_buckling_check(self):
+        self.web_buckling = IS800_2007.cl_8_2_1_web_buckling(
+            d=self.total_depth - (self.top_flange_thickness + self.bottom_flange_thickness),
+            tw=self.web_thickness,
+            e=self.epsilon,)
+        print("fafafajnafjkfmaf",self.web_buckling)
+
+        # if not self.web_buckling_check:
+        #     self.web_not_buckling_steps(self)
+    def shear_buckling_check_simple_postcritical(self,eff_depth,A_vg,V,c=0):
+        if self.web_philosophy == 'Thick Web without ITS':
+            K_v = 5.35
+        else:
+            if c/eff_depth < 1:
+                K_v = 4 + 5.35/(c/eff_depth)**2
             else:
-                print('Low shear')
-                return False
-            
-    def calc_Centroid(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
-        A_top = B_top * t_f_top
-        A_bot = B_bot * t_f_bot
-        A_web = (D - t_f_top - t_f_bot) * t_w
-
-        y_top = D - t_f_top / 2
-        y_bot = t_f_bot / 2
-        y_web = t_f_bot + (D - t_f_top - t_f_bot) / 2
-
-        y_neutral = (A_top * y_top + A_bot * y_bot + A_web * y_web) / (A_top + A_bot + A_web)
-        return y_neutral
-    
-    def calc_PlasticModulusZ(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
-        y_neutral = self.calc_Centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
-        A_top = B_top * t_f_top
-        A_bot = B_bot * t_f_bot
-        A_web_top = t_w * (D - y_neutral - t_f_top)
-        A_web_bot = t_w * (y_neutral - t_f_bot)
-
-        Zpz = (A_top * (D - y_neutral - t_f_top / 2) + A_web_top * (D - y_neutral - t_f_top - (D - y_neutral - t_f_top) / 2) +
-            A_bot * (y_neutral - t_f_bot / 2) + A_web_bot * ((y_neutral - t_f_bot) / 2)) / 1000
-
-        return round(Zpz, 2)
-    
-    def calc_MomentOfAreaZ(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
-        y_neutral = self.calc_Centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
-
-        I_top = (B_top * t_f_top ** 3) / 12 + B_top * t_f_top * (D - t_f_top / 2 - y_neutral) ** 2
-        I_bot = (B_bot * t_f_bot ** 3) / 12 + B_bot * t_f_bot * (y_neutral - t_f_bot / 2) ** 2
-        I_web = (t_w * (D - t_f_top - t_f_bot) ** 3) / 12 + t_w * (D - t_f_top - t_f_bot) * (y_neutral - (t_f_bot + (D - t_f_top - t_f_bot) / 2)) ** 2
-
-        I_zz = (I_top + I_bot + I_web) / 10000
-        return round(I_zz, 2)
-    
-    def calc_ElasticModulusZz(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
-        I_zz = self.calc_MomentOfAreaZ(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
-        y_neutral = self.calc_Centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
-        Z_ez_top = I_zz * 10 / (D - y_neutral)
-        Z_ez_bot = I_zz * 10 / y_neutral
-        return round(min(Z_ez_top, Z_ez_bot), 2)
+                K_v = 5.35 + 4/(c/eff_depth)**2
+        E = self.material.modulus_of_elasticity
+        mu = 0.3
+        tau_crc = IS800_2007.cl_8_4_2_2_tau_crc_Simple_postcritical(K_v, E,mu, eff_depth, self.web_thickness)
+        lambda_w = IS800_2007.cl_8_4_2_2_lambda_w_Simple_postcritical(self.material.fy, tau_crc)
+        tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, self.material.fy)
+        V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_vg)
+        print("V_cr value",V_cr)
+        if V_cr > V:
+            return True
+        else:
+            return False
+        
+    def shear_buckling_check_tension_field(self,eff_depth,A_vg,c=0,Nf = 0):
+        if self.web_philosophy == 'Thick Web without ITS':
+            K_v = 5.35
+        else:
+            if c/eff_depth < 1:
+                K_v = 4 + 5.35/(c/eff_depth)**2
+            else:
+                K_v = 5.35 + 4/(c/eff_depth)**2
+        E = self.material.modulus_of_elasticity
+        mu = 0.3
+        tau_crc = IS800_2007.cl_8_4_2_2_tau_crc_Simple_postcritical(K_v, E,mu, eff_depth, self.web_thickness)
+        lambda_w = IS800_2007.cl_8_4_2_2_lambda_w_Simple_postcritical(self.material.fy, tau_crc)
+        tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, self.material.fy)
+        phi,M_fr,s, w_tf,sai,fv,V_tf = IS800_2007.cl_8_4_2_2_TensionField( c, eff_depth, self.web_thickness, self.material.fy, self.top_flange_width,self.top_flange_thickness, self.material.fy,Nf, self.gamma_m0, A_vg,tau_b,self.load.shear_force)
+        print("vtf val",V_tf)
+        if V_tf >= self.load.shear_force:
+            return True
+        else:
+            return False
 
     def calc_Mdv(self,V, Vd, Zp, Ze, Fy, gamma_m0, D, tw, tf_top, tf_bot):  #only for major laterally supp
         """
@@ -1203,9 +1391,103 @@ class PlateGirderWelded(Member):
 
         return round(min(Mdv, Mdv_limit), 2)
 
-                         
+    def get_K_from_warping_restraint(self,warping_condition):
+        """
+        Return effective length factor K based on exact warping restraint description (IS 800:2007, Clause E.1).
+        """
+        if warping_condition == "Both flanges fully restrained":
+            return 0.5
+        elif warping_condition == "Compression flange fully restrained":
+            return 0.7
+        elif warping_condition == "Compression flange partially restrained":
+            return 0.85
+        elif warping_condition == "Warping not restrained in both flanges":
+            return 1.0
+        else:
+            raise ValueError("Invalid warping restraint. Use one of the four standard conditions.")
 
+    def calc_yj(self,Bf_top, tf_top, Bf_bot, tf_bot, D):
+        """
+        Calculate yj per IS 800:2007 Clause E.3.2.2. Returns 0 for symmetric sections.
+        """
+        if Bf_top == Bf_bot and tf_top == tf_bot:
+            return 0.0  # symmetric section
+        h = D - (tf_top + tf_bot)
+        Ift = (Bf_top * tf_top**3) / 12
+        Ifc = (Bf_bot * tf_bot**3) / 12
+        beta_f = Ifc / (Ifc + Ift)
+        alpha = 0.8 if beta_f > 0.5 else 1.0
+        return alpha * (2 * beta_f - 1) * h / 2
 
+    def calc_Mcr_LoadingCase(self,E, G, Iy, It, Iw, LLT, Kw, D,
+                            tf_top, tf_bot, Bf_top, Bf_bot,
+                            LoadingCase, warping_condition):
+        """
+        Calculate Elastic Critical Moment Mcr based on IS 800:2007 (Annex E or Eq 2.20 for symmetric).
+        Returns:
+            Mcr : Elastic Critical Moment in N·mm
+        """
+        yg = D / 2
+        yj = self.calc_yj(self,Bf_top, tf_top, Bf_bot, tf_bot, D)
+        K_value = 0
+        # Constants from Table 42 (IS 800:2007)
+        if LoadingCase == KEY_DISP_UDL_PIN_PIN_PG:
+            K_value == 1.0
+            c1, c2, c3 = 1.132, 0.459, 0.525
+        elif LoadingCase == KEY_DISP_UDL_FIX_FIX_PG:
+            K_value == 0.5
+            c1, c2, c3 = 0.712, 0.652, 1.070
+        elif LoadingCase == KEY_DISP_PL_PIN_PIN_PG:
+            K_value == 1.0
+            c1, c2, c3 = 1.365, 0.553, 1.780
+        elif LoadingCase == KEY_DISP_PL_FIX_FIX_PG:
+            K_value == 0.5
+            c1, c2, c3 = 0.938, 0.715, 4.800
+        else:
+            raise ValueError("Invalid Loading Case.")
+
+        # Symmetric section (Eq 2.20)
+        if Bf_top == Bf_bot and tf_top == tf_bot:
+            term1 = (math.pi ** 2 * E * Iy) / (LLT ** 2)
+            term2 = (Iw / Iy)
+            term3 = (G * It * LLT**2) / (math.pi**2 * E * Iy)
+            Mcr = term1 * math.sqrt(term2 + term3)
+        else:
+            # Unsymmetric case (Annex E full formula)
+            term1 = (math.pi ** 2 * E * Iy) / (LLT ** 2)
+            bracket = ((K_value / Kw) ** 2 * (Iw / Iy) +
+                    (G * It * LLT ** 2) / (math.pi ** 2 * E * Iy) +
+                    (c2 * yg - c3 * yj) ** 2)
+            Mcr = c1 * term1 * math.sqrt(bracket) - term1 * (c2 * yg - c3 * yj)
+
+        return Mcr  # in N·mm
+                        
+    def interpolate_value(self,slenderness_input, yield_stress_input,df):
+        # Extract the available slenderness ratios and yield stresses
+        slenderness_ratios = df.index.to_numpy()
+        yield_stresses = df.columns.to_numpy()
+
+        # Interpolate along the slenderness ratio for two nearest yield stress values
+        
+        yield_stress_lower_list = [ys for ys in yield_stresses if ys <= yield_stress_input]
+        yield_stress_upper_list = [ys for ys in yield_stresses if ys >= yield_stress_input]
+        if len(yield_stress_lower_list) == 0 or len(yield_stress_upper_list) == 0:
+            return None
+            
+        yield_stress_lower = max(yield_stress_lower_list)
+        yield_stress_upper = min(yield_stress_upper_list)
+        
+        
+            
+        interp_lower = np.interp(slenderness_input, slenderness_ratios, df[yield_stress_lower].to_numpy())
+        interp_upper = np.interp(slenderness_input, slenderness_ratios, df[yield_stress_upper].to_numpy())
+
+        # Interpolate between the lower and upper yield stress for the final value
+        final_value = np.interp(yield_stress_input, [yield_stress_lower, yield_stress_upper], [interp_lower, interp_upper])
+        
+       
+
+        return final_value
 
     #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -646,7 +646,7 @@ DISP_WARPING_RES = 'Warping Restraint *'
 Warping_Restraint1 = 'Both flanges fully restrained'
 Warping_Restraint2 = 'Compression flange fully restrained'
 # Warping_Restraint3 = 'Both flanges fully restrained'
-Warping_Restraint4 = 'Compressicm flange partially restrained'
+Warping_Restraint4 = 'Compression flange partially restrained'
 Warping_Restraint5 = 'Warping not restrained in both flanges'
 Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2, Warping_Restraint4, Warping_Restraint5))
 DISP_SUPPORT_RES = 'Support restraint *'
@@ -766,7 +766,7 @@ KEY_DISP_PL_PIN_PIN_PG='Concentrate Load with pinned-pinned support'
 KEY_PL_FIX_FIX_PG= 'PLFIXFIX.Data'
 KEY_DISP_PL_FIX_FIX_PG= 'Concentrate load with fixed-fixed support'
 KEY_DISP_GIRDERSEC = 'Girder Properties'
-Bending_moment_shape_list= list((KEY_DISP_UDL_PIN_PIN_PG, KEY_DISP_UDL_FIX_FIX_PG, KEY_DISP_PL_PIN_PIN_PG, KEY_DISP_PL_FIX_FIX_PG))
+Bending_moment_shape_list= list((KEY_DISP_UDL_PIN_PIN_PG, KEY_DISP_UDL_FIX_FIX_PG, KEY_DISP_PL_PIN_PIN_PG,KEY_DISP_PL_FIX_FIX_PG))
 VALUES_DEPTH_PG = ['Customized','Optimized']
 VALUES_OPT = ['All']
 KEY_DESIGN_LOAD = 'Design.Load'
@@ -788,6 +788,8 @@ VALUES_SUPPORTING_OPTIONS_DEF = ['NA']
 KEY_MAX_DEFL = 'Deflection.Max'
 KEY_DISP_MAX_DEFL = 'Maximum Deflection'
 VALUES_MAX_DEFL = ['Span/600','Span/800','Span/400','Span/300','Span/360','Span/150','Span/180','Span/240','Span/120','Span/500','Span/750','Span/1000']
+KEY_SUPPORT_WIDTH = 'Support.Width'
+KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
  
 ###################################
 # All Input Keys
@@ -2960,3 +2962,87 @@ FLEXURE_OPTIMIZATION_DESCRIPTION_Canti = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DT
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI + Bearing_Length_Para
+
+PLATE_GIRDER_DEFLECTION_TABLE = str("""
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clause 5.6.1 Deflection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      padding: 10px;
+      width: auto;
+    }
+    table th, table td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Clause 5.6.1 Deflection</h1>
+  <h2>Vertical Deflection - Table 6 of IS800-2007</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Type of structure</th>
+        <th>Load Type</th>
+        <th>Member</th>
+        <th>Supporting</th>
+        <th>Deflection Limit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Purlins and Girts</td><td>Elastic cladding</td><td>Span/150</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Purlins and Girts</td><td>Brittle cladding</td><td>Span/180</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Simple span</td><td>Elastic cladding</td><td>Span/240</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Simple span</td><td>Brittle cladding</td><td>Span/300</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Cantilever span</td><td>Elastic cladding</td><td>Span/120</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Cantilever span</td><td>Brittle cladding</td><td>Span/150</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Rafter supporting</td><td>Profiled Metal Sheeting</td><td>Span/180</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Rafter supporting</td><td>Plastered Sheeting</td><td>Span/240</td></tr>
+      <tr><td>Industrial building</td><td>Crane Load(Manual operation)</td><td>Gantry</td><td>Crane</td><td>Span/500</td></tr>
+      <tr><td>Industrial building</td><td>Crane load(Electric operation up to 50t)</td><td>Gantry</td><td>Crane</td><td>Span/750</td></tr>
+      <tr><td>Industrial building</td><td>Crane load(Electric operation over 50t)</td><td>Gantry</td><td>Crane</td><td>Span/1000</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Floor and Roof</td><td>Elements not susceptible to cracking</td><td>Span/300</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Floor and Roof</td><td>Element susceptible to cracking</td><td>Span/360</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Cantilever Span</td><td>Elements not susceptible to cracking</td><td>Span/150</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Cantilever Span</td><td>Element susceptible to cracking</td><td>Span/180</td></tr>
+      <tr><td>Highway Bridges</td><td>Live Load</td><td>Simple span</td><td>NA</td><td>Span/600</td></tr>
+      <tr><td>Railway Bridges</td><td>Live Load</td><td>Simple span</td><td>NA</td><td>Span/600</td></tr>
+      <tr><td>Highway Bridges</td><td>Dead Load</td><td>Simple span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Railway Bridges</td><td>Dead Load</td><td>Simple span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Highway Bridges</td><td>Live Load</td><td>Cantilever span</td><td>NA</td><td>Span/400</td></tr>
+      <tr><td>Railway Bridges</td><td>Live Load</td><td>Cantilever span</td><td>NA</td><td>Span/400</td></tr>
+      <tr><td>Highway Bridges</td><td>Dead Load</td><td>Cantilever span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Railway Bridges</td><td>Dead Load</td><td>Cantilever span</td><td>NA</td><td>Span/800</td></tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+
+
+""")

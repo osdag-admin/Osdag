@@ -16,7 +16,7 @@ file_path = os.path.join(base_dir, "osdagMainPage.py")
 ###############################       ALL FUNCTIONS        ################################
 
 ############## 1 ) MODULE VALIDATION AND VERIFICATION #########################
-VALID_MODULES = ["Fin Plate Connection."]
+VALID_MODULES = ["Fin Plate Connection"]
 
 
 def validate_module_name(module_name):
@@ -57,7 +57,7 @@ def detect_imported_modules():
 
 
 
-VALID_MODULES = detect_imported_modules()  # Auto-update detected modules
+#VALID_MODULES = detect_imported_modules()  # Auto-update detected modules
 
 #################################              END OF ALL FUNCTIONS     ##################################
 

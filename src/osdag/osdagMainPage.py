@@ -361,7 +361,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.verticalLayout.addWidget(self.mySpecialButton)
         self.mySpecialButton.ui.LP_Button.clicked.connect(self.show_input_dialog)
 
-####################################### UI Formation ################################
+####################################### UI Formation ################################e
         for ModuleName in self.Modules:                      #Level 1 dictionary handling
             Button= LeftPanelButton(ModuleName)
             self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)
@@ -809,6 +809,16 @@ class OsdagMainWindow(QMainWindow):
                 'Seated Angle Connection': SeatedAngleConnection,
                 'Base Plate Connection': BasePlateConnection,
                 'Beam-to-Beam Cover Plate Bolted Connection' : BeamCoverPlate,
+                'Beam-to-Beam End Plate Connection' : BeamBeamEndPlateSplice,
+                'Beam-to-Beam Cover Plate Welded Connection' : BeamCoverPlateWeld,
+                'Beam-to-Column End Plate Connection' : BeamColumnEndPlate,
+                'Column-to-Column Cover Plate Bolted Connection' : ColumnCoverPlate,
+                'Column-to-Column Cover Plate Welded Connection' : ColumnCoverPlateWeld,
+                'Column-to-Column End Plate Connection' : ColumnEndPlate,
+                'Base Plate Connection' : BasePlateConnection,
+                'Tension Member Design - Bolted to End Gusset' : Tension_bolted,
+                'Tension Member Design - Welded to End Gusset' : Tension_welded
+
             }
             
             if module_name in module_map:

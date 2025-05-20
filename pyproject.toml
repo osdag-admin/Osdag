@@ -1,34 +1,13 @@
 [build-system]
 requires = [
     "setuptools >= 61.0",
-    "setuptools_scm >= 8.0"
+    "setuptools_scm >= 8.0",
+    "pytest"  # Ensure pytest is available during the build process
 ]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "osdag"
-version = "0.1"
-description = "Open steel design and graphics"
-readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "MIT"}
-keywords = ["steel design", "civil engineering", "engineering"]
-dependencies = [
-    "PyQt5",
-    "requests",
-    "pylatex",
-    "numpy",
-    "PyYAML",
-    "PyGithub"
-]
-
-[project.gui-scripts]
-osdag = "osdag.osdagMainPage:do_stuff"
-
-[tool.setuptools]
-package-dir = {"" = "src"}
-
 [tool.setuptools.packages.find]
+namespaces = true
 where = ["src"]
 
 [tool.setuptools.package-data]
@@ -39,3 +18,18 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+
+[project]
+name = "osdag"
+dynamic = ["version"]
+dependencies = [
+    "PyQt5", "requests", "pylatex", "numpy", "PyYaml", "PyGithub", "pytest"  # Added pytest as a runtime dependency
+]
+requires-python = ">=3.8"
+description = "Open steel design and graphics"
+readme = "README.md"
+license = {text = "MIT"}
+keywords = ["steel design", "civil engineering", "engineering"]
+
+[project.gui-scripts]
+osdag = "osdag.osdagMainPage:do_stuff"

@@ -6,20 +6,24 @@ source:
   path: ..
 
 build:
-  noarch: python
   script:
-    - pip install .  # install using pyproject.toml
+    - pip install .
+    - pytest --verbose --capture=no
 
 requirements:
   build:
     - python
     - pip
+    - pytest
     - setuptools
     - setuptools_scm
 
   host:
     - python
     - pip
+    - pytest
+    - setuptools
+    - setuptools_scm
 
   run:
     - python
@@ -28,17 +32,18 @@ requirements:
     - numpy
     - pyyaml
     - pygithub
+    - pytest
 
 test:
   source_files:
-    - tests/
+    - recipe/tests/test_validator.py
+    - recipe/tests/validator.py
   requires:
     - pytest
   commands:
-    - pytest --verbose --capture=no
+    - pytest recipe/tests/
 
 about:
   home: "https://osdag.fossee.in"
   summary: "Open Steel Design and Graphics (Osdag) - an open-source software for structural steel design developed by FOSSEE, IIT Bombay."
-  license: MIT
 

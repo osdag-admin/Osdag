@@ -5,7 +5,7 @@ valid_designations = {
     "TensionBoltedTest1": ["40 x 20 x 3"],
     "TensionBoltedTest2": ["JC 100"],
     "TensionBoltedTest3": ["40 x 40 x 3"],
-    "TensionBoltedTest4": ["JC175"],
+    "TensionBoltedTest4": ["JC 175"],
 }
 valid_bolt_grades = ["3.6", "12.9", "4.6", "5.6"]
 valid_bolt_diameters = {

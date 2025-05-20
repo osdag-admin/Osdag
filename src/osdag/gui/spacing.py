@@ -5,12 +5,16 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPainter, QPen, QFont
+from PyQt5.QtGui import QPolygonF, QBrush
+from PyQt5.QtCore import QPointF
 from ..Common import *
 
 class BoltPatternGenerator(QMainWindow):
-    def __init__(self, connection_obj):
+    def __init__(self, connection_obj, rows=3, cols=2):
         super().__init__()
         self.connection = connection_obj
+        self.rows = rows
+        self.cols = cols
         self.initUI()
         
     def initUI(self):
@@ -84,7 +88,6 @@ class BoltPatternGenerator(QMainWindow):
 
         print("Extracted parameters:", param_map)
 
-
         return param_map
 
     def createDrawing(self, params):
@@ -101,14 +104,14 @@ class BoltPatternGenerator(QMainWindow):
         
         # Calculate dimensions
         if 'gauge' in params:
-            gauge1=gauge
-            gauge2=0
+            gauge1 = gauge
+            gauge2 = 0
         width = gauge1 + gauge2 + edge
-        height = 2 * end + 2 * pitch
+        height = 2 * end + (self.rows - 1) * pitch
         
         # Set up pens
-        outline_pen = QPen(Qt.black, 2)
-        dimension_pen = QPen(Qt.black, 1.5)  # Changed from blue to black
+        outline_pen = QPen(Qt.blue, 2)
+        dimension_pen = QPen(Qt.black, 1.5)
         
         # Dimension offsets
         h_offset = 40
@@ -119,29 +122,14 @@ class BoltPatternGenerator(QMainWindow):
                                width + 2*v_offset, height + 2*h_offset)
         
         # Draw rectangle
-        self.scene.addRect(0, 0, width, height, outline_pen)
+        self.scene.addRect(0, 0, width, height, dimension_pen)
         
         # Draw holes
-        # Top row
-        if 'gauge' in params:
-            gauge1=gauge
-            gauge2=0
-        self.scene.addEllipse(gauge1 - hole_diameter/2, end - hole_diameter/2, 
-                             hole_diameter, hole_diameter, outline_pen)
-        self.scene.addEllipse(gauge1 + gauge2 - hole_diameter/2, end - hole_diameter/2, 
-                             hole_diameter, hole_diameter, outline_pen)
-        
-        # Middle row
-        self.scene.addEllipse(gauge1 - hole_diameter/2, end + pitch - hole_diameter/2, 
-                             hole_diameter, hole_diameter, outline_pen)
-        self.scene.addEllipse(gauge1 + gauge2 - hole_diameter/2, end + pitch - hole_diameter/2, 
-                             hole_diameter, hole_diameter, outline_pen)
-        
-        # Bottom row
-        self.scene.addEllipse(gauge1 - hole_diameter/2, end + 2*pitch - hole_diameter/2, 
-                             hole_diameter, hole_diameter, outline_pen)
-        self.scene.addEllipse(gauge1 + gauge2 - hole_diameter/2, end + 2*pitch - hole_diameter/2, 
-                             hole_diameter, hole_diameter, outline_pen)
+        for row in range(self.rows):
+            for col in range(self.cols):
+                x = gauge1 - hole_diameter/2 if col == 0 else gauge1 + gauge2 - hole_diameter/2
+                y = end + row * pitch - hole_diameter/2
+                self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
         
         # Add dimensions
         self.addDimensions(params, dimension_pen)
@@ -158,11 +146,11 @@ class BoltPatternGenerator(QMainWindow):
         edge = params['edge']
 
         if 'gauge' in params:
-            gauge1=gauge
-            gauge2=0
+            gauge1 = gauge
+            gauge2 = 0
         
         width = gauge1 + gauge2 + edge
-        height = 2 * end + 2 * pitch
+        height = 2 * end + (self.rows - 1) * pitch
         
         # Offsets for dimension lines
         h_offset = 20
@@ -176,64 +164,101 @@ class BoltPatternGenerator(QMainWindow):
             
         self.addHorizontalDimension(gauge1 + gauge2, -h_offset, width, -h_offset, str(edge), pen)
         
-        # Add bottom horizontal dimension (edge_distance + gauge1 + gauge2)
+        # Add bottom horizontal dimension
         self.addHorizontalDimension(0, height + h_offset, width, height + h_offset, 
                                    str(edge + gauge1 + gauge2), pen)
         
         # Add vertical dimensions
         self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
-        self.addVerticalDimension(width + v_offset, end, width + v_offset, end + pitch, str(pitch), pen)
-        self.addVerticalDimension(width + v_offset, end + pitch, width + v_offset, end + 2*pitch, str(pitch), pen)
+        for i in range(self.rows - 1):
+            self.addVerticalDimension(width + v_offset, end + i * pitch, width + v_offset, end + (i + 1) * pitch, str(pitch), pen)
         
         # Add bottom end distance dimension
         self.addVerticalDimension(width + v_offset, height, width + v_offset, height - end, str(end), pen)
         
-        # Add left side dimension (2*(edge_distance + pitch_distance))
-        self.addVerticalDimension(-v_offset, 0, -v_offset, height, 
-                                 str(2 * (end + pitch)), pen)
+        # Add left side dimension
+        total_height = 2 * end + (self.rows - 1) * pitch
+        self.addVerticalDimension(-v_offset, 0, -v_offset, total_height, str(total_height), pen)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
-        # Draw dimension line
         self.scene.addLine(x1, y1, x2, y2, pen)
-        
-        # Draw extension lines
-        ext_length = 10
-        self.scene.addLine(x1, y1, x1, y1 + ext_length, pen)
-        self.scene.addLine(x2, y2, x2, y2 + ext_length, pen)
-        
-        # Add arrows
-        arrow_size = 2.5
-        self.scene.addLine(x1, y1, x1 + arrow_size, y1 + arrow_size, pen)
-        self.scene.addLine(x1, y1, x1 + arrow_size, y1 - arrow_size, pen)
-        self.scene.addLine(x2, y1, x2 - arrow_size, y1 + arrow_size, pen)
-        self.scene.addLine(x2, y1, x2 - arrow_size, y1 - arrow_size, pen)
-        
-        # Add text
-        text_item = self.scene.addText(text)
-        font = QFont()
-        font.setPointSize(5)  # Set your desired font size here
-        text_item.setFont(font)
-        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 20)
-        
-    def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
-        # Draw dimension line
-        self.scene.addLine(x1, y1, x2, y2, pen)
-        
-        # Draw extension lines
-        ext_length = 10
-        self.scene.addLine(x1, y1, x1 - ext_length, y1, pen)
-        self.scene.addLine(x2, y2, x2 - ext_length, y2, pen)
-        
-        # Add arrows
         arrow_size = 5
-        self.scene.addLine(x1, y1, x1 + arrow_size, y1 + arrow_size, pen)
-        self.scene.addLine(x1, y1, x1 - arrow_size, y1 + arrow_size, pen)
-        self.scene.addLine(x1, y2, x1 + arrow_size, y2 - arrow_size, pen)
-        self.scene.addLine(x1, y2, x1 - arrow_size, y2 - arrow_size, pen)
+        ext_length = 10
+        self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
+        self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
         
-        # Add text
+        points_left = [
+            (x1, y1),
+            (x1 + arrow_size, y1 - arrow_size/2),
+            (x1 + arrow_size, y1 + arrow_size/2)
+        ]
+        polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
+        polygon_left.setBrush(QBrush(Qt.black))
+        
+        points_right = [
+            (x2, y2),
+            (x2 - arrow_size, y2 - arrow_size/2),
+            (x2 - arrow_size, y2 + arrow_size/2)
+        ]
+        polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
+        polygon_right.setBrush(QBrush(Qt.black))
+        
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(5)  # Set your desired font size here
+        font.setPointSize(5)
         text_item.setFont(font)
-        text_item.setPos(x1 - 30, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+        
+        if y1 < 0:
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
+        else:
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
+
+    def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
+        self.scene.addLine(x1, y1, x2, y2, pen)
+        arrow_size = 5
+        ext_length = 10
+        self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
+        self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
+        
+        if y2 > y1:
+            points_top = [
+                (x1, y1),
+                (x1 - arrow_size/2, y1 + arrow_size),
+                (x1 + arrow_size/2, y1 + arrow_size)
+            ]
+            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
+            polygon_top.setBrush(QBrush(Qt.black))
+            
+            points_bottom = [
+                (x2, y2),
+                (x2 - arrow_size/2, y2 - arrow_size),
+                (x2 + arrow_size/2, y2 - arrow_size)
+            ]
+            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
+            polygon_bottom.setBrush(QBrush(Qt.black))
+        else:
+            points_top = [
+                (x2, y2),
+                (x2 - arrow_size/2, y2 + arrow_size),
+                (x2 + arrow_size/2, y2 + arrow_size)
+            ]
+            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
+            polygon_top.setBrush(QBrush(Qt.black))
+            
+            points_bottom = [
+                (x1, y1),
+                (x1 - arrow_size/2, y1 - arrow_size),
+                (x1 + arrow_size/2, y1 - arrow_size)
+            ]
+            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
+            polygon_bottom.setBrush(QBrush(Qt.black))
+        
+        text_item = self.scene.addText(text)
+        font = QFont()
+        font.setPointSize(5)
+        text_item.setFont(font)
+        
+        if x1 < 0:
+            text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+        else:
+            text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

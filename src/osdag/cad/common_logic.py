@@ -580,6 +580,17 @@ class CommonDesignLogic(object):
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
+            print("BOLT DETAILS")
+            print("bolt:", A.bolt)
+            print("bolt2:", A.bolt2)
+            print("spting_leg.bolts_one_line:", A.spting_leg.bolts_one_line)
+            print("spting_leg.bolt_line:", A.spting_leg.bolt_line)
+            print("total_bolts_spting:", A.total_bolts_spting)
+            print("get_bolt_PC:", A.get_bolt_PC)
+            print("bolt_values:", A.bolt_values)
+            print("END BOLT DETAILS")
+
+
         elif self.connection == KEY_DISP_SEATED_ANGLE:
             angle = Angle(L=A.seated_angle.width, A=A.seated.leg_a_length, B=A.seated.leg_b_length,
                           T=A.seated.thickness, R1=A.seated.root_radius, R2=A.seated.toe_radius)
@@ -942,6 +953,28 @@ class CommonDesignLogic(object):
         :return: creates CAD model
         """
         BCE = self.module_class
+
+
+
+        print("bolt_diameter_provided:", BCE.bolt_diameter_provided)
+        print("bolt_grade_provided:", BCE.bolt_grade_provided)
+        print("bolt_numbers:", BCE.bolt_numbers)
+        print("BCE.ep_height_provided:", BCE.ep_height_provided)
+        print("BCE.ep_width_provided:", BCE.ep_width_provided)
+
+        print("BCE.edge_distance_provided:", BCE.edge_distance_provided)
+        print("BCE.end_distance_provided:", BCE.end_distance_provided)
+        print("BCE.endplate_type:", BCE.endplate_type)
+        print("BCE.ep_height_max:", BCE.ep_height_max)
+        print("BCE.epsilon_beam:", BCE.epsilon_beam)
+        print("BCE.plate_thickness:", BCE.plate_thickness)
+
+
+
+
+
+
+
 
         column_tw = float(BCE.column_tw)
         column_T = float(BCE.column_tf)
@@ -2167,16 +2200,47 @@ class CommonDesignLogic(object):
 
 
             elif self.connection == KEY_DISP_BCENDPLATE:
-                self.Bc = self.module_class()
+                self.Bc = self.module_class
                 self.ExtObj = self.createBCEndPlateCAD()
 
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
                 c_length = self.column_length
                 Point1 = gp_Pnt(0.0, 0.0, c_length)
                 DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
-                b_length = self.beam_length + self.Bc.supporting_section.depth/2+100
-                Point2 = gp_Pnt(0.0,-b_length, c_length/2)
+
+                b_length = self.beam_length + self.Bc.supporting_section.depth/2 + 100
+
+                Point2 = gp_Pnt(0.0, -b_length, c_length/2)
                 DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
+
+                Point3 = gp_Pnt(0.0, -b_length, c_length)
+                DisplayMsg(self.display, Point3, f"Bolt Numbers: {self.Bc.bolt_numbers}")
+
+                # New points for bolt info
+                Point4 = gp_Pnt(0.0, -b_length - 100, c_length)
+                DisplayMsg(self.display, Point4, f"Bolt Diameter: {self.Bc.bolt_diameter_provided}")
+
+                Point5 = gp_Pnt(0.0, -b_length - 200, c_length)
+                DisplayMsg(self.display, Point5, f"Bolt Grade: {self.Bc.bolt_grade_provided}")
+
+                # Start reference point (you can adjust these values as needed)
+                base_x = 0.0
+                base_y = -b_length - 300  # Slightly above the previous messages
+                base_z = c_length
+
+                # Display endplate height
+                Point6 = gp_Pnt(base_x, base_y, base_z)
+                DisplayMsg(self.display, Point6, f"End Plate Height: {self.Bc.ep_height_provided}")
+
+                # Move down in Z for the next message
+                Point7 = gp_Pnt(base_x, base_y, base_z - 100)
+                DisplayMsg(self.display, Point7, f"End Plate Width: {self.Bc.ep_width_provided}")
+
+                # Move further down in Z for the last message
+                Point8 = gp_Pnt(base_x, base_y, base_z - 200)
+                DisplayMsg(self.display, Point8, f"End Plate Thickness: {self.Bc.plate_thickness}")
+
+
                 # Displays the beams #TODO ANAND
                 if component == "Column":
                     self.display.View_Iso()

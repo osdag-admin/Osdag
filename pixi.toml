@@ -1,0 +1,26 @@
+[project]
+name = "Osdag"
+version = "1.0.0"
+description = "pixi instructions for osdag"
+authors = ["Aathithya Sharan"]
+channels = ["conda-forge","osdag"]
+platforms = ["win-64"]
+
+[dependencies]
+osdag = "2025.01.a.2"
+python = "3.10.*"
+numpy  = "2.2.5"
+openpyxl ="3.1.5"
+pandas = "2.2.3"
+pynput = "1.8.1"
+pyqt = "5.15.10"
+pythonocc-core = "7.8.1.1"
+pylatex = "1.4.2"
+pygithub = "2.6.1"
+pyyaml = "6.0.2"
+smesh = "9.9.0.0"
+tbb = "2022.1.0"
+
+[tasks]
+osdag-editable = "pip install -e ."
+osdag = "osdag"

@@ -2,48 +2,61 @@
 import urllib.request
 import requests
 import re
-from PyQt5.QtWidgets import QMessageBox,QMainWindow
+from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import sys
 
 class Update():
     def __init__(self):
-        super().__init__()
-        self.old_version=self.get_current_version()
+        self.old_version = self.get_current_version()
         # msg = self.notifi()
 
     def notifi(self):
         try:
-            url = "https://raw.githubusercontent.com/osdag-admin/Osdag/master/README.md"
+            url = "https://raw.githubusercontent.com/osdag-admin/Osdag/master/src/osdag/_version.py"
             file = urllib.request.urlopen(url)
             version = 'not found'
-            for line in file:
-                decoded_line = line.decode("utf-8")
-                match = re.search(r'Download the latest release version (\S+)', decoded_line)
-                if match:
-                    version = match.group(1)
-                    version = version.split("<")[0]
-                    break
-            # decoded_line = line.decode("utf-8")
-            # new_version = decoded_line.split("=")[1]
-            if version != self.old_version:
-                msg = 'Current version: '+ self.old_version+'<br>'+'Latest version '+ str(version)+'<br>'+\
-                      'Update will be available <a href=\"https://osdag.fossee.in/resources/downloads\"> here <a/>'
+            # Read the whole file content, as _version.py is small
+            file_content = file.read().decode("utf-8")
+            VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+            mo = re.search(VSRE, file_content, re.M)
+            if mo:
+                version = mo.group(1)
+            
+            # Compare versions properly
+            # Convert version strings to tuples of integers and strings
+            def parse_version(v):
+                parts = []
+                for part in v.split('.'):
+                    try:
+                        parts.append(int(part))
+                    except ValueError:
+                        parts.append(part)
+                return parts
+                
+            current_version = parse_version(self.old_version)
+            latest_version = parse_version(version)
+            
+            # Compare version parts
+            if latest_version > current_version:
+                msg = 'Current version: ' + self.old_version + '<br>' + 'Latest version ' + str(version) + '<br>' + \
+                      'Update will be available <a href="https://osdag.fossee.in/resources/downloads"> here </a>'
             else:
                 msg = 'Already up to date'
             return msg
-        except:
+        except Exception as e:
             return "No internet connection"
 
     def get_current_version(self):
         version_file = "_version.py"
-        rel_path = str(sys.path[0])
-        rel_path = rel_path.replace("\\", "/")
-        VERSIONFILE = rel_path +'/'+ version_file
+        # Get the directory where this script is located
+        import os
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        VERSIONFILE = os.path.join(script_dir, version_file)
 
         try:
             verstrline = open(VERSIONFILE, "rt").read()
         except EnvironmentError:
-            pass  # Okay, there is no version file.
+            return "Unknown"  # Return a default value when version file isn't found
         else:
             VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
             mo = re.search(VSRE, verstrline, re.M)

@@ -72,19 +72,79 @@ class Unsymmetrical_I_Section_Properties:
                 return round(Z_ey, 2)
 
 
-        def calc_PlasticModulusZ(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
-                y_neutral = Unsymmetrical_I_Section_Properties.calc_centroid(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
-                A_top = B_top * t_f_top
-                A_bot = B_bot * t_f_bot
-                A_web_top = t_w * (D - y_neutral - t_f_top)
-                A_web_bot = t_w * (y_neutral - t_f_bot)
+        def calc_PlasticModulusZ(self, D, bf_top, bf_bot, tw, tf_top, tf_bot, eps):
+            """
+                    Plastic section modulus Zp about strong axis for unequal flanges:
 
-                Zpz = (A_top * (D - y_neutral - t_f_top / 2) + A_web_top * (
-                            D - y_neutral - t_f_top - (D - y_neutral - t_f_top) / 2) +
-                       A_bot * (y_neutral - t_f_bot / 2) + A_web_bot * ((y_neutral - t_f_bot) / 2))
+                    D       : total section depth between outer flange faces (mm)
+                    bf_top  : top flange width (mm)
+                    bf_bot  : bottom flange width (mm)
+                    tw      : web thickness (mm)
+                    tf_top  : top flange thickness (mm)
+                    tf_bot  : bottom flange thickness (mm)
+                    """
+            # clear web height between flange faces
+            h_w = D - tf_top - tf_bot
+        #     print("Inside plastic modulus Z function",h_w, tw, tf_top, tf_bot)
+        #     print("Epsilon", eps) 
+            # thin-web check
+            if h_w/tw < 67 * eps:
+                print("Inside thin web check",h_w/tw)
+                A_top = bf_top * tf_top
+                A_bot = bf_bot * tf_bot
+                A = A_top + A_bot
 
-                return round(Zpz, 2)
+                # Centroid location from top fiber
+                # top rectangle centroid at tf_top/2, bottom at D - tf_bot/2
+                c = (A_top * (tf_top / 2) + A_bot * (D - tf_bot / 2)) / A
+                # print("C value inside pLASMod",c)
+                c1 = D - c
 
+                # Distances from each rectangle's centroid to the composite centroid
+                y_top_centroid = abs((tf_top / 2) - c)
+                y_bot_centroid = abs((D - tf_bot / 2) - c)
+
+                # Second moment of area of each rectangle about its own centroid
+                I_top = (bf_top * tf_top ** 3) / 12.0
+                I_bot = (bf_bot * tf_bot ** 3) / 12.0
+
+                # Parallel-axis theorem
+                I = I_top + A_top * y_top_centroid ** 2 + I_bot + A_bot * y_bot_centroid ** 2
+
+                # Section moduli
+                # print("Zp value",I)
+                Zp = I / c
+                return round(Zp, 2)
+                
+                    
+            else:
+                print("THICK WEB CHECK",h_w/tw)
+
+                A_u = bf_top * tf_top
+                A_d = bf_bot * tf_bot
+                A_w = h_w * tw
+                A = A_u + A_d + A_w
+                if h_w / tw <= 67.0 * eps:
+                        y = (A_u * tf_top/2 + A_d * (D - tf_bot/2))/(A_u + A_d)
+                        y1 = D - y
+
+                # centroids measured from bottom face
+                y_d = tf_bot / 2.0
+                y_w = tf_bot + h_w / 2.0
+                y_u = tf_bot + h_w + tf_top / 2.0
+                # plastic neutral axis from bottom face
+                if A_d < A / 2.0 and A_u < A / 2.0:
+                        y_pna = tf_bot + (A - 2 * A_d) / (2 * tw)
+                elif A_d >= A / 2.0:
+                        y_pna = A / (2 * bf_bot)
+                else:
+                        y_pna = D - A / (2 * bf_top)
+                # compute Zp as sum of Ai * distance from plastic axis
+                Zp = (
+                                (bf_bot * y_pna ** 2 - (bf_bot - tw) * (y_pna - tf_bot) ** 2)
+                                + (bf_top * (D - y_pna) ** 2 - (bf_top - tw) * (D - tf_top - y_pna) ** 2)
+                        ) / 2.0
+                return round(Zp, 2)
 
         def calc_PlasticModulusY(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
                 Zpy = (t_f_top * B_top ** 2 / 4 + t_f_bot * B_bot ** 2 / 4 + (D - t_f_top - t_f_bot) * t_w ** 2 / 4)

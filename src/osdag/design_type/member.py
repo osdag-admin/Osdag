@@ -2906,7 +2906,7 @@ class Member(Main):
         optimum = []
         values = {KEY_IntermediateStiffener:'Yes',
                   KEY_IntermediateStiffener_spacing:'NA',
-                  KEY_LongitudnalStiffener:'Yes',
+                  KEY_LongitudnalStiffener:'Yes and 1 stiffener',
                   KEY_IntermediateStiffener_thickness:'6',
                   KEY_LongitudnalStiffener_thickness:'6',
                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]
@@ -2921,7 +2921,7 @@ class Member(Main):
 
         t8 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX, None, values[KEY_IntermediateStiffener_spacing])
         optimum.append(t8)
-        t9 = (KEY_LongitudnalStiffener, KEY_DISP_LongitudnalStiffener, TYPE_COMBOBOX, ['Yes','No'],  values[KEY_LongitudnalStiffener])
+        t9 = (KEY_LongitudnalStiffener, KEY_DISP_LongitudnalStiffener, TYPE_COMBOBOX, ['Yes and 1 stiffener','Yes and 2 stiffeners','No'],  values[KEY_LongitudnalStiffener])
         optimum.append(t9)
         t10 = (KEY_IntermediateStiffener_thickness, KEY_DISP_IntermediateStiffener_thickness, TYPE_COMBOBOX, ['All','Customized'], values[KEY_IntermediateStiffener_thickness])
         optimum.append(t10)

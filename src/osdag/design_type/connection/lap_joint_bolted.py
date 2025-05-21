@@ -466,7 +466,8 @@ class LapJointBolted(MomentConnection):
             if self.bolt.bolt_type == 'Bearing Bolt':
                 self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
             self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
-            self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
+            self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)
+            logger.info(" : Bolt diameter and grade selected are {} mm and {} respectively.".format(self.bolt.bolt_diameter_provided, self.bolt.bolt_grade_provided))  
             # print(self.bolt)
             self.number_r_c_bolts(self, design_dictionary,0,0)
 
@@ -509,7 +510,9 @@ class LapJointBolted(MomentConnection):
                 self.cols += 1
             else:
                 break
-        self.rows = math.ceil(self.rows/self.cols)  
+        self.rows = math.ceil(self.rows/self.cols)
+        if self.rows == 1:
+            self.rows = 2
 
         if self.cols>1:
             self.len_conn = (self.cols - 1)*self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
@@ -640,7 +643,7 @@ class LapJointBolted(MomentConnection):
         # print("fafafafafa",self.final_edge_dist, self.final_end_dist, self.final_pitch, self.final_gauge)
         print("FINAL FINAL",self.bolt)
         print("Final Edge/End/Gauge/Pitch",self.final_edge_dist,self.final_end_dist,self.final_gauge,self.final_pitch)
-
+        logger.info("Design is successful. \n")
         # print(self)
         # print("faahfnafanfaf")
         print("Max and min end edge dist ",self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)

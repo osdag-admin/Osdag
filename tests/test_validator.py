@@ -40,6 +40,7 @@ def test_tension_bolted_test3():
     run_test("TensionBoltedTest3.osi", expected_result)
 @pytest.mark.xfail
 # Test function 4
+@pytest.mark.xfail
 def test_tension_bolted_test4():
     expected_result = {
         "Member.Designation": "Pass",

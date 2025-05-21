@@ -842,51 +842,35 @@ class IS800_2007(object):
         return buckling_class
     
     @staticmethod
-    def cl_7_1_2_1_design_compressisive_stress_fcd_buckling_class_c():
-        data = {
-    200: [182.00, 182.00, 172.00, 163.00, 153.00, 142.00, 131.00, 120.00, 108.00, 97.50, 87.30, 78.20, 70.00, 62.90,
-          56.60, 51.10, 46.40, 42.20, 38.50, 35.30, 32.40, 29.90, 27.60, 25.60, 23.80],
-    210: [191.00, 190.00, 180.00, 170.00, 159.00, 148.00, 136.00, 123.00, 111.00, 100.00, 89.00, 79.40, 71.00, 63.60,
-          57.20, 51.60, 46.80, 42.50, 38.80, 35.50, 32.60, 30.10, 27.80, 25.70, 23.90],
-    220: [200.00, 199.00, 188.00, 177.00, 165.00, 153.00, 140.00, 127.00, 114.00, 102.00, 90.50, 80.60, 71.90, 64.40,
-          57.80, 52.10, 47.10, 42.80, 39.00, 35.70, 32.80, 30.20, 27.90, 25.90, 24.00],
-    230: [209.00, 207.00, 196.00, 184.00, 172.00, 158.00, 144.00, 130.00, 116.00, 104.00, 92.00, 81.70, 72.80, 65.00,
-          58.30, 52.50, 47.50, 43.10, 39.30, 35.90, 33.00, 30.40, 28.00, 26.00, 24.10],
-    240: [218.00, 216.00, 204.00, 191.00, 178.00, 163.00, 148.00, 133.00, 119.00, 105.00, 93.30, 82.70, 73.50, 65.60,
-          58.80, 52.90, 47.80, 43.40, 39.50, 36.10, 33.10, 30.50, 28.20, 26.10, 24.20],
-    250: [227.00, 224.00, 211.00, 198.00, 183.00, 168.00, 152.00, 136.00, 121.00, 107.00, 94.60, 83.70, 74.30, 66.20,
-          59.20, 53.30, 48.10, 43.60, 39.70, 36.30, 33.30, 30.60, 28.30, 26.20, 24.30],
-    260: [236.00, 233.00, 219.00, 205.00, 189.00, 173.00, 156.00, 139.00, 123.00, 109.00, 95.70, 84.60, 75.00, 66.70,
-          59.70, 53.60, 48.40, 43.90, 39.90, 36.50, 33.40, 30.80, 28.40, 26.30, 24.40],
-    280: [255.00, 250.00, 234.00, 218.00, 201.00, 182.00, 163.00, 145.00, 127.00, 112.00, 97.90, 86.20, 76.20, 67.70,
-          60.40, 54.20, 48.90, 44.30, 40.30, 36.80, 33.70, 31.00, 28.60, 26.40, 24.50],
-    300: [273.00, 266.00, 249.00, 231.00, 212.00, 191.00, 170.00, 149.00, 131.00, 114.00, 100.00, 87.60, 77.30, 68.60,
-          61.10, 54.80, 49.30, 44.70, 40.60, 37.00, 33.90, 31.20, 28.80, 26.60, 24.70],
-    320: [291.00, 283.00, 264.00, 244.00, 222.00, 199.00, 176.00, 154.00, 134.00, 116.00, 102.00, 88.90, 78.30, 69.30,
-          61.70, 55.30, 49.80, 45.00, 40.90, 37.30, 34.10, 31.40, 28.90, 26.70, 24.80],
-    340: [309.00, 299.00, 278.00, 256.00, 232.00, 207.00, 182.00, 158.00, 137.00, 119.00, 103.00, 90.10, 79.20, 70.00,
-          62.30, 55.70, 50.10, 45.30, 41.10, 37.50, 34.30, 31.50, 29.10, 26.90, 24.90],
-    360: [327.00, 316.00, 293.00, 268.00, 242.00, 215.00, 187.00, 162.00, 140.00, 120.00, 104.00, 91.10, 80.00, 70.70,
-          62.80, 56.10, 50.50, 45.60, 41.40, 37.70, 34.50, 31.70, 29.20, 27.00, 25.00],
-    380: [345.00, 332.00, 307.00, 280.00, 252.00, 222.00, 192.00, 165.00, 142.00, 122.00, 106.00, 92.10, 80.70, 71.20,
-          63.30, 56.50, 50.80, 45.80, 41.60, 37.90, 34.70, 31.80, 29.30, 27.10, 25.10],
-    400: [364.00, 348.00, 321.00, 292.00, 261.00, 228.00, 197.00, 169.00, 144.00, 124.00, 107.00, 93.00, 81.40, 71.80,
-          63.70, 56.90, 51.10, 46.10, 41.80, 38.10, 34.80, 31.90, 29.40, 27.20, 25.20],
-    420: [382.00, 364.00, 335.00, 304.00, 270.00, 235.00, 202.00, 172.00, 146.00, 125.00, 108.00, 93.80, 82.00, 72.30,
-          64.10, 57.20, 51.30, 46.30, 42.00, 38.20, 34.90, 32.10, 29.50, 27.30, 25.30],
-    450: [409.00, 388.00, 355.00, 320.00, 282.00, 244.00, 208.00, 176.00, 149.00, 127.00, 110.00, 94.90, 82.90, 72.90,
-          64.60, 57.60, 51.70, 46.60, 42.20, 38.40, 35.10, 32.20, 29.70, 27.40, 25.40],
-    480: [436.00, 412.00, 376.00, 337.00, 295.00, 252.00, 213.00, 180.00, 152.00, 129.00, 111.00, 95.90, 83.60, 73.50,
-          65.10, 58.00, 52.00, 46.90, 42.50, 38.60, 35.30, 32.40, 29.80, 27.50, 25.50],
-    510: [464.00, 435.00, 395.00, 352.00, 306.00, 260.00, 218.00, 183.00, 154.00, 131.00, 112.00, 96.80, 84.30, 74.10,
-          65.50, 58.40, 52.30, 47.10, 42.70, 38.80, 35.40, 32.50, 29.90, 27.60, 25.60],
-    540: [491.00, 458.00, 415.00, 367.00, 317.00, 267.00, 223.00, 186.00, 156.00, 132.00, 113.00, 97.60, 84.90, 74.60,
-          65.90, 58.70, 52.60, 47.30, 42.90, 39.00, 35.60, 32.60, 30.00, 27.70, 25.70]
-}
-        slenderness_ratios = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210,
-                      220, 230, 240, 250] 
-        df = pd.DataFrame(data, index=slenderness_ratios)
-        return df  
+    def cl_7_1_2_1_design_compressisive_stress_plategirder(f_y, gamma_mo, effective_slenderness_ratio,
+                                               modulus_of_elasticity):
+        """
+        Args:
+            f_y:Yield stress                                                                        (float)
+            gamma_mo:Effective length of member                                                        (float)
+            effective_slenderness_ratio:Euler buckling class                                                       (float)
+            imperfection_factor
+            modulus_of_elasticity
+
+        Returns:
+            list of euler_buckling_stress, nondimensional_effective_slenderness_ratio, phi, stress_reduction_factor, design_compressive_stress_fr .design_compressive_stress, design_compressive_stress_min
+        Note:
+            Reference: IS 800 pg34
+            @author:Rutvik Joshi
+        """
+        # 2.4 - Euler buckling stress
+        imperfection_factor = 0.49
+        euler_buckling_stress = (math.pi ** 2 * modulus_of_elasticity) / effective_slenderness_ratio ** 2
+        nondimensional_effective_slenderness_ratio = math.sqrt(f_y / euler_buckling_stress)
+        phi = 0.5 * (1 + imperfection_factor * (
+                    nondimensional_effective_slenderness_ratio - 0.2) + nondimensional_effective_slenderness_ratio ** 2)
+        # 2.6 - Design compressive stress
+        stress_reduction_factor = 1 / (phi + math.sqrt(phi ** 2 - nondimensional_effective_slenderness_ratio ** 2))
+        design_compressive_stress_fr = f_y * stress_reduction_factor / gamma_mo
+        design_compressive_stress_max = f_y / gamma_mo
+        design_compressive_stress = min(design_compressive_stress_fr, design_compressive_stress_max)
+        print(f"euler_buckling_stress {euler_buckling_stress} , nondimensional_effective_slenderness_ratio {nondimensional_effective_slenderness_ratio} , phi {phi} , stress_reduction_factor {stress_reduction_factor} , design_compressive_stress_fr {design_compressive_stress_fr} , design_compressive_stress_max {design_compressive_stress_max} , design_compressive_stress {design_compressive_stress}")
+        return design_compressive_stress  
         
     
 
@@ -1391,6 +1375,67 @@ class IS800_2007(object):
             V_tf == V_p
             print('phi',phi,'\n M_fr',M_fr,'\n s',s, '\n c',c, '\n w_tf', w_tf, '\n sai',sai,'\n fv',fv,'\n V_tf',V_tf,'\n V_p',V_p)
         return phi,M_fr,s, w_tf,sai,fv,V_tf
+    
+    @staticmethod
+    def cl_8_4_2_2_TensionField_unequal_Isection(
+    c, d, tw, fyw,
+    bf_top, tf_top, bf_bot, tf_bot,
+    Nf, gamma_m0, A_v, tau_b, V_p
+):
+        """
+        Tension‐field method per IS 800:2007 Cl. 8.4.2.2 for unequal flanges.
+
+        Parameters:
+        c       : float : panel width (mm)
+        d       : float : web depth (mm)
+        tw      : float : web thickness (mm)
+        fyw     : float : web yield stress (N/mm²)
+        bf_top  : float : top flange width (mm)
+        tf_top  : float : top flange thickness (mm)
+        bf_bot  : float : bottom flange width (mm)
+        tf_bot  : float : bottom flange thickness (mm)
+        Nf      : float : axial force in each flange (kN → N·mm units consistent)
+        gamma_m0: float : partial safety factor
+        A_v     : float : gross web area = d*tw (mm²)
+        tau_b   : float : post‐buckling shear stress of web (N/mm²)
+        V_p     : float : plastic shear strength V_np (kN)
+
+        Returns:
+        tuple: (phi, Mfr_top, Mfr_bot, s_top, s_bot, w_tf, psi, fv, V_tf)
+        """
+
+        # 1) Tension‐field angle φ
+        if c == 0:
+            phi = 90.0
+        else:
+            phi = math.degrees(math.atan(d / c))
+
+        # 2) Reduced plastic moment of each flange
+        def Mfr(bf, tf):
+            Mp = 0.25 * bf * tf**2 * fyw
+            ratio = Nf * 1e3 / (bf * tf * fyw / gamma_m0)   # Nf in kN → multiply by 1e3
+            return Mp * (1 - ratio**2)
+
+        Mfr_t = Mfr(bf_top, tf_top)
+        Mfr_b = Mfr(bf_bot, tf_bot)
+
+        # 3) s‐values for each flange, limited to c
+        sinφ = math.sin(math.radians(phi))
+        s_t = min(2 * math.sqrt(Mfr_t / (fyw * tw)) / sinφ, c)
+        s_b = min(2 * math.sqrt(Mfr_b / (fyw * tw)) / sinφ, c)
+
+        # 4) Width of the tension field w_tf
+        w_tf = d * math.cos(math.radians(phi)) - (c - s_t - s_b) * sinφ
+
+        # 5) Field yield strength f_v
+        psi = 1.5 * tau_b * math.sin(2 * math.radians(phi))
+        fv  = math.sqrt(fyw**2 - 3 * tau_b**2 + psi**2) - psi
+
+        # 6) Nominal shear resistance V_tf (kN)
+        V_tf = (A_v * tau_b + 0.9 * w_tf * tw * fv * sinφ) / 1e3
+        V_tf = min(V_tf, V_p)
+
+        return phi, Mfr_t, Mfr_b, s_t, s_b, w_tf, psi, fv, V_tf
 
     @staticmethod
     def cl_8_5_1_EndPanel(c, d, tw, fyw, bf, tf, fyf, Nf, gamma_mo, A_v, tau_b, V_p):
@@ -1427,6 +1472,110 @@ class IS800_2007(object):
             return True
         else:   
             return False
+    
+    @staticmethod   
+    def cl_8_6_1_1_and_8_6_1_2_web_thickness_check(d, tw, eps, stiffener_type, c=None):
+        """
+        Check minimum web thickness requirements as per IS 800:2007 Cl. 8.6.1.1 & 8.6.1.2
+
+        Parameters:
+        d (float): Depth of web (mm)
+        tw (float): Thickness of web (mm)
+        eps (float): ε = sqrt(250/fy) where fy is yield strength of steel (N/mm^2)
+        stiffener_type (str): Type of stiffening provided. Options:
+            - "no_stiffener"
+            - "transverse_only"
+            - "transverse_and_two_longitudinal_neutral"
+            - "transverse_and_one_longitudinal_compression"
+        c (float): Spacing of transverse stiffeners (mm), required for some types
+
+        Returns:
+        dict: Dictionary with result of the web thickness check.
+        """
+
+        results = {}
+
+        if stiffener_type == "no_stiffener":
+            ratio = d / tw
+            limit_serv = 200 * eps
+            limit_buckling = 345 * (eps ** 2)
+            limit = min(limit_serv, limit_buckling)
+            results["Limit"] = limit
+            if ratio <= limit:
+                return True
+            else:
+                return False
+
+        elif stiffener_type == "transverse_only":
+            if c is None:
+                return False #{"Error": "Spacing 'c' is required for 'transverse_only' stiffeners."}
+
+            if 3 * d >= c >= 1.5 * d:
+                ratio = d / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * (eps ** 2)
+            elif 1.5 * d > c >= d:
+                ratio = d / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * eps
+            elif 0.74 * d <= c < d:
+                ratio = c / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * eps
+            elif c < 0.74 * d:
+                ratio = d / tw
+                limit_serv = 270 * eps
+                limit_buckling = 345 * eps
+            else:
+                return False #{"Error": "Invalid range for spacing 'c'."}
+
+            limit = min(limit_serv, limit_buckling)
+            results["Limit"] = limit
+            results["Pass"] = ratio <= limit
+
+        elif stiffener_type == "transverse_and_two_longitudinal_neutral":
+            ratio = d / tw
+            limit = 400 * eps
+            results["Limit"] = limit
+            results["Pass"] = ratio <= limit
+
+        elif stiffener_type == "transverse_and_one_longitudinal_compression":
+            if c is None:
+                return False #{"Error": "Spacing 'c' is required for compression flange restraint."}
+
+            if 2.4 * d >= c >= 1.5 * d:
+                ratio = d / tw
+                limit_serv = 250 * eps
+                limit_buckling = 345 * (eps ** 2)
+            elif 1.5 * d > c >= d:
+                ratio = d / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * eps
+            elif 0.74 * d <= c < d:
+                ratio = c / tw
+                limit_serv = 250 * eps
+                limit_buckling = 345 * eps
+            elif c < 0.74 * d:
+                ratio = d / tw
+                limit_serv = 340 * eps
+                limit_buckling = 345 * eps
+            else:
+                return False #{"Error": "Invalid range for spacing 'c'."}
+
+            limit = min(limit_serv, limit_buckling)
+            results["Limit"] = limit
+            results["Pass"] = ratio <= limit
+
+        else:
+            return False #{"Error": "Invalid stiffener_type provided."}
+
+        if 'c' in locals() and ratio == c / tw:
+            results["c/tw"] = ratio
+        else:
+            results["d/tw"] = ratio
+
+        results["ε"] = eps
+        return True
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """

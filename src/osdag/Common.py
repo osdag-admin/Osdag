@@ -453,7 +453,7 @@ KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Buckling Stress (MPa)' # Euler 
 KEY_EFF_SEC_AREA = 'MajorEffSecArea'
-KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (mm<sup>2</sup>)' # ective
+KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (cm<sup>2</sup>)' # ective
 KEY_EFF_LEN = 'Major.Effective_Length'
 KEY_DISP_EFF_LEN = 'Eff. Length (m)' # ective
 KEY_BUCKLING_CURVE = 'BucklingCurve'
@@ -547,8 +547,8 @@ KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
 KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
 KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)' # Elastic 
 KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' # 
-KEY_DISP_T_constatnt= 'Torsional Constant (mm<sup>4</sup>)' #  (I<sub>t</sub>)
-KEY_DISP_W_constatnt= 'Warping Constant (mm<sup>6</sup>)' # (I<sub>w</sub>)
+KEY_DISP_T_constatnt= 'Torsional Constant (cm<sup>4</sup>)' #  (I<sub>t</sub>)
+KEY_DISP_W_constatnt= 'Warping Constant (cm<sup>6</sup>)' # (I<sub>w</sub>)
 KEY_LTB= 'L.T.B.Details'
 KEY_Elastic_CM= 'Elastic.Moment'
 KEY_T_constatnt= 'T.Constant'
@@ -667,9 +667,11 @@ KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
 KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 KEY_LongitudnalStiffener = 'LongitudnalStiffener.Data'
 KEY_LongitudnalStiffener_thickness = 'LongitudnalStiffner.Thickness'
+KEY_LongitudnalStiffener_thickness_val = 'LongitudnalStiffner.Thickness.val'
 KEY_DISP_LongitudnalStiffener = 'Longitudnal Stiffener'
 KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness'
 KEY_IntermediateStiffener_thickness = 'IntermediateStiffener.Thickness'
+KEY_IntermediateStiffener_thickness_val = 'IntermediateStiffener.Thickness.val'
 KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness'
 KEY_WeldWebtoflange= 'WeldWebtoflange.Data'
 KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange'
@@ -749,6 +751,12 @@ KEY_DISP_MAX_DEFL = 'Maximum Deflection'
 VALUES_MAX_DEFL = ['Span/600','Span/800','Span/400','Span/300','Span/360','Span/150','Span/180','Span/240','Span/120','Span/500','Span/750','Span/1000']
 KEY_SUPPORT_WIDTH = 'Support.Width'
 KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
+VALUES_STIFFENER_THICKNESS = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
+                        '110', '120']
+KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
+KEY_DISP_EndpanelStiffener_thickness = 'End Panel Stiffener Thickness (mm)'
+KEY_LongitudnalStiffener_numbers = 'LongitudnalStiffener.Numbers'
+KEY_DISP_LongitudnalStiffener_numbers = 'Number of Longitudnal Stiffeners'
  
 ###################################
 # All Input Keys

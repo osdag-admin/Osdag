@@ -1,0 +1,49 @@
+package:
+  name: osdag
+  version: "0.1"
+
+source:
+  path: ..
+
+build:
+  script:
+    - pip install .
+    - pytest --verbose --capture=no
+
+requirements:
+  build:
+    - python
+    - pip
+    - pytest
+    - setuptools
+    - setuptools_scm
+
+  host:
+    - python
+    - pip
+    - pytest
+    - setuptools
+    - setuptools_scm
+
+  run:
+    - python
+    - pyqt
+    - requests
+    - numpy
+    - pyyaml
+    - pygithub
+    - pytest
+
+test:
+  source_files:
+    - recipe/tests/test_validator.py
+    - recipe/tests/validator.py
+  requires:
+    - pytest
+  commands:
+    - pytest recipe/tests/
+
+about:
+  home: "https://osdag.fossee.in"
+  summary: "Open Steel Design and Graphics (Osdag) - an open-source software for structural steel design developed by FOSSEE, IIT Bombay."
+

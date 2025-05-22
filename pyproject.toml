@@ -1,7 +1,10 @@
 [build-system]
-requires = ["setuptools >= 61.0", "setuptools_scm >= 8.0"]
+requires = [
+    "setuptools >= 61.0",
+    "setuptools_scm >= 8.0",
+    "pytest"  # Ensure pytest is available during the build process
+]
 build-backend = "setuptools.build_meta"
-include-package-date = true
 
 [tool.setuptools.packages.find]
 namespaces = true
@@ -12,14 +15,20 @@ where = ["src"]
 "osdag.data.ResourceFiles.Database" = ["*"]
 "osdag.data.themes" = ["*"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
 [project]
 name = "osdag"
 dynamic = ["version"]
-dependencies = ["PyQt5", "requests", "pylatex", "numpy", "PyYaml", "PyGithub"]
-requires-python = ">= 3.8"
+dependencies = [
+    "PyQt5", "requests", "pylatex", "numpy", "PyYaml", "PyGithub", "pytest"  # Added pytest as a runtime dependency
+]
+requires-python = ">=3.8"
 description = "Open steel design and graphics"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = {text = "MIT"}
 keywords = ["steel design", "civil engineering", "engineering"]
 
 [project.gui-scripts]

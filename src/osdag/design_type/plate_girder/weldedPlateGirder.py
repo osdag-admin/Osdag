@@ -1592,7 +1592,7 @@ class PlateGirderWelded(Member):
         Ac = (b1 + n1) * tw
         slenderness_input = 2.5 * self.eff_depth / tw
         self.fcd = IS800_2007.cl_7_1_2_1_design_compressisive_stress_plategirder(Fy, gamma_m0, slenderness_input, E)
-        Critical_buckling_load = round(Ac * self.fcd / 1000, 2)
+        Critical_buckling_load = round(Ac * self.fcd, 2)
         self.shear_ratio =  max(self.load.shear_force / Critical_buckling_load , self.shear_ratio)
         if Critical_buckling_load>= self.load.shear_force:
             return True
@@ -1602,7 +1602,7 @@ class PlateGirderWelded(Member):
     #check 5 Web crippling for major laterally supported and unsupported & thick web
     def web_crippling_laterally_supported_thick_web(self, Fy, gamma_m0, tw, tf_top, b1):
         n2 = 2.5 * tf_top
-        Critical_crippling_load = round((b1 + n2) * tw * Fy / (gamma_m0 * 1000), 2)
+        Critical_crippling_load = round((b1 + n2) * tw * Fy / (gamma_m0), 2)
         self.shear_ratio =  max(self.load.shear_force / Critical_crippling_load , self.shear_ratio)
         if Critical_crippling_load >= self.load.shear_force:
             return True
@@ -1933,7 +1933,7 @@ class PlateGirderWelded(Member):
             Mid-span deflection in meters.
         """
         # unit conversions
-        M = M_kNm * 1e3  # kN·m → N·m
+        M = M_kNm  # kN·m → N·m
 
         pref = M * L ** 2 / (E * I)
         if case == KEY_DISP_UDL_PIN_PIN_PG:
@@ -2418,10 +2418,8 @@ class PlateGirderWelded(Member):
         
         # placeholder penalty
         penalty = 0
-        if self.design_check_optimized_version(self,design_dictionary) > 1:
-            penalty = 1e7
-        else:
-            penalty = (100 - (self.design_check_optimized_version(self,design_dictionary)/1000 * 100)) * 1e6
+       
+        penalty = abs(100 - (self.design_check_optimized_version(self,design_dictionary) * 100)) * 1e6
         
         return weight + penalty
 
@@ -2516,6 +2514,7 @@ class PlateGirderWelded(Member):
                     self.c = 0
                 else:
                     self.c = float(self.c)
+                print("c value",self.c)
                 self.design_flag2 = self.min_web_thickness_thick_web(self,self.eff_depth,self.web_thickness,self.epsilon,stiffener_type,self.c)
                 if self.design_flag2 == True:
 
@@ -2775,7 +2774,7 @@ class PlateGirderWelded(Member):
 
         #for customized
         print(f"RATIOS  moment {self.moment_ratio} shear {self.shear_ratio} deflection {self.deflection_ratio}")
-        return max(self.moment_ratio,self.shear_ratio)
+        return max(self.moment_ratio,self.shear_ratio,self.deflection_ratio)
                     
 
         
@@ -2793,7 +2792,7 @@ class PlateGirderWelded(Member):
         variable_list = self.build_variable_structure(self,is_thick_web, is_symmetric)
         lb, ub = self.get_bounds(self,variable_list)
         optimizer = GlobalBestPSO(
-        n_particles=500,
+        n_particles=50,
         dimensions=len(variable_list),
         options={'c1': 1.5, 'c2': 1.5, 'w': 0.4},
         bounds=(lb, ub)

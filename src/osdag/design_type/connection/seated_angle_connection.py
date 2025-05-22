@@ -604,7 +604,7 @@ class SeatedAngleConnection(ShearConnection):
 
         seated_spacing_beam = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details")
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing DetailsONE")
         seated_spacing_beam.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,

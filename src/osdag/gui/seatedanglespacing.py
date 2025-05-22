@@ -9,12 +9,12 @@ from PyQt5.QtGui import QPolygonF, QBrush
 from PyQt5.QtCore import QPointF
 from ..Common import *
 from .additionalfns import calculate_total_width
-class BoltPatternGenerator(QMainWindow):
+class SeatedanglespacingOnCol(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
-        self.rows = rows
-        self.cols = cols
+        self.rows = int(rows)
+        self.cols = int(cols)
         self.initUI()
         
     def initUI(self):
@@ -62,9 +62,17 @@ class BoltPatternGenerator(QMainWindow):
         
         # Ensure the view shows all content
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+    
     def get_parameters(self):
-        spacing_data = self.connection.spacing(status=True)  # Get actual values
-        param_map = {}
+        spacing_data = self.connection.top_spacing_col(flag=True)  # Get actual values
+        param_map = {
+    'pitch': 0.0,
+    'end': 0.0,
+    'gauge1': 0.0,
+    'gauge2': 0.0,
+    'gauge': 0.0,
+    'edge': 0.0
+}
         print('spacing_data length' , len(spacing_data))
         for item in spacing_data:
             key, _, _, value = item
@@ -93,6 +101,7 @@ class BoltPatternGenerator(QMainWindow):
         
         # Extract parameters
         pitch = params['pitch']
+
         end = params['end']
         if 'gauge' in params:
             gauge = params['gauge']
@@ -101,7 +110,7 @@ class BoltPatternGenerator(QMainWindow):
             gauge2 = params['gauge2']
         edge = params['edge']
         hole_diameter = params['hole']
-        
+        print(f"rows: {self.rows}, cols: {self.cols}")
         # Calculate dimensions
         if 'gauge' in params:
             gauge1 = gauge
@@ -109,7 +118,6 @@ class BoltPatternGenerator(QMainWindow):
         width = calculate_total_width(edge, gauge1, gauge2, self.cols)
 
         height = 2 * end + (self.rows - 1) * pitch
-        
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
         dimension_pen = QPen(Qt.black, 1.5)

@@ -64,7 +64,8 @@ from ..get_DPI_scale import scale,height,width
 from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
 from osdag.gui.spacing import BoltPatternGenerator
-
+from .seatedanglespacing import SeatedanglespacingOnCol
+from .Beam2ColEnddetailing import BeamtoColDetailing
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -2180,9 +2181,9 @@ class Window(QMainWindow):
     def output_button_connect(self, main, button_list, b):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
-    def run_spacing_script(self,cols,rows):
+    def run_spacing_script(self,cols,rows,generator_class=BoltPatternGenerator , main=None):
         print("Creating spacing window...")
-        self.spacing_window = BoltPatternGenerator(self.Obj,cols=cols,rows=rows)
+        self.spacing_window = generator_class(self.Obj,cols=cols,rows=rows,main=main)
         self.spacing_window.setWindowTitle("Spacing Viewer")
         self.spacing_window.raise_()
         self.spacing_window.activateWindow()
@@ -2251,6 +2252,29 @@ class Window(QMainWindow):
                                 self.run_spacing_script(cols=self.Obj.plate.bolt_line,
                                                         rows=self.Obj.plate.bolts_one_line)
                             break
+                elif op[0]=='SeatedAngle.Bolt_Spacing_col':
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj()                 # Instantiate it
+                            self.run_spacing_script(self.Obj.bolt.bolt_col,
+                                                        self.Obj.bolt.bolt_row,#reversed
+                                                        SeatedanglespacingOnCol)
+                elif op[0]=='SeatedAngle.Bolt_Spacing_beam':
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj()                 # Instantiate it
+                            self.run_spacing_script(2,
+                                                        1,#constant used in code
+                                                        SeatedanglespacingOnCol)
+                            print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
+                elif op[0]=='Detailing' and op[1]=='Typical Detailing':
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj()  
+                            print(f'rows: {self.Obj.bolt_row} , cols : {self.Obj.bolt_column} , {self.Obj.bolt_row_web}')
+                            self.run_spacing_script(0,0,BeamtoColDetailing,main)
+                            data=main.output_values(main,True)
+                            
 
                 dialog.setWindowTitle(title)
                 j = 1

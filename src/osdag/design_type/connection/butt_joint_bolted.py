@@ -1,6 +1,6 @@
 """
 Module: butt_joint_bolted.py
-Author: Aman
+Author: Tarandeep
 Date: 2025-02-26
 
 Description:
@@ -28,6 +28,9 @@ class ButtJointBolted(MomentConnection):
         super(ButtJointBolted, self).__init__()
         self.design_status = False
         self.spacing = None 
+        self.packing_plate_thickness = 0.0
+        self.beta_pkg = 1.0
+        self.calculated_cover_plate_thickness = 0.0
 
     ###############################################
     # Design Preference Functions Start
@@ -246,11 +249,10 @@ class ButtJointBolted(MomentConnection):
         list1.append(t1)
         t3 = (KEY_D, self.diam_bolt_customized)
         list1.append(t3)
-        # t5 = (KEY_PLATE1_THICKNESS, self.plate_thick_customized)
-        # list1.append(t5)
-        # t6 = (KEY_PLATE2_THICKNESS, self.plate_thick_customized)
-        # list1.append(t6)
-        
+        t5 = (KEY_PLATE1_THICKNESS, self.plate_thick_customized)
+        list1.append(t5)
+        t6 = (KEY_PLATE2_THICKNESS, self.plate_thick_customized)
+        list1.append(t6)
         return list1
     
     def spacing(self, status):
@@ -278,52 +280,59 @@ class ButtJointBolted(MomentConnection):
         return spacing
 
     def output_values(self, flag):
-
         out_list = []
         t4 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
         out_list.append(t4)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
-              '', True)
+              self.bolt.bolt_diameter_provided if flag else '', True)
         out_list.append(t2)
 
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX,
-              '', True)
+              self.bolt.bolt_grade_provided if flag else '', True)
         out_list.append(t3)
 
         t31 = (KEY_OUT_TYP_PROVIDED, KEY_OUT_DISP_TYP_PROVIDED, TYPE_TEXTBOX,
-              '', True)
+               self.bolt.bolt_type if flag else '', True)
         out_list.append(t31)
 
-        t8 = (KEY_OUT_BOLT_SHEAR,KEY_OUT_DISP_BOLT_SHEAR , TYPE_TEXTBOX, '', True)
+        t8 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+               self.bolt.bolt_shear_capacity if flag else '', True)
         out_list.append(t8)
 
-        t4 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, '', True)
+        t4 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,
+               self.bolt.bolt_bearing_capacity if flag else '', True)
         out_list.append(t4)
 
         t5 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
-              '', True)
+               self.bolt.bolt_capacity if flag else '', True)
         out_list.append(t5)
 
         t17 = (None, DISP_TITLE_BOLTDS, TYPE_TITLE, None, True)
         out_list.append(t17)
-        t17 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, '', True)
+        t17 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX,
+               self.number_bolts if flag else '', True)
         out_list.append(t17)
         
-        t11 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX, '', True) 
+        t11 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
+               self.packing_plate_thickness if flag else '', True) 
         out_list.append(t11)
 
-        t18 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX,'', True)
+        t18 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX,
+               self.rows if flag else '', True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX,'', True)
+        t19 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX,
+               self.cols if flag else '', True)
         out_list.append(t19)
 
-        t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True)
+        t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,
+               self.utilization_ratio if flag else '', True)
+        out_list.append(t29)
+
+        t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
+               self.len_conn if flag else '', True)
         out_list.append(t20)
-        
-        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
-        # out_list.append(t21)
 
         return out_list
 
@@ -367,8 +376,462 @@ class ButtJointBolted(MomentConnection):
         ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
 
-    ################################ Outlist Dict #####################################################################################
+    def func_for_validation(self, design_dictionary):
+
+        all_errors = []
+        "check valid inputs and empty inputs in input dock"
+        self.design_status = False
+        flag = False
+        flag1 = False
+        flag2 = False
+
+        option_list = self.input_values(self)
+        missing_fields_list = []
+
+        # print(f'\n func_for_validation option list = {option_list}'
+        #       f'\n  design_dictionary {design_dictionary}')
+
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+
+                    missing_fields_list.append(option[1])
+                else:
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_PLATE_WIDTH:
+
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag1 = True
+
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
+
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag2 = True
+            else:
+                pass
+
+
+        if len(missing_fields_list) > 0:
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
+        else:
+            flag = True
+
+        print(f'flag = {flag}, flag1 = {flag1}, flag2 = {flag2}')
+        if flag  and flag1 and flag2:
+            self.set_input_values(self, design_dictionary)
+        else:
+            return all_errors
+        
+    def set_input_values(self, design_dictionary):
+        """Initialize components required for butt joint design as per IS 800:2007"""
+        self.module = design_dictionary[KEY_MODULE]
+        self.mainmodule = "Butt Joint Bolted Connection"
+        self.main_material = design_dictionary[KEY_MATERIAL]
+        self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
+        self.width = design_dictionary[KEY_PLATE_WIDTH]
+        
+        # Initialize plates with material properties
+        self.plate1 = Plate(thickness=[design_dictionary[KEY_PLATE1_THICKNESS]],
+                        material_grade=design_dictionary[KEY_MATERIAL],
+                        width=design_dictionary[KEY_PLATE_WIDTH])
+        self.plate2 = Plate(thickness=[design_dictionary[KEY_PLATE2_THICKNESS]],
+                            material_grade=design_dictionary[KEY_MATERIAL],
+                            width=design_dictionary[KEY_PLATE_WIDTH])
+        
+        # Initialize bolt with properties
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], 
+                        diameter=design_dictionary[KEY_D],
+                        bolt_type=design_dictionary[KEY_TYP],
+                        bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                        edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                        mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None))
+        
+        # Calculate cover plate thickness as per Cl. 10.2.4.2
+        plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
+        plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+        Tmin = min(plate1_thk, plate2_thk)
+        cover_plate_type_str = design_dictionary[KEY_COVER_PLATE]
+
+        # Cover plate and packing plate logic as per documentation
+        available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]
+        if "double" in cover_plate_type_str.lower():
+            self.planes = 2
+            Tcp = math.ceil((9.0 / 8.0) * Tmin)  # Double cover plate thickness as per Eq. 3.2
+            self.calculated_cover_plate_thickness = min(
+                [thk for thk in available_thicknesses if thk >= Tcp],
+                default=Tcp
+            )
+
+            # Packing plate logic as per Cl. 10.3.3.2
+            if abs(plate1_thk - plate2_thk) > 0.001:
+                self.packing_plate_thickness = abs(plate1_thk - plate2_thk)
+                if self.packing_plate_thickness > 6.0:
+                    # βpkg calculation as per Eq. 3.3
+                    self.beta_pkg = (1.0 - 0.0125 * self.packing_plate_thickness)
+                else:
+                    self.beta_pkg = 1.0
+            else:
+                self.packing_plate_thickness = 0.0
+                self.beta_pkg = 1.0
+
+        elif "single" in cover_plate_type_str.lower():
+            self.planes = 1
+            Tcp = math.ceil((5.0 / 8.0) * Tmin)  # Single cover plate thickness as per Eq. 3.1
+            self.calculated_cover_plate_thickness = min(
+                [thk for thk in available_thicknesses if thk >= Tcp],
+                default=Tcp
+            )
+            self.packing_plate_thickness = 0.0
+            self.beta_pkg = 1.0
+
+        else:
+            self.planes = 1
+            Tcp = Tmin
+            self.calculated_cover_plate_thickness = min(
+                [thk for thk in available_thicknesses if thk >= Tcp],
+                default=Tcp
+            )
+            self.packing_plate_thickness = 0.0
+            self.beta_pkg = 1.0
+
+        # Initialize other parameters
+        self.count = 0
+        self.slip_res = None
+        self.yield_stress = None
+        self.cap_red = False
+        self.bolt_dia_grade_status = False
+        self.dia_available = False
+        self.final_pitch = 0
+        self.final_end_dist = 0
+        self.final_edge_dist = 0
+        self.final_gauge = 0
+        self.rows = 0
+        self.cols = 0
+        self.len_conn = 0
+        self.max_gauge_round = 0
+        self.max_pitch_round = 0
+        self.utilization_ratio = 0
+        self.bij = 0
+        self.blg = 0
+        self.cover_plate = design_dictionary[KEY_COVER_PLATE]
+        
+        # Start bolt selection process
+        self.select_bolt_dia_and_grade(self,design_dictionary)
+
+    def select_bolt_dia_and_grade(self,design_dictionary):
+        self.dia_available = False
+        self.bolt_dia_grade_status = False
+
+        if not self.bolt.bolt_diameter or not self.bolt.bolt_grade:
+            logger.error("No customized bolt diameters or grades provided.")
+            self.design_status = False
+            return
+
+        if isinstance(self.plate1.thickness, list):
+            self.plate1thk = self.plate1.thickness[0]
+
+        if isinstance(self.plate2.thickness, list):
+            self.plate2thk = self.plate2.thickness[0]
+
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((float(self.plate1thk), self.plate1.fu, self.plate1.fy))
+        self.bolt_conn_plates_t_fu_fy.append((float(self.plate2thk), self.plate2.fu, self.plate2.fy))
+
+        if float(self.plate1thk) < float(self.plate2thk):
+            self.plate = self.plate1
+            self.pltthk = float(self.plate1thk)
+            self.yield_stress = self.plate1.fy
+        else:
+            self.plate = self.plate2
+            self.pltthk = float(self.plate2thk)
+            self.yield_stress = self.plate2.fy
+
+        # Add maximum iterations to prevent infinite loops
+        max_diameter_iterations = len(self.bolt.bolt_diameter)
+        max_grade_iterations = len(self.bolt.bolt_grade)
+        diameter_iterations = 0
+        grade_iterations = 0
+
+        for self.bolt.bolt_diameter_provided in self.bolt.bolt_diameter:
+            diameter_iterations += 1
+            if diameter_iterations > max_diameter_iterations:
+                logger.error("Maximum diameter iterations reached. No suitable bolt diameter found.")
+                self.design_status = False
+                return
+
+            if 8 * float(self.bolt.bolt_diameter_provided) > (float(self.plate1thk) + float(self.plate2thk)):
+                self.dia_available = True
+                
+                for self.bolt.bolt_grade_provided in self.bolt.bolt_grade:
+                    grade_iterations += 1
+                    if grade_iterations > max_grade_iterations:
+                        logger.error("Maximum grade iterations reached. No suitable bolt grade found.")
+                        self.design_status = False
+                        return
+                    
+                    try:
+                        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
+                                                            conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n=self.planes)
+                        
+                        self.bolt.min_pitch_round = min(self.bolt.min_pitch_round, 2.5 * float(self.bolt.bolt_diameter_provided))
+                        self.bolt.min_gauge_round = min(self.bolt.min_gauge_round, 2.5 * float(self.bolt.bolt_diameter_provided))
+
+                        if design_dictionary[KEY_DP_DETAILING_EDGE_TYPE] == 'Sheared or hand flame cut':
+                            self.bolt.min_edge_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
+                            self.bolt.min_end_dist_round = round(max(1.7 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
+                        else:
+                            self.bolt.min_edge_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_edge_dist_round),0)
+                            self.bolt.min_end_dist_round = round(max(1.5 * float(self.bolt.bolt_diameter_provided),self.bolt.min_end_dist_round),0)
+
+                        self.max_pitch_round = self.max_gauge_round = min(32 * self.pltthk , 300)
+
+                        self.bolt.max_edge_dist_round = self.bolt.max_end_dist_round = round(min(self.bolt.max_edge_dist_round , 12 * self.pltthk * ((250 / self.yield_stress)** 0.5 )),0)                
+                        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=float(self.bolt.bolt_diameter_provided),
+                                                  bolt_grade_provided=float(self.bolt.bolt_grade_provided),
+                                                  conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                                  n_planes=self.planes, e=float(self.bolt.min_end_dist_round),
+                                                  p=float(self.bolt.min_pitch_round))
+                        
+                        num_bolts = float(self.tensile_force) / ( self.bolt.bolt_capacity / 1000)
+                        
+                        if num_bolts <= 2:
+                            self.bolt_dia_grade_status = True
+                            break
+                            
+                    except Exception as e:
+                        logger.error(f"Error in bolt calculations: {str(e)}")
+                        continue
+                    
+                if self.bolt_dia_grade_status == True:
+                    break
+
+        if self.dia_available == False:
+            self.design_status = False
+            logger.warning(" : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
+                           "bolt diameter of {} mm [Ref. Cl.10.3.3.2, IS 800:2007]."
+                           .format((float(self.plate1thk) + float(self.plate2thk)),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
+            logger.error(": Design is not safe. \n ")
+            logger.info(" :=========End Of design===========")
+            return
+
+        if not self.bolt_dia_grade_status:
+            self.design_status = False
+            logger.error(": No suitable bolt diameter and grade combination found for the given requirements.")
+            logger.info(" :=========End Of design===========")
+            return
+            
+        self.design_status = True
+        if self.bolt.bolt_type == 'Bearing Bolt':
+            self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
+        self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
+        self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
+        self.number_r_c_bolts(self, design_dictionary,0,0)
+
+    def number_r_c_bolts(self,design_dictionary,count=0,hit=0):
+        # Add maximum iteration limit
+        MAX_ITERATIONS = 100
+        iteration_count = 0
+        
+        bolt_cap = self.bolt.bolt_capacity
+        if self.bolt.bolt_type == 'Bearing Bolt':
+            self.slip_res = 'N/A'
+        else:
+            self.slip_res = self.bolt.bolt_capacity
+            self.bolt.bolt_bearing_capacity = 'N/A'
+            self.bolt.bolt_shear_capacity = 'N/A'
+        
+        if hit == 0:
+            self.number_bolts = float(self.tensile_force) /( bolt_cap / 1000)
+        else:
+            self.number_bolts += 1
+        
+        self.number_bolts = math.ceil(self.number_bolts)
+        if self.number_bolts < 2:
+            self.number_bolts = 2
+
+        def check_no_cols(numbolts):
+            if (2 * self.bolt.min_end_dist_round) + ((numbolts - 1 )*self.bolt.min_pitch_round) >= float(self.width):
+                return True
+            else:
+                return False
+
+        self.cols = 1
+        self.rows = self.number_bolts
+        temp_rows = self.rows
+        
+        # Add safety check for minimum width
+        min_required_width = 2 * self.bolt.min_end_dist_round
+        if float(self.width) < min_required_width:
+            self.design_status = False
+            logger.error(f": Width ({self.width} mm) is too small. Minimum required width is {min_required_width} mm")
+            logger.info(" :=========End Of design===========")
+            return
+
+        while iteration_count < MAX_ITERATIONS:
+            iteration_count += 1
+            if check_no_cols(temp_rows):
+                temp_rows = math.ceil(self.rows/(self.cols + 1))
+                self.cols += 1
+            else:
+                break
+        
+        if iteration_count >= MAX_ITERATIONS:
+            self.design_status = False
+            logger.error(": Could not find valid bolt arrangement within maximum iterations")
+            logger.info(" :=========End Of design===========")
+            return
+
+        self.rows = math.ceil(self.rows/self.cols)  
+
+        if self.cols>1:
+            self.len_conn = (self.cols - 1)*self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
+        else:
+            self.len_conn = self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
+
+        if self.number_bolts >= 2 and count == 0:
+            self.design_status = True
+            self.check_capacity_reduction_1(self, design_dictionary)
+        elif self.number_bolts>=2 and count == 1:
+            self.design_status = True
+            self.final_formatting(self,design_dictionary)
+        else:
+            self.design_status = False
+            logger.error(": Number of min bolts not satisfied. \n ")
+            logger.info(" :=========End Of design==========")
+
+    def check_capacity_reduction_1(self,design_dictionary):
+        """Long joint reduction as per Cl. 10.3.3.1 of IS 800:2007"""
+        if self.number_bolts > 2:
+            lj = (self.rows - 1)*self.bolt.min_pitch_round
+            if lj > 15 * self.bolt.bolt_diameter_provided:
+                # βlj calculation as per Eq. 3.7
+                self.bij = 1.075 - (lj / (200 * self.bolt.bolt_diameter_provided))
+                self.bij = max(0.75, min(1.0, self.bij))
+        
+        if self.bij >= 0.75 and self.bij <= 1.0:
+            self.cap_red = True
+            self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.bij
+            if self.bolt.bolt_type == 'Bearing Bolt':
+                self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
+            else:
+                self.slip_res = self.bolt.bolt_shear_capacity
+                self.bolt.bolt_capacity = self.slip_res
+
+        self.design_status = True
+        self.check_capacity_reduction_2(self,design_dictionary)
+
+    def check_capacity_reduction_2(self,design_dictionary):
+        """Large grip reduction as per Cl. 10.3.3.2 of IS 800:2007"""
+        self.cap_red = False
+        
+        lg = self.plate1thk + self.plate2thk
+        if lg > 5 * self.bolt.bolt_diameter_provided:
+            # βlg calculation as per Eq. 3.8
+            self.blg = 8 / (3 + (lg/self.bolt.bolt_diameter_provided))
+            self.blg = max(0.0, min(1.0, self.blg))
+        
+        if self.blg < self.bij and self.blg != 0:
+            self.cap_red = True
+            self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.blg
+            if self.bolt.bolt_type == 'Bearing Bolt':
+                self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
+            else:
+                self.slip_res = self.bolt.bolt_shear_capacity
+                self.bolt.bolt_capacity = self.slip_res
+            
+            if hit < 5:  # Limit recursion depth
+                self.number_r_c_bolts(self,design_dictionary,1,0)
+            else:
+                self.design_status = False
+                logger.error(": Maximum recursion depth reached. Design may not be optimal.")
+                logger.info(" :=========End Of design===========")
+                return
+        
+        if self.cap_red == False:
+            self.design_status = True
+            self.final_formatting(self,design_dictionary)
+
+    def final_formatting(self,design_dictionary):
+        """Final checks and formatting as per IS 800:2007"""
+        # Handle single row case
+        if self.rows <= 1:
+            self.final_gauge = 0  # No gauge distance needed for single row
+            self.final_pitch = self.bolt.min_pitch_round
+            self.final_end_dist = self.bolt.min_end_dist_round
+            self.final_edge_dist = self.bolt.min_edge_dist_round
+        else:
+            # Calculate gauge distance as per Cl. 10.2.2
+            gauge_dist = (float(self.width) - 2*self.bolt.min_end_dist_round)/(self.rows - 1)
+
+            # Check maximum pitch and gauge as per Cl. 10.2.3.1
+            if gauge_dist > self.max_gauge_round:
+                self.final_gauge = self.max_gauge_round
+                self.final_pitch = self.bolt.min_pitch_round
+
+                enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
+                if enddist > self.bolt.max_end_dist_round:
+                    self.design_status = False
+                    self.number_r_c_bolts(self,design_dictionary,0,1)
+                else:
+                    self.final_end_dist = enddist
+                    self.final_edge_dist = enddist
+                    self.design_status = True
+            else:
+                self.final_gauge = gauge_dist
+                self.final_pitch = self.bolt.min_pitch_round
+                enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
+                if enddist > self.bolt.max_end_dist_round:
+                    self.design_status = False
+                    self.number_r_c_bolts(self,design_dictionary,0,1)
+                else:
+                    self.final_end_dist = enddist
+                    self.final_edge_dist = enddist
+                    self.design_status = True
+
+        if self.design_status:
+            # Convert capacities to kN
+            if self.bolt.bolt_type == 'Bearing Bolt':
+                self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity/ 1000
+                self.bolt.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity / 1000
+                self.bolt.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity, 2)
+                self.bolt.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity, 2)
+                self.bolt.bolt_capacity = self.bolt.bolt_capacity / 1000
+                self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
+            else:
+                self.slip_res = self.slip_res / 1000
+                self.slip_res = round(self.slip_res, 2)
+                self.bolt.bolt_capacity = self.bolt.bolt_capacity / 1000
+                self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
+            
+            # Calculate utilization ratio
+            bltcap = self.bolt.bolt_capacity
+            if bltcap < 1:
+                bltcap = 1
+            self.utilization_ratio = float(self.tensile_force) / (bltcap * self.number_bolts)
+            self.utilization_ratio = round(self.utilization_ratio, 2)
+            
+            # Check if utilization ratio is less than 1 for valid design
+            if self.utilization_ratio >= 1:
+                self.design_status = False
+                logger.error(": Utilization ratio is greater than or equal to 1. Design is not safe.")
+                logger.info(" :=========End Of design===========")
+                return
+
+            # Round final values
+            self.final_gauge = round(self.final_gauge,0)
+            self.final_pitch = round(self.final_pitch,0)
+            print("FINAL FINAL",self.bolt)
+            print("Final Edge/End/Gauge/Pitch",self.final_edge_dist,self.final_end_dist,self.final_gauge,self.final_pitch)
+            print("Max and min end edge dist ",self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
+            print("Max min gauge pitch dist",self.max_gauge_round,self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
 
     
 
-    ################################ Design Report #####################################################################################
+
+    

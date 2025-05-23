@@ -66,6 +66,7 @@ from pynput.mouse import Button, Controller
 from osdag.gui.spacing import BoltPatternGenerator
 from .seatedanglespacing import SeatedanglespacingOnCol
 from .Beam2ColEnddetailing import BeamtoColDetailing
+from .baseplatedetailing import BasePlateDetailing
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -2275,7 +2276,11 @@ class Window(QMainWindow):
                             self.run_spacing_script(0,0,BeamtoColDetailing,main)
                             data=main.output_values(main,True)
                             
-
+                elif op[0]=='BasePlate.Detailing':
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    self.run_spacing_script(0,0,BasePlateDetailing,main)
                 dialog.setWindowTitle(title)
                 j = 1
                 _translate = QtCore.QCoreApplication.translate

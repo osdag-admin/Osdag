@@ -826,7 +826,8 @@ class BeamtoColDetailing(QMainWindow):
         # === Split remaining rows symmetrically ===
         top_rows = (remainingrows + 1) // 2
         bottom_rows = remainingrows // 2
-
+        self.top_rows=top_rows
+        self.bottom_rows=bottom_rows
         # Determine starting y for top and bottom
         if self.rowsabovestiff == 2:
             last_top_y = self.End + pitch+flange_thickness
@@ -859,6 +860,132 @@ class BeamtoColDetailing(QMainWindow):
                     x += gauge
                 elif col == 1:
                     x += crossgauge
+        self.addInternalGapsExtendedTwoWay(effective_stiffener_height)
+        self.addDimensionsExtendedTwoWay(edge,gauge,crossgauge,cols,effective_stiffener_height)
+    def addDimensionsExtendedTwoWay(self, edge, gauge, cross_gauge, cols, finalstifflen, y_offset=20):
+        from PyQt5.QtGui import QPen, QFont
+        from PyQt5.QtCore import Qt
+
+        pen = QPen(Qt.darkGreen, 1)
+        font = QFont()
+        font.setPointSize(7)
+
+        x_left = -20  # Left of plate
+
+        # === TOP DIMENSIONS ===
+        current_y = 0
+
+        # 1. First edge distance
+        next_y = current_y + self.End
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen)
+        current_y = next_y
+
+        # 2. Pitch if rowsabovestiff == 2
+        if self.rowsabovestiff == 2:
+            next_y = current_y + self.pitch
+            self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen)
+            current_y = next_y
+
+        # 3. Second edge distance (above flange)
+        next_y = current_y + self.End
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen)
+        current_y = next_y
+
+        # 4. Flange thickness
+        next_y = current_y + self.flange_thick
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.flange_thick:.1f} mm", pen)
+        current_y = next_y
+
+        # 5. Top bolt pitches
+        for i in range(self.top_rows):
+            next_y = current_y + self.pitch
+            self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen)
+            current_y = next_y
+
+        # === Total plate height dimension (right side) ===
+        x_right = self.width + 20
+        self.addVerticalDimension(x_right, 0, x_right, self.height, f"{self.height:.1f} mm", pen)
+
+        # === Horizontal EDGE and GAUGE dimensions ===
+        x = 0
+        y_horizontal_dim = self.height-self.End  # Use top bolt row as horizontal dimension reference
+
+        segments = []
+
+        # Left edge
+        x1 = x
+        x2 = x + edge
+        segments.append((x1, x2))
+        x = x2
+
+        # Left gauges
+        for _ in range((cols - 2) // 2):
+            x1 = x
+            x2 = x + gauge
+            segments.append((x1, x2))
+            x = x2
+
+        # Cross gauge
+        x1 = x
+        x2 = x + cross_gauge
+        segments.append((x1, x2))
+        x = x2
+
+        # Right gauges
+        for _ in range((cols - 2) // 2):
+            x1 = x
+            x2 = x + gauge
+            segments.append((x1, x2))
+            x = x2
+
+        # Right edge
+        x1 = x
+        x2 = x + edge
+        segments.append((x1, x2))
+
+        for x1, x2 in segments:
+            self.addHorizontalDimension(x1, y_horizontal_dim, x2, y_horizontal_dim, f"{x2 - x1:.1f} mm", pen)
+
+        # === Full Plate Width ===
+        y_plate = self.height + 20
+        self.addHorizontalDimension(0, y_plate, self.width, y_plate, f"{self.width:.1f} mm", pen)
+
+    def addInternalGapsExtendedTwoWay(self, finalstifflen, margin=12.5):
+        from PyQt5.QtGui import QPen, QFont
+        from PyQt5.QtCore import Qt
+
+        pen = QPen(Qt.darkMagenta, 1)
+        pen.setStyle(Qt.SolidLine)
+
+        label_text = f"{margin:.1f} mm"
+        font = QFont()
+        font.setPointSize(7)
+
+        pw = self.width
+        ph = self.height
+
+        # Y-positions: one from top, one from bottom
+        y_top = finalstifflen
+        y_bottom = ph - finalstifflen
+
+        # Define 4 horizontal gap lines: top-left, top-right, bottom-left, bottom-right
+        gap_lines = [
+            # Top left
+            ((0, y_top, margin, y_top), (margin + 4, y_top - 10)),
+            # Top right
+            ((pw - margin, y_top, pw, y_top), (pw - margin - 30, y_top - 10)),
+            # Bottom left
+            ((0, y_bottom, margin, y_bottom), (margin + 4, y_bottom - 10)),
+            # Bottom right
+            ((pw - margin, y_bottom, pw, y_bottom), (pw - margin - 30, y_bottom - 10)),
+        ]
+
+        for (x1, y1, x2, y2), (tx, ty) in gap_lines:
+            self.scene.addLine(x1, y1, x2, y2, pen)
+
+            text_item = self.scene.addText(label_text)
+            text_item.setFont(font)
+            text_item.setPos(tx, ty)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         from PyQt5.QtCore import QPointF

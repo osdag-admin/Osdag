@@ -2490,6 +2490,10 @@ KEY_COVERPLATE_THICKNESS = "Coverplate.Thickness"
 KEY_DISP_COVERPLATE_THICKNESS = "Cover Plate Thickness (mm)"
 KEY_DISP_CONNECTOR_MATERIAL = "Cover Plate Material*"
 
+# Welded butt joint - Additional constants
+VALUES_WELD_FABRICATION = KEY_DP_WELD_FAB_VALUES  # References existing fabrication values [Shop Weld, Field weld]
+DEFAULT_SELECT_OPTION_MSG = "Select..."  # Default selection message for dropdown options
+
 
 # DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 #                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

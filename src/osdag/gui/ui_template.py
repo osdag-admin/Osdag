@@ -67,6 +67,7 @@ from osdag.gui.spacing import BoltPatternGenerator
 from .seatedanglespacing import SeatedanglespacingOnCol
 from .Beam2ColEnddetailing import BeamtoColDetailing
 from .baseplatedetailing import BasePlateDetailing
+from .baseplatedetailinghollow import BasePlateDetailingHollow
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -2280,7 +2281,10 @@ class Window(QMainWindow):
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)
                     self.Obj=cls_obj()
-                    self.run_spacing_script(0,0,BasePlateDetailing,main)
+                    if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
+                        self.run_spacing_script(0,0,BasePlateDetailing,main)
+                    else:
+                        self.run_spacing_script(0,0,BasePlateDetailingHollow,main)
                 dialog.setWindowTitle(title)
                 j = 1
                 _translate = QtCore.QCoreApplication.translate

@@ -25,6 +25,7 @@ class BasePlateDetailing(QMainWindow):
         effective_length_web=self.connection.effective_length_web
         plate_thk_provided=main.plate_thk_provided
         column_D=main.column_D
+        print(f'Connectivity  : {main.connectivity}\n\n')
         # print(data)
         print(f"""
         bp_width_provided: {bp_width_provided}
@@ -80,6 +81,8 @@ class BasePlateDetailing(QMainWindow):
         self.initUI()
         
     def initUI(self):
+        if self.stiff_along_length!='N/A':
+            self.column_len=(self.plate_length-2*self.column_thickness-2*self.stiff_along_length)
         self.setWindowTitle('Bolt Pattern Generator')
         print(f"""
         Base Plate & Bolt Details:
@@ -134,6 +137,8 @@ class BasePlateDetailing(QMainWindow):
         # Step 6: Call parameter extraction and drawing
         # self.get_parameters()
         self.createDrawing()
+        self.view.resetTransform()
+        self.view.scale(0.5, 0.5)
     def createDrawing(self):
         try:
             plate_length = float(self.plate_length)
@@ -303,6 +308,7 @@ class BasePlateDetailing(QMainWindow):
         #FINDING EFFECTIVE Edge distance
         edge=self.Edgeout
         end=self.Endout
+        Gauge=0
         if self.Gaugeout!='N/A':
             Gauge=self.Gaugeout
         if self.pitchout!='N/A':
@@ -334,284 +340,285 @@ class BasePlateDetailing(QMainWindow):
 
             self.scene.addEllipse(x - radius, y_top - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
             self.scene.addEllipse(x - radius, y_bot - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
-    def createDrawing1(self):
-        try:
-            plate_length = float(self.plate_length)
-            plate_width = float(self.plate_width)
-        except (TypeError, ValueError):
-            print("Invalid plate dimensions")
-            return
+        
+        bolts=self.no_insidebolts
+        self.Edgeout=edge
+        if bolts!=0 and bolts!='N/A' :
+            hole_dia=self.dia_inside_bolt
+            radius=hole_dia/2
+            #2 rows
+            #FINDING EFFECTIVE Edge distance
+            edge=self.Edgein
+            end=self.Endin
+            if self.Gaugein!='N/A':
+                Gauge=self.Gaugein
+            if self.pitchin!='N/A':
+                pitch=self.pitchin
+            
+            
+            if bolts==4 and self.stiff_across_thickness!='N/A':
+                x_mid_left=center_x-self.stiff_across_thickness/2
+                x_mid_right=center_x+self.stiff_across_thickness/2
+                y_mid_top=center_y-web_thickness/2
+                y_mid_bot=center_y+web_thickness/2
+                #4 bolts :
+                x1 = x_mid_left - edge
+                y1 = y_mid_top - end
+                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
 
-        # Define the rectangle: (x, y, width, height)
-        rect = QRectF(0, 0, plate_length, plate_width)
+                # Bottom-left bolt
+                y2 = y_mid_bot + end
+                self.scene.addEllipse(x1 - radius, y2 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+
+                # Top-right bolt
+                x2 = x_mid_right + edge
+                y3 = y_mid_top - end
+                self.scene.addEllipse(x2 - radius, y3 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+
+                # Bottom-right bolt
+                y4 = y_mid_bot + end
+                self.scene.addEllipse(x2 - radius, y4 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+            elif self.stiff_across_thickness=='N/A' and bolts==2 :
+                x1=center_x
+                y1=center_y-end
+                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                y1=center_y+end
+                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+        self.addDimensions(black_pen)
+    def addDimensions(self, pen):
+        num_bolts = self.no_outsidebolts
+        edge_x = float(self.Edgeout)
+        end_y = float(self.Endout)
+        plate_length = float(self.plate_length)
+        plate_width = float(self.plate_width)
+
+        gauge = 0
+        if self.Gaugeout != 'N/A':
+            gauge = float(self.Gaugeout)
+
+        # Top side bolts
+        bolt1_x = edge_x
+        bolt1_y = end_y
+        bolt2_x = bolt1_x + gauge
+        bolt2_y = bolt1_y
+
+        # 1. Top - Edge to bolt 1
+        self.addHorizontalDimension(0, bolt1_y + 30, bolt1_x, bolt1_y + 30, f"{round(edge_x)} mm", pen)
+        # 2. Top - Gauge
+        if num_bolts // 4 == 2:
+            self.addHorizontalDimension(bolt1_x, bolt1_y - 20, bolt2_x, bolt2_y - 20, f"{round(gauge)} mm", pen)
+            # 3. Top - Bolt 2 to edge
+            self.addHorizontalDimension(bolt2_x, bolt2_y + 30, bolt2_x + edge_x, bolt2_y + 30, f"{round(edge_x)} mm", pen)
+        # 4. Top - Vertical from plate top to bolts
+        self.addVerticalDimension(bolt1_x + 30, 0, bolt1_x + 30, bolt1_y, f"{round(end_y)} mm", pen)
+
+        # Bottom side bolts
+        bolt1_y_bot = plate_width - end_y
+        bolt2_y_bot = bolt1_y_bot
+        self.addHorizontalDimension(0, bolt1_y_bot + 30, bolt1_x, bolt1_y_bot + 30, f"{round(edge_x)} mm", pen)
+        if num_bolts // 4 == 2:
+            self.addHorizontalDimension(bolt1_x, bolt1_y_bot + 20, bolt2_x, bolt2_y_bot + 20, f"{round(gauge)} mm", pen)
+            self.addHorizontalDimension(bolt2_x, bolt2_y_bot + 30, bolt2_x + edge_x, bolt2_y_bot + 30, f"{round(edge_x)} mm", pen)
+        self.addVerticalDimension(bolt1_x + 30, bolt1_y_bot, bolt1_x + 30, plate_width, f"{round(end_y)} mm", pen)
+
+        # Left side bolts
+        bolt2_x_right = plate_length - edge_x
+        bolt1_x_right = bolt2_x_right - gauge
+        bolt_y_right = end_y
+
+        # === 1. Right Edge to Bolt 2
+        self.addHorizontalDimension(
+            bolt2_x_right, bolt_y_right + 30, plate_length, bolt_y_right + 30,
+            f"{round(edge_x)} mm", pen
+        )
+
+        # === 2. Gauge (Bolt 1 to Bolt 2)
+        if num_bolts // 4 == 2:
+            self.addHorizontalDimension(
+                bolt1_x_right, bolt_y_right - 20, bolt2_x_right, bolt_y_right - 20,
+                f"{round(gauge)} mm", pen
+            )
+
+        # === 3. Left Edge to Bolt 1 (mirrored)
+        self.addHorizontalDimension(
+            bolt1_x_right - edge_x, bolt_y_right + 30, bolt1_x_right, bolt_y_right + 30,
+            f"{round(edge_x)} mm", pen
+        )
+
+        # === 4. Vertical (top edge to bolts)
+        self.addVerticalDimension(
+            bolt2_x_right + 30, 0, bolt2_x_right + 30, bolt_y_right,
+            f"{round(end_y)} mm", pen
+        )
+        # === Bottom-right corner bolts (horizontal gauge line between bolts)
+        bolt2_x_br = plate_length - edge_x
+        bolt1_x_br = bolt2_x_br - gauge
+        bolt_y_br = plate_width - end_y
+
+        # 1. Vertical from bottom edge to bolt row
+        self.addVerticalDimension(
+            bolt2_x_br + 30, bolt_y_br, bolt2_x_br + 30, plate_width,
+            f"{round(end_y)} mm", pen
+        )
+        # 2. Gauge (horizontal between bolts)
+        if num_bolts // 4 == 2:
+            self.addHorizontalDimension(
+                bolt1_x_br, bolt_y_br + 20, bolt2_x_br, bolt_y_br + 20,
+                f"{round(gauge)} mm", pen
+            )
+
+            # 3. Edge distance from left of bolt 1 (mirror)
+            self.addHorizontalDimension(
+                bolt1_x_br - edge_x, bolt_y_br + 30, bolt1_x_br, bolt_y_br + 30,
+                f"{round(edge_x)} mm", pen
+            )
+
+        # 4. Edge distance from bolt 2 to plate edge
+        self.addHorizontalDimension(
+            bolt2_x_br, bolt_y_br + 30, plate_length, bolt_y_br + 30,
+            f"{round(edge_x)} mm", pen
+        )
+        center_x=plate_length/2
+        center_y=plate_width/2
+        web_thickness=self.web_thickness
+        flange_thickness = self.column_thickness
         column_len=self.column_len
         column_width=self.column_width
-        flange_thickness=self.column_thickness
-        web_thickness=self.web_thickness
-        # Create a rectangle item
-        rect_item = QGraphicsRectItem(rect)
-
-        # Set pen and brush (black border, transparent fill)
-        pen = QPen(Qt.black)
-        pen.setWidth(2)
-        rect_item.setPen(pen)
-        rect_item.setBrush(QBrush(Qt.NoBrush))
-
-        # Add rectangle to the scene
-        self.scene.addItem(rect_item)
-        # Extract parameters
-        outline_pen = QPen(Qt.black)
-        outline_pen.setWidth(2)
-
-        # === Draw Base Plate Rectangle ===
-        rect_item = QGraphicsRectItem(QRectF(0, 0, plate_length, plate_width))
-        rect_item.setPen(outline_pen)
-        rect_item.setBrush(QBrush(Qt.white))
-        self.scene.addItem(rect_item)
-        outline_pen = QPen(Qt.blue)
-        outline_pen.setWidth(3)
-        # === Center of the base plate ===
-        center_x = plate_length / 2
-        center_y = plate_width / 2
-
-        # === Flange X dimensions ===
-        # === Parameters ===
-        flange_width = flange_thickness          # vertical width of flange
-        flange_length = column_len               # horizontal length of flange (same as web)
-        web_width = web_thickness                # vertical width of web
-        web_length = column_len                  # horizontal length of web (same as flange)
-
-        # === Column Center ===
-        center_x = plate_length / 2
-        center_y = plate_width / 2
-
-        # === Y positions ===
-        flange_top_y = center_y - column_width / 2
-        flange_bottom_y = center_y + column_width / 2
-
-        web_top_y = center_y - web_width / 2
-        web_bottom_y = center_y + web_width / 2
-
-        # === X positions (shared by web and flanges) ===
-        web_left_x = center_x - web_length / 2
-        web_right_x = center_x + web_length / 2
-
-        # === Pen for drawing ===
-        outline_pen = QPen(Qt.blue)
-        outline_pen.setWidth(3)
-
-        # === Draw Left Flange ===
-        self.scene.addLine(web_left_x, flange_top_y, web_right_x, flange_top_y, outline_pen)   # Top
-        self.scene.addLine(web_left_x, flange_top_y, web_left_x, web_top_y, outline_pen)       # Left top segment
-        self.scene.addLine(web_left_x, web_bottom_y, web_left_x, flange_bottom_y, outline_pen) # Left bottom segment
-        self.scene.addLine(web_left_x, flange_bottom_y, web_right_x, flange_bottom_y, outline_pen) # Bottom
-        self.scene.addLine(web_right_x, flange_top_y, web_right_x, web_top_y, outline_pen)     # Right top segment
-        self.scene.addLine(web_right_x, web_bottom_y, web_right_x, flange_bottom_y, outline_pen) # Right bottom segment
-
-        # === Draw Web (as rectangle) ===
-        # Top line
-        self.scene.addLine(web_left_x, web_top_y, web_right_x, web_top_y, outline_pen)
-        # Bottom line
-        self.scene.addLine(web_left_x, web_bottom_y, web_right_x, web_bottom_y, outline_pen)
-        # Left edge
-        self.scene.addLine(web_left_x, web_top_y, web_left_x, web_bottom_y, outline_pen)
-        # Right edge
-        self.scene.addLine(web_right_x, web_top_y, web_right_x, web_bottom_y, outline_pen)
-
-        #stifferener plate along column flange
-        red_brush = QBrush(Qt.red)
-        if self.stiff_flange_length != 'N/A':
-            # === Left Flange Stiffeners ===
-            # Top stiffener (left)
-            stiffener_left_top = QRectF(
-                left_flange_x1 -(self.stiff_flange_thickness-flange_thickness)/2 ,   # shift left by thickness
-                0,                                   # from top of plate
-                self.stiff_flange_thickness,                    # width
-                top_y                                # height from plate top to top of flange
-            )
-            self.scene.addRect(stiffener_left_top, outline_pen, red_brush)
-
-            # Bottom stiffener (left)
-            stiffener_left_bottom = QRectF(
-                left_flange_x1 - (self.stiff_flange_thickness-flange_thickness)/2,
-                bottom_y,                            # start just below flange
-                self.stiff_flange_thickness,
-                plate_width - bottom_y              # height from flange to base plate bottom
-            )
-            self.scene.addRect(stiffener_left_bottom, outline_pen, red_brush)
-
-            # === Right Flange Stiffeners ===
-            # Top stiffener (right)
-            stiffener_right_top = QRectF(
-                right_flange_x2 - flange_thickness - (self.stiff_flange_thickness-flange_thickness)/2,                    # start at flange outer edge
-                0,
-                self.stiff_flange_thickness,
-                top_y
-            )
-            self.scene.addRect(stiffener_right_top, outline_pen, red_brush)
-
-            # Bottom stiffener (right)
-            stiffener_right_bottom = QRectF(
-                right_flange_x2-flange_thickness - (self.stiff_flange_thickness-flange_thickness)/2,
-                bottom_y,
-                self.stiff_flange_thickness,
-                plate_width - bottom_y
-            )
-            self.scene.addRect(stiffener_right_bottom, outline_pen, red_brush)
         if self.stiff_along_thickness != 'N/A':
-            # Web center X range
-            web_center_left = plate_length
-            web_center_right = center_x + web_thickness / 2
+            #x = 0 to x= center_x -column_len/2 - flange_thickness (horizontal line) , y = center_y - self.stiff_along_thickness/2
+            x1 = 0
+            x2 = center_x - column_len / 2 - flange_thickness
+            y = center_y - self.stiff_along_thickness / 2
 
-            # Left web stiffener: from left edge to web start
-            stiffener_web_left = QRectF(
-        0,  # x-position (starts from left edge of plate)
-        plate_width / 2 - web_thickness / 2,  # y-position (top edge of stiffener)
-        web_center_left ,  # width (same as before, up to web)
-        web_thickness  # height (from y-position down)
-    )
-            self.scene.addRect(stiffener_web_left, outline_pen, red_brush)
-
-            # Right web stiffener: from web end to right edge
-            stiffener_web_right = QRectF(
-                web_center_right,
-                top_y,
-                plate_length - web_center_right,  # width from web to right edge
-                web_thickness
-            )
-            self.scene.addRect(stiffener_web_right, outline_pen, red_brush)
-    def addDimensions(self, params, pen):
-        # Extract parameters
-        pitch = params['pitch']
-        end = params['end']
-        if 'gauge' in params:
-            gauge = params['gauge']
-        else:
-            gauge1 = params['gauge1']
-            gauge2 = params['gauge2']
-        edge = params['edge']
-
-        if 'gauge' in params:
-            gauge1 = gauge
-            gauge2 = gauge
-        
-        width = calculate_total_width(edge, gauge1, gauge2, self.cols)
-        height = 2 * end + (self.rows - 1) * pitch
-        
-        # Offsets for dimension lines
-        h_offset = 20
-        v_offset = 30
-        
-        # Add horizontal dimensions
-        x_start = 0
-        segments = []
-        # First edge
-        segments.append(('edge', x_start, x_start + edge))
-        x_start += edge
-        # Alternate gauges
-        for i in range(self.cols - 1):
-            gauge = gauge1 if i % 2 == 0 else gauge2
-            label = f'gauge{i % 2 + 1}'
-            segments.append((label, x_start, x_start + gauge))
-            x_start += gauge
-        # Last edge
-        segments.append(('edge', x_start, x_start + edge))
-
-        # Draw each segment
-        for label, x1, x2 in segments:
-            value = x2 - x1
-            self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{value:.1f}", pen)
-        # Add vertical dimensions
-        self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
-        for i in range(self.rows - 1):
-            self.addVerticalDimension(width + v_offset, end + i * pitch, width + v_offset, end + (i + 1) * pitch, str(pitch), pen)
-        
-        # Add bottom end distance dimension
-        self.addVerticalDimension(width + v_offset, height, width + v_offset, height - end, str(end), pen)
-        
-        # Add left side dimension
-        total_height = 2 * end + (self.rows - 1) * pitch
-        self.addVerticalDimension(-v_offset, 0, -v_offset, total_height, str(total_height), pen)
-
+            self.addHorizontalDimension(x1, y-30, x2, y-30, f"{round(x2 - x1)} mm", pen)
+        if self.stiff_across_thickness != 'N/A':
+            x=center_x-self.stiff_across_thickness/2
+            y2=center_y-web_thickness/2
+            y1=y2-self.stiff_across_length
+            self.addVerticalDimension(x+60,y1,x+60,y2,f"{round(y2-y1)}mm" , pen)
+        if self.stiff_flange_thickness!='N/A':
+            x=center_x-column_len/2 + 20
+            y1=0
+            y2=center_y  -column_width/2
+            self.addVerticalDimension(x,y1,x,y2,f"{round(y2-y1)}mm" , pen)
+        num_bolts = self.no_insidebolts
+        edge_x = float(self.Edgein)
+        end_y = float(self.Endin)
+        if self.stiff_across_thickness!='N/A' and num_bolts==4:
+            #1
+            x1=center_x-edge_x-self.stiff_across_thickness/2
+            x2=x1+edge_x
+            y1=center_y-end_y-web_thickness/2
+            y2=y1+end_y
+            self.addHorizontalDimension(x1, y1-30, x2, y1-30, f"{round(edge_x)} mm", pen)
+            self.addVerticalDimension(x1-30,y1,x1-30,y2,f"{round(end_y)}",pen)
+        elif num_bolts==2:
+            x1=center_x
+            y1=center_y-end_y-web_thickness/2
+            y2=y1+end_y
+            self.addVerticalDimension(x1-30,y1,x1-30,y2,f"{round(end_y)} mm",pen)
+        x1=0
+        x2=plate_length
+        y1=0
+        self.addHorizontalDimension(x1, y1-40, x2, y1-40, f"{round(x2)} mm", pen)
+        x1=plate_length
+        y1=0
+        y2=plate_width
+        self.addVerticalDimension(x1+20,y1,x1+20,y2,f"{round(y2)} mm",pen)
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
+        from PyQt5.QtCore import QPointF
+        from PyQt5.QtGui import QPolygonF
+        from PyQt5.QtGui import QFont, QBrush
+        from PyQt5.QtCore import Qt
+
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 10
         ext_length = 10
-        self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
-        self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
-        
-        points_left = [
-            (x1, y1),
-            (x1 + arrow_size, y1 - arrow_size/2),
-            (x1 + arrow_size, y1 + arrow_size/2)
-        ]
-        polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
-        
-        points_right = [
-            (x2, y2),
-            (x2 - arrow_size, y2 - arrow_size/2),
-            (x2 - arrow_size, y2 + arrow_size/2)
-        ]
-        polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
-        
+
+        # Extension lines
+        self.scene.addLine(x1, y1 - ext_length / 2, x1, y1 + ext_length / 2, pen)
+        self.scene.addLine(x2, y2 - ext_length / 2, x2, y2 + ext_length / 2, pen)
+
+        # Left arrow
+        poly_left = QPolygonF([
+            QPointF(x1, y1),
+            QPointF(x1 + arrow_size, y1 - arrow_size / 2),
+            QPointF(x1 + arrow_size, y1 + arrow_size / 2)
+        ])
+        arrow_left = self.scene.addPolygon(poly_left, pen)
+        arrow_left.setBrush(QBrush(Qt.black))
+
+        # Right arrow
+        poly_right = QPolygonF([
+            QPointF(x2, y2),
+            QPointF(x2 - arrow_size, y2 - arrow_size / 2),
+            QPointF(x2 - arrow_size, y2 + arrow_size / 2)
+        ])
+        arrow_right = self.scene.addPolygon(poly_right, pen)
+        arrow_right.setBrush(QBrush(Qt.black))
+
+        # Text
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(5)
+        font.setPointSize(10)
         text_item.setFont(font)
-        
-        if y1 < 0:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
-        else:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
+        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
+        from PyQt5.QtCore import QPointF
+        from PyQt5.QtGui import QPolygonF, QFont, QBrush
+        from PyQt5.QtCore import Qt
+
+        # Draw dimension line
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+
+        arrow_size = 10
         ext_length = 10
-        self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
-        self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
-        
+
+        # Extension lines
+        self.scene.addLine(x1 - ext_length / 2, y1, x1 + ext_length / 2, y1, pen)
+        self.scene.addLine(x2 - ext_length / 2, y2, x2 + ext_length / 2, y2, pen)
+
+        # Arrowheads
         if y2 > y1:
-            points_top = [
-                (x1, y1),
-                (x1 - arrow_size/2, y1 + arrow_size),
-                (x1 + arrow_size/2, y1 + arrow_size)
-            ]
-            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
-            
-            points_bottom = [
-                (x2, y2),
-                (x2 - arrow_size/2, y2 - arrow_size),
-                (x2 + arrow_size/2, y2 - arrow_size)
-            ]
-            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            # Arrow at top (y1)
+            poly_top = QPolygonF([
+                QPointF(x1, y1),
+                QPointF(x1 - arrow_size / 2, y1 + arrow_size),
+                QPointF(x1 + arrow_size / 2, y1 + arrow_size)
+            ])
+            self.scene.addPolygon(poly_top, pen).setBrush(QBrush(Qt.black))
+
+            # Arrow at bottom (y2)
+            poly_bot = QPolygonF([
+                QPointF(x2, y2),
+                QPointF(x2 - arrow_size / 2, y2 - arrow_size),
+                QPointF(x2 + arrow_size / 2, y2 - arrow_size)
+            ])
+            self.scene.addPolygon(poly_bot, pen).setBrush(QBrush(Qt.black))
         else:
-            points_top = [
-                (x2, y2),
-                (x2 - arrow_size/2, y2 + arrow_size),
-                (x2 + arrow_size/2, y2 + arrow_size)
-            ]
-            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
-            
-            points_bottom = [
-                (x1, y1),
-                (x1 - arrow_size/2, y1 - arrow_size),
-                (x1 + arrow_size/2, y1 - arrow_size)
-            ]
-            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
-        
+            # Reversed
+            poly_top = QPolygonF([
+                QPointF(x2, y2),
+                QPointF(x2 - arrow_size / 2, y2 + arrow_size),
+                QPointF(x2 + arrow_size / 2, y2 + arrow_size)
+            ])
+            self.scene.addPolygon(poly_top, pen).setBrush(QBrush(Qt.black))
+
+            poly_bot = QPolygonF([
+                QPointF(x1, y1),
+                QPointF(x1 - arrow_size / 2, y1 - arrow_size),
+                QPointF(x1 + arrow_size / 2, y1 - arrow_size)
+            ])
+            self.scene.addPolygon(poly_bot, pen).setBrush(QBrush(Qt.black))
+
+        # === Label Text (only once)
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(5)
+        font.setPointSize(10)  # Bigger font
         text_item.setFont(font)
-        
-        if x1 < 0:
-            text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
-        else:
-            text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+
+        # Position to right side of the line
+        label_x_offset = 15
+        label_y_center = (y1 + y2) / 2 - text_item.boundingRect().height() / 2
+        text_item.setPos(x1 + label_x_offset, label_y_center)

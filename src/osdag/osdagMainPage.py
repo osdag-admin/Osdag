@@ -148,6 +148,8 @@ from .design_type.connection.end_plate_connection import EndPlateConnection
 from .design_type.connection.base_plate_connection import BasePlateConnection
 from .design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
+from .design_type.connection.butt_joint_bolted import ButtJointBolted
+from .design_type.connection.welded_butt_joint import WeldedButtJoint
 from .design_type.connection.beam_cover_plate import BeamCoverPlate
 from .design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from .design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
@@ -167,7 +169,7 @@ from .design_type.compression_member.Column import ColumnDesign
 from .design_type.flexural_member.flexure import Flexure
 from .design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from .design_type.flexural_member.flexure_othersupp import Flexure_Misc
-# from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
+from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 # from .cad.cad_common import call_3DBeam
 from .APP_CRASH.Appcrash import api as appcrash
 import configparser
@@ -285,6 +287,11 @@ class OsdagMainWindow(QMainWindow):
                                                                 ('Cover Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatewelded.png")),'C2C_Cover_Plate_Welded'),
                                                                 ('End Plate',str(files("osdag.data.ResourceFiles.images").joinpath("ccep_flush.png")),'C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
+                                                                    ],
+                                                    'Butt Joint' :[
+                                                                ('Bolted Butt Joint',str(files("osdag.data.ResourceFiles.images").joinpath("buttjointbolted.png")),'Butt_Joint_Bolted'),
+                                                                ('Welded Butt Joint',str(files("osdag.data.ResourceFiles.images").joinpath("buttjointwelded.png")),'Butt_Joint_Welded'),
+                                                                self.show_butt_joint,
                                                                     ],
                                                     'PEB' : self.Under_Development,
                                                     },
@@ -620,6 +627,22 @@ class OsdagMainWindow(QMainWindow):
                 return
 
         QMessageBox.about(self, "INFO", "Please select appropriate connection")
+        
+    def show_butt_joint(self):
+        button_name_window_type_pairs = \
+            [("Butt_Joint_Bolted", ButtJointBolted),
+             ("Butt_Joint_Welded", WeldedButtJoint),]
+
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate butt joint type")
 
     # def show_compression_module(self):
     #     # folder = self.select_workspace_folder()

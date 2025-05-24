@@ -1551,7 +1551,7 @@ if __name__ == '__main__':
     # from cad.common_logic import CommonDesignLogic
     from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 
-    from OCC.gp import gp_Pnt
+    from OCC import gp_Pnt
     # from OCC.Core.Graphic3d import Quantity_NOC_GRAY as GRAY
     from OCC.Display.SimpleGui import init_display
 

@@ -3,10 +3,28 @@ import yaml
 import shutil
 import time
 import pandas as pd
+import cairosvg
+
+# PyQt5 imports
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+
+# Specific imports from PyQt5 submodules
+from PyQt5.QtCore import (
+    Qt, QEvent, QRect, QSize, QCoreApplication, QMetaObject,
+    QThread, pyqtSignal, QRegExp
+)
+from PyQt5.QtGui import (
+    QFont, QIcon, QPixmap, QBrush, QColor, QFontMetrics,
+    QRegExpValidator, QDoubleValidator, QIntValidator
+)
+from PyQt5.QtWidgets import (
+    QDialog, QMessageBox, QDesktopWidget, QMainWindow, QScrollArea,
+    QVBoxLayout, QGridLayout, QWidget, QFrame, QLineEdit, QComboBox,
+    QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog,
+    QColorDialog, QProgressBar, QApplication
+)
+
+
 from .ui_tutorial import Ui_Tutorial
 from .ui_aboutosdag import Ui_AboutOsdag
 from .ui_ask_question import Ui_AskQuestion
@@ -750,7 +768,7 @@ class Window(QMainWindow):
                 pixmap = QPixmap(option[3])
                 im.setPixmap(pixmap)
                 i = i + 30
-                im.setFixedSize(im.size())
+                im.setFixedSize(100, 100)
                 in_layout2.addWidget(im, j, 2, 1, 1)
 
             if type == TYPE_IMAGE_COMPRESSION:
@@ -761,7 +779,7 @@ class Window(QMainWindow):
                 pixmapc = QPixmap(option[3])
                 imc.setPixmap(pixmapc)
                 i = i + 30
-                imc.setFixedSize(imc.size())
+                imc.setFixedSize(160, 150)
                 in_layout2.addWidget(imc, j, 2, 1, 1)
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)

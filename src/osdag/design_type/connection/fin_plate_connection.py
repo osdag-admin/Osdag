@@ -568,7 +568,7 @@ class FinPlateConnection(ShearConnection):
 
             print("for grade :", self.bolt.bolt_grade_provided, "capacity is:",self.bolt.bolt_capacity,"force is:", self.plate.bolt_force)
 
-            bolt_capacity_reduced = self.long_joint_factor*self.bolt.bolt_shear_capacity
+            bolt_capacity_reduced = self.long_joint_factor*self.bolt.bolt_capacity
             if bolt_capacity_reduced < self.plate.bolt_force and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous
                 break

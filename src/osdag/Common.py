@@ -354,12 +354,14 @@ KEY_DISP_TENSION_WELDED = 'Tension Member Design - Welded to End Gusset'
 KEY_DISP_BB_EP_SPLICE = 'Beam-to-Beam End Plate Connection'
 KEY_DISP_COMPRESSION = 'Compression Member'
 KEY_DISP_COMPRESSION_STRUT = 'Compression Member Design - Strut Design'
+KEY_DISP_WELDEDBUTTJOINT = "Welded Butt Joint"
 
 DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
 KEY_DISP_COMPRESSION_COLUMN = 'Columns with known support conditions'
 KEY_DISP_COMPRESSION_Strut = 'Struts in Trusses'
+KEY_MODULE_WELDEDBUTTJOINT = "Welded Butt Joint"
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'
@@ -1250,6 +1252,8 @@ KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction Coefficient <br>(between concrete a
 
 
 KEY_DISP_DP_BOLT_TYPE = 'Bolt tensioning type'
+
+KEY_CONN_WELDEDBUTTJOINT = "WeldedButtJoint"
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -2463,6 +2467,29 @@ WELD_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"htt
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>")
+
+KEY_PLATE1_THICKNESS = "Plate1.Thickness"
+KEY_DISP_PLATE1_THICKNESS = "Plate 1 Thickness (mm)*"
+KEY_PLATE2_THICKNESS = "Plate2.Thickness"
+KEY_DISP_PLATE2_THICKNESS = "Plate 2 Thickness (mm)*"
+KEY_PLATE_WIDTH = "Plate.Width"
+KEY_DISP_PLATE_WIDTH = "Plate Width (mm)*"
+KEY_TENSILE_FORCE = "Load.Tensile"
+KEY_DISP_TENSILE_FORCE = "Factored Tensile Force (kN)*"
+KEY_WELD_BUTT_TYPE = "Weld.ButtType"
+KEY_DISP_WELD_BUTT_TYPE = "Weld Configuration*"
+VALUES_WELD_BUTT_TYPE = ['Complete Penetration Butt Weld', 'Partial Penetration Butt Weld (Single Cover)', 'Partial Penetration Butt Weld (Double Cover)']
+KEY_EDGE_PREP_TYPE = "Weld.EdgePrepType"
+KEY_DISP_EDGE_PREP_TYPE = "Edge Preparation*"
+VALUES_EDGE_PREP_TYPE = ['Single V-Groove', 'Double V-Groove', 'Single U-Groove', 'Double U-Groove', 'Other/Manual']
+KEY_BEVEL_ANGLE = "Weld.BevelAngle"
+KEY_DISP_BEVEL_ANGLE = "Bevel Angle (deg)"
+KEY_ROOT_GAP = "Weld.RootGap"
+KEY_DISP_ROOT_GAP = "Root Gap (mm)"
+KEY_COVERPLATE_THICKNESS = "Coverplate.Thickness"
+KEY_DISP_COVERPLATE_THICKNESS = "Cover Plate Thickness (mm)"
+KEY_DISP_CONNECTOR_MATERIAL = "Cover Plate Material*"
+
 
 # DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 #                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

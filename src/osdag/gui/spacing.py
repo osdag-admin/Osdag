@@ -13,10 +13,13 @@ class BoltPatternGenerator(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
-        self.rows = rows
-        self.cols = cols
+        self.main=main
+        self.plate_height = main.plate.height
+        self.plate_width = main.plate.length 
+        self.hole_dia=main.bolt.bolt_diameter_provided
+        self.rows=main.plate.bolts_one_line
+        self.cols=main.plate.bolt_line
         self.initUI()
-        
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
         self.setGeometry(100, 100, 800, 500)
@@ -83,7 +86,7 @@ class BoltPatternGenerator(QMainWindow):
                 param_map['edge'] = float(value)
 
         # Add hardcoded hole diameter
-        param_map['hole'] = 10.0
+        param_map['hole'] = self.main.bolt.bolt_diameter_provided
 
         print("Extracted parameters:", param_map)
 
@@ -106,9 +109,9 @@ class BoltPatternGenerator(QMainWindow):
         if 'gauge' in params:
             gauge1 = gauge
             gauge2 = gauge
-        width = calculate_total_width(edge, gauge1, gauge2, self.cols)
+        width = self.plate_width
 
-        height = 2 * end + (self.rows - 1) * pitch
+        height = self.plate_height
         
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
@@ -128,19 +131,23 @@ class BoltPatternGenerator(QMainWindow):
         # Draw holes
         for row in range(self.rows):
             for col in range(self.cols):
-                # Start from edge distance (center of first hole)
-                x_center = edge
-                for i in range(col):
-                    x_center += gauge1 if i % 2 == 0 else gauge2
+                # Start from right edge (for example: total plate width - edge)
+                x_center = self.plate_width - edge
 
-                # Center of hole is at (x_center, y_center)
-                # Subtract hole_diameter/2 to draw ellipse properly from top-left
-                x = x_center - hole_diameter / 2
+                # Subtract gauges from right to left
+                for i in range(col):
+                    x_center -= gauge1 if i % 2 == 0 else gauge2
+
+                # Y-position stays the same
                 y_center = end + row * pitch
+
+                # Top-left corner for drawing the circle
+                x = x_center - hole_diameter / 2
                 y = y_center - hole_diameter / 2
 
                 print(f"row: {row}, col: {col}, x: {x}, y: {y}")
                 self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
+
         print(params,dimension_pen)
         # Add dimensions
         self.addDimensions(params, dimension_pen)
@@ -160,27 +167,22 @@ class BoltPatternGenerator(QMainWindow):
             gauge1 = gauge
             gauge2 = gauge
         
-        width = calculate_total_width(edge, gauge1, gauge2, self.cols)
-        height = 2 * end + (self.rows - 1) * pitch
+        width = self.plate_width
+        height = self.plate_height
         
         # Offsets for dimension lines
         h_offset = 20
         v_offset = 30
         
         # Add horizontal dimensions
-        x_start = 0
+        x_start = width
         segments = []
         # First edge
-        segments.append(('edge', x_start, x_start + edge))
-        x_start += edge
-        # Alternate gauges
-        for i in range(self.cols - 1):
-            gauge = gauge1 if i % 2 == 0 else gauge2
-            label = f'gauge{i % 2 + 1}'
-            segments.append((label, x_start, x_start + gauge))
-            x_start += gauge
+        segments.append(('edge', x_start-edge, x_start ))
+        x_start -=edge
+       
         # Last edge
-        segments.append(('edge', x_start, x_start + edge))
+        segments.append(('edge', 0, x_start))
 
         # Draw each segment
         for label, x1, x2 in segments:

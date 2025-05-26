@@ -13,10 +13,59 @@ class SeatedanglespacingOnCol(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
-        self.rows = int(rows)
-        self.cols = int(cols)
-        self.initUI()
+        self.val=rows
+        if self.val==3 or self.val==4:
+            self.plate_width=main.seated_angle.width
+            self.plate_length=main.seated_angle.leg_a_length
+        else:
+            self.plate_width=main.top_angle.width
+            self.plate_length=main.top_angle.leg_a_length
+        arr=[main.top_spacing_col(main,True),main.top_spacing_beam(main,True),main.seated_spacing_col(main,True),
+             main.seated_spacing_beam(main,True)]
+        val=self.val-1
+        print(val)
+        # print(arr[0],len(arr[0]))
+        # print('\n\n')
+        # for i in range(len(arr[0])):
+        #     print(f"INDEX : {i}  : {arr[0][i]} , {arr[0][i][3]}")
+        for i in arr[2]:
+            print(i)
+            print('\n\n')
         
+        data = {entry[0]: entry[3] for entry in arr[val] if entry[0]}
+        print(data)
+        self.rows  = data['Bolt.Rows']
+        self.cols  = data['Bolt.Cols']
+        self.End   = data['Bolt.EndDist']
+        self.Gauge = data['Bolt.Gauge']
+        if self.Gauge==0 and 'Bolt.GaugeCentral' in data:
+            self.Gauge=data['Bolt.GaugeCentral']
+        self.Edge  = data['Bolt.EdgeDist']
+        # return
+        print(f"""
+        Plate Dimensions
+        ----------------
+        Plate Width  : {self.plate_width} mm
+        Plate Length : {self.plate_length} mm
+
+        Bolt Layout
+        -----------
+        Rows         : {self.rows}
+        Columns      : {self.cols}
+        End Distance : {self.End} mm
+        Gauge        : {self.Gauge} mm
+        Edge Distance: {self.Edge} mm
+        """)
+        # self.initUI()
+        self.param_map = {
+    'end': self.End,
+    'gauge': self.Gauge,
+    'edge': self.Edge,
+     'hole': main.bolt.bolt_diameter_provided
+}
+        
+        print(self.param_map)
+        self.initUI()
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
         self.setGeometry(100, 100, 800, 500)
@@ -27,10 +76,8 @@ class SeatedanglespacingOnCol(QMainWindow):
         # Left panel for parameter display
         left_panel = QWidget()
         left_layout = QVBoxLayout()
-        
-        # Parameter display labels
-        params = self.get_parameters()
-        
+        params=self.param_map
+        # Parameter display labels        
         # Display the parameter values
         for key, value in params.items():
             param_layout = QHBoxLayout()
@@ -63,61 +110,23 @@ class SeatedanglespacingOnCol(QMainWindow):
         # Ensure the view shows all content
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
     
-    def get_parameters(self):
-        spacing_data = self.connection.top_spacing_col(flag=True)  # Get actual values
-        param_map = {
-    'pitch': 0.0,
-    'end': 0.0,
-    'gauge1': 0.0,
-    'gauge2': 0.0,
-    'gauge': 0.0,
-    'edge': 0.0
-}
-        print('spacing_data length' , len(spacing_data))
-        for item in spacing_data:
-            key, _, _, value = item
-            # print('key : ', key)
-            if key == KEY_OUT_PITCH:  
-                param_map['pitch'] = float(value)
-            elif key == KEY_OUT_END_DIST:
-                param_map['end'] = float(value)
-            elif key == KEY_OUT_GAUGE1:
-                param_map['gauge1'] = float(value)
-            elif key == KEY_OUT_GAUGE2:
-                param_map['gauge2'] = float(value)
-            elif key == KEY_OUT_GAUGE:
-                param_map['gauge'] = float(value)
-            elif key == KEY_OUT_EDGE_DIST:
-                param_map['edge'] = float(value)
 
-        # Add hardcoded hole diameter
-        param_map['hole'] = 10.0
-
-        print("Extracted parameters:", param_map)
-
-        return param_map
 
     def createDrawing(self, params):
         
         # Extract parameters
-        pitch = params['pitch']
 
         end = params['end']
         if 'gauge' in params:
             gauge = params['gauge']
-        else:
-            gauge1 = params['gauge1']
-            gauge2 = params['gauge2']
         edge = params['edge']
         hole_diameter = params['hole']
         print(f"rows: {self.rows}, cols: {self.cols}")
         # Calculate dimensions
-        if 'gauge' in params:
-            gauge1 = gauge
-            gauge2 = gauge
-        width = calculate_total_width(edge, gauge1, gauge2, self.cols)
+ 
+        width = self.plate_width
 
-        height = 2 * end + (self.rows - 1) * pitch
+        height = self.plate_length
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
         dimension_pen = QPen(Qt.black, 1.5)
@@ -139,12 +148,12 @@ class SeatedanglespacingOnCol(QMainWindow):
                 # Start from edge distance (center of first hole)
                 x_center = edge
                 for i in range(col):
-                    x_center += gauge1 if i % 2 == 0 else gauge2
+                    x_center += gauge
 
                 # Center of hole is at (x_center, y_center)
                 # Subtract hole_diameter/2 to draw ellipse properly from top-left
                 x = x_center - hole_diameter / 2
-                y_center = end + row * pitch
+                y_center = end 
                 y = y_center - hole_diameter / 2
 
                 print(f"row: {row}, col: {col}, x: {x}, y: {y}")
@@ -155,21 +164,16 @@ class SeatedanglespacingOnCol(QMainWindow):
 
     def addDimensions(self, params, pen):
         # Extract parameters
-        pitch = params['pitch']
         end = params['end']
         if 'gauge' in params:
             gauge = params['gauge']
-        else:
-            gauge1 = params['gauge1']
-            gauge2 = params['gauge2']
+
         edge = params['edge']
 
-        if 'gauge' in params:
-            gauge1 = gauge
-            gauge2 = gauge
+
         
-        width = calculate_total_width(edge, gauge1, gauge2, self.cols)
-        height = 2 * end + (self.rows - 1) * pitch
+        width=self.plate_width
+        height=self.plate_length
         
         # Offsets for dimension lines
         h_offset = 20
@@ -181,12 +185,8 @@ class SeatedanglespacingOnCol(QMainWindow):
         # First edge
         segments.append(('edge', x_start, x_start + edge))
         x_start += edge
-        # Alternate gauges
-        for i in range(self.cols - 1):
-            gauge = gauge1 if i % 2 == 0 else gauge2
-            label = f'gauge{i % 2 + 1}'
-            segments.append((label, x_start, x_start + gauge))
-            x_start += gauge
+        segments.append(('edge' ,x_start,x_start+gauge ))
+        x_start+=gauge
         # Last edge
         segments.append(('edge', x_start, x_start + edge))
 
@@ -196,14 +196,12 @@ class SeatedanglespacingOnCol(QMainWindow):
             self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{value:.1f}", pen)
         # Add vertical dimensions
         self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
-        for i in range(self.rows - 1):
-            self.addVerticalDimension(width + v_offset, end + i * pitch, width + v_offset, end + (i + 1) * pitch, str(pitch), pen)
         
         # Add bottom end distance dimension
         self.addVerticalDimension(width + v_offset, height, width + v_offset, height - end, str(end), pen)
         
         # Add left side dimension
-        total_height = 2 * end + (self.rows - 1) * pitch
+        total_height = 2 * end + (self.rows - 1)
         self.addVerticalDimension(-v_offset, 0, -v_offset, total_height, str(total_height), pen)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):

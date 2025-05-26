@@ -77,7 +77,7 @@ class BeamtoColDetailing(QMainWindow):
         self.view.setRenderHint(QPainter.Antialiasing)
 
         # Background and test shape (optional)
-        self.scene.setBackgroundBrush(Qt.lightGray)
+        self.scene.setBackgroundBrush(Qt.white)
 
         # Step 5: Add to main layout
         main_layout.addWidget(left_panel, stretch=1)
@@ -127,7 +127,7 @@ class BeamtoColDetailing(QMainWindow):
         v_gap = 12.5
         outline_pen = QPen(Qt.blue, 2)
         black_pen = QPen(QColor("black"), 2)
-        bolt_pen = QPen(Qt.black, 2)
+        bolt_pen = QPen(Qt.blue, 2)
         bolt_brush = QBrush(QColor("gold"))
         radius = holedia / 2
         total_span = 2 * edge + crossgauge
@@ -158,7 +158,8 @@ class BeamtoColDetailing(QMainWindow):
 
         web_y1 = flange_bottom_edge_y_top
         web_y2 = flange_bottom_edge_y_bottom
-
+        outline_pen = QPen(QColor("orange"))
+        outline_pen.setWidth(2)  
         # --- Web vertical lines ---
         self.scene.addLine(web_x1, web_y1, web_x1, web_y2, outline_pen)
         self.scene.addLine(web_x2, web_y1, web_x2, web_y2, outline_pen)
@@ -180,7 +181,7 @@ class BeamtoColDetailing(QMainWindow):
         # --- Calculate total bolt span ---
         # print(rows, cols)
         rowstop = int(rows / 2)
-
+        outline_pen=QPen(QColor("blue"))
         
 
         print('Total Span:', total_span)
@@ -198,7 +199,7 @@ class BeamtoColDetailing(QMainWindow):
                 # Draw bolt at (x, y)
                 # print(f'row : {row} , col : {col} , x : {x} y : {y}')
 
-                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, bolt_pen,bolt_brush)
+                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, bolt_pen)
 
                 # Advance x for next column
                 if col == 0 or col == 2:
@@ -213,7 +214,7 @@ class BeamtoColDetailing(QMainWindow):
             x = edge  # Reset x for each row
 
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, bolt_pen,bolt_brush)
+                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, bolt_pen)
 
                 # Advance x
                 if col == 0 or col == 2:
@@ -228,7 +229,7 @@ class BeamtoColDetailing(QMainWindow):
         from PyQt5.QtCore import Qt, QPointF
         from PyQt5.QtGui import QPolygonF
 
-        pen = QPen(Qt.darkMagenta, 1)
+        pen = QPen(Qt.black, 1)
         pen.setStyle(Qt.SolidLine)
 
         label_text = f"{margin:.1f} mm"
@@ -278,7 +279,7 @@ class BeamtoColDetailing(QMainWindow):
         if cols % 2 != 0 or cols < 2:
             raise ValueError("Number of columns must be even and >= 2")
 
-        pen = QPen(Qt.darkGreen, 1)
+        pen = QPen(Qt.black, 1)
         pen.setStyle(Qt.DashLine)
         y = -y_offset
 
@@ -394,7 +395,7 @@ class BeamtoColDetailing(QMainWindow):
         holedia=self.hole_diameter
         radius=holedia/2
         # === Pens and Brushes ===
-        outline_pen = QPen(Qt.blue, 2)
+        outline_pen = QPen(QColor("orange"))
         red_pen = QPen(QColor("red"), 2)
         red_brush = QBrush(QColor("red"))
         black_pen = QPen(QColor("black"), 2)
@@ -402,7 +403,7 @@ class BeamtoColDetailing(QMainWindow):
         # === Setup Scene ===
         self.scene.setSceneRect(-40, -60, plate_width + 80, plate_height + 120)
         self.scene.clear()
-        self.scene.setBackgroundBrush(Qt.lightGray)
+        self.scene.setBackgroundBrush(Qt.white)
 
         # === Draw Plate Boundary ===
         self.scene.addRect(0, 0, plate_width, plate_height, black_pen)
@@ -415,11 +416,36 @@ class BeamtoColDetailing(QMainWindow):
             effective_stiffener_height = 2 * end
             rowsabovestiff=1
         self.stiff_len=effective_stiffener_height
-        # === Draw Top Stiffener ===
-        stiffener_x = (plate_width - stiffener_thickness) / 2
-        stiffener_y = 0
-        self.scene.addRect(stiffener_x, stiffener_y, stiffener_thickness, effective_stiffener_height, red_pen, red_brush)
+        stiffener_x = (plate_width - web_thickness) / 2
+        blue_brush = QBrush(QColor("blue"))
 
+        # === Draw Top Stiffener ===
+        self.scene.addRect(
+                stiffener_x,
+                0,
+                web_thickness,
+                effective_stiffener_height,
+                black_pen,
+                blue_brush
+            )
+        self.scene.addRect(
+        stiffener_x - stiffener_thickness/2,
+                0,
+                stiffener_thickness/2,
+                effective_stiffener_height,
+                black_pen,
+                red_brush
+            )
+
+            # Draw right stiffener
+        self.scene.addRect(
+                stiffener_x + web_thickness,
+                0,
+                stiffener_thickness/2,
+                effective_stiffener_height,
+                black_pen,
+                red_brush
+            )
         # === Web and Flange Geometry ===
         top_flange_y = effective_stiffener_height
         top_flange_bottom_y = top_flange_y + flange_thickness
@@ -431,10 +457,12 @@ class BeamtoColDetailing(QMainWindow):
         web_y1 = top_flange_bottom_y
         web_y2 = bottom_flange_top_y
         weblen=web_y1-web_y2
+        outline_pen.setWidth(2)  
         # === Draw Web ===
+        outline_pen.setWidth(2)  
         self.scene.addLine(web_x1, web_y1, web_x1, web_y2, outline_pen)
         self.scene.addLine(web_x2, web_y1, web_x2, web_y2, outline_pen)
-
+          
         # === Draw Top Flange (5 lines) ===
         self.scene.addLine(h_gap, top_flange_y, plate_width - h_gap, top_flange_y, outline_pen)
         self.scene.addLine(h_gap, top_flange_y, h_gap, top_flange_bottom_y, outline_pen)
@@ -457,11 +485,12 @@ class BeamtoColDetailing(QMainWindow):
             edge += (plate_width - total_span) / 2
             
         y_bottom_bolt = plate_height - 12.5 - end -flange_thickness # From image: 12.5 mm gap, then e' up
-
+        outline_pen=blue_pen
         x = edge  # start x from edge
+        blue_pen = QPen(Qt.blue)
 
         for col in range(cols):
-            self.scene.addEllipse(x - radius, y_bottom_bolt - radius, holedia, holedia, red_pen, red_brush)
+            self.scene.addEllipse(x - radius, y_bottom_bolt - radius, holedia, holedia, blue_pen)
             # Advance x for next column
             if col == 0 or col == 2:
                 x += gauge
@@ -484,7 +513,7 @@ class BeamtoColDetailing(QMainWindow):
 
         x = edge  # Start x from adjusted edge
         for col in range(cols):
-            self.scene.addEllipse(x - radius, y_top_bolt - radius, holedia, holedia, red_pen, red_brush)
+            self.scene.addEllipse(x - radius, y_top_bolt - radius, holedia, holedia, blue_pen)
             # Advance x for next column
             if col == 0 or col == 2:
                 x += gauge
@@ -494,7 +523,7 @@ class BeamtoColDetailing(QMainWindow):
             y_top_bolt = end + pitch
             x = edge  # Start x from adjusted edge
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y_top_bolt - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y_top_bolt - radius, holedia, holedia, blue_pen)
                 # Advance x for next column
                 if col == 0 or col == 2:
                     x += gauge
@@ -509,7 +538,7 @@ class BeamtoColDetailing(QMainWindow):
             x = edge  # reset x for each row
 
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, blue_pen)
                 # Advance x for next column
                 if col == 0 or col == 2:
                     x += gauge
@@ -521,7 +550,7 @@ class BeamtoColDetailing(QMainWindow):
         from PyQt5.QtGui import QPen, QFont
         from PyQt5.QtCore import Qt
 
-        pen = QPen(Qt.darkGreen, 1)
+        pen = QPen(Qt.black, 1)
         font = QFont()
         font.setPointSize(7)
 
@@ -631,7 +660,7 @@ class BeamtoColDetailing(QMainWindow):
         from PyQt5.QtGui import QPen, QFont
         from PyQt5.QtCore import Qt
 
-        pen = QPen(Qt.darkMagenta, 1)
+        pen = QPen(Qt.black, 1)
         pen.setStyle(Qt.SolidLine)
 
         label_text = f"{margin:.1f} mm"
@@ -690,7 +719,7 @@ class BeamtoColDetailing(QMainWindow):
         h_gap = 12.5
 
         # === Pens and Brushes ===
-        outline_pen = QPen(Qt.blue, 2)
+        outline_pen = QPen(QColor("orange"))
         red_pen = QPen(QColor("red"), 2)
         red_brush = QBrush(QColor("red"))
         black_pen = QPen(QColor("black"), 2)
@@ -698,7 +727,7 @@ class BeamtoColDetailing(QMainWindow):
         # === Setup Scene ===
         self.scene.setSceneRect(-40, -60, plate_width + 80, plate_height + 120)
         self.scene.clear()
-        self.scene.setBackgroundBrush(Qt.lightGray)
+        self.scene.setBackgroundBrush(Qt.white)
 
         # === Draw Plate Boundary ===
         self.scene.addRect(0, 0, plate_width, plate_height, black_pen)
@@ -712,28 +741,70 @@ class BeamtoColDetailing(QMainWindow):
             rowsabovestiff = 1
         self.stiff_len = effective_stiffener_height
         self.rowsabovestiff = rowsabovestiff
+        blue_brush = QBrush(QColor("blue"))
+        blue_pen = QPen(Qt.blue)
 
         # === Draw Top Stiffener ===
-        stiffener_x = (plate_width - stiffener_thickness) / 2
+        stiffener_x = (plate_width - web_thickness) / 2
         self.scene.addRect(
             stiffener_x,
             0,
-            stiffener_thickness,
+            web_thickness,
             effective_stiffener_height,
-            red_pen,
+            black_pen,
+            blue_brush
+        )
+        self.scene.addRect(
+    stiffener_x - stiffener_thickness/2,
+            0,
+            stiffener_thickness/2,
+            effective_stiffener_height,
+            black_pen,
             red_brush
         )
 
+        # Draw right stiffener
+        self.scene.addRect(
+            stiffener_x + web_thickness,
+            0,
+            stiffener_thickness/2,
+            effective_stiffener_height,
+            black_pen,
+            red_brush
+        )
         # === Draw Bottom Stiffener ===
+        stiffener_x = (plate_width - web_thickness) / 2
+        stiffener_y = plate_height - effective_stiffener_height
+
+        # Center stiffener
         self.scene.addRect(
             stiffener_x,
-            plate_height - effective_stiffener_height,
-            stiffener_thickness,
+            stiffener_y,
+            web_thickness,
             effective_stiffener_height,
-            red_pen,
+            black_pen,
+            blue_brush
+        )
+
+        # Left stiffener
+        self.scene.addRect(
+            stiffener_x - stiffener_thickness/2,
+            stiffener_y,
+            stiffener_thickness/2,
+            effective_stiffener_height,
+            black_pen,
             red_brush
         )
 
+        # Right stiffener
+        self.scene.addRect(
+            stiffener_x + web_thickness,
+            stiffener_y,
+            stiffener_thickness/2,
+            effective_stiffener_height,
+            black_pen,
+            red_brush
+        )
         # === Calculate flange and web geometry ===
         top_flange_y = effective_stiffener_height
         top_flange_bottom_y = top_flange_y + flange_thickness
@@ -745,7 +816,7 @@ class BeamtoColDetailing(QMainWindow):
         web_x2 = web_x1 + web_thickness
         web_y1 = top_flange_bottom_y
         web_y2 = bottom_flange_top_y
-
+        outline_pen.setWidth(2)  
         # === Draw Top Flange (5-line detail) ===
         self.scene.addLine(h_gap, top_flange_y, plate_width - h_gap, top_flange_y, outline_pen)
         self.scene.addLine(h_gap, top_flange_y, h_gap, top_flange_bottom_y, outline_pen)
@@ -772,9 +843,9 @@ class BeamtoColDetailing(QMainWindow):
             edge += (plate_width - total_span) / 2
         x = edge
         y_top_bolt = self.End
-
+        outline_pen=blue_pen
         for col in range(cols):
-            self.scene.addEllipse(x - radius, y_top_bolt - radius, holedia, holedia, red_pen, red_brush)
+            self.scene.addEllipse(x - radius, y_top_bolt - radius, holedia, holedia, blue_pen)
             if col == 0 or col == 2:
                 x += gauge
             elif col == 1:
@@ -785,7 +856,7 @@ class BeamtoColDetailing(QMainWindow):
             x = edge
             y_top_bolt_2 = self.End + pitch
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y_top_bolt_2 - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y_top_bolt_2 - radius, holedia, holedia, blue_pen)
                 if col == 0 or col == 2:
                     x += gauge
                 elif col == 1:
@@ -796,7 +867,7 @@ class BeamtoColDetailing(QMainWindow):
         y_bottom_bolt = self.height - self.End
 
         for col in range(cols):
-            self.scene.addEllipse(x - radius, y_bottom_bolt - radius, holedia, holedia, red_pen, red_brush)
+            self.scene.addEllipse(x - radius, y_bottom_bolt - radius, holedia, holedia, blue_pen)
             if col == 0 or col == 2:
                 x += gauge
             elif col == 1:
@@ -807,7 +878,7 @@ class BeamtoColDetailing(QMainWindow):
             x = edge
             y_bottom_bolt_2 = self.height - self.End - pitch
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y_bottom_bolt_2 - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y_bottom_bolt_2 - radius, holedia, holedia, blue_pen)
                 if col == 0 or col == 2:
                     x += gauge
                 elif col == 1:
@@ -818,7 +889,7 @@ class BeamtoColDetailing(QMainWindow):
             y_mid_bolt = self.height / 2
 
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y_mid_bolt - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y_mid_bolt - radius, holedia, holedia, blue_pen)
                 if col == 0 or col == 2:
                     x += gauge
                 elif col == 1:
@@ -844,7 +915,7 @@ class BeamtoColDetailing(QMainWindow):
             y = last_top_y + (i + 1) * pitch  # start one pitch below the last top bolt
             x = edge
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, blue_pen)
                 if col == 0 or col == 2:
                     x += gauge
                 elif col == 1:
@@ -855,7 +926,7 @@ class BeamtoColDetailing(QMainWindow):
             y = last_bottom_y - (i + 1) * pitch  # start one pitch above the last bottom bolt
             x = edge
             for col in range(cols):
-                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, red_pen, red_brush)
+                self.scene.addEllipse(x - radius, y - radius, holedia, holedia, blue_pen)
                 if col == 0 or col == 2:
                     x += gauge
                 elif col == 1:
@@ -866,7 +937,7 @@ class BeamtoColDetailing(QMainWindow):
         from PyQt5.QtGui import QPen, QFont
         from PyQt5.QtCore import Qt
 
-        pen = QPen(Qt.darkGreen, 1)
+        pen = QPen(Qt.black, 1)
         font = QFont()
         font.setPointSize(7)
 
@@ -895,9 +966,11 @@ class BeamtoColDetailing(QMainWindow):
         next_y = current_y + self.flange_thick
         self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.flange_thick:.1f} mm", pen)
         current_y = next_y
-
+        next_y = current_y + self.End
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm456", pen)
+        current_y = next_y
         # 5. Top bolt pitches
-        for i in range(self.top_rows):
+        for i in range(self.top_rows-1):
             next_y = current_y + self.pitch
             self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen)
             current_y = next_y
@@ -954,7 +1027,7 @@ class BeamtoColDetailing(QMainWindow):
         from PyQt5.QtGui import QPen, QFont
         from PyQt5.QtCore import Qt
 
-        pen = QPen(Qt.darkMagenta, 1)
+        pen = QPen(Qt.black, 1)
         pen.setStyle(Qt.SolidLine)
 
         label_text = f"{margin:.1f} mm"
@@ -988,83 +1061,84 @@ class BeamtoColDetailing(QMainWindow):
             text_item.setPos(tx, ty)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
-        from PyQt5.QtCore import QPointF
-        from PyQt5.QtGui import QPolygonF
-        from PyQt5.QtGui import QFont, QBrush
-        from PyQt5.QtCore import Qt
-
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = 5
         ext_length = 10
-
-        # Extension lines
-        self.scene.addLine(x1, y1 - ext_length / 2, x1, y1 + ext_length / 2, pen)
-        self.scene.addLine(x2, y2 - ext_length / 2, x2, y2 + ext_length / 2, pen)
-
-        # Left arrow
-        poly_left = QPolygonF([
-            QPointF(x1, y1),
-            QPointF(x1 + arrow_size, y1 - arrow_size / 2),
-            QPointF(x1 + arrow_size, y1 + arrow_size / 2)
-        ])
-        arrow_left = self.scene.addPolygon(poly_left, pen)
-        arrow_left.setBrush(QBrush(Qt.black))
-
-        # Right arrow
-        poly_right = QPolygonF([
-            QPointF(x2, y2),
-            QPointF(x2 - arrow_size, y2 - arrow_size / 2),
-            QPointF(x2 - arrow_size, y2 + arrow_size / 2)
-        ])
-        arrow_right = self.scene.addPolygon(poly_right, pen)
-        arrow_right.setBrush(QBrush(Qt.black))
-
-        # Text
+        self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
+        self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
+        
+        points_left = [
+            (x1, y1),
+            (x1 + arrow_size, y1 - arrow_size/2),
+            (x1 + arrow_size, y1 + arrow_size/2)
+        ]
+        polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
+        polygon_left.setBrush(QBrush(Qt.black))
+        
+        points_right = [
+            (x2, y2),
+            (x2 - arrow_size, y2 - arrow_size/2),
+            (x2 - arrow_size, y2 + arrow_size/2)
+        ]
+        polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
+        polygon_right.setBrush(QBrush(Qt.black))
+        
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
-        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
+        
+        if y1 < 0:
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
+        else:
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
-        from PyQt5.QtCore import QPointF
-        from PyQt5.QtGui import QPolygonF
-
-        from PyQt5.QtGui import QFont, QBrush
-        from PyQt5.QtCore import Qt
-
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = 5
         ext_length = 10
-
-        # Extension lines
-        self.scene.addLine(x1 - ext_length / 2, y1, x1 + ext_length / 2, y1, pen)
-        self.scene.addLine(x2 - ext_length / 2, y2, x2 + ext_length / 2, y2, pen)
-
-        # Determine direction (y1 to y2 or vice versa)
-        up = y2 < y1
-
-        # Arrowhead at y1
-        poly1 = QPolygonF([
-            QPointF(x1, y1),
-            QPointF(x1 - arrow_size / 2, y1 + (arrow_size if up else -arrow_size)),
-            QPointF(x1 + arrow_size / 2, y1 + (arrow_size if up else -arrow_size))
-        ])
-        arrow1 = self.scene.addPolygon(poly1, pen)
-        arrow1.setBrush(QBrush(Qt.black))
-
-        # Arrowhead at y2
-        poly2 = QPolygonF([
-            QPointF(x2, y2),
-            QPointF(x2 - arrow_size / 2, y2 - (arrow_size if up else -arrow_size)),
-            QPointF(x2 + arrow_size / 2, y2 - (arrow_size if up else -arrow_size))
-        ])
-        arrow2 = self.scene.addPolygon(poly2, pen)
-        arrow2.setBrush(QBrush(Qt.black))
-
-        # Text
+        self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
+        self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
+        
+        if y2 > y1:
+            points_top = [
+                (x1, y1),
+                (x1 - arrow_size/2, y1 + arrow_size),
+                (x1 + arrow_size/2, y1 + arrow_size)
+            ]
+            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
+            polygon_top.setBrush(QBrush(Qt.black))
+            
+            points_bottom = [
+                (x2, y2),
+                (x2 - arrow_size/2, y2 - arrow_size),
+                (x2 + arrow_size/2, y2 - arrow_size)
+            ]
+            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
+            polygon_bottom.setBrush(QBrush(Qt.black))
+        else:
+            points_top = [
+                (x2, y2),
+                (x2 - arrow_size/2, y2 + arrow_size),
+                (x2 + arrow_size/2, y2 + arrow_size)
+            ]
+            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
+            polygon_top.setBrush(QBrush(Qt.black))
+            
+            points_bottom = [
+                (x1, y1),
+                (x1 - arrow_size/2, y1 - arrow_size),
+                (x1 + arrow_size/2, y1 - arrow_size)
+            ]
+            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
+            polygon_bottom.setBrush(QBrush(Qt.black))
+        
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
-        text_item.setPos(x1 + 10, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+        
+        if x1 < 0:
+            text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+        else:
+            text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

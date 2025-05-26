@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QGraphicsScene,QGraphicsRectItem)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtGui import QPainter, QPen, QFont
+from PyQt5.QtGui import QPainter, QPen, QFont,QColor
 from PyQt5.QtGui import QPolygonF, QBrush
 from PyQt5.QtCore import QPointF
 from ..Common import *
@@ -137,9 +137,11 @@ class BasePlateDetailing(QMainWindow):
         # Step 6: Call parameter extraction and drawing
         # self.get_parameters()
         self.createDrawing()
-        self.view.resetTransform()
-        self.view.scale(0.5, 0.5)
+        if self.plate_length>700:
+            self.view.resetTransform()
+            self.view.scale(0.5, 0.5)
     def createDrawing(self):
+        from PyQt5.QtGui import QColor
         try:
             plate_length = float(self.plate_length)
             plate_width = float(self.plate_width)
@@ -163,16 +165,14 @@ class BasePlateDetailing(QMainWindow):
         # Add rectangle to the scene
         self.scene.addItem(rect_item)
         # Extract parameters
-        outline_pen = QPen(Qt.black)
-        outline_pen.setWidth(2)
-
+        
+        outline_pen=QPen(Qt.black)
         # === Draw Base Plate Rectangle ===
         rect_item = QGraphicsRectItem(QRectF(0, 0, plate_length, plate_width))
         rect_item.setPen(outline_pen)
         rect_item.setBrush(QBrush(Qt.white))
         self.scene.addItem(rect_item)
-        outline_pen = QPen(Qt.blue)
-        outline_pen.setWidth(3)
+        outline_pen = QPen(QColor("orange"))
         # === Center of the base plate ===
         center_x = plate_length / 2
         center_y = plate_width / 2
@@ -218,6 +218,8 @@ class BasePlateDetailing(QMainWindow):
         # 5. Bottom horizontal line
         self.scene.addLine(left_x, bot_y, right_x, bot_y, outline_pen)
         red_brush = QBrush(Qt.red)
+        outline_pen = QPen(Qt.blue)
+        outline_pen.setWidth(2)
         if isinstance(self.stiff_flange_length, (int, float)):
             print('her')
             stiff_thk = self.stiff_flange_thickness
@@ -319,7 +321,7 @@ class BasePlateDetailing(QMainWindow):
         else:
             edge=((plate_length-column_len)/2 - flange_thickness - Gauge)/2
         print(edge)
-        from PyQt5.QtGui import QColor
+        
         gold_brush = QBrush(QColor("gold"))
         black_pen = QPen(Qt.black)
         black_pen.setWidth(2)
@@ -328,18 +330,18 @@ class BasePlateDetailing(QMainWindow):
 
             # Top row bolt
             y_top = end
-            self.scene.addEllipse(x - radius, y_top - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+            self.scene.addEllipse(x - radius, y_top - radius, 2 * radius, 2 * radius, outline_pen)
 
             # Bottom bolt
             y_bot = plate_width - end
-            self.scene.addEllipse(x - radius, y_bot - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+            self.scene.addEllipse(x - radius, y_bot - radius, 2 * radius, 2 * radius, outline_pen)
         for col in range(int(bolts/4)):
             x = plate_length - edge - col * Gauge
             y_top = end
             y_bot = plate_width - end
 
-            self.scene.addEllipse(x - radius, y_top - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
-            self.scene.addEllipse(x - radius, y_bot - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+            self.scene.addEllipse(x - radius, y_top - radius, 2 * radius, 2 * radius, outline_pen)
+            self.scene.addEllipse(x - radius, y_bot - radius, 2 * radius, 2 * radius, outline_pen)
         
         bolts=self.no_insidebolts
         self.Edgeout=edge
@@ -364,26 +366,26 @@ class BasePlateDetailing(QMainWindow):
                 #4 bolts :
                 x1 = x_mid_left - edge
                 y1 = y_mid_top - end
-                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, outline_pen)
 
                 # Bottom-left bolt
                 y2 = y_mid_bot + end
-                self.scene.addEllipse(x1 - radius, y2 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                self.scene.addEllipse(x1 - radius, y2 - radius, 2 * radius, 2 * radius, outline_pen)
 
                 # Top-right bolt
                 x2 = x_mid_right + edge
                 y3 = y_mid_top - end
-                self.scene.addEllipse(x2 - radius, y3 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                self.scene.addEllipse(x2 - radius, y3 - radius, 2 * radius, 2 * radius, outline_pen)
 
                 # Bottom-right bolt
                 y4 = y_mid_bot + end
-                self.scene.addEllipse(x2 - radius, y4 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                self.scene.addEllipse(x2 - radius, y4 - radius, 2 * radius, 2 * radius, outline_pen)
             elif self.stiff_across_thickness=='N/A' and bolts==2 :
                 x1=center_x
                 y1=center_y-end
-                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, outline_pen)
                 y1=center_y+end
-                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, black_pen, gold_brush)
+                self.scene.addEllipse(x1 - radius, y1 - radius, 2 * radius, 2 * radius, outline_pen)
         self.addDimensions(black_pen)
     def addDimensions(self, pen):
         num_bolts = self.no_outsidebolts
@@ -502,8 +504,9 @@ class BasePlateDetailing(QMainWindow):
             y2=center_y  -column_width/2
             self.addVerticalDimension(x,y1,x,y2,f"{round(y2-y1)}mm" , pen)
         num_bolts = self.no_insidebolts
-        edge_x = float(self.Edgein)
-        end_y = float(self.Endin)
+        if num_bolts!='N/A' and num_bolts!=0:
+            edge_x = float(self.Edgein)
+            end_y = float(self.Endin)
         if self.stiff_across_thickness!='N/A' and num_bolts==4:
             #1
             x1=center_x-edge_x-self.stiff_across_thickness/2
@@ -526,99 +529,83 @@ class BasePlateDetailing(QMainWindow):
         y2=plate_width
         self.addVerticalDimension(x1+20,y1,x1+20,y2,f"{round(y2)} mm",pen)
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
-        from PyQt5.QtCore import QPointF
-        from PyQt5.QtGui import QPolygonF
-        from PyQt5.QtGui import QFont, QBrush
-        from PyQt5.QtCore import Qt
-
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 10
+        arrow_size = 5
         ext_length = 10
-
-        # Extension lines
-        self.scene.addLine(x1, y1 - ext_length / 2, x1, y1 + ext_length / 2, pen)
-        self.scene.addLine(x2, y2 - ext_length / 2, x2, y2 + ext_length / 2, pen)
-
-        # Left arrow
-        poly_left = QPolygonF([
-            QPointF(x1, y1),
-            QPointF(x1 + arrow_size, y1 - arrow_size / 2),
-            QPointF(x1 + arrow_size, y1 + arrow_size / 2)
-        ])
-        arrow_left = self.scene.addPolygon(poly_left, pen)
-        arrow_left.setBrush(QBrush(Qt.black))
-
-        # Right arrow
-        poly_right = QPolygonF([
-            QPointF(x2, y2),
-            QPointF(x2 - arrow_size, y2 - arrow_size / 2),
-            QPointF(x2 - arrow_size, y2 + arrow_size / 2)
-        ])
-        arrow_right = self.scene.addPolygon(poly_right, pen)
-        arrow_right.setBrush(QBrush(Qt.black))
-
-        # Text
+        self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
+        self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
+        
+        points_left = [
+            (x1, y1),
+            (x1 + arrow_size, y1 - arrow_size/2),
+            (x1 + arrow_size, y1 + arrow_size/2)
+        ]
+        polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
+        polygon_left.setBrush(QBrush(Qt.black))
+        
+        points_right = [
+            (x2, y2),
+            (x2 - arrow_size, y2 - arrow_size/2),
+            (x2 - arrow_size, y2 + arrow_size/2)
+        ]
+        polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
+        polygon_right.setBrush(QBrush(Qt.black))
+        
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(10)
         text_item.setFont(font)
-        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
-
-    def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
-        from PyQt5.QtCore import QPointF
-        from PyQt5.QtGui import QPolygonF, QFont, QBrush
-        from PyQt5.QtCore import Qt
-
-        # Draw dimension line
-        self.scene.addLine(x1, y1, x2, y2, pen)
-
-        arrow_size = 10
-        ext_length = 10
-
-        # Extension lines
-        self.scene.addLine(x1 - ext_length / 2, y1, x1 + ext_length / 2, y1, pen)
-        self.scene.addLine(x2 - ext_length / 2, y2, x2 + ext_length / 2, y2, pen)
-
-        # Arrowheads
-        if y2 > y1:
-            # Arrow at top (y1)
-            poly_top = QPolygonF([
-                QPointF(x1, y1),
-                QPointF(x1 - arrow_size / 2, y1 + arrow_size),
-                QPointF(x1 + arrow_size / 2, y1 + arrow_size)
-            ])
-            self.scene.addPolygon(poly_top, pen).setBrush(QBrush(Qt.black))
-
-            # Arrow at bottom (y2)
-            poly_bot = QPolygonF([
-                QPointF(x2, y2),
-                QPointF(x2 - arrow_size / 2, y2 - arrow_size),
-                QPointF(x2 + arrow_size / 2, y2 - arrow_size)
-            ])
-            self.scene.addPolygon(poly_bot, pen).setBrush(QBrush(Qt.black))
+        
+        if y1 < 0:
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
         else:
-            # Reversed
-            poly_top = QPolygonF([
-                QPointF(x2, y2),
-                QPointF(x2 - arrow_size / 2, y2 + arrow_size),
-                QPointF(x2 + arrow_size / 2, y2 + arrow_size)
-            ])
-            self.scene.addPolygon(poly_top, pen).setBrush(QBrush(Qt.black))
-
-            poly_bot = QPolygonF([
-                QPointF(x1, y1),
-                QPointF(x1 - arrow_size / 2, y1 - arrow_size),
-                QPointF(x1 + arrow_size / 2, y1 - arrow_size)
-            ])
-            self.scene.addPolygon(poly_bot, pen).setBrush(QBrush(Qt.black))
-
-        # === Label Text (only once)
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
+    def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
+        self.scene.addLine(x1, y1, x2, y2, pen)
+        arrow_size = 5
+        ext_length = 10
+        self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
+        self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
+        
+        if y2 > y1:
+            points_top = [
+                (x1, y1),
+                (x1 - arrow_size/2, y1 + arrow_size),
+                (x1 + arrow_size/2, y1 + arrow_size)
+            ]
+            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
+            polygon_top.setBrush(QBrush(Qt.black))
+            
+            points_bottom = [
+                (x2, y2),
+                (x2 - arrow_size/2, y2 - arrow_size),
+                (x2 + arrow_size/2, y2 - arrow_size)
+            ]
+            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
+            polygon_bottom.setBrush(QBrush(Qt.black))
+        else:
+            points_top = [
+                (x2, y2),
+                (x2 - arrow_size/2, y2 + arrow_size),
+                (x2 + arrow_size/2, y2 + arrow_size)
+            ]
+            polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
+            polygon_top.setBrush(QBrush(Qt.black))
+            
+            points_bottom = [
+                (x1, y1),
+                (x1 - arrow_size/2, y1 - arrow_size),
+                (x1 + arrow_size/2, y1 - arrow_size)
+            ]
+            polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
+            polygon_bottom.setBrush(QBrush(Qt.black))
+        
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(10)  # Bigger font
+        font.setPointSize(10)
         text_item.setFont(font)
-
-        # Position to right side of the line
-        label_x_offset = 15
-        label_y_center = (y1 + y2) / 2 - text_item.boundingRect().height() / 2
-        text_item.setPos(x1 + label_x_offset, label_y_center)
+        
+        if x1 < 0:
+            text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+        else:
+            text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

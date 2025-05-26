@@ -73,7 +73,7 @@ class MyTutorials(QDialog):
         QDialog.__init__(self, parent)
         self.ui = Ui_Tutorial()
         self.ui.setupUi(self)
-
+        self.active_dialog = None
 
 class MyAboutOsdag(QDialog):
     def __init__(self, parent=None):
@@ -2242,42 +2242,52 @@ class Window(QMainWindow):
                 fn = tup[1]
                 cls = fn.__qualname__.split('.')[0]
                 if op[0] == 'spacing':
+
+                            self.active_dialog = QtWidgets.QDialog()
+                            dialog = self.active_dialog
                             module = inspect.getmodule(fn)       # Get the module where the function is defined
                             cls_obj = getattr(module, cls)       # Get the actual class object
                             self.Obj = cls_obj()                 # Instantiate it
                             if hasattr(self.Obj, 'spting_leg') and \
                             hasattr(self.Obj.spting_leg, 'bolt_line') and \
                             hasattr(self.Obj.spting_leg, 'bolts_one_line'):
-                                self.run_spacing_script(cols=self.Obj.spting_leg.bolt_line,
-                                                        rows=self.Obj.spting_leg.bolts_one_line)
+                                self.run_spacing_script(self.Obj.spting_leg.bolts_one_line,self.Obj.spting_leg.bolt_line,
+                                                        main=main)
                             else:
-                                self.run_spacing_script(cols=self.Obj.plate.bolt_line,
-                                                        rows=self.Obj.plate.bolts_one_line)
+                                self.run_spacing_script(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
+                                                        main=main)
                             break
-                elif op[0]=='SeatedAngle.Bolt_Spacing_col':
+                elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
+                            
                             module = inspect.getmodule(fn)       # Get the module where the function is defined
                             cls_obj = getattr(module, cls)       # Get the actual class object
                             self.Obj = cls_obj()                 # Instantiate it
-                            self.run_spacing_script(self.Obj.bolt.bolt_col,
-                                                        self.Obj.bolt.bolt_row,#reversed
-                                                        SeatedanglespacingOnCol)
-                elif op[0]=='SeatedAngle.Bolt_Spacing_beam':
-                            module = inspect.getmodule(fn)       # Get the module where the function is defined
-                            cls_obj = getattr(module, cls)       # Get the actual class object
-                            self.Obj = cls_obj()                 # Instantiate it
-                            self.run_spacing_script(2,
-                                                        1,#constant used in code
-                                                        SeatedanglespacingOnCol)
+                            if op[0]=='SeatedAngle.Bolt_Spacing_col':
+                                val=3
+                            elif op[0]=='SeatedAngle.Bolt_Spacing_beam':
+                                val=4
+                            elif op[0]=='TopAngle.Bolt_Spacing_col':
+                                val=1
+                            else:
+                                val=2
+                            self.run_spacing_script(None,
+                                                        val,#specifying which to use
+                                                        SeatedanglespacingOnCol,main)
+                            return
                             print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
                 elif op[0]=='Detailing' and op[1]=='Typical Detailing':
+                            self.clear_output_fields()
+
                             module = inspect.getmodule(fn)       # Get the module where the function is defined
                             cls_obj = getattr(module, cls)       # Get the actual class object
                             self.Obj = cls_obj()  
                             print(f'rows: {self.Obj.bolt_row} , cols : {self.Obj.bolt_column} , {self.Obj.bolt_row_web}')
                             self.run_spacing_script(0,0,BeamtoColDetailing,main)
                             data=main.output_values(main,True)
-                            
+                            return
                 elif op[0]=='BasePlate.Detailing':
+                    self.clear_output_fields()
+
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)
                     self.Obj=cls_obj()
@@ -2285,6 +2295,7 @@ class Window(QMainWindow):
                         self.run_spacing_script(0,0,BasePlateDetailing,main)
                     else:
                         self.run_spacing_script(0,0,BasePlateDetailingHollow,main)
+                    return
                 dialog.setWindowTitle(title)
                 j = 1
                 _translate = QtCore.QCoreApplication.translate

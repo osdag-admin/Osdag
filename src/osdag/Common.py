@@ -365,6 +365,7 @@ KEY_OUT_DISP_LENGTH_COVER_PLATE = 'Length of Cover Plate'
 DISP_TITLE_COVER_PLATE = 'Cover Plate Details'
 KEY_WELD_SIZE = 'Weld.Size'
 KEY_DISP_WELD_SIZE = 'Weld Size'
+KEY_DISP_COVER_PLT = 'Cover Plate *'
 
 # end
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'

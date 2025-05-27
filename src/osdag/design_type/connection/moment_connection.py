@@ -454,10 +454,7 @@ class MomentConnection(Connection, IS800_2007):
         self.mainmodule = "Moment Connection"
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None),
                          moment=design_dictionary[KEY_MOMENT])
-
-
-
-
+        
     def input_value_changed(self):
 
         lst = []

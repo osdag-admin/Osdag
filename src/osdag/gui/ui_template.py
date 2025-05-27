@@ -853,18 +853,17 @@ class Window(QMainWindow):
                                                   if all_values_available not in disabled_values]
             try:
                 print(f"<class 'AttributeError'>: {d} \n {new_list}")
-                d.get(new_list[0][0]).activated.connect(lambda: self.popup(d.get(new_list[0][0]), new_list,updated_list,data))
-                d.get(new_list[1][0]).activated.connect(lambda: self.popup(d.get(new_list[1][0]), new_list,updated_list,data))
-                d.get(new_list[2][0]).activated.connect(lambda: self.popup(d.get(new_list[2][0]), new_list,updated_list,data))
-                d.get(new_list[3][0]).activated.connect(lambda: self.popup(d.get(new_list[3][0]), new_list,updated_list,data))
-                d.get(new_list[4][0]).activated.connect(lambda: self.popup(d.get(new_list[4][0]), new_list,updated_list,data))
-                d.get(new_list[5][0]).activated.connect(lambda: self.popup(d.get(new_list[5][0]), new_list,updated_list,data))
-                d.get(new_list[6][0]).activated.connect(lambda: self.popup(d.get(new_list[6][0]), new_list,updated_list,data))
-                d.get(new_list[7][0]).activated.connect(lambda: self.popup(d.get(new_list[7][0]), new_list,updated_list,data))
-                d.get(new_list[8][0]).activated.connect(lambda: self.popup(d.get(new_list[8][0]), new_list,updated_list,data))
-                d.get(new_list[9][0]).activated.connect(lambda: self.popup(d.get(new_list[9][0]), new_list,updated_list,data))
-                d.get(new_list[10][0]).activated.connect(lambda: self.popup(d.get(new_list[10][0]), new_list,updated_list,data))
-            except IndexError:
+
+                #changed this code bcz an error was occuring in the code -t.s.
+                # Connect signals only for widgets that exist
+                for i in range(11):  # We were trying to connect 11 items before
+                    if i < len(new_list):
+                        widget = d.get(new_list[i][0])
+                        if widget is not None and hasattr(widget, 'activated'):
+                            widget.activated.connect(lambda checked, w=widget: self.popup(w, new_list, updated_list, data))
+            except Exception as e:
+                print(f"Error connecting signals: {str(e)}")
+                # changed ended here -t.s.
                 pass
 
         # Change in Ui based on Connectivity selection

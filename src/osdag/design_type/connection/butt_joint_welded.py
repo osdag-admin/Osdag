@@ -1,10 +1,10 @@
 """
-Module: butt_joint_bolted.py
+Module: butt_joint_welded.py
 Author: Aman
 Date: 2025-02-26
 
 Description:
-    ButtJointBolted is a moment connection module that represents a bolted butt joint connection.
+    ButtJointWelded is a moment connection module that represents a welded butt joint connection.
     It inherits from MomentConnection and follows the same structure and design logic as other
     connection modules (e.g., BeamCoverPlate, ColumnCoverPlate) used in Osdag.
     
@@ -23,19 +23,23 @@ import logging
 
 import math
 
+from PyQt5 import Qt
+
 class ButtJointWelded(MomentConnection):
     def __init__(self):
         super(ButtJointWelded, self).__init__()
         self.design_status = False
         self.spacing = None 
-
+        
     ###############################################
     # Design Preference Functions Start
     ###############################################
     def tab_list(self):
         tabs = []
         # Only Bolt and Detailing tabs
-        tabs.append(("Bolt", TYPE_TAB_2, self.bolt_values))
+        # removed bolt tab to add weld fabriacation and material grade t.s.
+        #tabs.append(("Bolt", TYPE_TAB_2, self.bolt_values)) 
+        tabs.append((("Weld", TYPE_TAB_2, self.weld_values))) # added this line t.s.
         tabs.append(("Detailing", TYPE_TAB_2, self.detailing_values))
         return tabs
 
@@ -50,16 +54,15 @@ class ButtJointWelded(MomentConnection):
         design_input = []
         
         # Bolt preferences
-        design_input.append(("Bolt", TYPE_COMBOBOX, [
-            KEY_DP_BOLT_TYPE,  # For pretensioned/non-pretensioned
-            KEY_DP_BOLT_HOLE_TYPE,  # For standard/oversized
-            KEY_DP_BOLT_SLIP_FACTOR  # For slip factor as per Table 20
+        design_input.append(("Weld", TYPE_COMBOBOX, [
+            KEY_DP_WELD_TYPE, # to choose where member fabricated
+            KEY_DP_WELD_MATERIAL_G_O # to choose material grade
         ]))
         
         # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE,
-            KEY_DP_DETAILING_PACKING_PLATE
+            KEY_DP_DETAILING_EDGE_TYPE
+            #KEY_DP_DETAILING_PACKING_PLATE
                 # For edge preparation method
         ]))
         
@@ -68,12 +71,12 @@ class ButtJointWelded(MomentConnection):
     def input_dictionary_without_design_pref(self):
         design_input = []
         
-        # Default values for bolt and detailing
+        # Default values for detailing and weld
         design_input.append((None, [
-            KEY_DP_BOLT_TYPE,
-            KEY_DP_BOLT_HOLE_TYPE, 
-            KEY_DP_BOLT_SLIP_FACTOR,
-            KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_PACKING_PLATE
+            KEY_DP_WELD_TYPE,
+            KEY_DP_WELD_MATERIAL_G_O, 
+            KEY_DP_DETAILING_EDGE_TYPE
+            #KEY_DP_DETAILING_PACKING_PLATE #might need to remove this t.s.
         ], ''))
         
         return design_input
@@ -81,18 +84,18 @@ class ButtJointWelded(MomentConnection):
     def get_values_for_design_pref(self, key, design_dictionary):
         # Default values as per requirements
         defaults = {
-            KEY_DP_BOLT_TYPE: "Non Pre-tensioned",
-            KEY_DP_BOLT_HOLE_TYPE: "Standard",
-            KEY_DP_BOLT_SLIP_FACTOR: "0.3",
-            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
-            KEY_DP_DETAILING_PACKING_PLATE: "Yes"
+            #chnged design preference values for weld fabrication and material grade t.s.
+            KEY_DP_WELD_TYPE:"Shop weld",
+            KEY_DP_WELD_MATERIAL_G_O:"E70XX", # not sure about what value to write in default t.s.
+            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut"
+            #KEY_DP_DETAILING_PACKING_PLATE: "Yes" #might need to remove t.s.
         }
         return defaults.get(key)
 
     def detailing_values(self, input_dictionary):
         values = {
             KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
-            KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
+            #KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
         }
 
         for key in values.keys():
@@ -107,9 +110,9 @@ class ButtJointWelded(MomentConnection):
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
-        t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
-              ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
-        detailing.append(t3)
+        # t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
+        #       ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
+        # detailing.append(t3)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
@@ -149,7 +152,32 @@ class ButtJointWelded(MomentConnection):
 
     #     return bolt
 
+    # added weld function
 
+    def weld_values(self, input_dictionary):
+        values = {
+            KEY_DP_WELD_TYPE:'Shop weld',
+            KEY_DP_WELD_MATERIAL_G_O:'E70XX', # not sure about what value to write in default t.s.
+        }
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
+        weld = [] #need to check if it exists
+
+        t3 = (KEY_DP_WELD_TYPE,"Type",TYPE_COMBOBOX,
+            ['Shop weld', 'Field weld'], 
+            values[KEY_DP_WELD_TYPE])
+        weld.append(t3)
+
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, "Material Grade", TYPE_TEXTBOX, #taking textbox input here need to check
+            None, 
+            values[KEY_DP_WELD_MATERIAL_G_O])
+        weld.append(t2)
+        return weld
+
+        
     ####################################
     # Design Preference Functions End
     ####################################
@@ -192,23 +220,21 @@ class ButtJointWelded(MomentConnection):
         lst.append(t8)
 
         return lst
-
+    # not sure about this function no changes done here -t.s.
 
     def input_values(self):
 
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_BUTTJOINTBOLTED, TYPE_MODULE, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_BUTTJOINTWELDED, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t1)
-
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t5)
 
         t31 = (KEY_PLATE1_THICKNESS, KEY_DISP_PLATE1_THICKNESS, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t31)
+        # changed order of the input list -t.s.
 
         t34 = (KEY_PLATE2_THICKNESS, KEY_DISP_PLATE2_THICKNESS, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t34)
@@ -216,44 +242,53 @@ class ButtJointWelded(MomentConnection):
         t35 = (KEY_PLATE_WIDTH, KEY_DISP_PLATE_WIDTH, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t35)
 
+        t6 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        options_list.append(t6)
+
         t36 = (KEY_COVER_PLATE, KEY_DISP_COVER_PLATE, TYPE_COMBOBOX, VALUES_COVER_PLATE, True, 'No Validator')
         options_list.append(t36)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t6)
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t7)
 
         t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
+        #not sure what number to use for disp title weld t.s.
+        t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t18)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t9)
+        #added size of weld input here t.s. need to check the following line
+        t20 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_TEXTBOX, None, True, 'Float Validator')
+        options_list.append(t20)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
-        options_list.append(t10)
+        #t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
+        #options_list.append(t10)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
-        options_list.append(t12)
+        #t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
+        #options_list.append(t12)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
-        options_list.append(t11)
+        #t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
+        #options_list.append(t11)
 
         return options_list
 
-    def customized_input(self):
-
-        list1 = []
-        t1 = (KEY_GRD, self.grdval_customized)
-        list1.append(t1)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        list1.append(t3)
+    #def customized_input(self):
+     #   list1 = []
+        #t11 = (KEY_GRD, self.grdval_customized)
+        #list1.append(t11)
+        #t13 = (KEY_D, self.diam_bolt_customized)
+        #list1.append(t13)
         # t5 = (KEY_PLATE1_THICKNESS, self.plate_thick_customized)
         # list1.append(t5)
         # t6 = (KEY_PLATE2_THICKNESS, self.plate_thick_customized)
         # list1.append(t6)
         
-        return list1
+       # return list1
+    # removed this function bcz no need of customized input as of now t.s.
+    
     
     def spacing(self, status):
+        #not sure about this function no changes done here -t.s.
         spacing = []
 
         t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
@@ -269,8 +304,8 @@ class ButtJointWelded(MomentConnection):
         t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t10)
 
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
-        spacing.append(t11)
+        t111 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
+        spacing.append(t111)
 
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
         spacing.append(t12)
@@ -278,49 +313,52 @@ class ButtJointWelded(MomentConnection):
         return spacing
 
     def output_values(self, flag):
-
         out_list = []
-        t4 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
-        out_list.append(t4)
+        t44 = (None, DISP_TITLE_COVER_PLATE, TYPE_TITLE, None, True)
+        out_list.append(t44)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
+        t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
               '', True)
-        out_list.append(t2)
+        out_list.append(t22)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX,
+        t13 = (KEY_OUT_NO_COVER_PLATE, KEY_OUT_DISP_NO_COVER_PLATE, TYPE_TEXTBOX,
               '', True)
-        out_list.append(t3)
+        out_list.append(t13)
 
-        t31 = (KEY_OUT_TYP_PROVIDED, KEY_OUT_DISP_TYP_PROVIDED, TYPE_TEXTBOX,
+        t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
               '', True)
-        out_list.append(t31)
+        out_list.append(t38)
 
-        t8 = (KEY_OUT_BOLT_SHEAR,KEY_OUT_DISP_BOLT_SHEAR , TYPE_TEXTBOX, '', True)
-        out_list.append(t8)
-
-        t4 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, '', True)
-        out_list.append(t4)
-
-        t5 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t5)
-
-        t17 = (None, DISP_TITLE_BOLTDS, TYPE_TITLE, None, True)
-        out_list.append(t17)
-        t17 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, '', True)
-        out_list.append(t17)
+        t28 = (KEY_OUT_LENGTH_COVER_PLATE,KEY_OUT_DISP_LENGTH_COVER_PLATE , TYPE_TEXTBOX, '', True)
+        out_list.append(t28)
         
-        t11 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX, '', True) 
-        out_list.append(t11)
+        t47 = (KEY_OUT_THICKNESS_COVER_PLATE,KEY_OUT_DISP_THICKNESS_COVER_PLATE , TYPE_TEXTBOX, '', True)
+        out_list.append(t47)
 
-        t18 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX,'', True)
-        out_list.append(t18)
+        #t4 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, '', True)
+        #out_list.append(t4)
 
-        t19 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX,'', True)
-        out_list.append(t19)
+        t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
+              '', True)
+        out_list.append(t15)
+        
+        t21 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
+        out_list.append(t21)
 
-        t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True)
-        out_list.append(t20)
+        t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, '', True)
+        out_list.append(t23)
+        
+        t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, '', True) 
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,'', True)
+        out_list.append(t25)
+
+        t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,'', True)
+        out_list.append(t26)
+
+        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True) #not sure about this line t.s.
+        out_list.append(t27)
         
         # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         # out_list.append(t21)
@@ -329,7 +367,7 @@ class ButtJointWelded(MomentConnection):
 
     def module_name(self):
 
-        return KEY_DISP_BUTTJOINTBOLTED
+        return KEY_DISP_BUTTJOINTWELDED
 
     def call_3DColumn(self, ui, bgcolor):
         # status = self.resultObj['Bolt']['status']
@@ -345,14 +383,14 @@ class ButtJointWelded(MomentConnection):
     def get_3d_components(self):
         components = []
 
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
+        t30 = ('Model', self.call_3DModel)
+        components.append(t30)
 
-        t3 = ('Plate1', self.call_3DColumn)
-        components.append(t3)
+        t32 = ('Plate1', self.call_3DColumn)
+        components.append(t32)
 
-        t4 = ('Plate2', self.call_3DPlate)
-        components.append(t4)
+        t37 = ('Plate2', self.call_3DPlate)
+        components.append(t37)
 
         return components
 

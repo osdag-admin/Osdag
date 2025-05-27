@@ -245,21 +245,21 @@ class ButtJointWelded(MomentConnection):
         t6 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t6)
 
-        t36 = (KEY_COVER_PLATE, KEY_DISP_COVER_PLATE, TYPE_COMBOBOX, VALUES_COVER_PLATE, True, 'No Validator')
+        t36 = (KEY_COVER_PLATE, KEY_DISP_COVER_PLT, TYPE_COMBOBOX, VALUES_COVER_PLATE, True, 'No Validator')
         options_list.append(t36)
-
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t7)
-
-        t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
-        options_list.append(t17)
-        #not sure what number to use for disp title weld t.s.
+        
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t18)
 
         #added size of weld input here t.s. need to check the following line
         t20 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t20)
+
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t7)
+
+        t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
+        options_list.append(t17)
 
         #t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         #options_list.append(t10)

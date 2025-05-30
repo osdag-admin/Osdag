@@ -29,16 +29,25 @@ class ButtJointWelded(MomentConnection):
     def __init__(self):
         super(ButtJointWelded, self).__init__()
         self.design_status = False
-        self.spacing = None 
-        
+        self.weld_size = None
+        self.weld_length_provided = None
+        self.weld_strength = None
+        self.weld_thickness = None
+        self.plate_width = None
+        self.plate_length = None
+        self.plate_thickness = None
+        self.weld_type = None
+        self.weld_material = None
+        self.weld_fabrication = None
+        self.weld_angle = None
+        self.weld_length_effective = None
+        self.utilization_ratio = None
+
     ###############################################
     # Design Preference Functions Start
     ###############################################
     def tab_list(self):
         tabs = []
-        # Only Bolt and Detailing tabs
-        # removed bolt tab to add weld fabriacation and material grade t.s.
-        #tabs.append(("Bolt", TYPE_TAB_2, self.bolt_values)) 
         tabs.append((("Weld", TYPE_TAB_2, self.weld_values))) # added this line t.s.
         tabs.append(("Detailing", TYPE_TAB_2, self.detailing_values))
         return tabs
@@ -52,33 +61,24 @@ class ButtJointWelded(MomentConnection):
 
     def input_dictionary_design_pref(self):
         design_input = []
-        
-        # Bolt preferences
         design_input.append(("Weld", TYPE_COMBOBOX, [
-            KEY_DP_WELD_TYPE, # to choose where member fabricated
-            KEY_DP_WELD_MATERIAL_G_O # to choose material grade
+            KEY_DP_WELD_TYPE,
+            KEY_DP_WELD_MATERIAL_G_O
         ]))
-        
-        # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE
-            #KEY_DP_DETAILING_PACKING_PLATE
-                # For edge preparation method
+            KEY_DP_DETAILING_EDGE_TYPE,
+            KEY_DP_DETAILING_PACKING_PLATE
         ]))
-        
         return design_input
 
     def input_dictionary_without_design_pref(self):
         design_input = []
-        
-        # Default values for detailing and weld
         design_input.append((None, [
             KEY_DP_WELD_TYPE,
-            KEY_DP_WELD_MATERIAL_G_O, 
-            KEY_DP_DETAILING_EDGE_TYPE
-            #KEY_DP_DETAILING_PACKING_PLATE #might need to remove this t.s.
+            KEY_DP_WELD_MATERIAL_G_O,
+            KEY_DP_DETAILING_EDGE_TYPE,
+            KEY_DP_DETAILING_PACKING_PLATE
         ], ''))
-        
         return design_input
 
     def get_values_for_design_pref(self, key, design_dictionary):
@@ -87,15 +87,15 @@ class ButtJointWelded(MomentConnection):
             #chnged design preference values for weld fabrication and material grade t.s.
             KEY_DP_WELD_TYPE:"Shop weld",
             KEY_DP_WELD_MATERIAL_G_O:"E70XX", # not sure about what value to write in default t.s.
-            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut"
-            #KEY_DP_DETAILING_PACKING_PLATE: "Yes" #might need to remove t.s.
+            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+            KEY_DP_DETAILING_PACKING_PLATE: "Yes" 
         }
         return defaults.get(key)
 
     def detailing_values(self, input_dictionary):
         values = {
             KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
-            #KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
+            KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
         }
 
         for key in values.keys():
@@ -110,9 +110,9 @@ class ButtJointWelded(MomentConnection):
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
-        # t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
-        #       ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
-        # detailing.append(t3)
+        t49 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
+               ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
+        detailing.append(t49)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
@@ -223,9 +223,8 @@ class ButtJointWelded(MomentConnection):
     # not sure about this function no changes done here -t.s.
 
     def input_values(self):
-
         options_list = []
-
+        
         t16 = (KEY_MODULE, KEY_DISP_BUTTJOINTWELDED, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
@@ -234,7 +233,6 @@ class ButtJointWelded(MomentConnection):
 
         t31 = (KEY_PLATE1_THICKNESS, KEY_DISP_PLATE1_THICKNESS, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t31)
-        # changed order of the input list -t.s.
 
         t34 = (KEY_PLATE2_THICKNESS, KEY_DISP_PLATE2_THICKNESS, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t34)
@@ -247,11 +245,10 @@ class ButtJointWelded(MomentConnection):
 
         t36 = (KEY_COVER_PLATE, KEY_DISP_COVER_PLT, TYPE_COMBOBOX, VALUES_COVER_PLATE, True, 'No Validator')
         options_list.append(t36)
-        
+
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t18)
 
-        #added size of weld input here t.s. need to check the following line
         t20 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t20)
 
@@ -260,15 +257,6 @@ class ButtJointWelded(MomentConnection):
 
         t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
-
-        #t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
-        #options_list.append(t10)
-
-        #t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
-        #options_list.append(t12)
-
-        #t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
-        #options_list.append(t11)
 
         return options_list
 
@@ -288,7 +276,6 @@ class ButtJointWelded(MomentConnection):
     
     
     def spacing(self, status):
-        #not sure about this function no changes done here -t.s.
         spacing = []
 
         t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
@@ -313,55 +300,62 @@ class ButtJointWelded(MomentConnection):
         return spacing
 
     def output_values(self, flag):
+        """Return list of output values for display"""
         out_list = []
+        
+        # Cover plate details
         t44 = (None, DISP_TITLE_COVER_PLATE, TYPE_TITLE, None, True)
         out_list.append(t44)
 
         t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
-              '', True)
+               f"{self.utilization_ratio:.2f}", True)
         out_list.append(t22)
 
+        cover_type = "Double" if self.planes == 2 else "Single"
         t13 = (KEY_OUT_NO_COVER_PLATE, KEY_OUT_DISP_NO_COVER_PLATE, TYPE_TEXTBOX,
-              '', True)
+               cover_type, True)
         out_list.append(t13)
 
         t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
-              '', True)
+               f"{self.width:.2f}", True)
         out_list.append(t38)
 
-        t28 = (KEY_OUT_LENGTH_COVER_PLATE,KEY_OUT_DISP_LENGTH_COVER_PLATE , TYPE_TEXTBOX, '', True)
+        t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
+               f"{self.connection_length:.2f}", True)
         out_list.append(t28)
-        
-        t47 = (KEY_OUT_THICKNESS_COVER_PLATE,KEY_OUT_DISP_THICKNESS_COVER_PLATE , TYPE_TEXTBOX, '', True)
+
+        t47 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
+               f"{self.Tcp:.2f}", True)
         out_list.append(t47)
 
-        #t4 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, '', True)
-        #out_list.append(t4)
+        if self.packing_thickness > 0:
+            t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
+                  f"{self.packing_thickness:.2f}", True)
+            out_list.append(t15)
 
-        t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t15)
-        
+        # Weld details
         t21 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t21)
 
-        t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, '', True)
+        t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
+               "Fillet", True)
         out_list.append(t23)
-        
-        t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, '', True) 
+
+        t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
+               f"{self.weld_size:.2f}", True)
         out_list.append(t24)
 
-        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,'', True)
+        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
+               f"{self.weld_strength:.2f}", True)
         out_list.append(t25)
 
-        t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,'', True)
+        t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
+               f"{self.weld_length_effective:.2f}", True)
         out_list.append(t26)
 
-        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True) #not sure about this line t.s.
+        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
+               f"{self.connection_length:.2f}", True)
         out_list.append(t27)
-        
-        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
-        # out_list.append(t21)
 
         return out_list
 
@@ -405,8 +399,233 @@ class ButtJointWelded(MomentConnection):
         ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
 
+    def func_for_validation(self, design_dictionary):
+
+        all_errors = []
+        "check valid inputs and empty inputs in input dock"
+        self.design_status = False
+        flag = False
+        flag1 = False
+        flag2 = False
+
+        option_list = self.input_values(self)
+        missing_fields_list = []
+
+        # print(f'\n func_for_validation option list = {option_list}'
+        #       f'\n  design_dictionary {design_dictionary}')
+
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+
+                    missing_fields_list.append(option[1])
+                else:
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_PLATE_WIDTH:
+
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag1 = True
+
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
+
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            error = "Input value(s) cannot be equal or less than zero."
+                            all_errors.append(error)
+                        else:
+                            flag2 = True
+            else:
+                pass
+
+
+        if len(missing_fields_list) > 0:
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
+        else:
+            flag = True
+
+        print(f'flag = {flag}, flag1 = {flag1}, flag2 = {flag2}')
+        if flag  and flag1 and flag2:
+            self.set_input_values(self, design_dictionary)
+        else:
+            return all_errors
+        
+    def set_input_values(self, design_dictionary):
+        """Initialize components required for butt joint design as per flowchart"""
+        # Initialize basic parameters
+        self.module = design_dictionary[KEY_MODULE]
+        self.mainmodule = "Butt Joint Welded Connection"
+        self.main_material = design_dictionary[KEY_MATERIAL]
+        self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])
+        self.width = float(design_dictionary[KEY_PLATE_WIDTH])
+        self.cover_plate = design_dictionary[KEY_COVER_PLATE]
+        
+        # Initialize plates with material properties
+        self.plate1 = Plate(thickness=[design_dictionary[KEY_PLATE1_THICKNESS]],
+                        material_grade=design_dictionary[KEY_MATERIAL],
+                        width=design_dictionary[KEY_PLATE_WIDTH])
+        self.plate2 = Plate(thickness=[design_dictionary[KEY_PLATE2_THICKNESS]],
+                        material_grade=design_dictionary[KEY_MATERIAL],
+                        width=design_dictionary[KEY_PLATE_WIDTH])
+        
+        # Initialize weld with properties
+        self.weld = Weld(size=design_dictionary[KEY_WELD_SIZE], 
+                        weld_type=design_dictionary[KEY_DP_WELD_TYPE],
+                        edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
+        
+        # Start design process
+        self.design_procedure()
+
+    def design_procedure(self):
+        """Main design procedure following IS 800:2007 code requirements"""
+        
+        # Initialize safety factors as per Table 5 (Cl. 5.4.1)
+        self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  # 1.10
+        self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['ultimate_stress']  # 1.25
+        self.gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]  # 1.25 for shop, 1.5 for field
+        
+        # Get plate thicknesses and minimum thickness
+        self.t1 = float(self.plate1.thickness[0])
+        self.t2 = float(self.plate2.thickness[0])
+        self.Tmin = min(self.t1, self.t2)
+        
+        # Calculate cover plate thickness based on type
+        self.calculate_cover_plate_thickness()
+        
+        # Get weld size and check limits as per Cl. 10.5.2.3
+        self.weld_size = float(self.weld.size)
+        
+        # value of a eq. 3.4
+        self.effective_throat_thickness = 0.707 * self.weld_size
+        
+        # f_wd calculated from eq. 3.5
+        self.f_y = self.plate1.fy
+        self.f_u = self.plate1.fu
+        self.f_wd = self.f_u / (math.sqrt(3) * self.gamma_mw)  
+        
+        min_weld_size = self.get_min_weld_size()
+        max_weld_size = self.Tmin - 1.5
+        
+        if self.weld_size < min_weld_size:
+            self.design_status = False
+            logger.error(f": Weld size {self.weld_size}mm is less than minimum required size {min_weld_size}mm as per Table 21")
+            return
+        
+        if self.weld_size > max_weld_size:
+            self.design_status = False
+            logger.error(f": Weld size {self.weld_size}mm exceeds maximum allowed size {max_weld_size}mm")
+            return
+        
+        # Convert from kN to N
+        self.tensile_force_N = self.tensile_force * 1000
+        
+        self.L_req = self.tensile_force_N / (self.f_wd * self.effective_throat_thickness * self.planes)
+        
+        if self.L_req <= self.width:
+            # Use straight welds
+            self.L_provided = self.width
+            self.alpha = 0
+            self.L_side = 0
+        else:
+            self.extend_weld_length()
+        
+        self.L_eff = self.L_provided - 2 * self.effective_throat_thickness
+        
+        # Check if L_eff ≥ 4s
+        if self.L_eff < 4 * self.weld_size:
+            self.design_status = False
+            logger.error(": Effective weld length is less than minimum required length")
+            logger.error(": Error: Increase weld size or length")
+            return
+        else:
+            # Calculate weld capacity C_w
+            self.weld_capacity = self.f_wd * self.effective_throat_thickness * self.L_eff * self.planes
+            
+            # Check if P_N < C_w
+            if self.tensile_force_N > self.weld_capacity:
+                self.design_status = False
+                logger.error(": Weld strength is insufficient")
+                logger.error(": Error: Revise weld size or overlap")
+                return
+            else:
+                # Base metal strength check
+                self.A_g = self.width * self.Tmin  
+                self.A_n = self.A_g 
+                
+                
+                self.T_db = min(
+                    (self.A_g * self.f_y) / self.gamma_m0,
+                    (0.9 * self.A_n * self.f_u) / self.gamma_m1
+                )
+                
+                # Check if P_N ≤ T_db
+                if self.tensile_force_N > self.T_db:
+                    self.design_status = False
+                    logger.error(": Base metal strength is insufficient")
+                    logger.error(": Error: Revise section")
+                    return
+                else:
+                    # Design is successful - Output detailing values
+                    self.design_status = True
+                    self.connection_length = self.L_provided + 2 * 25  # L_cp = L_provided + 2×clearance
+                    self.utilization_ratio = max(
+                        self.tensile_force_N / self.weld_capacity,
+                        self.tensile_force_N / self.T_db
+                    )
+                    logger.info(": Design is safe")
+                    return True
+
+    def calculate_cover_plate_thickness(self):
+        if "double" in self.cover_plate.lower():
+            self.Tcp = (9.0/16.0) * self.Tmin
+            self.planes = 2
+        else:
+            self.Tcp = (5.0/8.0) * self.Tmin
+            self.planes = 1
+        
+        available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]
+        self.Tcp = min([t for t in available_thicknesses if t >= self.Tcp], default=self.Tcp)
+
+        # Add packing plate if needed
+        if self.t1 != self.t2:
+            self.packing_thickness = abs(self.t1 - self.t2)
+        else:
+            self.packing_thickness = 0
+
+    def extend_weld_length(self):
+        self.L_tgt = self.L_req / self.planes
+        
+        # Calculate skew angle
+        self.alpha = math.degrees(math.atan((self.L_tgt - self.width)/(2 * self.width)))
+        
+        # Check angle limits
+        if self.alpha < 20:
+            self.alpha = 20
+        elif self.alpha > 60:
+            self.alpha = 60
+        
+        self.L_provided_line = self.width + 2 * self.width * math.tan(math.radians(self.alpha))
+        self.L_provided = self.planes * self.L_provided_line
+        
+        # check this logic
+        if self.alpha == 60:
+            self.L_side = (self.L_req - self.L_provided) / self.planes
+        else:
+            self.L_side = 0
+
+    def get_min_weld_size(self):
+        thicker_part = max(float(self.plate1.thickness[0]), float(self.plate2.thickness[0]))
+        
+        if thicker_part <= 10:
+            return 3
+        elif thicker_part <= 20:
+            return 5
+        elif thicker_part <= 32:
+            return 6
+        elif thicker_part <= 50:
+            return 8
+        else:
+            return 10
+
     ################################ Outlist Dict #####################################################################################
-
-    
-
-    ################################ Design Report #####################################################################################

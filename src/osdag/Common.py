@@ -748,7 +748,7 @@ VALUES_SUPPORTING_OPTIONS_FRC = ['Elements not susceptible to cracking', 'Elemen
 VALUES_SUPPORTING_OPTIONS_DEF = ['NA']
 KEY_MAX_DEFL = 'Deflection.Max'
 KEY_DISP_MAX_DEFL = 'Maximum Deflection'
-VALUES_MAX_DEFL = ['Span/600','Span/800','Span/400','Span/300','Span/360','Span/150','Span/180','Span/240','Span/120','Span/500','Span/750','Span/1000']
+VALUES_MAX_DEFL = ['600','800','400','300','360','150','180','240','120','500','750','1000']
 KEY_SUPPORT_WIDTH = 'Support.Width'
 KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
 VALUES_STIFFENER_THICKNESS = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
@@ -757,6 +757,10 @@ KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
 KEY_DISP_EndpanelStiffener_thickness = 'End Panel Stiffener Thickness (mm)'
 KEY_LongitudnalStiffener_numbers = 'LongitudnalStiffener.Numbers'
 KEY_DISP_LongitudnalStiffener_numbers = 'Number of Longitudnal Stiffeners'
+KEY_LongitudinalStiffener1_pos = 'LongitudnalStiffener1.Position'
+KEY_DISP_LongitudinalStiffener1_pos = 'Position of Longitudnal Stiffener 1 from NA (mm) '
+KEY_LongitudinalStiffener2_pos = 'LongitudnalStiffener2.Position'
+KEY_DISP_LongitudinalStiffener2_pos = 'Position of Longitudnal Stiffener 2 from NA (mm)'
  
 ###################################
 # All Input Keys
@@ -2717,6 +2721,25 @@ Bearing_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
 Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+Stiffener_Plategirder_para = str(
+    "<p align=\"justify\" style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
+    "<span style=\"font-weight:600;\">Types of Stiffeners in Plate Girders (IS 800:2007):</span>"
+    "</p>"
+    "<ul style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
+    "<li><strong>Intermediate Transverse Stiffeners:</strong> Provided at intervals to prevent web buckling due to shear forces.</li>"
+    "<li><strong>Load-bearing Stiffeners:</strong> Provided at points of concentrated loads to transfer load effectively to the web.</li>"
+    "<li><strong>Bearing Stiffeners:</strong> Placed at supports to transfer reactions to the supports and ensure stability.</li>"
+    "<li><strong>Longitudinal Stiffeners:</strong> Used horizontally along the length to increase web resistance against bending.</li>"
+    "<li><strong>End Stiffeners:</strong> Located at girder ends to strengthen web plates and transfer forces effectively.</li>"
+    "</ul>"
+    "<p align=\"justify\" style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
+    "<span style=\"font-weight:600;\">Methods for Plate Girder Design:</span>"
+    "</p>"
+    "<ul style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
+    "<li><strong>Simple Post-Critical Method:</strong> In this method, the girder web is allowed to buckle at certain loading conditions. The design assumes that the web can carry loads post-buckling, using the stable equilibrium formed after initial buckling.</li>"
+    "<li><strong>Tension Field Method:</strong> This method accounts explicitly for the tensile stresses that develop diagonally across the web post-buckling. The web, supported by stiffeners, forms a tension field action, substantially increasing shear-carrying capacity beyond initial web buckling.</li>"
+    "</ul>"
+)
 
 OPTIMIZATION_TABLE_UI = str("""
 <div style="width:100%;" style="overflow-x:auto;">

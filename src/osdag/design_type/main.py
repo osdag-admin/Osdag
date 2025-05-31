@@ -131,6 +131,9 @@ class Main():
               values[KEY_DP_DESIGN_METHOD])
         design.append(t1)
 
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, Stiffener_Plategirder_para , None)
+        design.append(t9)
+
         return design
 
     def plate_connector_values(self, input_dictionary):

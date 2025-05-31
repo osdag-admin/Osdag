@@ -14,7 +14,7 @@ class Unsymmetrical_I_Section_Properties:
 
         def calc_mass(self, D, B_top, B_bot, t_w, t_f_top, t_f_bot):
                 A = Unsymmetrical_I_Section_Properties.calc_area(self,D, B_top, B_bot, t_w, t_f_top, t_f_bot)
-                M = (7850 * A) / 10000
+                M = (7850 * A) / 1000000  # Convert to kg from mm^2
                 return round(M, 2)
 
 
@@ -85,11 +85,9 @@ class Unsymmetrical_I_Section_Properties:
                     """
             # clear web height between flange faces
             h_w = D - tf_top - tf_bot
-        #     print("Inside plastic modulus Z function",h_w, tw, tf_top, tf_bot)
-        #     print("Epsilon", eps) 
             # thin-web check
-            if h_w/tw < 67 * eps:
-                print("Inside thin web check",h_w/tw)
+            if h_w/tw > 67 * eps:
+                print("Thin web condition, using rectangular section properties", h_w/tw)
                 A_top = bf_top * tf_top
                 A_bot = bf_bot * tf_bot
                 A = A_top + A_bot
@@ -97,7 +95,6 @@ class Unsymmetrical_I_Section_Properties:
                 # Centroid location from top fiber
                 # top rectangle centroid at tf_top/2, bottom at D - tf_bot/2
                 c = (A_top * (tf_top / 2) + A_bot * (D - tf_bot / 2)) / A
-                # print("C value inside pLASMod",c)
                 c1 = D - c
 
                 # Distances from each rectangle's centroid to the composite centroid
@@ -112,13 +109,10 @@ class Unsymmetrical_I_Section_Properties:
                 I = I_top + A_top * y_top_centroid ** 2 + I_bot + A_bot * y_bot_centroid ** 2
 
                 # Section moduli
-                # print("Zp value",I)
                 Zp = I / c
                 return round(Zp, 2)
-                
                     
             else:
-                print("THICK WEB CHECK",h_w/tw)
 
                 A_u = bf_top * tf_top
                 A_d = bf_bot * tf_bot

@@ -1380,7 +1380,7 @@ class IS800_2007(object):
     def cl_8_4_2_2_TensionField_unequal_Isection(
     c, d, tw, fyw,
     bf_top, tf_top, bf_bot, tf_bot,
-    Nf, gamma_m0, A_v, tau_b, V_p
+    Nf, gamma_m0, A_v, tau_b
 ):
         """
         Tension‐field method per IS 800:2007 Cl. 8.4.2.2 for unequal flanges.
@@ -1408,21 +1408,30 @@ class IS800_2007(object):
         if c == 0:
             phi = 90.0
         else:
-            phi = math.degrees(math.atan(d / c))
+            phi = math.degrees(math.atan((d / c) / 1.5))
 
         # 2) Reduced plastic moment of each flange
         def Mfr(bf, tf):
             Mp = 0.25 * bf * tf**2 * fyw
-            ratio = Nf * 1e3 / (bf * tf * fyw / gamma_m0)   # Nf in kN → multiply by 1e3
-            return Mp * (1 - ratio**2)
+            ratio = Nf / (bf * tf * fyw / gamma_m0)
+            if ratio >= 1:
+                return 0
+            else:
+                return Mp * (1 - ratio**2)
 
         Mfr_t = Mfr(bf_top, tf_top)
         Mfr_b = Mfr(bf_bot, tf_bot)
 
         # 3) s‐values for each flange, limited to c
+
         sinφ = math.sin(math.radians(phi))
-        s_t = min(2 * math.sqrt(Mfr_t / (fyw * tw)) / sinφ, c)
-        s_b = min(2 * math.sqrt(Mfr_b / (fyw * tw)) / sinφ, c)
+        if sinφ == 0:
+            s_t= 0
+            s_b= 0
+        else:
+            s_t = min(2 * math.sqrt(Mfr_t / (fyw * tw)) / sinφ, c)
+            s_b = min(2 * math.sqrt(Mfr_b / (fyw * tw)) / sinφ, c)
+
 
         # 4) Width of the tension field w_tf
         w_tf = d * math.cos(math.radians(phi)) - (c - s_t - s_b) * sinφ
@@ -1432,7 +1441,8 @@ class IS800_2007(object):
         fv  = math.sqrt(fyw**2 - 3 * tau_b**2 + psi**2) - psi
 
         # 6) Nominal shear resistance V_tf (kN)
-        V_tf = (A_v * tau_b + 0.9 * w_tf * tw * fv * sinφ) / 1e3
+        V_tf = (A_v * tau_b + 0.9 * w_tf * tw * fv * sinφ)
+        V_p = d * tw * fyw / (math.sqrt(3) * gamma_m0)  # Plastic shear strength
         V_tf = min(V_tf, V_p)
 
         return phi, Mfr_t, Mfr_b, s_t, s_b, w_tf, psi, fv, V_tf
@@ -1494,9 +1504,10 @@ class IS800_2007(object):
         """
 
         results = {}
-
-        if stiffener_type == "no_stiffener":
+        print(stiffener_type)
+        if stiffener_type == "no_stiffener" or c > 3 * d:
             ratio = d / tw
+            print("Web Ratio:", ratio)
             limit_serv = 200 * eps
             limit_buckling = 345 * (eps ** 2)
             limit = min(limit_serv, limit_buckling)
@@ -1508,74 +1519,91 @@ class IS800_2007(object):
 
         elif stiffener_type == "transverse_only":
             if c is None:
-                return False #{"Error": "Spacing 'c' is required for 'transverse_only' stiffeners."}
 
-            if 3 * d >= c >= 1.5 * d:
-                ratio = d / tw
+                return False #{"Error": "Spacing 'c' is required for 'transverse_only' stiffeners."}
+            print("c:", c, "d:", d, "tw:", tw, "eps:", eps)
+            if 3 * d >= c and c >= 1.5 * d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
                 limit_serv = 200 * eps
                 limit_buckling = 345 * (eps ** 2)
-            elif 1.5 * d > c >= d:
-                ratio = d / tw
+            elif 1.5 * d > c and c >= d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
                 limit_serv = 200 * eps
                 limit_buckling = 345 * eps
-            elif 0.74 * d <= c < d:
-                ratio = c / tw
+            elif 0.74 * d <= c and c < d:
+                ratio_serv = c / tw
+                ratio_buckling = d / tw
                 limit_serv = 200 * eps
                 limit_buckling = 345 * eps
             elif c < 0.74 * d:
-                ratio = d / tw
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
                 limit_serv = 270 * eps
                 limit_buckling = 345 * eps
             else:
+                print('Transverse only')
                 return False #{"Error": "Invalid range for spacing 'c'."}
 
-            limit = min(limit_serv, limit_buckling)
-            results["Limit"] = limit
-            results["Pass"] = ratio <= limit
+
+            if ratio_serv <= limit_serv and ratio_buckling <= limit_buckling:
+                return True
+            else:
+                return False
 
         elif stiffener_type == "transverse_and_two_longitudinal_neutral":
-            ratio = d / tw
-            limit = 400 * eps
-            results["Limit"] = limit
-            results["Pass"] = ratio <= limit
+            if c >= 1.5 * d :
+                ratio = d / tw
+                limit_serv = 400 * eps
+                limit_buckling = 345 * (eps ** 2)
+                limit = min(limit_serv, limit_buckling)
+
+            else:
+                ratio = d / tw
+                limit_serv = 400 * eps
+                limit_buckling = 345 * eps
+                limit = min(limit_serv, limit_buckling)
+
+            if ratio <= limit:
+                return True
+            else:
+                return False
 
         elif stiffener_type == "transverse_and_one_longitudinal_compression":
             if c is None:
                 return False #{"Error": "Spacing 'c' is required for compression flange restraint."}
 
-            if 2.4 * d >= c >= 1.5 * d:
-                ratio = d / tw
+            if 2.4 * d >= c and c >= 1.5 * d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
                 limit_serv = 250 * eps
                 limit_buckling = 345 * (eps ** 2)
-            elif 1.5 * d > c >= d:
-                ratio = d / tw
-                limit_serv = 200 * eps
+            elif 1.5 * d > c and c >= d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 250 * eps
                 limit_buckling = 345 * eps
-            elif 0.74 * d <= c < d:
-                ratio = c / tw
+            elif 0.74 * d <= c and c < d:
+                ratio_serv = c / tw
+                ratio_buckling = d / tw
                 limit_serv = 250 * eps
                 limit_buckling = 345 * eps
             elif c < 0.74 * d:
-                ratio = d / tw
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
                 limit_serv = 340 * eps
                 limit_buckling = 345 * eps
             else:
                 return False #{"Error": "Invalid range for spacing 'c'."}
 
-            limit = min(limit_serv, limit_buckling)
-            results["Limit"] = limit
-            results["Pass"] = ratio <= limit
+            if ratio_serv <= limit_serv and ratio_buckling <= limit_buckling:
+                return True
+            else:
+                return False
 
         else:
             return False #{"Error": "Invalid stiffener_type provided."}
-
-        if 'c' in locals() and ratio == c / tw:
-            results["c/tw"] = ratio
-        else:
-            results["d/tw"] = ratio
-
-        results["ε"] = eps
-        return True
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """

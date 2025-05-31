@@ -2864,7 +2864,7 @@ class Member(Main):
         optimum.append(t1)
         t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
         optimum.append(t2)
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp , None)
         optimum.append(t9)
 
         return optimum
@@ -2897,7 +2897,7 @@ class Member(Main):
 
 
         
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, "DUMMYTEXT TODO: replace" , None)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp , None)
         optimum.append(t9)
 
         return optimum
@@ -2931,7 +2931,7 @@ class Member(Main):
         optimum.append(t1)
         t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
         optimum.append(t2)
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, "DUMMYTEXT TODO: replace" , None)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, Stiffener_Plategirder_para , None)
         optimum.append(t9)
         return optimum
     
@@ -2948,6 +2948,8 @@ class Member(Main):
 
         t2 = (KEY_IS_IT_SYMMETRIC, KEY_DISP_IS_IT_SYMMETRIC, TYPE_COMBOBOX, KEY_DISP_SYMMETRIC_list, values[KEY_IS_IT_SYMMETRIC])
         optimum.append(t2)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, Stiffener_Plategirder_para , None)
+        optimum.append(t9)
 
         return optimum
 
@@ -3149,13 +3151,22 @@ class Member(Main):
         plast_sec_mod_y = '' 
         torsion_const = '' 
         warping_const = '' 
-
+        
+        # print("\n\n\n\n\n")
+        # print(self[6])
+        # print("\n FROM NOW OBJECT 6")
+        # for i in self:
+        #     print(i)
+        #     print("\n")
+        
         t_d = float(self[0])
         w_t = float(self[1])
         t_f_w = float(self[2])
         t_f_t = float(self[3])
         b_f_w = float(self[4])
         b_f_t = float(self[5])
+        eps = math.sqrt(250/float(self[6]))  # Assuming self[6] is the yield strength in MPa
+        
 
         pc = Unsymmetrical_I_Section_Properties()
 
@@ -3167,7 +3178,7 @@ class Member(Main):
         rad_of_gy_y = pc.calc_RadiusOfGyrationY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
         elast_sec_mod_z = pc.calc_ElasticModulusZz(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
         elast_sec_mod_y = pc.calc_ElasticModulusZy(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        plast_sec_mod_z = pc.calc_PlasticModulusZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        plast_sec_mod_z = pc.calc_PlasticModulusZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t,eps)
         plast_sec_mod_y = pc.calc_PlasticModulusY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
         torsion_const = pc.calc_TorsionConstantIt(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
         warping_const = pc.calc_WarpingConstantIw(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
@@ -3178,20 +3189,20 @@ class Member(Main):
 
 
 
-        return {'Label_11': str(mass),
-                'Label_12': str(area),
-                'Label_13': str(mom_inertia_z),
-                'Label_14': str(mom_inertia_y),
-                'Label_15': str(rad_of_gy_z),
-                'Label_16': str(rad_of_gy_y),
-                'Label_17': str(elast_sec_mod_z),
-                'Label_18': str(elast_sec_mod_y),
-                'Label_19': str(plast_sec_mod_z),
-                'Label_20': str(plast_sec_mod_y),
-                'Label_21': str(torsion_const),
-                'Label_22': str(warping_const)
+        return {
+    'Label_12': str(int(round(mass, 0))),
+    'Label_13': str(int(round(area / 100, 0))),
+    'Label_14': str(int(round(mom_inertia_z / 10000, 0))),
+    'Label_15': str(int(round(mom_inertia_y / 10000, 0))),
+    'Label_16': str(int(round(rad_of_gy_z / 10, 0))),
+    'Label_17': str(int(round(rad_of_gy_y / 10, 0))),
+    'Label_18': str(int(round(elast_sec_mod_z / 1000, 0))),
+    'Label_19': str(int(round(elast_sec_mod_y / 1000, 0))),
+    'Label_20': str(int(round(plast_sec_mod_z / 1000, 0))),
+    'Label_21': str(int(round(plast_sec_mod_y / 1000, 0))),
+    'Label_22': str(int(round(torsion_const / 10000, 0))),
+    'Label_23': str(int(round(warping_const / 1000000, 0)))
 }
-
 
     @staticmethod
     def grdval_customized():

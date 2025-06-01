@@ -553,8 +553,9 @@ class ButtJointWelded(MomentConnection):
         self.design_of_weld(self,design_dictionary)
     
     def design_of_weld(self,design_dictionary):
-        self.effective_throat_thickness = design_dictionary[KEY_EFF_THROAT_THICKNESS]
-        self.design_strength = design_dictionary[KEY_DESIGN_STRENGTH_WELD]
+        self.effective_throat_thickness = float(design_dictionary[KEY_EFF_THROAT_THICKNESS])
+        #might need to change this
+        self.design_strength = float(design_dictionary[KEY_DESIGN_STRENGTH_WELD]) #might need to change this
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
         self.effective_throat_thickness = 0.707 * self.weld_size
         weld_type = design_dictionary[KEY_DP_WELD_TYPE]
@@ -570,4 +571,22 @@ class ButtJointWelded(MomentConnection):
         self.s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
         Tmin = min(plate1_thk, plate2_thk)
         self.s_max = Tmin - 1.5
+
+        if self.weld_size < self.s_min:
+            self.design_status = False
+            logger.error(": Weld size {} mm is less than the minimum required weld size of {} mm [Ref. Table 21, Cl.10.5.2.3, IS 800:2007].".format(
+                self.weld_size, self.s_min))
+            logger.info(": Increase the weld size.")
+            logger.error(": Design is unsafe. \n")
+            logger.info(" :=========End Of design===========")
+            return
+
+        if self.weld_size > self.s_max:
+            self.design_status = False
+            logger.error(": Weld size {} mm is greater than the maximum allowed weld size of {} mm [Ref. Cl.10.5.3.1, IS 800:2007].".format(
+                self.weld_size, self.s_max))
+            logger.info(": Decrease the weld size.")
+            logger.error(": Design is unsafe. \n")
+            logger.info(" :=========End Of design===========")
+            return
 

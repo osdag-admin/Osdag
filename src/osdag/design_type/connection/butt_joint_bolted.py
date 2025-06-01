@@ -372,3 +372,6 @@ class ButtJointBolted(MomentConnection):
     
 
     ################################ Design Report #####################################################################################
+
+    def save_design(self, popup_summary):
+        logger.info("ADD THE CODE FOR REPORT AFTER THIS")

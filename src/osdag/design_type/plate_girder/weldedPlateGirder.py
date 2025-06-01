@@ -1315,6 +1315,7 @@ class PlateGirderWelded(Member):
     def set_input_values(self, design_dictionary):
         
         self.module = design_dictionary[KEY_MODULE]
+        self.mainmodule = 'PLATE GIRDER'
         self.design_type = design_dictionary[KEY_OVERALL_DEPTH_PG_TYPE]
         print('design_type', design_dictionary[KEY_OVERALL_DEPTH_PG_TYPE])
         self.section_class = None

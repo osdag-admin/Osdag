@@ -45,7 +45,7 @@ class ButtJointWelded(MomentConnection):
         self.weld_fabrication = None
         self.weld_angle = None
         self.weld_length_effective = None
-        self.utilization_ratio = None
+
 
     ###############################################
     # Design Preference Functions Start
@@ -312,29 +312,33 @@ class ButtJointWelded(MomentConnection):
         out_list.append(t44)
 
         t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
-               f"{self.utilization_ratio:.2f}", True)
+               self.utilization_ratio if flag else '', True)
         out_list.append(t22)
 
-        cover_type = "Double" if self.planes == 2 else "Single"
+        # Calculate cover_type only if flag is True and we have the planes attribute
+        cover_type = ''
+        if flag and hasattr(self, 'planes'):
+            cover_type = "Double" if self.planes == 2 else "Single"
+            
         t13 = (KEY_OUT_NO_COVER_PLATE, KEY_OUT_DISP_NO_COVER_PLATE, TYPE_TEXTBOX,
-               cover_type, True)
+               cover_type if flag else '', True)
         out_list.append(t13)
 
         t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
-               f"{self.width:.2f}", True)
+               self.width if flag else '', True)
         out_list.append(t38)
 
         t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
-               f"{self.connection_length:.2f}", True)
+               self.connection_length if flag else '', True)
         out_list.append(t28)
 
         t47 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
-               f"{self.Tcp:.2f}", True)
+               self.Tcp if flag else '', True)
         out_list.append(t47)
 
-        if self.packing_thickness > 0:
+        if hasattr(self, 'packing_thickness') and self.packing_thickness > 0:
             t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
-                  f"{self.packing_thickness:.2f}", True)
+                  self.packing_thickness if flag else '', True)
             out_list.append(t15)
 
         # Weld details
@@ -342,23 +346,23 @@ class ButtJointWelded(MomentConnection):
         out_list.append(t21)
 
         t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
-               "Fillet", True)
+               "Fillet" if flag else '', True)
         out_list.append(t23)
 
         t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
-               f"{self.weld_size:.2f}", True)
+               self.weld_size if flag else '', True)
         out_list.append(t24)
 
         t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
-               f"{self.weld_strength:.2f}", True)
+               self.weld_strength if flag else '', True)
         out_list.append(t25)
 
         t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
-               f"{self.weld_length_effective:.2f}", True)
+               self.weld_length_effective if flag else '', True)
         out_list.append(t26)
 
         t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
-               f"{self.connection_length:.2f}", True)
+               self.connection_length if flag else '', True)
         out_list.append(t27)
 
         return out_list
@@ -570,7 +574,12 @@ class ButtJointWelded(MomentConnection):
             self.gamma_mw = 1.50  
         self.weld_design_strength = self.fu / (math.sqrt(3) * self.gamma_mw)
         
-#=================================REQUIRED WELD LENGTH========================================================
+        # Call the design sequence methods in order
+        self.weld_length(design_dictionary)
+        self.weld_strength_verification(design_dictionary)
+        self.long_joint_reduction_factor()
+        self.check_base_metal_strength(design_dictionary)
+    
     def weld_length(self, design_dictionary):
         self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
         self.plates_width = design_dictionary[KEY_PLATE_WIDTH]

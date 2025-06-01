@@ -14,6 +14,7 @@ Reference:
 
 from .moment_connection import MomentConnection
 from ...utils.common.component import *
+from ...utils.common.is800_2007 import IS800_2007
 from ...utils.common.is800_2007 import *
 from ...Common import *
 from ...design_report.reportGenerator_latex import CreateLatex
@@ -452,180 +453,123 @@ class ButtJointWelded(MomentConnection):
             return all_errors
         
     def set_input_values(self, design_dictionary):
-        """Initialize components required for butt joint design as per flowchart"""
-        # Initialize basic parameters
+        "initialisation of components required to design a butt joint welded along with connection"
+        super(ButtJointWelded,self).set_input_values(self, design_dictionary)
+        print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Butt Joint Welded Connection"
-        self.main_material = design_dictionary[KEY_MATERIAL]
-        self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])
-        self.width = float(design_dictionary[KEY_PLATE_WIDTH])
-        self.cover_plate = design_dictionary[KEY_COVER_PLATE]
         
-        # Initialize plates with material properties
+        # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+        self.main_material = design_dictionary[KEY_MATERIAL]
+        self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
+        self.width = design_dictionary[KEY_PLATE_WIDTH]
+
+        # print(self.sizelist)
+        self.efficiency = 0.0
+        self.K = 1
+        self.count = 0
         self.plate1 = Plate(thickness=[design_dictionary[KEY_PLATE1_THICKNESS]],
                         material_grade=design_dictionary[KEY_MATERIAL],
                         width=design_dictionary[KEY_PLATE_WIDTH])
         self.plate2 = Plate(thickness=[design_dictionary[KEY_PLATE2_THICKNESS]],
-                        material_grade=design_dictionary[KEY_MATERIAL],
-                        width=design_dictionary[KEY_PLATE_WIDTH])
+                            material_grade=design_dictionary[KEY_MATERIAL],
+                            width=design_dictionary[KEY_PLATE_WIDTH])
         
-        # Initialize weld with properties
-        self.weld = Weld(size=design_dictionary[KEY_WELD_SIZE], 
-                        weld_type=design_dictionary[KEY_DP_WELD_TYPE],
-                        edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
-        
+        self.weld = Weld(size=design_dictionary[KEY_DP_WELD_SIZE],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                         type=design_dictionary[KEY_DP_WELD_TYPE]
+                         )
         # Start design process
-        self.design_procedure()
+        print("input values are set. Doing preliminary member checks")
+        self.member_design_status = False
+        self.max_limit_status_1 = False
+        self.max_limit_status_2 = False
+        self.weld_design_status = False
+        self.thick_design_status = False
+        self.plate_design_status = False
+        self.initial_member_capacity(self,design_dictionary)
 
-    def design_procedure(self):
-        """Main design procedure following IS 800:2007 code requirements"""
-        
-        # Initialize safety factors as per Table 5 (Cl. 5.4.1)
-        self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  # 1.10
-        self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['ultimate_stress']  # 1.25
-        self.gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]  # 1.25 for shop, 1.5 for field
-        
-        # Get plate thicknesses and minimum thickness
-        self.t1 = float(self.plate1.thickness[0])
-        self.t2 = float(self.plate2.thickness[0])
-        self.Tmin = min(self.t1, self.t2)
-        
-        # Calculate cover plate thickness based on type
-        self.calculate_cover_plate_thickness()
-        
-        # Get weld size and check limits as per Cl. 10.5.2.3
-        self.weld_size = float(self.weld.size)
-        
-        # value of a eq. 3.4
-        self.effective_throat_thickness = 0.707 * self.weld_size
-        
-        # f_wd calculated from eq. 3.5
-        self.f_y = self.plate1.fy
-        self.f_u = self.plate1.fu
-        self.f_wd = self.f_u / (math.sqrt(3) * self.gamma_mw)  
-        
-        min_weld_size = self.get_min_weld_size()
-        max_weld_size = self.Tmin - 1.5
-        
-        if self.weld_size < min_weld_size:
-            self.design_status = False
-            logger.error(f": Weld size {self.weld_size}mm is less than minimum required size {min_weld_size}mm as per Table 21")
-            return
-        
-        if self.weld_size > max_weld_size:
-            self.design_status = False
-            logger.error(f": Weld size {self.weld_size}mm exceeds maximum allowed size {max_weld_size}mm")
-            return
-        
-        # Convert from kN to N
-        self.tensile_force_N = self.tensile_force * 1000
-        
-        self.L_req = self.tensile_force_N / (self.f_wd * self.effective_throat_thickness * self.planes)
-        
-        if self.L_req <= self.width:
-            # Use straight welds
-            self.L_provided = self.width
-            self.alpha = 0
-            self.L_side = 0
-        else:
-            self.extend_weld_length()
-        
-        self.L_eff = self.L_provided - 2 * self.effective_throat_thickness
-        
-        # Check if L_eff ≥ 4s
-        if self.L_eff < 4 * self.weld_size:
-            self.design_status = False
-            logger.error(": Effective weld length is less than minimum required length")
-            logger.error(": Error: Increase weld size or length")
-            return
-        else:
-            # Calculate weld capacity C_w
-            self.weld_capacity = self.f_wd * self.effective_throat_thickness * self.L_eff * self.planes
-            
-            # Check if P_N < C_w
-            if self.tensile_force_N > self.weld_capacity:
-                self.design_status = False
-                logger.error(": Weld strength is insufficient")
-                logger.error(": Error: Revise weld size or overlap")
-                return
-            else:
-                # Base metal strength check
-                self.A_g = self.width * self.Tmin  
-                self.A_n = self.A_g 
-                
-                
-                self.T_db = min(
-                    (self.A_g * self.f_y) / self.gamma_m0,
-                    (0.9 * self.A_n * self.f_u) / self.gamma_m1
-                )
-                
-                # Check if P_N ≤ T_db
-                if self.tensile_force_N > self.T_db:
-                    self.design_status = False
-                    logger.error(": Base metal strength is insufficient")
-                    logger.error(": Error: Revise section")
-                    return
-                else:
-                    # Design is successful - Output detailing values
-                    self.design_status = True
-                    self.connection_length = self.L_provided + 2 * 25  # L_cp = L_provided + 2×clearance
-                    self.utilization_ratio = max(
-                        self.tensile_force_N / self.weld_capacity,
-                        self.tensile_force_N / self.T_db
-                    )
-                    logger.info(": Design is safe")
-                    return True
 
-    def calculate_cover_plate_thickness(self):
-        if "double" in self.cover_plate.lower():
-            self.Tcp = (9.0/16.0) * self.Tmin
-            self.planes = 2
-        else:
-            self.Tcp = (5.0/8.0) * self.Tmin
-            self.planes = 1
-        
+        plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
+        plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+        Tmin = min(plate1_thk, plate2_thk)
+        cover_plate_type_str = design_dictionary[KEY_COVER_PLATE]
+
+        # Cover plate and packing plate logic as per documentation
         available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]
-        self.Tcp = min([t for t in available_thicknesses if t >= self.Tcp], default=self.Tcp)
+        if "double" in cover_plate_type_str.lower():
+            self.planes = 2
+            Tcp = math.ceil((9.0 / 16.0) * Tmin)  # Double cover plate thickness as per Eq. 3.2
+            self.calculated_cover_plate_thickness = min(
+                [thk for thk in available_thicknesses if thk >= Tcp],
+                default=Tcp
+            )
 
-        # Add packing plate if needed
-        if self.t1 != self.t2:
-            self.packing_thickness = abs(self.t1 - self.t2)
+            # Packing plate logic as per Cl. 10.3.3.2
+            if abs(plate1_thk - plate2_thk) > 0.001:
+                self.packing_plate_thickness = abs(plate1_thk - plate2_thk)
+            else:
+                self.packing_plate_thickness = 0.0
+
+        elif "single" in cover_plate_type_str.lower():
+            self.planes = 1
+            Tcp = math.ceil((5.0 / 8.0) * Tmin)  # Single cover plate thickness as per Eq. 3.1
+            self.calculated_cover_plate_thickness = min(
+                [thk for thk in available_thicknesses if thk >= Tcp],
+                default=Tcp
+            )
+            self.packing_plate_thickness = 0.0
+
         else:
-            self.packing_thickness = 0
+            self.planes = 1
+            Tcp = Tmin
+            self.calculated_cover_plate_thickness = min(
+                [thk for thk in available_thicknesses if thk >= Tcp],
+                default=Tcp
+            )
+            self.packing_plate_thickness = 0.0
 
-    def extend_weld_length(self):
-        self.L_tgt = self.L_req / self.planes
+        self.leg_size = 0
+        self.effective_throat_thickness = 0
+        self.yield_strength = 0
+        self.partial_safety_factor = 0
+        self.design_strength = 0
+        self.max_weld_size = 0
+        #change from here
+        self.final_pitch = 0
+        self.final_end_dist = 0
+        self.final_edge_dist = 0
+        self.final_gauge = 0
+        self.rows = 0
+        self.cols = 0
+        self.len_conn = 0
+        self.max_gauge_round = 0
+        self.max_pitch_round = 0
+        self.utilization_ratio = 0
+        self.bij = 0
+        self.blg = 0
+        self.cover_plate = design_dictionary[KEY_COVER_PLATE]
         
-        # Calculate skew angle
-        self.alpha = math.degrees(math.atan((self.L_tgt - self.width)/(2 * self.width)))
-        
-        # Check angle limits
-        if self.alpha < 20:
-            self.alpha = 20
-        elif self.alpha > 60:
-            self.alpha = 60
-        
-        self.L_provided_line = self.width + 2 * self.width * math.tan(math.radians(self.alpha))
-        self.L_provided = self.planes * self.L_provided_line
-        
-        # check this logic
-        if self.alpha == 60:
-            self.L_side = (self.L_req - self.L_provided) / self.planes
-        else:
-            self.L_side = 0
+        # Start bolt selection process
+        self.design_of_weld(self,design_dictionary)
+    
+    def design_of_weld(self,design_dictionary):
+        self.effective_throat_thickness = 0
+        self.design_strength = 0
+        self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
+        self.effective_throat_thickness = 0.707 * self.weld_size
+        weld_type = design_dictionary[KEY_DP_WELD_TYPE]
+        if weld_type == "Shop weld":
+            self.gamma_mw = 1.25  
+        else:  
+            self.gamma_mw = 1.50  
+        self.plate1.connect_to_database_to_get_fy_fu(design_dictionary[KEY_MATERIAL], float(design_dictionary[KEY_PLATE1_THICKNESS]))
+        self.fy = float(self.plate1.fy)  
+        self.weld_design_strength = self.fy / (math.sqrt(3) * self.gamma_mw)
+        plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
+        plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+        self.s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
+        Tmin = min(plate1_thk, plate2_thk)
+        self.s_max = Tmin - 1.5
 
-    def get_min_weld_size(self):
-        thicker_part = max(float(self.plate1.thickness[0]), float(self.plate2.thickness[0]))
-        
-        if thicker_part <= 10:
-            return 3
-        elif thicker_part <= 20:
-            return 5
-        elif thicker_part <= 32:
-            return 6
-        elif thicker_part <= 50:
-            return 8
-        else:
-            return 10
-
-    ################################ Outlist Dict #####################################################################################

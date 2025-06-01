@@ -26,6 +26,9 @@ import math
 
 from PyQt5 import Qt
 
+# Constants
+KEY_SKEW_ANGLE = "SkewAngle"
+
 class ButtJointWelded(MomentConnection):
     def __init__(self):
         super(ButtJointWelded, self).__init__()
@@ -552,41 +555,109 @@ class ButtJointWelded(MomentConnection):
         # Start bolt selection process
         self.design_of_weld(self,design_dictionary)
     
+    #========================DESIGN OF WELD==================================================================
     def design_of_weld(self,design_dictionary):
         self.effective_throat_thickness = float(design_dictionary[KEY_EFF_THROAT_THICKNESS])
         #might need to change this
         self.design_strength = float(design_dictionary[KEY_DESIGN_STRENGTH_WELD]) #might need to change this
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
-        self.effective_throat_thickness = 0.707 * self.weld_size
+        self.fu = design_dictionary[KEY_DP_WELD_MATERIAL_G_O]  # Weld material grade
+        # Determine weld type and set gamma_mw based on it
         weld_type = design_dictionary[KEY_DP_WELD_TYPE]
         if weld_type == "Shop weld":
             self.gamma_mw = 1.25  
         else:  
             self.gamma_mw = 1.50  
-        self.plate1.connect_to_database_to_get_fy_fu(design_dictionary[KEY_MATERIAL], float(design_dictionary[KEY_PLATE1_THICKNESS]))
-        self.fy = float(self.plate1.fy)  
-        self.weld_design_strength = self.fy / (math.sqrt(3) * self.gamma_mw)
+        self.weld_design_strength = self.fu / (math.sqrt(3) * self.gamma_mw)
+        
+#=================================REQUIRED WELD LENGTH========================================================
+    def weld_length(self, design_dictionary):
+        self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
+        self.plates_width = design_dictionary[KEY_PLATE_WIDTH]
+        self.weld_size = design_dictionary[KEY_WELD_SIZE]
+        self.cover_plate = design_dictionary[KEY_COVER_PLATE]
+        # Dictionary to store output values for UI display
+        self.output_values = {}
+        self.material = design_dictionary[KEY_MATERIAL]
+        self.fu = design_dictionary[KEY_DP_WELD_MATERIAL_G_O]
+        self.weld_type = design_dictionary[KEY_DP_WELD_TYPE]
         plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
         plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+        self.alpha = design_dictionary[KEY_SKEW_ANGLE]
+
+
+
         self.s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
         Tmin = min(plate1_thk, plate2_thk)
         self.s_max = Tmin - 1.5
+        if self.weld_size < self.s_min or self.weld_size > self.s_max:
+                self.design_status = False
+                if self.weld_size < self.s_min:
+                    logger.error(": Weld size {} mm is less than the minimum required weld size of {} mm [Ref. Table 21, Cl.10.5.2.3, IS 800:2007].".format(
+                        self.weld_size, self.s_min))
+                    logger.info(": Increase the weld size.")
+                else:
+                    logger.error(": Weld size {} mm is greater than the maximum allowed weld size of {} mm [Ref. Cl.10.5.3.1, IS 800:2007].".format(
+                        self.weld_size, self.s_max))
+                    logger.info(": Decrease the weld size.")
+                logger.error(": Design is unsafe. \n")
+                logger.info(" :=========End Of design===========")
+                return
+        else:
+                # Calculate weld length since size is acceptable
+                if "shop weld" in self.weld_type.lower():
+                    self.gamma_mw = 1.25
+                else:
+                    self.gamma_mw = 1.50
 
-        if self.weld_size < self.s_min:
-            self.design_status = False
-            logger.error(": Weld size {} mm is less than the minimum required weld size of {} mm [Ref. Table 21, Cl.10.5.2.3, IS 800:2007].".format(
-                self.weld_size, self.s_min))
-            logger.info(": Increase the weld size.")
-            logger.error(": Design is unsafe. \n")
-            logger.info(" :=========End Of design===========")
-            return
+                self.f_w = self.fu / (math.sqrt(3) * self.gamma_mw)  # Design strength of weld
 
-        if self.weld_size > self.s_max:
-            self.design_status = False
-            logger.error(": Weld size {} mm is greater than the maximum allowed weld size of {} mm [Ref. Cl.10.5.3.1, IS 800:2007].".format(
-                self.weld_size, self.s_max))
-            logger.info(": Decrease the weld size.")
-            logger.error(": Design is unsafe. \n")
-            logger.info(" :=========End Of design===========")
-            return
+                if "single" in self.cover_plate.lower():
+                    self.N_f = 1  # Number of welds
+                else:
+                    self.N_f = 2  # Double cover plate means two weld interfaces
 
+                # Calculate required weld length 
+                self.L_req = self.tensile_force / (self.N_f * 0.707 * self.weld_size * self.f_w)
+            
+        # Check if straight weld is sufficient
+        if self.L_req <= self.plates_width:
+            logger.info(": Straight weld will be provided as required length is less than plate width")
+            self.weld_length_provided = self.plates_width
+            self.weld_length_effective = self.weld_length_provided
+            self.weld_angle = 0
+            self.side_weld_length = 0
+
+        else:
+            # Calculate skewed weld parameters
+            L_target = self.L_req / self.N_f  # Required length per weld line
+        
+            # Calculate skew angle
+            self.alpha = math.degrees(math.atan((L_target - self.plates_width)/(2 * self.plates_width)))
+
+            # Constrain angle between 20-60 degrees
+            if self.alpha < 20:
+                self.alpha = 20
+            elif self.alpha > 60:
+                self.alpha = 60
+
+            # Calculate provided length per weld line with skew
+            L_provided_line = self.plates_width + 2 * self.plates_width * math.tan(math.radians(self.alpha))
+            L_provided_total = self.N_f * L_provided_line
+
+            # Check if side welds are needed
+            if L_provided_total < self.L_req:
+                # Calculate required side weld length
+                L_side = (self.L_req - L_provided_total) / self.N_f
+
+                # Calculate minimum return weld length
+                min_return = max(2 * self.weld_size, 10)  # As per IS 800:2007 Cl 10.5.10.2
+                L_side = max(L_side, min_return)
+
+                self.side_weld_length = L_side
+            else:
+                self.side_weld_length = 0
+
+            self.weld_length_provided = L_provided_total
+            self.weld_length_effective = L_provided_total + (2 * self.side_weld_length * self.N_f)
+            self.weld_angle = self.alpha

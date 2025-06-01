@@ -555,8 +555,8 @@ class ButtJointWelded(MomentConnection):
         self.design_of_weld(self,design_dictionary)
     
     def design_of_weld(self,design_dictionary):
-        self.effective_throat_thickness = 0
-        self.design_strength = 0
+        self.effective_throat_thickness = design_dictionary[KEY_EFF_THROAT_THICKNESS]
+        self.design_strength = design_dictionary[KEY_DESIGN_STRENGTH_WELD]
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
         self.effective_throat_thickness = 0.707 * self.weld_size
         weld_type = design_dictionary[KEY_DP_WELD_TYPE]

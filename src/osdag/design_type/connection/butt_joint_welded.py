@@ -531,10 +531,8 @@ class ButtJointWelded(MomentConnection):
             self.packing_plate_thickness = 0.0
 
         self.leg_size = 0
-        self.effective_throat_thickness = 0
         self.yield_strength = 0
         self.partial_safety_factor = 0
-        self.design_strength = 0
         self.max_weld_size = 0
         #change from here
         self.final_pitch = 0

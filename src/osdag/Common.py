@@ -368,6 +368,8 @@ KEY_DISP_WELD_SIZE = 'Weld Size'
 KEY_DISP_COVER_PLT = 'Cover Plate *'
 KEY_DP_WELD_SIZE = 'Weld.Size'
 KEY_WELD_GRADE = 'Weld.Grade'
+KEY_EFF_THROAT_THICKNESS = 'Effective Throat Thickness'
+KEY_DESIGN_STRENGTH_WELD = 'Design Strength of Weld'
 
 # end
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'

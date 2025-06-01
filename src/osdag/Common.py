@@ -649,7 +649,7 @@ KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
 ###################################
 # Plate Girder
 ###################################
-KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
+# KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
 KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER'
 KEY_DISP_PG_SectionDetail = 'Section Details'
 KEY_tf = 'TF.Data'

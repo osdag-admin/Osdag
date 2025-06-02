@@ -308,59 +308,69 @@ class ButtJointWelded(MomentConnection):
         t44 = (None, DISP_TITLE_COVER_PLATE, TYPE_TITLE, None, True)
         out_list.append(t44)
 
-        t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
-               self.utilization_ratio if flag else '', True)
-        out_list.append(t22)
+        if hasattr(self, 'utilization_ratio'):
+            t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
+                   round(self.utilization_ratio, 3) if flag else '', True)
+            out_list.append(t22)
 
-        # Calculate cover_type only if flag is True and we have the planes attribute
+        # Cover plate type output
         cover_type = ''
         if flag and hasattr(self, 'planes'):
-            cover_type = "Double" if self.planes == 2 else "Single"
+            cover_type = "Double Cover" if self.planes == 2 else "Single Cover"
             
         t13 = (KEY_OUT_NO_COVER_PLATE, KEY_OUT_DISP_NO_COVER_PLATE, TYPE_TEXTBOX,
                cover_type if flag else '', True)
         out_list.append(t13)
 
-        t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
-               self.width if flag else '', True)
-        out_list.append(t38)
+        # Plate dimensions
+        if hasattr(self, 'width'):
+            t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
+                   round(float(self.width), 2) if flag else '', True)
+            out_list.append(t38)
 
-        t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
-               self.connection_length if flag else '', True)
-        out_list.append(t28)
+        if hasattr(self, 'connection_length'):
+            t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
+                   round(self.connection_length, 2) if flag else '', True)
+            out_list.append(t28)
 
-        t47 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
-               self.Tcp if flag else '', True)
-        out_list.append(t47)
+        if hasattr(self, 'calculated_cover_plate_thickness'):
+            t47 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
+                   round(self.calculated_cover_plate_thickness, 2) if flag else '', True)
+            out_list.append(t47)
 
-        if hasattr(self, 'packing_thickness') and self.packing_thickness > 0:
+        # Packing plate details if applicable
+        if hasattr(self, 'packing_plate_thickness') and self.packing_plate_thickness > 0:
             t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
-                  self.packing_thickness if flag else '', True)
+                  round(self.packing_plate_thickness, 2) if flag else '', True)
             out_list.append(t15)
 
         # Weld details
         t21 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t21)
 
-        t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
-               "Fillet" if flag else '', True)
-        out_list.append(t23)
+        if hasattr(self, 'weld'):
+            t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
+                   self.weld.type if flag else '', True)
+            out_list.append(t23)
 
-        t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
-               self.weld_size if flag else '', True)
-        out_list.append(t24)
+            t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
+                   round(self.weld_size, 2) if flag else '', True)
+            out_list.append(t24)
 
-        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
-               self.weld_strength if flag else '', True)
-        out_list.append(t25)
+        if hasattr(self, 'weld_strength'):
+            t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
+                   round(self.weld_strength/1000, 2) if flag else '', True)
+            out_list.append(t25)
 
-        t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
-               self.weld_length_effective if flag else '', True)
-        out_list.append(t26)
+        if hasattr(self, 'weld_length_effective'):
+            t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
+                   round(self.weld_length_effective, 2) if flag else '', True)
+            out_list.append(t26)
 
-        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
-               self.connection_length if flag else '', True)
-        out_list.append(t27)
+            if hasattr(self, 'connection_length'):
+                t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
+                       round(self.connection_length, 2) if flag else '', True)
+                out_list.append(t27)
 
         return out_list
 
@@ -475,7 +485,7 @@ class ButtJointWelded(MomentConnection):
         
         # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
         self.main_material = design_dictionary[KEY_MATERIAL]
-        self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
+        self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])*1000
         self.width = design_dictionary[KEY_PLATE_WIDTH]
 
         # print(self.sizelist)
@@ -566,6 +576,9 @@ class ButtJointWelded(MomentConnection):
     
     #========================DESIGN OF WELD==================================================================
     def design_of_weld(self, design_dictionary):
+        # Track individual utilization ratios
+        self.utilization_ratios = {}
+
         # Calculate effective throat thickness based on weld size
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
         self.effective_throat_thickness = 0.707 * self.weld_size  
@@ -587,9 +600,11 @@ class ButtJointWelded(MomentConnection):
         self.weld_strength_verification(self,design_dictionary)
         self.long_joint_reduction_factor(self)
         self.check_base_metal_strength(self,design_dictionary)
+        
+        # Only after all checks are complete, calculate the final utilization ratio
+        self.calculate_final_utilization_ratio(self)
 
     def weld_length(self, design_dictionary):
-        self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])
         self.plates_width = float(design_dictionary[KEY_PLATE_WIDTH])
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
         self.cover_plate = design_dictionary[KEY_COVER_PLATE]
@@ -686,7 +701,6 @@ class ButtJointWelded(MomentConnection):
     def weld_strength_verification(self, design_dictionary):
         # Extract required values from the design dictionary
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
-        self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])
         
         # Ensure we have weld_length_provided from previous calculation
         if not hasattr(self, 'weld_length_provided'):
@@ -705,19 +719,24 @@ class ButtJointWelded(MomentConnection):
             logger.info(": Increase the weld length or size")
             return
             
-        # Calculate weld strength
+        # Calculate weld strength 
         self.weld_strength = self.f_w * 0.707 * self.weld_size * self.weld_length_effective * self.N_f
         
-        # Check if weld strength is adequate
-        if self.weld_strength < self.tensile_force:
-            self.design_status = False
-            logger.error(f": Weld strength {self.weld_strength:.2f} N is less than required force {self.tensile_force:.2f} N")
-            logger.info(": Increase weld size or length")
-            return
-        else:
-            self.design_status = True
-            self.utilization_ratio = self.tensile_force / self.weld_strength
-            logger.info(f": Weld strength verification successful with utilization ratio {self.utilization_ratio:.2f}")
+        # Calculate weld utilization ratio
+        weld_utilization = self.tensile_force / self.weld_strength
+        self.utilization_ratios['weld'] = weld_utilization
+        
+        print("\nWeld Strength Calculation Results:")
+        print(f"Design strength of weld (f_w) = {self.f_w:.2f} N/mm²") 
+        print(f"Effective throat thickness = {0.707 * self.weld_size:.2f} mm")
+        print(f"Weld size = {self.weld_size} mm")
+        print(f"Effective length = {self.weld_length_effective:.2f} mm")
+        print(f"Number of weld interfaces = {self.N_f}")
+        print(f"Calculated weld strength = {self.weld_strength/1000:.2f} kN")
+        print(f"Required tensile force = {self.tensile_force/1000:.2f} kN")
+        print(f"Weld utilization ratio = {weld_utilization:.3f}")
+        
+        logger.info(f"Weld strength calculation completed. Utilization ratio: {weld_utilization:.3f}")
     
     def long_joint_reduction_factor(self):
         """Calculate reduction factor for long joints according to IS 800:2007 Cl. 10.5.7.1(b)"""
@@ -746,8 +765,21 @@ class ButtJointWelded(MomentConnection):
     def check_base_metal_strength(self, design_dictionary):
         """Check strength of base metal according to IS 800:2007"""
         
-        # Extract material properties
-        self.fy = float(design_dictionary[KEY_MATERIAL])
+        # Extract material properties and handle material grade strings
+        material_grade = design_dictionary[KEY_MATERIAL]
+        # Extract numeric value from material grade string (e.g. "E 165 (Fe 290)" -> 165)
+        try:
+            # Extract the number after 'E' (e.g. "E 165" -> 165)
+            self.fy = float(material_grade.split('(')[0].strip().split()[-1])
+            
+            # For custom grades, try direct conversion
+            if material_grade.startswith('Custom'):
+                self.fy = float(material_grade.split('_')[1])
+        except (ValueError, IndexError):
+            logger.error(f": Invalid material grade format: {material_grade}")
+            self.design_status = False
+            return
+
         self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
         
         # Partial safety factors
@@ -767,11 +799,58 @@ class ButtJointWelded(MomentConnection):
         # Design base metal strength is minimum of the two
         self.T_db = min(T_dy, T_du)
         
-        # Check if design force is less than base metal strength
-        if self.tensile_force > self.T_db:
+        # Calculate base metal utilization ratio
+        base_metal_utilization = self.tensile_force/self.T_db
+        self.utilization_ratios['base_metal'] = base_metal_utilization
+        
+        print("\nBase Metal Strength Calculation Results:")
+        print(f"Material yield strength (fy) = {self.fy:.2f} N/mm²")
+        print(f"Material ultimate strength (fu) = {self.fu:.2f} N/mm²")
+        print(f"Gross section area = {self.A_g:.2f} mm²")
+        print(f"Net section area = {self.A_n:.2f} mm²") 
+        print(f"Tensile strength - Yielding = {T_dy/1000:.2f} kN")
+        print(f"Tensile strength - Rupture = {T_du/1000:.2f} kN")
+        print(f"Design strength of base metal = {self.T_db/1000:.2f} kN")
+        print(f"Required tensile force = {self.tensile_force/1000:.2f} kN")
+        print(f"Base metal utilization ratio = {base_metal_utilization:.3f}")
+        
+        # Don't set design status yet - will be done in final check
+        logger.info(f"Base metal strength verification completed. Utilization ratio: {base_metal_utilization:.3f}")
+    
+    def calculate_final_utilization_ratio(self):
+        """Calculate final utilization ratio and set design status after all component checks"""
+        
+        if not hasattr(self, 'utilization_ratios'):
+            logger.error("Cannot calculate final utilization ratio - component checks incomplete")
             self.design_status = False
-            logger.error(f": Base metal strength {self.T_db:.2f} N is less than required force {self.tensile_force:.2f} N")
-            logger.info(": Design is unsafe. Increase plate dimensions or use higher grade material")
             return
+            
+        # Get maximum utilization ratio across all components
+        self.utilization_ratio = max(self.utilization_ratios.values())
+        
+        print("\nFinal Design Status:")
+        print("--------------------")
+        print(f"Weld utilization ratio: {self.utilization_ratios['weld']:.3f}")
+        print(f"Base metal utilization ratio: {self.utilization_ratios['base_metal']:.3f}")
+        print(f"Overall utilization ratio: {self.utilization_ratio:.3f}")
+        
+        # Design is safe only if all utilization ratios are < 1.0
+        if self.utilization_ratio > 1.0:
+            self.design_status = False
+            print("DESIGN STATUS: UNSAFE")
+            print("The maximum utilization ratio exceeds 1.0")
+            
+            # Log which component caused the failure
+            critical_component = max(self.utilization_ratios.items(), key=lambda x: x[1])[0]
+            logger.error(f": Design is unsafe. {critical_component} utilization ratio ({self.utilization_ratio:.3f}) exceeds 1.0")
+            
+            recommendations = {
+                'weld': "Consider increasing weld size or length",
+                'base_metal': "Consider increasing plate dimensions or using higher grade material"
+            }
+            logger.info(f": Recommendation: {recommendations[critical_component]}")
         else:
-            logger.info(f": Base metal strength check passed. Utilization ratio = {self.tensile_force/self.T_db:.2f}")
+            self.design_status = True
+            print("DESIGN STATUS: SAFE") 
+            print("All utilization ratios are within acceptable limits (< 1.0)")
+            logger.info(f": Design is safe. Maximum utilization ratio: {self.utilization_ratio:.3f}")

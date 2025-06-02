@@ -3,10 +3,16 @@ import yaml
 import shutil
 import time
 import pandas as pd
+import cairosvg
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt5.QtGui import QRegExpValidator, QDoubleValidator, QBrush, QColor, QPixmap, QFont
+from PyQt5.QtWidgets import QDialog, QMainWindow, QMessageBox, QDesktopWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QDockWidget
+from PyQt5.QtWidgets import QFileDialog, QProgressBar, QLabel
+from PyQt5.QtWidgets import QScrollArea, QTableWidgetItem, QComboBox
+from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QColorDialog
+from PyQt5.QtWidgets import QFrame, QSplitter, QTableWidget
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QEvent, QObject, QRegExp, QRect
 from .ui_tutorial import Ui_Tutorial
 from .ui_aboutosdag import Ui_AboutOsdag
 from .ui_ask_question import Ui_AskQuestion

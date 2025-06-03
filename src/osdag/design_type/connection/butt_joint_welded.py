@@ -301,86 +301,65 @@ class ButtJointWelded(MomentConnection):
         return spacing
 
     def output_values(self, flag):
-        """Return list of output values for display in UI
-        
-        Args:
-            flag (bool): True if calculations are complete and values should be shown
-        
-        Returns:
-            list: List of output value tuples for UI display
-        """
-        out_list = []
-        
-        if flag:
-            # Main Title
-            t1 = (None, "Design Output", TYPE_TITLE, None, True)
-            out_list.append(t1)
-            
-            # Cover Plate Details Title
-            t2 = (None, "Cover Plate Details", TYPE_TITLE, None, True)
-            out_list.append(t2)
-            
-            # Utilization Ratio
-            t2 = (KEY_UTILIZATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX, 
-                  round(self.utilization_ratio, 3) if hasattr(self, 'utilization_ratio') else '', True)
-            out_list.append(t2)
-            
-            # Number of Cover Plate(s)
-            t3 = (KEY_OUT_NO_COVER_PLATE, KEY_OUT_DISP_NO_COVER_PLATE, TYPE_TEXTBOX,
-                  self.N_f if hasattr(self, 'N_f') else '', True)
-            out_list.append(t3)
-            
-            # Width of Cover Plate
-            t4 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
-                  self.plates_width if hasattr(self, 'plates_width') else '', True)
-            out_list.append(t4)
-            
-            # Length of Cover Plate
-            t5 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
-                  round(self.weld_length_effective, 2) if hasattr(self, 'weld_length_effective') else '', True)
-            out_list.append(t5)
-            
-            # Thickness of Cover Plate
-            t6 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
-                  self.calculated_cover_plate_thickness if hasattr(self, 'calculated_cover_plate_thickness') else '', True)
-            out_list.append(t6)
-            
-            # Thickness of Packing Plate 
-            t7 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
-                  self.packing_plate_thickness if hasattr(self, 'packing_plate_thickness') else '', True)
-            out_list.append(t7)
-            
-            # Weld Details Title
-            t8 = (None, "Weld Details", TYPE_TITLE, None, True)
-            out_list.append(t8)
-            
-            # Type of Weld
-            t8 = (KEY_DP_WELD_TYPE, KEY_DISP_DP_WELD_TYPE, TYPE_TEXTBOX,
-                  self.weld_type if hasattr(self, 'weld_type') else '', True)
-            out_list.append(t8)
-            
-            # Size of Weld
-            t9 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_TEXTBOX,
-                  self.weld_size if hasattr(self, 'weld_size') else '', True)
-            out_list.append(t9)
-            
-            # Strength of Weld
-            t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
-                   round(self.weld_strength/1000, 2) if hasattr(self, 'weld_strength') else '', True)
-            out_list.append(t10)
-            
-            # Effective Length of Weld
-            t11 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX,
-                   round(self.weld_length_effective, 2) if hasattr(self, 'weld_length_effective') else '', True)
-            out_list.append(t11)
-            
-            # Length of Connection
-            t12 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
-                   round(self.weld_length_provided, 2) if hasattr(self, 'weld_length_provided') else '', True)
-            out_list.append(t12)
+        out_list=[]
+        # Cover plate details
+        t44 = (None, DISP_TITLE_COVER_PLATE, TYPE_TITLE, None, True)
+        out_list.append(t44)
 
+        t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
+               self.utilization_ratio if flag else '', True)
+        out_list.append(t22)
 
-                
+        # Calculate cover_type only if flag is True and we have the planes attribute
+        cover_type = ''
+        if flag and hasattr(self, 'planes'):
+            cover_type = "Double" if self.planes == 2 else "Single"
+            
+        t13 = (KEY_OUT_NO_COVER_PLATE, KEY_OUT_DISP_NO_COVER_PLATE, TYPE_TEXTBOX,
+               cover_type if flag else '', True)
+        out_list.append(t13)
+
+        t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
+               self.width if flag else '', True)
+        out_list.append(t38)
+
+        t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
+               self.weld_length_provided if flag else '', True)
+        out_list.append(t28)
+
+        t47 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
+               self.calculated_cover_plate_thickness if flag else '', True)
+        out_list.append(t47)
+
+        if hasattr(self, 'packing_thickness') and self.packing_thickness > 0:
+            t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
+                  self.packing_thickness if flag else '', True)
+            out_list.append(t15)
+        
+        # Weld details
+        t21 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
+        out_list.append(t21)
+
+        t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
+               "Fillet" if flag else '', True)
+        out_list.append(t23)
+
+        t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
+               self.weld_size if flag else '', True)
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
+               self.weld_strength if flag else '', True)
+        out_list.append(t25)
+
+        t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
+               self.weld_length_effective if flag else '', True)
+        out_list.append(t26)
+
+        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
+               self.weld_length_provided if flag else '', True)
+        out_list.append(t27)
+
         return out_list
 
     def module_name(self):
@@ -627,7 +606,7 @@ class ButtJointWelded(MomentConnection):
         self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
         self.cover_plate = design_dictionary[KEY_COVER_PLATE]
         # Dictionary to store output values for UI display
-        self.output_values = {}
+        self.output_values_dict = {}
         self.material = design_dictionary[KEY_MATERIAL]
         self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
         self.weld_type = design_dictionary[KEY_DP_WELD_TYPE]
@@ -719,7 +698,7 @@ class ButtJointWelded(MomentConnection):
             logger.info(": Skewed weld will be provided with angle {:.2f} degrees".format(self.weld_angle))
             
         # Update output values for UI display
-        self.output_values[KEY_OUT_WELD_LENGTH] = self.weld_length_effective
+        self.output_values_dict[KEY_OUT_WELD_LENGTH] = self.weld_length_effective
     
     def weld_strength_verification(self, design_dictionary):
         """Verify weld strength and calculate utilization"""

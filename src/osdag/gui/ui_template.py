@@ -1793,11 +1793,10 @@ class Window(QMainWindow):
                     key = tab.findChild(QtWidgets.QWidget, key_name)
                     if key is None:
                         continue
-                    if input_type == TYPE_TEXTBOX:
+                    if isinstance(key, QtWidgets.QLineEdit):
                         val = key.text()
-                        print(f"design_fn val = {val}\n")
                         design_dictionary.update({key_name: val})
-                    elif input_type == TYPE_COMBOBOX:
+                    elif isinstance(key, QtWidgets.QComboBox):
                         val = key.currentText()
                         design_dictionary.update({key_name: val})
         else:

@@ -307,10 +307,10 @@ class ButtJointWelded(MomentConnection):
         out_list.append(t44)
 
         t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
-               self.utilization_ratio if flag else '', True)
+               round(self.utilization_ratio, 3) if flag else '', True)
         out_list.append(t22)
 
-        # Calculate cover_type only if flag is True and we have the planes attribute
+        # Calculate cover_type based on planes attribute
         cover_type = ''
         if flag and hasattr(self, 'planes'):
             cover_type = "Double" if self.planes == 2 else "Single"
@@ -320,11 +320,11 @@ class ButtJointWelded(MomentConnection):
         out_list.append(t13)
 
         t38 = (KEY_OUT_WIDTH_COVER_PLATE, KEY_OUT_DISP_WIDTH_COVER_PLATE, TYPE_TEXTBOX,
-               self.width if flag else '', True)
+               self.plates_width if flag else '', True)
         out_list.append(t38)
 
         t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
-               self.weld_length_provided if flag else '', True)
+               round(self.weld_length_provided, 1) if flag else '', True)
         out_list.append(t28)
 
         t47 = (KEY_OUT_THICKNESS_COVER_PLATE, KEY_OUT_DISP_THICKNESS_COVER_PLATE, TYPE_TEXTBOX,
@@ -333,7 +333,7 @@ class ButtJointWelded(MomentConnection):
 
         if hasattr(self, 'packing_thickness') and self.packing_thickness > 0:
             t15 = (KEY_PK_PLTHK, KEY_DISP_PK_PLTHK, TYPE_TEXTBOX,
-                  self.packing_thickness if flag else '', True)
+                  round(self.packing_thickness, 1) if flag else '', True)
             out_list.append(t15)
         
         # Weld details
@@ -345,19 +345,19 @@ class ButtJointWelded(MomentConnection):
         out_list.append(t23)
 
         t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
-               self.weld_size if flag else '', True)
+               round(self.weld_size, 1) if flag else '', True)
         out_list.append(t24)
 
-        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
-               self.weld_strength if flag else '', True)
+        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH_kN, TYPE_TEXTBOX,
+               round(self.weld_strength/1000, 2) if flag else '', True)  # Convert to kN
         out_list.append(t25)
 
         t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
-               self.weld_length_effective if flag else '', True)
+               round(self.weld_length_effective, 1) if flag else '', True)
         out_list.append(t26)
 
         t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
-               self.weld_length_provided if flag else '', True)
+               round(self.weld_length_provided, 1) if flag else '', True)
         out_list.append(t27)
 
         return out_list
@@ -881,3 +881,139 @@ class ButtJointWelded(MomentConnection):
             logger.info(": All utilization ratios are within acceptable limits")
         
         logger.info(": ==========End Of Design===========\n")
+    
+    def save_design(self, popup_summary):
+        """Save design details for report generation"""
+
+        # Report input dictionary
+        self.report_input = {
+            KEY_MODULE: self.module,
+            KEY_MAIN_MODULE: self.mainmodule,
+            
+            # Connection details
+            KEY_DISP_AXIAL: round(self.tensile_force/1000, 2),  # Convert N to kN
+            
+            # Connecting Members
+            "Connecting Members": "TITLE",
+            KEY_DISP_PLATETHK: str([int(d) for d in [self.plate1.thickness[0], self.plate2.thickness[0]]]),
+            KEY_DISP_MATERIAL: self.main_material,
+            KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.plate1.fu,
+            KEY_DISP_YIELD_STRENGTH_REPORT: self.plate1.fy,
+            KEY_DISP_PLATE_WIDTH: self.plates_width,
+            
+            # Weld Details
+            "Weld Details - Input and Design Preference": "TITLE",
+            KEY_DISP_DP_WELD_TYPE: self.weld_type,
+            KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+            KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT: self.weld.fu,
+            KEY_DISP_WELD_SIZE: self.weld_size,
+
+            # Safety Factors
+            "Safety Factors": "TITLE",
+            KEY_DISP_GAMMA_M0: self.gamma_m0,
+            KEY_DISP_GAMMA_M1: self.gamma_m1,
+            KEY_DISP_GAMMA_MW: self.gamma_mw
+        }
+
+        self.report_check = []
+
+        # Selected Member Data
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
+        self.report_check.append(t1)
+
+        if self.design_status:
+            # Member Check
+            t1 = ('SubSection', 'Member Check', '|p{2.5cm}|p{4.5cm}|p{7.5cm}|p{1cm}|')
+            self.report_check.append(t1)
+
+            t1 = (KEY_DISP_TENSION_YIELDCAPACITY, '', 
+                  cl_6_2_tension_yield_capacity_member(l=None, t=None, f_y=self.plate1.fy, gamma=self.gamma_m0,
+                                                     T_dg=round(self.T_db/1000, 2), area=self.A_g), '')
+            self.report_check.append(t1)
+
+            # Weld Design
+            t1 = ('SubSection', 'Weld Design', '|p{3cm}|p{6.5cm}|p{5cm}|p{1cm}|')
+            self.report_check.append(t1)
+
+            t1 = (DISP_MIN_WELD_SIZE, 
+                  cl_10_5_2_3_min_fillet_weld_size_required(self.weld_connecting_plates, self.weld.min_weld, self.weld.red),
+                  display_prov(self.weld_size, "s"),
+                  get_pass_fail(self.weld.min_weld, self.weld_size, relation="leq"))
+            self.report_check.append(t1)
+
+            t1 = (DISP_MAX_WELD_SIZE,
+                  cl_10_5_3_1_max_weld_size(self.weld_connecting_plates, self.weld_size_max),
+                  display_prov(self.weld_size, "s"),
+                  get_pass_fail(self.weld_size, self.weld_size_max, relation="leq"))
+            self.report_check.append(t1)
+
+            t1 = (DISP_THROAT, 
+                  cl_10_5_3_1_throat_thickness_req(),
+                  cl_10_5_3_1_throat_thickness_weld(self.weld_size, self.Kt),
+                  get_pass_fail(3.0, self.weld_size, relation="leq"))
+            self.report_check.append(t1)
+
+            t1 = (DISP_EFF, "", 
+                  display_prov(self.weld_length_effective, "l_w"), "")
+            self.report_check.append(t1)
+
+            t1 = (DISP_WELD_STRENGTH,
+                  weld_strength_req(V=0.0, A=self.tensile_force, M=0.0, Ip_w=1.0,
+                                  y_max=0.0, x_max=0.0, l_w=self.weld_length_effective,
+                                  R_w=self.weld.stress),
+                  cl_10_5_7_1_1_weld_strength(weld_conn_plates_fu=[self.fu], gamma_mw=self.gamma_mw,
+                                            t_t=round(self.weld.throat, 2),
+                                            f_w=round(self.weld.strength, 2)),
+                  get_pass_fail(self.weld.stress, self.weld.strength, relation="leq"))
+            self.report_check.append(t1)
+
+            # Long joint check if applicable
+            if hasattr(self, 'beta_L'):
+                t1 = (KEY_OUT_LONG_JOINT_WELD, long_joint_welded_req(),
+                      cl_10_5_7_3_weld_strength_post_long_joint(h=self.plates_width, 
+                                                              l=self.weld_length_provided,
+                                                              t_t=self.weld.throat,
+                                                              ws=self.weld.strength,
+                                                              wsr=self.weld.strength_red), "")
+                self.report_check.append(t1)
+
+                t1 = (KEY_OUT_DISP_RED_WELD_STRENGTH, 
+                      display_prov(round(self.weld.stress, 2), "f_w"),
+                      display_prov(round(self.weld.strength_red, 2), "f_wd"),
+                      get_pass_fail(self.weld.stress, self.weld.strength_red, relation="leq"))
+                self.report_check.append(t1)
+
+            # Final Checks
+            t1 = ('SubSection', 'Capacity Checks', '|p{3.5cm}|p{4.5cm}|p{6cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t1 = ('Base Metal Strength (kN)', 
+                  display_prov(round(self.tensile_force/1000, 2), "P"),
+                  display_prov(round(self.T_db/1000, 2), "T_db"),
+                  get_pass_fail(self.tensile_force, self.T_db, relation="leq"))
+            self.report_check.append(t1)
+
+            t1 = ('Overall Utilization Ratio', 
+                  required_IR_or_utilisation_ratio(IR=1),
+                  display_prov(round(self.utilization_ratio, 3), "IR"),
+                  get_pass_fail(self.utilization_ratio, 1, relation="leq"))
+            self.report_check.append(t1)
+
+        else:
+            t1 = ('SubSection', 'Design Status', '|p{3.5cm}|p{4.5cm}|p{6cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+            t1 = ('Design Status', '', 'Design Fails', 'Fail')
+            self.report_check.append(t1)
+
+        # Images
+        Disp_2d_image = []
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+
+        rel_path = os.path.abspath(".")
+        rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
+
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary,
+                             fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+    

@@ -584,10 +584,10 @@ class ButtJointWelded(MomentConnection):
         else:  
             self.gamma_mw = 1.50  
 
-        logger.info(": Input values:")
-        logger.info(": Weld type: {}".format(weld_type))
-        logger.info(": Ultimate strength of electrode (fu_w): {} N/mm²".format(self.fu))
-        logger.info(": Partial safety factor (γₘw): {}".format(self.gamma_mw))
+        #logger.info(": Input values:")
+        #logger.info(": Weld type: {}".format(weld_type))
+        #logger.info(": Ultimate strength of electrode (fu_w): {} N/mm²".format(self.fu))
+        #logger.info(": Partial safety factor (γₘw): {}".format(self.gamma_mw))
             
         # Calculate weld design strength
         self.weld_design_strength = self.fu / (math.sqrt(3) * self.gamma_mw)
@@ -619,10 +619,10 @@ class ButtJointWelded(MomentConnection):
         self.s_max = Tmin - 1.5
 
         # Check weld size constraints
-        logger.info(": Checking weld size requirements as per IS 800:2007")
-        logger.info(": Minimum weld size required (s_min) = {} mm [Ref. Table 21, Cl.10.5.2.3]".format(self.s_min))
-        logger.info(": Maximum allowed weld size (s_max) = {} mm [Ref. Cl.10.5.3.1]".format(self.s_max))
-        logger.info(": Selected weld size = {} mm".format(self.weld_size))
+        #logger.info(": Checking weld size requirements as per IS 800:2007")
+        #logger.info(": Minimum weld size required (s_min) = {} mm [Ref. Table 21, Cl.10.5.2.3]".format(self.s_min))
+        #logger.info(": Maximum allowed weld size (s_max) = {} mm [Ref. Cl.10.5.3.1]".format(self.s_max))
+        #logger.info(": Selected weld size = {} mm".format(self.weld_size))
 
         if self.weld_size < self.s_min or self.weld_size > self.s_max:
             self.design_status = False
@@ -735,15 +735,15 @@ class ButtJointWelded(MomentConnection):
         weld_utilization = self.tensile_force / self.weld_strength
         self.utilization_ratios['weld'] = weld_utilization
         
-        logger.info(": Weld Strength Calculation Results:")
-        logger.info(": Design strength of weld (f_w) = {} N/mm²".format(round(self.f_w, 2)))
-        logger.info(": Effective throat thickness = {} mm".format(round(0.707 * self.weld_size, 2)))
-        logger.info(": Weld size = {} mm".format(self.weld_size))
-        logger.info(": Effective length = {} mm".format(round(self.weld_length_effective, 2)))
-        logger.info(": Number of weld interfaces = {}".format(self.N_f))
-        logger.info(": Calculated weld strength = {} kN".format(round(self.weld_strength/1000, 2)))
-        logger.info(": Required tensile force = {} kN".format(round(self.tensile_force/1000, 2)))
-        logger.info(": Weld utilization ratio = {}".format(round(weld_utilization, 3)))
+        #logger.info(": Weld Strength Calculation Results:")
+        #logger.info(": Design strength of weld (f_w) = {} N/mm²".format(round(self.f_w, 2)))
+        #logger.info(": Effective throat thickness = {} mm".format(round(0.707 * self.weld_size, 2)))
+        #logger.info(": Weld size = {} mm".format(self.weld_size))
+        #logger.info(": Effective length = {} mm".format(round(self.weld_length_effective, 2)))
+        #logger.info(": Number of weld interfaces = {}".format(self.N_f))
+        #logger.info(": Calculated weld strength = {} kN".format(round(self.weld_strength/1000, 2)))
+        #logger.info(": Required tensile force = {} kN".format(round(self.tensile_force/1000, 2)))
+        #logger.info(": Weld utilization ratio = {}".format(round(weld_utilization, 3)))
         
         if weld_utilization > 1:
             logger.error(": Weld strength is insufficient")
@@ -779,11 +779,11 @@ class ButtJointWelded(MomentConnection):
         weld_utilization_reduced = self.tensile_force / self.weld_strength_reduced
         self.utilization_ratios['weld'] = weld_utilization_reduced  # Update the utilization ratio
         
-        logger.info(": Long joint reduction check results:")
-        logger.info(": Long joint reduction factor βL = {}".format(round(self.beta_L, 2)))
-        logger.info(": Original weld design strength = {} N/mm²".format(round(self.f_w, 2)))
-        logger.info(": Adjusted weld design strength = {} N/mm²".format(round(self.f_w_adjusted, 2)))
-        logger.info(": Updated weld utilization ratio = {}".format(round(weld_utilization_reduced, 3)))
+        #logger.info(": Long joint reduction check results:")
+        #logger.info(": Long joint reduction factor βL = {}".format(round(self.beta_L, 2)))
+        #logger.info(": Original weld design strength = {} N/mm²".format(round(self.f_w, 2)))
+        #logger.info(": Adjusted weld design strength = {} N/mm²".format(round(self.f_w_adjusted, 2)))
+        #logger.info(": Updated weld utilization ratio = {}".format(round(weld_utilization_reduced, 3)))
 
     def check_base_metal_strength(self, design_dictionary):
         """Check strength of base metal according to IS 800:2007"""
@@ -826,16 +826,16 @@ class ButtJointWelded(MomentConnection):
         base_metal_utilization = self.tensile_force/self.T_db
         self.utilization_ratios['base_metal'] = base_metal_utilization
         
-        logger.info(": Base Metal Strength Results:")
-        logger.info(": Material yield strength (fy) = {} N/mm²".format(round(self.fy, 2)))
-        logger.info(": Material ultimate strength (fu) = {} N/mm²".format(round(self.fu, 2)))
-        logger.info(": Gross section area = {} mm²".format(round(self.A_g, 2)))
-        logger.info(": Net section area = {} mm".format(round(self.A_n, 2)))
-        logger.info(": Tensile strength - Yielding = {} kN".format(round(T_dy/1000, 2)))
-        logger.info(": Tensile strength - Rupture = {} kN".format(round(T_du/1000, 2)))
-        logger.info(": Design strength of base metal = {} kN".format(round(self.T_db/1000, 2)))
-        logger.info(": Required tensile force = {} kN".format(round(self.tensile_force/1000, 2)))
-        logger.info(": Base metal utilization ratio = {}".format(round(base_metal_utilization, 3)))
+        #logger.info(": Base Metal Strength Results:")
+        #logger.info(": Material yield strength (fy) = {} N/mm²".format(round(self.fy, 2)))
+        #logger.info(": Material ultimate strength (fu) = {} N/mm²".format(round(self.fu, 2)))
+        #logger.info(": Gross section area = {} mm²".format(round(self.A_g, 2)))
+        #logger.info(": Net section area = {} mm".format(round(self.A_n, 2)))
+        #logger.info(": Tensile strength - Yielding = {} kN".format(round(T_dy/1000, 2)))
+        #logger.info(": Tensile strength - Rupture = {} kN".format(round(T_du/1000, 2)))
+        #logger.info(": Design strength of base metal = {} kN".format(round(self.T_db/1000, 2)))
+        #logger.info(": Required tensile force = {} kN".format(round(self.tensile_force/1000, 2)))
+        #logger.info(": Base metal utilization ratio = {}".format(round(base_metal_utilization, 3)))
         
         if base_metal_utilization > 1:
             logger.error(": Base metal strength is insufficient [cl. 6.2, IS 800:2007]")
@@ -855,10 +855,10 @@ class ButtJointWelded(MomentConnection):
         # Get maximum utilization ratio across all components
         self.utilization_ratio = max(self.utilization_ratios.values())
         
-        logger.info(": Design Status Summary:")
-        logger.info(": Weld utilization ratio: {}".format(round(self.utilization_ratios['weld'], 3)))
-        logger.info(": Base metal utilization ratio: {}".format(round(self.utilization_ratios['base_metal'], 3)))
-        logger.info(": Overall utilization ratio: {}".format(round(self.utilization_ratio, 3)))
+        #logger.info(": Design Status Summary:")
+        #logger.info(": Weld utilization ratio: {}".format(round(self.utilization_ratios['weld'], 3)))
+        #logger.info(": Base metal utilization ratio: {}".format(round(self.utilization_ratios['base_metal'], 3)))
+        #logger.info(": Overall utilization ratio: {}".format(round(self.utilization_ratio, 3)))
         
         # Design is safe only if all utilization ratios are < 1.0
         if self.utilization_ratio > 1.0:

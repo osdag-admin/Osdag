@@ -1982,7 +1982,11 @@ class Window(QMainWindow):
                                 str(key_str) + ": (" + str(uiObj[key_str]) + ") - Load should be positive integer! \n"
                             uiObj[key_str] = ""
 
-                    key.setText(uiObj[key_str] if uiObj[key_str] != 'Disabled' else "")
+                    # Convert list values to string before setting text
+                    value = uiObj[key_str]
+                    if isinstance(value, list):
+                        value = value[0] if value else ""
+                    key.setText(value if value != 'Disabled' else "")
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
                     for n in new:

@@ -172,7 +172,7 @@ class ButtJointWelded(MomentConnection):
             values[KEY_DP_WELD_TYPE])
         weld.append(t3)
 
-        t2 = (KEY_DP_WELD_MATERIAL_G_O, "Material Grade", TYPE_TEXTBOX, #taking textbox input here need to check
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, "Material Grade Overwrite, Fu (MPa)", TYPE_TEXTBOX, #taking textbox input here need to check
             None, 
             values[KEY_DP_WELD_MATERIAL_G_O])
         weld.append(t2)
@@ -250,7 +250,7 @@ class ButtJointWelded(MomentConnection):
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t18)
 
-        t20 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_TEXTBOX, None, True, 'Float Validator')
+        t20 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ALL_CUSTOMIZED, True, 'No Validator')
         options_list.append(t20)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -261,20 +261,15 @@ class ButtJointWelded(MomentConnection):
 
         return options_list
 
-    #def customized_input(self):
-     #   list1 = []
-        #t11 = (KEY_GRD, self.grdval_customized)
-        #list1.append(t11)
-        #t13 = (KEY_D, self.diam_bolt_customized)
-        #list1.append(t13)
-        # t5 = (KEY_PLATE1_THICKNESS, self.plate_thick_customized)
-        # list1.append(t5)
-        # t6 = (KEY_PLATE2_THICKNESS, self.plate_thick_customized)
-        # list1.append(t6)
-        
-       # return list1
-    # removed this function bcz no need of customized input as of now t.s.
+    def customized_input(self):
+        list1 = []
+        t11 = (KEY_WELD_SIZE, self.weld_size_customized)
+        list1.append(t11)
+        return list1
     
+    @staticmethod
+    def weld_size_customized():
+        return ALL_WELD_SIZES
     
     def spacing(self, status):
         spacing = []
@@ -571,8 +566,34 @@ class ButtJointWelded(MomentConnection):
         # Track individual utilization ratios
         self.utilization_ratios = {}
 
-        # Calculate effective throat thickness based on weld size
-        self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
+        # Handle case when weld size is a list (i.e. when "all" is selected)
+        weld_size = design_dictionary[KEY_WELD_SIZE]
+        if isinstance(weld_size, str) and weld_size.lower() == 'all':
+            weld_size = ALL_WELD_SIZES
+        
+        if isinstance(weld_size, list):
+            # Convert all sizes to float for comparison
+            weld_size = [float(size) for size in weld_size]
+            
+            # Use the first valid weld size from the list
+            plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
+            plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+            Tmin = min(plate1_thk, plate2_thk)
+            s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
+            s_max = Tmin - 1.5
+            
+            # Find first weld size in the list that meets min/max requirements
+            valid_sizes = [size for size in weld_size if s_min <= size <= s_max]
+            if not valid_sizes:
+                logger.error(": No valid weld size found in the available sizes")
+                logger.error(": Design status: UNSAFE")
+                logger.info(": =========End Of Design===========")
+                return
+            self.weld_size = float(valid_sizes[0])
+        else:
+            # Normal case - single weld size
+            self.weld_size = float(weld_size)
+
         self.effective_throat_thickness = 0.707 * self.weld_size  
         
         self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O]) 
@@ -584,11 +605,6 @@ class ButtJointWelded(MomentConnection):
         else:  
             self.gamma_mw = 1.50  
 
-        #logger.info(": Input values:")
-        #logger.info(": Weld type: {}".format(weld_type))
-        #logger.info(": Ultimate strength of electrode (fu_w): {} N/mm²".format(self.fu))
-        #logger.info(": Partial safety factor (γₘw): {}".format(self.gamma_mw))
-            
         # Calculate weld design strength
         self.weld_design_strength = self.fu / (math.sqrt(3) * self.gamma_mw)
         
@@ -603,7 +619,8 @@ class ButtJointWelded(MomentConnection):
 
     def weld_length(self, design_dictionary):
         self.plates_width = float(design_dictionary[KEY_PLATE_WIDTH])
-        self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
+        # Use the weld_size that was already processed in design_of_weld
+        # self.weld_size = float(design_dictionary[KEY_WELD_SIZE])  # This line is no longer needed
         self.cover_plate = design_dictionary[KEY_COVER_PLATE]
         # Dictionary to store output values for UI display
         self.output_values_dict = {}
@@ -704,8 +721,8 @@ class ButtJointWelded(MomentConnection):
         """Verify weld strength and calculate utilization"""
         logger.info(": =========== Checking Weld Strength ===========")
         
-        # Extract required values from the design dictionary
-        self.weld_size = float(design_dictionary[KEY_WELD_SIZE])
+        # Use the weld_size that was already processed in design_of_weld
+        # self.weld_size = float(design_dictionary[KEY_WELD_SIZE])  # This line is no longer needed
         
         # Ensure we have weld_length_provided from previous calculation
         if not hasattr(self, 'weld_length_provided'):

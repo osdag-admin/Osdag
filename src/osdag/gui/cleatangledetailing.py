@@ -9,63 +9,13 @@ from PyQt5.QtGui import QPolygonF, QBrush
 from PyQt5.QtCore import QPointF
 from ..Common import *
 from .additionalfns import calculate_total_width
-class SeatedanglespacingOnCol(QMainWindow):
+class CleatAngle(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
-        
-        self.connection = connection_obj
-        self.val=rows
-        if self.val==3 or self.val==4:
-            self.plate_width=main.seated_angle.width
-            self.plate_length=main.seated_angle.leg_a_length
-        else:
-            self.plate_width=main.top_angle.width
-            self.plate_length=main.top_angle.leg_a_length
-        arr=[main.top_spacing_col(main,True),main.top_spacing_beam(main,True),main.seated_spacing_col(main,True),
-             main.seated_spacing_beam(main,True)]
-        val=self.val-1
-        print(val)
-        # print(arr[0],len(arr[0]))
-        # print('\n\n')
-        # for i in range(len(arr[0])):
-        #     print(f"INDEX : {i}  : {arr[0][i]} , {arr[0][i][3]}")
-        for i in arr[2]:
+        spacing_data = connection_obj.spacing(status=True)
+        for i in spacing_data:
             print(i)
-            print('\n\n')
-        
-        data = {entry[0]: entry[3] for entry in arr[val] if entry[0]}
-        print(data)
-        self.rows  = data['Bolt.Rows']
-        self.cols  = data['Bolt.Cols']
-        self.End   = data['Bolt.EndDist']
-        self.Gauge = data['Bolt.Gauge']
-        if self.Gauge==0 and 'Bolt.GaugeCentral' in data:
-            self.Gauge=data['Bolt.GaugeCentral']
-        self.Edge  = data['Bolt.EdgeDist']
-        # return
-        print(f"""
-        Plate Dimensions
-        ----------------
-        Plate Width  : {self.plate_width} mm
-        Plate Length : {self.plate_length} mm
-
-        Bolt Layout
-        -----------
-        Rows         : {self.rows}
-        Columns      : {self.cols}
-        End Distance : {self.End} mm
-        Gauge        : {self.Gauge} mm
-        Edge Distance: {self.Edge} mm
-        """)
-        # self.initUI()
-        self.param_map = {
-    'end': self.End,
-    'gauge': self.Gauge,
-    'edge': self.Edge,
-     'hole': main.bolt.bolt_diameter_provided
-}
-        
-        print(self.param_map)
+        return
         self.initUI()
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
@@ -77,8 +27,10 @@ class SeatedanglespacingOnCol(QMainWindow):
         # Left panel for parameter display
         left_panel = QWidget()
         left_layout = QVBoxLayout()
-        params=self.param_map
-        # Parameter display labels        
+        
+        # Parameter display labels
+        params = self.get_parameters()
+        
         # Display the parameter values
         for key, value in params.items():
             param_layout = QHBoxLayout()
@@ -110,24 +62,54 @@ class SeatedanglespacingOnCol(QMainWindow):
         
         # Ensure the view shows all content
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
-    
+    def get_parameters(self):
+        spacing_data = self.connection.spacing(status=True)  # Get actual values
+        param_map = {}
+        print('spacing_data length' , len(spacing_data))
+        for item in spacing_data:
+            key, _, _, value = item
+            # print('key : ', key)
+            if key == KEY_OUT_PITCH:  
+                param_map['pitch'] = float(value)
+            elif key == KEY_OUT_END_DIST:
+                param_map['end'] = float(value)
+            elif key == KEY_OUT_GAUGE1:
+                param_map['gauge1'] = float(value)
+            elif key == KEY_OUT_GAUGE2:
+                param_map['gauge2'] = float(value)
+            elif key == KEY_OUT_GAUGE:
+                param_map['gauge'] = float(value)
+            elif key == KEY_OUT_EDGE_DIST:
+                param_map['edge'] = float(value)
 
+        # Add hardcoded hole diameter
+        param_map['hole'] = self.main.bolt.bolt_diameter_provided
+
+        print("Extracted parameters:", param_map)
+
+        return param_map
 
     def createDrawing(self, params):
         
         # Extract parameters
-
+        pitch = params['pitch']
         end = params['end']
         if 'gauge' in params:
             gauge = params['gauge']
+        else:
+            gauge1 = params['gauge1']
+            gauge2 = params['gauge2']
         edge = params['edge']
         hole_diameter = params['hole']
-        print(f"rows: {self.rows}, cols: {self.cols}")
+        
         # Calculate dimensions
- 
+        if 'gauge' in params:
+            gauge1 = gauge
+            gauge2 = gauge
         width = self.plate_width
 
-        height = self.plate_length
+        height = self.plate_height
+        
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
         dimension_pen = QPen(Qt.black, 1.5)
@@ -146,66 +128,74 @@ class SeatedanglespacingOnCol(QMainWindow):
         # Draw holes
         for row in range(self.rows):
             for col in range(self.cols):
-                # Start from edge distance (center of first hole)
-                x_center = edge
-                for i in range(col):
-                    x_center += gauge
+                # Start from right edge (for example: total plate width - edge)
+                x_center = self.plate_width - edge
 
-                # Center of hole is at (x_center, y_center)
-                # Subtract hole_diameter/2 to draw ellipse properly from top-left
+                # Subtract gauges from right to left
+                for i in range(col):
+                    x_center -= gauge1 if i % 2 == 0 else gauge2
+
+                # Y-position stays the same
+                y_center = end + row * pitch
+
+                # Top-left corner for drawing the circle
                 x = x_center - hole_diameter / 2
-                y_center = end 
                 y = y_center - hole_diameter / 2
 
                 print(f"row: {row}, col: {col}, x: {x}, y: {y}")
                 self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
+
         print(params,dimension_pen)
         # Add dimensions
         self.addDimensions(params, dimension_pen)
 
     def addDimensions(self, params, pen):
         # Extract parameters
+        pitch = params['pitch']
         end = params['end']
         if 'gauge' in params:
             gauge = params['gauge']
-
+        else:
+            gauge1 = params['gauge1']
+            gauge2 = params['gauge2']
         edge = params['edge']
 
-
+        if 'gauge' in params:
+            gauge1 = gauge
+            gauge2 = gauge
         
-        width=self.plate_width
-        height=self.plate_length
+        width = self.plate_width
+        height = self.plate_height
         
         # Offsets for dimension lines
         h_offset = 20
         v_offset = 30
         
         # Add horizontal dimensions
-        x_start = 0
+        x_start = width
         segments = []
         # First edge
-        segments.append(('edge', x_start, x_start + edge))
-        x_start += edge
-        segments.append(('edge' ,x_start,x_start+gauge ))
-        x_start+=gauge
+        segments.append(('edge', x_start-edge, x_start ))
+        x_start -=edge
+       
         # Last edge
-        segments.append(('edge', x_start, x_start + edge))
+        segments.append(('edge', 0, x_start))
 
         # Draw each segment
         for label, x1, x2 in segments:
             value = x2 - x1
             self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{value:.1f}", pen)
-        self.addHorizontalDimension(0,height+h_offset,width,height+h_offset,f"{width} mm" , pen)
         # Add vertical dimensions
-        # Add top end distance dimension (from 0 to end)
         self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
-
-        # Add remaining distance from end to height
-        self.addVerticalDimension(width + v_offset , end, width + v_offset , height, str(height - end), pen)
-
+        for i in range(self.rows - 1):
+            self.addVerticalDimension(width + v_offset, end + i * pitch, width + v_offset, end + (i + 1) * pitch, str(pitch), pen)
+        
+        # Add bottom end distance dimension
+        self.addVerticalDimension(width + v_offset, height, width + v_offset, height - end, str(end), pen)
+        
         # Add left side dimension
-        total_height = 2 * end + (self.rows - 1)
-        self.addVerticalDimension(-v_offset/2, 0, -v_offset/2, height, str(height), pen)
+        total_height = 2 * end + (self.rows - 1) * pitch
+        self.addVerticalDimension(-v_offset, 0, -v_offset, total_height, str(total_height), pen)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)

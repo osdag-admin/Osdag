@@ -21,7 +21,7 @@ from ..utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 #from .ui_design_preferences import Ui_Dialog
-
+from .beam2beamcoverplatedetailing import B2Bcoverplate
 from .ui_summary_popup import Ui_Dialog1
 from ..design_report.reportGenerator import save_html
 from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
@@ -68,6 +68,9 @@ from .seatedanglespacing import SeatedanglespacingOnCol
 from .Beam2ColEnddetailing import BeamtoColDetailing
 from .baseplatedetailing import BasePlateDetailing
 from .baseplatedetailinghollow import BasePlateDetailingHollow
+from .b2bcoverplateweld import B2Bcoverplateweld
+from .cleatangledetailing import CleatAngle
+from .BC2Cendplate import BC2CEndPlate
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -2242,20 +2245,26 @@ class Window(QMainWindow):
                 fn = tup[1]
                 cls = fn.__qualname__.split('.')[0]
                 if op[0] == 'spacing':
-
+                            # print(main)
                             self.active_dialog = QtWidgets.QDialog()
                             dialog = self.active_dialog
                             module = inspect.getmodule(fn)       # Get the module where the function is defined
                             cls_obj = getattr(module, cls)       # Get the actual class object
-                            self.Obj = cls_obj()                 # Instantiate it
-                            if hasattr(self.Obj, 'spting_leg') and \
-                            hasattr(self.Obj.spting_leg, 'bolt_line') and \
-                            hasattr(self.Obj.spting_leg, 'bolts_one_line'):
-                                self.run_spacing_script(self.Obj.spting_leg.bolts_one_line,self.Obj.spting_leg.bolt_line,
-                                                        main=main)
-                            else:
-                                self.run_spacing_script(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
-                                                        main=main)
+                            self.Obj = cls_obj() 
+                            if main is FinPlateConnection:
+                                if hasattr(self.Obj, 'spting_leg') and \
+                                    hasattr(self.Obj.spting_leg, 'bolt_line') and \
+                                    hasattr(self.Obj.spting_leg, 'bolts_one_line'):
+                                        self.run_spacing_script(self.Obj.spting_leg.bolts_one_line,self.Obj.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_spacing_script(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
+                                                                main=main)
+                            elif main is CleatAngleConnection:
+                                self.run_spacing_script(0,0,CleatAngle,main)
+                            # return
+                                            # Instantiate it
+                            
                             break
                 elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
                             
@@ -2276,7 +2285,6 @@ class Window(QMainWindow):
                             return
                             print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
                 elif op[0]=='Detailing' and op[1]=='Typical Detailing':
-                            self.clear_output_fields()
 
                             module = inspect.getmodule(fn)       # Get the module where the function is defined
                             cls_obj = getattr(module, cls)       # Get the actual class object
@@ -2286,7 +2294,6 @@ class Window(QMainWindow):
                             data=main.output_values(main,True)
                             return
                 elif op[0]=='BasePlate.Detailing':
-                    self.clear_output_fields()
 
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)
@@ -2296,6 +2303,47 @@ class Window(QMainWindow):
                     else:
                         self.run_spacing_script(0,0,BasePlateDetailingHollow,main)
                     return
+                elif op[0]=='Web_plate.spacing'  :
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_spacing_script(0,0,B2Bcoverplate,(main,True))
+                    return
+                elif op[0]=='Flange_plate.spacing':
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_spacing_script(0,0,B2Bcoverplate,(main,False))
+                    return
+                elif op[0]=='Web detail':
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_spacing_script(0,0,B2Bcoverplateweld,(main,True))
+                    return
+                elif op[0]=='Flange detail':
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_spacing_script(0,0,B2Bcoverplateweld,(main,False))
+                    return
+                elif op[0]=='Bolt.web_bolts' or op[0]=='Bolt.flange_bolts':
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    if op[0]=='Bolt.web_bolts':
+                        self.run_spacing_script(0,0,BC2CEndPlate,(main,0))
+                    else:
+                        self.run_spacing_script(0,0,BC2CEndPlate,(main,1))
+                    break
                 dialog.setWindowTitle(title)
                 j = 1
                 _translate = QtCore.QCoreApplication.translate

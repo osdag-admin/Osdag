@@ -24,8 +24,7 @@ class My_ListWidget(QListWidget):
         QListWidget.addItems(self, Iterable)
 
     def addItem(self, *__args):
-        # Convert the argument to string before creating QListWidgetItem
-        QListWidget.addItem(self, My_ListWidgetItem(str(__args[0])))
+        QListWidget.addItem(self, My_ListWidgetItem(__args[0]))
 
 
 class My_ListWidgetItem(QListWidgetItem):
@@ -172,6 +171,7 @@ class Ui_Popup(object):
 
     def addAvailableItems(self,items,KEY_EXISTINGVAL_CUSTOMIZED):
         # Function to addItems from one listWidget to another
+
         # @author : Amir
 
         self.listWidget_2.clear()
@@ -181,17 +181,15 @@ class Ui_Popup(object):
                 # self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
                 if item in self.disabled_values:
                     continue
-                # Convert item to string before adding
-                self.listWidget_2.addItem(str(item))
+                self.listWidget_2.addItem(item)
 
             a = list(set(items) - set(KEY_EXISTINGVAL_CUSTOMIZED))
             for item_a in list(set(a + self.disabled_values)):
-                # Convert item to string before adding
-                self.listWidget.addItem(str(item_a))
+                self.listWidget.addItem(item_a)
+            # self.listWidget.addItems(a)
         else:
             for it in items:
-                # Convert item to string before adding
-                self.listWidget_2.addItem(str(it))
+                self.listWidget_2.addItem(it)
 
         for all_items in [self.listWidget.item(i) for i in range(self.listWidget.count())]:
             if all_items.text() in self.disabled_values:

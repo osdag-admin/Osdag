@@ -951,6 +951,7 @@ VALUES_TRUSSBOLT_THK = ['8', '10', '12', '14', '16']
 
 VALUES_MEMBERS = ['2', '3', '4', '5', '6', '7', '8']
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+WELD_SIZES = [3, 5, 6, 10, 12]
 VALUES_TYP_ANCHOR = ['End Plate Type', 'IS 5624-Type A', 'IS 5624-Type B']
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 VALUES_TYP = [TYP_BEARING, TYP_FRICTION_GRIP]

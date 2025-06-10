@@ -269,7 +269,7 @@ class ButtJointWelded(MomentConnection):
     
     @staticmethod
     def weld_size_customized():
-        return ALL_WELD_SIZES
+        return [str(size) for size in WELD_SIZES]
     
     def spacing(self, status):
         spacing = []

@@ -9,7 +9,7 @@ Description:
     connection modules (e.g., BeamCoverPlate, ColumnCoverPlate) used in Osdag.
     
 Reference:
-    - Osdag software guidelines and connection module structure documentation
+    - Osdag software guidelines and connection module structure documentatioweldn
 """
 
 from .moment_connection import MomentConnection
@@ -566,55 +566,79 @@ class ButtJointWelded(MomentConnection):
         # Track individual utilization ratios
         self.utilization_ratios = {}
 
-        # Handle case when weld size is a list (i.e. when "all" is selected)
+        # Get the raw weld size input
         weld_size = design_dictionary[KEY_WELD_SIZE]
-        if isinstance(weld_size, str) and weld_size.lower() == 'all':
-            weld_size = ALL_WELD_SIZES
-        
-        if isinstance(weld_size, list):
-            # Convert all sizes to float for comparison
-            weld_size = [float(size) for size in weld_size]
-            
-            # Use the first valid weld size from the list
-            plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
-            plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
-            Tmin = min(plate1_thk, plate2_thk)
-            s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
-            s_max = Tmin - 1.5
-            
-            # Find first weld size in the list that meets min/max requirements
-            valid_sizes = [size for size in weld_size if s_min <= size <= s_max]
-            if not valid_sizes:
-                logger.error(": No valid weld size found in the available sizes")
-                logger.error(": Design status: UNSAFE")
-                logger.info(": =========End Of Design===========")
-                return
-            self.weld_size = float(valid_sizes[0])
-        else:
-            # Normal case - single weld size
-            self.weld_size = float(weld_size)
 
-        self.effective_throat_thickness = 0.707 * self.weld_size  
-        
-        self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O]) 
-        
-        # Determine weld type and set gamma_mw based on it
+        plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
+        plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+        Tmin = min(plate1_thk, plate2_thk)
+        s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
+        s_max = Tmin - 1.5
+
+        # If 'all' is selected, pick the first valid weld size as per IS 800:2007
+        if isinstance(weld_size, str) and weld_size.lower() == 'all':
+            valid_sizes = [s for s in ALL_WELD_SIZES if s_min <= s <= s_max]
+            if valid_sizes:
+                self.weld_size = float(valid_sizes[0])
+            else:
+                self.weld_size = None
+        else:
+            # Customized selection: could be a list of My_ListWidgetItem or direct value
+            values_to_process = weld_size
+            float_weld_sizes = []
+            if isinstance(values_to_process, list):
+                for item in values_to_process:
+                    try:
+                        # Handle My_ListWidgetItem or similar objects
+                        if hasattr(item, 'text') and callable(item.text):
+                            text_val = item.text()
+                            float_weld_sizes.append(float(text_val))
+                        elif isinstance(item, (str, int, float)):
+                            float_weld_sizes.append(float(item))
+                    except Exception:
+                        continue
+                # Use the first valid customized value within IS limits
+                valid_custom = [s for s in float_weld_sizes if s_min <= s <= s_max]
+                if valid_custom:
+                    self.weld_size = float(valid_custom[0])
+                else:
+                    self.weld_size = None
+            else:
+                # Single value (customized)
+                try:
+                    if hasattr(values_to_process, 'text') and callable(values_to_process.text):
+                        self.weld_size = float(values_to_process.text())
+                    else:
+                        self.weld_size = float(values_to_process)
+                    # Check IS limits
+                    if not (s_min <= self.weld_size <= s_max):
+                        self.weld_size = None
+                except Exception:
+                    self.weld_size = None
+
+        # Ensure weld_size is set before using it
+        if self.weld_size is None:
+            logger.error(": weld_size is not set. Cannot proceed with weld design.")
+            self.design_status = False
+            logger.error(": Design status: UNSAFE due to missing or invalid weld size.")
+            logger.info(": =========End Of Design===========")
+            return
+
+        # Return the selected weld size for output if needed
+        self.selected_weld_size = self.weld_size
+
+        self.effective_throat_thickness = 0.707 * self.weld_size
+        self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
         weld_type = design_dictionary[KEY_DP_WELD_TYPE]
         if weld_type == "Shop weld":
-            self.gamma_mw = 1.25  
-        else:  
-            self.gamma_mw = 1.50  
-
-        # Calculate weld design strength
+            self.gamma_mw = 1.25
+        else:
+            self.gamma_mw = 1.50
         self.weld_design_strength = self.fu / (math.sqrt(3) * self.gamma_mw)
-        
-        # Call the design sequence methods in order
         self.weld_length(self,design_dictionary)
         self.weld_strength_verification(self,design_dictionary)
         self.long_joint_reduction_factor(self)
         self.check_base_metal_strength(self,design_dictionary)
-        
-        # Only after all checks are complete, calculate the final utilization ratio
         self.calculate_final_utilization_ratio(self)
 
     def weld_length(self, design_dictionary):
@@ -1033,4 +1057,3 @@ class ButtJointWelded(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary,
                              fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-    

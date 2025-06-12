@@ -1,7 +1,7 @@
 """
 Module: butt_joint_welded.py
-Author: Aman
-Date: 2025-02-26
+Author: Aman, Tanu Singh, Nishi Kant Mandal
+Date: 2025-06-12
 
 Description:
     ButtJointWelded is a moment connection module that represents a welded butt joint connection.
@@ -9,7 +9,7 @@ Description:
     connection modules (e.g., BeamCoverPlate, ColumnCoverPlate) used in Osdag.
     
 Reference:
-    - Osdag software guidelines and connection module structure documentatioweldn
+    - Osdag software guidelines and connection module structure documentation
 """
 
 from .moment_connection import MomentConnection

@@ -83,11 +83,16 @@ class ButtJointWelded(MomentConnection):
         return design_input
 
     def get_values_for_design_pref(self, key, design_dictionary):
+        # Get fu value from selected material
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL], 41).fu
+        else:
+            fu = ''
+
         # Default values as per requirements
         defaults = {
-            #chnged design preference values for weld fabrication and material grade t.s.
-            KEY_DP_WELD_TYPE:"Shop weld",
-            KEY_DP_WELD_MATERIAL_G_O:"450", # not sure about what value to write in default t.s.
+            KEY_DP_WELD_TYPE: "Shop weld",
+            KEY_DP_WELD_MATERIAL_G_O: str(fu),  # Set weld material grade to fu of selected material
             KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
             KEY_DP_DETAILING_PACKING_PLATE: "Yes" 
         }
@@ -156,23 +161,30 @@ class ButtJointWelded(MomentConnection):
     # added weld function
 
     def weld_values(self, input_dictionary):
+        # Get fu value from selected material if available
+        fu = ''
+        if input_dictionary and KEY_MATERIAL in input_dictionary:
+            if input_dictionary[KEY_MATERIAL] != 'Select Material':
+                fu = Material(input_dictionary[KEY_MATERIAL], 41).fu
+
         values = {
-            KEY_DP_WELD_TYPE:'Shop weld',
-            KEY_DP_WELD_MATERIAL_G_O:'450', # not sure about what value to write in default t.s.
+            KEY_DP_WELD_TYPE: 'Shop weld',
+            KEY_DP_WELD_MATERIAL_G_O: str(fu) if fu else '410',  # Default to 410 if no material selected
         }
 
+        # Update values from input dictionary if available
         for key in values.keys():
-            if key in input_dictionary.keys():
+            if input_dictionary and key in input_dictionary:
                 values[key] = input_dictionary[key]
 
-        weld = [] #need to check if it exists
+        weld = []
 
-        t3 = (KEY_DP_WELD_TYPE,"Type",TYPE_COMBOBOX,
+        t3 = (KEY_DP_WELD_TYPE, "Type", TYPE_COMBOBOX,
             ['Shop weld', 'Field weld'], 
             values[KEY_DP_WELD_TYPE])
         weld.append(t3)
 
-        t2 = (KEY_DP_WELD_MATERIAL_G_O, "Material Grade Overwrite, Fu (MPa)", TYPE_TEXTBOX, #taking textbox input here need to check
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, "Material Grade Overwrite, Fu (MPa)", TYPE_TEXTBOX,
             None, 
             values[KEY_DP_WELD_MATERIAL_G_O])
         weld.append(t2)

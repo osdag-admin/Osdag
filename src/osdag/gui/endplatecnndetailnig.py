@@ -11,24 +11,26 @@ from ..Common import *
 from .additionalfns import calculate_total_width
 from ..design_type.connection.end_plate_connection import EndPlateConnection
 
-class BoltPatternGenerator(QMainWindow):
+class EndPlateDetailer(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
         self.main=main
-        self.plate_height = main.plate.height
-        self.plate_width = main.plate.length 
-        self.hole_dia=main.bolt.bolt_diameter_provided
-        self.rows=main.plate.bolts_one_line
-        self.cols=main.plate.bolt_line
-        print(self.plate_height,self.plate_width)
         output=main.output_values(main,True)
         dict1={i[0] : i[3] for i in output}
+        self.plate_height = dict1['Plate.Height']
+        self.plate_width = dict1['Plate.Length']
+        self.hole_dia=dict1['Bolt.Diameter']
+        self.rows=dict1['Bolt.Rows']
+        self.cols=main.plate.bolt_line
+        print(self.cols)
         for i in output:
             print(i)
         self.weldsize=0
         if 'Weld.Size' in dict1:
             self.weldsize=dict1['Weld.Size']
+        print(main.supported_section.web_thickness)       
+        self.weldgap=main.supported_section.web_thickness
         self.initUI()
         # print(self.connection.spacing(status=True))
     def initUI(self):
@@ -160,7 +162,11 @@ class BoltPatternGenerator(QMainWindow):
                 print(f"row: {row}, col: {col}, x: {x}, y: {y}")
                 self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
         weld_size=self.weldsize
-        self.scene.addRect(0, 0, weld_size, height, dimension_pen,red_brush)
+        weld_gap=self.weldgap
+        x_center=self.plate_width/2
+        y_center=self.plate_height/2
+        self.scene.addRect(x_center-weld_gap/2-weld_size, 0, weld_size, height, dimension_pen,red_brush)
+        self.scene.addRect(x_center+weld_gap/2, 0, weld_size, height, dimension_pen,red_brush)
         print(params,dimension_pen)
         # Add dimensions
         self.addDimensions(params, dimension_pen)

@@ -12,10 +12,43 @@ from .additionalfns import calculate_total_width
 class CleatAngle(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
+        (main,self.flag)=main
         spacing_data = connection_obj.spacing(status=True)
+        output=connection_obj.output_values(True)
+        data1={ f'{i[1]} + {i[0]}' : i[3] for i in output}
+        params= {
+            'width' : int(data1['Height (mm) + Plate.Height']),
+            'hole' : int(data1['Diameter (mm) + Bolt.Diameter']),
+        }
+        if self.flag==0:
+            params['length']=int(data1['Cleat Angle Designation + Cleat.Angle'][0:2])
+            params['rows']=int(data1['Bolt Rows (nos) + Bolt.OneLine'])
+            params['cols']=int(data1['Bolt Columns (nos) + Bolt.Line'])
+        else:
+            params['length']=int(data1['Cleat Angle Designation + Cleat.Angle'][5:7])
+            params['rows']=int(data1['Bolt Rows (nos) + Cleat.Spting_leg.OneLine'])
+            params['cols']=int(data1['Bolt Columns (nos) + Cleat.Spting_leg.Line'])
         for i in spacing_data:
             print(i)
-        return
+        for item in spacing_data:
+            if not isinstance(item[0], str):
+                continue
+            key = item[0].lower()
+            value = item[3]
+
+            if 'pitch' in key:
+                params['pitch'] = value
+            elif 'gauge1' in key:
+                params['gauge1'] = value
+            elif 'gauge2' in key:
+                params['gauge2'] = value
+            elif 'end' in key:
+                params['end']=value
+            elif 'edge' in key:
+                params['edge']=value
+        for i in params:
+            print(f'{i} : {params[i]}')
+        self.params=params
         self.initUI()
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
@@ -29,10 +62,12 @@ class CleatAngle(QMainWindow):
         left_layout = QVBoxLayout()
         
         # Parameter display labels
-        params = self.get_parameters()
+        params = self.params
         
         # Display the parameter values
         for key, value in params.items():
+            if key=='cols' or key=='rows' or key=='hole' or key=='length' or key=='width':
+                continue
             param_layout = QHBoxLayout()
             param_label = QLabel(f'{key.title()} Distance (mm):')
             value_label = QLabel(f'{value}')
@@ -62,32 +97,6 @@ class CleatAngle(QMainWindow):
         
         # Ensure the view shows all content
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
-    def get_parameters(self):
-        spacing_data = self.connection.spacing(status=True)  # Get actual values
-        param_map = {}
-        print('spacing_data length' , len(spacing_data))
-        for item in spacing_data:
-            key, _, _, value = item
-            # print('key : ', key)
-            if key == KEY_OUT_PITCH:  
-                param_map['pitch'] = float(value)
-            elif key == KEY_OUT_END_DIST:
-                param_map['end'] = float(value)
-            elif key == KEY_OUT_GAUGE1:
-                param_map['gauge1'] = float(value)
-            elif key == KEY_OUT_GAUGE2:
-                param_map['gauge2'] = float(value)
-            elif key == KEY_OUT_GAUGE:
-                param_map['gauge'] = float(value)
-            elif key == KEY_OUT_EDGE_DIST:
-                param_map['edge'] = float(value)
-
-        # Add hardcoded hole diameter
-        param_map['hole'] = self.main.bolt.bolt_diameter_provided
-
-        print("Extracted parameters:", param_map)
-
-        return param_map
 
     def createDrawing(self, params):
         
@@ -101,15 +110,18 @@ class CleatAngle(QMainWindow):
             gauge2 = params['gauge2']
         edge = params['edge']
         hole_diameter = params['hole']
-        
+        self.rows=params['rows']
+        self.cols=params['cols']
+
         # Calculate dimensions
         if 'gauge' in params:
             gauge1 = gauge
             gauge2 = gauge
-        width = self.plate_width
+        width = params['length']
 
-        height = self.plate_height
-        
+        height = params['width']
+        self.plate_width=width
+        self.plate_height=height
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
         dimension_pen = QPen(Qt.black, 1.5)

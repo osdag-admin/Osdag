@@ -71,6 +71,7 @@ from .baseplatedetailinghollow import BasePlateDetailingHollow
 from .b2bcoverplateweld import B2Bcoverplateweld
 from .cleatangledetailing import CleatAngle
 from .BC2Cendplate import BC2CEndPlate
+from .endplatecnndetailnig import EndPlateDetailer
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -2244,7 +2245,7 @@ class Window(QMainWindow):
                 title = tup[0]
                 fn = tup[1]
                 cls = fn.__qualname__.split('.')[0]
-                if op[0] == 'spacing':
+                if op[0] == 'spacing' or op[0]=='Cleat.Spting_leg.spacing':
                             # print(main)
                             self.active_dialog = QtWidgets.QDialog()
                             dialog = self.active_dialog
@@ -2260,8 +2261,12 @@ class Window(QMainWindow):
                                 else:
                                         self.run_spacing_script(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
                                                                 main=main)
-                            elif main is CleatAngleConnection:
-                                self.run_spacing_script(0,0,CleatAngle,main)
+                            elif main is CleatAngleConnection and op[0]=='spacing':
+                                self.run_spacing_script(0,0,CleatAngle,(main,0))
+                            elif op[0]!='spacing' and main is CleatAngleConnection:
+                                self.run_spacing_script(0,0,CleatAngle,(main,1))
+                            elif main is EndPlateConnection:
+                                self.run_spacing_script(0,0,EndPlateDetailer,main)
                             # return
                                             # Instantiate it
                             

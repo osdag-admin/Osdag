@@ -9,6 +9,7 @@
 
 ## Table of contents
 * <a href="#quick-start">Quick start</a>
+* <a href="#building-from-source">Building from Source</a>
 * <a href="#contribute">Contributing</a>
 * <a href="#bugs">Bugs and known issues</a>
 * <a href="#version">Versioning</a>
@@ -123,10 +124,72 @@
           If you are using the Unity desktop, you may also pin this launcher to the launcher sidebar.
 
       2) Using the Command:
-          In the bash prompt, navigate to the Osdag directory and enter the following command python osdagMainPage.py
-
-      Note that, Step/Command 2 will work only if the system default python is the one installed through Miniconda2.
+          In the bash prompt, navigate to the Osdag directory and enter the following command python osdagMainPage.py      Note that, Step/Command 2 will work only if the system default python is the one installed through Miniconda2.
       Alternatively, you may specify the (installed) python you wish to use, in Command 2.
+
+## Building from Source
+
+For developers who want to run Osdag from source code or contribute to development:
+
+### Prerequisites
+- Python 3.9 or later
+- Git
+- pip (Python package manager)
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/osdag-admin/Osdag.git
+cd Osdag
+```
+
+### 2. Install Dependencies
+
+#### Windows
+```bash
+pip install -r requirements.txt
+pip install PyQt5
+```
+
+#### Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install python3-pip python3-venv
+pip install -r requirements.txt
+pip install PyQt5
+```
+
+#### RHEL/CentOS/Fedora
+```bash
+sudo dnf install python3-pip python3-virtualenv  # Fedora
+sudo yum install python3-pip  # CentOS/RHEL
+pip install -r requirements.txt
+pip install PyQt5
+```
+
+### 3. Run Osdag
+```bash
+cd src
+python -m osdag.osdagMainPage
+```
+
+### Virtual Environment (Recommended)
+```bash
+# Create virtual environment
+python -m venv my_env
+
+# Activate virtual environment
+# Windows (Command Prompt/PowerShell):
+my_env\Scripts\activate
+
+# Linux/Mac (Terminal/Bash):
+source my_env/bin/activate
+
+# Install and run
+pip install -r requirements.txt
+pip install PyQt5
+cd src
+python -m osdag.osdagMainPage
+```
 
 ## <a id="user-content-contribute" class="anchor" href="#bugs" aria-hidden="true"></a> Contributing
 Osdag invites enthusiasts with similar interest(s) to contribute to Osdag development. Your contributions can go a long way in improving the software.

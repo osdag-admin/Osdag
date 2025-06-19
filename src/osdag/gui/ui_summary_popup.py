@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QDialogButtonBox
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QDialogButtonBox, QCheckBox
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
 import configparser
@@ -13,6 +13,8 @@ import os
 import re
 import time
 import pickle
+import subprocess
+import platform
 # from .ui_summary_popup import Ui_Dialog1
 from ..design_report.reportGenerator import save_html
 from ..design_report.reportGenerator_latex import CreateLatex
@@ -156,11 +158,18 @@ class Ui_Dialog1(object):
         self.txt_additionalComments.setReadOnly(False)
         self.txt_additionalComments.setObjectName("txt_additionalComments")
         self.gridLayout.addWidget(self.txt_additionalComments, 9, 1, 1, 1)
+        
+        # Add checkbox for opening PDF after generation
+        self.chk_open_pdf = QCheckBox(self.Dialog)
+        self.chk_open_pdf.setObjectName("chk_open_pdf")
+        self.chk_open_pdf.setChecked(True)  # Default to checked for better UX
+        self.gridLayout.addWidget(self.chk_open_pdf, 10, 1, 1, 1)
+        
         self.buttonBox = QtWidgets.QDialogButtonBox(self.Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.gridLayout.addWidget(self.buttonBox, 10, 1, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 11, 1, 1, 1)
 
         self.retranslateUi()
 
@@ -243,6 +252,10 @@ class Ui_Dialog1(object):
         if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext + '.log'):
             self.Dialog.accept()
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
+            
+            # Open PDF if checkbox is checked
+            if self.chk_open_pdf.isChecked():
+                self.open_pdf_file(filename.replace(".pdf", "") + ".pdf")
         elif not os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(
                 fname_no_ext + '.log'):
             self.Dialog.reject()
@@ -312,12 +325,27 @@ class Ui_Dialog1(object):
         self.lbl_jobNumber.setText(_translate("Dialog", "Job Number :"))
         self.lbl_client.setText(_translate("Dialog", "Client :"))
         self.lbl_addComment.setText(_translate("Dialog", "Additional Comments :"))
+        self.chk_open_pdf.setText(_translate("Dialog", "Open PDF after generation"))
         self.txt_additionalComments.setHtml(_translate("Dialog",
                                                        "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                                                        "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
                                                        "p, li { white-space: pre-wrap; }\n"
                                                        "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
                                                        "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:11pt;\"><br /></p></body></html>"))
+
+    def open_pdf_file(self, filename):
+        """Open PDF file using the system's default PDF viewer"""
+        try:
+            if platform.system() == 'Windows':
+                os.startfile(filename)
+            elif platform.system() == 'Darwin':  # macOS
+                subprocess.call(['open', filename])
+            else:  # Linux and other Unix-like systems
+                subprocess.call(['xdg-open', filename])
+        except Exception as e:
+            # If opening fails, show a gentle message but don't crash
+            QMessageBox.information(QMessageBox(), 'Information', 
+                                   f'Report saved successfully!\nCould not open PDF automatically: {str(e)}')
 
 
 if __name__ == "__main__":

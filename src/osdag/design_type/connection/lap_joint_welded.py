@@ -35,7 +35,7 @@ class LapJointWelded(MomentConnection):
     def tab_list(self):
         tabs = []
         # Only Bolt and Detailing tabs
-        tabs.append(("Bolt", TYPE_TAB_2, self.bolt_values))
+        tabs.append((("Weld", TYPE_TAB_2, self.weld_values)))
         tabs.append(("Detailing", TYPE_TAB_2, self.detailing_values))
         return tabs
 
@@ -48,47 +48,42 @@ class LapJointWelded(MomentConnection):
 
     def input_dictionary_design_pref(self):
         design_input = []
-        
-        # Bolt preferences
-        design_input.append(("Bolt", TYPE_COMBOBOX, [
-            KEY_DP_BOLT_TYPE,  # For pretensioned/non-pretensioned
-            KEY_DP_BOLT_HOLE_TYPE,  # For standard/oversized
-            KEY_DP_BOLT_SLIP_FACTOR  # For slip factor as per Table 20
+        design_input.append(("Weld", TYPE_COMBOBOX, [
+            KEY_DP_WELD_TYPE,
+            KEY_DP_WELD_MATERIAL_G_O
         ]))
-        
-        # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE  # For edge preparation method
+            KEY_DP_DETAILING_EDGE_TYPE,
         ]))
-        
         return design_input
 
     def input_dictionary_without_design_pref(self):
         design_input = []
-        
-        # Default values for bolt and detailing
         design_input.append((None, [
-            KEY_DP_BOLT_TYPE,
-            KEY_DP_BOLT_HOLE_TYPE, 
-            KEY_DP_BOLT_SLIP_FACTOR,
-            KEY_DP_DETAILING_EDGE_TYPE
+            KEY_DP_WELD_TYPE,
+            KEY_DP_WELD_MATERIAL_G_O,
+            KEY_DP_DETAILING_EDGE_TYPE,
         ], ''))
-        
         return design_input
 
     def get_values_for_design_pref(self, key, design_dictionary):
+        # Get fu value from selected material
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL], 41).fu
+        else:
+            fu = ''
+
         # Default values as per requirements
         defaults = {
-            KEY_DP_BOLT_TYPE: "Non Pre-tensioned",
-            KEY_DP_BOLT_HOLE_TYPE: "Standard",
-            KEY_DP_BOLT_SLIP_FACTOR: "0.3",
-            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut"
+            KEY_DP_WELD_TYPE: "Shop weld",
+            KEY_DP_WELD_MATERIAL_G_O: str(fu),  # Set weld material grade to fu of selected material
+            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
         }
         return defaults.get(key)
 
     def detailing_values(self, input_dictionary):
         values = {
-            KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut'
+            KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
         }
 
         for key in values.keys():
@@ -102,6 +97,7 @@ class LapJointWelded(MomentConnection):
             ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
+
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
 
@@ -139,6 +135,36 @@ class LapJointWelded(MomentConnection):
     #     bolt.append(t3)
 
     #     return bolt
+
+    def weld_values(self, input_dictionary):
+        # Get fu value from selected material if available
+        fu = ''
+        if input_dictionary and KEY_MATERIAL in input_dictionary:
+            if input_dictionary[KEY_MATERIAL] != 'Select Material':
+                fu = Material(input_dictionary[KEY_MATERIAL], 41).fu
+
+        values = {
+            KEY_DP_WELD_TYPE: 'Shop weld',
+            KEY_DP_WELD_MATERIAL_G_O: str(fu) if fu else '410',  # Default to 410 if no material selected
+        }
+
+        # Update values from input dictionary if available
+        for key in values.keys():
+            if input_dictionary and key in input_dictionary:
+                values[key] = input_dictionary[key]
+
+        weld = []
+
+        t3 = (KEY_DP_WELD_TYPE, "Type", TYPE_COMBOBOX,
+            ['Shop weld', 'Field weld'], 
+            values[KEY_DP_WELD_TYPE])
+        weld.append(t3)
+
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, "Material Grade Overwrite, Fu (MPa)", TYPE_TEXTBOX,
+            None, 
+            values[KEY_DP_WELD_MATERIAL_G_O])
+        weld.append(t2)
+        return weld
 
 
     ####################################
@@ -194,10 +220,7 @@ class LapJointWelded(MomentConnection):
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
-
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
-        options_list.append(t5)
-
+        
         t31 = (KEY_PLATE1_THICKNESS, KEY_DISP_PLATE1_THICKNESS, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t31)
 
@@ -207,39 +230,34 @@ class LapJointWelded(MomentConnection):
         t35 = (KEY_PLATE_WIDTH, KEY_DISP_PLATE_WIDTH, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t35)
 
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+        options_list.append(t5)
+
+        t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t18)
+
+        t20 = (KEY_WELD_SIZE, KEY_DISP_WELD_SIZE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ALL_CUSTOMIZED, True, 'No Validator')
+        options_list.append(t20)
+
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
         t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
-        options_list.append(t9)
-
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
-        options_list.append(t10)
-
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
-        options_list.append(t12)
-
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
-        options_list.append(t11)
-
         return options_list
 
     def customized_input(self):
 
         list1 = []
-        t1 = (KEY_GRD, self.grdval_customized)
-        list1.append(t1)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        list1.append(t3)
-        # t5 = (KEY_PLATE1_THICKNESS, self.plate_thick_customized)
-        # list1.append(t5)
-        # t6 = (KEY_PLATE2_THICKNESS, self.plate_thick_customized)
-        # list1.append(t6)
-        
+        t11 = (KEY_WELD_SIZE, self.weld_size_customized)
+        list1.append(t11)
         return list1
+    
+    @staticmethod
+    def weld_size_customized():
+        return [str(size) for size in WELD_SIZES]
+        
     
     def spacing(self, status):
         spacing = []
@@ -266,48 +284,35 @@ class LapJointWelded(MomentConnection):
         return spacing
 
     def output_values(self, flag):
-
-        out_list = []
-        t4 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
-        out_list.append(t4)
-
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t2)
-
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t3)
-
-        t31 = (KEY_OUT_TYP_PROVIDED, KEY_OUT_DISP_TYP_PROVIDED, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t31)
-
-        t8 = (KEY_OUT_BOLT_SHEAR,KEY_OUT_DISP_BOLT_SHEAR , TYPE_TEXTBOX, '', True)
-        out_list.append(t8)
-
-        t4 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, '', True)
-        out_list.append(t4)
-
-        t5 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
-              '', True)
-        out_list.append(t5)
-
-        t17 = (None, DISP_TITLE_BOLTDS, TYPE_TITLE, None, True)
-        out_list.append(t17)
-        t17 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, '', True)
-        out_list.append(t17)
-        t18 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX,'', True)
-        out_list.append(t18)
-
-        t19 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX,'', True)
-        out_list.append(t19)
-
-        t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,'', True)
-        out_list.append(t20)
-        
-        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
+        out_list=[]
+        # Cover plate details
+        # Calculate cover_type based on planes attribute
+        t21 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t21)
+
+        t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
+               round(self.utilization_ratio, 3) if flag else '', True)
+        out_list.append(t22)
+
+        t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
+               "Fillet" if flag else '', True)
+        out_list.append(t23)
+
+        t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
+               round(self.weld_size, 1) if flag else '', True)
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH_kN, TYPE_TEXTBOX,
+               round(self.weld_strength/1000, 2) if flag else '', True)  # Convert to kN
+        out_list.append(t25)
+
+        t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
+               round(self.weld_length_effective, 1) if flag else '', True)
+        out_list.append(t26)
+
+        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
+               round(self.weld_length_provided, 1) if flag else '', True)
+        out_list.append(t27)
 
         return out_list
 

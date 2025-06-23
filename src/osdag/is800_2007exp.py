@@ -1047,6 +1047,8 @@ class IS800_2007(object):
             min_weld_size = 5
         elif thicker_part_thickness <= 32.0:
             min_weld_size = 6
+        elif thicker_part_thickness <= 50.0:
+            min_weld_size = 8
         else:  # thicker_part_thickness <= 50.0:
             min_weld_size = 10
         # TODO else:

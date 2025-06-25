@@ -293,6 +293,10 @@ class Flexure_Misc(Member):
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
+        t_support = (KEY_SUPPORT, "Support Type", TYPE_COMBOBOX, ["Simply Supported", "Cantilever"], True, "")
+        options_list.append(t_support)
+
+
 
 
         return options_list

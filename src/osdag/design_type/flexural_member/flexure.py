@@ -35,6 +35,8 @@ from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
 from ...utils.common import is800_2007
 from ...utils.common.component import *
 from osdag.cad.items.plate import Plate
+from PyQt5.QtWidgets import QPushButton
+from .plot_bmd_sfd import PlotInputWidget
 
 class Flexure(Member):
 
@@ -256,11 +258,11 @@ class Flexure(Member):
         # options_list.append(t3)
 
         #
-        #t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT1, True, 'No Validator')
-        #options_list.append(t4)
+        t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT1, True, 'No Validator')
+        options_list.append(t4)
 
-        #t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
-        #options_list.append(t12)
+        t12 = (KEY_IMAGE, None, TYPE_IMAGE, Simply_Supported_img, True, 'No Validator')
+        options_list.append(t12)
 
 
         # t3 = (KEY_BUCKLING_METHOD, KEY_WEB_BUCKLING, TYPE_COMBOBOX, KEY_WEB_BUCKLING_option, False, 'No Validator')
@@ -286,10 +288,20 @@ class Flexure(Member):
 
         t8 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
+        bm_button = QPushButton("Plot BMD")
+        self.bmd_widget = PlotInputWidget("BM")
+        bm_button.clicked.connect(self.bmd_widget.show)
+        t8b = ("bm_plot_button", "", 'BUTTON', bm_button, True, "")
+        options_list.append(t8b)
 
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
+        sf_button = QPushButton("Plot SFD")
+        self.sfd_widget = PlotInputWidget("SFD")
+        sf_button.clicked.connect(self.sfd_widget.show)
+        t9b = ("sf_plot_button", "", 'BUTTON', sf_button, True, "")
+        options_list.append(t9b)
 
 
         return options_list
@@ -3089,4 +3101,3 @@ class Flexure(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #
-

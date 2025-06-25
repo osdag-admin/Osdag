@@ -22,6 +22,7 @@ from ...utils.common.load import Load
 import logging
 
 import math
+import os
 
 class ButtJointBolted(MomentConnection):
     def __init__(self):
@@ -31,6 +32,8 @@ class ButtJointBolted(MomentConnection):
         self.packing_plate_thickness = 0.0
         self.beta_pkg = 1.0
         self.calculated_cover_plate_thickness = 0.0
+        # Create placeholder files on initialization
+        self.create_placeholder_files()
 
     ###############################################
     # Design Preference Functions Start
@@ -61,9 +64,7 @@ class ButtJointBolted(MomentConnection):
         
         # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE,
-            KEY_DP_DETAILING_PACKING_PLATE
-                # For edge preparation method
+            KEY_DP_DETAILING_EDGE_TYPE  # For edge preparation method
         ]))
         
         return design_input
@@ -95,7 +96,7 @@ class ButtJointBolted(MomentConnection):
     def detailing_values(self, input_dictionary):
         values = {
             KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
-            KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
+            # KEY_DP_DETAILING_PACKING_PLATE: 'Yes',  # Commented out packing plate preference
         }
 
         for key in values.keys():
@@ -110,9 +111,10 @@ class ButtJointBolted(MomentConnection):
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
-        t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
-              ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
-        detailing.append(t3)
+        # Commented out packing plate design preference
+        # t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
+        #       ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
+        # detailing.append(t3)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
@@ -341,40 +343,81 @@ class ButtJointBolted(MomentConnection):
         return KEY_DISP_BUTTJOINTBOLTED
 
     def call_3DColumn(self, ui, bgcolor):
-        # status = self.resultObj['Bolt']['status']
-        # if status is True:
-        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-        if ui.chkBxCol.isChecked():
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        # self.display_3DModel("Beam", bgcolor)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
+        # Temporarily disabled 3D functionality
+        pass
+        # if ui.chkBxCol.isChecked():
+        #     ui.btn3D.setChecked(Qt.Unchecked)
+        #     ui.chkBxCol.setChecked(Qt.Unchecked)
+        #     ui.mytabWidget.setCurrentIndex(0)
+        # ui.commLogicObj.display_3DModel("Column", bgcolor)
 
-    def get_3d_components(self):
+    @staticmethod
+    def get_3d_components(main=None):
+        """Get 3D components for visualization"""
+        # Create placeholder files if they don't exist
+        ButtJointBolted.create_placeholder_files()
+        
+        # Return empty components list for now
         components = []
 
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
+        # t1 = ('Model', self.call_3DModel)
+        # components.append(t1)
 
-        t3 = ('Plate1', self.call_3DColumn)
-        components.append(t3)
+        # t3 = ('Plate1', self.call_3DColumn)
+        # components.append(t3)
 
-        t4 = ('Plate2', self.call_3DPlate)
-        components.append(t4)
+        # t4 = ('Plate2', self.call_3DPlate)
+        # components.append(t4)
+
 
         return components
 
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
+    @staticmethod
+    def create_placeholder_files():
+        """Create placeholder files for 3D visualization if they don't exist"""
+        try:
+            # Get the absolute path of the current directory
+            current_dir = os.path.abspath(os.path.dirname(__file__))
+            images_dir = os.path.join(current_dir, '..', '..', '..', 'ResourceFiles', 'images')
 
+            # Create directory if it doesn't exist
+            os.makedirs(images_dir, exist_ok=True)
+
+            # Create empty files
+            image_files = ['3d.png', 'top.png', 'front.png', 'side.png']
+            for filename in image_files:
+                filepath = os.path.join(images_dir, filename)
+                if not os.path.exists(filepath):
+                    with open(filepath, 'w') as f:
+                        pass
+                    print(f"Created placeholder file: {filepath}")
+
+        except Exception as e:
+            print(f"Warning: Could not create placeholder files: {str(e)}")
+
+
+    # def call_3DPlate(self, ui, bgcolor):
+    #     from PyQt5.QtWidgets import QCheckBox
+    #     from PyQt5.QtCore import Qt
+    #     for chkbox in ui.frame.children():
+    #         if chkbox.objectName() == 'Cover Plate':
+    #             continue
+    #         if isinstance(chkbox, QCheckBox):
+    #             chkbox.setChecked(Qt.Unchecked)
+    #     ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
+
+
+    def call_3DPlate(self, ui, bgcolor):
+        # Temporarily disabled 3D functionality
+        pass
+        # from PyQt5.QtWidgets import QCheckBox
+        # from PyQt5.QtCore import Qt
+        # for chkbox in ui.frame.children():
+        #     if chkbox.objectName() == 'Cover Plate':
+        #         continue
+        #     if isinstance(chkbox, QCheckBox):
+        #         chkbox.setChecked(Qt.Unchecked)
+        # ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     def func_for_validation(self, design_dictionary):
 

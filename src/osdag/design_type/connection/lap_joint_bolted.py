@@ -699,4 +699,5 @@ class LapJointBolted(MomentConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    
+    def save_design(self, popup_summary):
+        logger.info("ADD THE CODE FOR REPORT AFTER THIS")

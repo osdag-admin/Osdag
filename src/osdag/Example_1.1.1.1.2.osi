@@ -1,0 +1,26 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '20'
+Bolt.Grade:
+- '6.8'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Non pre-tensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Column Flange-Beam Web
+Connector.Material: E 300 (Fe 440)
+Connector.Plate.Thickness_List:
+- '14'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '35'
+Load.Shear: '175'
+Material: E 300 (Fe 440)
+Member.Supported_Section.Designation: WB 300
+Member.Supported_Section.Material: E 300 (Fe 440)
+Member.Supporting_Section.Designation: PBP 320 X 88.48
+Member.Supporting_Section.Material: E 300 (Fe 440)
+Module: Fin Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '440'

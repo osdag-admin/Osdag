@@ -832,6 +832,7 @@ class ButtJointBolted(MomentConnection):
             print("Max min gauge pitch dist",self.max_gauge_round,self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
 
     
-
+    def save_design(self, popup_summary):
+        logger.info("ADD THE CODE FOR REPORT AFTER THIS")
 
     

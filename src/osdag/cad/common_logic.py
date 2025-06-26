@@ -191,7 +191,8 @@ class CommonDesignLogic(object):
         self.connection = connection
         print(self.connection)
 
-
+        # Initialize component attribute to avoid AttributeError
+        self.component = None
         self.connectivityObj = None
         self.folder = folder
 
@@ -275,8 +276,8 @@ class CommonDesignLogic(object):
         '''
         This routine takes the bolt diameter and return bolt head diameter as per IS:1364 (PART-1) : 2002
 
-        __________ 
-        |        |  
+        __________
+        |        |
         |________|  ______
            |  |       |
            |  |       |
@@ -1151,7 +1152,7 @@ class CommonDesignLogic(object):
         ###########################
         '''
         Following sections are for creating Fillet Welds and Groove Welds
-        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
+        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis.
         '''
         ############################### Weld for the beam stiffeners ################################################
 
@@ -1809,7 +1810,7 @@ class CommonDesignLogic(object):
 
             column_R2 = float(Col.section_property.toe_radius)
             print(f"column_R2 (Toe Radius): {column_R2}")
-          
+
             column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
             column_length = float(Col.length_zz)
 
@@ -1879,16 +1880,16 @@ class CommonDesignLogic(object):
         col = CompressionMemberCAD(sec)
 
         sec=sec.create_model()
-        col.create_Flex3DModel() 
+        col.create_Flex3DModel()
 
-        return sec 
+        return sec
 
     def createCantileverBeam(self):
 
         Flex = self.module_class
 
         print(f"Flex.support {Flex.support}")
-        
+
         Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
         column_tw = float(Flex.section_property.web_thickness)
         print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
@@ -1911,15 +1912,15 @@ class CommonDesignLogic(object):
         col = CompressionMemberCAD(sec)
 
         sec=sec.create_model()
-        col.create_Flex3DModel() 
+        col.create_Flex3DModel()
 
-        return sec 
-    
+        return sec
+
     def createPurlin(self):
 
         Flex = self.module_class
         print(f"This is the module name {Flex}")
-        
+
         Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
         print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
         print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
@@ -1929,16 +1930,14 @@ class CommonDesignLogic(object):
         print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
         print(f"Flex.support : {Flex.support}")
         print(dir(Flex.section_property))
-        purlin=create_c_section(length = Flex.length*1000, 
-        depth = Flex.section_property.depth, 
-        flange_width = Flex.section_property.flange_width, 
+        purlin=create_c_section(length = Flex.length*1000,
+        depth = Flex.section_property.depth,
+        flange_width = Flex.section_property.flange_width,
         web_thickness = Flex.section_property.web_thickness,
         flange_thickness = Flex.section_property.flange_thickness)
 
         return purlin
 
-
-    
     def createStrutsInTrusses(self):
         Col = self.module_class
         Col.section_property = AngleComponent(designation = Col.result_designation, material_grade = Col.material)
@@ -1968,7 +1967,7 @@ class CommonDesignLogic(object):
 
             return prism
         elif Col.sec_profile=="Back to Back Angles - Same side of gusset":
-                   
+
             L = float(Col.length)
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
@@ -2003,9 +2002,9 @@ class CommonDesignLogic(object):
             shape = assembly.create_model()
 
             return shape
-        
+
         elif Col.sec_profile=="Back to Back Angles - Opposite side of gusset":
-                   
+
             L = float(Col.length)
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
@@ -2572,7 +2571,7 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-        
+
         elif self.mainmodule == 'Flexural Members - Purlins':
             if flag is True:
                 self.FObj = self.createPurlin()
@@ -2867,5 +2866,3 @@ class CommonDesignLogic(object):
 # if __name__!= "__main__":
 #
 #     CommonDesignLogic()
-
-

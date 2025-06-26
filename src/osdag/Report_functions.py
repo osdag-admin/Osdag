@@ -147,7 +147,7 @@ def cl_3_7_2_section_classification_angle_required(ratio_type, class_of_section=
     if class_of_section in ["Plastic", "Compact"]:
         eqn.append(NoEscape(r'\begin{aligned} \text{For ' + class_of_section + r' Section:} \\'))
         eqn.append(NoEscape(r'\text{No Specific Ratio Limit} \end{aligned}'))
-    
+
     elif class_of_section == "Semi-Compact":
         if ratio_type == 'b/t':
             eqn.append(NoEscape(r'\begin{aligned} \\'))
@@ -161,10 +161,10 @@ def cl_3_7_2_section_classification_angle_required(ratio_type, class_of_section=
             eqn.append(NoEscape(r'\begin{aligned}  \\'))
             eqn.append(NoEscape(r'\frac{b+d}{t} \leq 25\varepsilon'))
             eqn.append(NoEscape(r'\end{aligned}'))
-    
+
     else:
         raise ValueError("Invalid section classification. Choose from 'Plastic', 'Compact', 'Semi-Compact'.")
-    
+
     return eqn
 
 def cl_3_7_2_section_classification_angle_provided(b, d, t, ratio_value, ratio_type, epsilon, class_of_section=None):
@@ -189,17 +189,17 @@ def cl_3_7_2_section_classification_angle_provided(b, d, t, ratio_value, ratio_t
         eqn.append(NoEscape(r'\begin{aligned}'))
         eqn.append(NoEscape(r'\frac{b}{t} = \frac{' + str(b) + '}{' + str(t) + '} = ' + str(ratio_value) + r' \leq 15.7\varepsilon \\'))
         eqn.append(NoEscape(r'& \textbf{' + class_of_section + r'} \end{aligned}'))
-    
+
     elif ratio_type == 'd/t':
         eqn.append(NoEscape(r'\begin{aligned}'))
         eqn.append(NoEscape(r'\frac{d}{t} = \frac{' + str(d) + '}{' + str(t) + '} = ' + str(ratio_value) + r' \leq 15.7\varepsilon \\'))
         eqn.append(NoEscape(r'& \textbf{' + class_of_section + r'} \end{aligned}'))
-    
+
     elif ratio_type == '(b+d)/t':
         eqn.append(NoEscape(r'\begin{aligned}'))
         eqn.append(NoEscape(r'\frac{b+d}{t} = \frac{' + str(b+d) + '}{' + str(t) + '} = ' + str(ratio_value) + r' \leq 25\varepsilon \\'))
         eqn.append(NoEscape(r'& \textbf{' + class_of_section + r'} \end{aligned}'))
-    
+
     else:
         raise ValueError("Invalid ratio type. Choose from 'b/t', 'd/t', '(b+d)/t'.")
 
@@ -855,7 +855,7 @@ def cl_8_2_2_1_Mcr(M_cr, E,I_y,KL,G,I_t,I_w,):
     G = str(round(G*10**-3,2))
     I_t = str(round(I_t*10**-5,2))
     I_w = str(round(I_w*10**-11,2))
-   
+
     slender_eqn = Math(inline=True)
     slender_eqn.append(NoEscape(r'\begin{aligned}M_{cr}&= \sqrt{\frac{\pi^{2}EI_y}{(KL)^2}\left( GI_t+\frac{\pi^{2}EI_w}{(KL)^2} \right)} \\'))
     slender_eqn.append(NoEscape(r' &= \sqrt{\frac{\pi^{2}\times'+ E+r'\times 10^5 \times'+I_y+r'\times 10^4}{('+KL+r')^2}}\\'))  #   \sqrt{\left('+G+r'10^3 \times'+I_t+ r'\times 10^5+\frac{\pi^{2}'+E+r'\times 10^5\times'+I_w+r'\times 10^{11}}{('+KL+r')^2} \right)}\\
@@ -2508,14 +2508,14 @@ def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db, val
 def cl_10_4_3_HSFG_bolt_capacity(mu_f, n_e, K_h, fub, Anb, gamma_mf, capacity):
     """
     Calculate design shear strength of friction grip bolt as governed by slip
- 
+
     Args:
          mu_f:Coefficient of friction (slip factor) as specified in Table 20 , IS 800:2007
-           
+
          n_e:Number of  effective interfaces offering  frictional resistance to slip (int)
          K_h:1 for bolts in clearence holes and 0.85 for bolts in oversized holes
          fub: Ultimate tensile strength of the bolt in KN (float)
-           
+
          Anb: Net area of bolt in mm square
          gamma_mf:Partial safety factor  [Ref: Table 5, cl.5.4.1,IS 800:2007]
          capacity: Design shear strength of friction grip bolt as governed by slip in N (float)
@@ -8895,8 +8895,8 @@ def calculate_buckling_class(h, bf, tf, axis):
     axis: Can be "ZZ" or "YY"
     """
     h_bf_ratio = h / bf
-    tf_limit = tf  
-    
+    tf_limit = tf
+
     if axis == "ZZ":
         if h_bf_ratio <= 1.2 and tf_limit > 100:
             return "D"
@@ -8906,7 +8906,7 @@ def calculate_buckling_class(h, bf, tf, axis):
             return "B"
         elif h_bf_ratio > 1.2 and 40 < tf_limit <= 100:
             return "C"
-    
+
     elif axis == "YY":
         if h_bf_ratio > 1.2 and tf_limit <= 40:
             return "A"
@@ -8915,7 +8915,7 @@ def calculate_buckling_class(h, bf, tf, axis):
         elif h_bf_ratio <= 1.2 and tf_limit <= 100:
             return "B"
         elif h_bf_ratio <= 1.2 and tf_limit > 100:
-            return "D"   
+            return "D"
     else:
         return "Invalid Axis"
 def comp_column_class_section_check_required(h, bf, tf, axis):
@@ -8983,23 +8983,23 @@ def comp_column_class_section_check_provided(h, bf, tf, var_h_bf, axis):
         bucklingclass_eq: LaTeX formatted buckling class equation  (Math object)
     """
     bucklingclass_eq = Math(inline=True)
-    
+
     # Calculate buckling class first
     calculated_buckling_class = calculate_buckling_class(h, bf, tf, axis)
-    
+
     # Convert values to strings
     h = str(h)
     bf = str(bf)
     tf = str(tf)
     var_h_bf = str(var_h_bf)
-    
+
     # Append the LaTeX formatted equations including buckling class
     bucklingclass_eq.append(NoEscape(r'\begin{aligned} \text{Buckling Class: }' + calculated_buckling_class + r'\\'))
     bucklingclass_eq.append(NoEscape(r'\frac{h}{b_\text{f}}&= \frac{'+ h +r'}{' + bf + r'}\\'))
     bucklingclass_eq.append(NoEscape(r'                                  &='+ var_h_bf +r'\\'))
     bucklingclass_eq.append(NoEscape(r' t_f =' + tf + r' \\'))
     bucklingclass_eq.append(NoEscape(r'&[\text{Ref. IS\:800:2007,\:Cl.7.1.2.2}]\end{aligned}'))
-    
+
     return bucklingclass_eq
 
 
@@ -9207,3 +9207,89 @@ def flexure_section_check_required(bucklingclass , b , tf, d, tw ):
         bucklingclass_eq.append(NoEscape(r' t_\text{f} > 100'))
         bucklingclass_eq.append(NoEscape(r'                 \end(aligned)'))
     return bucklingclass_eq
+
+# new functions for long joint and large grip reduction factors
+
+def cl_10_3_3_1_long_joint_reduction_factor(lj, d, beta_lj):
+    """
+    Long joint reduction factor as per Cl. 10.3.3.1 of IS 800:2007
+
+    Args:
+        lj: Length of joint in mm (float)
+        d: Bolt diameter in mm (float)
+        beta_lj: Long joint reduction factor (float)
+
+    Returns:
+        LaTeX equation for long joint reduction factor calculation
+    """
+    lj_val = round(lj, 2)
+    d_val = round(d, 2)
+    beta_lj_val = round(beta_lj, 3)
+    limit_val = round(15 * d_val, 2)
+
+    lj = str(lj_val)
+    d = str(d_val)
+    beta_lj = str(beta_lj_val)
+    limit = str(limit_val)
+
+    lj_eq = Math(inline=True)
+    lj_eq.append(NoEscape(r'\begin{aligned}'))
+    lj_eq.append(NoEscape(r'l_j &= ' + lj + r' \text{ mm}\\'))
+    lj_eq.append(NoEscape(r'15d &= 15 \times ' + d + r' = ' + limit + r' \text{ mm}\\'))
+
+    # Check the actual condition
+    if lj_val > limit_val:
+        lj_eq.append(NoEscape(r'\text{Since } l_j &> 15d \text{, apply long joint reduction}\\'))
+        lj_eq.append(NoEscape(r'\beta_{lj} &= 1.075 - \frac{l_j}{200d}\\'))
+        lj_eq.append(NoEscape(r'&= 1.075 - \frac{' + lj + r'}{200 \times ' + d + r'}\\'))
+        lj_eq.append(NoEscape(r'&= ' + beta_lj + r'\\'))
+        lj_eq.append(NoEscape(r'\beta_{lj} &= \max(0.75, ' + beta_lj + r') = ' + beta_lj))
+    else:
+        lj_eq.append(NoEscape(r'\text{Since } l_j &\leq 15d \text{, no long joint reduction required}\\'))
+        lj_eq.append(NoEscape(r'\beta_{lj} &= 1.0'))
+
+    lj_eq.append(NoEscape(r'\end{aligned}'))
+
+    return lj_eq
+
+
+def cl_10_3_3_2_large_grip_reduction_factor(lg, d, beta_lg):
+    """
+    Large grip reduction factor as per Cl. 10.3.3.2 of IS 800:2007
+
+    Args:
+        lg: Grip length in mm (float)
+        d: Bolt diameter in mm (float)
+        beta_lg: Large grip reduction factor (float)
+
+    Returns:
+        LaTeX equation for large grip reduction factor calculation
+    """
+    lg_val = round(lg, 2)
+    d_val = round(d, 2)
+    beta_lg_val = round(beta_lg, 3)
+    limit_val = round(5 * d_val, 2)
+
+    lg = str(lg_val)
+    d = str(d_val)
+    beta_lg = str(beta_lg_val)
+    limit = str(limit_val)
+
+    lg_eq = Math(inline=True)
+    lg_eq.append(NoEscape(r'\begin{aligned}'))
+    lg_eq.append(NoEscape(r'l_g &= ' + lg + r' \text{ mm}\\'))
+    lg_eq.append(NoEscape(r'5d &= 5 \times ' + d + r' = ' + limit + r' \text{ mm}\\'))
+
+    # Check the actual condition
+    if lg_val > limit_val:
+        lg_eq.append(NoEscape(r'\text{Since } l_g &> 5d \text{, apply large grip reduction}\\'))
+        lg_eq.append(NoEscape(r'\beta_{lg} &= \frac{8}{3 + \frac{l_g}{d}}\\'))
+        lg_eq.append(NoEscape(r'&= \frac{8}{3 + \frac{' + lg + r'}{' + d + r'}}\\'))
+        lg_eq.append(NoEscape(r'&= ' + beta_lg))
+    else:
+        lg_eq.append(NoEscape(r'\text{Since } l_g &\leq 5d \text{, no large grip reduction required}\\'))
+        lg_eq.append(NoEscape(r'\beta_{lg} &= 1.0'))
+
+    lg_eq.append(NoEscape(r'\end{aligned}'))
+
+    return lg_eq

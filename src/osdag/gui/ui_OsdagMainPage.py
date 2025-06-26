@@ -15,6 +15,10 @@ from importlib.resources import files
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        #change 4
+        self.plugin_window = None
+        #end of change 4
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowModality(QtCore.Qt.NonModal)
@@ -70,6 +74,11 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
+        #change 1
+        self.comboBox_help.addItem("")
+        self.comboBox_help.addItem("")
+        self.comboBox_help.addItem("")
+        #end of change 1
         self.gridLayout.addWidget(self.comboBox_help, 1, 0)
         layout = QtWidgets.QHBoxLayout()
         self.lbl = QtWidgets.QLabel(self.centralwidget)
@@ -150,7 +159,27 @@ class Ui_MainWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         self.comboBox_help.setCurrentIndex(0)
         self.myStackedWidget.setCurrentIndex(0)
+        
+    # Change 2
+        self.comboBox_help.currentIndexChanged.connect(self.on_comboBox_help_changed)
+        
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def on_comboBox_help_changed(self, index):
+        
+        if self.comboBox_help.itemText(index) == "Plugins":
+            from osdag.gui.main import MainWindow as PluginWindow
+            if not self.plugin_window:
+                self.plugin_window = PluginWindow()
+            self.plugin_window.show()
+            self.comboBox_help.setCurrentIndex(0)
+        
+        elif self.comboBox_help.itemText(index) == "Install Plugins":
+            from osdag.gui.install_plugins import InstallPluginsDialog
+            install_dialog = InstallPluginsDialog()
+            install_dialog.exec_()
+            self.comboBox_help.setCurrentIndex(0)
+    #end of change 2
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -161,4 +190,10 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_help.setItemText(3, _translate("MainWindow", "Ask Us a Question"))
         self.comboBox_help.setItemText(4, _translate("MainWindow", "Check for Update"))
         self.comboBox_help.setItemText(5, _translate("MainWindow", "About Osdag"))
+        #change 3
+        self.comboBox_help.setItemText(6, _translate("MainWindow", "Plugins"))
+        #end of change 3
+        self.comboBox_help.setItemText(7, _translate("MainWindow", "Install Plugins"))
 from . import osdagMainPageIcons_rc
+
+

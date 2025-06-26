@@ -670,10 +670,10 @@ class Window(QMainWindow):
                 # for item in option[3]:
 
                 #     combo.addItem(item)
-                   
+
 
                 #     item_width = max(item_width, metrices.boundingRect(item).width())
-                
+
 
                 # in_layout2.addWidget(combo, j, 2, 1, 1)
 
@@ -685,7 +685,7 @@ class Window(QMainWindow):
                 # if len(option) == 6:
                 #     for disabled in option[3]:
                 #         combo.model().item(disabled).setEnabled(False)
-                        
+
             if type == TYPE_TABLE_IN:
                 table_widget = QtWidgets.QTableWidget(self.dockWidgetContents)
                 table_widget.setObjectName(option[0])
@@ -759,7 +759,7 @@ class Window(QMainWindow):
                 i = i + 30
                 im.setFixedSize(im.size())
                 in_layout2.addWidget(im, j, 2, 1, 1)
-            
+
             if type == TYPE_IMAGE_BIGGER:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
                 im.setGeometry(QtCore.QRect(190, 10 + i, 420, 400))
@@ -1525,7 +1525,7 @@ class Window(QMainWindow):
         """
         for tup in new:
             (object_name, k2_key, typ, f) = tup
-            
+
 
             if k1.objectName() not in object_name:
                 continue
@@ -1729,7 +1729,7 @@ class Window(QMainWindow):
                 module = op[1]
                 d1 = {op[0]: des_val}
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                try: 
+                try:
                     des_val = data_list[op[0] + "_customized"]
                     d1 = {op[0]: des_val}
                 except:
@@ -1747,13 +1747,13 @@ class Window(QMainWindow):
             design_dictionary.update(d1)
 
             self.input_dock_inputs.update(d1)
-            # print(f"\n self.input_dock_inputs{self.input_dock_inputs}")     
+            # print(f"\n self.input_dock_inputs{self.input_dock_inputs}")
 
 
         for design_pref_key in self.design_pref_inputs.keys():
             if design_pref_key not in self.input_dock_inputs.keys():
                 self.input_dock_inputs.update({design_pref_key: self.design_pref_inputs[design_pref_key]})
-        
+
         if self.designPrefDialog.flag:
             print('flag true')
 
@@ -2126,7 +2126,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
-                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut,KEY_DISP_LAPJOINTBOLTED]: # , KEY_DISP_FLEXURE
+                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut,KEY_DISP_LAPJOINTBOLTED,KEY_DISP_BUTTJOINTBOLTED]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
                 print(f"main object type: {type(main)}")
@@ -2256,9 +2256,9 @@ class Window(QMainWindow):
                         inner_grid_layout.addWidget(l, j, 1, 1, 1)
                         l.setFixedSize(l.sizeHint().width(), l.sizeHint().height())
                         max_label_width = max(l.sizeHint().width(), max_label_width)
-                        l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, 
+                        l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,
                                                               QtWidgets.QSizePolicy.Maximum))
-                        
+
                     if option_type == TYPE_SECTION:
                         if section != 0:
                             outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
@@ -2300,7 +2300,7 @@ class Window(QMainWindow):
                             QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum))
                         outer_grid_layout.addWidget(q, j, 1, 1, 2)
                         section += 1
-                        
+
                     if option_type == TYPE_TEXTBOX:
                         r = QtWidgets.QLineEdit(inner_grid_widget)
                         r.setFixedSize(100, 27)

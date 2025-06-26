@@ -2053,6 +2053,9 @@ KEY_OUT_WELD_LENGTH = 'Weld.Length'
 KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
 KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
+KEY_PLATE_THICKNESS_1 = "plate_thickness_1"
+KEY_PLATE_THICKNESS_2 = "plate_thickness_2" 
+KEY_PLATE_WIDTH = "plate_width"
 
 KEY_OUT_DISP_MEMB_TEN_YIELD = 'Tension Yield Capacity (KN)'
 KEY_OUT_DISP_MEMB_TEN_RUPTURE = 'Tension Rupture Capacity'

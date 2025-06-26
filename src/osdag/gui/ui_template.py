@@ -3,7 +3,7 @@ import yaml
 import shutil
 import time
 import pandas as pd
-import cairosvg
+# import cairosvg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QRegExpValidator, QDoubleValidator, QBrush, QColor, QPixmap, QFont
 from PyQt5.QtWidgets import QDialog, QMainWindow, QMessageBox, QDesktopWidget

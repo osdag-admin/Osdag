@@ -151,7 +151,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_help.setCurrentIndex(0)
         self.myStackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
+        
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Osdag"))

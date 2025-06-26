@@ -5,7 +5,7 @@ import time
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import *
 from .ui_tutorial import Ui_Tutorial
 from .ui_aboutosdag import Ui_AboutOsdag
@@ -60,7 +60,10 @@ import subprocess
 from ..get_DPI_scale import scale,height,width
 from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
-
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtCore import QThread
+from PyQt5.QtCore import pyqtSignal, QObject, QEvent
+from PyQt5.QtCore import *
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -582,6 +585,11 @@ class Window(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
+            if type == 'BUTTON':
+                b = option[3]
+                b.setObjectName(option[0])
+                in_layout2.addWidget(b, j, 2, 1, 1)
+
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setObjectName(option[0] + "_label")
@@ -865,6 +873,7 @@ class Window(QMainWindow):
         else:
             for t in updated_list:
                 for key_name in t[0]:
+                    
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
                     self.on_change_connect(key_changed, updated_list, data, main)
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
@@ -2133,7 +2142,24 @@ class Window(QMainWindow):
                     action.setEnabled(True)
                 fName = str('./ResourceFiles/images/3d.png')
                 file_extension = fName.split(".")[-1]
+
+                # if file_extension == 'png':
+                #     self.display.ExportToImage(fName)
+                #     im = Image.open('./ResourceFiles/images/3d.png')
+                #     w,h=im.size
+                #     if(w< 640 or h < 360):
+                #         print('Re-taking Screenshot')
+                #         self.resize(700,500)
+                #         self.outputDock.hide()
+                #         self.inputDock.hide()
+                #         self.textEdit.hide()
+                #         QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
+
             else:
+                for fName in ['3d.png', 'top.png',
+                              'front.png', 'side.png']:
+                    with open("./ResourceFiles/images/"+fName, 'w'):
+                        pass
                 self.display.EraseAll()
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)

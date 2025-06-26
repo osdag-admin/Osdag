@@ -34,6 +34,8 @@ from ..tension_member import *
 from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
 from ...utils.common import is800_2007
 from ...utils.common.component import *
+from PyQt5.QtWidgets import QPushButton
+from .plot_bmd_sfd import PlotInputWidget
 
 # TODO DEBUG
 class Flexure_Cantilever(Member):
@@ -256,11 +258,11 @@ class Flexure_Cantilever(Member):
         # options_list.append(t3)
         #
         #
-        #t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT2, True, 'No Validator')
-        #options_list.append(t4)
+        t4 = (KEY_SUPPORT, KEY_DISP_SUPPORT, TYPE_NOTE,KEY_DISP_SUPPORT2, True, 'No Validator')
+        options_list.append(t4)
 
-        #t12 = (KEY_IMAGE, None, TYPE_IMAGE, Cantilever_img, True, 'No Validator')
-        #options_list.append(t12)
+        t12 = (KEY_IMAGE, None, TYPE_IMAGE, Cantilever_img, True, 'No Validator')
+        options_list.append(t12)
         #
         # t10 = (KEY_TORSIONAL_RES, DISP_TORSIONAL_RES, TYPE_COMBOBOX, Torsion_Restraint_list, True, 'No Validator')
         # options_list.append(t10)
@@ -282,9 +284,21 @@ class Flexure_Cantilever(Member):
 
         t8 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
+        bm_button = QPushButton("Plot BMD")
+        self.bmd_widget = PlotInputWidget("BM")
+        bm_button.clicked.connect(self.bmd_widget.show)
+        t8b = ("bm_plot_button", "", 'BUTTON', bm_button, True, "")
+        options_list.append(t8b)
 
         t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
+
+
+        sf_button = QPushButton("Plot SFD")
+        self.sfd_widget = PlotInputWidget("SFD")
+        sf_button.clicked.connect(self.sfd_widget.show)
+        t9b = ("sf_plot_button", "", 'BUTTON', sf_button, True, "")
+        options_list.append(t9b)
 
 
 

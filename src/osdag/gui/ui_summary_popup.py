@@ -13,6 +13,17 @@ import os
 import re
 import time
 import pickle
+import shutil
+import tempfile
+
+# NEW: Conditional import for customization dialog
+try:
+    from .ui_report_customization_popup import show_customization_dialog
+    CUSTOMIZATION_DIALOG_AVAILABLE = True
+except ImportError:
+    show_customization_dialog = None
+    CUSTOMIZATION_DIALOG_AVAILABLE = False
+
 # from .ui_summary_popup import Ui_Dialog1
 from ..design_report.reportGenerator import save_html
 from ..design_report.reportGenerator_latex import CreateLatex
@@ -182,27 +193,35 @@ class Ui_Dialog1(object):
         self.Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
 
     def save_inputSummary(self, main):
-        input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
-        file_type = "PDF (*.pdf)"
-        # filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
-        #                                           file_type)
-        filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
-        # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
-        '''
-        Uncomment the third QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
-        it would be impossible to assign any modal to QFileDialog once it's opened, therefore it'll look like system is hanged.
-        But if you want to control the behaviour of QFileDialog according to your need then use the second function(QFileDialog provided by Qt which is faster than NativeDialog).
+        """
+        MAIN FUNCTION: Process user inputs and generate customizable report.
 
-        Same is the case when we'll select 'Load Input' option. We can't control the behaviour of QFileDialog because it's native and hence
-        OS and system dependent.
-        '''
+        WORKFLOW:
+        1. Collect user inputs from dialog form
+        2. Create temporary directory for LaTeX file processing
+        3. Show loading animation while generating LaTeX
+        4. Launch customization dialog for section selection
+        5. Clean up temporary files when done
 
-        if filename == '':
-            return
-        # else:
-        #     self.create_pdf_file(filename,main, input_summary)
-        #     self.pdf_file_message(filename)
+        CHANGES MADE:
+        - REMOVED: File save dialog (user no longer prompted for location)
+        - ADDED: Automatic temporary directory creation
+        - ADDED: Automatic cleanup after customization dialog closes
 
+        Args:
+            main: Main application object containing design data
+
+        """
+        # Get all user inputs from the dialog form
+        input_summary = self.getPopUpInputs()
+
+        # CREATE TEMPORARY WORKSPACE - No user prompt needed
+        temp_dir = tempfile.mkdtemp(prefix='osdag_report_')
+        filename = os.path.join(temp_dir, "report.tex")
+
+        print(f"INFO: Using temporary location for LaTeX file: {filename}")
+
+        # LOADING ANIMATION SETUP (unchanged from original)
         loading_widget = QDialog(self.module_window)
         window_width = self.module_window.width() // 2
         window_height = self.module_window.height() // 10
@@ -226,16 +245,163 @@ class Ui_Dialog1(object):
         self.thread_2.finished.connect(lambda: self.create_pdf_file(filename, main, input_summary))
         self.thread_2.finished.connect(lambda: loading_widget.close())
         self.thread_2.finished.connect(lambda: self.progress_bar.setValue(90))
-        self.thread_2.finished.connect(lambda: self.pdf_file_message(filename))
+        self.thread_2.finished.connect(lambda: self.tex_file_message(filename, main, input_summary))
 
     def create_pdf_file(self, filename, main, input_summary):
+        """
+        Generate LaTeX file (not PDF) for customization.
+
+        This method creates the initial LaTeX file that will be customized
+        in the next step.
+        """
         fname_no_ext = filename.split(".")[0]
         input_summary['filename'] = fname_no_ext
         input_summary['does_design_exist'] = self.design_exist
         input_summary['logger_messages'] = self.loggermsg
-        # self.progress_bar.setValue(30)
+        # Generate LaTeX file instead of PDF
         main.save_design(main, input_summary)
-        # self.progress_bar.setValue(80)
+
+    def tex_file_message(self, filename, main, input_summary):
+        """
+        INTEGRATION POINT: Launch customization dialog after LaTeX generation.
+
+        This function is called after the LaTeX file is successfully generated.
+        It launches our custom report customization dialog and handles cleanup.
+
+        CHANGES MADE:
+        - REPLACED: Old section selection dialog with new customization interface
+        - ADDED: Automatic temp directory cleanup after dialog closes
+        - ADDED: Better error handling and user feedback
+
+        Args:
+            filename (str): Path to generated LaTeX file
+            main: Main application object
+            input_summary (dict): User inputs from dialog
+        """
+        fname_no_ext = filename.split(".")[0]
+
+        # VERIFY LaTeX file was created successfully
+        if not os.path.isfile(str(fname_no_ext + ".tex")):
+            self.Dialog.reject()
+            QMessageBox.critical(self.Dialog, 'Error',
+                                'Error generating initial LaTeX file. Please check the console for details.')
+            return
+
+        # CHECK FOR NON-CAD MODULES that should bypass customization
+        module_name = getattr(main, 'module', '')
+        non_cad_modules = ['Butt Joint Bolted Connection', 'KEY_DISP_BUTTJOINTBOLTED']
+
+        if any(name in str(module_name) for name in non_cad_modules):
+            # BYPASS customization for non-CAD modules - use old workflow with PDF save
+            print(f"INFO: Bypassing customization for non-CAD module: {module_name}")
+
+            # Prompt user for PDF save location
+            file_type = "PDF (*.pdf)"
+            pdf_filename, _ = QFileDialog.getSaveFileName(
+                self.Dialog, "Save PDF Report As", '', file_type, None,
+                QtWidgets.QFileDialog.DontUseNativeDialog
+            )
+
+            if pdf_filename == '':
+                # User cancelled - clean up and return
+                temp_dir = os.path.dirname(fname_no_ext)
+                if temp_dir and os.path.exists(temp_dir):
+                    try:
+                        shutil.rmtree(temp_dir, ignore_errors=True)
+                        print(f"INFO: Cleaned up temp directory: {temp_dir}")
+                    except Exception as e:
+                        print(f"WARNING: Could not clean up temp directory {temp_dir}: {e}")
+                self.Dialog.reject()
+                return
+
+            # Generate PDF directly using pdflatex
+            try:
+                import subprocess
+                latex_dir = os.path.dirname(fname_no_ext)
+                latex_file = fname_no_ext + ".tex"
+
+                print(f"INFO: Generating PDF from {latex_file}")
+
+                # Use only the filename (not full path) since we're setting cwd=latex_dir
+                latex_filename = os.path.basename(latex_file)
+
+                # Run pdflatex to generate PDF in the temp directory
+                result = subprocess.run([
+                    'pdflatex', '-interaction=nonstopmode',
+                    latex_filename
+                ], cwd=latex_dir, capture_output=True, text=True, timeout=60)
+
+                # Look for PDF in the working directory (not using full path)
+                pdf_filename_only = os.path.splitext(latex_filename)[0] + ".pdf"
+                temp_pdf = os.path.join(latex_dir, pdf_filename_only)
+
+                if os.path.exists(temp_pdf):
+                    # Ensure the destination filename has .pdf extension
+                    if not pdf_filename.lower().endswith('.pdf'):
+                        pdf_filename += '.pdf'
+
+                    # Copy the generated PDF to user's chosen location
+                    shutil.copy2(temp_pdf, pdf_filename)
+                    print(f"INFO: PDF copied to {pdf_filename}")
+
+                    # Clean up temp directory
+                    if latex_dir and os.path.exists(latex_dir):
+                        shutil.rmtree(latex_dir, ignore_errors=True)
+                        print(f"INFO: Cleaned up temp directory: {latex_dir}")
+
+                    self.Dialog.accept()
+                    QMessageBox.information(self.Dialog, 'Information',
+                                          f'PDF report saved successfully to:\n{pdf_filename}')
+                else:
+                    # Check for errors in pdflatex output
+                    if result.stderr:
+                        print(f"ERROR: pdflatex stderr: {result.stderr}")
+                    if result.stdout:
+                        print(f"INFO: pdflatex stdout: {result.stdout}")
+
+                    self.Dialog.reject()
+                    QMessageBox.critical(self.Dialog, 'Error',
+                                       'Failed to generate PDF. Please check if LaTeX is installed and the LaTeX file is valid.')
+
+            except subprocess.TimeoutExpired:
+                self.Dialog.reject()
+                QMessageBox.critical(self.Dialog, 'Error',
+                                   'PDF generation timed out. The LaTeX file may have errors.')
+            except FileNotFoundError:
+                self.Dialog.reject()
+                QMessageBox.critical(self.Dialog, 'Error',
+                                   'LaTeX (pdflatex) not found. Please install a LaTeX distribution like MiKTeX or TeX Live.')
+            except Exception as e:
+                self.Dialog.reject()
+                QMessageBox.critical(self.Dialog, 'Error',
+                                   f'Error generating PDF: {str(e)}')
+            return
+
+        # LAUNCH CUSTOMIZATION DIALOG if available
+        if CUSTOMIZATION_DIALOG_AVAILABLE:
+            # Prepare data for customization dialog
+            main.report_input = getattr(main, 'report_input', {})
+            main.report_input['filename'] = fname_no_ext
+            main.report_input['temp_dir'] = os.path.dirname(fname_no_ext)  # Store for cleanup
+
+            # Open the customization dialog
+            show_customization_dialog(main, parent=self.Dialog)
+
+            # AUTOMATIC CLEANUP of temporary files
+            temp_dir = main.report_input.get('temp_dir')
+            if temp_dir and os.path.exists(temp_dir):
+                try:
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    print(f"INFO: Cleaned up temp directory: {temp_dir}")
+                except Exception as e:
+                    print(f"WARNING: Could not clean up temp directory {temp_dir}: {e}")
+
+            self.Dialog.accept()
+        else:
+            # FALLBACK: Show message if customization not available
+            self.Dialog.accept()
+            QMessageBox.information(self.Dialog, 'Information',
+                                    f'LaTeX file generated successfully at {fname_no_ext}.tex. Report customization not available.')
 
     def pdf_file_message(self, filename):
         fname_no_ext = filename.split(".")[0]

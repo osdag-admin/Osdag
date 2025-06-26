@@ -1959,10 +1959,13 @@ KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
+KEY_OUT_WELD_CONN_LEN = 'Weld.ConnLength'
+
 KEY_OUT_BOLT_CONN_LEN = 'Bolt.ConnLength'
 KEY_UTILIZATION_RATIO = 'Bolt.UtilizationRatio'
 KEY_DISP_UTILIZATION_RATIO = 'Utilization Ratio'
 KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
+KEY_OUT_DISP_WELD_CONN_LEN = 'Length of Connection (mm)'
 
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'

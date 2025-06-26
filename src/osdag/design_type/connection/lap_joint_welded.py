@@ -312,8 +312,8 @@ class LapJointWelded(MomentConnection):
                round(self.weld_length_effective, 1) if flag else '', True)
         out_list.append(t26)
 
-        t27 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
-               round(self.weld_length_provided, 1) if flag else '', True)
+        t27 = (KEY_OUT_WELD_CONN_LEN, KEY_OUT_DISP_WELD_CONN_LEN, TYPE_TEXTBOX,
+               round(self.connection_length, 1) if flag else '', True)
         out_list.append(t27)
 
         return out_list

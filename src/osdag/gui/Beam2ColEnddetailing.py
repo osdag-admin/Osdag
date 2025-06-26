@@ -34,7 +34,7 @@ class BeamtoColDetailing(QMainWindow):
         print(f'middle bolts : {self.middle_bolts}')
         print(f'stiffener length : {self.stiffener_length}')
         
-        self.setGeometry(100, 100, 800, 500)
+        self.setGeometry(100, 100, 1200, 900)
         print(f'web thickness : {self.web_thick}, flange thickness : {self.flange_thick} ')
         # Step 1: Create a central widget
         central_widget = QWidget()
@@ -85,6 +85,7 @@ class BeamtoColDetailing(QMainWindow):
 
         # Step 6: Call parameter extraction and drawing
         self.get_parameters()
+        self.view.scale(2.5, 2.5)  
     def get_parameters(self):
         print('setting parameters')
         self.rows=self.detail_dict['No. of Rows']
@@ -105,6 +106,11 @@ class BeamtoColDetailing(QMainWindow):
             self.createDrawingExtendedOneWay()
         else:
             self.createDrawingExtendedTwoWay()
+
+
+
+    #drawing setup for flushed reversible
+
     def createDrawingFlushedReversible(self):
         from PyQt5.QtCore import Qt
         from PyQt5.QtGui import QPen, QColor,QBrush
@@ -222,7 +228,7 @@ class BeamtoColDetailing(QMainWindow):
                 elif col == 1:
                     x += crossgauge
         self.addDimensionsFlushedReversible(edge,gauge,crossgauge,cols)
-        self.addInternalGapsFlushedReversible()
+        #self.addInternalGapsFlushedReversible()
     
     def addInternalGapsFlushedReversible(self, margin=12.5):
         from PyQt5.QtGui import QPen, QFont, QBrush
@@ -317,13 +323,17 @@ class BeamtoColDetailing(QMainWindow):
         x2 = x + edge
         segments.append(("edge", x1, x2))
 
+        pen = QPen(Qt.black, 0.5)
+        font = QFont()
+        font.setPointSize(4)
+
         # --- Draw all segments using your dimension method ---
         for label, x1, x2 in segments:
-            self.addHorizontalDimension(x1, y, x2, y, f"{x2 - x1:.1f}", pen)
+            self.addHorizontalDimension(x1, y, x2, y, f"{x2 - x1:.1f}", pen, font)
         plate_width = self.width
         y_plate = self.height + 20  # just below the plate
 
-        self.addHorizontalDimension(0, y_plate, plate_width, y_plate, f"{plate_width:.1f} mm", pen)
+        self.addHorizontalDimension(0, y_plate, plate_width, y_plate, f"{plate_width:.1f} mm", pen, font)
                 # --- Add vertical dimensions on left side for top half ---
         x_vdim = -30  # left of plate
         y_base = 12.5
@@ -331,18 +341,18 @@ class BeamtoColDetailing(QMainWindow):
         # 1. Flange thickness
         y1 = y_base
         y2 = y1 + self.flange_thick
-        self.addVerticalDimension(x_vdim, y1, x_vdim, y2, f"{self.flange_thick:.1f}", pen)
+        self.addVerticalDimension(x_vdim, y1, x_vdim, y2, f"{self.flange_thick:.1f}", pen, font)
 
         # 2. End distance
         y1 = y2
         y2 = y1 + self.End
-        self.addVerticalDimension(x_vdim, y1, x_vdim, y2, f"{self.End:.1f}", pen)
+        self.addVerticalDimension(x_vdim, y1, x_vdim, y2, f"{self.End:.1f}", pen, font)
 
         # 3. Pitch segments (top rows)
         for i in range(self.rows // 2 - 1):
             y1 = y2
             y2 = y1 + self.pitch
-            self.addVerticalDimension(x_vdim, y1, x_vdim, y2, f"{self.pitch:.1f}", pen)
+            self.addVerticalDimension(x_vdim, y1, x_vdim, y2, f"{self.pitch:.1f}", pen, font)
 
         # --- Add vertical dimensions on left side for bottom half ---
         y_base = self.height - 12.5
@@ -350,24 +360,26 @@ class BeamtoColDetailing(QMainWindow):
         # 1. Flange thickness
         y1 = y_base
         y2 = y1 - self.flange_thick
-        self.addVerticalDimension(x_vdim, y2, x_vdim, y1, f"{self.flange_thick:.1f}", pen)
+        self.addVerticalDimension(x_vdim, y2, x_vdim, y1, f"{self.flange_thick:.1f}", pen, font)
 
         # 2. End distance
         y1 = y2
         y2 = y1 - self.End
-        self.addVerticalDimension(x_vdim, y2, x_vdim, y1, f"{self.End:.1f}", pen)
+        self.addVerticalDimension(x_vdim, y2, x_vdim, y1, f"{self.End:.1f}", pen, font)
 
         # 3. Pitch segments (bottom rows)
         for i in range(self.rows // 2 - 1):
             y1 = y2
             y2 = y1 - self.pitch
-            self.addVerticalDimension(x_vdim, y2, x_vdim, y1, f"{self.pitch:.1f}", pen)
+            self.addVerticalDimension(x_vdim, y2, x_vdim, y1, f"{self.pitch:.1f}", pen, font)
         x_total_height = self.width + 20  # to the right of the plate
         y_top = 0
         y_bottom = self.height
 
-        self.addVerticalDimension(x_total_height, y_top, x_total_height, y_bottom, f"{self.height:.1f} mm", pen)
+        self.addVerticalDimension(x_total_height, y_top, x_total_height, y_bottom, f"{self.height:.1f} mm", pen, font)
     
+
+    #extended one way drawing setup
     
     def createDrawingExtendedOneWay(self):
         from PyQt5.QtCore import Qt
@@ -485,9 +497,10 @@ class BeamtoColDetailing(QMainWindow):
             edge += (plate_width - total_span) / 2
             
         y_bottom_bolt = plate_height - 12.5 - end -flange_thickness # From image: 12.5 mm gap, then e' up
+        blue_pen = QPen(Qt.blue)
         outline_pen=blue_pen
         x = edge  # start x from edge
-        blue_pen = QPen(Qt.blue)
+        
 
         for col in range(cols):
             self.scene.addEllipse(x - radius, y_bottom_bolt - radius, holedia, holedia, blue_pen)
@@ -544,46 +557,42 @@ class BeamtoColDetailing(QMainWindow):
                     x += gauge
                 elif col == 1:
                     x += crossgauge
-        self.addInternalGapsExtendedOneWay()
+        #self.addInternalGapsExtendedOneWay()
         self.addDimensionsExtendedOneWay(edge,self.Gauge,self.CrossGauge,self.cols)
     def addDimensionsExtendedOneWay(self, edge, gauge, cross_gauge, cols, y_offset=20):
         from PyQt5.QtGui import QPen, QFont
         from PyQt5.QtCore import Qt
 
-        pen = QPen(Qt.black, 1)
+        pen = QPen(Qt.black, 0.5)
         font = QFont()
-        font.setPointSize(7)
+        font.setPointSize(4)
 
         # === Draw vertical dimension for stiff_len from top ===
         x_dim_line = -15  # Position left of the plate
         y1 = 0
         y2 = self.stiff_len
 
-        self.scene.addLine(x_dim_line, y1, x_dim_line, y2, pen)
+        
 
-        # Add label
-        dim_label = f"{self.stiff_len:.1f} mm"
-        text_item = self.scene.addText(dim_label)
-        text_item.setFont(font)
-        text_item.setPos(x_dim_line - 25, (y1 + y2) / 2 - 8) 
+        self.addVerticalDimension(x_dim_line, y1, x_dim_line, y2, f"{self.stiff_len:.1f} mm", pen, font)
         # === Draw stacked vertical dimensions on right ===
         x_right = self.width + 20  # Position right of the plate
         current_y = 0  # Start from top
 
         # First end distance
         y_next = current_y + self.End
-        self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.End:.1f} mm", pen)
+        self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.End:.1f} mm", pen, font)
         current_y = y_next
 
         # If more than 1 row above stiffener, add pitch
         if self.rowsabovestiff > 1:
             y_next = current_y + self.pitch
-            self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.pitch:.1f} mm", pen)
+            self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.pitch:.1f} mm", pen, font)
             current_y = y_next
 
         # Add second end distance
         y_next = current_y + self.End
-        self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.End:.1f} mm", pen)
+        self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.End:.1f} mm", pen, font)
         # === Vertical Dimensions for Bolt Rows Below Stiffener ===
         y_start = y_next + self.flange_thick  # Below stiffener flange
         current_y = y_start
@@ -591,19 +600,19 @@ class BeamtoColDetailing(QMainWindow):
         if self.remainingrows >= 1:
             # First bolt row: end distance
             y_next = current_y + self.End
-            self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.End:.1f} mm", pen)
+            self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.End:.1f} mm", pen, font)
             current_y = y_next
 
         # Remaining rows: pitch
         for _ in range(self.remainingrows - 1):
             y_next = current_y + self.pitch
-            self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.pitch:.1f} mm", pen)
+            self.addVerticalDimension(x_right, current_y, x_right, y_next, f"{self.pitch:.1f} mm", pen, font)
             current_y = y_next
 
         # === From bottom flange up to last bolt row ===
         y_bottom = self.height - 12.5 - self.flange_thick
         y_top = y_bottom - self.End
-        self.addVerticalDimension(x_right, y_top, x_right, y_bottom, f"{self.End:.1f} mm", pen)
+        self.addVerticalDimension(x_right, y_top, x_right, y_bottom, f"{self.End:.1f} mm", pen, font)
         from PyQt5.QtGui import QPen
         from PyQt5.QtCore import Qt
 
@@ -650,11 +659,11 @@ class BeamtoColDetailing(QMainWindow):
 
         # --- Draw all segments using your dimension method ---
         for label, x1, x2 in segments:
-            self.addHorizontalDimension(x1, y, x2, y, f"{x2 - x1:.1f}", pen)
+            self.addHorizontalDimension(x1, y, x2, y, f"{x2 - x1:.1f}", pen, font)
         plate_width = self.width
         y_plate = self.height + 20  # just below the plate
 
-        self.addHorizontalDimension(0, y_plate, plate_width, y_plate, f"{plate_width:.1f} mm", pen)
+        self.addHorizontalDimension(0, y_plate, plate_width, y_plate, f"{plate_width:.1f} mm", pen, font)
        
     def addInternalGapsExtendedOneWay(self, margin=12.5):
         from PyQt5.QtGui import QPen, QFont
@@ -931,15 +940,15 @@ class BeamtoColDetailing(QMainWindow):
                     x += gauge
                 elif col == 1:
                     x += crossgauge
-        self.addInternalGapsExtendedTwoWay(effective_stiffener_height)
+        #self.addInternalGapsExtendedTwoWay(effective_stiffener_height)
         self.addDimensionsExtendedTwoWay(edge,gauge,crossgauge,cols,effective_stiffener_height)
     def addDimensionsExtendedTwoWay(self, edge, gauge, cross_gauge, cols, finalstifflen, y_offset=20):
         from PyQt5.QtGui import QPen, QFont
         from PyQt5.QtCore import Qt
 
-        pen = QPen(Qt.black, 1)
+        pen = QPen(Qt.black, 0.5)
         font = QFont()
-        font.setPointSize(7)
+        font.setPointSize(4)
 
         x_left = -20  # Left of plate
 
@@ -948,36 +957,36 @@ class BeamtoColDetailing(QMainWindow):
 
         # 1. First edge distance
         next_y = current_y + self.End
-        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen)
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen, font)
         current_y = next_y
 
         # 2. Pitch if rowsabovestiff == 2
         if self.rowsabovestiff == 2:
             next_y = current_y + self.pitch
-            self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen)
+            self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen, font)
             current_y = next_y
 
         # 3. Second edge distance (above flange)
         next_y = current_y + self.End
-        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen)
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen, font)
         current_y = next_y
 
         # 4. Flange thickness
         next_y = current_y + self.flange_thick
-        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.flange_thick:.1f} mm", pen)
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.flange_thick:.1f} mm", pen, font)
         current_y = next_y
         next_y = current_y + self.End
-        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm456", pen)
+        self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.End:.1f} mm", pen, font)
         current_y = next_y
         # 5. Top bolt pitches
         for i in range(self.top_rows-1):
             next_y = current_y + self.pitch
-            self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen)
+            self.addVerticalDimension(x_left, current_y, x_left, next_y, f"{self.pitch:.1f} mm", pen, font)
             current_y = next_y
 
         # === Total plate height dimension (right side) ===
         x_right = self.width + 20
-        self.addVerticalDimension(x_right, 0, x_right, self.height, f"{self.height:.1f} mm", pen)
+        self.addVerticalDimension(x_right, 0, x_right, self.height, f"{self.height:.1f} mm", pen, font)
 
         # === Horizontal EDGE and GAUGE dimensions ===
         x = 0
@@ -1015,13 +1024,16 @@ class BeamtoColDetailing(QMainWindow):
         x1 = x
         x2 = x + edge
         segments.append((x1, x2))
+        pen = QPen(Qt.black, 0.5)
+        font = QFont()
+        font.setPointSize(3)
 
         for x1, x2 in segments:
-            self.addHorizontalDimension(x1, y_horizontal_dim, x2, y_horizontal_dim, f"{x2 - x1:.1f} mm", pen)
+            self.addHorizontalDimension(x1, self.height+10, x2, self.height+10, f"{x2 - x1:.1f} mm", pen, font)
 
         # === Full Plate Width ===
-        y_plate = self.height + 20
-        self.addHorizontalDimension(0, y_plate, self.width, y_plate, f"{self.width:.1f} mm", pen)
+        # y_plate = self.height + 20
+        # self.addHorizontalDimension(0, y_plate+20, self.width, y_plate+20, f"{self.width:.1f} mm", pen)
 
     def addInternalGapsExtendedTwoWay(self, finalstifflen, margin=12.5):
         from PyQt5.QtGui import QPen, QFont
@@ -1060,7 +1072,7 @@ class BeamtoColDetailing(QMainWindow):
             text_item.setFont(font)
             text_item.setPos(tx, ty)
 
-    def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
+    def addHorizontalDimension(self, x1, y1, x2, y2, text, pen, font=None):
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = 5
         ext_length = 10
@@ -1084,16 +1096,15 @@ class BeamtoColDetailing(QMainWindow):
         polygon_right.setBrush(QBrush(Qt.black))
         
         text_item = self.scene.addText(text)
-        font = QFont()
-        font.setPointSize(5)
-        text_item.setFont(font)
+        if font is not None:
+            text_item.setFont(font)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
         else:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
 
-    def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
+    def addVerticalDimension(self, x1, y1, x2, y2, text, pen, font=None):
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = 5
         ext_length = 10
@@ -1134,9 +1145,8 @@ class BeamtoColDetailing(QMainWindow):
             polygon_bottom.setBrush(QBrush(Qt.black))
         
         text_item = self.scene.addText(text)
-        font = QFont()
-        font.setPointSize(5)
-        text_item.setFont(font)
+        if font is not None:
+            text_item.setFont(font)
         
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

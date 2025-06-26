@@ -82,7 +82,7 @@ class BC2CEndPlate(QMainWindow):
         Web Detail Width         : {self.webdetail_width}
         """)
         
-        self.setGeometry(100, 100, 800, 500)
+        self.setGeometry(100, 100, 1200, 900)
         # Step 1: Create a central widget
         central_widget = QWidget()
         self.setCentralWidget(central_widget)

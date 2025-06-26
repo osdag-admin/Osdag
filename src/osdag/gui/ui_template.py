@@ -22,6 +22,8 @@ from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 #from .ui_design_preferences import Ui_Dialog
 from .beam2beamcoverplatedetailing import B2Bcoverplate
+from .b2cendplateSketch import B2BEndPlateSketch
+from .beam2beamcoverplatedetailing_capacity_details import B2Bcoverplate_capacity_details
 from .ui_summary_popup import Ui_Dialog1
 from ..design_report.reportGenerator import save_html
 from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
@@ -64,11 +66,13 @@ from ..get_DPI_scale import scale,height,width
 from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
 from osdag.gui.spacing import BoltPatternGenerator
+from osdag.gui.capacity_details_finPlate import CapacityDetailsWindow
 from .seatedanglespacing import SeatedanglespacingOnCol
 from .Beam2ColEnddetailing import BeamtoColDetailing
 from .baseplatedetailing import BasePlateDetailing
 from .baseplatedetailinghollow import BasePlateDetailingHollow
 from .b2bcoverplateweld import B2Bcoverplateweld
+
 from .cleatangledetailing import CleatAngle
 from .BC2Cendplate import BC2CEndPlate
 from .endplatecnndetailnig import EndPlateDetailer
@@ -2194,6 +2198,18 @@ class Window(QMainWindow):
         self.spacing_window.raise_()
         self.spacing_window.activateWindow()
         self.spacing_window.show()
+    
+    def run_capacity_details(self,cols,rows,generator_class=CapacityDetailsWindow , main=None):
+        print("Creating capacity details window...")
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        print(generator_class)
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        self.capacity_window = generator_class(self.Obj,cols=cols,rows=rows,main=main)
+        self.capacity_window.setWindowTitle("Capacity Details")
+        self.capacity_window.raise_()
+        self.capacity_window.activateWindow()
+        self.capacity_window.show()
+    
 
 
 
@@ -2237,10 +2253,14 @@ class Window(QMainWindow):
         section = 0
         no_note = True
 
-        for op in button_list:
 
+        for op in button_list:
+        
             if op[0] == button.objectName():
                 print(op)
+                print("DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG")
+                print(main)
+                print("DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG")
                 tup = op[3]
                 title = tup[0]
                 fn = tup[1]
@@ -2271,6 +2291,25 @@ class Window(QMainWindow):
                                             # Instantiate it
                             
                             break
+                
+                elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]=='Capacity Details' and main is FinPlateConnection) :
+                    self.active_dialog = QtWidgets.QDialog()
+                    dialog = self.active_dialog
+                    module = inspect.getmodule(fn)       # Get the module where the function is defined
+                    cls_obj = getattr(module, cls)       # Get the actual class object
+                    self.Obj = cls_obj()
+                    if main is FinPlateConnection:
+                                if hasattr(self.Obj, 'spting_leg') and \
+                                    hasattr(self.Obj.spting_leg, 'bolt_line') and \
+                                    hasattr(self.Obj.spting_leg, 'bolts_one_line'):
+                                        self.run_capacity_details(self.Obj.spting_leg.bolts_one_line,self.Obj.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_capacity_details(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
+                                                                main=main)
+                    break
+                        
+
                 elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
                             
                             module = inspect.getmodule(fn)       # Get the module where the function is defined
@@ -2308,13 +2347,13 @@ class Window(QMainWindow):
                     else:
                         self.run_spacing_script(0,0,BasePlateDetailingHollow,main)
                     return
-                elif op[0]=='Web_plate.spacing'  :
+                elif op[0]=='Web_plate.spacing':
 
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)
                     self.Obj=cls_obj()
                     
-                    self.run_spacing_script(0,0,B2Bcoverplate,(main,True))
+                    self.run_capacity_details(0,0,B2Bcoverplate,(main,True, "spacing"))
                     return
                 elif op[0]=='Flange_plate.spacing':
 
@@ -2322,9 +2361,9 @@ class Window(QMainWindow):
                     cls_obj=getattr(module,cls)
                     self.Obj=cls_obj()
                     
-                    self.run_spacing_script(0,0,B2Bcoverplate,(main,False))
+                    self.run_capacity_details(0,0,B2Bcoverplate,(main,False, "spacing"))
                     return
-                elif op[0]=='Web detail':
+                elif op[0]=='Web detail' and main is BeamCoverPlateWeld:
 
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)
@@ -2332,7 +2371,7 @@ class Window(QMainWindow):
                     
                     self.run_spacing_script(0,0,B2Bcoverplateweld,(main,True))
                     return
-                elif op[0]=='Flange detail':
+                elif op[0]=='Flange detail' and main is BeamCoverPlateWeld:
 
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)
@@ -2340,6 +2379,33 @@ class Window(QMainWindow):
                     
                     self.run_spacing_script(0,0,B2Bcoverplateweld,(main,False))
                     return
+                
+
+                #im working here
+                elif op[0]=='section.web_capacities' and main is BeamCoverPlate:
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()                    
+                    self.run_capacity_details(0,0,B2Bcoverplate_capacity_details,(main,True,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]=='section.flange_capacity' and main is BeamCoverPlate:
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    self.run_capacity_details(0,0,B2Bcoverplate_capacity_details,(main,False,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]=="Stiffener.Sketch" and op[1]=="Typical Sketch":
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    self.run_spacing_script(0,0,B2BEndPlateSketch,main)
+                    return
+
                 elif op[0]=='Bolt.web_bolts' or op[0]=='Bolt.flange_bolts':
                     module=inspect.getmodule(fn)
                     cls_obj=getattr(module,cls)

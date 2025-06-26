@@ -15,12 +15,17 @@ class SeatedanglespacingOnCol(QMainWindow):
         
         self.connection = connection_obj
         self.val=rows
+        
         if self.val==3 or self.val==4:
             self.plate_width=main.seated_angle.width
             self.plate_length=main.seated_angle.leg_a_length
+            self.plate_thickness=float(main.seated_angle.designation.split(" x ")[-1])
         else:
             self.plate_width=main.top_angle.width
             self.plate_length=main.top_angle.leg_a_length
+            self.plate_thickness=float(main.top_angle.designation.split(" x ")[-1])
+        
+        
         arr=[main.top_spacing_col(main,True),main.top_spacing_beam(main,True),main.seated_spacing_col(main,True),
              main.seated_spacing_beam(main,True)]
         val=self.val-1
@@ -69,7 +74,7 @@ class SeatedanglespacingOnCol(QMainWindow):
         self.initUI()
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
-        self.setGeometry(100, 100, 800, 500)
+        self.setGeometry(100, 100, 1050, 750)
         
         # Main layout
         main_layout = QHBoxLayout()
@@ -131,6 +136,7 @@ class SeatedanglespacingOnCol(QMainWindow):
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
         dimension_pen = QPen(Qt.black, 1.5)
+        weld_fill = QBrush(Qt.red)
         
         # Dimension offsets
         h_offset = 40
@@ -142,6 +148,12 @@ class SeatedanglespacingOnCol(QMainWindow):
         
         # Draw rectangle
         self.scene.addRect(0, 0, width, height, dimension_pen)
+
+        if self.val==3 or self.val==1:
+            self.scene.addRect(0, height-self.plate_thickness, width, self.plate_thickness, dimension_pen, weld_fill)
+        elif self.val==4 or self.val==2:
+            self.scene.addRect(0, 0, width, self.plate_thickness, dimension_pen, weld_fill)
+
 
         # Draw holes
         for row in range(self.rows):

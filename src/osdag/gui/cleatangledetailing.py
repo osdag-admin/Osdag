@@ -16,6 +16,9 @@ class CleatAngle(QMainWindow):
         spacing_data = connection_obj.spacing(status=True)
         output=connection_obj.output_values(True)
         data1={ f'{i[1]} + {i[0]}' : i[3] for i in output}
+
+        self.angle_thickness=float(data1['Cleat Angle Designation + Cleat.Angle'].split(" ")[-1])
+        
         params= {
             'width' : int(data1['Height (mm) + Plate.Height']),
             'hole' : int(data1['Diameter (mm) + Bolt.Diameter']),
@@ -52,7 +55,7 @@ class CleatAngle(QMainWindow):
         self.initUI()
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
-        self.setGeometry(100, 100, 800, 500)
+        self.setGeometry(100, 100, 1000, 600)
         
         # Main layout
         main_layout = QHBoxLayout()
@@ -125,6 +128,7 @@ class CleatAngle(QMainWindow):
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
         dimension_pen = QPen(Qt.black, 1.5)
+        angle_pen = QBrush(Qt.red)
         
         # Dimension offsets
         h_offset = 40
@@ -136,6 +140,8 @@ class CleatAngle(QMainWindow):
         
         # Draw rectangle
         self.scene.addRect(0, 0, width, height, dimension_pen)
+        self.scene.addRect(0, 0, self.angle_thickness, height, dimension_pen, angle_pen)
+
 
         # Draw holes
         for row in range(self.rows):

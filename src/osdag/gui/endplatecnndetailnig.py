@@ -35,7 +35,7 @@ class EndPlateDetailer(QMainWindow):
         # print(self.connection.spacing(status=True))
     def initUI(self):
         self.setWindowTitle('Bolt Pattern Generator')
-        self.setGeometry(100, 100, 800, 500)
+        self.setGeometry(100, 100, 1200, 800)
         
         # Main layout
         main_layout = QHBoxLayout()

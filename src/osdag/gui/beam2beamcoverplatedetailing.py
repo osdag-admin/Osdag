@@ -22,6 +22,12 @@ class B2Bcoverplate(QMainWindow):
         data=main.output_values(main,True)
         print(type(main))
         dict1={i[0] : i[3] for i in data}
+
+
+        print("________________________DEBUG________________________")
+        print(dict1)
+        print("________________________DEBUG________________________")
+
         for i in dict1:
             print(f'{i} : {dict1[i]}')
         if web==True:

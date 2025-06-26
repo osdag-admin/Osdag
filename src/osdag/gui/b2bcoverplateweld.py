@@ -13,6 +13,7 @@ class B2Bcoverplateweld(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         print(main)
         if main:
+            self.web=main[1]
             web=main[1]
             main=main[0]
         super().__init__()
@@ -23,15 +24,20 @@ class B2Bcoverplateweld(QMainWindow):
         dict1={i[0] : i[3] for i in data}
         for i in dict1:
             print(f'{i} : {dict1[i]}')
+        print("????????????????????????????DEBUG?????????????????????????????")
+        print(dict1)
+        print("????????????????????????????DEBUG?????????????????????????????")
         
         if web==True:
             self.plate_length=main.web_plate.height
             self.plate_width=main.web_plate.length
+            self.plate_thickness=float(dict1['Connector.Web_Plate.Thickness_List'])
             self.weld_size=main.web_weld.size
             self.weld_gap=main.web_plate.gap
         elif web==False:
             self.plate_width=main.flange_plate.length
             self.plate_length=main.flange_plate.height
+            self.plate_thickness=float(dict1['Connector.Flange_Plate.Thickness_list'])
             self.weld_size=main.flange_weld.size
             self.weld_gap=main.flange_plate.gap
         self.initUI()
@@ -141,6 +147,13 @@ class B2Bcoverplateweld(QMainWindow):
         rect_item.setPen(outline_pen)
         rect_item.setBrush(QBrush(Qt.white))
         self.scene.addItem(rect_item)
+
+        dimension_pen = QPen(Qt.black, 1.5)
+        weld_fill = QBrush(Qt.blue)
+        if self.web==True:
+            self.scene.addRect(0, (plate_width-self.plate_thickness)/2 , plate_length, self.plate_thickness, dimension_pen, weld_fill)
+        elif self.web==False:
+            self.scene.addRect((plate_length-self.plate_thickness)/2, 0 , self.plate_thickness, plate_width, dimension_pen, weld_fill)
         # === Center of the base plate ===
         center_x = plate_length / 2
         center_y = plate_width / 2

@@ -266,35 +266,43 @@ class LapJointWelded(MomentConnection):
         return spacing
 
     def output_values(self, flag):
-        out_list=[]
-        # Cover plate details
-        # Calculate cover_type based on planes attribute
+        out_list = []
+
+        # Weld details title
         t21 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t21)
 
+        # Utilization ratio
         t22 = (KEY_OUT_UTILISATION_RATIO, KEY_OUT_DISP_UTILISATION_RATIO, TYPE_TEXTBOX,
-               round(self.utilization_ratio, 3) if flag else '', True)
+               round(self.utilization_ratio, 3) if flag and self.utilization_ratio is not None else '', True)
         out_list.append(t22)
 
+        # Weld type
         t23 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX,
                "Fillet" if flag else '', True)
         out_list.append(t23)
 
+        # Weld size
         t24 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
-               round(self.weld_size, 1) if flag else '', True)
+               round(self.weld_size, 1) if flag and self.weld_size is not None else '', True)
         out_list.append(t24)
 
+        # Weld strength
         t25 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH_kN, TYPE_TEXTBOX,
-               round(self.weld_strength/1000, 2) if flag else '', True)  # Convert to kN
+               round(self.weld_strength / 1000, 2) if flag and self.weld_strength is not None else '', True)
         out_list.append(t25)
 
+        # Effective weld length
         t26 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX,
-               round(self.weld_length_effective, 1) if flag else '', True)
+               round(self.weld_length_effective, 1) if flag and self.weld_length_effective is not None else '', True)
         out_list.append(t26)
 
+        # Connection length (total length including end returns)
         t27 = (KEY_OUT_WELD_CONN_LEN, KEY_OUT_DISP_WELD_CONN_LEN, TYPE_TEXTBOX,
-               round(self.connection_length, 1) if flag else '', True)
+               round(self.connection_length, 1) if flag and hasattr(self, 'connection_length') and self.connection_length is not None else '', True)
         out_list.append(t27)
+
+        # Optionally add more fields if needed (e.g., beta_lw, end_return_length, overlap_length, design_capacity)
 
         return out_list
 
@@ -575,6 +583,7 @@ class LapJointWelded(MomentConnection):
         logger.info(f"Fillet Weld Design Strength (used): {self.fillet_weld_design_strength}")
 
     def _calculate_and_validate_weld_length(self):
+        self.output_values_dict = {}
         self.weld_length_effective = self.tensile_force / (2 * self.fillet_weld_design_strength)
         self.leff_min = max(4 * self.weld_size, 40)
         self.leff_max = 70 * self.weld_size
@@ -601,6 +610,7 @@ class LapJointWelded(MomentConnection):
         self._l_req = l_req
         self._l_eff_max = l_eff_max
         self._t_t = t_t
+        self.output_values_dict[KEY_OUT_WELD_LENGTH] = self.weld_length_effective
         return True
 
     def _apply_long_joint_reduction_and_check(self):

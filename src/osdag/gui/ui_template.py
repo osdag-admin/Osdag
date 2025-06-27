@@ -180,6 +180,41 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
 
 class Window(QMainWindow):
     closed = QtCore.pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.mytabWidget = QTabWidget()
+        self.setCentralWidget(self.mytabWidget)
+
+        self.init_display()
+        # self.modelTab.installEventFilter(self)
+        print("Event filter installed")
+
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.MouseMove:
+            print("Mouse moved on:", source)
+        return super().eventFilter(source, event)
+
+
+    def check_hover(self, x, y):
+        context = self.display.Context
+        view = self.display.View
+
+        # Move selection to mouse position
+        context.MoveTo(x, y, view)
+
+        owner = context.DetectedOwner()
+        if owner:
+            obj = owner.Selectable()
+            for ais_obj, tooltip in getattr(self.display, "_hover_tooltips", []):
+                if obj == ais_obj:
+                    QToolTip.showText(QtGui.QCursor.pos(), tooltip, self.display)
+                    return
+        # Hide tooltip if not hovering
+        QToolTip.hideText()
+
+
     def center(self):
         frameGm = self.frameGeometry()
         screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
@@ -1384,7 +1419,7 @@ class Window(QMainWindow):
 
         # print("\n outside now")
         from ..osdagMainSettings import backend_name
-        self.display, _ = self.init_display(backend_str=backend_name())
+        self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None
         # print(f'setupUi done 10')
@@ -2712,39 +2747,55 @@ class Window(QMainWindow):
         self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
     def init_display(self, backend_str=None, size=(1024, 768)):
-
+        # ✅ Safe to import here
         from OCC.Display.backend import load_backend, get_qt_modules
 
-        used_backend = load_backend(backend_str)
+        used_backend = load_backend(backend_str)  # must come before qt imports
 
-        global display, start_display, app, _, USED_BACKEND
         if 'qt' in used_backend:
-            from OCC.Display.qtDisplay import qtViewer3d
             QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
-        # from OCC.Display.pyqt4Display import qtViewer3d
+        # ✅ Only now import qtViewer3d
         from OCC.Display.qtDisplay import qtViewer3d
-        self.modelTab = qtViewer3d(self)
 
-        # self.setWindowTitle("Osdag Fin Plate")
-        #self.mytabWidget.resize(size[0], size[1])
+        # Define subclass here...
+        class HoverableViewer3d(qtViewer3d):
+            def __init__(viewer_self, parent=None):
+                super(HoverableViewer3d, viewer_self).__init__(parent)
+
+            def mouseMoveEvent(viewer_self, event):
+                pos = event.pos()
+                if hasattr(viewer_self, '_display') and viewer_self._display:
+                    ctx = viewer_self._display.Context
+                    view = viewer_self._display.View
+                    ctx.MoveTo(pos.x(), pos.y(), view, True)
+
+                    owner = ctx.DetectedOwner()
+                    if owner:
+                        obj = owner.Selectable()
+                        for ais_obj, tooltip in getattr(viewer_self._display, "_hover_tooltips", []):
+                            if obj == ais_obj:
+                                QtWidgets.QToolTip.showText(QtGui.QCursor.pos(), tooltip, viewer_self)
+                                return
+                QtWidgets.QToolTip.hideText()
+                super().mouseMoveEvent(event)
+
+        # Instantiate viewer
+        self.modelTab = HoverableViewer3d(self)
         self.mytabWidget.addTab(self.modelTab, "")
-
         self.modelTab.InitDriver()
-        display = self.modelTab._display
-        key_function = {Qt.Key_Up: lambda: self.Pan_Rotate_model("Up"),
-                        Qt.Key_Down: lambda: self.Pan_Rotate_model("Down"),
-                        Qt.Key_Right: lambda: self.Pan_Rotate_model("Right"),
-                        Qt.Key_Left: lambda: self.Pan_Rotate_model("Left")}
-        self.modelTab._key_map.update(key_function)
 
-        # background gradient
-        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
-        # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_triedron()
-        # display.display_triedron()
-        display.View.SetProj(1, 1, 1)
+        self.display = self.modelTab._display
+        self.display._hover_tooltips = []
+        self.modelTab._display = self.display
+
+        self.display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        self.display.display_triedron()
+        self.display.View.SetProj(1, 1, 1)
+
+
+
+
 
         def centerOnScreen(self):
             '''Centers the window on the screen.'''
@@ -2755,7 +2806,30 @@ class Window(QMainWindow):
         def start_display():
             self.modelTab.raise_()
 
-        return display, start_display
+        # return display, start_display
+
+# class HoverableViewer3d(qtViewer3d):
+#     def __init__(self, parent=None, display=None):
+#         super().__init__(parent)
+#         self._display = display  # You can optionally pass and store it
+
+#     def mouseMoveEvent(self, event):
+#         pos = event.pos()
+#         if hasattr(self, '_display') and self._display:
+#             ctx = self._display.Context
+#             view = self._display.View
+#             ctx.MoveTo(pos.x(), pos.y(), view)
+
+#             owner = ctx.DetectedOwner()
+#             if owner:
+#                 obj = owner.Selectable()
+#                 for ais_obj, tooltip in getattr(self._display, "_hover_tooltips", []):
+#                     if obj == ais_obj:
+#                         QtWidgets.QToolTip.showText(QtGui.QCursor.pos(), tooltip, self)
+#                         return
+#         QtWidgets.QToolTip.hideText()
+#         super().mouseMoveEvent(event)
+
 
     def save_cadImages(self,main):
         """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)

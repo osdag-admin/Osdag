@@ -142,6 +142,9 @@ from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 # from OCC.Display.OCCViewer import V3d_XposYnegZneg
 from OCC.Core.TNaming import tnaming
 import multiprocessing
+from OCC.Core.Geom import Geom_CartesianPoint
+from OCC.Core.AIS import AIS_Point
+from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData

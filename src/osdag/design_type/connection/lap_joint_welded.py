@@ -322,19 +322,24 @@ class LapJointWelded(MomentConnection):
 
         return KEY_DISP_LAPJOINTBOLTED
     
-    def func_for_validation(self, design_dictionary):
+    @classmethod
+    def func_for_validation(cls, instance_or_dict=None, design_dictionary=None):
+        """Check valid inputs and empty inputs in input dock"""
+
+        # Determine the actual instance to work with
+        current_instance = None
+        if isinstance(instance_or_dict, cls) and not isinstance(instance_or_dict, type): # If it's an actual instance, use it
+            current_instance = instance_or_dict
+        else: # If it's the class itself, or None, or something else, create a new instance
+            current_instance = cls()
 
         all_errors = []
-        "check valid inputs and empty inputs in input dock"
-        # print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
-        self.design_status = False
-
+        current_instance.design_status = False
         flag = False
         flag1 = False
         flag2 = False
-        # self.include_status = True
 
-        option_list = self.input_values(self)
+        option_list = current_instance.input_values()  # Call on the instance
         missing_fields_list = []
 
         print(f'\n func_for_validation option list = {option_list}'
@@ -343,41 +348,26 @@ class LapJointWelded(MomentConnection):
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
-
                     print(f"\n option {option}")
-
                     missing_fields_list.append(option[1])
                 else:
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_PLATE_WIDTH:
-                        # val = option[4]
-                        # print(design_dictionary[option[0]], "jhvhj")
-                        if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Input value(s) cannot be equal or less than zero."
-                            all_errors.append(error)
-                        else:
-                            flag1 = True
+                    if option[0] == KEY_PLATE_WIDTH and float(design_dictionary[option[0]]) <= 0.0:
+                        all_errors.append("Input value(s) cannot be equal or less than zero.")
+                    else:
+                        flag1 = True
+                    if option[0] == KEY_TENSILE_FORCE and float(design_dictionary[option[0]]) <= 0.0:
+                        all_errors.append("Input value(s) cannot be equal or less than zero.")
+                    else:
+                        flag2 = True
 
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
-
-                        if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Input value(s) cannot be equal or less than zero."
-                            all_errors.append(error)
-                        else:
-                            flag2 = True
-            else:
-                pass
-
-
-        if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            # flag = False
+        if missing_fields_list:
+            all_errors.append(current_instance.generate_missing_fields_error_string(missing_fields_list))
         else:
             flag = True
-        if flag  and flag1 and flag2:
-            # self.set_input_values(self, design_dictionary)
-            # print("DESIGN DICT" + str(design_dictionary))
-            print("succsess")
+
+        if flag and flag1 and flag2:
+            current_instance.set_input_values(design_dictionary)
+            print("success")
         else:
             return all_errors
 
@@ -434,7 +424,7 @@ class LapJointWelded(MomentConnection):
 
 
     def set_input_values(self, design_dictionary):
-        "initialisation of components required to design a butt joint welded along with connection"
+        """Initialisation of components required to design a butt joint welded along with connection"""
         # Call parent class's set_input_values with default values if not provided
         design_dictionary_with_defaults = design_dictionary.copy()
         if KEY_SHEAR not in design_dictionary_with_defaults:
@@ -445,20 +435,16 @@ class LapJointWelded(MomentConnection):
             design_dictionary_with_defaults[KEY_MOMENT] = 0.0  # Default moment value if not provided
         
         # Call parent class method correctly
-        super(LapJointWelded, self).set_input_values(self,design_dictionary_with_defaults)
+        super(LapJointWelded, self).set_input_values(design_dictionary_with_defaults)
         print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Lap Joint Welded Connection"
         
-        # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+        # Initialize properties
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])*1000
         self.width = design_dictionary[KEY_PLATE_WIDTH]
 
-        # print(self.sizelist)
-        self.efficiency = 0.0
-        self.K = 1
-        self.count = 0
         self.plate1 = Plate(thickness=[design_dictionary[KEY_PLATE1_THICKNESS]],
                         material_grade=design_dictionary[KEY_MATERIAL],
                         width=design_dictionary[KEY_PLATE_WIDTH])
@@ -471,8 +457,8 @@ class LapJointWelded(MomentConnection):
                          fabrication=design_dictionary.get(KEY_DP_FAB_SHOP, KEY_DP_FAB_SHOP))
         # Set weld size after creating the weld object
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
-        # Start design process
-        print("input values are set. Doing preliminary member checks")
+        
+        # Initialize design statuses
         self.member_design_status = False
         self.max_limit_status_1 = False
         self.max_limit_status_2 = False
@@ -480,12 +466,14 @@ class LapJointWelded(MomentConnection):
         self.thick_design_status = False
         self.plate_design_status = False
 
-
+        # Initialize other properties
+        self.efficiency = 0.0
+        self.K = 1
+        self.count = 0
         self.leg_size = 0
         self.yield_strength = 0
         self.partial_safety_factor = 0
         self.max_weld_size = 0
-        #change from here
         self.final_pitch = 0
         self.final_end_dist = 0
         self.final_edge_dist = 0
@@ -498,12 +486,10 @@ class LapJointWelded(MomentConnection):
         self.utilization_ratio = 0
         self.bij = 0
         self.blg = 0
-        self.cover_plate = design_dictionary[KEY_COVER_PLATE]
         
         # Start design process
-        self.design_of_weld(self,design_dictionary)
-    
-    #========================DESIGN OF WELD==================================================================
+        self.design_of_weld(design_dictionary)
+
     def design_of_weld(self, design_dictionary):
         """Design sequence for welded butt joint"""
         logger.info(": ===========  Design for Welded Butt Joint  ===========")

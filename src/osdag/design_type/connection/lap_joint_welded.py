@@ -29,7 +29,19 @@ class LapJointWelded(MomentConnection):
     def __init__(self):
         super(LapJointWelded, self).__init__()
         self.design_status = False
-        self.spacing = None 
+        self.design_status = False
+        self.weld_size = None
+        self.weld_length_provided = None
+        self.weld_strength = None
+        self.weld_thickness = None
+        self.plate_width = None
+        self.plate_length = None
+        self.plate_thickness = None
+        self.weld_type = None
+        self.weld_material = None
+        self.weld_fabrication = None
+        self.weld_angle = None
+        self.weld_length_effective = None 
 
     ###############################################
     # Design Preference Functions Start
@@ -105,38 +117,6 @@ class LapJointWelded(MomentConnection):
 
         return detailing
 
-    # def bolt_values(self, input_dictionary):
-    #     values = {
-    #         KEY_DP_BOLT_TYPE: 'Non Pre-tensioned',
-    #         KEY_DP_BOLT_HOLE_TYPE: 'Standard',
-    #         KEY_DP_BOLT_SLIP_FACTOR: '0.3'
-    #     }
-
-    #     for key in values.keys():
-    #         if key in input_dictionary.keys():
-    #             values[key] = input_dictionary[key]
-
-    #     bolt = []
-        
-    #     # Bolt type selection
-    #     t1 = (KEY_DP_BOLT_TYPE, "Type", TYPE_COMBOBOX,
-    #         ['Non Pre-tensioned', 'Pre-tensioned'],
-    #         values[KEY_DP_BOLT_TYPE])
-    #     bolt.append(t1)
-        
-    #     # Bolt hole type
-    #     t2 = (KEY_DP_BOLT_HOLE_TYPE, "Bolt Hole", TYPE_COMBOBOX,
-    #         ['Standard', 'Over-sized'],
-    #         values[KEY_DP_BOLT_HOLE_TYPE])
-    #     bolt.append(t2)
-        
-    #     # Slip factor as per Table 20 of IS 800
-    #     t3 = (KEY_DP_BOLT_SLIP_FACTOR, "Slip Factor", TYPE_COMBOBOX,
-    #         ['0.3', '0.45', '0.5'],
-    #         values[KEY_DP_BOLT_SLIP_FACTOR])
-    #     bolt.append(t3)
-
-    #     return bolt
 
     def weld_values(self, input_dictionary):
         # Get fu value from selected material if available
@@ -217,7 +197,7 @@ class LapJointWelded(MomentConnection):
 
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_LAPJOINTBOLTED, TYPE_MODULE, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_LAPJOINTWELDED, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
@@ -320,7 +300,7 @@ class LapJointWelded(MomentConnection):
 
     def module_name(self):
 
-        return KEY_DISP_LAPJOINTBOLTED
+        return KEY_DISP_LAPJOINTWELDED
     
     @classmethod
     def func_for_validation(cls, instance_or_dict=None, design_dictionary=None):
@@ -497,11 +477,21 @@ class LapJointWelded(MomentConnection):
 
         if not self._select_and_validate_weld_size(design_dictionary):
             return
+        logger.info(": =========== Checking Weld Strength ===========")
         self._calculate_weld_strengths(design_dictionary)
         if not self._calculate_and_validate_weld_length():
             return
+        logger.info(": Checking minimum length requirements...")
+
         if not self._apply_long_joint_reduction_and_check():
             return
+        logger.info(": =========== Final Design Check ===========")
+        if self.design_status:
+            logger.info(": =========== Design is SAFE ===========")
+            logger.info(": All utilization ratios are within acceptable limits")
+        else:
+            logger.error(": =========== Design is UNSAFE ===========")
+        logger.info(": ===========End Of Design===========")
 
     def _select_and_validate_weld_size(self, design_dictionary):
         weld_size = design_dictionary[KEY_WELD_SIZE]
@@ -599,12 +589,14 @@ class LapJointWelded(MomentConnection):
             # Is l_req <= l_eff_max?
             if l_req <= l_eff_max:
                 l_eff = l_req
+                logger.info(": Minimum length requirement satisfied")
             else:
                 logger.error(": Required weld length exceeds maximum allowed. Increase weld size.")
                 self.design_status = False
                 return False
         else:
             l_eff = l_eff_min
+            logger.info(": Minimum length requirement satisfied")
         self.l_eff = l_eff
         self._l_req = l_req
         self._l_eff_max = l_eff_max
@@ -666,6 +658,7 @@ class LapJointWelded(MomentConnection):
                     logger.info(f"Utilization Ratio: {self.utilization_ratio}")
         else:
             self.beta_lw = 1.0
+            logger.info(": No reduction for long joints required as length is less than 150 times throat thickness")
             self.end_return_length = max(2 * self.weld_size, 12)
             self.connection_length = self.l_eff + 2 * self.end_return_length
             clearance = 0

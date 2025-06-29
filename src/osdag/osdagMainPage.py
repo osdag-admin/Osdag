@@ -166,6 +166,7 @@ from .design_type.compression_member.Column import ColumnDesign
 
 from .design_type.flexural_member.flexure import Flexure
 from .design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
+from .design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from .design_type.flexural_member.flexure_othersupp import Flexure_Misc
 # from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 # from .cad.cad_common import call_3DBeam
@@ -312,22 +313,21 @@ class OsdagMainWindow(QMainWindow):
                 'Flexural Member' : [
                     ('Simply Supported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("simply-supported-beam.jpg")), 'Beam_flexure'),
                     ('Cantilever Beam', str(files("osdag.data.ResourceFiles.images").joinpath("cantilever-beam.jpg")), 'Beam_flexure2'),
+                    ('Purlin', str(files("osdag.data.ResourceFiles.images").joinpath("purlin.jpg")), 'Beam_flexure4'),
                     # ('Other Beams', str(files("osdag.data.ResourceFiles.images").joinpath("fixed-beam.png")), 'Beam_flexure3'),
-                    
                     # ('Laterally Unsupported Beam', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Truss_Welded'),
                     self.show_flexure_module,
                 ],
                 'Beam-Column' : self.Under_Development,
-                'Plate Girder' : self.Under_Development,
                 # TODO @rutvik
                 # 'Beam-Column' :[
                 #     ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Beam_Column_Design'),
                 #     self.show_beamcolumn_module,
                 # ],
-                # 'Plate Girder' : [ #TODO: Check number of sub modules required
-                #     ('Welded Girder Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Welded_Girder_Design'),
-                #     self.Show_Girder_Design,
-                # ],
+                'Plate Girder' : [ #TODO: Check number of sub modules required
+                    ('Simply Supported', str(files('osdag.data.ResourceFiles.images').joinpath('simply-supported-beam.jpg')), 'Welded_Girder_Design'),
+                    self.show_girder_design,
+                ],
                 'Truss' : self.Under_Development,
                 '2D Frame' : self.Under_Development,
                 '3D Frame' : self.Under_Development,
@@ -533,96 +533,95 @@ class OsdagMainWindow(QMainWindow):
 
     @pyqtSlot()
     def show_shear_connection(self):
-        if self.findChild(QRadioButton,'Fin_Plate').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(CleatAngleConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'Seated_Angle').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow( SeatedAngleConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'End_Plate').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(EndPlateConnection, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        else:
-            QMessageBox.about(self, "INFO", "Please select appropriate connection")
+        button_name_window_type_pairs = \
+            [("Fin_Plate", FinPlateConnection),
+             ("Cleat_Angle", CleatAngleConnection),
+             ("Seated_Angle", SeatedAngleConnection),
+             ("End_Plate", EndPlateConnection),]
+
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     def show_moment_connection(self):
-        if self.findChild(QRadioButton,'B2B_Cover_Plate_Bolted').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamCoverPlate, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'B2B_Cover_Plate_Welded').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamCoverPlateWeld, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        # elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
-        #     self.hide()
-        #     self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice,' ')
-        #     self.ui2.show()
-        #     self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton, 'B2B_End_Plate_Splice').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(BeamBeamEndPlateSplice, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        button_name_window_type_pairs = \
+            [("B2B_Cover_Plate_Bolted", BeamCoverPlate),
+             ("B2B_Cover_Plate_Welded", BeamCoverPlateWeld),
+             # ("B2B_End_Plate_Connection", BeamBeamEndPlateSplice),
+             ("B2B_End_Plate_Splice", BeamBeamEndPlateSplice),]
+
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     def show_moment_connection_bc(self):
-        if self.findChild(QRadioButton,'BC_End_Plate').isChecked():
+        btn = self.findChild(QRadioButton, "BC_End_Plate")
+        if btn is not None and btn.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(BeamColumnEndPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+        else:
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     def show_base_plate(self):
-        if self.findChild(QRadioButton, 'Base_Plate').isChecked():
+        btn = self.findChild(QRadioButton, "Base_Plate")
+        if btn is not None and btn.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(BasePlateConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-
-    def show_truss_bolted(self):
-        if self.findChild(QRadioButton, 'Truss_Bolted').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(TrussConnectionBolted, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        #elif self.findChild(QRadioButton,'Truss_Welded').isChecked():
-        #    self.hide()
-        #    self.ui2 = Ui_ModuleWindow(BasePlateConnection, ' ')
-        #    self.ui2.show()
-        #    self.ui2.closed.connect(self.show)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
-    def show_moment_connection_cc(self):
-        if self.findChild(QRadioButton,'C2C_Cover_Plate_Bolted').isChecked() :
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(ColumnCoverPlate, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'C2C_Cover_Plate_Welded').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(ColumnCoverPlateWeld, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+    def show_truss_bolted(self):
+        button_name_window_type_pairs = \
+            [
+                ("Truss_Bolted", TrussConnectionBolted),
+                # ("Truss_Welded", BasePlateConnection),
+            ]
 
-        elif self.findChild(QRadioButton,'C2C_End_Plate_Connection').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(ColumnEndPlate, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
+    def show_moment_connection_cc(self):
+        button_name_window_type_pairs = \
+            [("C2C_Cover_Plate_Bolted", ColumnCoverPlate),
+             ("C2C_Cover_Plate_Welded", ColumnCoverPlateWeld),
+             ("C2C_End_Plate_Connection", ColumnEndPlate),]
+
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     # def show_compression_module(self):
     #     # folder = self.select_workspace_folder()
@@ -659,93 +658,73 @@ class OsdagMainWindow(QMainWindow):
     #         self.ui2.closed.connect(self.show)
 
     def show_tension_module(self):
-        # folder = self.select_workspace_folder()
-        # folder = str(folder)
-        # if not os.path.exists(folder):
-        #     if folder == '':
-        #         pass
-        #     else:
-        #         os.mkdir(folder, 0o755)
-        #
-        # root_path = folder
-        # images_html_folder = ['images_html']
-        # flag = True
-        # for create_folder in images_html_folder:
-        #     if root_path == '':
-        #         flag = False
-        #         return flag
-        #     else:
-        #         try:
-        #             os.mkdir(os.path.join(root_path, create_folder))
-        #         except OSError:
-        #             shutil.rmtree(os.path.join(folder, create_folder))
-        #             os.mkdir(os.path.join(root_path, create_folder))
+        button_name_window_type_pairs = \
+            [("Tension_Bolted", Tension_bolted),
+             ("Tension_Welded", Tension_welded),]
 
-        if self.findChild(QRadioButton,'Tension_Bolted').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Tension_bolted, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
 
-        elif self.findChild(QRadioButton,'Tension_Welded').isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Tension_welded, ' ')
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+        QMessageBox.about(self, "INFO", "Please select appropriate tension module")
 
     def show_compression_module(self):
         """ Create radio buttons for the sub-modules under the compression module"""
-        # print(f"Here8")
-        if self.findChild(QRadioButton, 'Column_Design').isChecked():
-            # print(f"Here9")
+        column_design_button = self.findChild(QRadioButton, 'Column_Design')
+        if column_design_button is not None and column_design_button.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(ColumnDesign, ' ')
-            # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+            return
 
-        elif self.findChild(QRadioButton, 'Strut_Design').isChecked():
-            print(f"Here9")
+        strut_design_button = self.findChild(QRadioButton, 'Strut_Design')
+        if strut_design_button is not None and strut_design_button.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(Compression, ' ')
-            print(f"Here11.2")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+            return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate compression module")
 
     def show_flexure_module(self):
         """ Create radio buttons for the sub-modules under the compression module"""
-        # print(f"Here8")
-        if self.findChild(QRadioButton, 'Beam_flexure').isChecked():
-            # print(f"Here9")
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Flexure, ' ')
-            # print(f"Here11")
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton, 'Beam_flexure2').isChecked():
-            # print(f"Here9")
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Flexure_Cantilever, ' ')
-            # print(f"Here11")
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-        elif self.findChild(QRadioButton, 'Beam_flexure3').isChecked():
-            # print(f"Here9")
-            self.hide()
-            self.ui2 = Ui_ModuleWindow(Flexure_Misc, ' ')
-            # print(f"Here11")
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
+
+        button_name_window_type_pairs = \
+            [("Beam_flexure", Flexure),
+             ("Beam_flexure2", Flexure_Cantilever),
+             ("Beam_flexure3", Flexure_Misc),
+             ("Beam_flexure4", Flexure_Purlin)]
+
+        for (button_name, window_type) in button_name_window_type_pairs:
+            btn = self.findChild(QRadioButton, button_name)
+            if btn is not None and btn.isChecked():
+                self.hide()
+                self.ui2 = Ui_ModuleWindow(window_type, ' ')
+                self.ui2.show()
+                self.ui2.closed.connect(self.show)
+                return
+
+        QMessageBox.about(self, "INFO", "Please select appropriate flexure module")
+
     def show_beamcolumn_module(self):
-        if self.findChild(QRadioButton, 'Beam_flexure').isChecked():
-            # print(f"Here9")
+        btn = self.findChild(QRadioButton, "Beam_flexure")
+        if btn is not None and btn.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(Flexure, ' ')
-            # print(f"Here11")
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-    def Show_Girder_Design(self):
-        if self.findChild(QRadioButton, 'Welded_Girder_Design').isChecked():
+            return
+
+    def show_girder_design(self):
+        btn = self.findChild(QRadioButton, "Welded_Girder_Design")
+        if btn is not None and btn.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(PlateGirderWelded, ' ')
             self.ui2.show()
@@ -775,7 +754,7 @@ class OsdagMainWindow(QMainWindow):
         self.ask_question()
 
     def design_examples(self):
-        root_path = os.path.join('ResourceFiles', 'html_page', '_build', 'html')
+        root_path = files('osdag.data.ResourceFiles.html_page._build').joinpath('html')
         for html_file in os.listdir(root_path):
             # if html_file.startswith('index'):
             print(os.path.splitext(html_file)[1])
@@ -969,5 +948,49 @@ def do_stuff():
     except BaseException as e:
         print("ERROR", e)
 
+
+import cProfile
+import pstats
+import threading
+import keyboard  # Install with `pip install keyboard`
+
+profiler = cProfile.Profile()
+
+def start_profiling():
+    print("Profiling started...")
+    profiler.enable()
+
+def stop_profiling():
+    print("Profiling stopped...")
+    profiler.disable()
+    profiler.dump_stats("profile_output")
+    
+    stats = pstats.Stats("profile_output")
+    stats.sort_stats("time")
+    
+    # Print to console
+    stats.print_stats(50)
+    
+    # Save output to a text file
+    with open("profile_output.txt", "w") as f:
+        stats.stream = f
+        stats.print_stats(50)
+
+    print("Profile output saved to profile_output.txt")
+
+
+# Run profiling triggers in a separate thread to avoid blocking Osdag
+def listen_for_keys():
+    keyboard.add_hotkey('p', start_profiling)  # Press 'p' to start
+    keyboard.add_hotkey('s', stop_profiling)   # Press 's' to stop
+    keyboard.wait('esc')  # Keep listening until 'esc' is pressed
+
+# Start the keyboard listener in the background
+threading.Thread(target=listen_for_keys, daemon=True).start()
+
+def main():
+    while True:
+        do_stuff()  # Your main Osdag loop
+
 if __name__ == '__main__':
-    do_stuff()
+    main()

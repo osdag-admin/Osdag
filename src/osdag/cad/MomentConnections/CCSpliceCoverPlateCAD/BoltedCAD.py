@@ -1,15 +1,17 @@
 """
 created on 14-04-2020
-
+Optimized to reduce BRepAlgoAPI_Fuse and BRepAlgoAPI_Cut calls
 """
 
 import numpy
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse, BRepAlgoAPI_Cut
+from OCC.Core.TopoDS import TopoDS_Shape, topods
+from OCC.Core.BOPAlgo import BOPAlgo_Builder
+from OCC.Core.TopTools import TopTools_ListOfShape
 import copy
 
 class CCSpliceCoverPlateBoltedCAD(object):
-    def __init__(self, C, column, flangePlate, innerFlangePlate, webPlate,  nut_bolt_array_AF, nut_bolt_array_BF, nut_bolt_array_Web):
+    def __init__(self, C, column, flangePlate, innerFlangePlate, webPlate, nut_bolt_array_AF, nut_bolt_array_BF, nut_bolt_array_Web):
 
         self.C = C
         self.column = column
@@ -21,7 +23,6 @@ class CCSpliceCoverPlateBoltedCAD(object):
         self.nut_bolt_array_Web = nut_bolt_array_Web
 
         self.gap = float(self.C.flange_plate.gap)
-
 
         self.column1 = copy.deepcopy(self.column)
         self.column2 = copy.deepcopy(self.column)
@@ -156,14 +157,47 @@ class CCSpliceCoverPlateBoltedCAD(object):
 
         return nutBoltOriginAF
 
+    def multi_fusion(self, shapes):
+        """
+        Fuse multiple shapes using BOPAlgo_Builder instead of multiple BRepAlgoAPI_Fuse calls
+        """
+        if not shapes:
+            return None
+        
+        if len(shapes) == 1:
+            return shapes[0]
+            
+        # Create a BOPAlgo_Builder object for multi-fusion
+        builder = BOPAlgo_Builder()
+        
+        # Create a TopTools_ListOfShape and add all shapes to it
+        shape_list = TopTools_ListOfShape()
+        for shape in shapes:
+            shape_list.Append(shape)
+            
+        # Set the shapes to be fused
+        builder.SetArguments(shape_list)
+        
+        # Perform the operation
+        builder.Perform()
+        
+        # Return the result
+        if not builder.HasErrors():
+            print("Using BOPAlgo_Builder for multi-fusion")
+            return builder.Shape()
+        else:
+            print("Using Fuse")
+            # Fallback to traditional method if BOPAlgo_Builder fails
+            result = shapes[0]
+            for shape in shapes[1:]:
+                result = BRepAlgoAPI_Fuse(result, shape).Shape()
+            return result
 
     def get_column_models(self):
         """
-
         :return: CAD mode for the columns
         """
         columns = BRepAlgoAPI_Fuse(self.column1Model, self.column2Model).Shape()
-
         return columns
 
     def get_plate_models(self):
@@ -178,41 +212,30 @@ class CCSpliceCoverPlateBoltedCAD(object):
             plates_sec = [self.flangePlate1Model, self.flangePlate2Model,
                           self.webPlate1Model, self.webPlate2Model]
 
-        plates = plates_sec[0]
-
-        for comp in plates_sec[1:]:
-            plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
-
-        return plates
+        # Use multi-fusion instead of sequential fusing
+        return self.multi_fusion(plates_sec)
 
     def get_nut_bolt_models(self):
         """
-            :return: CAD model for all nut_bolt_arrangments
+        :return: CAD model for all nut_bolt_arrangments
         """
+        # Get all bolt models
         nut_bolts_AF = self.nut_bolt_array_AF.get_modelsAF()
-        array_AF = nut_bolts_AF[0]
-        for comp in nut_bolts_AF:
-            array_AF = BRepAlgoAPI_Fuse(comp, array_AF).Shape()
-
         nut_bolts_BF = self.nut_bolt_array_BF.get_modelsBF()
-        array_BF = nut_bolts_BF[0]
-        for comp in nut_bolts_BF:
-            array_BF = BRepAlgoAPI_Fuse(comp, array_BF).Shape()
-
         nut_bolts_W = self.nut_bolt_array_Web.get_modelsW()
-        array_W = nut_bolts_W[0]
-        for comp in nut_bolts_W:
-            array_W = BRepAlgoAPI_Fuse(comp, array_W).Shape()
-
-        nut_bolts_array = BRepAlgoAPI_Fuse(array_AF, array_BF).Shape()
-        nut_bolts_array = BRepAlgoAPI_Fuse(nut_bolts_array, array_W).Shape()
-
-        return nut_bolts_array
+        
+        # Combine all bolt models into a single list for multi-fusion
+        all_bolt_models = nut_bolts_AF + nut_bolts_BF + nut_bolts_W
+        
+        # Use multi-fusion to fuse all bolt models at once
+        return self.multi_fusion(all_bolt_models)
 
     def get_only_column_models(self):
         columns = self.get_column_models()
         nutbolt = self.get_nut_bolt_models()
 
+        # Since we can't use multi_cut with BOPAlgo_Builder directly, 
+        # we'll use the BRepAlgoAPI_Cut but minimize the number of calls
         onlycolumn = BRepAlgoAPI_Cut(columns, nutbolt).Shape()
 
         return onlycolumn
@@ -221,7 +244,8 @@ class CCSpliceCoverPlateBoltedCAD(object):
         columns = self.get_column_models()
         plate_conectors = self.get_plate_models()
 
-        CAD = BRepAlgoAPI_Fuse(columns, plate_conectors).Shape()
+        # Use multi_fusion instead of BRepAlgoAPI_Fuse
+        CAD = self.multi_fusion([columns, plate_conectors])
 
         return CAD
 
@@ -237,7 +261,7 @@ if __name__ == '__main__':
 
     import OCC.Core.V3d
 
-    from OCC.gp import gp_Pnt
+    from OCC.Core.gp import gp_Pnt
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 

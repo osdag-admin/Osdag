@@ -3,6 +3,8 @@ import yaml
 import shutil
 import time
 import pandas as pd
+import subprocess
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -19,7 +21,9 @@ from ..utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 #from .ui_design_preferences import Ui_Dialog
-
+from .beam2beamcoverplatedetailing import B2Bcoverplate
+from .b2cendplateSketch import B2BEndPlateSketch
+from .beam2beamcoverplatedetailing_capacity_details import B2Bcoverplate_capacity_details
 from .ui_summary_popup import Ui_Dialog1
 from ..design_report.reportGenerator import save_html
 from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
@@ -54,19 +58,30 @@ from ..design_type.compression_member.compression import Compression
 from ..design_type.flexural_member.flexure import Flexure
 from ..design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from ..design_type.flexural_member.flexure_othersupp import Flexure_Misc
+from ..design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from ..gusset_connection import GussetConnection
 import logging
 import subprocess
 from ..get_DPI_scale import scale,height,width
 from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
+from osdag.gui.spacing import BoltPatternGenerator
+from osdag.gui.capacity_details_finPlate import CapacityDetailsWindow
+from .seatedanglespacing import SeatedanglespacingOnCol
+from .Beam2ColEnddetailing import BeamtoColDetailing
+from .baseplatedetailing import BasePlateDetailing
+from .baseplatedetailinghollow import BasePlateDetailingHollow
+from .b2bcoverplateweld import B2Bcoverplateweld
 
+from .cleatangledetailing import CleatAngle
+from .BC2Cendplate import BC2CEndPlate
+from .endplatecnndetailnig import EndPlateDetailer
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.ui = Ui_Tutorial()
         self.ui.setupUi(self)
-
+        self.active_dialog = None
 
 class MyAboutOsdag(QDialog):
     def __init__(self, parent=None):
@@ -865,7 +880,6 @@ class Window(QMainWindow):
         else:
             for t in updated_list:
                 for key_name in t[0]:
-                    
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
                     self.on_change_connect(key_changed, updated_list, data, main)
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
@@ -1866,6 +1880,8 @@ class Window(QMainWindow):
             return Flexure_Cantilever
         elif name == KEY_DISP_FLEXURE3:
             return Flexure_Misc
+        elif name == KEY_DISP_FLEXURE4:
+            return Flexure_Purlin
         else:
             return GussetConnection
 # Function for getting inputs from a file
@@ -2105,7 +2121,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
-                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut]: # , KEY_DISP_FLEXURE
+                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_FLEXURE3,KEY_DISP_FLEXURE4,KEY_DISP_COMPRESSION_Strut]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
                 print(f"main object type: {type(main)}")
@@ -2113,7 +2129,7 @@ class Window(QMainWindow):
                 print("main.mainmodule",main.mainmodule)
 
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                print(main.module)
+                print(f"This is MAIN.MODULE {main.module}")
                 print(main.mainmodule)
                 # print("common start")
                 status = main.design_status
@@ -2134,24 +2150,7 @@ class Window(QMainWindow):
                     action.setEnabled(True)
                 fName = str('./ResourceFiles/images/3d.png')
                 file_extension = fName.split(".")[-1]
-
-                # if file_extension == 'png':
-                #     self.display.ExportToImage(fName)
-                #     im = Image.open('./ResourceFiles/images/3d.png')
-                #     w,h=im.size
-                #     if(w< 640 or h < 360):
-                #         print('Re-taking Screenshot')
-                #         self.resize(700,500)
-                #         self.outputDock.hide()
-                #         self.inputDock.hide()
-                #         self.textEdit.hide()
-                #         QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
-
             else:
-                for fName in ['3d.png', 'top.png',
-                              'front.png', 'side.png']:
-                    with open("./ResourceFiles/images/"+fName, 'w'):
-                        pass
                 self.display.EraseAll()
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
@@ -2192,7 +2191,30 @@ class Window(QMainWindow):
     def output_button_connect(self, main, button_list, b):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
+    def run_spacing_script(self,cols,rows,generator_class=BoltPatternGenerator , main=None):
+        print("Creating spacing window...")
+        self.spacing_window = generator_class(self.Obj,cols=cols,rows=rows,main=main)
+        self.spacing_window.setWindowTitle("Spacing Viewer")
+        self.spacing_window.raise_()
+        self.spacing_window.activateWindow()
+        self.spacing_window.show()
+    
+    def run_capacity_details(self,cols,rows,generator_class=CapacityDetailsWindow , main=None):
+        print("Creating capacity details window...")
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        print(generator_class)
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        self.capacity_window = generator_class(self.Obj,cols=cols,rows=rows,main=main)
+        self.capacity_window.setWindowTitle("Capacity Details")
+        self.capacity_window.raise_()
+        self.capacity_window.activateWindow()
+        self.capacity_window.show()
+    
+
+
+
     def output_button_dialog(self, main, button_list, button):
+        import inspect
 
         dialog = QtWidgets.QDialog()
         dialog.setObjectName("Dialog")
@@ -2231,12 +2253,168 @@ class Window(QMainWindow):
         section = 0
         no_note = True
 
-        for op in button_list:
 
+        for op in button_list:
+        
             if op[0] == button.objectName():
+                print(op)
+                print("DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG")
+                print(main)
+                print("DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG_DEBUG")
                 tup = op[3]
                 title = tup[0]
                 fn = tup[1]
+                cls = fn.__qualname__.split('.')[0]
+                if op[0] == 'spacing' or op[0]=='Cleat.Spting_leg.spacing':
+                            # print(main)
+                            self.active_dialog = QtWidgets.QDialog()
+                            dialog = self.active_dialog
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj() 
+                            if main is FinPlateConnection:
+                                if hasattr(self.Obj, 'spting_leg') and \
+                                    hasattr(self.Obj.spting_leg, 'bolt_line') and \
+                                    hasattr(self.Obj.spting_leg, 'bolts_one_line'):
+                                        self.run_spacing_script(self.Obj.spting_leg.bolts_one_line,self.Obj.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_spacing_script(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
+                                                                main=main)
+                            elif main is CleatAngleConnection and op[0]=='spacing':
+                                self.run_spacing_script(0,0,CleatAngle,(main,0))
+                            elif op[0]!='spacing' and main is CleatAngleConnection:
+                                self.run_spacing_script(0,0,CleatAngle,(main,1))
+                            elif main is EndPlateConnection:
+                                self.run_spacing_script(0,0,EndPlateDetailer,main)
+                            # return
+                                            # Instantiate it
+                            
+                            break
+                
+                elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]=='Capacity Details' and main is FinPlateConnection) :
+                    self.active_dialog = QtWidgets.QDialog()
+                    dialog = self.active_dialog
+                    module = inspect.getmodule(fn)       # Get the module where the function is defined
+                    cls_obj = getattr(module, cls)       # Get the actual class object
+                    self.Obj = cls_obj()
+                    if main is FinPlateConnection:
+                                if hasattr(self.Obj, 'spting_leg') and \
+                                    hasattr(self.Obj.spting_leg, 'bolt_line') and \
+                                    hasattr(self.Obj.spting_leg, 'bolts_one_line'):
+                                        self.run_capacity_details(self.Obj.spting_leg.bolts_one_line,self.Obj.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_capacity_details(rows=self.Obj.plate.bolts_one_line,cols=self.Obj.plate.bolt_line,
+                                                                main=main)
+                    break
+                        
+
+                elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
+                            
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj()                 # Instantiate it
+                            if op[0]=='SeatedAngle.Bolt_Spacing_col':
+                                val=3
+                            elif op[0]=='SeatedAngle.Bolt_Spacing_beam':
+                                val=4
+                            elif op[0]=='TopAngle.Bolt_Spacing_col':
+                                val=1
+                            else:
+                                val=2
+                            self.run_spacing_script(None,
+                                                        val,#specifying which to use
+                                                        SeatedanglespacingOnCol,main)
+                            return
+                            print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
+                elif op[0]=='Detailing' and op[1]=='Typical Detailing':
+
+                            module = inspect.getmodule(fn)       # Get the module where the function is defined
+                            cls_obj = getattr(module, cls)       # Get the actual class object
+                            self.Obj = cls_obj()  
+                            print(f'rows: {self.Obj.bolt_row} , cols : {self.Obj.bolt_column} , {self.Obj.bolt_row_web}')
+                            self.run_spacing_script(0,0,BeamtoColDetailing,main)
+                            data=main.output_values(main,True)
+                            return
+                elif op[0]=='BasePlate.Detailing':
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
+                        self.run_spacing_script(0,0,BasePlateDetailing,main)
+                    else:
+                        self.run_spacing_script(0,0,BasePlateDetailingHollow,main)
+                    return
+                elif op[0]=='Web_plate.spacing':
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_capacity_details(0,0,B2Bcoverplate,(main,True, "spacing"))
+                    return
+                elif op[0]=='Flange_plate.spacing':
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_capacity_details(0,0,B2Bcoverplate,(main,False, "spacing"))
+                    return
+                elif op[0]=='Web detail' and main is BeamCoverPlateWeld:
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_spacing_script(0,0,B2Bcoverplateweld,(main,True))
+                    return
+                elif op[0]=='Flange detail' and main is BeamCoverPlateWeld:
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    
+                    self.run_spacing_script(0,0,B2Bcoverplateweld,(main,False))
+                    return
+                
+
+                #im working here
+                elif op[0]=='section.web_capacities' and main is BeamCoverPlate:
+
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()                    
+                    self.run_capacity_details(0,0,B2Bcoverplate_capacity_details,(main,True,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]=='section.flange_capacity' and main is BeamCoverPlate:
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    self.run_capacity_details(0,0,B2Bcoverplate_capacity_details,(main,False,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]=="Stiffener.Sketch" and op[1]=="Typical Sketch":
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    self.run_spacing_script(0,0,B2BEndPlateSketch,main)
+                    return
+
+                elif op[0]=='Bolt.web_bolts' or op[0]=='Bolt.flange_bolts':
+                    module=inspect.getmodule(fn)
+                    cls_obj=getattr(module,cls)
+                    self.Obj=cls_obj()
+                    if op[0]=='Bolt.web_bolts':
+                        self.run_spacing_script(0,0,BC2CEndPlate,(main,0))
+                    else:
+                        self.run_spacing_script(0,0,BC2CEndPlate,(main,1))
+                    break
                 dialog.setWindowTitle(title)
                 j = 1
                 _translate = QtCore.QCoreApplication.translate

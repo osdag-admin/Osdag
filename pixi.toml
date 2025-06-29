@@ -1,16 +1,16 @@
-[project]
+[workspace]
 name = "Osdag"
 version = "1.0.0"
-description = "pixi instructions for osdag"
+description = "Pixi instructions for Osdag"
 authors = ["Aathithya Sharan"]
-channels = ["conda-forge","osdag"]
+preview = ["pixi-build"]
+channels = ["conda-forge", "osdag"]
 platforms = ["win-64"]
 
 [dependencies]
-osdag = "2025.01.a.2"
 python = "3.10.*"
-numpy  = "2.2.5"
-openpyxl ="3.1.5"
+numpy = "2.2.5"
+openpyxl = "3.1.5"
 pandas = "2.2.3"
 pynput = "1.8.1"
 pyqt = "5.15.10"
@@ -21,6 +21,19 @@ pyyaml = "6.0.2"
 smesh = "9.9.0.0"
 tbb = "2022.1.0"
 
-[tasks]
-osdag-editable = "pip install -e ."
+[feature.editable.dependencies]
+osdag = "2025.01.a.2"
+
+[feature.editable.tasks]
+install-editable = "pip install -e ."
+osdag-editable = "osdag"
+
+[feature.noneditable.dependencies]
+osdag = "2025.01.a.2"
+
+[feature.noneditable.tasks]
 osdag = "osdag"
+
+[environments]
+dev = ["editable"]
+default = ["noneditable"]

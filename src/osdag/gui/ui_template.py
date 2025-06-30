@@ -209,46 +209,197 @@ class Window(QMainWindow):
         return self.ui.get_right_elements()
 
     def open_summary_popup(self, main):
-        print('main.module_name',main.module_name(main))
+        print('main.module_name', main.module_name(main))
         if not main.design_button_status:
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
-        if main.design_status: # and main.module_name(main) != KEY_DISP_FLEXURE and main.module_name(main) != KEY_DISP_FLEXURE2
-            from ..osdagMainSettings import backend_name
-            off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
-            print('off_display', off_display)
-            self.commLogicObj.display = off_display
-            current_component = self.commLogicObj.component
-            self.commLogicObj.display_3DModel("Model", "gradient_bg")
+        
+        # Generate 3D images only if design exists and we can create the logic object
+        if main.design_status:
+            try:
+                from ..osdagMainSettings import backend_name
+                off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
+                print('off_display', off_display)
+                
+                # Check if commLogicObj exists and is properly initialized
+                if hasattr(self, 'commLogicObj') and self.commLogicObj is not None:
+                    # Store original display settings
+                    original_display = self.commLogicObj.display
+                    original_component = getattr(self.commLogicObj, 'component', None)
+                    
+                    # Set up for image generation
+                    self.commLogicObj.display = off_display
+                    self.commLogicObj.display_3DModel("Model", "gradient_bg")
 
-            image_folder_path = "./ResourceFiles/images"
-            if not os.path.exists(image_folder_path):
-                os.makedirs(image_folder_path)
+                    image_folder_path = "./ResourceFiles/images"
+                    if not os.path.exists(image_folder_path):
+                        os.makedirs(image_folder_path)
 
-            off_display.set_bg_gradient_color([255,255,255],[255,255,255])
-            off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
-            off_display.View_Front()
-            off_display.FitAll()
-            off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
-            off_display.View_Top()
-            off_display.FitAll()
-            off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
-            off_display.View_Right()
-            off_display.FitAll()
-            off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
-            self.commLogicObj.display = self.display
-            self.commLogicObj.component = current_component
+                    off_display.set_bg_gradient_color([255,255,255],[255,255,255])
+                    off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
+                    off_display.View_Front()
+                    off_display.FitAll()
+                    off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
+                    off_display.View_Top()
+                    off_display.FitAll()
+                    off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
+                    off_display.View_Right()
+                    off_display.FitAll()
+                    off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
+                    
+                    # Restore original display settings
+                    self.commLogicObj.display = original_display
+                    if original_component is not None:
+                        self.commLogicObj.component = original_component
+                        
+                    print("3D images generated successfully")
+                else:
+                    print("commLogicObj not available - skipping 3D image generation")
+                    # Create default/placeholder images directory
+                    image_folder_path = "./ResourceFiles/images"
+                    if not os.path.exists(image_folder_path):
+                        os.makedirs(image_folder_path)
+                    
+            except Exception as e:
+                print(f"Error generating 3D images: {str(e)}")
+                # Ensure images directory exists even if image generation fails
+                image_folder_path = "./ResourceFiles/images"
+                if not os.path.exists(image_folder_path):
+                    os.makedirs(image_folder_path)
 
+        # Open the summary popup dialog
         self.new_window = QtWidgets.QDialog(self)
-        self.new_ui = Ui_Dialog1(main.design_status,loggermsg=self.textEdit.toPlainText())
+        self.new_ui = Ui_Dialog1(main.design_status, loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main, self)
+        
+        # Connect all the popup buttons
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
         self.new_ui.btn_useProfile.clicked.connect(lambda: self.useUserProfile(self.new_window))
+        
+        # Connect the generate report button to actual report generation
+        if hasattr(self.new_ui, 'btn_CreateDesignReport'):
+            self.new_ui.btn_CreateDesignReport.clicked.connect(lambda: self.generate_design_report(main, self.new_window))
+        elif hasattr(self.new_ui, 'buttonBox'):
+            # If using QDialogButtonBox, connect to accepted signal
+            self.new_ui.buttonBox.accepted.connect(lambda: self.generate_design_report(main, self.new_window))
+        
         self.new_window.exec()
-        # self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
-        # self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
-        # self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
+
+
+    def generate_design_report(self, main, dialog_window):
+        """Generate the actual design report"""
+        try:
+            # Collect all inputs from the popup
+            popup_summary = self.getPopUpInputs()
+            
+            # Add additional required fields
+            popup_summary['filename'] = popup_summary.get('filename', f'{main.module_name(main).replace(" ", "_")}_report')
+            popup_summary['folder'] = popup_summary.get('folder', './reports')
+            popup_summary['logger_messages'] = self.textEdit.toPlainText()
+            popup_summary['does_design_exist'] = main.design_status
+            
+            # **CRITICAL FIX**: Get the actual design instance, not the class
+            design_instance = None
+            
+            # Method 1: Try to get instance from commLogicObj if it exists
+            if hasattr(self, 'commLogicObj') and self.commLogicObj is not None:
+                if hasattr(self.commLogicObj, 'design_obj') and self.commLogicObj.design_obj is not None:
+                    design_instance = self.commLogicObj.design_obj
+                    print("DEBUG: Using design instance from commLogicObj")
+            
+            # Method 2: If no instance found, create one and set it up with design inputs
+            if design_instance is None:
+                print("DEBUG: Creating new design instance")
+                design_instance = main()  # Create instance from class
+                
+                # **FIX**: Copy ALL attributes from the class to the instance
+                for attr_name in dir(main):
+                    if not attr_name.startswith('_') and not callable(getattr(main, attr_name)):
+                        try:
+                            attr_value = getattr(main, attr_name)
+                            if attr_value is not None:
+                                setattr(design_instance, attr_name, attr_value)
+                        except:
+                            pass
+                
+                # Set the design inputs on the instance if available
+                if hasattr(self, 'design_inputs') and self.design_inputs:
+                    for key, value in self.design_inputs.items():
+                        if hasattr(design_instance, key):
+                            setattr(design_instance, key, value)
+                
+                # Copy design status from the class
+                design_instance.design_status = getattr(main, 'design_status', True)
+                
+                # Copy design status from the class
+                if hasattr(main, 'design_status'):
+                    design_instance.design_status = main.design_status
+                else:
+                    design_instance.design_status = True  # Assume successful if no status
+                
+                # Run the design calculation if needed
+                if hasattr(design_instance, 'design_status') and not design_instance.design_status:
+                    print("DEBUG: Running design calculation on instance")
+                    try:
+                        if hasattr(design_instance, 'design_connection'):
+                            design_instance.design_connection()
+                        elif hasattr(design_instance, 'design'):
+                            design_instance.design()
+                    except Exception as e:
+                        print(f"DEBUG: Error running design: {e}")
+            
+            # Now call save_design on the actual instance
+            if design_instance and hasattr(design_instance, 'save_design'):
+                print("DEBUG: Calling save_design on instance")
+                success = design_instance.save_design(popup_summary)
+                
+                if success:
+                    QMessageBox.information(self, 'Success', 'Design report generated successfully!')
+                    dialog_window.accept()
+                else:
+                    QMessageBox.warning(self, 'Error', 'Failed to generate design report. Please check the inputs.')
+            else:
+                QMessageBox.warning(self, 'Error', 'Could not access design instance for report generation.')
+                
+        except Exception as e:
+            QMessageBox.critical(self, 'Error', f'Error generating report: {str(e)}')
+            print(f"Report generation error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+    def getPopUpInputs(self):
+        """Enhanced method to collect all popup inputs"""
+        input_summary = {}
+        input_summary["ProfileSummary"] = {}
+        
+        # Profile information
+        input_summary["ProfileSummary"]["CompanyName"] = str(self.new_ui.lineEdit_companyName.text()) if hasattr(self.new_ui, 'lineEdit_companyName') else "Company Name"
+        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.new_ui.lbl_browse.text()) if hasattr(self.new_ui, 'lbl_browse') else ""
+        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text()) if hasattr(self.new_ui, 'lineEdit_groupName') else "Design Team"
+        input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text()) if hasattr(self.new_ui, 'lineEdit_designer') else "Designer"
+
+        # Project information - **CRITICAL**: These are required by reportGenerator
+        input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text()) if hasattr(self.new_ui, 'lineEdit_projectTitle') else "Welded Butt Joint Design"
+        input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text()) if hasattr(self.new_ui, 'lineEdit_subtitle') else "Design Report"
+        input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text()) if hasattr(self.new_ui, 'lineEdit_jobNumber') else "JOB-001"
+        input_summary["Client"] = str(self.new_ui.lineEdit_client.text()) if hasattr(self.new_ui, 'lineEdit_client') else "Client"
+        
+        # Additional comments
+        if hasattr(self.new_ui, 'txt_additionalComments'):
+            input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
+        else:
+            input_summary["AdditionalComments"] = "Design completed successfully"
+        
+        # File and folder settings
+        if hasattr(self.new_ui, 'lineEdit_fileName'):
+            input_summary["filename"] = str(self.new_ui.lineEdit_fileName.text())
+        if hasattr(self.new_ui, 'lineEdit_folder'):
+            input_summary["folder"] = str(self.new_ui.lineEdit_folder.text())
+
+        return input_summary
+
+
 
     def getLogoFilePath(self, window, lblwidget):
 
@@ -286,22 +437,6 @@ class Window(QMainWindow):
             infile = open(filename, 'w')
             yaml.dump(inputData, infile)
             infile.close()
-
-    def getPopUpInputs(self):
-        input_summary = {}
-        input_summary["ProfileSummary"] = {}
-        input_summary["ProfileSummary"]["CompanyName"] = str(self.new_ui.lineEdit_companyName.text())
-        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.new_ui.lbl_browse.text())
-        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text())
-        input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text())
-
-        # input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
-        # input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
-        # input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
-        # input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
-        # input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
-
-        return input_summary
 
     def useUserProfile(self, window):
 
@@ -1399,6 +1534,7 @@ class Window(QMainWindow):
         # print("\n outside now")
         from ..osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
+        self.commLogicObj = None
         self.connectivity = None
         self.fuse_model = None
         # print(f'setupUi done 10')
@@ -2150,6 +2286,20 @@ class Window(QMainWindow):
                 # self.progress_bar.setValue(80)
                 print("3D start")
                 self.commLogicObj.call_3DModel(status, module_class)
+                # Store the design instance for later use in report generation
+                if hasattr(self.commLogicObj, 'design_obj'):
+                    # Store reference to the design instance
+                    self.design_instance = self.commLogicObj.design_obj
+                else:
+                    # Create and store design instance manually
+                    self.design_instance = module_class()
+                    # Set design inputs on the instance
+                    for key, value in self.design_inputs.items():
+                        if hasattr(self.design_instance, key):
+                            setattr(self.design_instance, key, value)
+                    # Set design status
+                    self.design_instance.design_status = status
+
                 print("3D end")
                 self.display_x = 90
                 self.display_y = 90

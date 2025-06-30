@@ -62,6 +62,7 @@ from ..design_type.flexural_member.flexure import Flexure
 from ..design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from ..design_type.flexural_member.flexure_othersupp import Flexure_Misc
 from ..design_type.flexural_member.flexure_purlin import Flexure_Purlin
+from ..design_type.connection.butt_joint_bolted import ButtJointBolted
 from ..gusset_connection import GussetConnection
 import logging
 import subprocess
@@ -2022,6 +2023,8 @@ class Window(QMainWindow):
             return Flexure_Purlin
         elif name == KEY_DISP_LAPJOINTBOLTED:
             return LapJointBolted
+        elif name == KEY_DISP_BUTTJOINTBOLTED:
+            return ButtJointBolted
         else:
             return GussetConnection
 # Function for getting inputs from a file

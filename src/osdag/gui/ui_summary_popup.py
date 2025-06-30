@@ -238,36 +238,151 @@ class Ui_Dialog1(object):
         # self.progress_bar.setValue(80)
 
     def pdf_file_message(self, filename):
-        fname_no_ext = filename.split(".")[0]
-        # if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
-        if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext + '.log'):
-            self.Dialog.accept()
-            QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
-        elif not os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(
-                fname_no_ext + '.log'):
-            self.Dialog.reject()
-            QMessageBox.critical(QMessageBox(), 'Error',
-                                 'Latex Creation Error. Please run <latex> in command prompt to check if latex is installed.')
-        else:
-            logfile = open(fname_no_ext + '.log', 'r')
-            # TODO: This logic can be improved so that log is not read twice.
-            logs = logfile.read()
-            logfile.close()
-            self.Dialog.reject()
-            if (r'! I can\'t write on file' in logs):
-                QMessageBox.critical(QMessageBox(), 'Error',
-                                     'Please make sure no PDF is open with same name and try again.')
+        """Handle PDF generation completion and display appropriate message"""
+        try:
+            # **FIX**: Determine the correct UI object reference
+            ui_ref = None
+            if hasattr(self, 'ui') and self.ui:
+                ui_ref = self.ui
+            elif hasattr(self, 'lblmessage'):
+                ui_ref = self  # self is the UI object directly
             else:
-                missing_package = None
-                log_lines = logs.split('\n')
-                for line in log_lines:
-                    if '! LaTeX Error: File' in line:
-                        missing_package = line
-                if missing_package != None:
-                    QMessageBox.critical(QMessageBox(), 'Error', missing_package + ' Please install missing package')
+                print("Could not find UI reference")
+                return
+
+            # **FIX**: Handle encoding issues when reading log file
+            logfile_path = filename + '.log'
+            logs = ""
+            
+            if os.path.exists(logfile_path):
+                # Try multiple encoding strategies to handle LaTeX log files
+                encodings_to_try = ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
+                
+                for encoding in encodings_to_try:
+                    try:
+                        with open(logfile_path, 'r', encoding=encoding) as logfile:
+                            logs = logfile.read()
+                        print(f"Successfully read log file with {encoding} encoding")
+                        break
+                    except UnicodeDecodeError:
+                        continue
+                    except Exception as e:
+                        print(f"Error reading with {encoding}: {e}")
+                        continue
                 else:
-                    QMessageBox.critical(QMessageBox(), 'Error',
-                                         'Latex Creation Error. Please send us the log file created in the same folder choosen for the Design Report.')
+                    # If all encodings fail, try with error handling
+                    try:
+                        with open(logfile_path, 'r', encoding='utf-8', errors='ignore') as logfile:
+                            logs = logfile.read()
+                        print("Read log file with UTF-8 and ignored decode errors")
+                    except Exception as e:
+                        print(f"Final fallback failed: {e}")
+                        logs = "Could not read log file due to encoding issues"
+            else:
+                logs = "Log file not found"
+                print(f"Log file not found: {logfile_path}")
+
+            # Check for LaTeX errors in the log content
+            has_latex_error = False
+            has_fatal_error = False
+            
+            if logs:
+                # Check for various types of LaTeX errors
+                error_indicators = [
+                    "LaTeX Error:",
+                    "! LaTeX Error:",
+                    "Fatal error occurred",
+                    "Emergency stop",
+                    "! ==> Fatal error occurred",
+                    "Runaway argument",
+                    "! Undefined control sequence",
+                    "! Missing $ inserted",
+                    "! File ended while scanning"
+                ]
+                
+                for error in error_indicators:
+                    if error in logs:
+                        has_latex_error = True
+                        if "Fatal" in error or "Emergency stop" in error:
+                            has_fatal_error = True
+                        break
+
+            # Check if PDF was actually generated regardless of log errors
+            pdf_file_path = filename + '.pdf'
+            pdf_exists = os.path.exists(pdf_file_path)
+            
+            # Determine the appropriate message
+            if pdf_exists:
+                if has_fatal_error:
+                    message = "<font color='orange'>PDF generated with warnings. Please check the output.</font>"
+                elif has_latex_error:
+                    message = "<font color='orange'>PDF generated successfully with some LaTeX warnings.</font>"
+                else:
+                    message = "<font color='green'>PDF generated successfully.</font>"
+            else:
+                # PDF not generated
+                if has_latex_error or has_fatal_error:
+                    message = "<font color='red'>ERROR: LaTeX file processing failed. PDF not generated.</font>"
+                else:
+                    message = "<font color='red'>ERROR: PDF generation failed for unknown reason.</font>"
+
+            # **FIX**: Set message using the correct UI reference
+            if hasattr(ui_ref, 'lblmessage'):
+                ui_ref.lblmessage.setText(message)
+            elif hasattr(ui_ref, 'label') and hasattr(ui_ref.label, 'setText'):
+                ui_ref.label.setText(message)
+            else:
+                print(f"Message would be: {message}")
+
+            # **FIX**: Enable/disable buttons using correct UI reference
+            if pdf_exists:
+                # Enable view buttons if they exist
+                for btn_name in ['btn_viewPDF', 'pushButton_3', 'pushButton_view']:
+                    if hasattr(ui_ref, btn_name):
+                        getattr(ui_ref, btn_name).setEnabled(True)
+            else:
+                # Disable view buttons
+                for btn_name in ['btn_viewPDF', 'pushButton_3', 'pushButton_view']:
+                    if hasattr(ui_ref, btn_name):
+                        getattr(ui_ref, btn_name).setEnabled(False)
+
+            # Update progress bar if it exists
+            for progress_name in ['progressBar', 'progress']:
+                if hasattr(ui_ref, progress_name):
+                    getattr(ui_ref, progress_name).setValue(100)
+                    break
+
+            # Enable close buttons
+            for btn_name in ['btn_close', 'buttonBox']:
+                if hasattr(ui_ref, btn_name):
+                    getattr(ui_ref, btn_name).setEnabled(True)
+
+            print(f"PDF exists: {pdf_exists}")
+            print(f"Has LaTeX error: {has_latex_error}")
+            print(f"Has fatal error: {has_fatal_error}")
+
+        except Exception as e:
+            print(f"Error in pdf_file_message: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Fallback message
+            pdf_file_path = filename + '.pdf'
+            if os.path.exists(pdf_file_path):
+                message = "<font color='green'>PDF generated successfully.</font>"
+            else:
+                message = "<font color='red'>ERROR: Could not determine PDF generation status.</font>"
+            
+            # Try to set message with fallback approach
+            try:
+                if hasattr(self, 'lblmessage'):
+                    self.lblmessage.setText(message)
+                elif hasattr(self, 'ui') and hasattr(self.ui, 'lblmessage'):
+                    self.ui.lblmessage.setText(message)
+                else:
+                    print(f"Fallback message: {message}")
+            except:
+                print(f"Could not set UI message: {message}")
 
     def call_designreport(self, main, fileName, report_summary, folder):
         self.alist = main.report_input

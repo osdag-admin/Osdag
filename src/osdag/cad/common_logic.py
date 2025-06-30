@@ -53,6 +53,7 @@ from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from .BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 
 from .SimpleConnections.BoltedLapJoint.bolted_lap_joint import *
+from .SimpleConnections.BoltedButtJoint.Butt_joint_bolted import *
 
 from .MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
 from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
@@ -1814,6 +1815,28 @@ class CommonDesignLogic(object):
                                                                          edge=Conn.final_edge_dist,end=Conn.final_end_dist)
         return lap_joint, plate1, plate2, bolts, nuts
 
+    def createButtJointBoltedCAD(self):
+          
+            # Get input values from the design object (i.e., instance of ButtJointBolted)
+            Col = self.module_class
+
+            # Extract parameters from the ButtJointBolted object
+            self.plate1_thickness = float(Col.plate1.thickness[0])
+            self.plate2_thickness = float(Col.plate2.thickness[0])
+            self.cover_thickness = float(Col.calculated_cover_plate_thickness)
+            self.plate_width = float(Col.width)
+            self.bolt_dia = float(Col.bolt.bolt_diameter_provided)
+            self.bolt_rows = int(Col.rows)
+            self.bolt_cols = int(Col.cols)
+            self.pitch = float(Col.final_pitch)
+            self.gauge = float(Col.final_gauge)
+            self.edge = float(Col.final_edge_dist)
+            self.end = float(Col.final_end_dist)
+            self.number_bolts = int(Col.number_bolts)
+
+            butt_joint, plate1, plate2, platec, bolts, nuts = create_bolted_butt_joint(self.plate1_thickness, self.plate2_thickness, self.cover_thickness, self.plate_width, self.bolt_dia,
+                            self.bolt_rows, self.bolt_cols, self.pitch, self.gauge, self.edge, self.end, self.number_bolts)
+            return butt_joint, plate1, plate2, platec, bolts, nuts
 
     def createSimplySupportedBeam(self):
 
@@ -2314,6 +2337,21 @@ class CommonDesignLogic(object):
                 for nut in self.nuts_models:
                     osdag_display_shape(self.display, nut, update=True,
                                             color=Quantity_NOC_SADDLEBROWN)
+                    
+        elif self.mainmodule == 'Butt Joint Bolted Connection':
+            self.col = self.module_class()
+            self.assembly,self.plate1_model,self.plate2_model,self.platec_model,self.bolt_models,self.nuts_models = self.createButtJointBoltedCAD()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+                osdag_display_shape(self.display, self.platec_model, update=True)
+                for bolt in self.bolt_models:
+                    osdag_display_shape(self.display, bolt, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)
+                for nut in self.nuts_models:
+                    osdag_display_shape(self.display, nut, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)                     
 
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_class()
@@ -2524,6 +2562,15 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Lap Joint Bolted Connection':
             if flag is True:
                 self.ColObj = self.createBoltedLapJoint()
+
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
+                
+        elif self.mainmodule == 'Butt Joint Bolted Connection':
+            if flag is True:
+                self.ColObj = self.createButtJointBoltedCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
 

@@ -175,7 +175,7 @@ def tuple_to_str_popup(tl):
 
 def tuple_to_str(tl, call_type,table_name=None):
 
-    if call_type is "dropdown" and table_name != 'Material' and table_name != 'Bolt':
+    if call_type == "dropdown" and table_name != 'Material' and table_name != 'Bolt':
         arr = ['Select Section']
     else:
         arr = []

@@ -703,6 +703,9 @@ class Window(QMainWindow):
                 i = i + 30
                 im.setFixedSize(im.size())
                 in_layout2.addWidget(im, j, 2, 1, 1)
+            
+
+            
 
             if type == TYPE_IMAGE_COMPRESSION:
                 imc = QtWidgets.QLabel(self.dockWidgetContents)

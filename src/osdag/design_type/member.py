@@ -3,6 +3,7 @@ from ..utils.common.load import Load
 from ..utils.common.component import *
 from ..utils.common.Section_Properties_Calculator import *
 from .main import Main
+from ..utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
 
 class Member(Main):
 
@@ -2863,7 +2864,40 @@ class Member(Main):
         optimum.append(t1)
         t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
         optimum.append(t2)
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION , None)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp , None)
+        optimum.append(t9)
+
+        return optimum
+    
+    def optimization_tab_welded_plate_girder_design(self, input_dictionary):
+        print(f"optimization_tab_flexure_design input_dictionary {input_dictionary}")
+        values = {
+                   KEY_EFFECTIVE_AREA_PARA: '1.0', KEY_ALLOW_CLASS: 'Yes', KEY_LOAD : 'Normal', KEY_LENGTH_OVERWRITE :'NA',
+                   }
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
+        optimum = []
+
+        t2 = (
+        KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
+        optimum.append(t2)
+
+        t1 = (KEY_ALLOW_CLASS, KEY_DISP_CLASS, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS])
+        optimum.append(t1)
+
+        t1 = (KEY_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, KEY_DISP_LOAD_list, values[KEY_LOAD])
+        optimum.append(t1)
+
+        t2 = (
+            KEY_LENGTH_OVERWRITE, KEY_DISPP_LENGTH_OVERWRITE, TYPE_TEXTBOX, None, values[KEY_LENGTH_OVERWRITE])
+        optimum.append(t2)
+
+
+        
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, FLEXURE_OPTIMIZATION_DESCRIPTION_SimplySupp , None)
         optimum.append(t9)
 
         return optimum
@@ -2871,7 +2905,12 @@ class Member(Main):
     def Stiffener_design(self, input_dictionary):
         optimum = []
         values = {KEY_IntermediateStiffener:'Yes',
-                  KEY_IntermediateStiffener_spacing:'NA'
+                  KEY_IntermediateStiffener_spacing:'NA',
+                  KEY_LongitudnalStiffener:'Yes and 1 stiffener',
+                  KEY_IntermediateStiffener_thickness:'6',
+                  KEY_LongitudnalStiffener_thickness:'6',
+                  KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]
+
                    }
 
         for key in values.keys():
@@ -2882,26 +2921,288 @@ class Member(Main):
 
         t8 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX, None, values[KEY_IntermediateStiffener_spacing])
         optimum.append(t8)
-        
+        t9 = (KEY_LongitudnalStiffener, KEY_DISP_LongitudnalStiffener, TYPE_COMBOBOX, ['Yes and 1 stiffener','Yes and 2 stiffeners','No'],  values[KEY_LongitudnalStiffener])
+        optimum.append(t9)
+        t10 = (KEY_IntermediateStiffener_thickness, KEY_DISP_IntermediateStiffener_thickness, TYPE_COMBOBOX, ['All','Customized'], values[KEY_IntermediateStiffener_thickness])
+        optimum.append(t10)
+        t11 = (KEY_LongitudnalStiffener_thickness,KEY_DISP_LongitudnalStiffener_thickness,TYPE_COMBOBOX,['All','Customized'],values[KEY_LongitudnalStiffener_thickness])
+        optimum.append(t11)
+        t1 = (None, KEY_WEB_BUCKLING, TYPE_TITLE, None, True, 'No Validator')
+        optimum.append(t1)
+        t2 = (KEY_ShearBucklingOption, KEY_ShearBuckling, TYPE_COMBOBOX, KEY_DISP_SB_Option, values[KEY_ShearBucklingOption])
+        optimum.append(t2)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, Stiffener_Plategirder_para , None)
+        optimum.append(t9)
         return optimum
+    
+    def girder_geometry(self, input_dictionary):
+        values = {
+            KEY_IS_IT_SYMMETRIC : 'Symmetrical'
+        }
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
+        optimum = []
+
+        t2 = (KEY_IS_IT_SYMMETRIC, KEY_DISP_IS_IT_SYMMETRIC, TYPE_COMBOBOX, KEY_DISP_SYMMETRIC_list, values[KEY_IS_IT_SYMMETRIC])
+        optimum.append(t2)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, ADDITIONAL_GIRDER_DESCRIPTION , None)
+        optimum.append(t9)
+
+        return optimum
+
+
+    def tab_girder_sec(self, input_dictionary):
+       
+
+        #initialize variables
+        material = connectdb("Material", call_type="popup")
+        material_grade = material[1]
+        mat = Material(material_grade,41)
+        fu = mat.fu #material fu
+        fy = mat.fy #material fy
+        m_o_e = 200
+        m_o_r = 76.9
+        p_r = 0.3
+        t_e = 12
+        tot_depth = '750'
+        web_thickness = '10'
+        top_flange_width = '300'
+        top_flange_thickness = '15'
+        bottom_flange_width = '400'
+        bottom_flange_thickness = '20'
+        mass = '' 
+        area = '' 
+        mom_inertia_z = '' 
+        mom_inertia_y = '' 
+        rad_of_gy_z = '' 
+        rad_of_gy_y = '' 
+        elast_sec_mod_z = '' 
+        elast_sec_mod_y = '' 
+        plast_sec_mod_z = '' 
+        plast_sec_mod_y = '' 
+        torsion_const = '' 
+        warping_const = '' 
+        image = VALUES_IMG_BEAM[0]    #just any image put into the place just to check
+
+
+
+        section = []
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
+        section.append(t2)
+
+        t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
+        section.append(t34)
+
+        t3 = (KEY_SEC_FU, KEY_DISP_FU, TYPE_TEXTBOX, None, fu)
+        section.append(t3)
+
+        t4 = (KEY_SEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
+        section.append(t4)
+
+        t15 = ('Label_1', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        section.append(t15)
+
+        t16 = ('Label_2', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        section.append(t16)
+
+        t31 = ('Label_3', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        section.append(t31)
+
+        t32 = ('Label_4', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        section.append(t32)
+
+        t14 = ('Label_5', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Welded'], 'Welded')
+        section.append(t14)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        section.append(t5)
+
+        t6 = ('Label_6', KEY_DISP_OVERALL_DEPTH_PG, TYPE_TEXTBOX, None, tot_depth)
+        section.append(t6)
+
+        t9 = ('Label_7', KEY_DISP_WEB_THICKNESS_PG, TYPE_TEXTBOX, None, web_thickness)
+        section.append(t9)
+
+        t7 = ('Label_8',KEY_DISP_TOP_Bflange_PG , TYPE_TEXTBOX, None, top_flange_width)
+        section.append(t7)
+
+        t8 = ('Label_9', KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_TEXTBOX, None, top_flange_thickness)
+        section.append(t8)
+
+        t7 = ('Label_10',KEY_DISP_BOTTOM_Bflange_PG , TYPE_TEXTBOX, None, bottom_flange_width)
+        section.append(t7)
+
+        t8 = ('Label_11', KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_TEXTBOX, None, bottom_flange_thickness)
+        section.append(t8)
         
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
+        t18 = ('Label_12', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
+        section.append(t18)
+
+        t19 = ('Label_13', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
+        section.append(t19)
+
+        t20 = ('Label_14', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
+        section.append(t20)
+
+        t21 = ('Label_15', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
+        section.append(t21)
+
+        t22 = ('Label_16', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+        section.append(t22)
+
+        t23 = ('Label_17', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+        section.append(t23)
+
+        t24 = ('Label_18', KEY_DISP_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+        section.append(t24)
+
+        t25 = ('Label_19', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+        section.append(t25)
+
+        t26 = ('Label_20', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+        section.append(t26)
+
+        t27 = ('Label_21', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+        section.append(t27)
+
+        t26 = ('Label_22', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        section.append(t26)
+
+        t27 = ('Label_23', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+        section.append(t27)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
+
+        t17 = (None, 'Dynamic Image', TYPE_TITLE, None, None)
+        section.append(t17)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+        section.append(t33)
+
+        return section
+        
+    
+    def deflection_values(self, input_dictionary):
+
+        values = {}
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
+        deflection = []
+
+        t1 = (KEY_STR_TYPE,KEY_DISP_STR_TYPE, TYPE_COMBOBOX, KEY_DISP_STR_TYPE_list, KEY_DISP_STR_TYPE_list[0])
+        deflection.append(t1)
+        t2 = (KEY_DESIGN_LOAD, KEY_DISP_DESIGN_LOAD, TYPE_COMBOBOX, VALUE_DESIGN_LOAD_list, VALUE_DESIGN_LOAD_list[0])
+        deflection.append(t2)
+        t3 = (KEY_MEMBER_OPTIONS,KEY_DISP_MEMBER_OPTIONS, TYPE_COMBOBOX, VALUES_MEMBER_OPTIONS[0], VALUES_MEMBER_OPTIONS[0][0])
+        deflection.append(t3)
+        t4 = (KEY_SUPPORTING_OPTIONS,KEY_DISP_SUPPORTING_OPTIONS, TYPE_COMBOBOX, VALUES_SUPPORTING_OPTIONS_DEF, VALUES_SUPPORTING_OPTIONS_DEF[0])
+        deflection.append(t4)
+        t5 = (KEY_MAX_DEFL,KEY_DISP_MAX_DEFL, TYPE_TEXTBOX, None , VALUES_MAX_DEFL[0])
+        deflection.append(t5)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, PLATE_GIRDER_DEFLECTION_TABLE , None)
+        deflection.append(t9)
+        return deflection
     ########################################
     # Design Preference Functions End
     ########################################
 
+    def get_fu_fy_I_section_plate_girder(self):
+        material_grade = self[0]
 
-    # def customized_input(self):
-    #
-    #     list1 = []
-    #     t1 = (KEY_GRD, self.grdval_customized)
-    #     list1.append(t1)
-    #     t3 = (KEY_D, self.diam_bolt_customized)
-    #     list1.append(t3)
-    #     t6 = (KEY_PLATETHK, self.plate_thick_customized)
-    #     list1.append(t6)
-    #     # t8 = (KEY_SIZE, self.size_customized)
-    #     # list1.append(t8)
-    #     return list1
+        fu = ''
+        fy = ''
+        if material_grade != "Select Material":
+            material = Material(material_grade, 41)
+            fu = material.fu
+            fy = material.fy
+        else:
+            pass
+
+        d = {
+             KEY_SEC_FU: fu,
+             KEY_SEC_FY: fy}
+
+        return d
+    
+    def Unsymm_I_Section_properties(self):
+        mass = '' 
+        area = '' 
+        mom_inertia_z = '' 
+        mom_inertia_y = '' 
+        rad_of_gy_z = '' 
+        rad_of_gy_y = '' 
+        elast_sec_mod_z = '' 
+        elast_sec_mod_y = '' 
+        plast_sec_mod_z = '' 
+        plast_sec_mod_y = '' 
+        torsion_const = '' 
+        warping_const = '' 
+        
+        # print("\n\n\n\n\n")
+        # print(self[6])
+        # print("\n FROM NOW OBJECT 6")
+        # for i in self:
+        #     print(i)
+        #     print("\n")
+        
+        t_d = float(self[0])
+        w_t = float(self[1])
+        t_f_w = float(self[2])
+        t_f_t = float(self[3])
+        b_f_w = float(self[4])
+        b_f_t = float(self[5])
+        eps = math.sqrt(250/float(self[6]))  # Assuming self[6] is the yield strength in MPa
+        
+
+        pc = Unsymmetrical_I_Section_Properties()
+
+        mass = pc.calc_mass(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        area = pc.calc_area(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        mom_inertia_z = pc.calc_MomentOfAreaZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        mom_inertia_y = pc.calc_MomentOfAreaY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        rad_of_gy_z = pc.calc_RadiusOfGyrationZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        rad_of_gy_y = pc.calc_RadiusOfGyrationY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        elast_sec_mod_z = pc.calc_ElasticModulusZz(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        elast_sec_mod_y = pc.calc_ElasticModulusZy(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        plast_sec_mod_z = pc.calc_PlasticModulusZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t,eps)
+        plast_sec_mod_y = pc.calc_PlasticModulusY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        torsion_const = pc.calc_TorsionConstantIt(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+        warping_const = pc.calc_WarpingConstantIw(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+
+
+
+
+
+
+
+        return {
+    'Label_12': str(int(round(mass, 0))),
+    'Label_13': str(int(round(area / 100, 0))),
+    'Label_14': str(int(round(mom_inertia_z / 10000, 0))),
+    'Label_15': str(int(round(mom_inertia_y / 10000, 0))),
+    'Label_16': str(int(round(rad_of_gy_z / 10, 0))),
+    'Label_17': str(int(round(rad_of_gy_y / 10, 0))),
+    'Label_18': str(int(round(elast_sec_mod_z / 1000, 0))),
+    'Label_19': str(int(round(elast_sec_mod_y / 1000, 0))),
+    'Label_20': str(int(round(plast_sec_mod_z / 1000, 0))),
+    'Label_21': str(int(round(plast_sec_mod_y / 1000, 0))),
+    'Label_22': str(int(round(torsion_const / 10000, 0))),
+    'Label_23': str(int(round(warping_const / 1000000, 0)))
+}
 
     @staticmethod
     def grdval_customized():

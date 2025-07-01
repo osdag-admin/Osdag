@@ -90,8 +90,8 @@ class Main():
     def detailing_values(self, input_dictionary):
 
         values = {KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
-                  KEY_DP_DETAILING_GAP: '10',
-                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
+                KEY_DP_DETAILING_GAP: '10',
+                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -100,15 +100,15 @@ class Main():
         detailing = []
 
         t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
-              ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
-              values[KEY_DP_DETAILING_EDGE_TYPE])
+            ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
+            values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
         t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, None, values[KEY_DP_DETAILING_GAP])
         detailing.append(t2)
 
         t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-              ['No', 'Yes'], values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+            ['No', 'Yes'], values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
         detailing.append(t3)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION, None)
@@ -130,6 +130,9 @@ class Main():
               ['Limit State Design', 'Limit State (capacity based) Design', 'Working Stress Design'],
               values[KEY_DP_DESIGN_METHOD])
         design.append(t1)
+
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, DESIGN_METHOD_DESCRIPTION , None)
+        design.append(t9)
 
         return design
 

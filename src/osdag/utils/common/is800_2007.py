@@ -6,6 +6,7 @@ Started on 01 - Nov - 2018
 """
 import math
 from ...Common import *
+import pandas as pd
 # from ...Common import KEY_DP_FAB_SHOP
 
 
@@ -496,6 +497,40 @@ class IS800_2007(object):
                         "gamma_mr": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.25},
                         "gamma_mw": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.50}
                         }
+    
+    # ------------------------------------------------------------
+    #   5.6.1 Deflection
+    # -------------------------------------------------------------
+
+#     cl_5_6_1_vertical_deflection_Table_6 = {
+        
+# Type of structure      Load Type                           Member              Supporting                          Deflection Limit
+# Industrial building    Live Load                            Purlins and Girts    Elastic cladding                     Span/150
+# Industrial building    Live Load                            Purlins and Girts    Brittle cladding                     Span/180
+# Industrial building    Live Load                            Simple span          Elastic cladding                     Span/240
+# Industrial building    Live Load                            Simple span          Brittle cladding                     Span/300
+# Industrial building    Live Load                            Cantilever span      Elastic cladding                     Span/120
+# Industrial building    Live Load                            Cantilever span      Brittle cladding                     Span/150
+# Industrial building    Live Load                            Rafter supporting    Profiled Metal Sheeting              Span/180
+# Industrial building    Live Load                            Rafter supporting    Plastered Sheeting                   Span/240
+# Industrial building    Crane Load(Manual operation)         Gantry               Crane                                Span/500
+# Industrial building    Crane load(Electric operation up to 50t)  Gantry          Crane                                Span/750
+# Industrial building    Crane load(Electric operation over 50t)  Gantry           Crane                                Span/1000
+# Other buildings        Live Load                            Floor and Roof       Elements not susceptible to cracking Span/300
+# Other buildings        Live Load                            Floor and Roof       Element susceptible to cracking      Span/360
+# Other buildings        Live Load                            Cantilever Span      Elements not susceptible to cracking Span/150
+# Other buildings        Live Load                            Cantilever Span      Element susceptible to cracking      Span/180
+# Highway Bridges        Live Load                            Simple span          NA                                    Span/600
+# Railway Bridges        Live Load                            Simple span          NA                                    Span/600
+# Highway Bridges        Dead Load                            Simple span          NA                                    Span/800
+# Railway Bridges        Dead Load                            Simple span          NA                                    Span/800
+# Highway Bridges        Live Load                            Cantilever span      NA                                    Span/400
+# Railway Bridges        Live Load                            Cantilever span      NA                                    Span/400
+# Highway Bridges        Dead Load                            Cantilever span      NA                                    Span/800
+# Railway Bridges        Dead Load                            Cantilever span      NA                                    Span/800
+
+
+    # }
 
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
@@ -805,6 +840,39 @@ class IS800_2007(object):
                 }
 
         return buckling_class
+    
+    @staticmethod
+    def cl_7_1_2_1_design_compressisive_stress_plategirder(f_y, gamma_mo, effective_slenderness_ratio,
+                                               modulus_of_elasticity):
+        """
+        Args:
+            f_y:Yield stress                                                                        (float)
+            gamma_mo:Effective length of member                                                        (float)
+            effective_slenderness_ratio:Euler buckling class                                                       (float)
+            imperfection_factor
+            modulus_of_elasticity
+
+        Returns:
+            list of euler_buckling_stress, nondimensional_effective_slenderness_ratio, phi, stress_reduction_factor, design_compressive_stress_fr .design_compressive_stress, design_compressive_stress_min
+        Note:
+            Reference: IS 800 pg34
+            @author:Rutvik Joshi
+        """
+        # 2.4 - Euler buckling stress
+        imperfection_factor = 0.49
+        euler_buckling_stress = (math.pi ** 2 * modulus_of_elasticity) / effective_slenderness_ratio ** 2
+        nondimensional_effective_slenderness_ratio = math.sqrt(f_y / euler_buckling_stress)
+        phi = 0.5 * (1 + imperfection_factor * (
+                    nondimensional_effective_slenderness_ratio - 0.2) + nondimensional_effective_slenderness_ratio ** 2)
+        # 2.6 - Design compressive stress
+        stress_reduction_factor = 1 / (phi + math.sqrt(phi ** 2 - nondimensional_effective_slenderness_ratio ** 2))
+        design_compressive_stress_fr = f_y * stress_reduction_factor / gamma_mo
+        design_compressive_stress_max = f_y / gamma_mo
+        design_compressive_stress = min(design_compressive_stress_fr, design_compressive_stress_max)
+        print(f"euler_buckling_stress {euler_buckling_stress} , nondimensional_effective_slenderness_ratio {nondimensional_effective_slenderness_ratio} , phi {phi} , stress_reduction_factor {stress_reduction_factor} , design_compressive_stress_fr {design_compressive_stress_fr} , design_compressive_stress_max {design_compressive_stress_max} , design_compressive_stress {design_compressive_stress}")
+        return design_compressive_stress  
+        
+    
 
     @staticmethod
     def cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no = 2, fixity = 'Fixed'):
@@ -1286,7 +1354,10 @@ class IS800_2007(object):
 
         Author: Rutvik Joshi    '''
 
-        phi = math.atan(d/c) * 180/math.pi
+        if c == 0:
+            phi = 90  
+        else:
+            phi = math.atan(d/c) * 180/math.pi
         M_fr = 0.25 * bf * tf**2 * fyf*(1-(Nf/(bf * tf * fyf / gamma_mo))**2)
         print('phi',phi,'\n Nf',Nf,M_fr,'M_fr',phi*math.pi/180)
         s = 2 * math.sqrt(M_fr / (fyw * tw)) / math.sin(phi*math.pi/180)
@@ -1304,6 +1375,77 @@ class IS800_2007(object):
             V_tf == V_p
             print('phi',phi,'\n M_fr',M_fr,'\n s',s, '\n c',c, '\n w_tf', w_tf, '\n sai',sai,'\n fv',fv,'\n V_tf',V_tf,'\n V_p',V_p)
         return phi,M_fr,s, w_tf,sai,fv,V_tf
+    
+    @staticmethod
+    def cl_8_4_2_2_TensionField_unequal_Isection(
+    c, d, tw, fyw,
+    bf_top, tf_top, bf_bot, tf_bot,
+    Nf, gamma_m0, A_v, tau_b
+):
+        """
+        Tension‐field method per IS 800:2007 Cl. 8.4.2.2 for unequal flanges.
+
+        Parameters:
+        c       : float : panel width (mm)
+        d       : float : web depth (mm)
+        tw      : float : web thickness (mm)
+        fyw     : float : web yield stress (N/mm²)
+        bf_top  : float : top flange width (mm)
+        tf_top  : float : top flange thickness (mm)
+        bf_bot  : float : bottom flange width (mm)
+        tf_bot  : float : bottom flange thickness (mm)
+        Nf      : float : axial force in each flange (kN → N·mm units consistent)
+        gamma_m0: float : partial safety factor
+        A_v     : float : gross web area = d*tw (mm²)
+        tau_b   : float : post‐buckling shear stress of web (N/mm²)
+        V_p     : float : plastic shear strength V_np (kN)
+
+        Returns:
+        tuple: (phi, Mfr_top, Mfr_bot, s_top, s_bot, w_tf, psi, fv, V_tf)
+        """
+
+        # 1) Tension‐field angle φ
+        if c == 0:
+            phi = 90.0
+        else:
+            phi = math.degrees(math.atan((d / c) / 1.5))
+
+        # 2) Reduced plastic moment of each flange
+        def Mfr(bf, tf):
+            Mp = 0.25 * bf * tf**2 * fyw
+            ratio = Nf / (bf * tf * fyw / gamma_m0)
+            if ratio >= 1:
+                return 0
+            else:
+                return Mp * (1 - ratio**2)
+
+        Mfr_t = Mfr(bf_top, tf_top)
+        Mfr_b = Mfr(bf_bot, tf_bot)
+
+        # 3) s‐values for each flange, limited to c
+
+        sinφ = math.sin(math.radians(phi))
+        if sinφ == 0:
+            s_t= 0
+            s_b= 0
+        else:
+            s_t = min(2 * math.sqrt(Mfr_t / (fyw * tw)) / sinφ, c)
+            s_b = min(2 * math.sqrt(Mfr_b / (fyw * tw)) / sinφ, c)
+
+
+        # 4) Width of the tension field w_tf
+        w_tf = d * math.cos(math.radians(phi)) - (c - s_t - s_b) * sinφ
+
+        # 5) Field yield strength f_v
+        psi = 1.5 * tau_b * math.sin(2 * math.radians(phi))
+        fv  = math.sqrt(fyw**2 - 3 * tau_b**2 + psi**2) - psi
+
+        # 6) Nominal shear resistance V_tf (kN)
+        V_tf = (A_v * tau_b + 0.9 * w_tf * tw * fv * sinφ)
+        V_p = d * tw * fyw / (math.sqrt(3) * gamma_m0)  # Plastic shear strength
+        V_tf = min(V_tf, V_p)
+
+        return phi, Mfr_t, Mfr_b, s_t, s_b, w_tf, psi, fv, V_tf
 
     @staticmethod
     def cl_8_5_1_EndPanel(c, d, tw, fyw, bf, tf, fyf, Nf, gamma_mo, A_v, tau_b, V_p):
@@ -1331,6 +1473,138 @@ class IS800_2007(object):
         else:
             V_tf == V_p
         return phi, M_fr, s, w_tf, sai, fv, V_tf
+    
+
+    @staticmethod
+    def cl_8_6_1_1_plate_girder_minimum_web_a(D,tw,epsilon,tf_top,tf_bot):
+        d = D - (tf_top + tf_bot)
+        if d/tw < 200 * epsilon:
+            return True
+        else:   
+            return False
+    
+    @staticmethod   
+    def cl_8_6_1_1_and_8_6_1_2_web_thickness_check(d, tw, eps, stiffener_type, c=None):
+        """
+        Check minimum web thickness requirements as per IS 800:2007 Cl. 8.6.1.1 & 8.6.1.2
+
+        Parameters:
+        d (float): Depth of web (mm)
+        tw (float): Thickness of web (mm)
+        eps (float): ε = sqrt(250/fy) where fy is yield strength of steel (N/mm^2)
+        stiffener_type (str): Type of stiffening provided. Options:
+            - "no_stiffener"
+            - "transverse_only"
+            - "transverse_and_two_longitudinal_neutral"
+            - "transverse_and_one_longitudinal_compression"
+        c (float): Spacing of transverse stiffeners (mm), required for some types
+
+        Returns:
+        dict: Dictionary with result of the web thickness check.
+        """
+
+        results = {}
+        print(stiffener_type)
+        if stiffener_type == "no_stiffener" or c > 3 * d:
+            ratio = d / tw
+            print("Web Ratio:", ratio)
+            limit_serv = 200 * eps
+            limit_buckling = 345 * (eps ** 2)
+            limit = min(limit_serv, limit_buckling)
+            results["Limit"] = limit
+            if ratio <= limit:
+                return True
+            else:
+                return False
+
+        elif stiffener_type == "transverse_only":
+            if c is None:
+
+                return False #{"Error": "Spacing 'c' is required for 'transverse_only' stiffeners."}
+            print("c:", c, "d:", d, "tw:", tw, "eps:", eps)
+            if 3 * d >= c and c >= 1.5 * d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * (eps ** 2)
+            elif 1.5 * d > c and c >= d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * eps
+            elif 0.74 * d <= c and c < d:
+                ratio_serv = c / tw
+                ratio_buckling = d / tw
+                limit_serv = 200 * eps
+                limit_buckling = 345 * eps
+            elif c < 0.74 * d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 270 * eps
+                limit_buckling = 345 * eps
+            else:
+                print('Transverse only')
+                return False #{"Error": "Invalid range for spacing 'c'."}
+
+
+            if ratio_serv <= limit_serv and ratio_buckling <= limit_buckling:
+                return True
+            else:
+                return False
+
+        elif stiffener_type == "transverse_and_two_longitudinal_neutral":
+            if c >= 1.5 * d :
+                ratio = d / tw
+                limit_serv = 400 * eps
+                limit_buckling = 345 * (eps ** 2)
+                limit = min(limit_serv, limit_buckling)
+
+            else:
+                ratio = d / tw
+                limit_serv = 400 * eps
+                limit_buckling = 345 * eps
+                limit = min(limit_serv, limit_buckling)
+
+            if ratio <= limit:
+                return True
+            else:
+                return False
+
+        elif stiffener_type == "transverse_and_one_longitudinal_compression":
+            if c is None:
+                return False #{"Error": "Spacing 'c' is required for compression flange restraint."}
+
+            if 2.4 * d >= c and c >= 1.5 * d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 250 * eps
+                limit_buckling = 345 * (eps ** 2)
+            elif 1.5 * d > c and c >= d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 250 * eps
+                limit_buckling = 345 * eps
+            elif 0.74 * d <= c and c < d:
+                ratio_serv = c / tw
+                ratio_buckling = d / tw
+                limit_serv = 250 * eps
+                limit_buckling = 345 * eps
+            elif c < 0.74 * d:
+                ratio_serv = d / tw
+                ratio_buckling = d / tw
+                limit_serv = 340 * eps
+                limit_buckling = 345 * eps
+            else:
+                return False #{"Error": "Invalid range for spacing 'c'."}
+
+            if ratio_serv <= limit_serv and ratio_buckling <= limit_buckling:
+                return True
+            else:
+                return False
+
+        else:
+            return False #{"Error": "Invalid stiffener_type provided."}
+
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
 
@@ -1367,6 +1641,16 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
+
+    # -------------------------------------------------------------
+    #   10.1 General
+    # -------------------------------------------------------------
+
+
+
+
+
+
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """
 

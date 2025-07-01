@@ -33,6 +33,7 @@ from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
+from .popup_input_bounds_read_write import RangeInputDialog
 from ..cad.cad3dconnection import cadconnection
 from ..design_type.connection.fin_plate_connection import FinPlateConnection
 from ..design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -46,6 +47,8 @@ from ..design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlate
 from ..design_type.connection.column_end_plate import ColumnEndPlate
 from ..design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from ..design_type.connection.base_plate_connection import BasePlateConnection
+from ..design_type.connection.lap_joint_bolted import LapJointBolted
+from ..design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 from ..design_type.tension_member.tension_bolted import Tension_bolted
 from ..design_type.tension_member.tension_welded import Tension_welded
 from ..design_type.connection.beam_column_end_plate import BeamColumnEndPlate
@@ -57,6 +60,10 @@ from ..design_type.flexural_member.flexure_othersupp import Flexure_Misc
 from ..gusset_connection import GussetConnection
 import logging
 import subprocess
+from .popup_input_bounds_read import RangeInputDialogRead
+from .popup_display_pg import AvailableThicknessDialog
+from .popup_input_bounds_read_write import RangeInputDialog
+from .popup_customized_design_pref import PopupDialog
 from ..get_DPI_scale import scale,height,width
 from ..cad.cad3dconnection import cadconnection
 from pynput.mouse import Button, Controller
@@ -175,6 +182,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
             event.ignore()
 
 class Window(QMainWindow):
+    input_button_values_dictionary = {}
     closed = QtCore.pyqtSignal()
     def center(self):
         frameGm = self.frameGeometry()
@@ -537,6 +545,7 @@ class Window(QMainWindow):
         self.inputDock.setObjectName("inputDock")
         self.dockWidgetContents = QtWidgets.QWidget()
         self.dockWidgetContents.setObjectName("dockWidgetContents")
+        button_list = []
 
         # palette = QtGui.QPalette()
         # brush = QtGui.QBrush(QtGui.QColor(0, 0, 127))
@@ -582,7 +591,7 @@ class Window(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION,TYPE_IMAGE_BIGGER]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
@@ -742,6 +751,25 @@ class Window(QMainWindow):
                 l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 2, 1, 1)
 
+            
+            if type == TYPE_IN_BUTTON:
+                # fields = 0
+                v = option[3]
+                b = QtWidgets.QPushButton(self.dockWidgetContents)
+                b.setObjectName(option[0])
+                #b.setFixedSize(b.size())
+                b.resize(b.sizeHint().width(), b.sizeHint().height()+100)
+                b.setText(v[0])
+                b.setDisabled(False)
+                b.setVisible(True if option[4] else False)
+                # fields += 1
+                # self.output_title_fields[current_key][1] = fields
+                #b.setFixedSize(b.size())
+                button_list.append(option)
+                in_layout2.addWidget(b, j, 2, 1, 1)
+                maxi_width_right = max(maxi_width_right, b.sizeHint().width())
+                #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
+
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
                 im.setGeometry(QtCore.QRect(190, 10 + i, 100, 100))
@@ -752,6 +780,17 @@ class Window(QMainWindow):
                 i = i + 30
                 im.setFixedSize(im.size())
                 in_layout2.addWidget(im, j, 2, 1, 1)
+            
+            if type == TYPE_IMAGE_BIGGER:
+                im = QtWidgets.QLabel(self.dockWidgetContents)
+                im.setGeometry(QtCore.QRect(190, 10 + i, 420, 400))
+                im.setObjectName(option[0])
+                im.setScaledContents(True)
+                pixmap = QPixmap(option[3])
+                im.setPixmap(pixmap)
+                i = i + 30
+                im.setFixedSize(im.size())
+                in_layout2.addWidget(im, j, 1, 1, 1)
 
             if type == TYPE_IMAGE_COMPRESSION:
                 imc = QtWidgets.QLabel(self.dockWidgetContents)
@@ -783,6 +822,11 @@ class Window(QMainWindow):
         maxi_width = max(maxi_width, int(scale*350))    # In case there is no widget
         self.inputDock.setFixedWidth(maxi_width)
         self.in_widget.setFixedWidth(maxi_width)
+        if button_list:
+            for button_key in button_list:
+                button = self.dockWidgetContents.findChild(QtWidgets.QWidget, button_key[0])
+                print("\n\n\n button_key", button_key)
+                self.inp_button_connect(main, button_list, button)
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
@@ -1360,6 +1404,14 @@ class Window(QMainWindow):
                 last_design_dictionary = yaml.safe_load(last_design)
                 print(f'last_design_dictionary {last_design_dictionary}')
         if isinstance(last_design_dictionary, dict):
+            
+            for k,val in self.input_button_values_dictionary.items():
+                print("\n\n\n VALUES ", k, val)
+                if k not in last_design_dictionary.keys():
+                    last_design_dictionary[k] = val
+                else:
+                    last_design_dictionary[k] = val
+            print("\n \n LAST DESIGN DICTIONARY", last_design_dictionary)
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
             if "out_titles_status" in last_design_dictionary.keys():
                 title_status = last_design_dictionary["out_titles_status"]
@@ -1558,6 +1610,29 @@ class Window(QMainWindow):
             elif typ == TYPE_CUSTOM_SECTION:
                 if val:
                     self.import_custom_section()
+            # elif typ == TYPE_CUSTOM_BOUNDS:
+            #     k2.clear()
+            #     if val == 'Default Bounds':
+            #         # dialog = RangeInputDialogRead()
+            #         # dialog.set_custom_title("Display Sensor Range")
+            #         # dialog.set_read_only_values(10.0, 100, 10)
+            #         # dialog.exec_()
+            #         # for values in dialog.get_values():
+            #         for values in ["10.0", "100", "10"]:
+            #             k2.addItem(values)
+            #             k2.setCurrentIndex(0)
+                # elif val == 'Custom Bounds':
+                #     dialog = RangeInputDialog()
+                #     if dialog.exec_() == QDialog.Accepted:
+                #         print("Returned values:", dialog.get_values())
+                #         for values in dialog.get_values():
+                #             k2.addItem(str(values))
+                #             k2.setCurrentIndex(0)
+                # else:
+                #     k2.clear()
+                #     for values in val:
+                #         k2.addItem(str(values))
+                #         k2.setCurrentIndex(0)
 
             elif typ == TYPE_LABEL:
                 k2.setText(val)
@@ -1865,6 +1940,10 @@ class Window(QMainWindow):
             return Flexure_Cantilever
         elif name == KEY_DISP_FLEXURE3:
             return Flexure_Misc
+        elif name == KEY_DISP_LAPJOINTBOLTED:
+            return LapJointBolted
+        elif name == KEY_DISP_PLATE_GIRDER_WELDED: #im working here
+            return PlateGirderWelded
         else:
             return GussetConnection
 # Function for getting inputs from a file
@@ -2104,7 +2183,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
-                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut]: # , KEY_DISP_FLEXURE
+                                                  KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut,KEY_DISP_LAPJOINTBOLTED,KEY_DISP_PLATE_GIRDER_WELDED]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
                 print(f"main object type: {type(main)}")
@@ -2170,6 +2249,22 @@ class Window(QMainWindow):
 
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
         shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
+
+    def inp_button_connect(self, main, button_list, b):
+    # Connect button's clicked signal to call handler using lambda
+        print("\n\n\n\n BUTTON TYPE DETAILS",button_list, b, b.objectName())
+        b.clicked.connect(lambda: self.inp_button_call(main, button_list, b))
+
+    def inp_button_call(self, main, button_list, button):
+        # Loop through button list to find the button match
+        for v in button_list:
+            if v[0] == button.objectName():
+                dialog = RangeInputDialog()
+                if dialog.exec_() == QDialog.Accepted:
+                    values = dialog.get_values()
+                    print("Returned values:", values)
+                    # You can handle values here or emit a signal if needed
+                    self.input_button_values_dictionary[button.objectName()] = values
 
     def output_button_connect(self, main, button_list, b):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))

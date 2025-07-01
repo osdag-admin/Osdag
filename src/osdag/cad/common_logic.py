@@ -21,6 +21,7 @@ from .items.grout import Grout
 from .items.angle import Angle
 from .items.channel import Channel
 from .items.Gasset_plate import GassetPlate
+from .items.plate_girder import PlateGirder
 from .items.stiffener_flange import Stiffener_flange
 from .items.rect_hollow import RectHollow
 from .items.circular_hollow import CircularHollow
@@ -51,6 +52,8 @@ from .BBCad.nutBoltPlacement_AF import NutBoltArray_AF
 from .BBCad.nutBoltPlacement_BF import NutBoltArray_BF
 from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from .BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+
+from .SimpleConnections.BoltedLapJoint.bolted_lap_joint import *
 
 from .MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
 from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
@@ -93,7 +96,7 @@ from .MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
 from .MomentConnections.BCEndplate.BCE_nutBoltPlacement import BCE_NutBoltArray
 from ..Common import *
 from math import *
-
+from OCC.Core.TopoDS import TopoDS_Shape
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 # from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
 # from Connections.Shear.cleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
@@ -1783,6 +1786,35 @@ class CommonDesignLogic(object):
 
         return sec
 
+    def createBoltedLapJoint(self):
+
+        Conn = self.module_class
+        print("THIS IS CONN")
+        print(Conn)
+        for attr in dir(Conn):
+            if not callable(getattr(Conn, attr)) and not attr.startswith("__"):
+                print(f"{attr}: {getattr(Conn, attr)}")
+
+        print(f"Plate 1 Thickness: {float(Conn.plate1thk)}")
+        print(f"Plate 2 Thickness: {float(Conn.plate2thk)}")
+        print(f"Plate Width: {float(Conn.width)}")
+        print(f"Bolt Diameter: {Conn.bolt.bolt_diameter_provided}")
+        print(f"Actual Overlap Length: {Conn.len_conn}")
+        print(f"Bolt Columns: {Conn.cols}")
+        print(f"Bolt Rows: {Conn.rows}")
+        print(f"Number of Bolts: {Conn.number_bolts}")
+        print(f"Pitch: {Conn.final_pitch}")
+        print(f"Gauge: {Conn.final_gauge}")
+        print(f"Edge Distance: {Conn.final_edge_dist}")
+        print(f"End Distance: {Conn.final_end_dist}")
+
+        lap_joint, plate1, plate2, bolts, nuts = create_bolted_lap_joint(plate1_thickness = float(Conn.plate1thk), plate2_thickness = float(Conn.plate2thk), plate_width = float(Conn.width), bolt_dia = Conn.bolt.bolt_diameter_provided,
+                                                                         actual_overlap_length=Conn.len_conn,bolt_cols=Conn.cols,bolt_rows=Conn.rows, number_bolts=Conn.number_bolts,
+                                                                         pitch=Conn.final_pitch,gauge=Conn.final_gauge,
+                                                                         edge=Conn.final_edge_dist,end=Conn.final_end_dist)
+        return lap_joint, plate1, plate2, bolts, nuts
+
+
     def createSimplySupportedBeam(self):
 
         Flex = self.module_class
@@ -1949,6 +1981,54 @@ class CommonDesignLogic(object):
             shape = assembly.create_model()
 
             return shape
+
+
+    def createPlateGirder(self): #im working here
+        
+        # Val_obj = self.module_class
+        # Val_obj.section_property = Val_obj.section_connect_database(Val_obj, Val_obj.result_designation)
+       
+        Val_obj = self.module_class
+        print("THIS IS Val_obj")
+        print(Val_obj)
+        for attr in dir(Val_obj):
+            if not callable(getattr(Val_obj, attr)) and not attr.startswith("__"):
+                print(f"{attr}: {getattr(Val_obj, attr)}")
+
+        design_type = Val_obj.design_type
+        print("Design type : ", design_type)
+        length = int(Val_obj.length)
+        print("Total Length : ", length)
+
+        D = int(Val_obj.total_depth)
+        print("Total Depth : ", D)
+
+        tw = int(Val_obj.web_thickness)
+        print("Web Thickness : ", tw)
+
+        B_ft = int(Val_obj.top_flange_width)
+        print("Top Flange Width : ", B_ft)
+
+        T_ft = int(Val_obj.top_flange_thickness)
+        print("Top Flange Thickness : ", T_ft)
+
+        B_fb = int(Val_obj.bottom_flange_width)
+        print("Bottom Flange Width : ", B_fb)
+
+        T_fb = int(Val_obj.bottom_flange_thickness)
+        print("Bottom Flange Thickness : ", T_fb)
+
+        gap = int(Val_obj.c)
+        print("Gap Between Stiffener : ", gap)
+
+
+
+
+        plate_girder_model = PlateGirder(D, tw, length, gap, T_ft, T_fb, B_ft, B_fb)
+
+        model = plate_girder_model.createPlateGirder()
+
+        return model
 
 
     def display_3DModel(self, component, bgcolor):
@@ -2269,6 +2349,20 @@ class CommonDesignLogic(object):
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True)
 
+        elif self.mainmodule == 'Lap Joint Bolted Connection':
+            self.col = self.module_class()
+            self.assembly,self.plate1_model,self.plate2_model,self.bolt_models,self.nuts_models = self.createBoltedLapJoint()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+                for bolt in self.bolt_models:
+                    osdag_display_shape(self.display, bolt, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)
+                for nut in self.nuts_models:
+                    osdag_display_shape(self.display, nut, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)
+
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_class()
             self.FObj = self.createSimplySupportedBeam()
@@ -2286,6 +2380,14 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Struts in Trusses':
             self.col = self.module_class()
             self.ColObj = self.createStrutsInTrusses()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.ColObj, update=True)
+
+
+        elif self.mainmodule == KEY_DISP_PLATE_GIRDER_WELDED: #im working here
+            self.col = self.module_class()
+            self.ColObj = self.createPlateGirder()
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True)
@@ -2475,6 +2577,24 @@ class CommonDesignLogic(object):
 
             else:
                 self.display.EraseAll()
+        elif self.mainmodule == 'Lap Joint Bolted Connection':
+            if flag is True:
+                self.ColObj = self.createBoltedLapJoint()
+
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
+
+        elif self.mainmodule == KEY_DISP_PLATE_GIRDER_WELDED:#im working here
+            if flag is True:
+                self.ColObj = self.createPlateGirder()
+
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
+
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
 

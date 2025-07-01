@@ -148,6 +148,10 @@ from .design_type.connection.end_plate_connection import EndPlateConnection
 from .design_type.connection.base_plate_connection import BasePlateConnection
 from .design_type.connection.truss_connection_bolted import TrussConnectionBolted
 
+from .design_type.connection.lap_joint_bolted import LapJointBolted
+from .design_type.connection.lap_joint_welded import LapJointWelded
+from .design_type.connection.butt_joint_bolted import ButtJointBolted
+from .design_type.connection.butt_joint_welded import ButtJointWelded
 from .design_type.connection.beam_cover_plate import BeamCoverPlate
 from .design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from .design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
@@ -167,7 +171,7 @@ from .design_type.compression_member.Column import ColumnDesign
 from .design_type.flexural_member.flexure import Flexure
 from .design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from .design_type.flexural_member.flexure_othersupp import Flexure_Misc
-# from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
+from .design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 # from .cad.cad_common import call_3DBeam
 from .APP_CRASH.Appcrash import api as appcrash
 import configparser
@@ -261,7 +265,13 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
-                'Connection' : {
+                'Connection' : {'Simple Connection' : [
+                                    ('Lap Joint Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("LapJointBolted.png")),'Lap_Joint_Bolted'),
+                                    ('Lap Joint Welded',str(files("osdag.data.ResourceFiles.images").joinpath("LapJointWelded.png")),'Lap_Joint_Welded'),
+                                    ('Butt Joint Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointBolted.png")),'Butt_Joint_Bolted'),
+                                    ('Butt Joint Welded',str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointWelded.png")),'Butt_Joint_Welded'),
+                                    self.show_simple_connection,
+                                                    ],
                                 'Shear Connection' : [
                                     ('Fin Plate',str(files("osdag.data.ResourceFiles.images").joinpath("finplate.png")),'Fin_Plate'),
                                     ('Cleat Angle',str(files("osdag.data.ResourceFiles.images").joinpath("cleatAngle.png")),'Cleat_Angle'),
@@ -528,7 +538,26 @@ class OsdagMainWindow(QMainWindow):
         Button.ui.LP_Button.clicked.connect(lambda : self.ui.myStackedWidget.setCurrentIndex(Modules.index(ModuleName)+1))
 
 #################################### Module Launchers ##########################################
+    @pyqtSlot()
+    def show_simple_connection(self):
+        if self.findChild(QRadioButton, 'Lap_Joint_Bolted').isChecked():
+            module_class =LapJointBolted  # Import from simple_connection.py
+        elif self.findChild(QRadioButton, 'Lap_Joint_Welded').isChecked():
+            module_class = LapJointWelded  # You might adjust parameters if needed
+        elif self.findChild(QRadioButton, 'Butt_Joint_Bolted').isChecked():
+            module_class = ButtJointBolted
+        elif self.findChild(QRadioButton, 'Butt_Joint_Welded').isChecked():
+            module_class = ButtJointWelded
+        else:
+            QMessageBox.about(self, "INFO", "Please select an appropriate variant")
+            return
 
+        # Launch the module's UI window using the corresponding design class.
+        self.hide()
+        self.ui2 = Ui_ModuleWindow(module_class, ' ')
+        self.ui2.show()
+        self.ui2.closed.connect(self.show)
+        
     @pyqtSlot()
     def show_shear_connection(self):
         button_name_window_type_pairs = \
@@ -726,6 +755,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2 = Ui_ModuleWindow(PlateGirderWelded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+            return
 
 ################################# Help Actions ############################################
 

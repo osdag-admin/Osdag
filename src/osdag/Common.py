@@ -298,6 +298,7 @@ TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
+TYPE_IMAGE_BIGGER = 'Image_Bigger'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_IN_BUTTON = 'Input_dock_Button'
@@ -346,6 +347,9 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam-to-Beam Cover Plate Welded Connection'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column Cover Plate Welded Connection'
+KEY_DISP_LAPJOINTBOLTED = 'Lap Joint Bolted Connection'
+KEY_DISP_LAPJOINTWELDED = 'Lap Joint Welded Connection'
+KEY_DISP_BUTTJOINTBOLTED = 'Butt Joint Bolted Connection'
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
@@ -449,7 +453,7 @@ KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Buckling Stress (MPa)' # Euler 
 KEY_EFF_SEC_AREA = 'MajorEffSecArea'
-KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (mm<sup>2</sup>)' # ective
+KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (cm<sup>2</sup>)' # ective
 KEY_EFF_LEN = 'Major.Effective_Length'
 KEY_DISP_EFF_LEN = 'Eff. Length (m)' # ective
 KEY_BUCKLING_CURVE = 'BucklingCurve'
@@ -543,8 +547,8 @@ KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
 KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
 KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)' # Elastic 
 KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' # 
-KEY_DISP_T_constatnt= 'Torsional Constant (mm<sup>4</sup>)' #  (I<sub>t</sub>)
-KEY_DISP_W_constatnt= 'Warping Constant (mm<sup>6</sup>)' # (I<sub>w</sub>)
+KEY_DISP_T_constatnt= 'Torsional Constant (cm<sup>4</sup>)' #  (I<sub>t</sub>)
+KEY_DISP_W_constatnt= 'Warping Constant (cm<sup>6</sup>)' # (I<sub>w</sub>)
 KEY_LTB= 'L.T.B.Details'
 KEY_Elastic_CM= 'Elastic.Moment'
 KEY_T_constatnt= 'T.Constant'
@@ -591,17 +595,17 @@ KEY_DISP_LOAD1 ='Normal'
 KEY_DISP_LOAD2 = 'Destabilizing'
 KEY_DISP_LOAD_list = list((KEY_DISP_LOAD1, KEY_DISP_LOAD2))
 KEY_TORSIONAL_RES = 'Torsion.restraint'
-DISP_TORSIONAL_RES = 'Torsional restraint *'
+DISP_TORSIONAL_RES = 'Torsional Restraint *'
 Torsion_Restraint1 = 'Fully Restrained'
 Torsion_Restraint2 = 'Partially Restrained-support connection'
 Torsion_Restraint3 = 'Partially Restrained-bearing support'
 Torsion_Restraint_list = list(( Torsion_Restraint1, Torsion_Restraint2, Torsion_Restraint3))
 KEY_WARPING_RES = 'Warping.restraint'
-DISP_WARPING_RES = 'Warping restraint *'
+DISP_WARPING_RES = 'Warping Restraint *'
 Warping_Restraint1 = 'Both flanges fully restrained'
 Warping_Restraint2 = 'Compression flange fully restrained'
 # Warping_Restraint3 = 'Both flanges fully restrained'
-Warping_Restraint4 = 'Compressicm flange partially restrained'
+Warping_Restraint4 = 'Compression flange partially restrained'
 Warping_Restraint5 = 'Warping not restrained in both flanges'
 Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2, Warping_Restraint4, Warping_Restraint5))
 DISP_SUPPORT_RES = 'Support restraint *'
@@ -646,7 +650,8 @@ KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
 # Plate Girder
 ###################################
 KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
-KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER - WELDED'
+KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER'
+KEY_DISP_PG_SectionDetail = 'Section Details'
 KEY_tf = 'TF.Data'
 KEY_tw = 'TW.Data'
 KEY_dw = 'DW.Data'
@@ -660,6 +665,103 @@ KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
 KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
 KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
 KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
+KEY_LongitudnalStiffener = 'LongitudnalStiffener.Data'
+KEY_LongitudnalStiffener_thickness = 'LongitudnalStiffner.Thickness'
+KEY_LongitudnalStiffener_thickness_val = 'LongitudnalStiffner.Thickness.val'
+KEY_DISP_LongitudnalStiffener = 'Longitudnal Stiffener'
+KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness'
+KEY_IntermediateStiffener_thickness = 'IntermediateStiffener.Thickness'
+KEY_IntermediateStiffener_thickness_val = 'IntermediateStiffener.Thickness.val'
+KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness'
+KEY_WeldWebtoflange= 'WeldWebtoflange.Data'
+KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange'
+KEY_WeldStiffenertoweb= 'WeldStiffenertoweb.Data'
+KEY_DISP_WeldStiffenertoweb= 'Weld for Stiffener to Web'
+KEY_IS_IT_SYMMETRIC = 'Girder.Symmetry'
+KEY_DISP_IS_IT_SYMMETRIC = 'Symmetry'
+KEY_DISP_SYM = 'Symmetric Girder'
+KEY_DISP_UNSYM = 'Unsymmetric Girder'
+KEY_DISP_SYMMETRIC_list = list((KEY_DISP_SYM, KEY_DISP_UNSYM))
+KEY_TOP_FLANGE_THICKNESS_PG = 'TopFlange.Thickness'
+KEY_DISP_TOP_FLANGE_THICKNESS_PG = 'Top Flange Thickness (mm)'
+KEY_OVERALL_DEPTH_PG = 'Total.Depth'
+KEY_OVERALL_DEPTH_PG_TYPE = 'Total.Design_Type'
+KEY_DISP_OVERALL_DEPTH_PG_TYPE = 'Design Type'
+KEY_DISP_OVERALL_DEPTH_PG = 'Total Depth (mm)'
+KEY_WEB_THICKNESS_PG = 'Web.Thickness'
+KEY_DISP_WEB_THICKNESS_PG = 'Web Thickness (mm)'
+KEY_TOP_Bflange_PG_Type = 'Topflange.Width_Type'
+KEY_DISP_TOP_Bflange_PG_Type = 'Top Flange Width Type'
+KEY_TOP_Bflange_PG = 'Topflange.Width'
+KEY_DISP_TOP_Bflange_PG = 'Width of Top Flange (mm)'
+KEY_BOTTOM_Bflange_PG_Type = 'Bottomflange.Width_Type'
+KEY_DISP_BOTTOM_Bflange_PG_Type = 'Bottom Flange Width Type'
+KEY_BOTTOM_Bflange_PG = 'Bottomflange.Width'
+KEY_DISP_BOTTOM_Bflange_PG = 'Width of Bottom Flange (mm)'
+KEY_BOTTOM_FLANGE_THICKNESS_PG = 'BottomFlange.Thickness'
+KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG = 'Bottom Flange Thickness (mm)'
+KEY_STR_TYPE = 'Structure.Type'
+KEY_DISP_STR_TYPE = 'Type of Structure'
+KEY_WEB_PHILOSOPHY = 'Web.Philosophy'
+KEY_DISP_WEB_PHILOSOPHY = 'Web Philosophy'
+KEY_DISP_SECTION_DATA_PG = 'Design Inputs'
+KEY_LOADING = 'Factored Maximum Loads'
+KEY_DISP_STR_TYP1 = 'Highway Bridge'
+KEY_DISP_STR_TYP2 = 'Railway Bridge'
+KEY_DISP_STR_TYP3 = 'Industrial Structure'
+KEY_DISP_STR_TYP4 = 'Other Building'
+KEY_DISP_STR_TYPE_list = [KEY_DISP_STR_TYP1, KEY_DISP_STR_TYP2, KEY_DISP_STR_TYP3,KEY_DISP_STR_TYP4]
+KEY_DISP_PHILO1 = 'Thin Web with ITS'
+KEY_DISP_PHILO2 = 'Thick Web without ITS'
+WEB_PHILOSOPHY_list = list((KEY_DISP_PHILO1, KEY_DISP_PHILO2))
+KEY_DISP_DESIGN_STIFFER = 'Stiffener Design'
+KEY_DISP_WELD_DESIGN = 'Weld Design'
+KEY_BENDING_MOMENT_SHAPE= 'Bendingmoment.shape'
+KEY_DISP_BENDING_MOMENT_SHAPE='Bending Moment Shape'
+KEY_UDL_PIN_PIN_PG='UDLPINPIN.Data'
+KEY_DISP_UDL_PIN_PIN_PG='Uniform Loading with pinned-pinned support'
+KEY_UDL_FIX_FIX_PG= 'UDLFIXFIX.Data'
+KEY_DISP_UDL_FIX_FIX_PG= 'Uniform Loading with fixed-fixed support'
+KEY_PL_PIN_PIN_PG= 'PLPINPIN.Data'
+KEY_DISP_PL_PIN_PIN_PG='Concentrate Load with pinned-pinned support'
+KEY_PL_FIX_FIX_PG= 'PLFIXFIX.Data'
+KEY_DISP_PL_FIX_FIX_PG= 'Concentrate load with fixed-fixed support'
+KEY_DISP_GIRDERSEC = 'Girder Properties'
+Bending_moment_shape_list= list((KEY_DISP_UDL_PIN_PIN_PG, KEY_DISP_UDL_FIX_FIX_PG, KEY_DISP_PL_PIN_PIN_PG,KEY_DISP_PL_FIX_FIX_PG))
+VALUES_DEPTH_PG = ['Customized','Optimized']
+VALUES_OPT = ['All']
+KEY_DESIGN_LOAD = 'Design.Load'
+KEY_DISP_DESIGN_LOAD = 'Design Load'
+VALUE_DESIGN_LOAD_list = ['Live load','Dead load', 'Crane Load(Manual operation)', 'Crane load(Electric operation up to 50t)', 'Crane load(Electric operation over 50t)']
+KEY_MEMBER_OPTIONS = 'Member.Options'
+KEY_DISP_MEMBER_OPTIONS = 'Member Options'
+# VALUES_MEMBER_OPTIONS_INDUS = ['Purlin and Girts', 'Simple span', 'Cantilever span', 'Rafter Supporting', 'Gantry']
+# VALUES_MEMBER_OPTIONS_OTHER = ['Floor and roof', 'Cantilever']
+# VALUES_MEMBER_OPTIONS_BRIDGE = ['Simple span', 'Cantilever span']
+VALUES_MEMBER_OPTIONS = [['Simple Span', 'Cantilever Span'],['Purlin and Girts', 'Simple span', 'Cantilever span', 'Rafter Supporting', 'Gantry'], ['Floor and roof', 'Cantilever']]
+KEY_SUPPORTING_OPTIONS = 'Supporting.Options'
+KEY_DISP_SUPPORTING_OPTIONS = 'Supporting Options'
+VALUES_SUPPORTING_OPTIONS_PSC = ['Elastic cladding', 'Brittle cladding']
+VALUES_SUPPORTING_OPTIONS_RS = ['Profiled Metal sheeting', 'Plastered sheeting']
+VALUES_SUPPORTING_OPTIONS_GNT = ['Crane']
+VALUES_SUPPORTING_OPTIONS_FRC = ['Elements not susceptible to cracking', 'Element susceptible to cracking']
+VALUES_SUPPORTING_OPTIONS_DEF = ['NA']
+KEY_MAX_DEFL = 'Deflection.Max'
+KEY_DISP_MAX_DEFL = 'Maximum Deflection'
+VALUES_MAX_DEFL = ['600','800','400','300','360','150','180','240','120','500','750','1000']
+KEY_SUPPORT_WIDTH = 'Support.Width'
+KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
+VALUES_STIFFENER_THICKNESS = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
+                        '110', '120']
+KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
+KEY_DISP_EndpanelStiffener_thickness = 'End Panel Stiffener Thickness (mm)'
+KEY_LongitudnalStiffener_numbers = 'LongitudnalStiffener.Numbers'
+KEY_DISP_LongitudnalStiffener_numbers = 'Number of Longitudnal Stiffeners'
+KEY_LongitudinalStiffener1_pos = 'LongitudnalStiffener1.Position'
+KEY_DISP_LongitudinalStiffener1_pos = 'Position of Longitudnal Stiffener 1 from NA (mm) '
+KEY_LongitudinalStiffener2_pos = 'LongitudnalStiffener2.Position'
+KEY_DISP_LongitudinalStiffener2_pos = 'Position of Longitudnal Stiffener 2 from NA (mm)'
+ 
 ###################################
 # All Input Keys
 ###################################
@@ -758,7 +860,7 @@ KEY_DP_WELD_TYPE = 'Weld.Type'
 KEY_DP_DETAILING_EDGE_TYPE = 'Detailing.Edge_type'
 KEY_DP_DETAILING_GAP = 'Detailing.Gap'
 KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences'
-
+KEY_DP_DETAILING_PACKING_PLATE  = 'Detailing.Packing_Plate'
 KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 
 ###################
@@ -777,6 +879,7 @@ VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irrev
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
+VALUES_COVER_PLATE = ['Single-Cover', 'Double-Cover']
 
 # TODO: Every one is requested to use VALUES_ALL_CUSTOMIZED key instead of all other keys
 VALUES_ALL_CUSTOMIZED = ['All', 'Customized']
@@ -830,7 +933,11 @@ VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to
 VALUES_DIAM = connectdb("Bolt")
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 
-
+VALUES_IMAGE_PLATEGIRDER = [str(files("osdag.data.ResourceFiles.images").joinpath("ULPPS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("ULFFS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("CLPPS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("CLFFS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("CLPPSPB_PG.png"))]
 VALUES_IMG_TENSIONBOLTED = [str(files("osdag.data.ResourceFiles.images").joinpath("bA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bBBA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bSA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bC.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bBBC.png"))]
 VALUES_IMG_TENSIONWELDED = [str(files("osdag.data.ResourceFiles.images").joinpath("wA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wBBA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wSA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wC.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wBBC.png"))]
 VALUES_IMG_TENSIONBOLTED_DF01 = [str(files("osdag.data.ResourceFiles.images").joinpath("equaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bblequaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bbsequaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("salequaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("sasequaldp.png"))]
@@ -885,6 +992,7 @@ DISP_MIN_CLEAT_HEIGHT = 'Min. Cleat Angle Height'
 DISP_MAX_CLEAT_HEIGHT = 'Max. Cleat Angle Height'
 DISP_MIN_CLEAT_THK = 'Min. Cleat Angle Thickness (mm)'
 DISP_MIN_WIDTH = 'Minimum Width (mm)'
+
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####
@@ -937,6 +1045,19 @@ KEY_DISP_MEMBERS = 'No of Members'
 
 
 # VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+
+#lapjointbolted
+KEY_PLATE1_THICKNESS = "Plate1Thickness"
+KEY_PLATE2_THICKNESS = "Plate2Thickness" 
+KEY_PLATE_WIDTH = "PlateWidth"
+KEY_DISP_PLATE1_THICKNESS = "Thickness of Plate-1 (mm) *"
+KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *"
+KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *"
+KEY_TENSILE_FORCE = "TensileForce*"
+KEY_DISP_TENSILE_FORCE = "Tensile Force (kN) *"
+
+KEY_COVER_PLATE = "ButtJoint.CoverPlate"
+KEY_DISP_COVER_PLATE = "Cover Plate"
 
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
@@ -1310,6 +1431,7 @@ KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Edge Preparation Method'  # added by Danish A
 
 DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
 DISP_TITLE_BOLTD = 'Bolt Details'
+DISP_TITLE_BOLTDS = 'Bolt Design'
 DISP_TITLE_PLATED = 'Plate Details'
 
 KEY_DISP_DP_DETAILING_GAP = 'Gap Between Beam and <br>Support (mm)'
@@ -1319,6 +1441,7 @@ KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the Members Exposed to <br> Co
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the Members Exposed to Corrosive Influences?'
 KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
+KEY_DISP_DP_DETAILING_PACKING_PLATE = 'Packing Plate'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate Analysis'
 KEY_DISP_GAP = 'Gap Between Members (mm)'
@@ -1799,6 +1922,8 @@ KEY_OUT_DISP_INTER_D_PROVIDED = 'Diameter (mm)'
 
 
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade_Provided'
+KEY_OUT_DISP_TYP_PROVIDED = 'Type'
+KEY_OUT_TYP_PROVIDED = 'Bolt.Type_Provided'
 KEY_OUT_DISP_GRD_PROVIDED = 'Property Class'
 KEY_OUT_INTER_GRD_PROVIDED = 'Bolt.InterGrade'
 KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
@@ -1818,6 +1943,11 @@ KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
+KEY_OUT_BOLT_CONN_LEN = 'Bolt.ConnLength'
+KEY_UTILIZATION_RATIO = 'Bolt.UtilizationRatio'
+KEY_DISP_UTILIZATION_RATIO = 'Utilization Ratio'
+KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
+
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
@@ -1836,6 +1966,7 @@ KEY_OUT_DISP_BETA_LG = 'β<sub>lg</sub>'
 KEY_OUT_BETA_PK = 'Bolt.Betapk'
 KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
+KEY_OUT_BOLT_SLIP = 'Bolt.Slip'
 KEY_OUT_DISP_BOLT_SLIP_DR = 'Slip Resistance (kN)'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_BOLT_CAPACITY_SPTD = 'Bolt.Capacity_sptd'
@@ -2278,7 +2409,9 @@ DISP_TITLE_FL = 'Factored loads'
 KEY_AXFOR = 'Axial Force'
 KEY_DISP_AXFOR = 'Axial Force (kN)*'
 KEY_PLTHK = 'Plate thk'
+KEY_PK_PLTHK = 'PackingPlate thk'
 KEY_DISP_PLTHK = 'Plate thk (mm)'
+KEY_DISP_PK_PLTHK = 'Packing Plate thickness (mm)'
 KEY_PLTHICK = 'Plate thk'
 KEY_DISP_PLTHICK = 'Plate Thickness (mm)'
 KEY_DISP_PLATE_THICK = 'Plate Thickness (mm)'
@@ -2488,6 +2621,15 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
+DETAILING_DESCRIPTION_LAPJOINT = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n</body></html>")
+
+
+
 
 COLUMN_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -2581,6 +2723,71 @@ Bearing_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
 Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
+Stiffener_Plategirder_para = str(
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\">\n"
+    "p, li { white-space: pre-wrap; }\n"
+    "</style></head><body style=\" font-family:'Arial'; font-size:8.25pt; "
+    "font-weight:400; font-style:normal;\">\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Stiffener Details</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">1. Types of Stiffeners in Plate Girders</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">a. Intermediate (Transverse) Stiffeners</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Purpose: Prevent web buckling due to shear or compression.</span></li>\n"
+    "<li><span>Location: Placed vertically, perpendicular to the web, between the flanges at regular intervals.</span></li>\n"
+    "<li><span>Application: Needed when the web is slender (large depth-to-thickness ratio).</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">b. End Bearing Stiffeners</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Purpose: Strengthen the web at supports or concentrated loads to resist high bearing forces and prevent web crippling.</span></li>\n"
+    "<li><span>Location: Placed at the ends (supports) or under concentrated loads.</span></li>\n"
+    "<li><span>Application: Always provided at supports and where heavy loads are applied.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">c. Longitudinal Stiffeners</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Purpose: Increase web buckling resistance along the length, especially for very deep or slender webs.</span></li>\n"
+    "<li><span>Location: Placed horizontally at a certain distance from the compression flange or web neutral axis.</span></li>\n"
+    "<li><span>Application: Used when the web depth-to-thickness ratio is very high and transverse stiffeners alone are not sufficient.</span></li>\n"
+    "</ul>\n"
+
+    "<hr />\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">2. Web Buckling Design Methods (as per IS 800:2007)</span></p>\n"
+    "<p align=\"justify\"><span>IS 800:2007 recommends two principal methods for evaluating the web’s shear resistance when web slenderness is high:</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">a. Simple Post-Critical Method</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span style=\" font-weight:600;\">Concept:</span><br />"
+    "<span>Assumes that after initial buckling of the web (critical shear), the web still provides some shear strength due to diagonal tension across the buckled panels.</span><br />"
+    "<span>For webs with intermediate stiffeners, this method allows for some reserve strength beyond initial buckling, but does not fully utilize tension field action.</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Calculation:</span><br />"
+    "<span>The shear strength is based on the post-buckling strength of the web panel, up to the critical shear buckling stress, using the post-buckling formula provided in IS 800:2007 (Clause 8.4.2.2).</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Usage:</span><br />"
+    "<span>Suitable for webs with intermediate stiffeners, but where the web is not very slender or where full tension field action is not mobilized.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">b. Tension Field Method</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span style=\" font-weight:600;\">Concept:</span><br />"
+    "<span>After buckling, the web develops a diagonal tension field, supported by the flanges and stiffeners, which significantly increases the web’s shear capacity beyond the critical value.</span><br />"
+    "<span>This method fully utilizes the tension field action in the post-buckled web panel.</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Calculation:</span><br />"
+    "<span>The web’s ultimate shear strength is based on the ability of the web to develop this tension field and is given by the formulae in IS 800:2007 (Clause 8.4.2.3).</span><br />"
+    "<span>The design shear strength includes both the contribution of the buckled web (tension field action) and the flanges/stiffeners.</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Usage:</span><br />"
+    "<span>Used for panels with sufficient intermediate stiffeners, flanges, and connections that can develop and sustain the tension field.</span><br />"
+    "<span>Allows for greater economy and higher shear capacities in plate girders.</span></li>\n"
+    "</ul>\n"
+
+    "</body></html>"
+)
 
 OPTIMIZATION_TABLE_UI = str("""
 <div style="width:100%;" style="overflow-x:auto;">
@@ -2784,3 +2991,187 @@ FLEXURE_OPTIMIZATION_DESCRIPTION_Canti = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DT
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI + Bearing_Length_Para
+
+
+ADDITIONAL_GIRDER_DESCRIPTION = str(
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\">\n"
+    "p, li { white-space: pre-wrap; }\n"
+    "</style></head><body style=\" font-family:'Arial'; font-size:8.25pt; "
+    "font-weight:400; font-style:normal;\">\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Symmetrical I Girder</span></p>\n"
+    "<p align=\"justify\"><span>A symmetrical I girder (or beam) is an I-shaped structural member "
+    "in which the top and bottom flanges are identical in shape, size, and thickness. "
+    "The web (the vertical part) is centered between the flanges, making the whole section "
+    "mirrored about its central axis.</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Key Features</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Identical Flanges: Both top and bottom flanges have equal dimensions and thickness.</span></li>\n"
+    "<li><span>Web Centered: The web is exactly in the middle, so the cross-section is mirrored "
+    "about the horizontal and vertical axis.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Standardization: Easier to design and fabricate.</span></li>\n"
+    "<li><span>Common Use: Widely used in bridges, buildings, and frames where loads are mostly vertical "
+    "and evenly applied.</span></li>\n"
+    "</ul>\n"
+
+    "<hr />\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Unsymmetrical I Girder</span></p>\n"
+    "<p align=\"justify\"><span>An unsymmetrical I girder is an I-shaped structural member where the top "
+    "and bottom flanges are not identical—meaning they differ in width, thickness, or shape. "
+    "The web may not be centered.</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Key Features</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Different Flanges: The top and bottom flanges have different sizes or thicknesses.</span></li>\n"
+    "<li><span>Non-uniform Properties: Section modulus and moment of inertia differ for the top and bottom.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Optimized Design: Useful where the loading is not symmetrical (e.g., composite construction with a "
+    "concrete slab on top, or for cantilever situations).</span></li>\n"
+    "<li><span>Material Savings: Material can be saved by providing a larger flange where stresses are higher, "
+    "usually on the compression side.</span></li>\n"
+    "</ul>\n"
+
+    "</body></html>"
+)
+
+
+PLATE_GIRDER_DEFLECTION_TABLE = str("""
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clause 5.6.1 Deflection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      padding: 10px;
+      width: auto;
+    }
+    table th, table td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Clause 5.6.1 Deflection</h1>
+  <h2>Vertical Deflection - Table 6 of IS800-2007</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Type of structure</th>
+        <th>Load Type</th>
+        <th>Member</th>
+        <th>Supporting</th>
+        <th>Deflection Limit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Purlins and Girts</td><td>Elastic cladding</td><td>Span/150</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Purlins and Girts</td><td>Brittle cladding</td><td>Span/180</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Simple span</td><td>Elastic cladding</td><td>Span/240</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Simple span</td><td>Brittle cladding</td><td>Span/300</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Cantilever span</td><td>Elastic cladding</td><td>Span/120</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Cantilever span</td><td>Brittle cladding</td><td>Span/150</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Rafter supporting</td><td>Profiled Metal Sheeting</td><td>Span/180</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Rafter supporting</td><td>Plastered Sheeting</td><td>Span/240</td></tr>
+      <tr><td>Industrial building</td><td>Crane Load(Manual operation)</td><td>Gantry</td><td>Crane</td><td>Span/500</td></tr>
+      <tr><td>Industrial building</td><td>Crane load(Electric operation up to 50t)</td><td>Gantry</td><td>Crane</td><td>Span/750</td></tr>
+      <tr><td>Industrial building</td><td>Crane load(Electric operation over 50t)</td><td>Gantry</td><td>Crane</td><td>Span/1000</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Floor and Roof</td><td>Elements not susceptible to cracking</td><td>Span/300</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Floor and Roof</td><td>Element susceptible to cracking</td><td>Span/360</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Cantilever Span</td><td>Elements not susceptible to cracking</td><td>Span/150</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Cantilever Span</td><td>Element susceptible to cracking</td><td>Span/180</td></tr>
+      <tr><td>Highway Bridges</td><td>Live Load</td><td>Simple span</td><td>NA</td><td>Span/600</td></tr>
+      <tr><td>Railway Bridges</td><td>Live Load</td><td>Simple span</td><td>NA</td><td>Span/600</td></tr>
+      <tr><td>Highway Bridges</td><td>Dead Load</td><td>Simple span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Railway Bridges</td><td>Dead Load</td><td>Simple span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Highway Bridges</td><td>Live Load</td><td>Cantilever span</td><td>NA</td><td>Span/400</td></tr>
+      <tr><td>Railway Bridges</td><td>Live Load</td><td>Cantilever span</td><td>NA</td><td>Span/400</td></tr>
+      <tr><td>Highway Bridges</td><td>Dead Load</td><td>Cantilever span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Railway Bridges</td><td>Dead Load</td><td>Cantilever span</td><td>NA</td><td>Span/800</td></tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+
+
+""")
+
+DESIGN_METHOD_DESCRIPTION = str(
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\">\n"
+    "p, li { white-space: pre-wrap; }\n"
+    "</style></head><body style=\" font-family:'Arial'; font-size:8.25pt; "
+    "font-weight:400; font-style:normal;\">\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Design Method</span></p>\n"
+    "<p align=\"justify\">The \"Design Method\" dropdown allows you to choose the basis on which the structural design calculations for the girder will be performed. The main options are:</p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Limit State Design (LSD)</span></p>\n"
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Description:</span></p>\n"
+    "<p align=\"justify\">Limit State Design is the modern design philosophy adopted by most current codes (including IS 800:2007). In this method, the structure is designed to withstand all possible limit states, primarily:</p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span><b>Ultimate Limit State (ULS):</b> Safety against collapse due to strength failure.</span></li>\n"
+    "<li><span><b>Serviceability Limit State (SLS):</b> Ensures acceptable performance under normal use (deflections, vibrations, cracks).</span></li>\n"
+    "</ul>\n"
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages:</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Optimizes material usage.</span></li>\n"
+    "<li><span>Balances safety and serviceability.</span></li>\n"
+    "<li><span>Incorporates factors of safety for both loads and material strengths.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Working Stress Design (WSD)</span></p>\n"
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Description:</span></p>\n"
+    "<p align=\"justify\">Also known as the elastic method, Working Stress Design ensures that stresses induced by service loads do not exceed specified allowable values. It uses a single factor of safety applied to material strength.</p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages:</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Simple and conservative.</span></li>\n"
+    "<li><span>Suitable for structures where performance under service loads is more critical than ultimate strength.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Limitations:</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Less economical than LSD.</span></li>\n"
+    "<li><span>Not as widely used in modern codes for steel structures.</span></li>\n"
+    "</ul>\n"
+
+    "</body></html>"
+)

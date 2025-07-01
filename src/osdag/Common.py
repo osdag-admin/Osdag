@@ -649,7 +649,7 @@ KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
 ###################################
 # Plate Girder
 ###################################
-# KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
+KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
 KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER'
 KEY_DISP_PG_SectionDetail = 'Section Details'
 KEY_tf = 'TF.Data'
@@ -2629,6 +2629,8 @@ DETAILING_DESCRIPTION_LAPJOINT = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n</body></html>")
 
 
+
+
 COLUMN_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
                "p, li { white-space: pre-wrap; }\n"
@@ -2722,23 +2724,69 @@ Bearing_Length_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin
 Shear_Buckling_Para = str( "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Shear Buckling</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> is only applicable when the input sections are susceptible to shear buckling.. The default value of this parameter is set at </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Simple Post Critical Method</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">. Refer</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">Clause IS 8.4.2.2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">for understanding which method is applicable in your case.</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n")
 Stiffener_Plategirder_para = str(
-    "<p align=\"justify\" style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
-    "<span style=\"font-weight:600;\">Types of Stiffeners in Plate Girders (IS 800:2007):</span>"
-    "</p>"
-    "<ul style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
-    "<li><strong>Intermediate Transverse Stiffeners:</strong> Provided at intervals to prevent web buckling due to shear forces.</li>"
-    "<li><strong>Load-bearing Stiffeners:</strong> Provided at points of concentrated loads to transfer load effectively to the web.</li>"
-    "<li><strong>Bearing Stiffeners:</strong> Placed at supports to transfer reactions to the supports and ensure stability.</li>"
-    "<li><strong>Longitudinal Stiffeners:</strong> Used horizontally along the length to increase web resistance against bending.</li>"
-    "<li><strong>End Stiffeners:</strong> Located at girder ends to strengthen web plates and transfer forces effectively.</li>"
-    "</ul>"
-    "<p align=\"justify\" style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
-    "<span style=\"font-weight:600;\">Methods for Plate Girder Design:</span>"
-    "</p>"
-    "<ul style=\"font-family:'MS Shell Dlg 2'; font-size:8pt;\">"
-    "<li><strong>Simple Post-Critical Method:</strong> In this method, the girder web is allowed to buckle at certain loading conditions. The design assumes that the web can carry loads post-buckling, using the stable equilibrium formed after initial buckling.</li>"
-    "<li><strong>Tension Field Method:</strong> This method accounts explicitly for the tensile stresses that develop diagonally across the web post-buckling. The web, supported by stiffeners, forms a tension field action, substantially increasing shear-carrying capacity beyond initial web buckling.</li>"
-    "</ul>"
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\">\n"
+    "p, li { white-space: pre-wrap; }\n"
+    "</style></head><body style=\" font-family:'Arial'; font-size:8.25pt; "
+    "font-weight:400; font-style:normal;\">\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Stiffener Details</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">1. Types of Stiffeners in Plate Girders</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">a. Intermediate (Transverse) Stiffeners</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Purpose: Prevent web buckling due to shear or compression.</span></li>\n"
+    "<li><span>Location: Placed vertically, perpendicular to the web, between the flanges at regular intervals.</span></li>\n"
+    "<li><span>Application: Needed when the web is slender (large depth-to-thickness ratio).</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">b. End Bearing Stiffeners</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Purpose: Strengthen the web at supports or concentrated loads to resist high bearing forces and prevent web crippling.</span></li>\n"
+    "<li><span>Location: Placed at the ends (supports) or under concentrated loads.</span></li>\n"
+    "<li><span>Application: Always provided at supports and where heavy loads are applied.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">c. Longitudinal Stiffeners</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Purpose: Increase web buckling resistance along the length, especially for very deep or slender webs.</span></li>\n"
+    "<li><span>Location: Placed horizontally at a certain distance from the compression flange or web neutral axis.</span></li>\n"
+    "<li><span>Application: Used when the web depth-to-thickness ratio is very high and transverse stiffeners alone are not sufficient.</span></li>\n"
+    "</ul>\n"
+
+    "<hr />\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">2. Web Buckling Design Methods (as per IS 800:2007)</span></p>\n"
+    "<p align=\"justify\"><span>IS 800:2007 recommends two principal methods for evaluating the web’s shear resistance when web slenderness is high:</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">a. Simple Post-Critical Method</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span style=\" font-weight:600;\">Concept:</span><br />"
+    "<span>Assumes that after initial buckling of the web (critical shear), the web still provides some shear strength due to diagonal tension across the buckled panels.</span><br />"
+    "<span>For webs with intermediate stiffeners, this method allows for some reserve strength beyond initial buckling, but does not fully utilize tension field action.</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Calculation:</span><br />"
+    "<span>The shear strength is based on the post-buckling strength of the web panel, up to the critical shear buckling stress, using the post-buckling formula provided in IS 800:2007 (Clause 8.4.2.2).</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Usage:</span><br />"
+    "<span>Suitable for webs with intermediate stiffeners, but where the web is not very slender or where full tension field action is not mobilized.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">b. Tension Field Method</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span style=\" font-weight:600;\">Concept:</span><br />"
+    "<span>After buckling, the web develops a diagonal tension field, supported by the flanges and stiffeners, which significantly increases the web’s shear capacity beyond the critical value.</span><br />"
+    "<span>This method fully utilizes the tension field action in the post-buckled web panel.</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Calculation:</span><br />"
+    "<span>The web’s ultimate shear strength is based on the ability of the web to develop this tension field and is given by the formulae in IS 800:2007 (Clause 8.4.2.3).</span><br />"
+    "<span>The design shear strength includes both the contribution of the buckled web (tension field action) and the flanges/stiffeners.</span></li>\n"
+    "<li><span style=\" font-weight:600;\">Usage:</span><br />"
+    "<span>Used for panels with sufficient intermediate stiffeners, flanges, and connections that can develop and sustain the tension field.</span><br />"
+    "<span>Allows for greater economy and higher shear capacities in plate girders.</span></li>\n"
+    "</ul>\n"
+
+    "</body></html>"
 )
 
 OPTIMIZATION_TABLE_UI = str("""
@@ -2944,6 +2992,61 @@ FLEXURE_OPTIMIZATION_DESCRIPTION_Canti = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DT
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI + Bearing_Length_Para
 
+
+ADDITIONAL_GIRDER_DESCRIPTION = str(
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\">\n"
+    "p, li { white-space: pre-wrap; }\n"
+    "</style></head><body style=\" font-family:'Arial'; font-size:8.25pt; "
+    "font-weight:400; font-style:normal;\">\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Symmetrical I Girder</span></p>\n"
+    "<p align=\"justify\"><span>A symmetrical I girder (or beam) is an I-shaped structural member "
+    "in which the top and bottom flanges are identical in shape, size, and thickness. "
+    "The web (the vertical part) is centered between the flanges, making the whole section "
+    "mirrored about its central axis.</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Key Features</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Identical Flanges: Both top and bottom flanges have equal dimensions and thickness.</span></li>\n"
+    "<li><span>Web Centered: The web is exactly in the middle, so the cross-section is mirrored "
+    "about the horizontal and vertical axis.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Standardization: Easier to design and fabricate.</span></li>\n"
+    "<li><span>Common Use: Widely used in bridges, buildings, and frames where loads are mostly vertical "
+    "and evenly applied.</span></li>\n"
+    "</ul>\n"
+
+    "<hr />\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Unsymmetrical I Girder</span></p>\n"
+    "<p align=\"justify\"><span>An unsymmetrical I girder is an I-shaped structural member where the top "
+    "and bottom flanges are not identical—meaning they differ in width, thickness, or shape. "
+    "The web may not be centered.</span></p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Key Features</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Different Flanges: The top and bottom flanges have different sizes or thicknesses.</span></li>\n"
+    "<li><span>Non-uniform Properties: Section modulus and moment of inertia differ for the top and bottom.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Optimized Design: Useful where the loading is not symmetrical (e.g., composite construction with a "
+    "concrete slab on top, or for cantilever situations).</span></li>\n"
+    "<li><span>Material Savings: Material can be saved by providing a larger flange where stresses are higher, "
+    "usually on the compression side.</span></li>\n"
+    "</ul>\n"
+
+    "</body></html>"
+)
+
+
 PLATE_GIRDER_DEFLECTION_TABLE = str("""
 <!DOCTYPE html>
 <html>
@@ -3027,3 +3130,48 @@ PLATE_GIRDER_DEFLECTION_TABLE = str("""
 
 
 """)
+
+DESIGN_METHOD_DESCRIPTION = str(
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\">\n"
+    "p, li { white-space: pre-wrap; }\n"
+    "</style></head><body style=\" font-family:'Arial'; font-size:8.25pt; "
+    "font-weight:400; font-style:normal;\">\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Design Method</span></p>\n"
+    "<p align=\"justify\">The \"Design Method\" dropdown allows you to choose the basis on which the structural design calculations for the girder will be performed. The main options are:</p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Limit State Design (LSD)</span></p>\n"
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Description:</span></p>\n"
+    "<p align=\"justify\">Limit State Design is the modern design philosophy adopted by most current codes (including IS 800:2007). In this method, the structure is designed to withstand all possible limit states, primarily:</p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span><b>Ultimate Limit State (ULS):</b> Safety against collapse due to strength failure.</span></li>\n"
+    "<li><span><b>Serviceability Limit State (SLS):</b> Ensures acceptable performance under normal use (deflections, vibrations, cracks).</span></li>\n"
+    "</ul>\n"
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages:</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Optimizes material usage.</span></li>\n"
+    "<li><span>Balances safety and serviceability.</span></li>\n"
+    "<li><span>Incorporates factors of safety for both loads and material strengths.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Working Stress Design (WSD)</span></p>\n"
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Description:</span></p>\n"
+    "<p align=\"justify\">Also known as the elastic method, Working Stress Design ensures that stresses induced by service loads do not exceed specified allowable values. It uses a single factor of safety applied to material strength.</p>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Advantages:</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Simple and conservative.</span></li>\n"
+    "<li><span>Suitable for structures where performance under service loads is more critical than ultimate strength.</span></li>\n"
+    "</ul>\n"
+
+    "<p align=\"justify\"><span style=\" font-weight:600;\">Limitations:</span></p>\n"
+    "<ul style=\"margin-left:12px;\">\n"
+    "<li><span>Less economical than LSD.</span></li>\n"
+    "<li><span>Not as widely used in modern codes for steel structures.</span></li>\n"
+    "</ul>\n"
+
+    "</body></html>"
+)

@@ -2186,7 +2186,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_COMPRESSION_Strut,KEY_DISP_LAPJOINTBOLTED,KEY_DISP_PLATE_GIRDER_WELDED]: # , KEY_DISP_FLEXURE
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 print("common start")
-                print(f"main object type: {type(main)}")``
+                print(f"main object type: {type(main)}")
                 print(f"main attributes: {dir(main)}")
                 print("main.mainmodule",main.mainmodule)
 

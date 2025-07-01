@@ -2948,7 +2948,7 @@ class Member(Main):
 
         t2 = (KEY_IS_IT_SYMMETRIC, KEY_DISP_IS_IT_SYMMETRIC, TYPE_COMBOBOX, KEY_DISP_SYMMETRIC_list, values[KEY_IS_IT_SYMMETRIC])
         optimum.append(t2)
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, Stiffener_Plategirder_para , None)
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, ADDITIONAL_GIRDER_DESCRIPTION , None)
         optimum.append(t9)
 
         return optimum

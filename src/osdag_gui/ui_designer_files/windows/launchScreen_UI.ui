@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>610</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="AnimatedGIF">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>100</y>
+      <width>191</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="AestheticVector">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>230</y>
+      <width>611</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="MOSLogo">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>340</y>
+      <width>81</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="OsdagTagline">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>321</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="DescriptionLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>191</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="OsdagLogo">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="LoadingLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>290</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="OsdagLabel">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>40</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="IITBLogo">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>10</y>
+      <width>71</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FOSSEELogo">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>340</y>
+      <width>141</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FOSSEELogo_2">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>360</y>
+      <width>211</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+	background: rgb(255, 255, 255);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

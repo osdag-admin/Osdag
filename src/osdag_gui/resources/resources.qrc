@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+
+        <file>vectors/AnimateComponent_back.svg</file>
+        <file>vectors/Osdag_logo.svg</file>
+        <file>vectors/FOSSEE_logo.svg</file>
+        <file>vectors/IITB_logo.svg</file>
+        <file>vectors/ConstructSteel_logo.svg</file>
+        <file>vectors/MOS_logo.svg</file>
+        <file>vectors/Osdag_label.svg</file>
+        <file>vectors/Osdag_tagline.svg</file>
+        <file>vectors/contour_lines.svg</file>
+        <file>vectors/description_label.svg</file>
+        <file>vectors/version.svg</file>
+
+        <file>backgrounds/splash_bg.jpg</file>
+
+        <file>themes/darkstyle.qss</file>
+        <file>themes/lightstyle.qss</file>
+
+
+    </qresource>
+</RCC>

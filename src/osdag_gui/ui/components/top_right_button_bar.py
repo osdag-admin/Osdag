@@ -150,7 +150,7 @@ class TopButton(QPushButton):
         self.is_hovering = False
         # Only apply default style if the button is not currently in a "clicked" animation
         if not self.click_animation_timer.isActive():
-            self._apply_animated_style(self.default_style_sheet, 36, "", self.black_icon_path)
+            self._apply_animated_style(self.default_style_sheet, 40, "", self.black_icon_path)
         super().leaveEvent(event)
 
     def mousePressEvent(self, event):
@@ -175,7 +175,7 @@ class TopButton(QPushButton):
             self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
         else:
             # If the mouse has left, revert to default style
-            self._apply_animated_style(self.default_style_sheet, 36, "", self.black_icon_path)
+            self._apply_animated_style(self.default_style_sheet, 40, "", self.black_icon_path)
 
 class TopButton1(QPushButton):
     """

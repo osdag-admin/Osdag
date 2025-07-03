@@ -49,15 +49,15 @@ class CustomButton1(QPushButton):
                 color: #000000;
                 padding: 4px 4px 8px 8px;
                 font-family: "Calibri";
-                border-top: 2px solid #ffffff;
-                border-bottom: 2px solid #ffffff;
+                border-top: 1px solid #ffffff;
+                border-bottom: 1px solid #ffffff;
                 text-align: left;
             }
             QPushButton:hover {
                 background-color: transparent;
                 color: #90AF13;
-                border-top: 2px solid #90AF13;
-                border-bottom: 2px solid #90AF13;
+                border-top: 1px solid #90AF13;
+                border-bottom: 1px solid #90AF13;
             }
         """)
 
@@ -69,8 +69,8 @@ class CustomButton1(QPushButton):
                 color: #ffffff;
                 padding: 4px 4px 8px 8px;
                 font-family: "Calibri";
-                border-top: 2px solid #90AF13;
-                border-bottom: 2px solid #90AF13;
+                border-top: 1px solid #90AF13;
+                border-bottom: 1px solid #90AF13;
                 text-align: left;
             }
         """)
@@ -80,7 +80,6 @@ class VerticalMenuBar(QWidget):
     def __init__(self, data: dict):
         super().__init__()
 
-        self.setWindowTitle("Landing Sidebar")
         # Set size policy to expanding so it grows/shrinks with its parent layout
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 

@@ -31,6 +31,14 @@ class BackgroundSvgWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        # Draw left border
+        border_color = QColor("#90AF13")
+        pen = painter.pen()
+        pen.setColor(border_color)
+        pen.setWidth(3)
+        painter.setPen(pen)
+        painter.drawLine(0, 0, 0, self.height())
+        # Draw SVG background
         target_rect = self.rect()
         self.svg_renderer.render(painter, target_rect)
         painter.end()
@@ -75,6 +83,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Osdag")
         self.setMinimumSize(1200, 800)
+        self.setStyleSheet("")
 
         dat = Data()
         self.menu_bar_data = dat.MODULES
@@ -336,6 +345,7 @@ class MainWindow(QMainWindow):
                     border-bottom: 1px solid #90AF13;
                 }
             """)
+            # self.svg_card_layout.addStretch()
             self.svg_card_layout.addWidget(label)
             self.svg_card_layout.addStretch()
             self.svg_card_layout.addWidget(svg_card_widget)
@@ -346,11 +356,15 @@ class MainWindow(QMainWindow):
             self._clear_layout(self.svg_card_layout)
 
             self.primary_menu_container.show()
-
+            default_btn = None 
+            toggle = True
             self.primary_menu_layout.addStretch(1)
             for i in menu_bar_data.keys():
                 internal_dat = menu_bar_data.get(i)
                 btn = MenuButton(i)
+                if toggle:
+                    toggle = False
+                    default_btn = [i, btn]
                 if isinstance(internal_dat, list):
                     # single level menu bar
                     btn.clicked.connect(lambda _, b=btn, data=internal_dat: self.menu_trigger(data, b))
@@ -359,6 +373,8 @@ class MainWindow(QMainWindow):
                     btn.clicked.connect(lambda _, b=btn, data=internal_dat: self.submenu_trigger(data, b))
                 self.primary_menu_layout.addWidget(btn)
             self.primary_menu_layout.addStretch(1)
+            # set first Menu as Default
+            self.menu_trigger(menu_bar_data.get(default_btn[0]), default_btn[1])
 
     def show_home(self):
         self._clear_layout(self.svg_card_layout)
@@ -406,15 +422,24 @@ class MainWindow(QMainWindow):
         self.secondary_menu_container.hide()
         self.secondary_menu_hidden = True
 
+        default_btn = None 
+        toggle = True
+        
         self.secondary_menu_layout.addStretch(1)
         for i in data.keys():
             internal_dat = data.get(i)
             btn = MenuButton(i)
+            if toggle:
+                toggle = False
+                default_btn = [i, btn]
             btn.clicked.connect(lambda _, b=btn, data=internal_dat: self.menu_bar(data, b))
             self.secondary_menu_layout.addWidget(btn)
         self.secondary_menu_layout.addStretch(1)
 
         self._animate_secondary_menu(True)
+        # set first Menu as Default
+        self.menu_bar(data.get(default_btn[0]), default_btn[1])
+
 
     def menu_bar(self, data, clicked_button=None):
         """

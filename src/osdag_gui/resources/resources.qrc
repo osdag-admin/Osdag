@@ -13,7 +13,41 @@
         <file>vectors/description_label.svg</file>
         <file>vectors/version.svg</file>
 
+        <file>vectors/recently_used_module_icon.svg</file>
+        <file>vectors/info_hover.svg</file>
+        <file>vectors/info_default.svg</file>
+        <file>vectors/load_hover.svg</file>
+        <file>vectors/load_default.svg</file>
+        <file>vectors/plugin_hover.svg</file>
+        <file>vectors/plugin_default.svg</file>
+        <file>vectors/resources_hover.svg</file>
+        <file>vectors/resources_default.svg</file>
+
+        <file>vectors/search_icon.svg</file>
+        <file>vectors/background.svg</file>
+        
+        <file>vectors/shear_fin_plate_connec.svg</file>
+        <file>vectors/shear_cleat_angle_connec.svg</file>
+        <file>vectors/end_plate_connec.svg</file>
+        <file>vectors/seated_angle_connec.svg</file>
+        <file>vectors/cover_plate_bolted_btb_moment_connec.svg</file>
+        <file>vectors/cover_plate_welded_btb_moment_connec.svg</file>
+        <file>vectors/end_plate_btb_moment_connec.svg</file>
+        <file>vectors/end_plate_btc_moment_connec.svg</file>
+        <file>vectors/cover_plate_bolted_ctc_moment_connec.svg</file>
+        <file>vectors/cover_plate_welded_ctc_moment_connec.svg</file>
+        <file>vectors/end_plate_ctc_moment_connec.svg</file>
+        <file>vectors/base_plate_connec.svg</file>
+        <file>vectors/bolted_tension_member.svg</file>
+        <file>vectors/welded_tension_member.svg</file>
+        <file>vectors/struts_in_trusses_compression_mem.svg</file>
+        <file>vectors/cantilever_beam_flexural_mem.svg</file>
+        <file>vectors/ss_beam_flexural_mem.svg</file>
+
         <file>backgrounds/splash_bg.jpg</file>
+
+        <file>images/default_icon.png</file>
+        <file>images/clicked_icon.png</file>
 
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>

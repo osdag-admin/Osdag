@@ -30,12 +30,7 @@ class OsdagLaunchScreen(object):
         self.AnimatedGIF = QSvgWidget(self.centralwidget)
         self.AnimatedGIF.setObjectName(u"SplashScreen_AnimatedGIF")
         self.AnimatedGIF.setGeometry(QRect(400, 150, 191, 181))
-        # self.AnimatedGIF.setScaledContents(True)
-        # gif = QMovie("resources/images/a.gif")
-        # self.AnimatedGIF.setMovie(gif)
-        # gif.setScaledSize(QSize(191, 181))
-        # # gif.start()
-
+        
 
         self.AestheticVector = QSvgWidget(self.centralwidget)
         self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")
@@ -44,36 +39,6 @@ class OsdagLaunchScreen(object):
         self.OsdagLogo = QSvgWidget(self.centralwidget)
         self.OsdagLogo.setObjectName(u"SplashScreen_OsdagLogo")
         self.OsdagLogo.setGeometry(QRect(20, 20, 81, 81))
-
-        # # ======== ANIMATION ========
-        # # Initial position setup (left of final position)
-        # self.OsdagLogo.move(20 - 30, 20)  # Start 50px left of final position
-        
-        # # Create opacity effect
-        # self.logo_opacity = QGraphicsOpacityEffect(self.OsdagLogo)
-        # self.OsdagLogo.setGraphicsEffect(self.logo_opacity)
-        # self.logo_opacity.setOpacity(0.0)  # Start fully transparent
-
-        # # Create position animation
-        # self.logo_pos_anim = QPropertyAnimation(self.OsdagLogo, b"pos")
-        # self.logo_pos_anim.setDuration(1000)  # 1 second duration
-        # self.logo_pos_anim.setStartValue(QPoint(20 - 30, 20))  # Start position
-        # self.logo_pos_anim.setEndValue(QPoint(20, 20))         # Final position
-
-        # # Create opacity animation
-        # self.logo_fade_anim = QPropertyAnimation(self.logo_opacity, b"opacity")
-        # self.logo_fade_anim.setDuration(1000)
-        # self.logo_fade_anim.setStartValue(0.0)
-        # self.logo_fade_anim.setEndValue(1.0)
-
-        # # Group animations to play simultaneously
-        # self.logo_anim_group = QParallelAnimationGroup()
-        # self.logo_anim_group.addAnimation(self.logo_pos_anim)
-        # self.logo_anim_group.addAnimation(self.logo_fade_anim)
-        
-        # # Start animation
-        # self.logo_anim_group.start()
-        # # ======== END OF ANIMATION========
 
         # ======== POP-IN ANIMATION ========
         # Set initial small size at the same position
@@ -92,7 +57,6 @@ class OsdagLaunchScreen(object):
         # Start animation
         self.logo_pop_anim.start()
         # ======== END OF ANIMATION ========
-
 
         self.OsdagLabel = QSvgWidget(self.centralwidget)
         self.OsdagLabel.setObjectName(u"SplashScreen_OsdagLabel")
@@ -166,9 +130,6 @@ class OsdagLaunchScreen(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("Splash Screen", u"Splash Screen", None))
-
-        # self.AnimatedGIF.setPixmap(QPixmap("resources/images/AnimatedGIF.png"))
-        # self.AnimatedGIF.setScaledContents(True)
 
         self.AnimatedGIF.load(":/vectors/AnimateComponent_back.svg")
 

@@ -181,56 +181,67 @@ class TopButton1(QPushButton):
     """
     Custom QPushButton that changes style on hover and provides a momentary
     color change on click, instead of a persistent selected state.
+    Maintains expanded state while submenu is open.
     """
-    # Define custom signals that this button will emit
-    button_activated = Signal(QPushButton) # Emits the button instance when activated
-    button_deactivated = Signal(QPushButton) # Emits the button instance when deactivated
-
     def __init__(self, black_icon_path, white_icon_path, label, parent=None):
         super().__init__(parent)
         self.black_icon_path = black_icon_path
         self.white_icon_path = white_icon_path
         self.label_text = label
         
+        # Internal flag to track if the mouse is currently hovering over the button
         self.is_hovering = False
-        self.is_active = False 
         
+        # Timer for reverting the style after a click
         self.click_animation_timer = QTimer(self)
         self.click_animation_timer.setSingleShot(True)
-        self.click_animation_timer.timeout.connect(self._reset_style_after_click)
+        self.click_animation_timer.timeout.connect(self._reset_after_click)
         
-        self.setMinimumSize(40, 40)
+        # Set up initial button properties
+        self.setMinimumSize(40, 40) # Initial collapsed size
         self.setMaximumHeight(40)
         self.setIconSize(QSize(20, 20))
         
+        # Initialize width animation for smooth expansion/collapse
         self.animation = QPropertyAnimation(self, b"minimumWidth")
-        self.animation.setDuration(200)
-        self.animation.setEasingCurve(QEasingCurve.OutCubic)
+        self.animation.setDuration(200) # milliseconds
+        self.animation.setEasingCurve(QEasingCurve.OutCubic) # Smooth transition
 
         self.animation_max_width = QPropertyAnimation(self, b"maximumWidth")
         self.animation_max_width.setDuration(200)
         self.animation_max_width.setEasingCurve(QEasingCurve.OutCubic)
 
+        # Start with the default black icon and no text
         self.setIcon(QIcon(self.black_icon_path))
         self.setText("")
+        # Apply the default style sheet initially
         self.setStyleSheet(self.default_style_sheet())
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.PointingHandCursor) # Indicate clickable element
         
+        # Enable hover tracking for enterEvent and leaveEvent
         self.setAttribute(Qt.WA_Hover, True)
 
     def default_style_sheet(self):
+        """
+        Returns the CSS for the button's default (unhovered, unclicked) state.
+        White background, black text/icon, standard border.
+        """
         return f"""
             QPushButton {{
                 background: #fff;
                 border: 1px solid {BORDER_COLOR};
                 color: #000;
-                font-size: 1px;
+                font-size: 1px; /* Text size is effectively 0 when collapsed */
                 padding: 10px;
                 text-align: center;
             }}
         """
 
     def hover_style_sheet(self):
+        """
+        Returns the CSS for the button's hover state.
+        Green background, white text/icon, slightly darker green border, larger font.
+        """
         return f"""
             QPushButton {{
                 background: {OSDAG_GREEN};
@@ -243,20 +254,11 @@ class TopButton1(QPushButton):
             }}
         """
 
-    def pressed_style_sheet(self):
-        return f"""
-            QPushButton {{
-                background: {OSDAG_GREEN_DARK};
-                border: 1px solid {OSDAG_GREEN_DARK};
-                color: #fff;
-                font-size: 14px;
-                font-weight: 600;
-                padding: 12px;
-                text-align: center;
-            }}
-        """
-
     def _apply_animated_style(self, style_sheet_func, target_width, label_text=None, icon_path=None):
+        """
+        Applies a given style sheet and animates the button's width.
+        Stops any ongoing animations before starting new ones.
+        """
         self.animation.stop()
         self.animation_max_width.stop()
 
@@ -267,62 +269,83 @@ class TopButton1(QPushButton):
         self.animation_max_width.setStartValue(current_width)
         self.animation_max_width.setEndValue(target_width)
         
+        # Apply the style sheet immediately
         self.setStyleSheet(style_sheet_func())
 
+        # Update icon and text if provided
         if icon_path:
             self.setIcon(QIcon(icon_path))
         if label_text is not None:
             self.setText(label_text)
 
+        # Start the width animations
         self.animation.start()
         self.animation_max_width.start()
 
     def enterEvent(self, event):
+        """
+        Handles mouse entering the button area.
+        Changes style to hover state if no click animation is active.
+        """
         self.is_hovering = True
-        if not self.is_active and not self.click_animation_timer.isActive():
+        # Apply hover style if not in a click animation or submenu is not open
+        if not self.click_animation_timer.isActive():
             self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
         super().enterEvent(event)
 
     def leaveEvent(self, event):
+        """
+        Handles mouse leaving the button area.
+        Reverts to default style unless submenu is open or click animation is active.
+        """
         self.is_hovering = False
-        if not self.is_active and not self.click_animation_timer.isActive():
-            self._apply_animated_style(self.default_style_sheet, 36, "", self.black_icon_path)
+        if not getattr(self, 'menu_is_open', False) and not self.click_animation_timer.isActive():
+            self._apply_animated_style(self.default_style_sheet, 40, "", self.black_icon_path)
         super().leaveEvent(event)
 
+    def set_submenu(self, menu):
+        """
+        Sets the submenu and connects its show/hide signals.
+        """
+        self.submenu = menu
+        self.menu_is_open = False
+        self.submenu.aboutToShow.connect(self._on_menu_show)
+        self.submenu.aboutToHide.connect(self._on_menu_hide)
+
+    def _on_menu_show(self):
+        """
+        Called when submenu is about to show. Sets flag to keep expanded state.
+        """
+        self.menu_is_open = True
+        self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
+
+    def _on_menu_hide(self):
+        """
+        Called when submenu is hidden. Reverts to collapsed state if not hovering.
+        """
+        self.menu_is_open = False
+        if not self.is_hovering:
+            self._apply_animated_style(self.default_style_sheet, 40, "", self.black_icon_path)
+
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self._apply_animated_style(self.pressed_style_sheet, 120, self.label_text, self.white_icon_path)
-            
-            self.click_animation_timer.start(100)
-
-            # Toggle the active state
-            self.is_active = not self.is_active
-            
-            # Emit the signals directly from this button instance
-            if self.is_active:
-                self.button_activated.emit(self) # Emitting from TopButton1
-            else:
-                self.button_deactivated.emit(self) # Emitting from TopButton1
-
+        """
+        Handles mouse press to trigger a momentary click animation.
+        Maintains expanded state for submenu buttons.
+        """
+        # Apply the click animation (momentary hover style)
+        self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
+        # Set a short timer to revert the style after the click effect
+        self.click_animation_timer.start(100) # 100ms for click feedback
         super().mousePressEvent(event)
 
-    def _reset_style_after_click(self):
-        if self.is_active:
-            self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
-        elif self.is_hovering:
-            self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
-        else:
-            self._apply_animated_style(self.default_style_sheet, 36, "", self.black_icon_path)
-
-    def set_active(self, active: bool):
-        if self.is_active == active:
-            return
-
-        self.is_active = active
-        if self.is_active:
+    def _reset_after_click(self):
+        """
+        Resets style after click animation, but keeps expanded state if submenu is open.
+        """
+        if getattr(self, 'menu_is_open', False) or self.is_hovering:
             self._apply_animated_style(self.hover_style_sheet, 120, self.label_text, self.white_icon_path)
         else:
-            self._apply_animated_style(self.default_style_sheet, 36, "", self.black_icon_path)
+            self._apply_animated_style(self.default_style_sheet, 40, "", self.black_icon_path)
 
 class DropDownButton(TopButton1):
     """
@@ -364,6 +387,8 @@ class DropDownButton(TopButton1):
             # Connect each action to a simple print statement for demonstration
             action.triggered.connect(lambda clicked, t=text: print(f"Resources -> {t} clicked"))
             self.menu.addAction(action)
+        # Set the menu to the button
+        self.set_submenu(self.menu)
 
     def mousePressEvent(self, event):
         """
@@ -372,5 +397,4 @@ class DropDownButton(TopButton1):
         """
         super().mousePressEvent(event) # Call parent's method for click animation
         # Use singleShot to ensure the menu pops up slightly after the click visual feedback
-        # This prevents the menu from interfering with the immediate style change
         QTimer.singleShot(50, lambda: self.menu.popup(self.mapToGlobal(QPoint(0, self.height()))))

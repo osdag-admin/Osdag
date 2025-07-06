@@ -6,16 +6,15 @@ from PySide6.QtWidgets import (
     QMessageBox, QMenuBar, QMenu
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent
+from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent, Signal
 from PySide6.QtGui import QIcon, QFont, QPixmap, QGuiApplication, QKeySequence, QAction
 
 from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
+from osdag_gui.ui.components.input_dock import InputDock
 
 class CustomWindow(QWidget):
     def __init__(self, title: str):
         super().__init__()
-        self.setWindowTitle(title)
-
         self.y = 0
 
         screen = QGuiApplication.primaryScreen()
@@ -109,6 +108,8 @@ class CustomWindow(QWidget):
         self.sidebar.installEventFilter(self) # Install event filter for mouse events
         self.sidebar.raise_() # Ensure sidebar is always on top of other widgets
 
+        self.handle_add_tab(title)
+
     def resizeEvent(self, event):
         # When the main window resizes, resize the sidebar to match its height
         self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
@@ -179,9 +180,8 @@ class CustomWindow(QWidget):
         # QTabBar
         self.tab_bar = QTabBar()
         self.tab_bar.setExpanding(False)
-        self.tab_bar.addTab(title)
         self.tab_bar.setTabsClosable(True)
-        self.tab_bar.setMovable(True)
+        self.tab_bar.setMovable(False)
         self.tab_bar.tabCloseRequested.connect(self.close_tab_bar_tab)
         # Custom tab style
         self.tab_bar.setStyleSheet('''
@@ -222,11 +222,6 @@ class CustomWindow(QWidget):
         # Stretch to push buttons to the right
         top_h_layout.addStretch(1)
 
-        central_h_layout = QHBoxLayout()
-    
-
-        main_v_layout.addLayout(central_h_layout)
-
         # Helper function to create a styled button
         def create_button(icon_svg, is_close=False):
             btn = QPushButton()
@@ -257,7 +252,38 @@ class CustomWindow(QWidget):
                 btn.setObjectName("close_button")
             return btn
 
+        class ClickableSvgWidget(QSvgWidget):
+            clicked = Signal()  # Define a custom clicked signal
+            def __init__(self, parent=None):
+                super().__init__(parent)
+                self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+            def mousePressEvent(self, event):
+                if event.button() == Qt.MouseButton.LeftButton:
+                    self.clicked.emit()  # Emit the clicked signal on left-click
+                super().mousePressEvent(event)
+
         # Control buttons
+        control_button_layout = QHBoxLayout()
+        control_button_layout.setSpacing(10)
+        control_button_layout.setContentsMargins(5,5,5,5)
+
+        self.input_dock_control = ClickableSvgWidget()
+        self.input_dock_control.load(":/vectors/input_dock_active.svg")
+        self.input_dock_control.setFixedSize(18, 18)
+        self.input_dock_control.clicked.connect(self.input_dock_toggle)
+        self.input_dock_active = True
+        control_button_layout.addWidget(self.input_dock_control)
+
+        self.output_dock_control = ClickableSvgWidget()
+        self.output_dock_control.load(":/vectors/output_dock_active.svg")
+        self.output_dock_control.setFixedSize(18, 18)
+        self.output_dock_control.clicked.connect(self.output_dock_toggle)
+        self.output_dock_active = True
+        control_button_layout.addWidget(self.output_dock_control)
+
+        top_h_layout.addLayout(control_button_layout)
+
         self.minimize_button = create_button(":/vectors/window_minimize.svg")
         self.minimize_button.clicked.connect(self.showMinimized)
         top_h_layout.addWidget(self.minimize_button)
@@ -291,12 +317,13 @@ class CustomWindow(QWidget):
         self.tab_widget = QTabWidget()
         self.tab_widget.tabBar().hide()
         self.tab_widget.setTabsClosable(True) # Allow closing tabs
-        self.tab_widget.setMovable(True) # Allow reordering tabs
+        self.tab_widget.setMovable(False) # Allow reordering tabs
         self.tab_widget.setStyleSheet("""
             QTabWidget {
                 border: 1px solid #F4F4F4;
             }
         """)
+        self.tab_widget_content = []
         self.tab_widget.tabCloseRequested.connect(self.close_tab)
         center_v_layout.addWidget(self.tab_widget)
 
@@ -311,6 +338,22 @@ class CustomWindow(QWidget):
         if self.tab_bar.count() > 0:
             self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
 
+    def input_dock_toggle(self):
+        self.tab_widget_content[self.tab_bar.currentIndex()][1].toggle_input_dock()
+        self.input_dock_active = not self.input_dock_active
+        if self.input_dock_active:
+            self.input_dock_control.load(":/vectors/input_dock_active.svg")
+        else:
+            self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+        
+    def output_dock_toggle(self):
+        # self.tab_widget_content[self.tab_bar.currentIndex()][1].toggle_input_dock()
+        self.output_dock_active = not self.output_dock_active
+        if self.output_dock_active:
+            self.output_dock_control.load(":/vectors/output_dock_active.svg")
+        else:
+            self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+        
     def create_menu_bar_items(self):
         """
         Creates the menu bar items (menus and actions) for CustomWindow.
@@ -523,13 +566,20 @@ class CustomWindow(QWidget):
 
     def add_new_tab(self, content_text="New Tab Content"):
         """Helper to add a new tab to QTabWidget."""
-        new_tab_widget = QWidget()
-        tab_layout = QVBoxLayout(new_tab_widget)
-        tab_label = QLabel(content_text)
-        tab_label.setAlignment(Qt.AlignCenter)
-        tab_label.setFont(QFont("Calibri", 16))
-        tab_layout.addWidget(tab_label)
-        self.tab_widget.addTab(new_tab_widget, f"Tab {self.current_tab_index + 1}")
+        # ---------------------------
+        body_widget = QWidget()
+        tab_layout = QHBoxLayout(body_widget)
+        tab_layout.setContentsMargins(0,0,0,0)
+        tab_layout.setSpacing(0)
+
+        input_dock = InputDock()
+        tab_layout.addWidget(input_dock, 15)
+
+        tab_layout.addStretch(40)
+
+        self.tab_widget_content.append([body_widget, input_dock])
+        # --------------------------
+        self.tab_widget.addTab(body_widget, f"Tab {self.current_tab_index + 1}")
 
     def handle_add_tab(self, title):
         """Handles the 'Add New Tab' button click."""
@@ -549,6 +599,7 @@ class CustomWindow(QWidget):
         if self.tab_widget.count() > 1:
             self.tab_widget.removeTab(index)
             self.tab_bar.removeTab(index)
+            self.tab_widget_content.pop(index)
             # Adjust current index if the closed tab was the last one
             if self.tab_widget.currentIndex() == -1 and self.tab_widget.count() > 0:
                 self.tab_widget.setCurrentIndex(self.tab_widget.count() - 1)

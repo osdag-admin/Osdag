@@ -48,6 +48,15 @@
 
         <file>images/default_icon.png</file>
         <file>images/clicked_icon.png</file>
+        <file>images/colF2.png</file>
+        <file>images/colW1.png</file>
+        <file>images/fin_beam_beam.png</file>
+        <file>images/down_arrow.png</file>
+        <file>vectors/design_button.svg</file>
+        <file>vectors/input_dock_active.svg</file>
+        <file>vectors/input_dock_inactive.svg</file>
+        <file>vectors/output_dock_active.svg</file>
+        <file>vectors/output_dock_inactive.svg</file>
 
         <file>vectors/default_icon.svg</file>
         <file>vectors/clicked_icon.svg</file>

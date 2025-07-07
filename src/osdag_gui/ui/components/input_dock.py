@@ -15,6 +15,14 @@ class NoScrollComboBox(QComboBox):
     def wheelEvent(self, event):
         event.ignore()  # Prevent changing selection on scroll
 
+def right_aligned_widget(widget):
+    container = QWidget()
+    layout = QHBoxLayout(container)
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.addStretch()
+    layout.addWidget(widget)
+    return container
+
 def apply_dropdown_style(widget, arrow_down_path):
     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     widget.setFixedWidth(150)
@@ -79,6 +87,7 @@ def apply_dropdown_style(widget, arrow_down_path):
             font-weight: normal;
         }
         """)
+
 def create_connecting_members_group(apply_style_func, arrow_path):
     connectivity_configs = {
         "Column Flange-Beam Web": {
@@ -89,7 +98,22 @@ def create_connecting_members_group(apply_style_func, arrow_path):
                 {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
             ]
         },
-        # ... (other configurations remain the same)
+        "Column Web-Beam Web": {
+            "image": ":/images/colW1.png",
+            "fields": [
+                {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
+                {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
+            ]
+        },
+        "Beam-Beam": {
+            "image": ":/images/fin_beam_beam.png",
+            "fields": [
+                {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                {"label": "Secondary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
+            ]
+        }
     }
 
     group = QGroupBox("Connecting Members")
@@ -110,7 +134,7 @@ def create_connecting_members_group(apply_style_func, arrow_path):
         }
     """)
     layout = QVBoxLayout(group)
-    layout.setSpacing(10)
+    layout.setSpacing(5)
     layout.setContentsMargins(4, 4, 4, 4)
 
     conn_form = QFormLayout()
@@ -123,7 +147,7 @@ def create_connecting_members_group(apply_style_func, arrow_path):
     connectivity_cb = NoScrollComboBox()
     connectivity_cb.addItems(list(connectivity_configs.keys()))
     apply_style_func(connectivity_cb, arrow_path)
-    conn_form.addRow("Connectivity *       ", connectivity_cb)
+    conn_form.addRow("Connectivity *", right_aligned_widget(connectivity_cb))
     layout.addLayout(conn_form)
 
     details_widget = QWidget()
@@ -138,7 +162,7 @@ def create_connecting_members_group(apply_style_func, arrow_path):
         widget = QWidget()
         widget_layout = QVBoxLayout(widget)
         widget_layout.setContentsMargins(5, 5, 5, 5)
-        widget_layout.setSpacing(10)
+        widget_layout.setSpacing(5)
 
         img_label = QLabel()
         img_path = config["image"]
@@ -158,7 +182,7 @@ def create_connecting_members_group(apply_style_func, arrow_path):
             cb = NoScrollComboBox()
             cb.addItems(field["items"])
             apply_style_func(cb, arrow_path)
-            form.addRow(field["label"], cb)
+            form.addRow(field["label"], right_aligned_widget(cb))
             all_comboboxes.append(cb)
 
         widget_layout.addLayout(form)
@@ -215,43 +239,16 @@ def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spa
                 widget.setPlaceholderText(field["placeholder"])
         
         apply_style_func(widget, arrow_path)
-        form_layout.addRow(label, widget)
+        form_layout.addRow(label, right_aligned_widget(widget))
         all_widgets.append(widget)
     
     group.setLayout(form_layout)
     return group, all_widgets
 
-class SplitIconButton(QPushButton):
-    def __init__(self, filled_left=False, parent=None):
-        super().__init__(parent)
-        self.setFixedSize(36, 36)
-        self.setStyleSheet("border: none; background: transparent;")
-        self.update_icon(filled_left)
-
-    def update_icon(self, filled_left):
-        pixmap = QPixmap(36, 36)
-        pixmap.fill(Qt.transparent)
-        painter = QPainter(pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        painter.setPen(QColor("#AAAAAA"))
-        painter.setBrush(Qt.NoBrush)
-        painter.drawRoundedRect(3, 3, 30, 30, 6, 6)
-
-        if filled_left:
-            painter.fillRect(4, 4, 14, 28, QColor("black"))
-
-        painter.setPen(QColor("#AAAAAA"))
-        painter.drawLine(18, 6, 18, 30)
-
-        painter.end()
-        self.setIcon(QIcon(pixmap))
-        self.setIconSize(QSize(36, 36))
-
 class InputDock(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
-
+        self.parent = parent
         self.setStyleSheet("background: transparent;")
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -329,16 +326,21 @@ class InputDock(QWidget):
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         # Modern scrollbar style
         scroll_area.setStyleSheet('''
+            QScrollArea {
+                border: 1px solid #EFEFEC;
+                background-color: white;
+                padding: 3px;
+            }
             QScrollBar:vertical {
                 background: #C3E05D;
                 width: 8px;
-                margin: 4px 2px 4px 2px;
-                border-radius: 4px;
+                margin: 0px 0px 0px 3px;
+                border-radius: 2px;
             }
             QScrollBar::handle:vertical {
                 background: #90AF13;
                 min-height: 30px;
-                border-radius: 4px;
+                border-radius: 2px;
             }
             QScrollBar::handle:vertical:hover {
                 background: #6c8408;
@@ -353,7 +355,7 @@ class InputDock(QWidget):
         scroll_content = QWidget()
         scroll_layout = QVBoxLayout(scroll_content)
         scroll_layout.setContentsMargins(0, 0, 0, 0)
-        scroll_layout.setSpacing(10)
+        scroll_layout.setSpacing(5)
 
         arrow_path = ":/images/down_arrow.png"
         connecting_members_group = create_connecting_members_group(apply_dropdown_style, arrow_path)
@@ -428,6 +430,7 @@ class InputDock(QWidget):
 
     def toggle_input_dock(self):
         is_collapsing = self.left_container.width() > 0
+        self.parent.input_dock_icon_toggle()
         # Define a fixed expanded width that's suitable for your content
         EXPANDED_WIDTH = 340  # or whatever width works best for your comboboxes
 

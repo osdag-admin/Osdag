@@ -11,6 +11,7 @@ from PySide6.QtGui import QIcon, QFont, QPixmap, QGuiApplication, QKeySequence, 
 
 from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
 from osdag_gui.ui.components.input_dock import InputDock
+from osdag_gui.ui.components.output_dock import OutputDock
 
 class CustomWindow(QWidget):
     def __init__(self, title: str):
@@ -276,10 +277,10 @@ class CustomWindow(QWidget):
         control_button_layout.addWidget(self.input_dock_control)
 
         self.output_dock_control = ClickableSvgWidget()
-        self.output_dock_control.load(":/vectors/output_dock_active.svg")
+        self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
         self.output_dock_control.setFixedSize(18, 18)
         self.output_dock_control.clicked.connect(self.output_dock_toggle)
-        self.output_dock_active = True
+        self.output_dock_active = False
         control_button_layout.addWidget(self.output_dock_control)
 
         top_h_layout.addLayout(control_button_layout)
@@ -331,8 +332,11 @@ class CustomWindow(QWidget):
         main_v_layout.addLayout(center_v_layout)
 
         # Connect QTabBar to QTabWidget
-        self.tab_bar.currentChanged.connect(self.tab_widget.setCurrentIndex)
-        self.tab_widget.currentChanged.connect(self.tab_bar.setCurrentIndex)
+        # self.tab_bar.currentChanged.connect(self.tab_widget.setCurrentIndex) # Removed, handled by handle_tab_change
+        # self.tab_widget.currentChanged.connect(self.tab_bar.setCurrentIndex)
+
+        # Connect the QTabBar to custom handler
+        self.tab_bar.currentChanged.connect(self.handle_tab_change)
 
         # Ensure initial synchronization
         if self.tab_bar.count() > 0:
@@ -340,15 +344,21 @@ class CustomWindow(QWidget):
 
     def input_dock_toggle(self):
         self.tab_widget_content[self.tab_bar.currentIndex()][1].toggle_input_dock()
-        self.input_dock_active = not self.input_dock_active
+
+    def input_dock_icon_toggle(self):
+        self.tab_widget_content[self.tab_bar.currentIndex()][3] = not self.tab_widget_content[self.tab_bar.currentIndex()][3]
+        self.input_dock_active = self.tab_widget_content[self.tab_bar.currentIndex()][3]
         if self.input_dock_active:
             self.input_dock_control.load(":/vectors/input_dock_active.svg")
         else:
             self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
         
     def output_dock_toggle(self):
-        # self.tab_widget_content[self.tab_bar.currentIndex()][1].toggle_input_dock()
-        self.output_dock_active = not self.output_dock_active
+        self.tab_widget_content[self.tab_bar.currentIndex()][2].toggle_output_dock()
+
+    def output_dock_icon_toggle(self):
+        self.tab_widget_content[self.tab_bar.currentIndex()][4] = not self.tab_widget_content[self.tab_bar.currentIndex()][4]
+        self.output_dock_active = self.tab_widget_content[self.tab_bar.currentIndex()][4]
         if self.output_dock_active:
             self.output_dock_control.load(":/vectors/output_dock_active.svg")
         else:
@@ -564,7 +574,7 @@ class CustomWindow(QWidget):
             self.sidebar.move(-self.sidebar.width() + 12, top_offset)
 
 
-    def add_new_tab(self, content_text="New Tab Content"):
+    def add_new_tab(self, content_text):
         """Helper to add a new tab to QTabWidget."""
         # ---------------------------
         body_widget = QWidget()
@@ -572,28 +582,60 @@ class CustomWindow(QWidget):
         tab_layout.setContentsMargins(0,0,0,0)
         tab_layout.setSpacing(0)
 
-        input_dock = InputDock()
-        tab_layout.addWidget(input_dock, 15)
+        input_dock = InputDock(parent=self)
+        tab_layout.addWidget(input_dock)
 
-        tab_layout.addStretch(40)
+        tab_layout.addStretch(1)
 
-        self.tab_widget_content.append([body_widget, input_dock])
-        # --------------------------
+        output_dock = OutputDock(parent=self)
+        # Initially it will bw hidden
+        tab_layout.addWidget(output_dock)
+                                                               # input dock active, output dock active
+        self.tab_widget_content.append([body_widget, input_dock, output_dock, True, False])    
+        # ----------------------------
         self.tab_widget.addTab(body_widget, f"Tab {self.current_tab_index + 1}")
 
     def handle_add_tab(self, title):
         """Handles the 'Add New Tab' button click."""
         self.current_tab_index += 1
         self.tab_bar.addTab(title) # Add to tab bar
-        self.add_new_tab(f"Content for {title}") # Add to tab widget
-
         # Set the newly added tab as current
+        self.add_new_tab(f"Content for {title}") # Add to tab widget
+        
         new_index = self.tab_bar.count() - 1
         self.tab_bar.setCurrentIndex(new_index)
         self.tab_widget.setCurrentIndex(new_index)
+        self.input_dock_active = True
+        self.output_dock_active = False
+        self.update_docking_icons(self.tab_widget_content[new_index][3], self.tab_widget_content[new_index][4])
+        
         self.sidebar.raise_() # Ensure sidebar stays on top after new tab addition
 
+    def handle_tab_change(self, index):
+        # 1. Switch the QTabWidget to the new tab
+        self.tab_widget.setCurrentIndex(index)
+        # self.tab_bar.setCurrentIndex(index)  # Removed, handled by tab_widget.currentChanged sync
 
+        # 2. Update dock icons based on the new tab's state
+        if index < len(self.tab_widget_content):
+            self.update_docking_icons(self.tab_widget_content[index][3], self.tab_widget_content[index][4])
+    
+    def update_docking_icons(self, input_active, output_active):
+        # Update input dock icon
+            if input_active != self.input_dock_active:
+                self.input_dock_active = not self.input_dock_active
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+                            
+            if output_active != self.output_dock_active:
+                self.output_dock_active = not self.output_dock_active
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+                
     def close_tab(self, index):
         """Handles closing of tabs."""
         if self.tab_widget.count() > 1:

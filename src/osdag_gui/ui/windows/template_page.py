@@ -16,7 +16,6 @@ from osdag_gui.ui.components.output_dock import OutputDock
 class CustomWindow(QWidget):
     def __init__(self, title: str):
         super().__init__()
-        self.y = 0
 
         screen = QGuiApplication.primaryScreen()
         screen_size = screen.availableGeometry()
@@ -119,9 +118,9 @@ class CustomWindow(QWidget):
         # This check prevents it from jumping if it's already fully out.
         # Adjusted Y based on top bar elements (top_h_layout and menu_bar)
         top_offset = self.menu_bar.height() + self.tab_bar.height()
-        self.y = top_offset
+        # self.y = top_offset
         if self.sidebar.x() < 0: # If it's mostly hidden
-            self.sidebar.move(-self.sidebar.width() + 12, self.y) # Re-position with updated width
+            self.sidebar.move(-self.sidebar.width() + 12, top_offset) # Re-position with updated width
 
         # Ensure the sidebar stays on top after resize
         self.sidebar.raise_()
@@ -142,7 +141,7 @@ class CustomWindow(QWidget):
         end_x = 0
         # Ensure the start value is the current geometry to animate from current position
         self.sidebar_animation.setStartValue(self.sidebar.geometry())
-        self.sidebar_animation.setEndValue(QRect(end_x, self.y, self.sidebar.width(), self.sidebar.height()))
+        self.sidebar_animation.setEndValue(QRect(end_x, self.y(), self.sidebar.width(), self.sidebar.height()))
         self.sidebar_animation.start()
         self.sidebar.raise_() # Keep sidebar on top during and after animation
 
@@ -151,7 +150,7 @@ class CustomWindow(QWidget):
         self.sidebar_animation.stop()
         end_x = -self.sidebar.width() + 12 # Use 12px for consistency with initial move
         self.sidebar_animation.setStartValue(self.sidebar.geometry())
-        self.sidebar_animation.setEndValue(QRect(end_x, self.y, self.sidebar.width(), self.sidebar.height()))
+        self.sidebar_animation.setEndValue(QRect(end_x, self.y(), self.sidebar.width(), self.sidebar.height()))
         self.sidebar_animation.start()
 
     def init_ui(self, title: str):

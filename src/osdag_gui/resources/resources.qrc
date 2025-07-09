@@ -57,6 +57,8 @@
         <file>vectors/input_dock_inactive.svg</file>
         <file>vectors/output_dock_active.svg</file>
         <file>vectors/output_dock_inactive.svg</file>
+        <file>vectors/logs_dock_active.svg</file>
+        <file>vectors/logs_dock_inactive.svg</file>
 
         <file>vectors/default_icon.svg</file>
         <file>vectors/clicked_icon.svg</file>

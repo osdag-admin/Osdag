@@ -312,43 +312,4 @@ class OutputDock(QWidget):
     def is_panel_visible(self):
         return self.panel_visible
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Central Grey with White 30% Panel")
-
-        central_widget = QWidget()
-        central_widget.setObjectName("central_widget")
-        self.setCentralWidget(central_widget)
-        central_widget.setStyleSheet("""
-                #central_widget {
-                    background-color: #FFFFFF;
-                }
-        """)
-
-        layout = QHBoxLayout(central_widget)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        # Add stretch (main content placeholder)
-        layout.addStretch()
-
-        # OutputDock on the right
-        self.output_dock = OutputDock()
-        layout.addWidget(self.output_dock)
-
-        # Connect split button
-        self.split_btn.clicked.connect(self.toggle_output_dock)
-        self.update_button_state(self.output_dock.is_panel_visible())
-
-        self.showMaximized()
-
-    def toggle_output_dock(self):
-        parent_width = self.centralWidget().width()
-        self.output_dock.animate_panel(parent_width, self.update_button_state)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.output_dock.resize_to_parent(self.centralWidget().width())
-
 

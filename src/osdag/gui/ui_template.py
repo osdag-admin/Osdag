@@ -3,8 +3,6 @@ import yaml
 import shutil
 import time
 import pandas as pd
-import subprocess
-import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -2176,17 +2174,8 @@ class Window(QMainWindow):
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
         shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
 
-    # def output_button_connect(self, main, button_list, b):
-    #     b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
     def output_button_connect(self, main, button_list, b):
-        b.clicked.connect(lambda: self.run_spacing_script())
-
-    def run_spacing_script(self):
-        script_path = os.path.join(os.path.dirname(__file__), "spacing.py")
-        if os.path.exists(script_path):
-            subprocess.Popen([sys.executable, script_path], shell=True)
-        else:
-            print("spacing.py not found!")
+        b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
     def output_button_dialog(self, main, button_list, button):
 
@@ -2737,7 +2726,7 @@ class Window(QMainWindow):
             self.modelTab.raise_()
 
         return display, start_display
-
+    
     def save_cadImages(self,main):
         """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
 

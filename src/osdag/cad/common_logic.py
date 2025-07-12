@@ -142,6 +142,9 @@ from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 # from OCC.Display.OCCViewer import V3d_XposYnegZneg
 from OCC.Core.TNaming import tnaming
 import multiprocessing
+from OCC.Core.Geom import Geom_CartesianPoint
+from OCC.Core.AIS import AIS_Point
+from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData
@@ -580,6 +583,17 @@ class CommonDesignLogic(object):
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
+            print("BOLT DETAILS")
+            print("bolt:", A.bolt)
+            print("bolt2:", A.bolt2)
+            print("spting_leg.bolts_one_line:", A.spting_leg.bolts_one_line)
+            print("spting_leg.bolt_line:", A.spting_leg.bolt_line)
+            print("total_bolts_spting:", A.total_bolts_spting)
+            print("get_bolt_PC:", A.get_bolt_PC)
+            print("bolt_values:", A.bolt_values)
+            print("END BOLT DETAILS")
+
+
         elif self.connection == KEY_DISP_SEATED_ANGLE:
             angle = Angle(L=A.seated_angle.width, A=A.seated.leg_a_length, B=A.seated.leg_b_length,
                           T=A.seated.thickness, R1=A.seated.root_radius, R2=A.seated.toe_radius)
@@ -942,6 +956,28 @@ class CommonDesignLogic(object):
         :return: creates CAD model
         """
         BCE = self.module_class
+
+
+
+        print("bolt_diameter_provided:", BCE.bolt_diameter_provided)
+        print("bolt_grade_provided:", BCE.bolt_grade_provided)
+        print("bolt_numbers:", BCE.bolt_numbers)
+        print("BCE.ep_height_provided:", BCE.ep_height_provided)
+        print("BCE.ep_width_provided:", BCE.ep_width_provided)
+
+        print("BCE.edge_distance_provided:", BCE.edge_distance_provided)
+        print("BCE.end_distance_provided:", BCE.end_distance_provided)
+        print("BCE.endplate_type:", BCE.endplate_type)
+        print("BCE.ep_height_max:", BCE.ep_height_max)
+        print("BCE.epsilon_beam:", BCE.epsilon_beam)
+        print("BCE.plate_thickness:", BCE.plate_thickness)
+
+
+
+
+
+
+
 
         column_tw = float(BCE.column_tw)
         column_T = float(BCE.column_tf)

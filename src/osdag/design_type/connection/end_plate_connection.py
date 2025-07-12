@@ -1365,7 +1365,7 @@ class EndPlateConnection(ShearConnection):
 
         return bolt_details
 
-    def spacing(self, flag):
+    def spacing(self, status):
 
         spacing = []
 
@@ -1376,16 +1376,16 @@ class EndPlateConnection(ShearConnection):
                [str(files("osdag.data.ResourceFiles.images").joinpath("ep_shear.png")), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
-        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if flag else '')
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if status else '')
         spacing.append(t9)
 
-        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.output[0][15] if flag else '')
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.output[0][15] if status else '')
         spacing.append(t10)
 
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.output[0][14] if flag else '')
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.output[0][14] if status else '')
         spacing.append(t11)
 
-        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.output[0][16] if flag else '')
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.output[0][16] if status else '')
         spacing.append(t12)
 
         return spacing

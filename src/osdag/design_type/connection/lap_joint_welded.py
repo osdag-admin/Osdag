@@ -370,86 +370,129 @@ class LapJointWelded(MomentConnection):
 
     def calculate_weld_strength(self, design_dictionary):
         logger.info(": ============== Weld Strength Calculation ==============")
-        self.effective_throat_thickness = 0.7 * self.weld_size
+        # IS800:2007 Cl.10.5.3.2: Throat thickness a = K * s, where K depends on angle
+        # For fillet welds, K = sin(θ), θ = weld angle (default 45° if not specified)
+        weld_angle = design_dictionary.get('weld_angle', 45)
+        if not isinstance(weld_angle, (int, float)):
+            try:
+                weld_angle = float(weld_angle)
+            except Exception:
+                weld_angle = 45
+        # K = sin(angle)
+        K = round(math.sin(math.radians(weld_angle)), 3)
+        if K <= 0:
+            logger.error(f": Invalid weld angle {weld_angle}°. Using default K=0.7 (45°)")
+            K = 0.7
+        self.effective_throat_thickness = K * self.weld_size  # Cl.10.5.3.2
+        logger.info(f": Effective throat thickness (a) = {self.effective_throat_thickness:.2f} mm [Cl.10.5.3.2, K={K}, θ={weld_angle}°]")
         self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
-        self.gamma_mw = 1.25 if design_dictionary[KEY_DP_WELD_TYPE] == "Shop weld" else 1.50
-        self.weld_design_strength = (self.fu * self.effective_throat_thickness) / (math.sqrt(3) * self.gamma_mw)
-        self.parent_design_strength = 0.6 * self.fu * self.effective_throat_thickness / self.gamma_mw
+        self.gamma_mw = 1.25 if design_dictionary[KEY_DP_WELD_TYPE] == "Shop weld" else 1.50  # Cl.10.5.7.1
+        self.weld_design_strength = (self.fu * self.effective_throat_thickness) / (math.sqrt(3) * self.gamma_mw)  # Cl.10.5.7.1
+        self.parent_design_strength = 0.6 * self.fu * self.effective_throat_thickness / self.gamma_mw  # Cl.10.5.7.2
         self.fillet_weld_design_strength = min(self.weld_design_strength, self.parent_design_strength)
-        logger.info(f": Effective throat thickness = {self.effective_throat_thickness:.2f} mm")
-        logger.info(f": Design strength of fillet weld = {self.fillet_weld_design_strength:.2f} N/mm^2")
+        logger.info(f": Design strength of fillet weld = {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]")
+        # Weld stress check (Cl.10.5.7):
+        self.weld_stress = self.tensile_force / (2 * self.effective_throat_thickness * self.l_eff) if hasattr(self, 'l_eff') and self.l_eff else 0
+        if self.weld_stress > self.fillet_weld_design_strength:
+            logger.error(f": Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]")
+            self.design_status = False
+            raise ValueError("Weld stress exceeds design strength.")
 
     def calculate_weld_length(self):
         logger.info(": ============== Weld Length Calculation ==============")
-        self.weld_length_effective = self.tensile_force / (2 * self.fillet_weld_design_strength)
-        self.leff_min = max(4 * self.weld_size, 40)
-        self.leff_max = 70 * self.weld_size
-
-        logger.info(f": Required effective weld length = {self.weld_length_effective:.2f} mm")
-        logger.info(f": Minimum effective weld length = {self.leff_min} mm [Cl. 10.5.4]")
-
-        if self.weld_length_effective < self.leff_min:
+        # Required effective weld length (Cl.10.5.4.1)
+        self.weld_length_required = self.tensile_force / (2 * self.fillet_weld_design_strength)
+        self.leff_min = max(4 * self.weld_size, 40)  # Cl.10.5.4.1
+        self.leff_max = 70 * self.weld_size  # Cl.10.5.4.1
+        logger.info(f": Required effective weld length = {self.weld_length_required:.2f} mm")
+        logger.info(f": Minimum effective weld length = {self.leff_min} mm [Cl.10.5.4.1]")
+        logger.info(f": Maximum effective weld length = {self.leff_max} mm [Cl.10.5.4.1]")
+        # Check min/max
+        if self.weld_length_required < self.leff_min:
             self.l_eff = self.leff_min
-            logger.warning(f": Required length is less than minimum, using l_eff = {self.l_eff} mm")
-        elif self.weld_length_effective > self.leff_max:
-            logger.error(": Required weld length exceeds maximum allowed. Increase weld size.")
+            logger.warning(f": Required length is less than minimum, using l_eff = {self.l_eff} mm [Cl.10.5.4.1]")
+        elif self.weld_length_required > self.leff_max:
+            logger.error(": Required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
             self.design_status = False
-            return
+            raise ValueError("Required weld length exceeds maximum allowed.")
         else:
-            self.l_eff = self.weld_length_effective
+            self.l_eff = self.weld_length_required
             logger.info(": Required weld length is within limits (Pass)")
+        # Detailing: Minimum spacing between parallel fillet welds (Cl.10.5.4.2)
+        # Not implemented here, but should be checked in GUI or input validation
 
     def check_long_joint(self):
         logger.info(": ============== Long Joint Check ==============")
+        # IS800:2007 Cl.10.5.7.3: Long joint reduction factor
         self.beta_lw = 1.0
         if self.l_eff > 150 * self.effective_throat_thickness:
             self.beta_lw = 1.2 - 0.2 * (self.l_eff / (150 * self.effective_throat_thickness))
             self.beta_lw = max(0.6, min(self.beta_lw, 1.0))
-            logger.info(f": Joint is long, reduction factor beta_lw = {self.beta_lw:.3f} [Cl. 10.5.7.3]")
+            logger.info(f": Joint is long, reduction factor beta_lw = {self.beta_lw:.3f} [Cl.10.5.7.3]")
         else:
             logger.info(": No reduction for long joint required (Pass)")
-
-        l_req_modified = self.weld_length_effective / self.beta_lw
-        if l_req_modified > self.leff_max:
-            logger.error(": Modified required weld length exceeds maximum. Increase weld size.")
+        # Modified required length
+        l_req_modified = self.l_eff / self.beta_lw
+        if l_req_modified < self.leff_min:
+            logger.warning(f": Modified required weld length {l_req_modified:.2f} mm is less than minimum effective length {self.leff_min} mm [Cl.10.5.4.1]")
+            self.l_eff = self.leff_min
+        elif l_req_modified > self.leff_max:
+            logger.error(": Modified required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
             self.design_status = False
-            return
-
-        self.l_eff = l_req_modified
-        self.end_return_length = max(2 * self.weld_size, 12)
+            raise ValueError("Modified required weld length exceeds maximum allowed.")
+        else:
+            self.l_eff = l_req_modified
+        # End return length (Cl.10.5.4.5): min(2*s, 12mm)
+        self.end_return_length = max(2 * self.weld_size, 12)  # Cl.10.5.4.5
+        logger.info(f": End return length = {self.end_return_length} mm [Cl.10.5.4.5]")
+        # Overlap length (Cl.10.5.4.3): min overlap = 4*s or 40mm, whichever is more
+        self.overlap_length = max(4 * self.weld_size, 40)
+        logger.info(f": Overlap length = {self.overlap_length} mm [Cl.10.5.4.3]")
         self.connection_length = self.l_eff + 2 * self.end_return_length
-        self.overlap_length = self.connection_length
+        # Design capacity (Cl.10.5.7.3):
         self.design_capacity = 2 * self.l_eff * self.fillet_weld_design_strength * self.beta_lw
+        # Weld stress check (Cl.10.5.7):
+        self.weld_stress = self.tensile_force / (2 * self.effective_throat_thickness * self.l_eff) if self.l_eff else 0
+        if self.weld_stress > self.fillet_weld_design_strength:
+            logger.error(f": Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]")
+            self.design_status = False
+            raise ValueError("Weld stress exceeds design strength.")
         self.utilization_ratios['weld'] = self.tensile_force / self.design_capacity if self.design_capacity > 0 else float('inf')
         logger.info(f": Provided effective length = {self.l_eff:.2f} mm")
         logger.info(f": Design capacity of weld = {self.design_capacity/1000:.2f} kN")
 
     def check_base_metal_strength(self, design_dictionary):
         logger.info(": ============== Base Metal Strength Check ==============")
+        # IS800:2007 Cl.6.2.2, 6.2.3, 6.3 (shear lag)
         Tmin = min(float(design_dictionary[KEY_PLATE1_THICKNESS]), float(design_dictionary[KEY_PLATE2_THICKNESS]))
         self.A_g = Tmin * self.width
         self.gamma_m0 = 1.10
         self.gamma_m1 = 1.25
-        T_dg = self.A_g * self.plate1.fy / self.gamma_m0
-        T_dn = 0.9 * self.A_g * self.plate1.fu / self.gamma_m1
+        # Shear lag factor (Cl.6.3.3):
+        # For lap joints, net section efficiency = 0.7 (if not otherwise calculated)
+        shear_lag_factor = 0.7
+        T_dg = self.A_g * self.plate1.fy / self.gamma_m0  # Gross section yielding (Cl.6.2.2)
+        T_dn = 0.9 * self.A_g * self.plate1.fu * shear_lag_factor / self.gamma_m1  # Net section rupture (Cl.6.2.3, 6.3.3)
         self.T_db = min(T_dg, T_dn)
         self.utilization_ratios['base_metal'] = self.tensile_force / self.T_db if self.T_db > 0 else float('inf')
-        logger.info(f": Design strength of plate = {self.T_db/1000:.2f} kN [Cl. 6.2]")
+        logger.info(f": Design strength of plate = {self.T_db/1000:.2f} kN [Cl.6.2.2, 6.2.3, 6.3.3]")
 
     def calculate_final_utilization_ratio(self):
         logger.info(": ============== Final Check ==============")
+        # Eccentricity check (IS800:2007 Cl.10.5.7.4):
+        # For lap joints, if eccentricity exists, reduce design strength accordingly (not implemented, placeholder)
+        # TODO: Implement eccentricity reduction if required
         self.utilization_ratio = max(self.utilization_ratios.values())
         logger.info(f": Weld utilization ratio = {self.utilization_ratios['weld']:.3f}")
         logger.info(f": Base metal utilization ratio = {self.utilization_ratios['base_metal']:.3f}")
         logger.info(f": Overall utilization ratio = {self.utilization_ratio:.3f}")
-
         if self.utilization_ratio > 1.0:
             logger.error(": Design is UNSAFE. Utilization ratio exceeds 1.0.")
             self.design_status = False
+            raise ValueError("Utilization ratio exceeds 1.0. Design is unsafe.")
         else:
             logger.info(": Design is SAFE.")
             self.design_status = True
-
         self.weld_strength = self.design_capacity
         self.weld_length_effective = self.l_eff
 
@@ -470,7 +513,13 @@ class LapJointWelded(MomentConnection):
             KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT: self.weld.fu,
             KEY_DISP_WELD_SIZE: self.weld_size,
             "Safety Factors": "TITLE",
-            KEY_DISP_GAMMA_MW: self.gamma_mw
+            KEY_DISP_GAMMA_MW: self.gamma_mw,
+            "Weld Angle (deg)": getattr(self, 'weld_angle', 45),
+            "Effective Throat Thickness (mm)": getattr(self, 'effective_throat_thickness', None),
+            "Long Joint Reduction Factor β_lw": getattr(self, 'beta_lw', 1.0),
+            "End Return Length (mm)": getattr(self, 'end_return_length', None),
+            "Overlap Length (mm)": getattr(self, 'overlap_length', None),
+            "Shear Lag Factor": 0.7,
         }
         self.report_check = []
         if self.design_status:
@@ -491,7 +540,6 @@ class LapJointWelded(MomentConnection):
             self.report_check.append(t1)
             t1 = ('Design Status', '', 'Design Fails', 'Fail')
             self.report_check.append(t1)
-
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary,
                              fname_no_ext, os.path.abspath(".").replace("\\", "/"), [], "/ResourceFiles/images/3d.png", module=self.module)

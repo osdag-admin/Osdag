@@ -394,9 +394,12 @@ class LapJointWelded(MomentConnection):
         # Weld stress check (Cl.10.5.7):
         self.weld_stress = self.tensile_force / (2 * self.effective_throat_thickness * self.l_eff) if hasattr(self, 'l_eff') and self.l_eff else 0
         if self.weld_stress > self.fillet_weld_design_strength:
-            logger.error(f": Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]")
+            error_msg = f"Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]"
+            logger.error(": " + error_msg)
+            print("[Osdag ERROR]", error_msg)
             self.design_status = False
-            raise ValueError("Weld stress exceeds design strength.")
+            self.design_error = "Weld stress exceeds design strength."
+            return
 
     def calculate_weld_length(self):
         logger.info(": ============== Weld Length Calculation ==============")
@@ -454,9 +457,12 @@ class LapJointWelded(MomentConnection):
         # Weld stress check (Cl.10.5.7):
         self.weld_stress = self.tensile_force / (2 * self.effective_throat_thickness * self.l_eff) if self.l_eff else 0
         if self.weld_stress > self.fillet_weld_design_strength:
-            logger.error(f": Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]")
+            error_msg = f"Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]"
+            logger.error(": " + error_msg)
+            print("[Osdag ERROR]", error_msg)
             self.design_status = False
-            raise ValueError("Weld stress exceeds design strength.")
+            self.design_error = "Weld stress exceeds design strength."
+            return
         self.utilization_ratios['weld'] = self.tensile_force / self.design_capacity if self.design_capacity > 0 else float('inf')
         logger.info(f": Provided effective length = {self.l_eff:.2f} mm")
         logger.info(f": Design capacity of weld = {self.design_capacity/1000:.2f} kN")
@@ -487,9 +493,12 @@ class LapJointWelded(MomentConnection):
         logger.info(f": Base metal utilization ratio = {self.utilization_ratios['base_metal']:.3f}")
         logger.info(f": Overall utilization ratio = {self.utilization_ratio:.3f}")
         if self.utilization_ratio > 1.0:
-            logger.error(": Design is UNSAFE. Utilization ratio exceeds 1.0.")
+            error_msg = "Design is UNSAFE. Utilization ratio exceeds 1.0."
+            logger.error(": " + error_msg)
+            print("[Osdag ERROR]", error_msg)
             self.design_status = False
-            raise ValueError("Utilization ratio exceeds 1.0. Design is unsafe.")
+            self.design_error = "Utilization ratio exceeds 1.0. Design is unsafe."
+            return
         else:
             logger.info(": Design is SAFE.")
             self.design_status = True

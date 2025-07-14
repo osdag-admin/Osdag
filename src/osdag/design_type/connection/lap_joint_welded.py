@@ -1,7 +1,7 @@
 """
 Module: lap_joint_welded.py
-Author: Aman
-Date: 2025-02-18
+Author: Aman, Nishi Kant Mandal, Tanu Singh
+Date: 2025-07-14
 
 Description:
     LapJointWelded is a moment connection module that represents a welded lap joint connection.

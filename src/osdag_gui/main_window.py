@@ -21,6 +21,7 @@ from osdag_gui.ui.components.navbar import VerticalMenuBar
 from osdag_gui.ui.components.custom_buttons import MenuButton
 from osdag_gui.ui.components.top_right_button_bar import TopButton, DropDownButton
 from osdag_gui.ui.components.home_widget import HomeWidget
+from PySide6.QtWidgets import QSplitter
 
 class BackgroundSvgWidget(QWidget):
     def __init__(self, svg_path, parent=None):
@@ -78,11 +79,11 @@ class FadeWidget(QWidget):
         super().paintEvent(event)
 
 
-class MainWindow(QMainWindow):
+class HomeWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Osdag")
-        self.setMinimumSize(1200, 800)
+        # self.setWindowTitle("Osdag")
+        # self.setMinimumSize(1200, 800)
         self.setStyleSheet("")
 
         dat = Data()
@@ -92,10 +93,10 @@ class MainWindow(QMainWindow):
         self.current_primary_button = None
         self.current_secondary_button = None
 
-        self.osdag_content = QWidget()
-        self.setCentralWidget(self.osdag_content)
+        # self.osdag_content = QWidget()
+        # self.setCentralWidget(self.osdag_content)
 
-        main_h_layout = QHBoxLayout(self.osdag_content)
+        main_h_layout = QHBoxLayout(self)
         main_h_layout.setContentsMargins(0, 0, 0, 0)
         main_h_layout.setSpacing(0)
 
@@ -256,7 +257,7 @@ class MainWindow(QMainWindow):
         main_h_layout.addWidget(self.content, 8)
 
         self.show_home()
-        self.showMaximized()
+        # self.showMaximized()
 
     def _clear_layout(self, layout):
         """Recursively clears a layout and deletes its widgets."""
@@ -461,7 +462,7 @@ if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from PySide6.QtWidgets import QApplication
     app = QApplication(sys.argv)
-    main_window = MainWindow()
+    main_window = HomeWindow()
     main_window.show()
     sys.exit(app.exec())
 

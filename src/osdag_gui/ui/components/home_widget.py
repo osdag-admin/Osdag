@@ -36,9 +36,8 @@ class ThemeToggleButton(QPushButton):
 
     def update_icon(self):
         icon_path = ":/vectors/night_button.svg" if not self.is_dark_mode else ":/vectors/day_button_dark.svg"
-        if os.path.exists(icon_path):
-            self.setIcon(QIcon(icon_path))
-            self.setIconSize(QSize(25, 25))
+        self.setIcon(QIcon(icon_path))
+        self.setIconSize(QSize(25, 25))
 
     def toggle_theme(self):
         self.is_dark_mode = not self.is_dark_mode

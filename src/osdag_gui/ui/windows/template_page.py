@@ -3,10 +3,10 @@ import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QTabWidget, QTabBar,
-    QMessageBox, QMenuBar, QMenu
+    QMessageBox, QMenuBar, QMenu, QSplitter
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent, Signal
+from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent, Signal, QEasingCurve, Property, QTimer
 from PySide6.QtGui import QIcon, QFont, QPixmap, QGuiApplication, QKeySequence, QAction
 
 from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
@@ -110,23 +110,6 @@ class CustomWindow(QWidget):
         self.sidebar.raise_() # Ensure sidebar is always on top of other widgets
 
         self.handle_add_tab(title)
-
-    def resizeEvent(self, event):
-        # When the main window resizes, resize the sidebar to match its height
-        self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
-
-        # If the sidebar is currently hidden (peeked), adjust its position based on new width
-        # This check prevents it from jumping if it's already fully out.
-        # Adjusted Y based on top bar elements (top_h_layout and menu_bar)
-        top_offset = self.menu_bar.height() + self.tab_bar.height()
-        # self.y = top_offset
-        if self.sidebar.x() < 0: # If it's mostly hidden
-            self.sidebar.move(-self.sidebar.width() + 12, top_offset) # Re-position with updated width
-
-        # Ensure the sidebar stays on top after resize
-        self.sidebar.raise_()
-
-        super().resizeEvent(event)
 
     def eventFilter(self, watched, event):
         if watched == self.sidebar:
@@ -363,7 +346,9 @@ class CustomWindow(QWidget):
             self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
         
     def output_dock_toggle(self):
-        self.tab_widget_content[self.tab_bar.currentIndex()][2].toggle_output_dock()
+        # Toggle the output dock's visibility using toggle_animate
+        self.tab_widget_content[self.tab_bar.currentIndex()][2].show()  # Ensure widget is shown before animating
+        self.toggle_animate(show=not self.output_dock_active, dock='output')
 
     def output_dock_icon_toggle(self):
         self.tab_widget_content[self.tab_bar.currentIndex()][5] = not self.tab_widget_content[self.tab_bar.currentIndex()][5]
@@ -594,33 +579,258 @@ class CustomWindow(QWidget):
             top_offset = self.menu_bar.height() + self.tab_bar.height()
             self.sidebar.move(-self.sidebar.width() + 12, top_offset)
 
+    def resizeEvent(self, event):
+        # Resize the sidebar to match the window's height
+        self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
+
+        # Adjust sidebar position if it's mostly hidden (peeked)
+        top_offset = self.menu_bar.height() + self.tab_bar.height()
+        if self.sidebar.x() < 0:  # If sidebar is mostly hidden
+            self.sidebar.move(-self.sidebar.width() + 12, top_offset)
+
+        # Adjust the splitter widths for the current tab
+        current_tab_index = self.tab_bar.currentIndex()
+        if current_tab_index < len(self.tab_widget_content):
+            body_widget = self.tab_widget_content[current_tab_index][0]
+            splitter = None
+            for child in body_widget.children():
+                if isinstance(child, QSplitter):
+                    splitter = child
+                    break
+            
+            if splitter:
+                input_dock = splitter.widget(0)  # Input dock at index 0
+                output_dock = splitter.widget(2)  # Output dock at index 2
+                input_dock_width = input_dock.sizeHint().width() if self.tab_widget_content[current_tab_index][4] else 0
+                output_dock_width = output_dock.sizeHint().width() if self.tab_widget_content[current_tab_index][5] else 0
+                
+                # Calculate total available width
+                total_width = self.width() - splitter.contentsMargins().left() - splitter.contentsMargins().right()
+                
+                # Ensure splitter allows resizing
+                splitter.setMinimumWidth(0)
+                splitter.setCollapsible(0, True)
+                splitter.setCollapsible(1, True)
+                splitter.setCollapsible(2, True)
+                for i in range(splitter.count()):
+                    splitter.widget(i).setMinimumWidth(0)
+                    splitter.widget(i).setMaximumWidth(16777215)
+                
+                # Set splitter sizes: input and output docks get sizeHint().width(), central gets remainder
+                target_sizes = [0] * splitter.count()
+                target_sizes[0] = input_dock_width
+                target_sizes[2] = output_dock_width
+                remaining_width = total_width - input_dock_width - output_dock_width
+                target_sizes[1] = max(0, remaining_width)  # Central widget gets remaining width
+                
+                splitter.setSizes(target_sizes)
+                splitter.refresh()
+                body_widget.layout().activate()
+                splitter.update()
+
+        # Ensure the sidebar stays on top
+        self.sidebar.raise_()
+
+        super().resizeEvent(event)
+
+    def toggle_animate(self, show: bool, dock: str = 'output', tab_index=None):
+        if tab_index is None:
+            tab_index = self.tab_bar.currentIndex()
+        
+        # Find the splitter for the current tab
+        splitter = None
+        if tab_index < len(self.tab_widget_content):
+            body_widget = self.tab_widget_content[tab_index][0]
+            for child in body_widget.children():
+                if isinstance(child, QSplitter):
+                    splitter = child
+                    break
+        
+        if splitter is None:
+            print('Splitter not found!')
+            return
+        
+        sizes = splitter.sizes()
+        n = splitter.count()
+        
+        # Determine dock index
+        if dock == 'input':
+            dock_index = 0
+        elif dock == 'output':
+            dock_index = n - 1
+        elif dock == 'log':
+            log_dock = self.tab_widget_content[tab_index][3]
+            log_dock.setVisible(show)
+            self.log_dock_icon_toggle()
+            return
+        else:
+            print(f"Invalid dock: {dock}")
+            return
+        
+        dock_widget = splitter.widget(dock_index)
+        if show:
+            dock_widget.show()
+        
+        # Allow full resizing
+        splitter.setMinimumWidth(0)
+        splitter.setCollapsible(dock_index, True)
+        for i in range(n):
+            splitter.widget(i).setMinimumWidth(0)
+            splitter.widget(i).setMaximumWidth(16777215)
+        
+        target_sizes = sizes[:]
+        total_width = self.width() - splitter.contentsMargins().left() - splitter.contentsMargins().right()
+        
+        input_dock = splitter.widget(0)
+        output_dock = splitter.widget(n - 1)
+        
+        if dock == 'input':
+            if show:
+                target_sizes[0] = input_dock.sizeHint().width()
+            else:
+                target_sizes[0] = 0
+            target_sizes[2] = sizes[2]  # Preserve current output dock width
+            remaining_width = total_width - target_sizes[0] - target_sizes[2]
+            target_sizes[1] = max(0, remaining_width)  # Central widget gets remaining width
+        else:  # Output dock
+            if show:
+                target_sizes[2] = output_dock.sizeHint().width()
+            else:
+                target_sizes[2] = 0
+            target_sizes[0] = sizes[0]  # Preserve current input dock width
+            remaining_width = total_width - target_sizes[0] - target_sizes[2]
+            target_sizes[1] = max(0, remaining_width)  # Central widget gets remaining width
+
+        if sizes == target_sizes:
+            if not show:
+                dock_widget.hide()
+            return
+
+        if show:
+            splitter.setSizes(target_sizes)
+            splitter.refresh()
+            splitter.parentWidget().layout().activate()
+            splitter.update()
+            splitter.parentWidget().update()
+            self.update()
+            for i in range(splitter.count()):
+                splitter.widget(i).update()
+            return
+        
+        def on_finished():
+            if not show:
+                splitter.setSizes(target_sizes)
+                dock_widget.hide()
+        
+        self.animate_splitter_sizes(
+            splitter,
+            sizes,
+            target_sizes,
+            duration=500,
+            on_finished=on_finished if not show else None
+        )
 
     def add_new_tab(self, content_text):
         """Helper to add a new tab to QTabWidget."""
-        # ---------------------------
+        from PySide6.QtWidgets import QSplitter
         body_widget = QWidget()
-        tab_layout = QHBoxLayout(body_widget)
-        tab_layout.setContentsMargins(0,0,0,0)
-        tab_layout.setSpacing(0)
+        
+        # Create and set layout for body_widget first
+        layout = QHBoxLayout(body_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        # Create splitter and add widgets
+        self.splitter = QSplitter(Qt.Horizontal, body_widget)
 
         input_dock = InputDock(parent=self)
-        tab_layout.addWidget(input_dock)
+        input_dock_width = input_dock.sizeHint().width()
+        self._input_dock_default_width = input_dock_width
+        self.splitter.addWidget(input_dock)
+        input_dock.setStyleSheet(input_dock.styleSheet())
 
-        cad_log_vertical_layout = QVBoxLayout()
-        cad_log_vertical_layout.addStretch(7)
+        # Central widget for logs
+        central_widget = QWidget()
+        central_layout = QVBoxLayout(central_widget)
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+        central_layout.addStretch(7)
 
         logs_dock = LogDock()
         logs_dock.setVisible(False)
-        cad_log_vertical_layout.addWidget(logs_dock, 2)
-
-        tab_layout.addLayout(cad_log_vertical_layout, 1)
+        central_layout.addWidget(logs_dock, 2)
+        self.splitter.addWidget(central_widget)
 
         output_dock = OutputDock(parent=self)
-        tab_layout.addWidget(output_dock)
-                                                               # input dock active, output dock active
-        self.tab_widget_content.append([body_widget, input_dock, output_dock, logs_dock, True, False, False])    
-        # ----------------------------
+        self.splitter.addWidget(output_dock)
+        output_dock.setStyleSheet(output_dock.styleSheet())
+        output_dock.hide()  # Hide output dock initially
+
+        # Add splitter to layout
+        layout.addWidget(self.splitter)
+
+        # Set stretch factors: input:central:output = 1:2:1
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 2)
+        self.splitter.setStretchFactor(2, 1)
+
+        # Calculate total available width based on window size
+        total_width = self.width() - self.splitter.contentsMargins().left() - self.splitter.contentsMargins().right()
+        
+        # Set initial sizes: input dock gets sizeHint().width(), output dock hidden
+        n = self.splitter.count()
+        target_sizes = [0] * n
+        target_sizes[0] = input_dock_width
+        target_sizes[2] = 0  # Output dock initially hidden
+        remaining_width = total_width - input_dock_width
+        target_sizes[1] = max(0, remaining_width)  # Central widget gets remaining width
+        
+        self.splitter.setSizes(target_sizes)
+        layout.activate()
+
+        self.tab_widget_content.append([body_widget, input_dock, output_dock, logs_dock, True, False, False])
         self.tab_widget.addTab(body_widget, f"Tab {self.current_tab_index + 1}")
+
+    def animate_splitter_sizes(self, splitter, start_sizes, end_sizes, duration, on_finished=None):
+        steps = 50
+        interval = duration // steps
+        step_sizes = [
+            [start + (end - start) * i / steps for start, end in zip(start_sizes, end_sizes)]
+            for i in range(steps + 1)
+        ]
+
+        # Set splitter properties to allow zero-width widgets
+        splitter.setMinimumWidth(0)
+        splitter.setCollapsible(0, True)  # Allow input dock to collapse fully
+        splitter.setCollapsible(1, True)  # Allow central widget to collapse if needed
+        for i in range(splitter.count()):
+            splitter.widget(i).setMinimumWidth(0)
+            splitter.widget(i).setMaximumWidth(16777215)
+
+        current_step = 0
+
+        def update_step():
+            nonlocal current_step
+            if current_step <= steps:
+                sizes = [int(v) for v in step_sizes[current_step]]
+                splitter.setSizes(sizes)
+                splitter.refresh()
+                splitter.parentWidget().layout().activate()
+                splitter.update()
+                splitter.parentWidget().update()
+                self.update()
+                for i in range(splitter.count()):
+                    splitter.widget(i).update()
+                current_step += 1
+            else:
+                timer.stop()
+                if on_finished:
+                    on_finished()
+
+        timer = QTimer(self)
+        timer.timeout.connect(update_step)
+        timer.start(interval)
+        self._splitter_anim = timer
 
     def handle_add_tab(self, title):
         """Handles the 'Add New Tab' button click."""
@@ -648,7 +858,7 @@ class CustomWindow(QWidget):
             current_tab_data = self.tab_widget_content[index]
             self.update_docking_icons(current_tab_data[4], current_tab_data[5], current_tab_data[6])
     
-    def update_docking_icons(self, input_is_active, output_is_active, log_is_active):
+    def update_docking_icons(self, input_is_active, log_is_active, output_is_active ):
         # Update input dock icon
         self.input_dock_active = input_is_active
         if self.input_dock_active:
@@ -717,6 +927,7 @@ class CustomWindow(QWidget):
 
     def on_load_input(self):
         self.show_message("Action", "Load input selected.")
+        print(self.splitter.sizes())
 
     def on_save_input(self):
         self.show_message("Action", "Save input selected.")
@@ -735,6 +946,7 @@ class CustomWindow(QWidget):
 
     def on_design_preferences(self):
         self.show_message("Action", "Design Preferences selected.")
+
 
     def on_zoom_in(self):
         self.show_message("Action", "Zoom in selected.")
@@ -796,7 +1008,6 @@ class CustomWindow(QWidget):
         if event.button() == Qt.LeftButton:
             if hasattr(self, 'old_pos'):
                 del self.old_pos
-
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

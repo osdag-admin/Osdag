@@ -5,10 +5,11 @@ from PySide6.QtWidgets import (
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize
+from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QTimer
 from PySide6.QtGui import QPixmap, QIcon, QPainter, QColor
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
+from osdag_gui.ui.components.custom_buttons import CustomButton
 import osdag_gui.resources.resources_rc
 
 class NoScrollComboBox(QComboBox):
@@ -19,17 +20,18 @@ def right_aligned_widget(widget):
     container = QWidget()
     layout = QHBoxLayout(container)
     layout.setContentsMargins(0, 0, 0, 0)
-    layout.addStretch()
+    # Remove layout.addStretch()
     layout.addWidget(widget)
+    layout.setAlignment(widget, Qt.AlignVCenter)  # Optional: vertical center
     return container
 
 def apply_dropdown_style(widget, arrow_down_path):
-    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-    widget.setFixedWidth(150)
+    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+    # Removed setFixedWidth to allow expansion
     if isinstance(widget, QComboBox):
         style = f"""
         QComboBox {{
-            padding: 1px 5px;
+            padding: 2px;
             border: 1px solid black;
             border-radius: 5px;
             background-color: white;
@@ -38,13 +40,13 @@ def apply_dropdown_style(widget, arrow_down_path):
         QComboBox::drop-down {{
             subcontrol-origin: padding;
             subcontrol-position: top right;
-            width: 24px;
             border-left: 0px;
         }}
         QComboBox::down-arrow {{
             image: url("{arrow_down_path}");
-            width: 18px;
-            height: 18px;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
         }}
         QComboBox QAbstractItemView {{
             background-color: white;
@@ -57,7 +59,7 @@ def apply_dropdown_style(widget, arrow_down_path):
             border: none;
             border: 1px solid white;
             border-radius: 0;
-            padding: 2px 3px;
+            padding: 2px;
         }}
         QComboBox QAbstractItemView::item:hover {{
             border: 1px solid #90AF13;
@@ -88,34 +90,7 @@ def apply_dropdown_style(widget, arrow_down_path):
         }
         """)
 
-def create_connecting_members_group(apply_style_func, arrow_path):
-    connectivity_configs = {
-        "Column Flange-Beam Web": {
-            "image": ":/images/colF2.png",
-            "fields": [
-                {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
-                {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
-            ]
-        },
-        "Column Web-Beam Web": {
-            "image": ":/images/colW1.png",
-            "fields": [
-                {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
-                {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
-            ]
-        },
-        "Beam-Beam": {
-            "image": ":/images/fin_beam_beam.png",
-            "fields": [
-                {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                {"label": "Secondary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
-            ]
-        }
-    }
-
+def create_connecting_members_group(apply_style_func, arrow_path, connectivity_configs):
     group = QGroupBox("Connecting Members")
     group.setStyleSheet("""
         QGroupBox {
@@ -133,73 +108,60 @@ def create_connecting_members_group(apply_style_func, arrow_path):
             background-color: white;
         }
     """)
-    layout = QVBoxLayout(group)
-    layout.setSpacing(5)
-    layout.setContentsMargins(4, 4, 4, 4)
-
     conn_form = QFormLayout()
-    conn_form.setHorizontalSpacing(20)
+    conn_form.setHorizontalSpacing(5)
     conn_form.setVerticalSpacing(10)
-    conn_form.setContentsMargins(10, 5, 10, 5)
+    conn_form.setContentsMargins(10, 10, 10, 10)
     conn_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-    conn_form.setAlignment(Qt.AlignmentFlag.AlignRight)  # Align fields to the right
+    conn_form.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+    label = list(connectivity_configs.keys())[0]
+    label_dict = connectivity_configs[label]
 
     connectivity_cb = NoScrollComboBox()
-    connectivity_cb.addItems(list(connectivity_configs.keys()))
+    connectivity_cb.addItems(list(label_dict.keys()))
     apply_style_func(connectivity_cb, arrow_path)
-    conn_form.addRow("Connectivity *", right_aligned_widget(connectivity_cb))
-    layout.addLayout(conn_form)
+    # Use monospace font for the label
+    label_widget = QLabel(label)
+    label_widget.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+    conn_form.addRow(label_widget, right_aligned_widget(connectivity_cb))
 
-    details_widget = QWidget()
-    details_layout = QVBoxLayout(details_widget)
-    details_layout.setContentsMargins(0, 0, 0, 0)
-    details_layout.setSpacing(0)
+    dynamic_widgets = {"image_label": None, "field_rows": []}
 
-    all_comboboxes = [connectivity_cb]
-    connectivity_widgets = {}
+    def update_form(conn_type):
+        while conn_form.rowCount() > 1:
+            conn_form.removeRow(1)
+        dynamic_widgets["field_rows"] = []
 
-    for conn_type, config in connectivity_configs.items():
-        widget = QWidget()
-        widget_layout = QVBoxLayout(widget)
-        widget_layout.setContentsMargins(5, 5, 5, 5)
-        widget_layout.setSpacing(5)
-
+        config = label_dict[conn_type]
+        fields = config["fields"]
         img_label = QLabel()
         img_path = config["image"]
         img_label.setPixmap(QPixmap(img_path).scaledToWidth(90, Qt.SmoothTransformation))
         img_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        conn_form.addRow("", img_label)
+        dynamic_widgets["image_label"] = img_label
 
-        form = QFormLayout()
-        form.setHorizontalSpacing(20)
-        form.setVerticalSpacing(10)
-        form.setContentsMargins(10, 5, 10, 5)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-        form.setAlignment(Qt.AlignmentFlag.AlignRight)  # Align fields to the right
-
-        form.addRow("", img_label)
-
-        for field in config["fields"]:
+        for field in fields:
             cb = NoScrollComboBox()
             cb.addItems(field["items"])
             apply_style_func(cb, arrow_path)
-            form.addRow(field["label"], right_aligned_widget(cb))
-            all_comboboxes.append(cb)
+            label_widget = QLabel(field["label"])
+            label_widget.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+            conn_form.addRow(label_widget, right_aligned_widget(cb))
+            dynamic_widgets["field_rows"].append(cb)
 
-        widget_layout.addLayout(form)
-        details_layout.addWidget(widget)
-        connectivity_widgets[conn_type] = widget
+    update_form(connectivity_cb.currentText())
 
-    def switch_view(text):
-        for conn_type, widget in connectivity_widgets.items():
-            widget.setVisible(conn_type == text)
+    def on_connectivity_changed(text):
+        update_form(text)
 
-    connectivity_cb.currentTextChanged.connect(switch_view)
-    switch_view(connectivity_cb.currentText())
+    connectivity_cb.currentTextChanged.connect(on_connectivity_changed)
 
-    layout.addWidget(details_widget)
+    group.setLayout(conn_form)
     return group
 
-def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spacing=20):
+def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spacing=5):
     group = QGroupBox(title)
     group.setStyleSheet("""
         QGroupBox {
@@ -216,17 +178,13 @@ def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spa
             margin-top: -15px;
             background-color: white;
         }
-        QLabel {
-            margin-top: 4px;
-        }
     """)
-    
     form_layout = QFormLayout()
     form_layout.setHorizontalSpacing(horizontal_spacing)
     form_layout.setVerticalSpacing(10)
-    form_layout.setContentsMargins(10, 5, 10, 5)
+    form_layout.setContentsMargins(10, 10, 10, 10)
     form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-    
+    # Data class already pads labels
     all_widgets = []
     for field in fields:
         label = field["label"]
@@ -237,13 +195,93 @@ def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spa
             widget = QLineEdit()
             if "placeholder" in field:
                 widget.setPlaceholderText(field["placeholder"])
-        
         apply_style_func(widget, arrow_path)
-        form_layout.addRow(label, right_aligned_widget(widget))
+        label_widget = QLabel(label)
+        label_widget.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+        form_layout.addRow(label_widget, right_aligned_widget(widget))
         all_widgets.append(widget)
-    
     group.setLayout(form_layout)
     return group, all_widgets
+
+class Data:
+    def __init__(self):
+        self.connectivity_configs = {
+            "Connectivity *": {
+                "Column Flange-Beam Web": {
+                    "image": ":/images/colF2.png",
+                    "fields": [
+                        {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
+                        {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                        {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
+                    ]
+                },
+                "Column Web-Beam Web": {
+                    "image": ":/images/colW1.png",
+                    "fields": [
+                        {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
+                        {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                        {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
+                    ]
+                },
+                "Beam-Beam": {
+                    "image": ":/images/fin_beam_beam.png",
+                    "fields": [
+                        {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                        {"label": "Secondary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
+                        {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
+                    ]
+                }
+            }
+        }
+        self.group_configs = {
+            "Factored Loads": {
+                "fields": [
+                    {"label": "Shear Force (kN)", "placeholder": "ex. 10 kN"},
+                    {"label": "Axial Force (kN)", "placeholder": "ex. 10 kN"}
+                ]
+            },
+            "Bolt": {
+                "fields": [
+                    {"label": "Diameter (mm) *", "items": ["All", "Customized"]},
+                    {"label": "Type *", "items": ["Bearing Bolt", "Friction Grip Bolt"]},
+                    {"label": "Property Class *(mm)", "items": ["All", "Customized"]}
+                ]
+            },
+            "Plate": {
+                "fields": [
+                    {"label": "Thickness (mm) *", "items": ["All", "Customized"]}
+                ]
+            }
+        }
+        self.make_label_size_equal()
+
+    def make_label_size_equal(self):
+        # Collect all label strings from connectivity_configs and group_configs
+        labels = []
+        for label in self.connectivity_configs.keys():
+            labels.append(label)
+            label_dict = self.connectivity_configs[label]
+            for config in label_dict.values():
+                for field in config['fields']:
+                    labels.append(field['label'])
+        for config in self.group_configs.values():
+            for field in config['fields']:
+                labels.append(field['label'])
+        # Find max length
+        max_len = max(len(label) for label in labels)
+        # Pad all labels to max_len
+        for label in self.connectivity_configs.keys():
+            for config in label_dict.values():
+                for field in config['fields']:
+                    field['label'] = field['label'].ljust(max_len)
+
+        label = list(self.connectivity_configs.keys())[0]
+        self.connectivity_configs[label.ljust(max_len)] = self.connectivity_configs[label]
+        del self.connectivity_configs[label]
+
+        for config in self.group_configs.values():
+            for field in config['fields']:
+                field['label'] = field['label'].ljust(max_len)
 
 class InputDock(QWidget):
     def __init__(self, parent):
@@ -256,8 +294,8 @@ class InputDock(QWidget):
 
         self.left_container = QWidget()
         self.original_width = int(self.width())
-        # self.left_container.setMinimumWidth(self.original_width)
-        # self.left_container.setMaximumWidth(self.original_width)
+        self.setMinimumWidth(100)
+        self.data = Data()  # <-- Create Data instance here
         self.build_left_panel()
         self.main_layout.addWidget(self.left_container)
 
@@ -293,24 +331,33 @@ class InputDock(QWidget):
         self.right_spacer = QWidget()
         self.main_layout.addWidget(self.right_spacer)
 
+    def get_menu_data(self):
+        # Returns the menu data dicts from the Data instance
+        return {
+            'connectivity_configs': self.data.connectivity_configs,
+            'group_configs': self.data.group_configs
+        }
+
     def build_left_panel(self):
         left_layout = QVBoxLayout(self.left_container)
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.setSpacing(0)
 
+        # --- Main Content Panel (to be scrolled horizontally and vertically) ---
         self.left_panel = QWidget()
         self.left_panel.setStyleSheet("background-color: white;")
-        # self.left_panel.setMinimumWidth(360)
-        # self.left_panel.setMaximumWidth(400)
-
         panel_layout = QVBoxLayout(self.left_panel)
-        panel_layout.setContentsMargins(10, 10, 10, 10)
+        panel_layout.setContentsMargins(5, 5, 5, 5)
+        panel_layout.setSpacing(0)
 
-        # --- Top Bar (fixed) ---
+        # --- Top Bar (fixed inside scroll area) ---
         top_bar = QHBoxLayout()
+        top_bar.setSpacing(10)
         input_dock_btn = QPushButton("Input Dock")
-        input_dock_btn.setStyleSheet("background-color: #90AF13; color: white; border-radius: 5px;")
-        input_dock_btn.setFixedSize(108, 28)
+        input_dock_btn.setStyleSheet(
+            "background-color: #90AF13; color: white; border-radius: 5px; padding: 4px 16px; font-weight: bold;"
+        )
+        input_dock_btn.setFixedHeight(28)
         top_bar.addWidget(input_dock_btn)
         additional_inputs_btn = AdditionalInputsButton()
         additional_inputs_btn.setToolTip("Additional Inputs")
@@ -318,32 +365,31 @@ class InputDock(QWidget):
         top_bar.addStretch()
         panel_layout.addLayout(top_bar)
 
-        # --- Scroll Area for Main Content ---
+        # Vertical scroll area for group boxes (vertical only)
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_area.setFrameShape(QScrollArea.NoFrame)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        # Modern scrollbar style
-        scroll_area.setStyleSheet('''
+        scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        scroll_area.setStyleSheet("""
             QScrollArea {
                 border: 1px solid #EFEFEC;
-                background-color: white;
+                background-color: transparent;
                 padding: 3px;
             }
             QScrollBar:vertical {
-                background: #C3E05D;
+                background: #E0E0E0;
                 width: 8px;
                 margin: 0px 0px 0px 3px;
                 border-radius: 2px;
             }
             QScrollBar::handle:vertical {
-                background: #90AF13;
+                background: #A0A0A0;
                 min-height: 30px;
                 border-radius: 2px;
             }
             QScrollBar::handle:vertical:hover {
-                background: #6c8408;
+                background: #707070;
             }
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
@@ -351,109 +397,96 @@ class InputDock(QWidget):
             QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
                 background: none;
             }
-        ''')
-        scroll_content = QWidget()
-        scroll_layout = QVBoxLayout(scroll_content)
-        scroll_layout.setContentsMargins(0, 0, 0, 0)
-        scroll_layout.setSpacing(5)
+        """)
 
+        # --- Main Content (group boxes) ---
         arrow_path = ":/images/down_arrow.png"
-        connecting_members_group = create_connecting_members_group(apply_dropdown_style, arrow_path)
-        scroll_layout.addWidget(connecting_members_group)
+        menu_data = self.get_menu_data()
+        connecting_members_group = create_connecting_members_group(apply_dropdown_style, arrow_path, menu_data['connectivity_configs'])
 
-        group_configs = {
-            "Factored Loads": {
-                "horizontal_spacing": 38,
-                "fields": [
-                    {"label": "Shear Force (kN)", "placeholder": "ex. 10 kN"},
-                    {"label": "Axial Force (kN)", "placeholder": "ex. 10 kN"}
-                ]
-            },
-            "Bolt": {
-                "horizontal_spacing": 16,
-                "fields": [
-                    {"label": "Diameter (mm) *", "items": ["All", "Customized"]},
-                    {"label": "Type *", "items": ["Bearing Bolt", "Friction Grip Bolt"]},
-                    {"label": "Property Class *(mm)", "items": ["All", "Customized"]}
-                ]
-            },
-            "Plate": {
-                "horizontal_spacing": 38,
-                "fields": [
-                    {"label": "Thickness (mm) *", "items": ["All", "Customized"]}
-                ]
-            }
-        }
-
+        group_container = QWidget()
+        group_container_layout = QVBoxLayout(group_container)
+        group_container_layout.addWidget(connecting_members_group)
+        group_configs = menu_data['group_configs']
         all_comboboxes = []
         for title, config in group_configs.items():
             group, widgets = create_group_box(
                 title=title,
                 fields=config["fields"],
                 apply_style_func=apply_dropdown_style,
-                arrow_path=arrow_path,
-                horizontal_spacing=config["horizontal_spacing"]
+                arrow_path=arrow_path
             )
-            scroll_layout.addWidget(group)
+            group_container_layout.addWidget(group)
             all_comboboxes.extend(widgets)
 
-        scroll_layout.addStretch()
-        scroll_area.setWidget(scroll_content)
-        panel_layout.addWidget(scroll_area, 1)  # Expands to fill space between top and bottom
+        group_container_layout.addStretch()
 
-        # --- Bottom Design Button (fixed) ---
-        svg_widget = QSvgWidget(":/vectors/design_button.svg")
-        svg_widget.setFixedSize(150, 30)
-        svg_widget.setToolTip("Design")
-        svg_widget.setStyleSheet("""
-            background-color: white;
-            border: 2px solid #94b816;
-            border-radius: 4px;
-        """)
-        svg_clickable_btn = QPushButton(svg_widget)
-        svg_clickable_btn.setStyleSheet("background-color: transparent; border: none;")
-        svg_clickable_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        svg_clickable_btn.setFixedSize(svg_widget.size())
+        scroll_area.setWidget(group_container)
+        panel_layout.addWidget(scroll_area)
+
+        # --- Bottom Design Button (fixed inside scroll area) ---
+        btn_button_layout = QHBoxLayout()
+        btn_button_layout.setContentsMargins(0, 20, 0, 0)
+        btn_button_layout.addStretch(1)
+
+        svg_clickable_btn = CustomButton("Design")
         svg_clickable_btn.clicked.connect(lambda: print("design clicked"))
 
-        svg_outer_layout = QVBoxLayout()
-        svg_outer_layout.setContentsMargins(0, 20, 0, 0)
-        svg_button_layout = QHBoxLayout()
-        svg_button_layout.addStretch()
-        svg_button_layout.addWidget(svg_widget)
-        svg_button_layout.addStretch()
-        svg_outer_layout.addLayout(svg_button_layout)
-        panel_layout.addLayout(svg_outer_layout)
+        btn_button_layout.addWidget(svg_clickable_btn, 2)
+        btn_button_layout.addStretch(1)
+        panel_layout.addLayout(btn_button_layout)
 
-        panel_layout.addStretch()
-        left_layout.addWidget(self.left_panel)
+        # --- Horizontal scroll area for all right content ---
+        h_scroll_area = QScrollArea()
+        h_scroll_area.setWidgetResizable(True)
+        h_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        h_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        h_scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        h_scroll_area.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background-color: transparent;
+            }
+            QScrollBar:horizontal {
+                background: #E0E0E0;
+                height: 8px;
+                margin: 3px 0px 0px 0px;
+                border-radius: 2px;
+            }
+            QScrollBar::handle:horizontal {
+                background: #A0A0A0;
+                min-width: 30px;
+                border-radius: 2px;
+            }
+            QScrollBar::handle:horizontal:hover {
+                background: #707070;
+            }
+            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+                width: 0px;
+            }
+            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+                background: none;
+            }
+        """)
+        h_scroll_area.setWidget(self.left_panel)
+
+        left_layout.addWidget(h_scroll_area)
 
     def toggle_input_dock(self):
-        is_collapsing = self.left_container.width() > 0
-        self.parent.input_dock_icon_toggle()
-        # Define a fixed expanded width that's suitable for your content
-        EXPANDED_WIDTH = 340  # or whatever width works best for your comboboxes
-
-        # Then use it in your animation
-        target_width = 0 if is_collapsing else EXPANDED_WIDTH
-
-        for prop in [b"minimumWidth", b"maximumWidth"]:
-            container_anim = QPropertyAnimation(self.left_container, prop)
-            container_anim.setDuration(300)
-            container_anim.setStartValue(self.left_container.width())
-            container_anim.setEndValue(target_width)
-            container_anim.start()
-            setattr(self, f"_container_anim_{prop.decode()}", container_anim)
-
-            strip_anim = QPropertyAnimation(self.toggle_strip, prop)
-            strip_anim.setDuration(300)
-            strip_anim.setStartValue(self.toggle_strip.width())
-            strip_anim.setEndValue(0 if is_collapsing else 6)
-            strip_anim.start()
-            setattr(self, f"_strip_anim_{prop.decode()}", strip_anim)
-
+        parent = self.parent
+        if hasattr(parent, 'toggle_animate'):
+            is_collapsing = self.width() > 0
+            parent.toggle_animate(show=not is_collapsing, dock='input')
+        
         self.toggle_btn.setText("❯" if is_collapsing else "❮")
         self.toggle_btn.setToolTip("Show panel" if is_collapsing else "Hide panel")
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.width() == 0 and hasattr(self.parent, 'update_docking_icons'):
+            self.parent.update_docking_icons(False, self.parent.log_dock_active, self.parent.output_dock_active)
+        elif self.width() > 0 and hasattr(self.parent, 'update_docking_icons'):
+            self.parent.update_docking_icons(True, self.parent.log_dock_active, self.parent.output_dock_active)
 
 #----------------Standalone-Test-Code--------------------------------
 
@@ -480,4 +513,3 @@ class InputDock(QWidget):
 #     window = MyMainWindow()
 #     window.show()
 #     sys.exit(app.exec()) 
-

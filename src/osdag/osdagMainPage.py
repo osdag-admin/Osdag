@@ -329,8 +329,7 @@ class OsdagMainWindow(QMainWindow):
                     self.show_flexure_module,
                 ],
                 'Beam-Column' : self.Under_Development,
-                'Plate Girder' : [('Simply Supported', str(files('osdag.data.ResourceFiles.images').joinpath('simply-supported-beam.jpg')), 'Welded_Girder_Design'),
-                    self.show_girder_design,],
+                'Plate Girder' : self.Under_Development,
                 # TODO @rutvik
                 # 'Beam-Column' :[
                 #     ('Beam-Column Design', str(files("osdag.data.ResourceFiles.images").joinpath("broken.png")), 'Beam_Column_Design'),

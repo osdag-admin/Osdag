@@ -890,6 +890,11 @@ KEY_PLATETHK = 'Connector.Plate.Thickness_List'
 KEY_FLANGEPLATE_PREFERENCES = 'Connector.Flange_Plate.Preferences'
 KEY_FLANGEPLATE_THICKNESS = 'Connector.Flange_Plate.Thickness_list'
 KEY_WEBPLATE_THICKNESS = 'Connector.Web_Plate.Thickness_List'
+
+# Flat Plate Keys
+KEY_PLATE_THICKNESS_1 = 'Plate.Thickness_1'
+KEY_PLATE_THICKNESS_2 = 'Plate.Thickness_2'
+KEY_PLATE_WIDTH = 'Plate.Width'
 KEY_ANGLE_LIST='Connector.Angle_List'
 KEY_ANGLE_SELECTED = 'Connector.Angle_Selected'
 KEY_SEATEDANGLE = 'Connector.Seated_Angle_List'
@@ -2418,8 +2423,10 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
 KEY_DISP_SEC_TYPE = 'Section Type'
+
 VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
+VALUES_SEC_PROFILE_TENSION = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels', 'Flat Plate']
 #, 'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE4 = ['Channels']

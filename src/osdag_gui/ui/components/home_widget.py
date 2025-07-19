@@ -11,7 +11,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 
 import osdag_gui.resources.resources_rc
-from osdag_gui.resources.databases.data import Data
+from osdag_gui.data.menus.menu_data import Data
 
 # --- Theme Toggle Button ---
 class ThemeToggleButton(QPushButton):

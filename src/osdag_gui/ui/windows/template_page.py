@@ -1,4 +1,6 @@
 import sys, os
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = r"C:\\Users\\dell\\anaconda3\\envs\\osdag-env\\Lib\\site-packages\\PySide6\\plugins\\platforms"
+
 import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,

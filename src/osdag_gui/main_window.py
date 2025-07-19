@@ -5,7 +5,7 @@ from PySide6.QtCore import QThread, Signal
 
 import sys
 import os
-
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = r"C:\\Users\\dell\\anaconda3\\envs\\osdag-env\\Lib\\site-packages\\PySide6\\plugins\\platforms"
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
     QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup
@@ -15,7 +15,7 @@ from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation,
 from PySide6.QtGui import QFont, QIcon, QPainter, QColor
 from PySide6.QtSvg import QSvgRenderer
 
-from osdag_gui.resources.databases.data import Data
+from osdag_gui.data.menus.menu_data import Data
 from osdag_gui.ui.components.svg_card import SvgCardContainer
 from osdag_gui.ui.components.navbar import VerticalMenuBar
 from osdag_gui.ui.components.custom_buttons import MenuButton

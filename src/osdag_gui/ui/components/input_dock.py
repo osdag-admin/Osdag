@@ -11,6 +11,7 @@ from PySide6.QtGui import QPixmap, QIcon, QPainter, QColor
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import CustomButton
 import osdag_gui.resources.resources_rc
+from osdag_gui.data.modules.connection.shear_connection.fin_plate_data import Data
 
 class NoScrollComboBox(QComboBox):
     def wheelEvent(self, event):
@@ -203,86 +204,6 @@ def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spa
     group.setLayout(form_layout)
     return group, all_widgets
 
-class Data:
-    def __init__(self):
-        self.connectivity_configs = {
-            "Connectivity *": {
-                "Column Flange-Beam Web": {
-                    "image": ":/images/colF2.png",
-                    "fields": [
-                        {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
-                        {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                        {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
-                    ]
-                },
-                "Column Web-Beam Web": {
-                    "image": ":/images/colW1.png",
-                    "fields": [
-                        {"label": "Column Section *", "items": ["HB150", "HB200", "HB250", "HB300"]},
-                        {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                        {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
-                    ]
-                },
-                "Beam-Beam": {
-                    "image": ":/images/fin_beam_beam.png",
-                    "fields": [
-                        {"label": "Primary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                        {"label": "Secondary Beam *", "items": ["JB150", "JB175", "JB200", "JB225"]},
-                        {"label": "Material *", "items": ["E 165 (Fe 290)", "E250", "E300", "E350"]}
-                    ]
-                }
-            }
-        }
-        self.group_configs = {
-            "Factored Loads": {
-                "fields": [
-                    {"label": "Shear Force (kN)", "placeholder": "ex. 10 kN"},
-                    {"label": "Axial Force (kN)", "placeholder": "ex. 10 kN"}
-                ]
-            },
-            "Bolt": {
-                "fields": [
-                    {"label": "Diameter (mm) *", "items": ["All", "Customized"]},
-                    {"label": "Type *", "items": ["Bearing Bolt", "Friction Grip Bolt"]},
-                    {"label": "Property Class *(mm)", "items": ["All", "Customized"]}
-                ]
-            },
-            "Plate": {
-                "fields": [
-                    {"label": "Thickness (mm) *", "items": ["All", "Customized"]}
-                ]
-            }
-        }
-        self.make_label_size_equal()
-
-    def make_label_size_equal(self):
-        # Collect all label strings from connectivity_configs and group_configs
-        labels = []
-        for label in self.connectivity_configs.keys():
-            labels.append(label)
-            label_dict = self.connectivity_configs[label]
-            for config in label_dict.values():
-                for field in config['fields']:
-                    labels.append(field['label'])
-        for config in self.group_configs.values():
-            for field in config['fields']:
-                labels.append(field['label'])
-        # Find max length
-        max_len = max(len(label) for label in labels)
-        # Pad all labels to max_len
-        for label in self.connectivity_configs.keys():
-            for config in label_dict.values():
-                for field in config['fields']:
-                    field['label'] = field['label'].ljust(max_len)
-
-        label = list(self.connectivity_configs.keys())[0]
-        self.connectivity_configs[label.ljust(max_len)] = self.connectivity_configs[label]
-        del self.connectivity_configs[label]
-
-        for config in self.group_configs.values():
-            for field in config['fields']:
-                field['label'] = field['label'].ljust(max_len)
-
 class InputDock(QWidget):
     def __init__(self, parent):
         super().__init__()
@@ -431,6 +352,8 @@ class InputDock(QWidget):
 
         svg_clickable_btn = CustomButton("Design")
         svg_clickable_btn.clicked.connect(lambda: print("design clicked"))
+        # svg_clickable_btn.clicked.connect(lambda: print("design clicked"))
+
 
         btn_button_layout.addWidget(svg_clickable_btn, 2)
         btn_button_layout.addStretch(1)

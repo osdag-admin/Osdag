@@ -352,4 +352,15 @@ class OutputDock(QWidget):
         elif self.width() > 0 and hasattr(self.parent, 'update_docking_icons'):
             self.parent.update_docking_icons(self.parent.input_dock_active, self.parent.log_dock_active, True)
 
+    def set_results(self, result_dict):
+        layout = self.layout()
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+        for key, value in result_dict.items():
+            label = QLabel(f"{key}: {value}")
+            layout.addWidget(label)
+        self.current_result = result_dict
+
 

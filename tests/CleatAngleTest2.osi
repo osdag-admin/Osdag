@@ -1,0 +1,33 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '8'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Non pre-tensioned
+Bolt.Type: Bearing Bolt
+Connectivity *: Column Web-Beam Web
+Connector.Angle_List:
+- 60 x 60 x 4
+- 70 x 70 x 5
+Connector.Material: E 250 (Fe 410 W)A
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Rolled, machine-flame cut, sawn and planed
+Detailing.Gap: '10'
+Load.Shear: '80'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: LB 200
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: HB 225
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
+Module: Cleat Angle Connection

@@ -1,3 +1,7 @@
+"""
+Floating navigation bar for Osdag GUI.
+Provides quick access to modules and emits tab open signals.
+"""
 import os
 import osdag_gui.resources.resources_rc
 
@@ -5,7 +9,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QSizePolicy, QSpacerItem, QApplication, QToolTip
 )
 from PySide6.QtGui import QIcon, QCursor
-from PySide6.QtCore import Qt, QSize, QPoint, QTimer
+from PySide6.QtCore import Qt, QSize, QPoint, QTimer, Signal
 
 class SidebarIconButton(QPushButton):
     # Class-level attribute for default hover color
@@ -116,6 +120,7 @@ class SidebarIconButton(QPushButton):
         """)
 
 class SidebarWidget(QWidget):
+    openNewTab = Signal(str)
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
@@ -146,7 +151,7 @@ class SidebarWidget(QWidget):
             btn = SidebarIconButton(icon_path, tooltip_text=tooltip, selected_icon_path=":/vectors/clicked_icon.svg", hover_icon_path=":/vectors/clicked_icon.svg" ,group=self.button_group)
             self.button_layout.addWidget(btn)
             self.button_group.append(btn)
-            btn.clicked.connect(lambda _,title=tooltip: self.parent.handle_add_tab(title))
+            btn.clicked.connect(lambda _,title=tooltip: self.openNewTab.emit(title))
         self.button_container.setLayout(self.button_layout)
         self.layout.addWidget(self.button_container, alignment=Qt.AlignCenter)
         self.update_sidebar_size()

@@ -1,3 +1,7 @@
+"""
+Main application window for Osdag GUI.
+Handles tab management, docking icons, and main window controls.
+"""
 import osdag_gui.resources.resources_rc
 
 from PySide6.QtWidgets import QMainWindow
@@ -5,464 +9,495 @@ from PySide6.QtCore import QThread, Signal
 
 import sys
 import os
-os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = r"C:\\Users\\dell\\anaconda3\\envs\\osdag-env\\Lib\\site-packages\\PySide6\\plugins\\platforms"
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
-    QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup
+    QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup, QTabBar, QTabWidget,
+    QMessageBox
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation, QEasingCurve, Property
-from PySide6.QtGui import QFont, QIcon, QPainter, QColor
+from PySide6.QtGui import QFont, QIcon, QPainter, QColor, QGuiApplication, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
-from osdag_gui.data.menus.menu_data import Data
-from osdag_gui.ui.components.svg_card import SvgCardContainer
-from osdag_gui.ui.components.navbar import VerticalMenuBar
-from osdag_gui.ui.components.custom_buttons import MenuButton
-from osdag_gui.ui.components.top_right_button_bar import TopButton, DropDownButton
-from osdag_gui.ui.components.home_widget import HomeWidget
-from PySide6.QtWidgets import QSplitter
+from osdag_gui.ui.windows.home_window import HomeWindow
+from osdag_gui.ui.windows.template_page import CustomWindow
 
-class BackgroundSvgWidget(QWidget):
-    def __init__(self, svg_path, parent=None):
-        super().__init__(parent)
-        self.svg_path = svg_path
-        self.svg_renderer = QSvgRenderer(self.svg_path)
-        self.setContentsMargins(0, 0, 0, 0) # Ensure no margins for drawing
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        # Draw left border
-        border_color = QColor("#90AF13")
-        pen = painter.pen()
-        pen.setColor(border_color)
-        pen.setWidth(3)
-        painter.setPen(pen)
-        painter.drawLine(0, 0, 0, self.height())
-        # Draw SVG background
-        target_rect = self.rect()
-        self.svg_renderer.render(painter, target_rect)
-        painter.end()
-        super().paintEvent(event)
-
-# --- End of background_svg_widget.py content ---
-
-class FadeWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._opacity = 1.0
-        self.setAttribute(Qt.WA_TranslucentBackground)
-
-    def getOpacity(self):
-        return self._opacity
-
-    def setOpacity(self, opacity):
-        self._opacity = opacity
-        self.update()
-
-    opacity = Property(float, getOpacity, setOpacity)
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        # Set the current opacity for drawing the background
-        painter.setOpacity(self._opacity)
-
-        # Now, set opacity for child widgets if needed, or rely on their own painting
-        # For child widgets to also respect this opacity, they need to be painted after this
-        # or have their own opacity set. For simple layout containers, this is sufficient.
-        painter.end() # End painter for the background drawing
-
-        # Now, call the superclass paintEvent. This is where child widgets will be painted.
-        # It's crucial to call this AFTER your custom background drawing.
-        super().paintEvent(event)
-
-
-class HomeWindow(QWidget):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        # self.setWindowTitle("Osdag")
-        # self.setMinimumSize(1200, 800)
-        self.setStyleSheet("")
+        self.main_widget_instance = None
 
-        dat = Data()
-        self.menu_bar_data = dat.MODULES
-        floating_navbar = dat.FLOATING_NAVBAR
+        screen = QGuiApplication.primaryScreen()
+        screen_size = screen.availableGeometry()
 
-        self.current_primary_button = None
-        self.current_secondary_button = None
+        screen_width = screen_size.width()
+        screen_height = screen_size.height()
 
-        # self.osdag_content = QWidget()
-        # self.setCentralWidget(self.osdag_content)
+        # Calculate window size
+        window_width = int(7 * screen_width / 10)
+        window_height = int((7 * screen_height) / 8)
 
-        main_h_layout = QHBoxLayout(self)
-        main_h_layout.setContentsMargins(0, 0, 0, 0)
-        main_h_layout.setSpacing(0)
+        # Set window size
+        self.resize(window_width, window_height)
 
-        # Left Navigation Bar
-        nav_bar = VerticalMenuBar(self.menu_bar_data)
-        nav_bar.nav_bar_trigger.connect(self.nav_trigger)
+        # Center the window
+        x = int((screen_width - window_width) / 2)
+        y = int((screen_height - window_height) / 2)
 
-        main_h_layout.addWidget(nav_bar, 2)
-
-        self.content = BackgroundSvgWidget(":/vectors/background.svg")
-        self.content.setStyleSheet("""
-            QWidget {
-                background: transparent;
-            }
+        self.setGeometry(x, y, window_width, window_height)
+        self.setWindowFlags(Qt.FramelessWindowHint) # Make the window frameless for custom buttons
+        self.current_tab_index = 0 # To keep track of the next tab index
+        self.btn_size = QSize(46, 30)
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #fff;
+                margin: 0px;
+                padding: 0px;
+            }  
         """)
 
-        content_v_layout = QVBoxLayout(self.content)
-        content_v_layout.setContentsMargins(0, 0, 0, 0)
-        content_v_layout.setSpacing(0)
+        # Initialize UI first, as sidebar will overlay it
+        self.init_ui() # Call init_ui before sidebar creation to ensure main content exists
+        self.handle_add_tab("Home")
 
-        # --- Top Horizontal Layout with SVG and Widget ---
-        self.top_right_container = QWidget()
-        self.top_right_container.setStyleSheet("""
-            QWidget {
-                background: transparent;
+        # self.maximize_button.click()
+
+    def init_ui(self):
+        # Main Vertical Layout for the entire window's *content*
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_v_layout = QVBoxLayout(central_widget)
+        main_v_layout.setContentsMargins(0, 0, 0, 0)
+        main_v_layout.setSpacing(0)
+
+        # --- Top HBox Layout (Contains logo, tabs, and window control buttons) ---
+        top_h_layout = QHBoxLayout()
+        top_h_layout.setContentsMargins(0, 0, 0, 0)
+        top_h_layout.setSpacing(0)
+
+        icon_label_widget = QWidget()
+        icon_label_h_layout = QHBoxLayout(icon_label_widget)
+        icon_label_h_layout.setContentsMargins(5, 0, 5, 0)
+        icon_label_h_layout.setSpacing(0)
+
+        # SVG Widget (Dummy SVG for demonstration)
+        self.svg_widget = QSvgWidget()
+        self.svg_widget.load(":/vectors/Osdag_logo.svg")
+        self.svg_widget.setFixedSize(18, 18)
+
+        icon_label_h_layout.addWidget(self.svg_widget)
+        top_h_layout.addWidget(icon_label_widget)
+
+        # QTabBar
+        self.tab_bar = QTabBar()
+        self.tab_bar.setExpanding(False)
+        self.tab_bar.setTabsClosable(True)
+        self.tab_bar.setMovable(False)
+        self.tab_bar.tabCloseRequested.connect(self.close_tab)
+        # Custom tab style
+        self.tab_bar.setStyleSheet('''
+            QTabBar::tab {
+                background: #ffffff;
+                border-left: 1px solid #F4F4F4;
+                border-right: 1px solid #F4F4F4;
+                border-top: 1px solid #FFFFFF;
+                border-bottom: 1px solid #FFFFFF;
+                padding: 6px 18px 6px 18px;
+                color: #000000;
+                font-size: 11px;
+                margin-left: 0px;
             }
-        """)
-        self.top_right_h_layout = QHBoxLayout(self.top_right_container)
-        self.top_right_h_layout.setContentsMargins(10, 5, 10, 0)
-        self.top_right_h_layout.setSpacing(10)
-        self.top_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
-        self.top_svg_widget_1 = QSvgWidget()
-        self.top_svg_widget_1.load(":/vectors/Osdag_label.svg")
-        self.top_svg_widget_1.setFixedSize(181, 80)
-        # No explicit stylesheet for QSvgWidget here. It will rely on its parent's background.
-        self.top_right_h_layout.addWidget(self.top_svg_widget_1)
-
-        self.top_widget_2 = QHBoxLayout()
-        self.top_widget_2.setContentsMargins(0, 0, 15, 0)
-        self.top_widget_2.setSpacing(2)
-        self.button_group = QButtonGroup(self)
-        # self.button_group.setExclusive(True) # Removed as buttons are no longer checkable
-        self.buttons = [] # Store references to the created buttons
-
-        # Instantiate and add the custom buttons to the header
-        for i, (black_icon, white_icon, label) in enumerate(floating_navbar):
-            if label == "Resources":
-                button = DropDownButton(black_icon, white_icon, label)
-            else:
-                button = TopButton(black_icon, white_icon, label)
-            
-            self.buttons.append(button)
-            self.button_group.addButton(button, i) # Add button to the group with an ID
-            self.top_widget_2.addWidget(button)
-
-        self.top_right_h_layout.addStretch(1)
-        self.top_right_h_layout.addLayout(self.top_widget_2)
-
-        content_v_layout.addWidget(self.top_right_container)
-
-        # Single SVG Widget below the top horizontal layout (now a wrapper QWidget) ---
-        self.middle_top_svg_layout_wrapper_widget = QWidget() # The wrapper widget
-        self.middle_top_svg_layout_wrapper_widget.setStyleSheet("background: transparent;") # Explicit solid background
-        self.middle_top_svg_layout_wrapper = QHBoxLayout(self.middle_top_svg_layout_wrapper_widget) # Layout inside wrapper
-
-        self.middle_top_svg_widget = QSvgWidget()
-        self.middle_top_svg_widget.load(":/vectors/Osdag_tagline.svg")
-        self.middle_top_svg_widget.setFixedSize(420, 35)
-        # No explicit stylesheet for QSvgWidget here. It will rely on its parent's background.
-
-        # To align it to the left, remove the stretch before and add it after:
-        self.middle_top_svg_layout_wrapper.addWidget(self.middle_top_svg_widget)
-        self.middle_top_svg_layout_wrapper.addStretch(1) # Stretch to push content to left
-
-        self.middle_top_svg_layout_wrapper.setContentsMargins(10, 5, 10, 5)
-        content_v_layout.addWidget(self.middle_top_svg_layout_wrapper_widget) # Add the wrapper widget
-
-        self.variable_widget = QWidget()
-        self.variable_layout = QVBoxLayout(self.variable_widget)
-
-        # Primary Menu Container
-        self.primary_menu_container = FadeWidget()
-        # Set margins on the FadeWidget itself, not just its internal layout
-        self.primary_menu_container.setContentsMargins(10, 30, 10, 0) # These margins will be part of the painted area
-        self.primary_menu_layout = QHBoxLayout(self.primary_menu_container)
-        self.primary_menu_layout.setContentsMargins(0, 0, 0, 0) # Reset internal layout margins to 0
-        self.primary_menu_layout.setSpacing(5)
-        self.primary_menu_container.setStyleSheet("background: transparent;") # Keep transparent to allow custom painting
-        self.primary_menu_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.variable_layout.addWidget(self.primary_menu_container)
-
-        # Secondary Menu Container
-        self.secondary_menu_container = FadeWidget()
-        # Set margins on the FadeWidget itself
-        self.secondary_menu_container.setContentsMargins(10, 5, 10, 5) # These margins will be part of the painted area
-        self.secondary_menu_layout = QHBoxLayout(self.secondary_menu_container)
-        self.secondary_menu_layout.setContentsMargins(0, 0, 0, 0) # Reset internal layout margins to 0
-        self.secondary_menu_layout.setSpacing(5)
-        self.secondary_menu_container.setStyleSheet("background: transparent;") # Keep transparent
-        self.secondary_menu_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.secondary_menu_container.setMaximumHeight(0)
-        self.secondary_menu_container.setOpacity(0.0)
-        self.secondary_menu_container.hide()
-        self.secondary_menu_hidden = True
-        self.variable_layout.addWidget(self.secondary_menu_container)
-
-        # --- QScrollArea for SVG Card Area ---
-        self.scroll_area_for_svg_cards = QScrollArea()
-        self.scroll_area_for_svg_cards.setWidgetResizable(True)
-        self.scroll_area_for_svg_cards.setFrameShape(QFrame.NoFrame)
-        self.scroll_area_for_svg_cards.setStyleSheet("background: transparent;") # Explicit solid white background
-
-        self.svg_card_area = QWidget()
-        self.svg_card_layout = QVBoxLayout(self.svg_card_area)
-        self.svg_card_layout.setContentsMargins(10,10,10,10)
-        self.svg_card_layout.setSpacing(10)
-        self.svg_card_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-
-        self.scroll_area_for_svg_cards.setWidget(self.svg_card_area)
-        self.variable_layout.addWidget(self.scroll_area_for_svg_cards, 1)
-
-        content_v_layout.addWidget(self.variable_widget)
-
-        # --- Bottom Horizontal Layout with three SVG Widgets ---
-        self.bottom_right_container = QWidget()
-        self.bottom_right_container.setStyleSheet("""
-            QWidget {
-                background: transparent; /* Explicit solid background */
+            QTabBar::tab:selected {
+                background: #F4F4F4;
+                color: #000000;
+                border: 1px solid #90AF13;
+                border-bottom: 1px solid #F4F4F4;
+                padding: 6px 18px 6px 18px;
             }
-        """)
-        self.bottom_right_h_layout = QHBoxLayout(self.bottom_right_container)
-        self.bottom_right_h_layout.setContentsMargins(10, 10, 5, 10)
-        self.bottom_right_h_layout.setSpacing(10)
-        self.bottom_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            QTabBar::tab:hover {
+                border-top: 1px solid #90AF13;
+                border-left: 1px solid #90AF13;
+                border-right: 1px solid #90AF13;
+            }
+            QTabBar::close-button {
+                image: url(:/vectors/window_close.svg);
+                subcontrol-origin: padding;
+                subcontrol-position: center right;
+            }
+            QTabBar::close-button:hover {
+                image: url(:/vectors/window_close_hover.svg);
+            }
+        ''')
+        top_h_layout.addWidget(self.tab_bar)
 
-        self.bottom_svg_widget_1 = QSvgWidget()
-        self.bottom_svg_widget_1.load(":/vectors/FOSSEE_logo.svg")
-        self.bottom_svg_widget_1.setFixedSize(163, 60)
-        # No explicit stylesheet for QSvgWidget here.
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_1)
+        # Stretch to push buttons to the right
+        top_h_layout.addStretch(1)
 
-        self.bottom_svg_widget_2 = QSvgWidget()
-        self.bottom_svg_widget_2.load(":/vectors/MOS_logo.svg")
-        self.bottom_svg_widget_2.setFixedSize(122, 60)
-        # No explicit stylesheet for QSvgWidget here.
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
-
-        self.bottom_svg_widget_3 = QSvgWidget()
-        self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_logo.svg")
-        self.bottom_svg_widget_3.setFixedSize(263, 30)
-        # No explicit stylesheet for QSvgWidget here.
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignBottom)
-        self.bottom_right_h_layout.addStretch(1)
-
-        content_v_layout.addWidget(self.bottom_right_container)
-
-        main_h_layout.addWidget(self.content, 8)
-
-        self.show_home()
-        # self.showMaximized()
-
-    def _clear_layout(self, layout):
-        """Recursively clears a layout and deletes its widgets."""
-        if layout is not None:
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.deleteLater()
-                else:
-                    self._clear_layout(item.layout())
-
-    def _reset_primary_menu_style(self):
-        """Resets the style of the currently selected primary menu button."""
-        if self.current_primary_button:
-            self.current_primary_button.set_selected(False)
-            self.current_primary_button = None
-
-    def _reset_secondary_menu_style(self):
-        """Resets the style of the currently selected secondary menu button."""
-        if self.current_secondary_button:
-            self.current_secondary_button.set_selected(False)
-            self.current_secondary_button = None
-
-    def _animate_secondary_menu(self, show=True):
-        self.secondary_menu_animation_height = QPropertyAnimation(self.secondary_menu_container, b"maximumHeight")
-        self.secondary_menu_animation_opacity = QPropertyAnimation(self.secondary_menu_container, b"opacity")
-
-        duration = 300 # milliseconds
-
-        self.secondary_menu_animation_height.setDuration(duration)
-        self.secondary_menu_animation_opacity.setDuration(duration)
-        self.secondary_menu_animation_height.setEasingCurve(QEasingCurve.InOutQuad)
-        self.secondary_menu_animation_opacity.setEasingCurve(QEasingCurve.InOutQuad)
-
-        if show:
-            self.secondary_menu_container.show()
-            self.secondary_menu_animation_height.setStartValue(0)
-            self.secondary_menu_animation_height.setEndValue(self.secondary_menu_container.sizeHint().height())
-            self.secondary_menu_animation_opacity.setStartValue(0.0)
-            self.secondary_menu_animation_opacity.setEndValue(1.0)
-            self.secondary_menu_hidden = False
-        else:
-            self.secondary_menu_animation_height.setStartValue(self.secondary_menu_container.height())
-            self.secondary_menu_animation_height.setEndValue(0)
-            self.secondary_menu_animation_opacity.setStartValue(1.0)
-            self.secondary_menu_animation_opacity.setEndValue(0.0)
-            self.secondary_menu_animation_opacity.finished.connect(self.secondary_menu_container.hide)
-            self.secondary_menu_hidden = True
-
-        self.secondary_menu_animation_height.start()
-        self.secondary_menu_animation_opacity.start()
-
-    def nav_trigger(self, menu_bar_data, name):
-        """Triggered by main left navigation bar buttons."""
-        self._clear_layout(self.primary_menu_layout)
-        self._clear_layout(self.secondary_menu_layout)
-
-        self._reset_primary_menu_style()
-        self._reset_secondary_menu_style()
-
-        if not self.secondary_menu_hidden:
-            self.show_home()
-
-        if name == 'Home':
-            self._clear_layout(self.svg_card_layout)
-            self.primary_menu_container.hide()
-            home_widget = HomeWidget()
-            self.svg_card_layout.addWidget(home_widget)
-
-        elif isinstance(menu_bar_data, list):
-            # zero level menu bar
-            svg_card_widget = SvgCardContainer(menu_bar_data)
-            self._clear_layout(self.svg_card_layout)
-
-            label = QLabel(name)
-            label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
-            label.setStyleSheet("""
-                QLabel{
-                    color: #000000;
-                    font-size: 16px;
-                    font-family: 'Calibri';
-                    background-color: rgba(255, 255, 255, 150);
-                    padding: 2px 0px;
-                    border-top: 1px solid #90AF13;
-                    border-bottom: 1px solid #90AF13;
+        # Helper function to create a styled button
+        def create_button(icon_svg, is_close=False):
+            btn = QPushButton()
+            btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #FFFFFF;
+                    color: white;
+                    border: none;
+                    padding: 0px;
+                }
+                QPushButton:hover {
+                    background-color: #F4F4F4;
+                }
+                QPushButton:pressed {
+                    background-color: #FAFAFA;
+                }
+                QPushButton#close_button:hover {
+                    background-color: #E81123;
+                }
+                QPushButton#close_button:pressed {
+                    background-color: #F1707A;
                 }
             """)
-            # self.svg_card_layout.addStretch()
-            self.svg_card_layout.addWidget(label)
-            self.svg_card_layout.addStretch()
-            self.svg_card_layout.addWidget(svg_card_widget)
-            self.svg_card_layout.addStretch()
-            self.primary_menu_container.hide()
+            btn.setFixedSize(self.btn_size)
+            btn.setIcon(QIcon(QPixmap.fromImage(QPixmap(icon_svg).toImage())))
+            btn.setIconSize(QSize(14, 14))
+            if is_close:
+                btn.setObjectName("close_button")
+            return btn
 
-        elif isinstance(menu_bar_data, dict):
-            self._clear_layout(self.svg_card_layout)
+        class ClickableSvgWidget(QSvgWidget):
+            clicked = Signal()  # Define a custom clicked signal
+            def __init__(self, parent=None):
+                super().__init__(parent)
+                self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-            self.primary_menu_container.show()
-            default_btn = None 
-            toggle = True
-            self.primary_menu_layout.addStretch(1)
-            for i in menu_bar_data.keys():
-                internal_dat = menu_bar_data.get(i)
-                btn = MenuButton(i)
-                if toggle:
-                    toggle = False
-                    default_btn = [i, btn]
-                if isinstance(internal_dat, list):
-                    # single level menu bar
-                    btn.clicked.connect(lambda _, b=btn, data=internal_dat: self.menu_trigger(data, b))
-                elif isinstance(internal_dat, dict):
-                    # double level menu bar
-                    btn.clicked.connect(lambda _, b=btn, data=internal_dat: self.submenu_trigger(data, b))
-                self.primary_menu_layout.addWidget(btn)
-            self.primary_menu_layout.addStretch(1)
-            # set first Menu as Default
-            self.menu_trigger(menu_bar_data.get(default_btn[0]), default_btn[1])
+            def mousePressEvent(self, event):
+                if event.button() == Qt.MouseButton.LeftButton:
+                    self.clicked.emit()  # Emit the clicked signal on left-click
+                super().mousePressEvent(event)
 
-    def show_home(self):
-        self._clear_layout(self.svg_card_layout)
-        self.primary_menu_container.hide()
-        home_widget = HomeWidget()
-        self.svg_card_layout.addWidget(home_widget)
+        # Control buttons
+        control_button_layout = QHBoxLayout()
+        control_button_layout.setSpacing(10)
+        control_button_layout.setContentsMargins(5,5,5,5)
 
-    def menu_trigger(self, data, clicked_button=None):
-        """
-        Triggered when a primary menu button (that directly shows SVG cards)
-        or a secondary menu button is clicked.
-        """
-        self._clear_layout(self.svg_card_layout)
+        self.input_dock_control = ClickableSvgWidget()
+        self.input_dock_control.load(":/vectors/input_dock_active.svg")
+        self.input_dock_control.setFixedSize(18, 18)
+        self.input_dock_control.clicked.connect(self.toggle_input_dock)
+        self.input_dock_active = True
+        control_button_layout.addWidget(self.input_dock_control)
 
-        if isinstance(clicked_button, MenuButton):
-            self._reset_primary_menu_style()
-            clicked_button.set_selected(True)
-            self.current_primary_button = clicked_button
-            self._reset_secondary_menu_style()
+        self.log_dock_control = ClickableSvgWidget()
+        self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
+        self.log_dock_control.setFixedSize(18, 18)
+        self.log_dock_control.clicked.connect(self.logs_dock_icon_toggle)
+        self.log_dock_active = False
+        control_button_layout.addWidget(self.log_dock_control)
 
-        if not self.secondary_menu_hidden:
-            self.secondary_menu_container.setMaximumHeight(0)
-            self.secondary_menu_container.setOpacity(0.0)
-            self.secondary_menu_container.hide()
-            self.secondary_menu_hidden = True
+        self.output_dock_control = ClickableSvgWidget()
+        self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+        self.output_dock_control.setFixedSize(18, 18)
+        self.output_dock_control.clicked.connect(self.toggle_output_dock)
+        self.output_dock_active = False
+        control_button_layout.addWidget(self.output_dock_control)
 
-        svg_card_widget = SvgCardContainer(data)
-        self.svg_card_layout.addWidget(svg_card_widget)
+        self.input_dock_control.hide()
+        self.log_dock_control.hide()
+        self.output_dock_control.hide()
 
-    def submenu_trigger(self, data, clicked_button=None):
-        """
-        Triggered when a primary menu button (that leads to a submenu) is clicked.
-        """
-        self._clear_layout(self.secondary_menu_layout)
-        self._clear_layout(self.svg_card_layout)
+        top_h_layout.addLayout(control_button_layout)
 
-        if isinstance(clicked_button, MenuButton):
-            self._reset_primary_menu_style()
-            clicked_button.set_selected(True)
-            self.current_primary_button = clicked_button
-            self._reset_secondary_menu_style()
+        self.minimize_button = create_button(":/vectors/window_minimize.svg")
+        self.minimize_button.clicked.connect(self.showMinimized)
+        top_h_layout.addWidget(self.minimize_button)
 
-        self.secondary_menu_container.setMaximumHeight(0)
-        self.secondary_menu_container.setOpacity(0.0)
-        self.secondary_menu_container.hide()
-        self.secondary_menu_hidden = True
+        self.maximize_button = create_button(":/vectors/window_maximize.svg")
+        self.maximize_button.clicked.connect(self.toggle_maximize_restore)
+        top_h_layout.addWidget(self.maximize_button)
 
-        default_btn = None 
-        toggle = True
+        self.close_button = create_button(":/vectors/window_close.svg", is_close=True)
+        self.close_button.clicked.connect(self.close)
+        top_h_layout.addWidget(self.close_button)
+
+        self.start_pos = None
+        self.start_geometry = None
+
+        # Add top HBox to main VBox
+        main_v_layout.addLayout(top_h_layout)
+
+        # QTabWidget
+        self.tab_widget = QTabWidget()
+        self.tab_widget.tabBar().hide()
+        self.tab_widget.setTabsClosable(True) # Allow closing tabs
+        self.tab_widget.setMovable(False) # Allow reordering tabs
+        self.tab_widget.setStyleSheet("""
+            QTabWidget {
+                border: 0px;
+            }
+        """)
+        self.tab_widget_content = []
+        self.tab_widget.tabCloseRequested.connect(self.close_tab)
+        main_v_layout.addWidget(self.tab_widget)
+
+        # Connect the QTabBar to custom handler
+        self.tab_bar.currentChanged.connect(self.handle_tab_change)
+
+        # Ensure initial synchronization
+        if self.tab_bar.count() > 0:
+            self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
+
+    def set_maximize_icon(self):
+        self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize.svg").toImage())))
+
+    def set_restore_icon(self):
+        self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore.svg").toImage())))
+
+    def toggle_maximize_restore(self):
+        """Toggles between maximized and normal window states and updates the icon."""
+        if self.isMaximized():
+            self.showNormal()
+            self.set_maximize_icon()
+        else:
+            self.showMaximized()
+            self.set_restore_icon()
+
+    def add_new_tab(self, module):
+        """Helper to add a new tab to QTabWidget."""
+        body_widget = QWidget()
         
-        self.secondary_menu_layout.addStretch(1)
-        for i in data.keys():
-            internal_dat = data.get(i)
-            btn = MenuButton(i)
-            if toggle:
-                toggle = False
-                default_btn = [i, btn]
-            btn.clicked.connect(lambda _, b=btn, data=internal_dat: self.menu_bar(data, b))
-            self.secondary_menu_layout.addWidget(btn)
-        self.secondary_menu_layout.addStretch(1)
+        # Create and set layout for body_widget first
+        self.main_widget_layout = QHBoxLayout(body_widget)
+        self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_widget_layout.setSpacing(0)
 
-        self._animate_secondary_menu(True)
-        # set first Menu as Default
-        self.menu_bar(data.get(default_btn[0]), default_btn[1])
+        # it initially sets the home on the Tab
+        self.open_home_page(module)
+        # False(dock icons show status), True(input dock show), False(logs dock show), False(output dock show)
+        self.tab_widget_content.append([body_widget, False, True, False, False])
+        self.tab_widget.addTab(body_widget, f"Tab {self.current_tab_index + 1}")
+        # Update main_widget_layout to the layout of the new tab's body_widget
+        if hasattr(body_widget, 'layout'):
+            self.main_widget_layout = body_widget.layout()
 
+    def handle_add_tab(self, module):
+        """Handles the 'Add New Tab' button click."""
+        self.current_tab_index += 1
+        self.tab_bar.addTab("Home") # Add to tab bar
+        # Set the newly added tab as current
+        self.add_new_tab(module) # Add to tab widget
+        
+        new_index = self.tab_bar.count() - 1
+        self.tab_bar.setCurrentIndex(new_index)
+        self.tab_widget.setCurrentIndex(new_index)
+        # Update docking icons for the newly added tab
+        current_tab_data = self.tab_widget_content[new_index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+        
+        # self.sidebar.raise_() # Ensure sidebar stays on top after new tab addition
 
-    def menu_bar(self, data, clicked_button=None):
-        """
-        Triggered when a secondary menu button is clicked,
-        clearing SVG card area and displaying new cards.
-        """
-        self._clear_layout(self.svg_card_layout)
+    def handle_tab_change(self, index):
+        # 1. Switch the QTabWidget to the new tab
+        self.tab_widget.setCurrentIndex(index)
 
-        if isinstance(clicked_button, MenuButton):
-            self._reset_secondary_menu_style()
-            clicked_button.set_selected(True)
-            self.current_secondary_button = clicked_button
+        if len(self.tab_widget_content)>0:
+            if self.tab_bar.tabText(index) == "Home":
+                self.tab_widget_content[index][1] = False
+            else:
+                self.tab_widget_content[index][1] = True
+            current_tab_data = self.tab_widget_content[index]
+            self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+            
+            # Update main_widget_instance to the main widget in the current tab
+            body_widget = self.tab_widget_content[index][0]
+            if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
+                widget_item = body_widget.layout().itemAt(0)
+                if widget_item is not None:
+                    widget = widget_item.widget()
+                    if widget is not None:
+                        self.main_widget_instance = widget
+            # Update main_widget_layout to the layout of the current tab's body_widget
+            if hasattr(body_widget, 'layout'):
+                self.main_widget_layout = body_widget.layout()
 
-        svg_card_widget = SvgCardContainer(data)
-        self.svg_card_layout.addWidget(svg_card_widget)
+        # 2. Update dock icons based on the new tab's state
+        if index < len(self.tab_widget_content):
+            current_tab_data = self.tab_widget_content[index]
+            self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+    
+    def update_docking_icons(self, docking_icons_active, input_is_active, log_is_active, output_is_active):
+        # Update input dock icon
+        if docking_icons_active:
+            self.input_dock_control.show()
+            self.output_dock_control.show()
+            self.log_dock_control.show()
+            self.input_dock_active = input_is_active
+            if self.input_dock_active:
+                self.input_dock_control.load(":/vectors/input_dock_active.svg")
+            else:
+                self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+                            
+            # Update output dock icon
+            self.output_dock_active = output_is_active
+            if self.output_dock_active:
+                self.output_dock_control.load(":/vectors/output_dock_active.svg")
+            else:
+                self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+
+            # Update log dock icon
+            self.log_dock_active = log_is_active
+            if self.log_dock_active:
+                self.log_dock_control.load(":/vectors/logs_dock_active.svg")
+            else:
+                self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
+        else:
+            self.input_dock_control.hide()
+            self.output_dock_control.hide()
+            self.log_dock_control.hide()
+
+    def close_tab(self, index):
+        """Handles closing of tabs."""
+        if self.tab_widget.count() > 1:
+            self.tab_widget.removeTab(index)
+            self.tab_bar.removeTab(index)
+            self.tab_widget_content.pop(index)
+            # Adjust current index if the closed tab was the last one
+            if self.tab_widget.currentIndex() == -1 and self.tab_widget.count() > 0:
+                self.tab_widget.setCurrentIndex(self.tab_widget.count() - 1)
+        else:
+            # Using QMessageBox for information instead of alert()
+            msg_box = QMessageBox()
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setText("Cannot close the last tab.")
+            msg_box.setWindowTitle("Information")
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            msg_box.exec()
+
+        if self.tab_widget.count() > 0:
+            current_index = self.tab_widget.currentIndex()
+            body_widget = self.tab_widget_content[current_index][0]
+            if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
+                widget_item = body_widget.layout().itemAt(0)
+                if widget_item is not None:
+                    widget = widget_item.widget()
+                    if widget is not None:
+                        self.main_widget_instance = widget
+            # Show docking Icons
+            self.tab_widget_content[current_index][1] = True
+            current_tab_data = self.tab_widget_content[index]
+            self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+
+    def show_message(self, title, message):
+        """Helper function to display a message box."""
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        msg_box.exec()
+
+    # Allow dragging the window when frameless
+    def mousePressEvent(self, event):
+        # The draggable area is the combined height of the top_h_layout (tab bar + buttons) and the menu_bar
+        if self.isMaximized():
+            return
+        draggable_height = self.tab_bar.height() + (self.layout().contentsMargins().top() * 2) # Account for potential margins/spacing
+        # A more robust way might be to check if the cursor is within the bounding box of top_h_layout or menu_bar
+        if event.button() == Qt.LeftButton and event.position().y() < draggable_height:
+            self.old_pos = event.globalPosition().toPoint()
+
+    def mouseMoveEvent(self, event):
+        if self.isMaximized():
+            return
+        if hasattr(self, 'old_pos'):
+            delta = event.globalPosition().toPoint() - self.old_pos
+            self.move(self.x() + delta.x(), self.y() + delta.y())
+            self.old_pos = event.globalPosition().toPoint()
+
+    def mouseReleaseEvent(self, event):
+        if self.isMaximized():
+            return
+        if event.button() == Qt.LeftButton:
+            if hasattr(self, 'old_pos'):
+                del self.old_pos
+
+    def handle_card_open_clicked(self, card_title):
+        if card_title == "Fin Plate":
+            self.open_fin_plate_page()
+
+    def open_fin_plate_page(self):
+        title = "Fin Plate Connection"
+        self.clear_layout(self.main_widget_layout)
+        fin_plate = CustomWindow(title, "Fin Plate Connection")
+
+        # dock icon update trigger signal
+        fin_plate.outputDockIconToggle.connect(self.output_dock_icon_toggle)
+        fin_plate.inputDockIconToggle.connect(self.input_dock_icon_toggle)
+
+        self.main_widget_instance = fin_plate
+        fin_plate.openNewTab.connect(self.handle_add_tab)
+        self.main_widget_layout.addWidget(fin_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        # Show docking Icons
+        self.tab_widget_content[index][1] = True
+        current_tab_data = self.tab_widget_content[index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+
+    def open_home_page(self, module):
+        self.clear_layout(self.main_widget_layout)
+        home_window = HomeWindow()
+        self.main_widget_instance = home_window
+        home_window.set_active_button(module)
+        home_window.cardOpenClicked.connect(self.handle_card_open_clicked)
+        self.main_widget_layout.addWidget(home_window)
+
+    def clear_layout(self, layout):
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.setParent(None)
+            else:
+                self.clear_layout(item.layout())  
+
+    def input_dock_icon_toggle(self):
+        self.input_dock_active = not self.input_dock_active
+        self.tab_widget_content[self.tab_bar.currentIndex()][2] = self.input_dock_active
+        if self.input_dock_active:
+            self.input_dock_control.load(":/vectors/input_dock_active.svg")
+        else:
+            self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+
+    def toggle_input_dock(self):
+        if self.main_widget_instance:
+            self.main_widget_instance.input_dock_toggle()
+        
+    def output_dock_icon_toggle(self):
+        self.output_dock_active = not self.output_dock_active
+        self.tab_widget_content[self.tab_bar.currentIndex()][4] = self.output_dock_active
+        if self.output_dock_active:
+            self.output_dock_control.load(":/vectors/output_dock_active.svg")
+        else:
+            self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+    
+    def toggle_output_dock(self):
+        if self.main_widget_instance:
+            self.main_widget_instance.output_dock_toggle()
+
+    def logs_dock_icon_toggle(self):
+        self.log_dock_active = not self.log_dock_active
+        self.tab_widget_content[self.tab_bar.currentIndex()][3] = self.log_dock_active
+        if self.log_dock_active:
+            self.log_dock_control.load(":/vectors/logs_dock_active.svg")
+        else:
+            self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")    
+
+        if self.main_widget_instance:
+            self.main_widget_instance.logs_dock_toggle(self.log_dock_active)
 
 if __name__ == "__main__":
     import sys, os
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from PySide6.QtWidgets import QApplication
     app = QApplication(sys.argv)
-    main_window = HomeWindow()
+    main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec())
 

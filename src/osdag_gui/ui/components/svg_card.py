@@ -1,3 +1,7 @@
+"""
+SVG card widgets for Osdag GUI.
+Display module cards with SVG icons and open actions.
+"""
 import sys
 import os
 
@@ -10,10 +14,26 @@ from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation,
 from PySide6.QtGui import QFont, QIcon, QPainter
 from PySide6.QtSvg import QSvgRenderer
 
+from PySide6.QtCore import Signal, Qt
+
+class ClickableLabel(QLabel):
+    clicked = Signal(str)
+
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+        self.setCursor(Qt.PointingHandCursor)
+        self._id = text
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit(self._id)
+        super().mousePressEvent(event)
+
+    def set_id(self, id_str):
+        self._id = id_str
 
 class SvgCard(QFrame):
-    cardSelected = Signal(str)
-    cardDeselected = Signal()
+    openClicked = Signal(str)
 
     def __init__(self, title, svg_path, parent=None):
         super().__init__(parent)
@@ -34,9 +54,10 @@ class SvgCard(QFrame):
         self.svg_widget = QSvgWidget(svg_path)
         self.svg_widget.setFixedSize(90, 80)
 
-        self.open_label = QLabel("Open")
-        self.open_label.setAlignment(Qt.AlignCenter)
-        self.open_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.open_label = ClickableLabel("Open")
+        self.open_label.set_id(title)
+        self.open_label.clicked.connect(self.handle_open_clicked)
+        self.open_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         
         self.open_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed) 
 
@@ -57,7 +78,7 @@ class SvgCard(QFrame):
             }
         """)
         # Connect the click event for the QLabel
-        self.open_label.mousePressEvent = self.open_label_clicked # Override mousePressEvent for QLabel
+        # self.open_label.mousePressEvent = self.open_label_clicked # Override mousePressEvent for QLabel
 
 
         self.open_label_wrapper = QWidget(self)
@@ -126,19 +147,6 @@ class SvgCard(QFrame):
             self.open_button_animation.start()
         return super().eventFilter(obj, event)
 
-    # Removed the mousePressEvent for the QFrame itself.
-    # The selection logic will now be triggered only by the open_label_clicked method.
-    def open_label_clicked(self, event):
-        """Custom mousePressEvent for the open_label."""
-        if event.button() == Qt.LeftButton:
-            self.cardSelected.emit(self.title)
-        # Call the base class method to ensure standard QLabel behavior (e.g., event propagation)
-        super(type(self.open_label), self.open_label).mousePressEvent(event) 
-
-    def mouseDoubleClickEvent(self, event):
-        # This will still deselect if the card background is double-clicked
-        self.cardDeselected.emit()
-
     def set_selected(self, selected):
         self.is_selected = selected
         if selected:
@@ -152,8 +160,13 @@ class SvgCard(QFrame):
             self.open_label_wrapper.setMaximumHeight(0)
             self.open_label_wrapper.setMinimumHeight(0)
 
+    def handle_open_clicked(self, title):
+        self.openClicked.emit(title)
+
 
 class SvgCardContainer(QWidget):
+    cardOpenClicked = Signal(str)
+
     def __init__(self, card_data):
         super().__init__()
         self.layout = QGridLayout(self)
@@ -185,31 +198,9 @@ class SvgCardContainer(QWidget):
 
         for idx, (title, svg_path) in enumerate(self.card_data):
             card = SvgCard(title, svg_path)
-            card.cardSelected.connect(self.handle_card_selected)
-            card.cardDeselected.connect(self.deselect_card)
+            card.openClicked.connect(self.cardOpenClicked)  # propagate signal
             row, col = divmod(idx, 3)
             self.layout.addWidget(card, row + 1, col + 1)
 
-    def handle_card_selected(self, card_title):
-        for i in range(self.layout.count()):
-            widget_item = self.layout.itemAt(i)
-            if widget_item:
-                widget = widget_item.widget()
-                if isinstance(widget, SvgCard):
-                    widget.set_selected(widget.title == card_title)
-                    if widget.title == card_title:
-                        self.selected_card = widget
-                        self.selected_card_name = widget.title
-
     def get_selected_card_name(self):
         return self.selected_card_name
-
-    def deselect_card(self):
-        for i in range(self.layout.count()):
-            widget_item = self.layout.itemAt(i)
-            if widget_item:
-                widget = widget_item.widget()
-                if isinstance(widget, SvgCard):
-                    widget.set_selected(False)
-        self.selected_card = None
-        self.selected_card_name = ""

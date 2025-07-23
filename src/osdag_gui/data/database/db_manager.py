@@ -1,3 +1,7 @@
+"""
+Database manager for Osdag GUI.
+Handles SQLite connection and data fetching utilities.
+"""
 import sqlite3
 from pathlib import Path
 

@@ -1,3 +1,7 @@
+"""
+Entry point for Osdag GUI application.
+Handles splash screen and main window launch.
+"""
 from osdag_gui.main_window import MainWindow
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal

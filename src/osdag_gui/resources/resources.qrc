@@ -1,3 +1,7 @@
+<!--
+resources.qrc: Qt resource collection for Osdag GUI.
+Contains SVGs, images, backgrounds, and theme files for the application.
+-->
 <RCC>
     <qresource prefix="/">
 

@@ -1,3 +1,7 @@
+"""
+Top right button bar for Osdag GUI.
+Contains custom animated buttons and dropdowns for quick actions.
+"""
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QFrame, QMenu, QLabel, QPushButton, QButtonGroup

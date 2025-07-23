@@ -1,3 +1,7 @@
+"""
+Fin Plate data for Osdag GUI.
+Loads section, beam, and material data from the database for input forms.
+"""
 import sqlite3
 from osdag_gui.data.database.db_manager import DatabaseManager
 

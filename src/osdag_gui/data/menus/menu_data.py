@@ -1,3 +1,7 @@
+"""
+Menu data for Osdag GUI.
+Provides static data for modules, navigation, and recent projects.
+"""
 class Data:
     # Empty List means "Under Development"
     MODULES = {

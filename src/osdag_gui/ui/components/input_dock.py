@@ -1,3 +1,7 @@
+"""
+Input dock widget for Osdag GUI.
+Handles user input forms and group boxes for connection design.
+"""
 import sys
 import os
 from PySide6.QtWidgets import (
@@ -205,6 +209,8 @@ def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spa
     return group, all_widgets
 
 class InputDock(QWidget):
+    # inputDockVisibilityChanged = Signal(bool)
+
     def __init__(self, parent):
         super().__init__()
         self.parent = parent

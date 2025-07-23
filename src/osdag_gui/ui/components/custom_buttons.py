@@ -1,3 +1,7 @@
+"""
+Custom button widgets for Osdag GUI.
+Includes menu and action buttons with custom styles.
+"""
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
     QLabel, QMainWindow, QSizePolicy, QFrame

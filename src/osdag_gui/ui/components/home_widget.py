@@ -1,3 +1,7 @@
+"""
+Home widget for Osdag GUI.
+Displays recent projects, modules, and search bar.
+"""
 import sys
 import os
 from PySide6.QtWidgets import (

@@ -1,3 +1,7 @@
+"""
+Output dock widget for Osdag GUI.
+Displays output fields and report generation for connection design.
+"""
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
@@ -5,7 +9,7 @@ from PySide6.QtWidgets import (
     QFormLayout, QLineEdit, QScrollArea
 )
 from PySide6.QtGui import QPalette, QColor, QPixmap, QIcon, QPainter
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve
+from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve, Signal
 
 from osdag_gui.ui.components.custom_buttons import CustomButton
 
@@ -334,7 +338,7 @@ class OutputDock(QWidget):
             is_collapsing = self.width() > 0
             parent.toggle_animate(show=not is_collapsing, dock='output')
         
-        self.toggle_btn.setText("❯" if is_collapsing else "❮")
+        self.toggle_btn.setText("❮" if is_collapsing else "❯")
         self.toggle_btn.setToolTip("Show panel" if is_collapsing else "Hide panel")
 
     def _on_animation_finished(self):
@@ -344,13 +348,6 @@ class OutputDock(QWidget):
 
     def is_panel_visible(self):
         return self.panel_visible
-    
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        if self.width() == 0 and hasattr(self.parent, 'update_docking_icons'):
-            self.parent.update_docking_icons(self.parent.input_dock_active, self.parent.log_dock_active, False)
-        elif self.width() > 0 and hasattr(self.parent, 'update_docking_icons'):
-            self.parent.update_docking_icons(self.parent.input_dock_active, self.parent.log_dock_active, True)
 
     def set_results(self, result_dict):
         layout = self.layout()

@@ -1,3 +1,7 @@
+"""
+Vertical navigation bar for Osdag GUI.
+Handles navigation buttons and logo display.
+"""
 import sys
 import os
 from PySide6.QtWidgets import (
@@ -209,7 +213,6 @@ class VerticalMenuBar(QWidget):
         # This ensures the header height also scales with the logo
         self.header.setFixedHeight(logo_size + 10) # 10 pixels for padding top/bottom
 
-
     def resizeEvent(self, event: QEvent):
         """Called when the widget is resized."""
         super().resizeEvent(event)
@@ -221,3 +224,15 @@ class VerticalMenuBar(QWidget):
         painter.setBrush(QColor("white"))
         painter.drawRect(self.rect())
         super().paintEvent(event)
+
+    def set_active_button_by_name(self, name):
+        for btn in self.button_group:
+            if btn.text().strip() == name:
+                btn.set_active_style()
+                btn.setIcon(btn.clicked_icon)
+                btn.is_clicked = True
+                btn.click()
+            else:
+                btn.set_default_style()
+                btn.setIcon(btn.default_icon)
+                btn.is_clicked = False

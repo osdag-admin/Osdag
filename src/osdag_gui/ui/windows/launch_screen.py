@@ -1,3 +1,7 @@
+"""
+Launch screen UI for Osdag GUI.
+Displays splash screen with animation and logos.
+"""
 import osdag_gui.resources.resources_rc
 
 from PySide6.QtCore import (QCoreApplication, QMetaObject, QEasingCurve,
@@ -30,7 +34,6 @@ class OsdagLaunchScreen(object):
         self.AnimatedGIF = QSvgWidget(self.centralwidget)
         self.AnimatedGIF.setObjectName(u"SplashScreen_AnimatedGIF")
         self.AnimatedGIF.setGeometry(QRect(400, 150, 191, 181))
-        
 
         self.AestheticVector = QSvgWidget(self.centralwidget)
         self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")

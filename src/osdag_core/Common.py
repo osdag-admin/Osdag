@@ -175,7 +175,7 @@ def tuple_to_str_popup(tl):
 
 def tuple_to_str(tl, call_type,table_name=None):
 
-    if call_type is "dropdown" and table_name != 'Material' and table_name != 'Bolt':
+    if call_type == "dropdown" and table_name != 'Material' and table_name != 'Bolt':
         arr = ['Select Section']
     else:
         arr = []
@@ -298,6 +298,7 @@ TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
+TYPE_IMAGE_BIGGER = 'Image_Bigger'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_IN_BUTTON = 'Input_dock_Button'
@@ -346,6 +347,36 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam-to-Beam Cover Plate Welded Connection'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column Cover Plate Welded Connection'
+KEY_DISP_LAPJOINTBOLTED = 'Lap Joint Bolted Connection'
+KEY_DISP_LAPJOINTWELDED = 'Lap Joint Welded Connection'
+KEY_DISP_BUTTJOINTBOLTED = 'Butt Joint Bolted Connection'
+WELD_SIZES = [3, 5, 6, 10, 12]
+
+# MADE THIS t.s.
+KEY_DISP_BUTTJOINTWELDED = 'Butt Joint Welded Connection'
+KEY_OUT_UTILISATION_RATIO = 'Utilisation Ratio'
+KEY_OUT_DISP_UTILISATION_RATIO = 'Utilisation Ratio'
+KEY_OUT_NO_COVER_PLATE = 'No Cover Plate'
+KEY_OUT_DISP_NO_COVER_PLATE = 'No Cover Plate'
+KEY_OUT_WIDTH_COVER_PLATE = 'Width of Cover Plate'
+KEY_OUT_DISP_WIDTH_COVER_PLATE = 'Width of Cover Plate'
+KEY_OUT_THICKNESS_COVER_PLATE = 'Thickness of Cover Plate'
+KEY_OUT_DISP_THICKNESS_COVER_PLATE = 'Thickness of Cover Plate'
+KEY_OUT_LENGTH_COVER_PLATE = 'Length of Cover Plate'
+KEY_OUT_DISP_LENGTH_COVER_PLATE = 'Length of Cover Plate'
+DISP_TITLE_COVER_PLATE = 'Cover Plate Details'
+KEY_WELD_SIZE = 'Weld.Size'
+KEY_DISP_WELD_SIZE = 'Weld Size'
+KEY_DISP_COVER_PLT = 'Cover Plate *'
+KEY_DP_WELD_SIZE = 'Weld.Size'
+KEY_WELD_GRADE = 'Weld.Grade'
+KEY_EFF_THROAT_THICKNESS = 'Effective Throat Thickness'
+KEY_DESIGN_STRENGTH_WELD = 'Design Strength of Weld'
+KEY_OUT_DISP_WELD_STRENGTH_kN = 'Strength (kN)'
+
+# end
+
+
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
@@ -422,9 +453,9 @@ KEY_DISP_SR_FACTOR_ZZ = 'Stress Reduction Factor'
 KEY_SR_FACTOR_YY = 'MinorSRF'
 KEY_DISP_SR_FACTOR_YY = 'Stress Reduction Factor'
 KEY_NON_DIM_ESR_ZZ = 'MajorNDESR'
-KEY_DISP_NON_DIM_ESR_ZZ = 'Non-dimensional Effective SR'
+KEY_DISP_NON_DIM_ESR_ZZ = 'Non-dimensional Effective SR (z-z)'
 KEY_NON_DIM_ESR_YY = 'MinorNDESR'
-KEY_DISP_NON_DIM_ESR_YY = 'Non-dimensional Effective SR'
+KEY_DISP_NON_DIM_ESR_YY = 'Non-dimensional Effective SR (y-y)'
 KEY_EFF_SEC_AREA_ZZ = 'MajorEffSecArea'
 KEY_DISP_EFF_SEC_AREA_ZZ = 'Effective Sectional Area (mm2)'
 KEY_EFF_SEC_AREA_YY = 'MinorEffSecArea'
@@ -440,11 +471,23 @@ KEY_DESIGN_STRENGTH_ZZ = 'DesignStrength.z-z'
 ##Strut Design
 ###################################
 KEY_SHEAR_STRENGTH = 'Shear.Strength'
+KEY_SHEAR_STRENGTH_YY = 'Shear.Strength_YY'
+KEY_SHEAR_STRENGTH_ZZ = 'Shear.Strength_ZZ'
 KEY_MOMENT_STRENGTH = 'Moment.Strength'
+KEY_MOMENT_STRENGTH_YY = 'Moment.Strength_YY'
+KEY_MOMENT_STRENGTH_ZZ = 'Moment.Strength_ZZ'
 KEY_DISP_HIGH_SHEAR= 'High Shear Check'
+KEY_DISP_HIGH_SHEAR_YY= 'High Shear Check (y-y)'
+KEY_DISP_HIGH_SHEAR_ZZ= 'High Shear Check (z-z)'
 KEY_HIGH_SHEAR = 'Shear.High'
+KEY_HIGH_SHEAR_YY = 'Shear.High_YY'
+KEY_HIGH_SHEAR_ZZ = 'Shear.High_ZZ'
 KEY_DISP_DESIGN_STRENGTH_SHEAR = 'Shear Strength (kN)' # Design 
-KEY_DISP_DESIGN_STRENGTH_MOMENT = 'Moment Strength (kNm)' # Design 
+KEY_DISP_DESIGN_STRENGTH_SHEAR_YY = 'Shear Strength (y-y) (kN)'
+KEY_DISP_DESIGN_STRENGTH_SHEAR_ZZ = 'Shear Strength (z-z) (kN)'
+KEY_DISP_DESIGN_STRENGTH_MOMENT = 'Moment Strength (kNm)' # Design
+KEY_DISP_DESIGN_STRENGTH_MOMENT_YY = 'Moment Strength (y-y) (kNm)'
+KEY_DISP_DESIGN_STRENGTH_MOMENT_ZZ = 'Moment Strength (z-z) (kNm)'
 KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Buckling Stress (MPa)' # Euler 
@@ -529,6 +572,7 @@ KEY_Flexure_Member_MAIN_MODULE = 'Flexure Member'
 KEY_DISP_FLEXURE = 'Flexural Members - Simply Supported'
 KEY_DISP_FLEXURE2 = 'Flexural Members - Cantilever'
 KEY_DISP_FLEXURE3 = 'Flexural Members'
+KEY_DISP_FLEXURE4 = 'Flexural Members - Purlins'
 
 KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kNm)'
 KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kNm)'
@@ -541,12 +585,16 @@ KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'
 KEY_WEB_CRIPPLING= 'Crippling.Strength'
 KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
 KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
-KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)' # Elastic 
-KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' # 
+KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)'# Elastic
+KEY_DISP_Elastic_CM_YY= 'Critical Moment (y-y) (M<sub>cr</sub>)'
+KEY_DISP_Elastic_CM_ZZ= 'Critical Moment (z-z) (M<sub>cr</sub>)'
+KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' #
 KEY_DISP_T_constatnt= 'Torsional Constant (mm<sup>4</sup>)' #  (I<sub>t</sub>)
 KEY_DISP_W_constatnt= 'Warping Constant (mm<sup>6</sup>)' # (I<sub>w</sub>)
 KEY_LTB= 'L.T.B.Details'
 KEY_Elastic_CM= 'Elastic.Moment'
+KEY_Elastic_CM_YY = 'Elastic.Moment_YY'
+KEY_Elastic_CM_ZZ = 'Elastic.Moment_ZZ'
 KEY_T_constatnt= 'T.Constant'
 KEY_W_constatnt= 'W.Constant'
 KEY_IMPERFECTION_FACTOR_LTB = 'Imperfection.LTB'
@@ -554,15 +602,34 @@ KEY_SR_FACTOR_LTB = 'SR.LTB'
 KEY_NON_DIM_ESR_LTB = 'NDESR.LTB'
 # KEY_LTB= 'Lateral Torsional Buckling Details'
 KEY_WEB_BUCKLING= 'Web Buckling Details'
+KEY_WEB_RESISTANCE= 'Web Resistance Details'
 KEY_BEARING_LENGTH = 'Bearing.Length'
 Simply_Supported_img = str(files("osdag.data.ResourceFiles.images").joinpath("ss_beam.png"))
 Cantilever_img = str(files("osdag.data.ResourceFiles.images").joinpath("c_beam.png"))
+Purlin_img = str(files("osdag.data.ResourceFiles.images").joinpath("purlin.jpg"))
 KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
 KEY_DISPP_LENGTH_OVERWRITE = 'Effective Length Parameter'
 KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
 KEY_DISP_BEAM_MOMENT_Latex = 'Bending Moment (kNm)' # ($M_{z-z}$)
 KEY_SUPP_TYPE = 'Member.Type'
 DISP_TITLE_ISECTION = 'I Sections'
+KEY_DISP_CLADDING = 'Cladding (For Deflection)'
+
+#Web Resistance Values
+KEY_BENDING_COMPRESSIVE_STRESS_YY = 'Resistance.Bending_Cmp_Stress_yy'
+KEY_BENDING_COMPRESSIVE_STRESS_ZZ = 'Resistance.Bending_Cmp_Stress_zz'
+KEY_DISP_BENDING_COMPRESSIVE_STRESS_YY = 'Bending Compressive Stress (y-y)'
+KEY_DISP_BENDING_COMPRESSIVE_STRESS_ZZ = 'Bending Compressive Stress (z-z)'
+KEY_BENDING_STRESS_RF_YY = 'Resistance.Bending_Stress_RF_yy'
+KEY_BENDING_STRESS_RF_ZZ = 'Resistance.Bending_Stress_RF_zz'
+KEY_DISP_BENDING_STRESS_RF_YY = 'Bending Stress Reduction Factor (y-y)'
+KEY_DISP_BENDING_STRESS_RF_ZZ = 'Bending Stress Reduction Factor (z-z)'
+KEY_RESISTANCE_MOMENT_YY = 'Resistance.Moment_YY'
+KEY_RESISTANCE_MOMENT_ZZ = 'Resistance.Moment_ZZ'
+KEY_DISP_RESISTANCE_MOMENT_YY = 'Moment (y-y)'
+KEY_DISP_RESISTANCE_MOMENT_ZZ = 'Moment (z-z)'
+KEY_BUCKLING_CLASS = "Buckling Class"
+KEY_DISP_BUCKLING_CLASS = "Buckling Class"
 
 KEY_DISP_DESIGN_TYPE_FLEXURE = 'Laterally Supported'
 KEY_DESIGN_TYPE_FLEXURE = 'Flexure.Type'
@@ -581,9 +648,14 @@ KEY_SUPPORT = 'Flexure.Support'
 KEY_DISP_SUPPORT = 'End Conditions'
 KEY_DISP_SUPPORT1 = 'Simply Supported'
 KEY_DISP_SUPPORT2 = 'Cantilever'
-KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2)) #[KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2]
+KEY_DISP_SUPPORT3 = 'Purlins'
+KEY_DISP_SUPPORT_LIST = list((KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2, KEY_DISP_SUPPORT3)) #[KEY_DISP_SUPPORT1, KEY_DISP_SUPPORT2]
 # KEY_SUPPORT1 = 'SimpSupport.Torsional'
 # KEY_SUPPORT2 = 'SimpSupport.Warping'
+KEY_CLADDING_TYPE1 = 'Brittle Cladding'
+KEY_CLADDING_TYPE2 = 'Elastic Cladding'
+KEY_CLADDING = 'Cladding.type'
+VALUES_CLADDING = list((KEY_CLADDING_TYPE1, KEY_CLADDING_TYPE2))
 KEY_DISP_LENGTH_BEAM = 'Effective Span (m)*'
 KEY_LOAD = 'Loading.Condition'
 KEY_DISP_LOAD = 'Loading Condition'
@@ -591,17 +663,17 @@ KEY_DISP_LOAD1 ='Normal'
 KEY_DISP_LOAD2 = 'Destabilizing'
 KEY_DISP_LOAD_list = list((KEY_DISP_LOAD1, KEY_DISP_LOAD2))
 KEY_TORSIONAL_RES = 'Torsion.restraint'
-DISP_TORSIONAL_RES = 'Torsional restraint *'
+DISP_TORSIONAL_RES = 'Torsional Restraint *'
 Torsion_Restraint1 = 'Fully Restrained'
 Torsion_Restraint2 = 'Partially Restrained-support connection'
 Torsion_Restraint3 = 'Partially Restrained-bearing support'
 Torsion_Restraint_list = list(( Torsion_Restraint1, Torsion_Restraint2, Torsion_Restraint3))
 KEY_WARPING_RES = 'Warping.restraint'
-DISP_WARPING_RES = 'Warping restraint *'
+DISP_WARPING_RES = 'Warping Restraint *'
 Warping_Restraint1 = 'Both flanges fully restrained'
 Warping_Restraint2 = 'Compression flange fully restrained'
 # Warping_Restraint3 = 'Both flanges fully restrained'
-Warping_Restraint4 = 'Compressicm flange partially restrained'
+Warping_Restraint4 = 'Compression flange partially restrained'
 Warping_Restraint5 = 'Warping not restrained in both flanges'
 Warping_Restraint_list = list(( Warping_Restraint1, Warping_Restraint2, Warping_Restraint4, Warping_Restraint5))
 DISP_SUPPORT_RES = 'Support restraint *'
@@ -646,7 +718,8 @@ KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
 # Plate Girder
 ###################################
 KEY_PLATE_GIRDER_MAIN_MODULE = 'PLATE GIRDER'
-KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER - WELDED'
+KEY_DISP_PLATE_GIRDER_WELDED = 'PLATE GIRDER'
+KEY_DISP_PG_SectionDetail = 'Section Details'
 KEY_tf = 'TF.Data'
 KEY_tw = 'TW.Data'
 KEY_dw = 'DW.Data'
@@ -660,6 +733,91 @@ KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
 KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
 KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
 KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
+KEY_LongitudnalStiffener = 'LongitudnalStiffener.Data'
+KEY_LongitudnalStiffener_thickness = 'LongitudnalStiffner.Thickness'
+KEY_DISP_LongitudnalStiffener = 'Longitudnal Stiffener'
+KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness'
+KEY_IntermediateStiffener_thickness = 'IntermediateStiffener.Thickness'
+KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness'
+KEY_WeldWebtoflange= 'WeldWebtoflange.Data'
+KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange'
+KEY_WeldStiffenertoweb= 'WeldStiffenertoweb.Data'
+KEY_DISP_WeldStiffenertoweb= 'Weld for Stiffener to Web'
+KEY_IS_IT_SYMMETRIC = 'Girder.Symmetry'
+KEY_DISP_IS_IT_SYMMETRIC = 'Symmetry'
+KEY_DISP_SYM = 'Symmetric Girder'
+KEY_DISP_UNSYM = 'Unsymmetric Girder'
+KEY_DISP_SYMMETRIC_list = list((KEY_DISP_SYM, KEY_DISP_UNSYM))
+KEY_TOP_FLANGE_THICKNESS_PG = 'TopFlange.Thickness'
+KEY_DISP_TOP_FLANGE_THICKNESS_PG = 'Top Flange Thickness (mm)'
+KEY_OVERALL_DEPTH_PG = 'Total.Depth'
+KEY_OVERALL_DEPTH_PG_TYPE = 'Total.Design_Type'
+KEY_DISP_OVERALL_DEPTH_PG_TYPE = 'Design Type'
+KEY_DISP_OVERALL_DEPTH_PG = 'Total Depth (mm)'
+KEY_WEB_THICKNESS_PG = 'Web.Thickness'
+KEY_DISP_WEB_THICKNESS_PG = 'Web Thickness (mm)'
+KEY_TOP_Bflange_PG_Type = 'Topflange.Width_Type'
+KEY_DISP_TOP_Bflange_PG_Type = 'Top Flange Width Type'
+KEY_TOP_Bflange_PG = 'Topflange.Width'
+KEY_DISP_TOP_Bflange_PG = 'Width of Top Flange (mm)'
+KEY_BOTTOM_Bflange_PG_Type = 'Bottomflange.Width_Type'
+KEY_DISP_BOTTOM_Bflange_PG_Type = 'Bottom Flange Width Type'
+KEY_BOTTOM_Bflange_PG = 'Bottomflange.Width'
+KEY_DISP_BOTTOM_Bflange_PG = 'Width of Bottom Flange (mm)'
+KEY_BOTTOM_FLANGE_THICKNESS_PG = 'BottomFlange.Thickness'
+KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG = 'Bottom Flange Thickness (mm)'
+KEY_STR_TYPE = 'Structure.Type'
+KEY_DISP_STR_TYPE = 'Type of Structure'
+KEY_WEB_PHILOSOPHY = 'Web.Philosophy'
+KEY_DISP_WEB_PHILOSOPHY = 'Web Philosophy'
+KEY_DISP_SECTION_DATA_PG = 'Design Inputs'
+KEY_LOADING = 'Factored Maximum Loads'
+KEY_DISP_STR_TYP1 = 'Highway Bridge'
+KEY_DISP_STR_TYP2 = 'Railway Bridge'
+KEY_DISP_STR_TYP3 = 'Industrial Structure'
+KEY_DISP_STR_TYP4 = 'Other Building'
+KEY_DISP_STR_TYPE_list = [KEY_DISP_STR_TYP1, KEY_DISP_STR_TYP2, KEY_DISP_STR_TYP3,KEY_DISP_STR_TYP4]
+KEY_DISP_PHILO1 = 'Thin Web with ITS'
+KEY_DISP_PHILO2 = 'Thick Web without ITS'
+WEB_PHILOSOPHY_list = list((KEY_DISP_PHILO1, KEY_DISP_PHILO2))
+KEY_DISP_DESIGN_STIFFER = 'Stiffener Design'
+KEY_DISP_WELD_DESIGN = 'Weld Design'
+KEY_BENDING_MOMENT_SHAPE= 'Bendingmoment.shape'
+KEY_DISP_BENDING_MOMENT_SHAPE='Bending Moment Shape'
+KEY_UDL_PIN_PIN_PG='UDLPINPIN.Data'
+KEY_DISP_UDL_PIN_PIN_PG='Uniform Loading with pinned-pinned support'
+KEY_UDL_FIX_FIX_PG= 'UDLFIXFIX.Data'
+KEY_DISP_UDL_FIX_FIX_PG= 'Uniform Loading with fixed-fixed support'
+KEY_PL_PIN_PIN_PG= 'PLPINPIN.Data'
+KEY_DISP_PL_PIN_PIN_PG='Concentrate Load with pinned-pinned support'
+KEY_PL_FIX_FIX_PG= 'PLFIXFIX.Data'
+KEY_DISP_PL_FIX_FIX_PG= 'Concentrate load with fixed-fixed support'
+KEY_DISP_GIRDERSEC = 'Girder Properties'
+Bending_moment_shape_list= list((KEY_DISP_UDL_PIN_PIN_PG, KEY_DISP_UDL_FIX_FIX_PG, KEY_DISP_PL_PIN_PIN_PG,KEY_DISP_PL_FIX_FIX_PG))
+VALUES_DEPTH_PG = ['Customized','Optimized']
+VALUES_OPT = ['All']
+KEY_DESIGN_LOAD = 'Design.Load'
+KEY_DISP_DESIGN_LOAD = 'Design Load'
+VALUE_DESIGN_LOAD_list = ['Live load','Dead load', 'Crane Load(Manual operation)', 'Crane load(Electric operation up to 50t)', 'Crane load(Electric operation over 50t)']
+KEY_MEMBER_OPTIONS = 'Member.Options'
+KEY_DISP_MEMBER_OPTIONS = 'Member Options'
+# VALUES_MEMBER_OPTIONS_INDUS = ['Purlin and Girts', 'Simple span', 'Cantilever span', 'Rafter Supporting', 'Gantry']
+# VALUES_MEMBER_OPTIONS_OTHER = ['Floor and roof', 'Cantilever']
+# VALUES_MEMBER_OPTIONS_BRIDGE = ['Simple span', 'Cantilever span']
+VALUES_MEMBER_OPTIONS = [['Simple Span', 'Cantilever Span'],['Purlin and Girts', 'Simple span', 'Cantilever span', 'Rafter Supporting', 'Gantry'], ['Floor and roof', 'Cantilever']]
+KEY_SUPPORTING_OPTIONS = 'Supporting.Options'
+KEY_DISP_SUPPORTING_OPTIONS = 'Supporting Options'
+VALUES_SUPPORTING_OPTIONS_PSC = ['Elastic cladding', 'Brittle cladding']
+VALUES_SUPPORTING_OPTIONS_RS = ['Profiled Metal sheeting', 'Plastered sheeting']
+VALUES_SUPPORTING_OPTIONS_GNT = ['Crane']
+VALUES_SUPPORTING_OPTIONS_FRC = ['Elements not susceptible to cracking', 'Element susceptible to cracking']
+VALUES_SUPPORTING_OPTIONS_DEF = ['NA']
+KEY_MAX_DEFL = 'Deflection.Max'
+KEY_DISP_MAX_DEFL = 'Maximum Deflection'
+VALUES_MAX_DEFL = ['Span/600','Span/800','Span/400','Span/300','Span/360','Span/150','Span/180','Span/240','Span/120','Span/500','Span/750','Span/1000']
+KEY_SUPPORT_WIDTH = 'Support.Width'
+KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
+ 
 ###################################
 # All Input Keys
 ###################################
@@ -702,8 +860,12 @@ KEY_SEC_PROFILE = 'Member.Profile'
 KEY_SEC_TYPE = 'Member.Type'
 
 KEY_SHEAR = 'Load.Shear'
+KEY_SHEAR_YY = 'Load.Shear.YY'
+KEY_SHEAR_ZZ = 'Load.Shear.ZZ'
 KEY_AXIAL = 'Load.Axial'
 KEY_MOMENT = 'Load.Moment'
+KEY_MOMENT_YY = 'Load.Moment_YY'
+KEY_MOMENT_ZZ = 'Load.Moment_ZZ'
 
 KEY_D = 'Bolt.Diameter'
 KEY_TYP = 'Bolt.Type'
@@ -758,7 +920,7 @@ KEY_DP_WELD_TYPE = 'Weld.Type'
 KEY_DP_DETAILING_EDGE_TYPE = 'Detailing.Edge_type'
 KEY_DP_DETAILING_GAP = 'Detailing.Gap'
 KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences'
-
+KEY_DP_DETAILING_PACKING_PLATE  = 'Detailing.Packing_Plate'
 KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 
 ###################
@@ -777,6 +939,7 @@ VALUES_ENDPLATE_TYPE = ['Flushed - Reversible Moment', 'Extended One Way - Irrev
 # VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
+VALUES_COVER_PLATE = ['Single-Cover', 'Double-Cover']
 
 # TODO: Every one is requested to use VALUES_ALL_CUSTOMIZED key instead of all other keys
 VALUES_ALL_CUSTOMIZED = ['All', 'Customized']
@@ -793,6 +956,7 @@ VALUES_TRUSSBOLT_THK = ['8', '10', '12', '14', '16']
 
 VALUES_MEMBERS = ['2', '3', '4', '5', '6', '7', '8']
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+
 VALUES_TYP_ANCHOR = ['End Plate Type', 'IS 5624-Type A', 'IS 5624-Type B']
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 VALUES_TYP = [TYP_BEARING, TYP_FRICTION_GRIP]
@@ -830,7 +994,11 @@ VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to
 VALUES_DIAM = connectdb("Bolt")
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 
-
+VALUES_IMAGE_PLATEGIRDER = [str(files("osdag.data.ResourceFiles.images").joinpath("ULPPS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("ULFFS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("CLPPS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("CLFFS_PG.png")),
+    str(files("osdag.data.ResourceFiles.images").joinpath("CLPPSPB_PG.png"))]
 VALUES_IMG_TENSIONBOLTED = [str(files("osdag.data.ResourceFiles.images").joinpath("bA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bBBA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bSA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bC.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bBBC.png"))]
 VALUES_IMG_TENSIONWELDED = [str(files("osdag.data.ResourceFiles.images").joinpath("wA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wBBA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wSA.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wC.png")),str(files("osdag.data.ResourceFiles.images").joinpath("wBBC.png"))]
 VALUES_IMG_TENSIONBOLTED_DF01 = [str(files("osdag.data.ResourceFiles.images").joinpath("equaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bblequaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("bbsequaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("salequaldp.png")),str(files("osdag.data.ResourceFiles.images").joinpath("sasequaldp.png"))]
@@ -885,6 +1053,7 @@ DISP_MIN_CLEAT_HEIGHT = 'Min. Cleat Angle Height'
 DISP_MAX_CLEAT_HEIGHT = 'Max. Cleat Angle Height'
 DISP_MIN_CLEAT_THK = 'Min. Cleat Angle Thickness (mm)'
 DISP_MIN_WIDTH = 'Minimum Width (mm)'
+
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####
@@ -938,6 +1107,19 @@ KEY_DISP_MEMBERS = 'No of Members'
 
 # VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
 
+#lapjointbolted
+KEY_PLATE1_THICKNESS = "Plate1Thickness"
+KEY_PLATE2_THICKNESS = "Plate2Thickness" 
+KEY_PLATE_WIDTH = "PlateWidth"
+KEY_DISP_PLATE1_THICKNESS = "Thickness of Plate-1 (mm) *"
+KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *"
+KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *"
+KEY_TENSILE_FORCE = "TensileForce*"
+KEY_DISP_TENSILE_FORCE = "Tensile Force (kN) *"
+
+KEY_COVER_PLATE = "ButtJoint.CoverPlate"
+KEY_DISP_COVER_PLATE = "Cover Plate"
+
 KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
 KEY_DISP_LOCATION_STRUT = 'Connection *'
@@ -954,6 +1136,8 @@ KEY_DISP_BEAMSEC_REPORT = 'Beam Section'
 KEY_DISP_SECBM = 'Secondary Beam *'
 DISP_TITLE_FSL = 'Factored Loads'
 KEY_DISP_MOMENT = 'Bending Moment (kNm) *'
+KEY_DISP_MOMENT_ZZ = 'Bending Moment (z-z) (kNm)'
+KEY_DISP_MOMENT_YY = 'Bending Moment (y-y) (kNm)'
 
 KEY_DISP_TOP_ANGLE = 'Top Angle'
 
@@ -999,6 +1183,8 @@ SECTION_CLASSIFICATION = "Section Classification"
 
 KEY_DISP_D = 'Diameter (mm) *'
 KEY_DISP_SHEAR = 'Shear Force (kN) *'
+KEY_DISP_SHEAR_YY = 'Shear Force (y-y) (kN)'
+KEY_DISP_SHEAR_ZZ = 'Shear Force (z-z) (kN)'
 KEY_DISP_AXIAL = 'Axial Force (kN)'
 KEY_DISP_AXIAL_STAR = 'Axial Force (kN)* '
 DISP_TITLE_PLATE = 'Plate'
@@ -1310,6 +1496,7 @@ KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Edge Preparation Method'  # added by Danish A
 
 DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
 DISP_TITLE_BOLTD = 'Bolt Details'
+DISP_TITLE_BOLTDS = 'Bolt Design'
 DISP_TITLE_PLATED = 'Plate Details'
 
 KEY_DISP_DP_DETAILING_GAP = 'Gap Between Beam and <br>Support (mm)'
@@ -1319,6 +1506,7 @@ KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the Members Exposed to <br> Co
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the Members Exposed to Corrosive Influences?'
 KEY_DISP_CORR_INFLUENCES = 'Members exposed to corrosive influences?'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
+KEY_DISP_DP_DETAILING_PACKING_PLATE = 'Packing Plate'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate Analysis'
 KEY_DISP_GAP = 'Gap Between Members (mm)'
@@ -1799,6 +1987,8 @@ KEY_OUT_DISP_INTER_D_PROVIDED = 'Diameter (mm)'
 
 
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade_Provided'
+KEY_OUT_DISP_TYP_PROVIDED = 'Type'
+KEY_OUT_TYP_PROVIDED = 'Bolt.Type_Provided'
 KEY_OUT_DISP_GRD_PROVIDED = 'Property Class'
 KEY_OUT_INTER_GRD_PROVIDED = 'Bolt.InterGrade'
 KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
@@ -1818,6 +2008,11 @@ KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
+KEY_OUT_BOLT_CONN_LEN = 'Bolt.ConnLength'
+KEY_UTILIZATION_RATIO = 'Bolt.UtilizationRatio'
+KEY_DISP_UTILIZATION_RATIO = 'Utilization Ratio'
+KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
+
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
@@ -1836,6 +2031,7 @@ KEY_OUT_DISP_BETA_LG = 'β<sub>lg</sub>'
 KEY_OUT_BETA_PK = 'Bolt.Betapk'
 KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
+KEY_OUT_BOLT_SLIP = 'Bolt.Slip'
 KEY_OUT_DISP_BOLT_SLIP_DR = 'Slip Resistance (kN)'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_BOLT_CAPACITY_SPTD = 'Bolt.Capacity_sptd'
@@ -2047,6 +2243,7 @@ KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Stiffener (mm)'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER1 = 'Weld Size at Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
+
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
@@ -2225,6 +2422,7 @@ VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', '
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
+VALUES_SEC_PROFILE4 = ['Channels']
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)(mm)*'
 
@@ -2278,7 +2476,9 @@ DISP_TITLE_FL = 'Factored loads'
 KEY_AXFOR = 'Axial Force'
 KEY_DISP_AXFOR = 'Axial Force (kN)*'
 KEY_PLTHK = 'Plate thk'
+KEY_PK_PLTHK = 'PackingPlate thk'
 KEY_DISP_PLTHK = 'Plate thk (mm)'
+KEY_DISP_PK_PLTHK = 'Packing Plate thickness (mm)'
 KEY_PLTHICK = 'Plate thk'
 KEY_DISP_PLTHICK = 'Plate Thickness (mm)'
 KEY_DISP_PLATE_THICK = 'Plate Thickness (mm)'
@@ -2487,6 +2687,13 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+DETAILING_DESCRIPTION_LAPJOINT = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n</body></html>")
 
 
 COLUMN_OPTIMIZATION_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -2784,3 +2991,87 @@ FLEXURE_OPTIMIZATION_DESCRIPTION_Canti = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DT
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                ) + Allowable_Utilization_Para + Effective_Area_Para + Effective_Length_Para + OPTIMIZATION_TABLE_UI + Bearing_Length_Para
+
+PLATE_GIRDER_DEFLECTION_TABLE = str("""
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clause 5.6.1 Deflection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      padding: 10px;
+      width: auto;
+    }
+    table th, table td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Clause 5.6.1 Deflection</h1>
+  <h2>Vertical Deflection - Table 6 of IS800-2007</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Type of structure</th>
+        <th>Load Type</th>
+        <th>Member</th>
+        <th>Supporting</th>
+        <th>Deflection Limit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Purlins and Girts</td><td>Elastic cladding</td><td>Span/150</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Purlins and Girts</td><td>Brittle cladding</td><td>Span/180</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Simple span</td><td>Elastic cladding</td><td>Span/240</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Simple span</td><td>Brittle cladding</td><td>Span/300</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Cantilever span</td><td>Elastic cladding</td><td>Span/120</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Cantilever span</td><td>Brittle cladding</td><td>Span/150</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Rafter supporting</td><td>Profiled Metal Sheeting</td><td>Span/180</td></tr>
+      <tr><td>Industrial building</td><td>Live Load</td><td>Rafter supporting</td><td>Plastered Sheeting</td><td>Span/240</td></tr>
+      <tr><td>Industrial building</td><td>Crane Load(Manual operation)</td><td>Gantry</td><td>Crane</td><td>Span/500</td></tr>
+      <tr><td>Industrial building</td><td>Crane load(Electric operation up to 50t)</td><td>Gantry</td><td>Crane</td><td>Span/750</td></tr>
+      <tr><td>Industrial building</td><td>Crane load(Electric operation over 50t)</td><td>Gantry</td><td>Crane</td><td>Span/1000</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Floor and Roof</td><td>Elements not susceptible to cracking</td><td>Span/300</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Floor and Roof</td><td>Element susceptible to cracking</td><td>Span/360</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Cantilever Span</td><td>Elements not susceptible to cracking</td><td>Span/150</td></tr>
+      <tr><td>Other buildings</td><td>Live Load</td><td>Cantilever Span</td><td>Element susceptible to cracking</td><td>Span/180</td></tr>
+      <tr><td>Highway Bridges</td><td>Live Load</td><td>Simple span</td><td>NA</td><td>Span/600</td></tr>
+      <tr><td>Railway Bridges</td><td>Live Load</td><td>Simple span</td><td>NA</td><td>Span/600</td></tr>
+      <tr><td>Highway Bridges</td><td>Dead Load</td><td>Simple span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Railway Bridges</td><td>Dead Load</td><td>Simple span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Highway Bridges</td><td>Live Load</td><td>Cantilever span</td><td>NA</td><td>Span/400</td></tr>
+      <tr><td>Railway Bridges</td><td>Live Load</td><td>Cantilever span</td><td>NA</td><td>Span/400</td></tr>
+      <tr><td>Highway Bridges</td><td>Dead Load</td><td>Cantilever span</td><td>NA</td><td>Span/800</td></tr>
+      <tr><td>Railway Bridges</td><td>Dead Load</td><td>Cantilever span</td><td>NA</td><td>Span/800</td></tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+
+
+""")

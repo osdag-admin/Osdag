@@ -41,7 +41,7 @@ class SvgCard(QFrame):
         self.title = title
         self.is_selected = False
 
-        self.setFixedSize(160, 160) 
+        self.setFixedSize(160, 160)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(8)
@@ -49,14 +49,14 @@ class SvgCard(QFrame):
 
         self.title_label = QLabel(title)
         self.title_label.setAlignment(Qt.AlignCenter)
-        self.title_label.setStyleSheet("font-weight: bold; font-size: 13px;")
+        self.title_label.setStyleSheet("font-weight: bold; font-size: 13px;margin-top: 5px;")
 
         self.svg_widget = QSvgWidget(svg_path)
         self.svg_widget.setFixedSize(90, 80)
 
         self.open_label = ClickableLabel("Open")
         self.open_label.set_id(title)
-        self.open_label.clicked.connect(self.handle_open_clicked)
+        # self.open_label.clicked.connect(self.handle_open_clicked)
         self.open_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         
         self.open_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed) 
@@ -64,7 +64,7 @@ class SvgCard(QFrame):
         self.open_label.setFixedHeight(30)
         self.open_label.setStyleSheet("""
             QLabel {
-                background-color: white; 
+                background-color: white;
                 color: black; 
                 font-weight: bold; 
                 border-top: 2px solid #7ba525; 
@@ -72,9 +72,6 @@ class SvgCard(QFrame):
                 border-bottom-right-radius: 12px;
                 padding: 0px;
                 margin: 0px;
-            }
-            QLabel:hover {
-                color: #90AF13;
             }
         """)
         # Connect the click event for the QLabel
@@ -92,6 +89,7 @@ class SvgCard(QFrame):
         self.open_label_wrapper.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
 
         layout.addWidget(self.title_label)
+        layout.addStretch()
         layout.addWidget(self.svg_widget, alignment=Qt.AlignCenter)
         layout.addStretch()
         layout.addWidget(self.open_label_wrapper)
@@ -107,7 +105,7 @@ class SvgCard(QFrame):
         return """
         QFrame#SvgCard {
             border-radius: 12px;
-            background-color: rgba(255, 255, 255, 200);
+            background-color: rgb(255, 255, 255);
             border: 2px solid transparent;
         }
         """
@@ -115,7 +113,7 @@ class SvgCard(QFrame):
     def hover_style(self):
         return """
         QFrame#SvgCard {
-            background-color: rgba(144, 175, 19, 100);
+            background-color: rgb(144, 175, 19);
             border: 2px solid #90AF13;
             border-radius: 12px;
         }
@@ -124,24 +122,72 @@ class SvgCard(QFrame):
     def selected_style(self):
         return """
         QFrame#SvgCard {
-            background-color: rgba(144, 175, 19, 100);
+            background-color: rgb(144, 175, 19);
             border: 2px solid #90AF13;
             border-radius: 12px;
         }
         """
 
     def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress:
+            # Emit the signal directly from the card when clicked anywhere
+            self.openClicked.emit(self.title)
+            self.open_label.setStyleSheet(
+                    """   
+                        QLabel{
+                            background-color: white; 
+                            color: black;
+                            font-weight: bold; 
+                            border-top: 2px solid #7ba525; 
+                            border-bottom-left-radius: 12px; 
+                            border-bottom-right-radius: 12px;
+                            padding: 0px;
+                            margin: 0px;
+                        }
+                    """
+                )
+            
         if event.type() == QEvent.Enter:
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
             if not self.is_selected:
                 self.setStyleSheet(self.hover_style())
+                self.open_label.setStyleSheet(
+                    """   
+                        QLabel{
+                            background-color: white; 
+                            color: #90AF13;
+                            font-weight: bold; 
+                            border-top: 2px solid #7ba525; 
+                            border-bottom-left-radius: 12px; 
+                            border-bottom-right-radius: 12px;
+                            padding: 0px;
+                            margin: 0px;
+                        }
+                    """
+                )
             target_height = self.open_label.sizeHint().height()
             self.open_button_animation.setStartValue(self.open_label_wrapper.height())
             self.open_button_animation.setEndValue(target_height)
             self.open_button_animation.start()
             self.open_label_wrapper.setMinimumHeight(0)
         elif event.type() == QEvent.Leave:
+            self.setCursor(Qt.CursorShape.ArrowCursor)
             if not self.is_selected:
                 self.setStyleSheet(self.default_style())
+                self.open_label.setStyleSheet(
+                    """
+                        QLabel{
+                            background-color: white; 
+                            color: black;
+                            font-weight: bold; 
+                            border-top: 2px solid #7ba525; 
+                            border-bottom-left-radius: 12px; 
+                            border-bottom-right-radius: 12px;
+                            padding: 0px;
+                            margin: 0px;
+                        }
+                    """
+                )
             self.open_button_animation.setStartValue(self.open_label_wrapper.height())
             self.open_button_animation.setEndValue(0)
             self.open_button_animation.start()

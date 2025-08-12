@@ -221,38 +221,38 @@ class HomeWindow(QWidget):
 
         content_v_layout.addWidget(self.variable_widget)
 
-        # --- Bottom Horizontal Layout with three SVG Widgets ---
-        self.bottom_right_container = QWidget()
-        self.bottom_right_container.setStyleSheet("""
-            QWidget {
-                background: transparent; /* Explicit solid background */
-            }
-        """)
-        self.bottom_right_h_layout = QHBoxLayout(self.bottom_right_container)
-        self.bottom_right_h_layout.setContentsMargins(10, 10, 5, 10)
-        self.bottom_right_h_layout.setSpacing(10)
-        self.bottom_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        # # --- Bottom Horizontal Layout with three SVG Widgets ---
+        # self.bottom_right_container = QWidget()
+        # self.bottom_right_container.setStyleSheet("""
+        #     QWidget {
+        #         background: transparent; /* Explicit solid background */
+        #     }
+        # """)
+        # self.bottom_right_h_layout = QHBoxLayout(self.bottom_right_container)
+        # self.bottom_right_h_layout.setContentsMargins(10, 10, 5, 10)
+        # self.bottom_right_h_layout.setSpacing(10)
+        # self.bottom_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        self.bottom_svg_widget_1 = QSvgWidget()
-        self.bottom_svg_widget_1.load(":/vectors/FOSSEE_logo.svg")
-        self.bottom_svg_widget_1.setFixedSize(163, 60)
-        # No explicit stylesheet for QSvgWidget here.
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_1)
+        # self.bottom_svg_widget_1 = QSvgWidget()
+        # self.bottom_svg_widget_1.load(":/vectors/FOSSEE_logo.svg")
+        # self.bottom_svg_widget_1.setFixedSize(163, 60)
+        # # No explicit stylesheet for QSvgWidget here.
+        # self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_1)
 
-        self.bottom_svg_widget_2 = QSvgWidget()
-        self.bottom_svg_widget_2.load(":/vectors/MOS_logo.svg")
-        self.bottom_svg_widget_2.setFixedSize(122, 60)
-        # No explicit stylesheet for QSvgWidget here.
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
+        # self.bottom_svg_widget_2 = QSvgWidget()
+        # self.bottom_svg_widget_2.load(":/vectors/MOS_logo.svg")
+        # self.bottom_svg_widget_2.setFixedSize(122, 60)
+        # # No explicit stylesheet for QSvgWidget here.
+        # self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
 
-        self.bottom_svg_widget_3 = QSvgWidget()
-        self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_logo.svg")
-        self.bottom_svg_widget_3.setFixedSize(263, 30)
-        # No explicit stylesheet for QSvgWidget here.
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignBottom)
-        self.bottom_right_h_layout.addStretch(1)
+        # self.bottom_svg_widget_3 = QSvgWidget()
+        # self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_logo.svg")
+        # self.bottom_svg_widget_3.setFixedSize(263, 30)
+        # # No explicit stylesheet for QSvgWidget here.
+        # self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignBottom)
+        # self.bottom_right_h_layout.addStretch(1)
 
-        content_v_layout.addWidget(self.bottom_right_container)
+        # content_v_layout.addWidget(self.bottom_right_container)
 
         main_h_layout.addWidget(self.content, 8)
 
@@ -465,10 +465,10 @@ class HomeWindow(QWidget):
     def set_active_button(self, module):
         self.nav_bar.set_active_button_by_name(module)
 
-if __name__ == "__main__":
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    app = QApplication(sys.argv)
-    window = HomeWindow()
-    window.show()
-    sys.exit(app.exec())
+# if __name__ == "__main__":
+#     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#     app = QApplication(sys.argv)
+#     window = HomeWindow()
+#     window.show()
+#     sys.exit(app.exec())
 

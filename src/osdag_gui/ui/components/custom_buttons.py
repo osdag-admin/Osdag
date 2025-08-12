@@ -70,7 +70,7 @@ class MenuButton(QPushButton):
             self._update_style()
 
 class CustomButton(QPushButton):
-    def __init__(self, text: str, parent=None):
+    def __init__(self, text: str, icon_path: str, parent=None):
         super().__init__(parent)
         self.setCursor(Qt.PointingHandCursor)
         self.setStyleSheet("""
@@ -99,7 +99,7 @@ class CustomButton(QPushButton):
 
         # Left icon (extract from design_button.svg or use a similar SVG)
         left_icon = QSvgWidget()
-        left_icon.load(':/vectors/design.svg')
+        left_icon.load(icon_path)
         left_icon.setFixedSize(18, 18)
         layout.addWidget(left_icon)
 
@@ -108,18 +108,12 @@ class CustomButton(QPushButton):
         text_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(text_label)
 
-        # Right icon (use a down arrow SVG or PNG)
-        right_icon = QSvgWidget()
-        right_icon.load(':/vectors/arrow_down.svg')
-        right_icon.setFixedSize(18, 18)
-        layout.addWidget(right_icon)
-
         layout.setAlignment(Qt.AlignVCenter)
         self.setLayout(layout)
         
         # Calculate minimum width to prevent overlap
         text_width = text_label.sizeHint().width()
-        icon_width = 18 + 18  # Left and right icon widths
+        icon_width = 18
         margins = layout.contentsMargins().left() + layout.contentsMargins().right()  # 10 + 10
         padding = 20  # 10px padding on each side from stylesheet
         min_width = text_width + icon_width + margins + padding

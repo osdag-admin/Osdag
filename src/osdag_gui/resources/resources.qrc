@@ -75,6 +75,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/window_restore.svg</file>
 
         <file>vectors/design.svg</file>
+        <file>vectors/save.svg</file>
+        <file>vectors/design_report.svg</file>
         <file>vectors/arrow_down.svg</file>
 
         <file>themes/darkstyle.qss</file>

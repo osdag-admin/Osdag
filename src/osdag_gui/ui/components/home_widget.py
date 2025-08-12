@@ -661,6 +661,7 @@ class HomeWidget(QWidget):
         content_area_layout = QVBoxLayout(self)
         content_area_layout.setContentsMargins(0, 0, 0, 0)
         content_area_layout.setSpacing(0)
+        content_area_layout.addStretch()
 
         search_layout = QHBoxLayout()
         search_layout.addStretch()
@@ -673,7 +674,6 @@ class HomeWidget(QWidget):
         search_layout.addWidget(self.theme_toggle)
         search_layout.addStretch()
         content_area_layout.addLayout(search_layout)
-
         content_area_layout.addStretch()
 
         sections_layout = QHBoxLayout()
@@ -690,3 +690,4 @@ class HomeWidget(QWidget):
         sections_layout.addWidget(self.recent_modules, alignment=Qt.AlignCenter)
         sections_layout.addStretch(1)
         content_area_layout.addLayout(sections_layout)
+        content_area_layout.addStretch()

@@ -68,16 +68,16 @@ def apply_dropdown_style(widget, arrow_down_path):
         }}
         QComboBox QAbstractItemView::item:hover {{
             border: 1px solid #90AF13;
-            background-color: white;
+            background-color: #90AF13;
             color: black;
         }}
         QComboBox QAbstractItemView::item:selected {{
-            background-color: white;
+            background-color: #90AF13;
             color: black;
             border: 1px solid #90AF13;
         }}
         QComboBox QAbstractItemView::item:selected:hover {{
-            background-color: white;
+            background-color: #90AF13;
             color: black;
             border: 1px solid #94b816;
         }}
@@ -280,7 +280,7 @@ class InputDock(QWidget):
         # --- Top Bar (fixed inside scroll area) ---
         top_bar = QHBoxLayout()
         top_bar.setSpacing(10)
-        input_dock_btn = QPushButton("Input Dock")
+        input_dock_btn = QPushButton("Basic Inputs")
         input_dock_btn.setStyleSheet(
             "background-color: #90AF13; color: white; border-radius: 5px; padding: 4px 16px; font-weight: bold;"
         )
@@ -354,15 +354,18 @@ class InputDock(QWidget):
         # --- Bottom Design Button (fixed inside scroll area) ---
         btn_button_layout = QHBoxLayout()
         btn_button_layout.setContentsMargins(0, 20, 0, 0)
+        btn_button_layout.addStretch(2)
+
+        save_input_btn = CustomButton("Save Input", ":/vectors/save.svg")
+        save_input_btn.clicked.connect(lambda: print("design clicked"))
+        btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
-        svg_clickable_btn = CustomButton("Design")
-        svg_clickable_btn.clicked.connect(lambda: print("design clicked"))
-        # svg_clickable_btn.clicked.connect(lambda: print("design clicked"))
+        design_btn = CustomButton("Design", ":/vectors/design.svg")
+        design_btn.clicked.connect(lambda: print("design clicked"))
+        btn_button_layout.addWidget(design_btn)
+        btn_button_layout.addStretch(2)
 
-
-        btn_button_layout.addWidget(svg_clickable_btn, 2)
-        btn_button_layout.addStretch(1)
         panel_layout.addLayout(btn_button_layout)
 
         # --- Horizontal scroll area for all right content ---
@@ -419,26 +422,26 @@ class InputDock(QWidget):
 
 #----------------Standalone-Test-Code--------------------------------
 
-# class MyMainWindow(QMainWindow):
-#     def __init__(self):
-#         super().__init__()
+class MyMainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
 
-#         self.setStyleSheet("border: none")
+        self.setStyleSheet("border: none")
 
-#         self.central_widget = QWidget()
-#         self.central_widget.setObjectName("central_widget")
-#         self.setCentralWidget(self.central_widget)
+        self.central_widget = QWidget()
+        self.central_widget.setObjectName("central_widget")
+        self.setCentralWidget(self.central_widget)
 
-#         self.main_h_layout = QHBoxLayout(self.central_widget)
-#         self.main_h_layout.addWidget(InputDock(),15)
+        self.main_h_layout = QHBoxLayout(self.central_widget)
+        self.main_h_layout.addWidget(InputDock(self),15)
 
-#         self.main_h_layout.addStretch(40)
+        self.main_h_layout.addStretch(40)
 
-#         self.setWindowState(Qt.WindowMaximized)
+        self.setWindowState(Qt.WindowMaximized)
 
 
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = MyMainWindow()
-#     window.show()
-#     sys.exit(app.exec()) 
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MyMainWindow()
+    window.show()
+    sys.exit(app.exec()) 

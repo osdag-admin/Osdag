@@ -287,13 +287,18 @@ class OutputDock(QWidget):
 
         btn_button_layout = QHBoxLayout()
         btn_button_layout.setContentsMargins(0, 20, 0, 0)
+        btn_button_layout.addStretch(2)
+
+        design_report_btn = CustomButton("Generate Design Report", ":/vectors/design_report.svg")
+        design_report_btn.clicked.connect(lambda: print("Report Generate clicked"))
+        btn_button_layout.addWidget(design_report_btn)
         btn_button_layout.addStretch(1)
 
-        clickable_btn = CustomButton("Generate Report")
-        clickable_btn.clicked.connect(lambda: print("Report Generate clicked"))
+        save_output_csv_btn = CustomButton("Save Outputs(csv)", ":/vectors/design_report.svg")
+        save_output_csv_btn.clicked.connect(lambda: print("Report Generate clicked"))
+        btn_button_layout.addWidget(save_output_csv_btn)
+        btn_button_layout.addStretch(2)
 
-        btn_button_layout.addWidget(clickable_btn, 2)
-        btn_button_layout.addStretch(1)
         right_layout.addLayout(btn_button_layout)
 
         # --- Horizontal scroll area for all right content ---

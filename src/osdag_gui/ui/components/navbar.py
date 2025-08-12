@@ -102,6 +102,16 @@ class VerticalMenuBar(QWidget):
         self.osdag_logo = QSvgWidget(":/vectors/Osdag_logo.svg", parent=self)
         # Remove fixed size here, will be set dynamically in resizeEvent
         self.header_layout.addWidget(self.osdag_logo, alignment=Qt.AlignCenter)
+
+        self.version_label = QLabel("v2025.01.a.2")
+        self.version_label.setFont(QFont("Calibri", 12)) # Initial font, will be updated
+        self.version_label.setStyleSheet("""
+            QLabel {
+                color: gray;
+            }
+        """)
+        self.version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.header_layout.addWidget(self.version_label)
         
         self.main_layout.addWidget(self.header)
 
@@ -140,16 +150,6 @@ class VerticalMenuBar(QWidget):
         self.iitb_logo = QSvgWidget(":/vectors/IITB_logo.svg", parent=self)
         # Remove fixed size here, will be set dynamically in resizeEvent
         self.bottom_layout.addWidget(self.iitb_logo, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        self.version_label = QLabel("v2025.01.a.2")
-        self.version_label.setFont(QFont("Calibri", 12)) # Initial font, will be updated
-        self.version_label.setStyleSheet("""
-            QLabel {
-                color: gray;
-            }
-        """)
-        self.version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.bottom_layout.addWidget(self.version_label)
 
         self.main_layout.addWidget(self.bottom_frame)
 
@@ -209,9 +209,12 @@ class VerticalMenuBar(QWidget):
         self.osdag_logo.setFixedSize(logo_size, logo_size)
         self.iitb_logo.setFixedSize(logo_size, logo_size)
 
-        # Set header's fixed height based on the logo size + some padding
-        # This ensures the header height also scales with the logo
-        self.header.setFixedHeight(logo_size + 10) # 10 pixels for padding top/bottom
+        # Set header's fixed height based on the logo size + version label + spacing
+        # This ensures the header height scales with both the logo and version label
+        # Calculate version label height (approximate based on font size)
+        version_label_height = version_font_size + 8  # Font size + padding
+        header_height = logo_size + version_label_height + 15  # Logo + version + spacing + padding
+        self.header.setFixedHeight(header_height)
 
     def resizeEvent(self, event: QEvent):
         """Called when the widget is resized."""

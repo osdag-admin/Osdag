@@ -140,7 +140,6 @@ class SidebarWidget(QWidget):
             (":/vectors/default_icon.svg", "Compression Member"),
             (":/vectors/default_icon.svg", "Flexural Member"),
             (":/vectors/default_icon.svg", "Beam Column"),
-            (":/vectors/default_icon.svg", "Plate Girder"),
             (":/vectors/default_icon.svg", "Truss"),
             (":/vectors/default_icon.svg", "2D Frame"),
             (":/vectors/default_icon.svg", "3D Frame"),

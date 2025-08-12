@@ -145,11 +145,54 @@ class CustomWindow(QWidget):
         central_layout = QVBoxLayout(central_widget)
         central_layout.setContentsMargins(0, 0, 0, 0)
         central_layout.setSpacing(0)
+        
+        # Create a horizontal layout for the top labels
+        top_labels_layout = QHBoxLayout()
+        top_labels_layout.setContentsMargins(0, 0, 0, 0)
+        top_labels_layout.setSpacing(0)
+        
+        # Add dock indicator labels
+        self.input_dock_label = QLabel("Inputs")
+        self.input_dock_label.setAlignment(Qt.AlignLeft)
+        self.input_dock_label.setStyleSheet("""
+            QLabel {
+                background-color: #90AF13;
+                color: black;
+                padding: 5px;
+                font-family: "Calibri";
+                font-size: 12px;
+                font-weight: bold;
+            }
+        """)
+        self.input_dock_label.setVisible(False)
+        top_labels_layout.addWidget(self.input_dock_label)
+        
+        # Add spacer to push output label to the right
+        top_labels_layout.addStretch()
+        
+        # Add output dock indicator label
+        self.output_dock_label = QLabel("Outputs")
+        self.output_dock_label.setAlignment(Qt.AlignRight)
+        self.output_dock_label.setStyleSheet("""
+            QLabel {
+                background-color: #90AF13;
+                color: black;
+                padding: 5px;
+                font-family: "Calibri";
+                font-size: 12px;
+                font-weight: bold;
+            }
+        """)
+        self.output_dock_label.setVisible(True)
+        top_labels_layout.addWidget(self.output_dock_label)
+        
+        central_layout.addLayout(top_labels_layout)
         central_layout.addStretch(7)
         self.logs_dock = LogDock()
         self.logs_dock_active = True
         self.logs_dock.setVisible(False)
         central_layout.addWidget(self.logs_dock, 2)
+        
         self.splitter.addWidget(central_widget)
 
         self.output_dock = OutputDock(parent=self)
@@ -176,10 +219,14 @@ class CustomWindow(QWidget):
     def input_dock_toggle(self):
         self.input_dock.toggle_input_dock()
         self.input_dock_active = not self.input_dock_active
+        # Show/hide input dock label based on dock state
+        self.input_dock_label.setVisible(not self.input_dock_active)
         
     def output_dock_toggle(self):
         self.output_dock.toggle_output_dock()
         self.output_dock_active = not self.output_dock_active
+        # Show/hide output dock label based on dock state
+        self.output_dock_label.setVisible(self.output_dock_active)
 
     def logs_dock_toggle(self, log_dock_active):
         self.logs_dock.setVisible(log_dock_active)
@@ -359,8 +406,10 @@ class CustomWindow(QWidget):
             self.inputDockIconToggle.emit()
             if show:
                 target_sizes[0] = input_dock.sizeHint().width()
+                self.input_dock_label.setVisible(False)
             else:
                 target_sizes[0] = 0
+                self.input_dock_label.setVisible(True)
             target_sizes[2] = sizes[2]
             remaining_width = total_width - target_sizes[0] - target_sizes[2]
             target_sizes[1] = max(0, remaining_width)
@@ -368,8 +417,10 @@ class CustomWindow(QWidget):
             self.outputDockIconToggle.emit()
             if show:
                 target_sizes[2] = output_dock.sizeHint().width()
+                self.output_dock_label.setVisible(False)
             else:
                 target_sizes[2] = 0
+                self.output_dock_label.setVisible(True)
             target_sizes[0] = sizes[0]
             remaining_width = total_width - target_sizes[0] - target_sizes[2]
             target_sizes[1] = max(0, remaining_width)

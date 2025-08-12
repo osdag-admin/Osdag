@@ -53,14 +53,9 @@ class Data:
         [
             ("Simply Supported Beam", ":/vectors/ss_beam_flexural_mem.svg"),
             ("Cantilever Beam", ":/vectors/cantilever_beam_flexural_mem.svg"),
-            ("Simply Supported Beam", ":/vectors/ss_beam_flexural_mem.svg"),
-            ("Cantilever Beam", ":/vectors/cantilever_beam_flexural_mem.svg"),
-            ("Simply Supported Beam", ":/vectors/ss_beam_flexural_mem.svg"),
-            ("Cantilever Beam", ":/vectors/cantilever_beam_flexural_mem.svg")
+            ("Plate Girder", ":/vectors/ss_beam_flexural_mem.svg"),
         ],
         "Beam Column": 
-        [],
-        "Plate Girder": 
         [],
         "Truss": 
         [],
@@ -78,7 +73,6 @@ class Data:
         "compression_member": ["compression_member_button.svg", "compression_member_button_clicked.svg"],
         "flexural_member": ["flexural_member_button.svg", "flexural_member_button_clicked.svg"],
         "beam_column": ["beam_column_button.svg", "beam_column_button_clicked.svg"],
-        "plate_girder": ["plate_girder_button.svg", "plate_girder_button_clicked.svg"],
         "truss": ["truss_button.svg", "truss_button_clicked.svg"],
         "2d_frame": ["2d_frame_button.svg", "2d_frame_button_clicked.svg"],
         "3d_frame": ["3d_frame_button.svg", "3d_frame_button_clicked.svg"],
@@ -86,10 +80,10 @@ class Data:
     }
 
     FLOATING_NAVBAR = [
-        (":/vectors/info_default.svg", ":/vectors/info_hover.svg", "   Help"),
+        (":/vectors/info_default.svg", ":/vectors/info_hover.svg", "   Info"),
         (":/vectors/resources_default.svg", ":/vectors/resources_hover.svg", "Resources"),
-        (":/vectors/plugin_default.svg", ":/vectors/plugin_hover.svg", "Plugin"),
-        (":/vectors/load_default.svg", ":/vectors/load_hover.svg", "   Load"),
+        (":/vectors/plugin_default.svg", ":/vectors/plugin_hover.svg", "Plugins"),
+        (":/vectors/load_default.svg", ":/vectors/load_hover.svg", " Import"),
     ]
 
     Projects = [

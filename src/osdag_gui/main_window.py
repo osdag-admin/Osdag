@@ -323,31 +323,39 @@ class MainWindow(QMainWindow):
             current_tab_data = self.tab_widget_content[index]
             self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
     
-    def update_docking_icons(self, docking_icons_active, input_is_active, log_is_active, output_is_active):
+    def update_docking_icons(self, docking_icons_active=None, input_is_active=None, log_is_active=None, output_is_active=None):
+        index = self.tab_bar.currentIndex()
+        current_tab_data = self.tab_widget_content[index]
+        if(docking_icons_active is None):
+            docking_icons_active = current_tab_data[1]
+
         # Update input dock icon
         if docking_icons_active:
             self.input_dock_control.show()
             self.output_dock_control.show()
             self.log_dock_control.show()
-            self.input_dock_active = input_is_active
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+            if(input_is_active is not None):
+                self.input_dock_active = input_is_active
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
                             
             # Update output dock icon
-            self.output_dock_active = output_is_active
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+            if(output_is_active is not None):
+                self.output_dock_active = output_is_active
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
 
             # Update log dock icon
-            self.log_dock_active = log_is_active
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
+            if(log_is_active is not None):
+                self.log_dock_active = log_is_active
+                if self.log_dock_active:
+                    self.log_dock_control.load(":/vectors/logs_dock_active.svg")
+                else:
+                    self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
         else:
             self.input_dock_control.hide()
             self.output_dock_control.hide()
@@ -424,7 +432,7 @@ class MainWindow(QMainWindow):
     def open_fin_plate_page(self):
         title = "Fin Plate Connection"
         self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, "Fin Plate Connection")
+        fin_plate = CustomWindow(title, "Fin Plate Connection", parent=self)
 
         # dock icon update trigger signal
         fin_plate.outputDockIconToggle.connect(self.output_dock_icon_toggle)

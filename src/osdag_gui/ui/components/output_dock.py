@@ -364,5 +364,14 @@ class OutputDock(QWidget):
             label = QLabel(f"{key}: {value}")
             layout.addWidget(label)
         self.current_result = result_dict
+    
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.width() == 0:
+            self.parent.parent.update_docking_icons(output_is_active=False)
+            self.parent.update_output_label_state(True)
+        elif self.width() > 0:
+            self.parent.parent.update_docking_icons(output_is_active=True)
+            self.parent.update_output_label_state(False)
 
 

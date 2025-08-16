@@ -415,10 +415,12 @@ class InputDock(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if self.width() == 0 and hasattr(self.parent, 'update_docking_icons'):
-            self.parent.update_docking_icons(False, self.parent.log_dock_active, self.parent.output_dock_active)
-        elif self.width() > 0 and hasattr(self.parent, 'update_docking_icons'):
-            self.parent.update_docking_icons(True, self.parent.log_dock_active, self.parent.output_dock_active)
+        if self.width() == 0:
+            self.parent.parent.update_docking_icons(input_is_active=False)
+            self.parent.update_input_label_state(True)
+        elif self.width() > 0:
+            self.parent.parent.update_docking_icons(input_is_active=True)
+            self.parent.update_input_label_state(False)
 
 #----------------Standalone-Test-Code--------------------------------
 
@@ -440,8 +442,8 @@ class MyMainWindow(QMainWindow):
         self.setWindowState(Qt.WindowMaximized)
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MyMainWindow()
-    window.show()
-    sys.exit(app.exec()) 
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     window = MyMainWindow()
+#     window.show()
+#     sys.exit(app.exec()) 

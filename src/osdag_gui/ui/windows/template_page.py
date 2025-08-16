@@ -22,9 +22,9 @@ class CustomWindow(QWidget):
     openNewTab = Signal(str)
     outputDockIconToggle = Signal()
     inputDockIconToggle = Signal()
-    def __init__(self, title: str, backend: object):
+    def __init__(self, title: str, backend: object, parent):
         super().__init__()
-
+        self.parent = parent
         self.current_tab_index = 0
         self.setStyleSheet("""
             QWidget {
@@ -219,18 +219,24 @@ class CustomWindow(QWidget):
     def input_dock_toggle(self):
         self.input_dock.toggle_input_dock()
         self.input_dock_active = not self.input_dock_active
-        # Show/hide input dock label based on dock state
-        self.input_dock_label.setVisible(not self.input_dock_active)
         
     def output_dock_toggle(self):
         self.output_dock.toggle_output_dock()
         self.output_dock_active = not self.output_dock_active
         # Show/hide output dock label based on dock state
-        self.output_dock_label.setVisible(self.output_dock_active)
+        # self.output_dock_label.setVisible(self.output_dock_active)
 
     def logs_dock_toggle(self, log_dock_active):
         self.logs_dock.setVisible(log_dock_active)
         self.logs_dock_active = not self.logs_dock_active
+
+    def update_input_label_state(self, state):
+        # Show/hide input dock label based on dock state
+        self.input_dock_label.setVisible(state)
+    
+    def update_output_label_state(self, state):
+        # Show/hide input dock label based on dock state
+        self.output_dock_label.setVisible(state)
         
     def create_menu_bar_items(self):
         file_menu = self.menu_bar.addMenu("File")
@@ -378,6 +384,7 @@ class CustomWindow(QWidget):
         n = self.splitter.count()
         if dock == 'input':
             dock_index = 0
+
         elif dock == 'output':
             dock_index = n - 1
         elif dock == 'log':
@@ -403,7 +410,7 @@ class CustomWindow(QWidget):
         output_dock = self.splitter.widget(n - 1)
         
         if dock == 'input':
-            self.inputDockIconToggle.emit()
+            # self.inputDockIconToggle.emit()
             if show:
                 target_sizes[0] = input_dock.sizeHint().width()
                 self.input_dock_label.setVisible(False)
@@ -414,7 +421,7 @@ class CustomWindow(QWidget):
             remaining_width = total_width - target_sizes[0] - target_sizes[2]
             target_sizes[1] = max(0, remaining_width)
         else:
-            self.outputDockIconToggle.emit()
+            # self.outputDockIconToggle.emit()
             if show:
                 target_sizes[2] = output_dock.sizeHint().width()
                 self.output_dock_label.setVisible(False)
@@ -561,10 +568,10 @@ class DummyThread(QThread):
             time.sleep(self.sec)
             self.finished.emit()
 
-if __name__ == "__main__":
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    app = QApplication(sys.argv)
-    window = CustomWindow("Fin Plate Connection", "FinPlateConnection")
-    window.showMaximized()
-    window.show()
-    sys.exit(app.exec())
+# if __name__ == "__main__":
+#     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#     app = QApplication(sys.argv)
+#     window = CustomWindow("Fin Plate Connection", "FinPlateConnection")
+#     window.showMaximized()
+#     window.show()
+#     sys.exit(app.exec())

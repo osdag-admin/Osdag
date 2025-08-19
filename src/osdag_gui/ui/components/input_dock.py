@@ -9,13 +9,15 @@ from PySide6.QtWidgets import (
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QTimer
-from PySide6.QtGui import QPixmap, QIcon, QPainter, QColor
+from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QTimer, QRegularExpression
+from PySide6.QtGui import QPixmap, QIcon, QPainter, QColor, QDoubleValidator, QRegularExpressionValidator
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import CustomButton
 import osdag_gui.resources.resources_rc
 from osdag_gui.data.modules.connection.shear_connection.fin_plate_data import Data
+
+from osdag_core.Common import *
 
 class NoScrollComboBox(QComboBox):
     def wheelEvent(self, event):
@@ -25,12 +27,21 @@ def right_aligned_widget(widget):
     container = QWidget()
     layout = QHBoxLayout(container)
     layout.setContentsMargins(0, 0, 0, 0)
-    # Remove layout.addStretch()
     layout.addWidget(widget)
     layout.setAlignment(widget, Qt.AlignVCenter)  # Optional: vertical center
     return container
 
-def apply_dropdown_style(widget, arrow_down_path):
+def left_aligned_widget(widget):
+    container = QWidget()
+    layout = QHBoxLayout(container)
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.addWidget(widget)
+    layout.addStretch()
+    layout.setAlignment(widget, Qt.AlignVCenter)  # Optional: vertical center
+    return container
+
+def apply_field_style(widget):
+    arrow_down_path = ":/images/down_arrow.png"
     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
     # Removed setFixedWidth to allow expansion
     if isinstance(widget, QComboBox):
@@ -95,125 +106,13 @@ def apply_dropdown_style(widget, arrow_down_path):
         }
         """)
 
-def create_connecting_members_group(apply_style_func, arrow_path, connectivity_configs):
-    group = QGroupBox("Connecting Members")
-    group.setStyleSheet("""
-        QGroupBox {
-            border: 1px solid #90AF13;
-            border-radius: 4px;
-            margin-top: 0.8em;
-            font-weight: bold;
-        }
-        QGroupBox::title {
-            subcontrol-origin: content;
-            subcontrol-position: top left;
-            left: 10px;
-            padding: 0 4px;
-            margin-top: -15px;
-            background-color: white;
-        }
-    """)
-    conn_form = QFormLayout()
-    conn_form.setHorizontalSpacing(5)
-    conn_form.setVerticalSpacing(10)
-    conn_form.setContentsMargins(10, 10, 10, 10)
-    conn_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-    conn_form.setAlignment(Qt.AlignmentFlag.AlignRight)
-
-    label = list(connectivity_configs.keys())[0]
-    label_dict = connectivity_configs[label]
-
-    connectivity_cb = NoScrollComboBox()
-    connectivity_cb.addItems(list(label_dict.keys()))
-    apply_style_func(connectivity_cb, arrow_path)
-    # Use monospace font for the label
-    label_widget = QLabel(label)
-    label_widget.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
-    conn_form.addRow(label_widget, right_aligned_widget(connectivity_cb))
-
-    dynamic_widgets = {"image_label": None, "field_rows": []}
-
-    def update_form(conn_type):
-        while conn_form.rowCount() > 1:
-            conn_form.removeRow(1)
-        dynamic_widgets["field_rows"] = []
-
-        config = label_dict[conn_type]
-        fields = config["fields"]
-        img_label = QLabel()
-        img_path = config["image"]
-        img_label.setPixmap(QPixmap(img_path).scaledToWidth(90, Qt.SmoothTransformation))
-        img_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        conn_form.addRow("", img_label)
-        dynamic_widgets["image_label"] = img_label
-
-        for field in fields:
-            cb = NoScrollComboBox()
-            cb.addItems(field["items"])
-            apply_style_func(cb, arrow_path)
-            label_widget = QLabel(field["label"])
-            label_widget.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
-            conn_form.addRow(label_widget, right_aligned_widget(cb))
-            dynamic_widgets["field_rows"].append(cb)
-
-    update_form(connectivity_cb.currentText())
-
-    def on_connectivity_changed(text):
-        update_form(text)
-
-    connectivity_cb.currentTextChanged.connect(on_connectivity_changed)
-
-    group.setLayout(conn_form)
-    return group
-
-def create_group_box(title, fields, apply_style_func, arrow_path, horizontal_spacing=5):
-    group = QGroupBox(title)
-    group.setStyleSheet("""
-        QGroupBox {
-            border: 1px solid #90AF13;
-            border-radius: 4px;
-            margin-top: 0.8em;
-            font-weight: bold;
-        }
-        QGroupBox::title {
-            subcontrol-origin: content;
-            subcontrol-position: top left;
-            left: 10px;
-            padding: 0 4px;
-            margin-top: -15px;
-            background-color: white;
-        }
-    """)
-    form_layout = QFormLayout()
-    form_layout.setHorizontalSpacing(horizontal_spacing)
-    form_layout.setVerticalSpacing(10)
-    form_layout.setContentsMargins(10, 10, 10, 10)
-    form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-    # Data class already pads labels
-    all_widgets = []
-    for field in fields:
-        label = field["label"]
-        if "items" in field:
-            widget = NoScrollComboBox()
-            widget.addItems(field["items"])
-        else:
-            widget = QLineEdit()
-            if "placeholder" in field:
-                widget.setPlaceholderText(field["placeholder"])
-        apply_style_func(widget, arrow_path)
-        label_widget = QLabel(label)
-        label_widget.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
-        form_layout.addRow(label_widget, right_aligned_widget(widget))
-        all_widgets.append(widget)
-    group.setLayout(form_layout)
-    return group, all_widgets
-
 class InputDock(QWidget):
     # inputDockVisibilityChanged = Signal(bool)
 
-    def __init__(self, parent):
+    def __init__(self, backend:object, parent):
         super().__init__()
         self.parent = parent
+        self.backend = backend()
         self.setStyleSheet("background: transparent;")
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -222,8 +121,14 @@ class InputDock(QWidget):
         self.left_container = QWidget()
         self.original_width = int(self.width())
         self.setMinimumWidth(100)
-        self.data = Data()  # <-- Create Data instance here
-        self.build_left_panel()
+
+        # Bring the data instance from `design_type` folder
+        input_field_list = self.backend.input_values()
+        # To equalize the label length
+        # So that they are of equal size
+        input_field_list = self.equalize_label_length(input_field_list)
+
+        self.build_left_panel(input_field_list)
         self.main_layout.addWidget(self.left_container)
 
         self.toggle_strip = QWidget()
@@ -257,15 +162,36 @@ class InputDock(QWidget):
 
         self.right_spacer = QWidget()
         self.main_layout.addWidget(self.right_spacer)
+    
+    # To equalize the size of label strings
+    def equalize_label_length(self, list):
+        # Calculate maximum size
+        max_len = 0
+        for t in list:
+            if t[2] not in [TYPE_TITLE, TYPE_IMAGE]:
+                if len(t[1]) > max_len:
+                    max_len = len(t[1])
+        
+        # Create a new list with equal string length
+        return_list = [] 
+        for t in list:
+            if t[2] not in [TYPE_TITLE, TYPE_IMAGE]:
+                new_tupple = (t[0], t[1].ljust(max_len)) + t[2:]
+            else:
+                new_tupple = t
+            return_list.append(new_tupple)
 
-    def get_menu_data(self):
-        # Returns the menu data dicts from the Data instance
-        return {
-            'connectivity_configs': self.data.connectivity_configs,
-            'group_configs': self.data.group_configs
-        }
+        return return_list
 
-    def build_left_panel(self):
+    def get_validator(self, validator):
+        if validator == 'Int Validator':
+            return QRegularExpressionValidator(QRegularExpression("^(0|[1-9]\d*)(\.\d+)?$"))
+        elif validator == 'Double Validator':
+            return QDoubleValidator()
+        else:
+            return None
+        
+    def build_left_panel(self, field_list):
         left_layout = QVBoxLayout(self.left_container)
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.setSpacing(0)
@@ -326,29 +252,133 @@ class InputDock(QWidget):
             }
         """)
 
-        # --- Main Content (group boxes) ---
-        arrow_path = ":/images/down_arrow.png"
-        menu_data = self.get_menu_data()
-        connecting_members_group = create_connecting_members_group(apply_dropdown_style, arrow_path, menu_data['connectivity_configs'])
-
         group_container = QWidget()
         group_container_layout = QVBoxLayout(group_container)
-        group_container_layout.addWidget(connecting_members_group)
-        group_configs = menu_data['group_configs']
-        all_comboboxes = []
-        for title, config in group_configs.items():
-            group, widgets = create_group_box(
-                title=title,
-                fields=config["fields"],
-                apply_style_func=apply_dropdown_style,
-                arrow_path=arrow_path
-            )
-            group_container_layout.addWidget(group)
-            all_comboboxes.extend(widgets)
+
+        # --- Main Content (group boxes) ---
+
+        # Track any group is active or not
+        track_group = False
+        index = 0
+        for field in field_list:
+            index += 1
+            label = field[1]
+            type = field[2]
+            if type == TYPE_MODULE:
+                # No use of module title will see.
+                continue
+            elif type == TYPE_TITLE:
+                if track_group:
+                    current_group.setLayout(cur_box_form)
+                    group_container_layout.addWidget(current_group)
+                    track_group = False
+                
+                # Initialized the group box for current title
+                current_group = QGroupBox(label)
+                current_group.setObjectName(label)
+                track_group = True
+                current_group.setStyleSheet("""
+                    QGroupBox {
+                        border: 1px solid #90AF13;
+                        border-radius: 4px;
+                        margin-top: 0.8em;
+                        font-weight: bold;
+                    }
+                    QGroupBox::title {
+                        subcontrol-origin: content;
+                        subcontrol-position: top left;
+                        left: 10px;
+                        padding: 0 4px;
+                        margin-top: -15px;
+                        background-color: white;
+                    }
+                """)
+                cur_box_form = QFormLayout()
+                cur_box_form.setHorizontalSpacing(5)
+                cur_box_form.setVerticalSpacing(10)
+                cur_box_form.setContentsMargins(10, 10, 10, 10)
+                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
+                cur_box_form.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+            elif type == TYPE_COMBOBOX or type ==TYPE_COMBOBOX_CUSTOMIZED:
+                # Use monospace font for the label
+                left = QLabel(label)
+                left.setObjectName(field[0] + "_label")
+                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+
+                right = NoScrollComboBox()
+                right.setObjectName(field[0])
+                apply_field_style(right)
+                option_list = field[3]
+                right.addItems(option_list)
+
+                cur_box_form.addRow(left, right_aligned_widget(right))
+            
+            elif type == TYPE_IMAGE:
+                left = ""
+                right = QLabel()
+                right.setFixedWidth(90)
+                right.setFixedHeight(90)
+                right.setObjectName(field[0])
+                right.setScaledContents(True)
+                pixmap = QPixmap(field[3])
+                right.setPixmap(pixmap)
+                right.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                cur_box_form.addRow(left, left_aligned_widget(right))
+            
+            elif type == TYPE_TEXTBOX:
+                left = QLabel(label)
+                left.setObjectName(field[0] + "_label")
+                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                
+                right = QLineEdit()
+                apply_field_style(right)
+                right.setObjectName(field[0])
+                right.setEnabled(True if field[4] else False)
+                if field[5] != 'No Validator':
+                    right.setValidator(self.get_validator(field[5]))
+                cur_box_form.addRow(left, right_aligned_widget(right))
+            
+            if index == len(field_list):
+                # Last Data tupple
+                # Must add group_box with form
+                current_group.setLayout(cur_box_form)
+                group_container_layout.addWidget(current_group)
 
         group_container_layout.addStretch()
-
         scroll_area.setWidget(group_container)
+
+
+        # Change in Ui based on Connectivity selection
+        ##############################################
+
+        updated_list = self.backend.input_value_changed()
+        
+        # if updated_list is not None:
+        #     for t in updated_list:    
+        #         for key_name in t[0]:
+        #             key_changed = self.left_panel.findChild(QWidget, key_name)
+        #             self.on_change_connect(key_changed, updated_list, data, main)
+        #             print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         panel_layout.addWidget(scroll_area)
 
         # --- Bottom Design Button (fixed inside scroll area) ---
@@ -415,14 +445,22 @@ class InputDock(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if self.width() == 0:
-            self.parent.parent.update_docking_icons(input_is_active=False)
-            self.parent.update_input_label_state(True)
-        elif self.width() > 0:
-            self.parent.parent.update_docking_icons(input_is_active=True)
-            self.parent.update_input_label_state(False)
+        # Checking hasattr is only meant to prevent errors,
+        # while standalone testing of this widget
+        if self.parent and hasattr(self.parent, 'parent') and self.parent.parent:
+            if self.width() == 0:
+                if hasattr(self.parent.parent, 'update_docking_icons'):
+                    self.parent.parent.update_docking_icons(input_is_active=False)
+                if hasattr(self.parent, 'update_input_label_state'):
+                    self.parent.update_input_label_state(True)
+            elif self.width() > 0:
+                if hasattr(self.parent.parent, 'update_docking_icons'):
+                    self.parent.parent.update_docking_icons(input_is_active=True)
+                if hasattr(self.parent, 'update_input_label_state'):
+                    self.parent.update_input_label_state(False)
 
 #----------------Standalone-Test-Code--------------------------------
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 
 class MyMainWindow(QMainWindow):
     def __init__(self):
@@ -435,15 +473,15 @@ class MyMainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.main_h_layout = QHBoxLayout(self.central_widget)
-        self.main_h_layout.addWidget(InputDock(self),15)
+        self.main_h_layout.addWidget(InputDock(backend=FinPlateConnection ,parent=self),15)
 
         self.main_h_layout.addStretch(40)
 
         self.setWindowState(Qt.WindowMaximized)
 
 
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = MyMainWindow()
-#     window.show()
-#     sys.exit(app.exec()) 
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MyMainWindow()
+    window.show()
+    sys.exit(app.exec()) 

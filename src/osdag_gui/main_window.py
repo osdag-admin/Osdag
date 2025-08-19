@@ -22,6 +22,8 @@ from PySide6.QtSvg import QSvgRenderer
 from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow
 
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -432,7 +434,7 @@ class MainWindow(QMainWindow):
     def open_fin_plate_page(self):
         title = "Fin Plate Connection"
         self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, "Fin Plate Connection", parent=self)
+        fin_plate = CustomWindow(title, FinPlateConnection, parent=self)
 
         # dock icon update trigger signal
         fin_plate.outputDockIconToggle.connect(self.output_dock_icon_toggle)

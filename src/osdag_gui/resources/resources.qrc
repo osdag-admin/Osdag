@@ -54,8 +54,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>images/default_icon.png</file>
         <file>images/clicked_icon.png</file>
-        <file>images/colF2.png</file>
-        <file>images/colW1.png</file>
+        <file>images/fin_cf_bw.png</file>
+        <file>images/fin_cw_bw.png</file>
         <file>images/fin_beam_beam.png</file>
         <file>images/down_arrow.png</file>
         <file>vectors/design_button.svg</file>

@@ -33,7 +33,7 @@ class Data:
         self.connectivity_configs = {
             "Connectivity *": {
                 "Column Flange-Beam Web": {
-                    "image": ":/images/colF2.png",
+                    "image": ":/images/fin_cf_bw.png",
                     "fields": [
                         {"label": "Column Section *", "items": column_sections},
                         {"label": "Primary Beam *", "items": primary_beams},
@@ -41,7 +41,7 @@ class Data:
                     ]
                 },
                 "Column Web-Beam Web": {
-                    "image": ":/images/colW1.png",
+                    "image": ":/images/fin_cw_bw.png",
                     "fields": [
                         {"label": "Column Section *", "items": column_sections},
                         {"label": "Primary Beam *", "items": primary_beams},

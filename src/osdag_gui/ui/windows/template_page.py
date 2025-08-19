@@ -25,6 +25,7 @@ class CustomWindow(QWidget):
     def __init__(self, title: str, backend: object, parent):
         super().__init__()
         self.parent = parent
+        self.backend = backend
         self.current_tab_index = 0
         self.setStyleSheet("""
             QWidget {
@@ -134,7 +135,7 @@ class CustomWindow(QWidget):
         self.layout.setSpacing(0)
 
         self.splitter = QSplitter(Qt.Horizontal, self.body_widget)
-        self.input_dock = InputDock(parent=self)
+        self.input_dock = InputDock(backend=self.backend, parent=self)
         self.input_dock_active = True
         input_dock_width = self.input_dock.sizeHint().width()
         self._input_dock_default_width = input_dock_width
@@ -195,7 +196,7 @@ class CustomWindow(QWidget):
         
         self.splitter.addWidget(central_widget)
 
-        self.output_dock = OutputDock(parent=self)
+        self.output_dock = OutputDock(backend=self.backend, parent=self)
         self.output_dock_active = True
         self.splitter.addWidget(self.output_dock)
         self.output_dock.setStyleSheet(self.output_dock.styleSheet())

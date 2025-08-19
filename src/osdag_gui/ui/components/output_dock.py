@@ -12,18 +12,20 @@ from PySide6.QtGui import QPalette, QColor, QPixmap, QIcon, QPainter
 from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve, Signal
 
 from osdag_gui.ui.components.custom_buttons import CustomButton
+from osdag_core.Common import *
+import osdag_gui.resources.resources_rc
 
 def style_line_edit():
     return """
         QLineEdit {
-            padding: 1px 7px;
+            padding: 2px 7px;
             border: 1px solid #070707;
             border-radius: 4px;
             background-color: white;
             color: #000000;
             font-weight: normal;
-            min-width: 120px;
-            max-width: 140px;
+            min-width: 100px;
+            max-width: 120px;
         }
     """
 
@@ -34,8 +36,8 @@ def style_small_button():
             background-color: #888;
             color: white;
             border-radius: 4px;
-            min-width: 120px;
-            max-width: 140px;
+            min-width: 100px;
+            max-width: 120px;
             font-size: 12px;
         }
         QPushButton:disabled {
@@ -43,9 +45,6 @@ def style_small_button():
             color: #888888;
         }
     """
-
-def style_button():
-    return """padding: 4px 10px; background-color: #888; color: white; border-radius: 4px;"""
 
 def style_main_buttons():
     return """
@@ -64,112 +63,11 @@ def style_main_buttons():
         }
     """
 
-def style_group_box():
-    return """
-        QGroupBox {
-            border: 1px solid #90af13;
-            border-radius: 4px;
-            margin-top: 0.8em;
-            font-weight: bold;
-        }
-        QGroupBox::title {
-            subcontrol-origin: content;
-            subcontrol-position: top left;
-            left: 10px;
-            padding: 0 4px;
-            margin-top: -10px;
-            background-color: white;
-        }
-    """
-
-def pad_labels(fields):
-    max_len = max(len(field.get("row_label", field["label"])) for field in fields)
-    for field in fields:
-        label = field.get("row_label", field["label"])
-        field["label_padded"] = label.ljust(max_len)
-    return fields
-
-def create_row(label_text, widget, spacing=4):
-    row_widget = QWidget()
-    row_layout = QHBoxLayout(row_widget)
-    row_layout.setContentsMargins(0, 0, 0, 0)
-    row_layout.setSpacing(spacing)
-
-    label = QLabel(label_text)
-    label.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
-    label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-    row_layout.addWidget(label)
-    row_layout.addWidget(widget)
-    return row_widget
-
-# Data-driven group and field definition
-GROUPS_DATA = {
-    "Bolt": [
-        {"type": "lineedit", "label": "Diameter (mm)"},
-        {"type": "lineedit", "label": "Property Class"},
-        {"type": "lineedit", "label": "Shear Capacity (kN)"},
-        {"type": "lineedit", "label": "Bearing Capacity (kN)"},
-        {"type": "lineedit", "label": "Capacity (kN)"},
-        {"type": "lineedit", "label": "Bolt Force (kN)"},
-        {"type": "lineedit", "label": "Bolt Columns"},
-        {"type": "lineedit", "label": "Bolt Rows"},
-        {"type": "button", "label": "Spacing Details", "disabled": True, "row_label": "Spacing"},
-    ],
-    "Plate": [
-        {"type": "lineedit", "label": "Thickness (mm)"},
-        {"type": "lineedit", "label": "Height (mm)"},
-        {"type": "lineedit", "label": "Length (mm)"},
-        {"type": "button", "label": "Capacity Details", "disabled": True, "row_label": "Capacity"},
-    ],
-    "Section Details": [
-        {"type": "button", "label": "Capacity Details", "disabled": True, "row_label": "Capacity"},
-    ],
-    "Weld": [
-        {"type": "lineedit", "label": "Size (mm)"},
-        {"type": "lineedit", "label": "Strength (N/mm2)"},
-        {"type": "lineedit", "label": "Stress (N/mm)"},
-    ],
-}
-
-def create_group_box(title, fields):
-    group_box = QGroupBox(title)
-    group_box.setStyleSheet(style_group_box())
-    group_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-
-    layout = QVBoxLayout(group_box)
-    layout.setContentsMargins(4, 4, 4, 4)
-    layout.setSpacing(2)
-
-    form = QFormLayout()
-    form.setHorizontalSpacing(4)
-    form.setVerticalSpacing(4)
-    form.setLabelAlignment(Qt.AlignLeft)
-    form.setFormAlignment(Qt.AlignTop)
-
-    layout.addSpacing(4)
-
-    # Pad labels for this group
-    fields = pad_labels(fields)
-
-    for field in fields:
-        if field["type"] == "lineedit":
-            line = QLineEdit()
-            line.setStyleSheet(style_line_edit())
-            form.addRow(create_row(field["label_padded"], line, spacing=4))
-        elif field["type"] == "button":
-            btn = QPushButton(field["label"])
-            btn.setStyleSheet(style_small_button())
-            btn.setEnabled(not field.get("disabled", False))
-            form.addRow(create_row(field["label_padded"], btn, spacing=4))
-
-    layout.addLayout(form)
-    return group_box
-
 class OutputDock(QWidget):
-    def __init__(self, parent):
+    def __init__(self, backend:object, parent):
         super().__init__(parent)
         self.parent = parent
+        self.backend = backend()
         self.setStyleSheet("background-color: #FFF;")
         self.dock_width = 360
         self.panel_visible = False # Initially hidden
@@ -219,9 +117,13 @@ class OutputDock(QWidget):
         toggle_layout.addStretch()
         output_layout.addWidget(self.toggle_strip)
 
-        # Hide the dock initially
-        self.setMinimumWidth(0)
-        self.setMaximumWidth(0)
+        # # Hide the dock initially
+        # self.setMinimumWidth(0)
+        # self.setMaximumWidth(0)
+
+        # Show the dock initially for testing
+        self.setMinimumWidth(self.dock_width)
+        self.setMaximumWidth(self.dock_width)
 
         # --- Right content (everything except toggle strip) ---
         right_content = QWidget()
@@ -275,13 +177,86 @@ class OutputDock(QWidget):
         # Group container
         group_container = QWidget()
         group_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        group_layout = QVBoxLayout(group_container)
-        for title, fields in GROUPS_DATA.items():
-            group_box = create_group_box(title, fields)
-            group_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            group_layout.addWidget(group_box)
-        group_layout.addStretch()
+        group_container_layout = QVBoxLayout(group_container)
 
+        # Bring the data instance from `design_type` folder
+        field_list = self.backend.output_values(False)
+        # To equalize the label length
+        # So that they are of equal size
+        field_list = self.equalize_label_length(field_list)
+
+        # Track any group is active or not
+        track_group = False
+        index = 0
+        for field in field_list:
+            index += 1
+            label = field[1]
+            type = field[2]
+            if type == TYPE_MODULE:
+                # No use of module title will see.
+                continue
+            elif type == TYPE_TITLE:
+                if track_group:
+                    current_group.setLayout(cur_box_form)
+                    group_container_layout.addWidget(current_group)
+                    track_group = False
+
+                # Initialized the group box for current title
+                current_group = QGroupBox(label)
+                current_group.setObjectName(label)
+                track_group = True
+                current_group.setStyleSheet("""
+                    QGroupBox {
+                        border: 1px solid #90AF13;
+                        border-radius: 4px;
+                        margin-top: 0.8em;
+                        font-weight: bold;
+                    }
+                    QGroupBox::title {
+                        subcontrol-origin: content;
+                        subcontrol-position: top left;
+                        left: 10px;
+                        padding: 0 4px;
+                        margin-top: -15px;
+                        background-color: white;
+                    }
+                """)
+                cur_box_form = QFormLayout()
+                cur_box_form.setHorizontalSpacing(5)
+                cur_box_form.setVerticalSpacing(10)
+                cur_box_form.setContentsMargins(10, 10, 10, 10)
+                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
+                cur_box_form.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+            elif type == TYPE_TEXTBOX:
+                left = QLabel(label)
+                left.setObjectName(field[0] + "_label")
+                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                
+                right = QLineEdit()
+                right.setStyleSheet(style_line_edit())
+                right.setObjectName(field[0])
+                right.setReadOnly(True)
+                cur_box_form.addRow(left, right)
+            
+            elif type == TYPE_OUT_BUTTON:
+                left = QLabel(label)
+                left.setObjectName(field[0] + "_label")
+                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                
+                right = QPushButton(label.strip())
+                right.setObjectName(field[0])
+                right.setStyleSheet(style_small_button())
+                right.setDisabled(True)
+                cur_box_form.addRow(left, right)
+
+            if index == len(field_list):
+                # Last Data tupple
+                # Must add group_box with form
+                current_group.setLayout(cur_box_form)
+                group_container_layout.addWidget(current_group)
+
+        group_container_layout.addStretch()
         scroll_area.setWidget(group_container)
         right_layout.addWidget(scroll_area)
 
@@ -337,6 +312,26 @@ class OutputDock(QWidget):
 
         output_layout.addWidget(h_scroll_area)
 
+    # To equalize the size of label strings
+    def equalize_label_length(self, list):
+        # Calculate maximum size
+        max_len = 0
+        for t in list:
+            if t[2] not in [TYPE_TITLE]:
+                if len(t[1]) > max_len:
+                    max_len = len(t[1])
+        
+        # Create a new list with equal string length
+        return_list = [] 
+        for t in list:
+            if t[2] not in [TYPE_TITLE]:
+                new_tupple = (t[0], t[1].ljust(max_len)) + t[2:]
+            else:
+                new_tupple = t
+            return_list.append(new_tupple)
+
+        return return_list
+
     def toggle_output_dock(self):
         parent = self.parent
         if hasattr(parent, 'toggle_animate'):
@@ -363,15 +358,46 @@ class OutputDock(QWidget):
         for key, value in result_dict.items():
             label = QLabel(f"{key}: {value}")
             layout.addWidget(label)
-        self.current_result = result_dict
-    
+        self.current_result = result_dict      
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if self.width() == 0:
-            self.parent.parent.update_docking_icons(output_is_active=False)
-            self.parent.update_output_label_state(True)
-        elif self.width() > 0:
-            self.parent.parent.update_docking_icons(output_is_active=True)
-            self.parent.update_output_label_state(False)
+        # Checking hasattr is only meant to prevent errors,
+        # while standalone testing of this widget
+        if self.parent and hasattr(self.parent, 'parent') and self.parent.parent:
+            if self.width() == 0:
+                if hasattr(self.parent.parent, 'update_docking_icons'):
+                    self.parent.parent.update_docking_icons(output_is_active=False)
+                if hasattr(self.parent, 'update_input_label_state'):
+                    self.parent.update_output_label_state(True)
+            elif self.width() > 0:
+                if hasattr(self.parent.parent, 'update_docking_icons'):
+                    self.parent.parent.update_docking_icons(output_is_active=True)
+                if hasattr(self.parent, 'update_input_label_state'):
+                    self.parent.update_output_label_state(False)
 
+#----------------Standalone-Test-Code--------------------------------
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+
+class MyMainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setStyleSheet("border: none")
+
+        self.central_widget = QWidget()
+        self.central_widget.setObjectName("central_widget")
+        self.setCentralWidget(self.central_widget)
+
+        self.main_h_layout = QHBoxLayout(self.central_widget)
+        self.main_h_layout.addStretch(40)
+
+        self.main_h_layout.addWidget(OutputDock(backend=FinPlateConnection ,parent=self),15)
+        self.setWindowState(Qt.WindowMaximized)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MyMainWindow()
+    window.show()
+    sys.exit(app.exec()) 
 

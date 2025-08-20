@@ -34,8 +34,6 @@ class Update():
         """Compare current version with latest version and return update message."""
         try:
             latest_version = self.fetch_latest_version().lstrip("v").replace("_", ".")
-            print(f"Latest version found: {latest_version}")
-
             if latest_version == "not found":
                 return "Could not determine latest version."
 
@@ -43,8 +41,6 @@ class Update():
                 return (
                     f"Current version: {self.old_version}<br>"
                     f"Latest version: {latest_version}<br>"
-                    f'Update will be available '
-                    f'<a href="{self.URL}">here</a>'
                 )
 
             return "Already up to date"

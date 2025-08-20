@@ -513,7 +513,28 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Check for Update":
             update_class = Update()
             msg = update_class.notifi()
-            QMessageBox.information(self, 'Info',msg)
+            # QMessageBox.information(self, 'Info',msg)
+
+            box = QMessageBox(self)
+            box.setIcon(QMessageBox.Information)
+            box.setWindowTitle("Check for Updates")
+            box.setText(msg)
+
+            if msg != "Already up to date":
+                # Add buttons
+                update_now_btn = box.addButton("Update Now", QMessageBox.AcceptRole)
+                later_btn = box.addButton("Update Later", QMessageBox.RejectRole)
+            else:
+                ok_btn = box.addButton("OK", QMessageBox.AcceptRole)
+
+            box.exec_()
+
+            if msg != "Already up to date":
+                if box.clickedButton() == update_now_btn:
+                    pass
+                elif box.clickedButton() == later_btn:
+                    pass
+
         # elif loc == "FAQ":
         #     pass
 

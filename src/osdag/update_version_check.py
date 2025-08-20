@@ -6,6 +6,7 @@ from pathlib import Path
 from packaging.version import Version, InvalidVersion
 from PyQt5.QtCore import QObject, QProcess, pyqtSignal
 import subprocess
+import sys, os
 
 
 version_file = Path(__file__).parent / "_version.py"
@@ -67,11 +68,26 @@ class Update(QObject):
             return
         try:
             # cmd = ["conda", "install", "-y", f"osdag=={latest_version}"]
+            
+            env_path = sys.prefix  
+            env_path = Path(env_path)
+            base_conda_path = env_path.parents[1]
+            if sys.platform.startswith("win"):
+                conda_path = base_conda_path / "Scripts" / "conda.exe"
+                pixi_path = env_path / "Scripts" / "pixi.exe"
+                print(conda_path, pixi_path)
+            else:
+                conda_path = base_conda_path / "bin/conda"
+                pixi_path = env_path / "bin/pixi"
             if install_type == "conda":
-                cmd = ["conda", "update", "-y", f"osdag"]
-                # cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with conda && timeout /t 5"]
+                if not conda_path.exists():
+                    return False, f"conda.exe not found in {conda_path}"
+                # cmd = [str(conda_path), "update", "-y", f"osdag"]
+                cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with conda && timeout /t 5"]
             elif install_type == "pixi":
-                cmd = ["pixi", "update", "-y", f"osdag"]
+                if not pixi_path.exists():
+                    return False, f"pixi.exe not found in {pixi_path}"
+                cmd = [str(pixi_path), "update", "-y", f"osdag"]
 
             result = subprocess.run(cmd, capture_output=False, text=True)
             if result.returncode == 0:

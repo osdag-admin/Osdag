@@ -12,7 +12,7 @@ version_file = Path(__file__).parent / "_version.py"
 version_var = {}
 exec(version_file.read_text(), version_var)
 curr_version = version_var["__version__"]
-
+install_type = version_var["__installation_type__"]
 class Update(QObject):
 
     URL = "https://osdag.fossee.in/resources/downloads"
@@ -68,7 +68,10 @@ class Update(QObject):
         try:
             # safer conda install
             # cmd = ["conda", "install", "-y", f"osdag=={latest_version}"]
-            cmd = ["cmd", "/c", f"echo Updating to version {latest_version} && timeout /t 5"]
+            if install_type == "conda":
+                cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with conda && timeout /t 5"]
+            elif install_type == "pixi":
+                cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with pixi && timeout /t 5"]
 
             result = subprocess.run(cmd, capture_output=False, text=True)
             if result.returncode == 0:

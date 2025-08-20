@@ -4,19 +4,24 @@ import urllib.request
 import re
 from pathlib import Path
 from packaging.version import Version, InvalidVersion
+from PyQt5.QtCore import QObject, QProcess, pyqtSignal
+import subprocess
+
 
 version_file = Path(__file__).parent / "_version.py"
 version_var = {}
 exec(version_file.read_text(), version_var)
 curr_version = version_var["__version__"]
 
-class Update():
+class Update(QObject):
+
     URL = "https://osdag.fossee.in/resources/downloads"
     PATTERN = re.compile(r'Install\s+Osdag\s*\(\s*v([\w._-]+)\s*\)', re.IGNORECASE)
 
     def __init__(self):
         super().__init__()
         self.old_version = curr_version
+        self.process = None
 
     def fetch_latest_version(self) -> str:
         """Fetch the latest version string from Osdag downloads page."""
@@ -51,4 +56,29 @@ class Update():
             
         except InvalidVersion:
             return False, "Could not parse version string."
+        
+    def update_to_latest(self):
+        """Run conda update in background using QProcess."""
+        try:
+            latest_version = self.fetch_latest_version()
+            if latest_version:
+                latest_version = latest_version.lstrip("v").replace("_", ".")
+        except Exception as e:
+            return
+        try:
+            # safer conda install
+            # cmd = ["conda", "install", "-y", f"osdag=={latest_version}"]
+            cmd = ["cmd", "/c", f"echo Updating to version {latest_version} && timeout /t 5"]
 
+            result = subprocess.run(cmd, capture_output=False, text=True)
+            if result.returncode == 0:
+                return (True, "Update successful! Please restart Osdag.")
+            else:
+                return (False, f"Update failed.\nError: {result.stderr}\n"
+                               "Please retry or run:\nconda install --force-reinstall osdag::osdag")
+                
+        
+        except Exception as e:
+            return (False, f"Update failed: {e}")
+
+        

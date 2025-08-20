@@ -541,7 +541,7 @@ class OsdagMainWindow(QMainWindow):
                     
                     result = confirm_update.exec_()
                     if result == QMessageBox.Yes:
-                        pass
+                        print(update_class.update_to_latest())
 
         # elif loc == "FAQ":
         #     pass

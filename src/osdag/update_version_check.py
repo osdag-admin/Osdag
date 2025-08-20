@@ -1,55 +1,55 @@
 ######################### UpDateNotifi ################
+
 import urllib.request
-import requests
 import re
-from PyQt5.QtWidgets import QMessageBox,QMainWindow
-import sys
+from pathlib import Path
+
+version_file = Path(__file__).parent / "_version.py"
+ns = {}
+exec(version_file.read_text(), ns)
+curr_version = ns["__version__"]
 
 class Update():
+    URL = "https://osdag.fossee.in/resources/downloads"
+    PATTERN = re.compile(r'Install Osdag \((v[0-9a-zA-Z_]+)\)')
+
     def __init__(self):
         super().__init__()
-        self.old_version=self.get_current_version()
-        # msg = self.notifi()
+        self.old_version = curr_version
 
-    def notifi(self):
+    def fetch_latest_version(self) -> str:
+        """Fetch the latest version string from Osdag downloads page."""
         try:
-            url = "https://raw.githubusercontent.com/osdag-admin/Osdag/master/README.md"
-            file = urllib.request.urlopen(url)
-            version = 'not found'
-            for line in file:
-                decoded_line = line.decode("utf-8")
-                match = re.search(r'Download the latest release version (\S+)', decoded_line)
-                if match:
-                    version = match.group(1)
-                    version = version.split("<")[0]
-                    break
-            # decoded_line = line.decode("utf-8")
-            # new_version = decoded_line.split("=")[1]
-            if version != self.old_version:
-                msg = 'Current version: '+ self.old_version+'<br>'+'Latest version '+ str(version)+'<br>'+\
-                      'Update will be available <a href=\"https://osdag.fossee.in/resources/downloads\"> here <a/>'
-            else:
-                msg = 'Already up to date'
-            return msg
-        except:
-            return "No internet connection"
+            with urllib.request.urlopen(self.URL) as response:
+                for line in response:
+                    decoded_line = line.decode("utf-8")
+                    match = self.PATTERN.search(decoded_line)
+                    if match:
+                        return match.group(1)
+            return "not found"
+        except Exception as e:
+            raise ConnectionError(f"Error fetching latest version: {e}")
 
-    def get_current_version(self):
-        version_file = "_version.py"
-        rel_path = str(sys.path[0])
-        rel_path = rel_path.replace("\\", "/")
-        VERSIONFILE = rel_path +'/'+ version_file
-
+    def notifi(self) -> str:
+        """Compare current version with latest version and return update message."""
         try:
-            verstrline = open(VERSIONFILE, "rt").read()
-        except EnvironmentError:
-            pass  # Okay, there is no version file.
-        else:
-            VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-            mo = re.search(VSRE, verstrline, re.M)
-            if mo:
-                verstr = mo.group(1)
-                return verstr
-            else:
-                print("unable to find version in %s" % (VERSIONFILE,))
-                raise RuntimeError("if %s.py exists, it is required to be well-formed" % (VERSIONFILE,))
+            latest_version = self.fetch_latest_version().lstrip("v").replace("_", ".")
+            print(f"Latest version found: {latest_version}")
+
+            if latest_version == "not found":
+                return "Could not determine latest version."
+
+            if latest_version != self.old_version:
+                return (
+                    f"Current version: {self.old_version}<br>"
+                    f"Latest version: {latest_version}<br>"
+                    f'Update will be available '
+                    f'<a href="{self.URL}">here</a>'
+                )
+
+            return "Already up to date"
+
+        except Exception as e:
+            return str(e)
+
+

@@ -543,7 +543,11 @@ class OsdagMainWindow(QMainWindow):
                     
                     result = confirm_update.exec_()
                     if result == QMessageBox.Yes:
-                        print(update_class.update_to_latest())
+                        update_status, msg = update_class.update_to_latest()
+                        if update_status:
+                            QMessageBox.information(self, "Update", msg)
+                        else:
+                            QMessageBox.warning(self, "Update Failed", msg)
 
         # elif loc == "FAQ":
         #     pass

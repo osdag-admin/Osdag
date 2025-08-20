@@ -66,12 +66,12 @@ class Update(QObject):
         except Exception as e:
             return
         try:
-            # safer conda install
             # cmd = ["conda", "install", "-y", f"osdag=={latest_version}"]
             if install_type == "conda":
-                cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with conda && timeout /t 5"]
+                cmd = ["conda", "update", "-y", f"osdag"]
+                # cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with conda && timeout /t 5"]
             elif install_type == "pixi":
-                cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with pixi && timeout /t 5"]
+                cmd = ["pixi", "update", "-y", f"osdag"]
 
             result = subprocess.run(cmd, capture_output=False, text=True)
             if result.returncode == 0:

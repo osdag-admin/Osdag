@@ -512,16 +512,19 @@ class OsdagMainWindow(QMainWindow):
             self.ask_question()
         elif loc == "Check for Update":
             update_class = Update()
-            msg = update_class.notifi()
+            try:
+                update_avl, msg = update_class.notifi()
+            except ConnectionError as e:
+                QMessageBox.critical(self, "Network Error", str(e))
+                return
             # QMessageBox.information(self, 'Info',msg)
 
             box = QMessageBox(self)
             box.setIcon(QMessageBox.Information)
-            box.setWindowTitle("Check for Updates")
+            box.setWindowTitle("Update Status")
             box.setText(msg)
 
-            if msg != "Already up to date":
-                # Add buttons
+            if update_avl:
                 update_now_btn = box.addButton("Update Now", QMessageBox.AcceptRole)
                 later_btn = box.addButton("Update Later", QMessageBox.RejectRole)
             else:
@@ -529,11 +532,18 @@ class OsdagMainWindow(QMainWindow):
 
             box.exec_()
 
-            if msg != "Already up to date":
+            if update_avl:
                 if box.clickedButton() == update_now_btn:
-                    pass
-                elif box.clickedButton() == later_btn:
-                    pass
+                    confirm_update = QMessageBox(self)
+                    confirm_update.setIcon(QMessageBox.Information)
+                    confirm_update.setWindowTitle("Confirm Update")
+                    confirm_update.setText("This may take some time....\nDo you want to continue?")
+                    confirm_update.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                    confirm_update.setDefaultButton(QMessageBox.No)
+                    
+                    result = confirm_update.exec_()
+                    if result == QMessageBox.Yes:
+                        pass
 
         # elif loc == "FAQ":
         #     pass

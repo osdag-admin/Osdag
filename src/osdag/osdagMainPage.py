@@ -554,7 +554,8 @@ class OsdagMainWindow(QMainWindow):
                         layout.addWidget(self.progress_text)
 
                         self.progress_dialog.setLayout(layout)
-                        self.progress_dialog.setModal(True)
+                        self.progress_dialog.setModal(False)
+                        self.progress_dialog.setWindowFlags(self.progress_dialog.windowFlags() | Qt.WindowStaysOnTopHint)
                         self.progress_dialog.show()
 
                         self.updater.output_signal.connect(lambda text: self.progress_text.append(text))

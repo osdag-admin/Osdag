@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 from packaging.version import Version, InvalidVersion
 from PyQt5.QtCore import QObject, QProcess, pyqtSignal
+from PyQt5.QtWidgets import QDialog, QTextEdit, QLabel
 import subprocess
 import sys, os
 
@@ -17,6 +18,7 @@ install_type = version_var["__installation_type__"]
 class Update(QObject):
     output_signal = pyqtSignal(str)   
     finished_signal = pyqtSignal(bool, str) 
+
 
     URL = "https://osdag.fossee.in/resources/downloads"
     PATTERN = re.compile(r'Install\s+Osdag\s*\(\s*v([\w._-]+)\s*\)', re.IGNORECASE)
@@ -121,16 +123,25 @@ class Update(QObject):
     def handle_stdout(self):
         """Read stdout and print it, also emit signal for GUI."""
         if self.process:
-            output = self.process.readAllStandardOutput().data().decode()
-            print(output, end="")
+            output = self.process.readAllStandardOutput().data().decode("utf-8")
             self.output_signal.emit(output)
+            print(output, end="")  
+            # self.progress_text.append(output)  
+            # self.progress_text.verticalScrollBar().setValue(
+            #     self.progress_text.verticalScrollBar().maximum()
+            # )
 
     def handle_stderr(self):
         """Read stderr and print it."""
         if self.process:
-            error = self.process.readAllStandardError().data().decode()
-            print(error, end="")
+            error = self.process.readAllStandardError().data().decode("utf-8")
             self.output_signal.emit(error)
+            print(error, end="")
+            # self.output_signal.emit(error)
+            # self.progress_text.append(error)  
+            # self.progress_text.verticalScrollBar().setValue(
+            #     self.progress_text.verticalScrollBar().maximum()
+            # )
 
     def handle_finished(self, exit_code, exit_status):
         """Handle when the process finishes."""

@@ -509,9 +509,9 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Ask Us a Question":
             self.ask_question()
         elif loc == "Check for Update":
-            update_class = Update()
+            self.updater = Update()
             try:
-                update_avl, msg = update_class.notifi()
+                update_avl, msg = self.updater.notifi()
             except ConnectionError as e:
                 QMessageBox.critical(self, "Network Error", str(e))
                 return
@@ -530,8 +530,7 @@ class OsdagMainWindow(QMainWindow):
 
             box.exec_()
 
-            if update_avl:
-                if box.clickedButton() == update_now_btn:
+            if update_avl and box.clickedButton() == update_now_btn:
                     confirm_update = QMessageBox(self)
                     confirm_update.setIcon(QMessageBox.Information)
                     confirm_update.setWindowTitle("Confirm Update")
@@ -541,15 +540,24 @@ class OsdagMainWindow(QMainWindow):
                     
                     result = confirm_update.exec_()
                     if result == QMessageBox.Yes:
-                        update_status, msg = update_class.update_to_latest()
-                        if update_status:
-                            QMessageBox.information(self, "Update", msg)
-                        else:
-                            QMessageBox.warning(self, "Update Failed", msg)
+                        
+                        self.updater.output_signal.connect(lambda text: print(text, end=""))
+                        self.updater.finished_signal.connect(self.handle_update_finished)
+                        self.updater.update_to_latest()
+                        # if update_status:
+                        #     QMessageBox.information(self, "Update", msg)
+                        # else:
+                        #     QMessageBox.warning(self, "Update Failed", msg)
+                        
 
         # elif loc == "FAQ":
         #     pass
 
+    def handle_update_finished(self,success, msg):
+        if success:
+            QMessageBox.information(self, "Update", msg)
+        else:
+            QMessageBox.warning(self, "Update Failed", msg)
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder

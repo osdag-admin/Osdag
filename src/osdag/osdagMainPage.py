@@ -88,7 +88,7 @@ import traceback
 import time
 from importlib.resources import files
 import urllib.request
-from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow, QTextEdit
 from .update_version_check import Update
 #from Thread import timer
 from .get_DPI_scale import scale
@@ -540,8 +540,22 @@ class OsdagMainWindow(QMainWindow):
                     
                     result = confirm_update.exec_()
                     if result == QMessageBox.Yes:
-                        
-                        self.updater.output_signal.connect(lambda text: print(text, end=""))
+                        self.progress_dialog = QDialog(self)
+                        self.progress_dialog.setWindowTitle("Updating Osdag")
+                        layout = QVBoxLayout()
+
+                        self.progress_label = QLabel("Updating, please wait...")
+                        layout.addWidget(self.progress_label)
+
+                        self.progress_text = QTextEdit()
+                        self.progress_text.setReadOnly(True)
+                        layout.addWidget(self.progress_text)
+
+                        self.progress_dialog.setLayout(layout)
+                        self.progress_dialog.setModal(True)
+                        self.progress_dialog.show()
+
+                        self.updater.output_signal.connect(lambda text: self.progress_text.append(text))
                         self.updater.finished_signal.connect(self.handle_update_finished)
                         self.updater.update_to_latest()
                         # if update_status:
@@ -554,6 +568,7 @@ class OsdagMainWindow(QMainWindow):
         #     pass
 
     def handle_update_finished(self,success, msg):
+        self.progress_dialog.close()
         if success:
             QMessageBox.information(self, "Update", msg)
         else:

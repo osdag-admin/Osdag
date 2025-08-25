@@ -267,9 +267,9 @@ class OutputDock(QWidget):
         design_report_btn = CustomButton("Generate Design Report", ":/vectors/design_report.svg")
         design_report_btn.clicked.connect(lambda: print("Report Generate clicked"))
         btn_button_layout.addWidget(design_report_btn)
-        btn_button_layout.addStretch(1)
+        btn_button_layout.addStretch(1)       
 
-        save_output_csv_btn = CustomButton("Save Outputs(csv)", ":/vectors/design_report.svg")
+        save_output_csv_btn = CustomButton("  Save Outputs (csv)  ", ":/vectors/design_report.svg")
         save_output_csv_btn.clicked.connect(lambda: print("Report Generate clicked"))
         btn_button_layout.addWidget(save_output_csv_btn)
         btn_button_layout.addStretch(2)

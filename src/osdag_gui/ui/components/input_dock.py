@@ -9,13 +9,14 @@ from PySide6.QtWidgets import (
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
 from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import QMessageBox, QDialog
 from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QTimer, QRegularExpression
-from PySide6.QtGui import QPixmap, QIcon, QPainter, QColor, QDoubleValidator, QRegularExpressionValidator
+from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import CustomButton
 import osdag_gui.resources.resources_rc
-from osdag_gui.data.modules.connection.shear_connection.fin_plate_data import Data
+from osdag_gui.ui.components.customized_popups import Ui_Popup
 
 from osdag_core.Common import *
 
@@ -253,6 +254,7 @@ class InputDock(QWidget):
         """)
 
         group_container = QWidget()
+        self.input_widget = group_container
         group_container_layout = QVBoxLayout(group_container)
 
         # --- Main Content (group boxes) ---
@@ -264,6 +266,7 @@ class InputDock(QWidget):
             index += 1
             label = field[1]
             type = field[2]
+            print(f"Option:{field}")
             if type == TYPE_MODULE:
                 # No use of module title will see.
                 continue
@@ -275,7 +278,7 @@ class InputDock(QWidget):
                 
                 # Initialized the group box for current title
                 current_group = QGroupBox(label)
-                current_group.setObjectName(label)
+                current_group.setObjectName(label + "_group")
                 track_group = True
                 current_group.setStyleSheet("""
                     QGroupBox {
@@ -348,36 +351,77 @@ class InputDock(QWidget):
         group_container_layout.addStretch()
         scroll_area.setWidget(group_container)
 
+        ###############################
+        # Customized option in Combobox
+        ###############################
+        """
+        This routine takes both customized_input list and input_value_changed list.
+        Customized input list is the list displayed in popup, when "Customized" option is clicked.
+        input_value_Changed is the list of keys whose values depend on values of other keys in input dock.
+        The function which returns customized_input values takes no arguments.
+        But if a key is common in both customized input and input value changed, it takes argument as specified in
+         input value changed.
+        Here, on_change_key_popup gives list of keys which are common in both and needs an input argument.
+        Since, we don't know how may customized popups can be used in a module we have provided,
+         "triggered.connect" for up to 10 customized popups
+        """
+        print("\n\n\n",self.backend,"$$$$",self.backend.customized_input,self.backend.input_value_changed)
+        new_list = self.backend.customized_input()
+        updated_list = self.backend.input_value_changed()
+
+        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
+        data = {}
+
+        d = {}
+        if new_list != []:
+            for t in new_list:
+                Combobox_key = t[0]
+                disabled_values = []
+                if len(t) == 4:
+                    disabled_values = t[2]
+                d[Combobox_key] = self.input_widget.findChild(QWidget, t[0])
+                if updated_list != None:
+                    onchange_key_popup = [item for item in updated_list if item[1] == t[0] and item[2] == TYPE_COMBOBOX_CUSTOMIZED]
+                    arg_list = []
+                    if onchange_key_popup != []:
+                        for change_key in onchange_key_popup[0][0]:
+                            print(change_key)
+                            arg_list.append(self.input_widget.findChild(QWidget, change_key).currentText())
+                        data[t[0] + "_customized"] = [all_values_available for all_values_available in
+                                                      t[1](arg_list) if all_values_available not in disabled_values]
+                    else:
+                        data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
+                                                      if all_values_available not in disabled_values]
+                else:
+                    data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
+                                                  if all_values_available not in disabled_values]
+            try:
+                print(f"<class 'AttributeError'>: {d} \n {new_list}")
+
+                #changed this code bcz an error was occuring in the code -t.s.
+                # Connect signals only for widgets that exist
+                for i in range(11):  # We were trying to connect 11 items before
+                    if i < len(new_list):
+                        widget = d.get(new_list[i][0])
+                        if widget is not None and hasattr(widget, 'activated'):
+                            widget.activated.connect(lambda checked, w=widget: self.popup(w, new_list, updated_list, data))
+            except Exception as e:
+                print(f"Error connecting signals: {str(e)}")
+                # changed ended here -t.s.
+                pass
 
         # Change in Ui based on Connectivity selection
         ##############################################
 
-        updated_list = self.backend.input_value_changed()
-        
-        # if updated_list is not None:
-        #     for t in updated_list:    
-        #         for key_name in t[0]:
-        #             key_changed = self.left_panel.findChild(QWidget, key_name)
-        #             self.on_change_connect(key_changed, updated_list, data, main)
-        #             print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        print("\n\n\n*****")
+        self.print_widget_tree(group_container)
+        if updated_list is not None:
+            for t in updated_list:
+                for key_name in t[0]:
+                    key_changed = self.input_widget.findChild(QWidget, key_name)
+                    print(f"~~finding {key_name} get {key_changed} object {key_changed.objectName()}")
+                    self.on_change_connect(key_changed, updated_list, data, self.backend)                    
+                    print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
         panel_layout.addWidget(scroll_area)
 
@@ -386,12 +430,12 @@ class InputDock(QWidget):
         btn_button_layout.setContentsMargins(0, 20, 0, 0)
         btn_button_layout.addStretch(2)
 
-        save_input_btn = CustomButton("Save Input", ":/vectors/save.svg")
+        save_input_btn = CustomButton("       Save Input        ", ":/vectors/save.svg")
         save_input_btn.clicked.connect(lambda: print("design clicked"))
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
-        design_btn = CustomButton("Design", ":/vectors/design.svg")
+        design_btn = CustomButton("        Design           ", ":/vectors/design.svg")
         design_btn.clicked.connect(lambda: print("design clicked"))
         btn_button_layout.addWidget(design_btn)
         btn_button_layout.addStretch(2)
@@ -433,6 +477,188 @@ class InputDock(QWidget):
         h_scroll_area.setWidget(self.left_panel)
 
         left_layout.addWidget(h_scroll_area)
+
+    def print_widget_tree(self, widget: QWidget, indent: int=0):
+        prefix = "  " * (indent*4)
+        print(f"{prefix}{widget.objectName()}({widget.__class__.__name__})")
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                self.print_widget_tree(child, indent+1)
+
+    def popup(self,key, for_custom_list,updated_list,data):
+
+        """
+        Function for retaining the values in the popup once it is closed.
+        """
+
+        for c_tup in for_custom_list:
+            if c_tup[0] != key.objectName():
+                continue
+            selected = key.currentText()
+            f = c_tup[1]
+            disabled_values = []
+            note = ""
+            if updated_list != None:
+                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0] and item[2] == TYPE_COMBOBOX_CUSTOMIZED]
+            else:
+                onchange_key_popup = []
+            if onchange_key_popup != []:
+                arg_list = []
+                for change_key in onchange_key_popup[0][0]:
+                    arg_list.append(
+                        self.input_widget.findChild(QWidget, change_key).currentText())
+                options = f(arg_list)
+                existing_options = data[c_tup[0] + "_customized"]
+                if selected == "Customized":
+                    if len(c_tup) == 4:
+                        disabled_values = c_tup[2]
+                        note = c_tup[3]
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
+                                                                                disabled_values, note)
+                    if data[c_tup[0] + "_customized"] == []:
+                        # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                        #                                   if all_values_available not in disabled_values]
+                        data[c_tup[0] + "_customized"] = options
+                        key.setCurrentIndex(0)
+                else:
+                    # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                    #                                   if all_values_available not in disabled_values]
+                    data[c_tup[0] + "_customized"] = options
+
+                    # input = f(arg_list)
+                    # data[c_tup[0] + "_customized"] = input
+            else:
+                options = f()
+                existing_options = data[c_tup[0] + "_customized"]
+                if selected == "Customized":
+                    if len(c_tup) == 4:
+                        disabled_values = c_tup[2]
+                        note = c_tup[3]
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
+                                                                                disabled_values, note)
+                    if data[c_tup[0] + "_customized"] == []:
+                        # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                        #                               if all_values_available not in disabled_values]
+                        data[c_tup[0] + "_customized"] = options
+                        key.setCurrentIndex(0)
+                else:
+                    # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                    #                                   if all_values_available not in disabled_values]
+                    data[c_tup[0] + "_customized"] = options
+
+    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED, disabled_values=None, note=""):
+        """
+        Function to connect the customized_popup with the ui_template file
+        on clicking the customized option
+        """
+        if disabled_values is None:
+            disabled_values = []
+        self.window = QDialog()
+        self.ui = Ui_Popup()
+        self.ui.setupUi(self.window, disabled_values, note)
+        self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
+        self.window.exec()
+        return self.ui.get_right_elements()
+
+    def on_change_connect(self, key_changed, updated_list, data, backend):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, backend))
+
+    # To update the label and combobox if Connectivity
+    def change(self, k1, new, data, main):
+        print(f"$${new}")
+        for tup in new:
+            (object_name, k2_key, typ, f) = tup
+            print(f"\n object_name:{object_name}")
+            print(f"\n k1:{k1}")
+            print(f"\n f: {f}")
+            print(f"\n k1.objectName():{k1.objectName()}")
+            print(f"\n k2_key:{k2_key}")
+            print(f"\n typ:{typ}")
+            print(f"\n type:{typ}")
+            if k1.objectName() not in object_name:
+                continue
+            if typ in [TYPE_LABEL, TYPE_OUT_LABEL]:
+                k2_key = k2_key + "_label"
+            if typ == TYPE_NOTE:
+                k2_key = k2_key + "_note"
+
+            if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
+                k2 = self.input_widget.findChild(QWidget, k2_key)
+            elif typ == TYPE_WARNING:
+                k2 = str(k2_key)
+            else:
+                k2 = self.input_widget.findChild(QWidget, k2_key)
+
+
+            arg_list = []
+            for ob_name in object_name:
+                key = self.input_widget.findChild(QWidget, ob_name)
+                arg_list.append(key.currentText())
+
+            val = f(arg_list)
+            print(f"\n k2:{k2}")
+            print(f"\n val:{val}")
+            if typ == TYPE_COMBOBOX:
+                print("\n\nCombo")
+                k2.clear()
+                for values in val:
+                    k2.addItem(values)
+                    k2.setCurrentIndex(0)
+                if VALUES_WELD_TYPE[1] in val:
+                    k2.setCurrentText(VALUES_WELD_TYPE[1])
+                if k2_key in RED_LIST:
+                    red_list_set = set(red_list_function())
+                    current_list_set = set(val)
+                    current_red_list = list(current_list_set.intersection(red_list_set))
+                    for value in current_red_list:
+                        indx = val.index(str(value))
+                        k2.setItemData(indx, QBrush(QColor("red")), Qt.ForegroundRole)
+            elif typ == TYPE_COMBOBOX_CUSTOMIZED:
+                print("\n\nCust_Combo")
+                k2.setCurrentIndex(0)
+                data[k2_key + "_customized"] = val
+            elif typ == TYPE_CUSTOM_MATERIAL:
+                print("\n\nCust_Combo_material")
+                if val:
+                    self.new_material_dialog()
+            elif typ == TYPE_CUSTOM_SECTION:
+                if val:
+                    self.import_custom_section()
+
+            elif typ == TYPE_LABEL:
+                print("\n\nLabel")
+                k2.setText(val)
+            elif typ == TYPE_NOTE:
+                print("\n\nNote")
+                k2.setText(val)
+            elif typ == TYPE_IMAGE:
+                print("\n\nImg")
+                pixmap1 = QPixmap(val)
+                k2.setPixmap(pixmap1)
+            elif typ == TYPE_TEXTBOX:
+                print("\n\ntext")
+                if val:
+                    k2.setEnabled(True)
+                else:
+                    k2.setDisabled(True)
+                    k2.setText("")
+            elif typ == TYPE_COMBOBOX_FREEZE:
+                print("\n\nfreeze_Combo")
+                if val:
+                    k2.setEnabled(False)
+                else:
+                    k2.setEnabled(True)
+            elif typ == TYPE_WARNING:
+                print("\n\nwarning")
+                if val:
+                    QMessageBox.warning(self, "Application", k2)
+            elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
+                print("\n\nlast")
+                if val:
+                    k2.setVisible(False)
+                else:
+                    k2.setVisible(True)
+
 
     def toggle_input_dock(self):
         parent = self.parent

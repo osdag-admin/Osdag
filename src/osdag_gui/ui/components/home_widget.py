@@ -17,38 +17,6 @@ from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 import osdag_gui.resources.resources_rc
 from osdag_gui.data.menus.menu_data import Data
 
-# --- Theme Toggle Button ---
-class ThemeToggleButton(QPushButton):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.is_dark_mode = True
-        self.setFixedSize(50, 50)
-        self.setObjectName("themeToggle")
-        self.setStyleSheet("""
-            #themeToggle {
-                background: transparent;
-                border: none;
-                border-radius: 20px;
-            }
-            #themeToggle:hover {
-                background-color: rgba(255, 255, 255, 100);
-            }
-        """)
-        self.setCursor(Qt.PointingHandCursor)
-        self.clicked.connect(self.toggle_theme)
-        self.update_icon()
-
-    def update_icon(self):
-        icon_path = ":/vectors/night_button.svg" if not self.is_dark_mode else ":/vectors/day_button_dark.svg"
-        self.setIcon(QIcon(icon_path))
-        self.setIconSize(QSize(25, 25))
-
-    def toggle_theme(self):
-        self.is_dark_mode = not self.is_dark_mode
-        self.update_icon()
-        if self.parent() and hasattr(self.parent(), 'toggle_theme'):
-            self.parent().toggle_theme(self.is_dark_mode)
-
 # --- SVG Widget with Theme Support ---
 class ThemedSvgWidget(QSvgWidget):
     def __init__(self, light_svg, dark_svg, scale_factor=1.0, parent=None):
@@ -668,11 +636,8 @@ class HomeWidget(QWidget):
         self.search_bar = SearchBarWidget()
         self.search_bar.setFixedWidth(500)
         search_layout.addWidget(self.search_bar)
-
-        self.theme_toggle = ThemeToggleButton(self)
-        # self.theme_toggle.clicked.connect(self.toggle_theme)
-        search_layout.addWidget(self.theme_toggle)
         search_layout.addStretch()
+
         content_area_layout.addLayout(search_layout)
         content_area_layout.addStretch()
 

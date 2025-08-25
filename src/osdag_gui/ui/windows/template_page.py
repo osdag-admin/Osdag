@@ -143,57 +143,29 @@ class CustomWindow(QWidget):
         self.input_dock.setStyleSheet(self.input_dock.styleSheet())
 
         central_widget = QWidget()
-        central_layout = QVBoxLayout(central_widget)
-        central_layout.setContentsMargins(0, 0, 0, 0)
-        central_layout.setSpacing(0)
-        
-        # Create a horizontal layout for the top labels
-        top_labels_layout = QHBoxLayout()
-        top_labels_layout.setContentsMargins(0, 0, 0, 0)
-        top_labels_layout.setSpacing(0)
-        
+        central_H_layout = QHBoxLayout(central_widget)
+
         # Add dock indicator labels
-        self.input_dock_label = QLabel("Inputs")
-        self.input_dock_label.setAlignment(Qt.AlignLeft)
-        self.input_dock_label.setStyleSheet("""
-            QLabel {
-                background-color: #90AF13;
-                color: black;
-                padding: 5px;
-                font-family: "Calibri";
-                font-size: 12px;
-                font-weight: bold;
-            }
-        """)
+        self.input_dock_label = InputDockIndicator(parent=self)
         self.input_dock_label.setVisible(False)
-        top_labels_layout.addWidget(self.input_dock_label)
-        
-        # Add spacer to push output label to the right
-        top_labels_layout.addStretch()
-        
-        # Add output dock indicator label
-        self.output_dock_label = QLabel("Outputs")
-        self.output_dock_label.setAlignment(Qt.AlignRight)
-        self.output_dock_label.setStyleSheet("""
-            QLabel {
-                background-color: #90AF13;
-                color: black;
-                padding: 5px;
-                font-family: "Calibri";
-                font-size: 12px;
-                font-weight: bold;
-            }
-        """)
-        self.output_dock_label.setVisible(True)
-        top_labels_layout.addWidget(self.output_dock_label)
-        
-        central_layout.addLayout(top_labels_layout)
-        central_layout.addStretch(7)
+        central_H_layout.setContentsMargins(6, 0, 0, 0)
+        central_H_layout.setSpacing(0)
+        central_H_layout.addWidget(self.input_dock_label, 1)
+
+        central_V_layout = QVBoxLayout()
+        central_V_layout.setContentsMargins(0, 0, 0, 0)
+        central_V_layout.setSpacing(0)
+        central_V_layout.addStretch(7)
         self.logs_dock = LogDock()
         self.logs_dock_active = True
         self.logs_dock.setVisible(False)
-        central_layout.addWidget(self.logs_dock, 2)
-        
+        central_V_layout.addWidget(self.logs_dock, 2)
+        central_H_layout.addLayout(central_V_layout, 6)
+
+        # Add output dock indicator label
+        self.output_dock_label = OutputDockIndicator(parent=self)
+        self.output_dock_label.setVisible(True)
+        central_H_layout.addWidget(self.output_dock_label, 1)
         self.splitter.addWidget(central_widget)
 
         self.output_dock = OutputDock(backend=self.backend, parent=self)
@@ -568,6 +540,96 @@ class DummyThread(QThread):
         def run(self):
             time.sleep(self.sec)
             self.finished.emit()
+
+class InputDockIndicator(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.setStyleSheet("background-color: white;")
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
+
+        input_layout = QHBoxLayout(self)
+        input_layout.setContentsMargins(0,0,0,0)
+        input_layout.setSpacing(0)
+
+        input_label = QSvgWidget(":/vectors/inputs_label.svg")
+        input_layout.addWidget(input_label)
+        input_label.setFixedWidth(32)
+
+        self.toggle_strip = QWidget()
+        self.toggle_strip.setStyleSheet("background-color: #94b816;")
+        self.toggle_strip.setFixedWidth(6)  # Always visible
+        toggle_layout = QVBoxLayout(self.toggle_strip)
+        toggle_layout.setContentsMargins(0, 0, 0, 0)
+        toggle_layout.setSpacing(0)
+        toggle_layout.setAlignment(Qt.AlignVCenter | Qt.AlignRight)  # Align to right for input dock
+
+        self.toggle_btn = QPushButton("❯")  # Right-pointing chevron for input dock
+        self.toggle_btn.setFixedSize(6, 60)
+        self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.toggle_btn.clicked.connect(self.parent.input_dock_toggle)
+        self.toggle_btn.setToolTip("Show input panel")
+        self.toggle_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #6c8408;
+                color: white;
+                font-size: 12px;
+                font-weight: bold;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #5e7407;
+            }
+        """)
+        toggle_layout.addStretch()
+        toggle_layout.addWidget(self.toggle_btn)
+        toggle_layout.addStretch()
+        input_layout.addWidget(self.toggle_strip)
+
+class OutputDockIndicator(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.setStyleSheet("background-color: white;")
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
+
+        output_layout = QHBoxLayout(self)
+        output_layout.setContentsMargins(0,0,0,0)
+        output_layout.setSpacing(0)
+
+        self.toggle_strip = QWidget()
+        self.toggle_strip.setStyleSheet("background-color: #94b816;")
+        self.toggle_strip.setFixedWidth(6)  # Always visible
+        toggle_layout = QVBoxLayout(self.toggle_strip)
+        toggle_layout.setContentsMargins(0, 0, 0, 0)
+        toggle_layout.setSpacing(0)
+        toggle_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+
+        self.toggle_btn = QPushButton("❮")  # Show state initially
+        self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.toggle_btn.setFixedSize(6, 60)
+        self.toggle_btn.clicked.connect(self.parent.output_dock_toggle)
+        self.toggle_btn.setToolTip("Show panel")
+        self.toggle_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #6c8408;
+                color: white;
+                font-size: 12px;
+                font-weight: bold;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #5e7407;
+            }
+        """)
+        toggle_layout.addStretch()
+        toggle_layout.addWidget(self.toggle_btn)
+        toggle_layout.addStretch()
+        output_layout.addWidget(self.toggle_strip)
+
+        output_label = QSvgWidget(":/vectors/outputs_label.svg")
+        output_layout.addWidget(output_label)
+        output_label.setFixedWidth(28)
 
 # if __name__ == "__main__":
 #     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

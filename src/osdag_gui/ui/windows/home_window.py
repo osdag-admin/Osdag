@@ -26,6 +26,38 @@ from osdag_gui.ui.components.top_right_button_bar import TopButton, DropDownButt
 from osdag_gui.ui.components.home_widget import HomeWidget
 from PySide6.QtWidgets import QSplitter
 
+# --- Theme Toggle Button ---
+class ThemeToggleButton(QPushButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.is_dark_mode = True
+        self.setFixedSize(50, 50)
+        self.setObjectName("themeToggle")
+        self.setStyleSheet("""
+            #themeToggle {
+                background: transparent;
+                border: none;
+                border-radius: 20px;
+            }
+            #themeToggle:hover {
+                background-color: rgba(255, 255, 255, 100);
+            }
+        """)
+        self.setCursor(Qt.PointingHandCursor)
+        self.clicked.connect(self.toggle_theme)
+        self.update_icon()
+
+    def update_icon(self):
+        icon_path = ":/vectors/night_button.svg" if not self.is_dark_mode else ":/vectors/day_button_dark.svg"
+        self.setIcon(QIcon(icon_path))
+        self.setIconSize(QSize(25, 25))
+
+    def toggle_theme(self):
+        self.is_dark_mode = not self.is_dark_mode
+        self.update_icon()
+        if self.parent() and hasattr(self.parent(), 'toggle_theme'):
+            self.parent().toggle_theme(self.is_dark_mode)
+
 class BackgroundSvgWidget(QWidget):
     def __init__(self, svg_path, parent=None):
         super().__init__(parent)
@@ -41,10 +73,10 @@ class BackgroundSvgWidget(QWidget):
         pen.setColor(border_color)
         pen.setWidth(3)
         painter.setPen(pen)
-        painter.drawLine(0, 0, 0, self.height())
         # Draw SVG background
         target_rect = self.rect()
         self.svg_renderer.render(painter, target_rect)
+        painter.drawLine(0, 0, 0, self.height())
         painter.end()
         super().paintEvent(event)
 
@@ -106,7 +138,7 @@ class HomeWindow(QWidget):
 
         main_h_layout.addWidget(self.nav_bar, 2)
 
-        self.content = BackgroundSvgWidget(":/vectors/background.svg")
+        self.content = BackgroundSvgWidget(":/vectors/background_light.svg")
         self.content.setStyleSheet("""
             QWidget {
                 background: transparent;
@@ -152,6 +184,10 @@ class HomeWindow(QWidget):
             self.buttons.append(button)
             self.button_group.addButton(button, i) # Add button to the group with an ID
             self.top_widget_2.addWidget(button)
+        
+        self.theme_toggle = ThemeToggleButton(self)
+        # self.theme_toggle.clicked.connect(self.toggle_theme)
+        self.top_widget_2.addWidget(self.theme_toggle)
 
         self.top_right_h_layout.addStretch(1)
         self.top_right_h_layout.addLayout(self.top_widget_2)

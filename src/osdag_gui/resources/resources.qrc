@@ -31,6 +31,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/night_button.svg</file>
         <file>vectors/day_button_dark.svg</file>
         <file>vectors/background.svg</file>
+        <file>vectors/background_light.svg</file>
+        <file>vectors/background_dark.svg</file>
         
         <file>vectors/shear_fin_plate_connec.svg</file>
         <file>vectors/shear_cleat_angle_connec.svg</file>
@@ -78,6 +80,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/save.svg</file>
         <file>vectors/design_report.svg</file>
         <file>vectors/arrow_down.svg</file>
+        <file>vectors/inputs_label.svg</file>
+        <file>vectors/outputs_label.svg</file>
 
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>

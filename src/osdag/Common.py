@@ -13,7 +13,7 @@ PATH_TO_DATABASE = files("osdag.data.ResourceFiles.Database").joinpath("Intg_osd
 
 import sqlite3
 
-from .utils.common.other_standards import *
+from .utils.common.other_standards import IS1367_Part3_2002
 # from .utils.common.component import *
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate

@@ -113,3 +113,56 @@ def _save_to_pdf(module_class:Main, output_file:Path):
         'logger_messages': ''
         }
     module_class.save_design(module_class, popup_summary)
+
+
+
+def run_module(osi_path:Path | str, op_type:str):
+    """Run the module specified in the OSI file located at osi_path."""
+    if isinstance(osi_path, str):
+        osi_path = Path(osi_path)
+
+    filename = osi_path.stem
+    output_folder_path = osi_path.parent / "Outputs"
+    output_folder_path.mkdir(exist_ok=True)
+    design_dict = _get_design_dictionary(osi_path)
+    if design_dict is None:
+        print("File not found.")
+        return None
+    
+    module_name = design_dict.get("Module")
+    if module_name is None:
+        print("Module not specified.")
+        return None
+
+    module_class = available_modules.get(module_name)
+    if module_class is None:
+        print("Not a valid module class.")
+        return None
+    
+    module_class.set_osdaglogger(None)
+    val_errors = module_class.func_for_validation(module_class, design_dict)
+    
+    if (val_errors is None):
+        output_file = output_folder_path / f"{module_class.__name__}/{filename}"
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
+        if op_type == "save to csv":
+            _save_to_csv(_get_output_dictionary(module_class),str(output_file)+".csv")
+            return True
+        
+        elif op_type == "save to pdf":
+            _save_to_pdf(module_class, output_file)
+            return True
+
+        elif op_type == "output dictionary":
+            return _get_output_dictionary(module_class)
+
+    else:
+        for error in val_errors:
+            print(f"Error: {error}")
+            return None
+
+
+# run_module(r"C:\Users\1hasa\Osdag\TensionBoltedTest4.osi",op_type="save to csv")
+# run_module(r"C:\Users\1hasa\Osdag\TensionBoltedTest4.osi",op_type="save to pdf")
+# print(run_module(r"C:\Users\1hasa\Osdag\TensionBoltedTest4.osi",op_type="output dictionary"))

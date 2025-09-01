@@ -73,3 +73,19 @@ def _get_design_dictionary(osi_path:Path) -> dict | None:
     with open(osi_path, 'r') as file:
         return yaml.safe_load(file)
     
+def _get_output_dictionary(module_class:Main) -> dict:
+    status = module_class.design_status
+    out_list = module_class.output_values(module_class, status)
+    out_dict = {}
+    for option in out_list:
+        if option[0] is not None and option[2] == TYPE_TEXTBOX:
+            out_dict[option[0]] = option[3]
+        if option[2] == TYPE_OUT_BUTTON:
+            tup = option[3]
+            fn = tup[1]
+            for item in fn(module_class, status):
+                lable = item[0]
+                value = item[3]
+                if lable!=None and value!=None:
+                    out_dict[lable] = value
+    return out_dict

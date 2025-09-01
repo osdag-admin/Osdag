@@ -61,3 +61,15 @@ available_modules = {
     KEY_DISP_BB_EP_SPLICE:BeamBeamEndPlateSplice,
     KEY_DISP_BCENDPLATE:BeamColumnEndPlate,
 }
+
+from pathlib import Path
+import yaml
+import pandas as pd
+
+def _get_design_dictionary(osi_path:Path) -> dict | None:
+    """return the design dictionary from an OSI file."""
+    if not osi_path.exists():
+        return None
+    with open(osi_path, 'r') as file:
+        return yaml.safe_load(file)
+    

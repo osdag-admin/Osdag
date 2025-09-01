@@ -89,3 +89,27 @@ def _get_output_dictionary(module_class:Main) -> dict:
                 if lable!=None and value!=None:
                     out_dict[lable] = value
     return out_dict
+
+
+def _save_to_csv(output_dictionary:dict, output_file:str):
+    df = pd.DataFrame(output_dictionary.items())
+    df.to_csv(output_file, index=False, header=None)
+
+def _save_to_pdf(module_class:Main, output_file:Path):
+    popup_summary = {
+            'ProfileSummary': {
+            'CompanyName': 'LoremIpsum', 
+            'CompanyLogo': '', 
+            'Group/TeamName': 'LoremIpsum', 
+            'Designer': 'LoremIpsum'
+        }, 
+        'ProjectTitle': 'Fossee', 
+        'Subtitle': '', 
+        'JobNumber': '123', 
+        'AdditionalComments': 'No comments', 
+        'Client': 'LoremIpsum', 
+        'filename': f'{output_file}', 
+        'does_design_exist': True, 
+        'logger_messages': ''
+        }
+    module_class.save_design(module_class, popup_summary)

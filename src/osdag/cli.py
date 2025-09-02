@@ -66,14 +66,13 @@ from pathlib import Path
 import yaml
 import pandas as pd
 
-def _get_design_dictionary(osi_path:Path) -> dict | None:
+def _get_design_dictionary(osi_path:Path) -> dict:
     """return the design dictionary from an OSI file."""
-    if not osi_path.exists():
-        return None
     with open(osi_path, 'r') as file:
         return yaml.safe_load(file)
     
 def _get_output_dictionary(module_class:Main) -> dict:
+    """return the output dictionary for the design"""
     status = module_class.design_status
     out_list = module_class.output_values(module_class, status)
     out_dict = {}
@@ -92,10 +91,12 @@ def _get_output_dictionary(module_class:Main) -> dict:
 
 
 def _save_to_csv(output_dictionary:dict, output_file:str):
+    """save the output dictionary to a csv file"""
     df = pd.DataFrame(output_dictionary.items())
     df.to_csv(output_file, index=False, header=None)
 
 def _save_to_pdf(module_class:Main, output_file:Path):
+    """save the output dictionary to a pdf file"""
     popup_summary = {
             'ProfileSummary': {
             'CompanyName': 'LoremIpsum', 
@@ -116,19 +117,28 @@ def _save_to_pdf(module_class:Main, output_file:Path):
 
 
 
-def run_module(osi_path:Path | str, op_type:str):
+def run_module(osi_path:Path | str, op_type:str = "print_result", output_path:str | Path = None) -> bool | dict | None:
     """Run the module specified in the OSI file located at osi_path."""
     if isinstance(osi_path, str):
         osi_path = Path(osi_path)
+        if not osi_path.exists():
+            print("File not found.")
+            return None
 
     filename = osi_path.stem
-    output_folder_path = osi_path.parent / "Outputs"
-    output_folder_path.mkdir(exist_ok=True)
+    output_file = None
+    if not output_path:
+        output_folder_path = osi_path.parent / "Outputs"
+    else:
+        if isinstance(output_path, str):
+            output_path = Path(output_path)
+        output_file = output_path.stem
+        output_folder_path = output_path.parent
+    output_folder_path.mkdir(parents=True, exist_ok=True)
+    output_file = output_folder_path / f"{output_file if output_file else filename}"
+    print(output_folder_path)
+    print(output_file)
     design_dict = _get_design_dictionary(osi_path)
-    if design_dict is None:
-        print("File not found.")
-        return None
-    
     module_name = design_dict.get("Module")
     if module_name is None:
         print("Module not specified.")
@@ -143,19 +153,23 @@ def run_module(osi_path:Path | str, op_type:str):
     val_errors = module_class.func_for_validation(module_class, design_dict)
     
     if (val_errors is None):
-        output_file = output_folder_path / f"{module_class.__name__}/{filename}"
-        output_file.parent.mkdir(parents=True, exist_ok=True)
-
-        if op_type == "save to csv":
+        # if output_file is None: 
+        #     output_file = output_folder_path / f"{module_class.__name__}/{filename}"
+        # else :
+        #     output_file = output_folder_path / f"{module_class.__name__}/{output_file}"
+        # output_folder_path.parent.mkdir(parents=True, exist_ok=True)
+        if op_type == "save_csv":
             _save_to_csv(_get_output_dictionary(module_class),str(output_file)+".csv")
             return True
         
-        elif op_type == "save to pdf":
+        elif op_type == "save_pdf":
             _save_to_pdf(module_class, output_file)
             return True
 
-        elif op_type == "output dictionary":
-            return _get_output_dictionary(module_class)
+        elif op_type == "print_result":
+            out_dict = _get_output_dictionary(module_class)
+            print(out_dict)
+            return out_dict
 
     else:
         for error in val_errors:

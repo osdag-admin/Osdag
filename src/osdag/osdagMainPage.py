@@ -80,7 +80,7 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 7) Any further Levels will result in an error .
 '''
 
-import os
+import os, argparse
 from pathlib import Path
 import re
 import io
@@ -131,6 +131,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5 import QtWidgets, QtCore, QtGui
 import math
 import sys
+from osdag.cli import run_module
 from .gui.ui_tutorial import Ui_Tutorial
 from .gui.ui_aboutosdag import Ui_AboutOsdag
 from .gui.ui_ask_question import Ui_AskQuestion
@@ -975,5 +976,31 @@ def do_stuff():
     except BaseException as e:
         print("ERROR", e)
 
+def main():
+    parser = argparse.ArgumentParser(description="Osdag")
+    parser.add_argument("--input", type=str, default=None, help="Path to input file")
+    parser.add_argument(
+        "--op_type",
+        type=str,
+        choices=["save_csv", "save_pdf", "print_result"],
+        default=None,
+        help="Type of operation: save_csv | save_pdf | print_result"
+    )
+    parser.add_argument("--output", type=str, default=None, help="Path to output file")
+    args = parser.parse_args()
+
+    if args.input:
+        if args.op_type:
+            if args.output:
+                run_module(args.input, args.op_type, args.output)
+            else:
+                run_module(args.input, args.op_type)
+        else:
+            
+            run_module(args.input)
+    else:
+        do_stuff()
+
 if __name__ == '__main__':
-    do_stuff()
+    main()
+    # do_stuff()

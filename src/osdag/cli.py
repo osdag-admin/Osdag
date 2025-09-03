@@ -66,6 +66,12 @@ from pathlib import Path
 import yaml
 import pandas as pd
 
+def _print_result(out_dict:dict):
+    print("="*100)
+    for key, value in out_dict.items():
+        print(f"|| {key}: {value}")
+    print("="*100)
+
 def _get_design_dictionary(osi_path:Path) -> dict:
     """return the design dictionary from an OSI file."""
     with open(osi_path, 'r') as file:
@@ -75,7 +81,7 @@ def _get_output_dictionary(module_class:Main) -> dict:
     """return the output dictionary for the design"""
     status = module_class.design_status
     out_list = module_class.output_values(module_class, status)
-    out_dict = {}
+    out_dict = {"Parameter": "Value"}
     for option in out_list:
         if option[0] is not None and option[2] == TYPE_TEXTBOX:
             out_dict[option[0]] = option[3]
@@ -109,7 +115,7 @@ def _save_to_pdf(module_class:Main, output_file:Path):
         'JobNumber': '123', 
         'AdditionalComments': 'No comments', 
         'Client': 'LoremIpsum', 
-        'filename': f'{output_file}', 
+        'input_filename': f'{output_file}', 
         'does_design_exist': True, 
         'logger_messages': ''
         }
@@ -117,64 +123,99 @@ def _save_to_pdf(module_class:Main, output_file:Path):
 
 
 
-def run_module(osi_path:Path | str, op_type:str = "print_result", output_path:str | Path = None) -> bool | dict | None:
+def run_module(*args, **kargs) -> dict:
     """Run the module specified in the OSI file located at osi_path."""
-    if isinstance(osi_path, str):
-        osi_path = Path(osi_path)
-        if not osi_path.exists():
-            print("File not found.")
-            return None
+    osi_path = kargs["input_path"] if len(kargs) > 0 else None
+    op_type = kargs["op_type"] if len(kargs) > 1 else "print_result"
+    output_path = kargs["output_path"] if len(kargs) > 2 else None
 
-    filename = osi_path.stem
-    output_file = None
-    if not output_path:
-        output_folder_path = osi_path.parent / "Outputs"
-    else:
-        if isinstance(output_path, str):
-            output_path = Path(output_path)
-        output_file = output_path.stem
-        output_folder_path = output_path.parent
-    output_folder_path.mkdir(parents=True, exist_ok=True)
-    output_file = output_folder_path / f"{output_file if output_file else filename}"
-    print(output_folder_path)
-    print(output_file)
+    result = {
+        "success": False,
+        "operation": op_type,
+        "input": str(osi_path) if osi_path else None,
+        "output": None,
+        "data": None,
+        "errors": [],
+    }
+
+    if osi_path is None:
+        result["errors"].append("No input file provided.")
+        print(result)
+        return result
+    
+    osi_path = Path(osi_path) if osi_path else None
+    output_path = Path(output_path) if output_path else None
+    if not osi_path.exists():
+        result["errors"].append(f"File not found: {osi_path}")
+        print(result)
+        return result
+    
     design_dict = _get_design_dictionary(osi_path)
     module_name = design_dict.get("Module")
-    if module_name is None:
-        print("Module not specified.")
-        return None
+    if not module_name:
+        result["errors"].append("Module not specified.")
+        print(result)
+        return result
 
     module_class = available_modules.get(module_name)
-    if module_class is None:
-        print("Not a valid module class.")
-        return None
+    if not module_class:
+        result["errors"].append(f"Not a valid module class: {module_name}")
+        print(result)
+        return result
     
+    input_filename = osi_path.stem
+    output_filename = output_path.stem if output_path else None
+    if not output_path:
+        output_folder_path = osi_path.parent / "Outputs" / f"{module_class.__name__}"
+    else:
+        output_folder_path = output_path.parent / f"{module_class.__name__}"
+    output_folder_path.mkdir(parents=True, exist_ok=True)
+    output_file = output_folder_path / f"{output_filename if output_filename else input_filename}"
+
     module_class.set_osdaglogger(None)
     val_errors = module_class.func_for_validation(module_class, design_dict)
-    
-    if (val_errors is None):
-        # if output_file is None: 
-        #     output_file = output_folder_path / f"{module_class.__name__}/{filename}"
-        # else :
-        #     output_file = output_folder_path / f"{module_class.__name__}/{output_file}"
-        # output_folder_path.parent.mkdir(parents=True, exist_ok=True)
-        if op_type == "save_csv":
-            _save_to_csv(_get_output_dictionary(module_class),str(output_file)+".csv")
-            return True
-        
-        elif op_type == "save_pdf":
-            _save_to_pdf(module_class, output_file)
-            return True
 
-        elif op_type == "print_result":
-            out_dict = _get_output_dictionary(module_class)
-            print(out_dict)
-            return out_dict
+    if val_errors:
+        result["errors"].extend(val_errors)
+        print(result)
+        return result
+
+    out_dict = _get_output_dictionary(module_class)
+    result["data"] = out_dict
+    if op_type == "save_csv":
+        try:
+            _save_to_csv(out_dict, str(output_file) + ".csv")
+            result["success"] = True
+            result["output"] = str(output_file)
+        except Exception as e:
+            result["success"] = False
+            result["errors"].append(f"Failed to save CSV: {e}")
+
+    elif op_type == "save_pdf":
+        try:
+            _save_to_pdf(module_class, output_file)
+            result["success"] = True
+            result["output"] = str(output_file)
+        except Exception as e:
+            result["success"] = False
+            result["errors"].append(f"Failed to save PDF: {e}")
+
+    elif op_type == "print_result":
+        try:
+            result["success"] = True
+            _print_result(out_dict=out_dict)
+        except Exception as e:
+            result["success"] = False
+            result["errors"].append(f"Failed to get result: {e}")
 
     else:
-        for error in val_errors:
-            print(f"Error: {error}")
-            return None
+        result["errors"].append(f"Unsupported op_type: {op_type}")
+
+    if len(result["errors"]) > 0:
+        print(result)
+    
+    return result
+
 
 
 # run_module(r"C:\Users\1hasa\Osdag\TensionBoltedTest4.osi",op_type="save to csv")

@@ -23,7 +23,7 @@ class OsdagLaunchScreen(object):
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")
         self.centralwidget.setStyleSheet("""
             #SplashScreen_CentralWidget {
-                border: 1px solid #90af13;
+                border: 2px solid #90af13;
                 border-radius: 5px;
                 background-image: url(':/backgrounds/splash_bg.jpg');
                 background-repeat: no-repeat;

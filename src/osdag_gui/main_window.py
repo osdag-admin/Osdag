@@ -62,8 +62,6 @@ class MainWindow(QMainWindow):
         self.init_ui() # Call init_ui before sidebar creation to ensure main content exists
         self.handle_add_tab("Home")
 
-        # self.maximize_button.click()
-
     def init_ui(self):
         # Main Vertical Layout for the entire window's *content*
         central_widget = QWidget()
@@ -89,6 +87,9 @@ class MainWindow(QMainWindow):
 
         icon_label_h_layout.addWidget(self.svg_widget)
         top_h_layout.addWidget(icon_label_widget)
+        
+        # Keep a reference for event filtering (double-click to maximize/restore)
+        self.icon_label_widget = icon_label_widget
 
         # QTabBar
         self.tab_bar = QTabBar()
@@ -131,6 +132,10 @@ class MainWindow(QMainWindow):
             }
         ''')
         top_h_layout.addWidget(self.tab_bar)
+        
+        # Install event filters for double-click maximize/restore on title widgets
+        self.tab_bar.installEventFilter(self)
+        self.icon_label_widget.installEventFilter(self)
 
         # Stretch to push buttons to the right
         top_h_layout.addStretch(1)
@@ -246,6 +251,11 @@ class MainWindow(QMainWindow):
         # Ensure initial synchronization
         if self.tab_bar.count() > 0:
             self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
+        
+        # This is called one after another so that the normal state must also be recorded
+        # before maximizing, so that when we click on Restore it comes to normal state.
+        self.showNormal()
+        self.showMaximized()
 
     def set_maximize_icon(self):
         self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize.svg").toImage())))
@@ -426,6 +436,21 @@ class MainWindow(QMainWindow):
         if event.button() == Qt.LeftButton:
             if hasattr(self, 'old_pos'):
                 del self.old_pos
+
+    def mouseDoubleClickEvent(self, event):
+        # Toggle maximize/restore when double-clicking in the draggable title area
+        if event.button() == Qt.LeftButton:
+            draggable_height = self.tab_bar.height() + (self.layout().contentsMargins().top() * 2)
+            if event.position().y() < draggable_height:
+                self.toggle_maximize_restore()
+
+    def eventFilter(self, obj, event):
+        # Handle double-click on title widgets (e.g., tab bar, logo area)
+        if event.type() == QEvent.MouseButtonDblClick:
+            if event.button() == Qt.LeftButton:
+                self.toggle_maximize_restore()
+                return True
+        return super().eventFilter(obj, event)
 
     def handle_card_open_clicked(self, card_title):
         if card_title == "Fin Plate":

@@ -80,6 +80,7 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 7) Any further Levels will result in an error .
 '''
 
+from html import parser
 import os, argparse
 from pathlib import Path
 import re
@@ -977,29 +978,44 @@ def do_stuff():
         print("ERROR", e)
 
 def main():
-    parser = argparse.ArgumentParser(description="Osdag")
-    parser.add_argument("--input", type=str, default=None, help="Path to input file")
+    parser = argparse.ArgumentParser(
+        description=(
+            "========================================================================================================"
+            "\n\nOsdag Steel Design and Graphics Application\n\n"
+            "By default, running 'osdag' launches the GUI.\n"
+            "You can also run in CLI mode by providing --input, optional --op_type, and --output.\n"
+            "\nExamples:\n"
+            "  osdag                                   # Launch GUI\n"
+            "  osdag -i TensionBolted.osi         # Run design from input file and print design output\n"
+            "  osdag -i TensionBolted.osi -op save_csv -o result.csv  # Save output to CSV\n"
+            "  osdag -i TensionBolted.osi -op save_pdf -o result.pdf  # Save design report to PDF\n"
+            "  osdag -i TensionBolted.osi -op print_result                  # Print design result\n\n"
+            "========================================================================================================"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    parser.add_argument("-i", "--input", type=str, help="Path to input file (.osi)")
     parser.add_argument(
+        "-op",
         "--op_type",
         type=str,
         choices=["save_csv", "save_pdf", "print_result"],
-        default=None,
-        help="Type of operation: save_csv | save_pdf | print_result"
+        default="print_result",
+        help="Type of operation: save_csv | save_pdf | print_result (default: print_result)"
     )
-    parser.add_argument("--output", type=str, default=None, help="Path to output file")
+    parser.add_argument("-o", "--output", type=str, help="Path for output file")
+
     args = parser.parse_args()
 
-    if args.input:
-        if args.op_type:
-            if args.output:
-                run_module(args.input, args.op_type, args.output)
-            else:
-                run_module(args.input, args.op_type)
-        else:
-            
-            run_module(args.input)
-    else:
-        do_stuff()
+    if not args.input:
+        return do_stuff()
+    input_path = args.input
+    output_path = args.output if args.output else None
+
+    
+    result = run_module(input_path=input_path, op_type=args.op_type, output_path=output_path)
+    return result
 
 if __name__ == '__main__':
     main()

@@ -63,7 +63,7 @@ available_modules = {
 }
 
 from pathlib import Path
-import yaml
+import yaml, click
 import pandas as pd
 
 def _print_result(out_dict:dict):
@@ -203,7 +203,7 @@ def run_module(*args, **kargs) -> dict:
     elif op_type == "print_result":
         try:
             result["success"] = True
-            _print_result(out_dict=out_dict)
+            click.echo(_print_result(out_dict=out_dict))
         except Exception as e:
             result["success"] = False
             result["errors"].append(f"Failed to get result: {e}")

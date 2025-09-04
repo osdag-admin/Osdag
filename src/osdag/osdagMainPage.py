@@ -81,7 +81,7 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 '''
 
 from html import parser
-import os, argparse
+import os, click    
 from pathlib import Path
 import re
 import io
@@ -977,46 +977,79 @@ def do_stuff():
     except BaseException as e:
         print("ERROR", e)
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=(
-            "========================================================================================================"
-            "\n\nOsdag Steel Design and Graphics Application\n\n"
-            "By default, running 'osdag' launches the GUI.\n"
-            "You can also run in CLI mode by providing --input, optional --op_type, and --output.\n"
-            "\nExamples:\n"
-            "  osdag                                   # Launch GUI\n"
-            "  osdag -i TensionBolted.osi         # Run design from input file and print design output\n"
-            "  osdag -i TensionBolted.osi -op save_csv -o result.csv  # Save output to CSV\n"
-            "  osdag -i TensionBolted.osi -op save_pdf -o result.pdf  # Save design report to PDF\n"
-            "  osdag -i TensionBolted.osi -op print_result                  # Print design result\n\n"
-            "========================================================================================================"
-        ),
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+# --- Main CLI group ---
+help_msg = """\n\b
+==================================================
+Osdag Steel Design and Graphics Application
 
-    parser.add_argument("-i", "--input", type=str, help="Path to input file (.osi)")
-    parser.add_argument(
-        "-op",
-        "--op_type",
-        type=str,
-        choices=["save_csv", "save_pdf", "print_result"],
-        default="print_result",
-        help="Type of operation: save_csv | save_pdf | print_result (default: print_result)"
-    )
-    parser.add_argument("-o", "--output", type=str, help="Path for output file")
+Usage:\n
+  osdag                       # Launch GUI (default)\n
+  osdag cli run               # Use CLI tools (see below)
 
-    args = parser.parse_args()
+By default, running 'osdag' launches the GUI.
+You can also run in CLI mode using 'osdag cli run'.
 
-    if not args.input:
-        return do_stuff()
-    input_path = args.input
-    output_path = args.output if args.output else None
+Examples:\n
+  osdag\n
+  osdag cli run -i TensionBolted.osi\n
+  osdag cli run -i TensionBolted.osi -op save_csv -o result.csv\n
+  osdag cli run -i TensionBolted.osi -op save_pdf -o result.pdf\n
+  osdag cli run -i TensionBolted.osi -op print_result\n
+==================================================\n
+"""
 
-    
-    result = run_module(input_path=input_path, op_type=args.op_type, output_path=output_path)
-    return result
+@click.group(invoke_without_command=True,
+            help="\nOsdag Application. Run osdag to launch GUI, or use 'osdag cli run' for command-line tools.\n",
+            epilog=help_msg,
+            context_settings=dict(help_option_names=['-h', '--help']),
+            )
 
-if __name__ == '__main__':
-    main()
-    # do_stuff()
+@click.pass_context
+def osdag(ctx):
+    if ctx.invoked_subcommand is None:
+        do_stuff()
+
+
+# --- CLI group ---
+@osdag.group(help="\nRun in CLI mode (use subcommands like 'run').\n",
+            epilog=help_msg,
+            context_settings=dict(help_option_names=['-h', '--help']),
+            )
+def cli():
+    pass
+
+
+# --- Subcommand: run ---
+@cli.command(help="\nOsdag Application. Run osdag to launch GUI, or use 'osdag cli run' for command-line tools.\n",
+            epilog=help_msg,
+            context_settings=dict(help_option_names=['-h', '--help']),
+            )
+@click.option("-i", "--input", "input_path",
+              type=click.Path(exists=True, dir_okay=False),
+              required=True,
+              help="Path to input file (.osi)")
+@click.option("-op", "--op_type",
+              type=click.Choice(["save_csv", "save_pdf", "print_result"]),
+              default="print_result",
+              show_default=True,
+              help="Type of operation")
+@click.option("-o", "--output", "output_path",
+              type=click.Path(dir_okay=False, writable=True),
+              help="Path for output file")
+def run(input_path, op_type, output_path):
+    result = run_module(input_path=input_path,
+                        op_type=op_type,
+                        output_path=output_path)
+
+    if not result["success"]:
+        click.echo("Errors encountered:")
+        for err in result["errors"]:
+            click.echo(f"   - {err}")
+    else:
+        click.echo("Operation completed successfully")
+        if result.get("output"):
+            click.echo(f"Output saved at: {result['output']}")
+
+
+if __name__ == "__main__":
+    osdag()

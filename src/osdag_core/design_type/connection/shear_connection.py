@@ -472,11 +472,11 @@ class ShearConnection(Connection):
     def fn_conn_image(self, input):
         conn = input[0]
         if conn == VALUES_CONN[0]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
         elif conn == VALUES_CONN[1]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cw_bw.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cw_bw.png"))
         elif conn in VALUES_CONN_2:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_beam_beam.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_beam_beam.png"))
         else:
             return ''
 

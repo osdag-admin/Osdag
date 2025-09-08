@@ -19,7 +19,7 @@ import os
 import sys
 from importlib.resources import files
 
-PATH_TO_DATABASE = files("osdag.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 
 # IS 1363 - Part 1 : 2002
 class IS1363_part_1_2002(object):

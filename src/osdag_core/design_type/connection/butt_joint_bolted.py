@@ -267,7 +267,7 @@ class ButtJointBolted(MomentConnection):
 
         # Use a default image path that exists in the project
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-            [str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointBolted.png")), 400, 277, ""])  # [image, width, height, caption]
+            [str(files("osdag_core.data.ResourceFiles.images").joinpath("ButtJointBolted.png")), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
@@ -411,7 +411,7 @@ class ButtJointBolted(MomentConnection):
 
     def get_3d_image_path(self):
         image_path = "./ResourceFiles/images/3d.png"
-        fallback_image = str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointBolted.png"))
+        fallback_image = str(files("osdag_core.data.ResourceFiles.images").joinpath("ButtJointBolted.png"))
         if not os.path.exists(image_path):
             return fallback_image
         return image_path

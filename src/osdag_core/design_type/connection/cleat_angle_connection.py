@@ -172,7 +172,7 @@ class CleatAngleConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag.data.ResourceFiles.images").joinpath("fin_cf_bw.png")), True, 'No Validator')
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png")), True, 'No Validator')
         options_list.append(t3)
 
         t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUES_COLSEC, True, 'No Validator')
@@ -279,11 +279,11 @@ class CleatAngleConnection(ShearConnection):
 
         conn = self[0]
         if conn == VALUES_CONN[0]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
         elif conn == VALUES_CONN[1]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cw_bw.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cw_bw.png"))
         elif conn in VALUES_CONN_2:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_beam_beam.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_beam_beam.png"))
         else:
             return ''
 
@@ -508,7 +508,7 @@ class CleatAngleConnection(ShearConnection):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag.data.ResourceFiles.images").joinpath("cleat_beam.png")), 400, 277, ""])  # [image, width, height, caption]
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("cleat_beam.png")), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.sptd_leg.gauge_provided if status else '')
@@ -539,7 +539,7 @@ class CleatAngleConnection(ShearConnection):
         spting_spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag.data.ResourceFiles.images").joinpath("cleat.png")), 400, 277, ""])  # [image, width, height, caption]
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("cleat.png")), 400, 277, ""])  # [image, width, height, caption]
         spting_spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.spting_leg.gauge_provided if status else '')

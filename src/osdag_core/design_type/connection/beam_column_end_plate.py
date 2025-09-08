@@ -287,7 +287,7 @@ class BeamColumnEndPlate(MomentConnection):
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag.data.ResourceFiles.images").joinpath("cf_bw_ebw.png")), True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("cf_bw_ebw.png")), True, 'No Validator')
         options_list.append(t15)    
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
@@ -360,17 +360,17 @@ class BeamColumnEndPlate(MomentConnection):
         ep_type = self[1]
 
         if conn == CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[0]:  # Flushed - Reversible Moment
-            return str(files("osdag.data.ResourceFiles.images").joinpath("BC_CF-BW-Flush.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CF-BW-Flush.png"))
         elif conn == CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[1]:  # Extended One Way - Irreversible Moment
-            return str(files("osdag.data.ResourceFiles.images").joinpath("BC_CF-BW-EOW.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CF-BW-EOW.png"))
         elif conn in CONN_CFBW and ep_type == VALUES_ENDPLATE_TYPE[2]:  # Extended Both Ways - Reversible Moment
-            return str(files("osdag.data.ResourceFiles.images").joinpath("BC_CF-BW-EBW.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CF-BW-EBW.png"))
         elif conn == CONN_CWBW and ep_type == VALUES_ENDPLATE_TYPE[0]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("BC_CW-BW-Flush.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CW-BW-Flush.png"))
         elif conn == CONN_CWBW and ep_type == VALUES_ENDPLATE_TYPE[1]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("BC_CW-BW-EOW.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CW-BW-EOW.png"))
         elif conn in CONN_CWBW and ep_type == VALUES_ENDPLATE_TYPE[2]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("BC_CW-BW-EBW.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CW-BW-EBW.png"))
         else:
             return ''
 
@@ -636,28 +636,28 @@ class BeamColumnEndPlate(MomentConnection):
 
         if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BC-CW-BW_Flush.png"))
+                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_Flush.png"))
                 width = 880
                 height = 493
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BC-CW-BW_EOW.png"))
+                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_EOW.png"))
                 width = 612
                 height = 568
             else:  # Both-way
-                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BC-CW-BW_EBW.png"))
+                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_EBW.png"))
                 width = 620
                 height = 592
         else:  # CF-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BC_Stiffener_Flush.png"))
+                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_Flush.png"))
                 width = 938
                 height = 478
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BC_Stiffener_OWE.png"))
+                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_OWE.png"))
                 width = 636
                 height = 562
             else:  # Both-way
-                detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BC_Stiffener_BWE.png"))
+                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_BWE.png"))
                 width = 710
                 height = 550
 
@@ -672,7 +672,7 @@ class BeamColumnEndPlate(MomentConnection):
         weld = []
 
         t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
-               [str(files("osdag.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png")), 575.75, 519.4,
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png")), 575.75, 519.4,
                 'Weld Detail - beam to end plate connection'])
         weld.append(t99)
 
@@ -683,15 +683,15 @@ class BeamColumnEndPlate(MomentConnection):
         detailing = []
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
+            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
             width = 502
             height = 551
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
+            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
             width = 437
             height = 552
         else:  # Both-way
-            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
+            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
             width = 387
             height = 551
 
@@ -3227,28 +3227,28 @@ class BeamColumnEndPlate(MomentConnection):
         # End of design report
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
+            path_detailing = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
+            path_detailing = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
         else:  # Both-way
-            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
+            path_detailing = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
 
         if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BC-CW-BW_Flush.png"))
+                path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_Flush.png"))
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BC-CW-BW_EOW.png"))
+                path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_EOW.png"))
             else:  # Both-way
-                path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BC-CW-BW_EBW.png"))
+                path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_EBW.png"))
         else:  # CF-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BC_Stiffener_Flush.png"))
+                path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_Flush.png"))
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BC_Stiffener_OWE.png"))
+                path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_OWE.png"))
             else:  # Both-way
-                path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BC_Stiffener_BWE.png"))
+                path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_BWE.png"))
 
-        path_weld = str(files("osdag.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png"))
+        path_weld = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png"))
 
         Disp_2d_image = [path_weld, path_detailing, path_stiffener]
         Disp_3d_image = "/ResourceFiles/images/3d.png"

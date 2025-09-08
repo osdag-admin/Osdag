@@ -2,7 +2,6 @@
 Entry point for Osdag GUI application.
 Handles splash screen and main window launch.
 """
-from osdag_gui.main_window import MainWindow
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
@@ -13,8 +12,38 @@ class LoadingThread(QThread):
 
     def run(self):
         import time
+        self.create_sqlite()
         time.sleep(5)
         self.finished.emit()
+
+    def create_sqlite(self):
+        import os
+        from importlib.resources import files
+
+        ############################ Pre-Build Database Updation/Creation #################
+        sqlpath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sql')
+        sqlitepath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sqlite')
+
+        if sqlpath.exists():
+            if not sqlitepath.exists():
+                cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
+                os.system(cmd)
+                sqlpath.touch()
+                print('Database Created')
+
+            elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
+                try:
+                    sqlitenewpath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag_new.sqlite')
+                    cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
+                    error = os.system(cmd)
+                    print(error)
+                    os.remove(sqlitepath)
+                    sqlitenewpath.rename(sqlitepath)
+                    sqlpath.touch()
+                    print('Database Updated', sqlpath.stat().st_mtime, sqlitepath.stat().st_mtime)
+                except Exception as e:
+                    sqlitenewpath.unlink()
+                    print('Error: ', e)
 
 class LaunchScreenPopup(QMainWindow):
     def __init__(self, on_finish):
@@ -37,6 +66,7 @@ def main():
     app = QApplication(sys.argv)
 
     def show_main_window():
+        from osdag_gui.main_window import MainWindow
         app.main_window = MainWindow()
         app.main_window.show()
 

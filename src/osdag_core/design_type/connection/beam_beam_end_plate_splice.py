@@ -225,7 +225,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag.data.ResourceFiles.images").joinpath("flush_ep.png")), True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("flush_ep.png")), True, 'No Validator')
         options_list.append(t15)
 
         t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, connectdb("Beams"), True, 'No Validator')
@@ -291,11 +291,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         ep_type = self[0]
         if ep_type == VALUES_ENDPLATE_TYPE[0]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("flush_ep.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("flush_ep.png"))
         elif ep_type == VALUES_ENDPLATE_TYPE[1]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("owe_ep.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("owe_ep.png"))
         elif ep_type == VALUES_ENDPLATE_TYPE[2]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("extended.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("extended.png"))
         else:
             return ''
 
@@ -486,15 +486,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
         detailing = []
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_FP.png"))
+            detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB_Stiffener_FP.png"))
             width = 979
             height = 363
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_OWE.png"))
+            detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB_Stiffener_OWE.png"))
             width = 636
             height = 562
         else:  # Both-way
-            detailing_path = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_BWE.png"))
+            detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB_Stiffener_BWE.png"))
             width = 586
             height = 579
 
@@ -509,7 +509,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
         weld = []
 
         t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
-               [str(files("osdag.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png")), 575, 520,
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png")), 575, 520,
                 'Weld Detail - beam to end plate connection'])
         weld.append(t99)
 
@@ -520,15 +520,15 @@ class BeamBeamEndPlateSplice(MomentConnection):
         detailing = []
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
+            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
             width = 502
             height = 551
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
+            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
             width = 437
             height = 552
         else:  # Both-way
-            path = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
+            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
             width = 387
             height = 551
 
@@ -2056,20 +2056,20 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # End of design report functions
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
+            path_detailing = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
+            path_detailing = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
         else:  # Both-way
-            path_detailing = str(files("osdag.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
+            path_detailing = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
 
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_FP.png"))
+            path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB_Stiffener_FP.png"))
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_OWE.png"))
+            path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB_Stiffener_OWE.png"))
         else:  # Both-way
-            path_stiffener = str(files("osdag.data.ResourceFiles.images").joinpath("BB_Stiffener_BWE.png"))
+            path_stiffener = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB_Stiffener_BWE.png"))
 
-        path_weld = str(files("osdag.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png"))
+        path_weld = str(files("osdag_core.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png"))
 
         Disp_2d_image = [path_weld, path_detailing, path_stiffener]
         Disp_3d_image = "/ResourceFiles/images/3d.png"

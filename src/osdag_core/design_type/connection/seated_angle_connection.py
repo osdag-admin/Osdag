@@ -272,7 +272,7 @@ class SeatedAngleConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN_1, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag.data.ResourceFiles.images").joinpath("fin_cf_bw.png")), True, 'No Validator')
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png")), True, 'No Validator')
         options_list.append(t3)
 
         t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUES_COLSEC, True, 'No Validator')
@@ -389,11 +389,11 @@ class SeatedAngleConnection(ShearConnection):
     def fn_conn_image(self):
         conn = self[0]
         if conn == VALUES_CONN[0]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
         elif conn == VALUES_CONN[1]:
-            return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cw_bw.png"))
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cw_bw.png"))
         # elif self in VALUES_CONN_2:
-        #     return str(files("osdag.data.ResourceFiles.images").joinpath("fin_beam_beam.png"))
+        #     return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_beam_beam.png"))
         else:
             return ''
 
@@ -563,11 +563,11 @@ class SeatedAngleConnection(ShearConnection):
         seated_spacing_col.append(t00)
         if self.connectivity == VALUES_CONN_1[0]:
             t99 = (None, 'Spacing Details', TYPE_SECTION,
-                [str(files("osdag.data.ResourceFiles.images").joinpath("seated_column_cfbw.png")), 400, 277, ""])  # [image, width, height, caption]
+                [str(files("osdag_core.data.ResourceFiles.images").joinpath("seated_column_cfbw.png")), 400, 277, ""])  # [image, width, height, caption]
             seated_spacing_col.append(t99)
         else:
             t99 = (None, 'Spacing Details', TYPE_SECTION,
-                [str(files("osdag.data.ResourceFiles.images").joinpath("seated_column.png")), 400, 277, ""])  # [image, width, height, caption]
+                [str(files("osdag_core.data.ResourceFiles.images").joinpath("seated_column.png")), 400, 277, ""])  # [image, width, height, caption]
             seated_spacing_col.append(t99)
 
         t9 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_row if flag else '')
@@ -608,7 +608,7 @@ class SeatedAngleConnection(ShearConnection):
         seated_spacing_beam.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-            [str(files("osdag.data.ResourceFiles.images").joinpath("seated_beam.png")), 400, 277, ""])  # [image, width, height, caption]
+            [str(files("osdag_core.data.ResourceFiles.images").joinpath("seated_beam.png")), 400, 277, ""])  # [image, width, height, caption]
         seated_spacing_beam.append(t99)
 
         t9 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, 1 if flag else '')

@@ -7,16 +7,9 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-<<<<<<< HEAD
 from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QProgressBar
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QRect, QThread, Signal
 from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
-=======
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import QMessageBox, QDialog
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QTimer, QRegularExpression
-from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator
->>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import CustomButton
@@ -454,20 +447,12 @@ class InputDock(QWidget):
         btn_button_layout.addStretch(2)
 
         save_input_btn = CustomButton("       Save Input        ", ":/vectors/save.svg")
-<<<<<<< HEAD
         save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, data, "Save"))
-=======
-        save_input_btn.clicked.connect(lambda: print("design clicked"))
->>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
         design_btn = CustomButton("        Design           ", ":/vectors/design.svg")
-<<<<<<< HEAD
         design_btn.clicked.connect(lambda: self.parent.start_thread(data))
-=======
-        design_btn.clicked.connect(lambda: print("design clicked"))
->>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
         btn_button_layout.addWidget(design_btn)
         btn_button_layout.addStretch(2)
 

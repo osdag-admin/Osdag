@@ -9,7 +9,7 @@ import math
 import logging
 from importlib.resources import files
 
-PATH_TO_DATABASE = files("osdag.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 
 import sqlite3
 

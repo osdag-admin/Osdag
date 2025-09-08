@@ -410,13 +410,18 @@ class CustomWindow(QWidget):
         # Add dock indicator labels
         self.input_dock_label = InputDockIndicator(parent=self)
         self.input_dock_label.setVisible(False)
+<<<<<<< HEAD
         central_H_layout.setContentsMargins(0, 0, 0, 0)
+=======
+        central_H_layout.setContentsMargins(6, 0, 0, 0)
+>>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
         central_H_layout.setSpacing(0)
         central_H_layout.addWidget(self.input_dock_label, 1)
 
         central_V_layout = QVBoxLayout()
         central_V_layout.setContentsMargins(0, 0, 0, 0)
         central_V_layout.setSpacing(0)
+<<<<<<< HEAD
 
         # Add cad component checkboxes
         self.cad_comp_widget = CadComponentCheckbox(self.backend, parent=self)
@@ -443,6 +448,13 @@ class CustomWindow(QWidget):
         self.cad_log_splitter.setSizes([6, 1])
 
         central_V_layout.addWidget(self.cad_log_splitter)        
+=======
+        central_V_layout.addStretch(7)
+        self.logs_dock = LogDock()
+        self.logs_dock_active = True
+        self.logs_dock.setVisible(False)
+        central_V_layout.addWidget(self.logs_dock, 2)
+>>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
         central_H_layout.addLayout(central_V_layout, 6)
 
         # Add output dock indicator label
@@ -895,6 +907,7 @@ class CustomWindow(QWidget):
         self.thread_2.finished.connect(lambda: loading_widget.close())
         self.thread_2.finished.connect(lambda: self.setEnabled(True))
 
+<<<<<<< HEAD
     # Design Functions
     def common_function_for_save_and_design(self, main, data, trigger_type):
         option_list = main.input_values()
@@ -1383,6 +1396,8 @@ class CustomWindow(QWidget):
         msg_box.finished.connect(lambda: setattr(self, '_error_dialog_open', False))
         msg_box.exec()
 
+=======
+>>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
 class InputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
@@ -1391,7 +1406,11 @@ class InputDockIndicator(QWidget):
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
 
         input_layout = QHBoxLayout(self)
+<<<<<<< HEAD
         input_layout.setContentsMargins(6,0,0,0)
+=======
+        input_layout.setContentsMargins(0,0,0,0)
+>>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116
         input_layout.setSpacing(0)
 
         input_label = QSvgWidget(":/vectors/inputs_label.svg")
@@ -1473,6 +1492,7 @@ class OutputDockIndicator(QWidget):
         output_layout.addWidget(output_label)
         output_label.setFixedWidth(28)
 
+<<<<<<< HEAD
 class CadComponentCheckbox(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__(parent)
@@ -1517,3 +1537,12 @@ if __name__ == "__main__":
     window.showMaximized()
     window.show()
     sys.exit(app.exec())
+=======
+# if __name__ == "__main__":
+#     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#     app = QApplication(sys.argv)
+#     window = CustomWindow("Fin Plate Connection", "FinPlateConnection")
+#     window.showMaximized()
+#     window.show()
+#     sys.exit(app.exec())
+>>>>>>> 2bded52ba34f8c0bc6dcf1d993164c24be9f1116

@@ -106,7 +106,7 @@ class SvgCard(QFrame):
         QFrame#SvgCard {
             border-radius: 12px;
             background-color: rgb(255, 255, 255);
-            border: 2px solid transparent;
+            border: 2px solid #E5E5E5;
         }
         """
 

@@ -2,16 +2,14 @@
 Input dock widget for Osdag GUI.
 Handles user input forms and group boxes for connection design.
 """
-import sys
-import os
+import sys, time
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import QMessageBox, QDialog
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QTimer, QRegularExpression
-from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator
+from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QProgressBar
+from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QRect, QThread, Signal
+from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import CustomButton
@@ -107,13 +105,34 @@ def apply_field_style(widget):
         }
         """)
 
+def style_main_buttons():
+    return """
+        QPushButton {
+            background-color: #94b816;
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 6px 18px;
+        }
+        QPushButton:hover {
+            background-color: #7a9a12;
+        }
+        QPushButton:pressed {
+            background-color: #5f7a0e;
+        }
+    """
+
+
 class InputDock(QWidget):
     # inputDockVisibilityChanged = Signal(bool)
 
     def __init__(self, backend:object, parent):
         super().__init__()
         self.parent = parent
-        self.backend = backend()
+        # Already an Object created in template_page.py
+        self.backend = backend
+        self.input_widget = None
+
         self.setStyleSheet("background: transparent;")
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -121,7 +140,6 @@ class InputDock(QWidget):
 
         self.left_container = QWidget()
         self.original_width = int(self.width())
-        self.setMinimumWidth(100)
 
         # Bring the data instance from `design_type` folder
         input_field_list = self.backend.input_values()
@@ -160,9 +178,6 @@ class InputDock(QWidget):
         toggle_layout.addWidget(self.toggle_btn)
         toggle_layout.addStretch()
         self.main_layout.addWidget(self.toggle_strip)
-
-        self.right_spacer = QWidget()
-        self.main_layout.addWidget(self.right_spacer)
     
     # To equalize the size of label strings
     def equalize_label_length(self, list):
@@ -208,15 +223,16 @@ class InputDock(QWidget):
         top_bar = QHBoxLayout()
         top_bar.setSpacing(10)
         input_dock_btn = QPushButton("Basic Inputs")
-        input_dock_btn.setStyleSheet(
-            "background-color: #90AF13; color: white; border-radius: 5px; padding: 4px 16px; font-weight: bold;"
-        )
-        input_dock_btn.setFixedHeight(28)
+        input_dock_btn.setStyleSheet(style_main_buttons())
+        input_dock_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_bar.addWidget(input_dock_btn)
         additional_inputs_btn = AdditionalInputsButton()
+        additional_inputs_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, data, "Design_Pref"))
+        additional_inputs_btn.clicked.connect(lambda: self.parent.combined_design_prefer(data,self.backend))
+        additional_inputs_btn.clicked.connect(lambda: self.parent.design_preferences())
         additional_inputs_btn.setToolTip("Additional Inputs")
+        additional_inputs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_bar.addWidget(additional_inputs_btn)
-        top_bar.addStretch()
         panel_layout.addLayout(top_bar)
 
         # Vertical scroll area for group boxes (vertical only)
@@ -431,12 +447,12 @@ class InputDock(QWidget):
         btn_button_layout.addStretch(2)
 
         save_input_btn = CustomButton("       Save Input        ", ":/vectors/save.svg")
-        save_input_btn.clicked.connect(lambda: print("design clicked"))
+        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, data, "Save"))
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
         design_btn = CustomButton("        Design           ", ":/vectors/design.svg")
-        design_btn.clicked.connect(lambda: print("design clicked"))
+        design_btn.clicked.connect(lambda: self.parent.start_thread(data))
         btn_button_layout.addWidget(design_btn)
         btn_button_layout.addStretch(2)
 
@@ -668,6 +684,184 @@ class InputDock(QWidget):
         
         self.toggle_btn.setText("❯" if is_collapsing else "❮")
         self.toggle_btn.setToolTip("Show panel" if is_collapsing else "Hide panel")
+
+    def new_material_dialog(self):
+        dialog = QDialog(self)
+        self.material_popup_message = ''
+        self.invalid_field = ''
+        dialog.setWindowTitle('Custom Material')
+        layout = QGridLayout(dialog)
+        # Center the content by adding side stretch columns and margins
+        layout.setContentsMargins(20, 10, 20, 10)
+        layout.setHorizontalSpacing(6)
+        layout.setVerticalSpacing(12)
+        layout.setColumnStretch(0, 1)
+        layout.setColumnStretch(3, 1)
+        widget = QWidget(dialog)
+        widget.setLayout(layout)
+        dialog.setStyleSheet("""
+            QDialog, QWidget {
+                background-color: #ffffff;
+                color: #000000;
+            }
+            QLabel {
+                color: #000000;
+            }
+            QLineEdit {
+                background-color: #ffffff;
+                color: #000000;
+                border: 1px solid #c0c0c0;
+                border-radius: 3px;
+                padding: 2px 4px;
+                selection-background-color: #3875d6;
+                selection-border-color: #90af13;
+            }
+            QPushButton {
+                background-color: #90af13;
+                color: #000000;
+                padding: 4px 10px;
+                border-radius: 3px;
+            }
+            QPushButton:hover {
+                background-color: #5e7407;
+            }
+            QPushButton:pressed {
+                background-color: #7d9710;
+            }
+            """)
+        _translate = QCoreApplication.translate
+        textbox_list = ['Grade', 'Fy_20', 'Fy_20_40', 'Fy_40', 'Fu']
+        event_function = ['', self.material_popup_fy_20_event, self.material_popup_fy_20_40_event,
+                          self.material_popup_fy_40_event, self.material_popup_fu_event]
+        self.original_focus_event_functions = {}
+
+        i = 0
+        for textbox_name in textbox_list:
+            label = QLabel(widget)
+            label.setObjectName(textbox_name+"_label")
+            label.setText(_translate("MainWindow", "<html><body><p>" + textbox_name + "</p></body></html>"))
+            label.setFixedSize(100, 30)
+            layout.addWidget(label, i, 1, 1, 1)
+
+            textbox = QLineEdit(widget)
+            textbox.setObjectName(textbox_name)
+            textbox.setFixedSize(200, 24)
+            if textbox_name == 'Grade':
+                textbox.setReadOnly(True)
+                textbox.setText("Cus____")
+            else:
+                textbox.setValidator(QIntValidator())
+                # textbox.mousePressEvent = event_function[textbox_list.index(textbox_name)]
+                self.original_focus_event_functions.update({textbox_name: textbox.focusOutEvent})
+                textbox.focusOutEvent = event_function[textbox_list.index(textbox_name)]
+
+            self.connect_change_popup_material(textbox, widget)
+            layout.addWidget(textbox, i, 2, 1, 1)
+
+            i += 1
+
+        add_button = QPushButton(widget)
+        add_button.setObjectName("material_add")
+        add_button.setText("Add")
+        add_button.clicked.connect(lambda: self.update_material_db_validation(widget))
+        layout.addWidget(add_button, i, 1, 1, 2)
+
+        dialog.setFixedSize(350, 250)
+        closed = dialog.exec()
+        if closed is not None:
+            input_dock_material = self.input_widget.findChild(QWidget, KEY_MATERIAL)
+            input_dock_material.clear()
+            for item in connectdb("Material"):
+                input_dock_material.addItem(item)
+            input_dock_material.setCurrentIndex(1)
+
+    def material_popup_fy_20_event(self, e):
+        self.original_focus_event_functions['Fy_20'](e)
+        if self.invalid_field == 'Fy_20':
+            self.show_material_popup_message()
+
+    def material_popup_fy_20_40_event(self, e):
+        self.original_focus_event_functions['Fy_20_40'](e)
+        if self.invalid_field == 'Fy_20_40':
+            self.show_material_popup_message()
+
+    def material_popup_fy_40_event(self, e):
+        self.original_focus_event_functions['Fy_40'](e)
+        if self.invalid_field == 'Fy_40':
+            self.show_material_popup_message()
+
+    def material_popup_fu_event(self, e):
+        self.original_focus_event_functions['Fu'](e)
+        if self.invalid_field == 'Fu':
+            self.show_material_popup_message()
+
+    def connect_change_popup_material(self, textbox, widget):
+        if textbox.objectName() != 'Grade':
+            textbox.textChanged.connect(lambda: self.change_popup_material(widget))
+
+    def change_popup_material(self, widget):
+
+        grade = widget.findChild(QLineEdit, 'Grade')
+        fy_20 = widget.findChild(QLineEdit, 'Fy_20').text()
+        fy_20_40 = widget.findChild(QLineEdit, 'Fy_20_40').text()
+        fy_40 = widget.findChild(QLineEdit, 'Fy_40').text()
+        fu = widget.findChild(QLineEdit, 'Fu').text()
+
+        material = str("Cus_"+fy_20+"_"+fy_20_40+"_"+fy_40+"_"+fu)
+        material_validator = MaterialValidator(material)
+        if not material_validator.is_valid_custom():
+            if str(material_validator.invalid_value):
+                self.material_popup_message = "Please select "+str(material_validator.invalid_value)+" in valid range!"
+                self.invalid_field = str(material_validator.invalid_value)
+            else:
+                self.material_popup_message = ''
+                self.invalid_field = ''
+        else:
+            self.material_popup_message = ''
+            self.invalid_field = ''
+        grade.setText(material)
+
+    def update_material_db_validation(self, widget):
+
+        material = widget.findChild(QLineEdit, 'Grade').text()
+
+        material_validator = MaterialValidator(material)
+        if material_validator.is_already_in_db():
+            QMessageBox.about(QMessageBox(), "Information", "Material already exists in Database!")
+            return
+        elif not material_validator.is_format_custom():
+            QMessageBox.about(QMessageBox(), "Information", "Please fill all missing parameters!")
+            return
+        elif not material_validator.is_valid_custom():
+            QMessageBox.about(QMessageBox(), "Information", "Please select "+str(material_validator.invalid_value)+" in valid range!")
+            return
+
+        self.update_material_db(grade=material, material=material_validator)
+        QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+
+    def update_material_db(self, grade, material):
+
+        fy_20 = int(material.fy_20)
+        fy_20_40 = int(material.fy_20_40)
+        fy_40 = int(material.fy_40)
+        fu = int(material.fu)
+        elongation = 0
+
+        if fy_20 > 350:
+            elongation = 20
+        elif 250 < fy_20 <= 350:
+            elongation = 22
+        elif fy_20 <= 250:
+            elongation = 23
+
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        c = conn.cursor()
+        c.execute('''INSERT INTO Material (Grade,[Yield Stress (< 20)],[Yield Stress (20 -40)],
+        [Yield Stress (> 40)],[Ultimate Tensile Stress],[Elongation ]) VALUES (?,?,?,?,?,?)''',
+                  (grade, fy_20, fy_20_40, fy_40, fu, elongation))
+        conn.commit()
+        c.close()
+        conn.close()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

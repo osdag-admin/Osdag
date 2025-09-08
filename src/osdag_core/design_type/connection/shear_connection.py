@@ -431,9 +431,9 @@ class ShearConnection(Connection):
         list1.append(t3)
         return list1
 
-    def fn_conn_suptngsec_lbl(self):
+    def fn_conn_suptngsec_lbl(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return KEY_DISP_COLSEC
         elif conn in VALUES_CONN_2:
@@ -441,9 +441,9 @@ class ShearConnection(Connection):
         else:
             return ''
 
-    def fn_conn_suptdsec_lbl(self):
+    def fn_conn_suptdsec_lbl(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return KEY_DISP_BEAMSEC
         elif conn in VALUES_CONN_2:
@@ -451,9 +451,9 @@ class ShearConnection(Connection):
         else:
             return ''
 
-    def fn_conn_suptngsec(self):
+    def fn_conn_suptngsec(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return connectdb("Columns")
         elif conn in VALUES_CONN_2:
@@ -461,16 +461,16 @@ class ShearConnection(Connection):
         else:
             return []
 
-    def fn_conn_suptdsec(self):
+    def fn_conn_suptdsec(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN:
             return connectdb("Beams")
         else:
             return []
 
-    def fn_conn_image(self):
-        conn = self[0]
+    def fn_conn_image(self, input):
+        conn = input[0]
         if conn == VALUES_CONN[0]:
             return str(files("osdag.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
         elif conn == VALUES_CONN[1]:

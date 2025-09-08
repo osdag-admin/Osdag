@@ -485,14 +485,14 @@ class Connection(Main):
 
         return edit_list
 
-    def get_column_tab_name(self):
-        if self in VALUES_CONN_1:
+    def get_column_tab_name(self, input):
+        if input in VALUES_CONN_1:
             return KEY_DISP_COLSEC
         else:
             return KEY_DISP_PRIBM
 
-    def get_beam_tab_name(self):
-        if self in VALUES_CONN_1:
+    def get_beam_tab_name(self, input):
+        if input in VALUES_CONN_1:
             return KEY_DISP_BEAMSEC
         else:
             return KEY_DISP_SECBM
@@ -538,7 +538,7 @@ class Connection(Main):
         self.design_status = False
         flag1 = False
         flag2=True
-        option_list = self.input_values(self)
+        option_list = self.input_values()
         missing_fields_list = []
         for option in option_list:
             if option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
@@ -606,12 +606,12 @@ class Connection(Main):
             # else:
             #     flag2 = False
             if flag1 and flag2:
-                self.set_input_values(self, design_dictionary)
+                self.set_input_values(design_dictionary)
             else:
                 return all_errors
 
         else:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
             return all_errors
 
@@ -640,28 +640,26 @@ class Connection(Main):
         return information
 
     def call_3DColumn(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Column':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Column", bgcolor)
 
     def call_3DBeam(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Beam':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Beam", bgcolor)
 
-    def new_material(self):
+    def new_material(self, input):
 
-        selected_material = self[0]
+        selected_material = input[0]
         if selected_material == "Custom":
             return True
         else:

@@ -2,9 +2,8 @@
 Log dock widget for Osdag GUI.
 Displays log messages and status updates.
 """
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel
-from PySide6.QtCore import Qt
-from PySide6.QtCore import QDateTime
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel, QSizePolicy
+from PySide6.QtCore import Qt, QDateTime
 
 class LogDock(QWidget):
     def __init__(self, parent=None):
@@ -35,7 +34,9 @@ class LogDock(QWidget):
 
         # Create log display area
         self.log_display = QTextEdit()
+        self.log_display.setObjectName("textEdit")
         self.log_display.setReadOnly(True)
+        self.log_display.setOverwriteMode(True)
         self.log_display.setStyleSheet("""
             QTextEdit {
                 background-color: #F8F8F8;
@@ -70,14 +71,14 @@ class LogDock(QWidget):
 
         # Add demo log text matching the image format
         self.append_log(f"[{QDateTime.currentDateTime().toString('yyyy-MM-dd hh:mm:ss')}] Log initialized", "info")
-        demo_log_messages = [
-            ("Info: In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].", "info"),
-            ("Info: To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the one currently defined.", "info"),
-            ("Error: Overall bolted tension member design is safe.", "error"),
-            ("Info: ====== End Of Design ======", "info")
-        ]
-        for message, level in demo_log_messages:
-            self.append_log(message, level)
+        # demo_log_messages = [
+        #     ("Info: In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].", "info"),
+        #     ("Info: To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the one currently defined.", "info"),
+        #     ("Error: Overall bolted tension member design is safe.", "error"),
+        #     ("Info: ====== End Of Design ======", "info")
+        # ]
+        # for message, level in demo_log_messages:
+        #     self.append_log(message, level)
 
         self.setLayout(layout)
         self.show()  # Show initially to display demo text

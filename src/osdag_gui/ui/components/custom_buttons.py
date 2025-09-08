@@ -27,7 +27,7 @@ class MenuButton(QPushButton):
                 width: 140px;
                 color: black;
                 background-color: white;
-                border: 2px solid white;
+                border: 2px solid #E5E5E5;
                 border-radius: 5px;
                 padding: 8px 4px;
                 margin: 1px 2px;

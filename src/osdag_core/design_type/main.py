@@ -503,11 +503,10 @@ class Main():
         pass
 
     def call_3DModel(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Model':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Model", bgcolor)

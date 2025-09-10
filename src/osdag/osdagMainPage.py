@@ -549,10 +549,13 @@ class OsdagMainWindow(QMainWindow):
 
                         self.progress_text = QTextEdit()
                         self.progress_text.setReadOnly(True)
+                        self.progress_text.verticalScrollBar().setValue(
+                            self.progress_text.verticalScrollBar().maximum()
+                        )
                         layout.addWidget(self.progress_text)
 
                         self.progress_dialog.setLayout(layout)
-                        self.progress_dialog.setModal(False)
+                        self.progress_dialog.setModal(True)
                         self.progress_dialog.setWindowFlags(self.progress_dialog.windowFlags() | Qt.WindowStaysOnTopHint)
                         self.progress_dialog.show()
 
@@ -571,7 +574,7 @@ class OsdagMainWindow(QMainWindow):
     def handle_update_finished(self,success, msg):
         self.progress_dialog.close()
         if success:
-            QMessageBox.information(self, "Update", msg)
+            QMessageBox.information(self, "Update Completed", msg)
         else:
             QMessageBox.warning(self, "Update Failed", msg)
 

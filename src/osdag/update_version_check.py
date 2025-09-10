@@ -8,6 +8,7 @@ from PyQt5.QtCore import QObject, QProcess, pyqtSignal
 from PyQt5.QtWidgets import QDialog, QTextEdit, QLabel
 import subprocess
 import sys, os
+import json
 
 
 version_file = Path(__file__).parent / "_version.py"
@@ -15,33 +16,60 @@ version_var = {}
 exec(version_file.read_text(), version_var)
 curr_version = version_var["__version__"]
 install_type = version_var["__installation_type__"]
+
+
+
 class Update(QObject):
     output_signal = pyqtSignal(str)   
     finished_signal = pyqtSignal(bool, str) 
-
-
-    URL = "https://osdag.fossee.in/resources/downloads"
-    PATTERN = re.compile(r'Install\s+Osdag\s*\(\s*v([\w._-]+)\s*\)', re.IGNORECASE)
 
     def __init__(self):
         super().__init__()
         self.old_version = curr_version
         self.process = QProcess(self)
+    
+    def _set_exec_paths(self):
+        env_path = sys.prefix  
+        env_path = Path(env_path)
+        base_conda_path = env_path.parents[1]
+        if sys.platform.startswith("win"):
+            conda_path = base_conda_path / "Scripts" / "conda.exe"
+            pixi_path = env_path / "Scripts" / "pixi.exe"
+        else:
+            conda_path = base_conda_path / "bin/conda"
+            pixi_path = env_path / "bin/pixi"
+
+        self.conda_path = str(conda_path)
+        self.pixi_path = str(pixi_path)
 
     def fetch_latest_version(self) -> str:
         """Fetch the latest version string from Osdag downloads page."""
-        try:
-            with urllib.request.urlopen(self.URL) as response:
-                for line in response:
-                    decoded_line = line.decode("utf-8")
-                    match = self.PATTERN.search(decoded_line)
-                    if match:
-                        return match.group(1)
-            return None
-        except urllib.error.URLError as e:
-            raise ConnectionError(f"Network error: {e.reason}")
-        except urllib.error.HTTPError as e:
-            raise ConnectionError(f"HTTP error {e.code}: {e.reason}")
+        self._set_exec_paths()
+        if install_type == "conda":
+            cmd = [self.conda_path, "search", "-c", "conda-forge", "osdag::osdag", "--info", "--json"]
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                data = json.loads(result.stdout)
+            except subprocess.CalledProcessError as e:
+                raise ConnectionError(f"Failed to fetch version info: {e.stderr}")
+            if data: 
+                versions = data.get("osdag")
+                if versions:
+                    return sorted(versions, key=lambda x:x["version"])[-1]["version"]
+                else: return None
+                
+        elif install_type == "pixi":
+            cmd = [self.pixi_path, "search", "osdag", "--channel", "osdag"]
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                for line in result.stdout.splitlines():
+                    if line.strip().startswith("Version"):
+                        return line.split()[-1].strip()
+                
+                else: return None
+                    
+            except subprocess.CalledProcessError as e:
+                raise ConnectionError(f"Failed to fetch version info: {e.stderr}")
 
     def notifi(self) -> str:
         """Compare current version with latest version and return update message."""
@@ -73,27 +101,16 @@ class Update(QObject):
         try:
             # cmd = ["conda", "install", "-y", f"osdag=={latest_version}"]
             
-            env_path = sys.prefix  
-            env_path = Path(env_path)
-            base_conda_path = env_path.parents[1]
-            if sys.platform.startswith("win"):
-                conda_path = base_conda_path / "Scripts" / "conda.exe"
-                pixi_path = env_path / "Scripts" / "pixi.exe"
-                print(conda_path, pixi_path)
-            else:
-                conda_path = base_conda_path / "bin/conda"
-                pixi_path = env_path / "bin/pixi"
             if install_type == "conda":
-                if not conda_path.exists():
-                    self.finished_signal.emit(False, f"conda not found at {conda_path}")
-                    return 
-                cmd = [str(conda_path), "update", "-y", "osdag"]
-                # cmd = ["cmd", "/c", f"echo Updating to version {latest_version} with conda && timeout /t 5"]
+                if not Path(self.conda_path).exists():
+                    self.finished_signal.emit(False, f"conda not found at {self.conda_path}")
+                    return
+                cmd = [self.conda_path, "update", "-y", "osdag", "--channel", "osdag"]
             elif install_type == "pixi":
-                if not pixi_path.exists():
-                    self.finished_signal.emit(False, f"pixi.exe not found in {pixi_path}")
-                    return 
-                cmd = [str(pixi_path), "update", "-y", "osdag"]
+                if not Path(self.pixi_path).exists():
+                    self.finished_signal.emit(False, f"pixi not found at {self.pixi_path}")
+                    return
+                cmd = [self.pixi_path, "update", "-y", "osdag", "--channel", "osdag"]
 
             # Create QProcess
             self.process.setProgram(cmd[0]) 
@@ -150,5 +167,3 @@ class Update(QObject):
         else:
             self.finished_signal.emit(False, f"Update failed with code {exit_code}")
         self.process = None
-
-    

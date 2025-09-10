@@ -515,7 +515,6 @@ class OsdagMainWindow(QMainWindow):
             except ConnectionError as e:
                 QMessageBox.critical(self, "Network Error", str(e))
                 return
-            # QMessageBox.information(self, 'Info',msg)
 
             box = QMessageBox(self)
             box.setIcon(QMessageBox.Information)
@@ -549,21 +548,19 @@ class OsdagMainWindow(QMainWindow):
 
                         self.progress_text = QTextEdit()
                         self.progress_text.setReadOnly(True)
+                        self.progress_text.verticalScrollBar().setValue(
+                            self.progress_text.verticalScrollBar().maximum()
+                        )
                         layout.addWidget(self.progress_text)
 
                         self.progress_dialog.setLayout(layout)
-                        self.progress_dialog.setModal(False)
+                        self.progress_dialog.setModal(True)
                         self.progress_dialog.setWindowFlags(self.progress_dialog.windowFlags() | Qt.WindowStaysOnTopHint)
                         self.progress_dialog.show()
 
                         self.updater.output_signal.connect(lambda text: self.progress_text.append(text))
                         self.updater.finished_signal.connect(self.handle_update_finished)
                         self.updater.update_to_latest()
-                        # if update_status:
-                        #     QMessageBox.information(self, "Update", msg)
-                        # else:
-                        #     QMessageBox.warning(self, "Update Failed", msg)
-                        
 
         # elif loc == "FAQ":
         #     pass
@@ -571,7 +568,7 @@ class OsdagMainWindow(QMainWindow):
     def handle_update_finished(self,success, msg):
         self.progress_dialog.close()
         if success:
-            QMessageBox.information(self, "Update", msg)
+            QMessageBox.information(self, "Update Completed", msg)
         else:
             QMessageBox.warning(self, "Update Failed", msg)
 

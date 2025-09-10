@@ -66,7 +66,8 @@ from pathlib import Path
 import yaml, click
 import pandas as pd
 
-def _print_result(out_dict:dict):
+def _print_result(out_dict:dict) -> None:
+    """print the output dictionary to the console"""
     print("="*100)
     for key, value in out_dict.items():
         print(f"|| {key}: {value}")
@@ -77,14 +78,27 @@ def _get_design_dictionary(osi_path:Path) -> dict:
     with open(osi_path, 'r') as file:
         return yaml.safe_load(file)
     
+def _get_module_class(design_dict:dict) -> Main:
+    """return the module class from the design dictionary."""
+    module_name = design_dict.get("Module")
+    if not module_name:
+        raise ValueError("Module not specified.")
+    module_class = available_modules.get(module_name)
+    if not module_class:
+        raise ValueError(f"Not a valid module class: {module_name}")
+    return module_class
+    
 def _get_output_dictionary(module_class:Main) -> dict:
     """return the output dictionary for the design"""
     status = module_class.design_status
     out_list = module_class.output_values(module_class, status)
     out_dict = {"Parameter": "Value"}
     for option in out_list:
+        # ('Member.tension_blockshear', 'Block Shear Capacity (kN)', 'TextBox', 83.86, True)
         if option[0] is not None and option[2] == TYPE_TEXTBOX:
             out_dict[option[0]] = option[3]
+
+        # ('pattern1', 'Pattern', 'Output_dock_Button', ['Shear Pattern ', <function Tension_bolted.memb_pattern at 0x000002049DDBB920>], True)
         if option[2] == TYPE_OUT_BUTTON:
             tup = option[3]
             fn = tup[1]
@@ -101,7 +115,7 @@ def _save_to_csv(output_dictionary:dict, output_file:str):
     df = pd.DataFrame(output_dictionary.items())
     df.to_csv(output_file, index=False, header=None)
 
-def _save_to_pdf(module_class:Main, output_file:Path):
+def _save_to_pdf(module_class:Main, output_file:Path) -> None:
     """save the output dictionary to a pdf file"""
     popup_summary = {
             'ProfileSummary': {
@@ -125,6 +139,7 @@ def _save_to_pdf(module_class:Main, output_file:Path):
 
 def run_module(*args, **kargs) -> dict:
     """Run the module specified in the OSI file located at osi_path."""
+    
     osi_path = kargs["input_path"] if len(kargs) > 0 else None
     op_type = kargs["op_type"] if len(kargs) > 1 else "print_result"
     output_path = kargs["output_path"] if len(kargs) > 2 else None

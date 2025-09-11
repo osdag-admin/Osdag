@@ -88,7 +88,7 @@ import traceback
 import time
 from importlib.resources import files
 import urllib.request
-from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow, QTextEdit
 from .update_version_check import Update
 #from Thread import timer
 from .get_DPI_scale import scale
@@ -509,12 +509,74 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Ask Us a Question":
             self.ask_question()
         elif loc == "Check for Update":
-            update_class = Update()
-            msg = update_class.notifi()
-            QMessageBox.information(self, 'Info',msg)
+            self.updater = Update()
+            try:
+                update_avl, msg = self.updater.notifi()
+            except ConnectionError as e:
+                QMessageBox.critical(self, "Network Error", str(e))
+                return
+            # QMessageBox.information(self, 'Info',msg)
+
+            box = QMessageBox(self)
+            box.setIcon(QMessageBox.Information)
+            box.setWindowTitle("Update Status")
+            box.setText(msg)
+
+            if update_avl:
+                update_now_btn = box.addButton("Update Now", QMessageBox.AcceptRole)
+                later_btn = box.addButton("Update Later", QMessageBox.RejectRole)
+            else:
+                ok_btn = box.addButton("OK", QMessageBox.AcceptRole)
+
+            box.exec_()
+
+            if update_avl and box.clickedButton() == update_now_btn:
+                    confirm_update = QMessageBox(self)
+                    confirm_update.setIcon(QMessageBox.Information)
+                    confirm_update.setWindowTitle("Confirm Update")
+                    confirm_update.setText("This may take some time....\nDo you want to continue?")
+                    confirm_update.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                    confirm_update.setDefaultButton(QMessageBox.No)
+                    
+                    result = confirm_update.exec_()
+                    if result == QMessageBox.Yes:
+                        self.progress_dialog = QDialog(self)
+                        self.progress_dialog.setWindowTitle("Updating Osdag")
+                        layout = QVBoxLayout()
+
+                        self.progress_label = QLabel("Updating, please wait...")
+                        layout.addWidget(self.progress_label)
+
+                        self.progress_text = QTextEdit()
+                        self.progress_text.setReadOnly(True)
+                        self.progress_text.verticalScrollBar().setValue(
+                            self.progress_text.verticalScrollBar().maximum()
+                        )
+                        layout.addWidget(self.progress_text)
+
+                        self.progress_dialog.setLayout(layout)
+                        self.progress_dialog.setModal(True)
+                        self.progress_dialog.setWindowFlags(self.progress_dialog.windowFlags() | Qt.WindowStaysOnTopHint)
+                        self.progress_dialog.show()
+
+                        self.updater.output_signal.connect(lambda text: self.progress_text.append(text))
+                        self.updater.finished_signal.connect(self.handle_update_finished)
+                        self.updater.update_to_latest()
+                        # if update_status:
+                        #     QMessageBox.information(self, "Update", msg)
+                        # else:
+                        #     QMessageBox.warning(self, "Update Failed", msg)
+                        
+
         # elif loc == "FAQ":
         #     pass
 
+    def handle_update_finished(self,success, msg):
+        self.progress_dialog.close()
+        if success:
+            QMessageBox.information(self, "Update Completed", msg)
+        else:
+            QMessageBox.warning(self, "Update Failed", msg)
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder

@@ -14,7 +14,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 
 import osdag_gui.resources.resources_rc
 
-class CustomButton1(QPushButton):
+class CustomButton(QPushButton):
     def __init__(self, text, icon_path_default, icon_path_clicked, group=None, parent=None):
         super().__init__(text, parent)
         self.group = group
@@ -126,7 +126,7 @@ class VerticalMenuBar(QWidget):
 
         names = list(data.keys())
         for name in names:
-            btn = CustomButton1("  " + name, icon_default, icon_clicked, group=self.button_group)
+            btn = CustomButton("  " + name, icon_default, icon_clicked, group=self.button_group)
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Make buttons expand vertically
             btn.clicked.connect(lambda _,label=name, data=data.get(name): self._on_nav_button_clicked(data, label))
             btn.setCursor(Qt.CursorShape.PointingHandCursor)

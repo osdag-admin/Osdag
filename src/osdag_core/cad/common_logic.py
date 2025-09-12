@@ -2079,7 +2079,7 @@ class CommonDesignLogic(object):
 
         if bgcolor == "gradient_bg":
 
-            self.display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+            self.display.set_bg_gradient_color([51, 51, 51], [51, 51, 51])
         else:
             self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
 
@@ -2091,8 +2091,6 @@ class CommonDesignLogic(object):
 
 
             if self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_FINPLATE:
-                # pass
-                # print("hghghghg")
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
             elif self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_SEATED_ANGLE:
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)

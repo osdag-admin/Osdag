@@ -26,7 +26,7 @@ class AdditionalInputsButton(QPushButton):
                 border: 1px solid black;
                 padding: 5px 14px;
                 text-align: center;
-                # font-family: "Calibri";
+                font-family: "Calibri";
             }
             QPushButton:hover {
                 background-color: #90AF13;

@@ -83,6 +83,12 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/inputs_label.svg</file>
         <file>vectors/outputs_label.svg</file>
 
+        <file>vectors/msg_info.svg</file>
+        <file>vectors/msg_critical.svg</file>
+        <file>vectors/msg_about.svg</file>
+        <file>vectors/msg_warning.svg</file>
+        <file>vectors/msg_success.svg</file>
+
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>
 

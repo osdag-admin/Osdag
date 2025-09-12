@@ -10,10 +10,10 @@ from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent, Signal,
 from PySide6.QtGui import QIcon, QFont, QPixmap, QGuiApplication, QKeySequence, QAction, QColor, QBrush
 
 from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
-from osdag_gui.ui.components.input_dock import InputDock
-from osdag_gui.ui.components.output_dock import OutputDock
-from osdag_gui.ui.components.log_dock import LogDock
-from osdag_gui.ui.components.loading_widget import LinearProgressDialog, DelayThread
+from osdag_gui.ui.components.docks.input_dock import InputDock
+from osdag_gui.ui.components.docks.output_dock import OutputDock
+from osdag_gui.ui.components.docks.log_dock import LogDock
+from osdag_gui.ui.components.dialogs.loading_popup import ModernLoadingDialog, DelayThread
 
 from osdag_core.Common import *
 from osdag_gui.ui.windows.design_preferences import DesignPreferences
@@ -21,13 +21,12 @@ from osdag_core.cad.common_logic import CommonDesignLogic
 
 import time
 from PySide6.QtCore import QThread
-from PySide6.QtWidgets import QDialog, QProgressBar, QCheckBox, QComboBox, QLineEdit
+from PySide6.QtWidgets import QDialog, QCheckBox, QComboBox, QLineEdit
 
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
     outputDockIconToggle = Signal()
     inputDockIconToggle = Signal()
-    designCompleted = Signal()  # New signal for design completion
     def __init__(self, title: str, backend: object, parent):
         super().__init__()
         self.parent = parent
@@ -131,7 +130,7 @@ class CustomWindow(QWidget):
         self.cad_widget._key_map.update(key_function)
 
         # background gradient
-        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        display.set_bg_gradient_color([51, 51, 51], [51, 51, 51])
         display.display_triedron()
         display.View.SetProj(1, 1, 1)
 
@@ -451,6 +450,7 @@ class CustomWindow(QWidget):
         central_H_layout.addWidget(self.output_dock_label, 1)
         self.splitter.addWidget(central_widget)
 
+        # root is the greatest level of parent that is the MainWindow
         self.output_dock = OutputDock(backend=self.backend, parent=self)
         self.output_dock_active = True
         self.splitter.addWidget(self.output_dock)
@@ -883,17 +883,20 @@ class CustomWindow(QWidget):
     def start_thread(self, data):
         self.thread_1 = DelayThread()
         self.thread_2 = DelayThread()
-        loading_widget = LinearProgressDialog()
+    
+        self.loading = ModernLoadingDialog()
         self.setEnabled(False)
-        loading_widget.show()
+        self.loading.show()
         self.thread_1.start()
-        self.thread_1.finished.connect(lambda: loading_widget.set_progress(25))
         self.thread_1.finished.connect(lambda: self.common_function_for_save_and_design(self.backend, data, "Design"))
-        self.designCompleted.connect(lambda: loading_widget.set_progress(75))
-        self.designCompleted.connect(lambda: self.thread_2.start())
-        self.thread_2.finished.connect(lambda: loading_widget.set_progress(100))
-        self.thread_2.finished.connect(lambda: loading_widget.close())
-        self.thread_2.finished.connect(lambda: self.setEnabled(True))
+    
+    def finished_loading(self):
+        self.thread_2.start()
+        self.thread_2.finished.connect(self.loading_close)
+
+    def loading_close(self):
+        self.loading.close()
+        self.setEnabled(True)
 
     # Design Functions
     def common_function_for_save_and_design(self, main, data, trigger_type):
@@ -968,7 +971,7 @@ class CustomWindow(QWidget):
             if status:
                 def show_logs():
                     try:
-                        self.toggle_animate(True, 'log')
+                        self.toggle_animate(True, 'log', on_finished=self.finished_loading)
                         self.logs_dock_active = True
                     except Exception:
                         if hasattr(self, 'logs_dock'):
@@ -1092,7 +1095,6 @@ class CustomWindow(QWidget):
                     self.cad_comp_widget.findChild(QCheckBox, chkbox[0]).setChecked(False)
                 for action in self.menu_cad_components:
                     action.setEnabled(False)
-        self.designCompleted.emit()
 
     def design_fn(self, op_list, data_list, main):
         design_dictionary = {}

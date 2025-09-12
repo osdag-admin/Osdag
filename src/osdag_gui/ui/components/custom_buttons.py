@@ -69,7 +69,7 @@ class MenuButton(QPushButton):
             self._is_selected = selected
             self._update_style()
 
-class CustomButton(QPushButton):
+class DockCustomButton(QPushButton):
     def __init__(self, text: str, icon_path: str, parent=None):
         super().__init__(parent)
         self.setCursor(Qt.PointingHandCursor)

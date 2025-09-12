@@ -7,15 +7,16 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
     QPushButton, QLabel, QSizePolicy, QGroupBox, QFrame, QDialog,
     QFormLayout, QLineEdit, QScrollArea, QTableWidget, QGridLayout,
-    QFileDialog, QMessageBox
+    QFileDialog
 )
 from PySide6.QtGui import QPalette, QColor, QPixmap, QIcon, QPainter
 from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve, QCoreApplication
 
 from osdag_core.texlive.Design_wrapper import init_display as init_display_off_screen
 
-from osdag_gui.ui.components.custom_buttons import CustomButton
-from osdag_gui.ui.components.customized_popups import Ui_Dialog1
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from osdag_gui.ui.components.custom_buttons import DockCustomButton
+from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPopup
 from osdag_core.Common import *
 import osdag_gui.resources.resources_rc
 
@@ -303,12 +304,12 @@ class OutputDock(QWidget):
         btn_button_layout.setContentsMargins(0, 20, 0, 0)
         btn_button_layout.addStretch(2)
 
-        design_report_btn = CustomButton("Generate Design Report", ":/vectors/design_report.svg")
+        design_report_btn = DockCustomButton("Generate Design Report", ":/vectors/design_report.svg")
         design_report_btn.clicked.connect(lambda: self.open_summary_popup(self.backend))
         btn_button_layout.addWidget(design_report_btn)
         btn_button_layout.addStretch(1)    
 
-        save_output_csv_btn = CustomButton("  Save Outputs (csv)  ", ":/vectors/design_report.svg")
+        save_output_csv_btn = DockCustomButton("  Save Outputs (csv)  ", ":/vectors/design_report.svg")
         save_output_csv_btn.clicked.connect(lambda: self.save_output_to_csv(self.backend))
         btn_button_layout.addWidget(save_output_csv_btn)
         btn_button_layout.addStretch(2)
@@ -356,7 +357,11 @@ class OutputDock(QWidget):
     def open_summary_popup(self, main):
         print('main.module_name', main.module_name())
         if not main.design_button_status:
-            QMessageBox.warning(self, 'Warning', 'No design created!')
+            CustomMessageBox(
+                title="Warning",
+                text="No design created!",
+                dialogType=MessageBoxType.Warning
+            ).exec()
             return
         
         # Generate 3D images only if design exists and we can create the logic object
@@ -413,23 +418,17 @@ class OutputDock(QWidget):
                     os.makedirs(image_folder_path)
 
         # Open the summary popup dialog
-        self.new_window = QDialog(self)
-        self.new_ui = Ui_Dialog1(main.design_status, loggermsg=self.parent.textEdit.toPlainText())
-        self.new_ui.setupUi(self.new_window, main, self)
-        
-        # Connect all the popup buttons
-        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
-        self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
-        self.new_ui.btn_useProfile.clicked.connect(lambda: self.useUserProfile(self.new_window))
+        self.summary_popup = DesignSummaryPopup(main.design_status, loggermsg=self.parent.textEdit.toPlainText())
+        self.summary_popup.setupUi(main, self)
         
         # Connect the generate report button to actual report generation
-        if hasattr(self.new_ui, 'btn_CreateDesignReport'):
-            self.new_ui.btn_CreateDesignReport.clicked.connect(lambda: self.generate_design_report(main, self.new_window))
-        elif hasattr(self.new_ui, 'buttonBox'):
+        if hasattr(self.summary_popup, 'btn_CreateDesignReport'):
+            self.summary_popup.btn_CreateDesignReport.clicked.connect(lambda: self.generate_design_report(main, self.summary_popup))
+        elif hasattr(self.summary_popup, 'buttonBox'):
             # If using QDialogButtonBox, connect to accepted signal
-            self.new_ui.buttonBox.accepted.connect(lambda: self.generate_design_report(main, self.new_window))
+            self.summary_popup.buttonBox.accepted.connect(lambda: self.generate_design_report(main, self.summary_popup))
 
-        self.new_window.exec()
+        self.summary_popup.exec()
 
 
     def generate_design_report(self, main, dialog_window):
@@ -501,15 +500,31 @@ class OutputDock(QWidget):
                 print(success)
                 
                 if success:
-                    QMessageBox.information(self, 'Success', 'Design report generated successfully!')
+                    CustomMessageBox(
+                        title='Success',
+                        text='Design report generated successfully!',
+                        dialogType=MessageBoxType.Success
+                    ).exec()
                     dialog_window.accept()
                 else:
-                    QMessageBox.warning(self, 'Error', 'Failed to generate design report. Please check the inputs.')
+                    CustomMessageBox(
+                        title="Error",
+                        text="Failed to generate design report. Please check the inputs.",
+                        dialogType=MessageBoxType.Warning
+                    ).exec()
             else:
-                QMessageBox.warning(self, 'Error', 'Could not access design instance for report generation.')
+                CustomMessageBox(
+                    title="Error",
+                    text="Could not access design instance for report generation.",
+                    dialogType=MessageBoxType.Warning
+                ).exec()
                 
         except Exception as e:
-            QMessageBox.critical(self, 'Error', f'Error generating report: {str(e)}')
+            CustomMessageBox(
+                title="Error",
+                text=f'Error generating report: {str(e)}',
+                dialogType=MessageBoxType.Critical
+            ).exec()
             print(f"Report generation error: {str(e)}")
             import traceback
             traceback.print_exc()
@@ -520,104 +535,75 @@ class OutputDock(QWidget):
         input_summary["ProfileSummary"] = {}
         
         # Profile information
-        input_summary["ProfileSummary"]["CompanyName"] = str(self.new_ui.lineEdit_companyName.text()) if hasattr(self.new_ui, 'lineEdit_companyName') else "Company Name"
-        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.new_ui.lbl_browse.text()) if hasattr(self.new_ui, 'lbl_browse') else ""
-        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text()) if hasattr(self.new_ui, 'lineEdit_groupName') else "Design Team"
-        input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text()) if hasattr(self.new_ui, 'lineEdit_designer') else "Designer"
+        input_summary["ProfileSummary"]["CompanyName"] = str(self.summary_popup.lineEdit_companyName.text()) if hasattr(self.summary_popup, 'lineEdit_companyName') else "Company Name"
+        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.summary_popup.lbl_browse.text()) if hasattr(self.summary_popup, 'lbl_browse') else ""
+        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.summary_popup.lineEdit_groupName.text()) if hasattr(self.summary_popup, 'lineEdit_groupName') else "Design Team"
+        input_summary["ProfileSummary"]["Designer"] = str(self.summary_popup.lineEdit_designer.text()) if hasattr(self.summary_popup, 'lineEdit_designer') else "Designer"
 
         # Project information - **CRITICAL**: These are required by reportGenerator
-        input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text()) if hasattr(self.new_ui, 'lineEdit_projectTitle') else "Welded Butt Joint Design"
-        input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text()) if hasattr(self.new_ui, 'lineEdit_subtitle') else "Design Report"
-        input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text()) if hasattr(self.new_ui, 'lineEdit_jobNumber') else "JOB-001"
-        input_summary["Client"] = str(self.new_ui.lineEdit_client.text()) if hasattr(self.new_ui, 'lineEdit_client') else "Client"
+        input_summary["ProjectTitle"] = str(self.summary_popup.lineEdit_projectTitle.text()) if hasattr(self.summary_popup, 'lineEdit_projectTitle') else "Welded Butt Joint Design"
+        input_summary["Subtitle"] = str(self.summary_popup.lineEdit_subtitle.text()) if hasattr(self.summary_popup, 'lineEdit_subtitle') else "Design Report"
+        input_summary["JobNumber"] = str(self.summary_popup.lineEdit_jobNumber.text()) if hasattr(self.summary_popup, 'lineEdit_jobNumber') else "JOB-001"
+        input_summary["Client"] = str(self.summary_popup.lineEdit_client.text()) if hasattr(self.summary_popup, 'lineEdit_client') else "Client"
         
         # Additional comments
-        if hasattr(self.new_ui, 'txt_additionalComments'):
-            input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
+        if hasattr(self.summary_popup, 'txt_additionalComments'):
+            input_summary["AdditionalComments"] = str(self.summary_popup.txt_additionalComments.toPlainText())
         else:
             input_summary["AdditionalComments"] = "Design completed successfully"
         
         # File and folder settings
-        if hasattr(self.new_ui, 'lineEdit_fileName'):
-            input_summary["filename"] = str(self.new_ui.lineEdit_fileName.text())
-        if hasattr(self.new_ui, 'lineEdit_folder'):
-            input_summary["folder"] = str(self.new_ui.lineEdit_folder.text())
+        if hasattr(self.summary_popup, 'lineEdit_fileName'):
+            input_summary["filename"] = str(self.summary_popup.lineEdit_fileName.text())
+        if hasattr(self.summary_popup, 'lineEdit_folder'):
+            input_summary["folder"] = str(self.summary_popup.lineEdit_folder.text())
 
         return input_summary
 
-    def getLogoFilePath(self, window, lblwidget):
-
-        filename, _ = QFileDialog.getOpenFileName(window, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
-        if filename == '':
-            return False
-        else:
-            lblwidget.setText(str(filename))
-        return str(filename)
-
-    def saveUserProfile(self, window):
-
-        inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(window, 'Save Files',
-                                                  os.path.join(str(self.folder), "Profile"), '*.txt')
-        if filename == '':
-            return False
-        else:
-            infile = open(filename, 'w')
-            yaml.dump(inputData, infile)
-            infile.close()
-
-    def useUserProfile(self, window):
-
-        filename, _ = QFileDialog.getOpenFileName(window, 'Open Files',
-                                                  os.path.join(str(self.folder), "Profile"),
-                                                  '*.txt')
-        if os.path.isfile(filename):
-            outfile = open(filename, 'r')
-            reportsummary = yaml.safe_load(outfile)
-            self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
-            self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
-            self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
-            self.new_ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
 
     # ----------------------------------Save-Design-Report-END------------------------------------------------------
 
     # ----------------------------------Save-Outputs-START------------------------------------------------------
     def save_output_to_csv(self, main):
-        def save_fun():
-            status = main.design_status
-            out_list = main.output_values(status)
-            to_Save = {}
-            flag = 0
-            for option in out_list:
-                if option[0] is not None and option[2] == TYPE_TEXTBOX:
-                    to_Save[option[0]] = option[3]
-                    if str(option[3]):
-                        flag = 1
-                if option[2] == TYPE_OUT_BUTTON:
-                    tup = option[3]
-                    fn = tup[1]
-                    for item in fn(status):
-                        lable = item[0]
-                        value = item[3]
-                        if lable!=None and value!=None:
-                            to_Save[lable] = value
+        status = main.design_status
+        out_list = main.output_values(status)
+        to_Save = {}
+        flag = 0
+        for option in out_list:
+            if option[0] is not None and option[2] == TYPE_TEXTBOX:
+                to_Save[option[0]] = option[3]
+                if str(option[3]):
+                    flag = 1
+            if option[2] == TYPE_OUT_BUTTON:
+                tup = option[3]
+                fn = tup[1]
+                for item in fn(status):
+                    lable = item[0]
+                    value = item[3]
+                    if lable!=None and value!=None:
+                        to_Save[lable] = value
 
-            import pandas as pd
-            df = pd.DataFrame(self.design_inputs.items())
-            df1 = pd.DataFrame(to_Save.items())
-            bigdata = pd.concat([df, df1], axis=1)
-            if not flag:
-                QMessageBox.information(self, "Information",
-                                        "Nothing to Save.")
-            else:
-                fileName, _ = QFileDialog.getSaveFileName(self,
-                                                          "Save Output", os.path.join(self.folder, "untitled.csv"),
-                                                          "Input Files(*.csv)")
-                if fileName:
-                    bigdata.to_csv(fileName, index=False, header=None)
-                    QMessageBox.information(self, "Information",
-                                            "Saved successfully.")
-        return save_fun
+        import pandas as pd
+        df = pd.DataFrame(self.design_inputs.items())
+        df1 = pd.DataFrame(to_Save.items())
+        bigdata = pd.concat([df, df1], axis=1)
+        if not flag:
+            CustomMessageBox(
+                title="Information",
+                text="Nothing to Save.",
+                dialogType=MessageBoxType.Information
+            ).exec()
+        else:
+            fileName, _ = QFileDialog.getSaveFileName(self,
+                                                        "Save Output", os.path.join(self.folder, "untitled.csv"),
+                                                        "Input Files(*.csv)")
+            if fileName:
+                bigdata.to_csv(fileName, index=False, header=None)
+                CustomMessageBox(
+                    title="Success",
+                    text="Saved successfully.",
+                    dialogType=MessageBoxType.Success
+                ).exec()
 
     # ----------------------------------Save-Outputs-END------------------------------------------------------
 

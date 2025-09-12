@@ -20,10 +20,10 @@ from PySide6.QtSvg import QSvgRenderer
 
 from osdag_gui.data.menus.menu_data import Data
 from osdag_gui.ui.components.svg_card import SvgCardContainer
-from osdag_gui.ui.components.navbar import VerticalMenuBar
+from osdag_gui.ui.components.home.navbar import VerticalMenuBar
 from osdag_gui.ui.components.custom_buttons import MenuButton
-from osdag_gui.ui.components.top_right_button_bar import TopButton, DropDownButton
-from osdag_gui.ui.components.home_widget import HomeWidget
+from osdag_gui.ui.components.home.top_right_button_bar import TopButton, DropDownButton
+from osdag_gui.ui.components.home.home_widget import HomeWidget
 from PySide6.QtWidgets import QSplitter
 
 # --- Theme Toggle Button ---

@@ -6,7 +6,8 @@ from ..utils.common.Section_Properties_Calculator import *
 class Main():
 
     def __init__(self):
-        pass
+        # Defining logger so it is accessible by all the childs
+        self.logger = None
 
     #########################################
     # Design Preferences Functions Start

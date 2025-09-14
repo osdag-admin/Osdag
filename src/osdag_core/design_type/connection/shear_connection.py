@@ -526,12 +526,11 @@ class ShearConnection(Connection):
         """
 
         # @author Arsil Zunzunia
-        global logger
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
-            logger.warning(
+            self.logger.warning(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
-            logger.info(
+            self.logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):

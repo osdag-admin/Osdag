@@ -3,7 +3,7 @@ from ...design_report.reportGenerator_latex import CreateLatex
 from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Report_functions import *
-import logging
+from ...custom_logger import CustomLogger
 
 
 class FinPlateConnection(ShearConnection):
@@ -140,26 +140,32 @@ class FinPlateConnection(ShearConnection):
         """
         # @author Arsil Zunzunia
         # super(FinPlateConnection, FinPlateConnection).set_osdaglogger(key)
-        global logger
-        logger = logging.getLogger('Osdag')
 
-        logger.setLevel(logging.DEBUG)
+        # Set Custom logger
+        logging.setLoggerClass(CustomLogger)
+
+        self.logger = logging.getLogger('Osdag')
+
+        # clear any existing handlers
+        self.logger.handlers.clear()
+
+        self.logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
-            logger.addHandler(handler)
+            self.logger.addHandler(handler)
 
     def module_name(self):
         return KEY_DISP_FINPLATE
@@ -463,7 +469,7 @@ class FinPlateConnection(ShearConnection):
 
             if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                             40.0):
-                logger.warning(" : The value of factored shear force is less than the minimum recommended value. "
+                self.logger.warning(" : The value of factored shear force is less than the minimum recommended value. "
                                "Setting the value of the shear force to 15% of the supported beam shear capacity or 40 kN, whichever is lesser "
                                "[Ref. IS 800:2007, Cl.10.7].")
                 self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
@@ -474,14 +480,14 @@ class FinPlateConnection(ShearConnection):
 
             if not self.thickness_possible:
                 self.plate.thickness_available = min(self.plate.thickness)
-                logger.error(": The plate thickness should be greater than the web thickness of the suppported section.")
+                self.logger.error(": The plate thickness should be greater than the web thickness of the suppported section.")
             else:
                 print("Selecting bolt diameter")
                 self.select_bolt_dia()
 
         else:
             self.supported_section.design_status_initial = False
-            logger.warning(" : The shear yielding capacity (low shear case) {} and/or tension yielding capacity {} is less "
+            self.logger.warning(" : The shear yielding capacity (low shear case) {} and/or tension yielding capacity {} is less "
                            "than the applied load. Define a large/larger section(s) or decrease the load."
                            .format(round(self.supported_section.low_shear_capacity/1000,2),
                                    round(self.supported_section.tension_yielding_capacity/1000,2)))
@@ -550,7 +556,7 @@ class FinPlateConnection(ShearConnection):
 
         if self.plate.design_status is False:
             self.design_status = False
-            logger.error(self.plate.reason)
+            self.logger.error(self.plate.reason)
         else:
             self.get_bolt_grade()
 
@@ -672,10 +678,10 @@ class FinPlateConnection(ShearConnection):
                     break
 
             else:
-                logger.error(": For the given members and %2.2f mm thick plate, the weld size should be of the range "
+                self.logger.error(": For the given members and %2.2f mm thick plate, the weld size should be of the range "
                          "%2.2f mm -  %2.2f mm." %self.plate.thickness_provided % self.weld_size_min
                              % self.weld_size_max)
-                logger.info(": Weld design could not be performed with the available weld size(s).")
+                self.logger.info(": Weld design could not be performed with the available weld size(s).")
             if self.plate.moment_capacity < self.plate.moment_demand:
                 break
 
@@ -684,68 +690,68 @@ class FinPlateConnection(ShearConnection):
 
         if self.load.shear_force*1000 > self.plate.shear_capacity:
             self.design_status = False
-            logger.error(": The shear capacity of the plate is less than the applied shear force, %2.2f kN [Ref. Cl.6.4.1, IS 800:2007]."
+            self.logger.error(": The shear capacity of the plate is less than the applied shear force, %2.2f kN [Ref. Cl.6.4.1, IS 800:2007]."
                          % self.load.shear_force)
-            logger.warning(":The shear capacity of the plate is {} kN." .format(round(self.plate.shear_capacity/1000,2)))
-            logger.info(": Increase the plate thickness or material grade.")
+            self.logger.warning(":The shear capacity of the plate is {} kN." .format(round(self.plate.shear_capacity/1000,2)))
+            self.logger.info(": Increase the plate thickness or material grade.")
 
         if self.load.axial_force*1000 > self.plate.tension_capacity:
             self.design_status = False
-            logger.error(":The tensile capacity of the plate is less than the applied axial force, %2.2f kN [Ref. Cl.6.4.1, IS 800:2007]."
+            self.logger.error(":The tensile capacity of the plate is less than the applied axial force, %2.2f kN [Ref. Cl.6.4.1, IS 800:2007]."
                          % self.load.axial_force)
-            logger.warning(":The tensile capacity of the plate is {} kN." .format(round(self.plate.tension_capacity/1000,2)))
-            logger.info(": Increase the plate thickness or material grade.")
+            self.logger.warning(":The tensile capacity of the plate is {} kN." .format(round(self.plate.tension_capacity/1000,2)))
+            self.logger.info(": Increase the plate thickness or material grade.")
 
         if self.plate.moment_capacity < self.plate.moment_demand:
             self.design_status = False
-            logger.error(": The plate moment capacity is less than the moment demand, {} kNm [Ref. Cl.8.2.1.2, IS 800:2007]."
+            self.logger.error(": The plate moment capacity is less than the moment demand, {} kNm [Ref. Cl.8.2.1.2, IS 800:2007]."
                          .format(round(self.plate.moment_demand/1000000,2)))
             # print(self.plate.moment_capacity / 1000000)
-            logger.warning(": The moment capacity of the plate is {} kNm.".format(round(self.plate.moment_capacity/1000000,2)))
-            logger.info(": Increase the plate thickness or material grade.")
-            logger.info(": Arranging the bolts in one line will reduce the moment induced.")
+            self.logger.warning(": The moment capacity of the plate is {} kNm.".format(round(self.plate.moment_capacity/1000000,2)))
+            self.logger.info(": Increase the plate thickness or material grade.")
+            self.logger.info(": Arranging the bolts in one line will reduce the moment induced.")
 
         if self.load.shear_force*1000 > self.supported_section.shear_capacity:
             self.design_status = False
-            logger.error(": The shear capacity of the beam is less than the applied shear force, %2.2f kN [Ref. Cl.6.4.1, IS 800:2007]."
+            self.logger.error(": The shear capacity of the beam is less than the applied shear force, %2.2f kN [Ref. Cl.6.4.1, IS 800:2007]."
                          % self.load.shear_force)
-            logger.warning(": The shear capacity of the beam is {} kN.".format(round(self.supported_section.shear_capacity/1000,2)))
-            logger.info(": Choose a beam of higher size or provide a larger bolt diameter (if available) to increase the rupture/block shear "
+            self.logger.warning(": The shear capacity of the beam is {} kN.".format(round(self.supported_section.shear_capacity/1000,2)))
+            self.logger.info(": Choose a beam of higher size or provide a larger bolt diameter (if available) to increase the rupture/block shear "
                         "capacity.")
 
         if self.load.axial_force*1000 > self.supported_section.tension_capacity:
             self.design_status = False
-            logger.error(": The tensile capacity of the beam is less than the applied axial force, %2.2f kN [Ref. Cl. 6.4.1, IS 800:2007]."
+            self.logger.error(": The tensile capacity of the beam is less than the applied axial force, %2.2f kN [Ref. Cl. 6.4.1, IS 800:2007]."
                          % self.load.axial_force)
-            logger.warning(": The tensile capacity of the beam is {} kN." .format(round(self.supported_section.tension_capacity/1000,2)))
-            logger.info(": Choose a beam of higher size or material grade.")
-            logger.info(": Lesser number of bolts per line increases the rupture capacity.")
+            self.logger.warning(": The tensile capacity of the beam is {} kN." .format(round(self.supported_section.tension_capacity/1000,2)))
+            self.logger.info(": Choose a beam of higher size or material grade.")
+            self.logger.info(": Lesser number of bolts per line increases the rupture capacity.")
 
         if self.supported_section.moment_capacity < self.plate.moment_demand:
             self.design_status = False
-            logger.error(": The moment capacity of the beam is less than the moment demand, {} kNm [Ref. Cl. 8.2.1.2, IS 800:2007]."
+            self.logger.error(": The moment capacity of the beam is less than the moment demand, {} kNm [Ref. Cl. 8.2.1.2, IS 800:2007]."
                          .format(round(self.plate.moment_demand/1000000,2)))
-            logger.warning(": The moment capacity of the plate is {} kNm." .format(round(self.supported_section.cl_8_2_moment_capacity_member / 1000000, 2)))
-            logger.info(": Increase the plate thickness or material grade.")
-            logger.info(": Arranging bolts in one line will reduce moment induced.")
+            self.logger.warning(": The moment capacity of the plate is {} kNm." .format(round(self.supported_section.cl_8_2_moment_capacity_member / 1000000, 2)))
+            self.logger.info(": Increase the plate thickness or material grade.")
+            self.logger.info(": Arranging bolts in one line will reduce moment induced.")
 
         if self.plate.moment_capacity < self.plate.moment_demand:
             self.design_status = False
-            logger.error("Plate moment capacity is less than the moment demand, {} kNm [cl. 8.2.1.2]"
+            self.logger.error("Plate moment capacity is less than the moment demand, {} kNm [cl. 8.2.1.2]"
                          .format(round(self.plate.moment_demand/1000000,2)))
-            logger.warning(":Moment capacity of plate is {} kN-m" .format(round(self.supported_section.moment_capacity / 1000000, 2)))
-            logger.info("Increase the plate thickness or material grade")
-            logger.info("Arranging bolts in one line will reduce moment induced")
+            self.logger.warning(":Moment capacity of plate is {} kN-m" .format(round(self.supported_section.moment_capacity / 1000000, 2)))
+            self.logger.info("Increase the plate thickness or material grade")
+            self.logger.info("Arranging bolts in one line will reduce moment induced")
         if self.weld.strength < self.weld.stress:
             # t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
             self.weld.design_status = False
-            logger.error(": The weld thickness is not sufficient [Ref. Cl. 10.5.7, IS 800:2007].")
-            logger.warning(": The weld stress is {} N/mm and the weld strength is {} N/mm.".format(self.weld.stress,self.weld.strength))
-            logger.info(": Increase length of the weld/fin plate.")
+            self.logger.error(": The weld thickness is not sufficient [Ref. Cl. 10.5.7, IS 800:2007].")
+            self.logger.warning(": The weld stress is {} N/mm and the weld strength is {} N/mm.".format(self.weld.stress,self.weld.strength))
+            self.logger.info(": Increase length of the weld/fin plate.")
 
         else:
             if self.weld.size in (3, 4):
-                logger.info(": The minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
+                self.logger.info(": The minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
                             "cl. 10.5.3.1. Weld throat thickness is not considered as per cl. 10.5.3.2. Please take " +
                             "necessary detailing precautions at site accordingly.")
             self.weld.design_status = True
@@ -778,7 +784,7 @@ class FinPlateConnection(ShearConnection):
 
         if self.supported_section.shear_capacity < self.load.shear_force * 1000:
             self.supported_section.design_status = False
-            logger.warning(
+            self.logger.warning(
                 'The shear capacity of the section is guiding plate height, current height is {} mm.' .format(self.plate.height))
         else:
             self.supported_section.design_status = True
@@ -802,7 +808,7 @@ class FinPlateConnection(ShearConnection):
 
         if self.supported_section.tension_capacity < self.load.axial_force * 1000:
             self.supported_section.design_status = False
-            logger.warning(
+            self.logger.warning(
                 'The tension capacity of the section is guiding plate height, current height is {} mm.' .format(self.plate.height))
         else:
             self.supported_section.design_status = True
@@ -811,7 +817,7 @@ class FinPlateConnection(ShearConnection):
             (self.supported_section.elast_sec_mod_z, self.supported_section.plast_sec_mod_z, self.supported_section.fy, 'plastic')
 
         if self.supported_section.moment_capacity < self.plate.moment_demand:
-            logger.warning(
+            self.logger.warning(
                 'The moment capacity of the section is less than moment demand, choose a bigger section or increase the material strength of the '
                 'section.')
             self.supported_section.design_status = False
@@ -824,7 +830,7 @@ class FinPlateConnection(ShearConnection):
         if self.supported_section.IR > 1 or self.supported_section.moment_capacity < self.plate.moment_demand or\
                 self.supported_section.tension_capacity < self.load.axial_force * 1000 or \
                 self.supported_section.shear_capacity < self.load.shear_force * 1000:
-            logger.warning(
+            self.logger.warning(
                 'Axial - Moment interaction ratio of section is guiding plate height, current height is {} mm.' .format(self.plate.height))
             self.supported_section.design_status = False
         else:
@@ -859,7 +865,7 @@ class FinPlateConnection(ShearConnection):
 
         if self.plate.shear_capacity < self.load.shear_force*1000:
             self.plate.design_status_capacity = False
-            logger.warning(
+            self.logger.warning(
                 'The shear capacity of the section is guiding plate height, current height is {} mm.' .format(self.plate.height))
         else:
             self.plate.design_status_capacity = True
@@ -883,7 +889,7 @@ class FinPlateConnection(ShearConnection):
 
         if self.plate.tension_capacity < self.load.axial_force*1000:
             self.plate.design_status_capacity = False
-            logger.warning(
+            self.logger.warning(
                 'The tension capacity of the plate is guiding the plate height, current height is {} mm.' .format(self.plate.height))
         else:
             self.plate.design_status_capacity = True
@@ -893,7 +899,7 @@ class FinPlateConnection(ShearConnection):
         self.plate.moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, self.plate.fy, 'plastic')
 
         if self.plate.moment_capacity < self.plate.moment_demand:
-            logger.warning(
+            self.logger.warning(
                 'The moment capacity of the plate is guiding plate height, current height is {} mm.'.format(self.plate.height))
             self.plate.design_status_capacity = False
         else:
@@ -901,7 +907,7 @@ class FinPlateConnection(ShearConnection):
 
         self.plate.IR = round(self.plate.moment_demand/self.plate.moment_capacity + (self.load.axial_force*1000)/self.plate.tension_capacity,2)
         if self.plate.IR > 1 or self.plate.shear_capacity < self.load.shear_force*1000 or self.plate.moment_capacity < self.plate.moment_demand:
-            logger.warning(
+            self.logger.warning(
                 'Moment-Axial interaction ratio of plate is guiding plate height, current height is {} mm.'.format(self.plate.height))
             self.plate.design_status_capacity = False
         else:
@@ -915,9 +921,9 @@ class FinPlateConnection(ShearConnection):
             weld_size_max = round_up(weld_size_max, 2)
 
         if weld_size_max == weld_size_min:
-            logger.info("The minimum weld size is greater than or equal to the thickness of the thinner connecting plate [Ref. Table 21, "
+            self.logger.info("The minimum weld size is greater than or equal to the thickness of the thinner connecting plate [Ref. Table 21, "
                         "IS800:2007].")
-            logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld.")
+            self.logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld.")
 
         available_welds = list([x for x in ALL_WELD_SIZES if (weld_size_min <= x <= weld_size_max)])
         return available_welds,weld_size_min,weld_size_max
@@ -949,14 +955,14 @@ class FinPlateConnection(ShearConnection):
 
         if self.weld.strength < self.weld.stress:
             self.weld.design_status = False
-            logger.info('The weld stress is guiding plate dimensions, current length is {} mm, thickness is {} mm, and,'
+            self.logger.info('The weld stress is guiding plate dimensions, current length is {} mm, thickness is {} mm, and,'
                            ' weld size is {} mm.'.format(self.plate.height,self.plate.thickness_provided,self.weld.size))
 
     def get_design_status(self):
         print("plate design status is ",self.plate.design_status,"weld status is",self.weld.design_status)
         if self.plate.design_status is True and self.weld.design_status is True:
             self.design_status = True
-            logger.info("=== End Of Design ===")
+            self.logger.info("=== End Of Design ===")
 
     #############################
     # End of Calculations

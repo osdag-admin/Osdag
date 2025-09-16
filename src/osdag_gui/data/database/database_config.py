@@ -1,0 +1,5 @@
+PROJECT_NAME_KEY = 'project_name'
+CREATED_DATE = 'date_created'
+LAST_USED_DATE = 'last_used'
+RELATED_MODULE = 'module_name'
+RELATED_SUBMODULE = 'submodule_name'

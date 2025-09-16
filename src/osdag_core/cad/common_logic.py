@@ -2067,6 +2067,12 @@ class CommonDesignLogic(object):
 
     def display_3DModel(self, component, bgcolor):
 
+        # Component colors
+        weld_color = Quantity_Color(255/255.0, 0/255.0, 0/255.0, Quantity_TOC_RGB)
+        plate_color = Quantity_Color(47/255.0, 47/255.0, 35/255.0, Quantity_TOC_RGB)
+        column_color = Quantity_Color(72/255.0, 72/255.0, 54/255.0, Quantity_TOC_RGB)
+        beam_color = Quantity_Color(134/255.0, 134/255.0, 100/255.0, Quantity_TOC_RGB)
+
         self.component = component
 
         self.display.EraseAll()
@@ -2079,7 +2085,7 @@ class CommonDesignLogic(object):
 
         if bgcolor == "gradient_bg":
 
-            self.display.set_bg_gradient_color([51, 51, 51], [51, 51, 51])
+            self.display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
         else:
             self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
 
@@ -2089,7 +2095,6 @@ class CommonDesignLogic(object):
 
             self.loc = A.connectivity
 
-
             if self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_FINPLATE:
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
             elif self.loc == "Column Flange-Beam Web" and self.connection == KEY_DISP_SEATED_ANGLE:
@@ -2098,10 +2103,9 @@ class CommonDesignLogic(object):
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XposYnegZpos)
 
             if self.component == "Column":
-                osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)
+                osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), color=column_color, update=True)
             elif self.component == "Beam":
-                osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOM_ALUMINIUM,
-                                    update=True)
+                osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), color=beam_color, update=True)
             elif component == "cleatAngle":
 
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
@@ -2120,22 +2124,21 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
             elif self.component == "Plate":
-                osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=Quantity_NOC_RED, update=True)
-                osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=Quantity_NOC_RED, update=True)
-                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE4, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=weld_color, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=plate_color, update=True)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
             elif self.component == "Model":
-
-                osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
-                osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOM_ALUMINIUM,
-                                    update=True)
+                osdag_display_shape(self.display, self.connectivityObj.columnModel, color=column_color, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.beamModel, color=beam_color, update=True)
                 if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
-                    osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=Quantity_NOC_RED, update=True)
-                    osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=Quantity_NOC_RED, update=True)
-                    osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
+                    # Colors to be set on components
+                    osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=weld_color, update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.plateModel, color=plate_color,
                                         update=True)
 
                 elif self.connection == KEY_DISP_CLEATANGLE:

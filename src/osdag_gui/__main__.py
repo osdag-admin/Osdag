@@ -4,6 +4,7 @@ Handles splash screen and main window launch.
 """
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal
+from PySide6.QtGui import QIcon
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
 import sys
 

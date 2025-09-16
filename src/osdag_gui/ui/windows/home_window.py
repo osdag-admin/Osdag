@@ -18,11 +18,11 @@ from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation,
 from PySide6.QtGui import QFont, QIcon, QPainter, QColor
 from PySide6.QtSvg import QSvgRenderer
 
-from osdag_gui.data.menus.menu_data import Data
+from osdag_gui.data.ui_data import Data
 from osdag_gui.ui.components.svg_card import SvgCardContainer
 from osdag_gui.ui.components.home.navbar import VerticalMenuBar
 from osdag_gui.ui.components.custom_buttons import MenuButton
-from osdag_gui.ui.components.home.top_right_button_bar import TopButton, DropDownButton
+from osdag_gui.ui.components.home.top_right_buttons import TopButton, DropDownButton
 from osdag_gui.ui.components.home.home_widget import HomeWidget
 from PySide6.QtWidgets import QSplitter
 
@@ -125,10 +125,17 @@ class HomeWindow(QWidget):
         self.current_primary_button = None
         self.current_secondary_button = None
 
-        # self.osdag_content = QWidget()
-        # self.setCentralWidget(self.osdag_content)
+        main_v_layout = QVBoxLayout(self)
+        main_v_layout.setSpacing(0)
+        main_v_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Horizontal line separating titleBar and tabWidget
+        self.bottom_line = QWidget()
+        self.bottom_line.setObjectName("BottomLine")
+        self.bottom_line.setFixedHeight(1)
+        main_v_layout.addWidget(self.bottom_line)
 
-        main_h_layout = QHBoxLayout(self)
+        main_h_layout = QHBoxLayout()
         main_h_layout.setContentsMargins(0, 0, 0, 0)
         main_h_layout.setSpacing(0)
 
@@ -174,10 +181,10 @@ class HomeWindow(QWidget):
         # self.button_group.setExclusive(True) # Removed as buttons are no longer checkable
         self.buttons = [] # Store references to the created buttons
 
-        # Instantiate and add the custom buttons to the header
-        for i, (black_icon, white_icon, label) in enumerate(floating_navbar):
-            if label == "Resources":
-                button = DropDownButton(black_icon, white_icon, label)
+        # Instantiate and add the Buttons
+        for i, (black_icon, white_icon, label, submenu_data) in enumerate(floating_navbar):
+            if i==0 or i==1:
+                button = DropDownButton(black_icon, white_icon, label, submenu_data)
             else:
                 button = TopButton(black_icon, white_icon, label)
             
@@ -291,9 +298,10 @@ class HomeWindow(QWidget):
         # content_v_layout.addWidget(self.bottom_right_container)
 
         main_h_layout.addWidget(self.content, 8)
+                
+        main_v_layout.addLayout(main_h_layout)
 
         self.show_home()
-        # self.showMaximized()
 
     def _clear_layout(self, layout):
         """Recursively clears a layout and deletes its widgets."""

@@ -1,9 +1,9 @@
 import sys, os, yaml
 import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QTabWidget, QTabBar, QFileDialog,
-    QMessageBox, QMenuBar, QMenu, QSplitter, QSizePolicy
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QColorDialog,
+    QLabel, QPushButton, QFileDialog,  QCheckBox, QComboBox, QLineEdit,
+    QMenuBar, QSplitter, QSizePolicy, QDialog
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent, Signal, QEasingCurve, QTimer
@@ -14,14 +14,17 @@ from osdag_gui.ui.components.docks.input_dock import InputDock
 from osdag_gui.ui.components.docks.output_dock import OutputDock
 from osdag_gui.ui.components.docks.log_dock import LogDock
 from osdag_gui.ui.components.dialogs.loading_popup import ModernLoadingDialog, DelayThread
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
+from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
+from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
+from osdag_gui.common_functions import design_examples
 
 from osdag_core.Common import *
 from osdag_gui.ui.windows.design_preferences import DesignPreferences
 from osdag_core.cad.common_logic import CommonDesignLogic
 
-import time
-from PySide6.QtCore import QThread
-from PySide6.QtWidgets import QDialog, QCheckBox, QComboBox, QLineEdit
+from osdag_gui.__config__ import CAD_BACKEND
 
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
@@ -35,8 +38,14 @@ class CustomWindow(QWidget):
         self.design_pref_inputs = {}
         self.prev_inputs = {}
         self.input_dock_inputs = {}
+        self.design_inputs = {}
         self.folder = ' '
+        self.display_mode = 'Normal'
         self._did_apply_initial_sizes = False
+        self.ui_loaded = False
+        self.backend.design_status = False
+        self.backend.design_button_status = False
+        self.fuse_model = None
 
         self.setStyleSheet("""
             QWidget {
@@ -90,7 +99,7 @@ class CustomWindow(QWidget):
         """)
 
         # This initializes the cad Window in specific backend 
-        self.display, _ = self.init_display(backend_str="pyside6")
+        self.display, _ = self.init_display(backend_str=CAD_BACKEND)
         self.designPrefDialog = DesignPreferences(self.backend, self, input_dictionary=self.input_dock_inputs)
 
         self.init_ui(title)
@@ -123,14 +132,14 @@ class CustomWindow(QWidget):
 
         self.cad_widget.InitDriver()
         display = self.cad_widget._display
-        key_function = {Qt.Key_Up: lambda: self.Pan_Rotate_model("Up"),
-                        Qt.Key_Down: lambda: self.Pan_Rotate_model("Down"),
-                        Qt.Key_Right: lambda: self.Pan_Rotate_model("Right"),
-                        Qt.Key_Left: lambda: self.Pan_Rotate_model("Left")}
+        key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
+                        Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
+                        Qt.Key.Key_Right: lambda: self.Pan_Rotate_model("Right"),
+                        Qt.Key.Key_Left: lambda: self.Pan_Rotate_model("Left")}
         self.cad_widget._key_map.update(key_function)
 
         # background gradient
-        display.set_bg_gradient_color([51, 51, 51], [51, 51, 51])
+        display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
         display.display_triedron()
         display.View.SetProj(1, 1, 1)
 
@@ -178,7 +187,7 @@ class CustomWindow(QWidget):
             btn.setStyleSheet("""
                 QPushButton {
                     background-color: white;
-                    border: 1px solid white;
+                    border: 1px solid black;
                     color: black;
                     font-weight: bold;
                 }
@@ -189,7 +198,7 @@ class CustomWindow(QWidget):
                 }
                 QPushButton:pressed {
                     background-color: white;
-                    border: 1px solid white;
+                    border: 1px solid #90AF13;
                     color: black;
                 }
             """)
@@ -539,128 +548,476 @@ class CustomWindow(QWidget):
         self.output_dock_label.setVisible(state)
         
     def create_menu_bar_items(self):
+        # File Menus
         file_menu = self.menu_bar.addMenu("File")
+
         load_input_action = QAction("Load Input", self)
         load_input_action.setShortcut(QKeySequence("Ctrl+L"))
-        load_input_action.triggered.connect(self.on_load_input)
+        load_input_action.triggered.connect(self.loadDesign_inputs)
         file_menu.addAction(load_input_action)
+
         file_menu.addSeparator()
+
         save_input_action = QAction("Save Input", self)
         save_input_action.setShortcut(QKeySequence("Ctrl+S"))
-        save_input_action.triggered.connect(self.on_save_input)
+        save_input_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save"))
         file_menu.addAction(save_input_action)
+
         save_log_action = QAction("Save Log Messages", self)
         save_log_action.setShortcut(QKeySequence("Alt+M"))
-        save_log_action.triggered.connect(self.on_save_log_messages)
+        save_log_action.triggered.connect(lambda: self.saveLogMessages())
         file_menu.addAction(save_log_action)
+
         create_report_action = QAction("Create Design Report", self)
         create_report_action.setShortcut(QKeySequence("Alt+C"))
-        create_report_action.triggered.connect(self.on_create_design_report)
+        create_report_action.triggered.connect(lambda:self.output_dock.open_summary_popup(self.backend))
         file_menu.addAction(create_report_action)
+
         file_menu.addSeparator()
+
         save_3d_action = QAction("Save 3D Model", self)
         save_3d_action.setShortcut(QKeySequence("Alt+3"))
-        save_3d_action.triggered.connect(self.on_save_3d_model)
+        save_3d_action.triggered.connect(lambda: self.save3DcadImages(self.backend))
         file_menu.addAction(save_3d_action)
+
         save_cad_action = QAction("Save CAD Image", self)
         save_cad_action.setShortcut(QKeySequence("Alt+I"))
-        save_cad_action.triggered.connect(self.on_save_cad_image)
+        save_cad_action.triggered.connect(lambda: self.save_cadImages(self.backend))
         file_menu.addAction(save_cad_action)
+
         file_menu.addSeparator()
+
         quit_action = QAction("Quit", self)
         quit_action.setShortcut(QKeySequence("Shift+Q"))
-        quit_action.triggered.connect(self.close)
+        print("Quit..")
+        quit_action.triggered.connect(self.parent.close_current_tab)
         file_menu.addAction(quit_action)
 
+        # Edit Menus
         edit_menu = self.menu_bar.addMenu("Edit")
-        design_prefs_action = QAction("Design Preferences", self)
+
+        design_prefs_action = QAction("Additional Inputs", self)
         design_prefs_action.setShortcut(QKeySequence("Alt+P"))
-        design_prefs_action.triggered.connect(self.on_design_preferences)
+        design_prefs_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Design_Pref"))
+        design_prefs_action.triggered.connect(lambda: self.combined_design_prefer(self.input_dock.data,self.backend))
+        design_prefs_action.triggered.connect(lambda: self.design_preferences())
         edit_menu.addAction(design_prefs_action)
 
         graphics_menu = self.menu_bar.addMenu("Graphics")
         zoom_in_action = QAction("Zoom In", self)
         zoom_in_action.setShortcut(QKeySequence("Ctrl+I"))
-        zoom_in_action.triggered.connect(self.on_zoom_in)
+        zoom_in_action.triggered.connect(lambda: self.display.ZoomFactor(1.1))
         graphics_menu.addAction(zoom_in_action)
+
         zoom_out_action = QAction("Zoom Out", self)
         zoom_out_action.setShortcut(QKeySequence("Ctrl+O"))
-        zoom_out_action.triggered.connect(self.on_zoom_out)
+        zoom_out_action.triggered.connect(lambda: self.display.ZoomFactor(1/1.1))
         graphics_menu.addAction(zoom_out_action)
+
         pan_action = QAction("Pan", self)
         pan_action.setShortcut(QKeySequence("Ctrl+P"))
-        pan_action.triggered.connect(self.on_pan)
+        pan_action.triggered.connect(lambda: self.assign_display_mode("Pan"))
         graphics_menu.addAction(pan_action)
+
         rotate_3d_action = QAction("Rotate 3D Model", self)
         rotate_3d_action.setShortcut(QKeySequence("Ctrl+R"))
-        rotate_3d_action.triggered.connect(self.on_rotate_3d_model)
+        rotate_3d_action.triggered.connect(lambda: self.assign_display_mode('Rotate'))
         graphics_menu.addAction(rotate_3d_action)
+
         graphics_menu.addSeparator()
+
         front_view_action = QAction("Show Front View", self)
         front_view_action.setShortcut(QKeySequence("Alt+Shift+F"))
-        front_view_action.triggered.connect(self.on_show_front_view)
+        front_view_action.triggered.connect(self.view_front)
         graphics_menu.addAction(front_view_action)
+        
         top_view_action = QAction("Show Top View", self)
         top_view_action.setShortcut(QKeySequence("Alt+Shift+T"))
-        top_view_action.triggered.connect(self.on_show_top_view)
+        top_view_action.triggered.connect(self.view_top)
         graphics_menu.addAction(top_view_action)
+        
         side_view_action = QAction("Show Side View", self)
         side_view_action.setShortcut(QKeySequence("Alt+Shift+S"))
-        side_view_action.triggered.connect(self.on_show_side_view)
+        side_view_action.triggered.connect(self.view_left)
         graphics_menu.addAction(side_view_action)
+
         graphics_menu.addSeparator()
 
         self.menu_cad_components = []
 
-        model_view_action = QAction("Model", self)
-        self.menu_cad_components.append(model_view_action)
-        graphics_menu.addAction(model_view_action)
+        for component in self.backend.get_3d_components():
+            cad_component_action = QAction(component[0], self)
+            cad_component_action.setObjectName(component[0])
+            cad_component_action.setEnabled(False)
+            self.menu_cad_components.append(cad_component_action)
+            graphics_menu.addAction(cad_component_action)
+            cad_component_action.triggered.connect(
+            # This approaches prevents from making trigger on all components same
+            lambda checked=False, 
+                act=cad_component_action, 
+                comp_id=component[1], 
+                comp_name=component[0]:
+                self.cadComponentControl(act, comp_id, comp_name)
+            )
 
-        beam_view_action = QAction("Beam", self)
-        self.menu_cad_components.append(beam_view_action)
-        graphics_menu.addAction(beam_view_action)
-
-        column_view_action = QAction("Column", self)
-        self.menu_cad_components.append(column_view_action)
-        graphics_menu.addAction(column_view_action)
-
-        fin_plate_view_action = QAction("Fin Plate", self)
-        self.menu_cad_components.append(fin_plate_view_action)
-        graphics_menu.addAction(fin_plate_view_action)
-
-        graphics_menu.addSeparator()
-        change_bg_action = QAction("Change background", self)
-        change_bg_action.triggered.connect(self.on_change_background)
-        graphics_menu.addAction(change_bg_action)
-
+        # Database Menu
         database_menu = self.menu_bar.addMenu("Database")
-        download_submenu = database_menu.addMenu("Download")
-        download_submenu.addAction(QAction("Column", self))
-        download_submenu.addAction(QAction("Beam", self))
-        download_submenu.addAction(QAction("Angle", self))
-        download_submenu.addAction(QAction("Channel", self))
+
+        input_csv_action = QAction("Save Inputs (.csv)", self)
+        input_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend))
+        database_menu.addAction(input_csv_action)
+
+        output_csv_action = QAction("Save Outputs (.csv)", self)
+        output_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend))
+        database_menu.addAction(output_csv_action)
+
+        input_osi_action = QAction("Save Inputs (.osi)", self)
+        input_osi_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save"))
+        database_menu.addAction(input_osi_action)
+
+        download_database_menu = database_menu.addMenu("Download Database")
+
+        download_column_action = QAction("Column", self)
+        download_column_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Columns"))
+        download_database_menu.addAction(download_column_action)
+
+        download_bolt_action = QAction("Bolt", self)
+        download_bolt_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Beams"))
+        download_database_menu.addAction(download_bolt_action)
+
+        download_weld_action = QAction("Weld", self)
+        download_weld_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Channels"))
+        download_database_menu.addAction(download_weld_action)
+
+        download_angle_action = QAction("Angle", self)
+        download_angle_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
+        download_database_menu.addAction(download_angle_action)
+        
+        database_menu.addSeparator()
+
         reset_action = QAction("Reset", self)
-        reset_action.triggered.connect(self.on_reset_database)
+        reset_action.triggered.connect(self.reset_database)
+        reset_action.setShortcut(QKeySequence("Alt+R"))
         database_menu.addAction(reset_action)
 
+        # Help Menu
         help_menu = self.menu_bar.addMenu("Help")
+
         video_tutorials_action = QAction("Video Tutorials", self)
-        video_tutorials_action.triggered.connect(self.on_video_tutorials)
+        video_tutorials_action.triggered.connect(lambda: TutorialsDialog().exec())
         help_menu.addAction(video_tutorials_action)
+
         design_examples_action = QAction("Design Examples", self)
-        design_examples_action.triggered.connect(self.on_design_examples)
+        design_examples_action.triggered.connect(design_examples)
         help_menu.addAction(design_examples_action)
+
         help_menu.addSeparator()
+
         ask_question_action = QAction("Ask Us a Question", self)
-        ask_question_action.triggered.connect(self.on_ask_question)
+        ask_question_action.triggered.connect(lambda: AskQuestions().exec())
         help_menu.addAction(ask_question_action)
+
         about_osdag_action = QAction("About Osdag", self)
-        about_osdag_action.triggered.connect(self.on_about_osdag)
+        about_osdag_action.triggered.connect(lambda: AboutOsdagDialog().exec())
         help_menu.addAction(about_osdag_action)
+
         help_menu.addSeparator()
+
         check_update_action = QAction("Check For Update", self)
         check_update_action.triggered.connect(self.on_check_for_update)
         help_menu.addAction(check_update_action)
+    
+    def cadComponentControl(self, action, f, object_name):
+        # calling backend function
+        f(self, "gradient_bg")
+        # find the check box and make it checked
+        checkBox = self.cad_comp_widget.findChild(QCheckBox, object_name)
+        checkBox.setChecked(True)
+    
+    #----------------Function-Trigger-for-MenuBar-START----------------------------------------
+    
+    # Function for getting inputs from a file
+    def loadDesign_inputs(self):
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)),
+                                                  "InputFiles(*.osi)")
+        if not fileName:
+            return
+        try:
+            in_file = str(fileName)
+            with open(in_file, 'r') as fileObject:
+                uiObj = yaml.safe_load(fileObject)
+            module = uiObj[KEY_MODULE]
+
+            selected_module = self.backend.module_name()
+            if selected_module == module:
+                self.ui_loaded = False
+                self.setDictToUserInputs(uiObj)
+                self.ui_loaded = True
+                self.output_dock.output_title_change(self.backend)
+            else:
+                CustomMessageBox(
+                    title="Information",
+                    text="Please load the appropriate Input",
+                    dialogType=MessageBoxType.Information
+                ).exec()
+                return
+        except IOError:
+            CustomMessageBox(
+                title="Unable to open file",
+                text="There was an error opening \"%s\"" % fileName,
+                dialogType=MessageBoxType.Information
+            ).exec()
+            return
+
+    # Helper Function to load .osi -> self.loadDesign_inputs
+    def setDictToUserInputs(self, uiObj):
+        op_list = self.backend.input_values()
+        new = self.backend.customized_input()
+        data = self.input_dock.data
+        input_widget = self.input_dock.input_widget
+
+        self.load_input_error_message = "Invalid Inputs Found! \n"
+
+        for uiObj_key in uiObj.keys():
+            if str(uiObj_key) in [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL, KEY_SEC_MATERIAL, KEY_CONNECTOR_MATERIAL,
+                             KEY_BASE_PLATE_MATERIAL]:
+                material = uiObj[uiObj_key]
+                material_validator = MaterialValidator(material)
+                if material_validator.is_already_in_db():
+                    pass
+                elif material_validator.is_format_custom():
+                    if material_validator.is_valid_custom():
+                        self.update_material_db(grade=material, material=material_validator)
+                        input_dock_material = input_widget.findChild(QWidget, KEY_MATERIAL)
+                        input_dock_material.clear()
+                        for item in connectdb("Material"):
+                            input_dock_material.addItem(item)
+                    else:
+                        self.load_input_error_message += \
+                            str(uiObj_key) + ": (" + str(material) + ") - Default Value Considered! \n"
+                        continue
+                else:
+                    self.load_input_error_message += \
+                        str(uiObj_key) + ": (" + str(material) + ") - Default Value Considered! \n"
+                    continue
+
+            if uiObj_key not in [i[0] for i in op_list]:
+                self.design_pref_inputs.update({uiObj_key: uiObj[uiObj_key]})
+
+        for op in op_list:
+            key_str = op[0]
+            key = input_widget.findChild(QWidget, key_str)
+            if op[2] == TYPE_COMBOBOX:
+                if key_str in uiObj.keys():
+                    index = key.findText(uiObj[key_str], Qt.MatchFixedString)
+                    if index >= 0:
+                        key.setCurrentIndex(index)
+                    else:
+                        if key_str in [KEY_SUPTDSEC, KEY_SUPTNGSEC]:
+                            self.load_input_error_message += \
+                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Select from available Sections! \n"
+                        else:
+                            self.load_input_error_message += \
+                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Default Value Considered! \n"
+            elif op[2] == TYPE_TEXTBOX:
+                if key_str in uiObj.keys():
+                    if key_str == KEY_SHEAR or key_str==KEY_AXIAL or key_str == KEY_MOMENT:
+                        if uiObj[key_str] == "":
+                            pass
+                        elif float(uiObj[key_str]) >= 0:
+                            pass
+                        else:
+                            self.load_input_error_message += \
+                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Load should be positive integer! \n"
+                            uiObj[key_str] = ""
+
+                    # Convert list values to string before setting text
+                    value = uiObj[key_str]
+                    if isinstance(value, list):
+                        value = value[0] if value else ""
+                    key.setText(value if value != 'Disabled' else "")
+            elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if key_str in uiObj.keys():
+                    for n in new:
+
+                        if n[0] == key_str and n[0] == KEY_SECSIZE:
+                            if set(uiObj[key_str]) != set(n[1]([input_widget.findChild(QWidget,
+                                                          KEY_SEC_PROFILE).currentText()])):
+                                key.setCurrentIndex(1)
+                            else:
+                                key.setCurrentIndex(0)
+                            data[key_str + "_customized"] = uiObj[key_str]
+
+                        elif n[0] == key_str and n[0] != KEY_SECSIZE:
+                            if set(uiObj[key_str]) != set(n[1]()):
+                                key.setCurrentIndex(1)
+                            else:
+                                key.setCurrentIndex(1)
+                            data[key_str + "_customized"] = uiObj[key_str]
+            else:
+                pass
+
+        if self.load_input_error_message != "Invalid Inputs Found! \n":
+            CustomMessageBox(
+                title="Information",
+                text=self.load_input_error_message,
+                dialogType=MessageBoxType.About
+            ).exec()
+
+    # To Save 3D Model
+    def save3DcadImages(self, main):
+        from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+        from OCC.Core.Interface import Interface_Static_SetCVal
+        from OCC.Core.IFSelect import IFSelect_RetDone
+        from OCC.Core.StlAPI import StlAPI_Writer
+        from OCC.Core import BRepTools
+        from OCC.Core import IGESControl
+
+        if not main.design_button_status:
+            CustomMessageBox(
+                title="Warning",
+                text="No design created!",
+                dialogType=MessageBoxType.Warning
+            ).exec()
+            return
+
+        if main.design_status:
+            if self.fuse_model is None:
+                self.fuse_model = self.commLogicObj.create2Dcad()
+            shape = self.fuse_model
+
+            files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                                      files_types)
+            fName = str(fileName)
+
+            if fName and self.fuse_model:
+                file_extension = fName.split(".")[-1]
+
+                if file_extension == 'igs':
+                    IGESControl.IGESControl_Controller().Init()
+                    iges_writer = IGESControl.IGESControl_Writer()
+                    iges_writer.AddShape(shape)
+                    iges_writer.Write(fName)
+
+                elif file_extension == 'brep':
+
+                    BRepTools.breptools.Write(shape, fName)
+
+                elif file_extension == 'stp':
+                    # initialize the STEP exporter
+                    step_writer = STEPControl_Writer()
+                    Interface_Static_SetCVal("write.step.schema", "AP203")
+
+                    # transfer shapes and write file
+                    step_writer.Transfer(shape, STEPControl_AsIs)
+                    status = step_writer.Write(fName)
+
+                    assert (status == IFSelect_RetDone)
+
+                else:
+                    stl_writer = StlAPI_Writer()
+                    stl_writer.SetASCIIMode(True)
+                    stl_writer.Write(shape, fName)
+
+                self.fuse_model = None
+
+                CustomMessageBox(
+                    title="Information",
+                    text="File Saved",
+                    dialogType=MessageBoxType.About
+                ).exec()
+            else:
+                CustomMessageBox(
+                    title="Error",
+                    text="File not saved",
+                    dialogType=MessageBoxType.Critical
+                ).exec()
+        else:
+            CustomMessageBox(
+                title="Warning",
+                text="Design Unsafe: 3D Model cannot be saved",
+                dialogType=MessageBoxType.Warning
+            ).exec()
+
+    # Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
+    def save_cadImages(self, main):
+        if main.design_status:
+            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                      files_types)
+            fName = str(fileName)
+            file_extension = fName.split(".")[-1]
+
+            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+                self.display.ExportToImage(fName)
+                CustomMessageBox(
+                    title="Information",
+                    text="File saved",
+                    dialogType=MessageBoxType.About
+                ).exec()
+        else:
+            CustomMessageBox(
+                    title="Information",
+                    text="Design Unsafe: CAD image cannot be saved",
+                    dialogType=MessageBoxType.About
+                ).exec()    
+
+    # To change mode to Pan/Rotate using keyboard keys
+    def assign_display_mode(self, mode):
+        self.cad_widget.setFocus()
+        if mode == 'Pan':
+            self.display_mode = 'Pan'
+        elif mode == 'Rotate':
+            self.display_mode = 'Rotate'
+        else:
+            self.display_mode = 'Normal'
+
+    def Pan_Rotate_model(self, direction):
+
+        if self.display_mode == 'Pan':
+            if direction == 'Up':
+                self.display.Pan(0, 10)
+            elif direction == 'Down':
+                self.display.Pan(0, -10)
+            elif direction == 'Left':
+                self.display.Pan(-10, 0)
+            elif direction == 'Right':
+                self.display.Pan(10, 0)
+        elif self.display_mode == 'Rotate':
+            if direction == 'Up':
+                self.display_y += 10
+                self.display.Rotation(self.display_x, self.display_y)
+            elif direction == 'Down':
+                self.display_y -= 10
+                self.display.Rotation(self.display_x, self.display_y)
+            elif direction == 'Left':
+                self.display_x -= 10
+                self.display.Rotation(self.display_x, self.display_y)
+            elif direction == 'Right':
+                self.display_x += 10
+                self.display.Rotation(self.display_x, self.display_y)
+    
+    def reset_database(self):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        tables = ["Columns", "Beams", "Angles", "Channels"]
+        text = ""
+        for table in tables:
+            query = "DELETE FROM "+str(table)+" WHERE Source = ?"
+            cursor = conn.execute(query, ('Custom',))
+            text += str(table)+": "+str(cursor.rowcount)+" rows deleted. \n"
+            conn.commit()
+            cursor.close()
+        conn.close()
+        CustomMessageBox(
+            title="Successful",
+            text=text,
+            dialogType=MessageBoxType.Success
+        ).exec()
+
+
+    #----------------Function-Trigger-for-MenuBar-END------------------------------------------
 
     def resizeEvent(self, event):
         self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
@@ -810,74 +1167,8 @@ class CustomWindow(QWidget):
         for i in range(self.splitter.count()):
             self.splitter.widget(i).update()
 
-    def show_message(self, title, message):
-        msg_box = QMessageBox()
-        msg_box.setWindowTitle(title)
-        msg_box.setText(message)
-        msg_box.exec()
-
-    def on_load_input(self):
-        self.show_message("Action", "Load input selected.")
-
-    def on_save_input(self):
-        self.show_message("Action", "Save input selected.")
-
-    def on_save_log_messages(self):
-        self.show_message("Action", "Save log messages selected.")
-
-    def on_create_design_report(self):
-        self.show_message("Action", "Create design report selected.")
-
-    def on_save_3d_model(self):
-        self.show_message("Action", "Save 3D model selected.")
-
-    def on_save_cad_image(self):
-        self.show_message("Action", "Save CAD image selected.")
-
-    def on_design_preferences(self):
-        self.show_message("Action", "Design Preferences selected.")
-
-    def on_zoom_in(self):
-        self.show_message("Action", "Zoom in selected.")
-
-    def on_zoom_out(self):
-        self.show_message("Action", "Zoom out selected.")
-
-    def on_pan(self):
-        self.show_message("Action", "Pan selected.")
-
-    def on_rotate_3d_model(self):
-        self.show_message("Action", "Rotate 3D model selected.")
-
-    def on_show_front_view(self):
-        self.show_message("Action", "Show front view selected.")
-
-    def on_show_top_view(self):
-        self.show_message("Action", "Show top view selected.")
-
-    def on_show_side_view(self):
-        self.show_message("Action", "Show side view selected.")
-
-    def on_change_background(self):
-        self.show_message("Action", "Change background selected.")
-
-    def on_reset_database(self):
-        self.show_message("Action", "Database Reset selected.")
-
-    def on_video_tutorials(self):
-        self.show_message("Action", "Video Tutorials selected.")
-
-    def on_design_examples(self):
-        self.show_message("Action", "Design Examples selected.")
-
-    def on_ask_question(self):
-        self.show_message("Action", "Ask Us a Question selected.")
-
-    def on_about_osdag(self):
-        self.show_message("Action", "About Osdag selected.")
-
     def on_check_for_update(self):
-        self.show_message("Action", "Check For Update selected.")
+        print("Action", "Check For Update selected.")
 
     # This opens loading widget and execute Design
     def start_thread(self, data):
@@ -893,6 +1184,8 @@ class CustomWindow(QWidget):
     def finished_loading(self):
         self.thread_2.start()
         self.thread_2.finished.connect(self.loading_close)
+        print("Testing Custom Logger!")
+        print(self.backend.logger.logs)
 
     def loading_close(self):
         self.loading.close()
@@ -949,6 +1242,8 @@ class CustomWindow(QWidget):
 
             if error is not None:
                 self.show_error_msg(error)
+                # Close loading popup
+                self.finished_loading()
                 return
 
             out_list = main.output_values(status)
@@ -1318,8 +1613,37 @@ class CustomWindow(QWidget):
             with open(fileName, 'w') as input_file:
                 yaml.dump(self.design_inputs, input_file)
         except Exception as e:
-            QMessageBox.warning(self, "Application",
-                                "Cannot write file %s:\n%s" % (fileName, str(e)))
+            CustomMessageBox(
+                title="Application",
+                text="Cannot write file %s:\n%s" % (fileName, str(e)),
+                dialogType=MessageBoxType.Warning
+            ).exec()
+            return
+    
+    def saveLogMessages(self):
+        """Save log messages from textEdit to a text file"""
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Log Messages", os.path.join(self.folder, "log_messages.txt"),
+                                                  "Text Files(*.txt);;All Files(*.*)", None)
+        if not fileName:
+            return
+        
+        try:
+            log_content = self.textEdit.toPlainText()
+            with open(fileName, 'w', encoding='utf-8') as log_file:
+                log_file.write(log_content)
+            
+            CustomMessageBox(
+                title="Information",
+                text="Log messages saved successfully",
+                dialogType=MessageBoxType.Information
+            ).exec()
+        except Exception as e:
+            CustomMessageBox(
+                title="Error",
+                text="Cannot write file %s:\n%s" % (fileName, str(e)),
+                dialogType=MessageBoxType.Critical
+            ).exec()
             return
     
     def clear_output_fields(self):
@@ -1351,39 +1675,12 @@ class CustomWindow(QWidget):
         else:
             error_text = f"Error: {str(error)}"
         
-        # Use QMessageBox.critical for errors instead of QMessageBox.about
-        msg_box = QMessageBox(self)
-        msg_box.setIcon(QMessageBox.Icon.Critical)
-        msg_box.setWindowTitle("Validation Error")
-        msg_box.setText(error_text)
-        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
-        
-        # Apply styling to ensure proper button size
-        msg_box.setStyleSheet("""
-            QMessageBox {
-                background-color: white;
-            }
-            QMessageBox QPushButton {
-                background-color: #94b816;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                min-width: 80px;
-                min-height: 24px;
-                font-size: 12px;
-                font-weight: bold;
-                border-radius: 4px;
-            }
-            QMessageBox QPushButton:hover {
-                background-color: #7a9a12;
-            }
-            QMessageBox QPushButton:pressed {
-                background-color: #5f7a0e;
-            }
-        """)
-        # Connect the finished signal to reset the flag
+        msg_box = CustomMessageBox(
+            title="Validation Error",
+            text=error_text,
+            dialogType=MessageBoxType.Critical
+        ).exec()
         msg_box.finished.connect(lambda: setattr(self, '_error_dialog_open', False))
-        msg_box.exec()
 
 class InputDockIndicator(QWidget):
     def __init__(self, parent):

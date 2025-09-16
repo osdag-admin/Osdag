@@ -392,7 +392,7 @@ class ReportCustomizationDialog(QDialog):
 
         # Auto compile checkbox - disabled by default for speed
         self.auto_compile = QCheckBox("Auto Compile")
-        self.auto_compile.setChecked(False)  # Disabled by default
+        self.auto_compile.setChecked(True)  # Enable by default
         controls.addWidget(self.auto_compile)
 
         # Manual compile button

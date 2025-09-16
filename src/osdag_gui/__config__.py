@@ -1,0 +1,2 @@
+VERSION = "v2025.01.a.2"
+CAD_BACKEND = "pyside6"

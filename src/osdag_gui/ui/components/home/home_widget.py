@@ -15,7 +15,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 
 import osdag_gui.resources.resources_rc
-from osdag_gui.data.menus.menu_data import Data
+from osdag_gui.data.ui_data import Data
 
 # --- SVG Widget with Theme Support ---
 class ThemedSvgWidget(QSvgWidget):
@@ -247,14 +247,14 @@ class ProjectItem(QFrame):
         details_layout = QVBoxLayout()
         details_layout.setSpacing(1)
         
-        project_name_label = QLabel(self.project_data["sub_module"])
+        project_name_label = QLabel(self.project_data["project_name"])
         project_name_label.setObjectName("projectName")
         project_name_label.setWordWrap(True)
         project_name_label.setContentsMargins(2, 2, 2, 2)  # NEW
         project_name_label.setMinimumHeight(10) 
         
         # Truncate long project names
-        project_full_text = self.project_data["project_name"]
+        project_full_text = self.project_data["submodule_name"]
         if len(project_full_text) > 35:  # Reduced from 40
             project_full_text = project_full_text[:32] + "..."
         
@@ -268,7 +268,7 @@ class ProjectItem(QFrame):
         details_layout.addWidget(project_full_label)
         
         # Date label
-        date_label = QLabel(self.project_data["last_date"])
+        date_label = QLabel(self.project_data["last_used"])
         date_label.setObjectName("dateLabel")
         date_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
         
@@ -434,13 +434,13 @@ class ModuleItem(QFrame):
         details_layout = QVBoxLayout()
         details_layout.setSpacing(2)
         
-        module_name_label = EllipsisLabel(self.module_data["module_name"])
+        module_name_label = EllipsisLabel(self.module_data["submodule_name"])
         module_name_label.setObjectName("moduleName")
         module_name_label.setFont(QFont("Segoe UI", 11, QFont.Weight.Medium))
         details_layout.addWidget(module_name_label)
         
-        if self.module_data.get("sub_module"):
-            sub_module_label = EllipsisLabel(self.module_data["sub_module"])
+        if self.module_data.get("module_name"):
+            sub_module_label = EllipsisLabel(self.module_data["module_name"])
             sub_module_label.setObjectName("subModuleLabel")
             sub_module_label.setFont(QFont("Segoe UI", 8, QFont.Weight.Normal))
             details_layout.addWidget(sub_module_label)

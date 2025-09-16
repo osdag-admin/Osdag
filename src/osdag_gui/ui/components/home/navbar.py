@@ -12,6 +12,8 @@ from PySide6.QtGui import QFont, QCursor, QIcon, QPainter, QColor
 from PySide6.QtCore import Qt, QSize, QEvent, Signal
 from PySide6.QtSvgWidgets import QSvgWidget
 
+from osdag_gui.__config__ import VERSION
+
 import osdag_gui.resources.resources_rc
 
 class CustomButton(QPushButton):
@@ -103,7 +105,7 @@ class VerticalMenuBar(QWidget):
         # Remove fixed size here, will be set dynamically in resizeEvent
         self.header_layout.addWidget(self.osdag_logo, alignment=Qt.AlignCenter)
 
-        self.version_label = QLabel("v2025.01.a.2")
+        self.version_label = QLabel(VERSION)
         self.version_label.setFont(QFont("Calibri", 12)) # Initial font, will be updated
         self.version_label.setStyleSheet("""
             QLabel {

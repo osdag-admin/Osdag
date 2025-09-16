@@ -20,6 +20,8 @@ from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPo
 from osdag_core.Common import *
 import osdag_gui.resources.resources_rc
 
+from osdag_gui.__config__ import CAD_BACKEND
+
 import yaml
 
 def style_line_edit():
@@ -355,6 +357,8 @@ class OutputDock(QWidget):
     # ----------------------------------Save-Design-Report-Start------------------------------------------------------
     
     def open_summary_popup(self, main):
+        print("Testing Custom Logger!!")
+        print(self.backend.logger.logs)
         print('main.module_name', main.module_name())
         if not main.design_button_status:
             CustomMessageBox(
@@ -368,7 +372,7 @@ class OutputDock(QWidget):
         if main.design_status:
             try:
                 print("Start!")
-                off_display, _, _, _ = init_display_off_screen(backend_str="pyside6")
+                off_display, _, _, _ = init_display_off_screen(backend_str=CAD_BACKEND)
                 print('off_display', off_display)
                 
                 # Check if commLogicObj exists and is properly initialized
@@ -468,8 +472,8 @@ class OutputDock(QWidget):
                             pass
                 
                 # Set the design inputs on the instance if available
-                if hasattr(self, 'design_inputs') and self.design_inputs:
-                    for key, value in self.design_inputs.items():
+                if hasattr(self, 'design_inputs') and self.parent.design_inputs:
+                    for key, value in self.parent.design_inputs.items():
                         if hasattr(design_instance, key):
                             setattr(design_instance, key, value)
                 
@@ -566,6 +570,14 @@ class OutputDock(QWidget):
     # ----------------------------------Save-Outputs-START------------------------------------------------------
     def save_output_to_csv(self, main):
         status = main.design_status
+        if(not status):
+            CustomMessageBox(
+                title="Warning",
+                text="No Design is Created yet.",
+                dialogType=MessageBoxType.Warning
+            ).exec()
+            return
+           
         out_list = main.output_values(status)
         to_Save = {}
         flag = 0
@@ -584,7 +596,7 @@ class OutputDock(QWidget):
                         to_Save[lable] = value
 
         import pandas as pd
-        df = pd.DataFrame(self.design_inputs.items())
+        df = pd.DataFrame(self.parent.design_inputs.items())
         df1 = pd.DataFrame(to_Save.items())
         bigdata = pd.concat([df, df1], axis=1)
         if not flag:
@@ -595,7 +607,7 @@ class OutputDock(QWidget):
             ).exec()
         else:
             fileName, _ = QFileDialog.getSaveFileName(self,
-                                                        "Save Output", os.path.join(self.folder, "untitled.csv"),
+                                                        "Save Output", os.path.join(self.parent.folder, "untitled.csv"),
                                                         "Input Files(*.csv)")
             if fileName:
                 bigdata.to_csv(fileName, index=False, header=None)

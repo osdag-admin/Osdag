@@ -12,15 +12,15 @@ import os
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
     QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup, QTabBar, QTabWidget,
-    QMessageBox
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation, QEasingCurve, Property
+from PySide6.QtCore import Qt, Signal, QSize, QEvent, QTimer, QPropertyAnimation, QEasingCurve, Property
 from PySide6.QtGui import QFont, QIcon, QPainter, QColor, QGuiApplication, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
 from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 
@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.main_widget_instance = None
+        self.setWindowIcon(QIcon(":/vectors/Osdag_logo.svg"))
 
         screen = QGuiApplication.primaryScreen()
         screen_size = screen.availableGeometry()
@@ -52,22 +53,30 @@ class MainWindow(QMainWindow):
         self.btn_size = QSize(46, 30)
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #fff;
+                background-color: #f4f4f4;
+                border: 1px solid #90af13;
                 margin: 0px;
                 padding: 0px;
-            }  
+            } 
+            QWidget#BottomLine {
+                background-color: #90af13;
+            }
         """)
 
         # Initialize UI first, as sidebar will overlay it
         self.init_ui() # Call init_ui before sidebar creation to ensure main content exists
         self.handle_add_tab("Home")
 
+        # Using QTimer to delay maximizing until after the window is fully initialized
+        # Before maximizing, so that when we click on Restore it comes to normal state.
+        QTimer.singleShot(0, self.showMaximized)
+
     def init_ui(self):
         # Main Vertical Layout for the entire window's *content*
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_v_layout = QVBoxLayout(central_widget)
-        main_v_layout.setContentsMargins(0, 0, 0, 0)
+        main_v_layout.setContentsMargins(1, 0, 1, 1)
         main_v_layout.setSpacing(0)
 
         # --- Top HBox Layout (Contains logo, tabs, and window control buttons) ---
@@ -91,6 +100,10 @@ class MainWindow(QMainWindow):
         # Keep a reference for event filtering (double-click to maximize/restore)
         self.icon_label_widget = icon_label_widget
 
+        tabs_h_layout = QHBoxLayout()
+        tabs_h_layout.setSpacing(0)
+        tabs_h_layout.setContentsMargins(0, 2, 0, 0)
+
         # QTabBar
         self.tab_bar = QTabBar()
         self.tab_bar.setExpanding(False)
@@ -100,21 +113,21 @@ class MainWindow(QMainWindow):
         # Custom tab style
         self.tab_bar.setStyleSheet('''
             QTabBar::tab {
-                background: #ffffff;
-                border-left: 1px solid #F4F4F4;
-                border-right: 1px solid #F4F4F4;
-                border-top: 1px solid #FFFFFF;
-                border-bottom: 1px solid #FFFFFF;
+                background: #F4F4F4;
+                border-left: 1px solid #d9d7d7;
+                border-right: 1px solid #d9d7d7;
+                border-top: 1px solid #F4F4F4;
+                border-bottom: 1px solid #F4F4F4;
                 padding: 6px 18px 6px 18px;
                 color: #000000;
                 font-size: 11px;
                 margin-left: 0px;
             }
             QTabBar::tab:selected {
-                background: #F4F4F4;
+                background: #ffffff;
                 color: #000000;
                 border: 1px solid #90AF13;
-                border-bottom: 1px solid #F4F4F4;
+                border-bottom: 1px solid #ffffff;
                 padding: 6px 18px 6px 18px;
             }
             QTabBar::tab:hover {
@@ -131,7 +144,8 @@ class MainWindow(QMainWindow):
                 image: url(:/vectors/window_close_hover.svg);
             }
         ''')
-        top_h_layout.addWidget(self.tab_bar)
+        tabs_h_layout.addWidget(self.tab_bar)
+        top_h_layout.addLayout(tabs_h_layout)
         
         # Install event filters for double-click maximize/restore on title widgets
         self.tab_bar.installEventFilter(self)
@@ -145,16 +159,16 @@ class MainWindow(QMainWindow):
             btn = QPushButton()
             btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #FFFFFF;
+                    background-color: #f4f4f4;
                     color: white;
                     border: none;
                     padding: 0px;
                 }
                 QPushButton:hover {
-                    background-color: #F4F4F4;
+                    background-color: #d9d7d7;
                 }
                 QPushButton:pressed {
-                    background-color: #FAFAFA;
+                    background-color: #cfcfcf;
                 }
                 QPushButton#close_button:hover {
                     background-color: #E81123;
@@ -238,6 +252,7 @@ class MainWindow(QMainWindow):
         self.tab_widget.setMovable(False) # Allow reordering tabs
         self.tab_widget.setStyleSheet("""
             QTabWidget {
+                background-color: #ffffff;
                 border: 0px;
             }
         """)
@@ -251,11 +266,6 @@ class MainWindow(QMainWindow):
         # Ensure initial synchronization
         if self.tab_bar.count() > 0:
             self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
-        
-        # This is called one after another so that the normal state must also be recorded
-        # before maximizing, so that when we click on Restore it comes to normal state.
-        self.showNormal()
-        self.showMaximized()
 
     def set_maximize_icon(self):
         self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize.svg").toImage())))
@@ -372,6 +382,38 @@ class MainWindow(QMainWindow):
             self.input_dock_control.hide()
             self.output_dock_control.hide()
             self.log_dock_control.hide()
+    
+    # This is triggered by Quit button in Menu bar on template_page
+    def close_current_tab(self):
+        # Ask user for confirmation before closing the current tab.
+        current_index = self.tab_bar.currentIndex()
+        tab_title = self.tab_bar.tabText(current_index) if current_index >= 0 else "This"
+        is_last_tab = self.tab_widget.count() == 1
+
+        if is_last_tab:
+            title = "Confirm Exit"
+            message = f"'{tab_title}' is the last tab.\nClosing it will exit Osdag.\nDo you really want to close this tab?"
+        else:
+            title = "Confirm Close Tab"
+            message = f"Do you really want to close the current tab: '{tab_title}'?"
+
+        # Create custom message box
+        msg_box = CustomMessageBox(
+            title=title,
+            text=message,
+            buttons=["Yes", "No"],
+            dialogType=MessageBoxType.Warning,
+        )
+
+        # Show dialog and get result (button text)
+        result = msg_box.exec()
+
+        # Handle result
+        if result == "Yes":
+            if is_last_tab:
+                self.close()  # Close the main window (exit Osdag)
+            else:
+                self.close_tab(current_index)
 
     def close_tab(self, index):
         """Handles closing of tabs."""
@@ -383,13 +425,12 @@ class MainWindow(QMainWindow):
             if self.tab_widget.currentIndex() == -1 and self.tab_widget.count() > 0:
                 self.tab_widget.setCurrentIndex(self.tab_widget.count() - 1)
         else:
-            # Using QMessageBox for information instead of alert()
-            msg_box = QMessageBox()
-            msg_box.setIcon(QMessageBox.Information)
-            msg_box.setText("Cannot close the last tab.")
-            msg_box.setWindowTitle("Information")
-            msg_box.setStandardButtons(QMessageBox.Ok)
-            msg_box.exec()
+            CustomMessageBox(
+                title="Information",
+                text="Cannot close the last tab.",
+                buttons=["Yes", "No"],
+                dialogType=MessageBoxType.Information,
+            ).exec()
 
         if self.tab_widget.count() > 0:
             current_index = self.tab_widget.currentIndex()
@@ -402,15 +443,12 @@ class MainWindow(QMainWindow):
                         self.main_widget_instance = widget
             # Show docking Icons
             self.tab_widget_content[current_index][1] = True
-            current_tab_data = self.tab_widget_content[index]
+            # Ensure main_widget_layout points to the currently active tab's layout
+            if hasattr(body_widget, 'layout'):
+                self.main_widget_layout = body_widget.layout()
+            # Update docking icons using the current active tab index (not the closed one)
+            current_tab_data = self.tab_widget_content[current_index]
             self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-
-    def show_message(self, title, message):
-        """Helper function to display a message box."""
-        msg_box = QMessageBox()
-        msg_box.setWindowTitle(title)
-        msg_box.setText(message)
-        msg_box.exec()
 
     # Allow dragging the window when frameless
     def mousePressEvent(self, event):
@@ -532,6 +570,7 @@ if __name__ == "__main__":
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from PySide6.QtWidgets import QApplication
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec())

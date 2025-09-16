@@ -227,8 +227,8 @@ class InputDock(QWidget):
         input_dock_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_bar.addWidget(input_dock_btn)
         additional_inputs_btn = AdditionalInputsButton()
-        additional_inputs_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, data, "Design_Pref"))
-        additional_inputs_btn.clicked.connect(lambda: self.parent.combined_design_prefer(data,self.backend))
+        additional_inputs_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Design_Pref"))
+        additional_inputs_btn.clicked.connect(lambda: self.parent.combined_design_prefer(self.data,self.backend))
         additional_inputs_btn.clicked.connect(lambda: self.parent.design_preferences())
         additional_inputs_btn.setToolTip("Additional Inputs")
         additional_inputs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -386,7 +386,7 @@ class InputDock(QWidget):
         updated_list = self.backend.input_value_changed()
 
         print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
-        data = {}
+        self.data = {}
 
         d = {}
         if new_list != []:
@@ -403,13 +403,13 @@ class InputDock(QWidget):
                         for change_key in onchange_key_popup[0][0]:
                             print(change_key)
                             arg_list.append(self.input_widget.findChild(QWidget, change_key).currentText())
-                        data[t[0] + "_customized"] = [all_values_available for all_values_available in
+                        self.data[t[0] + "_customized"] = [all_values_available for all_values_available in
                                                       t[1](arg_list) if all_values_available not in disabled_values]
                     else:
-                        data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
+                        self.data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                       if all_values_available not in disabled_values]
                 else:
-                    data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
+                    self.data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                   if all_values_available not in disabled_values]
             try:
                 print(f"<class 'AttributeError'>: {d} \n {new_list}")
@@ -420,7 +420,7 @@ class InputDock(QWidget):
                     if i < len(new_list):
                         widget = d.get(new_list[i][0])
                         if widget is not None and hasattr(widget, 'activated'):
-                            widget.activated.connect(lambda checked, w=widget: self.popup(w, new_list, updated_list, data))
+                            widget.activated.connect(lambda checked, w=widget: self.popup(w, new_list, updated_list, self.data))
             except Exception as e:
                 print(f"Error connecting signals: {str(e)}")
                 # changed ended here -t.s.
@@ -436,7 +436,7 @@ class InputDock(QWidget):
                 for key_name in t[0]:
                     key_changed = self.input_widget.findChild(QWidget, key_name)
                     print(f"~~finding {key_name} get {key_changed} object {key_changed.objectName()}")
-                    self.on_change_connect(key_changed, updated_list, data, self.backend)                    
+                    self.on_change_connect(key_changed, updated_list, self.data, self.backend)                    
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
         panel_layout.addWidget(scroll_area)
@@ -447,12 +447,12 @@ class InputDock(QWidget):
         btn_button_layout.addStretch(2)
 
         save_input_btn = DockCustomButton("       Save Input        ", ":/vectors/save.svg")
-        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, data, "Save"))
+        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Save"))
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
         design_btn = DockCustomButton("        Design           ", ":/vectors/design.svg")
-        design_btn.clicked.connect(lambda: self.parent.start_thread(data))
+        design_btn.clicked.connect(lambda: self.parent.start_thread(self.data))
         btn_button_layout.addWidget(design_btn)
         btn_button_layout.addStretch(2)
 
@@ -524,43 +524,43 @@ class InputDock(QWidget):
                     arg_list.append(
                         self.input_widget.findChild(QWidget, change_key).currentText())
                 options = f(arg_list)
-                existing_options = data[c_tup[0] + "_customized"]
+                existing_options = self.data[c_tup[0] + "_customized"]
                 if selected == "Customized":
                     if len(c_tup) == 4:
                         disabled_values = c_tup[2]
                         note = c_tup[3]
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
+                    self.data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
                                                                                 disabled_values, note)
-                    if data[c_tup[0] + "_customized"] == []:
-                        # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                    if self.data[c_tup[0] + "_customized"] == []:
+                        # self.data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
                         #                                   if all_values_available not in disabled_values]
-                        data[c_tup[0] + "_customized"] = options
+                        self.data[c_tup[0] + "_customized"] = options
                         key.setCurrentIndex(0)
                 else:
-                    # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
+                    # self.data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f(arg_list)
                     #                                   if all_values_available not in disabled_values]
-                    data[c_tup[0] + "_customized"] = options
+                    self.data[c_tup[0] + "_customized"] = options
 
                     # input = f(arg_list)
-                    # data[c_tup[0] + "_customized"] = input
+                    # self.data[c_tup[0] + "_customized"] = input
             else:
                 options = f()
-                existing_options = data[c_tup[0] + "_customized"]
+                existing_options = self.data[c_tup[0] + "_customized"]
                 if selected == "Customized":
                     if len(c_tup) == 4:
                         disabled_values = c_tup[2]
                         note = c_tup[3]
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
+                    self.data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options,
                                                                                 disabled_values, note)
-                    if data[c_tup[0] + "_customized"] == []:
-                        # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                    if self.data[c_tup[0] + "_customized"] == []:
+                        # self.data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
                         #                               if all_values_available not in disabled_values]
-                        data[c_tup[0] + "_customized"] = options
+                        self.data[c_tup[0] + "_customized"] = options
                         key.setCurrentIndex(0)
                 else:
-                    # data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
+                    # self.data[c_tup[0] + "_customized"] = [all_values_available for all_values_available in f()
                     #                                   if all_values_available not in disabled_values]
-                    data[c_tup[0] + "_customized"] = options
+                    self.data[c_tup[0] + "_customized"] = options
 
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED, disabled_values=None, note=""):
         """
@@ -577,7 +577,7 @@ class InputDock(QWidget):
         return self.ui.get_right_elements()
 
     def on_change_connect(self, key_changed, updated_list, data, backend):
-        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, backend))
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, self.data, backend))
 
     # To update the label and combobox if Connectivity
     def change(self, k1, new, data, main):
@@ -632,7 +632,7 @@ class InputDock(QWidget):
             elif typ == TYPE_COMBOBOX_CUSTOMIZED:
                 print("\n\nCust_Combo")
                 k2.setCurrentIndex(0)
-                data[k2_key + "_customized"] = val
+                self.data[k2_key + "_customized"] = val
             elif typ == TYPE_CUSTOM_MATERIAL:
                 print("\n\nCust_Combo_material")
                 if val:

@@ -7,6 +7,7 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>vectors/AnimateComponent_back.svg</file>
         <file>vectors/Osdag_logo.svg</file>
+        <file>vectors/Osdag.svg</file>
         <file>vectors/FOSSEE_logo.svg</file>
         <file>vectors/IITB_logo.svg</file>
         <file>vectors/ConstructSteel_logo.svg</file>

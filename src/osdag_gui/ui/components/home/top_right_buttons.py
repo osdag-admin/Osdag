@@ -8,6 +8,10 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QSize, QPoint, QPropertyAnimation, QEasingCurve, QTimer, Signal
 from PySide6.QtGui import QIcon, QAction
+from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
+from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
+from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
+from osdag_gui.common_functions import design_examples
 
 # Define colors used in the UI
 OSDAG_GREEN = "#90AF13"
@@ -356,11 +360,11 @@ class DropDownButton(TopButton1):
     A specialized TopButton for "Resources" that opens a dropdown menu on click.
     It inherits the momentary click effect from TopButton.
     """
-    def __init__(self, black_icon_path, white_icon_path, label, parent=None):
+    def __init__(self, black_icon_path, white_icon_path, label, data, parent=None):
         super().__init__(black_icon_path, white_icon_path, label, parent)
-        self.setup_menu()
+        self.setup_menu(data)
 
-    def setup_menu(self):
+    def setup_menu(self, menu_items):
         """
         Sets up the dropdown menu with Osdag-themed styling and actions.
         """
@@ -385,11 +389,20 @@ class DropDownButton(TopButton1):
             }}
         """)
         
-        menu_items = ["Videos", "Osi File", "Documentation", "Databases"]
         for text in menu_items:
             action = QAction(text, self)
-            # Connect each action to a simple print statement for demonstration
-            action.triggered.connect(lambda clicked, t=text: print(f"Resources -> {t} clicked"))
+            if text == "Video Tutorials":
+                action.triggered.connect(lambda: TutorialsDialog().exec())
+            elif text == "Design Examples":
+                action.triggered.connect(design_examples)
+            elif text == "Ask Us a Question":
+                action.triggered.connect(lambda: AskQuestions().exec())
+            elif text == "About Osdag":
+                action.triggered.connect(lambda: AboutOsdagDialog().exec())
+            elif text == "Check For Update":
+                action.triggered.connect(lambda: print("Check For Update Trigger"))
+            elif text == "About Osdag":
+                action.triggered.connect(lambda: AboutOsdagDialog().exec())
             self.menu.addAction(action)
         # Set the menu to the button
         self.set_submenu(self.menu)

@@ -2,6 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QHBoxLayout, QWidget, QTextBrowser, QSizePolicy
 from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtGui import QIcon
 
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 import osdag_gui.resources.resources_rc
@@ -18,6 +19,7 @@ class AboutOsdagDialog(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("AboutOsdagDialog")
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         
         # Set size to match original dialog
         self.setFixedSize(580, 450)

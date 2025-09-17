@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.main_widget_instance = None
-        self.setWindowIcon(QIcon(":/vectors/Osdag_logo.svg"))
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
         screen = QGuiApplication.primaryScreen()
         screen_size = screen.availableGeometry()
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
         self.tab_bar.setExpanding(False)
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.setMovable(False)
-        self.tab_bar.tabCloseRequested.connect(self.close_tab)
+        self.tab_bar.tabCloseRequested.connect(self.handle_close_tab)
         # Custom tab style
         self.tab_bar.setStyleSheet('''
             QTabBar::tab {
@@ -257,7 +257,7 @@ class MainWindow(QMainWindow):
             }
         """)
         self.tab_widget_content = []
-        self.tab_widget.tabCloseRequested.connect(self.close_tab)
+        self.tab_widget.tabCloseRequested.connect(self.handle_close_tab)
         main_v_layout.addWidget(self.tab_widget)
 
         # Connect the QTabBar to custom handler
@@ -317,19 +317,18 @@ class MainWindow(QMainWindow):
         # self.sidebar.raise_() # Ensure sidebar stays on top after new tab addition
 
     def handle_tab_change(self, index):
-        # 1. Switch the QTabWidget to the new tab
-        self.tab_widget.setCurrentIndex(index)
+        # Switch the QTabWidget to the new tab
+        if index < len(self.tab_widget_content) and index >= 0:
+            self.tab_widget.setCurrentIndex(index)
 
-        if len(self.tab_widget_content)>0:
             if self.tab_bar.tabText(index) == "Home":
                 self.tab_widget_content[index][1] = False
             else:
                 self.tab_widget_content[index][1] = True
+                
             current_tab_data = self.tab_widget_content[index]
-            self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-            
             # Update main_widget_instance to the main widget in the current tab
-            body_widget = self.tab_widget_content[index][0]
+            body_widget = current_tab_data[0]
             if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
                 widget_item = body_widget.layout().itemAt(0)
                 if widget_item is not None:
@@ -340,115 +339,98 @@ class MainWindow(QMainWindow):
             if hasattr(body_widget, 'layout'):
                 self.main_widget_layout = body_widget.layout()
 
-        # 2. Update dock icons based on the new tab's state
-        if index < len(self.tab_widget_content):
-            current_tab_data = self.tab_widget_content[index]
+            # Update dock icons based on the new tab's state
             self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-    
-    def update_docking_icons(self, docking_icons_active=None, input_is_active=None, log_is_active=None, output_is_active=None):
-        index = self.tab_bar.currentIndex()
-        current_tab_data = self.tab_widget_content[index]
-        if(docking_icons_active is None):
-            docking_icons_active = current_tab_data[1]
 
-        # Update input dock icon
-        if docking_icons_active:
-            self.input_dock_control.show()
-            self.output_dock_control.show()
-            self.log_dock_control.show()
-            if(input_is_active is not None):
-                self.input_dock_active = input_is_active
-                if self.input_dock_active:
-                    self.input_dock_control.load(":/vectors/input_dock_active.svg")
-                else:
-                    self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
-                            
-            # Update output dock icon
-            if(output_is_active is not None):
-                self.output_dock_active = output_is_active
-                if self.output_dock_active:
-                    self.output_dock_control.load(":/vectors/output_dock_active.svg")
-                else:
-                    self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
 
-            # Update log dock icon
-            if(log_is_active is not None):
-                self.log_dock_active = log_is_active
-                if self.log_dock_active:
-                    self.log_dock_control.load(":/vectors/logs_dock_active.svg")
-                else:
-                    self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
-        else:
-            self.input_dock_control.hide()
-            self.output_dock_control.hide()
-            self.log_dock_control.hide()
-    
     # This is triggered by Quit button in Menu bar on template_page
     def close_current_tab(self):
-        # Ask user for confirmation before closing the current tab.
         current_index = self.tab_bar.currentIndex()
-        tab_title = self.tab_bar.tabText(current_index) if current_index >= 0 else "This"
+        self.handle_close_tab(current_index)
+
+    # General closing function
+    def handle_close_tab(self, index):
+
+        tab_title = self.tab_bar.tabText(index) if index >= 0 else "Module"
         is_last_tab = self.tab_widget.count() == 1
-
-        if is_last_tab:
-            title = "Confirm Exit"
-            message = f"'{tab_title}' is the last tab.\nClosing it will exit Osdag.\nDo you really want to close this tab?"
-        else:
-            title = "Confirm Close Tab"
-            message = f"Do you really want to close the current tab: '{tab_title}'?"
-
-        # Create custom message box
-        msg_box = CustomMessageBox(
-            title=title,
-            text=message,
-            buttons=["Yes", "No"],
-            dialogType=MessageBoxType.Warning,
-        )
-
-        # Show dialog and get result (button text)
-        result = msg_box.exec()
-
-        # Handle result
-        if result == "Yes":
-            if is_last_tab:
-                self.close()  # Close the main window (exit Osdag)
-            else:
-                self.close_tab(current_index)
-
-    def close_tab(self, index):
-        """Handles closing of tabs."""
-        if self.tab_widget.count() > 1:
-            self.tab_widget.removeTab(index)
-            self.tab_bar.removeTab(index)
-            self.tab_widget_content.pop(index)
-            # Adjust current index if the closed tab was the last one
-            if self.tab_widget.currentIndex() == -1 and self.tab_widget.count() > 0:
-                self.tab_widget.setCurrentIndex(self.tab_widget.count() - 1)
-        else:
-            CustomMessageBox(
-                title="Information",
-                text="Cannot close the last tab.",
+        to_save = self._check_design_done(index)
+        
+        if to_save and is_last_tab:
+            result = CustomMessageBox(
+                title="Confirm Exit",
+                text=(
+                    f"'{tab_title}' is the last tab.\n"
+                     "Closing it will exit Osdag.\n"
+                    f"Do you want to save your '{tab_title}' design before closing?"
+                ),
+                buttons=["Save and Exit", "Exit Without Saving", "Cancel"]
+            ).exec()
+            
+            if result == "Save and Exit":
+                # Ask to Save Design!!
+                print("??Save Design")
+                self.close()  # Exit Osdag
+            elif result == "Exit Without Saving":
+                self.close()  # Exit Osdag
+        
+        elif to_save:
+            result = CustomMessageBox(
+                title="Save Design",
+                text=f" Do you want to Save Your '{tab_title}' design before closing?",
                 buttons=["Yes", "No"],
-                dialogType=MessageBoxType.Information,
+                dialogType=MessageBoxType.Warning,
             ).exec()
 
-        if self.tab_widget.count() > 0:
-            current_index = self.tab_widget.currentIndex()
-            body_widget = self.tab_widget_content[current_index][0]
-            if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
-                widget_item = body_widget.layout().itemAt(0)
-                if widget_item is not None:
-                    widget = widget_item.widget()
-                    if widget is not None:
-                        self.main_widget_instance = widget
-            # Show docking Icons
-            self.tab_widget_content[current_index][1] = True
-            # Ensure main_widget_layout points to the currently active tab's layout
-            if hasattr(body_widget, 'layout'):
-                self.main_widget_layout = body_widget.layout()
-            # Update docking icons using the current active tab index (not the closed one)
-            current_tab_data = self.tab_widget_content[current_index]
-            self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+            if result == "Yes":
+                # Ask to Save Design!!
+                print("??Save Design")
+                self._close_tab(index)
+                pass
+
+        elif is_last_tab:
+            result = CustomMessageBox(
+                title="Confirm Exit",
+                text=f"'{tab_title}' is the last tab.\nClosing it will exit Osdag.\nDo you really want to close this tab?",
+                buttons=["Yes", "No"],
+                dialogType=MessageBoxType.Warning,
+            ).exec()
+
+            # Handle result
+            if result == "Yes":
+                self.close()  # Close the main window (exit Osdag)
+        else:
+            self._close_tab(index)
+
+    # Check if design is created in the module or not
+    def _check_design_done(self, index) -> bool:
+        module = self.tab_widget_content[index][0].layout().itemAt(0).widget()
+        if hasattr(module, 'backend'):
+            return module.backend.design_status
+        else:
+            return False
+
+    def _close_tab(self, index):
+        """Handles closing of tabs."""
+        self.tab_widget.removeTab(index)
+        self.tab_bar.removeTab(index)
+        self.tab_widget_content.pop(index)
+        # synchronize with tab_bar
+        self._synchronize_tab_widget()
+        
+    def _synchronize_tab_widget(self):
+        current_index = self.tab_bar.currentIndex()
+        self.tab_widget.setCurrentIndex(current_index)
+        # Update global variables and icons
+        current_tab_data = self.tab_widget_content[current_index]
+        body_widget = current_tab_data[0]
+        if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
+            widget = body_widget.layout().itemAt(0).widget()
+            self.main_widget_instance = widget
+        # Ensure main_widget_layout points to the currently active tab's layout
+        if hasattr(body_widget, 'layout'):
+            self.main_widget_layout = body_widget.layout()
+        # Update docking icons using the current active tab index (not the closed one)
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
 
     # Allow dragging the window when frameless
     def mousePressEvent(self, event):
@@ -494,14 +476,12 @@ class MainWindow(QMainWindow):
         if card_title == "Fin Plate":
             self.open_fin_plate_page()
 
+    #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
+
     def open_fin_plate_page(self):
         title = "Fin Plate Connection"
         self.clear_layout(self.main_widget_layout)
         fin_plate = CustomWindow(title, FinPlateConnection, parent=self)
-
-        # dock icon update trigger signal
-        fin_plate.outputDockIconToggle.connect(self.output_dock_icon_toggle)
-        fin_plate.inputDockIconToggle.connect(self.input_dock_icon_toggle)
 
         self.main_widget_instance = fin_plate
         fin_plate.openNewTab.connect(self.handle_add_tab)
@@ -512,7 +492,7 @@ class MainWindow(QMainWindow):
         self.tab_widget_content[index][1] = True
         current_tab_data = self.tab_widget_content[index]
         self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-
+    
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()
@@ -521,6 +501,8 @@ class MainWindow(QMainWindow):
         home_window.cardOpenClicked.connect(self.handle_card_open_clicked)
         self.main_widget_layout.addWidget(home_window)
 
+    #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
+
     def clear_layout(self, layout):
         while layout.count():
             item = layout.takeAt(0)
@@ -528,27 +510,56 @@ class MainWindow(QMainWindow):
             if widget is not None:
                 widget.setParent(None)
             else:
-                self.clear_layout(item.layout())  
+                self.clear_layout(item.layout())
 
-    def input_dock_icon_toggle(self):
-        self.input_dock_active = not self.input_dock_active
-        self.tab_widget_content[self.tab_bar.currentIndex()][2] = self.input_dock_active
-        if self.input_dock_active:
-            self.input_dock_control.load(":/vectors/input_dock_active.svg")
+    def update_docking_icons(self, docking_icons_active=None, input_is_active=None, log_is_active=None, output_is_active=None):
+        index = self.tab_bar.currentIndex()
+        current_tab_data = self.tab_widget_content[index]
+        if(docking_icons_active is None):
+            docking_icons_active = current_tab_data[1]
+
+        # Update input dock icon
+        if docking_icons_active:
+            self.input_dock_control.show()
+            self.output_dock_control.show()
+            self.log_dock_control.show()
+
+            if(input_is_active is not None):
+                self.input_dock_active = input_is_active
+                # Update and save control state
+                self.tab_widget_content[index][2] = input_is_active
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+                            
+            # Update output dock icon
+            if(output_is_active is not None):
+                self.output_dock_active = output_is_active
+                # Update and save control state
+                self.tab_widget_content[index][4] = output_is_active
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+
+            # Update log dock icon
+            if(log_is_active is not None):
+                self.log_dock_active = log_is_active
+                # Update and save control state
+                self.tab_widget_content[index][3] = log_is_active
+                if self.log_dock_active:
+                    self.log_dock_control.load(":/vectors/logs_dock_active.svg")
+                else:
+                    self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
         else:
-            self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+            self.input_dock_control.hide()
+            self.output_dock_control.hide()
+            self.log_dock_control.hide()
 
     def toggle_input_dock(self):
         if self.main_widget_instance:
             self.main_widget_instance.input_dock_toggle()
-        
-    def output_dock_icon_toggle(self):
-        self.output_dock_active = not self.output_dock_active
-        self.tab_widget_content[self.tab_bar.currentIndex()][4] = self.output_dock_active
-        if self.output_dock_active:
-            self.output_dock_control.load(":/vectors/output_dock_active.svg")
-        else:
-            self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
     
     def toggle_output_dock(self):
         if self.main_widget_instance:
@@ -564,6 +575,9 @@ class MainWindow(QMainWindow):
 
         if self.main_widget_instance:
             self.main_widget_instance.logs_dock_toggle(self.log_dock_active)
+
+    def print_n_test(self):
+        print(self)
 
 if __name__ == "__main__":
     import sys, os

@@ -15,6 +15,7 @@ class AskQuestions(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("AskQuestions")
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         
         # Set fixed size to match the compact design
         self.setFixedSize(320, 140)

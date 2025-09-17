@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (QPushButton, QLabel, QDialog, QGridLayout, QLineE
                                QMainWindow, QApplication, QSizePolicy, QFormLayout, QLayout, QProgressBar,
                                QWidget, QVBoxLayout, QSizeGrip)
 from PySide6.QtCore import (QRect, QMetaObject, QCoreApplication, QSize, QThread, Signal)
-from PySide6.QtGui import Qt, QGuiApplication, QCursor
+from PySide6.QtGui import Qt, QGuiApplication, QCursor, QIcon
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.dialogs.loading_popup import ModernLoadingDialog, DelayThread
@@ -28,6 +28,7 @@ class DesignSummaryPopup(QDialog):
         super().__init__(parent=parent)
         self.design_exist = design_exist
         self.loggermsg = loggermsg
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
     # It is a general function that can set the dialog look similar and in osdag theme with custom Title bar.
     def setupWrapper(self):

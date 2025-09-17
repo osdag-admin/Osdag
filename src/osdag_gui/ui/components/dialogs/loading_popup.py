@@ -1,7 +1,7 @@
 import time
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QDialog, QLabel
 from PySide6.QtCore import Qt, QThread, Signal, QTimer
-from PySide6.QtGui import QPainter, QColor, QPen
+from PySide6.QtGui import QPainter, QColor, QPen, QIcon
 
 class CircularProgressWidget(QLabel):
     def __init__(self, parent=None):
@@ -69,6 +69,7 @@ class ModernLoadingDialog(QDialog):
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setModal(True)
         self.setFixedSize(220, 170)
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         
         # Set up layout

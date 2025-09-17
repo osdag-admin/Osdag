@@ -73,6 +73,7 @@ from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QWidget,QSizeG
                            QTreeWidget, QTreeWidgetItem, QPushButton, QLabel,
                            QCheckBox, QFileDialog)
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QIcon
 
 # ==============================================================================
 # OSDAG IMPORTS - Try to import LaTeX generator
@@ -323,6 +324,7 @@ class ReportCustomizationDialog(QDialog):
         self.parser = LaTeXParser()
         self.filter = LaTeXFilter()
         self.latest_pdf = None
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
         self.init_ui()
         self.load_existing_or_generate_report()
@@ -559,22 +561,23 @@ class ReportCustomizationDialog(QDialog):
             )
 
             print(f"INFO: pdflatex return code: {result.returncode}")
+            print(os.path.exists(pdf_file))
 
             if result.returncode == 0 and os.path.exists(pdf_file):
                 print(f"SUCCESS: PDF generated: {pdf_file}")
                 self.latest_pdf = pdf_file
             else:
-                error_msg = "PDF compilation failed"
+                error_msg = "PDF compilation warning"
                 if result.stderr:
                     error_msg += f"\n\nErrors:\n{result.stderr[:500]}"
                 if result.stdout:
                     error_msg += f"\n\nOutput:\n{result.stdout[:500]}"
                 print(f"ERROR: {error_msg}")
-                CustomMessageBox(
-                    title="Compilation Failed",
-                    text=error_msg,
-                    dialogType=MessageBoxType.Warning
-                ).exec()
+                # CustomMessageBox(
+                #     title="Compilation Failed",
+                #     text=error_msg,
+                #     dialogType=MessageBoxType.Warning
+                # ).exec()
         except subprocess.TimeoutExpired:
             error_msg = "PDF compilation timed out (>30s)\n\nThis might be due to:\n• LaTeX not installed\n• Missing packages\n• Complex LaTeX content"
             print(f"TIMEOUT: {error_msg}")

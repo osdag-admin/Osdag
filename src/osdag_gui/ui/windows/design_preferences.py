@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog
 from PySide6.QtCore import Qt, QRegularExpression
-from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QFontMetrics, QTextCursor, QGuiApplication, QTextCharFormat, QCursor
+from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIcon, QFontMetrics, QTextCursor, QGuiApplication, QTextCharFormat, QCursor
 
 from osdag_core.Common import *
 from osdag_core.utils.common.Section_Properties_Calculator import *
@@ -35,6 +35,7 @@ class Window(QDialog):
         self.do_not_clear_list = []
         self.save_changes_list = []
         self.values_changed = False
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         for t in main.input_dictionary_design_pref():
             self.save_changes_list.extend(t[2])
         self.initUI(main,input_dictionary)

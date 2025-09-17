@@ -28,8 +28,6 @@ from osdag_gui.__config__ import CAD_BACKEND
 
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
-    outputDockIconToggle = Signal()
-    inputDockIconToggle = Signal()
     def __init__(self, title: str, backend: object, parent):
         super().__init__()
         self.parent = parent
@@ -532,8 +530,6 @@ class CustomWindow(QWidget):
     def output_dock_toggle(self):
         self.output_dock.toggle_output_dock()
         self.output_dock_active = not self.output_dock_active
-        # Show/hide output dock label based on dock state
-        # self.output_dock_label.setVisible(self.output_dock_active)
 
     def logs_dock_toggle(self, log_dock_active):
         self.logs_dock.setVisible(log_dock_active)
@@ -1080,7 +1076,6 @@ class CustomWindow(QWidget):
         output_dock = self.splitter.widget(n - 1)
         
         if dock == 'input':
-            # self.inputDockIconToggle.emit()
             if show:
                 target_sizes[0] = input_dock.sizeHint().width()
                 self.input_dock_label.setVisible(False)
@@ -1091,7 +1086,6 @@ class CustomWindow(QWidget):
             remaining_width = total_width - target_sizes[0] - target_sizes[2]
             target_sizes[1] = max(0, remaining_width)
         else:
-            # self.outputDockIconToggle.emit()
             if show:
                 target_sizes[2] = output_dock.sizeHint().width()
                 self.output_dock_label.setVisible(False)
@@ -1271,6 +1265,10 @@ class CustomWindow(QWidget):
                     except Exception:
                         if hasattr(self, 'logs_dock'):
                             self.logs_dock.setVisible(True)
+                    
+                    # Update logs dock control icon
+                    if hasattr(self.parent, 'update_docking_icons'):
+                        self.parent.update_docking_icons(log_is_active=True)
 
                 def hide_input():
                     try:

@@ -17,7 +17,7 @@ class OsdagLaunchScreen(object):
         MainWindow.resize(610, 400)
         MainWindow.setWindowFlags(Qt.FramelessWindowHint)
         MainWindow.setAttribute(Qt.WA_TranslucentBackground)
-        MainWindow.setWindowIcon(QIcon(":/vectors/Osdag_logo.svg"))
+        MainWindow.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")

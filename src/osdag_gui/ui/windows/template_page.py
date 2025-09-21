@@ -23,15 +23,22 @@ from osdag_gui.common_functions import design_examples
 from osdag_core.Common import *
 from osdag_gui.ui.windows.design_preferences import DesignPreferences
 from osdag_core.cad.common_logic import CommonDesignLogic
+from osdag_gui.data.database.database_config import insert_recent_module
 
 from osdag_gui.__config__ import CAD_BACKEND
 
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
-    def __init__(self, title: str, backend: object, parent):
+    def __init__(self, title: str, backend: object, parent, saved=False):
         super().__init__()
         self.parent = parent
         self.backend = backend()
+
+        # Update recent Modules
+        insert_recent_module(self.backend.module_name())
+        # State to retain state saved or not
+        self.saved = saved
+
         self.current_tab_index = 0
         self.design_pref_inputs = {}
         self.prev_inputs = {}

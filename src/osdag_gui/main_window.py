@@ -30,6 +30,19 @@ class MainWindow(QMainWindow):
         self.main_widget_instance = None
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
+        # Apply global QToolTip stylesheet here
+        QApplication.instance().setStyleSheet("""
+            QToolTip {
+                background-color: #FFFFFF;
+                color: #000000;
+                border: 1px solid #90AF13;
+                padding: 2px 2px;
+                font-size: 10px;
+                border-radius: 0px;
+                qproperty-alignment: AlignVCenter;
+            }
+        """)
+
         screen = QGuiApplication.primaryScreen()
         screen_size = screen.availableGeometry()
 

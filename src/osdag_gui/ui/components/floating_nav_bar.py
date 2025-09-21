@@ -155,20 +155,6 @@ class SidebarWidget(QWidget):
         self.layout.addWidget(self.button_container, alignment=Qt.AlignCenter)
         self.update_sidebar_size()
 
-        # Apply global QToolTip stylesheet here
-        QApplication.instance().setStyleSheet("""
-            QToolTip {
-                background-color: #FFFFFF;
-                color: #000000;
-                border: 1px solid #90AF13;
-                padding: 2px 2px;
-                font-size: 10px;
-                border-radius: 0px;
-                qproperty-alignment: AlignVCenter;
-            }
-        """)
-
-
     def update_sidebar_size(self):
         num_buttons = len(self.button_group)
         margin = SidebarIconButton.BUTTON_MARGIN

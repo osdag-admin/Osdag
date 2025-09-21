@@ -106,38 +106,3 @@ class Data:
         ),
     ]
 
-    Projects = [
-        {"submodule_name": "Cleat Angle", "last_used": "04-06-2025", "project_name": "ProjectA_R01_MB350-MB400_CleatAngle"},
-        {"submodule_name": "End Plate", "last_used": "03-06-2025", "project_name": "ProjectB_R01_MB300-MB350_EndPlate"},
-        {"submodule_name": "Fin Plate", "last_used": "02-06-2025", "project_name": "ProjectC_R01_MB250-MB300_FinPlate"},
-        {"submodule_name": "Welded Connection", "last_used": "01-06-2025", "project_name": "ProjectD_R01_MB200-MB250_WeldedConnection"},
-        {"submodule_name": "Base Plate", "last_used": "31-05-2025", "project_name": "ProjectE_R01_MB150-MB200_BasePlate"},
-        {"submodule_name": "Moment Connection", "last_used": "30-05-2025", "project_name": "ProjectF_R01_MB100-MB150_MomentConnection"},
-        {"submodule_name": "Splice Plate", "last_used": "29-05-2025", "project_name": "ProjectG_R01_MB50-MB100_SplicePlate"},
-        {"submodule_name": "Bracket", "last_used": "28-05-2025", "project_name": "ProjectH_R01_MB0-MB50_Bracket"},
-        {"submodule_name": "Gusset Plate", "last_used": "27-05-2025", "project_name": "ProjectI_R01_MB-50-MB0_GussetPlate"},
-        {"submodule_name": "Stiffener", "last_used": "26-05-2025", "project_name": "ProjectJ_R01_MB-100-MB-50_Stiffener"},
-        {"submodule_name": "Cleat Angle", "last_used": "25-05-2025", "project_name": "ProjectK_R01_MB-150-MB-100_CleatAngle"},
-        {"submodule_name": "End Plate", "last_used": "24-05-2025", "project_name": "ProjectL_R01_MB-200-MB-150_EndPlate"},
-        {"submodule_name": "Fin Plate", "last_used": "23-05-2025", "project_name": "ProjectM_R01_MB-250-MB-200_FinPlate"},
-    ]
-    Modules = [
-        {"module_name": "Connections", "date_created": "04-06-2025", "submodule_name": "Endplate Connection "},
-        {"module_name": "Connections", "date_created": "04-06-2025", "submodule_name": "Endplate Connection"},
-        {"module_name": "Tension Member", "date_created": "04-06-2025", "submodule_name": "Bolted Tension Member"},
-        {"module_name": "Beam Design", "date_created": "03-06-2025", "submodule_name": "Simply Supported Beam"},
-        {"module_name": "Column Design", "date_created": "02-06-2025", "submodule_name": "Axially Loaded Column"},
-        {"module_name": "Plate Girder", "date_created": "01-06-2025", "submodule_name": "Welded Plate Girder"},
-        {"module_name": "Base Plate", "date_created": "31-05-2025", "submodule_name": "Moment Base Plate"},
-        {"module_name": "Truss Design", "date_created": "30-05-2025", "submodule_name": "2D Truss Analysis"},
-        {"module_name": "Bracing", "date_created": "29-05-2025", "submodule_name": "Lateral Bracing System"},
-        {"module_name": "Portal Frame", "date_created": "28-05-2025", "submodule_name": "Single Bay Portal"},
-        {"module_name": "Composite Beam", "date_created": "27-05-2025", "submodule_name": "Slab Composite Beam"},
-    ]
-
-    def recent_projects(self):
-        return self.Projects
-    
-    def recent_modules(self):
-        return self.Modules
-

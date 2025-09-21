@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QIcon
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
+from osdag_gui.data.database.database_config import refactor_database, create_user_database
 import sys
 
 class LoadingThread(QThread):
@@ -14,6 +15,10 @@ class LoadingThread(QThread):
     def run(self):
         import time
         self.create_sqlite()
+        # Create user database if not exist
+        create_user_database()
+        # Clean up user database to ensure 10 records and atmost 60 days older with path exist
+        refactor_database()
         time.sleep(5)
         self.finished.emit()
 

@@ -91,6 +91,9 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/msg_warning.svg</file>
         <file>vectors/msg_success.svg</file>
 
+        <file>vectors/no_projects_light.svg</file>
+        <file>vectors/no_modules_light.svg</file>
+
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>
 

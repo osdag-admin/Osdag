@@ -10,12 +10,12 @@ from PySide6.QtWidgets import (
     QMenu, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect
 )
 from PySide6.QtCore import Qt, QSize, QPoint, Signal, QPropertyAnimation, QEasingCurve
-from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QCursor, QPainter, QAction, QFontMetrics
+from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QCursor, QPainter, QPixmap, QFontMetrics
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 
 import osdag_gui.resources.resources_rc
-from osdag_gui.data.ui_data import Data
+from osdag_gui.data.database.database_config import *
 
 # --- SVG Widget with Theme Support ---
 class ThemedSvgWidget(QSvgWidget):
@@ -191,9 +191,11 @@ class ProjectItem(QFrame):
             }
             #projectName{
                 color: #1a202c;
+                font-size: 13px;
             }
-            #projectFullName{
+            #submoduleName, #dateLabel{
                 color: #718096;
+                font-size: 11px;
             }
         """)
         self.setupUI()
@@ -242,40 +244,63 @@ class ProjectItem(QFrame):
                 font-size: 16px;
             }
         """)
+        info_layout.addWidget(number_label)
+
 
         # Project details
         details_layout = QVBoxLayout()
         details_layout.setSpacing(1)
-        
-        project_name_label = QLabel(self.project_data["project_name"])
-        project_name_label.setObjectName("projectName")
-        project_name_label.setWordWrap(True)
-        project_name_label.setContentsMargins(2, 2, 2, 2)  # NEW
-        project_name_label.setMinimumHeight(10) 
-        
+
         # Truncate long project names
-        project_full_text = self.project_data["submodule_name"]
-        if len(project_full_text) > 35:  # Reduced from 40
-            project_full_text = project_full_text[:32] + "..."
+        project_name = self.project_data[PROJECT_NAME]
+        short_project_name = project_name
+        if len(project_name) > 30:
+            short_project_name = short_project_name[:30] + "..."
         
-        project_full_label = QLabel(project_full_text)
-        project_full_label.setObjectName("projectFullName")
-        project_full_label.setWordWrap(True)
-        project_full_label.setContentsMargins(2, 2, 2, 2)
-        project_full_label.setMinimumHeight(18)
-        
+        project_name_label = QLabel(short_project_name)
+        project_name_label.setObjectName("projectName")
+        if len(project_name) > 30:
+            project_name_label.setToolTip(project_name)
+        project_name_label.setStyleSheet("""
+            QToolTip {
+                background-color: #FFFFFF;
+                color: #000000;
+                border: 1px solid #90AF13;
+                padding: 2px 2px;
+                font-size: 10px;
+                border-radius: 0px;
+                qproperty-alignment: AlignVCenter;
+            }
+        """)
+        project_name_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        project_name_label.setWordWrap(True)
+        project_name_label.setContentsMargins(2, 2, 2, 2)
+        project_name_label.setMinimumHeight(18) 
         details_layout.addWidget(project_name_label)
-        details_layout.addWidget(project_full_label)
+        
+        sub_detail_layout = QHBoxLayout()
+        sub_detail_layout.setSpacing(0)
+        sub_detail_layout.setContentsMargins(2, 0, 20, 0)
+
+        # Truncate long project names
+        submodule = self.project_data[RELATED_SUBMODULE]
+        if len(submodule) > 24:
+            submodule = submodule[:24] + "..."
+        
+        submodule_label = QLabel(submodule)
+        submodule_label.setObjectName("submoduleName")
+        submodule_label.setContentsMargins(1, 1, 1, 1)
+        submodule_label.setMinimumHeight(18)
+        sub_detail_layout.addWidget(submodule_label)
         
         # Date label
-        date_label = QLabel(self.project_data["last_used"])
+        date_label = QLabel(self.project_data[LAST_EDITED])
         date_label.setObjectName("dateLabel")
         date_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
-        
-        info_layout.addWidget(number_label)
+        sub_detail_layout.addWidget(date_label)
+
+        details_layout.addLayout(sub_detail_layout)        
         info_layout.addLayout(details_layout)
-        info_layout.addStretch()
-        info_layout.addWidget(date_label)
         
         layout.addLayout(info_layout)
         
@@ -290,11 +315,12 @@ class ProjectItem(QFrame):
         # Buttons with FULL visibility
         self.generate_btn = QPushButton("Generate Report")
         self.download_btn = QPushButton("Download OSI")
-        self.open_btn = QPushButton("Open project")
+        self.open_btn = QPushButton("Open Folder")
         
         # GUARANTEED full visibility styling
         for btn in [self.generate_btn, self.download_btn, self.open_btn]:
             btn.setFixedHeight(25)  # Slightly smaller
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setStyleSheet("""
                 QPushButton {
                     background-color: #ffffff ;
@@ -382,13 +408,11 @@ class ModuleItem(QFrame):
             }
             #moduleName {
                 color: #1a202c;
+                font-size: 13px;
             }
-            #subModuleLabel {
+            #subModuleLabel, #dateLabel {
                 color: #718096;
-            }
-            #dateLabel {
-                color: #a0aec0;
-                font-weight: 500;
+                font-size: 11px;
             }
         """)
         self.setupUI()
@@ -412,8 +436,8 @@ class ModuleItem(QFrame):
         self.setObjectName("moduleItem")
         self.setFixedHeight(55)
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 8, 12, 8)
-        layout.setSpacing(12)
+        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setSpacing(8)
         
         # Icon with proper SVG handling
         icon_label = QLabel()
@@ -429,32 +453,32 @@ class ModuleItem(QFrame):
         # Create icon using the svg to icon function
         icon = QIcon(icon_path).pixmap(QSize(16, 16))
         icon_label.setPixmap(icon)
-        
+        layout.addWidget(icon_label)
+
         # Module details
         details_layout = QVBoxLayout()
         details_layout.setSpacing(2)
         
-        module_name_label = EllipsisLabel(self.module_data["submodule_name"])
+        module_name_label = EllipsisLabel(self.module_data[RELATED_SUBMODULE])
         module_name_label.setObjectName("moduleName")
-        module_name_label.setFont(QFont("Segoe UI", 11, QFont.Weight.Medium))
         details_layout.addWidget(module_name_label)
         
-        if self.module_data.get("module_name"):
-            sub_module_label = EllipsisLabel(self.module_data["module_name"])
-            sub_module_label.setObjectName("subModuleLabel")
-            sub_module_label.setFont(QFont("Segoe UI", 8, QFont.Weight.Normal))
-            details_layout.addWidget(sub_module_label)
+        sub_detail_layout = QHBoxLayout()
+        sub_detail_layout.setSpacing(0)
+        sub_detail_layout.setContentsMargins(0, 0, 0, 0)
+
+        sub_module_label = EllipsisLabel(self.module_data[RELATED_MODULE])
+        sub_module_label.setObjectName("subModuleLabel")
+        sub_detail_layout.addWidget(sub_module_label)
         
         # Date label
-        date_label = QLabel(self.module_data["date_created"])
+        date_label = QLabel(self.module_data[LAST_OPENED])
         date_label.setObjectName("dateLabel")
         date_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
-        date_label.setFont(QFont("Segoe UI", 9, QFont.Weight.Normal))
-        
-        layout.addWidget(icon_label)
+        sub_detail_layout.addWidget(date_label)
+
+        details_layout.addLayout(sub_detail_layout)
         layout.addLayout(details_layout)
-        layout.addStretch()
-        layout.addWidget(date_label)
 
 class SectionWidget(QFrame):
     def __init__(self, title, items, is_project=True, main_window=None):
@@ -566,6 +590,28 @@ class SectionWidget(QFrame):
                 item_widget = ModuleItem(item, is_dark)
             vbox.addWidget(item_widget)
         
+        if len(self.items) == 0:
+            vbox.addStretch()
+            container.setStyleSheet("""
+                QWidget#scrollContainer {
+                    background: #f8f9fa;
+                    border: 1px solid #e2e8f0;
+                    margin: 2px 4px 6px 4px;
+                    border-radius: 10px;
+                }
+            """)
+            path = ''
+            if self.is_project:
+                path = ":/vectors/no_projects_light.svg"
+            else:
+                path = ":/vectors/no_modules_light.svg"
+            empty_label = QSvgWidget(path)
+            hlayout = QHBoxLayout()
+            hlayout.addStretch()
+            hlayout.addWidget(empty_label)
+            hlayout.addStretch()
+            vbox.addLayout(hlayout)
+        
         vbox.addStretch()
 
         scroll.setWidget(container)
@@ -643,10 +689,10 @@ class HomeWidget(QWidget):
 
         sections_layout = QHBoxLayout()
         sections_layout.setSpacing(30)
-        # --- Add more dummy data for scroll testing ---
-        data = Data()
-        projects = data.recent_projects()
-        modules = data.recent_modules()
+        
+        # Fetch recents data from database
+        projects = fetch_all_recent_projects()
+        modules = fetch_all_recent_modules()
 
         self.recent_projects = SectionWidget("Recent Projects", projects, is_project=True, main_window=self)
         self.recent_modules = SectionWidget("Recently Used Modules", modules, is_project=False, main_window=self)

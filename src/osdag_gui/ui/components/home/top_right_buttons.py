@@ -12,6 +12,7 @@ from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
 from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
 from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
 from osdag_gui.common_functions import design_examples
+from osdag_gui.update_gui import UpdateDialog
 
 # Define colors used in the UI
 OSDAG_GREEN = "#90AF13"
@@ -400,7 +401,7 @@ class DropDownButton(TopButton1):
             elif text == "About Osdag":
                 action.triggered.connect(lambda: AboutOsdagDialog().exec())
             elif text == "Check For Update":
-                action.triggered.connect(lambda: print("Check For Update Trigger"))
+                action.triggered.connect(lambda: UpdateDialog().exec())
             elif text == "About Osdag":
                 action.triggered.connect(lambda: AboutOsdagDialog().exec())
             self.menu.addAction(action)

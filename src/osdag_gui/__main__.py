@@ -65,7 +65,7 @@ class LaunchScreenPopup(QMainWindow):
         if self.on_finish:
             self.on_finish()
 
-def main():
+def GUI():
     app = QApplication(sys.argv)
 
     def show_main_window():
@@ -106,13 +106,13 @@ Examples:\n
             )
 
 @click.pass_context
-def osdag_cli(ctx):
+def main(ctx):
     if ctx.invoked_subcommand is None:
-        main()
+        GUI()
 
 
 # --- CLI group ---
-@osdag_cli.group(help="\nRun in CLI mode (use subcommands like 'run').\n",
+@main.group(help="\nRun in CLI mode (use subcommands like 'run').\n",
             epilog=help_msg,
             context_settings=dict(help_option_names=['-h', '--help']),
             )
@@ -153,4 +153,4 @@ def run(input_path, op_type, output_path):
 
 
 if __name__ == "__main__":
-    osdag_cli()
+    main()

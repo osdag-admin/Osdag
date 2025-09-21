@@ -115,7 +115,7 @@ def _save_to_pdf(module_class:Main, output_file:Path):
         'JobNumber': '123', 
         'AdditionalComments': 'No comments', 
         'Client': 'LoremIpsum', 
-        'input_filename': f'{output_file}', 
+        'filename': f'{output_file}', 
         'does_design_exist': True, 
         'logger_messages': ''
         }

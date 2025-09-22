@@ -320,7 +320,7 @@ class ReportCustomizationDialog(QDialog):
         self.latex_content = None
         self.temp_dir = None
         self.setModal(True)
-        self.resize(1000, 700)        # Initialize components
+        self.resize(int(600), int(550))
         self.parser = LaTeXParser()
         self.filter = LaTeXFilter()
         self.latest_pdf = None

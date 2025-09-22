@@ -11,3 +11,5 @@ def design_examples(self):
                 subprocess.call(["open", full_path])
             else:  # Linux and others
                 subprocess.call(["xdg-open", full_path])
+
+                

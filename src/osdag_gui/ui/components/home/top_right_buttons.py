@@ -391,20 +391,89 @@ class DropDownButton(TopButton1):
         """)
         
         for text in menu_items:
-            action = QAction(text, self)
-            if text == "Video Tutorials":
-                action.triggered.connect(lambda: TutorialsDialog().exec())
-            elif text == "Design Examples":
-                action.triggered.connect(design_examples)
-            elif text == "Ask Us a Question":
-                action.triggered.connect(lambda: AskQuestions().exec())
-            elif text == "About Osdag":
-                action.triggered.connect(lambda: AboutOsdagDialog().exec())
-            elif text == "Check For Update":
-                action.triggered.connect(lambda: UpdateDialog().exec())
-            elif text == "About Osdag":
-                action.triggered.connect(lambda: AboutOsdagDialog().exec())
-            self.menu.addAction(action)
+            if text == "Databases (IS:808)":
+                # Create a submenu
+                db_menu = QMenu("Databases (IS:808)", self)
+                db_menu.setStyleSheet(f"""
+                    QMenu {{
+                        background: #fff;
+                        border: 1px solid {OSDAG_GREEN};
+                        font-size: 14px;
+                        padding: 0px;
+                    }}
+                    QMenu::item {{
+                        padding: 8px 16px;
+                        color: #333;
+                        border: none;
+                        margin: 1px;
+                    }}
+                    QMenu::item:selected {{
+                        background: {OSDAG_GREEN};
+                        color: #fff;
+                        border-radius: 2px;
+                    }}
+                """)
+                sub_items = ["Column", "Beam", "Angle", "Channel"]
+                for sub in sub_items:
+                    sub_action = QAction(sub, self)
+                    if sub == "Column":
+                        sub_action.triggered.connect(lambda: print("Import clicked"))
+                    elif sub == "Beam":
+                        sub_action.triggered.connect(lambda: print("Export clicked"))
+                    elif sub == "Angle":
+                        sub_action.triggered.connect(lambda: print("Manage clicked"))
+                    elif sub == "Channel":
+                        sub_action.triggered.connect(lambda: print("Manage clicked"))
+                    db_menu.addAction(sub_action)
+                self.menu.addMenu(db_menu)
+
+            elif text == "Custom Database":
+                # Create a submenu
+                cdb_menu = QMenu("Custom Database", self)
+                cdb_menu.setStyleSheet(f"""
+                    QMenu {{
+                        background: #fff;
+                        border: 1px solid {OSDAG_GREEN};
+                        font-size: 14px;
+                        padding: 0px;
+                    }}
+                    QMenu::item {{
+                        padding: 8px 16px;
+                        color: #333;
+                        border: none;
+                        margin: 1px;
+                    }}
+                    QMenu::item:selected {{
+                        background: {OSDAG_GREEN};
+                        color: #fff;
+                        border-radius: 2px;
+                    }}
+                """)
+                sub_items = ["Download xlsx", "Import xlsx"]
+                for sub in sub_items:
+                    sub_action = QAction(sub, self)
+                    if sub == "Download xlsx":
+                        sub_action.triggered.connect(lambda: print("Import clicked"))
+                    elif sub == "Import xlsx":
+                        sub_action.triggered.connect(lambda: print("Export clicked"))
+                    cdb_menu.addAction(sub_action)
+                self.menu.addMenu(cdb_menu)
+
+            else:
+                action = QAction(text, self)
+                if text == "Video Tutorials":
+                    action.triggered.connect(lambda: TutorialsDialog().exec())
+                elif text == "Design Examples":
+                    action.triggered.connect(design_examples)
+                elif text == "Ask Us a Question":
+                    action.triggered.connect(lambda: AskQuestions().exec())
+                elif text == "About Osdag":
+                    action.triggered.connect(lambda: AboutOsdagDialog().exec())
+                elif text == "Check For Update":
+                    action.triggered.connect(lambda: UpdateDialog().exec())
+                elif text == "About Osdag":
+                    action.triggered.connect(lambda: AboutOsdagDialog().exec())
+                self.menu.addAction(action)
         # Set the menu to the button
         self.set_submenu(self.menu)
 

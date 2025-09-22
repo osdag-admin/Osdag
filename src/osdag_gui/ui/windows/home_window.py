@@ -113,7 +113,10 @@ class FadeWidget(QWidget):
         super().paintEvent(event)
 
 class HomeWindow(QWidget):
+    openProject = Signal(dict)
+    openModule = Signal(str)
     cardOpenClicked = Signal(str)  # Signal to propagate upward
+    triggerLoadOsi = Signal()
     def __init__(self):
         super().__init__()
         self.setStyleSheet("")
@@ -187,6 +190,9 @@ class HomeWindow(QWidget):
                 button = DropDownButton(black_icon, white_icon, label, submenu_data)
             else:
                 button = TopButton(black_icon, white_icon, label)
+
+            if label.strip() == "Import":
+                button.clicked.connect(lambda checked=False: self.triggerLoadOsi.emit())
             
             self.buttons.append(button)
             self.button_group.addButton(button, i) # Add button to the group with an ID
@@ -363,14 +369,8 @@ class HomeWindow(QWidget):
         self._reset_primary_menu_style()
         self._reset_secondary_menu_style()
 
-        if not self.secondary_menu_hidden:
-            self.show_home()
-
         if name == 'Home':
-            self._clear_layout(self.svg_card_layout)
-            self.primary_menu_container.hide()
-            home_widget = HomeWidget()
-            self.svg_card_layout.addWidget(home_widget)
+            self.show_home()
 
         elif isinstance(menu_bar_data, list):
             # zero level menu bar
@@ -425,6 +425,8 @@ class HomeWindow(QWidget):
         self._clear_layout(self.svg_card_layout)
         self.primary_menu_container.hide()
         home_widget = HomeWidget()
+        home_widget.openProject.connect(self.openProject)
+        home_widget.openModule.connect(self.openModule)
         self.svg_card_layout.addWidget(home_widget)
 
     def menu_trigger(self, data, clicked_button=None):

@@ -2,11 +2,11 @@
 Home widget for Osdag GUI.
 Displays recent projects, modules, and search bar.
 """
-import sys
+import sys, shutil
 import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QScrollArea, QFrame, QLineEdit, QPushButton, QButtonGroup,
+    QScrollArea, QFrame, QLineEdit, QPushButton, QFileDialog,
     QMenu, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect
 )
 from PySide6.QtCore import Qt, QSize, QPoint, Signal, QPropertyAnimation, QEasingCurve
@@ -15,6 +15,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 
 import osdag_gui.resources.resources_rc
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.data.database.database_config import *
 
 # --- SVG Widget with Theme Support ---
@@ -167,6 +168,7 @@ class SearchBarWidget(QWidget):
 
 # --- Project Item Widget ---
 class ProjectItem(QFrame):
+    openProject = Signal(dict)
     def __init__(self, project_data, index):
         super().__init__()
         self.project_data = project_data
@@ -272,7 +274,6 @@ class ProjectItem(QFrame):
                 qproperty-alignment: AlignVCenter;
             }
         """)
-        project_name_label.setCursor(Qt.CursorShape.PointingHandCursor)
         project_name_label.setWordWrap(True)
         project_name_label.setContentsMargins(2, 2, 2, 2)
         project_name_label.setMinimumHeight(18) 
@@ -314,8 +315,12 @@ class ProjectItem(QFrame):
         
         # Buttons with FULL visibility
         self.generate_btn = QPushButton("Generate Report")
+
         self.download_btn = QPushButton("Download OSI")
-        self.open_btn = QPushButton("Open Folder")
+        self.download_btn.clicked.connect(lambda checked=False, record=self.project_data: self.handle_download_osi(record))
+
+        self.open_btn = QPushButton("Open Project")
+        self.open_btn.clicked.connect(lambda checked=False, record=self.project_data: self.openProject.emit(record))
         
         # GUARANTEED full visibility styling
         for btn in [self.generate_btn, self.download_btn, self.open_btn]:
@@ -352,6 +357,56 @@ class ProjectItem(QFrame):
         self.expand_animation = QPropertyAnimation(self, b"maximumHeight")
         self.expand_animation.setDuration(250)
         self.expand_animation.setEasingCurve(QEasingCurve.OutCubic)
+
+    def handle_download_osi(self, record: dict):
+        # Ask user for save location
+        src_path = record.get(PROJECT_PATH)
+        if not src_path or not os.path.exists(src_path):
+            CustomMessageBox(
+                title="Error",
+                text="Project file not found.",
+                dialogType=MessageBoxType.Critical
+            ).exec()
+            return
+
+        # Suggest a default filename
+        default_name = os.path.basename(src_path) if src_path else "project.osi"
+        save_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save OSI File",
+            default_name,
+            "Osdag Project Files (*.osi);;All Files (*)"
+        )
+        if save_path:
+            try:
+                shutil.copy2(src_path, save_path)
+                CustomMessageBox(
+                    title="Success",
+                    text=f"Project saved to:\n{save_path}",
+                    dialogType=MessageBoxType.Success
+                ).exec()
+                
+                # Open the directory containing the saved file
+                folder = os.path.dirname(save_path)
+                if folder and os.path.exists(folder):
+                    try:
+                        if sys.platform == 'win32':
+                            os.startfile(folder)
+                        elif sys.platform == 'darwin':
+                            import subprocess
+                            subprocess.run(['open', folder])
+                        else:
+                            import subprocess
+                            subprocess.run(['xdg-open', folder])
+                    except Exception as e:
+                        print(f"Failed to open folder: {e}")
+
+            except Exception as e:
+                CustomMessageBox(
+                    title="Error",
+                    text=f"Failed to save file:\n{e}",
+                    dialogType=MessageBoxType.Critical
+                ).exec()
 
     def enterEvent(self, event):
         if not self.is_expanded:
@@ -391,10 +446,12 @@ class ProjectItem(QFrame):
         super().leaveEvent(event)
 
 class ModuleItem(QFrame):
+    openModule = Signal(str) # Module Key
     def __init__(self, module_data, is_dark_mode):
         super().__init__()
         self.module_data = module_data
         self.is_dark_mode = is_dark_mode
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setStyleSheet("""
             #moduleItem {
                 background: #f8f9fa;
@@ -479,8 +536,16 @@ class ModuleItem(QFrame):
 
         details_layout.addLayout(sub_detail_layout)
         layout.addLayout(details_layout)
+    
+    # Mouse Press Event
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.openModule.emit(self.module_data.get(MODULE_KEY))
+        return super().mousePressEvent(event)
 
 class SectionWidget(QFrame):
+    openProject = Signal(dict)
+    openModule = Signal(str)
     def __init__(self, title, items, is_project=True, main_window=None):
         super().__init__()
         self.main_window = main_window
@@ -585,9 +650,11 @@ class SectionWidget(QFrame):
         for i, item in enumerate(self.items, 1):
             if self.is_project:
                 item_widget = ProjectItem(item, i)
+                item_widget.openProject.connect(self.openProject)
             else:
                 is_dark = self.main_window.is_dark_mode if self.main_window else False
                 item_widget = ModuleItem(item, is_dark)
+                item_widget.openModule.connect(self.openModule)
             vbox.addWidget(item_widget)
         
         if len(self.items) == 0:
@@ -656,6 +723,8 @@ class EllipsisLabel(QLabel):
         super().setText(elided)
 
 class HomeWidget(QWidget):
+    openProject = Signal(dict)
+    openModule = Signal(str)
     def __init__(self):
         super().__init__()
         self.selected_item = None
@@ -695,7 +764,9 @@ class HomeWidget(QWidget):
         modules = fetch_all_recent_modules()
 
         self.recent_projects = SectionWidget("Recent Projects", projects, is_project=True, main_window=self)
+        self.recent_projects.openProject.connect(self.openProject)
         self.recent_modules = SectionWidget("Recently Used Modules", modules, is_project=False, main_window=self)
+        self.recent_modules.openModule.connect(self.openModule)
         sections_layout.addStretch(1)
         sections_layout.addWidget(self.recent_projects, alignment=Qt.AlignCenter)
         sections_layout.addWidget(self.recent_modules, alignment=Qt.AlignCenter)

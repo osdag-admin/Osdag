@@ -84,13 +84,13 @@ class Data:
             ":/vectors/info_default.svg",
             ":/vectors/info_hover.svg",
             "   Info",
-            ["Ask Us a Question", "About Osdag", "Check For Update"]
+            ["About Osdag", "Ask Us a Question", "Check For Update"]
         ),
         (
             ":/vectors/resources_default.svg",
             ":/vectors/resources_hover.svg",
             "Resources",
-            ["Video Tutorials", "Osi File", "Design Examples", "Databases"]
+            ["Video Tutorials", "Osi File", "Design Examples", "Databases (IS:808)", "Custom Database"]
         ),
         (
             ":/vectors/plugin_default.svg",

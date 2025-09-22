@@ -8,9 +8,10 @@ from PySide6.QtWidgets import QMainWindow
 from PySide6.QtCore import QThread, Signal
 
 import sys
-import os
+import os, yaml
+from pathlib import Path
 from PySide6.QtWidgets import (
-    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
+    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout, QFileDialog,
     QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup, QTabBar, QTabWidget,
 )
 from PySide6.QtSvgWidgets import QSvgWidget
@@ -22,14 +23,19 @@ from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 
+from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_project_path, delete_project_record
+
+from osdag_gui.data.database.database_config import get_module_function
+from osdag_core.Common import *
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.main_widget_instance = None
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
-
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         # Apply global QToolTip stylesheet here
         QApplication.instance().setStyleSheet("""
             QToolTip {
@@ -367,6 +373,7 @@ class MainWindow(QMainWindow):
         tab_title = self.tab_bar.tabText(index) if index >= 0 else "Module"
         is_last_tab = self.tab_widget.count() == 1
         to_save = self._check_design_done(index)
+        module = self._get_template_instance(index)
         
         if to_save and is_last_tab:
             result = CustomMessageBox(
@@ -376,15 +383,17 @@ class MainWindow(QMainWindow):
                      "Closing it will exit Osdag.\n"
                     f"Do you want to save your '{tab_title}' design before closing?"
                 ),
-                buttons=["Save and Exit", "Exit Without Saving", "Cancel"]
+                buttons=["Save and Exit", "Exit Without Saving"]
             ).exec()
             
             if result == "Save and Exit":
-                # Ask to Save Design!!
-                print("??Save Design")
-                self.close()  # Exit Osdag
+                # Call Save Function
+                module.saveDesign_inputs()
+                # Exit Osdag
+                self.close()
             elif result == "Exit Without Saving":
-                self.close()  # Exit Osdag
+                # Exit Osdag
+                self.close()
         
         elif to_save:
             result = CustomMessageBox(
@@ -395,10 +404,12 @@ class MainWindow(QMainWindow):
             ).exec()
 
             if result == "Yes":
-                # Ask to Save Design!!
-                print("??Save Design")
+                # Call Save Function
+                module.saveDesign_inputs()
                 self._close_tab(index)
-                pass
+            elif result == "No":
+                # Close Tab
+                self._close_tab(index)
 
         elif is_last_tab:
             result = CustomMessageBox(
@@ -416,11 +427,14 @@ class MainWindow(QMainWindow):
 
     # Check if design is created in the module or not
     def _check_design_done(self, index) -> bool:
-        module = self.tab_widget_content[index][0].layout().itemAt(0).widget()
+        module = self._get_template_instance(index)
         if hasattr(module, 'backend'):
             return module.backend.design_status
         else:
             return False
+    
+    def _get_template_instance(self, index) -> object:
+        return self.tab_widget_content[index][0].layout().itemAt(0).widget()
 
     def _close_tab(self, index):
         """Handles closing of tabs."""
@@ -509,10 +523,109 @@ class MainWindow(QMainWindow):
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()
+        home_window.triggerLoadOsi.connect(self.common_osi_load)
+        home_window.openProject.connect(self.handle_open_project)
+        home_window.openModule.connect(self.handle_open_module)
         self.main_widget_instance = home_window
         home_window.set_active_button(module)
         home_window.cardOpenClicked.connect(self.handle_card_open_clicked)
         self.main_widget_layout.addWidget(home_window)
+
+    # To open the recent module
+    def handle_open_module(self, key:str):
+        func = get_module_function(key)
+        if func != 'None':
+            func = getattr(self, func)
+            func() # Open the Releated Module
+
+    # To handle the click on open project of any recent project
+    def handle_open_project(self, record: dict):
+        self.common_osi_load(osi_path=record.get(PROJECT_PATH), id=record.get(ID))
+
+    # Common function to load osi file and also to open recent project
+    # If osi_path=None -> it triggers Load Osi else trigger open recent project
+    def common_osi_load(self, osi_path=None, id=None):
+        if osi_path is None:
+            osi_path, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(' ')),
+                                                  "InputFiles(*.osi)")
+            
+        else:
+            if not Path(osi_path).exists():
+                result = CustomMessageBox(
+                    title="Warning",
+                    text="Osi File has been moved, File does not exist!",
+                    dialogType=MessageBoxType.Warning,
+                    buttons=["Locate Osi", "Remove Record"]
+                ).exec()
+                if result == "Locate Osi":
+                    file_dialog_path, _ = QFileDialog.getOpenFileName(self, "Locate Osi File", os.path.expanduser("~"), "InputFiles(*.osi)")
+                    if file_dialog_path and id is not None:
+                        osi_path = file_dialog_path
+                        new_name = Path(osi_path).stem
+                        try:
+                            update_project_path(id, osi_path, new_name)
+                        except Exception as e:
+                            print(f"Failed to update project path: {e}")
+                    else:
+                        print("No file selected for relocation.")
+                        return
+                elif result == "Remove Record":
+                    print("Remove Record")
+                    if id is not None:
+                        try:
+                            delete_project_record(id)
+                            CustomMessageBox(
+                                title="Record Removed",
+                                text="The record has been removed from recent projects.",
+                                dialogType=MessageBoxType.Information
+                            ).exec()
+                            # Update Home page with deleted project
+                            self.main_widget_instance.show_home()
+
+                        except Exception as e:
+                            CustomMessageBox(
+                                title="Error",
+                                text=f"Failed to remove record: {e}",
+                                dialogType=MessageBoxType.Critical
+                            ).exec()
+                    else:
+                        print("No ID provided for record removal.")
+                    return
+
+        if not osi_path:
+            print("No Path selected!")
+            return
+        try:
+            in_file = str(osi_path)
+            with open(in_file, 'r') as fileObject:
+                uiObj = yaml.safe_load(fileObject)
+            module = uiObj[KEY_MODULE]
+
+            print("Osi File Belongs to. ", module)
+
+            func = get_module_function(module)
+            if func == 'None':
+                CustomMessageBox(
+                    title="Information",
+                    text="Please load the appropriate Input",
+                    dialogType=MessageBoxType.Information
+                ).exec()
+                print("Module Not Implemented yet.")
+                return
+            func = getattr(self, func)
+            func()
+            # Set variables in template page because it is opened project
+            self.main_widget_instance.setDictToUserInputs(uiObj)
+            self.main_widget_instance.project_id = id
+            self.main_widget_instance.save_state = True
+
+        except IOError:
+            CustomMessageBox(
+                title="Unable to open file",
+                text="There was an error opening \"%s\"" % osi_path,
+                dialogType=MessageBoxType.Critical
+            ).exec()
+            return    
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 

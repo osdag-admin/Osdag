@@ -17,48 +17,53 @@ RELATED_SUBMODULE = 'submodule'
 LAST_OPENED = 'opened_at'
 
 MODULE_MAP = {
-    #---------Connections-start---------------------------------------------------------
-    KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection'],
-    KEY_DISP_ENDPLATE: ['End Plate', 'Shear Connection'],
-    KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection'],
-    KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection'],
+    #---------Connections-start--------------------------------------------------------
+    #--------------------Submodule---------Module---------Open-module-function---------
+    KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection', 'open_fin_plate_page'],
+    KEY_DISP_ENDPLATE: ['End Plate', 'Shear Connection', 'None'],
+    KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'None'],
+    KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'None'],
 
-    KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection'],
-    KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection'],
-    KEY_DISP_BB_EP_SPLICE: ['Beam-to-Beam End Plate', 'Moment Connection'],
+    KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection', 'None'],
+    KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection', 'None'],
+    KEY_DISP_BB_EP_SPLICE: ['Beam-to-Beam End Plate', 'Moment Connection', 'None'],
 
-    KEY_DISP_COLUMNCOVERPLATE: ['Column to Column Cover Plate Bolted', 'Moment Connection'],
-    KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection'],
-    KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection'],
+    KEY_DISP_COLUMNCOVERPLATE: ['Column to Column Cover Plate Bolted', 'Moment Connection', 'None'],
+    KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection', 'None'],
+    KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection', 'None'],
 
-    KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection'],
+    KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'None'],
 
-    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection'],
-    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection'],
-    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection'],
-    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection'],
+    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection', 'None'],
+    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection', 'None'],
+    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection', 'None'],
+    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection', 'None'],
 
-    KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection'],
+    KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection', 'None'],
     #---------Connections-end-----------------------------------------------------------
 
     #---------Tension-Member-start------------------------------------------------------
-    KEY_DISP_TENSION_BOLTED: ['Bolted to End Gusset', 'Tension Member'],
-    KEY_DISP_TENSION_WELDED: ['Welded to End Gusset', 'Tension Member'],
+    KEY_DISP_TENSION_BOLTED: ['Bolted to End Gusset', 'Tension Member', 'None'],
+    KEY_DISP_TENSION_WELDED: ['Welded to End Gusset', 'Tension Member', 'None'],
     #---------Tension-Member-end------------------------------------------------------
 
     #---------Compression-Member-start------------------------------------------------------
-    KEY_DISP_COMPRESSION_Strut: ['Struts in Trusses', 'Compression Member'],
-    KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member'],
+    KEY_DISP_COMPRESSION_Strut: ['Struts in Trusses', 'Compression Member', 'None'],
+    KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member', 'None'],
     #---------Compression-Member-end------------------------------------------------------
 
     #---------Flexural-Member-start------------------------------------------------------
-    KEY_DISP_FLEXURE: ['Simply Supported Beam', 'Flexural Members'],
-    KEY_DISP_FLEXURE2: ['Cantilever Beam', 'Flexural Members'],
-    KEY_DISP_FLEXURE4: ['Purlins', 'Flexural Members'],
-    KEY_DISP_PLATE_GIRDER_WELDED: ['Plate Girder', 'Flexural Members']
+    KEY_DISP_FLEXURE: ['Simply Supported Beam', 'Flexural Members', 'None'],
+    KEY_DISP_FLEXURE2: ['Cantilever Beam', 'Flexural Members', 'None'],
+    KEY_DISP_FLEXURE4: ['Purlins', 'Flexural Members', 'None'],
+    KEY_DISP_PLATE_GIRDER_WELDED: ['Plate Girder', 'Flexural Members', 'None']
     #---------Flexural-Member-end------------------------------------------------------
 
 }
+
+# To retrieve the name of a module function that can open the required module
+def get_module_function(key: str):
+    return MODULE_MAP[key][2]
 
 import sqlite3
 from datetime import datetime, timedelta
@@ -160,6 +165,7 @@ def fetch_all_recent_modules() -> list[dict]:
             dat = MODULE_MAP[row[1]]
             r = {
                 ID: row[0],
+                MODULE_KEY: row[1],
                 RELATED_MODULE: dat[1],
                 RELATED_SUBMODULE: dat[0],
                 LAST_OPENED: format_datetime(row[2])
@@ -172,11 +178,112 @@ def fetch_all_recent_modules() -> list[dict]:
             conn.close()
     return records
 
+def delete_project_record(project_id: int) -> bool:
+    """
+    Delete a project record from the recent_projects table using its ID.
+
+    Args:
+        project_id (int): The ID of the project to delete.
+
+    Returns:
+        bool: True if the deletion was successful, False otherwise.
+    """
+    try:
+        conn = sqlite3.connect(SQLITE_FILE)
+        cursor = conn.cursor()
+        cursor.execute(f"DELETE FROM {PROJECT_TABLE} WHERE {ID} = ?;", (project_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()
+
+def update_project_path(project_id: int, new_path: str, new_name: str) -> int | None:
+    """
+    Update the project_path and project_name for a project in the recent_projects table using its ID.
+    If the new_path already exists in another record (with a different ID), delete those records,
+    then update the file name and path in the given id.
+
+    Args:
+        project_id (int): The ID of the project to update.
+        new_path (str): The new project path.
+        new_name (str): The new project name.
+
+    Returns:
+        int | None: The ID of the updated record (project_id) if update was successful,
+                    or None if an error occurred.
+    """
+    try:
+        conn = sqlite3.connect(SQLITE_FILE)
+        cursor = conn.cursor()
+        # Find and delete any records with the same path but a different id
+        cursor.execute(f"SELECT {ID} FROM {PROJECT_TABLE} WHERE {PROJECT_PATH} = ? AND {ID} != ?;", (new_path, project_id))
+        rows = cursor.fetchall()
+        for row in rows:
+            conflict_id = row[0]
+            cursor.execute(f"DELETE FROM {PROJECT_TABLE} WHERE {ID} = ?;", (conflict_id,))
+        # Now update the path and name for the given id
+        cursor.execute(
+            f"UPDATE {PROJECT_TABLE} SET {PROJECT_PATH} = ?, {PROJECT_NAME} = ? WHERE {ID} = ?;",
+            (new_path, new_name, project_id)
+        )
+        conn.commit()
+        return project_id
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+def get_project_by_id(project_id: int) -> dict | None:
+    """
+    Retrieve project data from the recent_projects table for the given project ID.
+
+    Args:
+        project_id (int): The ID of the project to retrieve.
+
+    Returns:
+        dict | None: Dictionary containing project data if found, else None.
+    """
+    try:
+        conn = sqlite3.connect(SQLITE_FILE)
+        cursor = conn.cursor()
+        cursor.execute(
+            f"SELECT {ID}, {PROJECT_NAME}, {PROJECT_PATH}, {MODULE_KEY}, {CREATION_DATE}, {LAST_EDITED} "
+            f"FROM {PROJECT_TABLE} WHERE {ID} = ?;",
+            (project_id,)
+        )
+        row = cursor.fetchone()
+        if row:
+            return {
+                ID: row[0],
+                PROJECT_NAME: row[1],
+                PROJECT_PATH: row[2]
+            }
+        else:
+            return None
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
+
 def insert_recent_project(data: dict) -> int | None:
     """
-    Insert a new record into recent_projects table.
+    Insert a new record into the recent_projects table.
+    
+    Args:
+        data (dict): Dictionary containing project details. Must include keys:
+            - PROJECT_NAME
+            - PROJECT_PATH
+            - MODULE_KEY
     Returns:
-        ID of the inserted record, or None if insertion failed.
+        int | None: ID of the inserted or updated record, or None if insertion failed.
     """
     # Fill missing dates with current timestamp
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -250,16 +357,15 @@ def refactor_database():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Remove invalid project paths
-    cursor.execute(f"SELECT {ID}, {PROJECT_PATH} FROM {PROJECT_TABLE}")
-    rows = cursor.fetchall()
-    deleted_count = 0
-    for row in rows:
-        if not Path(row[PROJECT_PATH]).exists():
-            cursor.execute(f"DELETE FROM {PROJECT_TABLE} WHERE {ID}=?", (row[ID],))
-            deleted_count += 1
-    if deleted_count > 0:
-        print(f"[INFO] Deleted {deleted_count} project(s) with missing paths.")
+    # Remove projects older than 60 days
+    cutoff_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute(f"""
+        DELETE FROM {PROJECT_TABLE}
+        WHERE {LAST_EDITED} < ?;
+    """, (cutoff_date,))
+    old_modules_deleted = cursor.rowcount
+    if old_modules_deleted > 0:
+        print(f"[INFO] Deleted {old_modules_deleted} project records older than 60 days.")
 
     # Keep only 10 most recent projects
     cursor.execute(f"""
@@ -274,14 +380,13 @@ def refactor_database():
         print(f"[INFO] Deleted {len(ids_to_delete)} oldest project(s) to maintain max 10 records.")
 
     # Remove modules older than 60 days
-    cutoff_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute(f"""
         DELETE FROM {MODULE_TABLE}
         WHERE {LAST_OPENED} < ?;
     """, (cutoff_date,))
     old_modules_deleted = cursor.rowcount
     if old_modules_deleted > 0:
-        print(f"[INFO] Deleted {old_modules_deleted} module(s) older than 60 days.")
+        print(f"[INFO] Deleted {old_modules_deleted} module records older than 60 days.")
 
     # Keep only 10 most recent modules
     cursor.execute(f"""

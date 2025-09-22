@@ -23,13 +23,13 @@ from osdag_gui.common_functions import design_examples
 from osdag_core.Common import *
 from osdag_gui.ui.windows.design_preferences import DesignPreferences
 from osdag_core.cad.common_logic import CommonDesignLogic
-from osdag_gui.data.database.database_config import insert_recent_module
+from osdag_gui.data.database.database_config import *
 
 from osdag_gui.__config__ import CAD_BACKEND
 
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
-    def __init__(self, title: str, backend: object, parent, saved=False):
+    def __init__(self, title: str, backend: object, parent):
         super().__init__()
         self.parent = parent
         self.backend = backend()
@@ -37,7 +37,9 @@ class CustomWindow(QWidget):
         # Update recent Modules
         insert_recent_module(self.backend.module_name())
         # State to retain state saved or not
-        self.saved = saved
+        self.save_state = False
+        # Saved Project
+        self.project_id = None
 
         self.current_tab_index = 0
         self.design_pref_inputs = {}
@@ -741,15 +743,16 @@ class CustomWindow(QWidget):
     
     # Function for getting inputs from a file
     def loadDesign_inputs(self):
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)),
+        filePath, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)),
                                                   "InputFiles(*.osi)")
-        if not fileName:
+        if not filePath:
             return
         try:
-            in_file = str(fileName)
+            in_file = str(filePath)
             with open(in_file, 'r') as fileObject:
                 uiObj = yaml.safe_load(fileObject)
             module = uiObj[KEY_MODULE]
+            print(module)
 
             selected_module = self.backend.module_name()
             if selected_module == module:
@@ -767,7 +770,7 @@ class CustomWindow(QWidget):
         except IOError:
             CustomMessageBox(
                 title="Unable to open file",
-                text="There was an error opening \"%s\"" % fileName,
+                text="There was an error opening \"%s\"" % filePath,
                 dialogType=MessageBoxType.Information
             ).exec()
             return
@@ -891,9 +894,9 @@ class CustomWindow(QWidget):
 
             files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
-            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+            filePath, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
                                                       files_types)
-            fName = str(fileName)
+            fName = str(filePath)
 
             if fName and self.fuse_model:
                 file_extension = fName.split(".")[-1]
@@ -948,9 +951,9 @@ class CustomWindow(QWidget):
     def save_cadImages(self, main):
         if main.design_status:
             files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+            filePath, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
                                                       files_types)
-            fName = str(fileName)
+            fName = str(filePath)
             file_extension = fName.split(".")[-1]
 
             if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
@@ -1231,9 +1234,6 @@ class CustomWindow(QWidget):
                     input_field.textChanged.connect(self.clear_output_fields)
                 elif type(input_field) == QComboBox:
                     input_field.currentIndexChanged.connect(self.clear_output_fields)
-            # self.textEdit.clear()
-            with open("logging_text.log", 'w') as log_file:
-                pass
 
             # print(f"\n design_dictionary {self.design_inputs}")
             error = main.func_for_validation(self.design_inputs)
@@ -1609,33 +1609,59 @@ class CustomWindow(QWidget):
         self.designPrefDialog.show()
 
     def saveDesign_inputs(self):
-        fileName, _ = QFileDialog.getSaveFileName(self,
-                                                  "Save Design", os.path.join(self.folder, "untitled.osi"),
-                                                  "Input Files(*.osi)",None)
-        if not fileName:
-            return
+        design_state = self.backend.design_status
+        filePath = None
+        fileName = None
+        if not self.save_state:
+            filePath, _ = QFileDialog.getSaveFileName(self,
+                                                    "Save Design", os.path.join(self.folder, "untitled.osi"),
+                                                    "Input Files(*.osi)", None)
+            fileName = Path(filePath).stem
+        else:
+            record = get_project_by_id(self.project_id)
+            filePath = record.get(PROJECT_PATH)
+            fileName = record.get(PROJECT_NAME)
+            
         try:
-            with open(fileName, 'w') as input_file:
+            with open(filePath, 'w') as input_file:
                 yaml.dump(self.design_inputs, input_file)
+            
+            # Design must be done before saving project
+            if design_state or self.save_state:
+                # Insert saved data in database and update states
+                self.save_state = True
+                record = {
+                    PROJECT_NAME: fileName,
+                    PROJECT_PATH: filePath,
+                    MODULE_KEY: self.backend.module_name(),
+                }
+                self.project_id = insert_recent_project(record)
+
+            CustomMessageBox(
+                title="Success",
+                text="Saved Osi Successfully!",
+                dialogType=MessageBoxType.Success
+            ).exec()
+
         except Exception as e:
             CustomMessageBox(
                 title="Application",
-                text="Cannot write file %s:\n%s" % (fileName, str(e)),
+                text="Cannot write file %s:\n%s" % (filePath, str(e)),
                 dialogType=MessageBoxType.Warning
             ).exec()
             return
     
     def saveLogMessages(self):
         """Save log messages from textEdit to a text file"""
-        fileName, _ = QFileDialog.getSaveFileName(self,
+        filePath, _ = QFileDialog.getSaveFileName(self,
                                                   "Save Log Messages", os.path.join(self.folder, "log_messages.txt"),
                                                   "Text Files(*.txt);;All Files(*.*)", None)
-        if not fileName:
+        if not filePath:
             return
         
         try:
             log_content = self.textEdit.toPlainText()
-            with open(fileName, 'w', encoding='utf-8') as log_file:
+            with open(filePath, 'w', encoding='utf-8') as log_file:
                 log_file.write(log_content)
             
             CustomMessageBox(
@@ -1646,7 +1672,7 @@ class CustomWindow(QWidget):
         except Exception as e:
             CustomMessageBox(
                 title="Error",
-                text="Cannot write file %s:\n%s" % (fileName, str(e)),
+                text="Cannot write file %s:\n%s" % (filePath, str(e)),
                 dialogType=MessageBoxType.Critical
             ).exec()
             return

@@ -299,51 +299,51 @@ def refactor_database():
     conn.close()
     print("[INFO] Database cleanup complete.") 
 
-# def main():
-#     print("=== Testing User Database Functions ===")
+def main():
+    print("=== Testing User Database Functions ===")
 
-#     print("\n[INFO] Creating/Updating database if needed...")
-#     create_user_database()
+    print("\n[INFO] Creating/Updating database if needed...")
+    create_user_database()
 
-#     # === Insert Dummy Projects for ALL MODULES ===
-#     print("\n[INFO] Inserting dummy projects for all modules...")
-#     for i, (module_key, module_info) in enumerate(MODULE_MAP.items(), start=1):
-#         sample_project = {
-#             PROJECT_NAME: f"Dummy Project {i} - {module_info[0]}",
-#             PROJECT_PATH: f"C:/Users/Me/Documents/dummy_project_{i}.osdag",
-#             MODULE_KEY: module_key,
-#         }
-#         inserted_id = insert_recent_project(sample_project)
-#         if inserted_id:
-#             print(f"[SUCCESS] Inserted project ID: {inserted_id} ({module_info[0]})")
-#         else:
-#             print(f"[ERROR] Failed to insert project for {module_info[0]}")
+    # === Insert Dummy Projects for ALL MODULES ===
+    print("\n[INFO] Inserting dummy projects for all modules...")
+    for i, (module_key, module_info) in enumerate(MODULE_MAP.items(), start=1):
+        sample_project = {
+            PROJECT_NAME: f"Dummy Project {i} - {module_info[0]}",
+            PROJECT_PATH: f"C:/Users/Me/Documents/dummy_project_{i}.osdag",
+            MODULE_KEY: module_key,
+        }
+        inserted_id = insert_recent_project(sample_project)
+        if inserted_id:
+            print(f"[SUCCESS] Inserted project ID: {inserted_id} ({module_info[0]})")
+        else:
+            print(f"[ERROR] Failed to insert project for {module_info[0]}")
 
-#     # === Insert Dummy Modules for ALL MODULES ===
-#     print("\n[INFO] Inserting dummy modules for all modules...")
-#     for module_key, module_info in MODULE_MAP.items():
-#         inserted_module_id = insert_recent_module(module_key)
-#         if inserted_module_id:
-#             print(f"[SUCCESS] Inserted module: {module_info[0]} ({module_info[1]})")
-#         else:
-#             print(f"[ERROR] Failed to insert module for {module_info[0]}")
+    # === Insert Dummy Modules for ALL MODULES ===
+    print("\n[INFO] Inserting dummy modules for all modules...")
+    for module_key, module_info in MODULE_MAP.items():
+        inserted_module_id = insert_recent_module(module_key)
+        if inserted_module_id:
+            print(f"[SUCCESS] Inserted module: {module_info[0]} ({module_info[1]})")
+        else:
+            print(f"[ERROR] Failed to insert module for {module_info[0]}")
 
-#     # === Fetch & Display Results ===
-#     print("\n=== Recent Projects ===")
-#     projects = fetch_all_recent_projects()
-#     for p in projects:
-#         print(f"- {p[PROJECT_NAME]} ({p[PROJECT_PATH]})")
-#         print(f"  Submodule: {p[RELATED_SUBMODULE]}")
-#         print(f"  Created: {p[CREATION_DATE]}, Last Edited: {p[LAST_EDITED]}")
-#         print("")
+    # === Fetch & Display Results ===
+    print("\n=== Recent Projects ===")
+    projects = fetch_all_recent_projects()
+    for p in projects:
+        print(f"- {p[PROJECT_NAME]} ({p[PROJECT_PATH]})")
+        print(f"  Submodule: {p[RELATED_SUBMODULE]}")
+        print(f"  Created: {p[CREATION_DATE]}, Last Edited: {p[LAST_EDITED]}")
+        print("")
 
-#     print("=== Recent Modules ===")
-#     modules = fetch_all_recent_modules()
-#     for m in modules:
-#         print(f"- {m[RELATED_MODULE]} > {m[RELATED_SUBMODULE]} (Opened: {m[LAST_OPENED]})")
+    print("=== Recent Modules ===")
+    modules = fetch_all_recent_modules()
+    for m in modules:
+        print(f"- {m[RELATED_MODULE]} > {m[RELATED_SUBMODULE]} (Opened: {m[LAST_OPENED]})")
 
-# if __name__=="__main__":
-#     create_user_database()
-#     # main()
-#     print(fetch_all_recent_modules())
-#     print(fetch_all_recent_projects())
+if __name__=="__main__":
+    create_user_database()
+    main()
+    # print(fetch_all_recent_modules())
+    # print(fetch_all_recent_projects())

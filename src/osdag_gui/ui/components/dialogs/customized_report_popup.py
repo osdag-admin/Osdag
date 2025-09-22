@@ -386,32 +386,24 @@ class ReportCustomizationDialog(QDialog):
 
         # Main content - only section tree (no PDF preview)
         self.section_tree = SectionTreeWidget()
-        self.section_tree.selectionChanged.connect(self.on_selection_changed)
+        # Do not auto-compile on selection changes
         layout.addWidget(self.section_tree)
 
         # Controls
         controls = QHBoxLayout()
 
-        # Auto compile checkbox - disabled by default for speed
-        self.auto_compile = QCheckBox("Auto Compile")
-        self.auto_compile.setChecked(True)  # Enable by default
-        controls.addWidget(self.auto_compile)
+        # Removed auto-compile and manual compile controls per UX update
 
-        # Manual compile button
-        compile_btn = QPushButton("Compile PDF")
-        compile_btn.clicked.connect(self.compile_pdf)
-        controls.addWidget(compile_btn)
-
-        # Open PDF button
+        # Open PDF button (compiles into temp dir each time before opening)
         open_btn = QPushButton("Open PDF")
-        open_btn.clicked.connect(self.open_latest_pdf)
+        open_btn.clicked.connect(self.compile_and_open_pdf)
         controls.addWidget(open_btn)
 
         controls.addStretch()
 
         # Save and close buttons
         save_btn = QPushButton("Save PDF")
-        save_btn.clicked.connect(self.save_pdf)
+        save_btn.clicked.connect(self.compile_and_save_pdf)
         controls.addWidget(save_btn)
 
         close_btn = QPushButton("Close")
@@ -510,19 +502,13 @@ class ReportCustomizationDialog(QDialog):
                 dialogType=MessageBoxType.Warning
             ).exec()
 
-    def on_selection_changed(self):
-        """Handle section selection changes"""
-        if self.auto_compile.isChecked():
-            self.compile_pdf()
 
     def compile_pdf(self):
-        """Compile filtered LaTeX to PDF - simplified version"""
+        """Compile filtered LaTeX to PDF in a fixed temp dir (overwritten each time)."""
         if not self.latex_content:
-            return
+            return None
         try:
             import shutil
-            import string
-            import random
 
             # Get selected sections
             selected = self.section_tree.get_selected_sections()
@@ -531,14 +517,13 @@ class ReportCustomizationDialog(QDialog):
             # Filter LaTeX content
             filtered_latex = self.filter.filter_content(self.latex_content, selected)
 
-            # Create safe temp directory for pdflatex
-            safe_temp_root = os.path.join(tempfile.gettempdir(), "osdag_pdf_compile")
-            os.makedirs(safe_temp_root, exist_ok=True)
-            safe_subdir = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-            safe_temp_dir = os.path.join(safe_temp_root, safe_subdir)
+            # Use fixed temp directory to overwrite each time
+            safe_temp_dir = os.path.join(tempfile.gettempdir(), "osdag_pdf_compile")
+            if os.path.exists(safe_temp_dir):
+                shutil.rmtree(safe_temp_dir, ignore_errors=True)
             os.makedirs(safe_temp_dir, exist_ok=True)
 
-            # Write filtered LaTeX to safe directory
+            # Write filtered LaTeX to fixed directory
             safe_latex_file = os.path.join(safe_temp_dir, "filtered_report.tex")
             with open(safe_latex_file, 'w', encoding='utf-8') as f:
                 f.write(filtered_latex)
@@ -549,7 +534,7 @@ class ReportCustomizationDialog(QDialog):
             if os.path.exists(pdf_file):
                 os.remove(pdf_file)
 
-            print(f"Running pdflatex in safe dir: {safe_temp_dir}")
+            print(f"Running pdflatex in fixed dir: {safe_temp_dir}")
 
             # Run pdflatex
             result = subprocess.run(
@@ -561,11 +546,11 @@ class ReportCustomizationDialog(QDialog):
             )
 
             print(f"INFO: pdflatex return code: {result.returncode}")
-            print(os.path.exists(pdf_file))
 
             if result.returncode == 0 and os.path.exists(pdf_file):
                 print(f"SUCCESS: PDF generated: {pdf_file}")
                 self.latest_pdf = pdf_file
+                return pdf_file
             else:
                 error_msg = "PDF compilation warning"
                 if result.stderr:
@@ -573,11 +558,6 @@ class ReportCustomizationDialog(QDialog):
                 if result.stdout:
                     error_msg += f"\n\nOutput:\n{result.stdout[:500]}"
                 print(f"ERROR: {error_msg}")
-                # CustomMessageBox(
-                #     title="Compilation Failed",
-                #     text=error_msg,
-                #     dialogType=MessageBoxType.Warning
-                # ).exec()
         except subprocess.TimeoutExpired:
             error_msg = "PDF compilation timed out (>30s)\n\nThis might be due to:\n• LaTeX not installed\n• Missing packages\n• Complex LaTeX content"
             print(f"TIMEOUT: {error_msg}")
@@ -602,6 +582,14 @@ class ReportCustomizationDialog(QDialog):
                 text=error_msg,
                 dialogType=MessageBoxType.Critical
             ).exec()
+        return None
+
+    def compile_and_open_pdf(self):
+        """Compile into fixed temp dir and open the PDF."""
+        pdf = self.compile_pdf()
+        if not pdf:
+            return
+        self.open_latest_pdf()
 
     def open_latest_pdf(self):
         """Open the latest generated PDF in external viewer"""
@@ -628,14 +616,10 @@ class ReportCustomizationDialog(QDialog):
                 dialogType=MessageBoxType.Information
             ).exec()
 
-    def save_pdf(self):
-        """Save customized PDF"""
-        if not self.latest_pdf or not os.path.exists(self.latest_pdf):
-            CustomMessageBox(
-                title="No PDF",
-                text="No PDF to save. Please compile first.",
-                dialogType=MessageBoxType.Warning
-            ).exec()
+    def compile_and_save_pdf(self):
+        """Compile into fixed temp dir and then save the PDF to a chosen location."""
+        pdf = self.compile_pdf()
+        if not pdf:
             return
 
         filename, _ = QFileDialog.getSaveFileName(
@@ -643,12 +627,13 @@ class ReportCustomizationDialog(QDialog):
         )
 
         if filename:
-            shutil.copy2(self.latest_pdf, filename)
+            shutil.copy2(pdf, filename)
             CustomMessageBox(
                 title="Success",
                 text=f"PDF saved to:\n{filename}",
                 dialogType=MessageBoxType.Success
             ).exec()
+            self.accept()
 
     def closeEvent(self, event):
         """Clean up temp files"""

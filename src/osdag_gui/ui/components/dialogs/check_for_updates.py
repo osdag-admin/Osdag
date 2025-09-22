@@ -1,12 +1,21 @@
+from pathlib import Path
+import sys, shutil, json
+from packaging.version import Version
+
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QPushButton, QHBoxLayout, QWidget, QTextBrowser, QSizePolicy, QProgressBar
+    QApplication, 
+    QDialog, 
+    QVBoxLayout, 
+    QPushButton, 
+    QHBoxLayout, 
+    QWidget, 
+    QTextBrowser, 
+    QSizePolicy, 
+    QProgressBar
 )
 from PySide6.QtCore import QProcess, Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QIcon
-from packaging.version import Version, InvalidVersion
-from pathlib import Path
-import sys, shutil, json
 
 from osdag_gui.__config__ import INSTALLATION_TYPE, VERSION
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
@@ -15,7 +24,6 @@ class UpdateDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.old_version = Version(VERSION)
-        self.process = QProcess(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("UpdateDialog")
@@ -97,8 +105,8 @@ class UpdateDialog(QDialog):
         contentLayout.addLayout(buttonLayout)
         mainLayout.addWidget(contentWidget)
 
-        # Start checking for updates immediately
-        self.textBrowser.setHtml("<p style='color:blue;'>Checking for updates...</p>")
+
+        self.textBrowser.setHtml("<p style='color:#90AF13;'>Checking for updates...</p>")
         self._set_exec_paths()
         self.check_for_updates()
 
@@ -117,63 +125,35 @@ class UpdateDialog(QDialog):
 
     def check_for_updates(self):
         """Run QProcess to fetch version asynchronously."""
-        if INSTALLATION_TYPE == "conda":
-            cmd = [self.conda_path, "search", "-c", "conda-forge", "osdag::osdag", "--info", "--json"]
-        elif INSTALLATION_TYPE == "pixi":
-            cmd = [self.pixi_path, "search", "osdag", "--channel", "osdag"]
-        else:
-            self.update_text("<p style='color:red;'>Unknown installation type.</p>")
+        if not (self.conda_path or self.pixi_path):
+            self.update_text("<p style='color:red;'>Executable Not Found.</p>")
             return
-
-        self.process.readyReadStandardOutput.connect(self.on_output)
-        self.process.readyReadStandardError.connect(self.on_error)
-        self.process.finished.connect(self.on_finished)
-        self.process.start(cmd[0], cmd[1:])
-
-    def update_to_latest(self):
+        
         try:
             if INSTALLATION_TYPE == "conda":
-                if not Path(self.conda_path).exists():
-                    self.update_text(f"<p style='color:red;'>conda not found at {self.conda_path}</p>")
-                    return
-                cmd = [self.conda_path, "update", "-y", "osdag", "--channel", "osdag"]
+                cmd = [self.conda_path, "search", "-c", "conda-forge", "osdag::osdag", "--info", "--json"]
             elif INSTALLATION_TYPE == "pixi":
-                if not Path(self.pixi_path).exists():
-                    self.update_text(f"<p style='color:red;'>pixi not found at {self.pixi_path}</p>")
-                    return
-                cmd = [self.pixi_path, "update", "-y", "osdag", "--channel", "osdag"]
+                cmd = [self.pixi_path, "search", "osdag", "--channel", "osdag"]
             else:
                 self.update_text("<p style='color:red;'>Unknown installation type.</p>")
                 return
-            
-            # Show progress bar again
-            self.progressBar.show()
-            self.progressBar.setRange(0, 0) 
-            self.updateNowButton.hide()
-            self.updateLaterButton.hide()
-
-            # Configure process
-            self.process = QProcess(self)
-            self.process.setProgram(cmd[0])
-            self.process.setArguments(cmd[1:])
-            self.process.readyReadStandardOutput.connect(self.handle_stdout)
-            self.process.readyReadStandardError.connect(self.handle_stderr)
-            self.process.finished.connect(self.handle_update_finished)
-
-            # Start update
-            self.update_text("<p style='color:blue;'>Updating Osdag to the latest version...</p>")
-            self.process.start()
-            
         except Exception as e:
-            self.update_text(f"<p style='color:red;'>Update failed: {e}</p>")
+            self.update_text(f"<p style='color:red;'>Error: {e}</p>")
+            return
+        
+        self.process = QProcess(self)
+        self.process.readyReadStandardOutput.connect(self.handle_stdout_update_check)
+        self.process.readyReadStandardError.connect(self.handle_stderr_update_check)
+        self.process.finished.connect(self.handle_update_check_finished)
+        self.process.start(cmd[0], cmd[1:])
 
-    def on_output(self):
+    def handle_stdout_update_check(self):
         self.output_data = self.process.readAllStandardOutput().data().decode()
 
-    def on_error(self):
+    def handle_stderr_update_check(self):
         self.error_data = self.process.readAllStandardError().data().decode()
 
-    def on_finished(self):
+    def handle_update_check_finished(self):
         self.progressBar.hide()
         latest_version = None
 
@@ -193,7 +173,7 @@ class UpdateDialog(QDialog):
                 if lv > self.old_version:
                     self.update_text(
                         f"<p style='color:green;'>A new version of Osdag is available: "
-                        f"<b>{lv}</b> (You have {self.old_version}).<br>"
+                        f"<b>{latest_version}</b> (You have {VERSION}).<br>"
                         f"Visit <a href='https://osdag.fossee.in/resources/downloads'>downloads</a>.</p>"
                     )
                     self.okButton.hide()
@@ -201,8 +181,8 @@ class UpdateDialog(QDialog):
                     self.updateLaterButton.show()
                 else:
                     self.update_text(
-                        f"<p style='color:blue;'>You are using the latest version of Osdag "
-                        f"(<b>{self.old_version}</b>).</p>"
+                        f"<p style='color:#90AF13;'>You are using the latest version of Osdag "
+                        f"(<b>{VERSION}</b>).</p>"
                     )
             else:
                 self.update_text("<p style='color:orange;'>Could not fetch version information.</p>")
@@ -210,23 +190,62 @@ class UpdateDialog(QDialog):
         except Exception as e:
             self.update_text(f"<p style='color:red;'>Error checking for updates: {e}</p>")
 
+
+    def update_to_latest(self):
+        """Run QProcess to update Osdag asynchronously."""
+        try:
+            if INSTALLATION_TYPE == "conda":
+                cmd = [self.conda_path, "update", "-y", "osdag", "--channel", "osdag"]
+            elif INSTALLATION_TYPE == "pixi":
+                cmd = [self.pixi_path, "update", "-y", "osdag", "--channel", "osdag"]
+            else:
+                self.update_text("<p style='color:red;'>Unknown installation type.</p>")
+                return
+
+            self.progressBar.show()
+            self.progressBar.setRange(0, 0) 
+            self.updateNowButton.hide()
+            self.updateLaterButton.hide()
+
+            # Configure process
+            self.process = QProcess(self)
+            self.process.readyReadStandardOutput.connect(self.handle_stdout_update)
+            self.process.readyReadStandardError.connect(self.handle_stderr_update)
+            self.process.finished.connect(self.handle_update_finished)
+
+            # Start update
+            self.update_text("<p style='color:blue;'>Updating Osdag to the latest version...</p>")
+            self.process.start(cmd[0], cmd[1:])
+            
+        except Exception as e:
+            self.update_text(f"<p style='color:red;'>Update failed: {e}</p>")
+
+    
     def update_text(self, html: str):
-        self.textBrowser.setHtml(f"<p style='font-family:Arial; font-size:9pt;'>{html}</p>")
+        self.textBrowser.setHtml(f"<p style='font-size:12pt;'>{html}</p>")
 
 
-    def handle_stdout(self):
+    def handle_stdout_update(self):
         output = self.process.readAllStandardOutput().data().decode()
-        self.update_text(f"<pre style='font-size:9pt;'>{output}</pre>")
+        self.update_text(f"<pre style='font-size:12pt;color:#90AF13a'>{output}</pre>")
 
-    def handle_stderr(self):
+    def handle_stderr_update(self):
         error = self.process.readAllStandardError().data().decode()
-        self.update_text(f"<pre style='color:red; font-size:9pt;'>{error}</pre>")
+        self.update_text(f"<pre style='color:red; font-size:12pt;'>{error}</pre>")
 
     def handle_update_finished(self):
         self.progressBar.hide()
         self.okButton.show()
         exit_code = self.process.exitCode()
         if exit_code == 0:
-            self.update_text("<p style='color:green;'>Update completed successfully!</p>")
+            self.update_text("<p style='color:#90AF13;'>Update completed successfully!</p>")
         else:
             self.update_text(f"<p style='color:red;'>Update failed with exit code {exit_code}.</p>")
+
+
+# Test the dialog
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    dialog = UpdateDialog()
+    dialog.exec()
+    sys.exit(app.exec())

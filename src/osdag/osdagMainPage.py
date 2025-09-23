@@ -80,7 +80,8 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 7) Any further Levels will result in an error .
 '''
 
-import os
+from html import parser
+import os, click    
 from pathlib import Path
 import re
 import io
@@ -131,6 +132,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5 import QtWidgets, QtCore, QtGui
 import math
 import sys
+from osdag.cli import run_module
 from .gui.ui_tutorial import Ui_Tutorial
 from .gui.ui_aboutosdag import Ui_AboutOsdag
 from .gui.ui_ask_question import Ui_AskQuestion
@@ -1031,5 +1033,79 @@ def do_stuff():
     except BaseException as e:
         print("ERROR", e)
 
-if __name__ == '__main__':
-    do_stuff()
+# --- Main CLI group ---
+help_msg = """\n\b
+==================================================
+Osdag Steel Design and Graphics Application
+
+Usage:\n
+  osdag                       # Launch GUI (default)\n
+  osdag cli run               # Use CLI tools (see below)
+
+By default, running 'osdag' launches the GUI.
+You can also run in CLI mode using 'osdag cli run'.
+
+Examples:\n
+  osdag\n
+  osdag cli run -i TensionBolted.osi\n
+  osdag cli run -i TensionBolted.osi -op save_csv -o result.csv\n
+  osdag cli run -i TensionBolted.osi -op save_pdf -o result.pdf\n
+  osdag cli run -i TensionBolted.osi -op print_result\n
+==================================================\n
+"""
+
+@click.group(invoke_without_command=True,
+            help="\nOsdag Application. Run osdag to launch GUI, or use 'osdag cli run' for command-line tools.\n",
+            epilog=help_msg,
+            context_settings=dict(help_option_names=['-h', '--help']),
+            )
+
+@click.pass_context
+def osdag(ctx):
+    if ctx.invoked_subcommand is None:
+        do_stuff()
+
+
+# --- CLI group ---
+@osdag.group(help="\nRun in CLI mode (use subcommands like 'run').\n",
+            epilog=help_msg,
+            context_settings=dict(help_option_names=['-h', '--help']),
+            )
+def cli():
+    pass
+
+
+# --- Subcommand: run ---
+@cli.command(help="\nOsdag Application. Run osdag to launch GUI, or use 'osdag cli run' for command-line tools.\n",
+            epilog=help_msg,
+            context_settings=dict(help_option_names=['-h', '--help']),
+            )
+@click.option("-i", "--input", "input_path",
+              type=click.Path(exists=True, dir_okay=False),
+              required=True,
+              help="Path to input file (.osi)")
+@click.option("-op", "--op_type",
+              type=click.Choice(["save_csv", "save_pdf", "print_result"]),
+              default="print_result",
+              show_default=True,
+              help="Type of operation")
+@click.option("-o", "--output", "output_path",
+              type=click.Path(dir_okay=False, writable=True),
+              help="Path for output file")
+def run(input_path, op_type, output_path):
+    result = run_module(input_path=input_path,
+                        op_type=op_type,
+                        output_path=output_path)
+
+    if not result["success"]:
+        click.echo("Errors encountered:")
+        for err in result["errors"]:
+            click.echo(f"   - {err}")
+    else:
+        click.echo("Operation completed successfully")
+        if result.get("output"):
+            click.echo(f"Output saved at: {result['output']}")
+
+
+if __name__ == "__main__":
+    osdag()

@@ -1255,9 +1255,9 @@ class CustomWindow(QWidget):
                     txt = self.output_dock.output_widget.findChild(QWidget, option[0])
                     txt.setText(str(option[3]))
                     if status:
-                        txt.setVisible(option[3] != "")
+                        txt.setVisible(bool(option[3] != ""))
                         txt_label = self.output_dock.output_widget.findChild(QWidget, option[0]+"_label")
-                        txt_label.setVisible(option[3] != "")
+                        txt_label.setVisible(bool(option[3] != ""))
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     print(f"$~$ Enabled button {option[0]}")

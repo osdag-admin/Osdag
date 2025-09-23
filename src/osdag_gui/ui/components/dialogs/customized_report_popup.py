@@ -162,10 +162,11 @@ class SectionTreeWidget(QTreeWidget):
             QTreeWidget {
                 border: 1px solid #a6a6a6;
                 border-radius: 6px;
-                background-color: #f6f6f6;
+                background-color: white;
             }
             QTreeWidget::item {
                 padding: 2px 0px;
+                background-color: white;             
             }
         """)
         # Connect item changes to our handler

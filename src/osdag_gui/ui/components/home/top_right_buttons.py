@@ -13,7 +13,6 @@ from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
 from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
 from osdag_gui.ui.components.dialogs.check_for_updates import UpdateDialog
 from osdag_gui.common_functions import design_examples
-from osdag_gui.ui.components.dialogs.update_dialog import UpdateDialog
 
 # Define colors used in the UI
 OSDAG_GREEN = "#90AF13"

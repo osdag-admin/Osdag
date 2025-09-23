@@ -69,7 +69,7 @@ class UpdateDialog(QDialog):
         self.textBrowser.setOpenExternalLinks(True)
         self.textBrowser.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.textBrowser.setStyleSheet(
-            "font-size: 12pt;"
+            "font-size: 12pt;color:green"
             )
         contentLayout.addWidget(self.textBrowser)
 
@@ -106,7 +106,7 @@ class UpdateDialog(QDialog):
         mainLayout.addWidget(contentWidget)
 
 
-        self.textBrowser.setHtml("<p style='color:#90AF13;'>Checking for updates...</p>")
+        self.textBrowser.setHtml("<p>Checking for updates...</p>")
         self._set_exec_paths()
         self.check_for_updates()
 
@@ -222,16 +222,16 @@ class UpdateDialog(QDialog):
 
     
     def update_text(self, html: str):
-        self.textBrowser.setHtml(f"<p style='font-size:12pt;'>{html}</p>")
+        self.textBrowser.setHtml(f"<p'>{html}</p>")
 
 
     def handle_stdout_update(self):
         output = self.process.readAllStandardOutput().data().decode()
-        self.update_text(f"<pre style='font-size:12pt;color:#90AF13a'>{output}</pre>")
+        self.update_text(f"<pre style='color:#90AF13a'>{output}</pre>")
 
     def handle_stderr_update(self):
         error = self.process.readAllStandardError().data().decode()
-        self.update_text(f"<pre style='color:red; font-size:12pt;'>{error}</pre>")
+        self.update_text(f"<pre style='color:red;'>{error}</pre>")
 
     def handle_update_finished(self):
         self.progressBar.hide()

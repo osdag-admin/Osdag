@@ -81,6 +81,7 @@ from PySide6.QtGui import QIcon
 
 try:
     from osdag_core.design_report.reportGenerator_latex import CreateLatex
+    from osdag_core.Common import PDFLATEX
     CREATELATEX_AVAILABLE = True
     print("INFO: CreateLatex successfully imported")
 except ImportError:
@@ -539,7 +540,7 @@ class ReportCustomizationDialog(QDialog):
 
             # Run pdflatex
             result = subprocess.run(
-                ['pdflatex', '-interaction=nonstopmode', 'filtered_report.tex'],
+                [PDFLATEX, '-interaction=nonstopmode', 'filtered_report.tex'],
                 capture_output=True,
                 text=True,
                 timeout=30,

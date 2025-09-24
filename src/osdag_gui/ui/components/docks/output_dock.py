@@ -17,6 +17,7 @@ from osdag_core.texlive.Design_wrapper import init_display as init_display_off_s
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPopup
+from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *
 import osdag_gui.resources.resources_rc
 
@@ -434,105 +435,151 @@ class OutputDock(QWidget):
 
         self.summary_popup.exec()
 
+    # ----------------------------------Save-Design-Report-END------------------------------------------------------
 
-    def generate_design_report(self, main, dialog_window):
-        """Generate the actual design report"""
-        try:
-            # Collect all inputs from the popup
-            popup_summary = self.getPopUpInputs()
-            
-            # Add additional required fields
-            popup_summary['filename'] = popup_summary.get('filename', f'{main.module_name().replace(" ", "_")}_report')
-            popup_summary['folder'] = popup_summary.get('folder', './reports')
-            popup_summary['logger_messages'] = self.parent.textEdit.toPlainText()
-            popup_summary['does_design_exist'] = main.design_status
-            
-            # **CRITICAL FIX**: Get the actual design instance, not the class
-            design_instance = None
-            
-            # Method 1: Try to get instance from commLogicObj if it exists
-            if hasattr(self, 'commLogicObj') and self.parent.commLogicObj is not None:
-                if hasattr(self.parent.commLogicObj, 'design_obj') and self.parent.commLogicObj.design_obj is not None:
-                    design_instance = self.parent.commLogicObj.design_obj
-                    print("DEBUG: Using design instance from commLogicObj")
-            
-            # Method 2: If no instance found, create one and set it up with design inputs
-            if design_instance is None:
-                print("DEBUG: Creating new design instance")
-                design_instance = main  # Create instance from class
+    #----------------------create-tex-to-save-project-START--------------------------------------
+
+    def generate_tex(self):
+        # Generate 3D images only if design exists and we can create the logic object
+        if self.backend.design_status:
+            try:
+                cad_pngs = []
+                off_display, _, _, _ = init_display_off_screen(backend_str=CAD_BACKEND)
                 
-                # **FIX**: Copy ALL attributes from the class to the instance
-                for attr_name in dir(main):
-                    if not attr_name.startswith('_') and not callable(getattr(main, attr_name)):
-                        try:
-                            attr_value = getattr(main, attr_name)
-                            if attr_value is not None:
-                                setattr(design_instance, attr_name, attr_value)
-                        except:
-                            pass
-                
-                # Set the design inputs on the instance if available
-                if hasattr(self, 'design_inputs') and self.parent.design_inputs:
-                    for key, value in self.parent.design_inputs.items():
-                        if hasattr(design_instance, key):
-                            setattr(design_instance, key, value)
-                
-                # Copy design status from the class
-                design_instance.design_status = getattr(main, 'design_status', True)
-                
-                # Copy design status from the class
-                if hasattr(main, 'design_status'):
-                    design_instance.design_status = main.design_status
+                # Check if commLogicObj exists and is properly initialized
+                if hasattr(self.parent, 'commLogicObj') and self.parent.commLogicObj is not None:
+                    # Store original display settings
+                    original_display = self.parent.commLogicObj.display
+                    original_component = getattr(self.parent.commLogicObj, 'component', None)
+                    
+                    # Set up for image generation
+                    self.parent.commLogicObj.display = off_display
+                    self.parent.commLogicObj.display_3DModel("Model", "gradient_bg")
+
+                    image_folder_path = "./ResourceFiles/images"
+                    if not os.path.exists(image_folder_path):
+                        os.makedirs(image_folder_path)
+
+                    off_display.set_bg_gradient_color([255,255,255],[255,255,255])
+                    off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
+                    cad_pngs.append(os.path.join(image_folder_path, '3d.png'))
+                    off_display.View_Front()
+                    off_display.FitAll()
+                    off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
+                    cad_pngs.append(os.path.join(image_folder_path, 'front.png'))
+                    off_display.View_Top()
+                    off_display.FitAll()
+                    off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
+                    cad_pngs.append(os.path.join(image_folder_path, 'top.png'))
+                    off_display.View_Right()
+                    off_display.FitAll()
+                    off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
+                    cad_pngs.append(os.path.join(image_folder_path, 'side.png'))
+                    
+                    # Restore original display settings
+                    self.parent.commLogicObj.display = original_display
+                    if original_component is not None:
+                        self.parent.commLogicObj.component = original_component
+                        
+                    print("3D images generated successfully")
                 else:
-                    design_instance.design_status = True  # Assume successful if no status
-                
-                # Run the design calculation if needed
-                if hasattr(design_instance, 'design_status') and not design_instance.design_status:
-                    print("DEBUG: Running design calculation on instance")
-                    try:
-                        if hasattr(design_instance, 'design_connection'):
-                            design_instance.design_connection()
-                        elif hasattr(design_instance, 'design'):
-                            design_instance.design()
-                    except Exception as e:
-                        print(f"DEBUG: Error running design: {e}")
-            
-            # Now call save_design on the actual instance
-            if design_instance and hasattr(design_instance, 'save_design'):
-                print("DEBUG: Calling save_design on instance")
-                success = design_instance.save_design(popup_summary)
-                print(success)
-                
-                if success:
-                    CustomMessageBox(
-                        title='Success',
-                        text='Design report generated successfully!',
-                        dialogType=MessageBoxType.Success
-                    ).exec()
-                    dialog_window.accept()
-                else:
-                    CustomMessageBox(
-                        title="Error",
-                        text="Failed to generate design report. Please check the inputs.",
-                        dialogType=MessageBoxType.Warning
-                    ).exec()
-            else:
-                CustomMessageBox(
-                    title="Error",
-                    text="Could not access design instance for report generation.",
-                    dialogType=MessageBoxType.Warning
-                ).exec()
-                
-        except Exception as e:
-            CustomMessageBox(
-                title="Error",
-                text=f'Error generating report: {str(e)}',
-                dialogType=MessageBoxType.Critical
-            ).exec()
-            print(f"Report generation error: {str(e)}")
-            import traceback
-            traceback.print_exc()
+                    print("commLogicObj not available - skipping 3D image generation")
+                    # Create default/placeholder images directory
+                    image_folder_path = "./ResourceFiles/images"
+                    if not os.path.exists(image_folder_path):
+                        os.makedirs(image_folder_path)
+                    
+            except Exception as e:
+                print(f"Error generating 3D images: {str(e)}")
+                # Ensure images directory exists even if image generation fails
+                image_folder_path = "./ResourceFiles/images"
+                if not os.path.exists(image_folder_path):
+                    os.makedirs(image_folder_path)
+
+        # Init input summary
+        input_summary = {}
+        input_summary["ProfileSummary"] = {}
+        input_summary["ProfileSummary"]["CompanyName"] = ''
+        input_summary["ProfileSummary"]["CompanyLogo"] = ''
+        input_summary["ProfileSummary"]["Group/TeamName"] = ''
+        input_summary["ProfileSummary"]["Designer"] = ''
+
+        input_summary["ProjectTitle"] = ''
+        input_summary["Subtitle"] = ''
+        input_summary["JobNumber"] = ''
+        input_summary["AdditionalComments"] = ''
+        input_summary["Client"] = ''
+
+        import tempfile
+        # CREATE TEMPORARY WORKSPACE - No user prompt needed
+        temp_dir = tempfile.mkdtemp(prefix='osdag_report_')
+        filename = os.path.join(temp_dir, "report.tex")
+
+        fname_no_ext = filename.split(".")[0]
+        input_summary['filename'] = fname_no_ext
+        input_summary['does_design_exist'] = self.backend.design_status
+        input_summary['logger_messages'] = self.parent.textEdit.toPlainText()
+        # Generate LaTeX file instead of PDF
+        self.backend.save_design(input_summary)
         
+        return cad_pngs, filename
+
+    # called from template_page
+    def save_to_database(self, record: dict):
+        imgs, tex_path = self.generate_tex()
+        import os
+        report_path = "osdag_gui.data.reports"
+        # Ensure the 'reports' directory exists
+        if not os.path.exists("./osdag_gui/data/reports"):
+            os.makedirs("./osdag_gui/data/reports")
+        record[REPORT_FILE_PATH] = report_path
+
+        id = insert_recent_project(record)
+
+        # tex_path should always be a string
+        if isinstance(tex_path, list):
+            tex_path = tex_path[0] if tex_path else None
+
+        # imgs should always be a list of valid files
+        if isinstance(imgs, str):
+            imgs = [imgs] if os.path.isfile(imgs) else []
+        elif isinstance(imgs, list):
+            imgs = [img for img in imgs if isinstance(img, str) and os.path.isfile(img)]
+        else:
+            imgs = []
+
+        # Copy the .tex file and PNGs to the report_path directory, suffixed with the record id
+        import shutil
+
+        import pathlib
+
+        # Construct the target directory path using an absolute path
+        # Place reports in a real directory, not a Python module path
+        base_report_dir = os.path.join(os.getcwd(), "osdag_gui", "data", "reports")
+        target_dir = os.path.join(base_report_dir, f"file_{id}")
+        pathlib.Path(target_dir).mkdir(parents=True, exist_ok=True)
+
+        # Copy the .tex file
+        try:
+            shutil.copy(tex_path, os.path.join(target_dir, os.path.basename(tex_path)))
+        except Exception as e:
+            print(f"Error copying .tex file to {target_dir}: {e}")
+
+        # Copy all PNG files
+        for img_path in imgs:
+            # Only copy if img_path is a file and ends with .png (case-insensitive)
+            if isinstance(img_path, str) and img_path.lower().endswith(".png") and os.path.isfile(img_path):
+                try:
+                    shutil.copy(img_path, os.path.join(target_dir, os.path.basename(img_path)))
+                except Exception as e:
+                    print(f"Error copying PNG file {img_path} to {target_dir}: {e}")
+            else:
+                print(f"Skipping invalid PNG path: {img_path}")
+
+        return id    
+    
+    #----------------------create-tex-to-save-project-END----------------------------------------
+
     def getPopUpInputs(self):
         """Enhanced method to collect all popup inputs"""
         input_summary = {}
@@ -563,9 +610,7 @@ class OutputDock(QWidget):
             input_summary["folder"] = str(self.summary_popup.lineEdit_folder.text())
 
         return input_summary
-
-
-    # ----------------------------------Save-Design-Report-END------------------------------------------------------
+    #----------------------create-tex-to-save-project-END----------------------------------------
 
     # ----------------------------------Save-Outputs-START------------------------------------------------------
     def save_output_to_csv(self, main):

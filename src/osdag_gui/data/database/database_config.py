@@ -15,6 +15,7 @@ MODULE_KEY = 'module_key'
 RELATED_MODULE = 'module'
 RELATED_SUBMODULE = 'submodule'
 LAST_OPENED = 'opened_at'
+REPORT_FILE_PATH = 'files_path'
 
 MODULE_MAP = {
     #---------Connections-start--------------------------------------------------------
@@ -86,6 +87,7 @@ def create_user_database():
         id INTEGER PRIMARY KEY,
         project_name TEXT NOT NULL,
         project_path TEXT NOT NULL UNIQUE,
+        files_path TEXT NOT NULL,
         module_key TEXT NOT NULL,
         creation_date DATETIME NOT NULL,
         last_edited DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -277,11 +279,14 @@ def insert_recent_project(data: dict) -> int | None:
     """
     Insert a new record into the recent_projects table.
     
-    Args:
-        data (dict): Dictionary containing project details. Must include keys:
-            - PROJECT_NAME
-            - PROJECT_PATH
-            - MODULE_KEY
+    data (dict): Dictionary containing project details. Must include keys:
+            - PROJECT_NAME: Name of the project
+            - PROJECT_PATH: Path to the project (unique identifier)
+            - MODULE_KEY: Module identifier
+            - FILES_PATH: Path to .tex and .pngs
+            Optional keys:
+            - creation_date: Creation timestamp (defaults to current time)
+            - last_edited: Last edited timestamp (defaults to current time)
     Returns:
         int | None: ID of the inserted or updated record, or None if insertion failed.
     """
@@ -293,16 +298,23 @@ def insert_recent_project(data: dict) -> int | None:
     try:
         conn = sqlite3.connect(SQLITE_FILE)
         cursor = conn.cursor()
-        # If there is some conflict in Path(UNIQUE) than last_edited dated is updated.
+        # If there is some conflict in Path(UNIQUE) then last_edited date is updated.
         cursor.execute(f"""
             INSERT INTO {PROJECT_TABLE} 
-            ({PROJECT_NAME}, {PROJECT_PATH}, {MODULE_KEY},{CREATION_DATE}, {LAST_EDITED})
-            VALUES (?, ?, ?, ?, ?)
+            ({PROJECT_NAME}, {PROJECT_PATH}, {REPORT_FILE_PATH}, {MODULE_KEY}, {CREATION_DATE}, {LAST_EDITED})
+            VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT({PROJECT_PATH})
             DO UPDATE SET 
                 {MODULE_KEY}=excluded.{MODULE_KEY},
                 {LAST_EDITED}=excluded.{LAST_EDITED};
-        """, (data[PROJECT_NAME], data[PROJECT_PATH], data[MODULE_KEY], creation_date, last_edited))
+        """, (
+            data[PROJECT_NAME],
+            data[PROJECT_PATH],
+            data[REPORT_FILE_PATH],
+            data[MODULE_KEY],
+            creation_date,
+            last_edited
+        ))
         conn.commit()
         return cursor.lastrowid
     except sqlite3.Error as e:

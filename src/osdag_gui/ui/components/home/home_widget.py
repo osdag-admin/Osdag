@@ -3,13 +3,13 @@ Home widget for Osdag GUI.
 Displays recent projects, modules, and search bar.
 """
 import sys, shutil
-import os
+import os, subprocess
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QScrollArea, QFrame, QLineEdit, QPushButton, QFileDialog,
     QMenu, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect
 )
-from PySide6.QtCore import Qt, QSize, QPoint, Signal, QPropertyAnimation, QEasingCurve
+from PySide6.QtCore import Qt, QSize, QPoint, Signal, QPropertyAnimation, QEasingCurve, QThread
 from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QCursor, QPainter, QPixmap, QFontMetrics
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
@@ -315,6 +315,7 @@ class ProjectItem(QFrame):
         
         # Buttons with FULL visibility
         self.generate_btn = QPushButton("Generate Report")
+        self.generate_btn.clicked.connect(lambda checked=False, record=self.project_data: self.recents_generate_report(record))
 
         self.download_btn = QPushButton("Download OSI")
         self.download_btn.clicked.connect(lambda checked=False, record=self.project_data: self.handle_download_osi(record))
@@ -407,6 +408,90 @@ class ProjectItem(QFrame):
                     text=f"Failed to save file:\n{e}",
                     dialogType=MessageBoxType.Critical
                 ).exec()
+
+    #-------------Functions-to-generate-report-of-recent-project-START---------------------------
+
+    class ReportWorker(QThread):
+        success = Signal(str)   # emits PDF path
+        error = Signal(str)     # emits error message
+
+        def __init__(self, record, target_pdf, parent=None):
+            super().__init__(parent)
+            self.record = record
+            self.target_pdf = target_pdf
+
+        def run(self):
+            try:
+                # 1. Check if tex exist
+                tex_path = os.path.join("osdag_gui", "data", "reports", f"file_{self.record[ID]}", "report.tex")
+                if not os.path.isfile(tex_path):
+                    self.error.emit(f"LaTeX file not found for this project:\n{tex_path}")
+                    return
+
+                # 2. Copy images
+                base_dir = os.path.join("ResourceFiles", "images")
+                os.makedirs(base_dir, exist_ok=True)
+
+                report_dir = os.path.join("osdag_gui", "data", "reports", f"file_{self.record[ID]}")
+                required_images = ["3d.png", "front.png", "top.png", "side.png"]
+
+                for img in required_images:
+                    src = os.path.join(report_dir, img)
+                    dst = os.path.join(base_dir, img)
+                    if os.path.isfile(src):
+                        shutil.copy2(src, dst)
+
+                # 3. Run pdflatex
+                result = subprocess.run(
+                    ["pdflatex", "-interaction=nonstopmode", os.path.basename(tex_path)],
+                    cwd=os.path.dirname(tex_path),
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+
+                # 4. Copy PDF
+                generated_pdf = os.path.join(os.path.dirname(tex_path), "report.pdf")
+                if os.path.isfile(generated_pdf):
+                    shutil.copy2(generated_pdf, self.target_pdf)
+                    self.success.emit(self.target_pdf)
+                else:
+                    self.error.emit("PDF generation failed. report.pdf not found.")
+
+            except subprocess.TimeoutExpired:
+                self.error.emit("pdflatex timed out.")
+            except Exception as e:
+                self.error.emit(str(e))
+    
+    def recents_generate_report(self, record: dict):
+        # QFileDialog must stay in the main thread
+        target_pdf, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save PDF Report As",
+            record[PROJECT_NAME],
+            "PDF (*.pdf)"
+        )
+        if not target_pdf:
+            return
+
+        if not target_pdf.lower().endswith(".pdf"):
+            target_pdf += ".pdf"
+
+        # Run heavy stuff in worker thread
+        self.worker = self.ReportWorker(record, target_pdf, parent=self)
+        self.worker.success.connect(lambda path: CustomMessageBox(
+            title="Success",
+            text=f"PDF report saved successfully to:\n{path}",
+            dialogType=MessageBoxType.Success
+        ).exec())
+        self.worker.error.connect(lambda msg: CustomMessageBox(
+            title="Error",
+            text=msg,
+            dialogType=MessageBoxType.Critical
+        ).exec())
+        self.worker.start()
+
+    #-------------Functions-to-generate-report-of-recent-project-END---------------------------
 
     def enterEvent(self, event):
         if not self.is_expanded:

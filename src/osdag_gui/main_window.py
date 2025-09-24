@@ -383,7 +383,7 @@ class MainWindow(QMainWindow):
                      "Closing it will exit Osdag.\n"
                     f"Do you want to save your '{tab_title}' design before closing?"
                 ),
-                buttons=["Save and Exit", "Exit Without Saving"]
+                buttons=["Save and Exit", "Exit Without Saving", "Cancel"]
             ).exec()
             
             if result == "Save and Exit":
@@ -627,7 +627,7 @@ class MainWindow(QMainWindow):
             ).exec()
             return    
 
-    #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
+    #-------------Functions-to-load-modules-in-Tabwidget-END------------------------------------
 
     def clear_layout(self, layout):
         while layout.count():

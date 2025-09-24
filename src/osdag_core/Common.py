@@ -992,7 +992,25 @@ VALUES_SECTYPE = ['Select Type','Beams and Columns','Columns','Angles','Back to 
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
-VALUES_DIAM = connectdb("Bolt")
+
+# Safe database call
+try:
+    VALUES_BEAMSEC = connectdb("Beams")
+    VALUES_SECBM = connectdb("Beams")
+    VALUES_COLSEC = connectdb("Columns")
+    VALUES_MATERIAL = connectdb("Material")
+    VALUES_PRIBM = connectdb("Beams")
+    VALUES_DIAM = connectdb("Bolt")
+except Exception as e:
+    print(f"Warning: Could not load bolt diameters from database: {e}")
+    VALUES_DIAM = []
+    VALUES_BEAMSEC = []
+    VALUES_SECBM = []
+    VALUES_COLSEC = []
+    VALUES_MATERIAL = []
+    VALUES_PRIBM = []
+
+VALUES_MATERIAL_SELECTED = "E 250 (Fe 410 W)A"
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 
 VALUES_IMAGE_PLATEGIRDER = [str(files("osdag_core.data.ResourceFiles.images").joinpath("ULPPS_PG.png")),
@@ -1009,13 +1027,6 @@ VALUES_IMG_TENSIONBOLTED_DF03 = [str(files("osdag_core.data.ResourceFiles.images
 
 VALUES_IMG_BEAM = [str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_Beam.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_Beam.png"))]
 VALUES_IMG_HOLLOWSECTION = [str(files("osdag_core.data.ResourceFiles.images").joinpath("SHS.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("RHS.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("CHS.png"))]
-
-VALUES_BEAMSEC = connectdb("Beams")
-VALUES_SECBM = connectdb("Beams")
-VALUES_COLSEC = connectdb("Columns")
-VALUES_MATERIAL = connectdb("Material")
-VALUES_MATERIAL_SELECTED = "E 250 (Fe 410 W)A"
-VALUES_PRIBM = connectdb("Beams")
 
 
 ############################
@@ -2504,8 +2515,11 @@ KEY_DISP_LEN_INLINE = 'Total Length in line with tension'
 KEY_LEN_OPPLINE = 'Total length opp line with tension'
 KEY_DISP_LEN_OPPLINE = 'Total Length opp line with tension'
 
-
-VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
+try:
+  VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
+except Exception as e:
+    print(f"Warning: Could not load Angles from database: {e}")
+    VALUES_ANGLESEC_CUSTOMIZED = []
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
 
@@ -2549,7 +2563,12 @@ def get_leg_lengths(designation):
     conn.close()
     return leg_a_length,leg_b_length,t,r_r
 
-all_angles = connectdb("Angles","popup")
+try:
+  all_angles = connectdb("Angles","popup")
+except Exception as e:
+    print(f"Warning: Could not load Angles from database: {e}")
+    all_angles = []
+
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
 print(all_angles)
 print("customised")

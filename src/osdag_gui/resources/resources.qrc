@@ -97,6 +97,7 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>
 
+        <file>fonts/UbuntuSans-Regular.ttf</file>
 
     </qresource>
 </RCC>

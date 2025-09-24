@@ -574,6 +574,15 @@ class MainWindow(QMainWindow):
                     if id is not None:
                         try:
                             delete_project_record(id)
+                            # Also delete the latex files for this project
+                            import shutil
+                            report_folder = f"osdag_gui/data/reports/file_{id}"
+                            try:
+                                shutil.rmtree(report_folder)
+                            except FileNotFoundError:
+                                pass
+                            except Exception as e:
+                                print(f"Failed to delete report folder: {e}")
                             CustomMessageBox(
                                 title="Record Removed",
                                 text="The record has been removed from recent projects.",

@@ -54,7 +54,6 @@ class CustomButton(QPushButton):
                 background-color: #ffffff;
                 color: #000000;
                 padding: 4px 4px 8px 8px;
-                font-family: "Calibri";
                 border-top: 1px solid #ffffff;
                 border-bottom: 1px solid #ffffff;
                 text-align: left;
@@ -74,7 +73,6 @@ class CustomButton(QPushButton):
                 background-color: #90AF13;
                 color: #ffffff;
                 padding: 4px 4px 8px 8px;
-                font-family: "Calibri";
                 border-top: 1px solid #90AF13;
                 border-bottom: 1px solid #90AF13;
                 text-align: left;

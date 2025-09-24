@@ -532,6 +532,7 @@ class Connection(Main):
     ########################################
 
     def func_for_validation(self, design_dictionary):
+        
         print('input dictionary')
         print(design_dictionary)
         all_errors = []
@@ -541,6 +542,13 @@ class Connection(Main):
         option_list = self.input_values()
         missing_fields_list = []
         for option in option_list:
+
+            # hover labels
+            if option[1] == KEY_DISP_COLSEC:
+                self.hover_dict["Column"] = f"Column Designation ({design_dictionary[option[0]]})"
+            elif option[1] == KEY_DISP_BEAMSEC:
+                self.hover_dict["Beam"] = f"Beam Designation ({design_dictionary[option[0]]})"
+
             if option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
                 if design_dictionary[option[0]] == 'Select Section' or design_dictionary[option[0]] == 'Select Grade':
                     missing_fields_list.append(option[1])

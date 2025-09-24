@@ -21,6 +21,7 @@ from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
 from osdag_gui.common_functions import design_examples
 
 from osdag_core.Common import *
+
 from osdag_gui.ui.windows.design_preferences import DesignPreferences
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_gui.data.database.database_config import *
@@ -135,10 +136,23 @@ class CustomWindow(QWidget):
             QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         from OCC.Display.qtDisplay import qtViewer3d
-        self.cad_widget = qtViewer3d(self)
+        from osdag_gui.ui.components.custom_3dviewer import CustomViewer3d
 
+        self.cad_widget = CustomViewer3d(self)
+        self.cad_widget.setFocusPolicy(Qt.StrongFocus)
+        self.cad_widget.setFocus()
+        self.cad_widget.setMouseTracking(True)
         self.cad_widget.InitDriver()
+
         display = self.cad_widget._display
+        self.cad_widget.context = display.Context
+        self.cad_widget.view = display.View
+        # to store model objects
+        self.cad_widget.model_ais_objects = {}
+
+        # Disable automatic highlighting to prevent flickering borders
+        self.cad_widget.context.SetAutomaticHilight(False)
+
         key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
                         Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
                         Qt.Key.Key_Right: lambda: self.Pan_Rotate_model("Right"),
@@ -1350,7 +1364,7 @@ class CustomWindow(QWidget):
                 print(f"main attributes: {dir(main)}")
                 print("main.mainmodule",main.mainmodule)
 
-                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                self.commLogicObj = CommonDesignLogic(self.display, self.cad_widget, self.folder, main.module, main.mainmodule)
                 print(f"This is MAIN.MODULE {main.module}")
                 print(main.mainmodule)
                 # print("common start")
@@ -1359,8 +1373,10 @@ class CustomWindow(QWidget):
                 # status = True
                 ##############trial##############
 
+                print("Hover Dictionary: ",main.hover_dict)
+
                 print("Calling 3D Model from CAD")
-                self.commLogicObj.call_3DModel(status, self.backend)
+                self.commLogicObj.call_3DModel(status, main)
                 # Store the design instance for later use in report generation
                 if hasattr(self.commLogicObj, 'design_obj'):
                     # Store reference to the design instance
@@ -1395,7 +1411,7 @@ class CustomWindow(QWidget):
                     self.cad_comp_widget.findChild(QCheckBox, chkbox[0]).setChecked(False)
                 for action in self.menu_cad_components:
                     action.setEnabled(False)
-
+            
     def design_fn(self, op_list, data_list, main):
         design_dictionary = {}
         self.input_dock_inputs = {}
@@ -1678,9 +1694,9 @@ class CustomWindow(QWidget):
             return
     
     def clear_output_fields(self):
-        for output_field in self.output_dock.ouput_widget.findChildren(QLineEdit):
+        for output_field in self.output_dock.output_widget.findChildren(QLineEdit):
             output_field.clear()
-        for output_field in self.output_dock.ouput_widget.findChildren(QPushButton):
+        for output_field in self.output_dock.output_widget.findChildren(QPushButton):
             if output_field.objectName() in ["btn_CreateDesign", "save_outputDock"]:
                 continue
             output_field.setEnabled(False)

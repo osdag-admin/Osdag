@@ -352,6 +352,13 @@ KEY_DISP_LAPJOINTWELDED = 'Lap Joint Welded Connection'
 KEY_DISP_BUTTJOINTBOLTED = 'Butt Joint Bolted Connection'
 WELD_SIZES = [3, 5, 6, 10, 12]
 
+
+#Simpleconnections (Tension+compression)
+KEY_DESIGN_FOR = 'Design.For'
+KEY_DISP_DESIGN_FOR = 'Design For'
+KEY_AXIAL_FORCE = 'Load.Axial.Force'  # If not using existing KEY_AXIAL
+KEY_DISP_AXIAL_FORCE = 'Axial Force (kN)'
+
 # MADE THIS t.s.
 KEY_DISP_BUTTJOINTWELDED = 'Butt Joint Welded Connection'
 KEY_OUT_UTILISATION_RATIO = 'Utilisation Ratio'
@@ -1903,6 +1910,11 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance (mm)'
 
 KEY_WEB_CAPACITY ='section.web_capacities'
 KEY_DISP_WEB_CAPACITY ='Capacity'
+
+
+#SimpleConnection(Tension+Compression)
+KEY_OUT_DESIGN_FOR = "Design For" 
+KEY_OUT_DISP_DESIGN_FOR = "Design For"
 
 # Web plate
 KEY_REDUCTION_FACTOR_WEB ='web_plate.red,factor'

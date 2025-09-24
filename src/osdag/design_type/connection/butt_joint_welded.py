@@ -57,6 +57,7 @@ class ButtJointWelded(MomentConnection):
         tabs = []
         tabs.append((("Weld", TYPE_TAB_2, self.weld_values))) # added this line t.s.
         tabs.append(("Detailing", TYPE_TAB_2, self.detailing_values))
+        tabs.append(("Design", TYPE_TAB_2, self.design_values))
         return tabs
 
     def tab_value_changed(self):
@@ -76,6 +77,7 @@ class ButtJointWelded(MomentConnection):
             KEY_DP_DETAILING_EDGE_TYPE,
             KEY_DP_DETAILING_PACKING_PLATE
         ]))
+        design_input.append(("Design", TYPE_COMBOBOX, [KEY_DESIGN_FOR]))
         return design_input
 
     def input_dictionary_without_design_pref(self):
@@ -84,7 +86,8 @@ class ButtJointWelded(MomentConnection):
             KEY_DP_WELD_TYPE,
             KEY_DP_WELD_MATERIAL_G_O,
             KEY_DP_DETAILING_EDGE_TYPE,
-            KEY_DP_DETAILING_PACKING_PLATE
+            KEY_DP_DETAILING_PACKING_PLATE,
+            KEY_DESIGN_FOR
         ], ''))
         return design_input
 
@@ -100,9 +103,24 @@ class ButtJointWelded(MomentConnection):
             KEY_DP_WELD_TYPE: "Shop weld",
             KEY_DP_WELD_MATERIAL_G_O: str(fu),  # Set weld material grade to fu of selected material
             KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
-            KEY_DP_DETAILING_PACKING_PLATE: "Yes" 
+            KEY_DP_DETAILING_PACKING_PLATE: "Yes",
+            KEY_DESIGN_FOR: "Tension"
         }
         return defaults.get(key)
+
+    def design_values(self, input_dictionary):
+        """Content of the 'Design' tab in Design Preferences."""
+        values = {
+            KEY_DESIGN_FOR: 'Tension',
+        }
+        if input_dictionary and KEY_DESIGN_FOR in input_dictionary:
+            values[KEY_DESIGN_FOR] = input_dictionary[KEY_DESIGN_FOR]
+
+        design_tab_content = []
+        t1 = (KEY_DESIGN_FOR, KEY_DISP_DESIGN_FOR, TYPE_COMBOBOX,
+              ['Tension', 'Compression'], values[KEY_DESIGN_FOR])
+        design_tab_content.append(t1)
+        return design_tab_content
 
     def detailing_values(self, input_dictionary):
         values = {
@@ -274,7 +292,7 @@ class ButtJointWelded(MomentConnection):
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
-        t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t17 = (KEY_AXIAL_FORCE, KEY_DISP_AXIAL_FORCE, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t17)
 
         return options_list
@@ -373,6 +391,10 @@ class ButtJointWelded(MomentConnection):
                round(self.weld_length_provided, 1) if flag else '', True)
         out_list.append(t27)
 
+        t29 = (KEY_OUT_DESIGN_FOR, KEY_OUT_DISP_DESIGN_FOR, TYPE_TEXTBOX,
+               self.design_for if flag else '', True)
+        out_list.append(t29)
+
         return out_list
 
     def module_name(self):
@@ -402,7 +424,7 @@ class ButtJointWelded(MomentConnection):
         t37 = ('Plate2', self.call_3DPlate)
         components.append(t37)
 
-        return componentsconda 
+        return components
 
     def call_3DPlate(self, ui, bgcolor):
         from PyQt5.QtWidgets import QCheckBox
@@ -444,10 +466,10 @@ class ButtJointWelded(MomentConnection):
                         else:
                             flag1 = True
 
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL_FORCE:
 
                         if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Input value(s) cannot be equal or less than zero."
+                            error = "Input value for Axial Force must be a positive value."
                             all_errors.append(error)
                         else:
                             flag2 = True
@@ -486,7 +508,15 @@ class ButtJointWelded(MomentConnection):
         
         # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
         self.main_material = design_dictionary[KEY_MATERIAL]
-        self.tensile_force = float(design_dictionary[KEY_TENSILE_FORCE])*1000
+        # Design mode: default to Tension if not provided
+        self.design_for = design_dictionary.get(KEY_DESIGN_FOR, 'Tension')
+        # Axial force: prefer KEY_AXIAL_FORCE, fallback to KEY_AXIAL, then KEY_TENSILE_FORCE
+        axial_kN_str = design_dictionary.get(KEY_AXIAL_FORCE,
+                design_dictionary.get(KEY_AXIAL,
+                design_dictionary.get(KEY_TENSILE_FORCE, 0)))
+        self.axial_force = abs(float(axial_kN_str)) * 1000  # N, always positive magnitude
+        # Maintain backward compatibility: many methods use tensile_force name
+        self.tensile_force = self.axial_force
         self.width = design_dictionary[KEY_PLATE_WIDTH]
 
         # print(self.sizelist)
@@ -791,7 +821,7 @@ class ButtJointWelded(MomentConnection):
         self.weld_strength = self.f_w * 0.707 * self.weld_size * self.weld_length_effective * self.N_f
         
         # Calculate weld utilization ratio
-        weld_utilization = self.tensile_force / self.weld_strength
+        weld_utilization = self.axial_force / self.weld_strength
         self.utilization_ratios['weld'] = weld_utilization
         
         #logger.info(": Weld Strength Calculation Results:")
@@ -835,7 +865,7 @@ class ButtJointWelded(MomentConnection):
         self.weld_strength_reduced = self.f_w_adjusted * 0.707 * self.weld_size * self.weld_length_effective * self.N_f
         
         # Update weld utilization with reduced strength
-        weld_utilization_reduced = self.tensile_force / self.weld_strength_reduced
+        weld_utilization_reduced = self.axial_force / self.weld_strength_reduced
         self.utilization_ratios['weld'] = weld_utilization_reduced  # Update the utilization ratio
         
         #logger.info(": Long joint reduction check results:")
@@ -845,7 +875,9 @@ class ButtJointWelded(MomentConnection):
         #logger.info(": Updated weld utilization ratio = {}".format(round(weld_utilization_reduced, 3)))
 
     def check_base_metal_strength(self, design_dictionary):
-        """Check strength of base metal according to IS 800:2007"""
+        """Check strength of base metal according to IS 800:2007.
+        Tension: yielding and rupture (Cl. 6). Compression: gross yielding (Cl. 7).
+        """
         
         # Extract material properties and handle material grade strings
         material_grade = design_dictionary[KEY_MATERIAL]
@@ -874,15 +906,16 @@ class ButtJointWelded(MomentConnection):
         self.A_g = Tmin * self.plates_width
         self.A_n = self.A_g  # For welded joints, net area equals gross area
         
-        # Calculate design strength based on yielding and rupture
-        T_dy = self.A_g * self.fy / self.gamma_m0
-        T_du = 0.9 * self.A_n * self.fu / self.gamma_m1
-        
-        # Design base metal strength is minimum of the two
-        self.T_db = min(T_dy, T_du)
-        
-        # Calculate base metal utilization ratio
-        base_metal_utilization = self.tensile_force/self.T_db
+        if self.design_for == 'Compression':
+            # Compression: use gross area yielding (buckling is member-level, not joint)
+            self.T_db = self.A_g * self.fy / self.gamma_m0
+            base_metal_utilization = self.axial_force / self.T_db
+        else:
+            # Tension: yielding and rupture, take minimum
+            T_dy = self.A_g * self.fy / self.gamma_m0
+            T_du = 0.9 * self.A_n * self.fu / self.gamma_m1
+            self.T_db = min(T_dy, T_du)
+            base_metal_utilization = self.axial_force / self.T_db
         self.utilization_ratios['base_metal'] = base_metal_utilization
         
         #logger.info(": Base Metal Strength Results:")
@@ -897,10 +930,15 @@ class ButtJointWelded(MomentConnection):
         #logger.info(": Base metal utilization ratio = {}".format(round(base_metal_utilization, 3)))
         
         if base_metal_utilization > 1:
-            logger.error(": Base metal strength is insufficient [cl. 6.2, IS 800:2007]")
-            logger.error(": Section fails in tension, try increasing the plate dimensions or using higher grade material")
+            if self.design_for == 'Compression':
+                logger.error(": Base metal strength in compression is insufficient [cl. 7, IS 800:2007]")
+            else:
+                logger.error(": Base metal strength in tension is insufficient [cl. 6, IS 800:2007]")
         else:
-            logger.info(": Base metal strength is adequate")
+            if self.design_for == 'Compression':
+                logger.info(": Base metal strength in compression is adequate")
+            else:
+                logger.info(": Base metal strength in tension is adequate")
     
     def calculate_final_utilization_ratio(self):
         """Calculate final utilization ratio and set design status after all component checks"""
@@ -959,7 +997,8 @@ class ButtJointWelded(MomentConnection):
             self.report_input = {
                 KEY_MODULE: getattr(self, 'module', 'Butt Joint Welded Connection'),
                 KEY_DISP_MATERIAL: safe_get('main_material', 'E 250 (Fe 410 W)A'),
-                KEY_DISP_TENSILE_FORCE: round(safe_get('tensile_force', 0)/1000, 2),
+                KEY_DISP_AXIAL: round(safe_get('axial_force', 0)/1000, 2),  # Changed from tensile_force
+                KEY_DISP_DESIGN_FOR: safe_get('design_for', 'Tension'),
                 KEY_DISP_PLATE1_THICKNESS: safe_get('plate1.thickness[0]', 8.0),
                 KEY_DISP_PLATE2_THICKNESS: safe_get('plate2.thickness[0]', 8.0), 
                 KEY_DISP_PLATE_WIDTH: safe_get('plates_width', 20.0),
@@ -1083,10 +1122,17 @@ class ButtJointWelded(MomentConnection):
 
                 T_db = min(T_dy, T_du)
                 
-                t1 = ('Base Metal Capacity',
-                    NoEscape(f'\\small T$_{{db}}$ = min(T$_{{dy}}$, T$_{{du}}$) = min({round(T_dy/1000, 2)}, {round(T_du/1000, 2)}) = {round(T_db/1000, 2)}~kN~[Ref:~IS~800:2007, Cl.6.2, 6.3]'),
-                    f'{round(T_db/1000, 2)} kN',
-                    'Pass')
+                # For base metal capacity section, conditionally format based on design_for
+                if safe_get('design_for') == 'Compression':
+                    t1 = ('Base Metal Capacity',
+                        NoEscape(f'\\small P$_{{d}}$ = A$_{{g}}$ $\\times$ f$_{{y}}$/$\\gamma$$_{{m0}}$ = {A_g} $\\times$ {fy}/{gamma_m0} = {round(T_db/1000, 2)}~kN~[Ref:~IS~800:2007, Cl.7.1.2]'),
+                        f'{round(T_db/1000, 2)} kN',
+                        'Pass')
+                else:
+                    t1 = ('Base Metal Capacity',
+                        NoEscape(f'\\small T$_{{db}}$ = min(T$_{{dy}}$, T$_{{du}}$) = min({round(T_dy/1000, 2)}, {round(T_du/1000, 2)}) = {round(T_db/1000, 2)}~kN~[Ref:~IS~800:2007, Cl.6.2, 6.3]'),
+                        f'{round(T_db/1000, 2)} kN',
+                        'Pass')
                 self.report_check.append(t1)
 
                 # Detailing Requirements Section
@@ -1220,6 +1266,7 @@ class ButtJointWelded(MomentConnection):
             
             # Connection details
             KEY_DISP_AXIAL: round(self.tensile_force/1000, 2),  # Convert N to kN
+            KEY_DISP_DESIGN_FOR: self.design_for,
             
             # Connecting Members
             "Connecting Members": "TITLE",

@@ -457,6 +457,8 @@ class DesignSummaryPopup(QDialog):
                     text=f'Error generating PDF: {str(e)}',
                     dialogType=MessageBoxType.Critical
                 ).exec()
+
+            # No Customization Dialog is created.
             return
 
         # LAUNCH CUSTOMIZATION DIALOG if available

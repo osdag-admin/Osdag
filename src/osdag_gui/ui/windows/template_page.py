@@ -1635,7 +1635,7 @@ class CustomWindow(QWidget):
                     PROJECT_PATH: filePath,
                     MODULE_KEY: self.backend.module_name(),
                 }
-                self.project_id = insert_recent_project(record)
+                self.project_id = self.output_dock.save_to_database(record)
 
             CustomMessageBox(
                 title="Success",

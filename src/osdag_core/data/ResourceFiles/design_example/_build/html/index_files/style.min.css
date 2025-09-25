@@ -1,0 +1,7 @@
+/**
+ * Nginx Indexer
+ * Light Style Colors
+ * by Tux {2015-07-06}
+ * https://github.com/tuxy
+ */
+*{margin:0;padding:0}body{min-width:320px;margin:1em;color:#333;background-color:#eee;font-size:120%}a{color:#1C6094;text-decoration:none}a:hover{color:#000}h1{padding:1em;color:#555;font-size:80%;font-weight:400}hr{display:block;margin:0 -1px;border-top:1px solid #ddd;border-bottom:none}pre{overflow:auto;margin:1em;line-height:2em}footer{margin:1em;color:#888;font-size:80%}#page{overflow:hidden;background-color:#fff;border-radius:5px;box-shadow:0 0 3px #ccc}

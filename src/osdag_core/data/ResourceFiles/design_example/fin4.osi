@@ -1,0 +1,51 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '24'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Material_Grade_OverWrite: '490'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Beam-Beam
+Connector.Material: E 350 (Fe 490)
+Connector.Plate.Thickness_List:
+- '3'
+- '4'
+- '5'
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '26'
+- '28'
+- '30'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '45'
+Load.Shear: '50'
+Material: E 350 (Fe 490)
+Member.Supported_Section.Designation: MB 200
+Member.Supported_Section.Material: E 350 (Fe 490)
+Member.Supporting_Section.Designation: MB 300
+Member.Supporting_Section.Material: E 350 (Fe 490)
+Module: Fin Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '490'

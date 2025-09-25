@@ -1,0 +1,83 @@
+%%
+%% This is file `extramarks.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% fancyhdr.dtx  (with options: `extramarks')
+%% 
+%% This is a generated file.
+%% 
+%% This file may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3 of this license
+%% or (at your option) any later version.  The latest version of this
+%% license is in:
+%% 
+%%    http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.3 or later is part of all distributions of LaTeX version
+%% 2005/12/01 or later.
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[2018-04-01]
+\ProvidesPackage{extramarks}
+           [2025/02/07 v5.2
+                  Extra marks for LaTeX]
+% Copyright (C) 1994-2025 by Pieter van Oostrum <pieter@vanoostrum.org>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\DeclareRelease{v4}{2024/11/30}{extramarks-v4.sty}
+\DeclareCurrentRelease{v5}{2025/02/07}
+\@ifundefined{NewMarkClass}
+             {\PackageWarningNoLine{extramarks}{%
+**************************************************\MessageBreak
+Your LaTeX installation is too old for extramarks version 5.\MessageBreak
+We will fallback to extramarks version 4 now.\MessageBreak
+Please note that some commands will not be available,\MessageBreak
+and that the functionality may be slightly different.\MessageBreak
+You are advised to update your LaTeX installation.\MessageBreak
+**************************************************}
+             \RequirePackage{extramarks-v4}\endinput}{}
+\AtBeginDocument{%
+  \IfPackageLoadedT{multicol}%
+    {\IfPackageAtLeastF{multicol}{2024-11-21}{%
+      \PackageWarningNoLine{extramarks}{%
+        You are using package `extramarks' with a version\MessageBreak
+        of `multicol' that is too old. The new version\MessageBreak
+        of `multicol' will be released on June 1, 2025.\MessageBreak
+        We will fallback to extramarks version 4 now.}%
+      \let\extramarks\undefined
+      \RequirePackage{extramarks-v4}
+      }%
+    }%
+}
+\ifx\@mkboth\@gobbletwo\else\def\@mkboth{\protect\markboth}\fi
+\NewMarkClass{extramarks-left}
+\NewMarkClass{extramarks-right}
+\newcommand\extramarks[2]{%
+  \InsertMark{extramarks-left}{#1}%
+  \InsertMark{extramarks-right}{#2}}
+\newcommand\extramarksleft[1]{%
+  \InsertMark{extramarks-left}{#1}}
+\newcommand\extramarksright[1]{%
+  \InsertMark{extramarks-right}{#1}}
+\newcommand\firstleftmark{\FirstMark{2e-left}}
+\newcommand\lastrightmark{\LastMark{2e-right}}
+\newcommand\firstrightmark{\rightmark}
+\let\firstrightmark \rightmark
+\newcommand\lastleftmark{\leftmark}
+\let\lastleftmark \leftmark
+\newcommand\firstleftxmark{\FirstMark{extramarks-left}}
+\newcommand\lastrightxmark{\LastMark{extramarks-right}}
+\newcommand\firstrightxmark{\FirstMark{extramarks-right}}
+\newcommand\topleftxmark{\TopMark{extramarks-left}}
+\newcommand\toprightxmark{\TopMark{extramarks-right}}
+\newcommand\lastleftxmark{\LastMark{extramarks-left}}
+\newcommand\firstxmark{\firstleftxmark}
+\let\firstxmark\firstleftxmark
+\newcommand\lastxmark{\lastrightxmark}
+\let\lastxmark\lastrightxmark
+\newcommand\topxmark{\topleftxmark}
+\let\topxmark\topleftxmark
+\endinput
+%%
+%% End of file `extramarks.sty'.

@@ -1,0 +1,53 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '24'
+- '30'
+Bolt.Grade:
+- '10.9'
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Non pre-tensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Column Flange-Beam Web
+Connector.Material: E 300 (Fe 440)
+Connector.Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Rolled, machine-flame cut, sawn and planed
+Detailing.Gap: '0'
+EndPlateType: Flushed - Reversible Moment
+Load.Axial: '32'
+Load.Moment: '220'
+Load.Shear: '95'
+Material: E 300 (Fe 440)
+Member.Supported_Section.Designation: WB 500
+Member.Supported_Section.Material: E 300 (Fe 440)
+Member.Supporting_Section.Designation: PBP 400 X 140.2
+Member.Supporting_Section.Material: E 300 (Fe 440)
+Module: Beam-to-Column End Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '510'
+Weld.Type: Groove Weld

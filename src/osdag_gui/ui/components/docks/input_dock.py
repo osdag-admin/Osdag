@@ -323,7 +323,7 @@ class InputDock(QWidget):
                 # Use monospace font for the label
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
 
                 right = NoScrollComboBox()
                 right.setObjectName(field[0])
@@ -348,7 +348,7 @@ class InputDock(QWidget):
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QLineEdit()
                 apply_field_style(right)

@@ -264,7 +264,7 @@ class OutputDock(QWidget):
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QLineEdit()
                 right.setStyleSheet(style_line_edit())
@@ -277,7 +277,8 @@ class OutputDock(QWidget):
             elif type == TYPE_OUT_BUTTON:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                print("@",label,"@")
+                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QPushButton(label.strip())
                 spacing_button_list.append(field)

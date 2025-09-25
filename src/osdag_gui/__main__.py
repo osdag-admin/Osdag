@@ -22,7 +22,7 @@ class LoadingThread(QThread):
         create_user_database()
         # Clean up user database to ensure 10 records and atmost 60 days older with path exist
         refactor_database()
-        time.sleep(5)
+        time.sleep(10)
         self.finished.emit()
 
     def create_sqlite(self):
@@ -75,7 +75,7 @@ def GUI():
     app = QApplication(sys.argv)
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     font = QFontDatabase.applicationFontFamilies(fid)[0]
-    app.setFont(QFont(font))
+    # app.setFont(QFont(font))
 
     file = QFile(":/themes/lightstyle.qss")
     if file.open(QFile.ReadOnly | QFile.Text):

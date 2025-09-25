@@ -99,5 +99,6 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>fonts/UbuntuSans-Regular.ttf</file>
 
+
     </qresource>
 </RCC>

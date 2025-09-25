@@ -9,6 +9,7 @@ from PySide6.QtCore import (QCoreApplication, QMetaObject, QEasingCurve,
 from PySide6.QtGui import (QFont, QIcon)
 from PySide6.QtWidgets import (QLabel, QWidget)
 from PySide6.QtSvgWidgets import QSvgWidget
+import os
 
 class OsdagLaunchScreen(object):
     def setupUi(self, MainWindow):
@@ -31,9 +32,14 @@ class OsdagLaunchScreen(object):
             }
         """)
 
-        self.AnimatedGIF = QSvgWidget(self.centralwidget)
+        # Use instead of QSvgWidget
+        self.AnimatedGIF = PNGSequencePlayer(self.centralwidget)
         self.AnimatedGIF.setObjectName(u"SplashScreen_AnimatedGIF")
-        self.AnimatedGIF.setGeometry(QRect(400, 150, 191, 181))
+        self.AnimatedGIF.setGeometry(QRect(330, 110, 320, 180))
+        animation_path = os.path.join(os.getcwd(), "osdag_gui", "resources", "animation")
+        animation_path = animation_path+"\{:04d}.png"
+        print(os.getcwd(),animation_path)
+        self.AnimatedGIF.load_sequence(animation_path, 96, 34)
 
         self.AestheticVector = QSvgWidget(self.centralwidget)
         self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")
@@ -134,8 +140,6 @@ class OsdagLaunchScreen(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("Splash Screen", u"Splash Screen", None))
 
-        self.AnimatedGIF.load(":/vectors/AnimateComponent_back.svg")
-
         self.AestheticVector.load(":/vectors/contour_lines.svg")
         
         self.OsdagLogo.load(":/vectors/Osdag_logo.svg")
@@ -157,3 +161,50 @@ class OsdagLaunchScreen(object):
         self.MOSLogo.load(":/vectors/MOS_logo.svg")
    
         self.ConstructsteelLogo.load(":/vectors/ConstructSteel_logo.svg")
+
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QLabel
+
+class PNGSequencePlayer(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.frames = []
+        self.current_frame = 0
+        self.frame_count = 0
+        self.timer = QTimer()
+        self.setScaledContents(True)
+        self.timer.timeout.connect(self.next_frame)
+        
+    def load_sequence(self, base_path, frame_count, fps=24):
+        """
+        Load PNG sequence
+        base_path: path pattern like ":/animation/{:04d}.png"
+        frame_count: total number of frames
+        fps: frames per second
+        """
+        self.frame_count = frame_count
+        self.frames = []
+        
+        for i in range(1, frame_count + 1):
+            frame_path = base_path.format(i)
+            pixmap = QPixmap(frame_path)
+            if not pixmap.isNull():
+                # Scale to widget size while maintaining aspect ratio
+                self.frames.append(pixmap)
+        
+        # Set timer interval based on FPS
+        interval = int(1000 / fps)  # Convert to milliseconds
+        self.timer.start(interval)
+        
+    def next_frame(self):
+        if self.frames:
+            self.setPixmap(self.frames[self.current_frame])
+            self.current_frame = (self.current_frame + 1) % len(self.frames)
+    
+    def stop_animation(self):
+        self.timer.stop()
+        
+    def start_animation(self):
+        if self.frames and not self.timer.isActive():
+            self.timer.start()

@@ -4,7 +4,7 @@ Handles splash screen and main window launch.
 """
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal, QFile, QTextStream
-from PySide6.QtGui import QIcon, QFontDatabase
+from PySide6.QtGui import QIcon, QFontDatabase, QFont
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
 from osdag_gui.data.database.database_config import refactor_database, create_user_database
 from osdag_core.cli import run_module
@@ -74,7 +74,8 @@ class LaunchScreenPopup(QMainWindow):
 def GUI():
     app = QApplication(sys.argv)
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
-    print(QFontDatabase.applicationFontFamilies(fid))
+    font = QFontDatabase.applicationFontFamilies(fid)[0]
+    app.setFont(QFont(font))
 
     file = QFile(":/themes/lightstyle.qss")
     if file.open(QFile.ReadOnly | QFile.Text):

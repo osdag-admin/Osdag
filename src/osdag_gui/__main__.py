@@ -26,33 +26,92 @@ class LoadingThread(QThread):
         self.finished.emit()
 
     def create_sqlite(self):
-        import os
+        import sqlite3
+        import subprocess
         from importlib.resources import files
+        import shutil
+        
+        try:
+            # Get paths
+            sqlpath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sql')
+            sqlitepath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sqlite')
 
-        ############################ Pre-Build Database Updation/Creation #################
-        sqlpath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sql')
-        sqlitepath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sqlite')
+            if not sqlpath.exists():
+                print(f"SQL file not found: {sqlpath}")
+                return
 
-        if sqlpath.exists():
-            if not sqlitepath.exists():
-                cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
-                os.system(cmd)
-                sqlpath.touch()
-                print('Database Created')
+            # Determine if we need to create or update
+            needs_creation = not sqlitepath.exists()
+            needs_update = (sqlitepath.exists() and 
+                        (sqlitepath.stat().st_size == 0 or 
+                            sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1))
 
-            elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
-                try:
-                    sqlitenewpath = files('osdag.data.ResourceFiles.Database').joinpath('Intg_osdag_new.sqlite')
-                    cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
-                    error = os.system(cmd)
-                    print(error)
-                    os.remove(sqlitepath)
-                    sqlitenewpath.rename(sqlitepath)
-                    sqlpath.touch()
-                    print('Database Updated', sqlpath.stat().st_mtime, sqlitepath.stat().st_mtime)
-                except Exception as e:
-                    sqlitenewpath.unlink()
-                    print('Error: ', e)
+            if not needs_creation and not needs_update:
+                print("Database is up to date")
+                return
+
+            # Create backup if updating existing database
+            backup_path = None
+            if needs_update:
+                backup_path = sqlitepath.with_suffix('.sqlite.backup')
+                shutil.copy2(sqlitepath, backup_path)
+
+            # Create/update database
+            target_path = sqlitepath
+            if needs_update:
+                # Create in temp location first
+                target_path = sqlitepath.parent / 'Intg_osdag_temp.sqlite'
+
+            # Try Python sqlite3 first
+            try:
+                with open(sqlpath, 'r', encoding='utf-8') as sql_file:
+                    sql_content = sql_file.read()
+                
+                conn = sqlite3.connect(target_path)
+                conn.executescript(sql_content)
+                conn.close()
+                
+                print(f"Database {'created' if needs_creation else 'updated'} using Python sqlite3")
+                
+            except Exception as e:
+                print(f"Python sqlite3 failed: {e}, trying command line")
+                
+                # Fallback to command line
+                result = subprocess.run([
+                    'sqlite3', str(target_path), 
+                    f'.read {sqlpath}'
+                ], capture_output=True, text=True, timeout=30)
+                
+                if result.returncode != 0:
+                    raise Exception(f"Command line sqlite3 failed: {result.stderr}")
+                
+                print(f"Database {'created' if needs_creation else 'updated'} using command line")
+
+            # If updating, replace the original
+            if needs_update:
+                sqlitepath.unlink()
+                target_path.rename(sqlitepath)
+                if backup_path and backup_path.exists():
+                    backup_path.unlink()
+
+            # Touch the SQL file to update timestamp
+            sqlpath.touch()
+
+        except Exception as e:
+            print(f'Database setup failed: {e}')
+            
+            # Cleanup on failure
+            if needs_update:
+                # Restore backup if available
+                if backup_path and backup_path.exists():
+                    if not sqlitepath.exists():
+                        shutil.copy2(backup_path, sqlitepath)
+                    backup_path.unlink()
+                
+                # Remove temp file
+                temp_path = sqlitepath.parent / 'Intg_osdag_temp.sqlite'
+                if temp_path.exists():
+                    temp_path.unlink()
 
 class LaunchScreenPopup(QMainWindow):
     def __init__(self, on_finish):

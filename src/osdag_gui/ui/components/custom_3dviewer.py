@@ -1,3 +1,7 @@
+"""
+Custom 3D CAD Viewer that has an extra functionality of Hover over Label on Models.
+This is custom class is created to implement parent 'qtViewer3d' class and add extra funcitonality of mouse event. 
+"""
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QToolTip
 

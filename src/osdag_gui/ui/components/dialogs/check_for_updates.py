@@ -24,6 +24,7 @@ class UpdateDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.old_version = Version(VERSION)
+        self.internet_connectivity = QApplication.instance().internet_connectivity
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("UpdateDialog")
@@ -125,6 +126,10 @@ class UpdateDialog(QDialog):
 
     def check_for_updates(self):
         """Run QProcess to fetch version asynchronously."""
+        if not self.internet_connectivity.is_online():
+            self.update_text("<p style='color:red;'>No internet connection. Please check your connectivity.</p>")
+            self.progressBar.hide()
+            return
         if not (self.conda_path or self.pixi_path):
             self.update_text("<p style='color:red;'>Executable Not Found.</p>")
             return
@@ -185,7 +190,7 @@ class UpdateDialog(QDialog):
                         f"(<b>{VERSION}</b>).</p>"
                     )
             else:
-                self.update_text("<p style='color:orange;'>Could not fetch version information.</p>")
+                self.update_text("<p style='color:red;'>Could not fetch version information.</p>")
 
         except Exception as e:
             self.update_text(f"<p style='color:red;'>Error checking for updates: {e}</p>")
@@ -242,6 +247,19 @@ class UpdateDialog(QDialog):
         else:
             self.update_text(f"<p style='color:red;'>Update failed with exit code {exit_code}.</p>")
 
+    def _handle_ok(self):
+        """Handle OK button safely"""
+        if self.process and self.process.state() != QProcess.NotRunning:
+            self.process.kill()
+            self.process.waitForFinished(1000)
+        self.accept() 
+    
+    def closeEvent(self, event):
+        """Handle user clicking the close (X) button"""
+        if self.process and self.process.state() != QProcess.NotRunning:
+            self.process.kill()
+            self.process.waitForFinished(1000)
+        super().closeEvent(event)
 
 # Test the dialog
 if __name__ == "__main__":

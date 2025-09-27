@@ -90,6 +90,7 @@ class MainWindow(QMainWindow):
         # Before maximizing, so that when we click on Restore it comes to normal state.
         QTimer.singleShot(0, self.showMaximized)
 
+
     def init_ui(self):
         # Main Vertical Layout for the entire window's *content*
         central_widget = QWidget()

@@ -28,6 +28,11 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/plugin_default.svg</file>
         <file>vectors/resources_hover.svg</file>
         <file>vectors/resources_default.svg</file>
+        <file>vectors/internet_connected_default.svg</file>
+        <file>vectors/internet_connected_hover.svg</file>
+        <file>vectors/internet_disconnected_default.svg</file>
+        <file>vectors/internet_disconnected_hover.svg</file>       
+
 
         <file>vectors/search_icon.svg</file>
         <file>vectors/night_button.svg</file>

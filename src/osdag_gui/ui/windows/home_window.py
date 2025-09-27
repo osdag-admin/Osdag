@@ -5,7 +5,7 @@ Displays navigation, SVG cards, and home widgets.
 import osdag_gui.resources.resources_rc
 
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, Slot
 
 import sys
 import os
@@ -25,6 +25,38 @@ from osdag_gui.ui.components.custom_buttons import MenuButton
 from osdag_gui.ui.components.home.top_right_buttons import TopButton, DropDownButton
 from osdag_gui.ui.components.home.home_widget import HomeWidget
 from PySide6.QtWidgets import QSplitter
+
+# --- Internet Connectivity Indicator Button ---
+class InternetConnectionIndicator(TopButton):
+    """
+    Updates a TopButton's icon pair (default + hover)
+    when connectivity changes.
+    """
+    def __init__(self, connectivity, button):
+        self.connectivity = connectivity
+        self.button = button
+
+        # Connect signal
+        self.connectivity.online_status_changed.connect(self.update_status)
+        self.update_status(self.connectivity.is_online())
+
+    @Slot(bool)
+    def update_status(self, online: bool):
+        """Change the Indicator icons based on internet status."""
+        if online:
+            self.button.black_icon_path = ":/vectors/internet_connected_default.svg"
+            self.button.white_icon_path = ":/vectors/internet_connected_hover.svg"
+            self.button.label_text = " Online"
+        else:
+            self.button.black_icon_path = ":/vectors/internet_disconnected_default.svg"
+            self.button.white_icon_path = ":/vectors/internet_disconnected_hover.svg"
+            self.button.label_text = " Offline"
+
+        # Update the icon immediately to reflect state
+        if self.button.is_hovering:
+            self.button.setIcon(QIcon(self.button.white_icon_path))
+        else:
+            self.button.setIcon(QIcon(self.button.black_icon_path))
 
 # --- Theme Toggle Button ---
 class ThemeToggleButton(QPushButton):
@@ -200,10 +232,22 @@ class HomeWindow(QWidget):
             self.buttons.append(button)
             self.button_group.addButton(button, i) # Add button to the group with an ID
             self.top_widget_2.addWidget(button)
-        
+
+        # # --- Internet Connectivity Indicator ---
+        # internet_connectivity = QApplication.instance().internet_connectivity
+        # internet_connectivity.start_monitoring()
+        # connectivityButton = TopButton(
+        #     ":/vectors/internet_disconnected_default.svg",
+        #     ":/vectors/internet_disconnected_hover.svg",
+        #     ""
+        # )
+        # self.top_widget_2.addWidget(connectivityButton)
+        # self.internet_status = InternetConnectionIndicator(internet_connectivity, connectivityButton)
+
+        # --- Theme Toggle Button ---
         self.theme_toggle = ThemeToggleButton(self)
         # self.theme_toggle.clicked.connect(self.toggle_theme)
-        self.top_widget_2.addWidget(self.theme_toggle)
+        self.top_widget_2.addWidget(self.theme_toggle)   
 
         self.top_right_h_layout.addStretch(1)
         self.top_right_h_layout.addLayout(self.top_widget_2)

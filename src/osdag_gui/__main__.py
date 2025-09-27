@@ -5,6 +5,7 @@ Handles splash screen and main window launch.
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal, QFile, QTextStream
 from PySide6.QtGui import QIcon, QFontDatabase, QFont
+from osdag_core.utils.internet_connectivity import InternetConnectivity
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
 from osdag_gui.data.database.database_config import refactor_database, create_user_database
 from osdag_core.cli import run_module
@@ -144,6 +145,7 @@ def GUI():
         app.setStyleSheet(stylesheet)
     
     def show_main_window():
+        app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
         from osdag_gui.main_window import MainWindow
         app.main_window = MainWindow()
         app.main_window.show()

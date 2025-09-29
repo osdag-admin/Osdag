@@ -13,7 +13,7 @@ class BasePlateHollowDetails(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
-        data=main.output_values(main,True)
+        data=main.output_values(True)
         print(type(main))
 
         bp_width_provided=main.bp_width_provided
@@ -65,7 +65,7 @@ class BasePlateHollowDetails(QMainWindow):
         self.Gaugein=self.detail_dict['Gauge Distance (mm) + Detailing.GaugeDistanceIn']
         print(f'Column Section : {main.column_section}')
         self.column_section=main.column_section
-        stiffdata=main.stiffener_hollow_details(main,True)
+        stiffdata=main.stiffener_hollow_details(True)
         self.stiff_D_len=stiffdata[1][3]
         self.stiff_D_thickness=stiffdata[3][3]
         self.stiff_B_len=stiffdata[9][3]

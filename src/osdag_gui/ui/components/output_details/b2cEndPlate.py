@@ -13,7 +13,7 @@ class B2CEndPlateDetails(QMainWindow):
     def __init__(self, connection_obj,main, rows=3, cols=2):
         super().__init__()
         self.connection = connection_obj
-        data=main.output_values(main,True)
+        data=main.output_values(True)
         self.web_thick=main.beam_tw
         self.endplatetype=main.endplate_type
         self.flange_thick=main.beam_tf

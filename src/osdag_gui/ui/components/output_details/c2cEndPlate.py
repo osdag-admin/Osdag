@@ -17,7 +17,7 @@ class C2CEndPlateDetails(QMainWindow):
             main=main[0]
         super().__init__()
         self.connection = connection_obj
-        data=main.output_values(main,True)
+        data=main.output_values(True)
         
         print(type(main))
         dict1={i[0] : i[3] for i in data}

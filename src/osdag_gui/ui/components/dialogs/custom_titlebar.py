@@ -3,8 +3,8 @@ from PySide6.QtCore import Qt, QPoint, QEvent
 from PySide6.QtGui import QMouseEvent, QPixmap, QFont
 
 class CustomTitleBar(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, max_res_btn: bool = False, parent=None):
+        super().__init__(parent)
         self._drag_pos = QPoint()
         self.setObjectName("CustomTitleBar")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -36,6 +36,16 @@ class CustomTitleBar(QWidget):
         self.btn_minimize.setFixedSize(46, 32)
         self.btn_minimize.clicked.connect(self._minimize_parent)
 
+        # Maximize/Restore button (optional)
+        self.btn_max_restore = None
+        if max_res_btn:
+            self.btn_max_restore = QToolButton(self)
+            self.btn_max_restore.setObjectName("MaxRestoreButton")
+            self.btn_max_restore.setToolTip("Maximize")
+            self.btn_max_restore.setText("□")
+            self.btn_max_restore.setFixedSize(46, 32)
+            self.btn_max_restore.clicked.connect(self._toggle_max_restore)
+
         # Close button
         self.btn_close = QToolButton(self)
         self.btn_close.setObjectName("CloseButton")
@@ -56,6 +66,8 @@ class CustomTitleBar(QWidget):
         row_layout.addWidget(self.logo_label, 0)
         row_layout.addWidget(self.title_label, 1)
         row_layout.addWidget(self.btn_minimize, 0)
+        if self.btn_max_restore is not None:
+            row_layout.addWidget(self.btn_max_restore, 0)
         row_layout.addWidget(self.btn_close, 0)
         outer_layout.addWidget(row_widget)
 
@@ -101,6 +113,22 @@ class CustomTitleBar(QWidget):
                 background-color: #a6a6a6;
             }
             
+            QToolButton#MaxRestoreButton {
+                background-color: transparent;
+                color: #000000;
+                border: none;
+                font-size: 16px;
+                border-radius: 0px;
+            }
+            
+            QToolButton#MaxRestoreButton:hover {
+                background-color: #f1f1f1;
+            }
+
+            QToolButton#MaxRestoreButton:pressed {
+                background-color: #a6a6a6;
+            }
+            
             QToolButton#CloseButton {
                 background-color: transparent;
                 color: #000000;
@@ -119,6 +147,11 @@ class CustomTitleBar(QWidget):
             }
         """)
 
+        # Keep the maximize/restore button state in sync with the window state
+        if self.btn_max_restore is not None and self.parent() is not None:
+            self.parent().installEventFilter(self)
+            self._update_max_restore_icon()
+
     def setTitle(self, title):
         """Set the title displayed in the title bar."""
         self.title_label.setText(title)
@@ -132,6 +165,37 @@ class CustomTitleBar(QWidget):
         """Minimize the parent widget."""
         if self.parent():
             self.parent().showMinimized()
+
+    def _toggle_max_restore(self):
+        """Toggle between maximizing and restoring the parent window."""
+        window = self.parent()
+        if not window:
+            return
+        if window.isMaximized():
+            window.showNormal()
+        else:
+            window.showMaximized()
+        self._update_max_restore_icon()
+
+    def _update_max_restore_icon(self):
+        """Update the icon/text and tooltip of the maximize/restore button based on window state."""
+        if self.btn_max_restore is None:
+            return
+        window = self.parent()
+        if not window:
+            return
+        if window.isMaximized():
+            self.btn_max_restore.setText("❐")  # Restore
+            self.btn_max_restore.setToolTip("Restore")
+        else:
+            self.btn_max_restore.setText("□")  # Maximize
+            self.btn_max_restore.setToolTip("Maximize")
+
+    def eventFilter(self, obj, event):
+        # Update button when window state changes (e.g., via system controls or double-click)
+        if obj is self.parent() and event.type() == QEvent.WindowStateChange:
+            self._update_max_restore_icon()
+        return super().eventFilter(obj, event)
 
     def mousePressEvent(self, event: QMouseEvent):
         """Handle mouse press for dragging."""
@@ -162,6 +226,9 @@ class CustomTitleBar(QWidget):
                 self.parent().showNormal()
             else:
                 self.parent().showMaximized()
+            # Keep button state in sync
+            if self.btn_max_restore is not None:
+                self._update_max_restore_icon()
             event.accept()
         else:
             super().mouseDoubleClickEvent(event)

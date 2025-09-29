@@ -9,7 +9,7 @@ from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
 from osdag_core.Common import *
 
-class B2Bcoverplate(QMainWindow):
+class B2BCoverPlateDetails(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         print(main)
         
@@ -19,7 +19,7 @@ class B2Bcoverplate(QMainWindow):
         super().__init__()
         self.connection = connection_obj
         # return
-        data=main.output_values(main,True)
+        data=main.output_values(True)
         print(type(main))
         dict1={i[0] : i[3] for i in data}
 
@@ -35,8 +35,8 @@ class B2Bcoverplate(QMainWindow):
             self.plate_width=dict1['Web_Plate.Width']
             self.bolt_diameter=dict1['Bolt.Diameter']
             web_capcity=dict1['Web_plate.spacing'][1]
-            print(web_capcity(main,True))
-            data2=web_capcity(main,True)
+            print(web_capcity(True))
+            data2=web_capcity(True)
             for i in range(len(data2)):
                 print(f"{i} : {data2[i]}")
             self.pitch=data2[2][3]
@@ -44,7 +44,7 @@ class B2Bcoverplate(QMainWindow):
             self.Gauge=data2[4][3]
             self.Edge=data2[5][3]
             bolt_cap=dict1['Web Bolt.Capacities'][1]
-            print(bolt_cap(main,True))
+            print(bolt_cap(True))
             bolt_cap=bolt_cap(main,True)
         elif web==False:
             self.plate_length=dict1['Flange_Plate.Width (mm)']

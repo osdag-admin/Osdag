@@ -14,7 +14,7 @@ class EndPlateDetails(QMainWindow):
         super().__init__()
         self.connection = connection_obj
         self.main=main
-        output=main.output_values(main,True)
+        output=main.output_values(True)
         dict1={i[0] : i[3] for i in output}
         self.plate_height = dict1['Plate.Height']
         self.plate_width = dict1['Plate.Length']

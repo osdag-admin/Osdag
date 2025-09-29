@@ -17,9 +17,33 @@ from osdag_core.texlive.Design_wrapper import init_display as init_display_off_s
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPopup
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *
 import osdag_gui.resources.resources_rc
+
+# Importing Core Files
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
+from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
+from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
+
+
+# Spacing Detail
+from osdag_gui.ui.components.output_details.b2bCoverPlateWelded import B2BCoverPlateWeldedDetails
+from osdag_gui.ui.components.output_details.b2bCoverPlate import B2BCoverPlateDetails
+from osdag_gui.ui.components.output_details.b2bCoverPlateCapacity import B2BCoverPlateCapacityDetails
+from osdag_gui.ui.components.output_details.b2cEndPlate import B2CEndPlateDetails
+from osdag_gui.ui.components.output_details.b2bEndPlateSketch import B2BEndPlateSketch
+from osdag_gui.ui.components.output_details.basePlate import BasePlateDetails
+from osdag_gui.ui.components.output_details.basePlateHollow import BasePlateHollowDetails
+from osdag_gui.ui.components.output_details.c2cEndPlate import C2CEndPlateDetails
+from osdag_gui.ui.components.output_details.finPlateCapacity import FinPlateCapacityDetails #CapacityDetailsWindow
+from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
+from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
+from osdag_gui.ui.components.output_details.seatedAngleSpacing import SeatedAngleDetails
+from osdag_gui.ui.components.output_details.cleatAngle import CleatAngleDetails
 
 from osdag_gui.__config__ import CAD_BACKEND
 
@@ -111,7 +135,7 @@ class OutputDock(QWidget):
         toggle_layout = QVBoxLayout(self.toggle_strip)
         toggle_layout.setContentsMargins(0, 0, 0, 0)
         toggle_layout.setSpacing(0)
-        toggle_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        toggle_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
 
         self.toggle_btn = QPushButton("❯")  # Show state initially
         self.toggle_btn.setFixedSize(6, 60)
@@ -665,166 +689,123 @@ class OutputDock(QWidget):
 
     # ----------------------------------Save-Outputs-END------------------------------------------------------
 
+    def run_spacing_script(self,cols,rows,generator_class=BoltPatternGenerator , main=None):
+        print("Creating spacing window...")
+        self.spacing_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
+        self.spacing_window.setWindowTitle("Spacing Viewer")
+        self.spacing_window.raise_()
+        self.spacing_window.activateWindow()
+        self.spacing_window.show()
+    
+    def run_capacity_details(self,cols,rows,generator_class=FinPlateCapacityDetails , main=None):
+        print("Creating capacity details window...")
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        print(generator_class)
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        self.capacity_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
+        self.capacity_window.setWindowTitle("Capacity Details")
+        self.capacity_window.raise_()
+        self.capacity_window.activateWindow()
+        self.capacity_window.show()   
+
     def output_button_connect(self, spacing_button_list, button):
         button.clicked.connect(lambda: self.spacing_dialog(self.backend, spacing_button_list, button))
 
     def spacing_dialog(self, main, button_list, button):
-        dialog = QDialog()
-        dialog.setObjectName("Dialog")
-        layout1 = QVBoxLayout(dialog)
-
-        note_widget = QWidget(dialog)
-        note_layout = QVBoxLayout(note_widget)
-        layout1.addWidget(note_widget)
-
-        tabel_widget = QWidget(dialog)
-        table_layout = QVBoxLayout(tabel_widget)
-        layout1.addWidget(tabel_widget)
-
-        scroll = QScrollArea(dialog)
-        layout1.addWidget(scroll)
-        scroll.setWidgetResizable(True)
-        scroll.horizontalScrollBar().setVisible(False)
-        scroll_content = QWidget(scroll)
-        outer_grid_layout = QGridLayout(scroll_content)
-        inner_grid_widget = QWidget(scroll_content)
-        image_widget = QWidget(scroll_content)
-        image_layout = QVBoxLayout(image_widget)
-        image_layout.setAlignment(Qt.AlignCenter)
-        image_widget.setLayout(image_layout)
-        inner_grid_layout = QGridLayout(inner_grid_widget)
-        inner_grid_widget.setLayout(inner_grid_layout)
-        scroll_content.setLayout(outer_grid_layout)
-        scroll.setWidget(scroll_content)
-
-        dialog_width = 260
-        dialog_height = 300
-        max_image_width = 0
-        max_label_width = 0
-        max_image_height = 0
-
-        section = 0
-        no_note = True
 
         for op in button_list:
-
             if op[0] == button.objectName():
-                tup = op[3]
-                title = tup[0]
-                fn = tup[1]
-                dialog.setWindowTitle(title)
-                j = 1
-                _translate = QCoreApplication.translate
-                for option in fn(main.design_status):
-                    option_type = option[2]
-                    lable = option[1]
-                    value = option[3]
-                    if option_type in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
-                        l = QLabel(inner_grid_widget)
+                if op[0]==KEY_OUT_SPACING or op[0]==KEY_OUT_SPTING_SPACING:
+                    # print(main)
+                    if main.module_name()==KEY_DISP_FINPLATE:
+                        if hasattr(self.backend, 'spting_leg') and \
+                            hasattr(self.backend.spting_leg, 'bolt_line') and \
+                            hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                                self.run_spacing_script(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                        main=main)
+                        else:
+                                self.run_spacing_script(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                        main=main)
+                    elif main.module_name()==KEY_DISP_CLEATANGLE and op[0]==KEY_OUT_SPACING:
+                        self.run_spacing_script(0,0,CleatAngleDetails,(main,0))
+                    elif op[0] != KEY_OUT_SPACING and main.module_name()==KEY_DISP_CLEATANGLE:
+                        self.run_spacing_script(0,0,CleatAngleDetails,(main,1))
+                    elif main.module_name()==KEY_DISP_ENDPLATE:
+                        self.run_spacing_script(0,0,EndPlateDetails,main)
+                    # return
+                    break
+                
+                elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]==KEY_OUT_DISP_BOLT_IR_DETAILS and main.module_name()==KEY_DISP_FINPLATE) :
+                    if main.module_name()==KEY_DISP_FINPLATE:
+                                if hasattr(self.backend, 'spting_leg') and \
+                                    hasattr(self.backend.spting_leg, 'bolt_line') and \
+                                    hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                                        self.run_capacity_details(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_capacity_details(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                                main=main)
+                    break    
 
-                        l.setObjectName(option[0] + "_label")
-                        l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                        inner_grid_layout.addWidget(l, j, 1, 1, 1)
-                        l.setFixedSize(l.sizeHint().width(), l.sizeHint().height())
-                        max_label_width = max(l.sizeHint().width(), max_label_width)
-                        l.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum))
+                elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
+                            if op[0]==KEY_OUT_SEATED_ANGLE_BOLT_COL:
+                                val=3
+                            elif op[0]==KEY_OUT_SEATED_ANGLE_BOLT_BEAM:
+                                val=4
+                            elif op[0]==KEY_OUT_TOP_ANGLE_BOLT_COL:
+                                val=1
+                            else:
+                                val=2
+                            self.run_spacing_script(None,
+                                                        val,#specifying which to use
+                                                        SeatedAngleDetails,main)
+                            return
+                            print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
+                elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:
+                            print(f'rows: {self.backend.bolt_row} , cols : {self.backend.bolt_column} , {self.backend.bolt_row_web}')
+                            self.run_spacing_script(0,0,B2CEndPlateDetails,main)
+                            return
+                elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
+                    if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
+                        self.run_spacing_script(0,0,BasePlateDetails,main)
+                    else:
+                        self.run_spacing_script(0,0,BasePlateHollowDetails,main)
+                    return
+                elif op[0]==KEY_WEB_SPACING:
+                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,True, KEY_OUT_SPACING))
+                    return
+                elif op[0]==KEY_FLANGE_SPACING:
+                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,False, KEY_OUT_SPACING))
+                    return
+                elif op[0]==KEY_WEB_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,True))
+                    return
+                elif op[0]==KEY_FLANGE_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,False))
+                    return   
 
-                    if option_type == TYPE_SECTION:
-                        if section != 0:
-                            outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
-                            outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
-                            hl1 = QFrame()
-                            hl1.setFrameShape(QFrame.HLine)
-                            j += 1
-                            outer_grid_layout.addWidget(hl1, j, 1, 1, 2)
+                #im working here
+                elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:  
+                    self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,True,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:
+                    self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,False,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]==KEY_OUT_STIFFENER_SKETCH and op[1]==KEY_OUT_DISP_STIFFENER_SKETCH:
+                    self.run_spacing_script(0,0,B2BEndPlateSketch,main)
+                    return
 
-                        inner_grid_widget = QWidget(scroll_content)
-                        image_widget = QWidget(scroll_content)
-                        image_layout = QVBoxLayout(image_widget)
-                        image_layout.setAlignment(Qt.AlignCenter)
-                        image_widget.setLayout(image_layout)
-                        inner_grid_layout = QGridLayout(inner_grid_widget)
-                        inner_grid_widget.setLayout(inner_grid_layout)
+                elif op[0]==KEY_BOLT_WEB_SPACING or op[0]==KEY_BOLT_FLANGE_SPACING:
+                    if op[0]==KEY_BOLT_WEB_SPACING:
+                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,0))
+                    else:
+                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,1))
+                    break
 
-                        if value is not None and value != "":
-                            im = QLabel(image_widget)
-                            im.setFixedSize(int(value[1]), int(value[2]))
-                            pmap = QPixmap(value[0])
-                            im.setScaledContents(1)
-                            im.setStyleSheet("background-color: white;")
-                            im.setPixmap(pmap)
-                            image_layout.addWidget(im)
-                            caption = QLabel(image_widget)
-                            caption.setAlignment(Qt.AlignCenter)
-                            caption.setText(value[3])
-                            caption.setFixedSize(int(value[1]), caption.sizeHint().height())
-                            image_layout.addWidget(caption)
-                            max_image_width = max(max_image_width, value[1])
-                            max_image_height = max(max_image_height, value[2])
-                        j += 1
-                        q = QLabel(scroll_content)
-                        q.setObjectName("_title")
-                        q.setText(lable)
-                        q.setFixedSize(q.sizeHint().width(), q.sizeHint().height())
-                        q.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum))
-                        outer_grid_layout.addWidget(q, j, 1, 1, 2)
-                        section += 1
-
-                    if option_type == TYPE_TEXTBOX:
-                        r = QLineEdit(inner_grid_widget)
-                        r.setFixedSize(100, 27)
-                        r.setObjectName(option[0])
-                        r.setText(str(value))
-                        inner_grid_layout.addWidget(r, j, 2, 1, 1)
-
-                    if option_type == TYPE_TABLE_OU:
-                        tb = QTableWidget(tabel_widget)
-                        #tb.setAlignment(Qt.AlignCenter)
-                        #tb.setScaledContents(True)
-                        table_layout.addWidget(tb)
-
-                    if option_type == TYPE_IMAGE:
-                        im = QLabel(image_widget)
-                        im.setScaledContents(True)
-                        im.setFixedSize(int(value[1]), int(value[2]))
-                        pmap = QPixmap(value[0])
-                        im.setStyleSheet("background-color: white;")
-                        im.setPixmap(pmap)
-                        image_layout.addWidget(im)
-                        caption = QLabel(image_widget)
-                        caption.setAlignment(Qt.AlignCenter)
-                        caption.setText(value[3])
-                        caption.setFixedSize(int(value[1]), 12)
-                        image_layout.addWidget(caption)
-                        max_image_width = max(max_image_width, value[1])
-                        max_image_height = max(max_image_height, value[2])
-
-                    if option_type == TYPE_NOTE:
-                        note = QLabel(note_widget)
-                        note.setText("Note: "+str(value))
-                        note.setFixedSize(note.sizeHint().width(), note.sizeHint().height())
-                        note_layout.addWidget(note)
-                        no_note = False
-
-                    j = j + 1
-
-                if inner_grid_layout.count() > 0:
-                    outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
-                if image_layout.count() > 0:
-                    outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
-
-                dialog_width += max_label_width
-                dialog_width += max_image_width
-                dialog_height = max(dialog_height, max_image_height+125)
-                if not no_note:
-                    dialog_height += 40
-                dialog.resize(int(dialog_width), int(dialog_height))
-                dialog.setMinimumSize(int(dialog_width), int(dialog_height))
-
-                if no_note:
-                    layout1.removeWidget(note_widget)
-
-                dialog.exec()
 
     # To equalize the size of label strings
     def equalize_label_length(self, list):
@@ -953,7 +934,6 @@ class OutputDock(QWidget):
 
 
 #----------------Standalone-Test-Code--------------------------------
-from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 
 class MyMainWindow(QMainWindow):
     def __init__(self):

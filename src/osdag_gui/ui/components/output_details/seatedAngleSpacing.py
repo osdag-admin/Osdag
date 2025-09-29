@@ -26,8 +26,8 @@ class SeatedAngleDetails(QMainWindow):
             self.plate_thickness=float(main.top_angle.designation.split(" x ")[-1])
         
         
-        arr=[main.top_spacing_col(main,True),main.top_spacing_beam(main,True),main.seated_spacing_col(main,True),
-             main.seated_spacing_beam(main,True)]
+        arr=[main.top_spacing_col(True),main.top_spacing_beam(True),main.seated_spacing_col(True),
+             main.seated_spacing_beam(True)]
         val=self.val-1
         print(val)
         # print(arr[0],len(arr[0]))

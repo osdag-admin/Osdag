@@ -13,7 +13,7 @@ class BasePlateDetails(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
-        data=main.output_values(main,True)
+        data=main.output_values(True)
         print(type(main))
 
         bp_width_provided=main.bp_width_provided
@@ -64,11 +64,11 @@ class BasePlateDetails(QMainWindow):
         self.pitchin=self.detail_dict['Pitch Distance (mm) + Detailing.PitchDistanceIn']
         self.Gaugein=self.detail_dict['Gauge Distance (mm) + Detailing.GaugeDistanceIn']
         
-        stiffacrossdata=main.stiffener_across_web_details(main,True)
+        stiffacrossdata=main.stiffener_across_web_details(True)
 
-        stiffalongdata=main.stiffener_along_web_details(main,True)
+        stiffalongdata=main.stiffener_along_web_details(True)
 
-        stiffflangedata=main.stiffener_flange_details(main,True)
+        stiffflangedata=main.stiffener_flange_details(True)
         self.stiff_across_length=stiffacrossdata[0][3]
         self.stiff_across_thickness=stiffacrossdata[2][3]
         self.stiff_along_length=stiffalongdata[0][3]

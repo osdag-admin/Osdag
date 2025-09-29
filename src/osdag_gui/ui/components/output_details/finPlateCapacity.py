@@ -1,15 +1,15 @@
 import sys
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QGraphicsView,
-                             QGraphicsScene)
-from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout, 
+                             QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
+                             QGraphicsScene, QScrollArea)
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QPainter, QPen, QFont
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
-class FinPlateCapacityDetails(QMainWindow):
+class FinPlateCapacityDetails(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         self.connection = connection_obj
@@ -21,12 +21,12 @@ class FinPlateCapacityDetails(QMainWindow):
         self.cols=main.plate.bolt_line
         self.plate_thickness=main.plate.thickness
         print(self.plate_height,self.plate_width)
-        output=main.output_values(main,True)
+        output=main.output_values(True)
         dict1={i[0] : i[3] for i in output}
 
         capacity_fnc = dict1['button1'][1]
         print(capacity_fnc)
-        capacity_details = capacity_fnc(main,True)
+        capacity_details = capacity_fnc(True)
         print(capacity_details)
         details_dict={i[1]:i[3] for i in capacity_details}
         
@@ -38,7 +38,6 @@ class FinPlateCapacityDetails(QMainWindow):
         self.axial_block_shear_capacity=float(details_dict['Axial Block Shear Capacity (kN)'])
         self.moment_demand=float(details_dict['Moment Demand (kNm)'])
         self.moment_capacity=float(details_dict['Moment Capacity (kNm)'])
-        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         print("------------------------------------------------------------------")
         self.dict_shear_failure={
             'Shear Yielding Capacity (kN)':self.shear_yield_capacity,
@@ -59,7 +58,6 @@ class FinPlateCapacityDetails(QMainWindow):
         print(self.dict_tension_failure)
         print(self.dict_section_3)
         print("------------------------------------------------------------------")
-        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
         for i in output:
             print(i)
@@ -68,95 +66,139 @@ class FinPlateCapacityDetails(QMainWindow):
             self.weldsize=dict1['Weld.Size']
         self.initUI()
 
+    def setupWrapper(self):
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
+        self.setStyleSheet("""
+            QDialog{ 
+                background-color: white;
+                border: 1px solid #90af13;
+            }
+            QPushButton {
+                background-color: white;
+                color: black;
+                font-weight: bold; 
+                border-radius: 5px;
+                border: 1px solid black;
+                padding: 5px 14px;
+                text-align: center;
+                font-family: "Calibri";
+            }
+            QPushButton:hover {
+                background-color: #90AF13;
+                border: 1px solid #90AF13;
+                color: white;
+            }
+            QPushButton:pressed {
+                color: black;
+                background-color: white;
+                border: 1px solid black;
+            }
+        """) 
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(1, 1, 1, 1)
+        main_layout.setSpacing(0)
+        self.title_bar = CustomTitleBar()
+        self.title_bar.setTitle("Bolt Pattern")
+        main_layout.addWidget(self.title_bar)
+        self.content_widget = QWidget(self)
+        main_layout.addWidget(self.content_widget, 1)
+        size_grip = QSizeGrip(self)
+        size_grip.setFixedSize(16, 16)
+        overlay = QHBoxLayout()
+        overlay.setContentsMargins(0, 0, 4, 4)
+        overlay.addStretch(1)
+        overlay.addWidget(size_grip, 0, Qt.AlignBottom | Qt.AlignRight)
+        main_layout.addLayout(overlay)
+
     def initUI(self):
-        self.setWindowTitle('Bolt Pattern Generator')
-        self.setGeometry(100, 100, 1650, 1050)
+        self.setupWrapper()
         
+        # Center the window on the screen with the same dimensions
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 900, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
+
+        content_layout = QVBoxLayout(self.content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+
+        # Create scroll area for the entire content
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll = QWidget()
+
         # Main layout
-        main_layout = QHBoxLayout()
+        main_layout = QHBoxLayout(scroll)
+        main_layout.setContentsMargins(10, 10, 10, 10)  # Reduced margins
         
         # Left panel for parameter display
         left_panel = QWidget()
+        left_panel.setMaximumWidth(400)  # Limit left panel width
         left_layout = QVBoxLayout()
+        left_layout.setSpacing(5)  # Reduced spacing
         
         # Parameter display labels
         params = self.get_parameters()
         
         heading_label = QLabel("Note: Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
-        heading_label.setStyleSheet("font-size: 20px;")
+        heading_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")  # Reduced font size
+        heading_label.setWordWrap(True)
         left_layout.addWidget(heading_label)
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 25px;")
-        left_layout.addWidget(space_label)
         
         sub_heading_label1 = QLabel("Failure Pattern due to Shear in Plate")
-        sub_heading_label1.setStyleSheet("font-size: 18px; font-weight: bold;")
+        sub_heading_label1.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
         left_layout.addWidget(sub_heading_label1)
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 15px;")
-        left_layout.addWidget(space_label)
 
         # Display the parameter values
         for key, value in self.dict_shear_failure.items():
             param_layout = QHBoxLayout()
+            param_layout.setContentsMargins(0, 2, 0, 2)  # Minimal margins
             param_label = QLabel(key.title())
+            param_label.setStyleSheet("font-size: 12px;")
             value_label = QLabel(f'{value}')
+            value_label.setStyleSheet("font-size: 12px; font-weight: bold;")
             param_layout.addWidget(param_label)
+            param_layout.addStretch()  # Push value to the right
             param_layout.addWidget(value_label)
             left_layout.addLayout(param_layout)
 
-            space_label=QLabel("  ")
-            space_label.setStyleSheet("font-size: 5px;")
-            left_layout.addWidget(space_label)
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 25px;")
-        left_layout.addWidget(space_label)
-
         sub_heading_label2 = QLabel("Failure Pattern due to Tension in Plate")
-        sub_heading_label2.setStyleSheet("font-size: 18px; font-weight: bold;")
+        sub_heading_label2.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
         left_layout.addWidget(sub_heading_label2)
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 15px;")
-        left_layout.addWidget(space_label)
 
         for key, value in self.dict_tension_failure.items():
             param_layout = QHBoxLayout()
+            param_layout.setContentsMargins(0, 2, 0, 2)
             param_label = QLabel(key.title())
+            param_label.setStyleSheet("font-size: 12px;")
             value_label = QLabel(f'{value}')
+            value_label.setStyleSheet("font-size: 12px; font-weight: bold;")
             param_layout.addWidget(param_label)
+            param_layout.addStretch()
             param_layout.addWidget(value_label)
             left_layout.addLayout(param_layout)
 
-            space_label=QLabel("  ")
-            space_label.setStyleSheet("font-size: 5px;")
-            left_layout.addWidget(space_label)
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 25px;")
-        left_layout.addWidget(space_label)
-
         sub_heading_label3 = QLabel("Section 3")
-        sub_heading_label3.setStyleSheet("font-size: 18px; font-weight: bold;")
+        sub_heading_label3.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
         left_layout.addWidget(sub_heading_label3)
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 15px;")
-        left_layout.addWidget(space_label)
 
         for key, value in self.dict_section_3.items():
             param_layout = QHBoxLayout()
+            param_layout.setContentsMargins(0, 2, 0, 2)
             param_label = QLabel(key.title())
+            param_label.setStyleSheet("font-size: 12px;")
             value_label = QLabel(f'{value}')
+            value_label.setStyleSheet("font-size: 12px; font-weight: bold;")
             param_layout.addWidget(param_label)
+            param_layout.addStretch()
             param_layout.addWidget(value_label)
             left_layout.addLayout(param_layout)
-            space_label=QLabel("  ")
-            space_label.setStyleSheet("font-size: 5px;")
-            left_layout.addWidget(space_label)
 
         left_layout.addStretch()
         left_panel.setLayout(left_layout)
@@ -164,43 +206,44 @@ class FinPlateCapacityDetails(QMainWindow):
         # Right panel for the two vertical drawings
         right_panel = QWidget()
         right_layout = QVBoxLayout()
+        right_layout.setSpacing(10)  # Reduced spacing
         right_panel.setLayout(right_layout)
 
         sub_heading_label1 = QLabel("Failure Pattern due to Shear in Plate:")
-        sub_heading_label1.setStyleSheet("font-size: 16px; font-weight: bold;")
+        sub_heading_label1.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px;")
         right_layout.addWidget(sub_heading_label1)
 
         # First drawing
         self.scene1 = QGraphicsScene()
         self.view1 = QGraphicsView(self.scene1)
         self.view1.setRenderHint(QPainter.Antialiasing)
+        self.view1.setMinimumWidth(500)
+        self.view1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Disable individual scroll bars
+        self.view1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.createDrawing(self.scene1)
         self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
         right_layout.addWidget(self.view1)
 
-
-        space_label=QLabel("  ")
-        space_label.setStyleSheet("font-size: 15px;")
-        right_layout.addWidget(space_label)
-
         sub_heading_label2 = QLabel("Failure Pattern due to Tension in Plate:")
-        sub_heading_label2.setStyleSheet("font-size: 16px; font-weight: bold;")
+        sub_heading_label2.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px; margin-top: 10px;")
         right_layout.addWidget(sub_heading_label2)
 
         # Second drawing (identical to first)
         self.scene2 = QGraphicsScene()
         self.view2 = QGraphicsView(self.scene2)
         self.view2.setRenderHint(QPainter.Antialiasing)
+        self.view2.setMinimumWidth(500)
+        self.view2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Disable individual scroll bars
+        self.view2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.createSecondDrawing(self.scene2)  # Using the same drawing function
         self.view2.fitInView(self.scene2.sceneRect(), Qt.KeepAspectRatio)
         right_layout.addWidget(self.view2)
 
         main_layout.addWidget(left_panel, 1)
-        main_layout.addWidget(right_panel, 3)
+        main_layout.addWidget(right_panel, 2)  # Reduced proportion for better balance
         
-        main_widget = QWidget()
-        main_widget.setLayout(main_layout)
-        self.setCentralWidget(main_widget)
+        scroll_area.setWidget(scroll)
+        content_layout.addWidget(scroll_area)
 
     def get_parameters(self):
         spacing_data = self.connection.spacing(status=True)  # Get actual values
@@ -227,8 +270,7 @@ class FinPlateCapacityDetails(QMainWindow):
         print("Extracted parameters:", param_map)
         return param_map
 
-
-# failure due to shear in plate   
+    # failure due to shear in plate   
     def createDrawing(self, scene):
         coeff = 2  # scaling coefficient
         params = self.get_parameters()
@@ -251,8 +293,6 @@ class FinPlateCapacityDetails(QMainWindow):
         
         # Create dashed pen for failure patterns
         dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
-    
-        
         
         h_offset = 40 / coeff
         v_offset = 60 / coeff
@@ -302,9 +342,6 @@ class FinPlateCapacityDetails(QMainWindow):
         # Create dashed pen for failure patterns
         dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
 
-        
-
-
         if self.cols==1:
             x_line_dist=width-end
         else:
@@ -318,7 +355,6 @@ class FinPlateCapacityDetails(QMainWindow):
         scene.addLine(x_line_dist, edge, x_line_dist, height-edge, dashed_pen)
         scene.addLine(x_line_dist, height-edge, width, height-edge, dashed_pen)
         scene.addRect(0, 0, width, height, dimension_pen)
-
         
         # Draw holes
         for row in range(self.rows):
@@ -335,8 +371,6 @@ class FinPlateCapacityDetails(QMainWindow):
             scene.addRect(0, 0, weld_size, height, dimension_pen, red_brush)
         # Add dimensions
         self.addDimensions(scene, width, height, pitch, end, gauge1, gauge2, edge, dimension_pen, coeff)
-
-
 
     def addDimensions(self, scene, width, height, pitch, end, gauge1, gauge2, edge, pen, coeff):
         h_offset = 20 / coeff
@@ -387,7 +421,7 @@ class FinPlateCapacityDetails(QMainWindow):
         text_item.setFont(font)
         
         if y1 < 0:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 12)
         else:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
 
@@ -440,3 +474,4 @@ class FinPlateCapacityDetails(QMainWindow):
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
         else:
             text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+

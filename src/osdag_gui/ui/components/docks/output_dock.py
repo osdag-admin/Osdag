@@ -66,7 +66,7 @@ def style_line_edit():
 def style_small_button():
     return """
         QPushButton {
-            padding: 2px 7px;
+            padding: 3px 7px;
             background-color: #888;
             color: white;
             border-radius: 4px;
@@ -120,7 +120,7 @@ class OutputDock(QWidget):
 
         # Animation setup
         self.animation = QPropertyAnimation(self, b"pos")
-        self.animation.setDuration(800)
+        self.animation.setDuration(100)
         self.animation.setEasingCurve(QEasingCurve.InOutQuad)
         self.animation.finished.connect(self._on_animation_finished)
         self._animation_callback = None
@@ -272,9 +272,8 @@ class OutputDock(QWidget):
                 cur_box_form = QFormLayout()
                 cur_box_form.setHorizontalSpacing(5)
                 cur_box_form.setVerticalSpacing(10)
-                cur_box_form.setContentsMargins(10, 10, 10, 10)
-                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-                cur_box_form.setAlignment(Qt.AlignmentFlag.AlignRight)
+                cur_box_form.setContentsMargins(10, 10, 30, 10)
+                cur_box_form.setFormAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
                 if key:
                     fields = 0
@@ -288,7 +287,7 @@ class OutputDock(QWidget):
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QLineEdit()
                 right.setStyleSheet(style_line_edit())
@@ -302,7 +301,7 @@ class OutputDock(QWidget):
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
                 print("@",label,"@")
-                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
+                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QPushButton(label.strip())
                 spacing_button_list.append(field)

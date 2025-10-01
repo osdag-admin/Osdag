@@ -10,25 +10,26 @@ from osdag_core.Common import *
 from osdag_core.utils.common.Section_Properties_Calculator import *
 from osdag_core.utils.common.component import *
 from osdag_core.utils.common.other_standards import *
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 
 import os
 import sqlite3
 import openpyxl
 
 class MyTableWidget(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.layout = QVBoxLayout(self)
-        self.tabs = QTabWidget(self)
+        self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(2, 2, 2, 2)
+        self.tabs = QTabWidget()
         self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
 
     def addTab(self, widget, text):
         self.tabs.addTab(widget, text)
         widget.setAutoFillBackground(True)
 
-
 class Window(QDialog):
-
     def __init__(self, main, input_dictionary):
         super().__init__()
         self.input_dictionary = input_dictionary
@@ -82,27 +83,64 @@ class Window(QDialog):
         self.values_changed = True
 
     def initUI(self,main,input_dictionary):
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setObjectName("AdditionalInputs")
+        self.setStyleSheet("""
+            #AdditionalInputs {
+                border: 1px solid #90AF13;
+            }
+            QPushButton {
+                background-color: white;
+                color: black;
+                font-weight: bold; 
+                border-radius: 5px;
+                border: 1px solid black;
+                padding: 5px 14px;
+                text-align: center;
+                font-family: "Calibri";
+            }
+            QPushButton:hover {
+                background-color: #90AF13;
+                border: 1px solid #90AF13;
+                color: white;
+            }
+            QPushButton:pressed {
+                color: black;
+                background-color: white;
+                border: 1px solid black;
+            }
+        """)
+    
         scale = 1
         button_size_x = int(scale*190)
         button_size_y = int(scale*30)
-        self.setObjectName("DesignPreferences")
-        self.setWindowTitle('Design Preference')
-        self.tabWidget = MyTableWidget(self)
-        self.setLayout(self.tabWidget.layout)
-        hlayout = QHBoxLayout()
-        self.tabWidget.layout.addLayout(hlayout)
-        self.btn_defaults = QPushButton()
-        self.btn_defaults.setText("Defaults")
-        self.btn_save = QPushButton()
-        self.btn_save.setText("Save")
-        hlayout.addWidget(self.btn_defaults)
-        hlayout.addWidget(self.btn_save)
-        self.btn_defaults.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-        self.btn_save.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-        self.btn_defaults.setFixedSize(button_size_x,button_size_y)
-        self.btn_save.setFixedSize(button_size_x,button_size_y)
 
-        tab_index = 0
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(1, 1, 1, 5)
+        self.main_layout.setSpacing(0)
+        # Custom title bar
+        self.titleBar = CustomTitleBar()
+        self.titleBar.setTitle('Additional Inputs')
+        self.main_layout.addWidget(self.titleBar)
+
+        self.tabWidget = MyTableWidget()
+        self.main_layout.addWidget(self.tabWidget)
+
+        self.button_layout = QHBoxLayout()
+        self.button_layout.setSpacing(5)
+        self.btn_defaults = QPushButton("Defaults")
+        self.btn_save = QPushButton("Save")
+        self.btn_defaults.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.btn_save.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.btn_defaults.setFixedSize(button_size_x, button_size_y)
+        self.btn_save.setFixedSize(button_size_x, button_size_y)
+        self.button_layout.addStretch()
+        self.button_layout.addWidget(self.btn_defaults)
+        self.button_layout.addWidget(self.btn_save)
+        self.button_layout.addStretch()
+
+        tab_index = -1
         print(f"\n main.tab_list(main)= {main.tab_list()} ")
         for tab_details in main.tab_list():
             last_title = ""
@@ -419,7 +457,13 @@ class Window(QDialog):
 
             scrollArea.setWidget(scrollAreaWidgetContents)
 
-        self.tabWidget.tabs.setCurrentIndex(2)
+        self.main_layout.addLayout(self.button_layout)
+        total_tabs = self.tabWidget.tabs.count()
+        print(f"Total tabs created: {total_tabs}")
+        if total_tabs > 0:
+            # Set to the last tab or a specific index if it exists
+            target_index = min(2, total_tabs - 1)
+            self.tabWidget.tabs.setCurrentIndex(target_index)
         module = main.module_name()
 
         if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BCENDPLATE]:
@@ -1317,64 +1361,7 @@ class Window(QDialog):
                 text_ignored.append(i)
         dialog.exec()
 
-        # self.ui.pushButton_Import_Column.setDisabled(True)
-
-    # def import_BeamPref(self):
-    #     wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
-    #     sheet = wb['First Sheet']
-    #     conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
-    #
-    #     for rowNum in range(2, sheet.max_row + 1):
-    #         designation = sheet.cell(row=rowNum, column=2).value
-    #         mass = sheet.cell(row=rowNum, column=3).value
-    #         area = sheet.cell(row=rowNum, column=4).value
-    #         d = sheet.cell(row=rowNum, column=5).value
-    #         b = sheet.cell(row=rowNum, column=6).value
-    #         tw = sheet.cell(row=rowNum, column=7).value
-    #         t = sheet.cell(row=rowNum, column=8).value
-    #         flangeSlope = sheet.cell(row=rowNum, column=9).value
-    #         r1 = sheet.cell(row=rowNum, column=10).value
-    #         r2 = sheet.cell(row=rowNum, column=11).value
-    #         iz = sheet.cell(row=rowNum, column=12).value
-    #         iy = sheet.cell(row=rowNum, column=13).value
-    #         rz = sheet.cell(row=rowNum, column=14).value
-    #         ry = sheet.cell(row=rowNum, column=15).value
-    #         zz = sheet.cell(row=rowNum, column=16).value
-    #         zy = sheet.cell(row=rowNum, column=17).value
-    #         zpz = sheet.cell(row=rowNum, column=18).value
-    #         zpy = sheet.cell(row=rowNum, column=19).value
-    #         source = sheet.cell(row=rowNum, column=20).value
-    #
-    #         c = conn.cursor()
-    #         c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (designation,))
-    #         data = c.fetchone()[0]
-    #         if data == 0:
-    #             c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
-    #                                                    Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-    #                       (designation, mass, area,
-    #                        d, b, tw, t,
-    #                        flangeSlope, r1
-    #                        ,
-    #                        r2, iz, iy, rz, ry,
-    #                        zz, zy
-    #                        ,
-    #                        zpz, zpy, source))
-    #             conn.commit()
-    #             c.close()
-    #
-    #     conn.close()
-    #     QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
-    #     self.ui.pushButton_Import_Beam.setDisabled(True)
-
-        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("DesignPreferences", "Column"))
-        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("DesignPreferences", "Beam"))
-        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("DesignPreferences", "Bolt"))
-        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Weld), _translate("DesignPreferences", "Weld"))
-        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("DesignPreferences", "Detailing"))
-        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Design), _translate("DesignPreferences", "Design"))
-
-
-class DesignPreferences():
+class AdditionalInputs():
     def __init__(self, main, module_window, input_dictionary, parent=None):
         self.ui = Window(main, input_dictionary)
         self.main = main

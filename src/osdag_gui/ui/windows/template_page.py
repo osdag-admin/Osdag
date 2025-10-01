@@ -22,7 +22,7 @@ from osdag_gui.common_functions import design_examples
 
 from osdag_core.Common import *
 
-from osdag_gui.ui.windows.design_preferences import DesignPreferences
+from osdag_gui.ui.windows.design_preferences import AdditionalInputs
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_gui.data.database.database_config import *
 
@@ -108,7 +108,7 @@ class CustomWindow(QWidget):
 
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
-        self.designPrefDialog = DesignPreferences(self.backend, self, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs)
 
         self.init_ui(title)
         self.sidebar = SidebarWidget(parent=self)
@@ -1230,7 +1230,7 @@ class CustomWindow(QWidget):
             print(f"trigger_type == Design_Pref")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
                 print(f"QDialog.Accepted")
-                self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
+                self.designPrefDialog = AdditionalInputs(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     # print(f"self.designPrefDialog.flag = False")
@@ -1830,7 +1830,55 @@ class CadComponentCheckbox(QWidget):
                 padding: 5px;               
             }
             QCheckBox {
+                color: #000000;
                 margin: 5px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: transparent;
+            }
+            QCheckBox:disabled {
+                color: #808086;
+                margin: 5px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: transparent;
+            }
+            QCheckBox:hover {
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: transparent;
+            }
+
+            QCheckBox::indicator {
+                width: 12px;
+                height: 12px;
+            }
+
+            QCheckBox::indicator:checked {
+                border-style: solid;
+                border-width: 1px;
+                border-color: qlineargradient(
+                    spread:pad, x1:0.5, y1:1, x2:0.5, y2:0,
+                    stop:0 rgba(120, 120, 120, 255),
+                    stop:1 rgba(180, 180, 180, 255)
+                );
+                background-color: qlineargradient(
+                    spread:pad, x1:0.5, y1:1, x2:0.5, y2:0,
+                    stop:0 rgba(120, 120, 120, 255),
+                    stop:1 rgba(200, 200, 200, 255)
+                );
+            }
+
+            QCheckBox::indicator:unchecked {
+                border-style: solid;
+                border-width: 1px;
+                border-color: qlineargradient(
+                    spread:pad, x1:0.5, y1:1, x2:0.5, y2:0,
+                    stop:0 rgba(160, 160, 160, 255),
+                    stop:1 rgba(200, 200, 200, 255)
+                );
+                background-color: #ffffff;
             }
         ''')
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

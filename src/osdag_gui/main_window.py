@@ -28,7 +28,7 @@ from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_pro
 from osdag_gui.data.database.database_config import get_module_function
 from osdag_core.Common import *
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-
+import openpyxl
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -512,6 +512,7 @@ class MainWindow(QMainWindow):
 
         self.main_widget_instance = fin_plate
         fin_plate.openNewTab.connect(self.handle_add_tab)
+        fin_plate.downloadDatabase.connect(self.download_Database)
         self.main_widget_layout.addWidget(fin_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
@@ -526,6 +527,7 @@ class MainWindow(QMainWindow):
         home_window.triggerLoadOsi.connect(self.common_osi_load)
         home_window.openProject.connect(self.handle_open_project)
         home_window.openModule.connect(self.handle_open_module)
+        home_window.downloadDatabase.connect(self.download_Database)
         self.main_widget_instance = home_window
         home_window.set_active_button(module)
         home_window.cardOpenClicked.connect(self.handle_card_open_clicked)
@@ -637,6 +639,60 @@ class MainWindow(QMainWindow):
             return    
 
     #-------------Functions-to-load-modules-in-Tabwidget-END------------------------------------
+
+    #----------------------------Download-Database/Excel-END-----------------------------------------
+    def download_Database(self, table, call_type="database"):
+
+        fileName, _ = QFileDialog.getSaveFileName(QFileDialog(), "Download File", os.path.join(os.getcwd(), str(table+"_Details.xlsx")),
+                                                  "SectionDetails(*.xlsx)")
+        if not fileName:
+            return
+        try:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            c = conn.cursor()
+            header = get_db_header(table)
+            wb = openpyxl.Workbook()
+            sheet = wb.create_sheet(table, 0)
+
+            col = 1
+            for head in header:
+                sheet.cell(row=1, column=col).value = head
+                col += 1
+            if call_type != "header":
+                if table == 'Columns':
+                    c.execute("SELECT * FROM Columns")
+                elif table == 'Beams':
+                    c.execute("SELECT * FROM Beams")
+                elif table == 'Angles':
+                    c.execute("SELECT * FROM Angles")
+                elif table == 'Channels':
+                    c.execute("SELECT * FROM Channels")
+                data = c.fetchall()
+                conn.commit()
+                c.close()
+                row = 2
+                for rows in data:
+                    col = 1
+                    for cols in range(len(header)):
+                        sheet.cell(row=row, column=col).value = rows[col - 1]
+                        col += 1
+                    row += 1
+            wb.save(fileName)
+            CustomMessageBox(
+                title='Information',
+                text='Your File is Downloaded.',
+                dialogType=MessageBoxType.Information
+            ).exec()
+
+        except IOError:
+            CustomMessageBox(
+                title='Information',
+                text='Unable to save file',
+                informativeText="There was an error saving \"%s\"" % fileName,
+                dialogType=MessageBoxType.Information
+            ).exec()
+            return
+    #----------------------------Download-Database/Excel--END----------------------------------------
 
     def clear_layout(self, layout):
         while layout.count():

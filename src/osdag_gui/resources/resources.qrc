@@ -56,11 +56,36 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>backgrounds/splash_bg.jpg</file>
 
-        <file>images/default_icon.png</file>
-        <file>images/clicked_icon.png</file>
-        <file>images/fin_cf_bw.png</file>
-        <file>images/fin_cw_bw.png</file>
-        <file>images/fin_beam_beam.png</file>
+        <file>images/home.png</file>
+        <file>images/home_clicked.png</file>
+
+        <file>images/connection.png</file>
+        <file>images/connection_clicked.png</file>
+
+        <file>images/tension_member.png</file>
+        <file>images/tension_member_clicked.png</file>
+
+        <file>images/compression_member.png</file>
+        <file>images/compression_member_clicked.png</file>
+
+        <file>images/flexural_member.png</file>
+        <file>images/flexural_member_clicked.png</file>
+
+        <file>images/beam_column.png</file>
+        <file>images/beam_column_clicked.png</file>
+
+        <file>images/truss.png</file>
+        <file>images/truss_clicked.png</file>
+
+        <file>images/2d_frame.png</file>
+        <file>images/2d_frame_clicked.png</file>
+
+        <file>images/3d_frame.png</file>
+        <file>images/3d_frame_clicked.png</file>
+
+        <file>images/group_design.png</file>
+        <file>images/group_design_clicked.png</file>
+
         <file>images/down_arrow.png</file>
         <file>vectors/design_button.svg</file>
         <file>vectors/input_dock_active.svg</file>
@@ -70,8 +95,6 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/logs_dock_active.svg</file>
         <file>vectors/logs_dock_inactive.svg</file>
 
-        <file>vectors/default_icon.svg</file>
-        <file>vectors/clicked_icon.svg</file>
         <file>vectors/window_close.svg</file>
         <file>vectors/window_close_hover.svg</file>
         <file>vectors/window_maximize.svg</file>

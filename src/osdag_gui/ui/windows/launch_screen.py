@@ -85,7 +85,7 @@ class OsdagLaunchScreen(object):
         
         self.LoadingLabel = QLabel(self.centralwidget)
         self.LoadingLabel.setObjectName(u"SplashScreen_LoadingLabel")
-        self.LoadingLabel.setAlignment(Qt.AlignCenter)
+        self.LoadingLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.LoadingLabel.setGeometry(QRect(20, 290, 130, 25))
         self.LoadingLabel.setStyleSheet("""
                 QLabel {

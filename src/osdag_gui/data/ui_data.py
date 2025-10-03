@@ -68,15 +68,16 @@ class Data:
     }
     
     NAVBAR_ICONS = {
-        "connection": ["connection_button.svg", "connection_button_clicked.svg"],
-        "tension_member": ["tension_member_button.svg", "tension_member_button_clicked.svg"],
-        "compression_member": ["compression_member_button.svg", "compression_member_button_clicked.svg"],
-        "flexural_member": ["flexural_member_button.svg", "flexural_member_button_clicked.svg"],
-        "beam_column": ["beam_column_button.svg", "beam_column_button_clicked.svg"],
-        "truss": ["truss_button.svg", "truss_button_clicked.svg"],
-        "2d_frame": ["2d_frame_button.svg", "2d_frame_button_clicked.svg"],
-        "3d_frame": ["3d_frame_button.svg", "3d_frame_button_clicked.svg"],
-        "group_design": ["group_design_button.svg", "group_design_button_clicked.svg"],
+        "Home": [":/images/home.png", ":/images/home_clicked.png"],
+        "Connection": [":/images/connection.png", ":/images/connection_clicked.png"],
+        "Tension Member": [":/images/tension_member.png", ":/images/tension_member_clicked.png"],
+        "Compression Member": [":/images/compression_member.png", ":/images/compression_member_clicked.png"],
+        "Flexural Member": [":/images/flexural_member.png", ":/images/flexural_member_clicked.png"],
+        "Beam Column": [":/images/beam_column.png", ":/images/beam_column_clicked.png"],
+        "Truss": [":/images/truss.png", ":/images/truss_clicked.png"],
+        "2D Frame": [":/images/2d_frame.png", ":/images/2d_frame_clicked.png"],
+        "3D Frame": [":/images/3d_frame.png", ":/images/3d_frame_clicked.png"],
+        "Group Design": [":/images/group_design.png", ":/images/group_design_clicked.png"],
     }
 
     FLOATING_NAVBAR = [

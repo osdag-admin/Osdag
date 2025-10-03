@@ -30,6 +30,7 @@ from osdag_gui.__config__ import CAD_BACKEND
 
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
+    downloadDatabase = Signal(str, str)
     def __init__(self, title: str, backend: object, parent):
         super().__init__()
         self.parent = parent
@@ -109,6 +110,7 @@ class CustomWindow(QWidget):
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
         self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog.downloadDatabase.connect(self.downloadDatabase)
 
         self.init_ui(title)
         self.sidebar = SidebarWidget(parent=self)
@@ -697,19 +699,19 @@ class CustomWindow(QWidget):
         download_database_menu = database_menu.addMenu("Download Database")
 
         download_column_action = QAction("Column", self)
-        download_column_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Columns"))
+        download_column_action.triggered.connect(lambda table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
         download_database_menu.addAction(download_column_action)
 
-        download_bolt_action = QAction("Bolt", self)
-        download_bolt_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Beams"))
+        download_bolt_action = QAction("Beam", self)
+        download_bolt_action.triggered.connect(lambda table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
         download_database_menu.addAction(download_bolt_action)
 
-        download_weld_action = QAction("Weld", self)
-        download_weld_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Channels"))
+        download_weld_action = QAction("Channel", self)
+        download_weld_action.triggered.connect(lambda table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
         download_database_menu.addAction(download_weld_action)
 
         download_angle_action = QAction("Angle", self)
-        download_angle_action.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
+        download_angle_action.triggered.connect(lambda table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
         download_database_menu.addAction(download_angle_action)
         
         database_menu.addSeparator()
@@ -752,7 +754,7 @@ class CustomWindow(QWidget):
         # find the check box and make it checked
         checkBox = self.cad_comp_widget.findChild(QCheckBox, object_name)
         checkBox.setChecked(True)
-    
+
     #----------------Function-Trigger-for-MenuBar-START----------------------------------------
     
     # Function for getting inputs from a file

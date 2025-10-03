@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QComboBox, QScrollArea, QLabel, QLineEdit, QSizePolicy, QTabWidget
 )
 from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog
-from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtCore import Qt, QRegularExpression, Signal
 from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIcon, QFontMetrics, QTextCursor, QGuiApplication, QTextCharFormat, QCursor
 
 from osdag_core.Common import *
@@ -30,6 +30,7 @@ class MyTableWidget(QWidget):
         widget.setAutoFillBackground(True)
 
 class Window(QDialog):
+    downloadDatabase = Signal(str, str)
     def __init__(self, main, input_dictionary):
         super().__init__()
         self.input_dictionary = input_dictionary
@@ -475,7 +476,7 @@ class Window(QDialog):
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
-            pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
+            pushButton_Download_Column.clicked.connect(lambda table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
@@ -483,7 +484,7 @@ class Window(QDialog):
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
             pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
-            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database(table="Beams", call_type="header"))
+            pushButton_Download_Beam.clicked.connect(lambda table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
             if module == KEY_DISP_CLEATANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
@@ -493,7 +494,7 @@ class Window(QDialog):
                 pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_CLEAT)
                 pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
                 pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CLEAT)
-                pushButton_Download_Angle.clicked.connect(lambda: self.download_Database(table="Angles", call_type="header"))
+                pushButton_Download_Angle.clicked.connect(lambda table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
             if module == KEY_DISP_SEATED_ANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(KEY_DISP_SEATED_ANGLE))
@@ -502,7 +503,7 @@ class Window(QDialog):
                 pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
                 pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_SEATED_ANGLE)
-                pushButton_Download_Angle.clicked.connect(lambda: self.download_Database(table="Angles", call_type="header"))
+                pushButton_Download_Angle.clicked.connect(lambda table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
@@ -512,7 +513,7 @@ class Window(QDialog):
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
-            pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
+            pushButton_Download_Column.clicked.connect(lambda table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
@@ -522,7 +523,7 @@ class Window(QDialog):
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
             pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
-            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database(table="Beams", call_type="header"))
+            pushButton_Download_Beam.clicked.connect(lambda table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_BB_EP_SPLICE:
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
@@ -532,7 +533,7 @@ class Window(QDialog):
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
             pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
-            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database(table="Beams", call_type="header"))
+            pushButton_Download_Beam.clicked.connect(lambda table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_COMPRESSION:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
@@ -542,7 +543,7 @@ class Window(QDialog):
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
-            pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
+            pushButton_Download_Column.clicked.connect(lambda table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
             pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
             pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CHANNEL))
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
@@ -550,7 +551,7 @@ class Window(QDialog):
             pushButton_Import_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
             pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
-            pushButton_Download_Channel.clicked.connect(lambda: self.download_Database(table="Channels", call_type="header"))
+            pushButton_Download_Channel.clicked.connect(lambda table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_COMPRESSION_STRUT:
             pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
@@ -560,7 +561,7 @@ class Window(QDialog):
             pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
             pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
             pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
-            pushButton_Download_Angle.clicked.connect(lambda: self.download_Database(table="Angles", call_type="header"))
+            pushButton_Download_Angle.clicked.connect(lambda table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_BASE_PLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
@@ -570,7 +571,7 @@ class Window(QDialog):
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
-            pushButton_Download_Column.clicked.connect(lambda: self.download_Database(table="Columns", call_type="header"))
+            pushButton_Download_Column.clicked.connect(lambda table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
 
         if module == KEY_DISP_TENSION_BOLTED or module == KEY_DISP_TENSION_WELDED:
             pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
@@ -580,7 +581,7 @@ class Window(QDialog):
             pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
             pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
             pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
-            pushButton_Download_Angle.clicked.connect(lambda: self.download_Database(table="Angles", call_type="header"))
+            pushButton_Download_Angle.clicked.connect(lambda table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
             pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
             pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CHANNEL))
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
@@ -588,7 +589,7 @@ class Window(QDialog):
             pushButton_Import_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
             pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
-            pushButton_Download_Channel.clicked.connect(lambda: self.download_Database(table="Channels", call_type="header"))
+            pushButton_Download_Channel.clicked.connect(lambda table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
 
     def manage_designation_size(self,line_edit):
         def change_size():
@@ -1155,50 +1156,6 @@ class Window(QDialog):
         else:
             return False
 
-    def download_Database(self, table, call_type="database"):
-
-        fileName, _ = QFileDialog.getSaveFileName(QFileDialog(), "Download File", os.path.join(os.getcwd(), str(table+"_Details.xlsx")),
-                                                  "SectionDetails(*.xlsx)")
-        if not fileName:
-            return
-        try:
-            conn = sqlite3.connect(PATH_TO_DATABASE)
-            c = conn.cursor()
-            header = get_db_header(table)
-            wb = openpyxl.Workbook()
-            sheet = wb.create_sheet(table, 0)
-
-            col = 1
-            for head in header:
-                sheet.cell(row=1, column=col).value = head
-                col += 1
-            if call_type != "header":
-                if table == 'Columns':
-                    c.execute("SELECT * FROM Columns")
-                elif table == 'Beams':
-                    c.execute("SELECT * FROM Beams")
-                elif table == 'Angles':
-                    c.execute("SELECT * FROM Angles")
-                elif table == 'Channels':
-                    c.execute("SELECT * FROM Channels")
-                data = c.fetchall()
-                conn.commit()
-                c.close()
-                row = 2
-                for rows in data:
-                    col = 1
-                    for cols in range(len(header)):
-                        sheet.cell(row=row, column=col).value = rows[col - 1]
-                        col += 1
-                    row += 1
-            wb.save(fileName)
-            QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded.')
-
-        except IOError:
-            QMessageBox.information(QMessageBox(), "Unable to save file",
-                                    "There was an error saving \"%s\"" % fileName)
-            return
-
     def import_section(self, tab_name):
         fileName, _ = QFileDialog.getOpenFileName(QFileDialog(), "Open File", os.getcwd(),
                                                   "SectionDetails(*.xlsx)")
@@ -1362,8 +1319,10 @@ class Window(QDialog):
         dialog.exec()
 
 class AdditionalInputs():
+    downloadDatabase = Signal(str, str)
     def __init__(self, main, module_window, input_dictionary, parent=None):
         self.ui = Window(main, input_dictionary)
+        self.ui.downloadDatabase.connect(self.downloadDatabase)
         self.main = main
         self.main_controller = parent
         self.module_window = module_window

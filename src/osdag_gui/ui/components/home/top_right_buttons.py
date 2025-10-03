@@ -361,6 +361,7 @@ class DropDownButton(TopButton1):
     A specialized TopButton for "Resources" that opens a dropdown menu on click.
     It inherits the momentary click effect from TopButton.
     """
+    downloadDatabase = Signal(str, str)
     def __init__(self, black_icon_path, white_icon_path, label, data, parent=None):
         super().__init__(black_icon_path, white_icon_path, label, parent)
         self.setup_menu(data)
@@ -413,17 +414,17 @@ class DropDownButton(TopButton1):
                         border-radius: 2px;
                     }}
                 """)
-                sub_items = ["Column", "Beam", "Angle", "Channel"]
+                sub_items = ["Column", "Beam", "Channel", "Angle"]
                 for sub in sub_items:
                     sub_action = QAction(sub, self)
                     if sub == "Column":
-                        sub_action.triggered.connect(lambda: print("Import clicked"))
+                        sub_action.triggered.connect(lambda table="Columns", call_type="database": self.downloadDatabase.emit(table, call_type))
                     elif sub == "Beam":
-                        sub_action.triggered.connect(lambda: print("Export clicked"))
-                    elif sub == "Angle":
-                        sub_action.triggered.connect(lambda: print("Manage clicked"))
+                        sub_action.triggered.connect(lambda table="Beams", call_type="database": self.downloadDatabase.emit(table, call_type))
                     elif sub == "Channel":
-                        sub_action.triggered.connect(lambda: print("Manage clicked"))
+                        sub_action.triggered.connect(lambda table="Channels", call_type="database": self.downloadDatabase.emit(table, call_type))
+                    elif sub == "Angle":
+                        sub_action.triggered.connect(lambda table="Angles", call_type="database": self.downloadDatabase.emit(table, call_type))
                     db_menu.addAction(sub_action)
                 self.menu.addMenu(db_menu)
 

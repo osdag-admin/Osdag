@@ -81,7 +81,7 @@ class CustomButton(QPushButton):
 
 class VerticalMenuBar(QWidget):
     nav_bar_trigger = Signal(object, object)
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, icons: dict):
         super().__init__()
 
         # Set size policy to expanding so it grows/shrinks with its parent layout
@@ -120,13 +120,11 @@ class VerticalMenuBar(QWidget):
 
         # Buttons section
         self.button_group = []
-        # Get paths relative to the script's directory
-        icon_default = ":/images/default_icon.png"
-        icon_clicked = ":/images/clicked_icon.png"
 
         names = list(data.keys())
         for name in names:
-            btn = CustomButton("  " + name, icon_default, icon_clicked, group=self.button_group)
+            icon = icons.get(name)
+            btn = CustomButton("  " + name, icon[0], icon[1], group=self.button_group)
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Make buttons expand vertically
             btn.clicked.connect(lambda _,label=name, data=data.get(name): self._on_nav_button_clicked(data, label))
             btn.setCursor(Qt.CursorShape.PointingHandCursor)

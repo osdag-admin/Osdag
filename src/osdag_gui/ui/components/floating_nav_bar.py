@@ -4,6 +4,7 @@ Provides quick access to modules and emits tab open signals.
 """
 import os
 import osdag_gui.resources.resources_rc
+from osdag_gui.data.ui_data import Data
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QSizePolicy, QSpacerItem, QApplication, QToolTip
@@ -133,21 +134,13 @@ class SidebarWidget(QWidget):
         self.button_layout.setAlignment(Qt.AlignHCenter)
         self.button_layout.setContentsMargins(0, 0, 0, 0)
         self.button_layout.setSpacing(0)  # spacing between buttons
-        icon_paths = [
-            (":/vectors/default_icon.svg", "Home"),
-            (":/vectors/default_icon.svg", "Connection"),
-            (":/vectors/default_icon.svg", "Tension Member"),
-            (":/vectors/default_icon.svg", "Compression Member"),
-            (":/vectors/default_icon.svg", "Flexural Member"),
-            (":/vectors/default_icon.svg", "Beam Column"),
-            (":/vectors/default_icon.svg", "Truss"),
-            (":/vectors/default_icon.svg", "2D Frame"),
-            (":/vectors/default_icon.svg", "3D Frame"),
-            (":/vectors/default_icon.svg", "Group Design")
-        ]
+
+        dat = Data()
+        navbar_icons = dat.NAVBAR_ICONS
+
         self.icon_size = 48  # px, you can adjust this value as needed
-        for i, (icon_path, tooltip) in enumerate(icon_paths):
-            btn = SidebarIconButton(icon_path, tooltip_text=tooltip, selected_icon_path=":/vectors/clicked_icon.svg", hover_icon_path=":/vectors/clicked_icon.svg" ,group=self.button_group)
+        for tooltip, icons in navbar_icons.items():
+            btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[1], hover_icon_path=icons[1] ,group=self.button_group)
             self.button_layout.addWidget(btn)
             self.button_group.append(btn)
             btn.clicked.connect(lambda _,title=tooltip: self.openNewTab.emit(title))

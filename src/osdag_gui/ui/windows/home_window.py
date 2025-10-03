@@ -117,6 +117,7 @@ class HomeWindow(QWidget):
     openModule = Signal(str)
     cardOpenClicked = Signal(str)  # Signal to propagate upward
     triggerLoadOsi = Signal()
+    downloadDatabase = Signal(str, str)
     def __init__(self):
         super().__init__()
         self.setStyleSheet("")
@@ -124,6 +125,7 @@ class HomeWindow(QWidget):
         dat = Data()
         self.menu_bar_data = dat.MODULES
         floating_navbar = dat.FLOATING_NAVBAR
+        navbar_icons = dat.NAVBAR_ICONS
 
         self.current_primary_button = None
         self.current_secondary_button = None
@@ -143,7 +145,7 @@ class HomeWindow(QWidget):
         main_h_layout.setSpacing(0)
 
         # Left Navigation Bar
-        self.nav_bar = VerticalMenuBar(self.menu_bar_data)
+        self.nav_bar = VerticalMenuBar(self.menu_bar_data, navbar_icons)
         self.nav_bar.nav_bar_trigger.connect(self.nav_trigger)
 
         main_h_layout.addWidget(self.nav_bar, 2)
@@ -188,6 +190,7 @@ class HomeWindow(QWidget):
         for i, (black_icon, white_icon, label, submenu_data) in enumerate(floating_navbar):
             if i==0 or i==1:
                 button = DropDownButton(black_icon, white_icon, label, submenu_data)
+                button.downloadDatabase.connect(self.downloadDatabase)
             else:
                 button = TopButton(black_icon, white_icon, label)
 

@@ -1373,7 +1373,7 @@ class CustomWindow(QWidget):
                 # status = True
                 ##############trial##############
 
-                print("Hover Dictionary: ",main.hover_dict)
+                print("Hover Dictionary: ", main.hover_dict)
 
                 print("Calling 3D Model from CAD")
                 self.commLogicObj.call_3DModel(status, main)

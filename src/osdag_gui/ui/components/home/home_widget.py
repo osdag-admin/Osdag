@@ -16,6 +16,7 @@ from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 
 import osdag_gui.resources.resources_rc
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from osdag_gui.ui.components.home.search_overlay import SearchOverlay
 from osdag_gui.data.database.database_config import *
 
 # --- SVG Widget with Theme Support ---
@@ -169,6 +170,9 @@ class SearchBarWidget(QWidget):
 # --- Project Item Widget ---
 class ProjectItem(QFrame):
     openProject = Signal(dict)
+    generateReport = Signal(dict)
+    downloadOsi = Signal(dict)
+
     def __init__(self, project_data, index):
         super().__init__()
         self.project_data = project_data
@@ -315,10 +319,10 @@ class ProjectItem(QFrame):
         
         # Buttons with FULL visibility
         self.generate_btn = QPushButton("Generate Report")
-        self.generate_btn.clicked.connect(lambda checked=False, record=self.project_data: self.recents_generate_report(record))
+        self.generate_btn.clicked.connect(lambda checked=False, record=self.project_data: self.generateReport.emit(record))
 
         self.download_btn = QPushButton("Download OSI")
-        self.download_btn.clicked.connect(lambda checked=False, record=self.project_data: self.handle_download_osi(record))
+        self.download_btn.clicked.connect(lambda checked=False, record=self.project_data: self.downloadOsi.emit(record))
 
         self.open_btn = QPushButton("Open Project")
         self.open_btn.clicked.connect(lambda checked=False, record=self.project_data: self.openProject.emit(record))
@@ -358,140 +362,6 @@ class ProjectItem(QFrame):
         self.expand_animation = QPropertyAnimation(self, b"maximumHeight")
         self.expand_animation.setDuration(250)
         self.expand_animation.setEasingCurve(QEasingCurve.OutCubic)
-
-    def handle_download_osi(self, record: dict):
-        # Ask user for save location
-        src_path = record.get(PROJECT_PATH)
-        if not src_path or not os.path.exists(src_path):
-            CustomMessageBox(
-                title="Error",
-                text="Project file not found.",
-                dialogType=MessageBoxType.Critical
-            ).exec()
-            return
-
-        # Suggest a default filename
-        default_name = os.path.basename(src_path) if src_path else "project.osi"
-        save_path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save OSI File",
-            default_name,
-            "Osdag Project Files (*.osi);;All Files (*)"
-        )
-        if save_path:
-            try:
-                shutil.copy2(src_path, save_path)
-                CustomMessageBox(
-                    title="Success",
-                    text=f"Project saved to:\n{save_path}",
-                    dialogType=MessageBoxType.Success
-                ).exec()
-                
-                # Open the directory containing the saved file
-                folder = os.path.dirname(save_path)
-                if folder and os.path.exists(folder):
-                    try:
-                        if sys.platform == 'win32':
-                            os.startfile(folder)
-                        elif sys.platform == 'darwin':
-                            import subprocess
-                            subprocess.run(['open', folder])
-                        else:
-                            import subprocess
-                            subprocess.run(['xdg-open', folder])
-                    except Exception as e:
-                        print(f"Failed to open folder: {e}")
-
-            except Exception as e:
-                CustomMessageBox(
-                    title="Error",
-                    text=f"Failed to save file:\n{e}",
-                    dialogType=MessageBoxType.Critical
-                ).exec()
-
-    #-------------Functions-to-generate-report-of-recent-project-START---------------------------
-
-    class ReportWorker(QThread):
-        success = Signal(str)   # emits PDF path
-        error = Signal(str)     # emits error message
-
-        def __init__(self, record, target_pdf, parent=None):
-            super().__init__(parent)
-            self.record = record
-            self.target_pdf = target_pdf
-
-        def run(self):
-            try:
-                # 1. Check if tex exist
-                tex_path = os.path.join("osdag_gui", "data", "reports", f"file_{self.record[ID]}", "report.tex")
-                if not os.path.isfile(tex_path):
-                    self.error.emit(f"LaTeX file not found for this project:\n{tex_path}")
-                    return
-
-                # 2. Copy images
-                base_dir = os.path.join("ResourceFiles", "images")
-                os.makedirs(base_dir, exist_ok=True)
-
-                report_dir = os.path.join("osdag_gui", "data", "reports", f"file_{self.record[ID]}")
-                required_images = ["3d.png", "front.png", "top.png", "side.png"]
-
-                for img in required_images:
-                    src = os.path.join(report_dir, img)
-                    dst = os.path.join(base_dir, img)
-                    if os.path.isfile(src):
-                        shutil.copy2(src, dst)
-
-                # 3. Run pdflatex
-                result = subprocess.run(
-                    ["pdflatex", "-interaction=nonstopmode", os.path.basename(tex_path)],
-                    cwd=os.path.dirname(tex_path),
-                    capture_output=True,
-                    text=True,
-                    timeout=60
-                )
-
-                # 4. Copy PDF
-                generated_pdf = os.path.join(os.path.dirname(tex_path), "report.pdf")
-                if os.path.isfile(generated_pdf):
-                    shutil.copy2(generated_pdf, self.target_pdf)
-                    self.success.emit(self.target_pdf)
-                else:
-                    self.error.emit("PDF generation failed. report.pdf not found.")
-
-            except subprocess.TimeoutExpired:
-                self.error.emit("pdflatex timed out.")
-            except Exception as e:
-                self.error.emit(str(e))
-    
-    def recents_generate_report(self, record: dict):
-        # QFileDialog must stay in the main thread
-        target_pdf, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save PDF Report As",
-            record[PROJECT_NAME],
-            "PDF (*.pdf)"
-        )
-        if not target_pdf:
-            return
-
-        if not target_pdf.lower().endswith(".pdf"):
-            target_pdf += ".pdf"
-
-        # Run heavy stuff in worker thread
-        self.worker = self.ReportWorker(record, target_pdf, parent=self)
-        self.worker.success.connect(lambda path: CustomMessageBox(
-            title="Success",
-            text=f"PDF report saved successfully to:\n{path}",
-            dialogType=MessageBoxType.Success
-        ).exec())
-        self.worker.error.connect(lambda msg: CustomMessageBox(
-            title="Error",
-            text=msg,
-            dialogType=MessageBoxType.Critical
-        ).exec())
-        self.worker.start()
-
-    #-------------Functions-to-generate-report-of-recent-project-END---------------------------
 
     def enterEvent(self, event):
         if not self.is_expanded:
@@ -631,6 +501,9 @@ class ModuleItem(QFrame):
 class SectionWidget(QFrame):
     openProject = Signal(dict)
     openModule = Signal(str)
+    generateReport = Signal(dict)
+    downloadOsi = Signal(dict)
+
     def __init__(self, title, items, is_project=True, main_window=None):
         super().__init__()
         self.main_window = main_window
@@ -736,6 +609,8 @@ class SectionWidget(QFrame):
             if self.is_project:
                 item_widget = ProjectItem(item, i)
                 item_widget.openProject.connect(self.openProject)
+                item_widget.downloadOsi.connect(self.downloadOsi)
+                item_widget.generateReport.connect(self.generateReport)
             else:
                 is_dark = self.main_window.is_dark_mode if self.main_window else False
                 item_widget = ModuleItem(item, is_dark)
@@ -814,8 +689,19 @@ class HomeWidget(QWidget):
         super().__init__()
         self.selected_item = None
         self.is_dark_mode = False
+        self.search_overlay = None
         self.setupUI()
         self.setupShortcuts()
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        """Hide overlay when clicking outside"""
+        if self.search_overlay and self.search_overlay.isVisible():
+            if event.type() == event.Type.MouseButtonPress:
+                if not self.search_bar.geometry().contains(event.pos()) and \
+                not self.search_overlay.geometry().contains(event.globalPos()):
+                    self.search_overlay.hide()
+        return super().eventFilter(obj, event)
 
     def setupShortcuts(self):
         search_shortcut = QShortcut(QKeySequence("Ctrl+L"), self)
@@ -835,6 +721,8 @@ class HomeWidget(QWidget):
         search_layout.addStretch()
         self.search_bar = SearchBarWidget()
         self.search_bar.setFixedWidth(500)
+
+        self.search_bar.textChanged.connect(self.on_search_text_changed)
         search_layout.addWidget(self.search_bar)
         search_layout.addStretch()
 
@@ -850,11 +738,200 @@ class HomeWidget(QWidget):
 
         self.recent_projects = SectionWidget("Recent Projects", projects, is_project=True, main_window=self)
         self.recent_projects.openProject.connect(self.openProject)
+        self.recent_projects.downloadOsi.connect(self.handle_download_osi)
+        self.recent_projects.generateReport.connect(self.recents_generate_report)
+
         self.recent_modules = SectionWidget("Recently Used Modules", modules, is_project=False, main_window=self)
         self.recent_modules.openModule.connect(self.openModule)
+
         sections_layout.addStretch(1)
         sections_layout.addWidget(self.recent_projects, alignment=Qt.AlignCenter)
         sections_layout.addWidget(self.recent_modules, alignment=Qt.AlignCenter)
         sections_layout.addStretch(1)
         content_area_layout.addLayout(sections_layout)
         content_area_layout.addStretch()
+
+    def on_search_text_changed(self, text):
+        """Handle search text changes - called on every keystroke"""
+        keyword = text.strip()
+        
+        if not keyword:
+            # If search is empty, hide overlay and reload original data
+            if self.search_overlay:
+                self.search_overlay.hide()
+        else:
+            # Call the search function
+            search_results = search_projects_and_modules(keyword)
+            
+            # Show overlay with results
+            self.show_search_overlay(search_results)
+
+    def show_search_overlay(self, search_data):
+        """Display the search overlay below the search bar"""
+        # Create overlay if it doesn't exist
+        if not self.search_overlay:
+            self.search_overlay = SearchOverlay(self)
+            self.search_overlay.openProject.connect(self.openProject)
+            self.search_overlay.downloadOsi.connect(self.handle_download_osi)
+            self.search_overlay.generateReport.connect(self.recents_generate_report)
+            self.search_overlay.openModule.connect(self.openModule)
+        
+        # Update and show overlay
+        self.search_overlay.show_results(search_data)
+        self.search_overlay.position_below_widget(self.search_bar)
+        self.search_overlay.show()
+
+    def on_overlay_project_selected(self, project_data):
+        """Handle project selection from overlay"""
+        if self.search_overlay:
+            self.search_overlay.hide()
+        # Clear search bar
+        self.search_bar.search_input.clear()
+        # Emit the project open signal
+        self.openProject.emit(project_data['raw_data'])
+
+    def on_overlay_module_selected(self, module_data):
+        """Handle module selection from overlay"""
+        if self.search_overlay:
+            self.search_overlay.hide()
+        # Clear search bar
+        self.search_bar.search_input.clear()
+        # Emit the module open signal
+        module_key = module_data['raw_data'].get(MODULE_KEY, '')
+        if module_key:
+            self.openModule.emit(module_key)
+    
+    def handle_download_osi(self, record: dict):
+        # Ask user for save location
+        src_path = record.get(PROJECT_PATH)
+        if not src_path or not os.path.exists(src_path):
+            CustomMessageBox(
+                title="Error",
+                text="Project file not found.",
+                dialogType=MessageBoxType.Critical
+            ).exec()
+            return
+
+        # Suggest a default filename
+        default_name = os.path.basename(src_path) if src_path else "project.osi"
+        save_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save OSI File",
+            default_name,
+            "Osdag Project Files (*.osi);;All Files (*)"
+        )
+        if save_path:
+            try:
+                shutil.copy2(src_path, save_path)
+                CustomMessageBox(
+                    title="Success",
+                    text=f"Project saved to:\n{save_path}",
+                    dialogType=MessageBoxType.Success
+                ).exec()
+                
+                # Open the directory containing the saved file
+                folder = os.path.dirname(save_path)
+                if folder and os.path.exists(folder):
+                    try:
+                        if sys.platform == 'win32':
+                            os.startfile(folder)
+                        elif sys.platform == 'darwin':
+                            import subprocess
+                            subprocess.run(['open', folder])
+                        else:
+                            import subprocess
+                            subprocess.run(['xdg-open', folder])
+                    except Exception as e:
+                        print(f"Failed to open folder: {e}")
+
+            except Exception as e:
+                CustomMessageBox(
+                    title="Error",
+                    text=f"Failed to save file:\n{e}",
+                    dialogType=MessageBoxType.Critical
+                ).exec()
+
+    #-------------Functions-to-generate-report-of-recent-project-START---------------------------
+
+    class ReportWorker(QThread):
+        success = Signal(str)   # emits PDF path
+        error = Signal(str)     # emits error message
+
+        def __init__(self, record, target_pdf, parent=None):
+            super().__init__(parent)
+            self.record = record
+            self.target_pdf = target_pdf
+
+        def run(self):
+            try:
+                # 1. Check if tex exist
+                tex_path = os.path.join("osdag_gui", "data", "reports", f"file_{self.record[ID]}", "report.tex")
+                if not os.path.isfile(tex_path):
+                    self.error.emit(f"LaTeX file not found for this project:\n{tex_path}")
+                    return
+
+                # 2. Copy images
+                base_dir = os.path.join("ResourceFiles", "images")
+                os.makedirs(base_dir, exist_ok=True)
+
+                report_dir = os.path.join("osdag_gui", "data", "reports", f"file_{self.record[ID]}")
+                required_images = ["3d.png", "front.png", "top.png", "side.png"]
+
+                for img in required_images:
+                    src = os.path.join(report_dir, img)
+                    dst = os.path.join(base_dir, img)
+                    if os.path.isfile(src):
+                        shutil.copy2(src, dst)
+
+                # 3. Run pdflatex
+                result = subprocess.run(
+                    ["pdflatex", "-interaction=nonstopmode", os.path.basename(tex_path)],
+                    cwd=os.path.dirname(tex_path),
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+
+                # 4. Copy PDF
+                generated_pdf = os.path.join(os.path.dirname(tex_path), "report.pdf")
+                if os.path.isfile(generated_pdf):
+                    shutil.copy2(generated_pdf, self.target_pdf)
+                    self.success.emit(self.target_pdf)
+                else:
+                    self.error.emit("PDF generation failed. report.pdf not found.")
+
+            except subprocess.TimeoutExpired:
+                self.error.emit("pdflatex timed out.")
+            except Exception as e:
+                self.error.emit(str(e))
+    
+    def recents_generate_report(self, record: dict):
+        # QFileDialog must stay in the main thread
+        target_pdf, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save PDF Report As",
+            record[PROJECT_NAME],
+            "PDF (*.pdf)"
+        )
+        if not target_pdf:
+            return
+
+        if not target_pdf.lower().endswith(".pdf"):
+            target_pdf += ".pdf"
+
+        # Run heavy stuff in worker thread
+        self.worker = self.ReportWorker(record, target_pdf, parent=self)
+        self.worker.success.connect(lambda path: CustomMessageBox(
+            title="Success",
+            text=f"PDF report saved successfully to:\n{path}",
+            dialogType=MessageBoxType.Success
+        ).exec())
+        self.worker.error.connect(lambda msg: CustomMessageBox(
+            title="Error",
+            text=msg,
+            dialogType=MessageBoxType.Critical
+        ).exec())
+        self.worker.start()
+
+    #-------------Functions-to-generate-report-of-recent-project-END---------------------------
+    

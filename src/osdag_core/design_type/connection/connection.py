@@ -545,9 +545,9 @@ class Connection(Main):
 
             # hover labels
             if option[1] == KEY_DISP_COLSEC:
-                self.hover_dict["Column"] = f"Column Designation ({design_dictionary[option[0]]})"
+                self.hover_dict["Column"] = f"Column: {design_dictionary[option[0]]}"
             elif option[1] == KEY_DISP_BEAMSEC:
-                self.hover_dict["Beam"] = f"Beam Designation ({design_dictionary[option[0]]})"
+                self.hover_dict["Beam"] = f"Beam: {design_dictionary[option[0]]}"
 
             if option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
                 if design_dictionary[option[0]] == 'Select Section' or design_dictionary[option[0]] == 'Select Grade':

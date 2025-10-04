@@ -15,6 +15,7 @@ from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsBut
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 import osdag_gui.resources.resources_rc
 from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 
 from osdag_core.Common import *
 
@@ -675,7 +676,6 @@ class InputDock(QWidget):
                 else:
                     k2.setVisible(True)
 
-
     def toggle_input_dock(self):
         parent = self.parent
         if hasattr(parent, 'toggle_animate'):
@@ -687,22 +687,46 @@ class InputDock(QWidget):
 
     def new_material_dialog(self):
         dialog = QDialog(self)
+        dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        dialog.setAttribute(Qt.WA_StyledBackground, True)
+        dialog.setModal(True)  # Make it modal to ensure it appears on top
+        
         self.material_popup_message = ''
         self.invalid_field = ''
-        dialog.setWindowTitle('Custom Material')
-        layout = QGridLayout(dialog)
+        
+        central_layout = QVBoxLayout()
+        central_layout.setContentsMargins(1, 1, 1, 1)
+        central_layout.setSpacing(0)
+        
+        # Create custom title bar
+        title_bar = CustomTitleBar(parent=dialog)
+        title_bar.setTitle('Custom Material')
+        
+        # Connect close button if CustomTitleBar has one
+        if hasattr(title_bar, 'close_button'):
+            title_bar.close_button.clicked.connect(dialog.close)
+        
+        central_layout.addWidget(title_bar)
+        
+        # Create main content widget
+        content_widget = QWidget()
+        content_layout = QGridLayout()
+        
         # Center the content by adding side stretch columns and margins
-        layout.setContentsMargins(20, 10, 20, 10)
-        layout.setHorizontalSpacing(6)
-        layout.setVerticalSpacing(12)
-        layout.setColumnStretch(0, 1)
-        layout.setColumnStretch(3, 1)
-        widget = QWidget(dialog)
-        widget.setLayout(layout)
+        content_layout.setContentsMargins(20, 10, 20, 10)
+        content_layout.setHorizontalSpacing(6)
+        content_layout.setVerticalSpacing(12)
+        content_layout.setColumnStretch(0, 1)
+        content_layout.setColumnStretch(3, 1)
+        
+        content_widget.setLayout(content_layout)
+        
+        # Apply styles
         dialog.setStyleSheet("""
-            QDialog, QWidget {
+            QDialog {
                 background-color: #ffffff;
                 color: #000000;
+                border: 1px solid #c0c0c0;
             }
             QLabel {
                 color: #000000;
@@ -714,67 +738,149 @@ class InputDock(QWidget):
                 border-radius: 3px;
                 padding: 2px 4px;
                 selection-background-color: #3875d6;
-                selection-border-color: #90af13;
+            }
+            QLineEdit:focus {
+                border: 1px solid #90af13;
             }
             QPushButton {
                 background-color: #90af13;
-                color: #000000;
-                padding: 4px 10px;
+                color: #ffffff;
+                padding: 6px 16px;
                 border-radius: 3px;
+                border: none;
+                font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #5e7407;
+                background-color: #7a9a12;
             }
             QPushButton:pressed {
-                background-color: #7d9710;
+                background-color: #5f7a0e;
             }
-            """)
+        """)
+        
         _translate = QCoreApplication.translate
         textbox_list = ['Grade', 'Fy_20', 'Fy_20_40', 'Fy_40', 'Fu']
         event_function = ['', self.material_popup_fy_20_event, self.material_popup_fy_20_40_event,
-                          self.material_popup_fy_40_event, self.material_popup_fu_event]
+                        self.material_popup_fy_40_event, self.material_popup_fu_event]
         self.original_focus_event_functions = {}
-
-        i = 0
-        for textbox_name in textbox_list:
-            label = QLabel(widget)
-            label.setObjectName(textbox_name+"_label")
-            label.setText(_translate("MainWindow", "<html><body><p>" + textbox_name + "</p></body></html>"))
+        
+        # Create form fields
+        for i, textbox_name in enumerate(textbox_list):
+            label = QLabel(content_widget)
+            label.setObjectName(textbox_name + "_label")
+            
+            # Format label text
+            display_name = textbox_name.replace('_', ' ')
+            if textbox_name == 'Fy_20':
+                display_name = 'Fy (< 20mm)'
+            elif textbox_name == 'Fy_20_40':
+                display_name = 'Fy (20-40mm)'
+            elif textbox_name == 'Fy_40':
+                display_name = 'Fy (> 40mm)'
+            elif textbox_name == 'Fu':
+                display_name = 'Fu'
+                
+            label.setText(_translate("MainWindow", display_name + ":"))
             label.setFixedSize(100, 30)
-            layout.addWidget(label, i, 1, 1, 1)
-
-            textbox = QLineEdit(widget)
+            content_layout.addWidget(label, i, 1, 1, 1)
+            
+            textbox = QLineEdit(content_widget)
             textbox.setObjectName(textbox_name)
             textbox.setFixedSize(200, 24)
+            
             if textbox_name == 'Grade':
                 textbox.setReadOnly(True)
                 textbox.setText("Cus____")
+                textbox.setStyleSheet("""
+                    QLineEdit[readOnly="true"] {
+                        background-color: #f0f0f0;
+                    }
+                """)
             else:
                 textbox.setValidator(QIntValidator())
-                # textbox.mousePressEvent = event_function[textbox_list.index(textbox_name)]
-                self.original_focus_event_functions.update({textbox_name: textbox.focusOutEvent})
+                # Store original focus event
+                self.original_focus_event_functions[textbox_name] = textbox.focusOutEvent
                 textbox.focusOutEvent = event_function[textbox_list.index(textbox_name)]
-
-            self.connect_change_popup_material(textbox, widget)
-            layout.addWidget(textbox, i, 2, 1, 1)
-
-            i += 1
-
-        add_button = QPushButton(widget)
+            
+            self.connect_change_popup_material(textbox, content_widget)
+            content_layout.addWidget(textbox, i, 2, 1, 1)
+        
+        # Add buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        
+        add_button = QPushButton("Add")
         add_button.setObjectName("material_add")
-        add_button.setText("Add")
-        add_button.clicked.connect(lambda: self.update_material_db_validation(widget))
-        layout.addWidget(add_button, i, 1, 1, 2)
+        add_button.setFixedSize(80, 30)
+        add_button.clicked.connect(lambda: self.update_material_db_validation(content_widget))
+        
+        cancel_button = QPushButton("Cancel")
+        cancel_button.setFixedSize(80, 30)
+        cancel_button.clicked.connect(dialog.reject)
+        
+        button_layout.addWidget(add_button)
+        button_layout.addWidget(cancel_button)
+        
+        content_layout.addLayout(button_layout, len(textbox_list), 1, 1, 2, Qt.AlignCenter)
+        
+        central_layout.addWidget(content_widget)
+        dialog.setLayout(central_layout)
+        
+        # Set dialog size and position
+        dialog.setFixedSize(350, 280)
+        
+        # Show dialog and wait for result
+        result = dialog.exec()
+        
+        # Update material combobox if dialog was accepted (Add button clicked successfully)
+        if result == QDialog.Accepted:
+            try:
+                input_dock_material = self.input_widget.findChild(QWidget, KEY_MATERIAL)
+                if input_dock_material:
+                    current_text = input_dock_material.currentText()
+                    input_dock_material.clear()
+                    for item in connectdb("Material"):
+                        input_dock_material.addItem(item)
+                    # Try to restore previous selection or set to new custom material
+                    index = input_dock_material.findText(current_text)
+                    if index >= 0:
+                        input_dock_material.setCurrentIndex(index)
+                    else:
+                        input_dock_material.setCurrentIndex(input_dock_material.count() - 1)
+            except Exception as e:
+                print(f"Error updating material combobox: {e}")
 
-        dialog.setFixedSize(350, 250)
-        closed = dialog.exec()
-        if closed is not None:
-            input_dock_material = self.input_widget.findChild(QWidget, KEY_MATERIAL)
-            input_dock_material.clear()
-            for item in connectdb("Material"):
-                input_dock_material.addItem(item)
-            input_dock_material.setCurrentIndex(1)
+    def show_material_popup_message(self):
+        """Show validation message for material popup"""
+        if self.material_popup_message:
+            QMessageBox.warning(self, "Validation Error", self.material_popup_message)
 
+    def update_material_db_validation(self, widget):
+        """Validate and update material database"""
+        material = widget.findChild(QLineEdit, 'Grade').text()
+        
+        material_validator = MaterialValidator(material)
+        if material_validator.is_already_in_db():
+            QMessageBox.warning(widget.window(), "Warning", "Material already exists in Database!")
+            return
+        elif not material_validator.is_format_custom():
+            QMessageBox.warning(widget.window(), "Warning", "Please fill all missing parameters!")
+            return
+        elif not material_validator.is_valid_custom():
+            QMessageBox.warning(widget.window(), "Warning", 
+                            f"Please select {material_validator.invalid_value} in valid range!")
+            return
+        
+        try:
+            self.update_material_db(grade=material, material=material_validator)
+            QMessageBox.information(widget.window(), 'Success', 
+                                'Material added successfully to the database.')
+            # Close dialog with accepted status
+            widget.window().accept()
+        except Exception as e:
+            QMessageBox.critical(widget.window(), 'Error', 
+                            f'Failed to add material to database: {str(e)}')
+        
     def material_popup_fy_20_event(self, e):
         self.original_focus_event_functions['Fy_20'](e)
         if self.invalid_field == 'Fy_20':
@@ -820,24 +926,6 @@ class InputDock(QWidget):
             self.material_popup_message = ''
             self.invalid_field = ''
         grade.setText(material)
-
-    def update_material_db_validation(self, widget):
-
-        material = widget.findChild(QLineEdit, 'Grade').text()
-
-        material_validator = MaterialValidator(material)
-        if material_validator.is_already_in_db():
-            QMessageBox.about(QMessageBox(), "Information", "Material already exists in Database!")
-            return
-        elif not material_validator.is_format_custom():
-            QMessageBox.about(QMessageBox(), "Information", "Please fill all missing parameters!")
-            return
-        elif not material_validator.is_valid_custom():
-            QMessageBox.about(QMessageBox(), "Information", "Please select "+str(material_validator.invalid_value)+" in valid range!")
-            return
-
-        self.update_material_db(grade=material, material=material_validator)
-        QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
 
     def update_material_db(self, grade, material):
 

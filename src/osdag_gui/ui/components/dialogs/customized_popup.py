@@ -1,8 +1,8 @@
-from PySide6.QtWidgets import (QPushButton, QLabel, QMessageBox, QDialog, QGridLayout, QLineEdit, QHBoxLayout, QTextEdit, QFrame, QDialogButtonBox,QFileDialog,
-                               QListWidget, QListWidgetItem, QAbstractItemView, QApplication, QSizePolicy, QFormLayout, QLayout, QProgressBar)
-from PySide6.QtCore import (QRect, QMetaObject, QCoreApplication, QSize, QThread, Signal)
-from PySide6.QtGui import Qt, QGuiApplication, QCursor
-import time
+from PySide6.QtWidgets import (QPushButton, QLabel, QMessageBox, QDialog, QGridLayout, QLineEdit, QHBoxLayout, QVBoxLayout, QWidget,
+                               QListWidget, QListWidgetItem, QAbstractItemView, QApplication, QSizePolicy)
+from PySide6.QtCore import (QRect, QMetaObject, QCoreApplication, QSize, Qt)
+from PySide6.QtGui import QGuiApplication
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 
 def get_screen_dimensions():
     """
@@ -82,213 +82,295 @@ class CustomValueSelectPopup(object):
         self.spacing = int(min(self.window_width, self.window_height) * self.spacing_pct)
 
     def setupUi(self, MainWindow, disabled_values, note):
-        """Setup the UI with dynamic sizing."""
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(self.window_width, self.window_height)
+        """Setup the UI with dynamic sizing and custom title bar."""
+        MainWindow.setObjectName("CustomValueSelectPopup")
+        MainWindow.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        MainWindow.setAttribute(Qt.WA_StyledBackground, True)
+        MainWindow.setModal(True)
         
         self.disabled_values = disabled_values
         self.note = note
-
-        # Setup labels
-        self._setup_labels(MainWindow)
         
-        # Setup list widgets
-        self._setup_list_widgets(MainWindow)
+        # Main layout
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(1, 1, 1, 1)
+        main_layout.setSpacing(0)
         
-        # Setup buttons
-        self._setup_buttons(MainWindow)
+        title_bar = CustomTitleBar(parent=MainWindow)
+        title_bar.setTitle('Select Values')
+        main_layout.addWidget(title_bar)
         
-        # Setup note label if needed
-        if self.note:
-            self._setup_note_label(MainWindow)
+        # Content widget
+        content_widget = QWidget()
+        content_widget.setObjectName("content_widget")
+        self.setupContent(content_widget, MainWindow)
+        main_layout.addWidget(content_widget)
         
-        # Setup connections and finalize
-        self.connections(MainWindow)
-        self.retranslateUi(MainWindow)
+        # Apply dialog styles
+        MainWindow.setStyleSheet("""
+            QDialog {
+                background-color: #ffffff;
+                color: #000000;
+                border: 1px solid #c0c0c0;
+            }
+            QWidget#content_widget {
+                background-color: #ffffff;
+            }
+        """)
+        
+        MainWindow.setLayout(main_layout)
+        MainWindow.resize(self.window_width, self.window_height + 30)  # Add height for title bar
+        
+        # Center the dialog
+        self.centerDialog(MainWindow)
+        
         QMetaObject.connectSlotsByName(MainWindow)
-        self.update_buttons_status()
 
-    def _setup_labels(self, MainWindow):
-        """Setup the labels with dynamic positioning."""
-        # Common label style
-        label_style = '''
+    def setupContent(self, content_widget, MainWindow):
+        """Setup the main content area."""
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(self.margin, self.margin, self.margin, self.margin)
+        
+        # Labels container
+        labels_layout = QHBoxLayout()
+        
+        # Available label
+        self.label = QLabel("Available:")
+        self.label.setObjectName("label")
+        self.label.setStyleSheet("""
             QLabel {
                 font-weight: bold;
-                font-size: 12px;
+                font-size: 13px;
                 color: #333333;
                 padding: 2px;
             }
-        '''
-        
-        # Available label
-        self.label = QLabel(MainWindow)
-        self.label.setGeometry(QRect(self.margin, self.margin, 150, 30))
-        self.label.setObjectName("label")
-        self.label.setStyleSheet(label_style)
+        """)
+        labels_layout.addWidget(self.label)
+        labels_layout.addStretch()
         
         # Selected label
-        self.label_2 = QLabel(MainWindow)
-        label2_x = self.margin + self.list_width + self.spacing + self.button_width + self.spacing
-        self.label_2.setGeometry(QRect(label2_x, self.margin, 150, 30))
+        self.label_2 = QLabel("Selected:")
         self.label_2.setObjectName("label_2")
-        self.label_2.setStyleSheet(label_style)
-
-    def _setup_list_widgets(self, MainWindow):
-        """Setup the list widgets with dynamic positioning."""
-        # List widget style with custom selection color
-        list_style = '''
-            QListWidget {
-                background-color: white;
+        self.label_2.setStyleSheet("""
+            QLabel {
+                font-weight: bold;
+                font-size: 13px;
+                color: #333333;
+                padding: 2px;
             }
-            QListWidget::item {
-                border-left: 2px solid transparent;
-                background-color: transparent;
-            }
-            QListWidget::item:hover {
-                border-left-color: #90af13;
-            }
-            QListWidget::item:selected {
-                background-color: #f9f9f9;
-                color: black;
-                border-left: 2px solid #90AF13;
-            }
-            QListWidget::item:selected:hover {
-                border-left-color: #000000;
-            }
-        '''
+        """)
+        labels_layout.addWidget(self.label_2)
         
-        # Available list widget
-        self.listWidget = My_ListWidget(MainWindow)
-        list_y = self.margin + 30 + self.margin  # Below label
-        self.listWidget.setGeometry(QRect(self.margin, list_y, self.list_width, self.list_height))
+        content_layout.addLayout(labels_layout)
+        
+        # Lists and buttons container
+        lists_layout = QHBoxLayout()
+        lists_layout.setSpacing(self.spacing // 2)
+        
+        # Available list
+        self.listWidget = My_ListWidget()
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setSortingEnabled(True)
         self.listWidget.setFocusPolicy(Qt.NoFocus)
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget.itemDoubleClicked.connect(self.move_to_selected)
-        self.listWidget.setStyleSheet(list_style)
+        self.listWidget.setStyleSheet(self.get_list_style())
+        self.listWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        lists_layout.addWidget(self.listWidget)
         
-        # Selected list widget
-        self.listWidget_2 = My_ListWidget(MainWindow)
-        list2_x = self.margin + self.list_width + self.spacing + self.button_width + self.spacing
-        self.listWidget_2.setGeometry(QRect(list2_x, list_y, self.list_width, self.list_height))
+        # Buttons container
+        buttons_widget = QWidget()
+        buttons_widget.setFixedWidth(self.button_width)
+        buttons_layout = QVBoxLayout(buttons_widget)
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+        buttons_layout.setSpacing(10)
+        
+        buttons_layout.addStretch()
+        
+        # Move all button (>>)
+        self.pushButton = QPushButton(">>")
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton.setAutoDefault(False)
+        self.pushButton.setFixedHeight(self.button_height)
+        self.pushButton.setStyleSheet(self.get_button_style())
+        buttons_layout.addWidget(self.pushButton)
+        
+        # Move one button (>)
+        self.pushButton_2 = QPushButton(">")
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.setAutoDefault(False)
+        self.pushButton_2.setFixedHeight(self.button_height)
+        self.pushButton_2.setStyleSheet(self.get_button_style())
+        buttons_layout.addWidget(self.pushButton_2)
+        
+        # Move one back button (<)
+        self.pushButton_3 = QPushButton("<")
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.setAutoDefault(False)
+        self.pushButton_3.setFixedHeight(self.button_height)
+        self.pushButton_3.setStyleSheet(self.get_button_style())
+        buttons_layout.addWidget(self.pushButton_3)
+        
+        # Move all back button (<<)
+        self.pushButton_4 = QPushButton("<<")
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.pushButton_4.setAutoDefault(False)
+        self.pushButton_4.setFixedHeight(self.button_height)
+        self.pushButton_4.setStyleSheet(self.get_button_style())
+        buttons_layout.addWidget(self.pushButton_4)
+        
+        buttons_layout.addStretch()
+        lists_layout.addWidget(buttons_widget)
+        
+        # Selected list
+        self.listWidget_2 = My_ListWidget()
         self.listWidget_2.setObjectName("listWidget_2")
         self.listWidget_2.setSortingEnabled(True)
         self.listWidget_2.setFocusPolicy(Qt.NoFocus)
         self.listWidget_2.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
-        self.listWidget_2.setStyleSheet(list_style)
-
-    def _setup_buttons(self, MainWindow):
-        """Setup the control buttons with dynamic positioning."""
-        button_x = self.margin + self.list_width + self.spacing
-        button_center_y = self.margin + 30 + self.margin + (self.list_height // 2)
+        self.listWidget_2.setStyleSheet(self.get_list_style())
+        self.listWidget_2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        lists_layout.addWidget(self.listWidget_2)
         
-        # Common button style
-        button_style = '''
-            QPushButton {
-                background-color: #90AF13;
-                border-radius: 5px;
-                border: 1px solid #90AF13;
-                padding: 3px;
-                margin: 2px;
-                color: white;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #7a9a0f;
-            }
-            QPushButton:pressed {
-                background-color: #5a7a0a;
-            }
-            QPushButton:disabled {
-                background-color: #cccccc;
-                border: 1px solid #cccccc;
-                color: #666666;
-            }
-        '''
+        content_layout.addLayout(lists_layout)
         
-        # Move all button (>>)
-        self.pushButton = QPushButton(MainWindow)
-        self.pushButton.setGeometry(QRect(button_x, button_center_y - 2*self.button_height - self.spacing//2, 
-                                        self.button_width, self.button_height))
-        self.pushButton.setStyleSheet(button_style)
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton.setAutoDefault(False)
+        # Note label if needed
+        if self.note:
+            self.note_label = QLabel("<b>Note:</b> " + self.note)
+            self.note_label.setObjectName("note_label")
+            self.note_label.setStyleSheet("""
+                QLabel {
+                    background-color: #f9f9f9;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 5px;
+                    padding: 10px;
+                    color: #555555;
+                    font-size: 12px;
+                }
+            """)
+            self.note_label.setWordWrap(True)
+            self.note_label.setMaximumHeight(80)
+            content_layout.addWidget(self.note_label)
         
-        # Move one button (>)
-        self.pushButton_2 = QPushButton(MainWindow)
-        self.pushButton_2.setGeometry(QRect(button_x, button_center_y - self.button_height, 
-                                          self.button_width, self.button_height))
-        self.pushButton_2.setStyleSheet(button_style)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.setAutoDefault(False)
+        # Submit button container
+        submit_layout = QHBoxLayout()
+        submit_layout.setContentsMargins(0, 10, 0, 0)
+        submit_layout.addStretch()
         
-        # Move one back button (<)
-        self.pushButton_3 = QPushButton(MainWindow)
-        self.pushButton_3.setGeometry(QRect(button_x, button_center_y, 
-                                          self.button_width, self.button_height))
-        self.pushButton_3.setStyleSheet(button_style)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.setAutoDefault(False)
-        
-        # Move all back button (<<)
-        self.pushButton_4 = QPushButton(MainWindow)
-        self.pushButton_4.setGeometry(QRect(button_x, button_center_y + self.button_height + self.spacing//2, 
-                                          self.button_width, self.button_height))
-        self.pushButton_4.setStyleSheet(button_style)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.pushButton_4.setAutoDefault(False)
-        
-        # Submit button
-        self.pushButton_5 = QPushButton(MainWindow)
-        submit_width = int(self.window_width * 0.26)  # 26% of window width
-        submit_height = int(self.window_height * 0.09)  # 8% of window height
-        submit_x = (self.window_width - submit_width) // 2  # Center horizontally
-        submit_y = self.window_height - submit_height - self.margin
-        self.pushButton_5.setGeometry(QRect(submit_x, submit_y, submit_width, submit_height))
-        self.pushButton_5.setStyleSheet(button_style)
+        self.pushButton_5 = QPushButton("Submit")
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_5.setDefault(True)
-
-    def _setup_note_label(self, MainWindow):
-        """Setup the note label if a note is provided."""
-        self.note_label = QLabel(MainWindow)
-        note_width = self.window_width - 2 * self.margin
-        note_height = int(self.window_height * 0.15)  # 15% of window height
-        note_y = self.window_height - note_height - self.margin - int(self.window_height * 0.09) - self.margin
-        self.note_label.setGeometry(QRect(self.margin, note_y, note_width, note_height))
-        self.note_label.setObjectName("note_label")
-        self.note_label.setText("<b>Note</b>: " + self.note)
-        self.note_label.setStyleSheet("""
-            QLabel {
-                background-color: white; 
-                border: 1px solid #cccccc; 
+        self.pushButton_5.setFixedSize(120, 35)
+        self.pushButton_5.setStyleSheet("""
+            QPushButton {
+                background-color: #90AF13;
+                color: white;
+                font-weight: bold;
+                font-size: 13px;
                 border-radius: 5px;
-                padding: 10px;
-                color: #333333;
-                font-size: 11px;
-                line-height: 1.4;
+                border: none;
+                padding: 8px 20px;
+            }
+            QPushButton:hover {
+                background-color: #7a9a12;
+            }
+            QPushButton:pressed {
+                background-color: #5f7a0e;
             }
         """)
-        self.note_label.setWordWrap(True)
-        self.note_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        self.note_label.resize(QSize(self.note_label.sizeHint()))
+        submit_layout.addWidget(self.pushButton_5)
+        submit_layout.addStretch()
         
-        # Adjust window height to accommodate note
-        MainWindow.resize(self.window_width, self.window_height + note_height + self.margin)
+        content_layout.addLayout(submit_layout)
+        
+        # Setup connections
+        self.connections(MainWindow)
+        self.update_buttons_status()
 
-    def retranslateUi(self, Form):
-        """Set the text for all UI elements."""
-        _translate = QCoreApplication.translate
-        Form.setWindowTitle(_translate("MainWindow", "Customized"))
-        self.label.setText(_translate("MainWindow", "Available:"))
-        self.label_2.setText(_translate("MainWindow", "Selected:"))
-        self.pushButton.setText(_translate("MainWindow", ">>"))
-        self.pushButton_2.setText(_translate("MainWindow", ">"))
-        self.pushButton_3.setText(_translate("MainWindow", "<"))
-        self.pushButton_4.setText(_translate("MainWindow", "<<"))
-        self.pushButton_5.setText(_translate("MainWindow", "Submit"))
+    def get_list_style(self):
+        """Return the style for list widgets."""
+        return """
+            QListWidget {
+                background-color: white;
+                border: 1px solid #d0d0d0;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QListWidget::item {
+                border-left: 2px solid transparent;
+                background-color: transparent;
+                padding: 3px;
+                margin: 1px;
+            }
+            QListWidget::item:hover {
+                background-color: #f0f7d0;
+                border-left-color: #90af13;
+            }
+            QListWidget::item:selected {
+                background-color: #e8f4c8;
+                color: black;
+                border-left: 2px solid #90AF13;
+            }
+            QListWidget::item:selected:hover {
+                background-color: #d8e4b8;
+                border-left-color: #7a9a12;
+            }
+            QListWidget::item:disabled {
+                color: #999999;
+                background-color: #f5f5f5;
+            }
+            QScrollBar:vertical {
+                background: #f0f0f0;
+                width: 10px;
+                margin: 0;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical {
+                background: #c0c0c0;
+                min-height: 30px;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #90AF13;
+            }
+        """
+
+    def get_button_style(self):
+        """Return the style for control buttons."""
+        return """
+            QPushButton {
+                background-color: #90AF13;
+                color: white;
+                font-weight: bold;
+                font-size: 14px;
+                border-radius: 5px;
+                border: none;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #7a9a12;
+            }
+            QPushButton:pressed {
+                background-color: #5f7a0e;
+            }
+            QPushButton:disabled {
+                background-color: #d0d0d0;
+                color: #888888;
+            }
+        """
+
+    def centerDialog(self, dialog):
+        """Center the dialog on the screen or parent window."""
+        if dialog.parent():
+            parent_geometry = dialog.parent().geometry()
+            x = parent_geometry.x() + (parent_geometry.width() - dialog.width()) // 2
+            y = parent_geometry.y() + (parent_geometry.height() - dialog.height()) // 2
+        else:
+            screen_geometry = QGuiApplication.primaryScreen().geometry()
+            x = (screen_geometry.width() - dialog.width()) // 2
+            y = (screen_geometry.height() - dialog.height()) // 2
+        dialog.move(x, y)
 
     def connections(self, MainWindow):
         """Setup signal connections."""
@@ -304,11 +386,11 @@ class CustomValueSelectPopup(object):
     def is_empty(self, MainWindow):
         """Check whether values are selected or not."""
         if len(self.get_right_elements()) == 0:
-            self.error_message = QMessageBox()
-            self.error_message.setWindowTitle('Information')
-            self.error_message.setIcon(QMessageBox.Critical)
-            self.error_message.setText('Please Select some values.')
-            self.error_message.exec()
+            error_message = QMessageBox(MainWindow)
+            error_message.setWindowTitle('Information')
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText('Please select some values.')
+            error_message.exec()
         else:
             MainWindow.close()
 
@@ -336,38 +418,36 @@ class CustomValueSelectPopup(object):
     def on_mButtonToAvailable_clicked(self):
         """Move all items from selected to available list."""
         while self.listWidget_2.count() > 0:
-            self.listWidget.addItem(self.listWidget_2.takeItem(0))
+            self.listWidget.addItem(self.listWidget_2.takeItem(0).text())
 
     def on_mButtonToSelected_clicked(self):
         """Move all items from available to selected list."""
         while self.listWidget.count() > 0:
-            self.listWidget_2.addItem(self.listWidget.takeItem(0))
+            item = self.listWidget.takeItem(0)
+            if item.flags() != Qt.NoItemFlags:  # Only move enabled items
+                self.listWidget_2.addItem(item.text())
+            else:
+                self.listWidget.addItem(item.text())  # Put disabled items back
 
     def addAvailableItems(self, items, KEY_EXISTINGVAL_CUSTOMIZED):
         """Add items to the available list with proper handling of disabled values."""
+        self.listWidget.clear()
         self.listWidget_2.clear()
         
-        if items not in KEY_EXISTINGVAL_CUSTOMIZED:
-            # Add existing customized values to selected list
-            for item in KEY_EXISTINGVAL_CUSTOMIZED:
-                if item in self.disabled_values:
-                    continue
+        # Add existing customized values to selected list
+        for item in KEY_EXISTINGVAL_CUSTOMIZED:
+            if item not in self.disabled_values:
                 self.listWidget_2.addItem(item)
-
-            # Add remaining items to available list
-            remaining_items = list(set(items) - set(KEY_EXISTINGVAL_CUSTOMIZED))
-            for item in list(set(remaining_items + self.disabled_values)):
-                self.listWidget.addItem(item)
-        else:
-            # Add all items to selected list
-            for item in items:
-                self.listWidget_2.addItem(item)
-
-        # Disable items that are in disabled_values
-        for i in range(self.listWidget.count()):
-            item = self.listWidget.item(i)
-            if item.text() in self.disabled_values:
-                item.setFlags(Qt.NoItemFlags)
+        
+        # Add remaining items to available list
+        remaining_items = list(set(items) - set(KEY_EXISTINGVAL_CUSTOMIZED))
+        for item in remaining_items:
+            list_item = self.listWidget.addItem(item)
+            # Disable items that are in disabled_values
+            if item in self.disabled_values:
+                items = self.listWidget.findItems(item, Qt.MatchExactly)
+                for disabled_item in items:
+                    disabled_item.setFlags(Qt.NoItemFlags)
 
     def get_right_elements(self):
         """Get the selected elements from the right list."""
@@ -375,24 +455,11 @@ class CustomValueSelectPopup(object):
 
     def move_to_selected(self, item):
         """Move item to selected list on double click."""
-        self.listWidget_2.addItem(item.text())
-        self.listWidget.takeItem(self.listWidget.row(item))
+        if item.flags() != Qt.NoItemFlags:  # Only move if not disabled
+            self.listWidget_2.addItem(item.text())
+            self.listWidget.takeItem(self.listWidget.row(item))
 
     def move_to_available(self, item):
         """Move item to available list on double click."""
         self.listWidget.addItem(item.text())
         self.listWidget_2.takeItem(self.listWidget_2.row(item))
-
-# if __name__ == "__main__":
-#     import sys
-#     app = QApplication(sys.argv)
-#     MainWindow = QDialog()
-#     ui = CustomValueSelectPopup()
-#     ui.setupUi(MainWindow, [], "This is a test note to demonstrate the popup functionality.")
-    
-#     # Add some sample data to test the functionality
-#     sample_items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8"]
-#     ui.addAvailableItems(sample_items, [])
-    
-#     MainWindow.show()
-#     sys.exit(app.exec())

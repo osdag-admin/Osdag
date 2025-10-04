@@ -110,7 +110,7 @@ class CustomWindow(QWidget):
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
         self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs)
-        self.designPrefDialog.downloadDatabase.connect(self.downloadDatabase)
+        self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabase)
 
         self.init_ui(title)
         self.sidebar = SidebarWidget(parent=self)

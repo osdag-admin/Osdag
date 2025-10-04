@@ -510,6 +510,23 @@ class MainWindow(QMainWindow):
         self.clear_layout(self.main_widget_layout)
         fin_plate = CustomWindow(title, FinPlateConnection, parent=self)
 
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                fin_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
         self.main_widget_instance = fin_plate
         fin_plate.openNewTab.connect(self.handle_add_tab)
         fin_plate.downloadDatabase.connect(self.download_Database)

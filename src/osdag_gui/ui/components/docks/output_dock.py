@@ -16,8 +16,9 @@ from osdag_core.texlive.Design_wrapper import init_display as init_display_off_s
 
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
+from osdag_gui.ui.components.dialogs.design_report import DesignReportDialog
 from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPopup
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+
 from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *
 import osdag_gui.resources.resources_rc
@@ -382,9 +383,11 @@ class OutputDock(QWidget):
     # ----------------------------------Save-Design-Report-Start------------------------------------------------------
     
     def open_summary_popup(self, main):
-        print("Testing Custom Logger!!")
+        """Open the unified report dialog instead of separate popups"""
+        print("Testing Unified Report Dialog")
         print(self.backend.logger.logs)
         print('main.module_name', main.module_name())
+        
         if not main.design_button_status:
             CustomMessageBox(
                 title="Warning",
@@ -393,7 +396,7 @@ class OutputDock(QWidget):
             ).exec()
             return
         
-        # Generate 3D images only if design exists and we can create the logic object
+        # Generate 3D images only if design exists
         if main.design_status:
             try:
                 print("Start!")
@@ -445,19 +448,17 @@ class OutputDock(QWidget):
                 image_folder_path = "./ResourceFiles/images"
                 if not os.path.exists(image_folder_path):
                     os.makedirs(image_folder_path)
-
-        # Open the summary popup dialog
-        self.summary_popup = DesignSummaryPopup(main.design_status, loggermsg=self.parent.textEdit.toPlainText())
-        self.summary_popup.setupUi(main, self)
+            
+        # Open Unified report popup dialog
+        self.design_report_dialog = DesignReportDialog(
+            backend=main,
+            module_window=self,
+            design_exist=main.design_status,
+            loggermsg=self.parent.textEdit.toPlainText()
+        )
         
-        # Connect the generate report button to actual report generation
-        if hasattr(self.summary_popup, 'btn_CreateDesignReport'):
-            self.summary_popup.btn_CreateDesignReport.clicked.connect(lambda: self.generate_design_report(main, self.summary_popup))
-        elif hasattr(self.summary_popup, 'buttonBox'):
-            # If using QDialogButtonBox, connect to accepted signal
-            self.summary_popup.buttonBox.accepted.connect(lambda: self.generate_design_report(main, self.summary_popup))
-
-        self.summary_popup.exec()
+        # Execute the dialog
+        self.design_report_dialog.exec()
 
     # ----------------------------------Save-Design-Report-END------------------------------------------------------
 
@@ -602,38 +603,6 @@ class OutputDock(QWidget):
 
         return id    
     
-    #----------------------create-tex-to-save-project-END----------------------------------------
-
-    def getPopUpInputs(self):
-        """Enhanced method to collect all popup inputs"""
-        input_summary = {}
-        input_summary["ProfileSummary"] = {}
-        
-        # Profile information
-        input_summary["ProfileSummary"]["CompanyName"] = str(self.summary_popup.lineEdit_companyName.text()) if hasattr(self.summary_popup, 'lineEdit_companyName') else "Company Name"
-        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.summary_popup.lbl_browse.text()) if hasattr(self.summary_popup, 'lbl_browse') else ""
-        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.summary_popup.lineEdit_groupName.text()) if hasattr(self.summary_popup, 'lineEdit_groupName') else "Design Team"
-        input_summary["ProfileSummary"]["Designer"] = str(self.summary_popup.lineEdit_designer.text()) if hasattr(self.summary_popup, 'lineEdit_designer') else "Designer"
-
-        # Project information - **CRITICAL**: These are required by reportGenerator
-        input_summary["ProjectTitle"] = str(self.summary_popup.lineEdit_projectTitle.text()) if hasattr(self.summary_popup, 'lineEdit_projectTitle') else "Welded Butt Joint Design"
-        input_summary["Subtitle"] = str(self.summary_popup.lineEdit_subtitle.text()) if hasattr(self.summary_popup, 'lineEdit_subtitle') else "Design Report"
-        input_summary["JobNumber"] = str(self.summary_popup.lineEdit_jobNumber.text()) if hasattr(self.summary_popup, 'lineEdit_jobNumber') else "JOB-001"
-        input_summary["Client"] = str(self.summary_popup.lineEdit_client.text()) if hasattr(self.summary_popup, 'lineEdit_client') else "Client"
-        
-        # Additional comments
-        if hasattr(self.summary_popup, 'txt_additionalComments'):
-            input_summary["AdditionalComments"] = str(self.summary_popup.txt_additionalComments.toPlainText())
-        else:
-            input_summary["AdditionalComments"] = "Design completed successfully"
-        
-        # File and folder settings
-        if hasattr(self.summary_popup, 'lineEdit_fileName'):
-            input_summary["filename"] = str(self.summary_popup.lineEdit_fileName.text())
-        if hasattr(self.summary_popup, 'lineEdit_folder'):
-            input_summary["folder"] = str(self.summary_popup.lineEdit_folder.text())
-
-        return input_summary
     #----------------------create-tex-to-save-project-END----------------------------------------
 
     # ----------------------------------Save-Outputs-START------------------------------------------------------

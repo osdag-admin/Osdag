@@ -252,13 +252,17 @@ class DesignReportDialog(QDialog):
                 timeout=30,
                 cwd=safe_temp_dir
             )
-            
-            if result.returncode == 0 and os.path.exists(pdf_file):
+
+            if result.returncode != 0:
                 print(f"ERROR: Return Code {result.returncode}")
+            else:
+                print(f"INFO: Compilation Successful, Return Code {result.returncode}")
+
+            if os.path.exists(pdf_file):
                 self.latest_pdf = pdf_file
+                print(f"INFO: PDF Generated.")
                 return pdf_file 
             
-            print(f"INFO: Compilation Successful, Return Code {result.returncode}")
 
         except subprocess.TimeoutExpired:
             CustomMessageBox(

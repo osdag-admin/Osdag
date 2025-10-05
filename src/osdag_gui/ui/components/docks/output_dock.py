@@ -17,7 +17,6 @@ from osdag_core.texlive.Design_wrapper import init_display as init_display_off_s
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 from osdag_gui.ui.components.dialogs.design_report import DesignReportDialog
-from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPopup
 
 from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *

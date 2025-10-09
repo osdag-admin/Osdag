@@ -1,0 +1,48 @@
+Anchor Bolt.ICF.Diameter:
+- M20
+Anchor Bolt.ICF.Grade:
+- '8.8'
+Anchor Bolt.OCF.Diameter:
+- M30
+Anchor Bolt.OCF.Grade:
+- '10.9'
+Anchor Bolt.Type: End Plate Type
+Base_Plate.Material: E 300 (Fe 440)
+Connectivity: Moment Base Plate
+Design.Design_Method: Limit State Design
+DesignPreferences.Anchor_Bolt.Friction_coefficient: '0.3'
+DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type: Over-sized
+DesignPreferences.Anchor_Bolt.ICF.Designation: M20X0 IS5624 GALV
+DesignPreferences.Anchor_Bolt.ICF.Galvanized: 'Yes'
+DesignPreferences.Anchor_Bolt.ICF.Length: '0'
+DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite: '830.0'
+DesignPreferences.Anchor_Bolt.ICF.Type: End Plate Type
+DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type: Over-sized
+DesignPreferences.Anchor_Bolt.OCF.Designation: M30X532.7 IS5624 GALV
+DesignPreferences.Anchor_Bolt.OCF.Galvanized: 'Yes'
+DesignPreferences.Anchor_Bolt.OCF.Length: '532.7'
+DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite: '1040.0'
+DesignPreferences.Anchor_Bolt.OCF.Type: End Plate Type
+DesignPreferences.Design.Base_Plate: Effective Area Method
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: b - Rolled, machine-flame cut, sawn and planed
+End Condition: Fixed
+Footing.Grade: M25
+Label_21: '73.5'
+Label_8: Rolled
+Load.Axial_Compression: '1600'
+Load.Axial_Tension: ''
+Load.Moment.Major: '180'
+Load.Moment.Minor: '45'
+Load.Shear.Major: '80'
+Load.Shear.Minor: '23'
+Material: E 300 (Fe 440)
+Member.Designation: HB 450
+Member.Fu: '440'
+Member.Fy: '300'
+Member.Material: E 300 (Fe 440)
+Module: Base Plate Connection
+Stiffener_Key.Material: E 300 (Fe 440)
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '600'
+Weld.Type: Groove Weld

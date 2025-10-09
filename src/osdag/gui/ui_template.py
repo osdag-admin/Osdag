@@ -723,9 +723,11 @@ class Window(QMainWindow):
         i = 0
         j = 1
         maxi_width_left, maxi_width_right = -1, -1
+        print("\n\n\n\n")
         for option in option_list:
             lable = option[1]
             type = option[2]
+            print(option)
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION,TYPE_IMAGE_BIGGER]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setObjectName(option[0] + "_label")
@@ -947,7 +949,7 @@ class Window(QMainWindow):
                 current_red_list = list(current_list_set.intersection(red_list_set))
 
                 for value in current_red_list:
-                    indx = option[3].index(str(value))
+                    indx = option[3].index(str(value)) # first occurance of value
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
         ###############################
@@ -965,7 +967,7 @@ class Window(QMainWindow):
         Since, we don't know how may customized popups can be used in a module we have provided,
          "triggered.connect" for up to 10 customized popups
         """
-
+        print("\n\n\n",main,"$$$$",main.customized_input,main.input_value_changed)
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
         print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')

@@ -1,0 +1,51 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '12'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Material_Grade_OverWrite: '540'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Beam-Beam
+Connector.Material: E 410 (Fe 540)
+Connector.Plate.Thickness_List:
+- '3'
+- '4'
+- '5'
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '26'
+- '28'
+- '30'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '85'
+Load.Shear: '100'
+Material: E 165 (Fe 290)
+Member.Supported_Section.Designation: MB 600
+Member.Supported_Section.Material: E 165 (Fe 290)
+Member.Supporting_Section.Designation: UB 1016 x 305 x 272
+Member.Supporting_Section.Material: E 165 (Fe 290)
+Module: Fin Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '540'

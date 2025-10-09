@@ -1,0 +1,134 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '27'
+- '30'
+- '33'
+- '36'
+- '39'
+- '42'
+- '45'
+- '48'
+- '52'
+- '56'
+- '60'
+- '64'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Non pre-tensioned
+Bolt.Type: Bearing Bolt
+Conn_Location: Web
+Connector.Material: E 300 (Fe 440)
+Connector.Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'Yes'
+Detailing.Edge_type: Rolled, machine-flame cut, sawn and planed
+Detailing.Gap: '0'
+Load.Axial: '500'
+Material: E 250 (Fe 410 W)A
+Member.Designation:
+- MC 75
+- MC 100
+- MC 125
+- MC 125*
+- MC 150
+- MC 150*
+- MC 175
+- MC 175*
+- MC 200
+- MC 200*
+- MC 225
+- MC 225*
+- MC 250
+- MC 250*
+- MC 250*
+- MC 300
+- MC 300*
+- MC 300*
+- MC 350
+- MC 400
+- JC 100
+- JC 125
+- JC 150
+- JC 175
+- JC 200
+- LC 75
+- LC 100
+- LC 125
+- LC (P) 125
+- LC 150
+- LC (P) 150
+- LC 175
+- LC 200
+- LC (P) 200
+- LC 225
+- LC 250
+- LC 300
+- LC (P) 300
+- LC 350
+- LC 400
+- MPC 75
+- MPC 100
+- MPC 125
+- MPC 125*
+- MPC 150
+- MPC 150*
+- MPC 175
+- MPC 175*
+- MPC 200
+- MPC 200*
+- MPC 225
+- MPC 225*
+- MPC 250
+- MPC 250*
+- MPC 250*
+- MPC 300
+- MPC 300*
+- MPC 300*
+- MPC 350
+- MPC 400
+Member.Length: '5000'
+Member.Material: E 165 (Fe 290)
+Member.Profile: Back to Back Channels
+Module: Tension Member Design - Bolted to End Gusset

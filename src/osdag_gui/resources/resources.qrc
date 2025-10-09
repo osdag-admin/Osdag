@@ -1,0 +1,132 @@
+<!--
+resources.qrc: Qt resource collection for Osdag GUI.
+Contains SVGs, images, backgrounds, and theme files for the application.
+-->
+<RCC>
+    <qresource prefix="/">
+
+        <file>vectors/AnimateComponent_back.svg</file>
+        <file>vectors/Osdag_logo.svg</file>
+        <file>images/osdag_logo.png</file>
+        <file>vectors/Osdag.svg</file>
+        <file>vectors/FOSSEE_logo.svg</file>
+        <file>vectors/IITB_logo.svg</file>
+        <file>vectors/ConstructSteel_logo.svg</file>
+        <file>vectors/MOS_logo.svg</file>
+        <file>vectors/Osdag_label.svg</file>
+        <file>vectors/Osdag_tagline.svg</file>
+        <file>vectors/contour_lines.svg</file>
+        <file>vectors/description_label.svg</file>
+        <file>vectors/version.svg</file>
+
+        <file>vectors/recently_used_module_icon.svg</file>
+        <file>vectors/info_hover.svg</file>
+        <file>vectors/info_default.svg</file>
+        <file>vectors/load_hover.svg</file>
+        <file>vectors/load_default.svg</file>
+        <file>vectors/plugin_hover.svg</file>
+        <file>vectors/plugin_default.svg</file>
+        <file>vectors/resources_hover.svg</file>
+        <file>vectors/resources_default.svg</file>
+        <file>vectors/internet_connected_default.svg</file>
+        <file>vectors/internet_connected_hover.svg</file>
+        <file>vectors/internet_disconnected_default.svg</file>
+        <file>vectors/internet_disconnected_hover.svg</file>       
+
+
+        <file>vectors/search_icon.svg</file>
+        <file>vectors/night_button.svg</file>
+        <file>vectors/day_button_dark.svg</file>
+        <file>vectors/background.svg</file>
+        <file>vectors/background_light.svg</file>
+        <file>vectors/background_dark.svg</file>
+        
+        <file>vectors/shear_fin_plate_connec.svg</file>
+        <file>vectors/shear_cleat_angle_connec.svg</file>
+        <file>vectors/end_plate_connec.svg</file>
+        <file>vectors/seated_angle_connec.svg</file>
+        <file>vectors/cover_plate_bolted_btb_moment_connec.svg</file>
+        <file>vectors/cover_plate_welded_btb_moment_connec.svg</file>
+        <file>vectors/end_plate_btb_moment_connec.svg</file>
+        <file>vectors/end_plate_btc_moment_connec.svg</file>
+        <file>vectors/cover_plate_bolted_ctc_moment_connec.svg</file>
+        <file>vectors/cover_plate_welded_ctc_moment_connec.svg</file>
+        <file>vectors/end_plate_ctc_moment_connec.svg</file>
+        <file>vectors/base_plate_connec.svg</file>
+        <file>vectors/bolted_tension_member.svg</file>
+        <file>vectors/welded_tension_member.svg</file>
+        <file>vectors/struts_in_trusses_compression_mem.svg</file>
+        <file>vectors/cantilever_beam_flexural_mem.svg</file>
+        <file>vectors/ss_beam_flexural_mem.svg</file>
+
+        <file>backgrounds/splash_bg.jpg</file>
+
+        <file>images/home.png</file>
+        <file>images/home_clicked.png</file>
+
+        <file>images/connection.png</file>
+        <file>images/connection_clicked.png</file>
+
+        <file>images/tension_member.png</file>
+        <file>images/tension_member_clicked.png</file>
+
+        <file>images/compression_member.png</file>
+        <file>images/compression_member_clicked.png</file>
+
+        <file>images/flexural_member.png</file>
+        <file>images/flexural_member_clicked.png</file>
+
+        <file>images/beam_column.png</file>
+        <file>images/beam_column_clicked.png</file>
+
+        <file>images/truss.png</file>
+        <file>images/truss_clicked.png</file>
+
+        <file>images/2d_frame.png</file>
+        <file>images/2d_frame_clicked.png</file>
+
+        <file>images/3d_frame.png</file>
+        <file>images/3d_frame_clicked.png</file>
+
+        <file>images/group_design.png</file>
+        <file>images/group_design_clicked.png</file>
+
+        <file>images/down_arrow.png</file>
+        <file>vectors/design_button.svg</file>
+        <file>vectors/input_dock_active.svg</file>
+        <file>vectors/input_dock_inactive.svg</file>
+        <file>vectors/output_dock_active.svg</file>
+        <file>vectors/output_dock_inactive.svg</file>
+        <file>vectors/logs_dock_active.svg</file>
+        <file>vectors/logs_dock_inactive.svg</file>
+
+        <file>vectors/window_close.svg</file>
+        <file>vectors/window_close_hover.svg</file>
+        <file>vectors/window_maximize.svg</file>
+        <file>vectors/window_minimize.svg</file>
+        <file>vectors/window_restore.svg</file>
+
+        <file>vectors/design.svg</file>
+        <file>vectors/save.svg</file>
+        <file>vectors/design_report.svg</file>
+        <file>vectors/arrow_down.svg</file>
+        <file>vectors/inputs_label.svg</file>
+        <file>vectors/outputs_label.svg</file>
+
+        <file>vectors/msg_info.svg</file>
+        <file>vectors/msg_critical.svg</file>
+        <file>vectors/msg_about.svg</file>
+        <file>vectors/msg_warning.svg</file>
+        <file>vectors/msg_success.svg</file>
+
+        <file>vectors/no_projects_light.svg</file>
+        <file>vectors/no_modules_light.svg</file>
+
+        <file>themes/darkstyle.qss</file>
+        <file>themes/lightstyle.qss</file>
+
+        <file>fonts/UbuntuSans-Regular.ttf</file>
+
+
+    </qresource>
+</RCC>

@@ -1,0 +1,27 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '12'
+Bolt.Grade:
+- '8.8'
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Column Web-Beam Web
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Plate.Thickness_List:
+- '10'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '100'
+Load.Shear: '200'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: UB 305 x 127 x 37
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: PBP 400 X 140.2
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
+Module: End Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'

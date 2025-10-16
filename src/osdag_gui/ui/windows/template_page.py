@@ -1257,6 +1257,19 @@ class CustomWindow(QWidget):
             print(f"status{status}")
             print(f"trigger_type{trigger_type}")
 
+            if status == False:
+                # Open Logs and close Loading
+                try:
+                    self.toggle_animate(True, 'log', on_finished=self.finished_loading)
+                    self.logs_dock_active = True
+                except Exception:
+                    if hasattr(self, 'logs_dock'):
+                        self.logs_dock.setVisible(True)
+                
+                # Update logs dock control icon
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(log_is_active=True)
+
             if error is not None:
                 self.show_error_msg(error)
                 # Close loading popup

@@ -716,7 +716,7 @@ class Plate(Material):
         tmv = moment_demand * xmax / sigma_r_sq
         abh = axial_load / (bolts_one_line * bolt_line)
         vres = math.sqrt((vbv + tmv) ** 2 + (tmh + abh) ** 2)
-        print('rsq,vres', sigma_r_sq, vres)
+        # print('rsq,vres', sigma_r_sq, vres)
         self.ymax = ymax
         self.xmax = xmax
         self.sigma_r_sq = sigma_r_sq
@@ -891,8 +891,8 @@ class Plate(Material):
 
             while (bolt_line <= bolt_line_limit and vres > bolt_capacity_red) or web_plate_h == False:
                 if web_plate_h is not False:
-                    print("entered web plate details loop for bolt force:", vres, "bolt capaity reduced:",
-                          bolt_capacity_red)
+                    # print("entered web plate details loop for bolt force:", vres, "bolt capaity reduced:",
+                        #   bolt_capacity_red)
                     [gauge, edge_dist, web_plate_h_recalc] = self.get_gauge_edge_dist(web_plate_h + 10, bolts_one_line,
                                                                                       min_edge_dist,
                                                                                       max_spacing, max_edge_dist)
@@ -949,8 +949,8 @@ class Plate(Material):
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
             else:
-                print("passed the web plate details loop for bolt force:", vres, "bolt capaity reduced:",
-                      bolt_capacity_red, "no. of bolts:", bolt_line * bolts_one_line, "height", web_plate_h)
+                # print("passed the web plate details loop for bolt force:", vres, "bolt capaity reduced:",
+                    #   bolt_capacity_red, "no. of bolts:", bolt_line * bolts_one_line, "height", web_plate_h)
                 self.design_status = True
 
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
@@ -1044,7 +1044,7 @@ class Plate(Material):
                                                                                      min_edge_dist, max_spacing,
                                                                                      max_edge_dist, web_thickness,
                                                                                      root_radius)
-                print("boltdetailsasaa", bolt_line, bolts_one_line, flange_plate_h)
+                # print("boltdetailsasaa", bolt_line, bolts_one_line, flange_plate_h)
                 if bolt_line == 1:
                     pitch = 0.0
                 else:
@@ -1059,7 +1059,7 @@ class Plate(Material):
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia, end_dist, gap, edge_dist, root_radius,
                                                           web_thickness,beta_lg= beta_lg)
-                print("boltforce", vres, bolt_capacity_red)
+                # print("boltforce", vres, bolt_capacity_red)
                 # convergence = bolt_capacity_red - vres
                 #
                 # if convergence < 0:

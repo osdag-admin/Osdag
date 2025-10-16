@@ -28,6 +28,10 @@ from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_pro
 from osdag_gui.data.database.database_config import get_module_function
 from osdag_core.Common import *
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
+from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
+from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
+
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -501,12 +505,19 @@ class MainWindow(QMainWindow):
         return super().eventFilter(obj, event)
 
     def handle_card_open_clicked(self, card_title):
+        print(card_title)
         if card_title == "Fin Plate":
-            self.open_fin_plate_page()
+            self.open_fin_plate_shear_connection()
+        elif card_title == "Cleat Angle":
+            self.open_cleat_angle_shear_connection()
+        elif card_title == "End Plate":
+            self.open_end_plate_shear_connection()
+        elif card_title == "Seated Angle":
+            self.open_seated_angle_shear_connection()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
-    def open_fin_plate_page(self):
+    def open_fin_plate_shear_connection(self):
         title = "Fin Plate Connection"
         self.clear_layout(self.main_widget_layout)
         fin_plate = CustomWindow(title, FinPlateConnection, parent=self)
@@ -538,7 +549,106 @@ class MainWindow(QMainWindow):
         self.tab_widget_content[index][1] = True
         current_tab_data = self.tab_widget_content[index]
         self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+
+    def open_cleat_angle_shear_connection(self):
+        title = "Cleat Angle Connection"
+        self.clear_layout(self.main_widget_layout)
+        fin_plate = CustomWindow(title, CleatAngleConnection, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                fin_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = fin_plate
+        fin_plate.openNewTab.connect(self.handle_add_tab)
+        fin_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(fin_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        # Show docking Icons
+        self.tab_widget_content[index][1] = True
+        current_tab_data = self.tab_widget_content[index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+
+    def open_end_plate_shear_connection(self):
+        title = "End Plate Connection"
+        self.clear_layout(self.main_widget_layout)
+        fin_plate = CustomWindow(title, EndPlateConnection, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                fin_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = fin_plate
+        fin_plate.openNewTab.connect(self.handle_add_tab)
+        fin_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(fin_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        # Show docking Icons
+        self.tab_widget_content[index][1] = True
+        current_tab_data = self.tab_widget_content[index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
     
+    def open_seated_angle_shear_connection(self):
+        title = "Seated Angle Connection"
+        self.clear_layout(self.main_widget_layout)
+        fin_plate = CustomWindow(title, SeatedAngleConnection, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                fin_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = fin_plate
+        fin_plate.openNewTab.connect(self.handle_add_tab)
+        fin_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(fin_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        # Show docking Icons
+        self.tab_widget_content[index][1] = True
+        current_tab_data = self.tab_widget_content[index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+           
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()

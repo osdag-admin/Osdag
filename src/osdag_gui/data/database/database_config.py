@@ -213,10 +213,10 @@ def search_projects_and_modules(query: str) -> dict[str, list]:
 MODULE_MAP = {
     #----------------------------Connections-start-------------------------------------
     #--------------------Submodule---------Module---------Open-module-function---------
-    KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection', 'open_fin_plate_page'],
-    KEY_DISP_ENDPLATE: ['End Plate', 'Shear Connection', 'None'],
-    KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'None'],
-    KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'None'],
+    KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection', 'open_fin_plate_shear_connection'],
+    KEY_DISP_ENDPLATE: ['End Plate', 'Shear Connection', 'open_end_plate_shear_connection'],
+    KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'open_cleat_angle_shear_connection'],
+    KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'open_seated_angle_shear_connection'],
 
     KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection', 'None'],
     KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection', 'None'],

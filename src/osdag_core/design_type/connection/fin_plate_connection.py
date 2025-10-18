@@ -1323,7 +1323,6 @@ class FinPlateConnection(ShearConnection):
             if chkbox.objectName() == 'Fin Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                print(f"clearing check of {chkbox.objectName()}")
                 chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Plate", bgcolor)
         

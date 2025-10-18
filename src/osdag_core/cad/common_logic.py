@@ -2087,11 +2087,10 @@ class CommonDesignLogic(object):
 
         self.display.DisableAntiAliasing()
 
-        if bgcolor == "gradient_bg":
-
+        if bgcolor == "gradient_light":
             self.display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
         else:
-            self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+            self.display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
 
         if self.mainmodule  == "Shear Connection":
             # hover labels

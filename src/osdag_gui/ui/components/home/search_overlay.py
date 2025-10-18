@@ -20,6 +20,7 @@ class SearchResultItem(QFrame):
     def __init__(self, item_data, item_type=KEY_SEARCH_PROJ, parent=None):
         super().__init__(parent)
         self.item_data = item_data
+        self.setObjectName("search_result_item")
         self.item_type = item_type
         self.original_height = 50
         self.expanded_height = 85
@@ -27,41 +28,6 @@ class SearchResultItem(QFrame):
         
         if item_type==KEY_SEARCH_MODULE:
             self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        
-        self.setStyleSheet("""
-            SearchResultItem {
-                background: white;
-                border: 1px solid white;
-                border-radius: 15px;
-                padding: 4px 12px;
-            }
-            SearchResultItem:hover {
-                border: 1px solid #9BC53D;
-                background: #D5E49B;
-            }
-            QLabel#primaryText {
-                color: #1a202c;
-                font-size: 13px;
-                font-weight: 600;
-                background: transparent;
-            }
-            QLabel#secondaryText {
-                color: #718096;
-                font-size: 12px;
-                background: transparent;
-            }
-            QLabel#dateText {
-                color: #a0aec0;
-                background: transparent;
-                font-size: 11px;
-            }
-            QLabel#iconLabel {
-                color: #2d3748;
-                font-size: 16px;
-                background: transparent;
-                font-weight: bold;
-            }
-        """)
         
         self.setupUI()
     
@@ -124,7 +90,6 @@ class SearchResultItem(QFrame):
         if self.item_type == KEY_SEARCH_PROJ:
             self.actions_frame = QFrame()
             self.actions_frame.setObjectName("actionsFrame")
-            self.actions_frame.setStyleSheet("background: transparent;")
             actions_layout = QHBoxLayout(self.actions_frame)
             actions_layout.setContentsMargins(28, 2, 10, 2)
             actions_layout.setSpacing(5)
@@ -143,24 +108,7 @@ class SearchResultItem(QFrame):
             for btn in [self.generate_btn, self.download_btn, self.open_btn]:
                 btn.setFixedHeight(25)
                 btn.setCursor(Qt.CursorShape.PointingHandCursor)
-                btn.setStyleSheet("""
-                    QPushButton {
-                        background-color: #ffffff;
-                        border-radius: 12px;
-                        color: #2d3748;
-                        border: 1px solid #cccccc;
-                        padding: 4px 5px;
-                        font-size: 10px;
-                        font-weight: 600;
-                    }
-                    QPushButton:hover {
-                        background-color: #f0f4e3;
-                        border-color: #9BC53D;
-                    }
-                    QPushButton:pressed {
-                        background-color: #d6e6be;
-                    }
-                """)
+                btn.setObjectName("search_result_proj_btn")
 
             actions_layout.addWidget(self.generate_btn)
             actions_layout.addWidget(self.download_btn)
@@ -234,69 +182,7 @@ class SearchOverlay(QFrame):
         self.border_radius = 12
         self.max_height = 400  # Maximum height for the overlay
         self.setObjectName("overlayFrame")
-        self.search_widget = None  # Reference to the search bar widget
-        
-        self.setStyleSheet("""
-            #overlayFrame {
-                background: white;
-                border: 2px solid #e2e8f0;
-                border-radius: 15px;
-            }
-            #projectsHeader {
-                color: #2d3748;
-                font-size: 12px;
-                font-weight: bold;
-                padding: 8px 16px;
-                border-radius: 12px;
-                background-color: #f7fafc;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            #modulesHeader {
-                color: #2d3748;
-                font-size: 12px;
-                font-weight: bold;
-                padding: 8px 16px;
-                border-radius: 12px;
-                background-color: #f7fafc;
-                border-top: 1px solid #e2e8f0;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            
-            #noResults {
-                color: #718096;
-                font-size: 13px;
-                padding: 24px;
-            }
-            QScrollArea {
-                border: none;
-                background: transparent;
-                border-radius: 12px;
-                margin: 3px;
-            }
-            QScrollBar:vertical {
-                border: none;
-                background: #f7fafc;
-                width: 3px;
-                margin-top: 8px;
-                margin-bottom: 8px;
-            }
-            QScrollBar::handle:vertical {
-                background: #cbd5e0;
-                border-radius: 2px;
-                min-height: 20px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #a0aec0;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                border: none;
-                background: none;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none;
-            }
-        """)
-        
+        self.search_widget = None  # Reference to the search bar widget        
         self.setupUI()
         
         # Install event filter on application to detect clicks outside
@@ -313,12 +199,14 @@ class SearchOverlay(QFrame):
         
         # Scroll area for results
         self.scroll_area = QScrollArea()
+        self.scroll_area.setObjectName("search_overlay_scrollarea")
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         
         self.content_widget = QWidget()
+        self.content_widget.setObjectName("search_overlay_scroll_content")
         self.content_layout = QVBoxLayout(self.content_widget)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_layout.setSpacing(3)

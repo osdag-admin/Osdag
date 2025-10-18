@@ -46,44 +46,33 @@ class CustomButton(QPushButton):
         font = self.font()
         font.setPointSize(size)
         self.setFont(font)
+        # Ensure stylesheet doesn't override the programmatic font by setting inline font-size
+        # Use px for consistent visual sizing across DPI scales
+        existing_style = self.styleSheet()
+        # Preserve any existing inline styles while enforcing font-size
+        if existing_style:
+            self.setStyleSheet(f"{existing_style}; font-size: {size}px;")
+        else:
+            self.setStyleSheet(f"font-size: {size}px;")
 
     def set_default_style(self):
         # Base style for default state
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: #ffffff;
-                color: #000000;
-                padding: 4px 4px 8px 8px;
-                border-top: 1px solid #ffffff;
-                border-bottom: 1px solid #ffffff;
-                text-align: left;
-            }
-            QPushButton:hover {
-                background-color: transparent;
-                color: #90AF13;
-                border-top: 1px solid #90AF13;
-                border-bottom: 1px solid #90AF13;
-            }
-        """)
+        self.setProperty("state", "default")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
     def set_active_style(self):
         # Base style for active state
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: #90AF13;
-                color: #ffffff;
-                padding: 4px 4px 8px 8px;
-                border-top: 1px solid #90AF13;
-                border-bottom: 1px solid #90AF13;
-                text-align: left;
-            }
-        """)
+        self.setProperty("state", "active")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
 class VerticalMenuBar(QWidget):
     nav_bar_trigger = Signal(object, object)
     def __init__(self, data: dict, icons: dict):
         super().__init__()
-
+        self.app = QApplication.instance()
+        self.theme_manager = self.app.theme_manager
         # Set size policy to expanding so it grows/shrinks with its parent layout
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -94,7 +83,7 @@ class VerticalMenuBar(QWidget):
 
         # Header section
         self.header = QFrame()
-        self.header.setStyleSheet("background-color: #ffffff;")
+        self.header.setObjectName("navbar_header")
         self.header_layout = QVBoxLayout(self.header)
         self.header_layout.setSpacing(5)
         self.header_layout.setAlignment(Qt.AlignCenter) # Center logo in header
@@ -104,12 +93,8 @@ class VerticalMenuBar(QWidget):
         self.header_layout.addWidget(self.osdag_logo, alignment=Qt.AlignCenter)
 
         self.version_label = QLabel(VERSION)
-        self.version_label.setFont(QFont("Calibri", 12)) # Initial font, will be updated
-        self.version_label.setStyleSheet("""
-            QLabel {
-                color: gray;
-            }
-        """)
+        self.version_label.setObjectName("version_label")
+
         self.version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.header_layout.addWidget(self.version_label)
         
@@ -128,6 +113,7 @@ class VerticalMenuBar(QWidget):
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Make buttons expand vertically
             btn.clicked.connect(lambda _,label=name, data=data.get(name): self._on_nav_button_clicked(data, label))
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn.setObjectName("navbar_button")
             self.button_group.append(btn)
             self.main_layout.addWidget(btn)
 
@@ -145,7 +131,7 @@ class VerticalMenuBar(QWidget):
         self.bottom_layout = QVBoxLayout(self.bottom_frame)
         self.bottom_layout.setSpacing(5)
 
-        self.iitb_logo = QSvgWidget(":/vectors/IITB_logo.svg", parent=self)
+        self.iitb_logo = QSvgWidget(parent=self)
         # Remove fixed size here, will be set dynamically in resizeEvent
         self.bottom_layout.addWidget(self.iitb_logo, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -188,12 +174,8 @@ class VerticalMenuBar(QWidget):
             else:
                 btn.set_default_style()
 
-
-        font_version = QFont("Calibri", version_font_size)
-        self.version_label.setFont(font_version)
         self.version_label.setStyleSheet(f"""
             QLabel {{
-                color: gray;
                 font-size: {version_font_size}pt; /* Apply font size directly via stylesheet for consistency */
             }}
         """)
@@ -222,7 +204,13 @@ class VerticalMenuBar(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor("white"))
+        if self.theme_manager.is_light():
+            self.iitb_logo.load(":/vectors/IITB_logo_light.svg")
+            painter.setBrush(QColor("#FFFFFF"))
+        else:
+            self.iitb_logo.load(":/vectors/IITB_logo_dark.svg")
+            painter.setBrush(QColor("#333333"))
+        
         painter.drawRect(self.rect())
         super().paintEvent(event)
 

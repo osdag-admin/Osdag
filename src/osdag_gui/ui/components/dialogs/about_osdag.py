@@ -16,6 +16,8 @@ from osdag_gui.__config__ import VERSION
 class AboutOsdagDialog(QDialog):
     def __init__(self):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("AboutOsdagDialog")
@@ -23,25 +25,6 @@ class AboutOsdagDialog(QDialog):
         
         # Set size to match original dialog
         self.setFixedSize(580, 450)
-        
-        # Base stylesheet for the dialog
-        self.setStyleSheet("""
-            QDialog#AboutOsdagDialog {
-                background-color: #ffffff;
-                border: 1px solid #90AF13;
-            }
-            QWidget#ContentWidget {
-                background-color: #ffffff;
-            }
-            QTextBrowser {
-                background-color: #ffffff;
-                border: 1px solid #e0e0e0;
-                border-radius: 4px;
-                font-family: 'Arial', sans-serif;
-                font-size: 8pt;
-                padding: 8px;
-            }
-        """)
 
         # Main layout
         mainLayout = QVBoxLayout(self)
@@ -60,7 +43,7 @@ class AboutOsdagDialog(QDialog):
         contentLayout.setContentsMargins(10, 10, 10, 10)
         contentLayout.setSpacing(10)
 
-        self.logoLabel = QSvgWidget(":/vectors/Osdag.svg", self)
+        self.logoLabel = QSvgWidget(":/vectors/Osdag_light.svg")
         self.logoLabel.setObjectName("LogoLabel")
         self.logoLabel.setFixedHeight(106) # calculated wrt original 1001x234
         self.logoLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -80,35 +63,26 @@ class AboutOsdagDialog(QDialog):
         
         okButton = QPushButton("OK", self)
         okButton.setFixedHeight(30)
-        okButton.setStyleSheet("""
-            QPushButton {
-                background-color: #90AF13;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 5px 20px;
-                font-size: 12px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #7A9611;
-            }
-            QPushButton:pressed {
-                background-color: #6B850F;
-            }
-        """)
+        
         okButton.clicked.connect(self.accept)
         buttonLayout.addWidget(okButton)
         
         contentLayout.addLayout(buttonLayout)
         mainLayout.addWidget(contentWidget)
 
+    def paintEvent(self, event):
+        if self.theme.is_light():
+            self.logoLabel.load(":/vectors/Osdag_light.svg")
+        else:
+            self.logoLabel.load(":/vectors/Osdag_dark.svg")
+        return super().paintEvent(event)
+
     def setAboutContent(self):
         """Set the HTML content for the about dialog"""
         html_content = f"""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
 p, li {{ white-space: pre-wrap; }}
-</style></head><body style=" font-family:'Arial'; font-size:7.8pt; font-weight:400; font-style:normal;">
+</style></head><body style=" font-family:'Arial'; font-size:7.8pt; font-weight:400; font-style:normal;color:#A6A6A6;">
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'monospace, monospace'; font-size:8pt;">Osdag© </span></p>
 <p align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'MS Shell Dlg 2'; font-size:8pt;">Version: {VERSION}</span></p>
 <p align="justify" style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;"><br /></p>

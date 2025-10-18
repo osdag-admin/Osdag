@@ -6,7 +6,7 @@ class Data:
     # Empty List means "Under Development"
     MODULES = {
         "Home": [],
-        "Connection" : 
+        "Connection" :
         {
             "Shear Connection":
             [
@@ -68,7 +68,7 @@ class Data:
     }
     
     NAVBAR_ICONS = {
-        "Home": [":/images/home.png", ":/images/home_clicked.png"],
+        "Home": [":/vectors/home_default.svg", ":/vectors/home_clicked.svg"],
         "Connection": [":/images/connection.png", ":/images/connection_clicked.png"],
         "Tension Member": [":/images/tension_member.png", ":/images/tension_member_clicked.png"],
         "Compression Member": [":/images/compression_member.png", ":/images/compression_member_clicked.png"],

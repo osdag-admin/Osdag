@@ -22,11 +22,7 @@ class AskQuestions(QDialog):
         
         # Base stylesheet for the dialog with gradient background
         self.setStyleSheet("""
-            #AskQuestions {
-                background-color: #FFFFFF;
-                border: 1px solid #90AF13;
-            }
-            t#ContentWidget {
+            #ContentWidget {
                 background-color: transparent;
                 margin: 2px;
             }
@@ -52,7 +48,7 @@ class AskQuestions(QDialog):
         # "Please visit :" label
         visitLabel = QLabel("Please visit :", self)
         visitLabel.setStyleSheet("""
-            color: #333333;
+            color: #A6A6A6;
             font-size: 13px;
             font-weight: normal;
         """)

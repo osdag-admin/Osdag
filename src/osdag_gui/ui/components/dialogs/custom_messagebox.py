@@ -25,16 +25,6 @@ class CustomMessageBox(QDialog):
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         self.setObjectName("CustomDialog")
 
-        # Base stylesheet for the dialog
-        self.setStyleSheet(
-            """
-            QDialog {
-                background-color: #ffffff;
-                border: 1px solid #90AF13;
-            }
-        """
-        )
-
         # Make dialog resizable
         self.setSizeGripEnabled(True)
 
@@ -64,14 +54,14 @@ class CustomMessageBox(QDialog):
         # Text layout
         textLayout = QVBoxLayout()
         self.textLabel = QLabel(text, self)
-        self.textLabel.setStyleSheet("font-size: 14px; font-weight: bold;")
+        self.textLabel.setObjectName("message_lbl1")
         self.textLabel.setAlignment(Qt.AlignLeft)
         textLayout.addWidget(self.textLabel)
 
         if informativeText:
             self.informativeLabel = QLabel(informativeText, self)
-            self.informativeLabel.setStyleSheet("font-size: 12px; color: #555555;")
             self.informativeLabel.setAlignment(Qt.AlignLeft)
+            self.informativeLabel.setObjectName("message_lbl2")
             self.informativeLabel.setWordWrap(True)
             textLayout.addWidget(self.informativeLabel)
 

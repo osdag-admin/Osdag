@@ -8,6 +8,7 @@ from PySide6.QtGui import QIcon, QFontDatabase, QFont
 from osdag_core.utils.internet_connectivity import InternetConnectivity
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
 from osdag_gui.data.database.database_config import refactor_database, create_user_database
+from osdag_gui.ui.utils.theme_manager import ThemeManager
 from osdag_core.cli import run_module
 import osdag_gui.resources.resources_rc
 import sys, click
@@ -25,7 +26,7 @@ class LoadingThread(QThread):
         refactor_database()
         time.sleep(10)
         self.finished.emit()
-
+    
     def create_sqlite(self):
         import sqlite3
         import subprocess
@@ -132,12 +133,28 @@ class LaunchScreenPopup(QMainWindow):
             self.on_finish()
 
 def GUI():
+    const = {
+        'GREEN_LIGHT_MODE': '#90AF13',
+        'WHITE': '#FFFFFF',
+        'OFF_WHITE': '#F4F4F4',
+        'CONTROL_BTN_HOVER': '#D9D7D7',
+        'CONTROL_BTN_CLICK': '#CFCFCF',
+        'CLOSE_BTN_HOVER': '#E81123',
+        'CLOSE_BTN_CLICK': '#F1707A'
+    }
     app = QApplication(sys.argv)
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     font = QFontDatabase.applicationFontFamilies(fid)[0]
     # app.setFont(QFont(font))
 
-    file = QFile(":/themes/lightstyle.qss")
+    app.theme_manager = ThemeManager(app)
+    app.theme_manager.load_theme(app.theme_manager.current_theme)
+
+    if app.theme_manager.is_light():
+        file = QFile(":/themes/lightstyle.qss")
+    else:
+        file = QFile(":/themes/darkstyle.qss")
+
     if file.open(QFile.ReadOnly | QFile.Text):
         stream = QTextStream(file)
         stylesheet = stream.readAll()
@@ -153,7 +170,6 @@ def GUI():
     splash = LaunchScreenPopup(on_finish=show_main_window)
     splash.show()
     sys.exit(app.exec())
-
 
 # --- Main CLI group ---
 help_msg = """\n\b

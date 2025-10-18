@@ -9,6 +9,7 @@ class LogDock(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.is_visible = True
+        self.setObjectName("logs_dock")
         self.init_ui()
         self.adjust_size()
 
@@ -20,15 +21,6 @@ class LogDock(QWidget):
 
         # Create a top strip for "Log Window"
         self.log_window_title = QLabel("Log Window")
-        self.log_window_title.setStyleSheet("""
-            QLabel {
-                background-color: #F2F2F2;
-                color: #000000;
-                padding: 3px;
-                font-weight: bold;
-                font-size: 12px;
-            }
-        """)
         self.log_window_title.setAlignment(Qt.AlignLeft)
         layout.addWidget(self.log_window_title)
 
@@ -37,58 +29,20 @@ class LogDock(QWidget):
         self.log_display.setObjectName("textEdit")
         self.log_display.setReadOnly(True)
         self.log_display.setOverwriteMode(True)
-        self.log_display.setStyleSheet("""
-            QTextEdit {
-                background-color: #F8F8F8;
-                border: 1px solid #D0D0D0;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
-                padding: 5px;
-                color: #000000;
-            }
-            QScrollBar:vertical {
-                background: #E0E0E0; /* Light grey for the scrollbar track */
-                width: 8px;
-                margin: 0px 0px 0px 3px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical {
-                background: #A0A0A0; /* Medium grey for the scrollbar handle */
-                min-height: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #707070; /* Darker grey on hover for the handle */
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px; /* Hides the up/down arrows */
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none; /* Hides the area between handle and arrows */
-            }
-        """)
         layout.addWidget(self.log_display)
 
-        # Add demo log text matching the image format
+        # Add init log text matching
         self.append_log(f"[{QDateTime.currentDateTime().toString('yyyy-MM-dd hh:mm:ss')}] Log initialized", "info")
-        # demo_log_messages = [
-        #     ("Info: In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].", "info"),
-        #     ("Info: To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the one currently defined.", "info"),
-        #     ("Error: Overall bolted tension member design is safe.", "error"),
-        #     ("Info: ====== End Of Design ======", "info")
-        # ]
-        # for message, level in demo_log_messages:
-        #     self.append_log(message, level)
 
         self.setLayout(layout)
-        self.show()  # Show initially to display demo text
+        self.show()  # Show init text
 
     def append_log(self, message, log_level="info"):
         """Append a message to the log display with specified color."""
         if log_level == "error":
             color = "#FF0000"  # Red for errors
         elif log_level == "info":
-            color = "#000000"  # Black for info
+            color = "#A6A6A6"  # Black for info
         elif log_level == "success":
             color = "#008000"  # Green for success
 

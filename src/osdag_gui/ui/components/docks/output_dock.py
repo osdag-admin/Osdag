@@ -49,54 +49,6 @@ from osdag_gui.__config__ import CAD_BACKEND
 
 import yaml
 
-def style_line_edit():
-    return """
-        QLineEdit {
-            padding: 2px 7px;
-            border: 1px solid #070707;
-            border-radius: 4px;
-            background-color: white;
-            color: #000000;
-            font-weight: normal;
-            min-width: 100px;
-            max-width: 120px;
-        }
-    """
-
-def style_small_button():
-    return """
-        QPushButton {
-            padding: 3px 7px;
-            background-color: #888;
-            color: white;
-            border-radius: 4px;
-            min-width: 100px;
-            max-width: 120px;
-            font-size: 12px;
-        }
-        QPushButton:disabled {
-            background-color: #cccccc;
-            color: #888888;
-        }
-    """
-
-def style_main_buttons():
-    return """
-        QPushButton {
-            background-color: #94b816;
-            color: white;
-            font-weight: bold;
-            border-radius: 4px;
-            padding: 6px 18px;
-        }
-        QPushButton:hover {
-            background-color: #7a9a12;
-        }
-        QPushButton:pressed {
-            background-color: #5f7a0e;
-        }
-    """
-
 class OutputDock(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__(parent)
@@ -109,7 +61,7 @@ class OutputDock(QWidget):
         # Tisplays sections that have meaningful content
         self.output_title_fields = {}
 
-        self.setStyleSheet("background-color: #FFF;")
+        self.setObjectName("output_dock")
         self.dock_width = 360
         self.panel_visible = False # Initially hidden
         self.setMinimumWidth(0)
@@ -130,28 +82,19 @@ class OutputDock(QWidget):
         output_layout.setSpacing(0)
 
         self.toggle_strip = QWidget()
-        self.toggle_strip.setStyleSheet("background-color: #94b816;")
+        self.toggle_strip.setObjectName("toggle_strip")
         self.toggle_strip.setFixedWidth(6)  # Always visible
         toggle_layout = QVBoxLayout(self.toggle_strip)
+
         toggle_layout.setContentsMargins(0, 0, 0, 0)
         toggle_layout.setSpacing(0)
         toggle_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
 
         self.toggle_btn = QPushButton("❯")  # Show state initially
         self.toggle_btn.setFixedSize(6, 60)
+        self.toggle_btn.setObjectName("toggle_strip_button")
         self.toggle_btn.setToolTip("Show panel")
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6c8408;
-                color: white;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #5e7407;
-            }
-        """)
+
         self.toggle_btn.clicked.connect(self.toggle_output_dock)
         toggle_layout.addStretch()
         toggle_layout.addWidget(self.toggle_btn)
@@ -168,6 +111,7 @@ class OutputDock(QWidget):
 
         # --- Right content (everything except toggle strip) ---
         right_content = QWidget()
+        right_content.setObjectName("outputs-rightpanel")
         self.output_widget = right_content
         right_layout = QVBoxLayout(right_content)
         right_layout.setContentsMargins(5,5,5,5)
@@ -176,7 +120,8 @@ class OutputDock(QWidget):
         # Top button
         top_button_layout = QHBoxLayout()
         output_dock_btn = QPushButton("Output Dock")
-        output_dock_btn.setStyleSheet(style_main_buttons())
+        output_dock_btn.setObjectName("outputs_button")
+        output_dock_btn.setCursor(Qt.CursorShape.ArrowCursor)
         output_dock_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_button_layout.addWidget(output_dock_btn)
         top_button_layout.addStretch()
@@ -188,44 +133,21 @@ class OutputDock(QWidget):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: 1px solid #EFEFEC;
-                background-color: transparent;
-                padding: 3px;
-            }
-            QScrollBar:vertical {
-                background: #E0E0E0;
-                width: 8px;
-                margin: 0px 0px 0px 3px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical {
-                background: #A0A0A0;
-                min-height: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #707070;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none;
-            }
-        """)
+        scroll_area.setObjectName("outputs_vscrollarea")
 
         # Group container
         group_container = QWidget()
+        group_container.setObjectName("outputs_container")
         group_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         group_container_layout = QVBoxLayout(group_container)
+        group_container_layout.setSpacing(0)
+        group_container_layout.setContentsMargins(5,5,5,5)
 
         # Bring the data instance from `design_type` folder
         field_list = self.backend.output_values(False)
         # To equalize the label length
         # So that they are of equal size
-        field_list = self.equalize_label_length(field_list)
+        # field_list = self.equalize_label_length(field_list)
 
         # Track any group is active or not
         track_group = False
@@ -253,27 +175,12 @@ class OutputDock(QWidget):
                 current_group = QGroupBox(label)
                 current_group.setObjectName(label)
                 track_group = True
-                current_group.setStyleSheet("""
-                    QGroupBox {
-                        border: 1px solid #90AF13;
-                        border-radius: 4px;
-                        margin-top: 0.8em;
-                        font-weight: bold;
-                    }
-                    QGroupBox::title {
-                        subcontrol-origin: content;
-                        subcontrol-position: top left;
-                        left: 10px;
-                        padding: 0 4px;
-                        margin-top: -15px;
-                        background-color: white;
-                    }
-                """)
                 cur_box_form = QFormLayout()
                 cur_box_form.setHorizontalSpacing(5)
                 cur_box_form.setVerticalSpacing(10)
-                cur_box_form.setContentsMargins(10, 10, 30, 10)
-                cur_box_form.setFormAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+                cur_box_form.setContentsMargins(10, 10, 10, 10)
+                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                cur_box_form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
                 if key:
                     fields = 0
@@ -287,28 +194,35 @@ class OutputDock(QWidget):
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QLineEdit()
-                right.setStyleSheet(style_line_edit())
                 right.setObjectName(field[0])
                 right.setReadOnly(True)
-                cur_box_form.addRow(left, right)
+                # To Right Align
+                layout = QHBoxLayout()
+                layout.setSpacing(0)
+                layout.setContentsMargins(0,0,0,0)
+                layout.addStretch()
+                layout.addWidget(right)
+                cur_box_form.addRow(left, layout)
                 fields += 1
                 self.output_title_fields[current_key][1] = fields
             
             elif type == TYPE_OUT_BUTTON:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                print("@",label,"@")
-                left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QPushButton(label.strip())
                 spacing_button_list.append(field)
                 right.setObjectName(field[0])
-                right.setStyleSheet(style_small_button())
                 right.setDisabled(True)
-                cur_box_form.addRow(left, right)
+                # To Right Align
+                layout = QHBoxLayout()
+                layout.setSpacing(0)
+                layout.setContentsMargins(0,0,0,0)
+                layout.addStretch()
+                layout.addWidget(right)
+                cur_box_form.addRow(left, layout)
                 fields += 1
                 self.output_title_fields[current_key][1] = fields
 
@@ -345,36 +259,11 @@ class OutputDock(QWidget):
 
         # --- Horizontal scroll area for all right content ---
         h_scroll_area = QScrollArea()
+        h_scroll_area.setObjectName("outputs_hscrollarea")
         h_scroll_area.setWidgetResizable(True)
         h_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         h_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         h_scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        h_scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-            }
-            QScrollBar:horizontal {
-                background: #E0E0E0;
-                height: 8px;
-                margin: 3px 0px 0px 0px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:horizontal {
-                background: #A0A0A0;
-                min-width: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:horizontal:hover {
-                background: #707070;
-            }
-            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-                width: 0px;
-            }
-            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
-                background: none;
-            }
-        """)
         h_scroll_area.setWidget(right_content)
 
         output_layout.addWidget(h_scroll_area)
@@ -723,9 +612,7 @@ class OutputDock(QWidget):
                                 val=1
                             else:
                                 val=2
-                            self.run_spacing_script(None,
-                                                        val,#specifying which to use
-                                                        SeatedAngleDetails,main)
+                            self.run_spacing_script(None,val,SeatedAngleDetails,main)
                             return
                             print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
                 elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:

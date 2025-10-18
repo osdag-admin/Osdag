@@ -87,31 +87,6 @@ class Window(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("AdditionalInputs")
-        self.setStyleSheet("""
-            #AdditionalInputs {
-                border: 1px solid #90AF13;
-            }
-            QPushButton {
-                background-color: white;
-                color: black;
-                font-weight: bold; 
-                border-radius: 5px;
-                border: 1px solid black;
-                padding: 5px 14px;
-                text-align: center;
-                font-family: "Calibri";
-            }
-            QPushButton:hover {
-                background-color: #90AF13;
-                border: 1px solid #90AF13;
-                color: white;
-            }
-            QPushButton:pressed {
-                color: black;
-                background-color: white;
-                border: 1px solid black;
-            }
-        """)
     
         scale = 1
         button_size_x = int(scale*190)

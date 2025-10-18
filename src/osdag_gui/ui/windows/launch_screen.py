@@ -16,21 +16,12 @@ class OsdagLaunchScreen(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"SplashScreen_MainWindow")
         MainWindow.resize(610, 400)
-        MainWindow.setWindowFlags(Qt.FramelessWindowHint)
+        MainWindow.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         MainWindow.setAttribute(Qt.WA_TranslucentBackground)
         MainWindow.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")
-        self.centralwidget.setStyleSheet("""
-            #SplashScreen_CentralWidget {
-                border: 2px solid #90af13;
-                border-radius: 5px;
-                background-image: url(':/backgrounds/splash_bg.jpg');
-                background-repeat: no-repeat;
-                background-position: center;
-            }
-        """)
 
         # Use instead of QSvgWidget
         self.AnimatedGIF = PNGSequencePlayer(self.centralwidget)
@@ -87,11 +78,7 @@ class OsdagLaunchScreen(object):
         self.LoadingLabel.setObjectName(u"SplashScreen_LoadingLabel")
         self.LoadingLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.LoadingLabel.setGeometry(QRect(20, 290, 130, 25))
-        self.LoadingLabel.setStyleSheet("""
-                QLabel {
-                        background-color: rgba(255,255,255,0.3)
-                }
-        """)
+        self.LoadingLabel.setObjectName("splash_loading_label")
         self.LoadingLabel.setFont(QFont("Menlo", 9))
 
         # aligned at to right with margin(top = right = 10 wrt size of MainWindow)
@@ -144,9 +131,9 @@ class OsdagLaunchScreen(object):
         
         self.OsdagLogo.load(":/vectors/Osdag_logo.svg")
 
-        self.OsdagLabel.load(":/vectors/Osdag_label.svg")
+        self.OsdagLabel.load(":/vectors/Osdag_label_light.svg")
 
-        self.OsdagTagline.load(":/vectors/Osdag_tagline.svg")
+        self.OsdagTagline.load(":/vectors/Osdag_tagline_light.svg")
         
         self.VersionLabel.load(":/vectors/version.svg")
 
@@ -154,7 +141,7 @@ class OsdagLaunchScreen(object):
 
         self.LoadingLabel.setText(f"Loading Application    ")
 
-        self.IITBLogo.load(":/vectors/IITB_logo.svg")
+        self.IITBLogo.load(":/vectors/IITB_logo_light.svg")
 
         self.FOSSEELogo.load(":/vectors/FOSSEE_logo.svg")
    

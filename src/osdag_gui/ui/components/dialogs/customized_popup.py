@@ -102,21 +102,10 @@ class CustomValueSelectPopup(object):
         
         # Content widget
         content_widget = QWidget()
-        content_widget.setObjectName("content_widget")
+        content_widget.setObjectName("ContentWidget")
         self.setupContent(content_widget, MainWindow)
         main_layout.addWidget(content_widget)
-        
-        # Apply dialog styles
-        MainWindow.setStyleSheet("""
-            QDialog {
-                background-color: #ffffff;
-                color: #000000;
-                border: 1px solid #c0c0c0;
-            }
-            QWidget#content_widget {
-                background-color: #ffffff;
-            }
-        """)
+        MainWindow.setObjectName("customized_input")
         
         MainWindow.setLayout(main_layout)
         MainWindow.resize(self.window_width, self.window_height + 30)  # Add height for title bar
@@ -137,28 +126,12 @@ class CustomValueSelectPopup(object):
         # Available label
         self.label = QLabel("Available:")
         self.label.setObjectName("label")
-        self.label.setStyleSheet("""
-            QLabel {
-                font-weight: bold;
-                font-size: 13px;
-                color: #333333;
-                padding: 2px;
-            }
-        """)
         labels_layout.addWidget(self.label)
         labels_layout.addStretch()
         
         # Selected label
         self.label_2 = QLabel("Selected:")
         self.label_2.setObjectName("label_2")
-        self.label_2.setStyleSheet("""
-            QLabel {
-                font-weight: bold;
-                font-size: 13px;
-                color: #333333;
-                padding: 2px;
-            }
-        """)
         labels_layout.addWidget(self.label_2)
         
         content_layout.addLayout(labels_layout)
@@ -174,7 +147,6 @@ class CustomValueSelectPopup(object):
         self.listWidget.setFocusPolicy(Qt.NoFocus)
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget.itemDoubleClicked.connect(self.move_to_selected)
-        self.listWidget.setStyleSheet(self.get_list_style())
         self.listWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         lists_layout.addWidget(self.listWidget)
         
@@ -192,7 +164,6 @@ class CustomValueSelectPopup(object):
         self.pushButton.setObjectName("pushButton")
         self.pushButton.setAutoDefault(False)
         self.pushButton.setFixedHeight(self.button_height)
-        self.pushButton.setStyleSheet(self.get_button_style())
         buttons_layout.addWidget(self.pushButton)
         
         # Move one button (>)
@@ -200,7 +171,6 @@ class CustomValueSelectPopup(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.setAutoDefault(False)
         self.pushButton_2.setFixedHeight(self.button_height)
-        self.pushButton_2.setStyleSheet(self.get_button_style())
         buttons_layout.addWidget(self.pushButton_2)
         
         # Move one back button (<)
@@ -208,7 +178,6 @@ class CustomValueSelectPopup(object):
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_3.setAutoDefault(False)
         self.pushButton_3.setFixedHeight(self.button_height)
-        self.pushButton_3.setStyleSheet(self.get_button_style())
         buttons_layout.addWidget(self.pushButton_3)
         
         # Move all back button (<<)
@@ -216,7 +185,6 @@ class CustomValueSelectPopup(object):
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.setAutoDefault(False)
         self.pushButton_4.setFixedHeight(self.button_height)
-        self.pushButton_4.setStyleSheet(self.get_button_style())
         buttons_layout.addWidget(self.pushButton_4)
         
         buttons_layout.addStretch()
@@ -229,7 +197,6 @@ class CustomValueSelectPopup(object):
         self.listWidget_2.setFocusPolicy(Qt.NoFocus)
         self.listWidget_2.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
-        self.listWidget_2.setStyleSheet(self.get_list_style())
         self.listWidget_2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         lists_layout.addWidget(self.listWidget_2)
         
@@ -239,16 +206,6 @@ class CustomValueSelectPopup(object):
         if self.note:
             self.note_label = QLabel("<b>Note:</b> " + self.note)
             self.note_label.setObjectName("note_label")
-            self.note_label.setStyleSheet("""
-                QLabel {
-                    background-color: #f9f9f9;
-                    border: 1px solid #e0e0e0;
-                    border-radius: 5px;
-                    padding: 10px;
-                    color: #555555;
-                    font-size: 12px;
-                }
-            """)
             self.note_label.setWordWrap(True)
             self.note_label.setMaximumHeight(80)
             content_layout.addWidget(self.note_label)
@@ -262,23 +219,6 @@ class CustomValueSelectPopup(object):
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_5.setDefault(True)
         self.pushButton_5.setFixedSize(120, 35)
-        self.pushButton_5.setStyleSheet("""
-            QPushButton {
-                background-color: #90AF13;
-                color: white;
-                font-weight: bold;
-                font-size: 13px;
-                border-radius: 5px;
-                border: none;
-                padding: 8px 20px;
-            }
-            QPushButton:hover {
-                background-color: #7a9a12;
-            }
-            QPushButton:pressed {
-                background-color: #5f7a0e;
-            }
-        """)
         submit_layout.addWidget(self.pushButton_5)
         submit_layout.addStretch()
         
@@ -287,78 +227,6 @@ class CustomValueSelectPopup(object):
         # Setup connections
         self.connections(MainWindow)
         self.update_buttons_status()
-
-    def get_list_style(self):
-        """Return the style for list widgets."""
-        return """
-            QListWidget {
-                background-color: white;
-                border: 1px solid #d0d0d0;
-                border-radius: 5px;
-                padding: 5px;
-            }
-            QListWidget::item {
-                border-left: 2px solid transparent;
-                background-color: transparent;
-                padding: 3px;
-                margin: 1px;
-            }
-            QListWidget::item:hover {
-                background-color: #f0f7d0;
-                border-left-color: #90af13;
-            }
-            QListWidget::item:selected {
-                background-color: #e8f4c8;
-                color: black;
-                border-left: 2px solid #90AF13;
-            }
-            QListWidget::item:selected:hover {
-                background-color: #d8e4b8;
-                border-left-color: #7a9a12;
-            }
-            QListWidget::item:disabled {
-                color: #999999;
-                background-color: #f5f5f5;
-            }
-            QScrollBar:vertical {
-                background: #f0f0f0;
-                width: 10px;
-                margin: 0;
-                border-radius: 5px;
-            }
-            QScrollBar::handle:vertical {
-                background: #c0c0c0;
-                min-height: 30px;
-                border-radius: 5px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #90AF13;
-            }
-        """
-
-    def get_button_style(self):
-        """Return the style for control buttons."""
-        return """
-            QPushButton {
-                background-color: #90AF13;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-                border-radius: 5px;
-                border: none;
-                padding: 5px;
-            }
-            QPushButton:hover {
-                background-color: #7a9a12;
-            }
-            QPushButton:pressed {
-                background-color: #5f7a0e;
-            }
-            QPushButton:disabled {
-                background-color: #d0d0d0;
-                color: #888888;
-            }
-        """
 
     def centerDialog(self, dialog):
         """Center the dialog on the screen or parent window."""

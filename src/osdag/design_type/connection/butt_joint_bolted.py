@@ -30,6 +30,12 @@ class ButtJointBolted(MomentConnection):
     def __init__(self):
         super(ButtJointBolted, self).__init__()
         self.design_status = False
+        self.design_for = 'Tension'
+        self.axial_force_kN = 0.0
+        self.axial_force = 0.0
+        self.base_metal_capacity_kN = None
+        self.utilization_breakdown = {}
+        self.design_error = ''
         self.spacing = None
         self.packing_plate_thickness = 0.0
         self.beta_pkg = 1.0
@@ -42,9 +48,10 @@ class ButtJointBolted(MomentConnection):
     ###############################################
     def tab_list(self):
         tabs = []
-        # Only Bolt and Detailing tabs
+        # Bolt, Detailing, and Design tabs
         tabs.append(("Bolt", TYPE_TAB_2, self.bolt_values))
         tabs.append(("Detailing", TYPE_TAB_2, self.detailing_values))
+        tabs.append(("Design", TYPE_TAB_2, self.design_values))
         return tabs
 
     def tab_value_changed(self):
@@ -160,6 +167,20 @@ class ButtJointBolted(MomentConnection):
     ####################################
     # Design Preference Functions End
     ####################################
+    def design_values(self, input_dictionary):
+        values = {
+            KEY_DESIGN_FOR: 'Tension'
+        }
+
+        if input_dictionary and KEY_DESIGN_FOR in input_dictionary:
+            values[KEY_DESIGN_FOR] = input_dictionary[KEY_DESIGN_FOR]
+
+        design = []
+        t1 = (KEY_DESIGN_FOR, KEY_DISP_DESIGN_FOR, TYPE_COMBOBOX,
+              ['Tension', 'Compression'], values[KEY_DESIGN_FOR])
+        design.append(t1)
+
+        return design
 
     def set_osdaglogger(key):
 
@@ -229,7 +250,7 @@ class ButtJointBolted(MomentConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t17 = (KEY_AXIAL_FORCE, KEY_DISP_AXIAL_FORCE, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t17)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -334,6 +355,21 @@ class ButtJointBolted(MomentConnection):
         t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,
                self.utilization_ratio if flag else '', True)
         out_list.append(t29)
+
+        t30 = (KEY_OUT_DESIGN_FOR, KEY_OUT_DISP_DESIGN_FOR, TYPE_TEXTBOX, self.design_for if flag else '', True)
+        out_list.append(t30)
+
+        t31 = (KEY_OUT_BASE_METAL_CAPACITY, KEY_OUT_DISP_BASE_METAL_CAPACITY, TYPE_TEXTBOX,
+                round(self.base_metal_capacity_kN, 2) if flag and self.base_metal_capacity_kN is not None else '', True)
+        out_list.append(t31)
+
+        t32 = (KEY_OUT_BASE_METAL_UTILIZATION, KEY_OUT_DISP_BASE_METAL_UTILIZATION, TYPE_TEXTBOX,
+                self.utilization_breakdown.get('base_metal') if flag and self.utilization_breakdown else '', True)
+        out_list.append(t32)
+
+        t33 = (KEY_OUT_BOLT_UTILIZATION, KEY_OUT_DISP_BOLT_UTILIZATION, TYPE_TEXTBOX,
+                self.utilization_breakdown.get('bolt') if flag and self.utilization_breakdown else '', True)
+        out_list.append(t33)
 
         t20 = (KEY_OUT_BOLT_CONN_LEN, KEY_OUT_DISP_BOLT_CONN_LEN, TYPE_TEXTBOX,
                self.len_conn if flag else '', True)
@@ -482,10 +518,31 @@ class ButtJointBolted(MomentConnection):
 
     def set_input_values(self, design_dictionary):
         """Initialize components required for butt joint design as per IS 800:2007"""
+
+        design_dictionary_with_defaults = design_dictionary.copy()
+        for key in (KEY_SHEAR, KEY_AXIAL, KEY_MOMENT):
+            if key not in design_dictionary_with_defaults:
+                design_dictionary_with_defaults[key] = 0.0
+
+        super(ButtJointBolted, self).set_input_values(self, design_dictionary_with_defaults)
+
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Butt Joint Bolted Connection"
         self.main_material = design_dictionary[KEY_MATERIAL]
-        self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
+
+        self.design_for = design_dictionary.get(KEY_DESIGN_FOR, 'Tension')
+        axial_input = design_dictionary.get(
+            KEY_AXIAL_FORCE,
+            design_dictionary.get(KEY_AXIAL,
+                                  design_dictionary.get(KEY_TENSILE_FORCE, 0)))
+        axial_value = float(axial_input)
+        if axial_value < 0 and KEY_DESIGN_FOR not in design_dictionary:
+            self.design_for = 'Compression'
+        self.axial_force_kN = abs(axial_value)
+        self.axial_force = self.axial_force_kN * 1000.0
+        # Legacy naming issue
+        self.tensile_force = self.axial_force_kN  # legacy naming in downstream methods
+
         self.width = design_dictionary[KEY_PLATE_WIDTH]
 
         # Initialize plates with material properties
@@ -859,14 +916,44 @@ class ButtJointBolted(MomentConnection):
                 self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
 
             # Calculate utilization ratio
-            bltcap = self.bolt.bolt_capacity
-            if bltcap < 1:
-                bltcap = 1
-            self.utilization_ratio = float(self.tensile_force) / (bltcap * self.number_bolts)
-            self.utilization_ratio = round(self.utilization_ratio, 2)
+            bolt_capacity_kN = self.bolt.bolt_capacity
+            bolt_capacity_total = bolt_capacity_kN * self.number_bolts if bolt_capacity_kN else 0.0
+            if bolt_capacity_total <= 0:
+                logger.error(": Bolt capacity is zero. Increase bolt size/grade or adjust layout.")
+                self.design_status = False
+                self.design_error = "Bolt capacity is zero."
+                return
+            bolt_util = self.axial_force_kN / bolt_capacity_total
+
+            if not self.check_base_metal_strength():
+                return
+
+            if not self.base_metal_capacity_kN or self.base_metal_capacity_kN <= 0:
+                logger.error(": Base metal capacity is zero or undefined. Check plate selection.")
+                self.design_status = False
+                self.design_error = "Base metal capacity is zero or undefined."
+                return
+
+            base_util = self.axial_force_kN / self.base_metal_capacity_kN
+
+            def _format_util(value, decimals=3):
+                if math.isinf(value) or math.isnan(value):
+                    return 'Inf'
+                return round(value, decimals)
+
+            overall_util = max(bolt_util, base_util)
+            self.utilization_breakdown = {
+                'bolt': _format_util(bolt_util),
+                'base_metal': _format_util(base_util)
+            }
+
+            if math.isinf(overall_util) or math.isnan(overall_util):
+                self.utilization_ratio = 'Inf'
+            else:
+                self.utilization_ratio = round(overall_util, 2)
 
             # Check if utilization ratio is less than 1 for valid design
-            if self.utilization_ratio >= 1:
+            if overall_util >= 1:
                 self.design_status = False
                 logger.error(": Utilization ratio is greater than or equal to 1. Design is not safe.")
                 logger.info(" :=========End Of design===========")
@@ -879,6 +966,67 @@ class ButtJointBolted(MomentConnection):
             print("Final Edge/End/Gauge/Pitch",self.final_edge_dist,self.final_end_dist,self.final_gauge,self.final_pitch)
             print("Max and min end edge dist ",self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
             print("Max min gauge pitch dist",self.max_gauge_round,self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
+
+
+    def check_base_metal_strength(self):
+        global logger
+        try:
+            logger
+        except NameError:
+            logger = logging.getLogger('Osdag')
+
+        logger.info(": ============== Base Metal Strength Check ==============")
+
+        plate_thk_min = min(float(self.plate1thk), float(self.plate2thk))
+        fy = min(self.plate1.fy, self.plate2.fy)
+        fu = min(self.plate1.fu, self.plate2.fu)
+
+        self.gamma_m0 = 1.10
+        self.gamma_m1 = 1.25
+
+        self.A_g = plate_thk_min * float(self.width)
+
+        if self.design_for == 'Compression':
+            self.T_db = self.A_g * fy / self.gamma_m0
+            logger.info(f": Design strength of plate in compression = {self.T_db / 1000:.2f} kN [Cl.7.1.2]")
+        else:
+            n_holes = max(self.rows, 1)
+            hole_dia = self.bolt.dia_hole if hasattr(self.bolt, 'dia_hole') else 0.0
+            net_width = float(self.width) - n_holes * hole_dia
+
+            if net_width <= 0:
+                logger.error(": Net width becomes zero/negative after deducting bolt holes. Increase plate width or reduce rows.")
+                self.design_status = False
+                self.design_error = "Net width insufficient for bolt holes."
+                return False
+
+            self.A_n = plate_thk_min * net_width
+            shear_lag_factor = 0.7  # IS 800:2007 Cl.6.3.3 for butt joints
+
+            T_dg = self.A_g * fy / self.gamma_m0
+            T_dn = 0.9 * self.A_n * fu * shear_lag_factor / self.gamma_m1
+            self.T_dg = T_dg
+            self.T_dn = T_dn
+            self.T_db = min(T_dg, T_dn)
+
+            # Calculate block shear strength
+            A_vg = plate_thk_min * ((self.rows - 1) * self.final_gauge + self.final_edge_dist)
+            A_vn = plate_thk_min * ((self.rows - 1) * self.final_gauge + self.final_edge_dist - (self.rows - 0.5) * hole_dia)
+            A_tg = plate_thk_min * self.final_end_dist
+            A_tn = plate_thk_min * (self.final_end_dist - 0.5 * hole_dia)
+
+            T_db_block = IS800_2007.cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, fu, fy)
+            self.T_db = min(self.T_db, T_db_block)
+            logger.info(f": Design strength of plate in tension = {self.T_db / 1000:.2f} kN [Cl.6.2.2, 6.2.3, 6.3.3]")
+
+        if self.T_db <= 0:
+            logger.error(": Plate design strength is non-positive. Check input dimensions/material.")
+            self.design_status = False
+            self.design_error = "Plate design strength is non-positive."
+            return False
+
+        self.base_metal_capacity_kN = self.T_db / 1000.0
+        return True
 
 
     def save_design(self, popup_summary):

@@ -2029,6 +2029,12 @@ KEY_UTILIZATION_RATIO = 'Bolt.UtilizationRatio'
 KEY_DISP_UTILIZATION_RATIO = 'Utilization Ratio'
 KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
 KEY_OUT_DISP_WELD_CONN_LEN = 'Length of Connection (mm)'
+KEY_OUT_BOLT_UTILIZATION = 'Bolt.Utilization'
+KEY_OUT_DISP_BOLT_UTILIZATION = 'Bolt Utilization'
+KEY_OUT_BASE_METAL_CAPACITY = 'Plate.BaseCapacity'
+KEY_OUT_DISP_BASE_METAL_CAPACITY = 'Base Metal Capacity (kN)'
+KEY_OUT_BASE_METAL_UTILIZATION = 'Plate.BaseUtilization'
+KEY_OUT_DISP_BASE_METAL_UTILIZATION = 'Base Metal Utilization'
 
 
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'

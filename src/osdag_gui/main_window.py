@@ -27,11 +27,11 @@ from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_pro
 
 from osdag_gui.data.database.database_config import get_module_function
 from osdag_core.Common import *
+# Backend Class Imports
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
-
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -41,20 +41,12 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         self.setCursor(Qt.CursorShape.ArrowCursor)
         # Apply global QToolTip stylesheet here
-        QApplication.instance().setStyleSheet("""
-            QToolTip {
-                background-color: #FFFFFF;
-                color: #000000;
-                border: 1px solid #90AF13;
-                padding: 2px 2px;
-                font-size: 10px;
-                border-radius: 0px;
-                qproperty-alignment: AlignVCenter;
-            }
-        """)
 
         screen = QGuiApplication.primaryScreen()
         screen_size = screen.availableGeometry()
+
+        app = QApplication.instance()
+        self.theme = app.theme_manager
 
         screen_width = screen_size.width()
         screen_height = screen_size.height()
@@ -74,17 +66,6 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint) # Make the window frameless for custom buttons
         self.current_tab_index = 0 # To keep track of the next tab index
         self.btn_size = QSize(46, 30)
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #f4f4f4;
-                border: 1px solid #90af13;
-                margin: 0px;
-                padding: 0px;
-            } 
-            QWidget#BottomLine {
-                background-color: #90af13;
-            }
-        """)
 
         # Initialize UI first, as sidebar will overlay it
         self.init_ui() # Call init_ui before sidebar creation to ensure main content exists
@@ -130,44 +111,11 @@ class MainWindow(QMainWindow):
 
         # QTabBar
         self.tab_bar = QTabBar()
+        self.tab_bar.setObjectName("main_tabs")
         self.tab_bar.setExpanding(False)
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.setMovable(False)
         self.tab_bar.tabCloseRequested.connect(self.handle_close_tab)
-        # Custom tab style
-        self.tab_bar.setStyleSheet('''
-            QTabBar::tab {
-                background: #F4F4F4;
-                border-left: 1px solid #d9d7d7;
-                border-right: 1px solid #d9d7d7;
-                border-top: 1px solid #F4F4F4;
-                border-bottom: 1px solid #F4F4F4;
-                padding: 6px 18px 6px 18px;
-                color: #000000;
-                font-size: 11px;
-                margin-left: 0px;
-            }
-            QTabBar::tab:selected {
-                background: #ffffff;
-                color: #000000;
-                border: 1px solid #90AF13;
-                border-bottom: 1px solid #ffffff;
-                padding: 6px 18px 6px 18px;
-            }
-            QTabBar::tab:hover {
-                border-top: 1px solid #90AF13;
-                border-left: 1px solid #90AF13;
-                border-right: 1px solid #90AF13;
-            }
-            QTabBar::close-button {
-                image: url(:/vectors/window_close.svg);
-                subcontrol-origin: padding;
-                subcontrol-position: center right;
-            }
-            QTabBar::close-button:hover {
-                image: url(:/vectors/window_close_hover.svg);
-            }
-        ''')
         tabs_h_layout.addWidget(self.tab_bar)
         top_h_layout.addLayout(tabs_h_layout)
         
@@ -181,31 +129,13 @@ class MainWindow(QMainWindow):
         # Helper function to create a styled button
         def create_button(icon_svg, is_close=False):
             btn = QPushButton()
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #f4f4f4;
-                    color: white;
-                    border: none;
-                    padding: 0px;
-                }
-                QPushButton:hover {
-                    background-color: #d9d7d7;
-                }
-                QPushButton:pressed {
-                    background-color: #cfcfcf;
-                }
-                QPushButton#close_button:hover {
-                    background-color: #E81123;
-                }
-                QPushButton#close_button:pressed {
-                    background-color: #F1707A;
-                }
-            """)
             btn.setFixedSize(self.btn_size)
             btn.setIcon(QIcon(QPixmap.fromImage(QPixmap(icon_svg).toImage())))
             btn.setIconSize(QSize(14, 14))
             if is_close:
                 btn.setObjectName("close_button")
+            else:
+                btn.setObjectName("window_control_button")
             return btn
 
         class ClickableSvgWidget(QSvgWidget):
@@ -225,21 +155,19 @@ class MainWindow(QMainWindow):
         control_button_layout.setContentsMargins(5,5,5,5)
 
         self.input_dock_control = ClickableSvgWidget()
-        self.input_dock_control.load(":/vectors/input_dock_active.svg")
         self.input_dock_control.setFixedSize(18, 18)
         self.input_dock_control.clicked.connect(self.toggle_input_dock)
         self.input_dock_active = True
         control_button_layout.addWidget(self.input_dock_control)
 
         self.log_dock_control = ClickableSvgWidget()
-        self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
+        self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
         self.log_dock_control.setFixedSize(18, 18)
         self.log_dock_control.clicked.connect(self.logs_dock_icon_toggle)
         self.log_dock_active = False
         control_button_layout.addWidget(self.log_dock_control)
 
         self.output_dock_control = ClickableSvgWidget()
-        self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
         self.output_dock_control.setFixedSize(18, 18)
         self.output_dock_control.clicked.connect(self.toggle_output_dock)
         self.output_dock_active = False
@@ -251,15 +179,15 @@ class MainWindow(QMainWindow):
 
         top_h_layout.addLayout(control_button_layout)
 
-        self.minimize_button = create_button(":/vectors/window_minimize.svg")
+        self.minimize_button = create_button(":/vectors/window_minimize_light.svg")
         self.minimize_button.clicked.connect(self.showMinimized)
         top_h_layout.addWidget(self.minimize_button)
 
-        self.maximize_button = create_button(":/vectors/window_maximize.svg")
+        self.maximize_button = create_button(":/vectors/window_maximize_light.svg")
         self.maximize_button.clicked.connect(self.toggle_maximize_restore)
         top_h_layout.addWidget(self.maximize_button)
 
-        self.close_button = create_button(":/vectors/window_close.svg", is_close=True)
+        self.close_button = create_button(":/vectors/window_close_light.svg", is_close=True)
         self.close_button.clicked.connect(self.close)
         top_h_layout.addWidget(self.close_button)
 
@@ -274,12 +202,6 @@ class MainWindow(QMainWindow):
         self.tab_widget.tabBar().hide()
         self.tab_widget.setTabsClosable(True) # Allow closing tabs
         self.tab_widget.setMovable(False) # Allow reordering tabs
-        self.tab_widget.setStyleSheet("""
-            QTabWidget {
-                background-color: #ffffff;
-                border: 0px;
-            }
-        """)
         self.tab_widget_content = []
         self.tab_widget.tabCloseRequested.connect(self.handle_close_tab)
         main_v_layout.addWidget(self.tab_widget)
@@ -291,11 +213,66 @@ class MainWindow(QMainWindow):
         if self.tab_bar.count() > 0:
             self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
 
+    def paintEvent(self, event):
+        if self.theme.is_light():
+            self.minimize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_minimize_light.svg").toImage())))
+            self.close_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_close_light.svg").toImage())))
+            if self.isMaximized():
+                self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore_light.svg").toImage())))
+            else:
+                self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize_light.svg").toImage())))
+            # Updating control buttons
+            if self.input_dock_active:
+                self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
+            else:
+                self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
+            
+            if self.output_dock_active:
+                self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
+            else:
+                self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
+            
+            if self.log_dock_active:
+                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
+            else:
+                self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
+
+        else:
+            self.minimize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_minimize_dark.svg").toImage())))
+            self.close_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_close_dark.svg").toImage())))
+            if self.isMaximized():
+                self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore_dark.svg").toImage())))
+            else:
+                self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize_dark.svg").toImage())))
+            # Updating control buttons
+            if self.input_dock_active:
+                self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
+            else:
+                self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
+            
+            if self.output_dock_active:
+                self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
+            else:
+                self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
+            
+            if self.log_dock_active:
+                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
+            else:
+                self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
+
+        super().paintEvent(event)
+
     def set_maximize_icon(self):
-        self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize.svg").toImage())))
+        if self.theme.is_light():
+            self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize_light.svg").toImage())))
+        else:
+            self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize_dark.svg").toImage())))
 
     def set_restore_icon(self):
-        self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore.svg").toImage())))
+        if self.theme.is_light():
+            self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore_light.svg").toImage())))
+        else:
+            self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore_dark.svg").toImage())))
 
     def toggle_maximize_restore(self):
         """Toggles between maximized and normal window states and updates the icon."""
@@ -648,7 +625,7 @@ class MainWindow(QMainWindow):
         self.tab_widget_content[index][1] = True
         current_tab_data = self.tab_widget_content[index]
         self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-           
+    
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()
@@ -848,9 +825,15 @@ class MainWindow(QMainWindow):
                 # Update and save control state
                 self.tab_widget_content[index][2] = input_is_active
                 if self.input_dock_active:
-                    self.input_dock_control.load(":/vectors/input_dock_active.svg")
+                    if self.theme.is_light():
+                        self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
+                    else:
+                        self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
                 else:
-                    self.input_dock_control.load(":/vectors/input_dock_inactive.svg")
+                    if self.theme.is_light():
+                        self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
+                    else:
+                        self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
                             
             # Update output dock icon
             if(output_is_active is not None):
@@ -858,9 +841,15 @@ class MainWindow(QMainWindow):
                 # Update and save control state
                 self.tab_widget_content[index][4] = output_is_active
                 if self.output_dock_active:
-                    self.output_dock_control.load(":/vectors/output_dock_active.svg")
+                    if self.theme.is_light():
+                        self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
+                    else:
+                        self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
                 else:
-                    self.output_dock_control.load(":/vectors/output_dock_inactive.svg")
+                    if self.theme.is_light():
+                        self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
+                    else:
+                        self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
 
             # Update log dock icon
             if(log_is_active is not None):
@@ -868,9 +857,15 @@ class MainWindow(QMainWindow):
                 # Update and save control state
                 self.tab_widget_content[index][3] = log_is_active
                 if self.log_dock_active:
-                    self.log_dock_control.load(":/vectors/logs_dock_active.svg")
+                    if self.theme.is_light():
+                        self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
+                    else:
+                        self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
                 else:
-                    self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")
+                    if self.theme.is_light():
+                        self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
+                    else:
+                        self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
         else:
             self.input_dock_control.hide()
             self.output_dock_control.hide()
@@ -888,9 +883,15 @@ class MainWindow(QMainWindow):
         self.log_dock_active = not self.log_dock_active
         self.tab_widget_content[self.tab_bar.currentIndex()][3] = self.log_dock_active
         if self.log_dock_active:
-            self.log_dock_control.load(":/vectors/logs_dock_active.svg")
+            if self.theme.is_light():
+                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
+            else:
+                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
         else:
-            self.log_dock_control.load(":/vectors/logs_dock_inactive.svg")    
+            if self.theme.is_light():
+                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
+            else:
+                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")    
 
         if self.main_widget_instance:
             self.main_widget_instance.logs_dock_toggle(self.log_dock_active)

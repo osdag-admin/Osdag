@@ -36,6 +36,8 @@ class CustomWindow(QWidget):
         self.parent = parent
         self.backend = backend()
 
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         # Update recent Modules
         insert_recent_module(self.backend.module_name())
         # State to retain state saved or not
@@ -55,57 +57,7 @@ class CustomWindow(QWidget):
         self.backend.design_status = False
         self.backend.design_button_status = False
         self.fuse_model = None
-
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #ffffff;
-                margin: 0px;
-                padding: 0px;
-            }
-            QMenuBar {
-                background-color: #F4F4F4;
-                color: #000000;
-                padding: 0px;
-            }
-            QMenuBar::item {
-                padding: 5px 10px;
-                background: transparent;
-                border-radius: 0px;
-            }
-            QMenuBar::item:selected {
-                background: #FFFFFF;
-            }
-            QMenuBar::item:pressed {
-                background: #E8E8E8;
-            }
-            QMenu {
-                background-color: #FFFFFF;
-                border: 1px solid #D0D0D0;
-                border-radius: 4px;
-                padding: 0px;
-            }
-            QMenu::item {
-                padding: 5px;
-                color: #000000;
-                font-size: 11px;
-            }
-            QMenu::item:selected {
-                background-color: #E6F0FF;
-                border-radius: 3px;
-            }
-            QMenu::separator {
-                height: 1px;
-                background: #F0F0F0;
-                margin-left: 2px;
-                margin-right: 2px;
-                margin-top: 0px;
-                margin-bottom: 0px;
-            }
-            QMenu::right-arrow {
-                width: 8px;
-                height: 8px;
-            }
-        """)
+        self.setObjectName("template_page")
 
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
@@ -162,7 +114,6 @@ class CustomWindow(QWidget):
         self.cad_widget._key_map.update(key_function)
 
         # background gradient
-        display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
         display.display_triedron()
         display.View.SetProj(1, 1, 1)
 
@@ -177,6 +128,12 @@ class CustomWindow(QWidget):
 
         return display, start_display
     
+    def paintEvent(self, event):
+        if self.theme.is_light():
+            self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
+        else:
+            self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
+        return super().paintEvent(event)
     # Create the view control button on cad widget
     def create_cad_view_controls(self):
         """Create view control buttons directly on the self.cad_widget"""
@@ -205,26 +162,7 @@ class CustomWindow(QWidget):
             btn.setFixedSize(32, 32)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.clicked.connect(callback)
-            
-            # Style each button individually
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: white;
-                    border: 1px solid black;
-                    color: black;
-                    font-weight: bold;
-                }
-                QPushButton:hover {
-                    background-color: #90AF13;
-                    border: 1px solid #90AF13;
-                    color: white;
-                }
-                QPushButton:pressed {
-                    background-color: white;
-                    border: 1px solid #90AF13;
-                    color: black;
-                }
-            """)
+            btn.setObjectName("cad_view_buttons")
             
             self.view_buttons.append(btn)
             btn.show()
@@ -417,6 +355,7 @@ class CustomWindow(QWidget):
         main_v_layout.setSpacing(0)
 
         self.menu_bar = QMenuBar(self)
+        self.menu_bar.setObjectName("template_page_menu_bar")
         self.menu_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.menu_bar.setFixedHeight(28)
         self.menu_bar.setContentsMargins(0, 0, 0, 0)
@@ -429,6 +368,7 @@ class CustomWindow(QWidget):
         self.layout.setSpacing(0)
 
         self.splitter = QSplitter(Qt.Horizontal, self.body_widget)
+        self.splitter.setHandleWidth(2)
         self.input_dock = InputDock(backend=self.backend, parent=self)
         self.input_dock_active = True
         input_dock_width = self.input_dock.sizeHint().width()
@@ -455,6 +395,7 @@ class CustomWindow(QWidget):
         central_V_layout.addWidget(self.cad_comp_widget)
 
         self.cad_log_splitter = QSplitter(Qt.Vertical)
+        self.cad_log_splitter.setHandleWidth(2)
         # Add Cad Model Widget
         self.create_cad_view_controls()
         self.cad_log_splitter.addWidget(self.cad_widget)
@@ -486,7 +427,7 @@ class CustomWindow(QWidget):
         self.output_dock = OutputDock(backend=self.backend, parent=self)
         self.output_dock_active = True
         self.splitter.addWidget(self.output_dock)
-        self.output_dock.setStyleSheet(self.output_dock.styleSheet())
+        # self.output_dock.setStyleSheet(self.output_dock.styleSheet())
         self.output_dock.hide()
 
         self.layout.addWidget(self.splitter)
@@ -611,7 +552,7 @@ class CustomWindow(QWidget):
         quit_action = QAction("Quit", self)
         quit_action.setShortcut(QKeySequence("Shift+Q"))
         print("Quit..")
-        quit_action.triggered.connect(self.parent.close_current_tab)
+        # quit_action.triggered.connect(self.parent.close_current_tab)
         file_menu.addAction(quit_action)
 
         # Edit Menus
@@ -750,7 +691,10 @@ class CustomWindow(QWidget):
     
     def cadComponentControl(self, action, f, object_name):
         # calling backend function
-        f(self, "gradient_bg")
+        background = "gradient_light"
+        if not self.theme.is_light():
+            background = "gradient_dark"
+        f(self, background)
         # find the check box and make it checked
         checkBox = self.cad_comp_widget.findChild(QCheckBox, object_name)
         checkBox.setChecked(True)
@@ -861,7 +805,6 @@ class CustomWindow(QWidget):
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
                     for n in new:
-
                         if n[0] == key_str and n[0] == KEY_SECSIZE:
                             if set(uiObj[key_str]) != set(n[1]([input_widget.findChild(QWidget,
                                                           KEY_SEC_PROFILE).currentText()])):
@@ -874,6 +817,7 @@ class CustomWindow(QWidget):
                             if set(uiObj[key_str]) != set(n[1]()):
                                 key.setCurrentIndex(1)
                             else:
+                                print(key,type(key))
                                 key.setCurrentIndex(1)
                             data[key_str + "_customized"] = uiObj[key_str]
             else:
@@ -1289,7 +1233,6 @@ class CustomWindow(QWidget):
                         txt_label.setVisible(bool(option[3] != ""))
 
                 elif option[2] == TYPE_OUT_BUTTON:
-                    print(f"$~$ Enabled button {option[0]}")
                     self.output_dock.output_widget.findChild(QWidget, option[0]).setEnabled(True)
 
             # Ensure Output dock is visible and sized when we have results
@@ -1748,19 +1691,19 @@ class InputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
-        self.setStyleSheet("background-color: white;")
+        self.setObjectName("input_dock_indicator")
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
 
         input_layout = QHBoxLayout(self)
         input_layout.setContentsMargins(6,0,0,0)
         input_layout.setSpacing(0)
 
-        input_label = QSvgWidget(":/vectors/inputs_label.svg")
-        input_layout.addWidget(input_label)
-        input_label.setFixedWidth(32)
+        self.input_label = QSvgWidget()
+        input_layout.addWidget(self.input_label)
+        self.input_label.setFixedWidth(32)
 
         self.toggle_strip = QWidget()
-        self.toggle_strip.setStyleSheet("background-color: #94b816;")
+        self.toggle_strip.setObjectName("toggle_strip")
         self.toggle_strip.setFixedWidth(6)  # Always visible
         toggle_layout = QVBoxLayout(self.toggle_strip)
         toggle_layout.setContentsMargins(0, 0, 0, 0)
@@ -1772,28 +1715,24 @@ class InputDockIndicator(QWidget):
         self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.toggle_btn.clicked.connect(self.parent.input_dock_toggle)
         self.toggle_btn.setToolTip("Show input panel")
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6c8408;
-                color: white;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #5e7407;
-            }
-        """)
+        self.toggle_btn.setObjectName("toggle_strip_button")
         toggle_layout.addStretch()
         toggle_layout.addWidget(self.toggle_btn)
         toggle_layout.addStretch()
         input_layout.addWidget(self.toggle_strip)
+    
+    def paintEvent(self, event):
+        if self.parent.theme.is_light():
+            self.input_label.load(":/vectors/inputs_label_light.svg")
+        else:
+            self.input_label.load(":/vectors/inputs_label_dark.svg")
+        return super().paintEvent(event)
 
 class OutputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
-        self.setStyleSheet("background-color: white;")
+        self.setObjectName("output_dock_indicator")
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
 
         output_layout = QHBoxLayout(self)
@@ -1801,8 +1740,8 @@ class OutputDockIndicator(QWidget):
         output_layout.setSpacing(0)
 
         self.toggle_strip = QWidget()
-        self.toggle_strip.setStyleSheet("background-color: #94b816;")
         self.toggle_strip.setFixedWidth(6)  # Always visible
+        self.toggle_strip.setObjectName("toggle_strip")
         toggle_layout = QVBoxLayout(self.toggle_strip)
         toggle_layout.setContentsMargins(0, 0, 0, 0)
         toggle_layout.setSpacing(0)
@@ -1813,26 +1752,22 @@ class OutputDockIndicator(QWidget):
         self.toggle_btn.setFixedSize(6, 60)
         self.toggle_btn.clicked.connect(self.parent.output_dock_toggle)
         self.toggle_btn.setToolTip("Show panel")
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6c8408;
-                color: white;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #5e7407;
-            }
-        """)
+        self.toggle_btn.setObjectName("toggle_strip_button")
         toggle_layout.addStretch()
         toggle_layout.addWidget(self.toggle_btn)
         toggle_layout.addStretch()
         output_layout.addWidget(self.toggle_strip)
 
-        output_label = QSvgWidget(":/vectors/outputs_label.svg")
-        output_layout.addWidget(output_label)
-        output_label.setFixedWidth(28)
+        self.output_label = QSvgWidget()
+        output_layout.addWidget(self.output_label)
+        self.output_label.setFixedWidth(28)
+
+    def paintEvent(self, event):
+        if self.parent.theme.is_light():
+            self.output_label.load(":/vectors/outputs_label_light.svg")
+        else:
+            self.output_label.load(":/vectors/outputs_label_dark.svg")
+        return super().paintEvent(event)
 
 class CadComponentCheckbox(QWidget):
     def __init__(self, backend:object, parent):
@@ -1840,62 +1775,7 @@ class CadComponentCheckbox(QWidget):
         self.parent = parent
         # Fetch checkbox data
         data = backend.get_3d_components()
-        self.setStyleSheet('''
-            QWidget {
-                padding: 5px;               
-            }
-            QCheckBox {
-                color: #000000;
-                margin: 5px;
-                border-style: solid;
-                border-width: 1px;
-                border-color: transparent;
-            }
-            QCheckBox:disabled {
-                color: #808086;
-                margin: 5px;
-                border-style: solid;
-                border-width: 1px;
-                border-color: transparent;
-            }
-            QCheckBox:hover {
-                border-radius: 4px;
-                border-style: solid;
-                border-width: 1px;
-                border-color: transparent;
-            }
-
-            QCheckBox::indicator {
-                width: 12px;
-                height: 12px;
-            }
-
-            QCheckBox::indicator:checked {
-                border-style: solid;
-                border-width: 1px;
-                border-color: qlineargradient(
-                    spread:pad, x1:0.5, y1:1, x2:0.5, y2:0,
-                    stop:0 rgba(120, 120, 120, 255),
-                    stop:1 rgba(180, 180, 180, 255)
-                );
-                background-color: qlineargradient(
-                    spread:pad, x1:0.5, y1:1, x2:0.5, y2:0,
-                    stop:0 rgba(120, 120, 120, 255),
-                    stop:1 rgba(200, 200, 200, 255)
-                );
-            }
-
-            QCheckBox::indicator:unchecked {
-                border-style: solid;
-                border-width: 1px;
-                border-color: qlineargradient(
-                    spread:pad, x1:0.5, y1:1, x2:0.5, y2:0,
-                    stop:0 rgba(160, 160, 160, 255),
-                    stop:1 rgba(200, 200, 200, 255)
-                );
-                background-color: #ffffff;
-            }
-        ''')
+        self.setObjectName("cad_custom_selector")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.checkbox_layout = QHBoxLayout(self)
@@ -1913,8 +1793,10 @@ class CadComponentCheckbox(QWidget):
         self.checkbox_layout.addStretch()
 
     def component_connect(self, backend, check_box, f):
-        check_box.clicked.connect(lambda: f(self.parent, "gradient_bg"))
-
+        background = "gradient_light"
+        if not self.parent.theme.is_light():
+            background = "gradient_dark"
+        check_box.clicked.connect(lambda: f(self.parent, background))
 
 # Standalone testing
 # python -m osdag_gui.ui.windows.template_page

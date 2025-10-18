@@ -17,26 +17,4 @@ class AdditionalInputsButton(QPushButton):
         # Styling
         self.setCursor(Qt.PointingHandCursor)
         self.setFixedHeight(30)
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: white;
-                color: black;
-                font-weight: bold; 
-                border-radius: 5px;
-                border: 1px solid black;
-                padding: 5px 14px;
-                text-align: center;
-                font-family: "Calibri";
-            }
-            QPushButton:hover {
-                background-color: #90AF13;
-                border: 1px solid #90AF13;
-                color: white;
-            }
-            QPushButton:pressed {
-                color: black;
-                background-color: white;
-                border: 1px solid black;
-            }
-        """)
-
+        self.setObjectName("additional_input_btn")

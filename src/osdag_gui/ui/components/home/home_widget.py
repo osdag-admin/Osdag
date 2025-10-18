@@ -51,42 +51,6 @@ class SearchBarWidget(QWidget):
         super().__init__(parent)
         self.is_focused = False
         self.setupUI()
-        self.setStyleSheet("""
-            #searchContainer {
-                    border: 2px solid #e1e5e9;
-                    border-radius: 24px;
-                    background: white;
-                    min-height: 48px;
-                    padding: 0px 8px;
-            }
-            #searchContainer[focused="true"] {
-                border-color: #C8D8A2;
-            }
-            #searchInput {
-                border: none;
-                background: transparent;
-                font-size: 16px;
-                color: #333;
-            }
-            #searchInput:focus {
-                outline: none;
-                border: none;
-            }
-            #shortcutKey, #lKey {
-                background: #f5f5f5;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                color: #666;
-                font-size: 11px;
-                font-weight: 600;
-                padding: 2px 4px;
-            }
-            #plusLabel {
-                color: #888;
-                font-size: 12px;
-                font-weight: 500;
-            }
-        """)
 
     def setupUI(self):
         layout = QHBoxLayout(self)
@@ -94,9 +58,6 @@ class SearchBarWidget(QWidget):
         layout.setSpacing(0)
 
         self.search_container = QWidget()
-        # self.search_container.setStyleSheet("""
-        #         QWidget { background: red; }
-        # """)
         self.search_container.setObjectName("searchContainer")
         container_layout = QHBoxLayout(self.search_container)
         container_layout.setContentsMargins(15, 0, 15, 0)
@@ -180,31 +141,8 @@ class ProjectItem(QFrame):
         self.original_height = 55  # Reduced from 60
         self.expanded_height = 95  # Reduced from 100
         self.is_expanded = False
-        self.setStyleSheet("""
-            #projectItem{
-                background: #f8f9fa;
-                border: 1px solid #e2e8f0;
-                margin: 2px 4px 6px 4px;
-                border-radius: 10px;
-            }
-            #projectItem:hover{
-                background: #D5E49B;
-                border-color: #9BC53D;
-            }
-            #projectItem[selected="true"] {
-                background: #D5E49B;
-                border-color: #9BC53D;
-            }
-            #projectName{
-                color: #1a202c;
-                font-size: 13px;
-            }
-            #submoduleName, #dateLabel{
-                color: #718096;
-                font-size: 11px;
-            }
-        """)
         self.setupUI()
+
     def mousePressEvent(self, event):
         self.set_selected(True)
         # Optionally notify parent to deselect others
@@ -241,17 +179,10 @@ class ProjectItem(QFrame):
         
         # Number label
         number_label = QLabel("L")
+        number_label.setObjectName("record_icon_label")
         number_label.setFixedSize(20, 20)
         number_label.setAlignment(Qt.AlignCenter)
-        number_label.setStyleSheet("""
-            QLabel {
-                font-weight: bold;
-                color: #1a202c;
-                font-size: 16px;
-            }
-        """)
         info_layout.addWidget(number_label)
-
 
         # Project details
         details_layout = QVBoxLayout()
@@ -267,17 +198,6 @@ class ProjectItem(QFrame):
         project_name_label.setObjectName("projectName")
         if len(project_name) > 30:
             project_name_label.setToolTip(project_name)
-        project_name_label.setStyleSheet("""
-            QToolTip {
-                background-color: #FFFFFF;
-                color: #000000;
-                border: 1px solid #90AF13;
-                padding: 2px 2px;
-                font-size: 10px;
-                border-radius: 0px;
-                qproperty-alignment: AlignVCenter;
-            }
-        """)
         project_name_label.setWordWrap(True)
         project_name_label.setContentsMargins(2, 2, 2, 2)
         project_name_label.setMinimumHeight(18) 
@@ -309,10 +229,8 @@ class ProjectItem(QFrame):
         
         layout.addLayout(info_layout)
         
-        # FIXED Action buttons - GUARANTEED full visibility
         self.actions_frame = QFrame()
         self.actions_frame.setObjectName("actionsFrame")
-        self.actions_frame.setStyleSheet("background: transparent;")
         actions_layout = QHBoxLayout(self.actions_frame)
         actions_layout.setContentsMargins(20, 5, 10, 5)  # Better margins
         actions_layout.setSpacing(5)  # Reduced spacing
@@ -331,29 +249,11 @@ class ProjectItem(QFrame):
         for btn in [self.generate_btn, self.download_btn, self.open_btn]:
             btn.setFixedHeight(25)  # Slightly smaller
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #ffffff ;
-                    border-radius: 12px;
-                    color: #2d3748 ;
-                    border: 1px solid #cccccc ;
-                    padding: 4px 5px ;
-                    font-size: 10px ;
-                    font-weight: 600 ;
-                }
-                QPushButton:hover {
-                    background-color: #f0f4e3 ;
-                    border-color: #9BC53D ;
-                }
-                QPushButton:pressed {
-                    background-color: #d6e6be ;
-                }
-            """)
+            btn.setObjectName("recent_proj_btn")
         
         actions_layout.addWidget(self.generate_btn)
         actions_layout.addWidget(self.download_btn)
         actions_layout.addWidget(self.open_btn)
-        actions_layout.addStretch()
         
         self.actions_frame.setVisible(False)
         layout.addWidget(self.actions_frame)
@@ -402,31 +302,12 @@ class ProjectItem(QFrame):
 
 class ModuleItem(QFrame):
     openModule = Signal(str) # Module Key
-    def __init__(self, module_data, is_dark_mode):
+    def __init__(self, module_data):
         super().__init__()
         self.module_data = module_data
-        self.is_dark_mode = is_dark_mode
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setStyleSheet("""
-            #moduleItem {
-                background: #f8f9fa;
-                border: 1px solid #e2e8f0;
-                margin: 2px 4px 6px 4px;
-                border-radius: 10px;
-            }
-            #moduleItem:hover {
-                background: #D5E49B;
-                border-color: #9BC53D;
-            }
-            #moduleName {
-                color: #1a202c;
-                font-size: 13px;
-            }
-            #subModuleLabel, #dateLabel {
-                color: #718096;
-                font-size: 11px;
-            }
-        """)
         self.setupUI()
         self.selected = False
     def mousePressEvent(self, event):
@@ -452,20 +333,12 @@ class ModuleItem(QFrame):
         layout.setSpacing(8)
         
         # Icon with proper SVG handling
-        icon_label = QLabel()
-        icon_label.setFixedSize(20, 20)
-        icon_label.setAlignment(Qt.AlignCenter)
-        icon_label.setObjectName("moduleIcon")
+        self.icon_label = QLabel()
+        self.icon_label.setFixedSize(20, 20)
+        self.icon_label.setAlignment(Qt.AlignCenter)
+        self.icon_label.setObjectName("moduleIcon")
         
-        # Use the correct icon path based on theme
-        if self.is_dark_mode:
-            icon_path = ":/vectors/recently_used_module_icon_dark.svg"
-        else:
-            icon_path = ":/vectors/recently_used_module_icon.svg"
-        # Create icon using the svg to icon function
-        icon = QIcon(icon_path).pixmap(QSize(16, 16))
-        icon_label.setPixmap(icon)
-        layout.addWidget(icon_label)
+        layout.addWidget(self.icon_label)
 
         # Module details
         details_layout = QVBoxLayout()
@@ -492,6 +365,13 @@ class ModuleItem(QFrame):
         details_layout.addLayout(sub_detail_layout)
         layout.addLayout(details_layout)
     
+    def paintEvent(self, event):
+        if self.theme.is_light():
+            self.icon_label.setPixmap(QIcon(":/vectors/recently_used_module_icon_light.svg").pixmap(QSize(16, 16)))   
+        else:
+            self.icon_label.setPixmap(QIcon(":/vectors/recently_used_module_icon_dark.svg").pixmap(QSize(16, 16)))   
+        super().paintEvent(event)
+
     # Mouse Press Event
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -506,70 +386,13 @@ class SectionWidget(QFrame):
 
     def __init__(self, title, items, is_project=True, main_window=None):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.main_window = main_window
         self.items = items
         self.is_project = is_project
         self.title = title
         self.setObjectName("sectionFrame")
-        self.setStyleSheet("""
-            #sectionFrame {
-                background: #ffffff;
-                border: 2px solid #e1e5e9;
-                border-radius: 18px;
-            }
-            #sectionHeading {
-                font-family: "Calibri", sans-serif;
-                font-size: 18px;
-                font-weight: bold;
-                color: #000000;
-                background: transparent;
-                padding: 8px;
-            }
-            #scrollContainer {
-                background: #ffffff;
-            }
-            
-            QScrollArea {
-                border: none;
-                padding: 10px;
-            }
-
-            /* Scrollbar itself */
-            QScrollBar:vertical {
-                border: none;
-                background: #f0f0f0;
-                width: 8px;
-                margin: 0px 0px 0px 0px;
-            }
-
-            /* Handle */
-            QScrollBar::handle:vertical {
-                background: #c0c0c0;
-                border-radius: 4px;
-                min-height: 20px;
-            }
-
-            /* Handle on hover */
-            QScrollBar::handle:vertical:hover {
-                background: #a0a0a0;
-            }
-
-            /* Handle when pressed */
-            QScrollBar::handle:vertical:pressed {
-                background: #808080; /* Even darker grey when pressed */
-            }
-
-            /* Remove add/sub line buttons (arrows) */
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                border: none;
-                background: none;
-            }
-
-            /* Styling the page area (the track around the handle) */
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none; /* Make the page area transparent, letting the QScrollBar background show through */
-            }
-        """)
         self.setFixedSize(350, 320)
         self.setupUI()
 
@@ -589,17 +412,21 @@ class SectionWidget(QFrame):
         heading.setObjectName("sectionHeading")
         heading.setFixedHeight(48)
         layout.addWidget(heading)
-
+   
         # Scroll area
         scroll = QScrollArea()
+        scroll.setObjectName("recents_scroll_area")
         scroll.setWidgetResizable(True)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll.setObjectName("scrollArea")
         scroll.setFixedHeight(275)
         
         container = QWidget()
-        container.setObjectName("scrollContainer")
+        if len(self.items) == 0:
+            
+            container.setObjectName("scrollContainer_empty")
+        else:
+            container.setObjectName("scrollContainer")
         vbox = QVBoxLayout(container)
         vbox.setContentsMargins(8, 5, 8, 5)
         vbox.setSpacing(2)
@@ -612,30 +439,21 @@ class SectionWidget(QFrame):
                 item_widget.downloadOsi.connect(self.downloadOsi)
                 item_widget.generateReport.connect(self.generateReport)
             else:
-                is_dark = self.main_window.is_dark_mode if self.main_window else False
-                item_widget = ModuleItem(item, is_dark)
+                item_widget = ModuleItem(item)
                 item_widget.openModule.connect(self.openModule)
             vbox.addWidget(item_widget)
         
         if len(self.items) == 0:
             vbox.addStretch()
-            container.setStyleSheet("""
-                QWidget#scrollContainer {
-                    background: #f8f9fa;
-                    border: 1px solid #e2e8f0;
-                    margin: 2px 4px 6px 4px;
-                    border-radius: 10px;
-                }
-            """)
             path = ''
             if self.is_project:
                 path = ":/vectors/no_projects_light.svg"
             else:
                 path = ":/vectors/no_modules_light.svg"
-            empty_label = QSvgWidget(path)
+            self.empty_label = QSvgWidget(path)
             hlayout = QHBoxLayout()
             hlayout.addStretch()
-            hlayout.addWidget(empty_label)
+            hlayout.addWidget(self.empty_label)
             hlayout.addStretch()
             vbox.addLayout(hlayout)
         
@@ -643,25 +461,20 @@ class SectionWidget(QFrame):
 
         scroll.setWidget(container)
         layout.addWidget(scroll)
-
-    def update_theme(self, is_dark_mode):
-        if not self.is_project:
-            # Recreate module items with new theme
-            scroll_area = self.findChild(QScrollArea)
-            if scroll_area:
-                container = scroll_area.widget()
-                if container:
-                    layout = container.layout()
-                    # Clear existing items
-                    while layout.count() > 1:
-                        child = layout.takeAt(0)
-                        if child.widget():
-                            child.widget().deleteLater()
-                    
-                    # Recreate items with new theme
-                    for i, item in enumerate(self.items, 1):
-                        item_widget = ModuleItem(item, is_dark_mode)
-                        layout.insertWidget(i-1, item_widget)
+    
+    def paintEvent(self, event):
+        if len(self.items) == 0:
+            if self.theme.is_light():
+                if self.is_project:
+                    self.empty_label.load(":/vectors/no_projects_light.svg")
+                else:
+                    self.empty_label.load(":/vectors/no_modules_light.svg")
+            else:
+                if self.is_project:
+                    self.empty_label.load(":/vectors/no_projects_dark.svg")
+                else:
+                    self.empty_label.load(":/vectors/no_modules_dark.svg")
+        super().paintEvent(event)
 
 class EllipsisLabel(QLabel):
     def __init__(self, text="", parent=None):
@@ -688,8 +501,8 @@ class HomeWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.selected_item = None
-        self.is_dark_mode = False
         self.search_overlay = None
+        
         self.setupUI()
         self.setupShortcuts()
         self.installEventFilter(self)

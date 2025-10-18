@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
                              QGraphicsScene, QScrollArea)
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QPainter, QPen, QFont
+from PySide6.QtGui import QPainter, QPen, QFont, QColor
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
@@ -12,6 +12,8 @@ from osdag_core.Common import *
 class FinPlateCapacityDetails(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.connection = connection_obj
         self.main=main
         self.plate_height = main.plate.height
@@ -68,32 +70,7 @@ class FinPlateCapacityDetails(QDialog):
 
     def setupWrapper(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
-        self.setStyleSheet("""
-            QDialog{ 
-                background-color: white;
-                border: 1px solid #90af13;
-            }
-            QPushButton {
-                background-color: white;
-                color: black;
-                font-weight: bold; 
-                border-radius: 5px;
-                border: 1px solid black;
-                padding: 5px 14px;
-                text-align: center;
-                font-family: "Calibri";
-            }
-            QPushButton:hover {
-                background-color: #90AF13;
-                border: 1px solid #90AF13;
-                color: white;
-            }
-            QPushButton:pressed {
-                color: black;
-                background-color: white;
-                border: 1px solid black;
-            }
-        """) 
+        self.setObjectName("spacing_capacity_details")
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(1, 1, 1, 1)
         main_layout.setSpacing(0)
@@ -132,6 +109,7 @@ class FinPlateCapacityDetails(QDialog):
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         
         scroll = QWidget()
+        scroll.setObjectName("spacing_scroll_widget")
 
         # Main layout
         main_layout = QHBoxLayout(scroll)
@@ -216,6 +194,10 @@ class FinPlateCapacityDetails(QDialog):
         # First drawing
         self.scene1 = QGraphicsScene()
         self.view1 = QGraphicsView(self.scene1)
+        if self.theme.is_light():
+            self.view1.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view1.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
         self.view1.setRenderHint(QPainter.Antialiasing)
         self.view1.setMinimumWidth(500)
         self.view1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Disable individual scroll bars
@@ -231,6 +213,10 @@ class FinPlateCapacityDetails(QDialog):
         # Second drawing (identical to first)
         self.scene2 = QGraphicsScene()
         self.view2 = QGraphicsView(self.scene2)
+        if self.theme.is_light():
+            self.view2.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view2.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
         self.view2.setRenderHint(QPainter.Antialiasing)
         self.view2.setMinimumWidth(500)
         self.view2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Disable individual scroll bars
@@ -288,11 +274,17 @@ class FinPlateCapacityDetails(QDialog):
         weld_size = self.weldsize / coeff
 
         outline_pen = QPen(Qt.blue, 2/coeff)
-        dimension_pen = QPen(Qt.black, 1.5/coeff)
+        if self.theme.is_light():
+            dimension_pen = QPen(Qt.black, 1.5/coeff)
+        else:
+            dimension_pen = QPen(QColor("#8A8A8A"), 1.5/coeff)
         red_brush = QBrush(Qt.red)
         
         # Create dashed pen for failure patterns
-        dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
+        if self.theme.is_light():
+            dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
+        else:
+            dashed_pen = QPen(QColor("#8A8A8A"), 1.5/coeff, Qt.DashLine)
         
         h_offset = 40 / coeff
         v_offset = 60 / coeff
@@ -336,11 +328,18 @@ class FinPlateCapacityDetails(QDialog):
         weld_size = self.weldsize / coeff
 
         outline_pen = QPen(Qt.blue, 2/coeff)
-        dimension_pen = QPen(Qt.black, 1.5/coeff)
+        
+        if self.theme.is_light():
+            dimension_pen = QPen(Qt.black, 1.5/coeff)
+        else:
+            dimension_pen = QPen(QColor("#8A8A8A"), 1.5/coeff)
         red_brush = QBrush(Qt.red)
 
         # Create dashed pen for failure patterns
-        dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
+        if self.theme.is_light():
+            dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
+        else:
+            dashed_pen = QPen(QColor("#8A8A8A"), 1.5/coeff, Qt.DashLine)
 
         if self.cols==1:
             x_line_dist=width-end
@@ -405,7 +404,10 @@ class FinPlateCapacityDetails(QDialog):
             (x1 + arrow_size, y1 + arrow_size/2)
         ]
         polygon_left = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
         
         points_right = [
             (x2, y2),
@@ -413,12 +415,19 @@ class FinPlateCapacityDetails(QDialog):
             (x2 - arrow_size, y2 + arrow_size/2)
         ]
         polygon_right = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_right.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = scene.addText(text)
         font = QFont()
         font.setPointSize(2)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 12)
@@ -439,7 +448,10 @@ class FinPlateCapacityDetails(QDialog):
                 (x1 + arrow_size/2, y1 + arrow_size)
             ]
             polygon_top = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x2, y2),
@@ -447,7 +459,10 @@ class FinPlateCapacityDetails(QDialog):
                 (x2 + arrow_size/2, y2 - arrow_size)
             ]
             polygon_bottom = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         else:
             points_top = [
                 (x2, y2),
@@ -455,7 +470,10 @@ class FinPlateCapacityDetails(QDialog):
                 (x2 + arrow_size/2, y2 + arrow_size)
             ]
             polygon_top = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x1, y1),
@@ -463,12 +481,19 @@ class FinPlateCapacityDetails(QDialog):
                 (x1 + arrow_size/2, y1 - arrow_size)
             ]
             polygon_bottom = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = scene.addText(text)
         font = QFont()
         font.setPointSize(2)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

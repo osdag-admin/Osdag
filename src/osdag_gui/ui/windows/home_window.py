@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation, QEasingCurve, Property
-from PySide6.QtGui import QFont, QIcon, QPainter, QColor
+from PySide6.QtGui import QFont, QIcon, QPaintEvent, QPainter, QColor
 from PySide6.QtSvg import QSvgRenderer
 
 from osdag_gui.data.ui_data import Data
@@ -62,39 +62,32 @@ class InternetConnectionIndicator(TopButton):
 class ThemeToggleButton(QPushButton):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.is_dark_mode = True
+        self.theme = parent.theme_manager
         self.setFixedSize(50, 50)
         self.setObjectName("themeToggle")
-        self.setStyleSheet("""
-            #themeToggle {
-                background: transparent;
-                border: none;
-                border-radius: 20px;
-            }
-            #themeToggle:hover {
-                background-color: rgba(255, 255, 255, 100);
-            }
-        """)
         self.setCursor(Qt.PointingHandCursor)
-        self.clicked.connect(self.toggle_theme)
+        self.update_icon()
+        self.clicked.connect(self._toggle_theme)
+
+    def _toggle_theme(self):
+        self.theme.toggle_theme()
         self.update_icon()
 
     def update_icon(self):
-        icon_path = ":/vectors/night_button.svg" if not self.is_dark_mode else ":/vectors/day_button_dark.svg"
+        if self.theme.is_light():
+            icon_path = ":/vectors/day_button.svg"
+        else:
+            icon_path = ":/vectors/night_button.svg"
         self.setIcon(QIcon(icon_path))
         self.setIconSize(QSize(25, 25))
 
-    def toggle_theme(self):
-        self.is_dark_mode = not self.is_dark_mode
-        self.update_icon()
-        if self.parent() and hasattr(self.parent(), 'toggle_theme'):
-            self.parent().toggle_theme(self.is_dark_mode)
-
 class BackgroundSvgWidget(QWidget):
-    def __init__(self, svg_path, parent=None):
+    def __init__(self, svg_light, svg_dark, parent=None):
         super().__init__(parent)
-        self.svg_path = svg_path
-        self.svg_renderer = QSvgRenderer(self.svg_path)
+        self.theme = parent.theme_manager
+        self.light = svg_light
+        self.dark = svg_dark
+        self.setObjectName("svg_widget_background")
         self.setContentsMargins(0, 0, 0, 0) # Ensure no margins for drawing
 
     def paintEvent(self, event):
@@ -107,7 +100,11 @@ class BackgroundSvgWidget(QWidget):
         painter.setPen(pen)
         # Draw SVG background
         target_rect = self.rect()
-        self.svg_renderer.render(painter, target_rect)
+        if self.theme.is_light():
+            svg_renderer = QSvgRenderer(self.light)
+        else:
+            svg_renderer = QSvgRenderer(self.dark)
+        svg_renderer.render(painter, target_rect)
         painter.drawLine(0, 0, 0, self.height())
         painter.end()
         super().paintEvent(event)
@@ -117,7 +114,7 @@ class FadeWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._opacity = 1.0
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def getOpacity(self):
         return self._opacity
@@ -152,8 +149,11 @@ class HomeWindow(QWidget):
     downloadDatabase = Signal(str, str)
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("")
-
+ 
+        # Get theme manager from app instance
+        self.app = QApplication.instance()
+        self.theme_manager = self.app.theme_manager
+    
         dat = Data()
         self.menu_bar_data = dat.MODULES
         floating_navbar = dat.FLOATING_NAVBAR
@@ -182,12 +182,7 @@ class HomeWindow(QWidget):
 
         main_h_layout.addWidget(self.nav_bar, 2)
 
-        self.content = BackgroundSvgWidget(":/vectors/background_light.svg")
-        self.content.setStyleSheet("""
-            QWidget {
-                background: transparent;
-            }
-        """)
+        self.content = BackgroundSvgWidget(":/vectors/background_light.svg", ":/vectors/background_dark.svg", parent=self)
 
         content_v_layout = QVBoxLayout(self.content)
         content_v_layout.setContentsMargins(0, 0, 0, 0)
@@ -195,18 +190,14 @@ class HomeWindow(QWidget):
 
         # --- Top Horizontal Layout with SVG and Widget ---
         self.top_right_container = QWidget()
-        self.top_right_container.setStyleSheet("""
-            QWidget {
-                background: transparent;
-            }
-        """)
+        self.top_right_container.setObjectName("home_top_right_container")
+
         self.top_right_h_layout = QHBoxLayout(self.top_right_container)
         self.top_right_h_layout.setContentsMargins(10, 5, 10, 0)
         self.top_right_h_layout.setSpacing(10)
         self.top_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.top_svg_widget_1 = QSvgWidget()
-        self.top_svg_widget_1.load(":/vectors/Osdag_label.svg")
         self.top_svg_widget_1.setFixedSize(181, 80)
         # No explicit stylesheet for QSvgWidget here. It will rely on its parent's background.
         self.top_right_h_layout.addWidget(self.top_svg_widget_1)
@@ -215,7 +206,6 @@ class HomeWindow(QWidget):
         self.top_widget_2.setContentsMargins(0, 0, 15, 0)
         self.top_widget_2.setSpacing(2)
         self.button_group = QButtonGroup(self)
-        # self.button_group.setExclusive(True) # Removed as buttons are no longer checkable
         self.buttons = [] # Store references to the created buttons
 
         # Instantiate and add the Buttons
@@ -246,8 +236,7 @@ class HomeWindow(QWidget):
 
         # --- Theme Toggle Button ---
         self.theme_toggle = ThemeToggleButton(self)
-        # self.theme_toggle.clicked.connect(self.toggle_theme)
-        self.top_widget_2.addWidget(self.theme_toggle)   
+        self.top_widget_2.addWidget(self.theme_toggle)
 
         self.top_right_h_layout.addStretch(1)
         self.top_right_h_layout.addLayout(self.top_widget_2)
@@ -256,11 +245,10 @@ class HomeWindow(QWidget):
 
         # Single SVG Widget below the top horizontal layout (now a wrapper QWidget) ---
         self.middle_top_svg_layout_wrapper_widget = QWidget() # The wrapper widget
-        self.middle_top_svg_layout_wrapper_widget.setStyleSheet("background: transparent;") # Explicit solid background
+        self.middle_top_svg_layout_wrapper_widget.setObjectName("mid_top_svg_lay_wrapper")
         self.middle_top_svg_layout_wrapper = QHBoxLayout(self.middle_top_svg_layout_wrapper_widget) # Layout inside wrapper
 
         self.middle_top_svg_widget = QSvgWidget()
-        self.middle_top_svg_widget.load(":/vectors/Osdag_tagline.svg")
         self.middle_top_svg_widget.setFixedSize(420, 35)
         # No explicit stylesheet for QSvgWidget here. It will rely on its parent's background.
 
@@ -276,23 +264,23 @@ class HomeWindow(QWidget):
 
         # Primary Menu Container
         self.primary_menu_container = FadeWidget()
+        self.primary_menu_container.setObjectName("pr_menu_container")
         # Set margins on the FadeWidget itself, not just its internal layout
         self.primary_menu_container.setContentsMargins(10, 30, 10, 0) # These margins will be part of the painted area
         self.primary_menu_layout = QHBoxLayout(self.primary_menu_container)
         self.primary_menu_layout.setContentsMargins(0, 0, 0, 0) # Reset internal layout margins to 0
         self.primary_menu_layout.setSpacing(5)
-        self.primary_menu_container.setStyleSheet("background: transparent;") # Keep transparent to allow custom painting
         self.primary_menu_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.variable_layout.addWidget(self.primary_menu_container)
 
         # Secondary Menu Container
         self.secondary_menu_container = FadeWidget()
+        self.secondary_menu_container.setObjectName("sec_menu_container")
         # Set margins on the FadeWidget itself
         self.secondary_menu_container.setContentsMargins(10, 5, 10, 5) # These margins will be part of the painted area
         self.secondary_menu_layout = QHBoxLayout(self.secondary_menu_container)
         self.secondary_menu_layout.setContentsMargins(0, 0, 0, 0) # Reset internal layout margins to 0
         self.secondary_menu_layout.setSpacing(5)
-        self.secondary_menu_container.setStyleSheet("background: transparent;") # Keep transparent
         self.secondary_menu_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.secondary_menu_container.setMaximumHeight(0)
         self.secondary_menu_container.setOpacity(0.0)
@@ -302,11 +290,13 @@ class HomeWindow(QWidget):
 
         # --- QScrollArea for SVG Card Area ---
         self.scroll_area_for_svg_cards = QScrollArea()
+        self.scroll_area_for_svg_cards.setObjectName("svgCard_scroll_area")
         self.scroll_area_for_svg_cards.setWidgetResizable(True)
         self.scroll_area_for_svg_cards.setFrameShape(QFrame.NoFrame)
-        self.scroll_area_for_svg_cards.setStyleSheet("background: transparent;") # Explicit solid white background
 
         self.svg_card_area = QWidget()
+        self.svg_card_area.setObjectName("svg_card_area")
+
         self.svg_card_layout = QVBoxLayout(self.svg_card_area)
         self.svg_card_layout.setContentsMargins(10,10,10,10)
         self.svg_card_layout.setSpacing(10)
@@ -316,45 +306,19 @@ class HomeWindow(QWidget):
         self.variable_layout.addWidget(self.scroll_area_for_svg_cards, 1)
 
         content_v_layout.addWidget(self.variable_widget)
-
-        # # --- Bottom Horizontal Layout with three SVG Widgets ---
-        # self.bottom_right_container = QWidget()
-        # self.bottom_right_container.setStyleSheet("""
-        #     QWidget {
-        #         background: transparent; /* Explicit solid background */
-        #     }
-        # """)
-        # self.bottom_right_h_layout = QHBoxLayout(self.bottom_right_container)
-        # self.bottom_right_h_layout.setContentsMargins(10, 10, 5, 10)
-        # self.bottom_right_h_layout.setSpacing(10)
-        # self.bottom_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
-        # self.bottom_svg_widget_1 = QSvgWidget()
-        # self.bottom_svg_widget_1.load(":/vectors/FOSSEE_logo.svg")
-        # self.bottom_svg_widget_1.setFixedSize(163, 60)
-        # # No explicit stylesheet for QSvgWidget here.
-        # self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_1)
-
-        # self.bottom_svg_widget_2 = QSvgWidget()
-        # self.bottom_svg_widget_2.load(":/vectors/MOS_logo.svg")
-        # self.bottom_svg_widget_2.setFixedSize(122, 60)
-        # # No explicit stylesheet for QSvgWidget here.
-        # self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
-
-        # self.bottom_svg_widget_3 = QSvgWidget()
-        # self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_logo.svg")
-        # self.bottom_svg_widget_3.setFixedSize(263, 30)
-        # # No explicit stylesheet for QSvgWidget here.
-        # self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignBottom)
-        # self.bottom_right_h_layout.addStretch(1)
-
-        # content_v_layout.addWidget(self.bottom_right_container)
-
-        main_h_layout.addWidget(self.content, 8)
-                
+        main_h_layout.addWidget(self.content, 8)       
         main_v_layout.addLayout(main_h_layout)
 
         self.show_home()
+    
+    def paintEvent(self, event: QPaintEvent):
+        if self.theme_manager.is_light():
+            self.top_svg_widget_1.load(":/vectors/Osdag_label_light.svg")
+            self.middle_top_svg_widget.load(":/vectors/Osdag_tagline_light.svg")
+        else:
+            self.top_svg_widget_1.load(":/vectors/Osdag_label_dark.svg")
+            self.middle_top_svg_widget.load(":/vectors/Osdag_tagline_dark.svg")
+        return super().paintEvent(event)
 
     def _clear_layout(self, layout):
         """Recursively clears a layout and deletes its widgets."""
@@ -426,19 +390,9 @@ class HomeWindow(QWidget):
             self._clear_layout(self.svg_card_layout)
 
             label = QLabel(name)
+            label.setObjectName("module_section_label")
             label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
-            label.setStyleSheet("""
-                QLabel{
-                    color: #000000;
-                    font-size: 16px;
-                    font-family: 'Calibri';
-                    background-color: rgba(255, 255, 255, 150);
-                    padding: 2px 0px;
-                    border-top: 1px solid #90AF13;
-                    border-bottom: 1px solid #90AF13;
-                }
-            """)
-            # self.svg_card_layout.addStretch()
+
             self.svg_card_layout.addWidget(label)
             self.svg_card_layout.addStretch()
             self.svg_card_layout.addWidget(svg_card_widget)

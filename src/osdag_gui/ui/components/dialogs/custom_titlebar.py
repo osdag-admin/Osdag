@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QPoint, QEvent
 from PySide6.QtGui import QMouseEvent, QPixmap, QFont
 
 class CustomTitleBar(QWidget):
-    def __init__(self, max_res_btn: bool = False, parent=None):
+    def __init__(self, max_res_btn: bool = False, min_res_btn:bool = False, parent=None):
         super().__init__(parent)
         self._drag_pos = QPoint()
         self.setObjectName("CustomTitleBar")
@@ -28,13 +28,15 @@ class CustomTitleBar(QWidget):
         title_font.setWeight(QFont.Weight.Medium)
         self.title_label.setFont(title_font)
 
-        # Minimize button
-        self.btn_minimize = QToolButton(self)
-        self.btn_minimize.setObjectName("MinimizeButton")
-        self.btn_minimize.setToolTip("Minimize")
-        self.btn_minimize.setText("–")
-        self.btn_minimize.setFixedSize(46, 32)
-        self.btn_minimize.clicked.connect(self._minimize_parent)
+        # Minimize button (optional)
+        self.btn_minimize = None
+        if min_res_btn:
+            self.btn_minimize = QToolButton(self)
+            self.btn_minimize.setObjectName("MinimizeButton")
+            self.btn_minimize.setToolTip("Minimize")
+            self.btn_minimize.setText("–")
+            self.btn_minimize.setFixedSize(46, 32)
+            self.btn_minimize.clicked.connect(self._minimize_parent)
 
         # Maximize/Restore button (optional)
         self.btn_max_restore = None
@@ -65,7 +67,8 @@ class CustomTitleBar(QWidget):
         row_layout.setSpacing(8)
         row_layout.addWidget(self.logo_label, 0)
         row_layout.addWidget(self.title_label, 1)
-        row_layout.addWidget(self.btn_minimize, 0)
+        if self.btn_minimize is not None:
+            row_layout.addWidget(self.btn_minimize, 0)
         if self.btn_max_restore is not None:
             row_layout.addWidget(self.btn_max_restore, 0)
         row_layout.addWidget(self.btn_close, 0)
@@ -75,77 +78,6 @@ class CustomTitleBar(QWidget):
         self.bottom_line.setObjectName("BottomLine")
         self.bottom_line.setFixedHeight(1)
         outer_layout.addWidget(self.bottom_line)
-
-        # Improved stylesheet
-        self.setStyleSheet("""
-            QWidget#CustomTitleBar { 
-                background-color: #f4f4f4;
-            }
-            QWidget#BottomLine {
-                background-color: #90af13;
-            }
-            
-            QLabel#TitleLabel {
-                color: #000000;
-                padding: 0px;
-                background: transparent;
-            }
-            
-            QLabel#LogoLabel {
-                background: transparent;
-                color: #ffffff;
-                font-size: 14px;
-            }
-            
-            QToolButton#MinimizeButton {
-                background-color: transparent;
-                color: #000000;
-                border: none;
-                font-size: 16px;
-                border-radius: 0px;
-            }
-            
-            QToolButton#MinimizeButton:hover {
-                background-color: #f1f1f1;
-            }
-
-            QToolButton#MinimizeButton:pressed {
-                background-color: #a6a6a6;
-            }
-            
-            QToolButton#MaxRestoreButton {
-                background-color: transparent;
-                color: #000000;
-                border: none;
-                font-size: 16px;
-                border-radius: 0px;
-            }
-            
-            QToolButton#MaxRestoreButton:hover {
-                background-color: #f1f1f1;
-            }
-
-            QToolButton#MaxRestoreButton:pressed {
-                background-color: #a6a6a6;
-            }
-            
-            QToolButton#CloseButton {
-                background-color: transparent;
-                color: #000000;
-                border: none;
-                font-size: 16px;
-                border-radius: 0px;
-            }
-            
-            QToolButton#CloseButton:hover {
-                background-color: #e74c3c;
-                color: #ffffff;
-            }
-            
-            QToolButton#CloseButton:pressed {
-                background-color: #c0392b;
-            }
-        """)
 
         # Keep the maximize/restore button state in sync with the window state
         if self.btn_max_restore is not None and self.parent() is not None:

@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout,
                              QGraphicsScene)
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QPainter, QPen, QFont
+from PySide6.QtGui import QPainter, QPen, QFont, QColor
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
@@ -13,6 +13,9 @@ from osdag_core.Common import *
 class BoltPatternGenerator(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
+
         self.connection = connection_obj
         self.main=main
         self.plate_height = main.plate.height
@@ -32,32 +35,7 @@ class BoltPatternGenerator(QDialog):
 
     def setupWrapper(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
-        self.setStyleSheet("""
-            QDialog{ 
-                background-color: white;
-                border: 1px solid #90af13;
-            }
-            QPushButton {
-                background-color: white;
-                color: black;
-                font-weight: bold; 
-                border-radius: 5px;
-                border: 1px solid black;
-                padding: 5px 14px;
-                text-align: center;
-                font-family: "Calibri";
-            }
-            QPushButton:hover {
-                background-color: #90AF13;
-                border: 1px solid #90AF13;
-                color: white;
-            }
-            QPushButton:pressed {
-                color: black;
-                background-color: white;
-                border: 1px solid black;
-            }
-        """) 
+        self.setObjectName("spacing_capacity_details")
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(1, 1, 1, 1)
         main_layout.setSpacing(0)
@@ -111,7 +89,10 @@ class BoltPatternGenerator(QDialog):
         self.scene = QGraphicsScene()
         self.view = QGraphicsView(self.scene)
         self.view.setRenderHint(QPainter.Antialiasing)
-        
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
         # Create and add the drawing to the scene
         self.createDrawing(params)
         
@@ -172,8 +153,11 @@ class BoltPatternGenerator(QDialog):
         height = self.plate_height
         
         # Set up pens
+        if self.theme.is_light():
+            dimension_pen = QPen(Qt.black, 1.5)
+        else:
+            dimension_pen = QPen(QColor("#8A8A8A"), 1.5)
         outline_pen = QPen(Qt.blue, 2)
-        dimension_pen = QPen(Qt.black, 1.5)
         red_brush = QBrush(Qt.red)
 
         # Dimension offsets
@@ -273,7 +257,10 @@ class BoltPatternGenerator(QDialog):
             (x1 + arrow_size, y1 + arrow_size/2)
         ]
         polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
         
         points_right = [
             (x2, y2),
@@ -281,12 +268,19 @@ class BoltPatternGenerator(QDialog):
             (x2 - arrow_size, y2 + arrow_size/2)
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
@@ -307,7 +301,10 @@ class BoltPatternGenerator(QDialog):
                 (x1 + arrow_size/2, y1 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x2, y2),
@@ -315,7 +312,10 @@ class BoltPatternGenerator(QDialog):
                 (x2 + arrow_size/2, y2 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         else:
             points_top = [
                 (x2, y2),
@@ -323,7 +323,10 @@ class BoltPatternGenerator(QDialog):
                 (x2 + arrow_size/2, y2 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x1, y1),
@@ -331,13 +334,20 @@ class BoltPatternGenerator(QDialog):
                 (x1 + arrow_size/2, y1 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
-        
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
+
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
         else:

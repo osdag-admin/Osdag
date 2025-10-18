@@ -116,47 +116,6 @@ class SectionTreeWidget(QTreeWidget):
         """Initialize the tree widget with proper configuration."""
         super().__init__()
         self.setHeaderLabel("Report Sections")
-        # Add a border to the tree widget for better visual separation
-        self.setStyleSheet("""
-            QTreeWidget {
-                border: 1px solid #90AF13;
-                border-radius: 6px;
-                background-color: #ffffff;
-                show-decoration-selected: 1;
-            }
-
-            QTreeWidget::item {
-                padding: 4px 6px;
-                background-color: #f9f9f9;
-                border-bottom: 1px solid #e0e0e0;
-            }
-
-            QTreeWidget::item:selected {
-                background-color: #d9e9c7;
-                color: #000000;
-            }
-
-            QTreeWidget::item:hover {
-                background-color: #eef5e6;
-            }
-
-            QTreeWidget::indicator {
-                width: 14px;
-                height: 14px;
-            }
-
-            QTreeWidget::indicator:unchecked {
-                border: 1px solid #555555;
-                background: #ffffff;
-            }
-
-            QTreeWidget::indicator:checked {
-                border: 1px solid #555555;
-                background: #90AF13;
-                image: none;
-            }
-        """)
-
         # Connect item changes to our handler
         self.itemChanged.connect(self.on_item_changed)
 
@@ -305,6 +264,7 @@ class CustomizationWidget(QWidget):
         self.parent = parent
         self.latex_content = None
         self.latest_pdf = None
+        self.setObjectName("report_customization_widget")
         self.init_ui()
         
         self.parser = LaTeXParser()

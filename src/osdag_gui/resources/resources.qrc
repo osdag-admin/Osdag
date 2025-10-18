@@ -5,21 +5,25 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 <RCC>
     <qresource prefix="/">
 
-        <file>vectors/AnimateComponent_back.svg</file>
         <file>vectors/Osdag_logo.svg</file>
         <file>images/osdag_logo.png</file>
-        <file>vectors/Osdag.svg</file>
+        <file>vectors/Osdag_light.svg</file>
+        <file>vectors/Osdag_dark.svg</file>
         <file>vectors/FOSSEE_logo.svg</file>
-        <file>vectors/IITB_logo.svg</file>
+        <file>vectors/IITB_logo_light.svg</file>
+        <file>vectors/IITB_logo_dark.svg</file>
         <file>vectors/ConstructSteel_logo.svg</file>
         <file>vectors/MOS_logo.svg</file>
-        <file>vectors/Osdag_label.svg</file>
-        <file>vectors/Osdag_tagline.svg</file>
+        <file>vectors/Osdag_label_light.svg</file>
+        <file>vectors/Osdag_tagline_light.svg</file>
+        <file>vectors/Osdag_label_dark.svg</file>
+        <file>vectors/Osdag_tagline_dark.svg</file>
         <file>vectors/contour_lines.svg</file>
         <file>vectors/description_label.svg</file>
         <file>vectors/version.svg</file>
 
-        <file>vectors/recently_used_module_icon.svg</file>
+        <file>vectors/recently_used_module_icon_light.svg</file>
+        <file>vectors/recently_used_module_icon_dark.svg</file>
         <file>vectors/info_hover.svg</file>
         <file>vectors/info_default.svg</file>
         <file>vectors/load_hover.svg</file>
@@ -36,8 +40,7 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>vectors/search_icon.svg</file>
         <file>vectors/night_button.svg</file>
-        <file>vectors/day_button_dark.svg</file>
-        <file>vectors/background.svg</file>
+        <file>vectors/day_button.svg</file>
         <file>vectors/background_light.svg</file>
         <file>vectors/background_dark.svg</file>
         
@@ -63,6 +66,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>images/home.png</file>
         <file>images/home_clicked.png</file>
+        <file>vectors/home_default.svg</file>
+        <file>vectors/home_clicked.svg</file>
 
         <file>images/connection.png</file>
         <file>images/connection_clicked.png</file>
@@ -91,27 +96,47 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>images/group_design.png</file>
         <file>images/group_design_clicked.png</file>
 
-        <file>images/down_arrow.png</file>
+        <file>images/down_arrow_light.png</file>
+        <file>images/down_arrow_dark.png</file>
         <file>vectors/design_button.svg</file>
-        <file>vectors/input_dock_active.svg</file>
-        <file>vectors/input_dock_inactive.svg</file>
-        <file>vectors/output_dock_active.svg</file>
-        <file>vectors/output_dock_inactive.svg</file>
-        <file>vectors/logs_dock_active.svg</file>
-        <file>vectors/logs_dock_inactive.svg</file>
 
-        <file>vectors/window_close.svg</file>
+        <file>vectors/input_dock_active_light.svg</file>
+        <file>vectors/input_dock_active_dark.svg</file>
+
+        <file>vectors/input_dock_inactive_light.svg</file>
+        <file>vectors/input_dock_inactive_dark.svg</file>
+
+        <file>vectors/output_dock_active_light.svg</file>
+        <file>vectors/output_dock_active_dark.svg</file>
+
+        <file>vectors/output_dock_inactive_light.svg</file>
+        <file>vectors/output_dock_inactive_dark.svg</file>
+
+        <file>vectors/logs_dock_active_light.svg</file>
+        <file>vectors/logs_dock_active_dark.svg</file>
+
+        <file>vectors/logs_dock_inactive_light.svg</file>
+        <file>vectors/logs_dock_inactive_dark.svg</file>
+
+        <file>vectors/window_close_light.svg</file>
+        <file>vectors/window_close_dark.svg</file>
         <file>vectors/window_close_hover.svg</file>
-        <file>vectors/window_maximize.svg</file>
-        <file>vectors/window_minimize.svg</file>
-        <file>vectors/window_restore.svg</file>
+        <file>vectors/window_maximize_light.svg</file>
+        <file>vectors/window_maximize_dark.svg</file>
+        <file>vectors/window_minimize_light.svg</file>
+        <file>vectors/window_minimize_dark.svg</file>
+        <file>vectors/window_restore_light.svg</file>
+        <file>vectors/window_restore_dark.svg</file>
+
 
         <file>vectors/design.svg</file>
         <file>vectors/save.svg</file>
         <file>vectors/design_report.svg</file>
         <file>vectors/arrow_down.svg</file>
-        <file>vectors/inputs_label.svg</file>
-        <file>vectors/outputs_label.svg</file>
+        <file>vectors/inputs_label_light.svg</file>
+        <file>vectors/inputs_label_dark.svg</file>
+        <file>vectors/outputs_label_light.svg</file>
+        <file>vectors/outputs_label_dark.svg</file>
 
         <file>vectors/msg_info.svg</file>
         <file>vectors/msg_critical.svg</file>
@@ -121,6 +146,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>vectors/no_projects_light.svg</file>
         <file>vectors/no_modules_light.svg</file>
+        <file>vectors/no_projects_dark.svg</file>
+        <file>vectors/no_modules_dark.svg</file>
 
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>

@@ -14,8 +14,6 @@ from PySide6.QtCore import Qt, QSize, QPoint, QTimer, Signal
 
 class SidebarIconButton(QPushButton):
     # Class-level attribute for default hover color
-    default_hover_color = "#d1f16a"
-    selected_color = "#d1f16a"
     BUTTON_MARGIN = 3
     BUTTON_PADDING = 1
 
@@ -25,6 +23,7 @@ class SidebarIconButton(QPushButton):
         self.icon_path = icon_path
         self.selected_icon_path = selected_icon_path
         self.hover_icon_path = hover_icon_path
+        self.setObjectName("floating_btn")
 
         self.is_selected = False
         self.custom_tooltip_text = tooltip_text
@@ -65,15 +64,7 @@ class SidebarIconButton(QPushButton):
 
     def enterEvent(self, event):
         if not self.is_selected:
-            self.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {self.default_hover_color};
-                    border: none;
-                    border-radius: 5px;
-                    margin: {self.BUTTON_MARGIN}px;
-                    padding: {self.BUTTON_PADDING}px;
-                }}
-            """)
+            self.set_selected_style()
             self.setIcon(self.hover_icon)
 
         self.tooltip_show_timer.start()
@@ -99,26 +90,14 @@ class SidebarIconButton(QPushButton):
         QToolTip.showText(tooltip_pos, self.custom_tooltip_text, self)
 
     def set_default_style(self):
-        self.setStyleSheet(f"""
-            QPushButton {{
-                background-color: white;
-                border: none;
-                border-radius: 5px;
-                margin: {self.BUTTON_MARGIN}px;
-                padding: {self.BUTTON_PADDING}px;
-            }}
-        """)
+        self.setProperty("state", "default")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
     def set_selected_style(self):
-        self.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {self.selected_color};
-                border-radius: 5px;
-                border: none;
-                margin: {self.BUTTON_MARGIN}px;
-                padding: {self.BUTTON_PADDING}px;
-            }}
-        """)
+        self.setProperty("state", "active")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
 class SidebarWidget(QWidget):
     openNewTab = Signal(str)
@@ -130,6 +109,7 @@ class SidebarWidget(QWidget):
         self.layout.setSpacing(0)
         self.button_group = []
         self.button_container = QWidget(self)
+        self.button_container.setObjectName("floating_btn_container")
         self.button_layout = QVBoxLayout(self.button_container)
         self.button_layout.setAlignment(Qt.AlignHCenter)
         self.button_layout.setContentsMargins(0, 0, 0, 0)
@@ -166,12 +146,3 @@ class SidebarWidget(QWidget):
     def resize_sidebar(self, window_width, window_height):
         # No longer use window size for sidebar sizing
         self.update_sidebar_size()
-        self.setStyleSheet("""
-            QWidget{
-                border: 1px solid #90AF13;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-                border-bottom-left-radius: 5px;
-                border-bottom-right-radius: 5px;
-            }
-        """)

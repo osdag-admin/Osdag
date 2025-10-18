@@ -6,6 +6,9 @@ from PySide6.QtGui import QPainter, QColor, QPen, QIcon
 class CircularProgressWidget(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
+        app = QApplication.instance()
+        self.theme = app.theme_manager
+
         self.angle = 0
         self.setFixedSize(100, 100)
         
@@ -46,12 +49,15 @@ class CircularProgressWidget(QLabel):
         pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         
         # Draw background circle with subtle color
-        pen.setColor(QColor(230, 230, 230))  # Lighter, more subtle background
+        pen.setColor(QColor(230, 230, 230))  # Lighter background
         painter.setPen(pen)
         painter.drawEllipse(x, y, w, h)
         
         # Draw progress arc with precise positioning
-        pen.setColor(QColor(0x90, 0xAF, 0x13))  # #90AF13
+        if self.theme.is_light():
+            pen.setColor(QColor(0x90, 0xAF, 0x13))  #90AF13
+        else:
+            pen.setColor(QColor(0x6B, 0x7D, 0x20))  #6B7D20
         painter.setPen(pen)
         
         # Use integer angles
@@ -66,6 +72,8 @@ class CircularProgressWidget(QLabel):
 class ModernLoadingDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setModal(True)
         self.setFixedSize(220, 170)
@@ -85,14 +93,7 @@ class ModernLoadingDialog(QDialog):
         # Add loading text
         self.loading_label = QLabel("Loading...")
         self.loading_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.loading_label.setStyleSheet("""
-            QLabel {
-                font-size: 15px;
-                font-weight: 500;
-                color: #444;
-                margin-top: 5px;
-            }
-        """)
+        self.loading_label.setObjectName("loading_label")
         layout.addWidget(self.loading_label)
         
         self.setLayout(layout)
@@ -125,7 +126,10 @@ class ModernLoadingDialog(QDialog):
         
         # Fill rounded rectangle
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(QColor(255, 255, 255, 250))
+        if self.theme.is_light():
+            painter.setBrush(QColor(255, 255, 255, 250))
+        else:
+            painter.setBrush(QColor(56, 56, 56, 250))
         painter.drawRoundedRect(rect, radius, radius)
         
         # Draw subtle border

@@ -23,6 +23,8 @@ from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 class UpdateDialog(QDialog):
     def __init__(self):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.old_version = Version(VERSION)
         self.internet_connectivity = QApplication.instance().internet_connectivity
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -33,16 +35,8 @@ class UpdateDialog(QDialog):
 
         # Layout and style
         self.setStyleSheet("""
-            QDialog#UpdateDialog { background-color: #ffffff; border: 1px solid #90AF13; }
-            QWidget#ContentWidget { background-color: #ffffff; }
-            QTextBrowser { background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px;
-                           font-family: 'Arial'; font-size: 8pt; padding: 8px; }
             QProgressBar { border: 1px solid #ccc; border-radius: 5px; text-align: center; height: 20px; }
             QProgressBar::chunk { background-color: #90AF13; }
-            QPushButton { background-color: #90AF13; color: white; border: none; border-radius: 5px;
-                          padding: 5px 20px; font-size: 12px; font-weight: bold; }
-            QPushButton:hover { background-color: #7A9611; }
-            QPushButton:pressed { background-color: #6B850F; }
         """)
 
         mainLayout = QVBoxLayout(self)
@@ -61,7 +55,7 @@ class UpdateDialog(QDialog):
         contentLayout.setContentsMargins(10, 10, 10, 10)
         contentLayout.setSpacing(10)
 
-        self.logoLabel = QSvgWidget(":/vectors/Osdag.svg", self)
+        self.logoLabel = QSvgWidget(":/vectors/Osdag_light.svg")
         self.logoLabel.setFixedHeight(106)
         self.logoLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         contentLayout.addWidget(self.logoLabel, 0, Qt.AlignCenter)
@@ -82,12 +76,6 @@ class UpdateDialog(QDialog):
         buttonLayout.addStretch()
         self.okButton = QPushButton("OK", self)
         self.okButton.setFixedHeight(30)
-        self.okButton.setStyleSheet("""
-            QPushButton { background-color: #90AF13; color: white; border: none; border-radius: 5px;
-                           padding: 5px 20px; font-size: 12px; font-weight: bold; }
-            QPushButton:hover { background-color: #7A9611; }
-            QPushButton:pressed { background-color: #6B850F; }
-        """)
         self.okButton.clicked.connect(self.accept)
         buttonLayout.addWidget(self.okButton)
 
@@ -110,6 +98,13 @@ class UpdateDialog(QDialog):
         self.textBrowser.setHtml("<p>Checking for updates...</p>")
         self._set_exec_paths()
         self.check_for_updates()
+    
+    def paintEvent(self, event):
+        if self.theme.is_light():
+            self.logoLabel.load(":/vectors/Osdag_light.svg")
+        else:
+            self.logoLabel.load(":/vectors/Osdag_dark.svg")
+        return super().paintEvent(event)
 
     def _set_exec_paths(self):
         env_path = Path(sys.prefix)
@@ -194,7 +189,6 @@ class UpdateDialog(QDialog):
 
         except Exception as e:
             self.update_text(f"<p style='color:red;'>Error checking for updates: {e}</p>")
-
 
     def update_to_latest(self):
         """Run QProcess to update Osdag asynchronously."""

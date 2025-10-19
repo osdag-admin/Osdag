@@ -32,6 +32,7 @@ from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleC
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
+from osdag_core.design_type.tension_member.tension_bolted import Tension_bolted
 
 from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 import openpyxl
@@ -416,6 +417,8 @@ class MainWindow(QMainWindow):
             self.open_end_plate_btc_page() 
         elif card_title == "Plate Girder":
             self.open_plate_girder()
+        elif card_title == "Bolted to End Gusset":
+            self.open_bolted_end_tension()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -595,6 +598,40 @@ class MainWindow(QMainWindow):
         # Update tab title and docking icons
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
+
+    def open_bolted_end_tension(self):
+        title = "Bolted to End Gusset"
+        self.clear_layout(self.main_widget_layout)
+        tension_bolted = CustomWindow(title, Tension_bolted, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(tension_bolted.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                tension_bolted.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = tension_bolted
+        tension_bolted.openNewTab.connect(self.handle_add_tab)
+        tension_bolted.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(tension_bolted)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        # Show docking Icons
+        self.tab_widget_content[index][1] = True
+        current_tab_data = self.tab_widget_content[index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+
 
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)

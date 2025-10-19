@@ -21,7 +21,7 @@ from ...Report_functions import *
 from ...utils.common.load import Load
 from ...utils.common.Section_Properties_Calculator import *
 
-import logging
+from ...custom_logger import CustomLogger
 from ..member import Member
 
 
@@ -32,6 +32,8 @@ class Tension_bolted(Member):
         print(f'Entering Tension_bolted')
         super(Tension_bolted, self).__init__()
         self.design_status = False
+
+        self.hover_dict = {}
 
     ###############################################
     # Design Preference Functions Start
@@ -223,33 +225,34 @@ class Tension_bolted(Member):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
 
         """
         Function to set Logger for Tension Module
         """
 
         # @author Arsil Zunzunia
-        global logger
-        logger = logging.getLogger('Osdag')
+        # Set Cusotom Logger
+        logging.setLoggerClass(CustomLogger)
+        self.logger = logging.getLogger('Osdag')
 
-        logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
-            logger.addHandler(handler)
+            self.logger.addHandler(handler)
 
     def module_name(self):
 
@@ -280,12 +283,12 @@ class Tension_bolted(Member):
 
         return c_lst
 
-    def fn_profile_section(self):
+    def fn_profile_section(self, args):
 
         "Function to populate combobox based on the section type selected"
 
         # print(self,"2")
-        profile = self[0]
+        profile = args[0]
         if profile == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif profile == 'Columns':
@@ -761,7 +764,7 @@ class Tension_bolted(Member):
 
 
         if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
             # flag = False
         else:
@@ -769,7 +772,7 @@ class Tension_bolted(Member):
         # print (all_errors,"ysdgh")
         # print (flag,flag1,flag2)
         if flag  and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(design_dictionary)
             # print(design_dictionary)
         else:
             return all_errors
@@ -781,19 +784,18 @@ class Tension_bolted(Member):
         """
 
         # @author Arsil Zunzunia
-        global logger
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
-            logger.warning(
+            self.logger.warning(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
-            logger.info(
+            self.logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
 
         "initialisation of components required to design a tension member along with connection"
 
-        super(Tension_bolted,self).set_input_values(self, design_dictionary)
+        super(Tension_bolted,self).set_input_values(design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
@@ -828,7 +830,7 @@ class Tension_bolted(Member):
         print("The input values are set. Performing preliminary member check(s).")
         # self.i = 0
 
-        self.initial_member_capacity(self,design_dictionary)
+        self.initial_member_capacity(design_dictionary)
 
 
     def select_section(self, design_dictionary, selectedsize):
@@ -855,7 +857,7 @@ class Tension_bolted(Member):
         for section in sizelist:
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles']:
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                self.min_rad_gyration_calc(self,designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL], key=design_dictionary[KEY_SEC_PROFILE],
+                self.min_rad_gyration_calc(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL], key=design_dictionary[KEY_SEC_PROFILE],
                                                             subkey=design_dictionary[KEY_LOCATION],D_a=self.section.a,B_b=self.section.b,T_t=self.section.thickness)
                 sec_gyr[self.section.designation] = self.min_radius_gyration
                 if self.loc == "Long Leg":
@@ -865,7 +867,7 @@ class Tension_bolted(Member):
 
             elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                self.min_rad_gyration_calc(self,designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL],
+                self.min_rad_gyration_calc(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
                                            subkey=design_dictionary[KEY_LOCATION], D_a=self.section.a,
                                            B_b=self.section.b, T_t=self.section.thickness)
@@ -878,7 +880,7 @@ class Tension_bolted(Member):
 
             else:
                 self.section = Channel(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                self.min_rad_gyration_calc(self,designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL],
+                self.min_rad_gyration_calc(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
                                            subkey=design_dictionary[KEY_LOCATION], D_a=self.section.depth,
                                            B_b=self.section.flange_width, T_t=self.section.flange_thickness,t = self.section.web_thickness)
@@ -916,7 +918,7 @@ class Tension_bolted(Member):
             self.section_size_max.tension_member_yielding(A_g=(self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity
-            self.min_rad_gyration_calc(self,designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile,subkey=self.loc, D_a=self.section_size_max.a,
                                        B_b=self.section_size_max.b, T_t=self.section_size_max.thickness)
             self.max_length = 400 * self.min_radius_gyration
@@ -927,7 +929,7 @@ class Tension_bolted(Member):
             self.section_size_max.tension_member_yielding(A_g=(2*self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             # self.max_member_force = self.section_size_max.tension_yielding_capacity * 2
-            self.min_rad_gyration_calc(self,designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.a,
                                        B_b=self.section_size_max.b, T_t=self.section_size_max.thickness)
             self.max_length = 400 * self.min_radius_gyration
@@ -941,7 +943,7 @@ class Tension_bolted(Member):
                                                           F_y=self.section_size_max.fy)
 
             self.max_member_force = self.section_size_max.tension_yielding_capacity
-            self.min_rad_gyration_calc(self,designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile,subkey=self.loc, D_a=self.section_size_max.depth,
                                        B_b=self.section_size_max.flange_width, T_t=self.section_size_max.flange_thickness,
                                        t=self.section_size_max.web_thickness)
@@ -953,7 +955,7 @@ class Tension_bolted(Member):
             self.section_size_max.tension_member_yielding(A_g=(2*self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             # self.max_member_force = 2 * self.section_size_max.tension_yielding_capacity
-            self.min_rad_gyration_calc(self,designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.depth,
                                        B_b=self.section_size_max.flange_width, T_t=self.section_size_max.flange_thickness,
                                        t=self.section_size_max.web_thickness)
@@ -1027,9 +1029,9 @@ class Tension_bolted(Member):
         min_yield = 0
 
         if self.count == 0:
-            self.max_section(self,design_dictionary,self.sizelist)
-            [self.force1, self.len1, self.slen1, self.gyr1]= self.max_force_length(self,  self.max_area)
-            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self,  self.max_gyr)
+            self.max_section(design_dictionary,self.sizelist)
+            [self.force1, self.len1, self.slen1, self.gyr1]= self.max_force_length(  self.max_area)
+            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(  self.max_gyr)
         else:
             pass
 
@@ -1046,7 +1048,7 @@ class Tension_bolted(Member):
         print(f" self.sizelist {self.sizelist}")
         for selectedsize in self.sizelist:
 
-            self.section_size = self.select_section(self,design_dictionary,selectedsize)
+            self.section_size = self.select_section(design_dictionary,selectedsize)
             self.bolt_diameter_min= min(self.bolt.bolt_diameter)
 
             self.edge_dist_min = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_min,self.bolt.bolt_hole_type,
@@ -1100,11 +1102,11 @@ class Tension_bolted(Member):
             # print(self.section_size.rad_of_gy_z)
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles','Star Angles','Back to Back Angles']:
                 # print(selectedsize)
-                self.min_rad_gyration_calc(self,designation=self.section_size.designation, material_grade=self.material,
+                self.min_rad_gyration_calc(designation=self.section_size.designation, material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_size.a,
                                            B_b=self.section_size.b, T_t=self.section_size.thickness)
             else:
-                self.min_rad_gyration_calc(self,designation=self.section_size.designation, material_grade=self.material,
+                self.min_rad_gyration_calc(designation=self.section_size.designation, material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_size.depth,
                                            B_b=self.section_size.flange_width, T_t=self.section_size.flange_thickness,
                                            t=self.section_size.web_thickness)
@@ -1119,16 +1121,16 @@ class Tension_bolted(Member):
                 self.member_design_status = True
                 if min_yield == 0:
                     min_yield = min_yield_current
-                    self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
+                    self.section_size_1 = self.select_section(design_dictionary, selectedsize)
                     self.section_size_1.tension_member_yielding(A_g=self.cross_area, F_y=self.section_size.fy)
                     if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                        self.min_rad_gyration_calc(self,designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
                                                    B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
 
                     else:
-                        self.min_rad_gyration_calc(self,designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
                                                    B_b=self.section_size_1.flange_width,
@@ -1140,15 +1142,15 @@ class Tension_bolted(Member):
 
                 elif min_yield_current < min_yield:
                     min_yield = min_yield_current
-                    self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
+                    self.section_size_1 = self.select_section( design_dictionary, selectedsize)
                     self.section_size_1.tension_member_yielding(A_g=self.cross_area, F_y=self.section_size.fy)
                     if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                        self.min_rad_gyration_calc(self,designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
                                                    B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
                     else:
-                        self.min_rad_gyration_calc(self,designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
                                                    B_b=self.section_size_1.flange_width,
@@ -1164,9 +1166,9 @@ class Tension_bolted(Member):
             elif (self.load.axial_force*1000 > self.force1) :
                 self.max_limit_status_1 = True
                 # self.design_status = False
-                logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                self.logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
                                "member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
-                logger.info(" : Define member(s) with a higher cross sectional area.")
+                self.logger.info(" : Define member(s) with a higher cross sectional area.")
                 # logge r.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1176,9 +1178,9 @@ class Tension_bolted(Member):
             elif self.length > self.len2:
                 self.max_limit_status_2 = True
                 # self.design_status = False
-                logger.warning(" : The member length ({} mm) exceeds the maximum allowable length ({} mm) with respect to the maximum available "
+                self.logger.warning(" : The member length ({} mm) exceeds the maximum allowable length ({} mm) with respect to the maximum available "
                                "member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
-                logger.info(" : Select member(s) with a higher radius of gyration value.")
+                self.logger.info(" : Select member(s) with a higher radius of gyration value.")
                 # logger.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1187,20 +1189,20 @@ class Tension_bolted(Member):
                 pass
 
         if self.member_design_status == False and self.max_limit_status_1!=True and self.max_limit_status_2!=True:
-            logger.warning(" : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
+            self.logger.warning(" : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
                            "minimum spacing limit [Ref. Cl. 10.2, IS 800:2007].".format(self.bolt_diameter_min))
-            logger.info(" : Reduce the bolt diameter or increase the member depth and re-design.")
+            self.logger.info(" : Reduce the bolt diameter or increase the member depth and re-design.")
             # logger.error(": Design is not safe. \n ")
             # logger.info(" :=========End Of design===========")
 
         if self.member_design_status == True:
             print("pass")
             self.design_status = True
-            self.select_bolt_dia(self, design_dictionary)
+            self.select_bolt_dia( design_dictionary)
         else:
             self.design_status = False
-            logger.error(": Design is unsafe. \n ")
-            logger.info(" :=========End Of design===========")
+            self.logger.error(": Design is unsafe. \n ")
+            self.logger.info(" :=========End Of design===========")
 
     def select_bolt_dia(self,design_dictionary,dia_remove =None):
 
@@ -1299,7 +1301,7 @@ class Tension_bolted(Member):
 
         if len(self.bolt_diameter_possible) ==0.0:
             self.design_status = False
-            logger.warning(" : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
+            self.logger.warning(" : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
                            "bolt diameter of {} mm [Ref. Cl.10.3.3.2, IS 800:2007]."
                            .format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
             # logger.error(": Design is not safe. \n ")
@@ -1389,14 +1391,14 @@ class Tension_bolted(Member):
         if self.bolt_design_status == True:
             self.design_status = True
             print("bolt ok")
-            self.get_bolt_grade(self, design_dictionary)
+            self.get_bolt_grade(design_dictionary)
 
         else:
             self.design_status = False
             if self.plate.reason != "":
-                logger.warning(self.plate.reason)
-            logger.error(": Design is unsafe. \n ")
-            logger.info(" :=========End Of design===========")
+                self.logger.warning(self.plate.reason)
+            self.logger.error(": Design is unsafe. \n ")
+            self.logger.info(" :=========End Of design===========")
 
     def get_bolt_grade(self,design_dictionary):
 
@@ -1506,7 +1508,7 @@ class Tension_bolted(Member):
         self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line -1) * self.plate.gauge_provided))/2),2)
         print(self.plate.bolt_line)
 
-        self.member_check(self, design_dictionary)
+        self.member_check(design_dictionary)
         print(f"")
 
 
@@ -1649,7 +1651,7 @@ class Tension_bolted(Member):
 
         self.section_size_1.design_check_for_slenderness(K = self.K, L = design_dictionary[KEY_LENGTH], r = self.min_radius_gyration)
         self.section_size_1.tension_capacity_calc(self.section_size_1.tension_yielding_capacity,self.section_size_1.tension_rupture_capacity,self.section_size_1.block_shear_capacity_axial)
-        self.member_recheck(self, design_dictionary)
+        self.member_recheck(design_dictionary)
 
     def member_recheck(self,design_dictionary): 
 
@@ -1663,24 +1665,24 @@ class Tension_bolted(Member):
         if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
             self.design_status = True
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
-            self.get_plate_thickness(self,design_dictionary)
+            self.get_plate_thickness(design_dictionary)
 
         else:
             # print("recheck")
             # previous_size = self.section_size_1.designation
-            # self.initial_member_capacity(self, design_dictionary, previous_size)
+            # self.initial_member_capacity(design_dictionary, previous_size)
             if len(self.sizelist)>=2:
                 size = self.section_size_1.designation
                 print("recheck",size )
-                self.initial_member_capacity(self, design_dictionary, size)
+                self.initial_member_capacity(design_dictionary, size)
             else:
                 self.design_status = False
-                logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                self.logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
                                "member size {}."
                                .format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area))
-                logger.info(" : Select member(s) with a higher cross sectional area.")
-                logger.error(": Design is unsafe. \n ")
-                logger.info(" :=========End Of design===========")
+                self.logger.info(" : Select member(s) with a higher cross sectional area.")
+                self.logger.error(": Design is unsafe. \n ")
+                self.logger.info(" :=========End Of design===========")
 
     def get_plate_thickness(self,design_dictionary):
 
@@ -1864,10 +1866,10 @@ class Tension_bolted(Member):
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             if (2 * self.plate.length) > self.length:
                 self.design_status = False
-                logger.warning (":The plate length of {} mm is larger than the member length of {} mm.". format(2*self.plate.length,self.length))
-                logger.info(":Try a bolt of larger diameter and/or increase the member length.")
-                logger.error(":Design is unsafe. \n ")
-                logger.info(":=========End Of design===========")
+                self.logger.warning (":The plate length of {} mm is larger than the member length of {} mm.". format(2*self.plate.length,self.length))
+                self.logger.info(":Try a bolt of larger diameter and/or increase the member length.")
+                self.logger.error(":Design is unsafe. \n ")
+                self.logger.info(":=========End Of design===========")
 
             elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
                 print("bolt check")
@@ -1893,86 +1895,86 @@ class Tension_bolted(Member):
                         self.plate.length = (self.plate.bolt_line - 1) * self.plate.pitch_provided + 2 * self.plate.end_dist_provided
                     else:
                         status = True
-                        self.status_pass(self, design_dictionary)
+                        self.status_pass(design_dictionary)
 
             elif (8 * self.bolt.bolt_diameter_provided) < self.comb_thick:
                 if len(self.sizelist) >= 2:
                     size = self.section_size_1.designation
                     # dia = self.bolt.bolt_diameter_provided
                     print("recheck", size)
-                    self.initial_member_capacity(self, design_dictionary, size)
+                    self.initial_member_capacity(design_dictionary, size)
 
                 else:
                     self.design_status = False
-                    logger.warning(":Design is unsuccessful due to long joint and/or large grip length, bolt reduction factors.")
-                    logger.error(":Design is unsafe. \n ")
-                    logger.info(":=========End Of design===========")
+                    self.logger.warning(":Design is unsuccessful due to long joint and/or large grip length, bolt reduction factors.")
+                    self.logger.error(":Design is unsafe. \n ")
+                    self.logger.info(":=========End Of design===========")
             else:
                 pass
         else:
             print(self.plate_tension_capacity, "hsdvdhsd")
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
                 print(self.section_size_1.designation, "hsdvdhsd")
-                # self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+                # self.initial_member_capacity(design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
                     size = self.section_size_1.designation
                     print("recheck", size)
-                    self.initial_member_capacity(self, design_dictionary, size)
+                    self.initial_member_capacity(design_dictionary, size)
                 else:
                     self.design_status = False
-                    logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
+                    self.logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
                                    "thickness of {} mm."
                                    . format(round(self.res_force/1000,2),round(self.plate_tension_capacity/1000,2),max(self.plate.thickness)))
-                    logger.error(":Design is unsafe. \n ")
-                    logger.info(":=========End Of design===========")
+                    self.logger.error(":Design is unsafe. \n ")
+                    self.logger.info(":=========End Of design===========")
             else:
                 self.design_status = False
-                logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
+                self.logger.warning(":The tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available plate "
                                "thickness of {} mm."
                                .format(round(self.res_force / 1000, 2), round(self.plate_tension_capacity / 1000, 2), max(self.plate.thickness)))
-                logger.error(":Design is unsafe. \n ")
-                logger.info(":=========End Of design===========")
+                self.logger.error(":Design is unsafe. \n ")
+                self.logger.info(":=========End Of design===========")
                 print(self.design_status)
 
     def status_pass(self,design_dictionary):
         if (2 * self.plate.length) > self.length:
             self.design_status = False
-            logger.warning(":The plate length of {} mm is larger than the member length of {} mm.".format(2 * self.plate.length,
+            self.logger.warning(":The plate length of {} mm is larger than the member length of {} mm.".format(2 * self.plate.length,
                                                                                                 self.length))
 
-            logger.info(":Try a bolt of larger diameter and/or increase the member length.")
-            logger.error(":Design is unsafe. \n ")
-            logger.info(":=========End Of design===========")
+            self.logger.info(":Try a bolt of larger diameter and/or increase the member length.")
+            self.logger.error(":Design is unsafe. \n ")
+            self.logger.info(":=========End Of design===========")
 
         else:
             self.plate_design_status = True
             self.design_status = True
-            self.intermittent_bolt(self, design_dictionary)
-            logger.info(":In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].")
+            self.intermittent_bolt(design_dictionary)
+            self.logger.info(":In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].")
             if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
-                logger.info(":In the case of reverse loading for double sections, spacing of the intermittent connection shall be less than 600 "
+                self.logger.info(":In the case of reverse loading for double sections, spacing of the intermittent connection shall be less than 600 "
                             "[Ref. Cl. 10.2.5.5, IS 800:2007].")
             else:
                 pass
-            logger.info(":To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the "
+            self.logger.info(":To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the "
                         "one currently defined.")
 
             if self.load.axial_force < (self.res_force / 1000):
-                logger.info(":The minimum design force based on the member size is used for performing the connection design, i.e. {} kN "
+                self.logger.info(":The minimum design force based on the member size is used for performing the connection design, i.e. {} kN "
                             "[Ref. Cl. 10.7, IS 800:2007].".format(round(self.res_force / 1000, 2)))
             else:
                 pass
 
-            logger.info(":Overall bolted tension member design is safe. \n")
-            logger.info(":=========End Of design===========")
+            self.logger.info(":Overall bolted tension member design is safe. \n")
+            self.logger.info(":=========End Of design===========")
 
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                            material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
                                            B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
             else:
-                self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                            material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
                                            B_b=self.section_size_1.flange_width,
@@ -2184,10 +2186,10 @@ class Tension_bolted(Member):
             gyration = self.min_radius_gyration
         else:
             if self.max_limit_status_2 == True:
-                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self, self.max_gyr)
+                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self.max_gyr)
                 member_yield_kn = round(member_yield_kn / 1000,2)
             else:
-                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self, self.max_area)
+                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self.max_area)
                 member_yield_kn = round(member_yield_kn / 1000,2)
 
         # if self.member_design_status == True:

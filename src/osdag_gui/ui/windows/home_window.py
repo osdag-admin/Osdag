@@ -442,6 +442,7 @@ class HomeWindow(QWidget):
             self.svg_card_layout.addWidget(svg_card_widget)
             self.svg_card_layout.addStretch()
             self.primary_menu_container.hide()
+            svg_card_widget.cardOpenClicked.connect(self.cardOpenClicked)
 
         elif isinstance(menu_bar_data, dict):
             self._clear_layout(self.svg_card_layout)

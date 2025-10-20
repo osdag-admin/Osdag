@@ -1124,7 +1124,8 @@ QDialog#custom_material_popup {
     border: 1px solid #90AF13;
 }
 #custom_material_popup QLabel,
-QDialog#spacing_capacity_details QLabel {
+QDialog#spacing_capacity_details QLabel,
+QDialog#spacing_dialog QLabel {
     color: #000000;
 }
 #custom_material_popup QLineEdit {
@@ -1187,8 +1188,13 @@ QScrollArea#outputs_hscrollarea QScrollBar::add-page:horizontal, QScrollBar::sub
 }
 
 /*=======================dialogs===========================*/
-QDialog#spacing_capacity_details QScrollArea {
+QDialog#spacing_capacity_details QScrollArea{
     background-color: #E0E0E0;
+    color: #000000;
+}
+QDialog#spacing_dialog QScrollArea,
+QDialog#spacing_dialog QWidget#scroll_widget{
+    background-color: #FFFFFF;
     color: #000000;
 }
 QDialog#TutorialsDialog,
@@ -1197,7 +1203,8 @@ QDialog#AboutOsdagDialog,
 QDialog#UpdateDialog,
 QDialog#CustomDialog,
 QDialog#design_report_popup,
-QDialog#customized_input{
+QDialog#customized_input,
+QDialog#spacing_dialog{
     background-color: #FFFFFF;
     border: 1px solid #90AF13;
 }
@@ -1347,7 +1354,8 @@ QDialog#spacing_capacity_details QPushButton:pressed {
     border: 1px solid black;
 }
 QDialog#design_report_popup QLineEdit, 
-QDialog#design_report_popup QTextEdit {
+QDialog#design_report_popup QTextEdit,
+QDialog#spacing_dialog QLineEdit {
     padding: 2px 7px;
     border: 1px solid #A6A6A6;
     border-radius: 4px;

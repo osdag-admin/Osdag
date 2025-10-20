@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
     QPushButton, QLabel, QSizePolicy, QGroupBox, QFrame, QDialog,
     QFormLayout, QLineEdit, QScrollArea, QTableWidget, QGridLayout,
-    QFileDialog
+    QFileDialog, QSizeGrip
 )
 from PySide6.QtGui import QPalette, QColor, QPixmap, QIcon, QPainter
 from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve, QCoreApplication
@@ -17,6 +17,7 @@ from osdag_core.texlive.Design_wrapper import init_display as init_display_off_s
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 from osdag_gui.ui.components.dialogs.design_report import DesignReportDialog
+from osdag_gui.ui.components.dialogs.spacing_dialog import SpacingDialog
 
 from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *
@@ -570,6 +571,9 @@ class OutputDock(QWidget):
     def spacing_dialog(self, main, button_list, button):
 
         for op in button_list:
+            tup = op[3]
+            title = tup[0]
+            fn = tup[1]
             if op[0] == button.objectName():
                 if op[0]==KEY_OUT_SPACING or op[0]==KEY_OUT_SPTING_SPACING:
                     # print(main)
@@ -614,7 +618,6 @@ class OutputDock(QWidget):
                                 val=2
                             self.run_spacing_script(None,val,SeatedAngleDetails,main)
                             return
-                            print(KEY_OUT_ROW_PROVIDED , KEY_OUT_COL_PROVIDED)
                 elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:
                             print(f'rows: {self.backend.bolt_row} , cols : {self.backend.bolt_column} , {self.backend.bolt_row_web}')
                             self.run_spacing_script(0,0,B2CEndPlateDetails,main)
@@ -659,7 +662,9 @@ class OutputDock(QWidget):
                     else:
                         self.run_spacing_script(0,0,C2CEndPlateDetails,(main,1))
                     break
-
+        #--------------------------Legacy-dialog----------------------------------------------------------------
+                dialog = SpacingDialog(main, title, fn)
+                dialog.exec()
 
     # To equalize the size of label strings
     def equalize_label_length(self, list):

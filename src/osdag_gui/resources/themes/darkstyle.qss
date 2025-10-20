@@ -1204,7 +1204,9 @@ QWidget#logs_dock QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 
 /*=======================dialogs===========================*/
 QDialog#spacing_capacity_details QScrollArea,
-QDialog#spacing_capacity_details #spacing_scroll_widget{
+QDialog#spacing_capacity_details #spacing_scroll_widget,
+QDialog#spacing_dialog QScrollArea,
+QDialog#spacing_dialog QWidget#scroll_widget{
     background-color: #333333;
 }
 QDialog#TutorialsDialog,
@@ -1214,7 +1216,8 @@ QDialog#UpdateDialog,
 QDialog#CustomDialog,
 QDialog#design_report_popup,
 QDialog#spacing_capacity_details,
-QDialog#customized_input {
+QDialog#customized_input,
+QDialog#spacing_dialog {
     background-color: #333333;
     border: 1px solid #6B7D20;
 }
@@ -1352,7 +1355,8 @@ QDialog#spacing_capacity_details QPushButton:pressed{
     border: 1px solid #D0D0D0;
 }
 QDialog#design_report_popup QLineEdit, 
-QDialog#design_report_popup QTextEdit {
+QDialog#design_report_popup QTextEdit,
+QDialog#spacing_dialog QLineEdit {
     padding: 2px 7px;
     border: 1px solid #D0D0D0;
     border-radius: 4px;
@@ -1361,7 +1365,8 @@ QDialog#design_report_popup QTextEdit {
     font-weight: normal;
 }
 QDialog#design_report_popup QLabel,
-QDialog#spacing_capacity_details QLabel {
+QDialog#spacing_capacity_details QLabel,
+QDialog#spacing_dialog QLabel {
     background: transparent;
     color: #D0D0D0;
 }

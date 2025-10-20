@@ -167,9 +167,6 @@ class IS1367_Part3_2002(object):
         bolt_fy = float(row[3])
         bolt_fu = float(row[4])
 
-        print(bolt_fu, bolt_fy)
-        # print(type(bolt_fu))
-
         # bolt_fu = float(int(bolt_grade) * 100)
         # bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)
         return [bolt_fu, bolt_fy]

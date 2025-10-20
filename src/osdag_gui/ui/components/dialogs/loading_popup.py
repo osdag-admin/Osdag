@@ -1,15 +1,15 @@
-import time
+import sys
+import multiprocessing as mp
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QDialog, QLabel
 from PySide6.QtCore import Qt, QThread, Signal, QTimer
 from PySide6.QtGui import QPainter, QColor, QPen, QIcon
 
-class CircularProgressWidget(QLabel):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        app = QApplication.instance()
-        self.theme = app.theme_manager
 
+class CircularProgressWidget(QLabel):
+    def __init__(self, is_light_theme, parent=None):
+        super().__init__(parent)
         self.angle = 0
+        self.is_light_theme = is_light_theme
         self.setFixedSize(100, 100)
         
         # Higher frame rate for smoother motion
@@ -54,7 +54,8 @@ class CircularProgressWidget(QLabel):
         painter.drawEllipse(x, y, w, h)
         
         # Draw progress arc with precise positioning
-        if self.theme.is_light():
+        # Simplified theme detection - you can pass theme via pipe if needed
+        if self.is_light_theme:
             pen.setColor(QColor(0x90, 0xAF, 0x13))  #90AF13
         else:
             pen.setColor(QColor(0x6B, 0x7D, 0x20))  #6B7D20
@@ -69,16 +70,21 @@ class CircularProgressWidget(QLabel):
     def stop_animation(self):
         self.timer.stop()
 
+
 class ModernLoadingDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, is_light_theme=True):
         super().__init__(parent)
-        app = QApplication.instance()
-        self.theme = app.theme_manager
+        self.is_light_theme = is_light_theme
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-        self.setModal(True)
+        self.setModal(False)  # Changed to False since it's in separate process
         self.setFixedSize(220, 170)
-        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
+        try:
+            self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
+        except:
+            pass  # Ignore if icon not available
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        # Keep window on top
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
         
         # Set up layout
         layout = QVBoxLayout()
@@ -87,18 +93,35 @@ class ModernLoadingDialog(QDialog):
         layout.setContentsMargins(12, 12, 12, 12)
         
         # Add circular progress widget
-        self.circular_progress = CircularProgressWidget()
+        self.circular_progress = CircularProgressWidget(is_light_theme)
         layout.addWidget(self.circular_progress, alignment=Qt.AlignmentFlag.AlignCenter)
         
         # Add loading text
         self.loading_label = QLabel("Loading...")
         self.loading_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.loading_label.setObjectName("loading_label")
+        if self.is_light_theme:
+            self.loading_label.setStyleSheet("""
+                QLabel#loading_label{
+                    font-size: 15px;
+                    font-weight: 500;
+                    color: #444444;
+                    margin-top: 5px;
+                }
+            """)
+        else:
+            self.loading_label.setStyleSheet("""
+                QLabel#loading_label{
+                    font-size: 15px;
+                    font-weight: 500;
+                    color: #D0D0D0;
+                    margin-top: 5px;
+                }
+            """)
+
         layout.addWidget(self.loading_label)
-        
         self.setLayout(layout)
         
-        # Remove window background styling; custom paint will handle rounded corners and border
         # Center on screen
         self.center_on_screen()
     
@@ -126,7 +149,7 @@ class ModernLoadingDialog(QDialog):
         
         # Fill rounded rectangle
         painter.setPen(Qt.PenStyle.NoPen)
-        if self.theme.is_light():
+        if self.is_light_theme:
             painter.setBrush(QColor(255, 255, 255, 250))
         else:
             painter.setBrush(QColor(56, 56, 56, 250))
@@ -144,27 +167,56 @@ class ModernLoadingDialog(QDialog):
         super().paintEvent(event)
 
 
-class DelayThread(QThread):
-    finished = Signal()
+def run_loading_dialog_process(stop_event, is_light_theme=True):
+    """
+    Function to run in separate process
+    Args:
+        stop_event: multiprocessing.Event to signal when to close
+        is_light_theme: bool indicating theme preference
+    """
+    app = QApplication(sys.argv)
+    dialog = ModernLoadingDialog(is_light_theme=is_light_theme)
+    
+    # Check stop event periodically
+    timer = QTimer()
+    timer.timeout.connect(lambda: dialog.close() if stop_event.is_set() else None)
+    timer.start(100)  # Check every 100ms
+    
+    dialog.show()
+    app.exec()
 
-    def __init__(self, parent=None):
-        super().__init__(parent=parent)
 
-    def run(self):
-        time.sleep(1)
-        self.finished.emit()
-
-
-if __name__ == "__main__":
-    app = QApplication.instance()
-    if app is None:
-        import sys
-        app = QApplication(sys.argv)
-        owns_app = True
-    else:
-        owns_app = False
-    dialog = ModernLoadingDialog()
-    QTimer.singleShot(5000, dialog.accept)
-    dialog.exec()
-    if owns_app:
-        app.quit()
+class LoadingDialogManager:
+    """
+    Manager class to control the loading dialog in a separate process
+    """
+    def __init__(self, is_light_theme=True):
+        self.process = None
+        self.stop_event = None
+        self.is_light_theme = is_light_theme
+    
+    def show(self):
+        """Show the loading dialog in a separate process"""
+        if self.process is not None and self.process.is_alive():
+            return  # Already running
+        
+        self.stop_event = mp.Event()
+        self.process = mp.Process(
+            target=run_loading_dialog_process,
+            args=(self.stop_event, self.is_light_theme)
+        )
+        self.process.start()
+    
+    def hide(self):
+        """Hide the loading dialog"""
+        if self.process is not None and self.process.is_alive():
+            self.stop_event.set()
+            self.process.join(timeout=2)  # Wait up to 2 seconds
+            if self.process.is_alive():
+                self.process.terminate()  # Force terminate if still running
+            self.process = None
+            self.stop_event = None
+    
+    def __del__(self):
+        """Cleanup when manager is destroyed"""
+        self.hide()

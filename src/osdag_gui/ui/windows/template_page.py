@@ -1,4 +1,4 @@
-import sys, os, yaml
+import sys, os, yaml, time
 import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QColorDialog,
@@ -13,7 +13,7 @@ from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
 from osdag_gui.ui.components.docks.input_dock import InputDock
 from osdag_gui.ui.components.docks.output_dock import OutputDock
 from osdag_gui.ui.components.docks.log_dock import LogDock
-from osdag_gui.ui.components.dialogs.loading_popup import ModernLoadingDialog, DelayThread
+from osdag_gui.ui.components.dialogs.loading_popup import LoadingDialogManager
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
 from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
@@ -1136,23 +1136,20 @@ class CustomWindow(QWidget):
 
     # This opens loading widget and execute Design
     def start_thread(self, data):
-        self.thread_1 = DelayThread()
-        self.thread_2 = DelayThread()
+        import multiprocessing as mp
+        mp.set_start_method('spawn', force=True)
     
-        self.loading = ModernLoadingDialog()
-        self.setEnabled(False)
+        self.loading = LoadingDialogManager(self.theme.is_light())
         self.loading.show()
-        self.thread_1.start()
-        self.thread_1.finished.connect(lambda: self.common_function_for_save_and_design(self.backend, data, "Design"))
+        self.setEnabled(False)
+        time.sleep(1)
+        self.common_function_for_save_and_design(self.backend, data, "Design")
     
     def finished_loading(self):
-        self.thread_2.start()
-        self.thread_2.finished.connect(self.loading_close)
         print("Testing Custom Logger!")
         print(self.backend.logger.logs)
-
-    def loading_close(self):
-        self.loading.close()
+        time.sleep(1)
+        self.loading.hide()
         self.setEnabled(True)
 
     # Design Functions

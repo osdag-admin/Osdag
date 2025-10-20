@@ -1370,12 +1370,6 @@ QDialog#spacing_dialog QLabel {
     background: transparent;
     color: #D0D0D0;
 }
-QLabel#loading_label{
-    font-size: 15px;
-    font-weight: 500;
-    color: #D0D0D0;
-    margin-top: 5px;
-}
 
 QWidget#report_customization_widget QTreeWidget {
     border: 1px solid #90AF13;

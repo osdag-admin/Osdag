@@ -378,19 +378,19 @@ class Tension_bolted(Member):
         lst.append(t9)
         return lst
 
-    def fn_conn_type(self):
+    def fn_conn_type(self, args):
 
         "Function to populate section size based on the type of section "
-        conn = self[0]
+        conn = args[0]
         if conn in ['Angles', 'Back to Back Angles', 'Star Angles']:
             return VALUES_LOCATION_1
         elif conn in ["Channels", "Back to Back Channels"]:
             return VALUES_LOCATION_2
 
-    def fn_conn_image(self):
+    def fn_conn_image(self,args):
 
         "Function to populate section images based on the type of section "
-        img = self[0]
+        img = args[0]
         if img == VALUES_SEC_PROFILE_2[0]:
             return VALUES_IMG_TENSIONBOLTED[0]
         elif img ==VALUES_SEC_PROFILE_2[1]:
@@ -402,17 +402,17 @@ class Tension_bolted(Member):
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
 
-    def out_bolt_bearing(self):
+    def out_bolt_bearing(self, args):
 
-        bolt_type= self[0]
+        bolt_type= args[0]
         if bolt_type != TYP_BEARING:
             return True
         else:
             return False
 
-    def out_intermittent(self):
+    def out_intermittent(self,args):
 
-        sec_type = self[0]
+        sec_type = args[0]
         if sec_type in [VALUES_SEC_PROFILE_2[0],VALUES_SEC_PROFILE_2[3]]:
             return True
         else:
@@ -712,6 +712,13 @@ class Tension_bolted(Member):
 
         t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',False)
         out_list.append(t21)
+
+        # Populate Hover Dict
+        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
+        
+        self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} mm x {float(self.plate.height) if flag else ''} mm x {self.plate.thickness_provided if flag else ''} mm"
+        
+        self.hover_dict["Member"] = f"Member: {self.section.designation if flag else ''}"
 
         return out_list
 

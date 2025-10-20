@@ -1671,7 +1671,7 @@ class CommonDesignLogic(object):
         """
         :return: The calculated values/parameters to create 3D CAD model of individual components.
         """
-        T = self.module_class
+        T = self.module_object
 
         # Types of connections =  #'Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels'
         if self.connection == KEY_DISP_TENSION_BOLTED:
@@ -2472,6 +2472,11 @@ class CommonDesignLogic(object):
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_object
+                
+                # Hover dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
+                
                 self.TObj = self.createTensionCAD()
 
                 member = self.TObj.get_members_models()
@@ -2484,24 +2489,27 @@ class CommonDesignLogic(object):
                 # Point = gp_Pnt(distance, 0.0, 300)
                 # DisplayMsg(self.display, Point, self.T.section_size_1.designation)
 
+                label_bolt = ["Bolt", hover_dict["Bolt"]]
+                label_plate = ["Plate", hover_dict["Plate"]]
+                label_member = ["Member", hover_dict["Member"]]
 
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, onlymember, update=True,label=label_member, canvas=self.cad_widget)
                 elif self.component == "Plate":
-                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
-                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True, label=label_bolt, canvas=self.cad_widget)
                 elif self.component == "Endplate":
                     endplate = self.TObj.get_end_plates_models()
                     end_nutbolt = self.TObj.get_end_nut_bolt_array_models()
-                    osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True)
-                    osdag_display_shape(self.display, end_nutbolt, color=Quantity_NOC_YELLOW, update=True)
+                    osdag_display_shape(self.display, endplate, color=Quantity_NOC_BLUE1, update=True, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, end_nutbolt, color=Quantity_NOC_YELLOW, update=True, label=label_bolt, canvas=self.cad_widget)
                 else:
                     connector = BRepAlgoAPI_Fuse(nutbolt, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
                     self.TObj.shape = shape
-                    osdag_display_shape(self.display, member, update=True)
-                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
-                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
+                    osdag_display_shape(self.display, member, update=True, label=label_member, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True, label=label_bolt, canvas=self.cad_widget)
 
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_object

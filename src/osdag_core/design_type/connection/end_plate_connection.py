@@ -441,7 +441,6 @@ class EndPlateConnection(ShearConnection):
             t_sum = self.plate.gap
             for i in self.bolt_conn_plates_t_fu_fy:
                 t_sum = t_sum + i[0]
-            print(t_sum)
             self.bolt.bolt_diameter_possible = []
             self.bolt.bolt_diameter_not_possible = []
             for d in self.bolt.bolt_diameter:
@@ -449,7 +448,7 @@ class EndPlateConnection(ShearConnection):
                     self.bolt.bolt_diameter_possible.append(d)
                 else:
                     self.bolt.bolt_diameter_not_possible.append(d)
-                    print("Removed bolt dia ", d, " mm from available bolt list for plate thickness ", self.plate.thickness_provided, " mm")
+                    # print("Removed bolt dia ", d, " mm from available bolt list for plate thickness ", self.plate.thickness_provided, " mm")
             # if self.connectivity == VALUES_CONN_1[1]:
             #     self.connecting_plates_tk = [self.plate.thickness_provided, self.supported_section.flange_thickness]
             # else:
@@ -499,7 +498,7 @@ class EndPlateConnection(ShearConnection):
                                 self.bolt.bolt_tension_capacity, bolts_required_initial, b_e, l_v,
                                 self.bolt.min_pitch_round, 1.0, 1.0, 1.0)
 
-                        print("Bolts required:", self.bolts_required_IR_LT1)
+                        # print("Bolts required:", self.bolts_required_IR_LT1)
 
                     # return self.bolts_required
                         bolt_rows = self.bolts_required_IR_LT1/2
@@ -564,7 +563,7 @@ class EndPlateConnection(ShearConnection):
 
                         if self.design_status_bolt is True and self.design_status_plate is True:
                             [available_welds, weld_size_min, weld_size_max] = self.get_available_welds(self.connecting_plates_tk)
-                            print(available_welds)
+                            # print(available_welds)
                             if available_welds:
                                 self.design_weld(available_welds)
                                 # if self.weld.design_status is True:
@@ -575,7 +574,7 @@ class EndPlateConnection(ShearConnection):
                             # #         ": For given members and %2.2f mm thick plate, weld sizes should be of range %2.2f mm and  %2.2f mm "
                             # #         % self.plate.thickness_provided % weld_size_min % weld_size_max)
                             # #     self.logger.info(": Cannot design weld with available welds ")
-                            print("Weld Status: ", self.weld.design_status)
+                            # print("Weld Status: ", self.weld.design_status)
                             # if self.weld.design_status is True:
                             plate_width = round_up(self.weld.size * 2 + self.bolt_dist_to_weld * 2 +
                                 self.bolt.min_edge_dist_round * 2 + self.supported_section.web_thickness, 2)
@@ -657,7 +656,7 @@ class EndPlateConnection(ShearConnection):
                                        # total_cost,
                                        count]
                                 self.output.append(row)
-                                print("********* Trial {} ends here *************".format(count))
+                                # print("********* Trial {} ends here *************".format(count))
                             else:
                                 row = [int(bolt_rows),  # 0-Rows of Bolts
                                        int(self.bolt.bolt_diameter_provided),  # 1-Bolt Diameter
@@ -774,7 +773,7 @@ class EndPlateConnection(ShearConnection):
             self.design_status_plate= True
             self.weld.design_status = True
             self.output.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
-            self.set_values_to_class(self)
+            self.set_values_to_class()
             print("No of effective trials: ", count)
             print(self.output[0])
             if self.output[0][26] == self.output[0][27]:
@@ -785,13 +784,13 @@ class EndPlateConnection(ShearConnection):
                 self.logger.info(": The minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
                             "cl. 10.5.3.1. Weld throat thickness is not considered as per cl. 10.5.3.2. Please take " +
                             "necessary detailing precautions at site accordingly.")
-            self.get_design_status(self)
+            self.get_design_status()
         elif len(self.failed_output_plate) > 0:
             self.design_status = False
             self.design_status_bolt = True
             self.design_status_plate= False
             self.weld.design_status = False
-            self.set_values_to_class(self)
+            self.set_values_to_class()
             self.logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade.")
             self.logger.error(" : (Or) Required plate width is greater than available width.")
             self.logger.error(": (Or) Weld thickness is not sufficient [Ref. Cl. 10.5.7, IS 800:2007].")
@@ -802,27 +801,27 @@ class EndPlateConnection(ShearConnection):
             self.design_status_bolt = False
             self.design_status_plate = False
             self.weld.design_status = False
-            self.set_values_to_class(self)
+            self.set_values_to_class()
             self.logger.error(" : Select a bolt of higher capacity, sufficient plate width/height is not available to accommodate the defined bolts.")
         # elif count == 0:
         #     self.design_status = False
         #     # print(self.design_status)
         #     # return self.design_status
-        #     self.set_values_to_class(self)
+        #     self.set_values_to_class()
         #     if self.design_status_plate is False:
         #         self.logger.error(" : Select plate of higher thickness")
         # elif self.design_status_plate is False:
         #     self.design_status = False
-        #     self.set_values_to_class(self)
+        #     self.set_values_to_class()
         #     self.logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade")
         # elif self.plate.design_status is False:
         #     self.design_status = False
-        #     self.set_values_to_class(self)
+        #     self.set_values_to_class()
         #     self.logger.error(" : Required plate width is greater than available width")
         # elif self.weld.design_status is False:
         #     # TODO: Check self.logger message
         #     self.design_status = False
-        #     self.set_values_to_class(self)
+        #     self.set_values_to_class()
         #     self.logger.error(": Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
         #     #logger.warning(": Minimum weld thickness required is %2.2f mm " % self.weld.t_weld_req)
         #     self.logger.info(": Should increase length of weld/End plate")
@@ -831,16 +830,16 @@ class EndPlateConnection(ShearConnection):
         #     #   % self.plate.thickness_provided % weld_size_min % weld_size_max)#
         #     self.logger.info(": Cannot design weld with available welds ")
         # else:
-        #     # self.get_design_status(self)
+        #     # self.get_design_status()
         #     self.output.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
-        #     self.set_values_to_class(self)
+        #     self.set_values_to_class()
         #     print("No of effective trials: ", count)
         #     print(self.output[0])
         #     if self.output[0][26] == self.output[0][27]:
         #         self.logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than or equal to thickness "
         #                     "of thinner connecting plate")
         #         self.logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
-        #     self.get_design_status(self)
+        #     self.get_design_status()
 
     def set_values_to_class(self):
         if self.design_status is True:
@@ -917,9 +916,9 @@ class EndPlateConnection(ShearConnection):
         no_bolt = self.plate.bolt_line * self.plate.bolts_one_line
         self.plate.connect_to_database_to_get_fy_fu(self.plate.material, self.plate.thickness_provided)
         self.bolt.bolt_shear = self.load.shear_force * 1000 / no_bolt  # N
-        print("bolt_shear", self.bolt.bolt_shear)
+        # print("bolt_shear", self.bolt.bolt_shear)
         self.bolt.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
-        print("bolt_tension", self.bolt.bolt_tension)
+        # print("bolt_tension", self.bolt.bolt_tension)
         if self.bolt.bolt_type == TYP_FRICTION_GRIP:
             self.bolt.bolt_tensioning = 'Pretensioned'
         # TODO: check available effective width per pair of bolts (b_e)
@@ -929,14 +928,14 @@ class EndPlateConnection(ShearConnection):
                                                                                self.plate.fy,
                                                                                self.bolt.min_end_dist_round,
                                                                                self.bolt.bolt_tensioning)
-        print("bolt_tension_prying", self.bolt.bolt_tension_prying)
+        # print("bolt_tension_prying", self.bolt.bolt_tension_prying)
         self.comb_bolt_ir = (self.bolt.bolt_shear / (self.bolt.bolt_capacity)) ** 2 + \
                             ((self.bolt.bolt_tension + self.bolt.bolt_tension_prying) / self.bolt.bolt_tension_capacity) ** 2
-        print(self.comb_bolt_ir)
+        # print(self.comb_bolt_ir)
         self.plate.Z_p = self.plate.height * self.plate.thickness_provided ** 2 / 4
         self.plate.Z_e = self.plate.height * self.plate.thickness_provided ** 2 / 6
         # [self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying,
-        #  self.bolts_required_IR_LT1] = self.get_bolt_IR(self, self.bolt.bolt_capacity,
+        #  self.bolts_required_IR_LT1] = self.get_bolt_IR(self.bolt.bolt_capacity,
         #                                                 self.bolt.bolt_tension_capacity, bolts_required_initial, b_e,
         #                                                 l_v,
         #                                                 self.bolt.min_pitch_round, 1.0, 1.0, 1.0)
@@ -971,7 +970,7 @@ class EndPlateConnection(ShearConnection):
             self.beta_lj = 1.0
             self.beta_lg = 1.0
             self.beta_pk = 1.0
-        print("beta_lj", self.beta_lj)
+        # print("beta_lj", self.beta_lj)
         col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.bolt.min_end_dist_round)
         beam_g = (self.supported_section.web_thickness / 2 + weld_size + self.bolt.min_end_dist_round)
         if col_g > beam_g:
@@ -1042,7 +1041,7 @@ class EndPlateConnection(ShearConnection):
                 pitch = round_up((plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
 
             plate_h = pitch * (bolts_one_line - 1) + edge_dist * 2
-            print(plate_h, "plate_h web")
+            # print(plate_h, "plate_h web")
             if self.bolt.bolt_type == TYP_BEARING:
                 l_j = pitch * (bolts_one_line - 1)
                 t_sum = self.plate.gap
@@ -1084,26 +1083,26 @@ class EndPlateConnection(ShearConnection):
             else:
                 break
 
-        print("web", pitch, edge_dist, plate_h)
+        # print("web", pitch, edge_dist, plate_h)
         return pitch, edge_dist, plate_h, bolts_one_line
 
     def get_bolt_IR(self, bolt_shear_capacity, bolt_tension_capacity, no_bolt, b_e, l_v, pitch, beta_lj=1.0,
                     beta_lg=1.0, beta_pk=1.0):
         while True:
             self.bolt.bolt_shear = self.load.shear_force * 1000 / no_bolt  # N
-            print("bolt_shear", self.bolt.bolt_shear)
+            # print("bolt_shear", self.bolt.bolt_shear)
             self.bolt.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
-            print("bolt_tension", self.bolt.bolt_tension)
+            # print("bolt_tension", self.bolt.bolt_tension)
             if self.bolt.bolt_type == TYP_FRICTION_GRIP:
                 self.bolt.bolt_tensioning = 'Pretensioned'
             # TODO: check available effective width per pair of bolts (b_e)
             self.bolt.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force(self.bolt.bolt_tension, l_v,
                                         0.7*self.bolt.bolt_fu, b_e, self.plate.thickness_provided,
                                         self.plate.fy, self.bolt.min_end_dist_round, self.bolt.bolt_tensioning)
-            print("bolt_tension_prying", self.bolt.bolt_tension_prying)
+            # print("bolt_tension_prying", self.bolt.bolt_tension_prying)
             self.comb_bolt_ir = (self.bolt.bolt_shear / (bolt_shear_capacity*beta_lj*beta_lg*beta_pk)) ** 2 + \
                            ((self.bolt.bolt_tension + self.bolt.bolt_tension_prying)/bolt_tension_capacity) ** 2
-            print(self.comb_bolt_ir)
+            # print(self.comb_bolt_ir)
             if self.comb_bolt_ir > 1:
                 no_bolt += 2
                 if self.bolt.bolt_type == TYP_BEARING:
@@ -1176,16 +1175,16 @@ class EndPlateConnection(ShearConnection):
                 break
             else:
                 t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
-                print(t_weld_req)
+                # print(t_weld_req)
                 available_welds_updated = list([x for x in available_welds if (t_weld_req <= x)])
-                print(available_welds_updated)
+                # print(available_welds_updated)
                 if not available_welds_updated:
                     self.plate.height += 10
                     self.weld.size = available_welds[0]
                     self.logger.warning('Weld stress is guiding plate height, trying with a length of %2.2f mm' % self.plate.height)
                 else:
                     self.weld.size = available_welds_updated[0]
-        print(self.weld.size, self.weld.length)
+        # print(self.weld.size, self.weld.length)
         if self.weld.strength < self.weld.stress:
             self.weld.t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
             self.weld.design_status = False
@@ -1431,7 +1430,7 @@ class EndPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self, popup_summary):
-        super(EndPlateConnection, self).save_design(self)
+        super(EndPlateConnection, self).save_design()
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
@@ -1726,7 +1725,7 @@ class EndPlateConnection(ShearConnection):
             ##################
             # Weld Checks
             ##################
-            plate_status = self.get_plate_status(self)
+            plate_status = self.get_plate_status()
 
             if self.design_status_bolt is True and plate_status is True:
                 weld_conn_plates_fu = [self.plate.fu, self.supported_section.fu, self.weld.fu]

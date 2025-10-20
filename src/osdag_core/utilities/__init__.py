@@ -77,7 +77,6 @@ def color_the_edges(shp, display, color, width):
             Ex.Next()
 
     except Exception as e:
-        # Print the error and traceback for more detail
         print(f"An error occurred: {e}")
         traceback.print_exc()  # This will print the full traceback
 

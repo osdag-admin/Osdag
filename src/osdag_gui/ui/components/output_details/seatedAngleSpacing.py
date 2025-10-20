@@ -1,18 +1,19 @@
-import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QGraphicsView,
-                             QGraphicsScene)
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtGui import QPainter, QPen, QFont
-from PyQt5.QtGui import QPolygonF, QBrush
-from PyQt5.QtCore import QPointF
+from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout, 
+                             QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
+                             QGraphicsScene, QScrollArea)
+from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainter, QPen, QFont
+from PySide6.QtGui import QPolygonF, QBrush
+from PySide6.QtCore import QPointF
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
-class SeatedAngleDetails(QMainWindow):
+class SeatedAngleDetails(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
-        
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.connection = connection_obj
         self.val=rows
         
@@ -30,10 +31,6 @@ class SeatedAngleDetails(QMainWindow):
              main.seated_spacing_beam(True)]
         val=self.val-1
         print(val)
-        # print(arr[0],len(arr[0]))
-        # print('\n\n')
-        # for i in range(len(arr[0])):
-        #     print(f"INDEX : {i}  : {arr[0][i]} , {arr[0][i][3]}")
         for i in arr[2]:
             print(i)
             print('\n\n')
@@ -64,20 +61,59 @@ class SeatedAngleDetails(QMainWindow):
         """)
         # self.initUI()
         self.param_map = {
-    'end': self.End,
-    'gauge': self.Gauge,
-    'edge': self.Edge,
-     'hole': main.bolt.bolt_diameter_provided
-}
+            'end': self.End,
+            'gauge': self.Gauge,
+            'edge': self.Edge,
+            'hole': main.bolt.bolt_diameter_provided
+        }
         
         print(self.param_map)
         self.initUI()
+
+    def setupWrapper(self):
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
+        self.setObjectName("spacing_capacity_details")
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(1, 1, 1, 1)
+        main_layout.setSpacing(0)
+        self.title_bar = CustomTitleBar()
+        self.title_bar.setTitle("Bolt Pattern")
+        main_layout.addWidget(self.title_bar)
+        self.content_widget = QWidget(self)
+        main_layout.addWidget(self.content_widget, 1)
+        size_grip = QSizeGrip(self)
+        size_grip.setFixedSize(16, 16)
+        overlay = QHBoxLayout()
+        overlay.setContentsMargins(0, 0, 4, 4)
+        overlay.addStretch(1)
+        overlay.addWidget(size_grip, 0, Qt.AlignBottom | Qt.AlignRight)
+        main_layout.addLayout(overlay)
+
     def initUI(self):
-        self.setWindowTitle('Bolt Pattern Generator')
-        self.setGeometry(100, 100, 1050, 750)
+        self.setupWrapper()
+        
+        # Center the window on the screen with the same dimensions
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 900, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
         
         # Main layout
-        main_layout = QHBoxLayout()
+        content_layout = QVBoxLayout(self.content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+        # Create scroll area for the entire content
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll = QWidget()
+        scroll.setObjectName("spacing_scroll_widget")
+
+        main_layout = QHBoxLayout(scroll)
         
         # Left panel for parameter display
         left_panel = QWidget()
@@ -99,6 +135,10 @@ class SeatedAngleDetails(QMainWindow):
         # Right panel for the drawing using QGraphicsView
         self.scene = QGraphicsScene()
         self.view = QGraphicsView(self.scene)
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
         self.view.setRenderHint(QPainter.Antialiasing)
         
         # Create and add the drawing to the scene
@@ -108,15 +148,11 @@ class SeatedAngleDetails(QMainWindow):
         main_layout.addWidget(left_panel, 1)
         main_layout.addWidget(self.view, 3)
         
-        # Set main widget
-        main_widget = QWidget()
-        main_widget.setLayout(main_layout)
-        self.setCentralWidget(main_widget)
-        
         # Ensure the view shows all content
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
     
-
+        scroll_area.setWidget(scroll)
+        content_layout.addWidget(scroll_area)
 
     def createDrawing(self, params):
         
@@ -135,7 +171,10 @@ class SeatedAngleDetails(QMainWindow):
         height = self.plate_length
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
-        dimension_pen = QPen(Qt.black, 1.5)
+        if self.theme.is_light():
+            dimension_pen = QPen(Qt.black, 1.5)
+        else:
+            dimension_pen = QPen(QColor("#8A8A8A"), 1.5)
         weld_fill = QBrush(Qt.red)
         
         # Dimension offsets
@@ -232,7 +271,10 @@ class SeatedAngleDetails(QMainWindow):
             (x1 + arrow_size, y1 + arrow_size/2)
         ]
         polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#4A4A4A")))
         
         points_right = [
             (x2, y2),
@@ -240,12 +282,19 @@ class SeatedAngleDetails(QMainWindow):
             (x2 - arrow_size, y2 + arrow_size/2)
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_right.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#4A4A4A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
@@ -266,7 +315,10 @@ class SeatedAngleDetails(QMainWindow):
                 (x1 + arrow_size/2, y1 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#4A4A4A")))
             
             points_bottom = [
                 (x2, y2),
@@ -274,7 +326,10 @@ class SeatedAngleDetails(QMainWindow):
                 (x2 + arrow_size/2, y2 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#4A4A4A")))
         else:
             points_top = [
                 (x2, y2),
@@ -282,7 +337,10 @@ class SeatedAngleDetails(QMainWindow):
                 (x2 + arrow_size/2, y2 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#4A4A4A")))
             
             points_bottom = [
                 (x1, y1),
@@ -290,12 +348,19 @@ class SeatedAngleDetails(QMainWindow):
                 (x1 + arrow_size/2, y1 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#4A4A4A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

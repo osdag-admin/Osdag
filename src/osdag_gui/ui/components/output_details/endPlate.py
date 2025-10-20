@@ -1,17 +1,19 @@
-import sys
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QGraphicsView,
-                             QGraphicsScene)
-from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QRectF
+from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout, 
+                             QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
+                             QGraphicsScene, QScrollArea)
+from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QPen, QFont
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
-class EndPlateDetails(QMainWindow):
+class EndPlateDetails(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.connection = connection_obj
         self.main=main
         output=main.output_values(True)
@@ -31,12 +33,51 @@ class EndPlateDetails(QMainWindow):
         self.weldgap=main.supported_section.web_thickness
         self.initUI()
         # print(self.connection.spacing(status=True))
+
+    def setupWrapper(self):
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
+        self.setObjectName("spacing_capacity_details")
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(1, 1, 1, 1)
+        main_layout.setSpacing(0)
+        self.title_bar = CustomTitleBar()
+        self.title_bar.setTitle("Bolt Pattern")
+        main_layout.addWidget(self.title_bar)
+        self.content_widget = QWidget(self)
+        main_layout.addWidget(self.content_widget, 1)
+        size_grip = QSizeGrip(self)
+        size_grip.setFixedSize(16, 16)
+        overlay = QHBoxLayout()
+        overlay.setContentsMargins(0, 0, 4, 4)
+        overlay.addStretch(1)
+        overlay.addWidget(size_grip, 0, Qt.AlignBottom | Qt.AlignRight)
+        main_layout.addLayout(overlay)
+
     def initUI(self):
-        self.setWindowTitle('Bolt Pattern Generator')
-        self.setGeometry(100, 100, 1200, 800)
+        self.setupWrapper()
         
+        # Center the window on the screen with the same dimensions
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 900, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
+
         # Main layout
-        main_layout = QHBoxLayout()
+        content_layout = QVBoxLayout(self.content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+        # Create scroll area for the entire content
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll = QWidget()
+        scroll.setObjectName("spacing_scroll_widget")
+
+        main_layout = QHBoxLayout(scroll)
         
         # Left panel for parameter display
         left_panel = QWidget()
@@ -60,6 +101,10 @@ class EndPlateDetails(QMainWindow):
         # Right panel for the drawing using QGraphicsView
         self.scene = QGraphicsScene()
         self.view = QGraphicsView(self.scene)
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
         self.view.setRenderHint(QPainter.Antialiasing)
         
         # Create and add the drawing to the scene
@@ -69,13 +114,12 @@ class EndPlateDetails(QMainWindow):
         main_layout.addWidget(left_panel, 1)
         main_layout.addWidget(self.view, 3)
         
-        # Set main widget
-        main_widget = QWidget()
-        main_widget.setLayout(main_layout)
-        self.setCentralWidget(main_widget)
-        
         # Ensure the view shows all content
         self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+
+        scroll_area.setWidget(scroll)
+        content_layout.addWidget(scroll_area)
+
     def get_parameters(self):
         spacing_data = self.connection.spacing(status=True)  # Get actual values
         param_map = {}
@@ -126,7 +170,10 @@ class EndPlateDetails(QMainWindow):
         
         # Set up pens
         outline_pen = QPen(Qt.blue, 2)
-        dimension_pen = QPen(Qt.black, 1.5)
+        if self.theme.is_light():
+            dimension_pen = QPen(Qt.black, 1.5)
+        else:
+            dimension_pen = QPen(QColor("#8A8A8A"), 1.5)
         red_brush = QBrush(Qt.red)
 
         # Dimension offsets
@@ -230,7 +277,10 @@ class EndPlateDetails(QMainWindow):
             (x1 + arrow_size, y1 + arrow_size/2)
         ]
         polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#4A4A4A")))
         
         points_right = [
             (x2, y2),
@@ -238,12 +288,19 @@ class EndPlateDetails(QMainWindow):
             (x2 - arrow_size, y2 + arrow_size/2)
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_right.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#4A4A4A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
@@ -264,7 +321,10 @@ class EndPlateDetails(QMainWindow):
                 (x1 + arrow_size/2, y1 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#4A4A4A")))
             
             points_bottom = [
                 (x2, y2),
@@ -272,7 +332,10 @@ class EndPlateDetails(QMainWindow):
                 (x2 + arrow_size/2, y2 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#4A4A4A")))
         else:
             points_top = [
                 (x2, y2),
@@ -280,7 +343,10 @@ class EndPlateDetails(QMainWindow):
                 (x2 + arrow_size/2, y2 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#4A4A4A")))
             
             points_bottom = [
                 (x1, y1),
@@ -288,12 +354,19 @@ class EndPlateDetails(QMainWindow):
                 (x1 + arrow_size/2, y1 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#4A4A4A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

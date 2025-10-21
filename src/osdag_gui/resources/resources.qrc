@@ -9,11 +9,16 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>images/osdag_logo.png</file>
         <file>vectors/Osdag_light.svg</file>
         <file>vectors/Osdag_dark.svg</file>
-        <file>vectors/FOSSEE_logo.svg</file>
+        <file>vectors/FOSSEE_light.svg</file>
+        <file>vectors/FOSSEE_dark.svg</file>
         <file>vectors/IITB_logo_light.svg</file>
         <file>vectors/IITB_logo_dark.svg</file>
-        <file>vectors/ConstructSteel_logo.svg</file>
-        <file>vectors/MOS_logo.svg</file>
+        <file>vectors/ConstructSteel_light.svg</file>
+        <file>vectors/ConstructSteel_dark.svg</file>
+        <file>vectors/MOS_light.svg</file>
+        <file>vectors/MOS_dark.svg</file>
+        <file>vectors/MOE_light.svg</file>
+        <file>vectors/MOE_dark.svg</file>
         <file>vectors/Osdag_label_light.svg</file>
         <file>vectors/Osdag_tagline_light.svg</file>
         <file>vectors/Osdag_label_dark.svg</file>
@@ -92,9 +97,6 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>images/3d_frame.png</file>
         <file>images/3d_frame_clicked.png</file>
-
-        <file>images/group_design.png</file>
-        <file>images/group_design_clicked.png</file>
 
         <file>images/down_arrow_light.png</file>
         <file>images/down_arrow_dark.png</file>

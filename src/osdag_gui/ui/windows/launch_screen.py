@@ -141,13 +141,13 @@ class OsdagLaunchScreen(object):
 
         self.LoadingLabel.setText(f"Loading Application    ")
 
-        self.IITBLogo.load(":/vectors/IITB_logo_light.svg")
+        self.IITBLogo.load(":/vectors/IITB_light.svg")
 
-        self.FOSSEELogo.load(":/vectors/FOSSEE_logo.svg")
+        self.FOSSEELogo.load(":/vectors/FOSSEE_light.svg")
    
-        self.MOSLogo.load(":/vectors/MOS_logo.svg")
+        self.MOSLogo.load(":/vectors/MOS_light.svg")
    
-        self.ConstructsteelLogo.load(":/vectors/ConstructSteel_logo.svg")
+        self.ConstructsteelLogo.load(":/vectors/ConstructSteel_light.svg")
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QPixmap

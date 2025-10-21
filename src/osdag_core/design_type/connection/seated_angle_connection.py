@@ -525,7 +525,7 @@ class SeatedAngleConnection(ShearConnection):
         # Populate hover dict
         self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {self.bolt.bolts_required if flag else ''}"
         
-        self.hover_dict["Angle"]= f"Angle: {self.seated_angle.designation if flag else ''}"
+        self.hover_dict["Angle"]= f"Angle: ISA {self.seated_angle.designation if flag else ''}"
         
         return out_list
 

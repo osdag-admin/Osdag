@@ -306,6 +306,34 @@ class HomeWindow(QWidget):
         self.variable_layout.addWidget(self.scroll_area_for_svg_cards, 1)
 
         content_v_layout.addWidget(self.variable_widget)
+
+        # --- Bottom Horizontal Layout with three SVG Widgets ---
+        self.bottom_right_container = QWidget()
+        self.bottom_right_container.setStyleSheet("""
+            QWidget {
+                background: transparent;
+            }
+        """)
+        self.bottom_right_h_layout = QHBoxLayout(self.bottom_right_container)
+        self.bottom_right_h_layout.setContentsMargins(10, 10, 0, 10)
+        self.bottom_right_h_layout.setSpacing(20)
+        self.bottom_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        self.bottom_svg_widget_1 = QSvgWidget()
+        self.bottom_svg_widget_1.setFixedSize(130, 60)         # 1032 x 479 ~ 130 x 60
+        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_1)
+
+        self.bottom_svg_widget_2 = QSvgWidget()
+        self.bottom_svg_widget_2.setFixedSize(122, 60)
+        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
+
+        self.bottom_svg_widget_3 = QSvgWidget()
+        self.bottom_svg_widget_3.setFixedSize(350, 40)
+        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignBottom)
+        self.bottom_right_h_layout.addStretch(1)
+
+        content_v_layout.addWidget(self.bottom_right_container)
+
         main_h_layout.addWidget(self.content, 8)       
         main_v_layout.addLayout(main_h_layout)
 
@@ -315,9 +343,15 @@ class HomeWindow(QWidget):
         if self.theme_manager.is_light():
             self.top_svg_widget_1.load(":/vectors/Osdag_label_light.svg")
             self.middle_top_svg_widget.load(":/vectors/Osdag_tagline_light.svg")
+            self.bottom_svg_widget_1.load(":/vectors/MOE_light.svg")
+            self.bottom_svg_widget_2.load(":/vectors/MOS_light.svg")
+            self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_light.svg")
         else:
             self.top_svg_widget_1.load(":/vectors/Osdag_label_dark.svg")
             self.middle_top_svg_widget.load(":/vectors/Osdag_tagline_dark.svg")
+            self.bottom_svg_widget_1.load(":/vectors/MOE_dark.svg")
+            self.bottom_svg_widget_2.load(":/vectors/MOS_dark.svg")
+            self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_dark.svg")
         return super().paintEvent(event)
 
     def _clear_layout(self, layout):

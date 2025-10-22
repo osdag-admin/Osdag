@@ -1529,7 +1529,8 @@ class Window(QMainWindow):
                         if title_name in out_titles:
                             title_name += str(title_repeat)
                             title_repeat += 1
-                        self.output_title_fields[title_name][0].setVisible(title_status[title_count])
+                        if title_count<len(title_status): 
+                            self.output_title_fields[title_name][0].setVisible(title_status[title_count])
                         title_count += 1
                         out_titles.append(title_name)
         self.ui_loaded = True

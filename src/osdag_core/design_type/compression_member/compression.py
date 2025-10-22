@@ -647,6 +647,101 @@ class Compression(Member):
         '', True)
         out_list.append(t1)
 
+        
+
+        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t9 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, "Fillet Weld" if flag else '', True)
+        out_list.append(t9)
+
+        t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '', True)
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
+        out_list.append(t10)
+
+
+        t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION_LONG_JOINT, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
+        out_list.append(t5)
+
+        t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX, round(self.weld.strength_red, 2) if flag else '',
+        True)
+        out_list.append(t10)
+
+        t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '', True)
+        out_list.append(t11)
+
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, int(round(self.weld.length,0)) if flag else '', True)
+
+        out_list.append(t13)
+
+        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
+        out_list.append(t18)
+
+
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, int(round(self.plate.thickness_provided,0)) if flag else '', True)
+        out_list.append(t19)
+
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, int(round(self.plate.height,0)) if flag else '', True)
+        out_list.append(t20)
+
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX,int(round(self.plate.length,0)) if flag else '', True)
+
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
+        out_list.append(t17)
+
+        t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+               (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
+
+        out_list.append(t21)
+
+        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
+        out_list.append(t18)
+
+        t8 = (None, DISP_TITLE_CONN_DETAILS , TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
+               int(round(self.inter_conn, 0)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
+               (round(self.inter_memb_length, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t9 = (KEY_OUT_INTER_WELD_SIZE, KEY_OUT_DISP_INTER_WELD_SIZE, TYPE_TEXTBOX, self.inter_weld_size if flag else '', True)
+        out_list.append(t9)
+
+        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
+        out_list.append(t18)
+
+        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,
+               int(round(self.inter_plate_height, 0)) if flag else '', True)
+        out_list.append(t20)
+
+        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,
+               int(round(self.inter_plate_length, 0)) if flag else '', True)
+        out_list.append(t21)
+
+
+
         # t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
         #        int(round(22.02, 0)) if flag else '', True)
         # out_list.append(t19)

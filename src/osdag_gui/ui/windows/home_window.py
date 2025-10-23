@@ -422,6 +422,7 @@ class HomeWindow(QWidget):
         elif isinstance(menu_bar_data, list):
             # zero level menu bar
             svg_card_widget = SvgCardContainer(menu_bar_data)
+            svg_card_widget.cardOpenClicked.connect(self.handle_card_open_clicked)
             self._clear_layout(self.svg_card_layout)
 
             label = QLabel(name)

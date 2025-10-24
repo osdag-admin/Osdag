@@ -17,8 +17,9 @@ from osdag_gui.__config__ import VERSION
 import osdag_gui.resources.resources_rc
 
 class CustomButton(QPushButton):
-    def __init__(self, text, icon_path_default, icon_path_clicked, group=None, parent=None):
+    def __init__(self, text, icon_path_default, icon_path_clicked, icon_dark, group=None, parent=None):
         super().__init__(text, parent)
+        self.theme = QApplication.instance().theme_manager
         self.group = group
         self.is_clicked = False
         self.setCursor(QCursor(Qt.PointingHandCursor))
@@ -26,7 +27,11 @@ class CustomButton(QPushButton):
 
         self.default_icon = QIcon(icon_path_default)
         self.clicked_icon = QIcon(icon_path_clicked)
-        self.setIcon(self.default_icon)
+        self.dark_icon = QIcon(icon_dark)
+        if self.theme.is_light():
+            self.setIcon(self.default_icon)
+        else:
+            self.setIcon(self.dark_icon)
         self.setIconSize(QSize(20, 20)) # Initial size, will be updated
         self.set_default_style()
 
@@ -34,13 +39,24 @@ class CustomButton(QPushButton):
         if self.group:
             for btn in self.group:
                 btn.set_default_style()
-                btn.setIcon(btn.default_icon)
+                if self.theme.is_light():
+                    btn.setIcon(self.default_icon)
+                else:
+                    btn.setIcon(self.dark_icon)
                 btn.is_clicked = False
         self.set_active_style()
         self.setIcon(self.clicked_icon)
         self.is_clicked = True
         print(self.text().strip(), "clicked")
         super().mousePressEvent(event)
+
+    def paintEvent(self, event):
+        if not self.is_clicked:
+            if self.theme.is_light():
+                self.setIcon(self.default_icon)
+            else:
+                self.setIcon(self.dark_icon)
+        return super().paintEvent(event)
 
     def set_font_size(self, size):
         font = self.font()
@@ -109,7 +125,7 @@ class VerticalMenuBar(QWidget):
         names = list(data.keys())
         for name in names:
             icon = icons.get(name)
-            btn = CustomButton("  " + name, icon[0], icon[1], group=self.button_group)
+            btn = CustomButton("  " + name, icon[0], icon[1], icon[2], group=self.button_group)
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Make buttons expand vertically
             btn.clicked.connect(lambda _,label=name, data=data.get(name): self._on_nav_button_clicked(data, label))
             btn.setCursor(Qt.CursorShape.PointingHandCursor)

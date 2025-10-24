@@ -62,22 +62,19 @@ class Data:
         "2D Frame": 
         [],
         "3D Frame": 
-        [],
-        "Group Design": 
         []
     }
     
     NAVBAR_ICONS = {
-        "Home": [":/vectors/home_default.svg", ":/vectors/home_clicked.svg"],
-        "Connection": [":/images/connection.png", ":/images/connection_clicked.png"],
-        "Tension Member": [":/images/tension_member.png", ":/images/tension_member_clicked.png"],
-        "Compression Member": [":/images/compression_member.png", ":/images/compression_member_clicked.png"],
-        "Flexural Member": [":/images/flexural_member.png", ":/images/flexural_member_clicked.png"],
-        "Beam Column": [":/images/beam_column.png", ":/images/beam_column_clicked.png"],
-        "Truss": [":/images/truss.png", ":/images/truss_clicked.png"],
-        "2D Frame": [":/images/2d_frame.png", ":/images/2d_frame_clicked.png"],
-        "3D Frame": [":/images/3d_frame.png", ":/images/3d_frame_clicked.png"],
-        "Group Design": [":/images/group_design.png", ":/images/group_design_clicked.png"],
+        "Home": [":/vectors/home_default.svg", ":/vectors/home_clicked.svg", ":/vectors/home_default.svg"],
+        "Connection": [":/images/connection.svg", ":/images/connection_clicked.svg", ":/images/connection_dark.svg"],
+        "Tension Member": [":/images/tension_member.svg", ":/images/tension_member_clicked.svg", ":/images/tension_member_dark.svg"],
+        "Compression Member": [":/images/compression_member.svg", ":/images/compression_member_clicked.svg", ":/images/compression_member_dark.svg"],
+        "Flexural Member": [":/images/flexural_member.svg", ":/images/flexural_member_clicked.svg", ":/images/flexural_member_dark.svg"],
+        "Beam Column": [":/images/beam_column.svg", ":/images/beam_column_clicked.svg", ":/images/beam_column_dark.svg"],
+        "Truss": [":/images/truss.svg", ":/images/truss_clicked.svg", ":/images/truss_dark.svg"],
+        "2D Frame": [":/images/2d_frame.svg", ":/images/2d_frame_clicked.svg", ":/images/2d_frame_dark.svg"],
+        "3D Frame": [":/images/3d_frame.png", ":/images/3d_frame_clicked.png", ":/images/3d_frame_dark.png"],
     }
 
     FLOATING_NAVBAR = [

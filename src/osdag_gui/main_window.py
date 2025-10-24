@@ -419,11 +419,19 @@ class MainWindow(QMainWindow):
         return self.tab_widget_content[index][0].layout().itemAt(0).widget()
 
     def _close_tab(self, index):
-        """Handles closing of tabs."""
+        """Handles closing of tabs with proper cleanup."""
+        widget = self.tab_widget.widget(index)
+        
+        # Get the template instance and cleanup
+        template_instance = self._get_template_instance(index)
+        if template_instance and hasattr(template_instance, 'cleanup'):
+            template_instance.cleanup()
+        
         self.tab_widget.removeTab(index)
         self.tab_bar.removeTab(index)
         self.tab_widget_content.pop(index)
-        # synchronize with tab_bar
+        
+        widget.deleteLater()
         self._synchronize_tab_widget()
         
     def _synchronize_tab_widget(self):
@@ -804,9 +812,9 @@ class MainWindow(QMainWindow):
             item = layout.takeAt(0)
             widget = item.widget()
             if widget is not None:
-                widget.setParent(None)
+                widget.deleteLater()
             else:
-                self.clear_layout(item.layout())
+                layout.deleteLater()
 
     def update_docking_icons(self, docking_icons_active=None, input_is_active=None, log_is_active=None, output_is_active=None):
         index = self.tab_bar.currentIndex()

@@ -141,7 +141,7 @@ class OsdagLaunchScreen(object):
 
         self.LoadingLabel.setText(f"Loading Application    ")
 
-        self.IITBLogo.load(":/vectors/IITB_light.svg")
+        self.IITBLogo.load(":/vectors/IITB_logo_light.svg")
 
         self.FOSSEELogo.load(":/vectors/FOSSEE_light.svg")
    

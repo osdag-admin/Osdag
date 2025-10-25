@@ -137,47 +137,6 @@ class MainWindow(QMainWindow):
                 btn.setObjectName("window_control_button")
             return btn
 
-        class ClickableSvgWidget(QSvgWidget):
-            clicked = Signal()  # Define a custom clicked signal
-            def __init__(self, parent=None):
-                super().__init__(parent)
-                self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-            def mousePressEvent(self, event):
-                if event.button() == Qt.MouseButton.LeftButton:
-                    self.clicked.emit()  # Emit the clicked signal on left-click
-                super().mousePressEvent(event)
-
-        # Control buttons
-        control_button_layout = QHBoxLayout()
-        control_button_layout.setSpacing(10)
-        control_button_layout.setContentsMargins(5,5,5,5)
-
-        self.input_dock_control = ClickableSvgWidget()
-        self.input_dock_control.setFixedSize(18, 18)
-        self.input_dock_control.clicked.connect(self.toggle_input_dock)
-        self.input_dock_active = True
-        control_button_layout.addWidget(self.input_dock_control)
-
-        self.log_dock_control = ClickableSvgWidget()
-        self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
-        self.log_dock_control.setFixedSize(18, 18)
-        self.log_dock_control.clicked.connect(self.logs_dock_icon_toggle)
-        self.log_dock_active = False
-        control_button_layout.addWidget(self.log_dock_control)
-
-        self.output_dock_control = ClickableSvgWidget()
-        self.output_dock_control.setFixedSize(18, 18)
-        self.output_dock_control.clicked.connect(self.toggle_output_dock)
-        self.output_dock_active = False
-        control_button_layout.addWidget(self.output_dock_control)
-
-        self.input_dock_control.hide()
-        self.log_dock_control.hide()
-        self.output_dock_control.hide()
-
-        top_h_layout.addLayout(control_button_layout)
-
         self.minimize_button = create_button(":/vectors/window_minimize_light.svg")
         self.minimize_button.clicked.connect(self.showMinimized)
         top_h_layout.addWidget(self.minimize_button)
@@ -220,21 +179,6 @@ class MainWindow(QMainWindow):
                 self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore_light.svg").toImage())))
             else:
                 self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize_light.svg").toImage())))
-            # Updating control buttons
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
-            
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
-            
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
 
         else:
             self.minimize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_minimize_dark.svg").toImage())))
@@ -243,21 +187,6 @@ class MainWindow(QMainWindow):
                 self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_restore_dark.svg").toImage())))
             else:
                 self.maximize_button.setIcon(QIcon(QPixmap.fromImage(QPixmap(":/vectors/window_maximize_dark.svg").toImage())))
-            # Updating control buttons
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
-            
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
-            
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
 
         super().paintEvent(event)
 
@@ -293,8 +222,8 @@ class MainWindow(QMainWindow):
 
         # it initially sets the home on the Tab
         self.open_home_page(module)
-        # False(dock icons show status), True(input dock show), False(logs dock show), False(output dock show)
-        self.tab_widget_content.append([body_widget, False, True, False, False])
+        # Widget of the Module
+        self.tab_widget_content.append(body_widget)
         self.tab_widget.addTab(body_widget, f"Tab {self.current_tab_index + 1}")
         # Update main_widget_layout to the layout of the new tab's body_widget
         if hasattr(body_widget, 'layout'):
@@ -310,25 +239,14 @@ class MainWindow(QMainWindow):
         new_index = self.tab_bar.count() - 1
         self.tab_bar.setCurrentIndex(new_index)
         self.tab_widget.setCurrentIndex(new_index)
-        # Update docking icons for the newly added tab
-        current_tab_data = self.tab_widget_content[new_index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-        
-        # self.sidebar.raise_() # Ensure sidebar stays on top after new tab addition
 
     def handle_tab_change(self, index):
         # Switch the QTabWidget to the new tab
         if index < len(self.tab_widget_content) and index >= 0:
             self.tab_widget.setCurrentIndex(index)
 
-            if self.tab_bar.tabText(index) == "Home":
-                self.tab_widget_content[index][1] = False
-            else:
-                self.tab_widget_content[index][1] = True
-                
-            current_tab_data = self.tab_widget_content[index]
             # Update main_widget_instance to the main widget in the current tab
-            body_widget = current_tab_data[0]
+            body_widget = self.tab_widget_content[index]
             if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
                 widget_item = body_widget.layout().itemAt(0)
                 if widget_item is not None:
@@ -338,10 +256,6 @@ class MainWindow(QMainWindow):
             # Update main_widget_layout to the layout of the current tab's body_widget
             if hasattr(body_widget, 'layout'):
                 self.main_widget_layout = body_widget.layout()
-
-            # Update dock icons based on the new tab's state
-            self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-
 
     # This is triggered by Quit button in Menu bar on template_page
     def close_current_tab(self):
@@ -415,7 +329,7 @@ class MainWindow(QMainWindow):
             return False
     
     def _get_template_instance(self, index) -> object:
-        return self.tab_widget_content[index][0].layout().itemAt(0).widget()
+        return self.tab_widget_content[index].layout().itemAt(0).widget()
 
     def _close_tab(self, index):
         """Handles closing of tabs with proper cleanup."""
@@ -437,16 +351,13 @@ class MainWindow(QMainWindow):
         current_index = self.tab_bar.currentIndex()
         self.tab_widget.setCurrentIndex(current_index)
         # Update global variables and icons
-        current_tab_data = self.tab_widget_content[current_index]
-        body_widget = current_tab_data[0]
+        body_widget = self.tab_widget_content[current_index]
         if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
             widget = body_widget.layout().itemAt(0).widget()
             self.main_widget_instance = widget
         # Ensure main_widget_layout points to the currently active tab's layout
         if hasattr(body_widget, 'layout'):
             self.main_widget_layout = body_widget.layout()
-        # Update docking icons using the current active tab index (not the closed one)
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
 
     # Allow dragging the window when frameless
     def mousePressEvent(self, event):
@@ -529,10 +440,6 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(fin_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
-        # Show docking Icons
-        self.tab_widget_content[index][1] = True
-        current_tab_data = self.tab_widget_content[index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
 
     def open_cleat_angle_shear_connection(self):
         title = "Cleat Angle Connection"
@@ -562,10 +469,6 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(fin_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
-        # Show docking Icons
-        self.tab_widget_content[index][1] = True
-        current_tab_data = self.tab_widget_content[index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
 
     def open_end_plate_shear_connection(self):
         title = "End Plate Connection"
@@ -595,11 +498,7 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(fin_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
-        # Show docking Icons
-        self.tab_widget_content[index][1] = True
-        current_tab_data = self.tab_widget_content[index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-    
+
     def open_seated_angle_shear_connection(self):
         title = "Seated Angle Connection"
         self.clear_layout(self.main_widget_layout)
@@ -628,11 +527,7 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(fin_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
-        # Show docking Icons
-        self.tab_widget_content[index][1] = True
-        current_tab_data = self.tab_widget_content[index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-    
+
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()
@@ -814,97 +709,6 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
             else:
                 layout.deleteLater()
-
-    def update_docking_icons(self, docking_icons_active=None, input_is_active=None, log_is_active=None, output_is_active=None):
-        index = self.tab_bar.currentIndex()
-        current_tab_data = self.tab_widget_content[index]
-        if(docking_icons_active is None):
-            docking_icons_active = current_tab_data[1]
-
-        # Update input dock icon
-        if docking_icons_active:
-            self.input_dock_control.show()
-            self.output_dock_control.show()
-            self.log_dock_control.show()
-
-            if(input_is_active is not None):
-                self.input_dock_active = input_is_active
-                # Update and save control state
-                self.tab_widget_content[index][2] = input_is_active
-                if self.input_dock_active:
-                    if self.theme.is_light():
-                        self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
-                    else:
-                        self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
-                else:
-                    if self.theme.is_light():
-                        self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
-                    else:
-                        self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
-                            
-            # Update output dock icon
-            if(output_is_active is not None):
-                self.output_dock_active = output_is_active
-                # Update and save control state
-                self.tab_widget_content[index][4] = output_is_active
-                if self.output_dock_active:
-                    if self.theme.is_light():
-                        self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
-                    else:
-                        self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
-                else:
-                    if self.theme.is_light():
-                        self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
-                    else:
-                        self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
-
-            # Update log dock icon
-            if(log_is_active is not None):
-                self.log_dock_active = log_is_active
-                # Update and save control state
-                self.tab_widget_content[index][3] = log_is_active
-                if self.log_dock_active:
-                    if self.theme.is_light():
-                        self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
-                    else:
-                        self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
-                else:
-                    if self.theme.is_light():
-                        self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
-                    else:
-                        self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
-        else:
-            self.input_dock_control.hide()
-            self.output_dock_control.hide()
-            self.log_dock_control.hide()
-
-    def toggle_input_dock(self):
-        if self.main_widget_instance:
-            self.main_widget_instance.input_dock_toggle()
-    
-    def toggle_output_dock(self):
-        if self.main_widget_instance:
-            self.main_widget_instance.output_dock_toggle()
-
-    def logs_dock_icon_toggle(self):
-        self.log_dock_active = not self.log_dock_active
-        self.tab_widget_content[self.tab_bar.currentIndex()][3] = self.log_dock_active
-        if self.log_dock_active:
-            if self.theme.is_light():
-                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
-        else:
-            if self.theme.is_light():
-                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")    
-
-        if self.main_widget_instance:
-            self.main_widget_instance.logs_dock_toggle(self.log_dock_active)
-
-    def print_n_test(self):
-        print(self)
 
 if __name__ == "__main__":
     import sys, os

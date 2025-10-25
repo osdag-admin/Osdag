@@ -747,6 +747,10 @@ QWidget#template_page {
     margin: 0px;
     padding: 0px;
 }
+QWidget#control_btn_widget {
+    background-color: #F4F4F4;
+    padding: 0px;
+}
 QMenuBar#template_page_menu_bar {
     background-color: #F4F4F4;
     color: #000000;

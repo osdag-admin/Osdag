@@ -125,29 +125,6 @@ QPushButton#themeToggle:hover {
     background-color: rgba(255, 255, 255, 100);
 }
 
-/* Additional Input Button */
-QPushButton#additional_input_btn {
-    background-color: white;
-    color: black;
-    font-weight: bold; 
-    border-radius: 5px;
-    border: 1px solid black;
-    padding: 5px 14px;
-    text-align: center;
-}
-
-QPushButton#additional_input_btn:hover {
-    background-color: #90AF13;
-    border: 1px solid #90AF13;
-    color: white;
-}
-
-QPushButton#additional_input_btn:pressed {
-    color: black;
-    background-color: white;
-    border: 1px solid black;
-}
-
 /* Navbar Button */
 QPushButton#navbar_button {
     background-color: #ffffff;
@@ -1501,4 +1478,107 @@ QDialog#customized_input QPushButton#pushButton_4:disabled,
 QDialog#customized_input QPushButton#pushButton_5:disabled {
     background-color: #d0d0d0;
     color: #888888;
+}
+/*=======================Additional-Inputs=======================================*/
+QDialog#AdditionalInputs{
+    background-color: #FFFFFF;
+    border: 1px solid #90AF13;
+}
+QWidget#TableWidget QTabWidget QWidget{
+    background-color: #ffffff;
+}
+QWidget#TableWidget QTabWidget > QWidget > QWidget > QWidget{
+    background-color: #ffffff;
+    border: 1px solid #D0D0D0;
+}
+#AdditionalInputs QTabBar::tab {
+    background: #F4F4F4;
+    border: 1px solid #d9d7d7;
+    padding: 6px 18px 6px 18px;
+    color: #000000;
+    margin-left: 0px;
+}
+#AdditionalInputs QTabBar::tab:selected {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    border-bottom: 1px solid #ffffff;
+    padding: 6px 18px 6px 18px;
+}
+#AdditionalInputs QTabBar::tab:hover {
+    border: 1px solid #000000;
+}
+/* Additional Input Button */
+QDialog#AdditionalInputs QPushButton {
+    background-color: white;
+    color: black;
+    font-weight: bold; 
+    border-radius: 5px;
+    border: 1px solid black;
+    padding: 5px 14px;
+    text-align: center;
+}
+QDialog#AdditionalInputs QPushButton:hover {
+    background-color: #90AF13;
+    border: 1px solid #90AF13;
+    color: white;
+}
+QDialog#AdditionalInputs QPushButton:pressed {
+    color: black;
+    background-color: white;
+    border: 1px solid black;
+}
+QDialog#AdditionalInputs QLineEdit {
+    padding: 2px 7px;
+    border: 1px solid #A6A6A6;
+    border-radius: 4px;
+    background-color: white;
+    color: #000000;
+    font-weight: normal;
+}
+QDialog#AdditionalInputs QComboBox{
+    padding: 2px 7px;
+    border: 1px solid #A6A6A6;
+    border-radius: 4px;
+    background-color: white;
+    color: black;
+}
+QDialog#AdditionalInputs QComboBox::drop-down{
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    border-left: 0px;
+}
+QDialog#AdditionalInputs QComboBox::down-arrow{
+    image: url(:/images/down_arrow_light.png);
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView{
+    background-color: white;
+    border: 1px solid black;
+    outline: none;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item{
+    color: black;
+    background-color: white;
+    border: none;
+    border: 1px solid white;
+    border-radius: 0;
+    padding: 2px;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:hover{
+    border: 1px solid #90AF13;
+    background-color: #90AF13;
+    color: black;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:selected{
+    background-color: #90AF13;
+    color: black;
+    border: 1px solid #90AF13;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:selected:hover{
+    background-color: #90AF13;
+    color: black;
+    border: 1px solid #94b816;
 }

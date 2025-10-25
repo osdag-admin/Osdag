@@ -19,6 +19,7 @@ import openpyxl
 class MyTableWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("TableWidget")
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(2, 2, 2, 2)
         self.tabs = QTabWidget()

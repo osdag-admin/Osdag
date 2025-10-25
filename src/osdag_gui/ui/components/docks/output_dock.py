@@ -717,17 +717,13 @@ class OutputDock(QWidget):
         super().resizeEvent(event)
         # Checking hasattr is only meant to prevent errors,
         # while standalone testing of this widget
-        if self.parent and hasattr(self.parent, 'parent') and self.parent.parent:
+        if self.parent:
             if self.width() == 0:
-                if hasattr(self.parent.parent, 'update_docking_icons'):
-                    self.parent.parent.update_docking_icons(output_is_active=False)
-                if hasattr(self.parent, 'update_input_label_state'):
-                    self.parent.update_output_label_state(True)
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(output_is_active=False)
             elif self.width() > 0:
-                if hasattr(self.parent.parent, 'update_docking_icons'):
-                    self.parent.parent.update_docking_icons(output_is_active=True)
-                if hasattr(self.parent, 'update_input_label_state'):
-                    self.parent.update_output_label_state(False)
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(output_is_active=True)
 
     # Functions for Design
     def output_title_change(self, main):

@@ -1510,3 +1510,109 @@ QDialog#customized_input QPushButton#pushButton_5:disabled {
     background-color: #d0d0d0;
     color: #888888;
 }
+/*=======================Additional-Inputs=======================================*/
+QDialog#AdditionalInputs{
+    background-color: #333333;
+    border: 1px solid #6B7D20;
+}
+QWidget#TableWidget QTabWidget QWidget{
+    background-color: #333333;
+}
+QWidget#TableWidget QTabWidget > QWidget > QWidget > QWidget{
+    background-color: #333333;
+    border: 1px solid #D0D0D0;
+}
+#AdditionalInputs QTabBar::tab {
+    background: #282828;
+    border: 1px solid #D0D0D0;
+    padding: 6px 18px 6px 18px;
+    color: #D0D0D0;
+    margin-left: 0px;
+}
+#AdditionalInputs QTabBar::tab:selected {
+    background: #333333;
+    color: #FFFFFF;
+    border: 1px solid #D0D0D0;
+    border-bottom: 1px solid #333333;
+    padding: 6px 18px 6px 18px;
+}
+#AdditionalInputs QTabBar::tab:hover {
+    border-bottom: 1px solid #333333;
+}
+/* Additional Input Button */
+QDialog#AdditionalInputs QPushButton {
+    background-color: #282828;
+    color: #D0D0D0;
+    font-weight: bold; 
+    border-radius: 5px;
+    border: 1px solid #D0D0D0;
+    padding: 5px 14px;
+    text-align: center;
+}
+QDialog#AdditionalInputs QPushButton:hover {
+    background-color: #6B7D20;
+    border: 1px solid #6B7D20;
+    color: white;
+}
+QDialog#AdditionalInputs QPushButton:pressed {
+    color: #D0D0D0;
+    background-color: #282828;
+    border: 1px solid #D0D0D0;
+}
+QDialog#AdditionalInputs QLineEdit {
+    padding: 2px 7px;
+    border: 1px solid #D0D0D0;
+    border-radius: 4px;
+    background-color: #333333;
+    color: #D0D0D0;
+    font-weight: normal;
+}
+QDialog#AdditionalInputs QLabel {
+    color: #D0D0D0;
+}
+QDialog#AdditionalInputs QComboBox{
+    padding: 2px 7px;
+    border: 1px solid #D0D0D0;
+    border-radius: 4px;
+    background-color: white;
+    color: #D0D0D0;
+}
+QDialog#AdditionalInputs QComboBox::drop-down{
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    border-left: 0px;
+}
+QDialog#AdditionalInputs QComboBox::down-arrow{
+    image: url(:/images/down_arrow_light.png);
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView{
+    background-color: #282828;
+    border: 1px solid #D0D0D0;
+    outline: none;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item{
+    color: #D0D0D0;
+    background-color: #282828;
+    border: none;
+    border: 1px solid #282828;
+    border-radius: 0;
+    padding: 2px;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:hover{
+    border: 1px solid #6B7D20;
+    background-color: #6B7D20;
+    color: #D0D0D0;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:selected{
+    background-color: #6B7D20;
+    color: #D0D0D0;
+    border: 1px solid #6B7D20;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:selected:hover{
+    background-color: #6B7D20;
+    color: #D0D0D0;
+    border: 1px solid #6B7D20;
+}

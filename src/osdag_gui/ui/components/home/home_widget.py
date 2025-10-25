@@ -236,7 +236,7 @@ class ProjectItem(QFrame):
         actions_layout.setSpacing(5)  # Reduced spacing
         
         # Buttons with FULL visibility
-        self.generate_btn = QPushButton("Generate Report")
+        self.generate_btn = QPushButton("Download Report")
         self.generate_btn.clicked.connect(lambda checked=False, record=self.project_data: self.generateReport.emit(record))
 
         self.download_btn = QPushButton("Download OSI")
@@ -736,7 +736,7 @@ class HomeWidget(QWidget):
         self.worker = self.ReportWorker(record, target_pdf, parent=self)
         self.worker.success.connect(lambda path: CustomMessageBox(
             title="Success",
-            text=f"PDF report saved successfully to:\n{path}",
+            text=f"PDF Report Saved Successfully.",
             dialogType=MessageBoxType.Success
         ).exec())
         self.worker.error.connect(lambda msg: CustomMessageBox(

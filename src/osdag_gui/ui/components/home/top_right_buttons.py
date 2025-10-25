@@ -2,12 +2,10 @@
 Top right button bar for Osdag GUI.
 Contains custom animated buttons and dropdowns for quick actions.
 """
-import sys
-import os
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QFrame, QMenu, QLabel, QPushButton, QButtonGroup
+    QApplication, QMenu, QPushButton
 )
-from PySide6.QtCore import Qt, QSize, QPoint, QPropertyAnimation, QEasingCurve, QTimer, Signal, QFile, QTextStream
+from PySide6.QtCore import Qt, QSize, QPoint, QPropertyAnimation, QEasingCurve, QTimer, Signal
 from PySide6.QtGui import QIcon, QAction
 from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
 from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions

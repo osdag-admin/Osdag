@@ -4,7 +4,7 @@ Handles splash screen and main window launch.
 """
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal, QFile, QTextStream
-from PySide6.QtGui import QIcon, QFontDatabase, QFont
+from PySide6.QtGui import QFontDatabase, QFont
 from osdag_core.utils.internet_connectivity import InternetConnectivity
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
 from osdag_gui.data.database.database_config import refactor_database, create_user_database
@@ -133,15 +133,15 @@ class LaunchScreenPopup(QMainWindow):
             self.on_finish()
 
 def GUI():
-    const = {
-        'GREEN_LIGHT_MODE': '#90AF13',
-        'WHITE': '#FFFFFF',
-        'OFF_WHITE': '#F4F4F4',
-        'CONTROL_BTN_HOVER': '#D9D7D7',
-        'CONTROL_BTN_CLICK': '#CFCFCF',
-        'CLOSE_BTN_HOVER': '#E81123',
-        'CLOSE_BTN_CLICK': '#F1707A'
-    }
+    # const = {
+    #     'GREEN_LIGHT_MODE': '#90AF13',
+    #     'WHITE': '#FFFFFF',
+    #     'OFF_WHITE': '#F4F4F4',
+    #     'CONTROL_BTN_HOVER': '#D9D7D7',
+    #     'CONTROL_BTN_CLICK': '#CFCFCF',
+    #     'CLOSE_BTN_HOVER': '#E81123',
+    #     'CLOSE_BTN_CLICK': '#F1707A'
+    # }
     app = QApplication(sys.argv)
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     font = QFontDatabase.applicationFontFamilies(fid)[0]

@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
+    QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QComboBox, QScrollArea, QLabel, QLineEdit, QSizePolicy, QTabWidget
 )
 from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog

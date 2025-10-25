@@ -2,18 +2,12 @@
 SVG card widgets for Osdag GUI.
 Display module cards with SVG icons and open actions.
 """
-import sys
-import os
-
 from PySide6.QtWidgets import (
-    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
-    QLabel, QMainWindow, QSizePolicy, QFrame
+    QWidget, QVBoxLayout, QGridLayout,
+    QLabel, QSizePolicy, QFrame
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation, QEasingCurve
-from PySide6.QtGui import QFont, QIcon, QPainter
-from PySide6.QtSvg import QSvgRenderer
-
+from PySide6.QtCore import Qt, Signal, QEvent, QPropertyAnimation, QEasingCurve
 from PySide6.QtCore import Signal, Qt
 
 class ClickableLabel(QLabel):

@@ -2,18 +2,15 @@
 Vertical navigation bar for Osdag GUI.
 Handles navigation buttons and logo display.
 """
-import sys
-import os
 from PySide6.QtWidgets import (
-    QMainWindow, QApplication, QWidget, QPushButton, QLabel,
-    QVBoxLayout, QHBoxLayout, QFrame, QSizePolicy, QSpacerItem
+    QApplication, QWidget, QPushButton, QLabel,
+    QVBoxLayout, QFrame, QSizePolicy, QSpacerItem
 )
 from PySide6.QtGui import QFont, QCursor, QIcon, QPainter, QColor
 from PySide6.QtCore import Qt, QSize, QEvent, Signal
 from PySide6.QtSvgWidgets import QSvgWidget
 
 from osdag_gui.__config__ import VERSION
-
 import osdag_gui.resources.resources_rc
 
 class CustomButton(QPushButton):

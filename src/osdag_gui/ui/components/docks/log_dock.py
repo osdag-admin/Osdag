@@ -2,7 +2,7 @@
 Log dock widget for Osdag GUI.
 Displays log messages and status updates.
 """
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel
 from PySide6.QtCore import Qt, QDateTime
 
 class LogDock(QWidget):

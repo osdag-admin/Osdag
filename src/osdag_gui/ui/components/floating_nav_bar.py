@@ -2,12 +2,11 @@
 Floating navigation bar for Osdag GUI.
 Provides quick access to modules and emits tab open signals.
 """
-import os
 import osdag_gui.resources.resources_rc
 from osdag_gui.data.ui_data import Data
 
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QPushButton, QSizePolicy, QSpacerItem, QApplication, QToolTip
+    QWidget, QVBoxLayout, QPushButton, QToolTip
 )
 from PySide6.QtGui import QIcon, QCursor
 from PySide6.QtCore import Qt, QSize, QPoint, QTimer, Signal

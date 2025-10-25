@@ -1,7 +1,7 @@
 import sys
 import multiprocessing as mp
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QDialog, QLabel
-from PySide6.QtCore import Qt, QThread, Signal, QTimer
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QPainter, QColor, QPen, QIcon
 
 

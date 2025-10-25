@@ -5,7 +5,7 @@ Displays splash screen with animation and logos.
 import osdag_gui.resources.resources_rc
 
 from PySide6.QtCore import (QCoreApplication, QMetaObject, QEasingCurve,
-                            QRect, QTimer, Qt, QPropertyAnimation, QFile)
+                            QRect, QTimer, Qt, QPropertyAnimation)
 from PySide6.QtGui import (QFont, QIcon)
 from PySide6.QtWidgets import (QLabel, QWidget)
 from PySide6.QtSvgWidgets import QSvgWidget

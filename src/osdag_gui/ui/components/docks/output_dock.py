@@ -5,12 +5,11 @@ Displays output fields and report generation for connection design.
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
-    QPushButton, QLabel, QSizePolicy, QGroupBox, QFrame, QDialog,
-    QFormLayout, QLineEdit, QScrollArea, QTableWidget, QGridLayout,
-    QFileDialog, QSizeGrip
+    QPushButton, QLabel, QSizePolicy, QGroupBox,
+    QFormLayout, QLineEdit, QScrollArea,
+    QFileDialog
 )
-from PySide6.QtGui import QPalette, QColor, QPixmap, QIcon, QPainter
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve, QCoreApplication
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 
 from osdag_core.texlive.Design_wrapper import init_display as init_display_off_screen
 

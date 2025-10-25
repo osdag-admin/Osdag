@@ -1,13 +1,13 @@
 import sys, os, yaml, time
 import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QColorDialog,
-    QLabel, QPushButton, QFileDialog,  QCheckBox, QComboBox, QLineEdit,
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QFileDialog,  QCheckBox, QComboBox, QLineEdit,
     QMenuBar, QSplitter, QSizePolicy, QDialog
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEvent, Signal, QEasingCurve, QTimer
-from PySide6.QtGui import QIcon, QFont, QPixmap, QGuiApplication, QKeySequence, QAction, QColor, QBrush
+from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, Signal, QTimer
+from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush
 
 from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
 from osdag_gui.ui.components.docks.input_dock import InputDock

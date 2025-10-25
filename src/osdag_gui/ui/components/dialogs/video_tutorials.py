@@ -1,8 +1,7 @@
 import sys
-from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QHBoxLayout, QWidget
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QIcon, QPixmap, QFont, QCursor, QDesktopServices
-from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon, QCursor
 
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 import osdag_gui.resources.resources_rc

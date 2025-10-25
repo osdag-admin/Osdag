@@ -2,14 +2,14 @@
 Input dock widget for Osdag GUI.
 Handles user input forms and group boxes for connection design.
 """
-import sys, time
+import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QProgressBar
-from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QRect, QThread, Signal
-from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
+from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout
+from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication
+from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import DockCustomButton

@@ -4,17 +4,14 @@ Displays navigation, SVG cards, and home widgets.
 """
 import osdag_gui.resources.resources_rc
 
-from PySide6.QtWidgets import QMainWindow
-from PySide6.QtCore import QThread, Signal, Slot
+from PySide6.QtCore import Signal, Slot
 
-import sys
-import os
 from PySide6.QtWidgets import (
-    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout,
-    QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup
+    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication,
+    QLabel, QSizePolicy, QFrame, QScrollArea, QButtonGroup
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, Signal, QSize, QEvent, QRect, QPropertyAnimation, QEasingCurve, Property
+from PySide6.QtCore import Qt, Signal, QSize, QPropertyAnimation, QEasingCurve, Property
 from PySide6.QtGui import QFont, QIcon, QPaintEvent, QPainter, QColor
 from PySide6.QtSvg import QSvgRenderer
 
@@ -24,7 +21,6 @@ from osdag_gui.ui.components.home.navbar import VerticalMenuBar
 from osdag_gui.ui.components.custom_buttons import MenuButton
 from osdag_gui.ui.components.home.top_right_buttons import TopButton, DropDownButton
 from osdag_gui.ui.components.home.home_widget import HomeWidget
-from PySide6.QtWidgets import QSplitter
 
 # --- Internet Connectivity Indicator Button ---
 class InternetConnectionIndicator(TopButton):

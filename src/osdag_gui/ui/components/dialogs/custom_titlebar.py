@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QHBoxLayout, QSizePolicy, QVBoxLayout
 from PySide6.QtCore import Qt, QPoint, QEvent
-from PySide6.QtGui import QMouseEvent, QPixmap, QFont
+from PySide6.QtGui import QMouseEvent, QFont
 
 class CustomTitleBar(QWidget):
     def __init__(self, max_res_btn: bool = False, min_res_btn:bool = False, parent=None):

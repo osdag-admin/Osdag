@@ -5,14 +5,13 @@ Displays recent projects, modules, and search bar.
 import sys, shutil
 import os, subprocess
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QScrollArea, QFrame, QLineEdit, QPushButton, QFileDialog,
-    QMenu, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect
+    QGraphicsDropShadowEffect
 )
-from PySide6.QtCore import Qt, QSize, QPoint, Signal, QPropertyAnimation, QEasingCurve, QThread
-from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QCursor, QPainter, QPixmap, QFontMetrics
+from PySide6.QtCore import Qt, QSize, Signal, QPropertyAnimation, QEasingCurve, QThread
+from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QFontMetrics
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtSvg import QSvgRenderer # Import QSvgRenderer for custom painting
 
 import osdag_gui.resources.resources_rc
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType

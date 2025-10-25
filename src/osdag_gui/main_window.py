@@ -5,19 +5,18 @@ Handles tab management, docking icons, and main window controls.
 import osdag_gui.resources.resources_rc
 
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import Signal
 
 import sys
 import os, yaml
 from pathlib import Path
 from PySide6.QtWidgets import (
-    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QGridLayout, QFileDialog,
-    QLabel, QMainWindow, QSizePolicy, QFrame, QScrollArea, QButtonGroup, QTabBar, QTabWidget,
+    QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog,
+    QMainWindow, QTabBar, QTabWidget,
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, Signal, QSize, QEvent, QTimer, QPropertyAnimation, QEasingCurve, Property
-from PySide6.QtGui import QFont, QIcon, QPainter, QColor, QGuiApplication, QPixmap
-from PySide6.QtSvg import QSvgRenderer
+from PySide6.QtCore import Qt, Signal, QSize, QEvent, QTimer
+from PySide6.QtGui import QIcon, QGuiApplication, QPixmap
 
 from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow

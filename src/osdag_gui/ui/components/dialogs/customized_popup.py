@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import (QPushButton, QLabel, QMessageBox, QDialog, QGridLayout, QLineEdit, QHBoxLayout, QVBoxLayout, QWidget,
+from PySide6.QtWidgets import (QPushButton, QLabel, QMessageBox, QHBoxLayout, QVBoxLayout, QWidget,
                                QListWidget, QListWidgetItem, QAbstractItemView, QApplication, QSizePolicy)
-from PySide6.QtCore import (QRect, QMetaObject, QCoreApplication, QSize, Qt)
+from PySide6.QtCore import (QRect, QMetaObject, Qt)
 from PySide6.QtGui import QGuiApplication
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 

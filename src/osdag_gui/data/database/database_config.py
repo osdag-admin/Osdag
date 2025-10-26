@@ -28,7 +28,7 @@ REPORT_FILE_PATH = 'files_path'
 #------------------------------------Search-logic-start------------------------------------------------------------
 SEARCH_MODULE_MAP = {
     'Fin Plate Shear Connection': KEY_DISP_FINPLATE,
-    'End Plate Shear Connection': KEY_DISP_ENDPLATE,
+    'Header Plate Shear Connection': KEY_DISP_ENDPLATE,
     'Cleat Angle Shear Connection': KEY_DISP_CLEATANGLE,
     'Seated Angle Shear Connection': KEY_DISP_SEATED_ANGLE,
     'Beam to Beam Cover Plate Bolted Moment Connection': KEY_DISP_BEAMCOVERPLATE,
@@ -214,7 +214,7 @@ MODULE_MAP = {
     #----------------------------Connections-start-------------------------------------
     #--------------------Submodule---------Module---------Open-module-function---------
     KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection', 'open_fin_plate_shear_connection'],
-    KEY_DISP_ENDPLATE: ['End Plate', 'Shear Connection', 'open_end_plate_shear_connection'],
+    KEY_DISP_ENDPLATE: ['Header Plate', 'Shear Connection', 'open_header_plate_shear_connection'],
     KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'open_cleat_angle_shear_connection'],
     KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'open_seated_angle_shear_connection'],
 

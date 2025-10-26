@@ -405,8 +405,8 @@ class MainWindow(QMainWindow):
             self.open_fin_plate_shear_connection()
         elif card_title == "Cleat Angle":
             self.open_cleat_angle_shear_connection()
-        elif card_title == "End Plate":
-            self.open_end_plate_shear_connection()
+        elif card_title == "Header Plate":
+            self.open_header_plate_shear_connection()
         elif card_title == "Seated Angle":
             self.open_seated_angle_shear_connection()
 
@@ -470,8 +470,8 @@ class MainWindow(QMainWindow):
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
 
-    def open_end_plate_shear_connection(self):
-        title = "End Plate Connection"
+    def open_header_plate_shear_connection(self):
+        title = "Header Plate Connection"
         self.clear_layout(self.main_widget_layout)
         fin_plate = CustomWindow(title, EndPlateConnection, parent=self)
 

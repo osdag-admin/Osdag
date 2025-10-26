@@ -12,7 +12,7 @@ class Data:
             [
                 ("Fin Plate",":/vectors/shear_fin_plate_connec.svg"),
                 ("Cleat Angle", ":/vectors/shear_cleat_angle_connec.svg"),
-                ("End Plate", ":/vectors/end_plate_connec.svg"),
+                ("Header Plate", ":/vectors/end_plate_connec.svg"),
                 ("Seated Angle", ":/vectors/seated_angle_connec.svg")
             ],
             "Moment Connection": 

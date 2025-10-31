@@ -790,7 +790,7 @@ QMenuBar#template_page_menu_bar::item:selected {
     background: #282828;
 }
 QMenuBar#template_page_menu_bar::item:pressed {
-    background: #D0D0D0;
+    background: rgb(94, 94, 94);
 }
 QMenuBar#template_page_menu_bar QMenu {
     background-color: #383838;

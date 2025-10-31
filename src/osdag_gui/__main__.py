@@ -144,7 +144,7 @@ def GUI():
     # }
     app = QApplication(sys.argv)
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
-    font = QFontDatabase.applicationFontFamilies(fid)[0]
+    # font = QFontDatabase.applicationFontFamilies(fid)[0]
     # app.setFont(QFont(font))
 
     app.theme_manager = ThemeManager(app)

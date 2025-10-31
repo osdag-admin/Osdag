@@ -4,7 +4,7 @@ Displays navigation, SVG cards, and home widgets.
 """
 import osdag_gui.resources.resources_rc
 
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import QRectF, Signal, Slot
 
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication,
@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, Signal, QSize, QPropertyAnimation, QEasingCurve, Property
-from PySide6.QtGui import QFont, QIcon, QPaintEvent, QPainter, QColor
+from PySide6.QtGui import QFont, QIcon, QPaintEvent, QPainter, QColor, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
 from osdag_gui.data.ui_data import Data
@@ -81,29 +81,43 @@ class BackgroundSvgWidget(QWidget):
     def __init__(self, svg_light, svg_dark, parent=None):
         super().__init__(parent)
         self.theme = parent.theme_manager
-        self.light = svg_light
-        self.dark = svg_dark
+        self.is_light = True
+        self.light = QSvgRenderer(svg_light)
+        self.dark = QSvgRenderer(svg_dark)
+        self.pixmap = None
         self.setObjectName("svg_widget_background")
         self.setContentsMargins(0, 0, 0, 0) # Ensure no margins for drawing
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
+    def updatePixmap(self):
+        size = self.size()
+        if not size.isValid():
+            return
+        renderer = self.light if self.theme.is_light() else self.dark
+        self.pixmap = QPixmap(size)
+        self.pixmap.fill(Qt.transparent)
+        painter = QPainter(self.pixmap)
+        # Draw SVG background
+        renderer.render(painter, QRectF(0, 0, size.width(), size.height()))
         # Draw left border
-        border_color = QColor("#90AF13")
         pen = painter.pen()
+        border_color = QColor("#90AF13")
         pen.setColor(border_color)
         pen.setWidth(3)
         painter.setPen(pen)
-        # Draw SVG background
-        target_rect = self.rect()
-        if self.theme.is_light():
-            svg_renderer = QSvgRenderer(self.light)
-        else:
-            svg_renderer = QSvgRenderer(self.dark)
-        svg_renderer.render(painter, target_rect)
         painter.drawLine(0, 0, 0, self.height())
         painter.end()
-        super().paintEvent(event)
+
+    def resizeEvent(self, event):
+        self.updatePixmap()
+
+    def paintEvent(self, event):
+        if self.pixmap:
+            painter = QPainter(self)
+            painter.drawPixmap(0, 0, self.pixmap)
+        # XOR of both values to check if they differ
+        if (self.is_light and not self.theme.is_light()) or (not self.is_light and self.theme.is_light()):
+            self.is_light = not self.is_light
+            self.updatePixmap()
 
 # --- End of background_svg_widget.py content ---
 class FadeWidget(QWidget):

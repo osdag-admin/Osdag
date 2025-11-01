@@ -226,7 +226,7 @@ MODULE_MAP = {
     KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection', 'None'],
     KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection', 'None'],
 
-    KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'None'],
+    KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'open_end_plate_btc_page'],
 
     KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection', 'None'],
     KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection', 'None'],

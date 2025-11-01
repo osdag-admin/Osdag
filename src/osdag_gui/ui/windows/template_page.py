@@ -1362,6 +1362,8 @@ class CustomWindow(QWidget):
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.output_dock.output_widget.findChild(QWidget, option[0]).setEnabled(True)
+                    self.output_dock.output_widget.findChild(QPushButton, option[0]).setEnabled(True)
+
 
             # Ensure Output dock is visible and sized when we have results
             if status:

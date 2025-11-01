@@ -239,7 +239,12 @@ class OutputDock(QWidget):
         if spacing_button_list:
             for tupple in spacing_button_list:
                 button = self.output_widget.findChild(QWidget, tupple[0])
-                self.output_button_connect(spacing_button_list, button)
+                buttonQPush = self.output_widget.findChild(QPushButton, tupple[0])
+
+                if button:
+                    self.output_button_connect(spacing_button_list, button)
+                if buttonQPush and buttonQPush is not button:
+                    self.output_button_connect(spacing_button_list, buttonQPush)
 
         btn_button_layout = QHBoxLayout()
         btn_button_layout.setContentsMargins(0, 20, 0, 0)
@@ -621,6 +626,17 @@ class OutputDock(QWidget):
                             print(f'rows: {self.backend.bolt_row} , cols : {self.backend.bolt_column} , {self.backend.bolt_row_web}')
                             self.run_spacing_script(0,0,B2CEndPlateDetails,main)
                             return
+               
+                # Stiffener Sketch
+                elif op[0] == KEY_OUT_STIFFENER_SKETCH and main.module_name() == KEY_DISP_BCENDPLATE:
+                    self.run_capacity_details(cols=1, rows=1, generator_class=B2CEndPlateDetails, main=main)
+                    return
+                # Typical Detailing
+                elif op[0] == "Stiffener.Sketch" and op[1] == "Typical Sketch":
+                    if main.module_name() == KEY_DISP_BCENDPLATE:
+                        self.run_spacing_script(0,0, B2CEndPlateDetails, main)
+                        return
+
                 elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
                     if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
                         self.run_spacing_script(0,0,BasePlateDetails,main)

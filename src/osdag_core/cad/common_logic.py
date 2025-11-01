@@ -963,7 +963,7 @@ class CommonDesignLogic(object):
         Calls the CAD components like beam, plate, stiffeners, fillet and grove weld, nut and bolt. Also calls CAD file
         :return: creates CAD model
         """
-        BCE = self.module_class
+        BCE = self.module_object
 
 
 
@@ -2275,6 +2275,13 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_BCENDPLATE:
                 self.Bc = self.module_object
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
+                label_column = ["Column", hover_dict.get("Column", "Column")]
+                label_beam = ["Beam", hover_dict.get("Beam", "Beam")]
+                label_plate = ["Plate", hover_dict.get("Plate", "Plate")]
+                label_weld = ["Weld", hover_dict.get("Weld", "Weld")]
+                label_bolt = ["Bolt", hover_dict.get("Bolt", "Bolt")]
                 self.ExtObj = self.createBCEndPlateCAD()
 
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
@@ -2287,7 +2294,8 @@ class CommonDesignLogic(object):
                 # Displays the beams #TODO ANAND
                 if self.component == "Column":
                     self.display.View_Iso()
-                    osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
+                    osdag_display_shape(self.display, self.ExtObj.columnModel, update=True, color=column_color, label=label_column, canvas=self.cad_widget)
+
                     # Point1 = gp_Pnt(-self.Bc.supporting_section.flange_width/2, 0, c_length)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                     # Point = gp_Pnt(0.0, 0.0, 10)
@@ -2295,30 +2303,32 @@ class CommonDesignLogic(object):
 
                 elif self.component == "Beam":
                     self.display.View_Iso()
-                    osdag_display_shape(self.display, self.ExtObj.beamModel, update=True,
-                                        material=Graphic3d_NOM_ALUMINIUM)
+                    osdag_display_shape(self.display, self.ExtObj.beamModel, update=True, color=beam_color,
+                        label=label_beam, canvas=self.cad_widget)
                     # Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
                     # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                     # , color = 'Dark Gray'
 
                 elif self.component == "Connector":
                     osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
+                        color=plate_color, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
+                        color=weld_color, label=label_weld, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
-                                        color=Quantity_NOC_SADDLEBROWN)
+                        color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
 
 
                 elif self.component == "Model":
-
-                    osdag_display_shape(self.display, self.ExtObj.get_column_models(), update=True)
+                    osdag_display_shape(self.display, self.ExtObj.get_column_models(), update=True,
+                        color=column_color, label=label_column, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True,
-                                        material=Graphic3d_NOM_ALUMINIUM)
+                        color=beam_color, label=label_beam, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
+                        color=plate_color, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
+                        color=weld_color, label=label_weld, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
-                                        color=Quantity_NOC_SADDLEBROWN)
+                        color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
                     # Point1 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -self.Bc.supporting_section.depth/2, c_length*0.75)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                     # Point2 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -b_length, c_length / 2)
@@ -2476,7 +2486,7 @@ class CommonDesignLogic(object):
 
 
                 if self.component == "Member":  # Todo: change this into key
-                    osdag_display_shape(self.display, onlymember, update=True)
+                    osdag_display_shape(self.display, onlymember, update=True,label=label_member, canvas=self.cad_widget)
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
@@ -2492,7 +2502,6 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_YELLOW, update=True)
-
 
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_object

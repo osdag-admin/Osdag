@@ -72,7 +72,7 @@ class CustomWindow(QWidget):
         self.sidebar.resize_sidebar(self.width(), self.height())
         self.sidebar.move(-self.sidebar.width() + 12, self.menu_bar.height())
         self.sidebar_animation = QPropertyAnimation(self.sidebar, b"geometry")
-        self.sidebar_animation.setDuration(40)
+        self.sidebar_animation.setDuration(80)
         self.sidebar.installEventFilter(self)
         self.sidebar.raise_()
 
@@ -1212,12 +1212,12 @@ class CustomWindow(QWidget):
             self.splitter,
             sizes,
             target_sizes,
-            duration=40,
+            duration=10,
             on_finished=after_anim
         )
 
     def animate_splitter_sizes(self, splitter, start_sizes, end_sizes, duration, on_finished=None):
-        steps = 5
+        steps = 1
         interval = duration // steps
         step_sizes = [
             [start + (end - start) * i / steps for start, end in zip(start_sizes, end_sizes)]

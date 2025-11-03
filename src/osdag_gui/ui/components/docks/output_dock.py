@@ -43,6 +43,7 @@ from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
 from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
 from osdag_gui.ui.components.output_details.seatedAngleSpacing import SeatedAngleDetails
 from osdag_gui.ui.components.output_details.cleatAngle import CleatAngleDetails
+from osdag_gui.ui.components.output_details.tensionBoltedSpacing import TensionBoltedDetails
 
 from osdag_gui.__config__ import CAD_BACKEND
 
@@ -595,6 +596,8 @@ class OutputDock(QWidget):
                         self.run_spacing_script(0,0,CleatAngleDetails,(main,1))
                     elif main.module_name()==KEY_DISP_ENDPLATE:
                         self.run_spacing_script(0,0,EndPlateDetails,main)
+                    elif main.module_name()==KEY_DISP_TENSION_BOLTED:
+                        self.run_spacing_script(0,0,TensionBoltedDetails, main)
                     # return
                     break
                 

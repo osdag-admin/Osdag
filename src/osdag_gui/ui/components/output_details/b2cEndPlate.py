@@ -1,17 +1,20 @@
 import sys
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QGraphicsView,
+from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout, 
+                             QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
                              QGraphicsScene)
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QPainter, QPen, QFont
+from PySide6.QtGui import QPainter, QPen, QFont, QColor
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
-class B2CEndPlateDetails(QMainWindow):
+class B2CEndPlateDetails(QDialog):
     def __init__(self, connection_obj,main, rows=3, cols=2):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.connection = connection_obj
         data=main.output_values(True)
         self.web_thick=main.beam_tw
@@ -28,23 +31,49 @@ class B2CEndPlateDetails(QMainWindow):
                                 }
         self.initUI()
         
+    def setupWrapper(self):
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
+        self.setObjectName("spacing_capacity_details")
+
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(1, 1, 1, 1)
+        main_layout.setSpacing(0)
+        
+        self.title_bar = CustomTitleBar()
+        self.title_bar.setTitle("Bolt Pattern")
+        main_layout.addWidget(self.title_bar)
+        
+        self.content_widget = QWidget(self)
+        main_layout.addWidget(self.content_widget, 1)
+
+        size_grip = QSizeGrip(self)
+        size_grip.setFixedSize(16, 16)
+
+        overlay = QHBoxLayout()
+        overlay.setContentsMargins(0, 0, 4, 4)
+        overlay.addStretch(1)
+        overlay.addWidget(size_grip, 0, Qt.AlignBottom | Qt.AlignRight)
+        main_layout.addLayout(overlay)
+
     def initUI(self):
-        self.setWindowTitle('Bolt Pattern Generator')
+        self.setupWrapper()
         print(f'End Plate Type :  {self.endplatetype}')
         print(f'middle bolts : {self.middle_bolts}')
         print(f'stiffener length : {self.stiffener_length}')
         
-        self.setGeometry(100, 100, 1200, 900)
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 900, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        
+        
+        self.setGeometry(x, y, width, height)
         print(f'web thickness : {self.web_thick}, flange thickness : {self.flange_thick} ')
-        # Step 1: Create a central widget
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        
+        main_layout = QHBoxLayout(self.content_widget)
 
-        # Step 2: Create main layout
-        main_layout = QHBoxLayout()
-        central_widget.setLayout(main_layout)
-
-        # Step 3: Left panel for selected labels only
+        # Left panel for selected labels only
         left_panel = QWidget()
         left_layout = QVBoxLayout()
         left_panel.setLayout(left_layout)
@@ -63,29 +92,65 @@ class B2CEndPlateDetails(QMainWindow):
             'Diameter (mm)',
         ]
 
+        # Graphics view and scene
+        self.scene = QGraphicsScene()
+        self.view = QGraphicsView(self.scene)
+        self.view.setRenderHint(QPainter.Antialiasing)
+
         # Add labels
         for key in keys_to_display:
             if key in self.detail_dict:
                 value = self.detail_dict[key]
                 label = QLabel(f"<b>{key}</b>: {value}")
+                label = QLabel(f"<b>{key}</b>: {value}")
+
+                # Set text color depending on theme
+                if self.theme.is_light():
+                    label.setStyleSheet("color: black;")
+                else:
+                    label.setStyleSheet("color: white;")
+
                 left_layout.addWidget(label)
+
         self.edge_label = QLabel("<b>Adjusted Edge Distance</b>: computing...")
+        if self.theme.is_light():
+            self.edge_label.setStyleSheet("color: black;")
+        else:
+            self.edge_label.setStyleSheet("color: white;")
+
         left_layout.addWidget(self.edge_label)
-        # Step 4: Graphics view and scene
-        self.scene = QGraphicsScene()
-        self.view = QGraphicsView(self.scene)
-        self.view.setRenderHint(QPainter.Antialiasing)
 
-        # Background and test shape (optional)
-        self.scene.setBackgroundBrush(Qt.white)
+        
 
-        # Step 5: Add to main layout
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
+
+        
+
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
+
+        # Define and visualize the drawing area
+        self.scene.setSceneRect(-200, -200, 1500, 1000)
+        if self.theme.is_light():
+            pen = QPen(Qt.black)
+        else:
+            pen = QPen(QColor("#8A8A8A"))
+        pen.setWidth(2)
+        self.scene.addRect(self.scene.sceneRect(), pen)
+
+        # Add to main layout
         main_layout.addWidget(left_panel, stretch=1)
         main_layout.addWidget(self.view, stretch=3)
 
         # Step 6: Call parameter extraction and drawing
         self.get_parameters()
-        self.view.scale(2.5, 2.5)  
+        self.view.scale(2, 2) 
+
     def get_parameters(self):
         print('setting parameters')
         self.rows=self.detail_dict['No. of Rows']
@@ -106,7 +171,6 @@ class B2CEndPlateDetails(QMainWindow):
             self.createDrawingExtendedOneWay()
         else:
             self.createDrawingExtendedTwoWay()
-
 
 
     #drawing setup for flushed reversible
@@ -132,7 +196,11 @@ class B2CEndPlateDetails(QMainWindow):
         h_gap = 12.5
         v_gap = 12.5
         outline_pen = QPen(Qt.blue, 2)
-        black_pen = QPen(QColor("black"), 2)
+        if self.theme.is_light():
+            black_pen = QPen(Qt.black, 2)
+        else:
+            black_pen = QPen(QColor("#8A8A8A"), 2)
+
         bolt_pen = QPen(Qt.blue, 2)
         bolt_brush = QBrush(QColor("gold"))
         radius = holedia / 2
@@ -235,7 +303,10 @@ class B2CEndPlateDetails(QMainWindow):
         from PySide6.QtCore import Qt, QPointF
         from PySide6.QtGui import QPolygonF
 
-        pen = QPen(Qt.black, 1)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 1)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 1)
         pen.setStyle(Qt.SolidLine)
 
         label_text = f"{margin:.1f} mm"
@@ -285,7 +356,10 @@ class B2CEndPlateDetails(QMainWindow):
         if cols % 2 != 0 or cols < 2:
             raise ValueError("Number of columns must be even and >= 2")
 
-        pen = QPen(Qt.black, 1)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 1)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 1)
         pen.setStyle(Qt.DashLine)
         y = -y_offset
 
@@ -323,7 +397,10 @@ class B2CEndPlateDetails(QMainWindow):
         x2 = x + edge
         segments.append(("edge", x1, x2))
 
-        pen = QPen(Qt.black, 0.5)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 0.5)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
         font.setPointSize(4)
 
@@ -410,7 +487,10 @@ class B2CEndPlateDetails(QMainWindow):
         outline_pen = QPen(QColor("orange"))
         red_pen = QPen(QColor("red"), 2)
         red_brush = QBrush(QColor("red"))
-        black_pen = QPen(QColor("black"), 2)
+        if self.theme.is_light():
+            black_pen = QPen(Qt.black, 2)
+        else:
+            black_pen = QPen(QColor("#8A8A8A"), 2)
 
         # === Setup Scene ===
         self.scene.setSceneRect(-40, -60, plate_width + 80, plate_height + 120)
@@ -563,7 +643,10 @@ class B2CEndPlateDetails(QMainWindow):
         from PySide6.QtGui import QPen, QFont
         from PySide6.QtCore import Qt
 
-        pen = QPen(Qt.black, 0.5)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 0.5)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
         font.setPointSize(4)
 
@@ -669,7 +752,10 @@ class B2CEndPlateDetails(QMainWindow):
         from PySide6.QtGui import QPen, QFont
         from PySide6.QtCore import Qt
 
-        pen = QPen(Qt.black, 1)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 1)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 1)
         pen.setStyle(Qt.SolidLine)
 
         label_text = f"{margin:.1f} mm"
@@ -731,7 +817,10 @@ class B2CEndPlateDetails(QMainWindow):
         outline_pen = QPen(QColor("orange"))
         red_pen = QPen(QColor("red"), 2)
         red_brush = QBrush(QColor("red"))
-        black_pen = QPen(QColor("black"), 2)
+        if self.theme.is_light():
+            black_pen = QPen(Qt.black, 2)
+        else:
+            black_pen = QPen(QColor("#8A8A8A"), 2)
 
         # === Setup Scene ===
         self.scene.setSceneRect(-40, -60, plate_width + 80, plate_height + 120)
@@ -946,7 +1035,10 @@ class B2CEndPlateDetails(QMainWindow):
         from PySide6.QtGui import QPen, QFont
         from PySide6.QtCore import Qt
 
-        pen = QPen(Qt.black, 0.5)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 0.5)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
         font.setPointSize(4)
 
@@ -1024,7 +1116,10 @@ class B2CEndPlateDetails(QMainWindow):
         x1 = x
         x2 = x + edge
         segments.append((x1, x2))
-        pen = QPen(Qt.black, 0.5)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 0.5)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
         font.setPointSize(3)
 
@@ -1039,7 +1134,10 @@ class B2CEndPlateDetails(QMainWindow):
         from PySide6.QtGui import QPen, QFont
         from PySide6.QtCore import Qt
 
-        pen = QPen(Qt.black, 1)
+        if self.theme.is_light():
+            pen = QPen(Qt.black, 0.5)
+        else:
+            pen = QPen(QColor("#8A8A8A"), 0.5)
         pen.setStyle(Qt.SolidLine)
 
         label_text = f"{margin:.1f} mm"
@@ -1085,19 +1183,31 @@ class B2CEndPlateDetails(QMainWindow):
             (x1 + arrow_size, y1 + arrow_size/2)
         ]
         polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
-        
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
+         
         points_right = [
             (x2, y2),
             (x2 - arrow_size, y2 - arrow_size/2),
             (x2 - arrow_size, y2 + arrow_size/2)
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
+         
         
         text_item = self.scene.addText(text)
         if font is not None:
             text_item.setFont(font)
+
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
@@ -1118,7 +1228,11 @@ class B2CEndPlateDetails(QMainWindow):
                 (x1 + arrow_size/2, y1 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
+             
             
             points_bottom = [
                 (x2, y2),
@@ -1126,7 +1240,11 @@ class B2CEndPlateDetails(QMainWindow):
                 (x2 + arrow_size/2, y2 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
+         
         else:
             points_top = [
                 (x2, y2),
@@ -1134,7 +1252,11 @@ class B2CEndPlateDetails(QMainWindow):
                 (x2 + arrow_size/2, y2 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
+             
             
             points_bottom = [
                 (x1, y1),
@@ -1142,11 +1264,20 @@ class B2CEndPlateDetails(QMainWindow):
                 (x1 + arrow_size/2, y1 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
+         
         
         text_item = self.scene.addText(text)
         if font is not None:
             text_item.setFont(font)
+
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

@@ -298,7 +298,7 @@ class BeamColumnEndPlate(MomentConnection):
         t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("cf_bw_ebw.png")), True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_CF-BW-Flush.png")), True, 'No Validator')
         options_list.append(t15)    
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
@@ -3296,4 +3296,3 @@ class BeamColumnEndPlate(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3d_image, module=self.module)
-        

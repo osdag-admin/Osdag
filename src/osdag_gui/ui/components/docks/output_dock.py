@@ -29,7 +29,6 @@ from osdag_core.design_type.connection.end_plate_connection import EndPlateConne
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
 
-
 # Spacing Detail
 from osdag_gui.ui.components.output_details.b2bCoverPlateWelded import B2BCoverPlateWeldedDetails
 from osdag_gui.ui.components.output_details.b2bCoverPlate import B2BCoverPlateDetails
@@ -631,11 +630,6 @@ class OutputDock(QWidget):
                 elif op[0] == KEY_OUT_STIFFENER_SKETCH and main.module_name() == KEY_DISP_BCENDPLATE:
                     self.run_capacity_details(cols=1, rows=1, generator_class=B2CEndPlateDetails, main=main)
                     return
-                # Typical Detailing
-                elif op[0] == "Stiffener.Sketch" and op[1] == "Typical Sketch":
-                    if main.module_name() == KEY_DISP_BCENDPLATE:
-                        self.run_spacing_script(0,0, B2CEndPlateDetails, main)
-                        return
 
                 elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
                     if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
@@ -802,7 +796,6 @@ class OutputDock(QWidget):
 
         return title_repeat
 
-
 #----------------Standalone-Test-Code--------------------------------
 
 class MyMainWindow(QMainWindow):
@@ -826,4 +819,3 @@ if __name__ == "__main__":
     window = MyMainWindow()
     window.show()
     sys.exit(app.exec()) 
-

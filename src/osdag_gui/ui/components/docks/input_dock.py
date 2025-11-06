@@ -538,7 +538,6 @@ class InputDock(QWidget):
         else:
             # Bounds Button
             btn = QPushButton("Set Bounds")
-            print("@Suh",tupple[1])
             btn.clicked.connect(lambda checked=False, name=tupple[1]: self.choose_bounds(name))
             self.backend.bound_widgets[tupple[1]] = [old_widget, btn]
             print(f"Created new button for {tupple[1]}")
@@ -606,11 +605,27 @@ class InputDock(QWidget):
         return self.input_widget.findChild(QWidget, widget_name)
 
     def choose_bounds(self, name: str):
-        print("@Pram", name)
-        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[100.0, 0.0, 0.1])
+        bounds = None
+        # Get default values
+        if name == KEY_OVERALL_DEPTH_PG:
+            bounds = self.backend.bounds_map.get('D')
+        elif name == KEY_TOP_Bflange_PG:
+            bounds = self.backend.bounds_map.get('tf')
+        elif name == KEY_BOTTOM_Bflange_PG:
+            bounds = self.backend.bounds_map.get('bf')
+
+        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]])
         result = dialog.exec()
+        
         if result:
-            print(f"Selected bounds: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
+            print(f"New bounds for {name}: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
+            # Update Bounds
+            if name == KEY_OVERALL_DEPTH_PG:
+                self.backend.bounds_map['D'] = (result[0], result[1], result[2])
+            elif name == KEY_TOP_Bflange_PG:
+                self.backend.bounds_map['tf'] = (result[0], result[1], result[2])
+            elif name == KEY_BOTTOM_Bflange_PG:
+                self.backend.bounds_map['bf'] = (result[0], result[1], result[2]) 
         else:
             print("Dialog was cancelled")
 

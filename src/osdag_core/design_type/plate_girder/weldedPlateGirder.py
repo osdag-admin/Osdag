@@ -341,14 +341,14 @@ class PlateGirderWelded(Member):
         self.design_status = False
         # Defining default Bounds
         self.bounds_map = {
-            'tf': (6, 100),
+            'tf': (6, 100, 1),
             'tf_top': (6, 100),
             'tf_bot': (6, 100),
             'tw': (6, 40),
-            'bf': (100, 1000),
+            'bf': (100, 1000, 1),
             'bf_top': (100, 1000),
             'bf_bot': (100, 1000),
-            'D': (200, 2000),
+            'D': (200, 2000, 1),
             'c': (75, 3000),
             't_stiff': (6, 40)
         }        

@@ -72,7 +72,7 @@ class CustomWindow(QWidget):
         self.sidebar.resize_sidebar(self.width(), self.height())
         self.sidebar.move(-self.sidebar.width() + 12, self.menu_bar.height())
         self.sidebar_animation = QPropertyAnimation(self.sidebar, b"geometry")
-        self.sidebar_animation.setDuration(80)
+        self.sidebar_animation.setDuration(150)
         self.sidebar.installEventFilter(self)
         self.sidebar.raise_()
 

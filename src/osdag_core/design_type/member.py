@@ -13,10 +13,10 @@ class Member(Main):
     ########################################
     # Design Preference Functions Start
     ########################################
-    def df_conn_image(self):
+    def df_conn_image(self, input):
 
         "Function to populate section size based on the type of section "
-        img = self[0]
+        img = input[0]
         if img == VALUES_SEC_PROFILE_2[0]:
             return VALUES_IMG_TENSIONBOLTED[0]
         elif img == VALUES_SEC_PROFILE_2[1]:
@@ -968,13 +968,13 @@ class Member(Main):
         return section
 
 
-    def get_new_angle_section_properties(self):
+    def get_new_angle_section_properties(self, input):
 
-        designation = self[0]
-        material_grade = self[1]
-        l = self[3][KEY_LOCATION]
-        section_profile = self[3][KEY_SEC_PROFILE]
-        plate_thk = float(self[2])
+        designation = input[0]
+        material_grade = input[1]
+        l = input[3][KEY_LOCATION]
+        section_profile = input[3][KEY_SEC_PROFILE]
+        plate_thk = float(input[2])
         Angle_attributes = Angle(designation, material_grade)
         source = str(Angle_attributes.source)
         fu = str(Angle_attributes.fu)
@@ -1373,18 +1373,18 @@ class Member(Main):
         section.append(t27)
 
         return section
-    def get_strut_angle_section_properties(self):
+    def get_strut_angle_section_properties(self, input):
         print(f" get_strut_angle_section_properties\n"
               f" self {self} \n"
-              f" designation {self[0]}\n"
-              f" {self[1]}\n"
-              f"{self[2]}\n"
-              f"{self[3]}\n")
-        designation = self[0]
-        material_grade = self[1]
-        l = self[2][KEY_LOCATION]
-        section_profile = self[2][KEY_SEC_PROFILE]
-        plate_thk = float(self[2][KEY_PLATETHK])
+              f" designation {input[0]}\n"
+              f" {input[1]}\n"
+              f"{input[2]}\n"
+              f"{input[3]}\n")
+        designation = input[0]
+        material_grade = input[1]
+        l = input[2][KEY_LOCATION]
+        section_profile = input[2][KEY_SEC_PROFILE]
+        plate_thk = float(input[2][KEY_PLATETHK])
         Angle_attributes = Angle(designation, material_grade)
         source = str(Angle_attributes.source)
         fu = str(Angle_attributes.fu)
@@ -1557,7 +1557,7 @@ class Member(Main):
         }
         return d
 
-    def get_Strut_Angle_sec_properties(self):
+    def get_Strut_Angle_sec_properties(self, input):
         print(f" get_Strut_Angle_sec_properties \n self{self}")
         if '' in self:
             mass = ''
@@ -1579,14 +1579,14 @@ class Member(Main):
             I_t = ''
             image = ''
         else:
-            a = float(self[0])
-            b = float(self[1])
-            t = float(self[2])
-            plate_thk = float(self[3][KEY_PLATETHK][0])
-            # plate_thk = float(self[3])
+            a = float(input[0])
+            b = float(input[1])
+            t = float(input[2])
+            plate_thk = float(input[3][KEY_PLATETHK][0])
+            # plate_thk = float(input[3])
 
-            l = self[3][KEY_LOCATION]
-            p = self[3][KEY_SEC_PROFILE]
+            l = input[3][KEY_LOCATION]
+            p = input[3][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -1698,13 +1698,13 @@ class Member(Main):
 
         return d
 
-    def get_new_channel_section_properties(self):
-        designation = self[0]
-        material_grade = self[1]
-        # sl = self[2]
-        l = self[3][KEY_LOCATION]
-        section_profile = self[3][KEY_SEC_PROFILE]
-        plate_thk = float(self[2])
+    def get_new_channel_section_properties(self, input):
+        designation = input[0]
+        material_grade = input[1]
+        # sl = input[2]
+        l = input[3][KEY_LOCATION]
+        section_profile = input[3][KEY_SEC_PROFILE]
+        plate_thk = float(input[2])
         Channel_attributes = Channel(designation, material_grade)
         source = str(Channel_attributes.source)
         Type = str(Channel_attributes.type)
@@ -1795,7 +1795,7 @@ class Member(Main):
         }
         return d
 
-    def get_Angle_sec_properties(self):
+    def get_Angle_sec_properties(self, input):
         if '' in self:
             mass = ''
             area = ''
@@ -1816,14 +1816,14 @@ class Member(Main):
             I_t = ''
             image = ''
         else:
-            a = float(self[0])
-            b = float(self[1])
-            t = float(self[2])
-            # plate_thk = float(self[3][KEY_PLATETHK][0])
-            plate_thk = float(self[3])
+            a = float(input[0])
+            b = float(input[1])
+            t = float(input[2])
+            # plate_thk = float(input[3][KEY_PLATETHK][0])
+            plate_thk = float(input[3])
 
-            l = self[4][KEY_LOCATION]
-            p = self[4][KEY_SEC_PROFILE]
+            l = input[4][KEY_LOCATION]
+            p = input[4][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -1935,7 +1935,7 @@ class Member(Main):
 
         return d
 
-    def get_Channel_sec_properties(self):
+    def get_Channel_sec_properties(self, input):
 
         if '' in self:
             mass = ''
@@ -1957,14 +1957,14 @@ class Member(Main):
             image =''
 
         else:
-            f_w = float(self[0])
-            f_t = float(self[1])
-            w_h = float(self[2])
-            w_t = float(self[3])
-            sl = float(self[4])
-            plate_thk = float(self[5][KEY_PLATETHK][0])
-            l = self[5][KEY_LOCATION]
-            p = self[5][KEY_SEC_PROFILE]
+            f_w = float(input[0])
+            f_t = float(input[1])
+            w_h = float(input[2])
+            w_t = float(input[3])
+            sl = float(input[4])
+            plate_thk = float(input[5][KEY_PLATETHK][0])
+            l = input[5][KEY_LOCATION]
+            p = input[5][KEY_SEC_PROFILE]
 
             if p =="Channels":
                 sec_prop = Single_Channel_Properties()
@@ -2381,9 +2381,9 @@ class Member(Main):
         return section
 
 
-    def get_fu_fy_I_section(self):
-        material_grade = self[0]
-        designation = self[1][KEY_SECSIZE]
+    def get_fu_fy_I_section(self, input):
+        material_grade = input[0]
+        designation = input[1][KEY_SECSIZE]
 
         fu = ''
         fy = ''
@@ -2405,11 +2405,11 @@ class Member(Main):
 
         return d
 
-    def get_fu_fy_section(self):
-        material_grade = self[0]
-        designation = self[2][KEY_SECSIZE_SELECTED]
-        # designation = self[1][KEY_SECSIZE][0]
-        profile = self[1][KEY_SEC_PROFILE]
+    def get_fu_fy_section(self, input):
+        material_grade = input[0]
+        designation = input[2][KEY_SECSIZE_SELECTED]
+        # designation = input[1][KEY_SECSIZE][0]
+        profile = input[1][KEY_SEC_PROFILE]
 
         if material_grade != "Select Material" and designation != "":
             if profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
@@ -2450,8 +2450,8 @@ class Member(Main):
 
         return d
 
-    def get_fu_fy(self):
-        material_grade = self[0]
+    def get_fu_fy(self, input):
+        material_grade = input[0]
 
         if material_grade != "Select Material":
             m_conn = Material(material_grade)
@@ -3118,8 +3118,8 @@ class Member(Main):
     # Design Preference Functions End
     ########################################
 
-    def get_fu_fy_I_section_plate_girder(self):
-        material_grade = self[0]
+    def get_fu_fy_I_section_plate_girder(self, input):
+        material_grade = input[0]
 
         fu = ''
         fy = ''
@@ -3150,12 +3150,12 @@ class Member(Main):
         torsion_const = '' 
         warping_const = '' 
 
-        t_d = float(self[0])
-        w_t = float(self[1])
-        t_f_w = float(self[2])
-        t_f_t = float(self[3])
-        b_f_w = float(self[4])
-        b_f_t = float(self[5])
+        t_d = float(input[0])
+        w_t = float(input[1])
+        t_f_w = float(input[2])
+        t_f_t = float(input[3])
+        b_f_w = float(input[4])
+        b_f_t = float(input[5])
 
         pc = Unsymmetrical_I_Section_Properties()
 
@@ -3232,9 +3232,9 @@ class Member(Main):
         #     self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
 
 
-    def new_material(self):
+    def new_material(self, input):
 
-        selected_material = self[0]
+        selected_material = input[0]
         if selected_material in ["Custom","Custom Section"]:
             return True
         else:

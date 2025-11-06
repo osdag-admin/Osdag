@@ -32,31 +32,6 @@ class BoundsSelectorDialog(QDialog):
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("BoundsSelectorDialog")
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
-
-        self.setStyleSheet("""
-            QDialog#BoundsSelectorDialog {
-                background-color: #FFFFFF;
-                border: 1px solid #90AF13;
-            }
-            QDialog#BoundsSelectorDialog QLineEdit {
-                background-color: #FFFFFF;
-                border: 1px solid #CCCCCC;
-                border-radius: 4px;
-                padding: 5px 8px;
-                font-size: 12px;
-                color: #333333;
-            }
-            QDialog#BoundsSelectorDialog QLineEdit:hover {
-                border: 1px solid #999999;
-            }
-            QDialog#BoundsSelectorDialog QLineEdit:focus {
-                border: 1px solid #90AF13;
-                background-color: #F5FFF9;
-            }
-            QDialog#BoundsSelectorDialog QLabel {
-                color: #000000;
-            }
-        """)
         
         # Set fixed size for the dialog
         self.setFixedSize(320, 220)
@@ -94,11 +69,6 @@ class BoundsSelectorDialog(QDialog):
         self.lowerBoundLineEdit.setValidator(lower_validator)
 
         lowerLabel = QLabel("Lower Bound:", self)
-        lowerLabel.setStyleSheet("""
-            color: #333333;
-            font-size: 13px;
-            font-weight: normal;
-        """)
         formLayout.addRow(lowerLabel, self.lowerBoundLineEdit)
 
         # Upper bound input (above lower bound)
@@ -120,11 +90,6 @@ class BoundsSelectorDialog(QDialog):
         self.upperBoundLineEdit.setValidator(upper_validator)
 
         upperLabel = QLabel("Upper Bound:", self)
-        upperLabel.setStyleSheet("""
-            color: #333333;
-            font-size: 13px;
-            font-weight: normal;
-        """)
         formLayout.addRow(upperLabel, self.upperBoundLineEdit)
 
         # Step input
@@ -146,11 +111,6 @@ class BoundsSelectorDialog(QDialog):
         self.stepLineEdit.setValidator(step_validator)
 
         stepLabel = QLabel("Increment:", self)
-        stepLabel.setStyleSheet("""
-            color: #333333;
-            font-size: 13px;
-            font-weight: normal;
-        """)
         formLayout.addRow(stepLabel, self.stepLineEdit)
 
         # Connect lower bound changes to update upper bound minimum
@@ -177,44 +137,12 @@ class BoundsSelectorDialog(QDialog):
         # Cancel button
         self.cancelButton = QPushButton("Cancel", self)
         self.cancelButton.setFixedHeight(30)
-        self.cancelButton.setStyleSheet("""
-            QPushButton {
-                background-color: #757575;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 5px 15px;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background-color: #616161;
-            }
-            QPushButton:pressed {
-                background-color: #424242;
-            }
-        """)
         self.cancelButton.clicked.connect(self.reject)
         buttonLayout.addWidget(self.cancelButton, alignment=Qt.AlignmentFlag.AlignRight)
 
         # OK button
         self.okButton = QPushButton("OK", self)
         self.okButton.setFixedHeight(30)
-        self.okButton.setStyleSheet("""
-            QPushButton {
-                background-color: #2196F3;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 5px 15px;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background-color: #1E88E5;
-            }
-            QPushButton:pressed {
-                background-color: #1976D2;
-            }
-        """)
         self.okButton.clicked.connect(self.accept)
         buttonLayout.addWidget(self.okButton, alignment=Qt.AlignmentFlag.AlignRight)
 

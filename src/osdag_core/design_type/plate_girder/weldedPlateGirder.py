@@ -341,14 +341,14 @@ class PlateGirderWelded(Member):
         self.design_status = False
         # Defining default Bounds
         self.bounds_map = {
-            'tf': (6, 100, 1),
+            'tf': (6, 100),
             'tf_top': (6, 100),
-            'tf_bot': (6, 100),
+            'tf_bot': (6, 100), 
             'tw': (6, 40),
-            'bf': (100, 1000, 1),
-            'bf_top': (100, 1000),
-            'bf_bot': (100, 1000),
-            'D': (200, 2000, 1),
+            'bf': (100, 1000),
+            'bf_top': (100, 1000, 10), # width of top flange
+            'bf_bot': (100, 1000, 10), # width of bottom flange
+            'D': (200, 2000, 25), # total depth
             'c': (75, 3000),
             't_stiff': (6, 40)
         }        
@@ -2869,8 +2869,8 @@ class PlateGirderWelded(Member):
             setattr(section, name, value)
         
         # handle symmetric naming if needed
-        print("Particle",particle)
-        print("Variable list",variable_list)
+        # print("Particle",particle)
+        # print("Variable list",variable_list)
         if 'tf' in variable_list:
             section.tf_top = section.tf_bot = section.tf
             section.bf_top     = section.bf_bot     = section.bf

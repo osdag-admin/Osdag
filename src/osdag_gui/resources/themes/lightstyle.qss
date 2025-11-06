@@ -1586,3 +1586,27 @@ QDialog#AdditionalInputs QComboBox QAbstractItemView::item:selected:hover{
     color: black;
     border: 1px solid #94b816;
 }
+/* Plate-Girder Bounds Dialog */
+QDialog#BoundsSelectorDialog {
+    background-color: #FFFFFF;
+    border: 1px solid #90AF13;
+    border-radius: 0px;
+}
+QDialog#BoundsSelectorDialog QLineEdit {
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: #333333;
+}
+QDialog#BoundsSelectorDialog QLineEdit:hover {
+    border: 1px solid #999999;
+}
+QDialog#BoundsSelectorDialog QLineEdit:focus {
+    border: 1px solid #90AF13;
+    background-color: #F5FFF9;
+}
+QDialog#BoundsSelectorDialog QLabel {
+    color: #000000;
+}

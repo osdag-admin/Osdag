@@ -6,7 +6,7 @@ import osdag_gui.resources.resources_rc
 from osdag_gui.data.ui_data import Data
 
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QPushButton, QToolTip
+    QWidget, QVBoxLayout, QPushButton, QToolTip, QApplication
 )
 from PySide6.QtGui import QIcon, QCursor
 from PySide6.QtCore import Qt, QSize, QPoint, QTimer, Signal
@@ -16,8 +16,9 @@ class SidebarIconButton(QPushButton):
     BUTTON_MARGIN = 3
     BUTTON_PADDING = 1
 
-    def __init__(self, icon_path, tooltip_text="", selected_icon_path=None, hover_icon_path=None, group=None, parent=None):
+    def __init__(self, icon_path, tooltip_text="", selected_icon_path=None, hover_icon_path=None, dark_icon_path=None, group=None, parent=None):
         super().__init__(parent)
+        self.theme = QApplication.instance().theme_manager
         self.group = group
         self.icon_path = icon_path
         self.selected_icon_path = selected_icon_path
@@ -28,11 +29,15 @@ class SidebarIconButton(QPushButton):
         self.custom_tooltip_text = tooltip_text
 
         # Load icons
-        self.default_icon = self._load_icon(icon_path, "default")
-        self.selected_icon = self._load_icon(selected_icon_path, "selected") if selected_icon_path else self.default_icon
-        self.hover_icon = self._load_icon(hover_icon_path, "hover") if hover_icon_path else self.selected_icon
+        self.default_icon = self._load_icon(icon_path)
+        self.selected_icon = self._load_icon(selected_icon_path)
+        self.hover_icon = self._load_icon(hover_icon_path)
+        self.dark_icon = self._load_icon(dark_icon_path)
 
-        self.setIcon(self.default_icon)
+        if self.theme.is_light():
+            self.setIcon(self.default_icon)
+        else:
+            self.setIcon(self.dark_icon)
         self.setCursor(QCursor(Qt.PointingHandCursor))
         self.setFocusPolicy(Qt.NoFocus)
 
@@ -46,13 +51,24 @@ class SidebarIconButton(QPushButton):
     def _load_icon(self, path, icon_type=""):
         return QIcon(path)
 
+    def paintEvent(self, event):
+        if not self.is_selected:
+            if self.theme.is_light():
+                self.setIcon(self.default_icon)
+            else:
+                self.setIcon(self.dark_icon)
+        return super().paintEvent(event)
+
     def mousePressEvent(self, event):
         if self.group:
             for btn in self.group:
                 if btn != self:
                     btn.is_selected = False
                     btn.set_default_style()
-                    btn.setIcon(btn.default_icon)
+                    if self.theme.is_light():
+                        btn.setIcon(btn.default_icon)
+                    else:
+                        btn.setIcon(btn.dark_icon)
 
         self.is_selected = True
         self.set_selected_style()
@@ -72,7 +88,10 @@ class SidebarIconButton(QPushButton):
     def leaveEvent(self, event):
         if not self.is_selected:
             self.set_default_style()
-            self.setIcon(self.default_icon)
+            if self.theme.is_light():
+                self.setIcon(self.default_icon)
+            else:
+                self.setIcon(self.dark_icon)
 
         self.tooltip_show_timer.stop()
         QToolTip.hideText()
@@ -119,7 +138,7 @@ class SidebarWidget(QWidget):
 
         self.icon_size = 48  # px, you can adjust this value as needed
         for tooltip, icons in navbar_icons.items():
-            btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[1], hover_icon_path=icons[1] ,group=self.button_group)
+            btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[1], hover_icon_path=icons[1], dark_icon_path=icons[2] ,group=self.button_group)
             self.button_layout.addWidget(btn)
             self.button_group.append(btn)
             btn.clicked.connect(lambda _,title=tooltip: self.openNewTab.emit(title))

@@ -10,16 +10,16 @@ from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 import osdag_gui.resources.resources_rc
 
 class BoundsSelectorDialog(QDialog):
-    def __init__(self, title: str, default: list = [1.0, 0.0, 0.1], parent=None):
+    def __init__(self, title: str, default: list, parent=None):
         super().__init__(parent)
         # Extract values from list: [upper_bound, lower_bound, step]
         if len(default) >= 3:
-            upper_bound = default[0]
-            lower_bound = default[1]
+            upper_bound = default[1]
+            lower_bound = default[0]
             step_value = default[2]
         elif len(default) >= 2:
-            upper_bound = default[0]
-            lower_bound = default[1]
+            upper_bound = default[1]
+            lower_bound = default[0]
             step_value = 0.1
         else:
             upper_bound = 1.0
@@ -463,7 +463,7 @@ class BoundsSelectorDialog(QDialog):
             step = step_max
         
         # Return as list [upper_bound, lower_bound, step]
-        self.bounds = [upper, lower, step]
+        self.bounds = [lower, upper, step]
         super().accept()
 
     def exec(self):

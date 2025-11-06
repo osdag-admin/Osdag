@@ -16,6 +16,8 @@ from osdag_gui.ui.components.custom_buttons import DockCustomButton
 import osdag_gui.resources.resources_rc
 from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
+
 
 from osdag_core.Common import *
 
@@ -417,7 +419,6 @@ class InputDock(QWidget):
 
     # To update the label and combobox if Connectivity
     def change(self, k1, new, data, main):
-        print(f"$${new}")
         for tup in new:
             (object_name, k2_key, typ, f) = tup
             print(f"\n object_name:{object_name}")
@@ -433,14 +434,12 @@ class InputDock(QWidget):
                 k2_key = k2_key + "_label"
             if typ == TYPE_NOTE:
                 k2_key = k2_key + "_note"
-
             if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 k2 = self.input_widget.findChild(QWidget, k2_key)
             elif typ == TYPE_WARNING:
                 k2 = str(k2_key)
             else:
                 k2 = self.input_widget.findChild(QWidget, k2_key)
-
 
             arg_list = []
             for ob_name in object_name:
@@ -487,13 +486,22 @@ class InputDock(QWidget):
                 print("\n\nImg")
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
+
             elif typ == TYPE_TEXTBOX:
                 print("\n\ntext")
-                if val:
-                    k2.setEnabled(True)
+                if main.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
+                    w = self.get_current_widget_in_layout(k2_key)
+                    if not val and isinstance(w, QLineEdit):  # Show optimization button
+                        self.change_text_to_bound_btn(w, tup)
+                    elif val and isinstance(w, QPushButton):  # Show textbox for customized input
+                        self.change_bound_btn_to_text(w, tup)
                 else:
-                    k2.setDisabled(True)
-                    k2.setText("")
+                    if val:
+                        k2.setEnabled(True)
+                    else: 
+                        k2.setText("")
+                        k2.setDisabled(True)
+
             elif typ == TYPE_COMBOBOX_FREEZE:
                 print("\n\nfreeze_Combo")
                 if val:
@@ -510,6 +518,103 @@ class InputDock(QWidget):
                     k2.setVisible(False)
                 else:
                     k2.setVisible(True)
+
+    # For Plate-Girder Module-starts----------------------------------------------------
+    def change_text_to_bound_btn(self, old_widget, tupple):
+        layout = old_widget.parentWidget().layout()
+        if layout is None:
+            print(f"ERROR:: Widget layout not Found for {tupple[1]}")
+            return None
+
+        index = layout.indexOf(old_widget)
+        if index == -1:
+            print(f"ERROR:: Widget not found for {tupple[1]}")
+            return None
+
+        # Create or retrieve button
+        if self.backend.bound_widgets.get(tupple[1], ""):
+            btn = self.backend.bound_widgets.get(tupple[1])[1]
+            print(f"Reusing existing button for {tupple[1]}")
+        else:
+            # Bounds Button
+            btn = QPushButton("Set Bounds")
+            print("@Suh",tupple[1])
+            btn.clicked.connect(lambda checked=False, name=tupple[1]: self.choose_bounds(name))
+            self.backend.bound_widgets[tupple[1]] = [old_widget, btn]
+            print(f"Created new button for {tupple[1]}")
+        
+        btn.setObjectName(tupple[1])
+        layout.replaceWidget(old_widget, btn)
+        old_widget.hide()  # Hide the old widget
+        btn.show()  # Show the button
+    
+    def change_bound_btn_to_text(self, old_widget, tupple):
+        layout = old_widget.parentWidget().layout()
+        if layout is None:
+            print(f"ERROR:: Widget layout not Found for {tupple[1]}")
+            return None
+
+        index = layout.indexOf(old_widget)
+        if index == -1:
+            print(f"ERROR:: Widget not found for {tupple[1]}")
+            return None
+
+        # Retrieve or create textbox
+        if self.backend.bound_widgets.get(tupple[1], ""):
+            text_box = self.backend.bound_widgets.get(tupple[1])[0]
+            print(f"Reusing existing LineEdit for {tupple[1]}")
+        else:
+            print(f"Creating new LineEdit for {tupple[1]}")
+            inputs = self.backend.input_values()
+            data_tup = None
+            for tup in inputs:
+                if tup[0] == tupple[1]:
+                    data_tup = tup
+                    break
+            
+            text_box = QLineEdit()
+            text_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            if data_tup and data_tup[5] != 'No Validator':
+                text_box.setValidator(self.get_validator(data_tup[5]))
+            self.backend.bound_widgets[tupple[1]] = [text_box, old_widget]
+        
+        text_box.setObjectName(tupple[1])    
+        layout.replaceWidget(old_widget, text_box)
+        old_widget.hide()  # Hide the button
+        text_box.show()  # Show the textbox
+
+    def get_current_widget_in_layout(self, widget_name):
+        """Find the actual widget currently in the layout by objectName"""
+        # Check if we have it stored in bound_widgets
+        if widget_name in self.backend.bound_widgets:
+            stored = self.backend.bound_widgets[widget_name]
+            # Return whichever widget is currently visible/in layout
+            text_box = stored[0]
+            button = stored[1]
+            
+            # Check which one is actually in a layout
+            if text_box.parentWidget() and text_box.parentWidget().layout():
+                layout = text_box.parentWidget().layout()
+                if layout.indexOf(text_box) != -1:
+                    return text_box
+            
+            if button.parentWidget() and button.parentWidget().layout():
+                layout = button.parentWidget().layout()
+                if layout.indexOf(button) != -1:
+                    return button
+
+        return self.input_widget.findChild(QWidget, widget_name)
+
+    def choose_bounds(self, name: str):
+        print("@Pram", name)
+        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[100.0, 0.0, 0.1])
+        result = dialog.exec()
+        if result:
+            print(f"Selected bounds: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
+        else:
+            print("Dialog was cancelled")
+
+    # For Plate-Girder Module-starts-ends---------------------------------------------------  
 
     def toggle_input_dock(self):
         parent = self.parent

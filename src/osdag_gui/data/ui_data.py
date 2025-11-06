@@ -53,7 +53,7 @@ class Data:
         [
             ("Simply Supported Beam", ":/vectors/ss_beam_flexural_mem.svg"),
             ("Cantilever Beam", ":/vectors/cantilever_beam_flexural_mem.svg"),
-            ("Plate Girder", ":/vectors/ss_beam_flexural_mem.svg"),
+            ("Plate Girder", ":/vectors/simple_supported_plate_girder.svg"),
         ],
         "Beam Column": 
         [],
@@ -74,7 +74,7 @@ class Data:
         "Beam Column": [":/images/beam_column.svg", ":/images/beam_column_clicked.svg", ":/images/beam_column_dark.svg"],
         "Truss": [":/images/truss.svg", ":/images/truss_clicked.svg", ":/images/truss_dark.svg"],
         "2D Frame": [":/images/2d_frame.svg", ":/images/2d_frame_clicked.svg", ":/images/2d_frame_dark.svg"],
-        "3D Frame": [":/images/3d_frame.png", ":/images/3d_frame_clicked.png", ":/images/3d_frame_dark.png"],
+        "3D Frame": [":/images/3d_frame.svg", ":/images/3d_frame_clicked.svg", ":/images/3d_frame_dark.svg"],
     }
 
     FLOATING_NAVBAR = [

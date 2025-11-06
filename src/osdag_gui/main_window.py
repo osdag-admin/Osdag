@@ -32,6 +32,8 @@ from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleC
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
+
+from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -412,6 +414,8 @@ class MainWindow(QMainWindow):
             self.open_seated_angle_shear_connection()
         elif card_title == "End Plate":
             self.open_end_plate_btc_page() 
+        elif card_title == "Plate Girder":
+            self.open_plate_girder()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -506,6 +510,35 @@ class MainWindow(QMainWindow):
         title = "Seated Angle Connection"
         self.clear_layout(self.main_widget_layout)
         fin_plate = CustomWindow(title, SeatedAngleConnection, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                fin_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = fin_plate
+        fin_plate.openNewTab.connect(self.handle_add_tab)
+        fin_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(fin_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+    
+    def open_plate_girder(self):
+        title = "Plate Girder"
+        self.clear_layout(self.main_widget_layout)
+        fin_plate = CustomWindow(title, PlateGirderWelded, parent=self)
 
         # Load the last Design Inputs-start------------------------------------
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')

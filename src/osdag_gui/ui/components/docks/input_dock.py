@@ -610,9 +610,9 @@ class InputDock(QWidget):
         if name == KEY_OVERALL_DEPTH_PG:
             bounds = self.backend.bounds_map.get('D')
         elif name == KEY_TOP_Bflange_PG:
-            bounds = self.backend.bounds_map.get('tf')
+            bounds = self.backend.bounds_map.get('bf_top')
         elif name == KEY_BOTTOM_Bflange_PG:
-            bounds = self.backend.bounds_map.get('bf')
+            bounds = self.backend.bounds_map.get('bf_bot')
 
         dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]])
         result = dialog.exec()
@@ -629,7 +629,7 @@ class InputDock(QWidget):
         else:
             print("Dialog was cancelled")
 
-    # For Plate-Girder Module-starts-ends---------------------------------------------------  
+    # For Plate-Girder Module-ends---------------------------------------------------  
 
     def toggle_input_dock(self):
         parent = self.parent

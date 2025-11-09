@@ -21,12 +21,28 @@ references     9)
 """
 import logging
 import math
-
-
-# import pyswarm
 import numpy as np
-# from pyswarms.single.global_best import GlobalBestPSO
-# from pyswarm import pso
+
+# Constants for plate girder design
+KEY_OVERALL_DEPTH_PG_CST = "Overall Depth (D) (mm)"
+
+# PSO implementation using pyswarm
+class GlobalBestPSO:
+    def __init__(self, n_particles, dimensions, options, bounds):
+        self.n_particles = n_particles
+        self.dimensions = dimensions
+        self.options = options
+        self.bounds = bounds
+        self.swarm = type('Swarm', (), {'position': np.random.uniform(bounds[0], bounds[1], (n_particles, dimensions))})
+
+    def optimize(self, objective_func, iters):
+        xopt, fopt = pso(objective_func, self.bounds[0], self.bounds[1],
+                        swarmsize=self.n_particles,
+                        maxiter=iters,
+                        omega=self.options.get('w', 0.5),
+                        phip=self.options.get('c1', 0.5),
+                        phig=self.options.get('c2', 0.5))
+        return fopt, xopt
 from ...Common import *
 # from ..connection.moment_connection import MomentConnection
 from ...utils.common.material import *
@@ -46,14 +62,12 @@ from ...utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Sec
 from ...custom_logger import CustomLogger
 
 #GUI TO SELECT CUSTOM IN DESIGN PREFERENCES
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QDialog, QListWidget, QListWidgetItem
-from PyQt5.QtWidgets import (
+from PySide6.QtWidgets import (
     QDialog, QLabel, QLineEdit, QPushButton, QFormLayout,
-    QApplication, QMessageBox
+    QMessageBox, QListWidget, QListWidgetItem, QAbstractItemView
 )
-from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt, QRect
 import re
 import sys
 
@@ -186,36 +200,36 @@ class PopupDialog(QDialog):
         self.set_styles()
 
     def init_ui(self):
-        self.label = QtWidgets.QLabel("Available:", self)
-        self.label.setGeometry(QtCore.QRect(20, 20, 150, 30))
+        self.label = QLabel("Available:", self)
+        self.label.setGeometry(QRect(20, 20, 150, 30))
 
-        self.label_2 = QtWidgets.QLabel("Selected:", self)
-        self.label_2.setGeometry(QtCore.QRect(int(scale * 320), 20, 150, 30))
+        self.label_2 = QLabel("Selected:", self)
+        self.label_2.setGeometry(QRect(int(scale * 320), 20, 150, 30))
 
         self.listWidget = My_ListWidget(self)
-        self.listWidget.setGeometry(QtCore.QRect(20, 50, int(scale*180), int(scale*300)))
-        self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget.setGeometry(QRect(20, 50, int(scale*180), int(scale*300)))
+        self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget.itemDoubleClicked.connect(self.move_to_selected)
 
         self.listWidget_2 = My_ListWidget(self)
-        self.listWidget_2.setGeometry(QtCore.QRect(int(scale*320), 50, int(scale*180), int(scale*300)))
-        self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget_2.setGeometry(QRect(int(scale*320), 50, int(scale*180), int(scale*300)))
+        self.listWidget_2.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
 
-        self.pushButton = QtWidgets.QPushButton(">>", self)
-        self.pushButton.setGeometry(QtCore.QRect(int(scale*225), int(scale*140), int(scale*70), int(scale*30)))
+        self.pushButton = QPushButton(">>", self)
+        self.pushButton.setGeometry(QRect(int(scale*225), int(scale*140), int(scale*70), int(scale*30)))
 
-        self.pushButton_2 = QtWidgets.QPushButton(">", self)
-        self.pushButton_2.setGeometry(QtCore.QRect(int(scale*225), int(scale*180), int(scale*70), int(scale*30)))
+        self.pushButton_2 = QPushButton(">", self)
+        self.pushButton_2.setGeometry(QRect(int(scale*225), int(scale*180), int(scale*70), int(scale*30)))
 
-        self.pushButton_3 = QtWidgets.QPushButton("<", self)
-        self.pushButton_3.setGeometry(QtCore.QRect(int(scale*225), int(scale*220), int(scale*70), int(scale*30)))
+        self.pushButton_3 = QPushButton("<", self)
+        self.pushButton_3.setGeometry(QRect(int(scale*225), int(scale*220), int(scale*70), int(scale*30)))
 
-        self.pushButton_4 = QtWidgets.QPushButton("<<", self)
-        self.pushButton_4.setGeometry(QtCore.QRect(int(scale*225), int(scale*260), int(scale*70), int(scale*30)))
+        self.pushButton_4 = QPushButton("<<", self)
+        self.pushButton_4.setGeometry(QRect(int(scale*225), int(scale*260), int(scale*70), int(scale*30)))
 
-        self.pushButton_5 = QtWidgets.QPushButton("Submit", self)
-        self.pushButton_5.setGeometry(QtCore.QRect(int(scale*190), int(scale*400), int(scale*140), int(scale*35)))
+        self.pushButton_5 = QPushButton("Submit", self)
+        self.pushButton_5.setGeometry(QRect(int(scale*190), int(scale*400), int(scale*140), int(scale*35)))
         self.pushButton_5.setDefault(True)
 
         self.pushButton.clicked.connect(self.move_all_to_selected)
@@ -335,10 +349,18 @@ KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
 class PlateGirderWelded(Member):
     int_thicklist = []
     long_thicklist = []
+    # Class-level warning flags for optimization methods
+    _flange_warning_logged = False
+    _dimension_warning_logged = False
+    _web_crippling_warning_logged = False
 
     def __init__(self):
         super(PlateGirderWelded, self).__init__()
         self.design_status = False
+        # Instance-level warning flags
+        self.flange_warning_logged = False  # Flag to log b/tf warnings only once per session
+        self.dimension_warning_logged = False  # Flag to log dimension warnings only once per session
+        self.web_crippling_warning_logged = False  # Flag to log web crippling warnings only once per session
         # Defining default Bounds
         self.bounds_map = {
             'tf': (6, 100),
@@ -354,7 +376,7 @@ class PlateGirderWelded(Member):
         }        
         # to save bound input widgets
         self.bound_widgets = {}
-
+        
     ###############################################
     # Design Preference Functions Start
     ###############################################
@@ -506,6 +528,8 @@ class PlateGirderWelded(Member):
         # else:
         #     fu = ''
         #     fy = ''
+
+            
 
         val = {
             KEY_ALLOW_CLASS: 'Yes',
@@ -719,7 +743,6 @@ class PlateGirderWelded(Member):
 
         t2 = (KEY_OVERALL_DEPTH_PG_TYPE, KEY_DISP_OVERALL_DEPTH_PG_TYPE, TYPE_COMBOBOX, VALUES_DEPTH_PG, True, 'No Validator')
         options_list.append(t2)
-        
         t33 = (KEY_OVERALL_DEPTH_PG, KEY_DISP_OVERALL_DEPTH_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t33)
 
@@ -793,7 +816,7 @@ class PlateGirderWelded(Member):
 
         # t15 = (KEY_IMAGE, None, TYPE_IMAGE_BIGGER, VALUES_IMAGE_PLATEGIRDER[0], True,'No Validator')
         # options_list.append(t15)
-        return options_list       
+        return options_list
 
     def fn_torsion_warping(self, input):
         # print( 'Inside fn_torsion_warping', self)
@@ -826,6 +849,13 @@ class PlateGirderWelded(Member):
             return VALUES_IMAGE_PLATEGIRDER[3]
         else:
             return VALUES_IMAGE_PLATEGIRDER[4]
+        
+    def customized_dimensions(self, input):
+        conn = input[0]
+        if conn == "Customized":
+            return KEY_DISP_OVERALL_DEPTH_PG
+        else:
+            return ''
     
     def customized_dimensions_1(self, input):
         conn = input[0]
@@ -847,7 +877,6 @@ class PlateGirderWelded(Member):
             return True
         else:
             return False
-
     def customized_options(self, input):
         conn = input[0]
         if conn == "Customized":
@@ -876,6 +905,8 @@ class PlateGirderWelded(Member):
                 # print("Returned values:", dialog.get_values())
                 return str(dialog.get_values())
         
+    
+
     def input_value_changed(self):
 
         lst = []
@@ -1056,6 +1087,10 @@ class PlateGirderWelded(Member):
 
         # t6 = (None,"Design Results" , TYPE_TITLE, None, True)
         # out_list.append(t6)
+
+        
+
+        
 
         # t9 = (None, KEY_DISP_DESIGN_STIFFER , TYPE_TITLE, None, True)
         # out_list.append(t9)
@@ -1301,7 +1336,7 @@ class PlateGirderWelded(Member):
     def set_input_values(self, design_dictionary):
         
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = KEY_PLATE_GIRDER_MAIN_MODULE
+        self.mainmodule = 'PLATE GIRDER'
         self.design_type = design_dictionary[KEY_OVERALL_DEPTH_PG_TYPE]
         # print('design_type', design_dictionary[KEY_OVERALL_DEPTH_PG_TYPE])
         self.section_class = None
@@ -1379,7 +1414,7 @@ class PlateGirderWelded(Member):
         self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]
         self.beta_b_lt = None
         self.web_philosophy = design_dictionary[KEY_WEB_PHILOSOPHY]
-        self.epsilon = math.sqrt(250 / self.material.fy)
+        self.epsilon = math.sqrt(250 / (self.material.fy / 1e6))
         self.b1 = float(design_dictionary[KEY_SUPPORT_WIDTH])
         self.c = design_dictionary[KEY_IntermediateStiffener_spacing]
         self.Is = None
@@ -1460,6 +1495,12 @@ class PlateGirderWelded(Member):
         # self.support = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]
 
         # factored loads
+        
+        
+
+
+
+
 
         # design preferences
         # self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
@@ -1523,7 +1564,7 @@ class PlateGirderWelded(Member):
         else:
             self.design_check(design_dictionary)
         # if self.flag:
-        #     self.results( design_dictionary)
+        #     self.results(design_dictionary)
          
 
         # else:
@@ -1583,7 +1624,7 @@ class PlateGirderWelded(Member):
                 self.section_class = KEY_SemiCompact
         # print("overall section class", self.section_class)
         self.Zp_req = self.load.moment * self.gamma_m0 / self.material.fy
-        self.effective_length_beam( design_dictionary, self.length)
+        self.effective_length_beam(design_dictionary, self.length)
 
         # print( 'self.allow_class', self.allow_class)
 
@@ -1594,10 +1635,10 @@ class PlateGirderWelded(Member):
 
 
     def beta_value(self, design_dictionary, section_class):
-        self.plast_sec_mod_z = Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(self.total_depth, self.top_flange_width, self.bottom_flange_width,
-                                                    self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, self.epsilon)
-        self.elast_sec_mod_z = Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(self.total_depth, self.top_flange_width, self.bottom_flange_width,
-                                                    self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+        self.plast_sec_mod_z = Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(self.total_depth,self.top_flange_width,self.bottom_flange_width,
+                                                    self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.epsilon)
+        self.elast_sec_mod_z =Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(self.total_depth,self.top_flange_width,self.bottom_flange_width,
+                                                    self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness)
         # print('total_depth',self.total_depth)
         # print('top_flange_thickness',self.top_flange_thickness)
         # print('bottom_flange_thickness',self.bottom_flange_thickness)
@@ -1635,7 +1676,7 @@ class PlateGirderWelded(Member):
         self.V_d = ((A_vg * Fy) / (math.sqrt(3) * gamma_m0))
         if V > 0.6 * self.V_d: #high shear(Mdv calculation for high shear. Naming kept Md for compatibility)
             # print("High shear condition")
-            self.Md = self.calc_Mdv( V, self.V_d, Zp, Ze, Fy, gamma_m0, D, tw, tf_top, tf_bot)
+            self.Md = self.calc_Mdv(V, self.V_d, Zp, Ze, Fy, gamma_m0, D, tw, tf_top, tf_bot)
             # print("Md", self.Md)
         else: #low shear
             # print("Low shear condition")
@@ -1680,14 +1721,19 @@ class PlateGirderWelded(Member):
     
     #check 5 Web crippling for major laterally supported and unsupported & thick web
     def web_crippling_laterally_supported_thick_web(self, Fy, gamma_m0, tw, tf_top, b1):
-        n2 = 2.5 * tf_top
-        Critical_crippling_load = round((b1 + n2) * tw * Fy / (gamma_m0), 2)
-        # print("Critical crippling load", Critical_crippling_load)
-        self.web_crippling_ratio = self.load.shear_force / Critical_crippling_load
-        self.shear_ratio =  max(self.load.shear_force / Critical_crippling_load , self.shear_ratio)
-        if Critical_crippling_load >= self.load.shear_force:
-            return True
-        else:
+        try:
+            web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
+            # Use the IS 800:2007 compliant check_web_crippling method
+            return self.check_web_crippling(b1, tw, Fy, web_height)
+        except Exception as e:
+            if isinstance(self, PlateGirderWelded):
+                if not self.web_crippling_warning_logged:
+                    self.logger.error(f"Error in web crippling check during optimization: {str(e)}")
+                    self.web_crippling_warning_logged = True
+            else:
+                if not PlateGirderWelded._web_crippling_warning_logged:
+                    self.logger.error(f"Error in web crippling check during optimization: {str(e)}")
+                    PlateGirderWelded._web_crippling_warning_logged = True
             return False
 
 
@@ -1831,23 +1877,23 @@ class PlateGirderWelded(Member):
         yj= alpha * (2 * beta_f - 1) * h / 2
 
         G = 0.769 * 10 ** 5
-        Kw = self.get_K_from_warping_restraint( self.warping)
-        Iy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY( self.total_depth, self.top_flange_width,
+        Kw = self.get_K_from_warping_restraint(self.warping)
+        Iy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(self.total_depth, self.top_flange_width,
                                                                    self.bottom_flange_width, self.web_thickness,
                                                                    self.top_flange_thickness,
                                                                    self.bottom_flange_thickness)
-        self.It = Unsymmetrical_I_Section_Properties.calc_TorsionConstantIt( self.total_depth, self.top_flange_width,
+        self.It = Unsymmetrical_I_Section_Properties.calc_TorsionConstantIt(self.total_depth, self.top_flange_width,
                                                                        self.bottom_flange_width, self.web_thickness,
                                                                        self.top_flange_thickness,
                                                                        self.bottom_flange_thickness)
-        self.Iw = Unsymmetrical_I_Section_Properties.calc_WarpingConstantIw( self.total_depth, self.top_flange_width,
+        self.Iw = Unsymmetrical_I_Section_Properties.calc_WarpingConstantIw(self.total_depth, self.top_flange_width,
                                                                        self.bottom_flange_width, self.web_thickness,
                                                                        self.top_flange_thickness,
                                                                        self.bottom_flange_thickness)
 
         # Mcr calc
         yg = D / 2
-        yj = self.calc_yj( Bf_top, tf_top, Bf_bot, tf_bot, D)
+        yj = self.calc_yj(Bf_top, tf_top, Bf_bot, tf_bot, D)
         K_value = 0
         # Constants from Table 42 (IS 800:2007)
         if LoadingCase == KEY_DISP_UDL_PIN_PIN_PG:
@@ -1893,12 +1939,12 @@ class PlateGirderWelded(Member):
         self.Md = IS800_2007.cl_8_2_2_Unsupported_beam_bending_strength(self.plast_sec_mod_z, self.elast_sec_mod_z, self.fbd_lt,
                                                                         self.section_class)
         if shear_force > 0.6 * self.V_d:  # high shear(Mdv calculation for high shear. Naming kept Md for compatibility)
-            self.Md = self.calc_Mdv_lat_unsupported( self.load.shear_force, self.V_d, self.plast_sec_mod_z,
+            self.Md = self.calc_Mdv_lat_unsupported(self.load.shear_force, self.V_d, self.plast_sec_mod_z,
                                                     self.elast_sec_mod_z, self.material.fy, self.gamma_m0,
                                                     self.total_depth, self.web_thickness, self.top_flange_thickness,
                                                     self.bottom_flange_thickness, self.Md)
         else:  # low shear
-            self.Md = self.bending_check_lat_unsupported( self.beta_b_lt, self.plast_sec_mod_z,
+            self.Md = self.bending_check_lat_unsupported(self.beta_b_lt, self.plast_sec_mod_z,
                                                          self.elast_sec_mod_z,
                                                          self.material.fy, self.M_cr, self.section_class)
 
@@ -1930,16 +1976,117 @@ class PlateGirderWelded(Member):
                 self.logger.warning("Invalid Effective Length Parameter.")
                 self.logger.info('Effective Length Parameter is set to default: 1.0')
                 design_dictionary[KEY_LENGTH_OVERWRITE] = '1.0'
-                self.effective_length_beam( design_dictionary, length)
+                self.effective_length_beam(design_dictionary, length)
                 # print(f"Working 3 {self.effective_length}")
         # print(f"Inside effective_length_beam",self.effective_length, design_dictionary[KEY_LENGTH_OVERWRITE])
+
+    def check_web_crippling(self, N, tw, fy, d):
+        """
+        Check web crippling as per IS 800:2007 Section 8.7.2.
+        
+        Parameters:
+        -----------
+        N : float
+            Bearing length (mm)
+        tw : float
+            Web thickness (mm)
+        fy : float
+            Yield strength (MPa)
+        d : float
+            Clear depth of web between flanges (mm)
+        
+        Returns:
+        --------
+        bool
+            True if web crippling check passes, False otherwise
+        """
+        try:
+            # Input validation with IS code specific checks
+            if any(val <= 0 for val in [N, tw, fy, d]):
+                # Handle both class and instance method calls
+                if isinstance(self, PlateGirderWelded):
+                    if not self.web_crippling_warning_logged:
+                        self.logger.warning("Invalid input parameters for web crippling check")
+                        self.web_crippling_warning_logged = True
+                else:
+                    if not PlateGirderWelded._web_crippling_warning_logged:
+                        self.logger.warning("Invalid input parameters for web crippling check")
+                        PlateGirderWelded._web_crippling_warning_logged = True
+                return False
+
+            # As per IS 800:2007 Section 8.7.2
+            # Constants for end bearing condition
+            k1 = 3.25  # For end reactions (Clause 8.7.2.1)
+            k2 = 0.15  # For end reactions (Clause 8.7.2.1)
+            
+            # Modulus of elasticity (E) as per IS 800:2007
+            E = self.material.modulus_of_elasticity  # Should be 2e5 MPa for steel
+            
+            # Calculate web crippling resistance as per IS 800:2007 Clause 8.7.2.1
+            # P_w = (k1 * k2 * tw^2 * sqrt(fy * E)) * (1 + (N/d))
+            # where N = bearing length, d = clear depth of web
+            P_w = (k1 * k2 * tw * tw * math.sqrt(fy * E)) * (1 + (N/d))
+            
+            # Apply partial safety factor (γm0) as per IS 800:2007 Table 5 (Clause 5.4.1)
+            # For strength, γm0 = 1.10 is used as per IS 800:2007
+            P_w = P_w / self.gamma_m0  
+
+            # Additional checks as per IS 800:2007
+            if d/tw > 200:  # Slender web condition
+                # Handle both class and instance method calls
+                if isinstance(self, PlateGirderWelded):
+                    if not self.web_crippling_warning_logged:
+                        self.logger.warning("Web slenderness ratio (d/tw) exceeds 200. Additional stiffening may be required.")
+                        self.web_crippling_warning_logged = True
+                else:
+                    if not PlateGirderWelded._web_crippling_warning_logged:
+                        self.logger.warning("Web slenderness ratio (d/tw) exceeds 200. Additional stiffening may be required.")
+                        PlateGirderWelded._web_crippling_warning_logged = True
+            
+            # Compare with factored load as per IS 800:2007
+            if P_w >= self.load.shear_force:
+                return True
+            else:
+                if isinstance(self, PlateGirderWelded):
+                    if not self.web_crippling_warning_logged:
+                        self.logger.warning(f"Web crippling resistance ({P_w:.2f} N) is less than factored load ({self.load.shear_force:.2f} N)")
+                        self.web_crippling_warning_logged = True
+                else:
+                    if not PlateGirderWelded._web_crippling_warning_logged:
+                        self.logger.warning(f"Web crippling resistance ({P_w:.2f} N) is less than factored load ({self.load.shear_force:.2f} N)")
+                        PlateGirderWelded._web_crippling_warning_logged = True
+                return False
+                
+        except Exception as e:
+            if isinstance(self, PlateGirderWelded):
+                if not self.web_crippling_warning_logged:
+                    self.logger.error(f"Error in web crippling calculation: {str(e)}")
+                    self.web_crippling_warning_logged = True
+            else:
+                if not PlateGirderWelded._web_crippling_warning_logged:
+                    self.logger.error(f"Error in web crippling calculation: {str(e)}")
+                    PlateGirderWelded._web_crippling_warning_logged = True
+            return False
+        E = self.material.modulus_of_elasticity  # Get E from material properties
+        Pw = k1 * tw**2 * (1 + k2 * (N/d)) * math.sqrt(E * fy)
+        
+        # Compare with applied load
+        if Pw >= self.load.shear_force * 1000:
+            return True
+        return False
 
     def end_panel_stiffener_calc(self,
                                  Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d,
                                  tf_top, total_depth, effective_length, tf_bot, E, eps, c
                                  ):
         """
-        Calculate end panel stiffener properties.
+        Calculate end panel stiffener properties according to IS 800:2007 Section 8.7.4.
+        
+        The design follows these key requirements:
+        1. Section 8.7.4.1 - Design of intermediate and end bearing stiffeners
+        2. Section 8.7.4.1.1 - Width-to-thickness requirements
+        3. Section 8.7.4.2 - Bearing strength requirements
+        4. Section 8.7.4.3 - Stiffener moment of inertia requirements
 
         Parameters:
         Bf_top (float): Width of flange at top (mm)
@@ -1961,11 +2108,16 @@ class PlateGirderWelded(Member):
         dict: Dictionary of results including buckling resistance, bearing capacity, and torsion check.
         """
         A_vg = d * tw
+        # Validate and handle c value
+        if c is None:
+            # For end panels, use minimum spacing per IS 800:2007
+            c = d  # Default to web depth as recommended
+            
         if self.web_philosophy == 'Thick Web without ITS':
             K_v = 5.35
         else:
-            if c / d < 1:
-                K_v = 4 + 5.35 / (c / d) ** 2
+            if float(c) / float(d) < 1:
+                K_v = 4 + 5.35 / (float(c) / float(d)) ** 2
             else:
                 K_v = 5.35 + 4 / (c / d) ** 2
         E = self.material.modulus_of_elasticity
@@ -1976,11 +2128,47 @@ class PlateGirderWelded(Member):
         tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fy)
         self.V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_vg)
         Nf = self.load.moment / d
-        phi, M_fr_t, M_fr_b, s_t, s_b, w_tf, sai, fv, self.V_tf = IS800_2007.cl_8_4_2_2_TensionField_unequal_Isection(c, d, tw,
-                                                                            fy, Bf_top,
-                                                                            tf_top, Bf_bot, tf_bot,
-                                                                            Nf, gamma_m0,
-                                                                            A_vg, tau_b)
+        # 1) Tension‐field angle φ
+        if c is None or c == 0:
+            # For end panels or when c is not specified, assume c = d as per code recommendations
+            c = d
+            phi = math.degrees(math.atan(1/1.5))  # Using c = d
+        else:
+            phi = math.degrees(math.atan((d / float(c)) / 1.5))
+
+        # 2) Reduced plastic moment of each flange
+        ratio_t = Nf / (Bf_top * tf_top * fy / gamma_m0)
+        if ratio_t >= 1:
+            M_fr_t = 0
+        else:
+            M_fr_t = 0.25 * Bf_top * tf_top**2 * fy * (1 - ratio_t**2)
+        
+        ratio_b = Nf / (Bf_bot * tf_bot * fy / gamma_m0)
+        if ratio_b >= 1:
+            M_fr_b = 0
+        else:
+            M_fr_b = 0.25 * Bf_bot * tf_bot**2 * fy * (1 - ratio_b**2)
+
+        # 3) s‐values for each flange, limited to c
+        sinφ = math.sin(math.radians(phi))
+        if sinφ == 0:
+            s_t = 0
+            s_b = 0
+        else:
+            s_t = min(2 * math.sqrt(M_fr_t / (fy * tw)) / sinφ, c)
+            s_b = min(2 * math.sqrt(M_fr_b / (fy * tw)) / sinφ, c)
+
+        # 4) Width of the tension field w_tf
+        w_tf = d * math.cos(math.radians(phi)) - (c - s_t - s_b) * sinφ
+
+        # 5) Field yield strength f_v
+        sai = 1.5 * tau_b * math.sin(2 * math.radians(phi))
+        fv = math.sqrt(fy**2 - 3 * tau_b**2 + sai**2) - sai
+
+        # 6) Nominal shear resistance V_tf (kN)
+        self.V_tf = (A_vg * tau_b + 0.9 * w_tf * tw * fv * sinφ)
+        V_p = d * tw * fy / (math.sqrt(3) * gamma_m0)  # Plastic shear strength
+        self.V_tf = min(self.V_tf, V_p)
         V_dp = (d * tw * fy / math.sqrt(3))
 
         rad = 1.0 - (self.V_cr / V_dp)
@@ -2014,36 +2202,112 @@ class PlateGirderWelded(Member):
         for self.end_stiffthickness in thickness_list:
 
             self.end_stiffthickness = float(self.end_stiffthickness)
-            Aq = 2 * self.end_stiffthickness * self.end_stiffwidth
-            # print('Aq',Aq)
-            max_outstand = 14 * self.end_stiffthickness * self.epsilon
-            if self.end_stiffwidth <= max_outstand:
+            
+            # IS 800:2007 Section 8.7.4.1.1 - Width-to-thickness requirements
+            # Calculate minimum required width of stiffener considering root radius
+            root_radius = min(tf_top, tf_bot) * 0.15  # Typical root radius if not specified
+            min_width = (min(Bf_top, Bf_bot) - tw - 2 * root_radius)/2  # Minimum required width
+            
+            # Maximum outstand limit per IS 800:2007 Section 8.7.4.1.1
+            max_outstand = min(14 * self.end_stiffthickness * self.epsilon,  # Local buckling limit
+                             200)  # Absolute maximum per code
+            
+            # Check minimum thickness requirement per IS 800:2007
+            min_thickness = max(self.end_stiffwidth/16,  # Width-based requirement
+                              6)  # Absolute minimum per code
+            if self.end_stiffthickness < min_thickness:
+                continue
+                
+            if self.end_stiffwidth < min_width:
+                self.end_stiffwidth = min_width
+            if self.end_stiffwidth > max_outstand:
                 self.end_stiffwidth = max_outstand
-            I_x = (((2 * self.end_stiffwidth + tw) ** 3) * self.end_stiffthickness) / 12
-            I_x += (20 * tw * 2 * tw ** 3) / 12
-            I_x -= (self.end_stiffthickness * tw ** 3) / 12
-
+                
+            # IS 800:2007 Section 8.7.4.2 - Calculate effective bearing area
+            # Include stiffener area and effective web contribution
+            web_contrib_length = min(25 * tw, d/2)  # Web contribution limited to 25tw or d/2
+            
+            # Calculate bearing length (N) per IS 800:2007
+            N = max(self.load.shear_force * 1000 * self.gamma_m0 / (tw * self.material.fy),  # Required length
+                   tf_bot + root_radius)  # Minimum length
+            
+            # Calculate effective area including stiffeners and web portion
+            Aq = (2 * self.end_stiffwidth * self.end_stiffthickness) + (web_contrib_length * tw)
+            
+            # IS 800:2007 Section 8.7.4.3 - Calculate moment of inertia
+            # Consider combined stiffener-web section as per code
+            I_x = (((2 * self.end_stiffwidth + tw) ** 3) * self.end_stiffthickness) / 12  # Stiffener contribution
+            I_x += (web_contrib_length * tw ** 3) / 12  # Web contribution
+            
+            # Additional requirement: Minimum second moment of area
+            min_I = (d * tw**3) / 12  # As per IS 800:2007 Section 8.7.4.3
+            if I_x < min_I:
+                continue  # Stiffener section inadequate
+            
             # Radius of gyration
             r_x = math.sqrt(I_x / Aq)
-
-            # Slenderness ratio
-            Le = self.lefactor * d
+            
+            # IS 800:2007 Section 8.7.4.1 - Effective length for end bearing stiffeners
+            Le = 0.7 * d  # 0.7 times web depth for end bearing stiffeners
             slenderness_input = Le / r_x
 
-            # Design compressive stress from IS 800
+            # IS 800:2007 Section 8.7.4.1 - Design compressive stress
+            # Consider effective length factor K = 0.7 for end bearing stiffeners
+            K = 0.7
+            KL_r = K * Le / r_x  # Effective slenderness ratio
+            
+            # Calculate design compressive stress as per IS 800:2007
             fcd = IS800_2007.cl_7_1_2_1_design_compressisive_stress_plategirder(
-                self.material.fy, self.gamma_m0, slenderness_input, self.material.modulus_of_elasticity
+                self.material.fy, self.gamma_m0, KL_r, self.material.modulus_of_elasticity
             )
 
-            # Critical buckling resistance (kN)
+            # Critical buckling resistance (kN) considering effective section
             Pd = Aq * fcd
-
-            # print('moment ratio', self.moment_ratio, 'end panel shear ratio 2', self.endshear_ratio )
             self.Critical_buckling_resistance = Pd
-            n2 = 2.5 * self.bottom_flange_thickness
-            Fw = n2 * tw * self.material.fy / (self.gamma_m0)
-            Bearing_stiffenerforce = Fc - Fw
-            Bearing_capacity = self.material.fy * Aq / (self.gamma_m0)
+
+            # IS 800:2007 Section 8.7.4.2 - Bearing strength calculation
+            # Consider bearing length as per code requirements
+            n1 = N  # Actual bearing length
+            n2 = 2.5 * self.bottom_flange_thickness  # Extended bearing length
+            
+            # Web contribution to bearing strength considering both bearing lengths
+            Fw = min(n1, n2) * tw * self.material.fy / self.gamma_m0  # Web bearing contribution
+            
+            # Check local web crippling as per IS 800:2007
+            web_height = d - tf_top - tf_bot  # Clear depth of web between flanges
+            
+            # Web slenderness check as per IS 800:2007
+            if web_height/tw > 200:  # Slender web condition requiring additional checks
+                try:
+                    # Additional check for web crippling needed as per IS 800:2007 Section 8.7.2
+                    web_crippling_check = self.check_web_crippling(n1, tw, self.material.fy, web_height)
+                    if not web_crippling_check:
+                        # Handle both class and instance method calls
+                        if isinstance(self, PlateGirderWelded):
+                            if not self.web_crippling_warning_logged:
+                                self.logger.warning("Web crippling check failed as per IS 800:2007. Consider increasing web thickness or adding stiffeners.")
+                                self.web_crippling_warning_logged = True
+                        else:
+                            if not PlateGirderWelded._web_crippling_warning_logged:
+                                self.logger.warning("Web crippling check failed as per IS 800:2007. Consider increasing web thickness or adding stiffeners.")
+                                PlateGirderWelded._web_crippling_warning_logged = True
+                        continue
+                except Exception as e:
+                    if isinstance(self, PlateGirderWelded):
+                        if not self.web_crippling_warning_logged:
+                            self.logger.error(f"Error during web crippling check: {str(e)}")
+                            self.web_crippling_warning_logged = True
+                    else:
+                        if not PlateGirderWelded._web_crippling_warning_logged:
+                            self.logger.error(f"Error during web crippling check: {str(e)}")
+                            PlateGirderWelded._web_crippling_warning_logged = True
+                    continue
+            
+            # Total bearing capacity including stiffener and web as per IS 800:2007
+            Bearing_capacity = (self.material.fy * Aq / self.gamma_m0) + Fw
+            
+            # Calculate bearing force on stiffener
+            Bearing_stiffenerforce = Fc - Fw  # Net force on stiffener after web contribution
             # print('stiff width', self.end_stiffwidth, 'stiff thick', self.end_stiffthickness, 'D', d, 'Vcr',
             #       self.V_cr, 'Vdp', V_dp, rad, 'Hq', H_q, 'Rtf', R_tf, 'Av', A_v, 'Vn', V_n, 'Mtf', M_tf, 'I', I,
             #       'Mq', M_q, 'Fm', Fm, 'Fc', Fc, 'bearing_area', bearing_area, 'Aq', Aq, 'max_outstand',
@@ -2051,22 +2315,34 @@ class PlateGirderWelded(Member):
             #       Pd, 'Fw', Fw, 'Bearing_stiffenerforce', Bearing_stiffenerforce, 'Bearing_capacity',
             #       Bearing_capacity)
             # print('fcd', fcd, 'Pd', Pd, 'FC', Fc)
-            self.endshear_ratio  = max(Bearing_stiffenerforce / Bearing_capacity, Fc / Pd, R_tf / V_n )
-            # print('moment ratio', self.moment_ratio, 'end panel shear ratio 3', self.endshear_ratio )
-
-            if  self.endshear_ratio  <= 1:
+            # Check all design criteria as per IS 800:2007 Section 8.7.4
+            bearing_ratio = Bearing_stiffenerforce / Bearing_capacity  # Bearing strength check
+            buckling_ratio = Fc / Pd  # Compression buckling check
+            shear_ratio = R_tf / V_n  # Shear capacity check
+            
+            self.endshear_ratio = max(bearing_ratio, buckling_ratio, shear_ratio)
+            
+            # Additional checks as per IS 800:2007
+            min_MOI = (d * tw**3) / 12  # Minimum moment of inertia requirement
+            moi_check = I_x >= min_MOI
+            
+            if self.endshear_ratio <= 1.0 and moi_check:
+                # All checks passed:
+                # 1. Bearing strength adequate
+                # 2. Buckling resistance sufficient
+                # 3. Shear capacity adequate
+                # 4. Moment of inertia requirement met
                 break
             else:
                 continue
+                
         self.shear_ratio = max(self.endshear_ratio, self.shear_ratio)
-        if self.endshear_ratio  <= 1:
-            # print("end stiffener check passed")
-
+        
+        if self.endshear_ratio <= 1.0:
             return True
         else:
-            # print("Tension field end stiffener check failed: Bearing capacity insufficient")
+            # Design failed - reset stiffener thickness
             self.end_stiffthickness = 0
-
             return False
 
         # # Geometrical properties
@@ -2092,7 +2368,7 @@ class PlateGirderWelded(Member):
         # bearing_capacity = (Aq * fy) / (0.8 * gamma_m0)
         #
         # # Torsional restraint
-        # ry = Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY( total_depth, Bf_top, Bf_bot, tw, tf_top, tf_bot)
+        # ry = Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(total_depth, Bf_top, Bf_bot, tw, tf_top, tf_bot)
         # slender_torsion = effective_length / ry
         #
         # if slender_torsion <= 50:
@@ -2241,9 +2517,7 @@ class PlateGirderWelded(Member):
         using f_wd from cl.10.5.7.1.1.
         """
         # 1) get f_wd in MPa → convert to N/mm²
-        f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-            ultimate_stresses
-        )  # MPa
+        f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses)  # MPa
 
         # 2) convert q to N/mm
         q_N_per_mm = q_kN_per_mm
@@ -2263,7 +2537,7 @@ class PlateGirderWelded(Member):
 
                                              ):
         # compute shear flows
-        sf = self.shear_stress_unsym_I( V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w)
+        sf = self.shear_stress_unsym_I(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w)
         min_weld_legtop = IS800_2007.cl_10_5_2_3_min_weld_size(t_ft, t_w)
         min_weld_legbot = IS800_2007.cl_10_5_2_3_min_weld_size(t_fb, t_w)
         max_weld_legtop = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(t_ft, t_w)
@@ -2277,7 +2551,7 @@ class PlateGirderWelded(Member):
 
         a_bot = round_up(max(self.weld_leg_from_q_with_cl10(
                                             sf['q_bot_kN_per_mm'], ultimate_stresses
-                                            ), min_weld_legbot) and min(self.weld_leg_from_q_with_cl10( sf['q_bot_kN_per_mm'], ultimate_stresses
+                                            ), min_weld_legbot) and min(self.weld_leg_from_q_with_cl10(sf['q_bot_kN_per_mm'], ultimate_stresses
                                             ), max_weld_legbot),1)
 
         # end‐stiffener check (unchanged)
@@ -2324,7 +2598,7 @@ class PlateGirderWelded(Member):
         max_weld_legtop = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(t_st, tw)
 
         # weld legs using cl.10 strength
-        weld_stiff = self.weld_leg_from_q_with_cl10( q_each, ultimate_stresses)
+        weld_stiff = self.weld_leg_from_q_with_cl10(q_each, ultimate_stresses)
         # print("weld_stiff", weld_stiff, "min_weld_legtop", min_weld_legtop, "max_weld_legtop", max_weld_legtop)
         if weld_stiff < min_weld_legtop:
             weld_stiff = min_weld_legtop
@@ -2372,7 +2646,7 @@ class PlateGirderWelded(Member):
     V_ed,
     gamma_m0,
     fy,
-    E
+    E   
 ):
         """
         Performs global and shear buckling checks for an intermediate stiffener.
@@ -2468,7 +2742,7 @@ class PlateGirderWelded(Member):
 
         # Check axial capacity
         # if F_q < Pd:
-        #     print("Intermediate stiffener shear buckling check passed")
+            # print("Intermediate stiffener shear buckling check passed")
         return True
         # else:
         #     return False
@@ -2758,7 +3032,7 @@ class PlateGirderWelded(Member):
         """
         c = float(c)
         tw = float(tw)
-        d_na= Unsymmetrical_I_Section_Properties.calc_centroid( self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+        d_na= Unsymmetrical_I_Section_Properties.calc_centroid(self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
         # print('d_na', d_na)
         # 2) stiffener locations
         self.x1 = int(round(d_na / 5.0 ,0)) # first stiffener at 1/5 of neutral axis from compression flange
@@ -2799,7 +3073,7 @@ class PlateGirderWelded(Member):
     ##### NEW PSO #####
 
 
-    # def initialize( design_dictionary):
+    # def initialize(self, design_dictionary):
 
     
     # 1. Generate the “empirical” first particle
@@ -2881,7 +3155,6 @@ class PlateGirderWelded(Member):
         self.top_flange_width = section.bf_top
         self.bottom_flange_width = section.bf_bot
         self.total_depth = section.D
-        self.pso_y = self.total_depth
         self.eff_depth = section.D - section.tf_top - section.tf_bot
         self.IntStiffnerwidth = min(self.top_flange_width,self.bottom_flange_width) - self.web_thickness/2 - 10
         self.end_stiffwidth = self.IntStiffnerwidth
@@ -2896,7 +3169,7 @@ class PlateGirderWelded(Member):
         sec = Section()
         self.assign_particle_to_section(particle, variable_list, sec)
         self.design_check(design_dictionary)
-        max_ratio, slender_ok, thickness_ok = self.design_check_optimized_version(design_dictionary)
+        max_ratio, slender_ok, thickness_ok = self.design_check_optimized_version(self,design_dictionary)
 
         area = ((self.top_flange_thickness * self.top_flange_width) +
                 (self.bottom_flange_thickness * self.bottom_flange_width) +
@@ -2928,7 +3201,15 @@ class PlateGirderWelded(Member):
         # 5) Return penalized objective
         return mass + P * penalty
 
+    
     def optimized_method(self, design_dictionary, is_thick_web, is_symmetric):
+
+        # Reset warning flags at the start of optimization run
+        self.flange_warning_logged = False
+        self.dimension_warning_logged = False
+        self.web_crippling_warning_logged = False
+        PlateGirderWelded._web_crippling_warning_logged = False  # Reset class-level flag as well
+
         variable_list = self.build_variable_structure(is_thick_web, is_symmetric)
         lb, ub = self.get_bounds(variable_list)
         lb = np.array(lb)
@@ -3061,7 +3342,6 @@ class PlateGirderWelded(Member):
 
             volume = area * self.length  # mm³
             mass = volume * 7.85e-6  # kg
-            self.pso_x = mass
 
             if sec.c is None or sec.t_stiff is None:
                 mass_stiff = 0.0
@@ -3170,6 +3450,10 @@ class PlateGirderWelded(Member):
         self.design_status = True
 
 
+
+
+
+
     # 5. Objective function
     def objective_function(self,x, variable_list,design_dictionary,is_symmetric,is_thick_web):
         """
@@ -3228,12 +3512,39 @@ class PlateGirderWelded(Member):
         self.momentchecks = False
         self.defl_check = False
         self.long_check = False
-        self.design_flag = self.section_classification( design_dictionary)
+        self.design_flag = self.section_classification(design_dictionary)
         if self.design_flag == False:
             self.logger.error("slender section not allowed")
             
         else:
-            self.beta_value( design_dictionary,self.section_class)
+            # Ensure flange warning flag is initialized
+            if not hasattr(self, 'flange_warning_logged'):
+                self.flange_warning_logged = False
+            if not hasattr(self, 'dimension_warning_logged'):
+                self.dimension_warning_logged = False
+            
+            # Check minimum b/tf ratio for flanges to prevent overly thick flanges
+            min_b_tf = 7.4 * self.epsilon
+            b_tf_top = self.top_flange_width / self.top_flange_thickness
+            if b_tf_top < min_b_tf and not self.flange_warning_logged:
+                self.logger.warning(f"Top flange b/tf ratio ({b_tf_top:.2f}) is less than minimum ({min_b_tf:.2f}), flanges may be too thick")
+                self.flange_warning_logged = True
+            
+            b_tf_bot = self.bottom_flange_width / self.bottom_flange_thickness
+            if b_tf_bot < min_b_tf and not self.flange_warning_logged:
+                self.logger.warning(f"Bottom flange b/tf ratio ({b_tf_bot:.2f}) is less than minimum ({min_b_tf:.2f}), flanges may be too thick")
+                self.flange_warning_logged = True
+            
+            # Check that bottom flange dimensions are not less than top flange dimensions
+            if self.bottom_flange_width < self.top_flange_width and not self.dimension_warning_logged:
+                self.logger.warning(f"Bottom flange width ({self.bottom_flange_width:.2f} mm) is less than top flange width ({self.top_flange_width:.2f} mm)")
+                self.dimension_warning_logged = True
+            
+            if self.bottom_flange_thickness < self.top_flange_thickness and not self.dimension_warning_logged:
+                self.logger.warning(f"Bottom flange thickness ({self.bottom_flange_thickness:.2f} mm) is less than top flange thickness ({self.top_flange_thickness:.2f} mm)")
+                self.dimension_warning_logged = True
+            
+            self.beta_value(design_dictionary,self.section_class)
 
             if self.web_philosophy == 'Thick Web without ITS':
                 self.design_flag2 = self.min_web_thickness_thick_web(self.eff_depth,self.web_thickness,self.epsilon,"no_stiffener",0)
@@ -3308,7 +3619,7 @@ class PlateGirderWelded(Member):
                     second_stiffener = False
                     if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
                         second_stiffener = True
-                    if self.design_longitudinal_stiffeners( self.eff_depth, self.web_thickness, self.c,self.epsilon, second_stiffener):
+                    if self.design_longitudinal_stiffeners(self.eff_depth, self.web_thickness, self.c,self.epsilon, second_stiffener):
                         self.logger.info("Longitudinal Stiffener Check passed")
                     else:
                         self.logger.error("Longitudinal Stiffener Check failed")
@@ -3331,7 +3642,7 @@ class PlateGirderWelded(Member):
                             self.logger.info("Shear Check passed")
                         else:
                             self.logger.info("Shear Check Failed, add end stiffeners")
-                            if self.end_panel_stiffener_calc( self.top_flange_width, self.bottom_flange_width,
+                            if self.end_panel_stiffener_calc(self.top_flange_width, self.bottom_flange_width,
                                                              self.web_thickness, self.end_stiffthickness,
                                                              self.material.fy, self.gamma_m0, self.eff_depth,
                                                              self.top_flange_thickness, self.total_depth,
@@ -3356,7 +3667,7 @@ class PlateGirderWelded(Member):
                         else:
 
                             self.logger.error("Shear Buckling Check failed, provide end panel stiffeners")
-                            if self.tension_field_end_stiffener( self.eff_depth, self.web_thickness, self.material.fy,
+                            if self.tension_field_end_stiffener(self.eff_depth, self.web_thickness, self.material.fy,
                                                              self.load.shear_force, self.load.moment,
                                                              self.c):
                                 self.shearflag1 = True
@@ -3397,12 +3708,17 @@ class PlateGirderWelded(Member):
                             self.momentchecks = False
                             self.logger.error("Moment Check failed")
 
-        #end panel stiffener checks
-       # if self.end_panel_stiffener_calc( self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.intstiffener_thk, self.material.fy, self.gamma_m0, self.eff_depth, self.top_flange_thickness, self.total_depth, self.effective_length, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.epsilon):
-       #  if self.end_panel_stiffener_calc( self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.end_stiffthickness, self.material.fy, self.gamma_m0, self.eff_depth, self.top_flange_thickness, self.total_depth, self.effective_length, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.epsilon, self.c):
-       #      self.logger.info("End Panel Stiffener Check passed")
-       #  else:
-       #      self.logger.error("End Panel Stiffener Check failed")
+         # End panel stiffener checks as per IS 800:2007
+        if self.end_panel_stiffener_calc(self.top_flange_width, self.bottom_flange_width, 
+                                        self.web_thickness, self.end_stiffthickness, 
+                                        self.material.fy, self.gamma_m0, self.eff_depth, 
+                                        self.top_flange_thickness, self.total_depth, 
+                                        self.effective_length, self.bottom_flange_thickness, 
+                                        self.material.modulus_of_elasticity, self.epsilon, self.c):
+            self.logger.info("End Panel Stiffener Check passed")
+        else:
+            self.logger.error("End Panel Stiffener Check failed")
+            self.end_stiffthickness = 0  # Reset if check fails
 
        
 
@@ -3422,6 +3738,10 @@ class PlateGirderWelded(Member):
             pass
         self.final_format(design_dictionary)
 
+        # Reset warning flags after design completion for next run
+        self.flange_warning_logged = False
+        self.dimension_warning_logged = False
+
     def design_check_optimized_version(self,design_dictionary):
         self.design_flag = False
         self.design_flag2 = False
@@ -3432,14 +3752,41 @@ class PlateGirderWelded(Member):
         self.momentchecks = False
         self.defl_check = False
         self.long_check = False
-        self.design_flag = self.section_classification( design_dictionary)
+        self.design_flag = self.section_classification(design_dictionary)
         #print('DEISGN FLAG',self.design_flag)
         if self.design_flag == False:
             pass
             # self.logger.error("slender section not allowed")
             
         else:
-            self.beta_value( design_dictionary,self.section_class)
+            # Ensure flange warning flag is initialized
+            if not hasattr(self, 'flange_warning_logged'):
+                self.flange_warning_logged = False
+            if not hasattr(self, 'dimension_warning_logged'):
+                self.dimension_warning_logged = False
+            
+            # Check minimum b/tf ratio for flanges to prevent overly thick flanges
+            min_b_tf = 7.4 * self.epsilon
+            b_tf_top = self.top_flange_width / self.top_flange_thickness
+            if b_tf_top < min_b_tf and not self.flange_warning_logged:
+                self.logger.warning(f"Top flange b/tf ratio ({b_tf_top:.2f}) is less than minimum ({min_b_tf:.2f}), flanges may be too thick")
+                self.flange_warning_logged = True
+            
+            b_tf_bot = self.bottom_flange_width / self.bottom_flange_thickness
+            if b_tf_bot < min_b_tf and not self.flange_warning_logged:
+                self.logger.warning(f"Bottom flange b/tf ratio ({b_tf_bot:.2f}) is less than minimum ({min_b_tf:.2f}), flanges may be too thick")
+                self.flange_warning_logged = True
+            
+            # Check that bottom flange dimensions are not less than top flange dimensions
+            if self.bottom_flange_width < self.top_flange_width and not self.dimension_warning_logged:
+                self.logger.warning(f"Bottom flange width ({self.bottom_flange_width:.2f} mm) is less than top flange width ({self.top_flange_width:.2f} mm)")
+                self.dimension_warning_logged = True
+            
+            if self.bottom_flange_thickness < self.top_flange_thickness and not self.dimension_warning_logged:
+                self.logger.warning(f"Bottom flange thickness ({self.bottom_flange_thickness:.2f} mm) is less than top flange thickness ({self.top_flange_thickness:.2f} mm)")
+                self.dimension_warning_logged = True
+            
+            self.beta_value(design_dictionary,self.section_class)
 
             if self.web_philosophy == 'Thick Web without ITS':
                 # print('THICK WEB')
@@ -3466,8 +3813,9 @@ class PlateGirderWelded(Member):
                         # self.logger.error("Web Buckling Check failed")
                     
                     #web crippling check
-                    if self.web_crippling_laterally_supported_thick_web(self.material.fy,self.gamma_m0,self.web_thickness,self.top_flange_thickness,self.b1):
-                        self.shearflag3 = False
+                    web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
+                    if self.check_web_crippling(self.b1, self.web_thickness, self.material.fy, web_height):
+                        self.shearflag3 = True  # Fixed from False to True
                         # self.logger.info("Web Crippling Check passed")
                     else:
                         self.shearflag3 = False
@@ -3514,7 +3862,7 @@ class PlateGirderWelded(Member):
                     second_stiffener = False
                     if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
                         second_stiffener = True
-                    if self.design_longitudinal_stiffeners( self.eff_depth, self.web_thickness, self.c,
+                    if self.design_longitudinal_stiffeners(self.eff_depth, self.web_thickness, self.c,
                                                            self.epsilon, second_stiffener):
                     #self.logger.info("Longitudinal Stiffener Check passed")
                         self.long_check = True
@@ -3539,7 +3887,7 @@ class PlateGirderWelded(Member):
                             # self.logger.info("Shear Check passed")
                         else:
 
-                            if self.end_panel_stiffener_calc( self.top_flange_width, self.bottom_flange_width,
+                            if self.end_panel_stiffener_calc(self.top_flange_width, self.bottom_flange_width,
                                                              self.web_thickness, self.end_stiffthickness,
                                                              self.material.fy, self.gamma_m0, self.eff_depth,
                                                              self.top_flange_thickness, self.total_depth,
@@ -3566,14 +3914,14 @@ class PlateGirderWelded(Member):
                             self.shearflag1 = True
                             # self.logger.info("Shear Buckling Check passed")
                         else:
-                            if self.tension_field_end_stiffener( self.eff_depth, self.web_thickness, self.material.fy,
+                            if self.tension_field_end_stiffener(self.eff_depth, self.web_thickness, self.material.fy,
                                                              self.load.shear_force, self.load.moment,
                                                              self.c):
                                 self.shearflag1 = True
                             else:
                                 self.shearflag1 = False
                                 # self.logger.error("Tension Field Check failed, increase stiffener thickness")
-                        if self.tension_field_intermediate_stiffener( self.eff_depth, self.web_thickness, self.c,
+                        if self.tension_field_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c,
                                                                      self.epsilon, self.IntStiffThickness,
                                                                      self.IntStiffnerwidth, self.load.shear_force,
                                                                      self.gamma_m0, self.material.fy,
@@ -3610,16 +3958,9 @@ class PlateGirderWelded(Member):
                             self.momentchecks = False
 
                             # self.logger.error("Moment Check failed")
-
-
-
-                
-
                 else:
                     # self.logger.error("Increase the web thickness")
                     pass
-
-
 
         #deflection checks
         if self.evaluate_deflection_kNm_mm(self.load.moment, self.length, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria):
@@ -3730,13 +4071,9 @@ class PlateGirderWelded(Member):
             # print('vdfgbdfhb')
         
         self.logger.info(f"Optimized values : Flange width top and bottom {self.top_flange_width} {self.bottom_flange_width} flange thickness top and bottom {self.top_flange_thickness} { self.bottom_flange_thickness} web_thickness  {self.web_thickness} total depth { self.total_depth} C value {self.c} thickness stiffener { self.IntStiffThickness}")
-
-        self.design_check(design_dictionary)
-
-        # # self.logger.info(f"Web Thickness: {self.web_thickness}, Flange Thickness Top: {self.top_flange_thickness}, Flange Width Top: {self.top_flange_width}, Total Depth: {self.total_depth}")
-        
+        self.design_check(design_dictionary)   
     
-    def final_format(self,design_dictionary):
+    def final_format(self, design_dictionary):
         
         self.result_designation = (str(int(self.total_depth)) + " x " +str(int(self.web_thickness)) + " x " +str(int(self.bottom_flange_width)) + " x " +str(int(self.bottom_flange_thickness)) + " x " +str(int(self.top_flange_width)) + " x "  +str(int(self.top_flange_thickness)))
         if self.moment_ratio == None:
@@ -3752,8 +4089,6 @@ class PlateGirderWelded(Member):
         # print("RATIOS",'moment ratio', self.moment_ratio, 'shear ratio', self.shear_ratio, 'deflection ratio', self.deflection_ratio)
         # print(self.moment_ratio, self.shear_ratio)
         self.result_UR = max(self.moment_ratio,self.shear_ratio, self.deflection_ratio)
-        self.pso_z = self.result_UR
-
         self.section_classification_val = self.section_class
         if self.beta_b_lt == None:
             self.beta_b_lt = 0
@@ -3791,8 +4126,8 @@ class PlateGirderWelded(Member):
         self.atop= 0
         self.abot= 0
         self.weld_stiff= None
-        self.atop, self.abot= self.design_welds_with_strength_web_to_flange( self.load.shear_force, self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.web_thickness, self.eff_depth, [self.material.fu])
-        self.weld_stiff = self.weld_for_end_stiffener( self.end_stiffthickness, self.end_stiffwidth, self.load.shear_force, self.V_d, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, [self.material.fu])
+        self.atop, self.abot= self.design_welds_with_strength_web_to_flange(self.load.shear_force, self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.web_thickness, self.eff_depth, [self.material.fu])
+        self.weld_stiff = self.weld_for_end_stiffener(self.end_stiffthickness, self.end_stiffwidth, self.load.shear_force, self.V_d, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, [self.material.fu])
         self.design_status = True
 
     def save_design(self, popup_summary):

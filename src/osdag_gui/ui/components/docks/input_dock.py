@@ -90,14 +90,14 @@ class InputDock(QWidget):
         # Calculate maximum size
         max_len = 0
         for t in list:
-            if t[2] not in [TYPE_TITLE, TYPE_IMAGE]:
+            if t[2] not in [TYPE_TITLE, TYPE_IMAGE, TYPE_IMAGE_COMPRESSION] and t[1] is not None:
                 if len(t[1]) > max_len:
                     max_len = len(t[1])
         
         # Create a new list with equal string length
         return_list = [] 
         for t in list:
-            if t[2] not in [TYPE_TITLE, TYPE_IMAGE]:
+            if t[2] not in [TYPE_TITLE, TYPE_IMAGE, TYPE_IMAGE_COMPRESSION] and t[1] is not None:
                 new_tupple = (t[0], t[1].ljust(max_len)) + t[2:]
             else:
                 new_tupple = t

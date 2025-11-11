@@ -38,10 +38,7 @@ from osdag_core.design_type.connection.lap_joint_welded import LapJointWelded
 from osdag_core.design_type.connection.lap_joint_bolted import LapJointBolted
 from osdag_core.design_type.connection.butt_joint_bolted import ButtJointBolted
 from osdag_core.design_type.connection.butt_joint_welded import ButtJointWelded
-
-
-
-
+from osdag_core.design_type.compression_member.compression import Compression
 from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 from osdag_core.design_type.compression_member.Column import ColumnDesign
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
@@ -460,6 +457,8 @@ class MainWindow(QMainWindow):
             self.open_column_cover_plate_connection()
         elif card_title == "Column Cover Plate Welded":
             self.open_column_cover_plate_weld_connection() 
+        elif card_title == "Struts in Trusses":
+            self.open_struts_in_trusses_compression_member()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -1032,7 +1031,40 @@ class MainWindow(QMainWindow):
         current_tab_data = self.tab_widget_content[index]
         self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
 
+    
+    def open_struts_in_trusses_compression_member(self):
+        title = "Struts in Trusses"
+        self.clear_layout(self.main_widget_layout)
+        compression_member = CustomWindow(title, Compression, parent=self)
 
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(compression_member.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                compression_member.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = compression_member
+        compression_member.openNewTab.connect(self.handle_add_tab)
+        compression_member.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(compression_member)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        # Show docking Icons
+        self.tab_widget_content[index][1] = True
+        current_tab_data = self.tab_widget_content[index]
+        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+           
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()

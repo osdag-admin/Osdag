@@ -242,7 +242,7 @@ MODULE_MAP = {
     #---------Tension-Member-end------------------------------------------------------
 
     #---------Compression-Member-start------------------------------------------------------
-    KEY_DISP_COMPRESSION_Strut: ['Struts in Trusses', 'Compression Member', 'None'],
+    KEY_DISP_COMPRESSION_Strut: ['Struts in Trusses', 'Compression Member', 'open_struts_in_trusses_compression_member'],
     KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member', 'None'],
     #---------Compression-Member-end------------------------------------------------------
 

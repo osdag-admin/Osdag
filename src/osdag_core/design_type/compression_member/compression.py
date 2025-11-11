@@ -257,29 +257,28 @@ class Compression(Member):
     def module_name(self):
         return KEY_DISP_COMPRESSION_Strut
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
 
         """
         Function to set Logger for Strut design Module
         """
 
         # @author Rutvik J
-        global logger
-        logger = logging.getLogger('Osdag')
+        self.logger = logging.getLogger('Osdag')
 
-        logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
         # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
 
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
         # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
         # handler.setLevel(logging.INFO)
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
@@ -289,7 +288,7 @@ class Compression(Member):
             # handler.setLevel(logging.DEBUG)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
             handler.setFormatter(formatter)
-            logger.addHandler(handler)
+            self.logger.addHandler(handler)
 
     def customized_input(self):
 
@@ -537,9 +536,13 @@ class Compression(Member):
             return VALUES_IMG_TENSIONBOLTED[4]
 
 
-    def fn_profile_section(self):
+    def fn_profile_section(self, args=None):
         #print(f"fn_profile_section self {self}")
-        profile = self[0]
+        # Use provided argument or fall back to self[0]
+        if args and len(args) > 0:
+            profile = args[0]
+        else:
+            profile = self[0]
         # print(f'profile = {self[0]}'
         #       f'VALUES_SEC_PROFILE_Compression_Strut {VALUES_SEC_PROFILE_Compression_Strut}')
         if profile == 'Beams':
@@ -709,37 +712,9 @@ class Compression(Member):
 
         out_list.append(t21)
 
-        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
-        out_list.append(t18)
+        
 
-        t8 = (None, DISP_TITLE_CONN_DETAILS , TYPE_TITLE, None, True)
-        out_list.append(t8)
-
-        t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
-               int(round(self.inter_conn, 0)) if flag else '', True)
-        out_list.append(t21)
-
-        t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
-               (round(self.inter_memb_length, 2)) if flag else '', True)
-        out_list.append(t21)
-
-        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
-        out_list.append(t8)
-
-        t9 = (KEY_OUT_INTER_WELD_SIZE, KEY_OUT_DISP_INTER_WELD_SIZE, TYPE_TEXTBOX, self.inter_weld_size if flag else '', True)
-        out_list.append(t9)
-
-        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
-        out_list.append(t18)
-
-        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,
-               int(round(self.inter_plate_height, 0)) if flag else '', True)
-        out_list.append(t20)
-
-        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,
-               int(round(self.inter_plate_length, 0)) if flag else '', True)
-        out_list.append(t21)
-
+     
 
 
         # t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
@@ -2294,9 +2269,6 @@ class Compression(Member):
         # overall design status
 
 
-
-
-    ### start writing save_design from here!
     def save_design(self, popup_summary):
 
         """if self.connectivity == 'Hollow/Tubular Column Base':

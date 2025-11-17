@@ -162,8 +162,9 @@ class PNGSequencePlayer(QLabel):
         self.timer = QTimer()
         self.setScaledContents(True)
         self.timer.timeout.connect(self.next_frame)
+        self.loop = False
         
-    def load_sequence(self, base_path, frame_count, fps=24):
+    def load_sequence(self, base_path, frame_count, fps=24, loop=False):
         """
         Load PNG sequence
         base_path: path pattern like ":/animation/{:04d}.png"
@@ -172,6 +173,7 @@ class PNGSequencePlayer(QLabel):
         """
         self.frame_count = frame_count
         self.frames = []
+        self.loop = loop
         
         for i in range(1, frame_count + 1):
             frame_path = base_path.format(i)
@@ -187,11 +189,20 @@ class PNGSequencePlayer(QLabel):
     def next_frame(self):
         if self.frames:
             self.setPixmap(self.frames[self.current_frame])
-            self.current_frame = (self.current_frame + 1) % len(self.frames)
+            self.current_frame += 1
+
+            # Stop when reaching the end if not looping
+            if self.current_frame >= len(self.frames):
+                if self.loop:
+                    self.current_frame = 0  # Loop back to start
+                else:
+                    self.timer.stop()  # Stop animation
+                    self.current_frame = len(self.frames) - 1  # Stay on last frame
     
     def stop_animation(self):
         self.timer.stop()
         
     def start_animation(self):
         if self.frames and not self.timer.isActive():
+            self.current_frame = 0
             self.timer.start()

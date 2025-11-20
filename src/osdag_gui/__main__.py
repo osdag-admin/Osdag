@@ -178,17 +178,17 @@ Osdag Steel Design and Graphics Application
 
 Usage:\n
   osdag                       # Launch GUI (default)\n
-  osdag cli run               # Use CLI tools (see below)
+  osdag-cli run               # Use CLI tools (see below)
 
 By default, running 'osdag' launches the GUI.
-You can also run in CLI mode using 'osdag cli run'.
+You can also run in CLI mode using 'osdag-cli run'.
 
 Examples:\n
   osdag\n
-  osdag cli run -i TensionBolted.osi\n
-  osdag cli run -i TensionBolted.osi -op save_csv -o result.csv\n
-  osdag cli run -i TensionBolted.osi -op save_pdf -o result.pdf\n
-  osdag cli run -i TensionBolted.osi -op print_result\n
+  osdag-cli run -i TensionBolted.osi\n
+  osdag-cli run -i TensionBolted.osi -op save_csv -o result.csv\n
+  osdag-cli run -i TensionBolted.osi -op save_pdf -o result.pdf\n
+  osdag-cli run -i TensionBolted.osi -op print_result\n
 ==================================================\n
 """
 

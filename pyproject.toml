@@ -16,12 +16,14 @@ where = ["src"]
 [project]
 name = "osdag"
 dynamic = ["version"]
-dependencies = ["PyQt5", "requests", "pylatex", "numpy", "PyYaml", "PyGithub"]
-requires-python = ">= 3.8"
+dependencies = ["PyQt5", "PySide6", "requests", "pylatex", "numpy", "PyYaml", "PyGithub"]
+requires-python = ">= 3.11"
 description = "Open steel design and graphics"
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = ["steel design", "civil engineering", "engineering"]
 
 [project.gui-scripts]
-osdag = "osdag.osdagMainPage:do_stuff"
+osdag = "osdag_gui.__main__:GUI"
+[project.scripts]
+osdag-cli = "osdag_gui.__main__:cli"

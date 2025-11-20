@@ -210,7 +210,10 @@ def main(ctx):
             context_settings=dict(help_option_names=['-h', '--help']),
             )
 def cli():
-    pass
+    from click.testing import CliRunner
+    runner = CliRunner()
+    result = runner.invoke(main, ["cli"])
+    print(result.output)
 
 
 # --- Subcommand: run ---

@@ -28,6 +28,7 @@ from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleC
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
+from osdag_core.design_type.compression_member.Column import ColumnDesign
 
 # Spacing Detail
 from osdag_gui.ui.components.output_details.b2bCoverPlateWelded import B2BCoverPlateWeldedDetails
@@ -602,8 +603,7 @@ class OutputDock(QWidget):
                         flag_legacyspacing = True
 
                     if not flag_legacyspacing:
-                        return   
-            
+                        return            
                 
                 elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]==KEY_OUT_DISP_BOLT_IR_DETAILS and main.module_name()==KEY_DISP_FINPLATE) :
                     if main.module_name()==KEY_DISP_FINPLATE:

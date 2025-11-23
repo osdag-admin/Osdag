@@ -1,12 +1,19 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QGraphicsView,
-                             QGraphicsScene)
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtGui import QPainter, QPen, QFont
-from PyQt5.QtGui import QPolygonF, QBrush
-from PyQt5.QtCore import QPointF
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QHBoxLayout, QLabel, QGraphicsView,
+    QGraphicsScene, QGraphicsRectItem, QFrame
+)
+
+from PySide6.QtGui import (
+    QPixmap, QPainter, QPen, QFont, QColor,
+    QPolygonF, QBrush
+)
+
+from PySide6.QtCore import (
+    Qt, QRectF, QPointF
+)
+
 from osdag_core.Common import *
 
 class B2BEndPlateSketch(QMainWindow):

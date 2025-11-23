@@ -178,10 +178,10 @@ Osdag Steel Design and Graphics Application
 
 Usage:\n
   osdag                       # Launch GUI (default)\n
-  osdag-cli run               # Use CLI tools (see below)
+  osdag cli run               # Use CLI tools (see below)
 
 By default, running 'osdag' launches the GUI.
-You can also run in CLI mode using 'osdag-cli run'.
+You can also run in CLI mode using 'osdag cli run'.
 
 Examples:\n
   osdag\n
@@ -210,10 +210,7 @@ def main(ctx):
             context_settings=dict(help_option_names=['-h', '--help']),
             )
 def cli():
-    from click.testing import CliRunner
-    runner = CliRunner()
-    result = runner.invoke(main, ["cli"])
-    print(result.output)
+    pass
 
 
 # --- Subcommand: run ---

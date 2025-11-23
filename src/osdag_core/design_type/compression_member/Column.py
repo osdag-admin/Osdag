@@ -27,6 +27,7 @@ class ColumnDesign(Member):
 
     def __init__(self):
         # print(f"Here10")
+        self.hover_dict = {}
         super(ColumnDesign, self).__init__()
 
     ###############################################
@@ -239,7 +240,7 @@ class ColumnDesign(Member):
     def module_name(self):
         return KEY_DISP_COMPRESSION_COLUMN
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
         """
         Set logger for Column Design Module.
         """
@@ -279,7 +280,7 @@ class ColumnDesign(Member):
 
         Fuction to return a list of tuples to be displayed as the UI (Input Dock)
 
-        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), (None, 'Section Data', 'Title', None, True, 'No Validator'), ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), (None, 'End Condition', 'Title', None, True, 'No Validator'), ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('Image', None, 'Image_compression', str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), (None, 'Factored Loads', 'Title', None, True, 'No Validator'), ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
+        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), (None, 'Section Data', 'Title', None, True, 'No Validator'), ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), (None, 'End Condition', 'Title', None, True, 'No Validator'), ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('Image', None, 'Image_compression', str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), (None, 'Factored Loads', 'Title', None, True, 'No Validator'), ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
         """
 
         self.module = KEY_DISP_COMPRESSION_COLUMN
@@ -318,7 +319,7 @@ class ColumnDesign(Member):
         t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
+        t12 = (KEY_IMAGE, "Image z-z", TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t12)
 
         t13 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
@@ -330,7 +331,7 @@ class ColumnDesign(Member):
         t15 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
         options_list.append(t15)
 
-        t16 = (KEY_IMAGE_Y, None, TYPE_IMAGE_COMPRESSION, str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
+        t16 = (KEY_IMAGE_Y, "Image y-y", TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t16)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -341,9 +342,9 @@ class ColumnDesign(Member):
 
         return options_list
 
-    def fn_profile_section(self):
+    def fn_profile_section(self, args=None):
 
-        profile = self[0]
+        profile = args[0] if args else self.design_values.get(KEY_SEC_PROFILE)
         if profile == 'Beams and Columns':
             res1 = connectdb("Beams", call_type="popup")
             res2 = connectdb("Columns", call_type="popup")
@@ -548,7 +549,7 @@ class ColumnDesign(Member):
         all_errors = []
         self.design_status = False
         flag = False
-        option_list = self.input_values(self)
+        option_list = self.input_values()
         missing_fields_list = []
         #print(f'func_for_validation option_list {option_list}')
         for option in option_list:
@@ -564,7 +565,7 @@ class ColumnDesign(Member):
 
         if len(missing_fields_list) > 0:
             print(design_dictionary)
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
             # flag = False
         else:
@@ -572,7 +573,7 @@ class ColumnDesign(Member):
 
         if flag:
             print(f"\n design_dictionary{design_dictionary}")
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(design_dictionary)
             if self.design_status ==False and len(self.failed_design_dict)>0:
                 logger.error(
                     "Design Failed, Check Design Report"
@@ -613,7 +614,7 @@ class ColumnDesign(Member):
 
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
-        super(ColumnDesign, self).set_input_values(self, design_dictionary)
+        super(ColumnDesign, self).set_input_values(design_dictionary)
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
@@ -634,7 +635,7 @@ class ColumnDesign(Member):
         self.end_2_y = design_dictionary[KEY_END2_Y]
 
         # factored loads
-        self.load = Load(axial_force=design_dictionary[KEY_AXIAL], shear_force="", moment="", moment_minor="", unit_kNm=True)
+        self.load = Load(axial_force=float(design_dictionary[KEY_AXIAL]), shear_force=0, moment=0, moment_minor=0, unit_kNm=True)
 
         # design preferences
         self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
@@ -690,11 +691,11 @@ class ColumnDesign(Member):
         self.design_status_list = []
         self.design_status = False
         self.failed_design_dict = {}
-        flag = self.section_classification(self)
+        flag = self.section_classification()
         print(flag)
         if flag:
-            self.design_column(self)
-            self.results(self)
+            self.design_column()
+            self.results()
         print(f"Here[Column/set_input_values]")
 
     # Simulation starts here
@@ -867,7 +868,7 @@ class ColumnDesign(Member):
         # 2 - Based on optimum cost
         self.optimum_section_cost_results = {}
         self.optimum_section_cost = []
-        self.flag = self.section_classification(self)
+        self.flag = self.section_classification()
 
         print('self.flag:',self.flag)
 
@@ -1133,7 +1134,6 @@ class ColumnDesign(Member):
                     )
                     self.result_UR = self.failed_design_dict['UR'] #temp
                     self.common_result(
-                        self,
                         list_result=self.failed_design_dict,
                         result_type=None,
                     )
@@ -1149,7 +1149,6 @@ class ColumnDesign(Member):
                 print(f"self.result_UR{self.result_UR}")
                 self.design_status = True
                 self.common_result(
-                    self,
                     list_result=self.optimum_section_ur_results,
                     result_type=self.result_UR,
                 )

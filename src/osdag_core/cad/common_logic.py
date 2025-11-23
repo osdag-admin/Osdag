@@ -1881,7 +1881,7 @@ class CommonDesignLogic(object):
 
     def createSimplySupportedBeam(self):
 
-        Flex = self.module_class
+        Flex = self.module_object
 
         print(f"Flex.support {Flex.support}")
 
@@ -1913,7 +1913,7 @@ class CommonDesignLogic(object):
 
     def createCantileverBeam(self):
 
-        Flex = self.module_class
+        Flex = self.module_object
 
         print(f"Flex.support {Flex.support}")
 
@@ -1945,7 +1945,7 @@ class CommonDesignLogic(object):
 
     def createPurlin(self):
 
-        Flex = self.module_class
+        Flex = self.module_object
         print(f"This is the module name {Flex}")
 
         Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
@@ -1966,7 +1966,7 @@ class CommonDesignLogic(object):
         return purlin
 
     def createStrutsInTrusses(self):
-        Col = self.module_class
+        Col = self.module_object
         Col.section_property = AngleComponent(designation = Col.result_designation, material_grade = Col.material)
         if Col.sec_profile=="Angles":
 
@@ -2409,7 +2409,10 @@ class CommonDesignLogic(object):
             self.ColObj = self.createColumnInFrameCAD()
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.ColObj, update=True)
+                print("Displaying Simple TopoDS Column Shape...")
+                self.display.DisplayShape(self.ColObj, update=True)
+                self.display.FitAll()
+
 
 
         
@@ -2497,7 +2500,7 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             self.flex = self.module_object  
-            print(f"THIS IS SELF.MODULE_CLASS {self.flex}")
+            print(f"THIS IS SELF.MODULE_OBJECT {self.flex}")
             self.FObj = self.createPurlin()
 
             if self.component == "Model":

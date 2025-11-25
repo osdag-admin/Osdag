@@ -1073,32 +1073,50 @@ class CustomWindow(QWidget):
     #----------------Function-Trigger-for-MenuBar-END------------------------------------------
 
     def resizeEvent(self, event):
-        self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
-        top_offset = self.menu_bar.height()
-        if self.sidebar.x() < 0:
-            self.sidebar.move(-self.sidebar.width() + 12, top_offset)
 
-        input_dock_width = self.input_dock.sizeHint().width()
-        output_dock_width = self.output_dock.sizeHint().width()
-        total_width = self.width() - self.splitter.contentsMargins().left() - self.splitter.contentsMargins().right()
-        self.splitter.setMinimumWidth(0)
-        self.splitter.setCollapsible(0, True)
-        self.splitter.setCollapsible(1, True)
-        self.splitter.setCollapsible(2, True)
-        for i in range(self.splitter.count()):
-            self.splitter.widget(i).setMinimumWidth(0)
-            self.splitter.widget(i).setMaximumWidth(16777215)
-        target_sizes = [0] * self.splitter.count()
-        target_sizes[0] = input_dock_width
-        target_sizes[2] = output_dock_width
-        remaining_width = total_width - input_dock_width - output_dock_width
-        target_sizes[1] = max(0, remaining_width)
-        self.splitter.setSizes(target_sizes)
-        self.splitter.refresh()
-        self.body_widget.layout().activate()
-        self.splitter.update()
-        self.sidebar.raise_()
-        super().resizeEvent(event)
+        """Override resizeEvent with safety check."""
+        # Check if being deleted
+        if not self.isVisible() or self.signalsBlocked():
+            return
+        
+        # Check if splitter exists and has children
+        try:
+            if not hasattr(self, 'splitter') or self.splitter is None:
+                return
+            if self.splitter.count() < 3:
+                return
+            
+            # Normal Resize Event
+            self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
+            top_offset = self.menu_bar.height()
+            if self.sidebar.x() < 0:
+                self.sidebar.move(-self.sidebar.width() + 12, top_offset)
+
+            input_dock_width = self.input_dock.sizeHint().width()
+            output_dock_width = self.output_dock.sizeHint().width()
+            total_width = self.width() - self.splitter.contentsMargins().left() - self.splitter.contentsMargins().right()
+            self.splitter.setMinimumWidth(0)
+            self.splitter.setCollapsible(0, True)
+            self.splitter.setCollapsible(1, True)
+            self.splitter.setCollapsible(2, True)
+            for i in range(self.splitter.count()):
+                self.splitter.widget(i).setMinimumWidth(0)
+                self.splitter.widget(i).setMaximumWidth(16777215)
+            target_sizes = [0] * self.splitter.count()
+            target_sizes[0] = input_dock_width
+            target_sizes[2] = output_dock_width
+            remaining_width = total_width - input_dock_width - output_dock_width
+            target_sizes[1] = max(0, remaining_width)
+            self.splitter.setSizes(target_sizes)
+            self.splitter.refresh()
+            self.body_widget.layout().activate()
+            self.splitter.update()
+            self.sidebar.raise_()
+            super().resizeEvent(event)
+            
+        except (IndexError, RuntimeError, AttributeError):
+            # Being deleted, ignore
+            return
 
     #---------------------------------Docking-Icons-Functionality-START----------------------------------------------
 
@@ -1771,7 +1789,7 @@ class CustomWindow(QWidget):
 
             CustomMessageBox(
                 title="Success",
-                text="Saved Osi Successfully!",
+                text="Saved OSI Successfully!",
                 dialogType=MessageBoxType.Success
             ).exec()
 

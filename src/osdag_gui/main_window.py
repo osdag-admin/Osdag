@@ -48,6 +48,7 @@ from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
 from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from osdag_core.design_type.flexural_member.flexure import Flexure
+from osdag_core.design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 
 import openpyxl
@@ -662,7 +663,10 @@ class MainWindow(QMainWindow):
         self.common_open_module(ColumnDesign, "Column Design")
 
     def open_beam_cover_plate_weld_moment_connection(self):
-        self.common_open_module(BeamCoverPlateWeld, "Cover Plate Welded") 
+        self.common_open_module(BeamCoverPlateWeld, "Cover Plate Welded")
+
+    def open_flexure_purlin(self):
+        self.common_open_module(Flexure_Purlin, "Purlin")
 
     def open_bolted_end_tension(self):
         self.common_open_module(Tension_bolted, "Bolted to End Gusset")

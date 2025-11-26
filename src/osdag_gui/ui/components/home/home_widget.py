@@ -48,6 +48,8 @@ class ThemedSvgWidget(QSvgWidget):
 class SearchBarWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.is_focused = False
         self.setupUI()
 
@@ -499,6 +501,8 @@ class HomeWidget(QWidget):
     openModule = Signal(str)
     def __init__(self):
         super().__init__()
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.selected_item = None
         self.search_overlay = None
         

@@ -231,7 +231,7 @@ class MainWindow(QMainWindow):
     def add_new_tab(self, module):
         """Helper to add a new tab to QTabWidget."""
         body_widget = QWidget()
-        
+
         # Create and set layout for body_widget first
         self.main_widget_layout = QHBoxLayout(body_widget)
         self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -256,6 +256,8 @@ class MainWindow(QMainWindow):
         new_index = self.tab_bar.count() - 1
         self.tab_bar.setCurrentIndex(new_index)
         self.tab_widget.setCurrentIndex(new_index)
+
+        print("@[New Tab Added]Total Widgets. ", len(QApplication.allWidgets()))
 
     def handle_tab_change(self, index):
         # Switch the QTabWidget to the new tab
@@ -349,22 +351,132 @@ class MainWindow(QMainWindow):
     def _get_template_instance(self, index) -> object:
         return self.tab_widget_content[index].layout().itemAt(0).widget()
 
+    def clear_layout(self, layout):
+        """Properly clear layout with signal disconnection and widget cleanup."""
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                try:
+                    widget.setUpdatesEnabled(False)
+                    widget.blockSignals(True)
+                    widget.hide()
+                    
+                    # Disconnect specific signals if they exist
+                    signals = ['openNewTab', 'downloadDatabase', 'triggerLoadOsi',
+                            'openProject', 'openModule', 'cardOpenClicked']
+                    
+                    for sig in signals:
+                        if hasattr(widget, sig):
+                            try:
+                                getattr(widget, sig).disconnect()
+                            except:
+                                pass
+                    
+                    widget.setParent(None)
+                    widget.deleteLater()
+                except (RuntimeError, TypeError):
+                    pass
+            else:
+                sub_layout = item.layout()
+                if sub_layout:
+                    self.clear_layout(sub_layout)
+                    sub_layout.deleteLater()
+
+    def _cleanup_scroll_area(self, scroll_area):
+        """Special cleanup for QScrollArea widgets."""
+        from PySide6.QtWidgets import QScrollArea
+        
+        if not isinstance(scroll_area, QScrollArea):
+            return
+        
+        try:
+            # Get and clean the viewport widget
+            viewport = scroll_area.viewport()
+            if viewport:
+                viewport_widget = scroll_area.widget()
+                if viewport_widget:
+                    self.delete_all_children(viewport_widget)
+                    viewport_widget.setParent(None)
+                    viewport_widget.deleteLater()
+                
+                # Clear the scroll area
+                scroll_area.setWidget(None)
+                
+        except (RuntimeError, AttributeError) as e:
+            print(f"Error cleaning scroll area: {e}")
+
     def _close_tab(self, index):
-        """Handles closing of tabs with proper cleanup."""
+        """Close tab with comprehensive cleanup."""
         widget = self.tab_widget.widget(index)
         
-        # Get the template instance and cleanup
-        template_instance = self._get_template_instance(index)
-        if template_instance and hasattr(template_instance, 'cleanup'):
-            template_instance.cleanup()
+        print(f"\n@Before cleanup - Total Widgets: {len(QApplication.allWidgets())}")
         
+        template_instance = self._get_template_instance(index)
+        
+        if template_instance:
+            try:
+                # Disable updates immediately
+                template_instance.setUpdatesEnabled(False)
+                template_instance.blockSignals(True)
+                template_instance.hide()
+                
+                # Find and clean all scroll areas first (they create the container widgets)
+                from PySide6.QtWidgets import QScrollArea
+                scroll_areas = template_instance.findChildren(QScrollArea)
+                for scroll_area in scroll_areas:
+                    self._cleanup_scroll_area(scroll_area)
+                
+                # Recursively delete all children
+                self.delete_all_children(template_instance)
+                
+                # Finally delete the template instance itself
+                template_instance.setParent(None)
+                template_instance.deleteLater()
+                        
+            except (RuntimeError, AttributeError) as e:
+                print(f"Error in pre-cleanup: {e}")
+        
+        # Remove from UI structures
         self.tab_widget.removeTab(index)
         self.tab_bar.removeTab(index)
         self.tab_widget_content.pop(index)
         
-        widget.deleteLater()
+        if widget:
+            widget.setParent(None)
+            widget.deleteLater()
+        
         self._synchronize_tab_widget()
         
+        # Force immediate processing of deferred deletions
+        QApplication.processEvents()
+        
+        # Force garbage collection
+        import gc
+        gc.collect()
+        
+        print(f"@After cleanup - Total Widgets: {len(QApplication.allWidgets())}\n")
+    
+    def delete_all_children(self, widget):
+            """
+            Recursively delete all child widgets of the given widget.
+            Traverses depth-first, deleting only QWidget children on the way back up.
+            """
+            from PySide6.QtWidgets import QWidget
+            
+            # Get all immediate children
+            children = widget.children()
+            
+            # Recursively process each child
+            for child in children:
+                # Only process QWidget instances
+                if isinstance(child, QWidget):
+                    # First, recursively delete this child's children
+                    self.delete_all_children(child)
+                    
+                    # Then delete this child itself
+                    child.deleteLater()
+
     def _synchronize_tab_widget(self):
         current_index = self.tab_bar.currentIndex()
         self.tab_widget.setCurrentIndex(current_index)
@@ -462,14 +574,13 @@ class MainWindow(QMainWindow):
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
-    def open_fin_plate_shear_connection(self):
-        title = "Fin Plate Connection"
+    def common_open_module(self, backend_class, title):
         self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, FinPlateConnection, parent=self)
+        template_page = CustomWindow(title, backend_class, parent=self)
 
         # Load the last Design Inputs-start------------------------------------
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = str(template_page.backend.module_name()).replace(' ', '') + ".osi"
         last_design_file = os.path.join(last_design_folder, last_design_file)
         last_design_dictionary = {}
 
@@ -481,368 +592,48 @@ class MainWindow(QMainWindow):
         if os.path.isfile(last_design_file):
             with open(str(last_design_file), 'r') as last_design:
                 last_design_dictionary = yaml.safe_load(last_design)
-                fin_plate.setDictToUserInputs(last_design_dictionary)
+                template_page.setDictToUserInputs(last_design_dictionary)
         # Load the last Design Inputs-end------------------------------------
 
-        self.main_widget_instance = fin_plate
-        fin_plate.openNewTab.connect(self.handle_add_tab)
-        fin_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(fin_plate)
+        self.main_widget_instance = template_page
+        template_page.openNewTab.connect(self.handle_add_tab)
+        template_page.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(template_page)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
+
+    def open_fin_plate_shear_connection(self):
+        self.common_open_module(FinPlateConnection, "Fin Plate Connection")
 
     def open_cleat_angle_shear_connection(self):
-        title = "Cleat Angle Connection"
-        self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, CleatAngleConnection, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                fin_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = fin_plate
-        fin_plate.openNewTab.connect(self.handle_add_tab)
-        fin_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(fin_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(CleatAngleConnection, "Cleat Angle Connection")
 
     def open_header_plate_shear_connection(self):
-        title = "Header Plate Connection"
-        self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, EndPlateConnection, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                fin_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = fin_plate
-        fin_plate.openNewTab.connect(self.handle_add_tab)
-        fin_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(fin_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-        
-    def open_beam_cover_plate_weld_moment_connection(self):
-        title= "Cover Plate Welded"
-        self.clear_layout(self.main_widget_layout)
-        cover_plate = CustomWindow(title, BeamCoverPlateWeld, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(cover_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                cover_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = cover_plate
-        cover_plate.openNewTab.connect(self.handle_add_tab)
-        cover_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(cover_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)    
+        self.common_open_module(EndPlateConnection, "Header Plate Connection")  
 
     def open_beam_cover_plate_moment_connection(self):
-        title = "Cover Plate Bolted"
-        self.clear_layout(self.main_widget_layout)
-        Cover_Plate_Bolted = CustomWindow(title, BeamCoverPlate, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(Cover_Plate_Bolted.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                Cover_Plate_Bolted.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = Cover_Plate_Bolted
-        Cover_Plate_Bolted.openNewTab.connect(self.handle_add_tab)
-        Cover_Plate_Bolted.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(Cover_Plate_Bolted)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-        
+        self.common_open_module(BeamCoverPlate, "Cover Plate Bolted")
         
     def open_beam_beam_end_plate_splice_connection(self):
-        title = "Beam Beam End Plate"
-        self.clear_layout(self.main_widget_layout)
-        BB_end_plate = CustomWindow(title, BeamBeamEndPlateSplice, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(BB_end_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                BB_end_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = BB_end_plate
-        BB_end_plate.openNewTab.connect(self.handle_add_tab)
-        BB_end_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(BB_end_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(BeamBeamEndPlateSplice, "Beam Beam End Plate")
         
     def open_column_end_plate_connection(self):
-        title = "Column End plate"
-        self.clear_layout(self.main_widget_layout)
-        CC_end_plate = CustomWindow(title, ColumnEndPlate, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(CC_end_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                CC_end_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = CC_end_plate
-        CC_end_plate.openNewTab.connect(self.handle_add_tab)
-        CC_end_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(CC_end_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)    
+        self.common_open_module(ColumnEndPlate, "Column End plate")    
 
     def open_column_cover_plate_connection(self):
-        title = "Cover Plate Bolted"
-        self.clear_layout(self.main_widget_layout)
-        CC_cover_plate_bolted = CustomWindow(title, ColumnCoverPlate, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(CC_cover_plate_bolted.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                CC_cover_plate_bolted.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = CC_cover_plate_bolted
-        CC_cover_plate_bolted.openNewTab.connect(self.handle_add_tab)
-        CC_cover_plate_bolted.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(CC_cover_plate_bolted)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(ColumnCoverPlate, "Cover Plate Bolted")
         
     def open_column_cover_plate_weld_connection(self):
-        title = "Cover Plate Welded"
-        self.clear_layout(self.main_widget_layout)
-        CC_cover_plate_welded = CustomWindow(title, ColumnCoverPlateWeld, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(CC_cover_plate_welded.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                CC_cover_plate_welded.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = CC_cover_plate_welded
-        CC_cover_plate_welded.openNewTab.connect(self.handle_add_tab)
-        CC_cover_plate_welded.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(CC_cover_plate_welded)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(ColumnCoverPlateWeld, "Cover Plate Welded")
         
     def open_seated_angle_shear_connection(self):
-        title = "Seated Angle Connection"
-        self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, SeatedAngleConnection, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                fin_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = fin_plate
-        fin_plate.openNewTab.connect(self.handle_add_tab)
-        fin_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(fin_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-        
-        
-    def open_column_design(self):
-        """Opens the Column Design module."""
-        title = "Column Design"
-        self.clear_layout(self.main_widget_layout)
-        column_design = CustomWindow(title, ColumnDesign, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(column_design.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Ensure folder and file exist safely
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder, exist_ok=True)
-
-        if os.path.isfile(last_design_file):
-                with open(str(last_design_file), 'r') as last_design:
-                    last_design_dictionary = yaml.safe_load(last_design)
-                    column_design.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = column_design
-        column_design.openNewTab.connect(self.handle_add_tab)
-        column_design.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(column_design)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(SeatedAngleConnection, "Seated Angle Connection")
     
     def open_plate_girder(self):
-        title = "Plate Girder"
-        self.clear_layout(self.main_widget_layout)
-        fin_plate = CustomWindow(title, PlateGirderWelded, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(fin_plate.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                fin_plate.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = fin_plate
-        fin_plate.openNewTab.connect(self.handle_add_tab)
-        fin_plate.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(fin_plate)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(PlateGirderWelded, "Plate Girder")
 
     def open_end_plate_btc_page(self):
-        title = "Beam-to-Column End Plate Connection"
-        self.clear_layout(self.main_widget_layout)
-        
-        end_plate_btc = CustomWindow(title, BeamColumnEndPlate, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(end_plate_btc.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                end_plate_btc.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = end_plate_btc
-        end_plate_btc.openNewTab.connect(self.handle_add_tab)
-        end_plate_btc.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(end_plate_btc)
-
-        # Update tab title and docking icons
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
+        self.common_open_module(BeamColumnEndPlate, "Beam-to-Column End Plate Connection")
 
     def open_tension_welded_page(self):
         title = "Tension Member: Welded to End Gusset"
@@ -999,72 +790,11 @@ class MainWindow(QMainWindow):
     
 
     def open_bolted_end_tension(self):
-        title = "Bolted to End Gusset"
-        self.clear_layout(self.main_widget_layout)
-        tension_bolted = CustomWindow(title, Tension_bolted, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(tension_bolted.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                tension_bolted.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = tension_bolted
-        tension_bolted.openNewTab.connect(self.handle_add_tab)
-        tension_bolted.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(tension_bolted)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-        # Show docking Icons
-        self.tab_widget_content[index][1] = True
-        current_tab_data = self.tab_widget_content[index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-
+        self.common_open_module(Tension_bolted, "Bolted to End Gusset")
     
     def open_struts_in_trusses_compression_member(self):
-        title = "Struts in Trusses"
-        self.clear_layout(self.main_widget_layout)
-        compression_member = CustomWindow(title, Compression, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(compression_member.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                compression_member.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = compression_member
-        compression_member.openNewTab.connect(self.handle_add_tab)
-        compression_member.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(compression_member)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-        # Show docking Icons
-        self.tab_widget_content[index][1] = True
-        current_tab_data = self.tab_widget_content[index]
-        self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
-           
+        self.common_open_module(Compression, "Struts in Trusses")
+    
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()
@@ -1237,15 +967,6 @@ class MainWindow(QMainWindow):
             ).exec()
             return
     #----------------------------Download-Database/Excel--END----------------------------------------
-
-    def clear_layout(self, layout):
-        while layout.count():
-            item = layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
-            else:
-                layout.deleteLater()
 
 if __name__ == "__main__":
     import sys, os

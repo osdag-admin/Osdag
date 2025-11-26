@@ -261,6 +261,8 @@ class CustomizationWidget(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         self.latex_content = None
         self.latest_pdf = None

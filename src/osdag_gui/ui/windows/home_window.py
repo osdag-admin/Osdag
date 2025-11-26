@@ -80,6 +80,8 @@ class ThemeToggleButton(QPushButton):
 class BackgroundSvgWidget(QWidget):
     def __init__(self, svg_light, svg_dark, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.theme = parent.theme_manager
         self.is_light = True
         self.light = QSvgRenderer(svg_light)
@@ -123,6 +125,8 @@ class BackgroundSvgWidget(QWidget):
 class FadeWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self._opacity = 1.0
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
@@ -159,7 +163,8 @@ class HomeWindow(QWidget):
     downloadDatabase = Signal(str, str)
     def __init__(self):
         super().__init__()
- 
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         # Get theme manager from app instance
         self.app = QApplication.instance()
         self.theme_manager = self.app.theme_manager
@@ -348,7 +353,7 @@ class HomeWindow(QWidget):
         main_v_layout.addLayout(main_h_layout)
 
         self.show_home()
-    
+
     def paintEvent(self, event: QPaintEvent):
         if self.theme_manager.is_light():
             self.top_svg_widget_1.load(":/vectors/Osdag_label_light.svg")

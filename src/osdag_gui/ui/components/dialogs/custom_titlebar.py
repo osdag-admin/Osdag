@@ -5,6 +5,8 @@ from PySide6.QtGui import QMouseEvent, QFont
 class CustomTitleBar(QWidget):
     def __init__(self, max_res_btn: bool = False, min_res_btn:bool = False, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self._drag_pos = QPoint()
         self.setObjectName("CustomTitleBar")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

@@ -178,6 +178,36 @@ QPushButton#navbar_button[state="active"] {
     text-align: left;
 }
 
+QPushButton#navbar_button_under_dev {
+    background-color: #333333;
+    color: #FFFFFF;
+    padding: 4px 4px 8px 8px;
+    font-weight: normal;
+    border-radius: 0px;
+    border: none;
+    border-top: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+    text-align: left;
+}
+
+QPushButton#navbar_button_under_dev:hover {
+    background-color: transparent;
+    color: #D0D0D0;
+    border-top: 1px solid #D0D0D0;
+    border-bottom: 1px solid #D0D0D0;
+}
+
+QPushButton#navbar_button_under_dev[state="active"] {
+    background-color: #888888;
+    color: #000000;
+    border-radius: 0px;
+    border: none;
+    padding: 4px 4px 8px 8px;
+    border-top: 1px solid #888888;
+    border-bottom: 1px solid #888888;
+    text-align: left;
+}
+
 /* Menu Button */
 QPushButton#menu_button {
     font-size: 14px;

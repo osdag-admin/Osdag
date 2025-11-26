@@ -5,7 +5,7 @@ Provides static data for modules, navigation, and recent projects.
 class Data:
     # Empty List means "Under Development"
     MODULES = {
-        "Home": [],
+        "Home": [""], # Just to suggest that it is not under development
         "Connection" :
         {
             "Simple Connection":

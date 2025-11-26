@@ -30,6 +30,9 @@ QToolTip {
     border-radius: 0px;
     qproperty-alignment: AlignVCenter;
 }
+QSplitter::handle {
+    background-color: #D0D0D0;
+}
 
 /* ==============================================
    2. TRANSPARENT BACKGROUNDS

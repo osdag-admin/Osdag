@@ -1258,36 +1258,69 @@ class CustomWindow(QWidget):
             if on_finished:
                 on_finished()
 
+        # User requested "one step animation" with "no delay"
         self.animate_splitter_sizes(
             self.splitter,
             sizes,
             target_sizes,
-            duration=10,
+            duration=0,
             on_finished=after_anim
         )
 
     def animate_splitter_sizes(self, splitter, start_sizes, end_sizes, duration, on_finished=None):
-        steps = 1
-        interval = duration // steps
-        step_sizes = [
-            [start + (end - start) * i / steps for start, end in zip(start_sizes, end_sizes)]
-            for i in range(steps + 1)
-        ]
+        if duration <= 0:
+            # Instant update
+            splitter.setSizes(end_sizes)
+            splitter.refresh()
+            if splitter.parentWidget() and splitter.parentWidget().layout():
+                splitter.parentWidget().layout().activate()
+            splitter.update()
+            if splitter.parentWidget():
+                splitter.parentWidget().update()
+            self.update()
+            for i in range(splitter.count()):
+                widget = splitter.widget(i)
+                if widget:
+                    widget.update()
+            
+            if on_finished:
+                on_finished()
+            return
 
+        # Target 60 FPS -> ~16ms interval
+        interval = 16
+        steps = max(1, duration // interval)
+        
         current_step = 0
+
+        def ease_out_quad(t):
+            return t * (2 - t)
 
         def update_step():
             nonlocal current_step
             if current_step <= steps:
-                sizes = [int(v) for v in step_sizes[current_step]]
+                progress = current_step / steps
+                # Apply easing
+                eased_progress = ease_out_quad(progress)
+                
+                sizes = [
+                    int(start + (end - start) * eased_progress) 
+                    for start, end in zip(start_sizes, end_sizes)
+                ]
+                
                 splitter.setSizes(sizes)
                 splitter.refresh()
-                splitter.parentWidget().layout().activate()
+                if splitter.parentWidget() and splitter.parentWidget().layout():
+                    splitter.parentWidget().layout().activate()
                 splitter.update()
-                splitter.parentWidget().update()
+                if splitter.parentWidget():
+                    splitter.parentWidget().update()
                 self.update()
                 for i in range(splitter.count()):
-                    splitter.widget(i).update()
+                    widget = splitter.widget(i)
+                    if widget:
+                        widget.update()
+                
                 current_step += 1
             else:
                 timer.stop()

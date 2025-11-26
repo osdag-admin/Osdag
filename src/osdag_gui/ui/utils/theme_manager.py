@@ -19,19 +19,28 @@ class ThemeManager(QObject):
             "light": ":/themes/lightstyle.qss",
             "dark": ":/themes/darkstyle.qss"
         }
+        self.theme_cache = {}
+        self._preload_themes()
     
+    def _preload_themes(self):
+        """Read and cache theme stylesheets."""
+        for name, path in self.themes.items():
+            file = QFile(path)
+            if file.open(QFile.ReadOnly | QFile.Text):
+                stream = QTextStream(file)
+                self.theme_cache[name] = stream.readAll()
+                file.close()
+            else:
+                print(f"Failed to preload theme: {name} from {path}")
+
     def load_theme(self, theme_name):
         """Load and apply theme stylesheet."""
         if theme_name not in self.themes:
             print(f"Theme '{theme_name}' not found. Available: {list(self.themes.keys())}")
             return False
         
-        theme_file = self.themes[theme_name]
-        file = QFile(theme_file)
-        if file.open(QFile.ReadOnly | QFile.Text):
-            stream = QTextStream(file)
-            stylesheet = stream.readAll()
-            file.close()
+        stylesheet = self.theme_cache.get(theme_name)
+        if stylesheet:
             self.app.setStyleSheet(stylesheet)
             self.set_palette(theme_name)
             self.current_theme = theme_name
@@ -39,7 +48,7 @@ class ThemeManager(QObject):
             print(f"Theme changed to: {theme_name}")
             return True
         else:
-            print(f"Failed to open theme file: {theme_file}")
+            print(f"Theme content not found in cache for: {theme_name}")
             return False
     
     def set_palette(self, theme_name):

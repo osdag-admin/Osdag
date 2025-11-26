@@ -342,9 +342,14 @@ class HomeWindow(QWidget):
         self.bottom_svg_widget_2.setFixedSize(122, 60)
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
 
+        self.bottom_svg_widget_4 = QSvgWidget()
+        self.bottom_svg_widget_4.setFixedSize(58, 60)
+        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_4)
+
         self.bottom_svg_widget_3 = QSvgWidget()
         self.bottom_svg_widget_3.setFixedSize(350, 40)
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignBottom)
+
         self.bottom_right_h_layout.addStretch(1)
 
         content_v_layout.addWidget(self.bottom_right_container)
@@ -361,12 +366,14 @@ class HomeWindow(QWidget):
             self.bottom_svg_widget_1.load(":/vectors/MOE_light.svg")
             self.bottom_svg_widget_2.load(":/vectors/MOS_light.svg")
             self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_light.svg")
+            self.bottom_svg_widget_4.load(":/vectors/INSDAG_light.svg")
         else:
             self.top_svg_widget_1.load(":/vectors/Osdag_label_dark.svg")
             self.middle_top_svg_widget.load(":/vectors/Osdag_tagline_dark.svg")
             self.bottom_svg_widget_1.load(":/vectors/MOE_dark.svg")
             self.bottom_svg_widget_2.load(":/vectors/MOS_dark.svg")
             self.bottom_svg_widget_3.load(":/vectors/ConstructSteel_dark.svg")
+            self.bottom_svg_widget_4.load(":/vectors/INSDAG_dark.svg")
         return super().paintEvent(event)
 
     def _clear_layout(self, layout):

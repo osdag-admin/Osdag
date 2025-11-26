@@ -11,6 +11,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/Osdag_dark.svg</file>
         <file>vectors/FOSSEE_light.svg</file>
         <file>vectors/FOSSEE_dark.svg</file>
+        <file>vectors/INSDAG_light.svg</file>
+        <file>vectors/INSDAG_dark.svg</file>
         <file>vectors/IITB_logo_light.svg</file>
         <file>vectors/IITB_logo_dark.svg</file>
         <file>vectors/ConstructSteel_light.svg</file>

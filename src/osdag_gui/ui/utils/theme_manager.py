@@ -32,7 +32,6 @@ class ThemeManager(QObject):
                 file.close()
             else:
                 print(f"Failed to preload theme: {name} from {path}")
-                pass
 
     def load_theme(self, theme_name):
         """Load and apply theme stylesheet."""
@@ -49,7 +48,7 @@ class ThemeManager(QObject):
             # print(f"Theme changed to: {theme_name}")
             return True
         else:
-            # print(f"Theme content not found in cache for: {theme_name}")
+            print(f"Theme content not found in cache for: {theme_name}")
             return False
     
     def set_palette(self, theme_name):

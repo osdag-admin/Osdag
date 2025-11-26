@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 import os
 import yaml
+from osdag_core.Common import get_documents_folder
 
 class DesignSummaryWidget(QWidget):
     """Widget for Design Summary input (first page)"""
@@ -169,15 +170,11 @@ class DesignSummaryWidget(QWidget):
     
     def save_profile(self):
         input_data = self.get_inputs()
-        
-        if hasattr(self.parent, 'folder'):
-            folder = self.parent.folder
-        else:
-            folder = ""
             
+        default_dir = os.path.join(get_documents_folder(), "Profile")
         filename, _ = QFileDialog.getSaveFileName(
             self, 'Save Profile',
-            os.path.join(str(folder), "Profile"), 
+            default_dir, 
             '*.txt'
         )
         if filename:

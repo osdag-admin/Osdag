@@ -24,7 +24,7 @@ class LoadingThread(QThread):
         create_user_database()
         # Clean up user database to ensure 10 records and atmost 60 days older with path exist
         refactor_database()
-        time.sleep(10)
+        time.sleep(5)
         self.finished.emit()
     
     def create_sqlite(self):

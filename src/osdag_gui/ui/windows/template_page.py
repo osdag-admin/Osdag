@@ -1765,9 +1765,12 @@ class CustomWindow(QWidget):
         filePath = None
         fileName = None
         if not self.save_state:
+            default_dir = os.path.join(get_documents_folder(), "Inputs.osi")
             filePath, _ = QFileDialog.getSaveFileName(self,
-                                                    "Save Design", os.path.join(self.folder, "untitled.osi"),
-                                                    "Input Files(*.osi)", None)
+                                                    "Save Design",
+                                                    default_dir,
+                                                    "Input Files(*.osi)",
+                                                    None)
             fileName = Path(filePath).stem
         else:
             record = get_project_by_id(self.project_id)
@@ -1805,9 +1808,13 @@ class CustomWindow(QWidget):
     
     def saveLogMessages(self):
         """Save log messages from textEdit to a text file"""
+        default_dir = os.path.join(get_documents_folder(), "log_messages.txt")
         filePath, _ = QFileDialog.getSaveFileName(self,
-                                                  "Save Log Messages", os.path.join(self.folder, "log_messages.txt"),
-                                                  "Text Files(*.txt);;All Files(*.*)", None)
+                                                  "Save Log Messages",
+                                                  default_dir,
+                                                  "Text Files(*.txt);;All Files(*.*)",
+                                                  None
+                                                )
         if not filePath:
             return
         

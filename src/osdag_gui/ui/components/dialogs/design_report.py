@@ -23,7 +23,7 @@ import shutil
 import subprocess
 
 try:
-    from osdag_core.Common import PDFLATEX
+    from osdag_core.Common import PDFLATEX, get_documents_folder
 except ImportError:
     # using systems pdflatex
     PDFLATEX = 'pdflatex'
@@ -275,9 +275,10 @@ class DesignReportDialog(QDialog):
         if not pdf_path:
             return
         
+        default_dir = os.path.join(get_documents_folder(), "Osdag_Custom_Report.pdf")
         filename, _ = QFileDialog.getSaveFileName(
             self, "Save Customized Report", 
-            "Osdag_Custom_Report.pdf", 
+            default_dir, 
             "PDF files (*.pdf)"
         )
         

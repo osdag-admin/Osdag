@@ -4,6 +4,7 @@ Handles theme switching and persistence.
 """
 from PySide6.QtCore import QSettings, QObject, Signal
 from PySide6.QtCore import QFile, QTextStream
+from PySide6.QtGui import QPalette, QColor
 
 
 class ThemeManager(QObject):
@@ -32,6 +33,7 @@ class ThemeManager(QObject):
             stylesheet = stream.readAll()
             file.close()
             self.app.setStyleSheet(stylesheet)
+            self.set_palette(theme_name)
             self.current_theme = theme_name
             self.settings.setValue("theme", theme_name)
             print(f"Theme changed to: {theme_name}")
@@ -40,6 +42,40 @@ class ThemeManager(QObject):
             print(f"Failed to open theme file: {theme_file}")
             return False
     
+    def set_palette(self, theme_name):
+        """Set the application palette to match the theme."""
+        palette = QPalette()
+        if theme_name == "light":
+            palette.setColor(QPalette.Window, QColor("#f4f4f4"))
+            palette.setColor(QPalette.WindowText, QColor("#000000"))
+            palette.setColor(QPalette.Base, QColor("#ffffff"))
+            palette.setColor(QPalette.AlternateBase, QColor("#f4f4f4"))
+            palette.setColor(QPalette.ToolTipBase, QColor("#ffffff"))
+            palette.setColor(QPalette.ToolTipText, QColor("#000000"))
+            palette.setColor(QPalette.Text, QColor("#000000"))
+            palette.setColor(QPalette.Button, QColor("#f4f4f4"))
+            palette.setColor(QPalette.ButtonText, QColor("#000000"))
+            palette.setColor(QPalette.BrightText, QColor("#ff0000"))
+            palette.setColor(QPalette.Link, QColor("#2a82da"))
+            palette.setColor(QPalette.Highlight, QColor("#90AF13"))
+            palette.setColor(QPalette.HighlightedText, QColor("#ffffff"))
+        else:
+            palette.setColor(QPalette.Window, QColor("#282828"))
+            palette.setColor(QPalette.WindowText, QColor("#D0D0D0"))
+            palette.setColor(QPalette.Base, QColor("#333333"))
+            palette.setColor(QPalette.AlternateBase, QColor("#282828"))
+            palette.setColor(QPalette.ToolTipBase, QColor("#2B2B2B"))
+            palette.setColor(QPalette.ToolTipText, QColor("#D0D0D0"))
+            palette.setColor(QPalette.Text, QColor("#D0D0D0"))
+            palette.setColor(QPalette.Button, QColor("#353535"))
+            palette.setColor(QPalette.ButtonText, QColor("#D0D0D0"))
+            palette.setColor(QPalette.BrightText, QColor("#ff0000"))
+            palette.setColor(QPalette.Link, QColor("#2a82da"))
+            palette.setColor(QPalette.Highlight, QColor("#6B7D20"))
+            palette.setColor(QPalette.HighlightedText, QColor("#ffffff"))
+        
+        self.app.setPalette(palette)
+
     def toggle_theme(self):
         """Toggle between light and dark themes."""
         new_theme = "dark" if self.current_theme == "light" else "light"

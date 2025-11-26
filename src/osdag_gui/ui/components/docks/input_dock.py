@@ -18,7 +18,6 @@ from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPo
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
 
-
 from osdag_core.Common import *
 
 class NoScrollComboBox(QComboBox):
@@ -45,6 +44,8 @@ def left_aligned_widget(widget):
 class InputDock(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__()
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         # Already an Object created in template_page.py
         self.backend = backend

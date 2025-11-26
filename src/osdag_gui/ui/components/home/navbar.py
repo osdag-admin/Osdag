@@ -84,6 +84,8 @@ class VerticalMenuBar(QWidget):
     nav_bar_trigger = Signal(object, object)
     def __init__(self, data: dict, icons: dict):
         super().__init__()
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.app = QApplication.instance()
         self.theme_manager = self.app.theme_manager
         # Set size policy to expanding so it grows/shrinks with its parent layout

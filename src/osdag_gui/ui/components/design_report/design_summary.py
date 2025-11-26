@@ -13,6 +13,8 @@ class DesignSummaryWidget(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         self.init_ui()
         

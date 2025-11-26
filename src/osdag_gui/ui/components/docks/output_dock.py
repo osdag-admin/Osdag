@@ -53,6 +53,8 @@ import yaml
 class OutputDock(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         # Already an Object created in template_page.py
         self.backend = backend

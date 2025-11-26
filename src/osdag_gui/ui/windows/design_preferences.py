@@ -19,6 +19,8 @@ import openpyxl
 class MyTableWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.setObjectName("TableWidget")
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(2, 2, 2, 2)

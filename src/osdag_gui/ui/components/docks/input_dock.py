@@ -160,7 +160,7 @@ class InputDock(QWidget):
         panel_layout.addLayout(top_bar)
 
         #-Lock-ToolTip--------------------------------------
-        self.lock_btn_tooltp = QLabel("Unlock to Edit")
+        self.lock_btn_tooltp = QLabel("🔒Unlock to Edit")
         self.lock_btn_tooltp.setObjectName("lock_btn_tooltip")
         self.lock_btn_tooltp.setWindowFlags(Qt.ToolTip)
         self.lock_btn_tooltp.hide()

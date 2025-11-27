@@ -29,6 +29,16 @@ QToolTip {
     border-radius: 0px;
     qproperty-alignment: AlignVCenter;
 }
+QLabel#custom_tooltip {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #90AF13;
+    padding: 2px 2px;
+    font-size: 12px;
+    border-radius: 0px;
+    qproperty-alignment: AlignVCenter;
+}
+
 QSplitter::handle {
     background-color: #D0D0D0;
 }
@@ -225,6 +235,23 @@ QPushButton#dock_custom_button {
 
 QPushButton#dock_custom_button:pressed {
     background-color: #7d9710;
+}
+
+/* Lock Button */
+QPushButton#lock_btn {
+    background-color: #f4f4f4;
+    border: none;
+    padding: 7px;
+    border-radius: 4px;
+}
+QPushButton#lock_btn:hover {
+    background-color: #e0e0e0;
+}
+QPushButton#lock_btn:checked {
+    background-color: #FFA500;
+}
+QPushButton#lock_btn:checked:hover {
+    background-color: #FFB732;
 }
 
 /* Search Result Project Button */
@@ -961,7 +988,6 @@ QWidget#logs_dock QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 }
 
 /*=======================Input-Dock===========================*/
-
 QScrollArea#inputs_vscrollarea,
 QScrollArea#outputs_vscrollarea {
     border: 1px solid #EFEFEC;

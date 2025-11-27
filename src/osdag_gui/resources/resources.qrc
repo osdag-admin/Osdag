@@ -29,6 +29,11 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/description_label.svg</file>
         <file>vectors/version.svg</file>
 
+        <file>vectors/lock_close_light.svg</file>
+        <file>vectors/lock_close_dark.svg</file>
+        <file>vectors/lock_open_light.svg</file>
+        <file>vectors/lock_open_dark.svg</file>
+
         <file>vectors/recently_used_module_icon_light.svg</file>
         <file>vectors/recently_used_module_icon_dark.svg</file>
         <file>vectors/info_hover.svg</file>

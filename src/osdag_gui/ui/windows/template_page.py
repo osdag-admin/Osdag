@@ -1477,6 +1477,8 @@ class CustomWindow(QWidget):
                     try:
                         self.toggle_animate(False, 'input', on_finished=show_logs)
                         self.input_dock_active = False
+                        # Lock Basic Inputs
+                        self.input_dock.toggle_lock()
                     except Exception:
                         input_widget = self.splitter.widget(0)
                         if input_widget:

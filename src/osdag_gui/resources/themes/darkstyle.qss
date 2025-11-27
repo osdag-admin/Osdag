@@ -30,6 +30,17 @@ QToolTip {
     border-radius: 0px;
     qproperty-alignment: AlignVCenter;
 }
+
+QLabel#custom_tooltip {
+    background-color: #2B2B2B;
+    color: #D0D0D0;
+    border: 1px solid #6B7D20;
+    padding: 2px 2px;
+    font-size: 12px;
+    border-radius: 0px;
+    qproperty-alignment: AlignVCenter;
+}
+
 QSplitter::handle {
     background-color: #D0D0D0;
 }
@@ -250,6 +261,23 @@ QPushButton#dock_custom_button {
 
 QPushButton#dock_custom_button:pressed {
     background-color: #7d9710;
+}
+
+/* Lock Button */
+QPushButton#lock_btn {
+    background-color: #555555;
+    border: none;
+    padding: 7px;
+    border-radius: 4px;
+}
+QPushButton#lock_btn:hover {
+    background-color: #444444;
+}
+QPushButton#lock_btn:checked {
+    background-color: #FFA500;
+}
+QPushButton#lock_btn:checked:hover {
+    background-color: #FFB732;
 }
 
 /* Search Result Project Button */

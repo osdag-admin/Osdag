@@ -4,12 +4,13 @@ Handles user input forms and group boxes for connection design.
 """
 import sys
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
+    QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QToolTip,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
 from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout
-from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication
-from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
+from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
+from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
+        QRegularExpressionValidator, QIntValidator, QIcon)
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
@@ -44,6 +45,8 @@ def left_aligned_widget(widget):
 class InputDock(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__()
+
+        self.theme_manager = QApplication.instance().theme_manager
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
@@ -128,12 +131,13 @@ class InputDock(QWidget):
 
         # --- Top Bar (fixed inside scroll area) ---
         top_bar = QHBoxLayout()
-        top_bar.setSpacing(10)
+        top_bar.setSpacing(8)
         input_dock_btn = QPushButton("Basic Inputs")
         input_dock_btn.setObjectName("inputs_button")
         input_dock_btn.setCursor(Qt.CursorShape.ArrowCursor)
         input_dock_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_bar.addWidget(input_dock_btn)
+        # additonal input button
         additional_inputs_btn = AdditionalInputsButton()
         additional_inputs_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Design_Pref"))
         additional_inputs_btn.clicked.connect(lambda: self.parent.combined_design_prefer(self.data,self.backend))
@@ -141,15 +145,31 @@ class InputDock(QWidget):
         additional_inputs_btn.setToolTip("Additional Inputs")
         additional_inputs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_bar.addWidget(additional_inputs_btn)
+        # lock-unlock button
+        self.state_locked = False    # Open by default
+        self.lock_btn = QPushButton()
+        self.lock_btn.setObjectName("lock_btn")
+        self.lock_btn.setCheckable(True)
+        self.lock_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.lock_btn.clicked.connect(self.toggle_lock)
+        top_bar.addWidget(self.lock_btn)
         panel_layout.addLayout(top_bar)
 
+        #-Lock-ToolTip--------------------------------------
+        self.custom_tooltip = QLabel("🔒 Unlock to Edit")
+        self.custom_tooltip.setObjectName("custom_tooltip")
+        self.custom_tooltip.setWindowFlags(Qt.ToolTip)
+        self.custom_tooltip.hide()
+        #--------------------------------------------------
+
         # Vertical scroll area for group boxes (vertical only)
-        scroll_area = QScrollArea()
-        scroll_area.setObjectName("inputs_vscrollarea")
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setObjectName("inputs_vscrollarea")
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.scroll_area.installEventFilter(self)
 
         group_container = QWidget()
         self.input_widget = group_container
@@ -230,7 +250,7 @@ class InputDock(QWidget):
                 group_container_layout.addWidget(current_group)
 
         group_container_layout.addStretch()
-        scroll_area.setWidget(group_container)
+        self.scroll_area.setWidget(group_container)
 
         ###############################
         # Customized option in Combobox
@@ -303,7 +323,7 @@ class InputDock(QWidget):
                     self.on_change_connect(key_changed, updated_list, self.data, self.backend)                    
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
-        panel_layout.addWidget(scroll_area)
+        panel_layout.addWidget(self.scroll_area)
 
         # --- Bottom Design Button (fixed inside scroll area) ---
         btn_button_layout = QHBoxLayout()
@@ -332,6 +352,61 @@ class InputDock(QWidget):
         h_scroll_area.setWidget(self.left_panel)
 
         left_layout.addWidget(self.left_panel)
+
+    #-Lock-Tooltip-Events-Starts-------------------------------------------------------------------------
+    def eventFilter(self, obj, event):
+        # Check if it's the scroll area and it's a mouse press
+        if obj.objectName() == "inputs_vscrollarea" and event.type() == QEvent.MouseButtonPress:
+            if self.state_locked:
+                self.show_lock_tooltip()
+            return True  # Block the event
+        return super().eventFilter(obj, event)
+
+    def show_lock_tooltip(self):
+        # Stop any existing timer first
+        if hasattr(self, 'tooltip_timer') and self.tooltip_timer.isActive():
+            self.tooltip_timer.stop()
+        
+        # Position tooltip to the right of the lock button
+        lock_global_pos = self.lock_btn.mapToGlobal(self.lock_btn.rect().topRight())
+        tooltip_pos = lock_global_pos+ QPoint(5, 4)
+        
+        # Adjust size and position
+        self.custom_tooltip.adjustSize()
+        self.custom_tooltip.move(tooltip_pos)
+        self.custom_tooltip.show()
+        self.custom_tooltip.raise_()
+        
+        # Hide after 1 seconds
+        if not hasattr(self, 'tooltip_timer'):
+            self.tooltip_timer = QTimer()
+            self.tooltip_timer.setSingleShot(True)
+            self.tooltip_timer.timeout.connect(self.custom_tooltip.hide)
+        
+        self.tooltip_timer.start(1000)
+    
+    def toggle_lock(self):
+        self.state_locked = not self.state_locked
+        self.lock_btn.setChecked(self.state_locked)
+        self.scroll_area.setDisabled(self.state_locked)
+        self.update_lock_icon()
+
+    def update_lock_icon(self):
+        if self.state_locked:
+            icon_name = "lock_close"
+        else:
+            icon_name = "lock_open"
+        
+        if self.theme_manager.is_light():
+            self.lock_btn.setIcon(QIcon(f":/vectors/{icon_name}_light.svg"))
+        else:
+            self.lock_btn.setIcon(QIcon(f":/vectors/{icon_name}_dark.svg"))
+
+    def paintEvent(self, event):
+        self.update_lock_icon()
+        return super().paintEvent(event)
+    
+    #-Lock-Tooltip-Events-Ends-------------------------------------------------------------------------
 
     def print_widget_tree(self, widget: QWidget, indent: int=0):
         prefix = "  " * (indent*4)

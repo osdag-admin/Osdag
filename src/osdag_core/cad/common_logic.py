@@ -718,7 +718,7 @@ class CommonDesignLogic(object):
         '''
 
         if self.connection == KEY_DISP_BEAMCOVERPLATE:
-            B = BeamCoverPlate()
+            B = self.B 
             # beam_data = self.fetchBeamPara()  # Fetches the beam dimensions
 
             beam_tw = float(B.section.web_thickness)
@@ -778,13 +778,13 @@ class CommonDesignLogic(object):
                 B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
 
             # Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
-            bolting_AF = NutBoltArray_AF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
+            bolting_AF = NutBoltArray_AF(self.B, nut, bolt, numOfBoltsF, nutSpaceF)
 
             # Bolt placement for Below Flange bolts, call to nutBoltPlacement_BF.py
-            bolting_BF = NutBoltArray_BF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
+            bolting_BF = NutBoltArray_BF(self.B, nut, bolt, numOfBoltsF, nutSpaceF)
 
             # Bolt placement for Web Plate bolts, call to nutBoltPlacement_Web.py
-            bolting_Web = NutBoltArray_Web(BeamCoverPlate(), nut, bolt, numOfBoltsW, nutSpaceW)
+            bolting_Web = NutBoltArray_Web(self.B, nut, bolt, numOfBoltsW, nutSpaceW)
 
             # bbCoverPlate is an object which is passed BBCoverPlateBoltedCAD.py file, which initialized the parameters of each CAD component
             bbCoverPlate = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
@@ -792,7 +792,7 @@ class CommonDesignLogic(object):
                                                  innerplateAbvFlangeBack, innerplateBelwFlangeFront,
                                                  innerplateBelwFlangeBack,
                                                  WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web,
-                                                 BeamCoverPlate())
+                                                 self.B)
 
             # bbCoverPlate.create_3DModel() will create the CAD model of each component, debugging this line will give moe clarity
             bbCoverPlate.create_3DModel()
@@ -2236,7 +2236,7 @@ class CommonDesignLogic(object):
 
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
-                self.B = self.module_object  
+                self.B = module_object
                 self.CPObj = self.createBBCoverPlateCAD()
                 beams = self.CPObj.get_beam_models()
                 plates = self.CPObj.get_plate_models()
@@ -2409,9 +2409,7 @@ class CommonDesignLogic(object):
             self.ColObj = self.createColumnInFrameCAD()
 
             if self.component == "Model":
-                print("Displaying Simple TopoDS Column Shape...")
-                self.display.DisplayShape(self.ColObj, update=True)
-                self.display.FitAll()
+                osdag_display_shape(self.display, self.ColObj, update=True)
 
 
 
@@ -2516,11 +2514,9 @@ class CommonDesignLogic(object):
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_object
-                
-                # Hover dict
+                 # Hover dict
                 hover_dict = self.module_object.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict
-                
                 self.TObj = self.createTensionCAD()
 
                 member = self.TObj.get_members_models()
@@ -2532,7 +2528,7 @@ class CommonDesignLogic(object):
                 # distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
                 # Point = gp_Pnt(distance, 0.0, 300)
                 # DisplayMsg(self.display, Point, self.T.section_size_1.designation)
-
+                
                 label_bolt = ["Bolt", hover_dict["Bolt"]]
                 label_plate = ["Plate", hover_dict["Plate"]]
                 label_member = ["Member", hover_dict["Member"]]
@@ -2641,6 +2637,7 @@ class CommonDesignLogic(object):
             if self.connection == KEY_DISP_BEAMCOVERPLATE or self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 if flag is True:
 
+                    self.B = module_object
                     self.CPObj = self.createBBCoverPlateCAD()
 
                     self.display_3DModel("Model", "gradient_bg")

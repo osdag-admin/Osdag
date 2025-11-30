@@ -27,7 +27,7 @@ class Data:
                     [
                         ("Cover Plate Bolted", ":/vectors/cover_plate_bolted_btb_moment_connec.svg"),
                         ("Cover Plate Welded", ":/vectors/cover_plate_welded_btb_moment_connec.svg"),
-                        ("End Plate", ":/vectors/end_plate_btb_moment_connec.svg")
+                        ("Beam Beam End Plate", ":/vectors/end_plate_btb_moment_connec.svg")
                     ],
                     "Beam to Column": 
                     [
@@ -54,7 +54,8 @@ class Data:
         ],
         "Compression Member": 
         [
-            ("Struts in Trusses", ":/vectors/struts_in_trusses_compression_mem.svg")
+            ("Struts in Trusses", ":/vectors/struts_in_trusses_compression_mem.svg"),
+            ("Column", ":/vectors/column_design_compression_mem.svg"),
         ],
         "Flexural Member": 
         [

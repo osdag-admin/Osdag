@@ -44,7 +44,9 @@ from osdag_core.design_type.connection.butt_joint_welded import ButtJointWelded
 
 from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 from osdag_core.design_type.compression_member.Column import ColumnDesign
-
+from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
+from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -442,7 +444,12 @@ class MainWindow(QMainWindow):
             self.open_butt_joint_welded()
         elif card_title == "Column":
             self.open_column_design()
-
+        elif card_title == "Cover Plate Welded":
+            self.open_beam_cover_plate_weld_moment_connection()
+        elif card_title == "Cover Plate Bolted":
+            self.open_beam_cover_plate_moment_connection()
+        elif card_title == "Beam Beam End Plate":
+            self.open_beam_beam_end_plate_splice_connection()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -532,6 +539,94 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(fin_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
+        
+    def open_beam_cover_plate_weld_moment_connection(self):
+        title= "Cover Plate Welded"
+        self.clear_layout(self.main_widget_layout)
+        cover_plate = CustomWindow(title, BeamCoverPlateWeld, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(cover_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                cover_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = cover_plate
+        cover_plate.openNewTab.connect(self.handle_add_tab)
+        cover_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(cover_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)    
+
+    def open_beam_cover_plate_moment_connection(self):
+        title = "Cover Plate Bolted"
+        self.clear_layout(self.main_widget_layout)
+        Cover_Plate_Bolted = CustomWindow(title, BeamCoverPlate, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(Cover_Plate_Bolted.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                Cover_Plate_Bolted.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = Cover_Plate_Bolted
+        Cover_Plate_Bolted.openNewTab.connect(self.handle_add_tab)
+        Cover_Plate_Bolted.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(Cover_Plate_Bolted)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        
+        
+    def open_beam_beam_end_plate_splice_connection(self):
+        title = "Beam Beam End Plate"
+        self.clear_layout(self.main_widget_layout)
+        BB_end_plate = CustomWindow(title, BeamBeamEndPlateSplice, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(BB_end_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                BB_end_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = BB_end_plate
+        BB_end_plate.openNewTab.connect(self.handle_add_tab)
+        BB_end_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(BB_end_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
 
     def open_seated_angle_shear_connection(self):
         title = "Seated Angle Connection"
@@ -583,7 +678,6 @@ class MainWindow(QMainWindow):
                 with open(str(last_design_file), 'r') as last_design:
                     last_design_dictionary = yaml.safe_load(last_design)
                     column_design.setDictToUserInputs(last_design_dictionary)
-
         # Load the last Design Inputs-end------------------------------------
 
         self.main_widget_instance = column_design
@@ -592,7 +686,6 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(column_design)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
-
     
     def open_plate_girder(self):
         title = "Plate Girder"

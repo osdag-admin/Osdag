@@ -193,7 +193,7 @@ QPushButton#navbar_button[state="active"] {
 }
 
 QPushButton#navbar_button_under_dev {
-    background-color: #333333;
+    background-color: #474242;
     color: #FFFFFF;
     padding: 4px 4px 8px 8px;
     font-weight: normal;

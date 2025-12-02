@@ -126,7 +126,10 @@ class VerticalMenuBar(QWidget):
             # If list is empty, Grey It
             if isinstance(data.get(name), list) and len(data.get(name))<=0:
                 btn = CustomButton("  " + name, icon[0], icon[1], icon[2], under_dev=True, group=self.button_group)
+                btn.setDisabled(True)
                 btn.setObjectName("navbar_button_under_dev")
+                btn.setToolTip("Under Development")
+                btn.setCursor(Qt.CursorShape.ForbiddenCursor)
             else:
                 btn = CustomButton("  " + name, icon[0], icon[1], icon[2], group=self.button_group)
                 btn.setObjectName("navbar_button")

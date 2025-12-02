@@ -159,6 +159,15 @@ class InputDock(QWidget):
         self.custom_tooltip = QLabel("🔒 Unlock to Edit")
         self.custom_tooltip.setObjectName("custom_tooltip")
         self.custom_tooltip.setWindowFlags(Qt.ToolTip)
+        self.custom_tooltip.setStyleSheet("""
+            QLabel#custom_tooltip {
+                background-color: #fafafa;
+                border-radius: 6px;
+                padding: 5px 10px;
+                font-size: 15px;
+            }
+        """)
+        self.custom_tooltip.setMinimumWidth(160)
         self.custom_tooltip.hide()
         #--------------------------------------------------
 
@@ -170,6 +179,19 @@ class InputDock(QWidget):
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.scroll_area.installEventFilter(self)
+        # self.scroll_area.setStyleSheet("""
+        #     QScrollArea#inputs_vscrollarea:disabled{
+        #         background: #f1f1f1;
+        #     }
+
+        #     QScrollArea#inputs_vscrollarea:disabled QLineEdit:disabled,
+        #     QScrollArea#inputs_vscrollarea:disabled QComboBox:disabled,
+        #     QScrollArea#inputs_vscrollarea:disabled QSpinBox:disabled,
+        #     QScrollArea#inputs_vscrollarea:disabled QDoubleSpinBox:disabled {
+        #         background: #f1f1f1;
+        #         color: #666;
+        #     }
+        # """)
 
         group_container = QWidget()
         self.input_widget = group_container
@@ -377,13 +399,13 @@ class InputDock(QWidget):
         self.custom_tooltip.show()
         self.custom_tooltip.raise_()
         
-        # Hide after 1 seconds
+        # Hide after 3 seconds
         if not hasattr(self, 'tooltip_timer'):
             self.tooltip_timer = QTimer()
             self.tooltip_timer.setSingleShot(True)
             self.tooltip_timer.timeout.connect(self.custom_tooltip.hide)
         
-        self.tooltip_timer.start(1000)
+        self.tooltip_timer.start(3000)
     
     def toggle_lock(self):
         self.state_locked = not self.state_locked

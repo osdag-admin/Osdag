@@ -238,7 +238,7 @@ MODULE_MAP = {
 
     #---------Tension-Member-start------------------------------------------------------
     KEY_DISP_TENSION_BOLTED: ['Bolted to End Gusset', 'Tension Member', 'open_bolted_end_tension'],
-    KEY_DISP_TENSION_WELDED: ['Welded to End Gusset', 'Tension Member', 'None'],
+    KEY_DISP_TENSION_WELDED: ['Welded to End Gusset', 'Tension Member', 'open_tension_welded_page'],
     #---------Tension-Member-end------------------------------------------------------
 
     #---------Compression-Member-start------------------------------------------------------

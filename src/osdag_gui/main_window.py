@@ -33,6 +33,9 @@ from osdag_core.design_type.connection.seated_angle_connection import SeatedAngl
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from osdag_core.design_type.tension_member.tension_bolted import Tension_bolted
+from osdag_core.design_type.tension_member.tension_welded import Tension_welded
+
+
 
 from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 import openpyxl
@@ -331,6 +334,7 @@ class MainWindow(QMainWindow):
             return module.backend.design_status
         else:
             return False
+
     
     def _get_template_instance(self, index) -> object:
         return self.tab_widget_content[index].layout().itemAt(0).widget()
@@ -419,6 +423,8 @@ class MainWindow(QMainWindow):
             self.open_plate_girder()
         elif card_title == "Bolted to End Gusset":
             self.open_bolted_end_tension()
+        elif card_title == "Welded to End Gusset":
+            self.open_tension_welded_page()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -598,6 +604,37 @@ class MainWindow(QMainWindow):
         # Update tab title and docking icons
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
+
+    def open_tension_welded_page(self):
+        title = "Tension Member: Welded to End Gusset"
+        self.clear_layout(self.main_widget_layout)
+        tension_welded = CustomWindow(title, Tension_welded, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(tension_welded.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                tension_welded.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = tension_welded
+        tension_welded.openNewTab.connect(self.handle_add_tab)
+        tension_welded.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(tension_welded)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+
+    
 
     def open_bolted_end_tension(self):
         title = "Bolted to End Gusset"

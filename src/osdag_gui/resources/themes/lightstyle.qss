@@ -167,14 +167,14 @@ QPushButton#navbar_button[state="active"] {
 }
 
 QPushButton#navbar_button_under_dev {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #f8f9fa;
+    color: #817d86;
     padding: 4px 4px 8px 8px;
     font-weight: normal;
     border-radius: 0px;
     border: none;
-    border-top: 1px solid #ffffff;
-    border-bottom: 1px solid #ffffff;
+    border-top: 1px solid #f8f9fa;
+    border-bottom: 1px solid #f8f9fa;
     text-align: left;
 }
 

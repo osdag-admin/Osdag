@@ -186,9 +186,9 @@ You can also run in CLI mode using 'osdag-cli run'.
 Examples:\n
   osdag\n
   osdag-cli run -i TensionBolted.osi\n
-  osdag-cli run -i TensionBolted.osi -op save_csv -o result.csv\n
-  osdag-cli run -i TensionBolted.osi -op save_pdf -o result.pdf\n
-  osdag-cli run -i TensionBolted.osi -op print_result\n
+  osdag-cli run -i TensionBolted.osi -t save_csv -o result.csv\n
+  osdag-cli run -i TensionBolted.osi -t save_pdf -o result.pdf\n
+  osdag-cli run -i TensionBolted.osi -t print_result\n
 ==================================================\n
 """
 
@@ -222,7 +222,7 @@ def cli():
               type=click.Path(exists=True, dir_okay=False),
               required=True,
               help="Path to input file (.osi)")
-@click.option("-op", "--op_type",
+@click.option("-t", "--op_type", "op_type",
               type=click.Choice(["save_csv", "save_pdf", "print_result"]),
               default="print_result",
               show_default=True,

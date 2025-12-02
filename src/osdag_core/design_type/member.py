@@ -4,6 +4,10 @@ from ..utils.common.component import *
 from ..utils.common.Section_Properties_Calculator import *
 from .main import Main
 from ..utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
+from PySide6 import QtWidgets
+from PySide6.QtWidgets import QCheckBox
+from PySide6.QtCore import Qt
+
 
 class Member(Main):
 
@@ -2498,17 +2502,17 @@ class Member(Main):
 
         return edit_list
 
-    def get_selected_tab(self):
+    def get_selected_tab(self, arg):
         """
 
         :return: This function have key value passed in self. This return name of the tab selected
         based on the value of the key passed.
         """
-        if self in ['Angles', 'Back to Back Angles', 'Star Angles']:
+        if arg in ['Angles', 'Back to Back Angles', 'Star Angles']:
             return DISP_TITLE_ANGLE
-        elif self in [ 'Channels', 'Back to Back Channels']:
+        elif arg in [ 'Channels', 'Back to Back Channels']:
             return DISP_TITLE_CHANNEL
-        elif self in['Beams']:
+        elif arg in['Beams']:
             return KEY_DISP_BEAMSEC
         else:
             return KEY_DISP_COLSEC
@@ -3261,32 +3265,29 @@ class Member(Main):
         return components
 
     def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+        
+        for chkbox in ui.findChildren(QtWidgets.QCheckBox):
             if chkbox.objectName() == 'Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Plate", bgcolor)
 
     def call_3DMember(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+      
+        for chkbox in ui.findChildren(QtWidgets.QCheckBox):
             if chkbox.objectName() == 'Member':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Member", bgcolor)
 
 
     def call_3DEndplate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+       
+        for chkbox in ui.findChildren(QtWidgets.QCheckBox):
             if chkbox.objectName() == 'Endplate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Endplate", bgcolor)

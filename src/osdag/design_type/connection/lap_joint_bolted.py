@@ -23,10 +23,18 @@ import logging
 
 import math
 
+from PyQt5.QtCore import Qt
+
 class LapJointBolted(MomentConnection):
     def __init__(self):
         super(LapJointBolted, self).__init__()
         self.design_status = False
+        self.design_for = 'Tension'
+        self.axial_force_kN = 0.0
+        self.axial_force = 0.0
+        self.base_metal_capacity_kN = None
+        self.utilization_breakdown = {}
+        self.design_error = ''
         
         # self.spacing = None
 
@@ -39,6 +47,7 @@ class LapJointBolted(MomentConnection):
         # Only Bolt and Detailing tabs
         tabs.append(("Bolt", TYPE_TAB_2, self.bolt_values))
         tabs.append(("Detailing", TYPE_TAB_2, self.detailing_values))
+        tabs.append(("Design", TYPE_TAB_2, self.design_values))
         return tabs
 
     def tab_value_changed(self):
@@ -62,6 +71,11 @@ class LapJointBolted(MomentConnection):
         design_input.append(("Detailing", TYPE_COMBOBOX, [
             KEY_DP_DETAILING_EDGE_TYPE  # For edge preparation method
         ]))
+
+        # Design preferences
+        design_input.append(("Design", TYPE_COMBOBOX, [
+            KEY_DESIGN_FOR
+        ]))
         
         return design_input
 
@@ -73,7 +87,8 @@ class LapJointBolted(MomentConnection):
             KEY_DP_BOLT_TYPE,
             KEY_DP_BOLT_HOLE_TYPE, 
             KEY_DP_BOLT_SLIP_FACTOR,
-            KEY_DP_DETAILING_EDGE_TYPE
+            KEY_DP_DETAILING_EDGE_TYPE,
+            KEY_DESIGN_FOR
         ], ''))
         
         return design_input
@@ -84,9 +99,25 @@ class LapJointBolted(MomentConnection):
             KEY_DP_BOLT_TYPE: "Non Pre-tensioned",
             KEY_DP_BOLT_HOLE_TYPE: "Standard",
             KEY_DP_BOLT_SLIP_FACTOR: "0.3",
-            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut"
+            KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+            KEY_DESIGN_FOR: 'Tension'
         }
         return defaults.get(key)
+
+    def design_values(self, input_dictionary):
+        values = {
+            KEY_DESIGN_FOR: 'Tension'
+        }
+
+        if input_dictionary and KEY_DESIGN_FOR in input_dictionary:
+            values[KEY_DESIGN_FOR] = input_dictionary[KEY_DESIGN_FOR]
+
+        design = []
+        t1 = (KEY_DESIGN_FOR, KEY_DISP_DESIGN_FOR, TYPE_COMBOBOX,
+              ['Tension', 'Compression'], values[KEY_DESIGN_FOR])
+        design.append(t1)
+
+        return design
 
     def detailing_values(self, input_dictionary):
         values = {
@@ -172,7 +203,7 @@ class LapJointBolted(MomentConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_TENSILE_FORCE, KEY_DISP_TENSILE_FORCE, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t17 = (KEY_AXIAL_FORCE, KEY_DISP_AXIAL_FORCE, TYPE_TEXTBOX, None, True, 'Float Validator')
         options_list.append(t17)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -270,6 +301,21 @@ class LapJointBolted(MomentConnection):
 
         t29 = (KEY_UTILIZATION_RATIO, KEY_DISP_UTILIZATION_RATIO, TYPE_TEXTBOX,self.utilization_ratio if flag else '', True)
         out_list.append(t29)
+
+        t30 = (KEY_OUT_DESIGN_FOR, KEY_OUT_DISP_DESIGN_FOR, TYPE_TEXTBOX, self.design_for if flag else '', True)
+        out_list.append(t30)
+
+        t31 = (KEY_OUT_BASE_METAL_CAPACITY, KEY_OUT_DISP_BASE_METAL_CAPACITY, TYPE_TEXTBOX,
+                round(self.base_metal_capacity_kN, 2) if flag and self.base_metal_capacity_kN is not None else '', True)
+        out_list.append(t31)
+
+        t32 = (KEY_OUT_BASE_METAL_UTILIZATION, KEY_OUT_DISP_BASE_METAL_UTILIZATION, TYPE_TEXTBOX,
+                self.utilization_breakdown.get('base_metal') if flag and self.utilization_breakdown else '', True)
+        out_list.append(t32)
+
+        t33 = (KEY_OUT_BOLT_UTILIZATION, KEY_OUT_DISP_BOLT_UTILIZATION, TYPE_TEXTBOX,
+                self.utilization_breakdown.get('bolt') if flag and self.utilization_breakdown else '', True)
+        out_list.append(t33)
         
         t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         out_list.append(t21)
@@ -311,10 +357,10 @@ class LapJointBolted(MomentConnection):
                         else:
                             flag1 = True
 
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
-
-                        if float(design_dictionary[option[0]]) <= 0.0:
-                            error = "Input value(s) cannot be equal or less than zero."
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL_FORCE:
+                        axial_val = float(design_dictionary[option[0]])
+                        if math.isclose(axial_val, 0.0, abs_tol=1e-9):
+                            error = "Input value for Axial Force must be non-zero."
                             all_errors.append(error)
                         else:
                             flag2 = True
@@ -334,23 +380,45 @@ class LapJointBolted(MomentConnection):
         
     def set_input_values(self, design_dictionary):
 
-        "initialisation of components required to design a tension member along with connection"
+        "initialisation of components required to design a lap joint for axial load (tension/compression)"
+
+        design_dictionary_with_defaults = design_dictionary.copy()
+        for key in (KEY_SHEAR, KEY_AXIAL, KEY_MOMENT):
+            if key not in design_dictionary_with_defaults:
+                design_dictionary_with_defaults[key] = 0.0
+
+        super(LapJointBolted, self).set_input_values(self, design_dictionary_with_defaults)
 
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Lap Joint Bolted Connection"
         self.main_material = design_dictionary[KEY_MATERIAL]
-        self.tensile_force = design_dictionary[KEY_TENSILE_FORCE]
-        self.width = design_dictionary[KEY_PLATE_WIDTH]
-        self.plate1 = Plate(thickness=[design_dictionary[KEY_PLATE1_THICKNESS]],
-                        material_grade=design_dictionary[KEY_MATERIAL],width=design_dictionary[KEY_PLATE_WIDTH])
-        self.plate2 = Plate(thickness=[design_dictionary[KEY_PLATE2_THICKNESS]],
-                            material_grade=design_dictionary[KEY_MATERIAL],width=design_dictionary[KEY_PLATE_WIDTH])
+
+        self.design_for = design_dictionary.get(KEY_DESIGN_FOR, 'Tension')
+        axial_input = design_dictionary.get(
+            KEY_AXIAL_FORCE,
+            design_dictionary.get(KEY_AXIAL,
+                                  design_dictionary.get(KEY_TENSILE_FORCE, 0)))
+        axial_value = float(axial_input)
+        if axial_value < 0 and KEY_DESIGN_FOR not in design_dictionary:
+            self.design_for = 'Compression'
+        self.axial_force_kN = abs(axial_value)
+        self.axial_force = self.axial_force_kN * 1000.0
+        # Legacy naming issue
+        self.tensile_force = self.axial_force_kN  # legacy naming in downstream methods
+
+        self.width = float(design_dictionary[KEY_PLATE_WIDTH])
+        plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
+        plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
+        self.plate1 = Plate(thickness=[plate1_thk],
+                            material_grade=design_dictionary[KEY_MATERIAL], width=self.width)
+        self.plate2 = Plate(thickness=[plate2_thk],
+                            material_grade=design_dictionary[KEY_MATERIAL], width=self.width)
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
-                        bolt_type=design_dictionary[KEY_TYP],
-                        bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                        edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-                        mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
-                        )
+                         bolt_type=design_dictionary[KEY_TYP],
+                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
+                         )
         self.planes = 1
         self.count = 0
         self.slip_res = None
@@ -371,6 +439,9 @@ class LapJointBolted(MomentConnection):
         self.utilization_ratio = 0
         self.bij = 0
         self.blg = 0
+        self.base_metal_capacity_kN = None
+        self.utilization_breakdown = {}
+        self.design_error = ''
         self.select_bolt_dia_and_grade(self,design_dictionary)
 
     def select_bolt_dia_and_grade(self,design_dictionary):
@@ -576,22 +647,18 @@ class LapJointBolted(MomentConnection):
 
 
     def final_formatting(self,design_dictionary):
-        # print("I am herefa fafjafjafjafjajfjafajf")
-        # print(self.bolt)
-
-        gauge_dist = (float(self.width) - 2*self.bolt.min_end_dist_round)/(self.rows - 1)
+        gauge_divisor = max(self.rows - 1, 1)
+        gauge_dist = (float(self.width) - 2 * self.bolt.min_end_dist_round) / gauge_divisor
 
         if gauge_dist > self.max_gauge_round:
             self.final_gauge = self.max_gauge_round
             self.final_pitch = self.bolt.min_pitch_round
 
-            enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
+            enddist = (float(self.width) - ((self.rows - 1) * self.final_gauge)) / 2
             if enddist > self.bolt.max_end_dist_round:
                 self.design_status = False
-                self.number_r_c_bolts(self,design_dictionary,0,1)
-                # print("okay")
-                
-                # self.design_status = True
+                self.number_r_c_bolts(self, design_dictionary, 0, 1)
+                return
             else:
                 self.final_end_dist = enddist
                 self.final_edge_dist = enddist
@@ -599,54 +666,130 @@ class LapJointBolted(MomentConnection):
         else:
             self.final_gauge = gauge_dist
             self.final_pitch = self.bolt.min_pitch_round
-            enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
+            enddist = (float(self.width) - ((self.rows - 1) * self.final_gauge)) / 2
             if enddist > self.bolt.max_end_dist_round:
-                # self.loop_helper_func(self,design_dictionary)
-                # print("okay")
-                # self.design_status = False
                 self.design_status = False
-                self.number_r_c_bolts(self,design_dictionary,0,1)
-
-                
+                self.number_r_c_bolts(self, design_dictionary, 0, 1)
+                return
             else:
                 self.final_end_dist = enddist
                 self.final_edge_dist = enddist
                 self.design_status = True
-        # print("I got here")
+
         if self.bolt.bolt_type == 'Bearing Bolt':
-            self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity/ 1000
-            self.bolt.bolt_bearing_capacity = self.bolt.bolt_bearing_capacity / 1000
-            self.bolt.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity, 2)
-            self.bolt.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity, 2)
-            self.bolt.bolt_capacity = self.bolt.bolt_capacity / 1000
-            self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
+            self.bolt.bolt_shear_capacity = round(self.bolt.bolt_shear_capacity / 1000, 2)
+            self.bolt.bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+            self.bolt.bolt_capacity = round(self.bolt.bolt_capacity / 1000, 2)
         else:
-            self.slip_res = self.slip_res / 1000
-            self.slip_res = round(self.slip_res, 2)
-            self.bolt.bolt_capacity = self.bolt.bolt_capacity / 1000
-            self.bolt.bolt_capacity = round(self.bolt.bolt_capacity, 2)
-        
-        # print("Going for util ratio")
-        # print("Still here")
-        # print("Numbolts",self.number_bolts)
-        bltcap = self.bolt.bolt_capacity
-        if bltcap < 1:
-            bltcap = 1
-        self.utilization_ratio = float(self.tensile_force) / (bltcap * self.number_bolts)
-        self.utilization_ratio = round(self.utilization_ratio, 2)
+            self.slip_res = round(self.slip_res / 1000, 2)
+            self.bolt.bolt_capacity = round(self.bolt.bolt_capacity / 1000, 2)
 
-        self.final_gauge = round(self.final_gauge,0)
-        self.final_pitch = round(self.final_pitch,0)
-        # print("fafafafafa",self.final_edge_dist, self.final_end_dist, self.final_pitch, self.final_gauge)
-        print("FINAL FINAL",self.bolt)
-        print("Final Edge/End/Gauge/Pitch",self.final_edge_dist,self.final_end_dist,self.final_gauge,self.final_pitch)
+        bolt_capacity_kN = self.bolt.bolt_capacity
+        bolt_capacity_total = bolt_capacity_kN * self.number_bolts if bolt_capacity_kN else 0.0
+        if bolt_capacity_total <= 0:
+            logger.error(": Bolt capacity is zero. Increase bolt size/grade or adjust layout.")
+            self.design_status = False
+            self.design_error = "Bolt capacity is zero."
+            return
+        bolt_util = self.axial_force_kN / bolt_capacity_total
 
-        # print(self)
-        # print("faahfnafanfaf")
-        print("Max and min end edge dist ",self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
-        print("Max min gauge pitch dist",self.max_gauge_round,self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
-        # self.design_status = True
+        if not self.check_base_metal_strength():
+            return
 
+        if not self.base_metal_capacity_kN or self.base_metal_capacity_kN <= 0:
+            logger.error(": Base metal capacity is zero or undefined. Check plate selection.")
+            self.design_status = False
+            self.design_error = "Base metal capacity is zero or undefined."
+            return
+
+        base_util = self.axial_force_kN / self.base_metal_capacity_kN
+
+        def _format_util(value, decimals=3):
+            if math.isinf(value) or math.isnan(value):
+                return 'Inf'
+            return round(value, decimals)
+
+        overall_util = max(bolt_util, base_util)
+        self.utilization_breakdown = {
+            'bolt': _format_util(bolt_util),
+            'base_metal': _format_util(base_util)
+        }
+
+        if math.isinf(overall_util) or math.isnan(overall_util):
+            self.utilization_ratio = 'Inf'
+        else:
+            self.utilization_ratio = round(overall_util, 2)
+
+        self.final_gauge = round(self.final_gauge, 0)
+        self.final_pitch = round(self.final_pitch, 0)
+        self.final_end_dist = round(self.final_end_dist, 0)
+        self.final_edge_dist = round(self.final_edge_dist, 0)
+
+        print("FINAL FINAL", self.bolt)
+        print("Final Edge/End/Gauge/Pitch", self.final_edge_dist, self.final_end_dist, self.final_gauge, self.final_pitch)
+        print("Max and min end edge dist ", self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
+        print("Max min gauge pitch dist", self.max_gauge_round, self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
+
+
+    def check_base_metal_strength(self):
+        global logger
+        try:
+            logger
+        except NameError:
+            logger = logging.getLogger('Osdag')
+
+        logger.info(": ============== Base Metal Strength Check ==============")
+
+        plate_thk_min = min(float(self.plate1thk), float(self.plate2thk))
+        fy = min(self.plate1.fy, self.plate2.fy)
+        fu = min(self.plate1.fu, self.plate2.fu)
+
+        self.gamma_m0 = 1.10
+        self.gamma_m1 = 1.25
+
+        self.A_g = plate_thk_min * float(self.width)
+
+        if self.design_for == 'Compression':
+            self.T_db = self.A_g * fy / self.gamma_m0
+            logger.info(f": Design strength of plate in compression = {self.T_db / 1000:.2f} kN [Cl.7.1.2]")
+        else:
+            n_holes = max(self.rows, 1)
+            hole_dia = self.bolt.dia_hole if hasattr(self.bolt, 'dia_hole') else 0.0
+            net_width = float(self.width) - n_holes * hole_dia
+
+            if net_width <= 0:
+                logger.error(": Net width becomes zero/negative after deducting bolt holes. Increase plate width or reduce rows.")
+                self.design_status = False
+                self.design_error = "Net width insufficient for bolt holes."
+                return False
+
+            self.A_n = plate_thk_min * net_width
+            shear_lag_factor = 0.7  # IS 800:2007 Cl.6.3.3 for lap joints
+
+            T_dg = self.A_g * fy / self.gamma_m0
+            T_dn = 0.9 * self.A_n * fu * shear_lag_factor / self.gamma_m1
+            self.T_dg = T_dg
+            self.T_dn = T_dn
+            self.T_db = min(T_dg, T_dn)
+
+            # Calculate block shear strength
+            A_vg = plate_thk_min * ((self.rows - 1) * self.final_gauge + self.final_edge_dist)
+            A_vn = plate_thk_min * ((self.rows - 1) * self.final_gauge + self.final_edge_dist - (self.rows - 0.5) * hole_dia)
+            A_tg = plate_thk_min * self.final_end_dist
+            A_tn = plate_thk_min * (self.final_end_dist - 0.5 * hole_dia)
+
+            T_db_block = IS800_2007.cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, fu, fy)
+            self.T_db = min(self.T_db, T_db_block)
+            logger.info(f": Design strength of plate in tension = {self.T_db / 1000:.2f} kN [Cl.6.2.2, 6.2.3, 6.3.3]")
+
+        if self.T_db <= 0:
+            logger.error(": Plate design strength is non-positive. Check input dimensions/material.")
+            self.design_status = False
+            self.design_error = "Plate design strength is non-positive."
+            return False
+
+        self.base_metal_capacity_kN = self.T_db / 1000.0
+        return True
 
 
     def call_3DColumn(self, ui, bgcolor):

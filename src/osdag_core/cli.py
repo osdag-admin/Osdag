@@ -63,7 +63,7 @@ available_modules = {
 }
 
 from pathlib import Path
-import yaml, click
+import yaml, click, platform, os
 import pandas as pd
 
 def _print_result(out_dict:dict):
@@ -121,6 +121,34 @@ def _save_to_pdf(module_class:Main, output_file:Path):
         }
     module_class.save_design(module_class, popup_summary)
 
+def _get_documents_folder() -> Path:
+    """Get the user's Documents folder path."""
+    system = platform.system()
+
+    if system == "Windows": 
+        return Path(os.environ["USERPROFILE"]) / "Documents"
+
+    elif system == "Darwin":  # macOS
+        return Path.home() / "Documents"
+
+    else:  # Linux
+        # Most Linux systems follow the XDG standard 
+        xdg = os.environ.get("XDG_DOCUMENTS_DIR")
+        if xdg:
+            return Path(os.path.expandvars(xdg))
+        return Path.home() / "Documents"
+
+def _is_in_current_user(path: str | Path) -> bool:
+    """Check if the OSdag is running in the current user's directory."""
+    path = Path(path).expanduser().resolve()
+    home = Path.home().resolve()
+
+    # Check if the given path starts with the home directory
+    try:
+        path.relative_to(home)
+        return True
+    except ValueError:
+        return False
 
 
 def run_module(*args, **kargs) -> dict:
@@ -140,34 +168,38 @@ def run_module(*args, **kargs) -> dict:
 
     if osi_path is None:
         result["errors"].append("No input file provided.")
-        print(result)
+        # print(result)
         return result
     
     osi_path = Path(osi_path) if osi_path else None
     output_path = Path(output_path) if output_path else None
     if not osi_path.exists():
         result["errors"].append(f"File not found: {osi_path}")
-        print(result)
+        # print(result)
         return result
     
     design_dict = _get_design_dictionary(osi_path)
     module_name = design_dict.get("Module")
     if not module_name:
         result["errors"].append("Module not specified.")
-        print(result)
+        # print(result)
         return result
 
     module_class = available_modules.get(module_name)
     if not module_class:
         result["errors"].append(f"Not a valid module class: {module_name}")
-        print(result)
+        # print(result)
         return result
     
     input_filename = osi_path.stem
     output_filename = output_path.stem if output_path else None
     if not output_path:
-        output_folder_path = osi_path.parent / "Outputs" / f"{module_class.__name__}"
+        output_folder_path = _get_documents_folder() / "Osdag Outputs" / f"{module_class.__name__}"
     else:
+        if not _is_in_current_user(output_path):
+            result["errors"].append("Output path must be within the current user's directory.")
+            # print(result)
+            return result
         output_folder_path = output_path.parent / f"{module_class.__name__}"
     output_folder_path.mkdir(parents=True, exist_ok=True)
     output_file = output_folder_path / f"{output_filename if output_filename else input_filename}"
@@ -177,14 +209,15 @@ def run_module(*args, **kargs) -> dict:
 
     if val_errors:
         result["errors"].extend(val_errors)
-        print(result)
+        # print(result)
         return result
 
     out_dict = _get_output_dictionary(module_class)
     result["data"] = out_dict
     if op_type == "save_csv":
         try:
-            _save_to_csv(out_dict, str(output_file) + ".csv")
+            output_file = output_file.with_suffix('.csv')
+            _save_to_csv(out_dict, str(output_file))
             result["success"] = True
             result["output"] = str(output_file)
         except Exception as e:
@@ -195,7 +228,7 @@ def run_module(*args, **kargs) -> dict:
         try:
             _save_to_pdf(module_class, output_file)
             result["success"] = True
-            result["output"] = str(output_file)
+            result["output"] = str(output_file) + ".pdf"
         except Exception as e:
             result["success"] = False
             result["errors"].append(f"Failed to save PDF: {e}")
@@ -212,6 +245,6 @@ def run_module(*args, **kargs) -> dict:
         result["errors"].append(f"Unsupported op_type: {op_type}")
 
     if len(result["errors"]) > 0:
-        print(result)
+        print(result["errors"])
     
     return result

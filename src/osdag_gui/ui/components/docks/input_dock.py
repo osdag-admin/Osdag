@@ -174,19 +174,6 @@ class InputDock(QWidget):
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.scroll_area.installEventFilter(self)
-        # self.scroll_area.setStyleSheet("""
-        #     QScrollArea#inputs_vscrollarea:disabled{
-        #         background: #f1f1f1;
-        #     }
-
-        #     QScrollArea#inputs_vscrollarea:disabled QLineEdit:disabled,
-        #     QScrollArea#inputs_vscrollarea:disabled QComboBox:disabled,
-        #     QScrollArea#inputs_vscrollarea:disabled QSpinBox:disabled,
-        #     QScrollArea#inputs_vscrollarea:disabled QDoubleSpinBox:disabled {
-        #         background: #f1f1f1;
-        #         color: #666;
-        #     }
-        # """)
 
         group_container = QWidget()
         self.input_widget = group_container

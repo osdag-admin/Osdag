@@ -289,6 +289,12 @@ QPushButton#lock_btn:checked:hover {
 QPushButton#lock_btn[forceHover="true"] {
     background: #acc933;
 }
+QPushButton#lock_btn[forceHover="true"] {
+    background: #FFB732;
+}
+QPushButton#lock_btn[forceHover="false"] {
+    background: #FFA500;
+}
 
 /* Search Result Project Button */
 QPushButton#search_result_proj_btn {

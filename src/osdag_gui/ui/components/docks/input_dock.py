@@ -161,13 +161,13 @@ class InputDock(QWidget):
         self.custom_tooltip.setWindowFlags(Qt.ToolTip)
         self.custom_tooltip.setStyleSheet("""
             QLabel#custom_tooltip {
-                background-color: #fafafa;
-                border-radius: 6px;
-                padding: 5px 10px;
+                background-color: #f1f1f1;
+                border: 1px solid #94b816;
+                padding: 4px;
                 font-size: 15px;
             }
         """)
-        self.custom_tooltip.setMinimumWidth(160)
+        # self.custom_tooltip.setMinimumWidth(160)
         self.custom_tooltip.hide()
         #--------------------------------------------------
 
@@ -179,19 +179,6 @@ class InputDock(QWidget):
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.scroll_area.installEventFilter(self)
-        # self.scroll_area.setStyleSheet("""
-        #     QScrollArea#inputs_vscrollarea:disabled{
-        #         background: #f1f1f1;
-        #     }
-
-        #     QScrollArea#inputs_vscrollarea:disabled QLineEdit:disabled,
-        #     QScrollArea#inputs_vscrollarea:disabled QComboBox:disabled,
-        #     QScrollArea#inputs_vscrollarea:disabled QSpinBox:disabled,
-        #     QScrollArea#inputs_vscrollarea:disabled QDoubleSpinBox:disabled {
-        #         background: #f1f1f1;
-        #         color: #666;
-        #     }
-        # """)
 
         group_container = QWidget()
         self.input_widget = group_container
@@ -383,6 +370,11 @@ class InputDock(QWidget):
                 self.show_lock_tooltip()
             return True  # Block the event
         return super().eventFilter(obj, event)
+    
+    def clear_force_hover(self):
+        self.lock_btn.setProperty("forceHover", False)
+        self.lock_btn.style().polish(self.lock_btn)
+        self.lock_btn.update()
 
     def show_lock_tooltip(self):
         # Stop any existing timer first
@@ -391,8 +383,11 @@ class InputDock(QWidget):
         
         # Position tooltip to the right of the lock button
         lock_global_pos = self.lock_btn.mapToGlobal(self.lock_btn.rect().topRight())
-        tooltip_pos = lock_global_pos+ QPoint(5, 4)
-        
+        tooltip_pos = lock_global_pos + QPoint(5, 0)
+        self.lock_btn.setProperty("forceHover", True)
+        self.lock_btn.style().polish(self.lock_btn)
+        self.lock_btn.update()
+                
         # Adjust size and position
         self.custom_tooltip.adjustSize()
         self.custom_tooltip.move(tooltip_pos)
@@ -404,6 +399,7 @@ class InputDock(QWidget):
             self.tooltip_timer = QTimer()
             self.tooltip_timer.setSingleShot(True)
             self.tooltip_timer.timeout.connect(self.custom_tooltip.hide)
+            self.tooltip_timer.timeout.connect(self.clear_force_hover)
         
         self.tooltip_timer.start(3000)
     

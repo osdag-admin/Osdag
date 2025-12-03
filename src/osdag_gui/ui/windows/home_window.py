@@ -342,13 +342,13 @@ class HomeWindow(QWidget):
         self.bottom_svg_widget_2.setFixedSize(95, 47)         # 970 x 479(ratio 2.02) ~ 95 x 47
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
 
+        self.bottom_svg_widget_3 = QSvgWidget()
+        self.bottom_svg_widget_3.setFixedSize(306, 35)  # 2048 x 234 (ratio 8.75) ~ 250 x 28.6
+        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignVCenter)
+
         self.bottom_svg_widget_4 = QSvgWidget()
         self.bottom_svg_widget_4.setFixedSize(41, 43)       # 490 x 510(ratio 0.96) ~ 58 x 60
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_4, alignment=Qt.AlignmentFlag.AlignBottom)
-
-        self.bottom_svg_widget_3 = QSvgWidget()
-        self.bottom_svg_widget_3.setFixedSize(250, 28.6)  # 2048 x 234 ~ 250 x 28.6
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         self.bottom_right_h_layout.addStretch(1)
 

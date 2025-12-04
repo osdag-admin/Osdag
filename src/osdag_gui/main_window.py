@@ -257,7 +257,7 @@ class MainWindow(QMainWindow):
         self.tab_bar.setCurrentIndex(new_index)
         self.tab_widget.setCurrentIndex(new_index)
 
-        print("@[New Tab Added]Total Widgets. ", len(QApplication.allWidgets()))
+        # print("@[New Tab Added]Total Widgets. ", len(QApplication.allWidgets()))
 
     def handle_tab_change(self, index):
         # Switch the QTabWidget to the new tab
@@ -404,13 +404,13 @@ class MainWindow(QMainWindow):
                 scroll_area.setWidget(None)
                 
         except (RuntimeError, AttributeError) as e:
-            print(f"Error cleaning scroll area: {e}")
+            print(f"[ERROR] Error cleaning scroll area: {e}")
 
     def _close_tab(self, index):
         """Close tab with comprehensive cleanup."""
         widget = self.tab_widget.widget(index)
         
-        print(f"\n@Before cleanup - Total Widgets: {len(QApplication.allWidgets())}")
+        # print(f"\n@Before cleanup - Total Widgets: {len(QApplication.allWidgets())}")
         
         template_instance = self._get_template_instance(index)
         
@@ -435,7 +435,7 @@ class MainWindow(QMainWindow):
                 template_instance.deleteLater()
                         
             except (RuntimeError, AttributeError) as e:
-                print(f"Error in pre-cleanup: {e}")
+                print(f"[ERROR] Error in pre-cleanup: {e}")
         
         # Remove from UI structures
         self.tab_widget.removeTab(index)
@@ -455,7 +455,7 @@ class MainWindow(QMainWindow):
         import gc
         gc.collect()
         
-        print(f"@After cleanup - Total Widgets: {len(QApplication.allWidgets())}\n")
+        # print(f"@After cleanup - Total Widgets: {len(QApplication.allWidgets())}\n")
     
     def delete_all_children(self, widget):
             """
@@ -530,7 +530,7 @@ class MainWindow(QMainWindow):
         return super().eventFilter(obj, event)
 
     def handle_card_open_clicked(self, card_title):
-        print(card_title)
+        # print(f"[INFO] Card opened: {card_title}")
         if card_title == "Fin Plate":
             self.open_fin_plate_shear_connection()
         elif card_title == "Cleat Angle":
@@ -841,12 +841,12 @@ class MainWindow(QMainWindow):
                         try:
                             update_project_path(id, osi_path, new_name)
                         except Exception as e:
-                            print(f"Failed to update project path: {e}")
+                            print(f"[ERROR] Failed to update project path: {e}")
                     else:
-                        print("No file selected for relocation.")
+                        print("[INFO] No file selected for relocation.")
                         return
                 elif result == "Remove Record":
-                    print("Remove Record")
+                    print("[INFO] Remove Record")
                     if id is not None:
                         try:
                             delete_project_record(id)
@@ -858,7 +858,7 @@ class MainWindow(QMainWindow):
                             except FileNotFoundError:
                                 pass
                             except Exception as e:
-                                print(f"Failed to delete report folder: {e}")
+                                print(f"[ERROR] Failed to delete report folder: {e}")
                             CustomMessageBox(
                                 title="Record Removed",
                                 text="The record has been removed from recent projects.",
@@ -874,11 +874,11 @@ class MainWindow(QMainWindow):
                                 dialogType=MessageBoxType.Critical
                             ).exec()
                     else:
-                        print("No ID provided for record removal.")
+                        print("[INFO] No ID provided for record removal.")
                     return
 
         if not osi_path:
-            print("No Path selected!")
+            print("[INFO] No Path selected!")
             return
         try:
             in_file = str(osi_path)
@@ -886,7 +886,7 @@ class MainWindow(QMainWindow):
                 uiObj = yaml.safe_load(fileObject)
             module = uiObj[KEY_MODULE]
 
-            print("Osi File Belongs to. ", module)
+            print(f"[INFO] Osi File Belongs to: {module}")
 
             func = get_module_function(module)
             if func == 'None':
@@ -895,7 +895,7 @@ class MainWindow(QMainWindow):
                     text="Please load the appropriate Input",
                     dialogType=MessageBoxType.Information
                 ).exec()
-                print("Module Not Implemented yet.")
+                print("[INFO] Module Under Development.")
                 return
             func = getattr(self, func)
             func()

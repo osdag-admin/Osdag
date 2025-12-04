@@ -118,6 +118,8 @@ class InputDock(QWidget):
             return None
         
     def build_left_panel(self, field_list):
+        print("\n","="*100,"\n\n")
+        print("[INFO] Building Input Dock UI...")
         left_layout = QVBoxLayout(self.left_container)
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.setSpacing(0)
@@ -194,7 +196,7 @@ class InputDock(QWidget):
             index += 1
             label = field[1]
             type = field[2]
-            print(f"Option:{field}")
+            # print(f"[INFO] Option:{field}")
             if type == TYPE_MODULE:
                 # No use of module title will see.
                 pass
@@ -206,7 +208,7 @@ class InputDock(QWidget):
                 
                 # Initialized the group box for current title
                 current_group = QGroupBox(label)
-                print("Group_box: ", label)
+                # print(f"[INFO] Group_box: {label}")
                 current_group.setObjectName(label + "_group")
                 track_group = True
                 cur_box_form = QFormLayout()
@@ -275,11 +277,11 @@ class InputDock(QWidget):
         Since, we don't know how may customized popups can be used in a module we have provided,
          "triggered.connect" for up to 10 customized popups
         """
-        print("\n\n\n",self.backend,"$$$$",self.backend.customized_input,self.backend.input_value_changed)
+        # print("\n\n\n [INFO] ",self.backend,"$$$$",self.backend.customized_input,self.backend.input_value_changed)
         new_list = self.backend.customized_input()
         updated_list = self.backend.input_value_changed()
 
-        print(f'\n ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
+        # print(f'\n [INFO] ui_template.py input_value_changed {updated_list} \n new_list {new_list}')
         self.data = {}
 
         d = {}
@@ -295,7 +297,7 @@ class InputDock(QWidget):
                     arg_list = []
                     if onchange_key_popup != []:
                         for change_key in onchange_key_popup[0][0]:
-                            print(change_key)
+                            # print(f"[INFO] Change key: {change_key}")
                             arg_list.append(self.input_widget.findChild(QWidget, change_key).currentText())
                         self.data[t[0] + "_customized"] = [all_values_available for all_values_available in
                                                       t[1](arg_list) if all_values_available not in disabled_values]
@@ -306,7 +308,7 @@ class InputDock(QWidget):
                     self.data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                   if all_values_available not in disabled_values]
             try:
-                print(f"<class 'AttributeError'>: {d} \n {new_list}")
+                print(f"[ERROR] <class 'AttributeError'>: {d} \n {new_list}")
 
                 #changed this code bcz an error was occuring in the code -t.s.
                 # Connect signals only for widgets that exist
@@ -316,21 +318,21 @@ class InputDock(QWidget):
                         if widget is not None and hasattr(widget, 'activated'):
                             widget.activated.connect(lambda checked, w=widget: self.popup(w, new_list, updated_list, self.data))
             except Exception as e:
-                print(f"Error connecting signals: {str(e)}")
+                print(f"[ERROR] Error connecting signals: {str(e)}")
                 # changed ended here -t.s.
                 pass
 
         # Change in Ui based on Connectivity selection
         ##############################################
 
-        print("\n\n\n*****")
+        print("\n\n\n","="*100)
         self.print_widget_tree(group_container)
         if updated_list is not None:
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.input_widget.findChild(QWidget, key_name)
                     self.on_change_connect(key_changed, updated_list, self.data, self.backend)                    
-                    print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
+                    # print(f"[INFO] key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
         panel_layout.addWidget(self.scroll_area)
 
@@ -428,7 +430,7 @@ class InputDock(QWidget):
 
     def print_widget_tree(self, widget: QWidget, indent: int=0):
         prefix = "  " * (indent*4)
-        print(f"{prefix}{widget.objectName()}({widget.__class__.__name__})")
+        # print(f"[INFO] {prefix}{widget.objectName()}({widget.__class__.__name__})")
         for child in widget.children():
             if isinstance(child, QWidget):
                 self.print_widget_tree(child, indent+1)
@@ -515,13 +517,13 @@ class InputDock(QWidget):
     def change(self, k1, new, data, main):
         for tup in new:
             (object_name, k2_key, typ, f) = tup
-            print(f"\n object_name:{object_name}")
-            print(f"\n k1:{k1}")
-            print(f"\n f: {f}")
-            print(f"\n k1.objectName():{k1.objectName()}")
-            print(f"\n k2_key:{k2_key}")
-            print(f"\n typ:{typ}")
-            print(f"\n type:{typ}")
+            # print(f"\n[INFO] object_name:{object_name}")
+            # print(f"\n[INFO] k1:{k1}")
+            # print(f"\n[INFO] f: {f}")
+            # print(f"\n[INFO] k1.objectName():{k1.objectName()}")
+            # print(f"\n[INFO] k2_key:{k2_key}")
+            # print(f"\n[INFO] typ:{typ}")
+            # print(f"\n[INFO] type:{typ}")
             if k1.objectName() not in object_name:
                 continue
             if typ in [TYPE_LABEL, TYPE_OUT_LABEL]:
@@ -541,10 +543,10 @@ class InputDock(QWidget):
                 arg_list.append(key.currentText())
 
             val = f(arg_list)
-            print(f"\n k2:{k2}")
-            print(f"\n val:{val}")
+            # print(f"\n[INFO] k2:{k2}")
+            # print(f"\n[INFO] val:{val}")
             if typ == TYPE_COMBOBOX:
-                print("\n\nCombo")
+                # print("\n\n[INFO] Combo")
                 k2.clear()
                 for values in val:
                     k2.addItem(values)
@@ -559,11 +561,11 @@ class InputDock(QWidget):
                         indx = val.index(str(value))
                         k2.setItemData(indx, QBrush(QColor("red")), Qt.ForegroundRole)
             elif typ == TYPE_COMBOBOX_CUSTOMIZED:
-                print("\n\nCust_Combo")
+                # print("\n\n[INFO] Cust_Combo")
                 k2.setCurrentIndex(0)
                 self.data[k2_key + "_customized"] = val
             elif typ == TYPE_CUSTOM_MATERIAL:
-                print("\n\nCust_Combo_material")
+                # print("\n\n[INFO] Cust_Combo_material")
                 if val:
                     self.new_material_dialog()
             elif typ == TYPE_CUSTOM_SECTION:
@@ -571,18 +573,18 @@ class InputDock(QWidget):
                     self.import_custom_section()
 
             elif typ == TYPE_LABEL:
-                print("\n\nLabel")
+                # print("\n\n[INFO] Label")
                 k2.setText(val)
             elif typ == TYPE_NOTE:
-                print("\n\nNote")
+                # print("\n\n[INFO] Note")
                 k2.setText(val)
             elif typ == TYPE_IMAGE:
-                print("\n\nImg")
+                # print("\n\n[INFO] Img")
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
 
             elif typ == TYPE_TEXTBOX:
-                print("\n\ntext")
+                # print("\n\n[INFO] text")
                 if main.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
                     w = self.get_current_widget_in_layout(k2_key)
                     if not val and isinstance(w, QLineEdit):  # Show optimization button
@@ -597,17 +599,17 @@ class InputDock(QWidget):
                         k2.setDisabled(True)
 
             elif typ == TYPE_COMBOBOX_FREEZE:
-                print("\n\nfreeze_Combo")
+                # print("\n\n[INFO] freeze_Combo")
                 if val:
                     k2.setEnabled(False)
                 else:
                     k2.setEnabled(True)
             elif typ == TYPE_WARNING:
-                print("\n\nwarning")
+                # print("\n\n[INFO] warning")
                 if val:
                     QMessageBox.warning(self, "Application", k2)
             elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
-                print("\n\nlast")
+                # print("\n\n[INFO] last")
                 if val:
                     k2.setVisible(False)
                 else:
@@ -617,24 +619,24 @@ class InputDock(QWidget):
     def change_text_to_bound_btn(self, old_widget, tupple):
         layout = old_widget.parentWidget().layout()
         if layout is None:
-            print(f"ERROR:: Widget layout not Found for {tupple[1]}")
+            print(f"[ERROR]: Widget layout not Found for {tupple[1]}")
             return None
 
         index = layout.indexOf(old_widget)
         if index == -1:
-            print(f"ERROR:: Widget not found for {tupple[1]}")
+            print(f"[ERROR]: Widget not found for {tupple[1]}")
             return None
 
         # Create or retrieve button
         if self.backend.bound_widgets.get(tupple[1], ""):
             btn = self.backend.bound_widgets.get(tupple[1])[1]
-            print(f"Reusing existing button for {tupple[1]}")
+            # print(f"[INFO] Reusing existing button for {tupple[1]}")
         else:
             # Bounds Button
             btn = QPushButton("Set Bounds")
             btn.clicked.connect(lambda checked=False, name=tupple[1]: self.choose_bounds(name))
             self.backend.bound_widgets[tupple[1]] = [old_widget, btn]
-            print(f"Created new button for {tupple[1]}")
+            # print(f"[INFO] Created new button for {tupple[1]}")
         
         btn.setObjectName(tupple[1])
         layout.replaceWidget(old_widget, btn)
@@ -644,20 +646,20 @@ class InputDock(QWidget):
     def change_bound_btn_to_text(self, old_widget, tupple):
         layout = old_widget.parentWidget().layout()
         if layout is None:
-            print(f"ERROR:: Widget layout not Found for {tupple[1]}")
+            print(f"[ERROR]: Widget layout not Found for {tupple[1]}")
             return None
 
         index = layout.indexOf(old_widget)
         if index == -1:
-            print(f"ERROR:: Widget not found for {tupple[1]}")
+            print(f"[ERROR]: Widget not found for {tupple[1]}")
             return None
 
         # Retrieve or create textbox
         if self.backend.bound_widgets.get(tupple[1], ""):
             text_box = self.backend.bound_widgets.get(tupple[1])[0]
-            print(f"Reusing existing LineEdit for {tupple[1]}")
+            # print(f"[INFO] Reusing existing LineEdit for {tupple[1]}")
         else:
-            print(f"Creating new LineEdit for {tupple[1]}")
+            # print(f"[INFO] Creating new LineEdit for {tupple[1]}")
             inputs = self.backend.input_values()
             data_tup = None
             for tup in inputs:
@@ -712,7 +714,7 @@ class InputDock(QWidget):
         result = dialog.exec()
         
         if result:
-            print(f"New bounds for {name}: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
+            # print(f"[INFO] New bounds for {name}: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
             # Update Bounds
             if name == KEY_OVERALL_DEPTH_PG:
                 self.backend.bounds_map['D'] = (result[0], result[1], result[2])
@@ -721,7 +723,8 @@ class InputDock(QWidget):
             elif name == KEY_BOTTOM_Bflange_PG:
                 self.backend.bounds_map['bf'] = (result[0], result[1], result[2]) 
         else:
-            print("Dialog was cancelled")
+            # print("[INFO] Dialog was cancelled")
+            pass
 
     # For Plate-Girder Module-ends---------------------------------------------------  
 
@@ -855,7 +858,7 @@ class InputDock(QWidget):
                     else:
                         input_dock_material.setCurrentIndex(input_dock_material.count() - 1)
             except Exception as e:
-                print(f"Error updating material combobox: {e}")
+                print(f"[ERROR]: Error updating material combobox: {e}")
 
     def show_material_popup_message(self):
         """Show validation message for material popup"""

@@ -14,6 +14,23 @@ import osdag_gui.resources.resources_rc
 import sys, click
 
 
+# Uncomment below to enable print tracing for debugging
+# =========================================================
+# import builtins
+# import inspect
+
+# _original_print = builtins.print
+
+# def traced_print(*args, **kwargs):
+#     frame = inspect.stack()[1]
+#     filename = frame.filename
+#     line = frame.lineno
+#     _original_print(f"[{filename}:{line}]", *args, **kwargs)
+
+# builtins.print = traced_print
+# =========================================================a
+
+
 class LoadingThread(QThread):
     finished = Signal()
 
@@ -39,7 +56,7 @@ class LoadingThread(QThread):
             sqlitepath = files('osdag_core.data.ResourceFiles.Database').joinpath('Intg_osdag.sqlite')
 
             if not sqlpath.exists():
-                print(f"SQL file not found: {sqlpath}")
+                print(f"[ERROR] SQL file not found: {sqlpath}")
                 return
 
             # Determine if we need to create or update
@@ -49,7 +66,7 @@ class LoadingThread(QThread):
                             sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1))
 
             if not needs_creation and not needs_update:
-                print("Database is up to date")
+                # print("[INFO] Database is up to date")
                 return
 
             # Create backup if updating existing database
@@ -73,10 +90,10 @@ class LoadingThread(QThread):
                 conn.executescript(sql_content)
                 conn.close()
                 
-                print(f"Database {'created' if needs_creation else 'updated'} using Python sqlite3")
+                print(f"[INFO] Database {'created' if needs_creation else 'updated'} using Python sqlite3")
                 
             except Exception as e:
-                print(f"Python sqlite3 failed: {e}, trying command line")
+                print(f"[ERROR] Python sqlite3 failed: {e}, trying command line")
                 
                 # Fallback to command line
                 result = subprocess.run([
@@ -85,9 +102,9 @@ class LoadingThread(QThread):
                 ], capture_output=True, text=True, timeout=30)
                 
                 if result.returncode != 0:
-                    raise Exception(f"Command line sqlite3 failed: {result.stderr}")
+                    raise Exception(f"[ERROR] Command line sqlite3 failed: {result.stderr}")
                 
-                print(f"Database {'created' if needs_creation else 'updated'} using command line")
+                print(f"[INFO] Database {'created' if needs_creation else 'updated'} using command line")
 
             # If updating, replace the original
             if needs_update:
@@ -100,7 +117,7 @@ class LoadingThread(QThread):
             sqlpath.touch()
 
         except Exception as e:
-            print(f'Database setup failed: {e}')
+            print(f"[ERROR] Database setup failed: {e}")
             
             # Cleanup on failure
             if needs_update:

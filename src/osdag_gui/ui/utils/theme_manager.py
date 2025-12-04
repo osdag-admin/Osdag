@@ -31,12 +31,13 @@ class ThemeManager(QObject):
                 self.theme_cache[name] = stream.readAll()
                 file.close()
             else:
-                print(f"Failed to preload theme: {name} from {path}")
+                # print(f"Failed to preload theme: {name} from {path}")
+                pass
 
     def load_theme(self, theme_name):
         """Load and apply theme stylesheet."""
         if theme_name not in self.themes:
-            print(f"Theme '{theme_name}' not found. Available: {list(self.themes.keys())}")
+            # print(f"Theme '{theme_name}' not found. Available: {list(self.themes.keys())}")
             return False
         
         stylesheet = self.theme_cache.get(theme_name)
@@ -45,10 +46,10 @@ class ThemeManager(QObject):
             self.set_palette(theme_name)
             self.current_theme = theme_name
             self.settings.setValue("theme", theme_name)
-            print(f"Theme changed to: {theme_name}")
+            # print(f"Theme changed to: {theme_name}")
             return True
         else:
-            print(f"Theme content not found in cache for: {theme_name}")
+            # print(f"Theme content not found in cache for: {theme_name}")
             return False
     
     def set_palette(self, theme_name):

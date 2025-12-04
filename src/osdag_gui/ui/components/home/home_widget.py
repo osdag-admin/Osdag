@@ -658,7 +658,7 @@ class HomeWidget(QWidget):
                             import subprocess
                             subprocess.run(['xdg-open', folder])
                     except Exception as e:
-                        print(f"Failed to open folder: {e}")
+                        print(f"[ERROR] Failed to open folder: {e}")
 
             except Exception as e:
                 CustomMessageBox(

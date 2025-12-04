@@ -44,7 +44,7 @@ class CustomButton(QPushButton):
         self.set_active_style()
         self.setIcon(self.clicked_icon)
         self.is_clicked = True
-        print(self.text().strip(), "clicked")
+        # print(self.text().strip(), "clicked")
         super().mousePressEvent(event)
 
     def paintEvent(self, event):

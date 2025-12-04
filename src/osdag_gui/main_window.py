@@ -47,6 +47,10 @@ from osdag_core.design_type.compression_member.Column import ColumnDesign
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
 from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
+from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
+from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -450,6 +454,12 @@ class MainWindow(QMainWindow):
             self.open_beam_cover_plate_moment_connection()
         elif card_title == "Beam Beam End Plate":
             self.open_beam_beam_end_plate_splice_connection()
+        elif card_title == "Column End Plate":
+            self.open_column_end_plate_connection()
+        elif card_title == "Column Cover Plate Bolted":
+            self.open_column_cover_plate_connection()
+        elif card_title == "Column Cover Plate Welded":
+            self.open_column_cover_plate_weld_connection() 
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -627,7 +637,94 @@ class MainWindow(QMainWindow):
         self.main_widget_layout.addWidget(BB_end_plate)
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
+        
+    def open_column_end_plate_connection(self):
+        title = "Column End plate"
+        self.clear_layout(self.main_widget_layout)
+        CC_end_plate = CustomWindow(title, ColumnEndPlate, parent=self)
 
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(CC_end_plate.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                CC_end_plate.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = CC_end_plate
+        CC_end_plate.openNewTab.connect(self.handle_add_tab)
+        CC_end_plate.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(CC_end_plate)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)    
+
+    def open_column_cover_plate_connection(self):
+        title = "Cover Plate Bolted"
+        self.clear_layout(self.main_widget_layout)
+        CC_cover_plate_bolted = CustomWindow(title, ColumnCoverPlate, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(CC_cover_plate_bolted.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                CC_cover_plate_bolted.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = CC_cover_plate_bolted
+        CC_cover_plate_bolted.openNewTab.connect(self.handle_add_tab)
+        CC_cover_plate_bolted.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(CC_cover_plate_bolted)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        
+    def open_column_cover_plate_weld_connection(self):
+        title = "Cover Plate Welded"
+        self.clear_layout(self.main_widget_layout)
+        CC_cover_plate_welded = CustomWindow(title, ColumnCoverPlateWeld, parent=self)
+
+        # Load the last Design Inputs-start------------------------------------
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(CC_cover_plate_welded.backend.module_name()).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+
+        # Create folder if it doesn't exist
+        if not os.path.isdir(last_design_folder):
+            os.makedirs(last_design_folder)
+
+        # Load previous design if file exists
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+                CC_cover_plate_welded.setDictToUserInputs(last_design_dictionary)
+        # Load the last Design Inputs-end------------------------------------
+
+        self.main_widget_instance = CC_cover_plate_welded
+        CC_cover_plate_welded.openNewTab.connect(self.handle_add_tab)
+        CC_cover_plate_welded.downloadDatabase.connect(self.download_Database)
+        self.main_widget_layout.addWidget(CC_cover_plate_welded)
+        index = self.tab_bar.currentIndex()
+        self.tab_bar.setTabText(index, title)
+        
     def open_seated_angle_shear_connection(self):
         title = "Seated Angle Connection"
         self.clear_layout(self.main_widget_layout)

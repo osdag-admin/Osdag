@@ -31,11 +31,11 @@ try:
     from osdag_core.design_report.reportGenerator_latex import CreateLatex
     from osdag_core.Common import PDFLATEX
     CREATELATEX_AVAILABLE = True
-    print("INFO: CreateLatex successfully imported")
+    # print("[INFO]: CreateLatex successfully imported")
 except ImportError:
     CreateLatex = None
     CREATELATEX_AVAILABLE = False
-    print("WARNING: CreateLatex not available")
+    print("[WARNING]: CreateLatex not available")
     CREATELATEX_AVAILABLE = False
 
 # ==============================================================================
@@ -130,7 +130,7 @@ class SectionTreeWidget(QTreeWidget):
 
         # Validate input format
         if not isinstance(sections, dict):
-            print(f"ERROR: Expected dict, got {type(sections)}: {sections}")
+            print(f"[ERROR]: Expected dict, got {type(sections)}: {sections} check SectionTreeWidget.build_from_sections")
             return
 
         # Create tree items for each section
@@ -147,7 +147,7 @@ class SectionTreeWidget(QTreeWidget):
                     sub_item.setFlags(sub_item.flags() | Qt.ItemIsUserCheckable)
                     sub_item.setCheckState(0, Qt.Checked)  # Default: all selected
             else:
-                print(f"WARNING: Subsections not iterable for {section_name}: {type(subsections)}")
+                print(f"[WARNING]: Subsections not iterable for {section_name}: {type(subsections)}")
 
         # Expand all items to show the full tree structure
         self.expandAll()

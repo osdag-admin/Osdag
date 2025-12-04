@@ -295,7 +295,7 @@ def create_user_database():
 
     conn.commit()
     conn.close()
-    print(f"[INFO] Database initialized at: {sqlitepath}")
+    # print(f"[INFO] Database initialized at: {sqlitepath}")
 
 def _format_datetime(dt_str: str) -> str:
     """
@@ -367,7 +367,7 @@ def fetch_all_recent_modules() -> list[dict]:
             }
             records.append(r)
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
     finally:
         if conn:
             conn.close()
@@ -390,7 +390,7 @@ def delete_project_record(project_id: int) -> bool:
         conn.commit()
         return cursor.rowcount > 0
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return False
     finally:
         if conn:
@@ -428,7 +428,7 @@ def update_project_path(project_id: int, new_path: str, new_name: str) -> int | 
         conn.commit()
         return project_id
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return None
     finally:
         if conn:
@@ -462,7 +462,7 @@ def get_project_by_id(project_id: int) -> dict | None:
         else:
             return None
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return None
     finally:
         if conn:
@@ -511,7 +511,7 @@ def insert_recent_project(data: dict) -> int | None:
         conn.commit()
         return cursor.lastrowid
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return None
     finally:
         if conn:
@@ -544,7 +544,7 @@ def insert_recent_module(module_key: str) -> int | None:
         conn.commit()
         return cursor.lastrowid
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return None
     finally:
         if conn:
@@ -607,7 +607,7 @@ def refactor_database():
 
     conn.commit()
     conn.close()
-    print("[INFO] Database cleanup complete.") 
+    # print("[INFO] Database cleanup complete.") 
 
 def main():
     print("=== Testing User Database Functions ===")

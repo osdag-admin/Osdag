@@ -120,7 +120,7 @@ class Window(QDialog):
         self.button_layout.addStretch()
 
         tab_index = -1
-        print(f"\n main.tab_list(main)= {main.tab_list()} ")
+        # print(f"\n main.tab_list(main)= {main.tab_list()} ")
         for tab_details in main.tab_list():
             last_title = ""
             tab_name = tab_details[0]
@@ -174,7 +174,7 @@ class Window(QDialog):
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
                 grid.setHorizontalSpacing(10)
                 grid.setVerticalSpacing(10)
-                print(f"ui_de_pref elements {elements}\n")
+                # print(f"ui_de_pref elements {elements}\n")
                 for element in elements:
                     type = element[2]
                     lable = element[1]
@@ -438,7 +438,7 @@ class Window(QDialog):
 
         self.main_layout.addLayout(self.button_layout)
         total_tabs = self.tabWidget.tabs.count()
-        print(f"Total tabs created: {total_tabs}")
+        # print(f"Total tabs created: {total_tabs}")
         if total_tabs > 0:
             # Set to the last tab or a specific index if it exists
             target_index = min(2, total_tabs - 1)

@@ -29,7 +29,7 @@ class OsdagLaunchScreen(object):
         self.AnimatedGIF.setGeometry(QRect(330, 110, 320, 180))
         animation_path = os.path.join(os.getcwd(), "osdag_gui", "resources", "animation")
         animation_path = animation_path+"\{:04d}.png"
-        print(os.getcwd(),animation_path)
+        # print(os.getcwd(),animation_path)
         self.AnimatedGIF.load_sequence(animation_path, 96, 34)
 
         self.AestheticVector = QSvgWidget(self.centralwidget)

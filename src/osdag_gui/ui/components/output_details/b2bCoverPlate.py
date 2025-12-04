@@ -11,7 +11,7 @@ from osdag_core.Common import *
 
 class B2BCoverPlateDetails(QMainWindow):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
-        print(main)
+        # print(main)
         
         if main:
             web=main[1]
@@ -20,13 +20,13 @@ class B2BCoverPlateDetails(QMainWindow):
         self.connection = connection_obj
         # return
         data=main.output_values(True)
-        print(type(main))
+        # print(type(main))
         dict1={i[0] : i[3] for i in data}
 
 
-        print("________________________DEBUG________________________")
-        print(dict1)
-        print("________________________DEBUG________________________")
+        # print("________________________DEBUG________________________")
+        # print(dict1)
+        # print("________________________DEBUG________________________")
 
         for i in dict1:
             print(f'{i} : {dict1[i]}')

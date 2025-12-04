@@ -129,7 +129,7 @@ class DesignReportDialog(QDialog):
         self.temp_dir = tempfile.mkdtemp(prefix='osdag_report_')
         filename = os.path.join(self.temp_dir, "report.tex")
 
-        print(f"INFO: Temp dir initialized, {self.temp_dir}")
+        # print(f"INFO: Temp dir initialized, {self.temp_dir}")
 
         # Generate LaTeX file
         self.generate_latex_file(filename, input_summary)
@@ -219,13 +219,14 @@ class DesignReportDialog(QDialog):
             )
 
             if result.returncode != 0:
-                print(f"ERROR: Return Code {result.returncode}")
+                print(f"[ERROR]: Design Report Compilation Failed, Return Code {result.returncode}")
+                print(result.stdout)
             else:
-                print(f"INFO: Compilation Successful, Return Code {result.returncode}")
+                print(f"[INFO]: Design Report Compilation Successful.")
 
             if os.path.exists(pdf_file):
                 self.latest_pdf = pdf_file
-                print(f"INFO: PDF Generated.")
+                print(f"[INFO]: PDF Generated.")
                 return pdf_file 
             
 

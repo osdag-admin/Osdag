@@ -35,9 +35,9 @@ class Data:
                     ],
                     "Column to Column": 
                     [
-                        ("Cover Plate Bolted", ":/vectors/cover_plate_bolted_ctc_moment_connec.svg"),
-                        ("Cover Plate Welded", ":/vectors/cover_plate_welded_ctc_moment_connec.svg"),
-                        ("End Plate", ":/vectors/end_plate_ctc_moment_connec.svg")
+                        ("Column Cover Plate Bolted", ":/vectors/cover_plate_bolted_ctc_moment_connec.svg"),
+                        ("Column Cover Plate Welded", ":/vectors/cover_plate_welded_ctc_moment_connec.svg"),
+                        ("Column End Plate", ":/vectors/end_plate_ctc_moment_connec.svg")
                     ],
                     "PEB": []
                 },

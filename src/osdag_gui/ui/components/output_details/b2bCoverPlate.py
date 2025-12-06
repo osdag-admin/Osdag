@@ -45,7 +45,7 @@ class B2BCoverPlateDetails(QMainWindow):
             self.Edge=data2[5][3]
             bolt_cap=dict1['Web Bolt.Capacities'][1]
             print(bolt_cap(True))
-            bolt_cap=bolt_cap(main,True)
+            bolt_cap=bolt_cap(True)
         elif web==False:
             self.plate_length=dict1['Flange_Plate.Width (mm)']
             self.plate_width=dict1['flange_plate.Length']

@@ -34,9 +34,9 @@ class C2CEndPlateDetails(QMainWindow):
         self.hole_dia=dict1['Bolt.Diameter']
         webspacing=dict1['Bolt.web_bolts'][1]
         flangespacing=dict1['Bolt.flange_bolts'][1]
-        flangespacing=flangespacing(main,True)
+        flangespacing=flangespacing(True)
         # print(webspacing)
-        webspacing=webspacing(main,True)
+        webspacing=webspacing(True)
         print(webspacing)
         # for i in webspacing:
         #     print(i)

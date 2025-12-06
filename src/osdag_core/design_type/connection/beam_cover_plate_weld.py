@@ -1953,7 +1953,7 @@ class BeamCoverPlateWeld(MomentConnection):
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
         for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
+            if chkbox.objectName() == 'Cover Plate Welded':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)

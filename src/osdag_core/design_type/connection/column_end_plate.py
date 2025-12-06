@@ -1733,7 +1733,7 @@ class ColumnEndPlate(MomentConnection):
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
         for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'End Plate':
+            if chkbox.objectName() == 'Column End Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)

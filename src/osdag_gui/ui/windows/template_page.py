@@ -1904,9 +1904,11 @@ class CustomWindow(QWidget):
             title="Validation Error",
             text=error_text,
             dialogType=MessageBoxType.Critical
-        ).exec()
-        msg_box.finished.connect(lambda: setattr(self, '_error_dialog_open', False))
+        )
 
+        msg_box.finished.connect(lambda: setattr(self, '_error_dialog_open', False))
+        msg_box.exec()
+        
 class InputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)

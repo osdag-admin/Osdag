@@ -107,6 +107,9 @@ class CustomWindow(QWidget):
 
         # Disable automatic highlighting to prevent flickering borders
         self.cad_widget.context.SetAutomaticHilight(False)
+        
+        # Display View Cube
+        self.cad_widget.display_view_cube()
 
         key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
                         Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
@@ -169,72 +172,86 @@ class CustomWindow(QWidget):
     def create_cad_view_controls(self):
         """Create view control buttons directly on the self.cad_widget"""
         
-        # Define the 9 view buttons with their positions and labels
-        view_buttons_config = [
-            ("↖", "Top-Left Isometric", self.view_iso_top_left),
-            (" ", "Top View", self.view_top),
-            ("↗", "Top-Right Isometric", self.view_iso_top_right),
-
-            (" ", "Left View", self.view_left),
-            ("F", "Front View", self.view_front),
-            (" ", "Right View", self.view_right),
-
-            ("↙", "Bottom-Left Isometric", self.view_iso_bottom_left),
-            (" ", "Bottom View", self.view_bottom),
-            ("↘", "Bottom-Right Isometric", self.view_iso_bottom_right),
-        ]
         
-        # Create and position buttons directly as children of canvas_container
-        self.view_buttons = []
+        # Create zoom buttons
+        self.zoom_in_btn = QPushButton("+", self.cad_widget)
+        self.zoom_in_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 16px;
+                font-weight: bold;
+                color: #000000;
+                background-color: #FFFFFF;
+                border: 1px solid #CCCCCC;
+                border-radius: 4px;
+                text-align: center;
+                padding : 5px;
+            }
+            QPushButton:hover {
+                background-color: #E0E0E0;
+            }
+            QPushButton:pressed {
+                background-color: #D0D0D0;
+            }
+        """)
+        self.zoom_in_btn.setToolTip("Zoom In (Ctrl+I)")
+        self.zoom_in_btn.setFixedSize(40, 40)
+        self.zoom_in_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.zoom_in_btn.clicked.connect(lambda: self.display.ZoomFactor(1.1))
+        self.zoom_in_btn.setObjectName("zoom_buttons")
+        self.zoom_in_btn.show()
         
-        for label, tooltip, callback in view_buttons_config:
-            btn = QPushButton(label, self.cad_widget)
-            btn.setToolTip(tooltip)
-            btn.setFixedSize(32, 32)
-            btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn.clicked.connect(callback)
-            btn.setObjectName("cad_view_buttons")
-            
-            self.view_buttons.append(btn)
-            btn.show()
+        self.zoom_out_btn = QPushButton("-", self.cad_widget)
+        self.zoom_out_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 16px;
+                font-weight: bold;
+                color: #000000;
+                background-color: #FFFFFF;
+                border: 1px solid #CCCCCC;
+                border-radius: 4px;
+                text-align: center;
+                padding : 5px;
+                
+            }
+            QPushButton:hover {
+                background-color: #E0E0E0;
+            }
+            QPushButton:pressed {
+                background-color: #D0D0D0;
+            }
+        """)
+        self.zoom_out_btn.setToolTip("Zoom Out (Ctrl+O)")
+        self.zoom_out_btn.setFixedSize(40, 40)
+        self.zoom_out_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.zoom_out_btn.clicked.connect(lambda: self.display.ZoomFactor(1/1.1))
+        self.zoom_out_btn.setObjectName("zoom_buttons")
+        self.zoom_out_btn.show()
         
-        # Position all buttons initially
-        self.position_view_buttons()
+        
+        # Position zoom buttons
+        self.position_zoom_buttons()
         
         # Connect resize event to reposition buttons
         self.original_resize_event = self.cad_widget.resizeEvent
         self.cad_widget.resizeEvent = self.on_cad_widget_resize
 
-    # Set Overlay position to the buttons on the cad_widget
-    def position_view_buttons(self):
-        """Position the view control buttons in a 3x3 grid at top-right of canvas"""
-        if not hasattr(self, 'view_buttons') or not self.view_buttons:
-            return
-            
-        canvas_rect = self.cad_widget.rect()
+    def position_zoom_buttons(self):
+        """Position the zoom buttons"""
+        # canvas_rect = self.cad_widget.rect()
         
-        # Grid configuration
         button_size = 32
         spacing = 2
-        margin = 10
-        grid_size = (button_size * 3) + (spacing * 2)  # 3 buttons + 2 spaces
         
-        # Calculate starting position (top-right corner)
-        start_x = canvas_rect.width() - grid_size - margin
-        start_y = margin
+        # Position at Top-Left
+        start_x = 20
+        start_y = 20
         
-        # Position each button in the 3x3 grid
-        button_index = 0
-        for row in range(3):
-            for col in range(3):
-                if button_index < len(self.view_buttons):
-                    btn = self.view_buttons[button_index]
-                    
-                    x = start_x + (col * (button_size + spacing))
-                    y = start_y + (row * (button_size + spacing))
-                    
-                    btn.move(x, y)
-                    button_index += 1
+        if hasattr(self, 'zoom_in_btn') and hasattr(self, 'zoom_out_btn'):
+            zoom_in_y = start_y
+            zoom_out_y = start_y + button_size + spacing
+            
+            self.zoom_in_btn.move(start_x, zoom_in_y)
+            self.zoom_out_btn.move(start_x, zoom_out_y)
 
     def on_cad_widget_resize(self, event):
         """Handle canvas resize to reposition buttons"""
@@ -243,7 +260,7 @@ class CustomWindow(QWidget):
             self.original_resize_event(event)
         
         # Reposition our buttons
-        self.position_view_buttons()
+        self.position_zoom_buttons()
 
     # Set Direction on cad window
     def view_front(self):
@@ -345,10 +362,23 @@ class CustomWindow(QWidget):
             self.fit_all()
         except Exception as e:
             print(f"Error setting bottom-right isometric view: {e}")
+
+    def initial_view(self):
+        """Setting initial view"""
+        try:
+            view = self.display.View
+            view.SetProj(1, 1, 1)  # Isometric projection
+            view.SetUp(0, 0, 1)    
+            self.fit_all()
+
+        except Exception as e:
+            print(f"Error setting initial view: {e}")
     
     def fit_all(self):
         """Fit all objects in the view"""
+        self.display.SetProj(1, -1, 1)
         self.display.FitAll()
+        
     
     #---------------------------------CAD-SETUP-END----------------------------------------------
     
@@ -1367,6 +1397,17 @@ class CustomWindow(QWidget):
 
             # Ensure Output dock is visible and sized when we have results
             if status:
+                # --- Set Camera to Right Top Isometric View ---
+                try:
+                    # Back Right Top Isometric: Looking from (+X, +Y, +Z) towards origin
+                    print("DEBUG: Setting Camera to Back Right Top Isometric (1, -1, 1)...")
+                    self.cad_widget.view.SetUp(1, -1, 1)
+                    self.cad_widget.view.SetProj(1, -1, 1)
+                    self.cad_widget.view.FitAll()
+                    self.cad_widget.view.Redraw()
+                except Exception as e:
+                    print(f"Error setting camera view: {e}")
+
                 def show_logs():
                     try:
                         self.toggle_animate(True, 'log', on_finished=self.finished_loading)
@@ -1379,6 +1420,7 @@ class CustomWindow(QWidget):
                     self.update_docking_icons(log_is_active=True)
 
                 def hide_input():
+                    self.initial_view()
                     try:
                         self.toggle_animate(False, 'input', on_finished=show_logs)
                         self.input_dock_active = False

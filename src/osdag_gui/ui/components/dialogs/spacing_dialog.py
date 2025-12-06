@@ -23,7 +23,6 @@ class SpacingDialog(QDialog):
         x = screen_geometry.x() + (screen_geometry.width() - width) // 2
         y = screen_geometry.y() + (screen_geometry.height() - height) // 2
         self.setGeometry(x, y, width, height)
-
         self.setObjectName("spacing_dialog")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
         main_layout = QVBoxLayout(self)
@@ -35,7 +34,7 @@ class SpacingDialog(QDialog):
         self.content_widget = QWidget(self)
         main_layout.addWidget(self.content_widget, 1)
         size_grip = QSizeGrip(self)
-        size_grip.setFixedSize(16, 16)
+        size_grip.setFixedSize(1, 1)
         overlay = QHBoxLayout()
         overlay.setContentsMargins(0, 0, 4, 4)
         overlay.addStretch(1)

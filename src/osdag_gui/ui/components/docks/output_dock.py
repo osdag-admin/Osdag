@@ -281,7 +281,7 @@ class OutputDock(QWidget):
     def open_summary_popup(self, main):
         """Open the unified report dialog instead of separate popups"""
         # print("Testing Unified Report Dialog")
-        # print(self.backend.logger.logs)
+        print(self.backend.logger.logs)
         # print('main.module_name', main.module_name())
         
         if not main.design_button_status:

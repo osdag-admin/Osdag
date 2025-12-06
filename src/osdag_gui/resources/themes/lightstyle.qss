@@ -29,12 +29,12 @@ QToolTip {
     border-radius: 0px;
     qproperty-alignment: AlignVCenter;
 }
-QLabel#custom_tooltip {
-    background-color: #FFFFFF;
+QLabel#lock_btn_tooltip {
+    background-color: #f1f1f1;
     color: #000000;
     border: 1px solid #90AF13;
-    padding: 2px 2px;
-    font-size: 12px;
+    padding: 4px;
+    font-size: 15px;
     border-radius: 0px;
     qproperty-alignment: AlignVCenter;
 }
@@ -250,15 +250,19 @@ QPushButton#lock_btn:hover {
 QPushButton#lock_btn:checked {
     background-color: #FFA500;
 }
+QPushButton#lock_btn:unchecked {
+    background-color: #f4f4f4;
+}
+QPushButton#lock_btn:unchecked:hover {
+    background-color: #e0e0e0;
+}
 QPushButton#lock_btn:checked:hover {
-    background-color: #FFB732;
+    background-color: #fa7a02;
 }
 QPushButton#lock_btn[forceHover="true"] {
-    background: #fabc49ff;
+    background: #fa7a02;
 }
-QPushButton#lock_btn[forceHover="false"] {
-    background: #FFA500;
-}
+
 
 /* Search Result Project Button */
 QPushButton#search_result_proj_btn {

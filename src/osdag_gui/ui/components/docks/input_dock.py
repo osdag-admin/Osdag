@@ -158,19 +158,10 @@ class InputDock(QWidget):
         panel_layout.addLayout(top_bar)
 
         #-Lock-ToolTip--------------------------------------
-        self.custom_tooltip = QLabel("🔒 Unlock to Edit")
-        self.custom_tooltip.setObjectName("custom_tooltip")
-        self.custom_tooltip.setWindowFlags(Qt.ToolTip)
-        self.custom_tooltip.setStyleSheet("""
-            QLabel#custom_tooltip {
-                background-color: #f1f1f1;
-                border: 1px solid #94b816;
-                padding: 4px;
-                font-size: 15px;
-            }
-        """)
-        # self.custom_tooltip.setMinimumWidth(160)
-        self.custom_tooltip.hide()
+        self.lock_btn_tooltp = QLabel("Unlock to Edit")
+        self.lock_btn_tooltp.setObjectName("lock_btn_tooltip")
+        self.lock_btn_tooltp.setWindowFlags(Qt.ToolTip)
+        self.lock_btn_tooltp.hide()
         #--------------------------------------------------
 
         # Vertical scroll area for group boxes (vertical only)
@@ -391,16 +382,16 @@ class InputDock(QWidget):
         self.lock_btn.update()
                 
         # Adjust size and position
-        self.custom_tooltip.adjustSize()
-        self.custom_tooltip.move(tooltip_pos)
-        self.custom_tooltip.show()
-        self.custom_tooltip.raise_()
+        self.lock_btn_tooltp.adjustSize()
+        self.lock_btn_tooltp.move(tooltip_pos)
+        self.lock_btn_tooltp.show()
+        self.lock_btn_tooltp.raise_()
         
         # Hide after 3 seconds
         if not hasattr(self, 'tooltip_timer'):
             self.tooltip_timer = QTimer()
             self.tooltip_timer.setSingleShot(True)
-            self.tooltip_timer.timeout.connect(self.custom_tooltip.hide)
+            self.tooltip_timer.timeout.connect(self.lock_btn_tooltp.hide)
             self.tooltip_timer.timeout.connect(self.clear_force_hover)
         
         self.tooltip_timer.start(3000)

@@ -73,15 +73,24 @@ class BoltPatternGenerator(QDialog):
         # Parameter display labels
         params = self.get_parameters()
         
+
         # Display the parameter values
         for key, value in params.items():
             param_layout = QHBoxLayout()
-            param_label = QLabel(f'{key.title()} Distance (mm):')
-            value_label = QLabel(f'{value}')
+            param_label = QLabel(f'{key.title()} Distance :')
+            param_label.setStyleSheet("font-size: 15px; font-weight: bold;")
+            value_label = QLabel(f'{float(value):.2f}')
+            value_label.setStyleSheet("font-size: 15px;")
             param_layout.addWidget(param_label)
             param_layout.addWidget(value_label)
             left_layout.addLayout(param_layout)
-        
+
+        param_layout = QHBoxLayout()
+        param_label = QLabel("(All Dimensions are in mm)")
+        param_label.setStyleSheet("font-size: 12px; font-style: italic;")
+        param_layout.addWidget(param_label)
+        left_layout.addLayout(param_layout)
+
         left_layout.addStretch()
         left_panel.setLayout(left_layout)
         
@@ -154,10 +163,11 @@ class BoltPatternGenerator(QDialog):
         
         # Set up pens
         if self.theme.is_light():
-            dimension_pen = QPen(Qt.black, 1.5)
+            dimension_pen = QPen(Qt.black, 1.0)
         else:
-            dimension_pen = QPen(QColor("#8A8A8A"), 1.5)
-        outline_pen = QPen(Qt.blue, 2)
+            dimension_pen = QPen(QColor("#8A8A8A"), 1.0)
+        weld_pen = QPen(Qt.red, 1)
+        outline_pen = QPen(QColor("#723B17"), 2)
         red_brush = QBrush(Qt.red)
 
         # Dimension offsets
@@ -169,7 +179,8 @@ class BoltPatternGenerator(QDialog):
                                width + 2*v_offset, height + 2*h_offset)
         
         # Draw rectangle
-        self.scene.addRect(0, 0, width, height, dimension_pen)
+        background_brush = QBrush(QColor("#A7A796"))
+        self.scene.addRect(0, 0, width, height, dimension_pen, background_brush)
 
         # Draw holes
         for row in range(self.rows):
@@ -191,7 +202,7 @@ class BoltPatternGenerator(QDialog):
                 print(f"row: {row}, col: {col}, x: {x}, y: {y}")
                 self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
         weld_size=self.weldsize
-        self.scene.addRect(0, 0, weld_size, height, dimension_pen,red_brush)
+        self.scene.addRect(0, 0, weld_size, height, weld_pen,red_brush)
         print(params,dimension_pen)
         # Add dimensions
         self.addDimensions(params, dimension_pen)
@@ -215,8 +226,8 @@ class BoltPatternGenerator(QDialog):
         height = self.plate_height
         
         # Offsets for dimension lines
-        h_offset = 20
-        v_offset = 30
+        h_offset = 15
+        v_offset = 10
         
         # Add horizontal dimensions
         x_start = width
@@ -231,7 +242,7 @@ class BoltPatternGenerator(QDialog):
         # Draw each segment
         for label, x1, x2 in segments:
             value = x2 - x1
-            self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{value:.1f}", pen)
+            self.addHorizontalDimension(x1, -h_offset + 5, x2, -h_offset + 5, f"{value:.1f}", pen)
         # Add vertical dimensions
         self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
         for i in range(self.rows - 1):
@@ -246,7 +257,7 @@ class BoltPatternGenerator(QDialog):
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 3
         ext_length = 10
         self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
         self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
@@ -283,13 +294,13 @@ class BoltPatternGenerator(QDialog):
             text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
         else:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
+            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 3
         ext_length = 10
         self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
         self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
@@ -349,6 +360,6 @@ class BoltPatternGenerator(QDialog):
             text_item.setDefaultTextColor(Qt.white)
 
         if x1 < 0:
-            text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+            text_item.setPos(x1 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
         else:
-            text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+            text_item.setPos(x1, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

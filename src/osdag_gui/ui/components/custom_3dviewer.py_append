@@ -1,0 +1,25 @@
+    def mouseReleaseEvent(self, event):
+        if self.is_interacting_with_cube:
+            try:
+                from PySide6.QtCore import QTime
+                current_time = QTime.currentTime().msecsSinceStartOfDay()
+                time_diff = current_time - self.mouse_press_time
+                
+                # Calculate distance moved
+                current_pos = event.position()
+                dist = (current_pos - self.mouse_press_pos).manhattanLength()
+                
+                # Thresholds for a "click": < 200ms and < 5 pixels movement
+                if time_diff < 200 and dist < 5:
+                    # It's a click! Reset view.
+                    self.view.SetProj(1, -1, 1)
+                    self.view.SetUp(0, 0, 1)
+                    self.view.FitAll()
+                
+            except Exception as e:
+                print(f"Error in mouseReleaseEvent: {e}")
+            finally:
+                self.is_interacting_with_cube = False
+                self.mouse_press_pos = None
+
+        super().mouseReleaseEvent(event)

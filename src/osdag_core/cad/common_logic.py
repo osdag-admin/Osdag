@@ -2091,6 +2091,7 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
+        self.cad_widget.display_view_cube()
 
         self.display.View_Iso()
 
@@ -2708,6 +2709,7 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model","gradient_bg")
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == "Moment Connection":
 
@@ -2720,6 +2722,7 @@ class CommonDesignLogic(object):
                     self.display_3DModel("Model", "gradient_bg")
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 if flag is True:
@@ -2730,6 +2733,7 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_BCENDPLATE:
                 if flag is True:
@@ -2740,6 +2744,7 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 if flag is True:
@@ -2750,6 +2755,7 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
                 if flag is True:
@@ -2758,6 +2764,7 @@ class CommonDesignLogic(object):
                     self.display_3DModel("Model", "gradient_bg")
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_BASE_PLATE:
 
@@ -2768,6 +2775,7 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
         elif self.mainmodule == 'Flexure Member':
             if flag is True:
                 self.FObj = self.createSimplySupportedBeam()
@@ -2775,6 +2783,7 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             if flag is True:
@@ -2783,6 +2792,7 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             if flag is True:
@@ -2791,6 +2801,7 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Columns with known support conditions':
             if flag is True:
@@ -2800,6 +2811,7 @@ class CommonDesignLogic(object):
 
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
         elif self.mainmodule == 'Struts in Trusses':
             if flag is True:
                 self.ColObj = self.createStrutsInTrusses()
@@ -2808,6 +2820,7 @@ class CommonDesignLogic(object):
 
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
         elif self.mainmodule == 'Lap Joint Bolted Connection':
             if flag is True:
                 self.ColObj = self.createBoltedLapJoint()
@@ -2816,6 +2829,7 @@ class CommonDesignLogic(object):
 
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
                 
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if flag is True:
@@ -2825,6 +2839,7 @@ class CommonDesignLogic(object):
 
             else:
                 self.display.EraseAll()
+                self.cad_widget.display_view_cube()
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
 
@@ -2835,6 +2850,7 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+                self.cad_widget.display_view_cube()
 
     # def call_saveOutputs(self):  # Done
     #     return self.call_calculation(self.uiObj)

@@ -25,7 +25,7 @@ class CustomViewer3d(qtViewer3d):
         self.model_ais_objects = {}  # Dictionary to map AIS objects to model names
         self.model_hover_labels = {}  # Dictionary to map model names to tooltip text
         self.current_hovered_model = None
-        self.current_highlighted_ais = None  # Track currently highlighted object
+        self.current_highlighted_ais_list = []  # Track currently highlighted objects (list)
         self.current_highlighted_owner = None  # Track currently highlighted owner (for View Cube parts)
         self.hover_timer = QTimer(self)
         self.hover_timer.setSingleShot(True)
@@ -61,8 +61,11 @@ class CustomViewer3d(qtViewer3d):
 
             # Check if something is detected
             hovered_model = None
+            detected_ais = None
+            
             if self.context.HasDetected():
                 detected = self.context.DetectedInteractive()
+                detected_ais = detected
                 
                 # --- VIEW CUBE HIGHLIGHTING LOGIC ---
                 if hasattr(self, 'view_cube') and detected == self.view_cube:
@@ -91,18 +94,12 @@ class CustomViewer3d(qtViewer3d):
                         # Update detected after re-move
                         if self.context.HasDetected():
                             detected = self.context.DetectedInteractive()
+                            detected_ais = detected
                         else:
                             detected = None
+                            detected_ais = None
 
-                    if detected and detected != self.current_highlighted_ais:
-                        if self.current_highlighted_ais:
-                            self.context.Unhilight(self.current_highlighted_ais, False)
-                        
-                        self.current_highlighted_ais = detected
-                        self.context.HilightWithColor(self.current_highlighted_ais, self.context.HighlightStyle(), False)
-                        self.view.Redraw()
-
-                    # Handle Tooltip identification
+                    # Identify the model name of the detected object
                     if self.model_ais_objects and detected:
                         for model_name, ais_list in self.model_ais_objects.items():
                             for ais_object in ais_list:
@@ -116,6 +113,59 @@ class CustomViewer3d(qtViewer3d):
                                         break
                                 except:
                                     continue
+                            if hovered_model:
+                                break
+
+                    # Determine objects to highlight
+                    objects_to_highlight = []
+                    if detected:
+                        if hovered_model == "Bolt" or hovered_model == "Nut":
+                            # If it's a bolt or nut, highlight ALL bolts and nuts
+                            if "Bolt" in self.model_ais_objects:
+                                objects_to_highlight.extend(self.model_ais_objects["Bolt"])
+                            if "Nut" in self.model_ais_objects:
+                                objects_to_highlight.extend(self.model_ais_objects["Nut"])
+                        else:
+                            # Otherwise, just highlight the detected object
+                            objects_to_highlight.append(detected)
+
+                    # Check if the set of highlighted objects has changed
+                    # We use sets of handles (if available) or objects for comparison
+                    current_set = set()
+                    new_set = set()
+                    
+                    # Helper to get ID for comparison
+                    def get_id(obj):
+                        if hasattr(obj, 'GetHandle'):
+                            return obj.GetHandle().HashCode(2147483647) # Use HashCode for comparison
+                        return id(obj)
+
+                    for obj in self.current_highlighted_ais_list:
+                        current_set.add(get_id(obj))
+                    
+                    for obj in objects_to_highlight:
+                        new_set.add(get_id(obj))
+
+                    if current_set != new_set:
+                        # Unhighlight old objects
+                        for obj in self.current_highlighted_ais_list:
+                            try:
+                                self.context.Unhilight(obj, False)
+                            except:
+                                pass
+                        
+                        # Update list
+                        self.current_highlighted_ais_list = objects_to_highlight
+                        
+                        # Highlight new objects
+                        for obj in self.current_highlighted_ais_list:
+                            try:
+                                self.context.HilightWithColor(obj, self.context.HighlightStyle(), False)
+                            except:
+                                pass
+                        
+                        self.view.Redraw()
+
             else:
                 # Unhighlight everything if nothing is detected
                 if self.view_cube_active:
@@ -128,12 +178,15 @@ class CustomViewer3d(qtViewer3d):
                     self.view.Redraw()
 
                 if self.current_highlighted_owner:
-                    # This shouldn't be needed anymore but keeping for safety
                     self.current_highlighted_owner = None
                     
-                if self.current_highlighted_ais:
-                    self.context.Unhilight(self.current_highlighted_ais, False)
-                    self.current_highlighted_ais = None
+                if self.current_highlighted_ais_list:
+                    for obj in self.current_highlighted_ais_list:
+                        try:
+                            self.context.Unhilight(obj, False)
+                        except:
+                            pass
+                    self.current_highlighted_ais_list = []
                     self.view.Redraw()
 
             self.hover_position = event.globalPosition().toPoint()
@@ -181,13 +234,14 @@ class CustomViewer3d(qtViewer3d):
             except:
                 pass
         
-        if self.current_highlighted_ais:
-            try:
-                self.context.Unhilight(self.current_highlighted_ais, False)
-                self.current_highlighted_ais = None
-                self.view.Redraw()
-            except:
-                pass
+        if self.current_highlighted_ais_list:
+            for obj in self.current_highlighted_ais_list:
+                try:
+                    self.context.Unhilight(obj, False)
+                except:
+                    pass
+            self.current_highlighted_ais_list = []
+            self.view.Redraw()
         QToolTip.hideText()
         super().leaveEvent(event)
 

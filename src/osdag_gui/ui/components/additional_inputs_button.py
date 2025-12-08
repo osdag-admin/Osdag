@@ -15,6 +15,6 @@ class AdditionalInputsButton(QPushButton):
         self.clicked.connect(self.button_clicked.emit)
         
         # Styling
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setFixedHeight(30)
         self.setObjectName("additional_input_btn")

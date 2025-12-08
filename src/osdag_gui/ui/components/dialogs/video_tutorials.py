@@ -60,7 +60,7 @@ class TutorialsDialog(QDialog):
             padding: 2px 0px;
         """)
         self.youtubeLink.setOpenExternalLinks(True)
-        self.youtubeLink.setCursor(QCursor(Qt.PointingHandCursor))
+        self.youtubeLink.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         contentLayout.addWidget(self.youtubeLink)
 
         # Fossee link
@@ -70,7 +70,7 @@ class TutorialsDialog(QDialog):
             padding: 2px 0px;
         """)
         self.fosseeLink.setOpenExternalLinks(True)
-        self.fosseeLink.setCursor(QCursor(Qt.PointingHandCursor))
+        self.fosseeLink.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         contentLayout.addWidget(self.fosseeLink)
 
         mainLayout.addWidget(contentWidget)

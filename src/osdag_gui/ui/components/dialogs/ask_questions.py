@@ -60,7 +60,7 @@ class AskQuestions(QDialog):
             padding: 2px 0px;
         """)
         self.fosseeLink.setOpenExternalLinks(True)
-        self.fosseeLink.setCursor(QCursor(Qt.PointingHandCursor))
+        self.fosseeLink.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         contentLayout.addWidget(self.fosseeLink)
 
         mainLayout.addWidget(contentWidget)

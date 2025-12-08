@@ -70,9 +70,10 @@ class CustomWindow(QWidget):
         self.init_ui(title)
         self.sidebar = SidebarWidget(parent=self)
         self.sidebar.openNewTab.connect(self.openNewTabEmit)
-        self.sidebar.setParent(self)
         self.sidebar.resize_sidebar(self.width(), self.height())
-        self.sidebar.move(-self.sidebar.width() + 12, self.menu_bar.height())
+        # Center sidebar vertically within the content area (below menu bar)
+        self.sidebar_y = self.height()//2 - self.sidebar.height()//4
+        self.sidebar.move(-self.sidebar.width() + 12, self.sidebar_y)
         self.sidebar_animation = QPropertyAnimation(self.sidebar, b"geometry")
         self.sidebar_animation.setDuration(150)
         self.sidebar.installEventFilter(self)
@@ -398,7 +399,7 @@ class CustomWindow(QWidget):
     def slide_in(self):
         self.sidebar_animation.stop()
         end_x = 0
-        top_offset = self.menu_bar.height()
+        top_offset = self.sidebar_y
         self.sidebar_animation.setStartValue(self.sidebar.geometry())
         self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
         self.sidebar_animation.start()
@@ -407,7 +408,7 @@ class CustomWindow(QWidget):
     def slide_out(self):
         self.sidebar_animation.stop()
         end_x = -self.sidebar.width() + 12
-        top_offset = self.menu_bar.height()
+        top_offset = self.sidebar_y
         self.sidebar_animation.setStartValue(self.sidebar.geometry())
         self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
         self.sidebar_animation.start()
@@ -1089,13 +1090,20 @@ class CustomWindow(QWidget):
                 return
             
             # Normal Resize Event
-            self.sidebar.resize_sidebar(self.sidebar.width(), self.height())
+            self.sidebar.resize_sidebar(self.sidebar.width(), self.sidebar_y)
             top_offset = self.menu_bar.height()
             if self.sidebar.x() < 0:
                 self.sidebar.move(-self.sidebar.width() + 12, top_offset)
 
-            input_dock_width = self.input_dock.sizeHint().width()
-            output_dock_width = self.output_dock.sizeHint().width()
+            if self.input_dock.isVisible():
+                input_dock_width = self.input_dock.sizeHint().width()
+            else:
+                input_dock_width = 0
+            
+            if self.output_dock.isVisible():
+                output_dock_width = self.output_dock.sizeHint().width()
+            else:
+                output_dock_width = 0
             total_width = self.width() - self.splitter.contentsMargins().left() - self.splitter.contentsMargins().right()
             self.splitter.setMinimumWidth(0)
             self.splitter.setCollapsible(0, True)
@@ -1124,11 +1132,9 @@ class CustomWindow(QWidget):
 
     def input_dock_toggle(self):
         self.input_dock.toggle_input_dock()
-        self.input_dock_active = not self.input_dock_active
         
     def output_dock_toggle(self):
         self.output_dock.toggle_output_dock()
-        self.output_dock_active = not self.output_dock_active
 
     def logs_dock_toggle(self):
         self.log_dock_active = not self.log_dock_active
@@ -1163,7 +1169,6 @@ class CustomWindow(QWidget):
                         
         # Update output dock icon
         if(output_is_active is not None):
-            self.output_dock_active = output_is_active
             # Update and save control state
             self.output_dock_active = output_is_active
             if self.output_dock_active:
@@ -1871,6 +1876,7 @@ class CustomWindow(QWidget):
             ).exec()
             return
     
+    # Clear output fields
     def clear_output_fields(self):
         for output_field in self.output_dock.output_widget.findChildren(QLineEdit):
             output_field.clear()
@@ -1878,6 +1884,16 @@ class CustomWindow(QWidget):
             if output_field.objectName() in ["btn_CreateDesign", "save_outputDock"]:
                 continue
             output_field.setEnabled(False)
+    
+    # Clear Cad widget
+    def flush_cad_widget(self):
+        if hasattr(self, 'cad_widget'):
+            # Remove all AIS objects from context
+            self.cad_widget.context.RemoveAll(True)
+            # Clear the stored model objects dictionary
+            self.cad_widget.model_ais_objects.clear()
+            # Update the display
+            self.cad_widget._display.Repaint()
 
     # Error Message Box
     def show_error_msg(self, error):

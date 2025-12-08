@@ -179,13 +179,16 @@ def GUI():
         app.setStyleSheet(stylesheet)
     
     def show_main_window():
-        app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
         from osdag_gui.main_window import MainWindow
+        app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
+        # Parallely load the MainWindow
         app.main_window = MainWindow()
+        import time 
+        time.sleep(1)
         app.main_window.show()
 
     splash = LaunchScreenPopup(on_finish=show_main_window)
-    splash.show()
+    splash.show()   
     sys.exit(app.exec())
 
 # --- Main CLI group ---

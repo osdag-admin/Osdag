@@ -9,7 +9,7 @@ import osdag_gui.resources.resources_rc
 from osdag_gui.__config__ import VERSION
 
 # For testing purposes - replace with actual import
-# VERSION = "V2025.01.a.2"
+# VERSION = "v2025.01.a.2"
 # from custom_titlebar import CustomTitleBar
 # import resources_rc
 

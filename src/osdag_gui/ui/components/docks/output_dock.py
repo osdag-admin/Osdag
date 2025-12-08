@@ -66,9 +66,6 @@ class OutputDock(QWidget):
 
         self.setObjectName("output_dock")
         self.dock_width = 360
-        self.panel_visible = False # Initially hidden
-        self.setMinimumWidth(0)
-        self.setMaximumWidth(16777215)
 
         # Ensure OutputDock expands in splitter
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -103,14 +100,6 @@ class OutputDock(QWidget):
         toggle_layout.addWidget(self.toggle_btn)
         toggle_layout.addStretch()
         output_layout.addWidget(self.toggle_strip)
-
-        # # Hide the dock initially
-        # self.setMinimumWidth(0)
-        # self.setMaximumWidth(0)
-
-        # Show the dock initially for testing
-        self.setMinimumWidth(self.dock_width)
-        self.setMaximumWidth(self.dock_width)
 
         # --- Right content (everything except toggle strip) ---
         right_content = QWidget()
@@ -275,7 +264,6 @@ class OutputDock(QWidget):
         h_scroll_area.setWidget(right_content)
 
         output_layout.addWidget(h_scroll_area)
-
     # ----------------------------------Save-Design-Report-Start------------------------------------------------------
     
     def open_summary_popup(self, main):
@@ -722,9 +710,6 @@ class OutputDock(QWidget):
         # For now, we don't have a specific callback for the width animation
         pass
 
-    def is_panel_visible(self):
-        return self.panel_visible
-
     def set_results(self, result_dict):
         layout = self.layout()
         while layout.count():
@@ -738,8 +723,7 @@ class OutputDock(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        # Checking hasattr is only meant to prevent errors,
-        # while standalone testing of this widget
+        # Checking hasattr is only meant to prevent errors
         if self.parent:
             if self.width() == 0:
                 if hasattr(self.parent, 'update_docking_icons'):

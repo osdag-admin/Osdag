@@ -19,7 +19,7 @@ class CustomButton(QPushButton):
         self.theme = QApplication.instance().theme_manager
         self.group = group
         self.is_clicked = False
-        self.setCursor(QCursor(Qt.PointingHandCursor))
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setFocusPolicy(Qt.NoFocus)
 
         self.default_icon = QIcon(icon_path_default)

@@ -31,7 +31,7 @@ class ThemeManager(QObject):
                 self.theme_cache[name] = stream.readAll()
                 file.close()
             else:
-                # print(f"Failed to preload theme: {name} from {path}")
+                print(f"Failed to preload theme: {name} from {path}")
                 pass
 
     def load_theme(self, theme_name):

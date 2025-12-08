@@ -308,12 +308,16 @@ class ModuleItem(QFrame):
         self.module_data = module_data
         app = QApplication.instance()
         self.theme = app.theme_manager
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setupUI()
         self.selected = False
-    def mousePressEvent(self, event):
-        self.set_selected(True)
-        # Optionally notify parent to deselect others
+    
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        super().enterEvent(event)
+    
+    def leaveEvent(self, event):
+        self.setCursor(Qt.ArrowCursor)
+        super().leaveEvent(event)
 
     def set_selected(self, selected):
         self.selected = selected
@@ -376,6 +380,7 @@ class ModuleItem(QFrame):
     # Mouse Press Event
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
+            self.setCursor(Qt.ArrowCursor)
             self.openModule.emit(self.module_data.get(MODULE_KEY))
         return super().mousePressEvent(event)
 

@@ -20,6 +20,12 @@ class OsdagLaunchScreen(object):
         MainWindow.setAttribute(Qt.WA_TranslucentBackground)
         MainWindow.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
+        def close_on_click(event):
+            MainWindow.hide()
+        
+        MainWindow.mouseDoubleClickEvent = close_on_click
+        MainWindow.setCursor(Qt.CursorShape.ArrowCursor)
+
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")
 

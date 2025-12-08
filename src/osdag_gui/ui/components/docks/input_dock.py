@@ -150,6 +150,7 @@ class InputDock(QWidget):
         # lock-unlock button
         self.state_locked = False    # Open by default
         self.lock_btn = QPushButton()
+        self.lock_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.lock_btn.setObjectName("lock_btn")
         self.lock_btn.setCheckable(True)
         self.lock_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -299,7 +300,7 @@ class InputDock(QWidget):
                     self.data[t[0] + "_customized"] = [all_values_available for all_values_available in t[1]()
                                                   if all_values_available not in disabled_values]
             try:
-                print(f"[ERROR] <class 'AttributeError'>: {d} \n {new_list}")
+                print(f"New_List: {d} \n {new_list}")
 
                 #changed this code bcz an error was occuring in the code -t.s.
                 # Connect signals only for widgets that exist
@@ -399,6 +400,7 @@ class InputDock(QWidget):
     def toggle_lock(self):
         if self.state_locked:
             self.parent.clear_output_fields()
+            self.parent.flush_cad_widget()
         self.state_locked = not self.state_locked
         self.lock_btn.setChecked(self.state_locked)
         self.scroll_area.setDisabled(self.state_locked)
@@ -422,6 +424,7 @@ class InputDock(QWidget):
     
     #-Lock-Tooltip-Events-Ends-------------------------------------------------------------------------
 
+    # Used to print the widget tree for debugging
     def print_widget_tree(self, widget: QWidget, indent: int=0):
         prefix = "  " * (indent*4)
         # print(f"[INFO] {prefix}{widget.objectName()}({widget.__class__.__name__})")

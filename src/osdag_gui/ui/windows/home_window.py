@@ -61,7 +61,7 @@ class ThemeToggleButton(QPushButton):
         self.theme = parent.theme_manager
         self.setFixedSize(50, 50)
         self.setObjectName("themeToggle")
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.update_icon()
         self.clicked.connect(self._toggle_theme)
 

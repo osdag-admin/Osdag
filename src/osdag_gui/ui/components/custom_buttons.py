@@ -45,7 +45,7 @@ class MenuButton(QPushButton):
 class DockCustomButton(QPushButton):
     def __init__(self, text: str, icon_path: str, parent=None):
         super().__init__(parent)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setObjectName("dock_custom_button")
 
         # Layout for icons and text

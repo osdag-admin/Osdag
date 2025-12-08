@@ -53,7 +53,7 @@ class TopButton(QPushButton):
         self.setText("")
         # Apply the default style sheet initially
         self.apply_default_style()
-        self.setCursor(Qt.PointingHandCursor) # Indicate clickable element
+        self.setCursor(Qt.CursorShape.PointingHandCursor) # Indicate clickable element
         
         # Enable hover tracking for enterEvent and leaveEvent
         self.setAttribute(Qt.WA_Hover, True)
@@ -203,7 +203,7 @@ class TopButton1(QPushButton):
         self.setText("")
         # Apply the default style sheet initially
         self.apply_default_style()
-        self.setCursor(Qt.PointingHandCursor) # Indicate clickable element
+        self.setCursor(Qt.CursorShape.PointingHandCursor) # Indicate clickable element
         
         # Enable hover tracking for enterEvent and leaveEvent
         self.setAttribute(Qt.WA_Hover, True)

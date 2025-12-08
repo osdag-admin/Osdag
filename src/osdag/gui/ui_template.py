@@ -2335,7 +2335,8 @@ class Window(QMainWindow):
         self.textEdit.show()
 
     def show_error_msg(self, error):
-        QMessageBox.about(self,'information',error[0])  # show only first error message.
+        if len(error) > 0:
+            QMessageBox.about(self,'information',"" if len(error) < 1 else error[0])  # show only first error message.
 
     def clear_output_fields(self):
         for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QLineEdit):

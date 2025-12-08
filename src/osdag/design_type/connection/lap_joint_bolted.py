@@ -693,7 +693,7 @@ class LapJointBolted(MomentConnection):
             return
         bolt_util = self.axial_force_kN / bolt_capacity_total
 
-        if not self.check_base_metal_strength():
+        if not self.check_base_metal_strength(self):
             return
 
         if not self.base_metal_capacity_kN or self.base_metal_capacity_kN <= 0:

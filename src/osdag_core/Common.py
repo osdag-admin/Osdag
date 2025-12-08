@@ -352,6 +352,12 @@ KEY_DISP_LAPJOINTWELDED = 'Lap Joint Welded Connection'
 KEY_DISP_BUTTJOINTBOLTED = 'Butt Joint Bolted Connection'
 WELD_SIZES = [3, 5, 6, 10, 12]
 
+#Simpleconnections (Tension+compression)
+KEY_DESIGN_FOR = 'Design.For'
+KEY_DISP_DESIGN_FOR = 'Design For'
+KEY_AXIAL_FORCE = 'Load.Axial.Force'  # If not using existing KEY_AXIAL
+KEY_DISP_AXIAL_FORCE = 'Axial Force (kN)'
+
 # MADE THIS t.s.
 KEY_DISP_BUTTJOINTWELDED = 'Butt Joint Welded Connection'
 KEY_OUT_UTILISATION_RATIO = 'Utilisation Ratio'
@@ -1121,6 +1127,7 @@ KEY_DISP_MEMBERS = 'No of Members'
 #lapjointbolted
 KEY_PLATE1_THICKNESS = "Plate1Thickness"
 KEY_PLATE2_THICKNESS = "Plate2Thickness" 
+KEY_PLATEC_THICKNESS = "PlatecThickness" 
 KEY_PLATE_WIDTH = "PlateWidth"
 KEY_DISP_PLATE1_THICKNESS = "Thickness of Plate-1 (mm) *"
 KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *"
@@ -1915,6 +1922,11 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance (mm)'
 KEY_WEB_CAPACITY ='section.web_capacities'
 KEY_DISP_WEB_CAPACITY ='Capacity'
 
+#SimpleConnection(Tension+Compression)
+KEY_OUT_DESIGN_FOR = "Design For" 
+KEY_OUT_DISP_DESIGN_FOR = "Design For"
+
+
 # Web plate
 KEY_REDUCTION_FACTOR_WEB ='web_plate.red,factor'
 KEY_DISP_REDUCTION_FACTOR_WEB ="Red. Factor"
@@ -2019,10 +2031,19 @@ KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
 
+KEY_OUT_WELD_CONN_LEN = 'Weld.ConnLength'
+
 KEY_OUT_BOLT_CONN_LEN = 'Bolt.ConnLength'
 KEY_UTILIZATION_RATIO = 'Bolt.UtilizationRatio'
 KEY_DISP_UTILIZATION_RATIO = 'Utilization Ratio'
 KEY_OUT_DISP_BOLT_CONN_LEN = 'Length of Connection (mm)'
+KEY_OUT_DISP_WELD_CONN_LEN = 'Length of Connection (mm)'
+KEY_OUT_BOLT_UTILIZATION = 'Bolt.Utilization'
+KEY_OUT_DISP_BOLT_UTILIZATION = 'Bolt Utilization'
+KEY_OUT_BASE_METAL_CAPACITY = 'Plate.BaseCapacity'
+KEY_OUT_DISP_BASE_METAL_CAPACITY = 'Base Metal Capacity (kN)'
+KEY_OUT_BASE_METAL_UTILIZATION = 'Plate.BaseUtilization'
+KEY_OUT_DISP_BASE_METAL_UTILIZATION = 'Base Metal Utilization'
 
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'

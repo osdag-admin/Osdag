@@ -228,10 +228,10 @@ MODULE_MAP = {
 
     KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'open_end_plate_btc_page'],
 
-    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection', 'None'],
-    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection', 'None'],
-    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection', 'None'],
-    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection', 'None'],
+    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection', 'open_lap_joint_bolted'],
+    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection', 'open_lap_joint_welded'],
+    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection', 'open_butt_joint_bolted'],
+    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection', 'open_butt_joint_welded'],
 
     KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection', 'None'],
     #---------Connections-end-----------------------------------------------------------

@@ -13,9 +13,6 @@ class FinPlateCapacityDetails(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         app = QApplication.instance()
-        print("########################")
-        print("debug")
-        print("########################")
         self.theme = app.theme_manager
         self.connection = connection_obj
         self.main=main

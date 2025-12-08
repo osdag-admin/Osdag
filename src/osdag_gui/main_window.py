@@ -636,158 +636,19 @@ class MainWindow(QMainWindow):
         self.common_open_module(BeamColumnEndPlate, "Beam-to-Column End Plate Connection")
 
     def open_tension_welded_page(self):
-        title = "Tension Member: Welded to End Gusset"
-        self.clear_layout(self.main_widget_layout)
-        tension_welded = CustomWindow(title, Tension_welded, parent=self)
+        self.common_open_module(Tension_welded, "Tension Member: Welded to End Gusset")
 
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(tension_welded.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                tension_welded.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = tension_welded
-        tension_welded.openNewTab.connect(self.handle_add_tab)
-        tension_welded.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(tension_welded)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-
-
-    #new work - harsh chelani
     def open_lap_joint_welded(self):
-        title = "Lap Joint Welded Connection"
-        self.clear_layout(self.main_widget_layout)
-        lap_joint_welded = CustomWindow(title, LapJointWelded, parent=self)
+        self.common_open_module(LapJointWelded, "Lap Joint Welded Connection")
 
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(lap_joint_welded.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                lap_joint_welded.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = lap_joint_welded
-        lap_joint_welded.openNewTab.connect(self.handle_add_tab)
-        lap_joint_welded.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(lap_joint_welded)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-
-
-    #new work - harsh chelani
     def open_lap_joint_bolted(self):
-        title = "Lap Joint Bolted Connection"
-        self.clear_layout(self.main_widget_layout)
-        lap_joint_bolted = CustomWindow(title, LapJointBolted, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(lap_joint_bolted.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                lap_joint_bolted.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = lap_joint_bolted
-        lap_joint_bolted.openNewTab.connect(self.handle_add_tab)
-        lap_joint_bolted.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(lap_joint_bolted)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-
-    #new work - harsh chelani
+        self.common_open_module(LapJointBolted, "Lap Joint Bolted Connection")
+        
     def open_butt_joint_bolted(self):
-        title = "Butt Joint Bolted Connection"
-        self.clear_layout(self.main_widget_layout)
-        butt_joint_bolted = CustomWindow(title, ButtJointBolted, parent=self)
+        self.common_open_module(ButtJointBolted, "Butt Joint Bolted Connection")
 
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(butt_joint_bolted.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                butt_joint_bolted.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = butt_joint_bolted
-        butt_joint_bolted.openNewTab.connect(self.handle_add_tab)
-        butt_joint_bolted.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(butt_joint_bolted)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-
-    #new work - harsh chelani
     def open_butt_joint_welded(self):
-        title = "Butt Joint Welded Connection"
-        self.clear_layout(self.main_widget_layout)
-        butt_joint_welded = CustomWindow(title, ButtJointWelded, parent=self)
-
-        # Load the last Design Inputs-start------------------------------------
-        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-        last_design_file = str(butt_joint_welded.backend.module_name()).replace(' ', '') + ".osi"
-        last_design_file = os.path.join(last_design_folder, last_design_file)
-        last_design_dictionary = {}
-
-        # Create folder if it doesn't exist
-        if not os.path.isdir(last_design_folder):
-            os.makedirs(last_design_folder)
-
-        # Load previous design if file exists
-        if os.path.isfile(last_design_file):
-            with open(str(last_design_file), 'r') as last_design:
-                last_design_dictionary = yaml.safe_load(last_design)
-                butt_joint_welded.setDictToUserInputs(last_design_dictionary)
-        # Load the last Design Inputs-end------------------------------------
-
-        self.main_widget_instance = butt_joint_welded
-        butt_joint_welded.openNewTab.connect(self.handle_add_tab)
-        butt_joint_welded.downloadDatabase.connect(self.download_Database)
-        self.main_widget_layout.addWidget(butt_joint_welded)
-        index = self.tab_bar.currentIndex()
-        self.tab_bar.setTabText(index, title)
-
-
-    
+        self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection")  
 
     def open_bolted_end_tension(self):
         self.common_open_module(Tension_bolted, "Bolted to End Gusset")

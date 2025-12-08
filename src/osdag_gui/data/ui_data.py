@@ -8,6 +8,13 @@ class Data:
         "Home": [],
         "Connection" :
         {
+            "Simple Connection":
+            [
+                ("Lap Joint Bolted",  ":/vectors/lap_joint_bolted_simple_connec.svg"),
+                ("Lap Joint Welded",  ":/vectors/lap_joint_welded_simple_connec.svg"),
+                ("Butt Joint Bolted", ":/vectors/butt_joint_bolted_simple_connec.svg"),
+                ("Butt Joint Welded", ":/vectors/butt_joint_welded_simple_connec.svg")
+            ],
             "Shear Connection":
             [
                 ("Fin Plate",":/vectors/shear_fin_plate_connec.svg"),

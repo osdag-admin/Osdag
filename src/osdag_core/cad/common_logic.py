@@ -1762,7 +1762,7 @@ class CommonDesignLogic(object):
             :return: The calculated values/parameters to create 3D CAD model of individual components.
         """
 
-        Col = self.module_class
+        Col = self.module_object
         print("COL_DESIGINATION :",Col.result_designation)
 
         if 'RHS' in Col.result_designation or 'SHS' in Col.result_designation:  # hollow sections 'RHS and SHS'
@@ -1830,7 +1830,7 @@ class CommonDesignLogic(object):
 
     def createBoltedLapJoint(self):
 
-        Conn = self.module_class
+        Conn = self.module_object
         print("THIS IS CONN")
         print(Conn)
         for attr in dir(Conn):
@@ -1859,7 +1859,7 @@ class CommonDesignLogic(object):
     def createButtJointBoltedCAD(self):
           
             # Get input values from the design object (i.e., instance of ButtJointBolted)
-            Col = self.module_class
+            Col = self.module_object
 
             # Extract parameters from the ButtJointBolted object
             self.plate1_thickness = float(Col.plate1.thickness[0])
@@ -2411,34 +2411,75 @@ class CommonDesignLogic(object):
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True)
 
-        elif self.mainmodule == 'Lap Joint Bolted Connection':
-            self.col = self.module_object  
-            self.assembly,self.plate1_model,self.plate2_model,self.bolt_models,self.nuts_models = self.createBoltedLapJoint()
 
-            if self.component == "Model":
-                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
-                osdag_display_shape(self.display, self.plate2_model, update=True)
-                for bolt in self.bolt_models:
-                    osdag_display_shape(self.display, bolt, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)
-                for nut in self.nuts_models:
-                    osdag_display_shape(self.display, nut, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)
+        
+        elif self.mainmodule == 'Lap Joint Bolted Connection':
+            if self.connection == KEY_DISP_LAPJOINTBOLTED:
+                self.ColObj = self.createBoltedLapJoint()
+                self.col = self.module_object 
+
+                # Hover dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
+
+                if isinstance(self.ColObj, (tuple, list)):
+                    _, plate1, plate2, _, _ = self.ColObj
+                else:
+                    plate1 = self.ColObj.plate1
+                    plate2 = self.ColObj.plate2         
+                    bolt = self.ColObj.bolt         
+                    nut = self.ColObj.nut        
+
+                # lap_joint, plate1, plate2, bolts, nuts
+                label_plate1 = ["plate1", hover_dict["plate1"]]
+                label_plate2 = ["Plate2", hover_dict["plate2"]]
+                label_bolt = ["Bolt", hover_dict["Bolt"]]
+                label_nut = ["Nut", hover_dict["Nut"]]
+                
+                self.assembly,self.plate1_model,self.plate2_model,self.bolt_models,self.nuts_models = self.createBoltedLapJoint()
+
+                if self.component == "Model":
+                    osdag_display_shape(self.display, plate1, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, plate2, update=True, label=label_plate2, canvas=self.cad_widget)
+                    for bolt in self.bolt_models:
+                        osdag_display_shape(self.display, bolt, update=True,
+                                                color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
+                    for nut in self.nuts_models:
+                        osdag_display_shape(self.display, nut, update=True,
+                                                color=Quantity_NOC_SADDLEBROWN, label=label_nut, canvas=self.cad_widget)
                     
         elif self.mainmodule == 'Butt Joint Bolted Connection':
-            self.col = self.module_object  
-            self.assembly,self.plate1_model,self.plate2_model,self.platec_model,self.bolt_models,self.nuts_models = self.createButtJointBoltedCAD()
+            if self.connection == KEY_DISP_BUTTJOINTBOLTED:
+                self.ColObj = self.createButtJointBoltedCAD()
+                self.col = self.module_object  
+                self.assembly,self.plate1_model,self.plate2_model,self.platec_model,self.bolt_models,self.nuts_models = self.createButtJointBoltedCAD()
 
-            if self.component == "Model":
-                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
-                osdag_display_shape(self.display, self.plate2_model, update=True)
-                osdag_display_shape(self.display, self.platec_model, update=True)
-                for bolt in self.bolt_models:
-                    osdag_display_shape(self.display, bolt, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)
-                for nut in self.nuts_models:
-                    osdag_display_shape(self.display, nut, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)                     
+                # Hover dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
+                
+                plate1 = self.ColObj.plate1
+                plate2 = self.ColObj.plate2        
+                platec = self.ColObj.platec        
+                bolt = self.ColObj.bolt         
+                nut = self.ColObj.nut
+                
+                # butt_joint, plate1, plate2, platec, bolts, nuts
+                label_plate1 = ["plate1", hover_dict["plate1"]]
+                label_plate2 = ["Plate2", hover_dict["plate2"]]
+                label_platec = ["Platec", hover_dict["platec"]]
+                label_bolt = ["Bolt", hover_dict["Bolt"]]
+                label_nut = ["Nut", hover_dict["Nut"]]
+                if self.component == "Model":
+                    osdag_display_shape(self.display, plate1, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, plate2, update=True, label=label_plate2, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, platec, update=True, label=label_platec, canvas=self.cad_widget)
+                    for bolt in self.bolt_models:
+                        osdag_display_shape(self.display, bolt, update=True,
+                                                color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
+                    for nut in self.nuts_models:
+                        osdag_display_shape(self.display, nut, update=True,
+                                                color=Quantity_NOC_SADDLEBROWN, label=label_nut, canvas=self.cad_widget)                     
 
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_object  

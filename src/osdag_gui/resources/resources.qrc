@@ -49,6 +49,10 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/background_light.svg</file>
         <file>vectors/background_dark.svg</file>
         
+        <file>vectors/lap_joint_bolted_simple_connec.svg</file>
+        <file>vectors/butt_joint_bolted_simple_connec.svg</file>
+        <file>vectors/lap_joint_welded_simple_connec.svg</file>
+        <file>vectors/butt_joint_welded_simple_connec.svg</file>
         <file>vectors/shear_fin_plate_connec.svg</file>
         <file>vectors/shear_cleat_angle_connec.svg</file>
         <file>vectors/end_plate_connec.svg</file>
@@ -67,6 +71,7 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/cantilever_beam_flexural_mem.svg</file>
         <file>vectors/ss_beam_flexural_mem.svg</file>
         <file>vectors/simple_supported_plate_girder.svg</file>
+        
 
 
         <file>backgrounds/splash_bg.jpg</file>

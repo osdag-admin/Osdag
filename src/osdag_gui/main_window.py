@@ -649,6 +649,12 @@ class MainWindow(QMainWindow):
 
     def open_butt_joint_welded(self):
         self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection")  
+    
+    def open_column_design(self):
+        self.common_open_module(ColumnDesign, "Column Design")
+
+    def open_beam_cover_plate_weld_moment_connection(self):
+        self.common_open_module(BeamCoverPlateWeld, "Cover Plate Welded") 
 
     def open_bolted_end_tension(self):
         self.common_open_module(Tension_bolted, "Bolted to End Gusset")

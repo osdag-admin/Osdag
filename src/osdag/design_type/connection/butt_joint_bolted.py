@@ -493,7 +493,7 @@ class ButtJointBolted(MomentConnection):
                         else:
                             flag1 = True
 
-                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_TENSILE_FORCE:
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL_FORCE:
 
                         if float(design_dictionary[option[0]]) <= 0.0:
                             error = "Input value(s) cannot be equal or less than zero."

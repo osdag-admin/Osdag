@@ -103,45 +103,95 @@ class CustomWindow(QWidget):
         self.cad_widget.setCursor(Qt.CursorShape.ArrowCursor)
         self.cad_widget.setFocus()
         self.cad_widget.setMouseTracking(True)
-        self.cad_widget.InitDriver()
-
-        display = self.cad_widget._display
-        self.cad_widget.context = display.Context
-        self.cad_widget.view = display.View
-        # to store model objects
-        self.cad_widget.model_ais_objects = {}
-
-        # Disable automatic highlighting to prevent flickering borders
-        self.cad_widget.context.SetAutomaticHilight(False)
         
-        # Display View Cube
-        self.cad_widget.display_view_cube()
+        # Defer InitDriver to after widget is shown to prevent UI blocking
+        # This is critical for cross-platform (especially Linux) stability
+        self._cad_init_pending = True
+        QTimer.singleShot(100, self._deferred_init_driver)
 
-        key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
-                        Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
-                        Qt.Key.Key_Right: lambda: self.Pan_Rotate_model("Right"),
-                        Qt.Key.Key_Left: lambda: self.Pan_Rotate_model("Left")}
-        self.cad_widget._key_map.update(key_function)
-
-        # background gradient
-        display.display_triedron()
-        display.View.SetProj(1, 1, 1)
-
-        def centerOnScreen(self):
-            '''Centers the window on the screen.'''
-            resolution = QtGui.QDesktopWidget().screenGeometry()
-            self.move((resolution.width() // 2) - (self.frameSize().width() // 2),
-                      (resolution.height() // 2) - (self.frameSize().height() // 2))
-
+        # These will be set after deferred init
+        display = None
+        
         def start_display():
             self.cad_widget.raise_()
 
         return display, start_display
     
+    def _deferred_init_driver(self):
+        """Initialize OpenGL driver after widget is visible (prevents blocking)."""
+        try:
+            if hasattr(self, 'cad_widget') and self.cad_widget and self._cad_init_pending:
+                self.cad_widget.InitDriver()
+                self._cad_init_pending = False
+                
+                # Complete the CAD setup that depends on InitDriver
+                self._complete_cad_init()
+                
+                # Process events to ensure UI remains responsive
+                QApplication.processEvents()
+                
+        except Exception as e:
+            print(f"[WARNING] OpenGL initialization failed: {e}")
+            print("[INFO] 3D view may be unavailable. Try setting LIBGL_ALWAYS_SOFTWARE=1")
+            self._cad_init_pending = False
+    
+    def _is_display_ready(self):
+        """Check if the CAD display is initialized and ready to use."""
+        return (hasattr(self, 'display') and 
+                self.display is not None and
+                hasattr(self, '_cad_init_pending') and
+                not self._cad_init_pending)
+    
+    def _complete_cad_init(self):
+        """Complete CAD initialization after InitDriver succeeds."""
+        try:
+            self.display = self.cad_widget._display
+            self.cad_widget.context = self.display.Context
+            self.cad_widget.view = self.display.View
+            # to store model objects
+            self.cad_widget.model_ais_objects = {}
+
+            # Disable automatic highlighting to prevent flickering borders
+            self.cad_widget.context.SetAutomaticHilight(False)
+            
+            # Display View Cube
+            self.cad_widget.display_view_cube()
+
+            key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
+                            Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
+                            Qt.Key.Key_Right: lambda: self.Pan_Rotate_model("Right"),
+                            Qt.Key.Key_Left: lambda: self.Pan_Rotate_model("Left")}
+            self.cad_widget._key_map.update(key_function)
+
+            # background gradient
+            self.display.display_triedron()
+            self.display.View.SetProj(1, 1, 1)
+            
+            print("[INFO] 3D CAD viewer initialized successfully")
+            
+            # Trigger repaint to apply background colors now that display is ready
+            self.update()
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to complete CAD initialization: {e}")
+
+    
     def paintEvent(self, event):
+        # Guard: Skip CAD display operations if not initialized yet (deferred init)
+        cad_ready = (hasattr(self, 'cad_widget') and 
+                     self.cad_widget is not None and 
+                     hasattr(self.cad_widget, '_display') and 
+                     self.cad_widget._display is not None and
+                     not getattr(self, '_cad_init_pending', True))
+        
+        if cad_ready:
+            if self.theme.is_light():
+                self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
+            else:
+                self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
+        
+        # Update control buttons (these don't depend on CAD init)
         if self.theme.is_light():
-            self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
-            # Updating control buttons
             if self.input_dock_active:
                 self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
             else:
@@ -157,8 +207,6 @@ class CustomWindow(QWidget):
             else:
                 self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
         else:
-            self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
-            # Updating control buttons
             if self.input_dock_active:
                 self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
             else:
@@ -382,8 +430,14 @@ class CustomWindow(QWidget):
     
     def fit_all(self):
         """Fit all objects in the view"""
-        self.display.SetProj(1, -1, 1)
-        self.display.FitAll()
+        if not self._is_display_ready():
+            return
+        try:
+            self.display.View.SetProj(1, -1, 1)
+            self.display.FitAll()
+        except Exception as e:
+            print(f"[WARNING] fit_all failed: {e}")
+        
     
     #---------------------------------CAD-SETUP-END----------------------------------------------
     
@@ -1450,8 +1504,12 @@ class CustomWindow(QWidget):
                         txt_label.setVisible(bool(option[3] is not None))
 
                 elif option[2] == TYPE_OUT_BUTTON:
-                    self.output_dock.output_widget.findChild(QWidget, option[0]).setEnabled(True)
-                    self.output_dock.output_widget.findChild(QPushButton, option[0]).setEnabled(True)
+                    btn = self.output_dock.output_widget.findChild(QWidget, option[0])
+                    if btn is not None:
+                        btn.setEnabled(True)
+                    btn_push = self.output_dock.output_widget.findChild(QPushButton, option[0])
+                    if btn_push is not None:
+                        btn_push.setEnabled(True)
 
 
             # Ensure Output dock is visible and sized when we have results
@@ -1566,7 +1624,18 @@ class CustomWindow(QWidget):
                 # print("Hover Dictionary: ", main.hover_dict)
 
                 print("[INFO] Calling 3D Model from CAD")
-                self.commLogicObj.call_3DModel(status, main)
+                # CRITICAL: Process Qt events before OpenGL rendering to prevent segfault on Linux
+                from PySide6.QtWidgets import QApplication
+                QApplication.processEvents()
+                
+                # Ensure display is ready before 3D rendering
+                if self._is_display_ready():
+                    try:
+                        self.commLogicObj.call_3DModel(status, main)
+                    except Exception as e:
+                        print(f"[ERROR] 3D model rendering failed: {e}")
+                else:
+                    print("[WARNING] Display not ready for 3D rendering")
                 # Store the design instance for later use in report generation
                 if hasattr(self.commLogicObj, 'design_obj'):
                     # Store reference to the design instance

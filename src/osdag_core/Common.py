@@ -13,6 +13,8 @@ import platform
 
 PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 
+PDFLATEX = "pdflatex"
+
 import sqlite3
 
 from .utils.common.other_standards import *
@@ -60,7 +62,14 @@ class OurLog(logging.Handler):
             msg = "<span style='color: red;'>"+ msg +"</span>"
         elif record.levelname == 'INFO':
             msg = "<span style='color: green;'>" + msg + "</span>"
-        self.key.append(msg)
+        # Safety check: ensure QTextEdit is not deleted before appending
+        try:
+            if self.key is not None:
+                self.key.append(msg)
+        except RuntimeError:
+            # QTextEdit C++ object has been deleted - skip appending
+            pass
+
 
 
 def connectdb1():
@@ -737,11 +746,11 @@ KEY_DISP_r_eff_latex = '$r_{eff}$web'
 KEY_DISP_K_v_latex = '$K_{v}$'
 KEY_DISP_Elastic_Critical_shear_stress_web = 'Elastic Critical Shear Stress Web($N/mm^2$)' #(\tau_{crc})
 KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners(c)(mm)'
-KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio($\lambda_w$)'
+KEY_DISP_slenderness_ratio_web = r'Web Slenderness ratio($\lambda_w$)'
 KEY_DISP_BUCKLING_STRENGTH= 'Buckling Resistance (kN)'
 KEY_DISP_reduced_moment= 'Reduced moment (Nmm)'
 # KEY_DISP_reduced_moment= 'Reduced moment (N_f)'
-KEY_DISP_tension_field_incline= 'Tension field inclination($\phi$)'
+KEY_DISP_tension_field_incline= r'Tension field inclination($\phi$)'
 KEY_DISP_Yield_Strength_Tension_field = 'Yield Strength of Tension field(f_v)($N/mm^2$)'
 KEY_DISP_AnchoragelengthTensionField= 'Anchorage length of Tension Field(s)(mm)'
 KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
@@ -1520,7 +1529,7 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip Factor, (mu<sub>f</sub>)'
-KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = 'Slip Factor, ($\mu_{f}$)'
+KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = r'Slip Factor, ($\mu_{f}$)'
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
 KEY_DISP_GAMMA_M0 = "Governed by Yielding"

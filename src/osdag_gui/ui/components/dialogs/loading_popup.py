@@ -19,8 +19,8 @@ class CircularProgressWidget(QLabel):
         self.timer.start(16)
     
     def rotate(self):
-        # Smaller increment for smoother rotation
-        self.angle = (self.angle - 6) % 360
+        # Smaller increment for ultra-smooth rotation (3 degrees instead of 6)
+        self.angle = (self.angle - 3) % 360
         self.update()
     
     def paintEvent(self, event):
@@ -188,34 +188,56 @@ def run_loading_dialog_process(stop_event, is_light_theme=True):
 
 class LoadingDialogManager:
     """
-    Manager class to control the loading dialog in a separate process
+    Manager class to control the loading dialog.
+    Uses in-process dialog on Linux to avoid window duplication issues.
+    Uses separate process on Windows/macOS for better performance.
     """
     def __init__(self, is_light_theme=True):
         self.process = None
         self.stop_event = None
         self.is_light_theme = is_light_theme
+        self._dialog = None  # For in-process mode
+        
+        # Detect OS - Linux has issues with multiprocess GUI windows
+        import platform
+        self._use_process = platform.system() != "Linux"
     
     def show(self):
-        """Show the loading dialog in a separate process"""
-        if self.process is not None and self.process.is_alive():
-            return  # Already running
-        
-        self.stop_event = mp.Event()
-        self.process = mp.Process(
-            target=run_loading_dialog_process,
-            args=(self.stop_event, self.is_light_theme)
-        )
-        self.process.start()
+        """Show the loading dialog"""
+        if self._use_process:
+            # Windows/macOS - use separate process
+            if self.process is not None and self.process.is_alive():
+                return  # Already running
+            
+            self.stop_event = mp.Event()
+            self.process = mp.Process(
+                target=run_loading_dialog_process,
+                args=(self.stop_event, self.is_light_theme)
+            )
+            self.process.start()
+        else:
+            # Linux - use in-process dialog to avoid duplicate window issues
+            if self._dialog is None:
+                self._dialog = ModernLoadingDialog(is_light_theme=self.is_light_theme)
+            self._dialog.show()
+            QApplication.processEvents()  # Ensure dialog is drawn
     
     def hide(self):
         """Hide the loading dialog"""
-        if self.process is not None and self.process.is_alive():
-            self.stop_event.set()
-            self.process.join(timeout=2)  # Wait up to 2 seconds
-            if self.process.is_alive():
-                self.process.terminate()  # Force terminate if still running
-            self.process = None
-            self.stop_event = None
+        if self._use_process:
+            if self.process is not None and self.process.is_alive():
+                self.stop_event.set()
+                self.process.join(timeout=2)  # Wait up to 2 seconds
+                if self.process.is_alive():
+                    self.process.terminate()  # Force terminate if still running
+                self.process = None
+                self.stop_event = None
+        else:
+            # Linux - close in-process dialog
+            if self._dialog is not None:
+                self._dialog.hide()
+                self._dialog.circular_progress.stop_animation()
+                self._dialog = None
     
     def __del__(self):
         """Cleanup when manager is destroyed"""

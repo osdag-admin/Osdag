@@ -609,6 +609,11 @@ class ButtJointBolted(MomentConnection):
             self.packing_plate_thickness = 0.0
             self.beta_pkg = 1.0
 
+        # Initialize cover plate with calculated thickness
+        self.platec = Plate(thickness=[self.calculated_cover_plate_thickness],
+                            material_grade=design_dictionary[KEY_MATERIAL],
+                            width=design_dictionary[KEY_PLATE_WIDTH])
+
         # Initialize other parameters
         self.count = 0
         self.slip_res = None

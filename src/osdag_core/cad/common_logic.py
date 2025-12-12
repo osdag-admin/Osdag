@@ -1885,7 +1885,7 @@ class CommonDesignLogic(object):
 
         print(f"Flex.support {Flex.support}")
 
-        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        Flex.section_property = Flex.section_connect_database(Flex.result_designation)
         column_tw = float(Flex.section_property.web_thickness)
         print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
         column_T = float(Flex.section_property.flange_thickness)
@@ -1917,7 +1917,7 @@ class CommonDesignLogic(object):
 
         print(f"Flex.support {Flex.support}")
 
-        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        Flex.section_property = Flex.section_connect_database(Flex.result_designation)
         column_tw = float(Flex.section_property.web_thickness)
         print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
         column_T = float(Flex.section_property.flange_thickness)
@@ -2503,7 +2503,7 @@ class CommonDesignLogic(object):
                 label_plate2 = ["Plate 2", hover_dict["Plate 2"]]
                 label_bolt = ["Bolt", hover_dict["Bolt"]]
                 label_nut = ["Nut", hover_dict["Nut"]]
-                
+
                 self.assembly,self.plate1_model,self.plate2_model,self.bolt_models,self.nuts_models = self.createBoltedLapJoint()
 
                 if self.component == "Model":
@@ -2521,17 +2521,17 @@ class CommonDesignLogic(object):
                 self.ColObj = self.createButtJointBoltedCAD()
                 self.col = self.module_object  
                 self.assembly,self.plate1_model,self.plate2_model,self.platec_model,self.bolt_models,self.nuts_models = self.createButtJointBoltedCAD()
-
+                
                 # Hover dict
                 hover_dict = self.module_object.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict
-                
+
                 plate1 = self.ColObj.plate1
                 plate2 = self.ColObj.plate2        
                 platec = self.ColObj.platec        
                 bolt = self.ColObj.bolt         
                 nut = self.ColObj.nut
-                
+
                 # butt_joint, plate1, plate2, platec, bolts, nuts
                 label_plate1 = ["plate1", hover_dict["plate1"]]
                 label_plate2 = ["Plate2", hover_dict["plate2"]]
@@ -2552,16 +2552,31 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_object  
             self.FObj = self.createSimplySupportedBeam()
+            
+            hover_dict = getattr(self.flex, "hover_dict", {})
+
+            if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
+                self.cad_widget.model_hover_labels = self.flex.hover_dict
+                
+            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member", "Flexure Member")]    
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.FObj, update=True)
+                osdag_display_shape(self.display, self.FObj, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             self.flex = self.module_object  
             self.FObj = self.createCantileverBeam()
+            
+            
+            hover_dict = getattr(self.flex, "hover_dict", {})
+            
+            if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
+                self.cad_widget.model_hover_labels = self.flex.hover_dict
+                
+            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member", "Flexure Member")]
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.FObj, update=True)
+                osdag_display_shape(self.display, self.FObj, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             if self.connection == KEY_DISP_FLEXURE4 :
@@ -2646,7 +2661,6 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
 
-
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_object
                 hover_dict = self.module_object.hover_dict
@@ -2655,10 +2669,9 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
-
                 self.TObj = self.createTensionCAD()
 
-            
+
 
                 label_plate = ["Plate", hover_dict["Plate"]]
                 label_weld = ["Weld", hover_dict["Weld"]]
@@ -2666,19 +2679,14 @@ class CommonDesignLogic(object):
 
                 if hasattr(self, "cad_widget") and hasattr(self.T, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.T.hover_dict
-
-
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, member, update=True, color=beam_color, label=label_member, canvas=self.cad_widget)
-
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
-
+                    osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)      
                 elif self.component == "Endplate":
                     endplate = self.TObj.get_end_plates_models()
                     osdag_display_shape(self.display, endplate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
-
                 else:
                     connector = BRepAlgoAPI_Fuse(welds, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
@@ -2686,9 +2694,6 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, member, update=True, color=beam_color, label=label_member, canvas=self.cad_widget)
                     osdag_display_shape(self.display, plate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
                     osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
-
-
-
     #
     # def display_msg(self):
     #     if self.connection == KEY_DISP_TENSION_BOLTED:

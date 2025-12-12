@@ -47,7 +47,8 @@ from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBea
 from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
 from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from osdag_core.design_type.flexural_member.flexure_purlin import Flexure_Purlin
+from osdag_core.design_type.flexural_member.flexure import Flexure
+from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 
 import openpyxl
 
@@ -570,6 +571,10 @@ class MainWindow(QMainWindow):
             self.open_column_cover_plate_connection()
         elif card_title == "Column Cover Plate Welded":
             self.open_column_cover_plate_weld_connection() 
+        elif card_title == "Simply Supported Beam":
+            self.open_flexure_member()
+        elif card_title == "Cantilever Beam":
+            self.open_flexure_cantilever_member()
         elif card_title == "Struts in Trusses":
             self.open_struts_in_trusses_compression_member()
         elif card_title == "Purlin":
@@ -661,6 +666,12 @@ class MainWindow(QMainWindow):
 
     def open_bolted_end_tension(self):
         self.common_open_module(Tension_bolted, "Bolted to End Gusset")
+ 
+    def open_flexure_member(self):
+        self.common_open_module(Flexure, "Simply Supported Beam")
+        
+    def open_flexure_cantilever_member(self):
+        self.common_open_module(Flexure_Cantilever, "Cantilever Beam")
     
     def open_struts_in_trusses_compression_member(self):
         self.common_open_module(Compression, "Struts in Trusses")

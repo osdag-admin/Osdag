@@ -2516,26 +2516,29 @@ class CommonDesignLogic(object):
                     
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if self.connection == KEY_DISP_BUTTJOINTBOLTED:
-                self.ColObj = self.createButtJointBoltedCAD()
-                self.col = self.module_object  
-                self.assembly,self.plate1_model,self.plate2_model,self.platec_model,self.bolt_models,self.nuts_models = self.createButtJointBoltedCAD()
+                self.col = self.module_object
                 
-                # Hover dict
+                # Reuse ColObj if already created by call_3DModel, otherwise create it
+                if hasattr(self, 'ColObj') and self.ColObj is not None:
+                    # ColObj is a tuple from createButtJointBoltedCAD()
+                    self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.ColObj
+                else:
+                    self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.createButtJointBoltedCAD()
+
                 hover_dict = self.module_object.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict
-
-                plate1 = self.ColObj.plate1
-                plate2 = self.ColObj.plate2        
-                platec = self.ColObj.platec        
-                bolt = self.ColObj.bolt         
-                nut = self.ColObj.nut
-
+                
+                # Use the unpacked tuple variables directly
+                plate1 = self.plate1_model
+                plate2 = self.plate2_model        
+                platec = self.platec_model        
+                
                 # butt_joint, plate1, plate2, platec, bolts, nuts
-                label_plate1 = ["plate1", hover_dict["plate1"]]
-                label_plate2 = ["Plate2", hover_dict["plate2"]]
-                label_platec = ["Platec", hover_dict["platec"]]
-                label_bolt = ["Bolt", hover_dict["Bolt"]]
-                label_nut = ["Nut", hover_dict["Nut"]]
+                label_plate1 = ["plate1", hover_dict.get("plate1", "Plate 1")]
+                label_plate2 = ["Plate2", hover_dict.get("plate2", "Plate 2")]
+                label_platec = ["Platec", hover_dict.get("platec", "Cover Plate")]
+                label_bolt = ["Bolt", hover_dict.get("bolts", hover_dict.get("Bolt", "Bolts"))]
+                label_nut = ["Nut", hover_dict.get("nuts", hover_dict.get("Nut", "Nuts"))]
                 if self.component == "Model":
                     osdag_display_shape(self.display, plate1, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
                     osdag_display_shape(self.display, plate2, update=True, label=label_plate2, canvas=self.cad_widget)

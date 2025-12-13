@@ -7161,7 +7161,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             section_type = 'I Section'
 
         if self.dp_column_source == 'IS808_Rev':
-            self.dp_column_source = 'IS 808\_Rev'
+            self.dp_column_source = 'IS 808\\_Rev'
 
         self.column_properties = {
             KEY_DISP_SEC_PROFILE: select_section_img,  # select image of the section for displaying in design report

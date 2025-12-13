@@ -57,7 +57,7 @@ class LaTeXParser:
     """
     Parses LaTeX files to extract document structure.
 
-    This class finds all \section{} and \subsection{} commands in a LaTeX
+    This class finds all \\section{} and \\subsection{} commands in a LaTeX
     document and organizes them into a hierarchical structure.
 
     Returns:

@@ -17,7 +17,7 @@ class Load(object):
             force_multiplier = 1e3
             moment_multiplier = 1e6
         print(force_multiplier, "is force multiplier")
-        if axial_force is not "":
+        if axial_force != "":
             self.axial_force = force_multiplier * float(axial_force)
         else:
             self.axial_force = 0.0
@@ -25,15 +25,15 @@ class Load(object):
         '''
             Shear force
         '''
-        if shear_force is not "":
+        if shear_force != "":
             self.shear_force = force_multiplier * float(shear_force)
         else:
             self.shear_force = 0.0
-        if shear_force_zz is not "":
+        if shear_force_zz != "":
             self.shear_force_zz = force_multiplier * float(shear_force_zz)
         else:
             self.shear_force_zz = 0.0
-        if shear_force_yy is not "":
+        if shear_force_yy != "":
             self.shear_force_yy = force_multiplier * float(shear_force_yy)
         else:
             self.shear_force_yy = 0.0
@@ -41,19 +41,19 @@ class Load(object):
         '''
             Moment force
         '''
-        if moment is not "":
+        if moment != "":
             self.moment = moment_multiplier * float(moment)
             self.moment_minor = moment_multiplier * float(moment_minor)
         else:
             self.moment = 0.0
             self.moment_minor = 0.0
-        if moment_yy is not "":
+        if moment_yy != "":
             self.moment_yy = moment_multiplier * float(moment_yy)
             self.moment_minor = moment_multiplier * float(moment_minor)
         else:
             self.moment_yy = 0.0
             self.moment_minor = 0.0
-        if moment_zz is not "":
+        if moment_zz != "":
             self.moment_zz = moment_multiplier * float(moment_zz)
             self.moment_minor = moment_multiplier * float(moment_minor)
         else:

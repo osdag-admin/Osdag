@@ -47,6 +47,7 @@ from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBea
 from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
 from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from osdag_core.design_type.flexural_member.flexure_purlin import Flexure_Purlin
 
 import openpyxl
 
@@ -571,6 +572,8 @@ class MainWindow(QMainWindow):
             self.open_column_cover_plate_weld_connection() 
         elif card_title == "Struts in Trusses":
             self.open_struts_in_trusses_compression_member()
+        elif card_title == "Purlin":
+            self.open_flexure_purlin()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 

@@ -1948,7 +1948,7 @@ class CommonDesignLogic(object):
         Flex = self.module_object
         print(f"This is the module name {Flex}")
 
-        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        Flex.section_property = Flex.section_connect_database(Flex.result_designation)
         print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
         print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
         print(f"Flex.section_property.depth : {Flex.section_property.depth}")
@@ -2564,12 +2564,25 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.FObj, update=True)
 
         elif self.mainmodule == 'Flexural Members - Purlins':
-            self.flex = self.module_object  
-            print(f"THIS IS SELF.MODULE_OBJECT {self.flex}")
-            self.FObj = self.createPurlin()
+            if self.connection == KEY_DISP_FLEXURE4 :
+                self.flex = self.module_object
 
-            if self.component == "Model":
-                osdag_display_shape(self.display, self.FObj, update=True)
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
+                
+                # Hover dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
+
+                if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
+                    self.cad_widget.model_hover_labels = self.flex.hover_dict
+
+                label_flexure = ["Flexural Members - Purlins", hover_dict["Flexural Members - Purlins"]]
+                  
+                print(f"THIS IS SELF.MODULE_OBJECT {self.flex}")
+                self.FObj = self.createPurlin()
+
+                if self.component == "Model":
+                    osdag_display_shape(self.display, self.FObj, update=True, label=label_flexure, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Struts in Trusses':
             self.col = self.module_object  

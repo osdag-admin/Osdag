@@ -62,6 +62,7 @@ class Data:
             ("Simply Supported Beam", ":/vectors/ss_beam_flexural_mem.svg"),
             ("Cantilever Beam", ":/vectors/cantilever_beam_flexural_mem.svg"),
             ("Plate Girder", ":/vectors/simple_supported_plate_girder.svg"),
+            ("Purlin", ":/vectors/purlin_flexure_member.svg"),
         ],
         "Beam Column": 
         [],

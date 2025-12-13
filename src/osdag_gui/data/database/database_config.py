@@ -250,7 +250,7 @@ MODULE_MAP = {
     #---------Flexural-Member-start------------------------------------------------------
     KEY_DISP_FLEXURE: ['Simply Supported Beam', 'Flexural Members', 'None'],
     KEY_DISP_FLEXURE2: ['Cantilever Beam', 'Flexural Members', 'None'],
-    KEY_DISP_FLEXURE4: ['Purlins', 'Flexural Members', 'None'],
+    KEY_DISP_FLEXURE4: ['Purlins', 'Flexural Members', 'open_flexure_purlin'],
     KEY_DISP_PLATE_GIRDER_WELDED: ['Plate Girder', 'Flexural Members', 'open_plate_girder']
     #---------Flexural-Member-end------------------------------------------------------
 

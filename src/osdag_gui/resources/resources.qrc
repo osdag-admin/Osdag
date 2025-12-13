@@ -79,6 +79,8 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/ss_beam_flexural_mem.svg</file>
         <file>vectors/simple_supported_plate_girder.svg</file>
         <file>vectors/column_design_compression_mem.svg</file>        
+        <file>vectors/purlin_flexure_member.svg</file>
+        
 
 
         <file>backgrounds/splash_bg.jpg</file>

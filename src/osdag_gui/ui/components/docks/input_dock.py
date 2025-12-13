@@ -47,8 +47,8 @@ class InputDock(QWidget):
         super().__init__()
 
         self.theme_manager = QApplication.instance().theme_manager
-        # Ensures automatic deletion when closed
-        self.setAttribute(Qt.WA_DeleteOnClose, True)
+        # NOTE: Do NOT use WA_DeleteOnClose - it causes heap corruption (use-after-free)
+        # when processEvents() is called during OpenGL rendering. Parent manages lifecycle.
         self.parent = parent
         # Already an Object created in template_page.py
         self.backend = backend

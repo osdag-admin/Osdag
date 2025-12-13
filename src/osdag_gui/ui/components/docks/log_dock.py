@@ -8,8 +8,8 @@ from PySide6.QtCore import Qt, QDateTime
 class LogDock(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        # Ensures automatic deletion when closed
-        self.setAttribute(Qt.WA_DeleteOnClose, True)
+        # NOTE: Do NOT use WA_DeleteOnClose - it causes heap corruption (use-after-free)
+        # when processEvents() is called during OpenGL rendering. Parent manages lifecycle.
         self.is_visible = True
         self.setObjectName("logs_dock")
         self.init_ui()

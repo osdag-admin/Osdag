@@ -2399,7 +2399,13 @@ class CommonDesignLogic(object):
                     
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             self.col = self.module_class()
-            self.assembly,self.plate1_model,self.plate2_model,self.platec_model,self.bolt_models,self.nuts_models = self.createButtJointBoltedCAD()
+            
+            # Reuse ColObj if already created by call_3DModel, otherwise create it
+            if hasattr(self, 'ColObj') and self.ColObj is not None:
+                # ColObj is a tuple from createButtJointBoltedCAD()
+                self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.ColObj
+            else:
+                self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.createButtJointBoltedCAD()
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
@@ -2411,6 +2417,7 @@ class CommonDesignLogic(object):
                 for nut in self.nuts_models:
                     osdag_display_shape(self.display, nut, update=True,
                                             color=Quantity_NOC_SADDLEBROWN)                     
+
 
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_class()

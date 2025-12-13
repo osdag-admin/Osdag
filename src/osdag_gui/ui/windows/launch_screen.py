@@ -156,9 +156,9 @@ class OsdagLaunchScreen(object):
    
         self.ConstructsteelLogo.load(":/vectors/ConstructSteel_light.svg")
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QLabel, QApplication
 
 class PNGSequencePlayer(QLabel):
     def __init__(self, parent=None):
@@ -167,9 +167,11 @@ class PNGSequencePlayer(QLabel):
         self.current_frame = 0
         self.frame_count = 0
         self.timer = QTimer()
+        self.timer.setTimerType(Qt.TimerType.PreciseTimer)  # Use precise timer for smooth animation
         self.setScaledContents(True)
         self.timer.timeout.connect(self.next_frame)
         self.loop = False
+        self._target_size = None
         
     def load_sequence(self, base_path, frame_count, fps=24, loop=False):
         """
@@ -181,13 +183,29 @@ class PNGSequencePlayer(QLabel):
         self.frame_count = frame_count
         self.frames = []
         self.loop = loop
+        self._target_size = self.size()
         
+        # Pre-load and pre-scale all frames for smoother playback
         for i in range(1, frame_count + 1):
             frame_path = base_path.format(i)
             pixmap = QPixmap(frame_path)
             if not pixmap.isNull():
-                # Scale to widget size while maintaining aspect ratio
+                # Pre-scale to widget size for faster rendering
+                if self._target_size.isValid() and self._target_size.width() > 0:
+                    pixmap = pixmap.scaled(
+                        self._target_size, 
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation
+                    )
                 self.frames.append(pixmap)
+            
+            # Process events periodically to keep UI responsive during loading
+            if i % 10 == 0:
+                QApplication.processEvents()
+        
+        # Show first frame immediately
+        if self.frames:
+            self.setPixmap(self.frames[0])
         
         # Set timer interval based on FPS
         interval = int(1000 / fps)  # Convert to milliseconds
@@ -195,9 +213,8 @@ class PNGSequencePlayer(QLabel):
         
     def next_frame(self):
         if self.frames:
-            self.setPixmap(self.frames[self.current_frame])
             self.current_frame += 1
-
+            
             # Stop when reaching the end if not looping
             if self.current_frame >= len(self.frames):
                 if self.loop:
@@ -205,6 +222,9 @@ class PNGSequencePlayer(QLabel):
                 else:
                     self.timer.stop()  # Stop animation
                     self.current_frame = len(self.frames) - 1  # Stay on last frame
+                    return
+            
+            self.setPixmap(self.frames[self.current_frame])
     
     def stop_animation(self):
         self.timer.stop()

@@ -399,45 +399,6 @@ class ButtJointBolted(MomentConnection):
                self.len_conn if flag else '', True)
         out_list.append(t20)
 
-        # Populate Hover Dict (Butt Joint Bolted)
-
-        self.hover_dict["plate1"] = (
-            f"<b>plate1</b><br>"
-            f"Length: {float(self.plate1.length) if flag else ''} mm<br>"
-            f"Width: {float(self.plate1.height) if flag else ''} mm<br>"
-            f"Thickness: {self.plate1.thickness if flag else ''} mm"
-        )
-
-        self.hover_dict["plate2"] = (
-            f"<b>plate2</b><br>"
-            f"Length: {float(self.plate2.length) if flag else ''} mm<br>"
-            f"Width: {float(self.plate2.height) if flag else ''} mm<br>"
-            f"Thickness: {self.plate2.thickness if flag else ''} mm"
-        )
-
-        self.hover_dict["platec"] = (
-            f"<b>Cover Plate (platec)</b><br>"
-            f"Length: {float(self.platec.length) if flag else ''} mm<br>"
-            f"Width: {float(self.platec.height) if flag else ''} mm<br>"
-            f"Thickness: {self.platec.thickness if flag else ''} mm"
-        )
-
-        self.hover_dict["bolts"] = (
-            f"<b>Bolts</b><br>"
-            f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
-            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>"
-            f"No. of Bolts: "
-            f"{int(self.platec.bolts_one_line) * int(self.platec.bolt_line) if flag else ''}"
-        )
-
-        self.hover_dict["nuts"] = (
-            f"<b>Nuts</b><br>"
-            f"Grade: {self.nut.grade if flag else ''}<br>"
-            f"Thickness: {self.nut.thickness if flag else ''} mm"
-        )
-
-
-
         return out_list
 
     def module_name(self):
@@ -874,10 +835,10 @@ class ButtJointBolted(MomentConnection):
 
         if self.number_bolts >= 2 and count == 0:
             self.design_status = True
-            self.check_capacity_reduction_1(self, design_dictionary)
+            self.check_capacity_reduction_1(design_dictionary)
         elif self.number_bolts>=2 and count == 1:
             self.design_status = True
-            self.final_formatting(self,design_dictionary)
+            self.final_formatting(design_dictionary)
         else:
             self.design_status = False
             self.logger.error(": Number of min bolts not satisfied. \n ")
@@ -902,7 +863,7 @@ class ButtJointBolted(MomentConnection):
                 self.bolt.bolt_capacity = self.slip_res
 
         self.design_status = True
-        self.check_capacity_reduction_2(self,design_dictionary)
+        self.check_capacity_reduction_2(design_dictionary)
 
     def check_capacity_reduction_2(self,design_dictionary):
         """Large grip reduction as per Cl. 10.3.3.2 of IS 800:2007"""
@@ -924,10 +885,10 @@ class ButtJointBolted(MomentConnection):
                 self.bolt.bolt_capacity = self.slip_res
 
             # Continue design with reduced capacity - recursion limit handled in number_r_c_bolts
-            self.number_r_c_bolts(self,design_dictionary,1,0)
+            self.number_r_c_bolts(design_dictionary,1,0)
         else:
             self.design_status = True
-            self.final_formatting(self,design_dictionary)
+            self.final_formatting(design_dictionary)
 
     def final_formatting(self,design_dictionary):
         """Final checks and formatting as per IS 800:2007"""
@@ -949,7 +910,7 @@ class ButtJointBolted(MomentConnection):
                 enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
                 if enddist > self.bolt.max_end_dist_round:
                     self.design_status = False
-                    self.number_r_c_bolts(self,design_dictionary,0,1)
+                    self.number_r_c_bolts(design_dictionary,0,1)
                 else:
                     self.final_end_dist = enddist
                     self.final_edge_dist = enddist
@@ -960,7 +921,7 @@ class ButtJointBolted(MomentConnection):
                 enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
                 if enddist > self.bolt.max_end_dist_round:
                     self.design_status = False
-                    self.number_r_c_bolts(self,design_dictionary,0,1)
+                    self.number_r_c_bolts(design_dictionary,0,1)
                 else:
                     self.final_end_dist = enddist
                     self.final_edge_dist = enddist

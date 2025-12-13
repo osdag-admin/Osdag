@@ -115,7 +115,7 @@ class InputDock(QWidget):
 
     def get_validator(self, validator):
         if validator == 'Int Validator':
-            return QRegularExpressionValidator(QRegularExpression("^(0|[1-9]\d*)(\.\d+)?$"))
+            return QRegularExpressionValidator(QRegularExpression(r"^(0|[1-9]\d*)(\.\d+)?$"))
         elif validator == 'Double Validator':
             return QDoubleValidator()
         else:

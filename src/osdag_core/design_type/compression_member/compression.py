@@ -2916,7 +2916,7 @@ class Compression(Member):
                                 ' ')
             self.report_check.append(t1)
             
-            t1 = ('$\phi$', ' ',
+            t1 = (r'$\phi$', ' ',
                                 cl_8_7_1_5_phi(0.49,round(self.nondimensional_effective_slenderness_ratio, 2), round(self.phi, 2)),#need to check this as its given only for zz but rest are values wrt yy
                                 ' ')
             self.report_check.append(t1)

@@ -1411,8 +1411,10 @@ class CustomWindow(QWidget):
 
     # This opens loading widget and execute Design
     def start_thread(self, data):
-        import multiprocessing as mp
-        mp.set_start_method('spawn', force=True)
+        # Use safety module for multiprocessing (already initialized at startup)
+        # This is safe to call multiple times - will be ignored if already set
+        from osdag_gui.osdag_safety import ensure_mp_spawn
+        ensure_mp_spawn()
     
         self.loading = LoadingDialogManager(self.theme.is_light())
         self.loading.show()
@@ -1657,7 +1659,13 @@ class CustomWindow(QWidget):
                 # Show cad component checkboxes
                 self.cad_comp_widget.show()
                 for chkbox in main.get_3d_components():
-                    self.cad_comp_widget.findChild(QCheckBox, chkbox[0]).setChecked(False)
+                    checkbox_widget = self.cad_comp_widget.findChild(QCheckBox, chkbox[0])
+                    if checkbox_widget:
+                        # CRITICAL: Block signals to prevent triggering display_3DModel calls
+                        # which causes heap corruption from rapid OpenCASCADE operations
+                        checkbox_widget.blockSignals(True)
+                        checkbox_widget.setChecked(False)
+                        checkbox_widget.blockSignals(False)
 
                 for action in self.menu_cad_components:
                     action.setEnabled(True)
@@ -1667,7 +1675,12 @@ class CustomWindow(QWidget):
                 # Hide cad component checkboxes
                 self.cad_comp_widget.hide()
                 for chkbox in main.get_3d_components():
-                    self.cad_comp_widget.findChild(QCheckBox, chkbox[0]).setChecked(False)
+                    checkbox_widget = self.cad_comp_widget.findChild(QCheckBox, chkbox[0])
+                    if checkbox_widget:
+                        # CRITICAL: Block signals to prevent triggering display_3DModel calls
+                        checkbox_widget.blockSignals(True)
+                        checkbox_widget.setChecked(False)
+                        checkbox_widget.blockSignals(False)
                 for action in self.menu_cad_components:
                     action.setEnabled(False)
             

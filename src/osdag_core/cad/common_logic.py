@@ -2070,7 +2070,6 @@ class CommonDesignLogic(object):
 
 
     def display_3DModel(self, component, bgcolor):
-        
         hover_dict = {}
         if hasattr(self, "module_object") and hasattr(self.module_object, "hover_dict"):
             hover_dict = self.module_object.hover_dict
@@ -2663,12 +2662,11 @@ class CommonDesignLogic(object):
                 hover_dict = self.module_object.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict
 
+                # NOTE: self.TObj is already created in call_3DModel() before display_3DModel() is called
+                # Do NOT call createTensionCAD() again here - it causes OpenCASCADE memory corruption
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
-                self.TObj = self.createTensionCAD()
-
-
 
                 label_plate = ["Plate", hover_dict["Plate"]]
                 label_weld = ["Weld", hover_dict["Weld"]]
@@ -2864,7 +2862,6 @@ class CommonDesignLogic(object):
 
                 if flag is True:
                     self.TObj = self.createTensionCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
 
                 else:

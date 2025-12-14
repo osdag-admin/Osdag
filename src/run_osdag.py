@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Cross-platform launcher for Osdag GUI."""
+"""Cross-platform launcher for Osdag GUI.
+Author: Nishi Kant Mandal """
 
 import os
 import sys
@@ -75,6 +76,20 @@ def setup_environment():
 def main():
     """Launch Osdag GUI."""
     setup_environment()
+    
+    # CRITICAL: Initialize safety module FIRST before any other imports
+    # This ensures multiprocessing is configured exactly once
+    try:
+        from osdag_gui.osdag_safety import ensure_safe_startup
+        ensure_safe_startup()
+    except ImportError:
+        # Fallback if safety module not found
+        import multiprocessing as mp
+        try:
+            if mp.get_start_method(allow_none=True) is None:
+                mp.set_start_method('spawn')
+        except RuntimeError:
+            pass
     
     try:
         from osdag_gui.__main__ import main as gui_main

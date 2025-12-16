@@ -121,6 +121,17 @@ class StiffenerPlate(object):
 
         return prism1
 
+    def clone(self):
+        """
+        Create a fresh instance of StiffenerPlate with the same parameters.
+        This avoids issues with shallow copying or shared numpy arrays/OCC pointers.
+        """
+        return StiffenerPlate(self.L, self.W, self.T, 
+                              self.L11, self.L12, 
+                              self.R11, self.R12, 
+                              self.R21, self.R22, 
+                              self.L21, self.L22)
+
 if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
 

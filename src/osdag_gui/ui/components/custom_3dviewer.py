@@ -251,7 +251,11 @@ class CustomViewer3d(qtViewer3d):
         super().leaveEvent(event)
 
     def display_view_cube(self):
+        import gc
         try:
+            # Force garbage collection before OCC operations to prevent heap corruption
+            gc.collect()
+            
             # Remove existing view cube if it exists
             if hasattr(self, 'view_cube') and self.view_cube:
                 self.context.Remove(self.view_cube, False)

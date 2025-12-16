@@ -3,6 +3,7 @@
 modified: Darshan Vishwakarma (12-09-2020)
 """
 import numpy as np
+import gc
 
 from ...items.bolt import Bolt
 from ...items.nut import Nut
@@ -322,11 +323,20 @@ class BBENutBoltArray(object):
 
         :return: cad model of nut bolt arrangement
         """
-        for bolt in self.bolts:
+        # CRITICAL: Garbage collect before heavy OCC operations to prevent heap corruption
+        gc.collect()
+        
+        for idx, bolt in enumerate(self.bolts):
             self.models.append(bolt.create_model())
+            # Periodic garbage collection every 10 bolts to prevent memory accumulation
+            if (idx + 1) % 10 == 0:
+                gc.collect()
 
-        for nut in self.nuts:
+        for idx, nut in enumerate(self.nuts):
             self.models.append(nut.create_model())
+            # Periodic garbage collection every 10 nuts
+            if (idx + 1) % 10 == 0:
+                gc.collect()
 
         dbg = self.dbgSphere(self.origin) #TODO : know why sphere is appended to the model (by Anand Swaroop)
         self.models.append(dbg)

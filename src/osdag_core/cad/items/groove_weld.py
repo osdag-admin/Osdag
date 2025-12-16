@@ -73,6 +73,12 @@ class GrooveWeld(object):
 
         return prism
 
+    def clone(self):
+        """
+        Create a fresh instance of GrooveWeld with the same parameters.
+        """
+        return GrooveWeld(self.b, self.h, self.L)
+
 
 if __name__ == '__main__':
 

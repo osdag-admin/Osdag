@@ -808,7 +808,6 @@ class CustomWindow(QWidget):
                 self.ui_loaded = False
                 self.setDictToUserInputs(uiObj)
                 self.ui_loaded = True
-                self.output_dock.output_title_change(self.backend)
             else:
                 CustomMessageBox(
                     title="Information",
@@ -1797,6 +1796,8 @@ class CustomWindow(QWidget):
 
     def design_preferences(self):
         #Function to show Design Preferences Dialog
+        self.designPrefDialog.ui.state_locked = self.input_dock.state_locked
+        self.designPrefDialog.ui.set_lock()
         self.designPrefDialog.show()
 
     def saveDesign_inputs(self):
@@ -1889,6 +1890,8 @@ class CustomWindow(QWidget):
         if hasattr(self, 'cad_widget'):
             # Remove all AIS objects from context
             self.cad_widget.context.RemoveAll(True)
+            # Set self references to None
+            self.cad_widget.view_cube = None
             # Clear the stored model objects dictionary
             self.cad_widget.model_ais_objects.clear()
             # Update the display

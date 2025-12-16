@@ -381,7 +381,6 @@ class CustomWindow(QWidget):
         """Fit all objects in the view"""
         self.display.SetProj(1, -1, 1)
         self.display.FitAll()
-        
     
     #---------------------------------CAD-SETUP-END----------------------------------------------
     
@@ -1481,7 +1480,7 @@ class CustomWindow(QWidget):
                         self.toggle_animate(False, 'input', on_finished=show_logs)
                         self.input_dock_active = False
                         # Lock Basic Inputs
-                        self.input_dock.toggle_lock()
+                        self.input_dock.toggle_lock(set_locked_state=True)
                     except Exception:
                         input_widget = self.splitter.widget(0)
                         if input_widget:

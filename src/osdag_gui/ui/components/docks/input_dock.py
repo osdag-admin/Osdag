@@ -397,15 +397,20 @@ class InputDock(QWidget):
         
         self.tooltip_timer.start(3000)
     
-    def toggle_lock(self):
-        if self.state_locked:
-            self.parent.clear_output_fields()
-            self.parent.flush_cad_widget()
-        self.state_locked = not self.state_locked
-        self.lock_btn.setChecked(self.state_locked)
-        self.scroll_area.setDisabled(self.state_locked)
-        self.update_lock_icon()
-
+    def toggle_lock(self, set_locked_state=False):
+        if set_locked_state:
+            self.state_locked = True
+            self.lock_btn.setChecked(True)
+            self.scroll_area.setDisabled(True)
+            self.update_lock_icon()
+        else:
+            if self.state_locked:
+                self.parent.clear_output_fields()
+                self.parent.flush_cad_widget()
+            self.state_locked = not self.state_locked
+            self.lock_btn.setChecked(self.state_locked)
+            self.scroll_area.setDisabled(self.state_locked)
+            self.update_lock_icon()
 
     def update_lock_icon(self):
         if self.state_locked:

@@ -2099,14 +2099,45 @@ class CommonDesignLogic(object):
 
         self.component = component
 
-        self.display.EraseAll()
-        self.cad_widget.display_view_cube()
+        # CRITICAL: Garbage collect before any OCC operations to prevent heap corruption
+        gc.collect()
+        
+        # CRITICAL: Clean up all internal widget state BEFORE EraseAll
+        # This prevents memory corruption from stale OCC object references
+        # (fixes "object has been displayed in another context" segfault)
+        if hasattr(self, 'cad_widget') and hasattr(self.cad_widget, 'cleanup_for_new_model'):
+            self.cad_widget.cleanup_for_new_model()
+        
+        # Garbage collect after cleanup
+        gc.collect()
+        
+        try:
+            self.display.EraseAll()
+        except Exception as e:
+            print(f"[WARNING] Error erasing display: {e}")
+        
+        # Garbage collect between major OCC operations
+        gc.collect()
+        
+        try:
+            self.cad_widget.display_view_cube()
+        except Exception as e:
+            print(f"[WARNING] Error displaying view cube: {e}")
 
-        self.display.View_Iso()
+        try:
+            self.display.View_Iso()
+        except Exception as e:
+            print(f"[WARNING] Error setting iso view: {e}")
 
-        self.display.FitAll()
+        try:
+            self.display.FitAll()
+        except Exception as e:
+            print(f"[WARNING] Error fitting all: {e}")
 
-        self.display.DisableAntiAliasing()
+        try:
+            self.display.DisableAntiAliasing()
+        except Exception as e:
+            print(f"[WARNING] Error disabling anti-aliasing: {e}")
 
         if bgcolor == "gradient_light":
             self.display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
@@ -2254,26 +2285,34 @@ class CommonDesignLogic(object):
                 label_bolt      = ["Bolt", hover_dict.get("Bolt")]
 
                 if self.component == "Beam":
+                    gc.collect()  # CRITICAL: GC before heavy fuse operations
                     osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                                         color=beam_color, label=label_beam, canvas=self.cad_widget)
 
                 elif self.component == "Connector":
+                    gc.collect()  # CRITICAL: GC before heavy fuse operations
                     osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                                         color=plate_color, label=label_plate, canvas=self.cad_widget)
+                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                                         color=weld_color, label=label_weld, canvas=self.cad_widget)
+                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
                 elif self.component == "Model":
-
-                    # osdag_display_shape(self.display, self.CPObj.get_models(), update=True)
+                    # CRITICAL: Add garbage collection between heavy shape fusing operations
+                    # to prevent "free(): corrupted unsorted chunks" heap corruption
+                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                                         color=beam_color, label=label_beam, canvas=self.cad_widget)
+                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                                         color=plate_color, label=label_plate, canvas=self.cad_widget)
+                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                                         color=weld_color, label=label_weld, canvas=self.cad_widget)
+                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
@@ -2767,11 +2806,8 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 if flag is True:
-
                     self.CPObj = self.createBBEndPlateCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
-
                 else:
                     self.display.EraseAll()
                 self.cad_widget.display_view_cube()

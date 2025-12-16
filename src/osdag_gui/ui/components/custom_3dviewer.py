@@ -250,15 +250,68 @@ class CustomViewer3d(qtViewer3d):
         self.releaseMouse()
         super().leaveEvent(event)
 
+    def cleanup_for_new_model(self):
+        """
+        Clean up all internal state before displaying a new model.
+        This prevents memory corruption from stale OCC object references.
+        """
+        import gc
+        
+        # Reset view cube state
+        if hasattr(self, 'view_cube') and self.view_cube:
+            try:
+                # Try to remove from context if possible
+                if self.context:
+                    try:
+                        self.context.Remove(self.view_cube, False)
+                    except Exception:
+                        pass  # May already be removed by EraseAll
+            except Exception:
+                pass
+            self.view_cube = None
+        
+        # Reset View Cube interaction state
+        self.view_cube_active = False
+        self.is_interacting_with_cube = False
+        
+        # Clear highlighted objects list
+        if self.current_highlighted_ais_list and self.context:
+            for obj in self.current_highlighted_ais_list:
+                try:
+                    self.context.Unhilight(obj, False)
+                except Exception:
+                    pass
+            self.current_highlighted_ais_list = []
+        elif self.current_highlighted_ais_list:
+            # Context not available, just clear the list
+            self.current_highlighted_ais_list = []
+        
+        self.current_highlighted_owner = None
+        self.current_hovered_model = None
+        
+        # Clear the model AIS objects dictionary
+        self.model_ais_objects.clear()
+        
+        # Clear hover labels
+        self.model_hover_labels.clear()
+        
+        # Force garbage collection to clean up OCC shapes
+        gc.collect()
+
     def display_view_cube(self):
         import gc
         try:
             # Force garbage collection before OCC operations to prevent heap corruption
             gc.collect()
             
-            # Remove existing view cube if it exists
+            # Remove existing view cube if it exists using safe method
             if hasattr(self, 'view_cube') and self.view_cube:
-                self.context.Remove(self.view_cube, False)
+                try:
+                    self.context.Remove(self.view_cube, False)
+                except Exception as remove_error:
+                    # Object may have been displayed in a different context or already removed
+                    # Just log and continue - we'll create a fresh one
+                    print(f"Note: Could not remove old ViewCube (may already be removed): {remove_error}")
                 self.view_cube = None
 
             self.view_cube = AIS_ViewCube()

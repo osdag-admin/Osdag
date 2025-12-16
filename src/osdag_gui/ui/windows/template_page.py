@@ -1877,6 +1877,9 @@ class CustomWindow(QWidget):
     
     # Clear output fields
     def clear_output_fields(self):
+        # Reset the design status
+        self.backend.design_status = False
+        self.backend.design_button_status = False
         for output_field in self.output_dock.output_widget.findChildren(QLineEdit):
             output_field.clear()
         for output_field in self.output_dock.output_widget.findChildren(QPushButton):

@@ -85,7 +85,7 @@ class NutBoltArray():
         self.cGauge = bolt_place_obj.pitch_spting
         self.cEdge = bolt_place_obj.edge_spting
         self.cEnd = bolt_place_obj.end_spting
-        print(self.cEnd,"hghghwuuw")
+        print(self.cEnd)
         self.cRow = bolt_place_obj.bolt_one_line_spting
         self.cCol = bolt_place_obj.bolt_lines_spting
         # self.thk = bolt_place_obj.cleat.thickness

@@ -236,6 +236,18 @@ class InputDock(QWidget):
                 right.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 cur_box_form.addRow(left, left_aligned_widget(right))
             
+            elif type == TYPE_IMAGE_COMPRESSION:
+                left = ""
+                right = QLabel()
+                right.setFixedWidth(90)
+                right.setFixedHeight(90)
+                right.setObjectName(field[0])
+                right.setScaledContents(True)
+                pixmap = QPixmap(field[3])
+                right.setPixmap(pixmap)
+                right.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                cur_box_form.addRow(left, left_aligned_widget(right))
+
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")                

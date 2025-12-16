@@ -292,7 +292,20 @@ class ColumnDesign(Member):
 
         Fuction to return a list of tuples to be displayed as the UI (Input Dock)
 
-        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), (None, 'Section Data', 'Title', None, True, 'No Validator'), ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), (None, 'End Condition', 'Title', None, True, 'No Validator'), ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), ('Image', None, 'Image_compression', str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), (None, 'Factored Loads', 'Title', None, True, 'No Validator'), ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
+        eg:[(None, 'Section Property', 'Title', None, True, 'No Validator'), 
+        ('Module', 'Pure Axial Column Design', 'Window Title', None, True, 'No Validator'), 
+        ('Member.Profile', 'Section Profile*', 'ComboBox', ['Beams', 'Columns', 'RHS', 'SHS', 'CHS', 'Angles', 'Back to Back Angles', 'Channels', 'Back to Back Channels'], True, 'No Validator'), 
+        ('Member.Designation', 'Section Size*', 'ComboBox_Customized', ['All', 'Customized'], True, 'No Validator'), 
+        ('Material', 'Material', 'ComboBox', ['E 165 (Fe 290)', 'E 250 (Fe 410 W)A', 'E 250 (Fe 410 W)B', 'E 250 (Fe 410 W)C', 'E 300 (Fe 440)', 'E 350 (Fe 490)', 'E 410 (Fe 540)', 'E 450 (Fe 570)D', 'E 450 (Fe 590) E', 'Cus_400_500_600_1400', 'Custom'], True, 'No Validator'), 
+        (None, 'Section Data', 'Title', None, True, 'No Validator'), 
+        ('Actual.Length_zz', 'Actual Length (z-z), mm', 'TextBox', None, True, 'Int Validator'), 
+        ('Actual.Length_yy', 'Actual Length (y-y), mm', 'TextBox', None, True, 'Int Validator'), 
+        (None, 'End Condition', 'Title', None, True, 'No Validator'), 
+        ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), 
+        ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), 
+        ('Image', None, 'Image_compression', str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), 
+        (None, 'Factored Loads', 'Title', None, True, 'No Validator'), 
+        ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
         """
 
         self.module = KEY_DISP_COMPRESSION_COLUMN
@@ -331,7 +344,7 @@ class ColumnDesign(Member):
         t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE, "Image z-z", TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
+        t12 = (KEY_IMAGE, "Image z-z", TYPE_IMAGE_COMPRESSION, str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t12)
 
         t13 = (None, KEY_DISP_END_CONDITION_2, TYPE_TITLE, None, True, 'No Validator')
@@ -343,7 +356,7 @@ class ColumnDesign(Member):
         t15 = (KEY_END2_Y, KEY_DISP_END2_Y, TYPE_COMBOBOX, VALUES_END2_Y, True, 'No Validator')
         options_list.append(t15)
 
-        t16 = (KEY_IMAGE_Y, "Image y-y", TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
+        t16 = (KEY_IMAGE_Y, "Image y-y", TYPE_IMAGE_COMPRESSION, str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
         options_list.append(t16)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -372,9 +385,9 @@ class ColumnDesign(Member):
         elif profile in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type= "popup")
 
-    def fn_end1_end2(self):
+    def fn_end1_end2(self, arg):
 
-        end1 = self[0]
+        end1 = arg[0]
         print("end1 is {}".format(end1))
         if end1 == 'Fixed':
             return VALUES_END2
@@ -396,10 +409,10 @@ class ColumnDesign(Member):
         elif self == 'Roller':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
 
-    def fn_end2_image(self):
+    def fn_end2_image(self, arg):
 
-        end1 = self[0]
-        end2 = self[1]
+        end1 = arg[0]
+        end2 = arg[1]
         print("end 1 and end 2 are {}".format(end1, end2))
 
         if end1 == 'Fixed':

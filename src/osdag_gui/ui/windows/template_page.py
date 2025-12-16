@@ -1892,6 +1892,8 @@ class CustomWindow(QWidget):
         if hasattr(self, 'cad_widget'):
             # Remove all AIS objects from context
             self.cad_widget.context.RemoveAll(True)
+            # Set self references to None
+            self.cad_widget.view_cube = None
             # Clear the stored model objects dictionary
             self.cad_widget.model_ais_objects.clear()
             # Update the display

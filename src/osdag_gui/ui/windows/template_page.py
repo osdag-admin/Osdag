@@ -537,7 +537,6 @@ class CustomWindow(QWidget):
         # root is the greatest level of parent that is the MainWindow
         self.output_dock = OutputDock(backend=self.backend, parent=self)
         self.splitter.addWidget(self.output_dock)
-        # self.output_dock.setStyleSheet(self.output_dock.styleSheet())
         self.output_dock.hide()
 
         self.layout.addWidget(self.splitter)

@@ -1798,6 +1798,8 @@ class CustomWindow(QWidget):
 
     def design_preferences(self):
         #Function to show Design Preferences Dialog
+        self.designPrefDialog.ui.state_locked = self.input_dock.state_locked
+        self.designPrefDialog.ui.set_lock()
         self.designPrefDialog.show()
 
     def saveDesign_inputs(self):

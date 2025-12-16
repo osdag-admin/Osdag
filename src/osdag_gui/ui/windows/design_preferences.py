@@ -569,6 +569,31 @@ class Window(QDialog):
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
             pushButton_Download_Channel.clicked.connect(lambda table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
 
+    def set_lock(self):
+        """
+        This method locks input fields.
+        """
+        locked = self.state_locked
+
+        # Set input fields to read-only based on state_locked
+        for widget in self.findChildren(QWidget):
+            if isinstance(widget, (QComboBox, QLineEdit)):
+                widget.setDisabled(locked)
+
+        # Set buttons to disabled based on state_locked
+        self.btn_defaults.setDisabled(locked)
+        # self.btn_save.setDisabled(locked)
+        button_objectname_pattern = QRegularExpression(r"^pushButton_(Add|Clear|Import)_")
+        for button in self.findChildren(QPushButton, button_objectname_pattern):
+            button.setDisabled(locked)
+
+        # Tooltip on dialog
+        if locked:
+            self.setToolTip("Inputs are locked")
+        else:
+            self.setToolTip("")
+
+
     def manage_designation_size(self,line_edit):
         def change_size():
             font = line_edit.font()

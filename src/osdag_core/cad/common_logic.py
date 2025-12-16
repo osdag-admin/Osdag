@@ -6,6 +6,7 @@ modified : Sourabh Das, Darshan Vishwakarma
 '''
 
 # from utils.common.component import Bolt,Beam,Section,Angle,Plate,Nut,Column,Weld
+import gc
 from .items.notch import Notch
 from .items.bolt import Bolt
 from .items.nut import Nut
@@ -837,6 +838,8 @@ class CommonDesignLogic(object):
         Calls the CAD components like beam, plate, stiffeners, fillet and grove weld, nut and bolt. Also calls CAD file
         :return: creates CAD model
         """
+        # CRITICAL: Garbage collect before creating CAD model to prevent heap corruption
+        gc.collect()
 
         BBE = self.module_object  
 
@@ -854,13 +857,19 @@ class CommonDesignLogic(object):
         beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                              R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                              length=beam_length, notchObj=None)
-        beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+        # CRITICAL: Create new instance instead of copy.copy to prevent shared numpy array state
+        beam_Right = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+                              R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                              length=beam_length, notchObj=None)
 
 
         plate_Left = Plate(W=BBE.ep_width_provided,
                            L=BBE.ep_height_provided,
                            T=BBE.plate_thickness)
-        plate_Right = copy.copy(plate_Left)  # Since both the end plates are identical
+        # CRITICAL: Create new instance instead of copy.copy to prevent shared numpy array state
+        plate_Right = Plate(W=BBE.ep_width_provided,
+                            L=BBE.ep_height_provided,
+                            T=BBE.plate_thickness)
 
         # Beam stiffeners 4 if extended both ways, only 1 and 3 if extended oneway and non for flus type
         beam_stiffeners = StiffenerPlate(W=BBE.stiffener_height, L=BBE.stiffener_length,
@@ -2188,7 +2197,12 @@ class CommonDesignLogic(object):
             if self.connection == KEY_DISP_BEAMCOVERPLATE:
 
                 self.B = self.module_object
-                self.CPObj = self.createBBCoverPlateCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
+                # else:
+                #     pass
+                #
+                # self.loc = A.connectivity
+                # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 
                 hover_dict = getattr(self.B, "hover_dict", {})
 
@@ -2225,7 +2239,9 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 self.B = self.module_object  
 
-                self.ExtObj = self.createBBEndPlateCAD()
+                # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
+                # Do NOT call createBBEndPlateCAD() again here
                 hover_dict = getattr(self.B, "hover_dict", {})
 
                 # Safely set hover labels
@@ -2238,32 +2254,33 @@ class CommonDesignLogic(object):
                 label_bolt      = ["Bolt", hover_dict.get("Bolt")]
 
                 if self.component == "Beam":
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                                         color=beam_color, label=label_beam, canvas=self.cad_widget)
 
                 elif self.component == "Connector":
-                    osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                                         color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                                         color=weld_color, label=label_weld, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
                 elif self.component == "Model":
 
-                    # osdag_display_shape(self.display, self.ExtObj.get_models(), update=True)
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True,
+                    # osdag_display_shape(self.display, self.CPObj.get_models(), update=True)
+                    osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                                         color=beam_color, label=label_beam, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                                         color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                                         color=weld_color, label=label_weld, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 self.B = self.module_object
-                self.CPObj = self.createBBCoverPlateCAD()
+                # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 beams = self.CPObj.get_beam_models()
                 plates = self.CPObj.get_plate_models()
                 welds = self.CPObj.get_welded_modules()
@@ -2291,7 +2308,8 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE:
                 self.C = self.module_object  
-                self.CPObj = self.createCCCoverPlateCAD()
+                # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 columns = self.CPObj.get_column_models()
                 plates = self.CPObj.get_plate_models()
                 nutbolt = self.CPObj.get_nut_bolt_models()
@@ -2325,7 +2343,9 @@ class CommonDesignLogic(object):
                 label_plate = ["Plate", hover_dict.get("Plate")]
                 label_weld = ["Weld", hover_dict.get("Weld")]
                 label_bolt = ["Bolt", hover_dict.get("Bolt")]
-                self.ExtObj = self.createBCEndPlateCAD()
+                # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
+                # Do NOT call createBCEndPlateCAD() again here
 
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
                 c_length = self.column_length
@@ -2337,7 +2357,7 @@ class CommonDesignLogic(object):
                 # Displays the beams #TODO ANAND
                 if self.component == "Column":
                     self.display.View_Iso()
-                    osdag_display_shape(self.display, self.ExtObj.columnModel, update=True, color=column_color, label=label_column, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, self.CPObj.columnModel, update=True, color=column_color, label=label_column, canvas=self.cad_widget)
 
                     # Point1 = gp_Pnt(-self.Bc.supporting_section.flange_width/2, 0, c_length)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
@@ -2346,31 +2366,31 @@ class CommonDesignLogic(object):
 
                 elif self.component == "Beam":
                     self.display.View_Iso()
-                    osdag_display_shape(self.display, self.ExtObj.beamModel, update=True, color=beam_color,
+                    osdag_display_shape(self.display, self.CPObj.beamModel, update=True, color=beam_color,
                         label=label_beam, canvas=self.cad_widget)
                     # Point2 = gp_Pnt(0.0, -b_length, c_length / 2)
                     # DisplayMsg(self.display, Point2, self.Bc.supported_section.designation)
                     # , color = 'Dark Gray'
 
                 elif self.component == "Connector":
-                    osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                         color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                         color=weld_color, label=label_weld, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
 
                 elif self.component == "Model":
-                    osdag_display_shape(self.display, self.ExtObj.get_column_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_column_models(), update=True,
                         color=column_color, label=label_column, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                         color=beam_color, label=label_beam, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                         color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                         color=weld_color, label=label_weld, canvas=self.cad_widget)
-                    osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
+                    osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
                     # Point1 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -self.Bc.supporting_section.depth/2, c_length*0.75)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
@@ -2381,7 +2401,8 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_object
-                self.CPObj = self.createCCCoverPlateCAD()
+                # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 columns = self.CPObj.get_column_models()
                 plates = self.CPObj.get_plate_models()
                 welds = self.CPObj.get_welded_modules()
@@ -2410,7 +2431,8 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
                 self.CEP = self.module_object  
-                self.CEPObj = self.createCCEndPlateCAD()
+                # NOTE: Reuse self.CEPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 columns = self.CEPObj.get_column_models()
                 plates = self.CEPObj.get_plate_models()
                 welds = self.CEPObj.get_weld_models()
@@ -2441,7 +2463,8 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BASE_PLATE:
                 self.Bp = self.module_object  
 
-                self.BPObj = self.createBasePlateCAD()
+                # NOTE: Reuse self.BPObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
 
                 column = self.BPObj.get_column_model()
                 plate = self.BPObj.get_plate_connector_models()
@@ -2623,7 +2646,8 @@ class CommonDesignLogic(object):
                  # Hover dict
                 hover_dict = self.module_object.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict
-                self.TObj = self.createTensionCAD()
+                # NOTE: Reuse self.TObj created in call_3DModel() to prevent duplicate CAD creation
+                # which causes OpenCASCADE memory corruption (malloc double linked list error)
 
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()

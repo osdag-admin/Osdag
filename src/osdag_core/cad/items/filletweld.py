@@ -77,6 +77,12 @@ class FilletWeld(object):
 
         return prism1
 
+    def clone(self):
+        """
+        Create a fresh instance of FilletWeld with the same parameters.
+        """
+        return FilletWeld(self.b, self.h, self.L)
+
 
 if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display

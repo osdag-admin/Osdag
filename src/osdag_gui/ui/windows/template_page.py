@@ -1,4 +1,4 @@
-import sys, os, yaml, time
+import sys, os, yaml, time, gc
 import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
@@ -1626,7 +1626,11 @@ class CustomWindow(QWidget):
                 # print("Hover Dictionary: ", main.hover_dict)
 
                 print("[INFO] Calling 3D Model from CAD")
-                # CRITICAL: Process Qt events before OpenGL rendering to prevent segfault on Linux
+                # CRITICAL: Garbage collect before heavy CAD operations to prevent heap corruption
+                # This is essential when creating 64+ OpenCASCADE shapes (bolts/nuts/welds)
+                gc.collect()
+                
+                # Process Qt events before OpenGL rendering to prevent segfault on Linux
                 from PySide6.QtWidgets import QApplication
                 QApplication.processEvents()
                 
@@ -1634,6 +1638,8 @@ class CustomWindow(QWidget):
                 if self._is_display_ready():
                     try:
                         self.commLogicObj.call_3DModel(status, main)
+                        # Garbage collect after CAD operations to clean up OCC shapes
+                        gc.collect()
                     except Exception as e:
                         print(f"[ERROR] 3D model rendering failed: {e}")
                 else:

@@ -7,7 +7,7 @@ modified : Darshan Vishwakarma (12-09-2020)
 """""
 
 import numpy
-import copy
+import numpy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
@@ -43,14 +43,14 @@ class CADFillet(object): # not used in the current version as groove weld is pre
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
         self.beam_stiffener_1 = beam_stiffeners
-        self.beam_stiffener_2 = copy.deepcopy(beam_stiffeners)
-        self.beam_stiffener_3 = copy.deepcopy(beam_stiffeners)
-        self.beam_stiffener_4 = copy.deepcopy(beam_stiffeners)
+        self.beam_stiffener_2 = beam_stiffeners.clone()
+        self.beam_stiffener_3 = beam_stiffeners.clone()
+        self.beam_stiffener_4 = beam_stiffeners.clone()
 
         self.beam_stiffener_F1 = beam_stiffenerFlush
-        self.beam_stiffener_F2 = copy.deepcopy(beam_stiffenerFlush)
-        self.beam_stiffener_F3 = copy.deepcopy(beam_stiffenerFlush)
-        self.beam_stiffener_F4 = copy.deepcopy(beam_stiffenerFlush)
+        self.beam_stiffener_F2 = beam_stiffenerFlush.clone()
+        self.beam_stiffener_F3 = beam_stiffenerFlush.clone()
+        self.beam_stiffener_F4 = beam_stiffenerFlush.clone()
         # self.alist = alist
         # self.outputobj = outputobj
         self.boltProjection = float(outputobj['Plate']['Projection'])
@@ -90,61 +90,61 @@ class CADFillet(object): # not used in the current version as groove weld is pre
 
 
         # Weld above flange for left and right beam
-        self.bbWeldAbvFlang_11 = copy.deepcopy(bbWeldAbvFlang)    # Left beam upper side
-        self.bbWeldAbvFlang_12 = copy.deepcopy(bbWeldAbvFlang)      # Left beam lower side
-        self.bbWeldAbvFlang_21 = copy.deepcopy(bbWeldAbvFlang)     # Right beam upper side
-        self.bbWeldAbvFlang_22 = copy.deepcopy(bbWeldAbvFlang)      # Right beam lower side
+        self.bbWeldAbvFlang_11 = bbWeldAbvFlang.clone()    # Left beam upper side
+        self.bbWeldAbvFlang_12 = bbWeldAbvFlang.clone()      # Left beam lower side
+        self.bbWeldAbvFlang_21 = bbWeldAbvFlang.clone()     # Right beam upper side
+        self.bbWeldAbvFlang_22 = bbWeldAbvFlang.clone()      # Right beam lower side
 
-        self.bbWeldBelwFlang_11 = copy.deepcopy(bbWeldBelwFlang)    # Left beam, upper, left
-        self.bbWeldBelwFlang_12 = copy.deepcopy(bbWeldBelwFlang)    # Left beam, upper, right
-        self.bbWeldBelwFlang_13 = copy.deepcopy(bbWeldBelwFlang)    # Left beam, lower, left
-        self.bbWeldBelwFlang_14 = copy.deepcopy(bbWeldBelwFlang)    # Left beam, lower, right
-        self.bbWeldBelwFlang_21 = copy.deepcopy(bbWeldBelwFlang)    # behind bbWeldBelwFlang_11
-        self.bbWeldBelwFlang_22 = copy.deepcopy(bbWeldBelwFlang)    # behind bbWeldBelwFlang_12
-        self.bbWeldBelwFlang_23 = copy.deepcopy(bbWeldBelwFlang)    # behind bbWeldBelwFlang_13
-        self.bbWeldBelwFlang_24 = copy.deepcopy(bbWeldBelwFlang)    # behind bbWeldBelwFlang_14
+        self.bbWeldBelwFlang_11 = bbWeldBelwFlang.clone()    # Left beam, upper, left
+        self.bbWeldBelwFlang_12 = bbWeldBelwFlang.clone()    # Left beam, upper, right
+        self.bbWeldBelwFlang_13 = bbWeldBelwFlang.clone()    # Left beam, lower, left
+        self.bbWeldBelwFlang_14 = bbWeldBelwFlang.clone()    # Left beam, lower, right
+        self.bbWeldBelwFlang_21 = bbWeldBelwFlang.clone()    # behind bbWeldBelwFlang_11
+        self.bbWeldBelwFlang_22 = bbWeldBelwFlang.clone()    # behind bbWeldBelwFlang_12
+        self.bbWeldBelwFlang_23 = bbWeldBelwFlang.clone()    # behind bbWeldBelwFlang_13
+        self.bbWeldBelwFlang_24 = bbWeldBelwFlang.clone()    # behind bbWeldBelwFlang_14
 
 
-        self.bbWeldSideWeb_11 = copy.deepcopy(bbWeldSideWeb)        # Left beam, left of Web
-        self.bbWeldSideWeb_12 = copy.deepcopy(bbWeldSideWeb)        # Left beam, right of Web
-        self.bbWeldSideWeb_21 = copy.deepcopy(bbWeldSideWeb)       # Behind bbWeldSideWeb_11
-        self.bbWeldSideWeb_22 = copy.deepcopy(bbWeldSideWeb)        # Behind bbWeldSideWeb_12
+        self.bbWeldSideWeb_11 = bbWeldSideWeb.clone()        # Left beam, left of Web
+        self.bbWeldSideWeb_12 = bbWeldSideWeb.clone()        # Left beam, right of Web
+        self.bbWeldSideWeb_21 = bbWeldSideWeb.clone()       # Behind bbWeldSideWeb_11
+        self.bbWeldSideWeb_22 = bbWeldSideWeb.clone()        # Behind bbWeldSideWeb_12
 
         self.bbWeldStiffHL_1 = bbWeldStiffHeight
-        self.bbWeldStiffHL_2 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHL_3 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHL_4 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_1 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_2 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_3 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_4 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHL_2 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHL_3 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHL_4 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_1 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_2 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_3 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_4 = bbWeldStiffHeight.clone()
 
         self.bbWeldStiffLL_1 = bbWeldStiffLength
-        self.bbWeldStiffLL_2 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLL_3 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLL_4 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_1 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_2 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_3 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_4 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLL_2 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLL_3 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLL_4 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_1 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_2 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_3 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_4 = bbWeldStiffLength.clone()
 
         self.bbWeldstiff1_u1 = bbWeldFlushstiffHeight
-        self.bbWeldstiff1_l1 =copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff2_u1 =copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff2_l1 =copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff3_u1 =copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff3_l1 =copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff4_u1 =copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff4_l1 =copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff1_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff2_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff2_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff3_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff3_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff4_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff4_l1 = bbWeldFlushstiffHeight.clone()
 
         self.bbWeldstiff1_u2 = bbWeldFlushstiffLength
-        self.bbWeldstiff1_l2 =copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff2_u2 =copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff2_l2 =copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff3_u2 =copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff3_l2 =copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff4_u2 =copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff4_l2 =copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff1_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff2_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff2_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff3_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff3_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff4_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff4_l2 = bbWeldFlushstiffLength.clone()
 
 
     def create_3DModel(self):
@@ -894,9 +894,9 @@ class CADGroove(object):
         self.plateLModel = None
         self.plateRModel = None
         self.beam_stiffener_1 = beam_stiffeners
-        self.beam_stiffener_2 = copy.deepcopy(beam_stiffeners)
-        self.beam_stiffener_3 = copy.deepcopy(beam_stiffeners)
-        self.beam_stiffener_4 = copy.deepcopy(beam_stiffeners)
+        self.beam_stiffener_2 = beam_stiffeners.clone()
+        self.beam_stiffener_3 = beam_stiffeners.clone()
+        self.beam_stiffener_4 = beam_stiffeners.clone()
         self.module = module
 
         #flush stiffener#
@@ -917,67 +917,67 @@ class CADGroove(object):
             self.loc1 = float(self.module.beam_D / 2 - self.module.stiffener_thickness / 2 - self.module.pitch_distance_web/2)
             self.loc2 = float(self.module.beam_D / 2 - self.module.stiffener_thickness / 2 + self.module.pitch_distance_web/2)
         self.bbWeldFlang_R1 = bbWeldFlang
-        self.bbWeldFlang_R2 = copy.deepcopy(bbWeldFlang)
-        self.bbWeldFlang_L1 = copy.deepcopy(bbWeldFlang)
-        self.bbWeldFlang_L2 = copy.deepcopy(bbWeldFlang)
+        self.bbWeldFlang_R2 = bbWeldFlang.clone()
+        self.bbWeldFlang_L1 = bbWeldFlang.clone()
+        self.bbWeldFlang_L2 = bbWeldFlang.clone()
         self.bbWeldWeb_R3 =  bbWeldWeb
-        self.bbWeldWeb_L3 = copy.deepcopy(bbWeldWeb)
+        self.bbWeldWeb_L3 = bbWeldWeb.clone()
         #
 
 
         #Fillet weld
 
         self.bbWeldStiffHL_1 = bbWeldStiffHeight
-        self.bbWeldStiffHL_2 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHL_3 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHL_4 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_1 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_2 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_3 = copy.deepcopy(bbWeldStiffHeight)
-        self.bbWeldStiffHR_4 = copy.deepcopy(bbWeldStiffHeight)
+        self.bbWeldStiffHL_2 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHL_3 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHL_4 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_1 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_2 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_3 = bbWeldStiffHeight.clone()
+        self.bbWeldStiffHR_4 = bbWeldStiffHeight.clone()
 
         self.bbWeldStiffLL_1 = bbWeldStiffLength
-        self.bbWeldStiffLL_2 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLL_3 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLL_4 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_1 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_2 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_3 = copy.deepcopy(bbWeldStiffLength)
-        self.bbWeldStiffLR_4 = copy.deepcopy(bbWeldStiffLength)
+        self.bbWeldStiffLL_2 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLL_3 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLL_4 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_1 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_2 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_3 = bbWeldStiffLength.clone()
+        self.bbWeldStiffLR_4 = bbWeldStiffLength.clone()
         #
         self.bbWeldstiff1_u1 = bbWeldFlushstiffHeight
-        self.bbWeldstiff1_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff2_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff2_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff3_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff3_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff4_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff4_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff1_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff2_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff2_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff3_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff3_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff4_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff4_l1 = bbWeldFlushstiffHeight.clone()
         self.bbWeldstiff5_u1 = bbWeldFlushstiffHeight
-        self.bbWeldstiff5_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff6_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff6_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff7_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff7_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff8_u1 = copy.deepcopy(bbWeldFlushstiffHeight)
-        self.bbWeldstiff8_l1 = copy.deepcopy(bbWeldFlushstiffHeight)
+        self.bbWeldstiff5_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff6_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff6_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff7_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff7_l1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff8_u1 = bbWeldFlushstiffHeight.clone()
+        self.bbWeldstiff8_l1 = bbWeldFlushstiffHeight.clone()
         #
         self.bbWeldstiff1_u2 = bbWeldFlushstiffLength
-        self.bbWeldstiff1_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff2_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff2_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff3_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff3_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff4_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff4_l2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff1_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff2_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff2_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff3_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff3_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff4_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff4_l2 = bbWeldFlushstiffLength.clone()
         self.bbWeldstiff5_u2 = bbWeldFlushstiffLength
-        self.bbWeldstiff5_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff6_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff6_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff7_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff7_l2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff8_u2 = copy.deepcopy(bbWeldFlushstiffLength)
-        self.bbWeldstiff8_l2 = copy.deepcopy(bbWeldFlushstiffLength)
+        self.bbWeldstiff5_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff6_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff6_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff7_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff7_l2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff8_u2 = bbWeldFlushstiffLength.clone()
+        self.bbWeldstiff8_l2 = bbWeldFlushstiffLength.clone()
 
     def create_3DModel(self):
         """
@@ -1004,7 +1004,6 @@ class CADGroove(object):
         # flush stiffener#
         # self.create_bbWeldFlushstiffHeight()
         # self.create_bbWeldFlushstiffLength()
-
 
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()

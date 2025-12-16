@@ -2576,7 +2576,7 @@ class CommonDesignLogic(object):
                 if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.flex.hover_dict
 
-                label_flexure = ["Flexural Members - Purlins", hover_dict["Flexural Members - Purlins"]]
+                label_flexure = ["Flexural Members", hover_dict["Flexural Members"]]
                   
                 print(f"THIS IS SELF.MODULE_OBJECT {self.flex}")
                 self.FObj = self.createPurlin()

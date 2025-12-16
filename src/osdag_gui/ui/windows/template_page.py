@@ -1840,7 +1840,7 @@ class CustomWindow(QWidget):
         except Exception as e:
             CustomMessageBox(
                 title="Application",
-                text="Cannot write file %s:\n%s" % (filePath, str(e)),
+                text="OSI file not saved.",
                 dialogType=MessageBoxType.Warning
             ).exec()
             return

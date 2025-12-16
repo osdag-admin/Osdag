@@ -1880,7 +1880,7 @@ class CustomWindow(QWidget):
         for output_field in self.output_dock.output_widget.findChildren(QLineEdit):
             output_field.clear()
         for output_field in self.output_dock.output_widget.findChildren(QPushButton):
-            if output_field.objectName() in ["btn_CreateDesign", "save_outputDock"]:
+            if output_field.objectName() == "dock_custom_button":
                 continue
             output_field.setEnabled(False)
     

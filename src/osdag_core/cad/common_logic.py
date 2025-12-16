@@ -2188,11 +2188,7 @@ class CommonDesignLogic(object):
         if self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE:
 
-                self.B = self.module_object  
-                # else:
-                #     pass
-                #
-                # self.loc = A.connectivity
+                self.B = self.module_object
                 self.CPObj = self.createBBCoverPlateCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
                 
                 hover_dict = getattr(self.B, "hover_dict", {})
@@ -2200,9 +2196,9 @@ class CommonDesignLogic(object):
                 if hasattr(self, "cad_widget") and hasattr(self.B, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.B.hover_dict
                     
-                label_beam   = ["Beam",   hover_dict.get("Beam",   "Beam")]
-                label_plate  = ["Plate",  hover_dict.get("Plate",  "Plate")]
-                label_bolt   = ["Bolt",   hover_dict.get("Bolt",   "Bolt")]
+                label_beam   = ["Beam",   hover_dict.get("Beam")]
+                label_plate  = ["Plate",  hover_dict.get("Plate")]
+                label_bolt   = ["Bolt",   hover_dict.get("Bolt")]
             
                 if self.component == "Beam":
                     # Displays both beams
@@ -2237,10 +2233,10 @@ class CommonDesignLogic(object):
                 if hasattr(self, "cad_widget") and hasattr(self.B, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.B.hover_dict
                     
-                label_beam      = ["Beam",      hover_dict.get("Beam", "Beam")]
-                label_plate     = ["Plate",     hover_dict.get("Plate", "Plate")]
-                label_weld      = ["Weld",      hover_dict.get("Weld", "Weld")]
-                label_bolt      = ["Bolt",      hover_dict.get("Bolt", "Bolt")]
+                label_beam      = ["Beam", hover_dict.get("Beam")]
+                label_plate     = ["Plate", hover_dict.get("Plate")]
+                label_weld      = ["Weld", hover_dict.get("Weld")]
+                label_bolt      = ["Bolt", hover_dict.get("Bolt")]
 
                 if self.component == "Beam":
                     osdag_display_shape(self.display, self.ExtObj.get_beam_models(), update=True,
@@ -2279,9 +2275,9 @@ class CommonDesignLogic(object):
                 if hasattr(self, "cad_widget") and hasattr(self.module_object, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.module_object.hover_dict
                     
-                label_beam   = ["Beam",   hover_dict.get("Beam",   "Beam")]
-                label_plate  = ["Plate",  hover_dict.get("Plate",  "Plate")]
-                label_welds   = ["Weld",   hover_dict.get("Weld",   "Weld")]
+                label_beam   = ["Beam", hover_dict.get("Beam")]
+                label_plate  = ["Plate", hover_dict.get("Plate")]
+                label_welds   = ["Weld", hover_dict.get("Weld")]
                
                 if self.component == "Beam":
                     # Displays both beams
@@ -2305,9 +2301,9 @@ class CommonDesignLogic(object):
                 if hasattr(self, "cad_widget") and hasattr(self.module_object, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.module_object.hover_dict
 
-                label_column = ["Column", hover_dict.get("Column", "Column")]
-                label_plate  = ["Plate",  hover_dict.get("Plate",  "Plate")]
-                label_bolt   = ["Bolt",   hover_dict.get("Bolt",   "Bolt")]
+                label_column = ["Column", hover_dict.get("Column")]
+                label_plate  = ["Plate",  hover_dict.get("Plate")]
+                label_bolt   = ["Bolt",   hover_dict.get("Bolt")]
 
                 if self.component == "Column":
                     # Displays both beams
@@ -2325,11 +2321,11 @@ class CommonDesignLogic(object):
                 self.Bc = self.module_object
                 hover_dict = self.module_object.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict
-                label_column = ["Column", hover_dict.get("Column", "Column")]
-                label_beam = ["Beam", hover_dict.get("Beam", "Beam")]
-                label_plate = ["Plate", hover_dict.get("Plate", "Plate")]
-                label_weld = ["Weld", hover_dict.get("Weld", "Weld")]
-                label_bolt = ["Bolt", hover_dict.get("Bolt", "Bolt")]
+                label_column = ["Column", hover_dict.get("Column")]
+                label_beam = ["Beam", hover_dict.get("Beam")]
+                label_plate = ["Plate", hover_dict.get("Plate")]
+                label_weld = ["Weld", hover_dict.get("Weld")]
+                label_bolt = ["Bolt", hover_dict.get("Bolt")]
                 self.ExtObj = self.createBCEndPlateCAD()
 
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
@@ -2397,9 +2393,9 @@ class CommonDesignLogic(object):
                     self.cad_widget.model_hover_labels = self.C.hover_dict
                     
         
-                label_column = ["Column", hover_dict.get("Column", "Column")]
-                label_plate  = ["Plate",  hover_dict.get("Plate",  "Plate")]
-                label_weld   = ["Weld",   hover_dict.get("Weld",   "Weld")]
+                label_column = ["Column", hover_dict.get("Column")]
+                label_plate  = ["Plate",  hover_dict.get("Plate")]
+                label_weld   = ["Weld",   hover_dict.get("Weld")]
               
 
                 if self.component == "Column":
@@ -2426,10 +2422,10 @@ class CommonDesignLogic(object):
                 if hasattr(self, "cad_widget") and hover_dict:
                     self.cad_widget.model_hover_labels = hover_dict
                     
-                label_column = ["Column", hover_dict.get("Column", "Column")]
-                label_plate  = ["Plate",  hover_dict.get("Plate",  "Plate")]
-                label_weld   = ["Weld",   hover_dict.get("Weld",   "Weld")]
-                label_bolt   = ["Bolt",   hover_dict.get("Bolt",   "Bolt")]
+                label_column = ["Column", hover_dict.get("Column")]
+                label_plate  = ["Plate",  hover_dict.get("Plate")]
+                label_weld   = ["Weld",   hover_dict.get("Weld")]
+                label_bolt   = ["Bolt",   hover_dict.get("Bolt")]
 
                 if self.component == "Column":
                     osdag_display_shape(self.display, columns, update=True, color=column_color, label=label_column,canvas=self.cad_widget)
@@ -2477,12 +2473,10 @@ class CommonDesignLogic(object):
             self.col = self.module_object  
             self.ColObj = self.createColumnInFrameCAD()
             
-            hover_dict = getattr(self.module_object, "hover_dict", None) or getattr(self, "C", None) and getattr(self.C, "hover_dict", None) or getattr(self, "col", None) and getattr(self.col, "hover_dict", None) or {}
-
-            if hasattr(self, "cad_widget") and hover_dict:
-                    self.cad_widget.model_hover_labels = hover_dict
+            hover_dict = self.module_object.hover_dict
+            self.cad_widget.model_hover_labels = hover_dict
                     
-            label_column = ["Column", hover_dict.get("Column", "Column")]
+            label_column = ["Column", hover_dict.get("Column")]
                     
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True, color=column_color, label=label_column,canvas=self.cad_widget)

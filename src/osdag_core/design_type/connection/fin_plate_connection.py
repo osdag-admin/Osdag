@@ -136,12 +136,10 @@ class FinPlateConnection(ShearConnection):
     ####################################
 
     def set_osdaglogger(self, key):
-
         """
         Function to set Logger for FinPlate Module
         """
         # @author Arsil Zunzunia
-        # super(FinPlateConnection, FinPlateConnection).set_osdaglogger(key)
 
         # Set Custom logger
         logging.setLoggerClass(CustomLogger)

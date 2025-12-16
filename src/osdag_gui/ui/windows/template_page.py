@@ -1625,7 +1625,6 @@ class CustomWindow(QWidget):
 
                 # print("Hover Dictionary: ", main.hover_dict)
 
-                print("[INFO] Calling 3D Model from CAD")
                 # CRITICAL: Garbage collect before heavy CAD operations to prevent heap corruption
                 # This is essential when creating 64+ OpenCASCADE shapes (bolts/nuts/welds)
                 gc.collect()
@@ -1985,17 +1984,63 @@ class CustomWindow(QWidget):
     
     # Clear Cad widget
     def flush_cad_widget(self):
-        if hasattr(self, 'cad_widget'):
-            # Remove all AIS objects from context
-            self.cad_widget.context.RemoveAll(True)
-            # Set self references to None
-            self.cad_widget.view_cube = None
-            # Clear the stored model objects dictionary
-            self.cad_widget.model_ais_objects.clear()
-            # Update the display
-            self.cad_widget._display.Repaint()
+        """
+        Safely clear the CAD widget. Uses deferred execution to prevent
+        heap corruption from OCC operations conflicting with Qt rendering.
+        """
+        if not hasattr(self, 'cad_widget') or not self.cad_widget:
+            return
+            
+        # Check if CAD widget is fully initialized (deferred init may not be complete)
+        if getattr(self, '_cad_init_pending', True):
+            print("[INFO] CAD widget not yet initialized, skipping flush")
+            return
+        
+        # CRITICAL: Defer the actual OCC cleanup to avoid heap corruption
+        # The crash was caused by RemoveAll() conflicting with ongoing OCC operations
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(0, self._do_flush_cad_widget)
     
-    #--------------------Unlocking-Inputs-After-Design-Start-----------------------
+    def _do_flush_cad_widget(self):
+        """
+        Internal method that performs the actual CAD widget cleanup.
+        This is called via QTimer.singleShot to defer execution.
+        """
+        import gc
+        
+        if not hasattr(self, 'cad_widget') or not self.cad_widget:
+            return
+            
+        # Force garbage collection BEFORE OCC operations
+        gc.collect()
+        
+        # Use the new cleanup method to properly reset all internal state
+        # This prevents memory corruption from stale OCC object references
+        if hasattr(self.cad_widget, 'cleanup_for_new_model'):
+            try:
+                self.cad_widget.cleanup_for_new_model()
+            except Exception as e:
+                print(f"[WARNING] Error in cleanup_for_new_model: {e}")
+        
+        # Force garbage collection after cleanup
+        gc.collect()
+        
+        # Remove all AIS objects from context (with safety check)
+        # Use False to NOT force immediate update - this prevents crash
+        if hasattr(self.cad_widget, 'context') and self.cad_widget.context:
+            try:
+                self.cad_widget.context.RemoveAll(False)  # Changed from True to False
+            except Exception as e:
+                print(f"[WARNING] Error removing AIS objects: {e}")
+        
+        gc.collect()
+        
+        # Update the display (with safety check)
+        if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
+            try:
+                self.cad_widget._display.Repaint()
+            except Exception as e:
+                print(f"[WARNING] Error repainting display: {e}")
 
     # Error Message Box
     def show_error_msg(self, error):

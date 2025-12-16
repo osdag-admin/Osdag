@@ -82,6 +82,7 @@ class InputDock(QWidget):
         self.toggle_btn = QPushButton("❮")
         self.toggle_btn.setObjectName("toggle_strip_button")
         self.toggle_btn.setFixedSize(6, 60)
+        self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.toggle_btn.setToolTip("Hide panel")
         self.toggle_btn.clicked.connect(self.toggle_input_dock)
         toggle_layout.addStretch()

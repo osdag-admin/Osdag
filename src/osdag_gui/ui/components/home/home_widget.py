@@ -316,7 +316,7 @@ class ModuleItem(QFrame):
         super().enterEvent(event)
     
     def leaveEvent(self, event):
-        self.setCursor(Qt.ArrowCursor)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         super().leaveEvent(event)
 
     def set_selected(self, selected):
@@ -380,7 +380,7 @@ class ModuleItem(QFrame):
     # Mouse Press Event
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.setCursor(Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.ArrowCursor)
             self.openModule.emit(self.module_data.get(MODULE_KEY))
         return super().mousePressEvent(event)
 

@@ -92,6 +92,7 @@ class OutputDock(QWidget):
 
         self.toggle_btn = QPushButton("❯")  # Show state initially
         self.toggle_btn.setFixedSize(6, 60)
+        self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.toggle_btn.setObjectName("toggle_strip_button")
         self.toggle_btn.setToolTip("Show panel")
 

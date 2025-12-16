@@ -1365,7 +1365,7 @@ class CustomWindow(QWidget):
         self.common_function_for_save_and_design(self.backend, data, "Design")
     
     def finished_loading(self):
-        print("Testing Custom Logger!")
+        print("Custom Logger: ")
         print(self.backend.logger.logs)
         time.sleep(1)
         self.loading.hide()

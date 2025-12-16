@@ -22,6 +22,7 @@ from ..member import Member
 from ...Report_functions import *
 from ...design_report.reportGenerator_latex import CreateLatex
 from pylatex.utils import NoEscape
+from ...custom_logger import CustomLogger
 
 class ColumnDesign(Member):
 
@@ -242,28 +243,39 @@ class ColumnDesign(Member):
 
     def set_osdaglogger(self, key):
         """
-        Set logger for Column Design Module.
+        Function to set Logger for FinPlate Module
         """
-        global logger
-        logger = logging.getLogger('Osdag')
+        # @author Arsil Zunzunia
 
-        logger.setLevel(logging.DEBUG)
+        # Set Custom logger
+        logging.setLoggerClass(CustomLogger)
+
+        self.logger = logging.getLogger('Osdag')
+
+        if not isinstance(self.logger, CustomLogger):
+            logging.getLogger('Osdag', None).manager.loggerDict.pop('Osdag', None)
+            # clear any existing handlers
+            self.logger = logging.getLogger('Osdag')
+        
+        self.logger.handlers.clear()
+
+        self.logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
-            logger.addHandler(handler)
+            self.logger.addHandler(handler)
 
     def customized_input(self):
 
@@ -542,6 +554,9 @@ class ColumnDesign(Member):
               round(self.result_capacity * 1e-3, 2) if flag else '', True)
         out_list.append(t1)
 
+        # Populate hover dict
+        self.hover_dict["Column"] = f"Column: {self.result_designation if flag else ''}"
+        
         return out_list
 
     def func_for_validation(self, design_dictionary):
@@ -575,14 +590,14 @@ class ColumnDesign(Member):
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(design_dictionary)
             if self.design_status ==False and len(self.failed_design_dict)>0:
-                logger.error(
+                self.logger.error(
                     "Design Failed, Check Design Report"
                 )
                 return # ['Design Failed, Check Design Report'] @TODO
             elif self.design_status:
                 pass
             else:
-                logger.error(
+                self.logger.error(
                     "Design Failed. Slender Sections Selected"
                 )
                 return # ['Design Failed. Slender Sections Selected']
@@ -604,13 +619,12 @@ class ColumnDesign(Member):
     # warn if a beam of older version of IS 808 is selected
     def warn_text(self):
         """ give logger warning when a beam from the older version of IS 808 is selected """
-        global logger
         red_list = red_list_function()
 
         if (self.sec_profile == VALUES_SEC_PROFILE[0]):  # Beams and Columns
             for section in self.sec_list:
                 if section in red_list:
-                    logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
+                    self.logger.warning(" : You are using a section ({}) (in red color) that is not available in latest version of IS 808".format(section))
 
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
@@ -811,15 +825,15 @@ class ColumnDesign(Member):
 
             limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
             if self.effective_sr_zz > limit and self.effective_sr_yy > limit:
-                logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
-                logger.error("Cannot compute. Given Length does not pass.")
+                self.logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+                self.logger.error("Cannot compute. Given Length does not pass.")
                 continue
             #else:
-            #    logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+            #    self.logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
 
             # if len(self.allowed_sections) == 0:
-            #     logger.warning("Select at-least one type of section in the design preferences tab.")
-            #     logger.error("Cannot compute. Selected section classification type is Null.")
+            #     self.logger.warning("Select at-least one type of section in the design preferences tab.")
+            #     self.logger.error("Cannot compute. Selected section classification type is Null.")
             #     self.design_status = False
             #     self.design_status_list.append(self.design_status)
 
@@ -834,25 +848,25 @@ class ColumnDesign(Member):
         """ Perform design of column """
         # checking DP inputs
         if (self.allowable_utilization_ratio <= 0.10) or (self.allowable_utilization_ratio > 1.0):
-            logger.warning("The defined value of Utilization Ratio in the design preferences tab is out of the suggested range.")
-            logger.info("Provide an appropriate input and re-design.")
-            logger.info("Assuming a default value of 1.0.")
+            self.logger.warning("The defined value of Utilization Ratio in the design preferences tab is out of the suggested range.")
+            self.logger.info("Provide an appropriate input and re-design.")
+            self.logger.info("Assuming a default value of 1.0.")
             self.allowable_utilization_ratio = 1.0
             self.design_status = False
             self.design_status_list.append(self.design_status)
 
         if (self.effective_area_factor <= 0.10) or (self.effective_area_factor > 1.0):
-            logger.warning("The defined value of Effective Area Factor in the design preferences tab is out of the suggested range.")
-            logger.info("Provide an appropriate input and re-design.")
-            logger.info("Assuming a default value of 1.0.")
+            self.logger.warning("The defined value of Effective Area Factor in the design preferences tab is out of the suggested range.")
+            self.logger.info("Provide an appropriate input and re-design.")
+            self.logger.info("Assuming a default value of 1.0.")
             self.effective_area_factor = 1.0
             self.design_status = False
             self.design_status_list.append(self.design_status)
 
         # if (self.steel_cost_per_kg == 0.10) or (self.effective_area_factor > 1.0):
-        #     logger.warning("The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range.")
-        #     logger.info("Provide an appropriate input and re-design.")
-        #     logger.info("Assuming a default rate of 50 (INR/kg).")
+        #     self.logger.warning("The defined value of the cost of steel (in INR) in the design preferences tab is out of the suggested range.")
+        #     self.logger.info("Provide an appropriate input and re-design.")
+        #     self.logger.info("Assuming a default rate of 50 (INR/kg).")
         #     self.steel_cost_per_kg = 50
         #     self.design_status = False
         #     self.design_status_list.append(self.design_status)
@@ -1090,10 +1104,10 @@ class ColumnDesign(Member):
                         list_2.pop(0)
                         break
         #else:
-        #    logger.warning("The section(s) defined for performing the column design is/are not selected based on the selected Inputs and/or "
+        #    self.logger.warning("The section(s) defined for performing the column design is/are not selected based on the selected Inputs and/or "
         #                   "Design Preferences")
-        #    logger.error("Cannot compute!")
-        #    logger.info("Change the inputs provided and re-design.")
+        #    self.logger.error("Cannot compute!")
+        #    self.logger.info("Change the inputs provided and re-design.")
         #    self.design_status = False
         #    self.design_status_list.append(self.design_status)
             # print(f"design_status_list{self.design_status_list}")
@@ -1123,13 +1137,13 @@ class ColumnDesign(Member):
 
             # selecting the section with most optimum UR
             if len(self.optimum_section_ur) == 0:  # no design was successful
-                logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
+                self.logger.warning("The sections selected by the solver from the defined list of sections did not satisfy the Utilization Ratio (UR) "
                                "criteria")
-                logger.error("The solver did not find any adequate section from the defined list.")
-                logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
+                self.logger.error("The solver did not find any adequate section from the defined list.")
+                self.logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
                 self.design_status = False
                 if len(self.failed_design_dict)>0:
-                    logger.info(
+                    self.logger.info(
                     "The details for the best section provided is being shown"
                     )
                     self.result_UR = self.failed_design_dict['UR'] #temp
@@ -1137,7 +1151,7 @@ class ColumnDesign(Member):
                         list_result=self.failed_design_dict,
                         result_type=None,
                     )
-                    logger.warning(
+                    self.logger.warning(
                     "Re-define the list of sections or check the Design Preferences option and re-design."
                 )
                     return
@@ -1168,13 +1182,13 @@ class ColumnDesign(Member):
                 self.design_status = True
 
         if self.design_status:
-            logger.info(": ========== Design Status ============")
-            logger.info(": Overall Column design is SAFE")
-            logger.info(": ========== End Of Design ============")
+            self.logger.info(": ========== Design Status ============")
+            self.logger.info(": Overall Column design is SAFE")
+            self.logger.info(": ========== End Of Design ============")
         else:
-            logger.info(": ========== Design Status ============")
-            logger.info(": Overall Column design is UNSAFE")
-            logger.info(": ========== End Of Design ============")
+            self.logger.info(": ========== Design Status ============")
+            self.logger.info(": Overall Column design is UNSAFE")
+            self.logger.info(": ========== End Of Design ============")
 
     ### start writing save_design from here!
     """def save_design(self, popup_summary):
@@ -1201,18 +1215,18 @@ class ColumnDesign(Member):
         self.section_class = self.input_section_classification[self.result_designation][0]
 
         if self.section_class == 'Slender':
-            logger.warning("The trial section ({}) is Slender. Computing the Effective Sectional Area as per Sec. 9.7.2, "
+            self.logger.warning("The trial section ({}) is Slender. Computing the Effective Sectional Area as per Sec. 9.7.2, "
                         "Fig. 2 (B & C) of The National Building Code of India (NBC), 2016.".format(self.result_designation))
         if self.effective_area_factor < 1.0:
             self.effective_area = round(self.effective_area * self.effective_area_factor, 2)
 
-            logger.warning("Reducing the effective sectional area as per the definition in the Design Preferences tab.")
-            logger.info("The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".
+            self.logger.warning("Reducing the effective sectional area as per the definition in the Design Preferences tab.")
+            self.logger.info("The actual effective area is {} mm2 and the reduced effective area is {} mm2 [Reference: Cl. 7.3.2, IS 800:2007]".
                         format(round((self.effective_area / self.effective_area_factor), 2), self.effective_area))
         else:
             if self.section_class != 'Slender':
-                logger.info("The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007].")
-        logger.info(
+                self.logger.info("The effective sectional area is taken as 100% of the cross-sectional area [Reference: Cl. 7.3.2, IS 800:2007].")
+        self.logger.info(
             "The section is {}. The {} section  has  {} flange({}) and  {} web({}).  [Reference: Cl 3.7, IS 800:2007].".format(
                 self.input_section_classification[self.result_designation][0] ,
                 self.result_designation,

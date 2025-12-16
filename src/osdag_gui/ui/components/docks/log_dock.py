@@ -38,6 +38,11 @@ class LogDock(QWidget):
 
         self.setLayout(layout)
         self.show()  # Show init text
+    
+    def clear_logs(self):
+        self.log_display.clear()
+        # Add init log text matching
+        self.append_log(f"[{QDateTime.currentDateTime().toString('yyyy-MM-dd hh:mm:ss')}] Log initialized", "info")
 
     def append_log(self, message, log_level="info"):
         """Append a message to the log display with specified color."""

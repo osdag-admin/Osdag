@@ -1877,6 +1877,7 @@ class CustomWindow(QWidget):
             ).exec()
             return
     
+    #--------------------Unlocking-Inputs-After-Design-Start-----------------------
     # Clear output fields
     def clear_output_fields(self):
         # Reset the design status
@@ -1888,6 +1889,9 @@ class CustomWindow(QWidget):
             if output_field.objectName() == "dock_custom_button":
                 continue
             output_field.setEnabled(False)
+        
+        # Clear logs
+        self.logs_dock.clear_logs()
     
     # Clear Cad widget
     def flush_cad_widget(self):
@@ -1900,6 +1904,8 @@ class CustomWindow(QWidget):
             self.cad_widget.model_ais_objects.clear()
             # Update the display
             self.cad_widget._display.Repaint()
+    
+    #--------------------Unlocking-Inputs-After-Design-Start-----------------------
 
     # Error Message Box
     def show_error_msg(self, error):

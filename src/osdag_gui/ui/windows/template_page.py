@@ -808,7 +808,6 @@ class CustomWindow(QWidget):
                 self.ui_loaded = False
                 self.setDictToUserInputs(uiObj)
                 self.ui_loaded = True
-                self.output_dock.output_title_change(self.backend)
             else:
                 CustomMessageBox(
                     title="Information",

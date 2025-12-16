@@ -218,13 +218,13 @@ MODULE_MAP = {
     KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'open_cleat_angle_shear_connection'],
     KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'open_seated_angle_shear_connection'],
 
-    KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection', 'None'],
-    KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection', 'None'],
-    KEY_DISP_BB_EP_SPLICE: ['Beam-to-Beam End Plate', 'Moment Connection', 'None'],
+    KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection', 'open_beam_cover_plate_moment_connection'],
+    KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection', 'open_beam_cover_plate_weld_moment_connection'],
+    KEY_DISP_BB_EP_SPLICE: ['Beam-to-Beam End Plate', 'Moment Connection', 'open_beam_beam_end_plate_splice_connection'],
 
-    KEY_DISP_COLUMNCOVERPLATE: ['Column to Column Cover Plate Bolted', 'Moment Connection', 'None'],
-    KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection', 'None'],
-    KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection', 'None'],
+    KEY_DISP_COLUMNCOVERPLATE: ['Column to Column Cover Plate Bolted', 'Moment Connection', 'open_column_cover_plate_connection'],
+    KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection', 'open_column_cover_plate_weld_connection'],
+    KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection', 'open_column_end_plate_connection'],
 
     KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'open_end_plate_btc_page'],
 
@@ -244,6 +244,7 @@ MODULE_MAP = {
     #---------Compression-Member-start------------------------------------------------------
     KEY_DISP_COMPRESSION_Strut: ['Struts in Trusses', 'Compression Member', 'open_struts_in_trusses_compression_member'],
     KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member', 'None'],
+    KEY_DISP_COMPRESSION_COLUMN: ['Columns with Support', 'Compression Member', 'open_column_design'],
     #---------Compression-Member-end------------------------------------------------------
 
     #---------Flexural-Member-start------------------------------------------------------

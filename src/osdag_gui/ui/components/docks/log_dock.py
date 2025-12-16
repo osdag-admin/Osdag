@@ -68,18 +68,16 @@ class LogDock(QWidget):
         if not parent:
             return
 
-        # Get the current tab's input and output dock states
-        current_tab_index = parent.tab_bar.currentIndex()
-        if current_tab_index < 0 or current_tab_index >= len(parent.tab_widget_content):
+        if parent.input_dock is None or parent.output_dock is None:
             return
-
-        input_active = parent.tab_widget_content[current_tab_index][3]
-        output_active = parent.tab_widget_content[current_tab_index][4]
+        
+        input_dock = parent.input_dock
+        output_dock = parent.output_dock
 
         # Calculate available width
         parent_width = parent.width()
-        input_dock_width = parent.tab_widget_content[current_tab_index][1].width() if input_active else 0
-        output_dock_width = parent.tab_widget_content[current_tab_index][2].width() if output_active else 0
+        input_dock_width = input_dock.width() if input_dock.isVisible() else 0
+        output_dock_width = output_dock.width() if output_dock.isVisible() else 0
         available_width = parent_width - input_dock_width - output_dock_width
 
         # Set log dock size

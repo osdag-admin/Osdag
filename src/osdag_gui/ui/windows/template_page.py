@@ -49,6 +49,8 @@ class CustomWindow(QWidget):
         self.project_id = None
 
         self.current_tab_index = 0
+        self.input_dock = None
+        self.output_dock = None
         self.design_pref_inputs = {}
         self.prev_inputs = {}
         self.input_dock_inputs = {}
@@ -511,7 +513,7 @@ class CustomWindow(QWidget):
         self.create_cad_view_controls()
         self.cad_log_splitter.addWidget(self.cad_widget)
 
-        self.logs_dock = LogDock()
+        self.logs_dock = LogDock(parent=self)
         self.logs_dock.setVisible(False)
         # log text
         self.textEdit = self.logs_dock.log_display

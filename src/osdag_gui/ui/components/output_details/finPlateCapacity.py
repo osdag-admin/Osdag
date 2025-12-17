@@ -124,7 +124,7 @@ class FinPlateCapacityDetails(QDialog):
         # Parameter display labels
         params = self.get_parameters()
         
-        heading_label = QLabel("Note: Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        heading_label = QLabel("Note: Representative image for Failure Pattern (Half Plate)")
         heading_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")  # Reduced font size
         heading_label.setWordWrap(True)
         left_layout.addWidget(heading_label)

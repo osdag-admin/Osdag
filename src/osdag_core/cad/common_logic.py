@@ -2093,7 +2093,7 @@ class CommonDesignLogic(object):
             return shape
 
     def display_3DModel(self, component, bgcolor):
-
+        
         # Component colors
         weld_color = Quantity_NOC_SADDLEBROWN
         plate_color = Quantity_Color(47/255.0, 47/255.0, 35/255.0, Quantity_TOC_RGB)
@@ -2574,19 +2574,30 @@ class CommonDesignLogic(object):
             self.assembly, self.plate1_model, self.plate2_model, self.weld_models = self.createWeldedLapJoint()
             print(f"DEBUG: Models created. Assembly: {self.assembly}")
             
+            hover_dict = getattr(self.connection, "hover_dict", {})
+            if hasattr(self, "cad_widget"):
+                self.cad_widget.model_hover_labels = hover_dict
+
+            label_plate1 = ["Plate 1", hover_dict.get("Plate 1", "Plate 1")]
+            label_plate2 = ["Plate 2", hover_dict.get("Plate 2", "Plate 2")]
+            label_weld = ["Weld", hover_dict.get("Weld", "Weld")]
+            
             if self.component == "Model":
                 print("DEBUG: Displaying Model components")
-                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
-                osdag_display_shape(self.display, self.plate2_model, update=True)
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
+                osdag_display_shape(self.display, self.plate2_model, update=True, label=label_plate2, canvas=self.cad_widget)
                 for weld in self.weld_models:
-                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED)
+                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED, label=label_weld, canvas=self.cad_widget)
+                self.display.View_Iso()
+                self.display.FitAll()
+                self.display.View.Redraw()
             elif self.component == "Plate 1":
-                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
             elif self.component == "Plate 2":
-                osdag_display_shape(self.display, self.plate2_model, update=True)
+                osdag_display_shape(self.display, self.plate2_model, update=True, label=label_plate2, canvas=self.cad_widget)
             elif self.component == "Weld":
                 for weld in self.weld_models:
-                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED)
+                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED, label=label_weld, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if self.connection == KEY_DISP_BUTTJOINTBOLTED:

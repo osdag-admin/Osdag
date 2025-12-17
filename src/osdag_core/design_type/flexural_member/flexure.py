@@ -37,9 +37,6 @@ from ...utils.common.component import *
 from osdag.cad.items.plate import Plate
 from ...custom_logger import CustomLogger
 
-logger = logging.getLogger("Osdag")
-logger.setLevel(logging.DEBUG)
-
 class Flexure(Member):
 
     def __init__(self):
@@ -610,6 +607,16 @@ class Flexure(Member):
         t2 = (KEY_NON_DIM_ESR, KEY_DISP_NON_DIM_ESR, TYPE_TEXTBOX, self.result_nd_esr if flag else '', True)
         out_list.append(t2)
 
+        # Populate hover dict
+        self.hover_dict["Flexure Member"] = (
+            f"<b>Flexure Member</b><br>"
+            f"Section: {self.result_designation if flag else ''}<br>"
+            f"Effective Length: {self.result_eff_len if flag else ''} m<br>"
+            f"Section Class: {self.result_section_class if flag else ''}<br>"
+            f"Bending Strength: {round(self.result_bending, 2) if flag else ''}<br>"
+            f"Shear Strength: {round(self.result_shear, 2) if flag else ''}<br>"
+            f"Utilization Ratio: {round(self.result_UR, 3) if flag else ''}"
+        )
 
 
         return out_list

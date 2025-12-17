@@ -2553,10 +2553,8 @@ class CommonDesignLogic(object):
             self.flex = self.module_object  
             self.FObj = self.createSimplySupportedBeam()
             
-            hover_dict = getattr(self.flex, "hover_dict", {})
-
-            if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
-                self.cad_widget.model_hover_labels = self.flex.hover_dict
+            hover_dict = self.module_object.hover_dict
+            self.cad_widget.model_hover_labels = hover_dict
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member", "Flexure Member")]    
 
@@ -2568,10 +2566,8 @@ class CommonDesignLogic(object):
             self.FObj = self.createCantileverBeam()
             
             
-            hover_dict = getattr(self.flex, "hover_dict", {})
-            
-            if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
-                self.cad_widget.model_hover_labels = self.flex.hover_dict
+            hover_dict = self.module_object.hover_dict
+            self.cad_widget.model_hover_labels = hover_dict
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member", "Flexure Member")]
 

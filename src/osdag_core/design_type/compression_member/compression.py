@@ -480,9 +480,9 @@ class Compression(Member):
 
         return pattern
 
-    def fn_end1_end2(self):
+    def fn_end1_end2(self, arg):
 
-        end1 = self[0]
+        end1 = arg[0]
         if end1 == 'Fixed':
             return VALUES_STRUT_END2
         elif end1 == 'Free':
@@ -503,10 +503,10 @@ class Compression(Member):
         elif self == 'Roller':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
 
-    def fn_end2_image(self):
+    def fn_end2_image(self, arg):
 
-        end1 = self[0]
-        end2 = self[1]
+        end1 = arg[0]
+        end2 = arg[1]
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
@@ -532,10 +532,10 @@ class Compression(Member):
             elif end2 == 'Hinged':
                 return str(files("osdag_core.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
 
-    def fn_conn_image(self):
+    def fn_conn_image(self, arg):
 
         "Function to populate section images based on the type of section "
-        img = self[0]
+        img = arg[0]
         if img == VALUES_SEC_PROFILE_Compression_Strut[0]:
             return VALUES_IMG_STRUT[0]
         elif img ==VALUES_SEC_PROFILE_Compression_Strut[1]:
@@ -549,15 +549,9 @@ class Compression(Member):
             return VALUES_IMG_TENSIONBOLTED[4]
 
 
-    def fn_profile_section(self, args=None):
-        #print(f"fn_profile_section self {self}")
-        # Use provided argument or fall back to self[0]
-        if args and len(args) > 0:
-            profile = args[0]
-        else:
-            profile = self[0]
-        # print(f'profile = {self[0]}'
-        #       f'VALUES_SEC_PROFILE_Compression_Strut {VALUES_SEC_PROFILE_Compression_Strut}')
+    def fn_profile_section(self, arg=None):
+        profile = arg[0]
+            
         if profile == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif profile == 'Columns':
@@ -965,10 +959,10 @@ class Compression(Member):
 
         return components
 
-    def fn_conn_type(self):
+    def fn_conn_type(self, arg):
 
         "Function to populate section size based on the type of section "
-        conn = self[0]
+        conn = arg[0]
         if conn in VALUES_SEC_PROFILE_Compression_Strut:
             return VALUES_LOCATION_1
         else:

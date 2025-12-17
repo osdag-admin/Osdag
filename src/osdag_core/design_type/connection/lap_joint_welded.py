@@ -639,3 +639,35 @@ class LapJointWelded(MomentConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary,
                              fname_no_ext, os.path.abspath(".").replace("\\", "/"), [], "/ResourceFiles/images/3d.png", module=self.module)
+
+    def get_3d_components(self):
+        components = []
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+        t2 = ('Plate 1', self.call_3DPlate1)
+        components.append(t2)
+        t3 = ('Plate 2', self.call_3DPlate2)
+        components.append(t3)
+        t4 = ('Weld', self.call_3DWeld)
+        components.append(t4)
+        return components
+
+    def call_3DModel(self, ui, bgcolor):
+        from ...cad.common_logic import CommonDesignLogic
+        self.commLogicObj = CommonDesignLogic(ui, "3D_Model", self.module, self.mainmodule)
+        self.commLogicObj.display_3DModel("Model", bgcolor)
+
+    def call_3DPlate1(self, ui, bgcolor):
+        from ...cad.common_logic import CommonDesignLogic
+        self.commLogicObj = CommonDesignLogic(ui, "3D_Model", self.module, self.mainmodule)
+        self.commLogicObj.display_3DModel("Plate 1", bgcolor)
+
+    def call_3DPlate2(self, ui, bgcolor):
+        from ...cad.common_logic import CommonDesignLogic
+        self.commLogicObj = CommonDesignLogic(ui, "3D_Model", self.module, self.mainmodule)
+        self.commLogicObj.display_3DModel("Plate 2", bgcolor)
+
+    def call_3DWeld(self, ui, bgcolor):
+        from ...cad.common_logic import CommonDesignLogic
+        self.commLogicObj = CommonDesignLogic(ui, "3D_Model", self.module, self.mainmodule)
+        self.commLogicObj.display_3DModel("Weld", bgcolor)

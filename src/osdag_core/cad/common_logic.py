@@ -55,6 +55,7 @@ from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from .BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 
 from .SimpleConnections.BoltedLapJoint.bolted_lap_joint import *
+from .SimpleConnections.WeldedLapJoint.welded_lap_joint import *
 from .SimpleConnections.BoltedButtJoint.Butt_joint_bolted import *
 
 from .MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
@@ -1865,6 +1866,21 @@ class CommonDesignLogic(object):
                                                                          edge=Conn.final_edge_dist,end=Conn.final_end_dist)
         return lap_joint, plate1, plate2, bolts, nuts
 
+    def createWeldedLapJoint(self):
+        Conn = self.module_class
+        
+        plate1_thickness = float(Conn.plate1.thickness[0])
+        plate2_thickness = float(Conn.plate2.thickness[0])
+        plate_width = float(Conn.width)
+        overlap_length = float(Conn.connection_length)
+        weld_size = float(Conn.weld_size)
+        
+        print(f"DEBUG: createWeldedLapJoint called with: t1={plate1_thickness}, t2={plate2_thickness}, w={plate_width}, l={overlap_length}, s={weld_size}")
+        
+        lap_joint, plate1, plate2, welds = create_welded_lap_joint(plate1_thickness, plate2_thickness, plate_width, overlap_length, weld_size)
+        print(f"DEBUG: create_welded_lap_joint returned: {lap_joint}, {plate1}, {plate2}, {welds}")
+        return lap_joint, plate1, plate2, welds
+
     def createButtJointBoltedCAD(self):
           
             # Get input values from the design object (i.e., instance of ButtJointBolted)
@@ -2498,25 +2514,7 @@ class CommonDesignLogic(object):
                 column = self.BPObj.get_column_model()
                 plate = self.BPObj.get_plate_connector_models()
                 weld = self.BPObj.get_welded_models()
-                nut_bolt = self.BPObj.get_nut_bolt_array_models()
-                conc = self.BPObj.get_concrete_models()
-                grout = self.BPObj.get_grout_models()
 
-                if self.component == "Model":  # Todo: change this into key
-                    osdag_display_shape(self.display, column, update=True)
-                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
-                    osdag_display_shape(self.display, weld, color=Quantity_NOC_RED, update=True)
-                    osdag_display_shape(self.display, nut_bolt, color=Quantity_NOC_YELLOW, update=True)
-                    osdag_display_shape(self.display, conc, color=GRAY, transparency=0.5, update=True)
-                    osdag_display_shape(self.display, grout, color=GRAY, transparency=0.5, update=True)
-
-                elif self.component == "Column":
-                    osdag_display_shape(self.display, column, update=True)
-
-                elif self.component == "Connector":
-                    osdag_display_shape(self.display, plate, color=Quantity_NOC_BLUE1, update=True)
-                    osdag_display_shape(self.display, weld, color=Quantity_NOC_RED, update=True)
-                    osdag_display_shape(self.display, nut_bolt, color=Quantity_NOC_YELLOW, update=True)
 
         elif self.mainmodule == 'Columns with known support conditions':
             self.col = self.module_object  
@@ -2563,7 +2561,33 @@ class CommonDesignLogic(object):
                     for nut in self.nuts_models:
                         osdag_display_shape(self.display, nut, update=True,
                                                 color=bolt_color, label=label_bolt, canvas=self.cad_widget)
-                    
+
+                elif self.component == "Plate1":
+                    osdag_display_shape(self.display, plate1, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
+
+                elif self.component == "Plate2":
+                    osdag_display_shape(self.display, plate2, update=True, label=label_plate2, canvas=self.cad_widget)
+
+        elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
+            print("DEBUG: Inside display_3DModel for Lap Joint Welded Connection")
+            self.col = self.module_class()
+            self.assembly, self.plate1_model, self.plate2_model, self.weld_models = self.createWeldedLapJoint()
+            print(f"DEBUG: Models created. Assembly: {self.assembly}")
+            
+            if self.component == "Model":
+                print("DEBUG: Displaying Model components")
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+                for weld in self.weld_models:
+                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED)
+            elif self.component == "Plate 1":
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+            elif self.component == "Plate 2":
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+            elif self.component == "Weld":
+                for weld in self.weld_models:
+                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED)
+
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if self.connection == KEY_DISP_BUTTJOINTBOLTED:
                 self.col = self.module_object

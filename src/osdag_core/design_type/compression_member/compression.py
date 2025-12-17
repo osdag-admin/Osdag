@@ -25,6 +25,8 @@ class Compression(Member):
     def __init__(self):
         # print(f"Here Compression")
         super(Compression, self).__init__()
+        self.design_status = False
+        self.hover_dict = {}
 
     ###############################################
     # Design Preference Functions Start
@@ -871,6 +873,22 @@ class Compression(Member):
         #        int(round(self.inter_plate_length, 0)) if flag else '', False)
         # out_list.append(t21)
 
+        # Populate Hover Dict (Compression Member)
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>"
+            f"Size: {self.weld.size if (flag and hasattr(self.weld, 'size')) else ''} mm<br>"
+            f"Strength: {round(self.weld.strength, 2) if (flag and hasattr(self.weld, 'strength')) else ''} N/mm²<br>"
+            f"Stress: {round(self.weld.stress, 2) if (flag and hasattr(self.weld, 'stress')) else ''} N/mm<br>"
+            f"Eff. Length: {int(round(self.weld.length, 0)) if (flag and hasattr(self.weld, 'length')) else ''} mm"
+        )
+
+        self.hover_dict["Plate"] = (
+            f"Plate: {float(self.plate.length) if (flag and hasattr(self.plate, 'length')) else ''} mm x "
+            f"{float(self.plate.height) if (flag and hasattr(self.plate, 'height')) else ''} mm x "
+            f"{self.plate.thickness_provided if (flag and hasattr(self.plate, 'thickness_provided')) else ''} mm"
+        )
+
+        self.hover_dict["Member"] = f"Member: {self.result_designation if (flag and hasattr(self, 'result_designation')) else ''}"
 
         return out_list
     def func_for_validation(self, design_dictionary):
@@ -956,6 +974,12 @@ class Compression(Member):
 
         t1 = ('Model', self.call_3DModel)
         components.append(t1)
+
+        t2 = ('Member', self.call_3DMember)
+        components.append(t2)
+
+        t3 = ('Plate', self.call_3DPlate)
+        components.append(t3)
 
         return components
 

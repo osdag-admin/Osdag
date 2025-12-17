@@ -3259,8 +3259,8 @@ class Member(Main):
         t2 = ('Plate', self.call_3DPlate)
         components.append(t2)
 
-        t3 = ('Endplate', self.call_3DEndplate)
-        components.append(t3)
+        # t3 = ('Endplate', self.call_3DEndplate)
+        # components.append(t3)
 
         return components
 

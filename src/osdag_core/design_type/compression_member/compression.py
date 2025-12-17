@@ -2228,7 +2228,7 @@ class Compression(Member):
             self.flange_weld = round_up(((self.weld.effective - self.web_weld) / 4), 1, 50)
             self.weld.length = (self.web_weld + 4 * self.flange_weld)
 
-        elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", Profile_name_2, Profile_name_3] and design_dictionary[
             KEY_LOCATION] == "Long Leg":
             if web == None:
                 self.web_weld = 2 * (self.section_property.max_leg - 2 * self.weld.size)
@@ -2239,7 +2239,7 @@ class Compression(Member):
             self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 4 * self.flange_weld)
 
-        elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", Profile_name_2, Profile_name_3] and design_dictionary[
             KEY_LOCATION] == "Short Leg":
             if web == None:
                 self.web_weld = 2 * (self.section_property.min_leg - 2 * self.weld.size)
@@ -2250,7 +2250,7 @@ class Compression(Member):
             self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 4 * self.flange_weld)
 
-        elif design_dictionary[KEY_SEC_PROFILE] == "Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
+        elif design_dictionary[KEY_SEC_PROFILE] == Profile_name_1 and design_dictionary[KEY_LOCATION] == "Long Leg":
             if web == None:
                 self.web_weld = (self.section_property.max_leg - 2 * self.weld.size)
             else:
@@ -2275,12 +2275,16 @@ class Compression(Member):
             self.plate.height = 2 * self.section_property.max_leg + max((4 * self.weld.size), 30)
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = 2 * self.section_property.min_leg + max((4 * self.weld.size), 30)
-        elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
+        elif design_dictionary[KEY_SEC_PROFILE] in [Profile_name_1, Profile_name_2, Profile_name_3] and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = self.section_property.min_leg + max((4 * self.weld.size), 30)
-        elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
+        elif design_dictionary[KEY_SEC_PROFILE] in [Profile_name_1, Profile_name_2, Profile_name_3] and design_dictionary[KEY_LOCATION] == "Long Leg":
             self.plate.height = self.section_property.max_leg + max((4 * self.weld.size), 30)
-        else:
+        elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
+            # For Channels, use depth attribute
             self.plate.height = self.section_property.depth + max((4 * self.weld.size), 30)
+        else:
+            # Default fallback for angles
+            self.plate.height = self.section_property.max_leg + max((4 * self.weld.size), 30)
 
     def get_plate_thickness(self, design_dictionary):
         """
@@ -2661,7 +2665,7 @@ class Compression(Member):
             section_type = 'I Section' """
         
         if self.section_property.max_leg == self.section_property.min_leg:
-            if self.sec_profile == "Back to Back Angles":
+            if self.sec_profile in [Profile_name_2, Profile_name_3]:
                 if self.loc == "Long Leg":
                     image = "bblequaldp"
                 else:
@@ -2675,7 +2679,7 @@ class Compression(Member):
                 image = "equaldp"
 
         else:
-            if self.sec_profile == "Back to Back Angles":
+            if self.sec_profile in [Profile_name_2, Profile_name_3]:
                 if self.loc == "Long Leg":
                     image = "bblunequaldp"
                 else:
@@ -2691,7 +2695,7 @@ class Compression(Member):
         if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):
             if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:  # Angles and Back to Back Angles
                 self.section_property = Angle(designation = self.result_designation, material_grade = self.material)
-            if self.sec_profile == "Angles" or self.sec_profile == VALUES_SEC_PROFILE_2[0]:
+            if self.sec_profile == Profile_name_1:
                 self.report_column = {KEY_DISP_SEC_PROFILE: image,
                                         KEY_DISP_SECSIZE: (self.section_property.designation, self.sec_profile),
                                         KEY_DISP_MATERIAL: self.section_property.material,

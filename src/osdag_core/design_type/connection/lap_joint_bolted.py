@@ -372,21 +372,21 @@ class LapJointBolted(MomentConnection):
 
         # Populate Hover Dict (Lap Joint Bolted)
         self.hover_dict["Plate 1"] = (
-            f"<b>plate1</b><br>"
+            f"<b>Plate 1</b><br>"
             f"Length: {2} mm<br>"
             f"Width: {2} mm<br>"
             f"Thickness: {2} mm"
         )
 
         self.hover_dict["Plate 2"] = (
-            f"<b>plate2</b><br>"
+            f"<b>Plate 2</b><br>"
             f"Length: {2} mm<br>"
             f"Width: {2} mm<br>"
             f"Thickness: {2} mm"
         )
 
         self.hover_dict["Cover Plate"] = (
-            f"<b>plate2</b><br>"
+            f"<b>Cover Plate</b><br>"
             f"Length: {2} mm<br>"
             f"Width: {2} mm<br>"
             f"Thickness: {2} mm"
@@ -394,9 +394,9 @@ class LapJointBolted(MomentConnection):
 
         self.hover_dict["Bolt"] = (
             f"<b>Bolt</b><br>"
-            f"Grade: {self.bolt.bolt_grade_provided}<br>"
-            f"Diameter: {int(self.bolt.bolt_diameter_provided)} mm<br>"
-            f"No. of Bolts: {self.number_bolts}"
+            f"Grade: {self.bolt.bolt_grade_provided if flag and self.bolt else ''}<br>"
+            f"Diameter: {self.bolt.bolt_diameter_provided if flag and self.bolt else ''} mm<br>"
+            f"No. of Bolts: {self.number_bolts if flag else ''}"
         )
 
         return out_list
@@ -933,36 +933,22 @@ class LapJointBolted(MomentConnection):
         self.base_metal_capacity_kN = self.T_db / 1000.0
         return True
 
-
-    def call_3DColumn(self, ui, bgcolor):
-        # status = self.resultObj['Bolt']['status']
-        # if status is True:
-        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-        chk = getattr(ui, "chkBxCol", None)
-        if chk is not None and chk.isChecked():
-            ui.btn3D.setChecked(False)
-            ui.chkBxCol.setChecked(False)
-            ui.mytabWidget.setCurrentIndex(0)
-        # self.display_3DModel("Beam", bgcolor)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
-
     def get_3d_components(self):
         components = []
 
         t1 = ('Model', self.call_3DModel)
         components.append(t1)
 
-        t2 = ('Plate1', self.call_3DPlate)
+        t2 = ('Plate1', self.call_3DPlate1)
         components.append(t2)
 
-        t3 = ('Plate2', self.call_3DPlate)
+        t3 = ('Plate2', self.call_3DPlate2)
         components.append(t3)
 
         return components
 
-    def call_3DPlate(self, ui, bgcolor):
+    def call_3DPlate1(self, ui, bgcolor):
         from PySide6.QtWidgets import QCheckBox
-        from PySide6.QtCore import Qt
         for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Plate1':
                 continue
@@ -970,6 +956,8 @@ class LapJointBolted(MomentConnection):
                 chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Plate1", bgcolor)
 
+    def call_3DPlate2(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
         for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Plate2':
                 continue

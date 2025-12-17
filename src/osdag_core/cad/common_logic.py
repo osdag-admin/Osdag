@@ -1867,7 +1867,7 @@ class CommonDesignLogic(object):
         return lap_joint, plate1, plate2, bolts, nuts
 
     def createWeldedLapJoint(self):
-        Conn = self.module_class
+        Conn = self.connection
         
         plate1_thickness = float(Conn.plate1.thickness[0])
         plate2_thickness = float(Conn.plate2.thickness[0])
@@ -2570,7 +2570,7 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
             print("DEBUG: Inside display_3DModel for Lap Joint Welded Connection")
-            self.col = self.module_class()
+            self.col = self.connection
             self.assembly, self.plate1_model, self.plate2_model, self.weld_models = self.createWeldedLapJoint()
             print(f"DEBUG: Models created. Assembly: {self.assembly}")
             

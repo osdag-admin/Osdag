@@ -496,7 +496,7 @@ class FinPlateCapacityDetails(QDialog):
             text_item.setDefaultTextColor(Qt.white)
         
         if x1 < 0:
-            text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+            text_item.setPos(x1 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
         else:
-            text_item.setPos(x1 + 15, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+            text_item.setPos(x1, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
 

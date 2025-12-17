@@ -266,7 +266,7 @@ class FinPlateConnection(ShearConnection):
     def capacities(self, status):
         capacities = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         capacities.append(t00)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
@@ -314,7 +314,7 @@ class FinPlateConnection(ShearConnection):
         capacities = []
 
         t00 = (
-        None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         capacities.append(t00)
 
         t99 = (None, 'Failure Pattern due to Shear in Member', TYPE_SECTION,

@@ -451,7 +451,7 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
         #        './ResourceFiles/images/column_flange_failure.png')
         # flangecapacity.append(t99)
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)- 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)")
         flangecapacity.append(t00)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
                [str(files("osdag_core.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
@@ -475,7 +475,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity = []
 
         t00 = (
-        None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate) - 2 x 3 Bolts pattern considered")
+        None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)")
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,

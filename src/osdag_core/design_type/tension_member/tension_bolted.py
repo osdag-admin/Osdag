@@ -533,7 +533,7 @@ class Tension_bolted(Member):
 
         pattern = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern")
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_IMAGE,
@@ -546,7 +546,7 @@ class Tension_bolted(Member):
 
         pattern = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern")
         pattern.append(t00)
 
         t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,

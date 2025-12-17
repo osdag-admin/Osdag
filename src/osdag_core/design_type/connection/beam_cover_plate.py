@@ -414,7 +414,7 @@ class BeamCoverPlate(MomentConnection):
     def flangecapacity(self, flag):
 
         flangecapacity = []
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         flangecapacity.append(t00)
 
         # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
@@ -443,7 +443,7 @@ class BeamCoverPlate(MomentConnection):
 
     def webcapacity(self, flag):
         webcapacity = []
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,

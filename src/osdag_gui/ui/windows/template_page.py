@@ -1586,7 +1586,7 @@ class CustomWindow(QWidget):
                 # print(f"[INFO] main attributes: {dir(main)}")
                 # print("[INFO] main.mainmodule",main.mainmodule)
 
-                self.commLogicObj = CommonDesignLogic(self.display, self.cad_widget, self.folder, main.module, main.mainmodule)
+                self.commLogicObj = CommonDesignLogic(self.display, self.cad_widget, self.folder, main, main.mainmodule)
                 # print(f"This is MAIN.MODULE {main.module}")
                 # print("[INFO] main.mainmodule", main.mainmodule)
                 # print("[INFO] common start")
@@ -1615,6 +1615,7 @@ class CustomWindow(QWidget):
                         print(f"[ERROR] 3D model rendering failed: {e}")
                 else:
                     print("[WARNING] Display not ready for 3D rendering")
+                    
                 # Store the design instance for later use in report generation
                 if hasattr(self.commLogicObj, 'design_obj'):
                     # Store reference to the design instance
@@ -2142,6 +2143,7 @@ class CadComponentCheckbox(QWidget):
         self.checkbox_layout.setSpacing(0)
         self.checkbox_layout.addStretch()
 
+        self.checkboxes = []
         for option in data:
             label = option[0]
             check_box = QCheckBox(label)
@@ -2149,13 +2151,39 @@ class CadComponentCheckbox(QWidget):
             function_name = option[1]
             self.component_connect(check_box, function_name)
             self.checkbox_layout.addWidget(check_box)
+            self.checkboxes.append(check_box)
+            
+            # Default check for "Model"
+            if label == "Model":
+                check_box.setChecked(True)
         self.checkbox_layout.addStretch()
 
     def component_connect(self, check_box, f):
         background = "gradient_light"
         if not self.parent.theme.is_light():
             background = "gradient_dark"
-        check_box.clicked.connect(lambda: f(self.parent, background))
+            
+        def on_click(state):
+            if state:
+                # Uncheck others
+                for cb in self.checkboxes:
+                    if cb != check_box:
+                        cb.blockSignals(True)
+                        cb.setChecked(False)
+                        cb.blockSignals(False)
+                # Call display function
+                f(self.parent, background)
+            else:
+                # If trying to uncheck the active one, treat it as re-click or ignore?
+                # Usually radio behavior prevents unchecking.
+                # Re-check it to enforce selection? Or allow empty view?
+                # User says: "when a check box is checked, other checkboxes should be unchecked"
+                # Let's enforce single selection.
+                check_box.blockSignals(True)
+                check_box.setChecked(True)
+                check_box.blockSignals(False)
+
+        check_box.clicked.connect(on_click)
 
 # Standalone testing
 # python -m osdag_gui.ui.windows.template_page

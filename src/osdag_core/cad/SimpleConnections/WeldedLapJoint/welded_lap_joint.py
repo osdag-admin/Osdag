@@ -45,18 +45,27 @@ def create_welded_lap_joint(plate1_thickness, plate2_thickness, plate_width, ove
     weld_b = weld_size
     
     # Weld 1: Transverse weld at the "start" of overlap (Plate 2 edge)
-    weld1 = FilletWeld(weld_b, weld_h, weld_l)
-    # Rotate to align with X axis
-    origin_w1 = numpy.array([0.0, plate2_offset, plate1_thickness])
+    # Visual preference: Match weld leg length to the plate thickness being welded
+    weld1 = FilletWeld(plate2_thickness, plate2_thickness, weld_l)
+    # Origin at (0, offset - L/2, T1/2) - Interface level, start of overlap
+    # uDir along +Z (Up Plate 2 face)
+    # wDir along +X (Extrusion)
+    # vDir will be -Y (Along Plate 1 surface)
+    origin_w1 = numpy.array([0.0, plate2_offset - plate_length/2, plate1_thickness/2])
     uDir_w1 = numpy.array([0.0, 0.0, 1.0])
     wDir_w1 = numpy.array([1.0, 0.0, 0.0])
     weld1.place(origin_w1, uDir_w1, wDir_w1)
     weld1_model = weld1.create_model()
     
     # Weld 2: Transverse weld at the "end" of overlap (Plate 1 edge)
-    weld2 = FilletWeld(weld_b, weld_h, weld_l)
-    origin_w2 = numpy.array([0.0, plate_length, plate1_thickness])
-    uDir_w2 = numpy.array([0.0, 0.0, -1.0]) # Points down?
+    # Visual preference: Match weld leg length to the plate thickness being welded
+    weld2 = FilletWeld(plate1_thickness, plate1_thickness, weld_l)
+    # Origin at (0, L/2, T1/2) - Interface level, end of overlap
+    # uDir along -Z (Down Plate 1 face)
+    # wDir along +X (Extrusion)
+    # vDir will be +Y (Along Plate 2 bottom)
+    origin_w2 = numpy.array([0.0, plate_length/2, plate1_thickness/2])
+    uDir_w2 = numpy.array([0.0, 0.0, -1.0]) 
     wDir_w2 = numpy.array([1.0, 0.0, 0.0])
     weld2.place(origin_w2, uDir_w2, wDir_w2)
     weld2_model = weld2.create_model()

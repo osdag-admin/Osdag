@@ -383,7 +383,15 @@ class LapJointWelded(MomentConnection):
                          type=design_dictionary[KEY_DP_WELD_TYPE],
                          fabrication=design_dictionary.get(KEY_DP_FAB_SHOP, KEY_DP_FAB_SHOP))
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
+        self.weld.size = design_dictionary[KEY_WELD_SIZE]
         self.design_of_weld(design_dictionary)
+
+        # 3D Display Labels
+        self.hover_dict = {}
+        self.hover_dict["Model"] = "Lap Joint Welded Connection"
+        self.hover_dict["Plate 1"] = f"Plate 1 ({self.plate1.thickness[0]} mm)"
+        self.hover_dict["Plate 2"] = f"Plate 2 ({self.plate2.thickness[0]} mm)"
+        self.hover_dict["Weld"] = f"Fillet Weld ({self.weld.size} mm)"
 
     def design_of_weld(self, design_dictionary):
         self.logger.info(": =========== Design of Lap Joint Welded Connection ==========")
@@ -654,20 +662,20 @@ class LapJointWelded(MomentConnection):
 
     def call_3DModel(self, ui, bgcolor):
         from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self.module, self.mainmodule)
+        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
         self.commLogicObj.display_3DModel("Model", bgcolor)
 
     def call_3DPlate1(self, ui, bgcolor):
         from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self.module, self.mainmodule)
+        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
         self.commLogicObj.display_3DModel("Plate 1", bgcolor)
 
     def call_3DPlate2(self, ui, bgcolor):
         from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self.module, self.mainmodule)
+        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
         self.commLogicObj.display_3DModel("Plate 2", bgcolor)
 
     def call_3DWeld(self, ui, bgcolor):
         from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self.module, self.mainmodule)
+        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
         self.commLogicObj.display_3DModel("Weld", bgcolor)

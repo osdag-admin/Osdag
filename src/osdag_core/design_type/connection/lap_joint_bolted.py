@@ -327,29 +327,34 @@ class LapJointBolted(MomentConnection):
 
         # Populate Hover Dict (Lap Joint Bolted)
 
-        self.hover_dict["plate1"] = (
-            f"<b>plate1</b><br>"
-            f"Length: {float(self.plate1.length) if flag else ''} mm<br>"
-            f"Width: {float(self.plate1.height) if flag else ''} mm<br>"
-            f"Thickness: {self.plate1.thickness if flag else ''} mm"
+        self.hover_dict["Plate 1"] = (
+            f"<b>Plate 1</b><br>"
+            f"Length: {float(self.len_conn) if flag else ''} mm<br>"
+            f"Width: {float(self.width) if flag else ''} mm<br>"
+            f"Thickness: {float(self.plate1thk) if flag else ''} mm"
         )
 
-        self.hover_dict["plate2"] = (
-            f"<b>plate2</b><br>"
-            f"Length: {float(self.plate2.length) if flag else ''} mm<br>"
-            f"Width: {float(self.plate2.height) if flag else ''} mm<br>"
-            f"Thickness: {self.plate2.thickness if flag else ''} mm"
+
+
+        self.hover_dict["Plate 2"] = (
+            f"<b>Plate 2</b><br>"
+            f"Length: {float(self.len_conn) if flag else ''} mm<br>"
+            f"Width: {float(self.width) if flag else ''} mm<br>"
+            f"Thickness: {self.plate2thk if flag else ''} mm"
         )
 
-        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
-        
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>"
+            f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
+            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>"
+            f"No. of Bolts: {int(self.number_bolts) if flag else ''}"
+        )
 
         self.hover_dict["Nut"] = (
             f"<b>Nut</b><br>"
             f"Grade: <br>"
             f"Thickness:  mm"
         )
-
 
 
 
@@ -841,11 +846,11 @@ class LapJointBolted(MomentConnection):
         t1 = ('Model', self.call_3DModel)
         components.append(t1)
 
-        t3 = ('Plate1', self.call_3DColumn)
-        components.append(t3)
+        t2 = ('Plate1', self.call_3DPlate)
+        components.append(t2)
 
-        t4 = ('Plate2', self.call_3DPlate)
-        components.append(t4)
+        t3 = ('Plate2', self.call_3DPlate)
+        components.append(t3)
 
         return components
 
@@ -853,11 +858,18 @@ class LapJointBolted(MomentConnection):
         from PySide6.QtWidgets import QCheckBox
         from PySide6.QtCore import Qt
         for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Cover Plate':
+            if chkbox.objectName() == 'Plate1':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(False)
-        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
+        ui.commLogicObj.display_3DModel("Plate1", bgcolor)
+
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate2':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Plate2", bgcolor)
     
     def warn_text(self):
 

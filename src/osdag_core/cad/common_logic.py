@@ -2499,8 +2499,8 @@ class CommonDesignLogic(object):
                     nut = self.ColObj.nut        
 
                 # lap_joint, plate1, plate2, bolts, nuts
-                label_plate1 = ["plate1", hover_dict["plate1"]]
-                label_plate2 = ["Plate2", hover_dict["plate2"]]
+                label_plate1 = ["Plate 1", hover_dict["Plate 1"]]
+                label_plate2 = ["Plate 2", hover_dict["Plate 2"]]
                 label_bolt = ["Bolt", hover_dict["Bolt"]]
                 label_nut = ["Nut", hover_dict["Nut"]]
                 

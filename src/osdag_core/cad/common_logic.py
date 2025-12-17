@@ -2574,9 +2574,24 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Struts in Trusses':
             self.col = self.module_object  
             self.ColObj = self.createStrutsInTrusses()
+            
+            # Setup hover labels
+            hover_dict = {}
+            if hasattr(self.col, "hover_dict"):
+                hover_dict = self.col.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
+            
+            # Define labels for hover
+            label_member = ["Member", hover_dict.get("Member")]
+            label_plate = ["Plate", hover_dict.get("Plate")]
+            label_weld = ["Weld", hover_dict.get("Weld")]
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.ColObj, update=True)
+                osdag_display_shape(self.display, self.ColObj, update=True, label=label_member, canvas=self.cad_widget)
+            elif self.component == "Member":
+                osdag_display_shape(self.display, self.ColObj, update=True, label=label_member, canvas=self.cad_widget)
+            elif self.component == "Plate":
+                osdag_display_shape(self.display, self.ColObj, update=True, label=label_plate, canvas=self.cad_widget)
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:

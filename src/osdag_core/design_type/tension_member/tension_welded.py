@@ -600,10 +600,10 @@ class Tension_welded(Member):
         # Populate Hover Dict (Tension Welded)
         self.hover_dict["Weld"] = (
             f"<b>Weld</b><br>"
-            f"Size: {self.weld.weld_size if flag else ''} mm<br>"
+            f"Size: {self.weld.size if flag else ''} mm<br>"
             f"Strength: {self.weld.strength if flag else ''} N/mm²<br>"
             f"Stress: {self.weld.stress if flag else ''} N/mm<br>"
-            f"Eff. Length: {self.weld.eff_length if flag else ''} mm"
+            f"Eff. Length: {self.weld.length if flag else ''} mm"
         )
 
         self.hover_dict["Plate"] = (
@@ -612,7 +612,7 @@ class Tension_welded(Member):
             f"{self.plate.thickness_provided if flag else ''} mm"
         )
 
-        self.hover_dict["Member"] = f"Member: {self.section.designation if flag else ''}"
+        self.hover_dict["Member"] = f"Member: {self.section_size_1.designation if flag else ''}"
 
         return out_list
 

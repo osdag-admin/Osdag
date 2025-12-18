@@ -718,7 +718,7 @@ class Tension_bolted(Member):
         
         self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} mm x {float(self.plate.height) if flag else ''} mm x {self.plate.thickness_provided if flag else ''} mm"
         
-        self.hover_dict["Member"] = f"Member: {self.section.designation if flag else ''}"
+        self.hover_dict["Member"] = f"Member: {self.section_size_1.designation if flag else ''}"
 
         return out_list
 

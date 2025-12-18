@@ -2640,7 +2640,7 @@ class CommonDesignLogic(object):
                 label_member = ["Member", hover_dict["Member"]]
 
                 if self.component == "Member":  # Todo: change this into key
-                    osdag_display_shape(self.display, onlymember, update=True,label=label_member, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, onlymember, color=beam_color, update=True,label=label_member, canvas=self.cad_widget)
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
@@ -2653,7 +2653,7 @@ class CommonDesignLogic(object):
                     connector = BRepAlgoAPI_Fuse(nutbolt, plate).Shape()
                     shape = BRepAlgoAPI_Fuse(connector, member).Shape()
                     self.TObj.shape = shape
-                    osdag_display_shape(self.display, member, update=True, label=label_member, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, member, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
                     osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
 

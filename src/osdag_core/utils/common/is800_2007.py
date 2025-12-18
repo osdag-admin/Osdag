@@ -956,11 +956,19 @@ class IS800_2007(object):
                 k2 = 0.6
                 k3 = 5
             elif fixity == 'Partial':
-                temp = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no , fixity = 'Fixed')
-                temp2 = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length, r_min, b1, b2, t, f_y, bolt_no , fixity = 'Hinged')
-                k1 = (temp[3] +temp2[3]) /2
-                k2 = (temp[4] +temp2[4]) /2
-                k3 = (temp[5] +temp2[5]) /2
+                # For partial fixity, interpolate between Fixed and Hinged cases using
+                # recursive calls to this same staticmethod. We must qualify the call
+                # with the class name; an unqualified name here would look for a
+                # module-level function and raise NameError.
+                temp = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                    length, r_min, b1, b2, t, f_y, bolt_no, fixity='Fixed'
+                )
+                temp2 = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                    length, r_min, b1, b2, t, f_y, bolt_no, fixity='Hinged'
+                )
+                k1 = (temp[3] + temp2[3]) / 2
+                k2 = (temp[4] + temp2[4]) / 2
+                k3 = (temp[5] + temp2[5]) / 2
 
         elif bolt_no == 1:
             if fixity == 'Fixed':
@@ -972,16 +980,12 @@ class IS800_2007(object):
                 k2 = 0.5
                 k3 = 60
             elif fixity == 'Partial':
-                temp = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length,
-                                                                                                           r_min, b1,
-                                                                                                           b2, t, f_y,
-                                                                                                           bolt_no,
-                                                                                                           fixity='Fixed')
-                temp2 = cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(length,
-                                                                                                            r_min, b1,
-                                                                                                            b2, t, f_y,
-                                                                                                            bolt_no,
-                                                                                                            fixity='Hinged')
+                temp = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                    length, r_min, b1, b2, t, f_y, bolt_no, fixity='Fixed'
+                )
+                temp2 = IS800_2007.cl_7_5_1_2_equivalent_slenderness_ratio_of_truss_compression_members_loaded_one_leg(
+                    length, r_min, b1, b2, t, f_y, bolt_no, fixity='Hinged'
+                )
                 k1 = (temp[3] + temp2[3]) / 2
                 k2 = (temp[4] + temp2[4]) / 2
                 k3 = (temp[5] + temp2[5]) / 2

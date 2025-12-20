@@ -33,9 +33,10 @@ class OsdagLaunchScreen(object):
         self.AnimatedGIF = PNGSequencePlayer(self.centralwidget)
         self.AnimatedGIF.setObjectName(u"SplashScreen_AnimatedGIF")
         self.AnimatedGIF.setGeometry(QRect(330, 110, 320, 180))
-        animation_path = os.path.join(os.getcwd(), "osdag_gui", "resources", "animation")
-        animation_path = animation_path+"\{:04d}.png"
-        # print(os.getcwd(),animation_path)
+        
+        from pathlib import Path
+        base_path = Path.cwd() / "osdag_gui" / "resources" / "animation"
+        animation_path = str(base_path / "{:04d}.png")
         self.AnimatedGIF.load_sequence(animation_path, 96, 34)
 
         self.AestheticVector = QSvgWidget(self.centralwidget)

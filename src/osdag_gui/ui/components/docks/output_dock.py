@@ -206,6 +206,7 @@ class OutputDock(QWidget):
                 left.setObjectName(field[0] + "_label")
                 
                 right = QPushButton(label.strip())
+                right.setCursor(Qt.CursorShape.PointingHandCursor)
                 spacing_button_list.append(field)
                 right.setObjectName(field[0])
                 right.setDisabled(True)

@@ -516,6 +516,12 @@ class MainWindow(QMainWindow):
         if event.button() == Qt.LeftButton:
             if hasattr(self, 'old_pos'):
                 del self.old_pos
+        
+        # restore holding cursor so cursor can update
+        self.unsetCursor()
+        QApplication.restoreOverrideCursor()
+        self.releaseMouse()
+        super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
         # Toggle maximize/restore when double-clicking in the draggable title area

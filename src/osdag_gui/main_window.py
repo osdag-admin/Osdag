@@ -576,8 +576,8 @@ class MainWindow(QMainWindow):
             self.open_flexure_member()
         elif card_title == "Cantilever Beam":
             self.open_flexure_cantilever_member()
-        elif card_title == "Struts in Trusses":
-            self.open_struts_in_trusses_compression_member()
+        elif card_title == "Struts Welded to End Gusset":
+            self.open_struts_weld_end_gusset_compression_member()
         elif card_title == "Purlin":
             self.open_flexure_purlin()
 
@@ -611,75 +611,98 @@ class MainWindow(QMainWindow):
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
 
+    # 1-Fin-plate-shear-connection
     def open_fin_plate_shear_connection(self):
         self.common_open_module(FinPlateConnection, "Fin Plate Connection")
 
+    # 2-Cleat-angle-shear-connection
     def open_cleat_angle_shear_connection(self):
         self.common_open_module(CleatAngleConnection, "Cleat Angle Connection")
 
+    # 3-Header-plate-shear-connection
     def open_header_plate_shear_connection(self):
         self.common_open_module(EndPlateConnection, "Header Plate Connection")  
-
-    def open_beam_cover_plate_moment_connection(self):
-        self.common_open_module(BeamCoverPlate, "Cover Plate Bolted")
-        
-    def open_beam_beam_end_plate_splice_connection(self):
-        self.common_open_module(BeamBeamEndPlateSplice, "Beam Beam End Plate")
-        
-    def open_column_end_plate_connection(self):
-        self.common_open_module(ColumnEndPlate, "Column End plate")    
-
-    def open_column_cover_plate_connection(self):
-        self.common_open_module(ColumnCoverPlate, "Cover Plate Bolted")
-        
-    def open_column_cover_plate_weld_connection(self):
-        self.common_open_module(ColumnCoverPlateWeld, "Cover Plate Welded")
-        
+    
+    # 4-Seated-angle-shear-connection
     def open_seated_angle_shear_connection(self):
         self.common_open_module(SeatedAngleConnection, "Seated Angle Connection")
     
-    def open_plate_girder(self):
-        self.common_open_module(PlateGirderWelded, "Plate Girder")
-
+    # 5-Beam-column-end-plate
     def open_end_plate_btc_page(self):
         self.common_open_module(BeamColumnEndPlate, "Beam-to-Column End Plate Connection")
 
-    def open_tension_welded_page(self):
-        self.common_open_module(Tension_welded, "Tension Member: Welded to End Gusset")
+    # 6-Plate-girder
+    def open_plate_girder(self):
+        self.common_open_module(PlateGirderWelded, "Plate Girder")
 
-    def open_lap_joint_welded(self):
-        self.common_open_module(LapJointWelded, "Lap Joint Welded Connection")
-
-    def open_lap_joint_bolted(self):
-        self.common_open_module(LapJointBolted, "Lap Joint Bolted Connection")
-        
-    def open_butt_joint_bolted(self):
-        self.common_open_module(ButtJointBolted, "Butt Joint Bolted Connection")
-
-    def open_butt_joint_welded(self):
-        self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection")  
-    
-    def open_column_design(self):
-        self.common_open_module(ColumnDesign, "Column Design")
-
-    def open_beam_cover_plate_weld_moment_connection(self):
-        self.common_open_module(BeamCoverPlateWeld, "Cover Plate Welded")
-
-    def open_flexure_purlin(self):
-        self.common_open_module(Flexure_Purlin, "Purlin")
-
+    # 7-Bolted-end-tension
     def open_bolted_end_tension(self):
         self.common_open_module(Tension_bolted, "Bolted to End Gusset")
  
+    # 8-Tension-member-welded-to-end-gusset
+    def open_tension_welded_page(self):
+        self.common_open_module(Tension_welded, "Tension Member: Welded to End Gusset")
+
+    # 9-Lap-joint-welded
+    def open_lap_joint_welded(self):
+        self.common_open_module(LapJointWelded, "Lap Joint Welded Connection")
+
+    # 10-Lap-joint-bolted
+    def open_lap_joint_bolted(self):
+        self.common_open_module(LapJointBolted, "Lap Joint Bolted Connection")
+        
+    # 11-Butt-joint-bolted
+    def open_butt_joint_bolted(self):
+        self.common_open_module(ButtJointBolted, "Butt Joint Bolted Connection")
+
+    # 12-Butt-joint-welded
+    def open_butt_joint_welded(self):
+        self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection")  
+    
+    # 13-Column-design
+    def open_column_design(self):
+        self.common_open_module(ColumnDesign, "Column Design")
+
+    # 14-Beam-cover-plate-weld-moment-connection
+    def open_beam_cover_plate_weld_moment_connection(self):
+        self.common_open_module(BeamCoverPlateWeld, "Cover Plate Welded")
+
+    # 15-Beam-cover-plate-moment-connection
+    def open_beam_cover_plate_moment_connection(self):
+        self.common_open_module(BeamCoverPlate, "Cover Plate Bolted")
+        
+    # 16-Beam-beam-end-plate-splice-connection
+    def open_beam_beam_end_plate_splice_connection(self):
+        self.common_open_module(BeamBeamEndPlateSplice, "Beam Beam End Plate")
+        
+    # 17-Column-end-plate-connection
+    def open_column_end_plate_connection(self):
+        self.common_open_module(ColumnEndPlate, "Column End plate")    
+
+    # 18-Column-cover-plate-connection
+    def open_column_cover_plate_connection(self):
+        self.common_open_module(ColumnCoverPlate, "Cover Plate Bolted")
+        
+    # 19-Column-cover-plate-weld-connection
+    def open_column_cover_plate_weld_connection(self):
+        self.common_open_module(ColumnCoverPlateWeld, "Cover Plate Welded")
+
+    # 20-Flexure-member
     def open_flexure_member(self):
         self.common_open_module(Flexure, "Simply Supported Beam")
         
+    # 21-Flexure-cantilever-member
     def open_flexure_cantilever_member(self):
         self.common_open_module(Flexure_Cantilever, "Cantilever Beam")
     
-    def open_struts_in_trusses_compression_member(self):
-        self.common_open_module(Compression, "Struts in Trusses")
+    # 22-Struts-in-trusses-compression-member
+    def open_struts_weld_end_gusset_compression_member(self):
+        self.common_open_module(Compression, "Struts: Welded to End Gusset")
     
+    # 23-Flexure-purlin
+    def open_flexure_purlin(self):
+        self.common_open_module(Flexure_Purlin, "Purlin")
+
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
         home_window = HomeWindow()

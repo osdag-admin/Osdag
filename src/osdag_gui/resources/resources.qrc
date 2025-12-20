@@ -74,7 +74,7 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/base_plate_connec.svg</file>
         <file>vectors/bolted_tension_member.svg</file>
         <file>vectors/welded_tension_member.svg</file>
-        <file>vectors/struts_in_trusses_compression_mem.svg</file>
+        <file>vectors/struts_weld_end_gusset.svg</file>
         <file>vectors/cantilever_beam_flexural_mem.svg</file>
         <file>vectors/ss_beam_flexural_mem.svg</file>
         <file>vectors/simple_supported_plate_girder.svg</file>

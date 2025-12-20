@@ -45,7 +45,7 @@ SEARCH_MODULE_MAP = {
     'Base Plate Connection': KEY_DISP_BASE_PLATE,
     'Bolted to End Gusset Tension Member': KEY_DISP_TENSION_BOLTED,
     'Welded to End Gusset Tension Member': KEY_DISP_TENSION_WELDED,
-    'Struts in Trusses Compression Member': KEY_DISP_COMPRESSION_Strut,
+    'Struts Welded to End Gusset Compression Member': KEY_DISP_COMPRESSION_Strut,
     'Axially Loaded Columns Compression Member': KEY_DISP_COMPRESSION_COLUMN,
     'Simply Supported Beam Flexural Member': KEY_DISP_FLEXURE,
     'Cantilever Beam Flexural Member': KEY_DISP_FLEXURE2,
@@ -242,7 +242,7 @@ MODULE_MAP = {
     #---------Tension-Member-end------------------------------------------------------
 
     #---------Compression-Member-start------------------------------------------------------
-    KEY_DISP_COMPRESSION_Strut: ['Struts in Trusses', 'Compression Member', 'open_struts_in_trusses_compression_member'],
+    KEY_DISP_COMPRESSION_Strut: ['Struts Welded to End Gusset', 'Compression Member', 'open_struts_weld_end_gusset_compression_member'],
     KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member', 'None'],
     KEY_DISP_COMPRESSION_COLUMN: ['Columns with Support', 'Compression Member', 'open_column_design'],
     #---------Compression-Member-end------------------------------------------------------

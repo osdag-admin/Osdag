@@ -1110,6 +1110,10 @@ QScrollArea#outputs_vscrollarea QScrollBar::sub-page:vertical {
     background: #f1f1f1;
     color: #666;
 }
+#AdditionalInputs QLineEdit:disabled, #AdditionalInputs QComboBox:disabled{
+    background: #f1f1f1;
+    color: #666;
+}
 
 QWidget#outputs_group_container,
 QWidget#outputs_container{

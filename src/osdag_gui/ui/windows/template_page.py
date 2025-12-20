@@ -100,6 +100,7 @@ class CustomWindow(QWidget):
 
         self.cad_widget = CustomViewer3d(self)
         self.cad_widget.setFocusPolicy(Qt.StrongFocus)
+        self.cad_widget.setCursor(Qt.CursorShape.ArrowCursor)
         self.cad_widget.setFocus()
         self.cad_widget.setMouseTracking(True)
         self.cad_widget.InitDriver()

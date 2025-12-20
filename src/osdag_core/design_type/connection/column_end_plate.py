@@ -575,6 +575,52 @@ class ColumnEndPlate(MomentConnection):
         out_list.append(t26)
         # t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
         # out_list.append(t22)
+        
+        # Populate hover dict
+
+        # Column
+        self.hover_dict["Column"] = (
+            f"<b>Column</b><br>"
+            f"Section: {self.section.designation if flag else ''}<br>"
+            f"Depth: {self.section.depth if flag else ''} mm<br>"
+            f"Flange Width: {self.section.flange_width if flag else ''} mm<br>"
+            f"Web Thickness: {self.section.web_thickness if flag else ''} mm<br>"
+            f"Flange Thickness: {self.section.flange_thickness if flag else ''} mm"
+        )
+
+        # End Plate
+        self.hover_dict["Plate"] = (
+            f"<b>End Plate</b><br>"
+            f"Width: {self.plate_width if flag else ''} mm<br>"
+            f"Height: {self.plate_height if flag else ''} mm<br>"
+            f"Thickness: {self.plate_thickness_provided if flag else ''} mm<br>"
+            f"Moment Capacity: {round(self.m_dp_prov / 1e6, 2) if flag else ''} kNm"
+        )
+
+        # Bolts
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolts</b><br>"
+            f"Diameter: {self.bolt_diam_provided if flag else ''} mm<br>"
+            f"Grade: {self.bolt_grade_provided if flag else ''}<br>"
+            f"Total Bolts: {self.no_bolts if flag else ''}<br>"
+            f"Shear Capacity: {round(self.bolt_cap / 1000, 2) if flag else ''} kN"
+        )
+
+        # Welds
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>"
+            f"Type: {self.weld_type if flag else ''}<br>"
+            f"Stiffener Weld Type: Groove Weld<br>"
+            f"Weld Size: {self.weld_size_prov if flag else ''} mm"
+        )
+
+        # Stiffener
+        self.hover_dict["Stiffener"] = (
+            f"<b>Stiffener Plate</b><br>"
+            f"Height: {self.stiff_ht if flag else ''} mm<br>"
+            f"Width: {self.stiff_wt if flag else ''} mm<br>"
+            f"Thickness: {self.t_s if flag else ''} mm"
+        )
 
         return out_list
 
@@ -616,8 +662,8 @@ class ColumnEndPlate(MomentConnection):
 
         return lst
 
-    def out_stiffener(self):
-        conn_type = self[0]
+    def out_stiffener(self, args):
+        conn_type = args[0]
         if conn_type != 'Extended Both Ways':
             return True
         else:

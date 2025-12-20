@@ -2417,10 +2417,8 @@ class CommonDesignLogic(object):
                 welds = self.CEPObj.get_weld_models()
                 nutBolts = self.CEPObj.get_nut_bolt_models()
                 
-                hover_dict = getattr(getattr(self, "C", None), "hover_dict", {})
-
-                if hasattr(self, "cad_widget") and hover_dict:
-                    self.cad_widget.model_hover_labels = hover_dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict
                     
                 label_column = ["Column", hover_dict.get("Column")]
                 label_plate  = ["Plate",  hover_dict.get("Plate")]

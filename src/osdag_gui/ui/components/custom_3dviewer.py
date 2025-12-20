@@ -3,7 +3,7 @@ Custom 3D CAD Viewer that has an extra functionality of Hover over Label on Mode
 This is custom class is created to implement parent 'qtViewer3d' class and add extra functionality of mouse event. 
 """
 from PySide6.QtCore import QTimer, QTime, Qt
-from PySide6.QtWidgets import QToolTip
+from PySide6.QtWidgets import QToolTip, QApplication
 
 from osdag_gui.__config__ import CAD_BACKEND
 
@@ -243,6 +243,11 @@ class CustomViewer3d(qtViewer3d):
             self.current_highlighted_ais_list = []
             self.view.Redraw()
         QToolTip.hideText()
+
+        # restore holding cursor so cursor can update
+        self.unsetCursor()
+        QApplication.restoreOverrideCursor()
+        self.releaseMouse()
         super().leaveEvent(event)
 
     def display_view_cube(self):
@@ -338,6 +343,7 @@ class CustomViewer3d(qtViewer3d):
 
         super().mousePressEvent(event)
 
+
     def mouseReleaseEvent(self, event):
         if self.is_interacting_with_cube:
             try:
@@ -369,4 +375,8 @@ class CustomViewer3d(qtViewer3d):
                 self.is_interacting_with_cube = False
                 self.mouse_press_pos = None
 
+        # restore holding cursor so cursor can update
+        self.unsetCursor()
+        QApplication.restoreOverrideCursor()
+        self.releaseMouse()
         super().mouseReleaseEvent(event)

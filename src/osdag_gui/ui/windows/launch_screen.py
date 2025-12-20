@@ -83,9 +83,9 @@ class OsdagLaunchScreen(object):
         self.LoadingLabel = QLabel(self.centralwidget)
         self.LoadingLabel.setObjectName(u"SplashScreen_LoadingLabel")
         self.LoadingLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.LoadingLabel.setGeometry(QRect(20, 290, 130, 25))
+        self.LoadingLabel.setGeometry(QRect(20, 290, 160, 25))
         self.LoadingLabel.setObjectName("splash_loading_label")
-        self.LoadingLabel.setFont(QFont("Menlo", 9))
+        self.LoadingLabel.setFont(QFont("Arial", 11))
 
         # aligned at to right with margin(top = right = 10 wrt size of MainWindow)
         self.IITBLogo = QSvgWidget(self.centralwidget)

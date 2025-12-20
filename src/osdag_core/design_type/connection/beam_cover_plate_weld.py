@@ -219,9 +219,9 @@ class BeamCoverPlateWeld(MomentConnection):
 
         return add_buttons
 
-    def preference_type(self):
+    def preference_type(self, args):
 
-        pref_type = self[0]
+        pref_type = args[0]
         if pref_type == VALUES_FLANGEPLATE_PREFERENCES[0]:
             return True
         else:
@@ -581,8 +581,40 @@ class BeamCoverPlateWeld(MomentConnection):
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
                self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
+        
+        # Populate hover dict
 
+        # Beam
+        self.hover_dict["Beam"] = (
+            f"<b>Beam</b><br>"
+            f"Section: {self.section.designation if flag else ''}<br>"
+            f"Depth: {self.section.depth if flag else ''} mm<br>"
+            f"Flange Width: {self.section.flange_width if flag else ''} mm<br>"
+            f"Web Thickness: {self.section.web_thickness if flag else ''} mm<br>"
+            f"Flange Thickness: {self.section.flange_thickness if flag else ''} mm"
+        )
 
+        # Cover Plates (Flange + Web)
+        self.hover_dict["Plate"] = (
+            f"<b>Cover Plates</b><br>"
+            f"Flange Plate: {self.flange_plate.length if flag else ''} × "
+            f"{self.flange_plate.height if flag else ''} × "
+            f"{self.flange_out_plate_tk if flag else ''} mm<br>"
+            f"Inner Flange Plate: {self.plate_in_len if flag else ''} × "
+            f"{self.flange_plate.Innerheight if flag else ''} × "
+            f"{self.flange_in_plate_tk if flag else ''} mm<br>"
+            f"Web Plate: {self.web_plate.length if flag else ''} × "
+            f"{self.web_plate.height if flag else ''} × "
+            f"{self.web_plate.thickness_provided if flag else ''} mm"
+        )
+
+        # Weld
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>"
+            f"Flange Weld Size: {self.flange_weld.size if flag else ''} mm<br>"
+            f"Web Weld Size: {self.web_weld.size if flag else ''} mm<br>"
+            f"Weld Type: Fillet Weld"
+        )
 
         return out_list
 

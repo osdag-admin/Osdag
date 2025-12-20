@@ -250,9 +250,9 @@ class BeamCoverPlate(MomentConnection):
         else:
             return False
 
-    def preference_type(self):
+    def preference_type(self, args):
 
-        pref_type = self[0]
+        pref_type = args[0]
         if pref_type == VALUES_FLANGEPLATE_PREFERENCES[0] :
             return True
         else:
@@ -759,6 +759,41 @@ class BeamCoverPlate(MomentConnection):
         # t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
         #        self.flange_plate.thickness_provided if flag else '',True)
         # out_list.append(t20)
+        
+        # Populate hover dict
+
+        # Beam
+        self.hover_dict["Beam"] = (
+            f"<b>Beam</b><br>"
+            f"Section: {self.section.designation if flag else ''}<br>"
+            f"Depth: {self.section.depth if flag else ''} mm<br>"
+            f"Flange Width: {self.section.flange_width if flag else ''} mm<br>"
+            f"Web Thickness: {self.section.web_thickness if flag else ''} mm<br>"
+            f"Flange Thickness: {self.section.flange_thickness if flag else ''} mm"
+        )
+
+        # Cover Plates (Flange + Web)
+        self.hover_dict["Plate"] = (
+            f"<b>Cover Plates</b><br>"
+            f"Flange Plate: {self.flange_plate.length if flag else ''} × "
+            f"{self.flange_plate.height if flag else ''} × "
+            f"{self.flange_out_plate_tk if flag else ''} mm<br>"
+            f"Inner Flange Plate: {self.plate_in_len if flag else ''} × "
+            f"{self.flange_plate.Innerheight if flag else ''} × "
+            f"{self.flange_in_plate_tk if flag else ''} mm<br>"
+            f"Web Plate: {self.web_plate.length if flag else ''} × "
+            f"{self.web_plate.height if flag else ''} × "
+            f"{self.web_plate.thickness_provided if flag else ''} mm"
+        )
+
+        # Bolts
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolts</b><br>"
+            f"Diameter: {self.bolt.bolt_diameter_provided if flag else ''} mm<br>"
+            f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
+            f"Flange Bolts: {self.flange_plate.bolts_required if flag else ''}<br>"
+            f"Web Bolts: {self.web_plate.bolts_required if flag else ''}"
+        )
 
 
         return out_list

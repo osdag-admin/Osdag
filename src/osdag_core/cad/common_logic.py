@@ -2162,66 +2162,66 @@ class CommonDesignLogic(object):
 
             if self.component == "Column":
                 # hover label
-                label = ["Column", hover_dict["Column"]]
+                label = ["Column", hover_dict.get("Column", "Column")]
                 osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), color=column_color, update=True, label=label, canvas=self.cad_widget)
             elif self.component == "Beam":
-                label = ["Beam", hover_dict["Beam"]]
+                label = ["Beam", hover_dict.get("Beam", "Beam")]
                 osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), color=beam_color, update=True, label=label, canvas=self.cad_widget)
             elif self.component == "cleatAngle":
-                label = ["Angle", hover_dict["Angle"]]
+                label = ["Angle", hover_dict.get("Angle", "Angle")]
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict["Bolt"]]
+                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "SeatAngle":
-                label = ["Angle", hover_dict["Angle"]]
+                label = ["Angle", hover_dict.get("Angle", "Angle")]
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict["Bolt"]]
+                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "Plate":
                 # hover label
-                label = ["Weld", hover_dict["Weld"]]
+                label = ["Weld", hover_dict.get("Weld", "Weld")]
                 osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=weld_color, update=True, label=label, canvas=self.cad_widget)
-                label = ["Plate", hover_dict["Plate"]]
+                label = ["Plate", hover_dict.get("Plate", "Plate")]
                 osdag_display_shape(self.display, self.connectivityObj.plateModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict["Bolt"]]
+                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "Model":
                 # hover label
-                label = ["Column", hover_dict["Column"]]
+                label = ["Column", hover_dict.get("Column", "Column")]
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, color=column_color, update=True, label=label, canvas=self.cad_widget)
-                label = ["Beam", hover_dict["Beam"]]
+                label = ["Beam", hover_dict.get("Beam", "Beam")]
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, color=beam_color, update=True, label=label, canvas=self.cad_widget)
                 if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
                     # Colors to be set on self.components
-                    label = ["Weld", hover_dict["Weld"]]
+                    label = ["Weld", hover_dict.get("Weld", "Weld")]
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True, label=label, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=weld_color, update=True, label=label, canvas=self.cad_widget)
-                    label = ["Plate", hover_dict["Plate"]]
+                    label = ["Plate", hover_dict.get("Plate", "Plate")]
                     osdag_display_shape(self.display, self.connectivityObj.plateModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
 
                 elif self.connection == KEY_DISP_CLEATANGLE:
-                    label = ["Angle", hover_dict["Angle"]]
+                    label = ["Angle", hover_dict.get("Angle", "Angle")]
                     osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 else:
-                    label = ["Angle", hover_dict["Angle"]]
+                    label = ["Angle", hover_dict.get("Angle", "Angle")]
                     osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict["Bolt"]]
+                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
         if self.mainmodule == "Moment Connection":

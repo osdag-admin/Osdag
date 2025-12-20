@@ -1586,7 +1586,8 @@ class CustomWindow(QWidget):
                 # print(f"[INFO] main attributes: {dir(main)}")
                 # print("[INFO] main.mainmodule",main.mainmodule)
 
-                self.commLogicObj = CommonDesignLogic(self.display, self.cad_widget, self.folder, main, main.mainmodule)
+                self.commLogicObj = CommonDesignLogic(self.display, self.cad_widget, self.folder, main.module, main.mainmodule)
+                self.commLogicObj.module_object = main
                 # print(f"This is MAIN.MODULE {main.module}")
                 # print("[INFO] main.mainmodule", main.mainmodule)
                 # print("[INFO] common start")

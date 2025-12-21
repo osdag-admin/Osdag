@@ -393,9 +393,9 @@ class Connection(Main):
 
         return supporting_section
 
-    def get_fu_fy_I_section_suptng(self):
-        material_grade = self[0]
-        designation = self[1].get(KEY_SUPTNGSEC, None)
+    def get_fu_fy_I_section_suptng(self, arg):
+        material_grade = arg[0]
+        designation = arg[1].get(KEY_SUPTNGSEC, None)
         fu = ''
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
@@ -412,9 +412,9 @@ class Connection(Main):
 
         return d
 
-    def get_fu_fy_I_section_suptd(self):
-        material_grade = self[0]
-        designation = self[1].get(KEY_SUPTDSEC, None)
+    def get_fu_fy_I_section_suptd(self, arg):
+        material_grade = arg[0]
+        designation = arg[1].get(KEY_SUPTDSEC, None)
         fu = ''
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
@@ -432,8 +432,8 @@ class Connection(Main):
 
         return d
 
-    def get_fu_fy(self):
-        material_grade = self[0]
+    def get_fu_fy(self, arg):
+        material_grade = arg[0]
         fu_conn = ''
         fy_20 = ''
         fy_20_40 = ''
@@ -463,8 +463,8 @@ class Connection(Main):
 
         return d
 
-    def get_bolt_tension_type_for_prying(self):
-        bolt_type = self[0]
+    def get_bolt_tension_type_for_prying(self, arg):
+        bolt_type = arg[0]
 
         if bolt_type == "Bearing Bolt":
             bolt_tension_type = 'Non pre-tensioned'

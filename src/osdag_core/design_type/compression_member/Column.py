@@ -398,15 +398,15 @@ class ColumnDesign(Member):
         elif end1 == 'Roller':
             return ['Fixed', 'Hinged']
 
-    def fn_end1_image(self):
+    def fn_end1_image(self, arg):
 
-        if self == 'Fixed':
+        if arg == 'Fixed':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
-        elif self == 'Free':
+        elif arg == 'Free':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
-        elif self == 'Hinged':
+        elif arg == 'Hinged':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
-        elif self == 'Roller':
+        elif arg == 'Roller':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
 
     def fn_end2_image(self, arg):

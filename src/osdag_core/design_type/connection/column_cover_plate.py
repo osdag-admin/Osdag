@@ -218,9 +218,9 @@ class ColumnCoverPlate(MomentConnection):
 
         return val
 
-    def out_bolt_bearing(self):
+    def out_bolt_bearing(self, arg):
 
-        bolt_type = self[0]
+        bolt_type = arg[0]
         if bolt_type != TYP_BEARING:
             return True
         else:

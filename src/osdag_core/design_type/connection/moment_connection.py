@@ -360,9 +360,9 @@ class MomentConnection(Connection, IS800_2007):
 
         return section
 
-    def get_fu_fy_I_section(self):
-        material_grade = self[0]
-        designation = self[1][KEY_SECSIZE]
+    def get_fu_fy_I_section(self, arg):
+        material_grade = arg[0]
+        designation = arg[1][KEY_SECSIZE]
 
         fu = ''
         fy = ''

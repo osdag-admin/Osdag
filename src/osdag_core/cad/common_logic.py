@@ -2570,34 +2570,57 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
             print("DEBUG: Inside display_3DModel for Lap Joint Welded Connection")
-            self.col = self.module_object
-            self.assembly, self.plate1_model, self.plate2_model, self.weld_models = self.createWeldedLapJoint()
-            print(f"DEBUG: Models created. Assembly: {self.assembly}")
-            
-            hover_dict = getattr(self.module_object, "hover_dict", {})
-            if hasattr(self, "cad_widget"):
-                self.cad_widget.model_hover_labels = hover_dict
+            try:
+                if hasattr(self, 'module_object'):
+                    self.col = self.module_object
+                else:
+                    print("ERROR: module_object not set in display_3DModel for Lap Joint Welded!")
+                    return
+                
+                # Create fresh models on each call (same pattern as LapJointBolted)
+                print("DEBUG: Creating fresh CAD models")
+                self.assembly, self.plate1_model, self.plate2_model, self.weld_models = self.createWeldedLapJoint()
+                print(f"DEBUG: Models created. Plate1: {type(self.plate1_model)}, Plate2: {type(self.plate2_model)}")
+                
+                hover_dict = getattr(self.module_object, "hover_dict", {})
+                if hasattr(self, "cad_widget"):
+                    self.cad_widget.model_hover_labels = hover_dict
 
-            label_plate1 = ["Plate 1", hover_dict.get("Plate 1", "Plate 1")]
-            label_plate2 = ["Plate 2", hover_dict.get("Plate 2", "Plate 2")]
-            label_weld = ["Weld", hover_dict.get("Weld", "Weld")]
-            
-            if self.component == "Model":
-                print("DEBUG: Displaying Model components")
-                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
-                osdag_display_shape(self.display, self.plate2_model, update=True, label=label_plate2, canvas=self.cad_widget)
-                for weld in self.weld_models:
-                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED, label=label_weld, canvas=self.cad_widget)
-                self.display.View_Iso()
+                # Use direct DisplayShape 
+                if self.component == "Model":
+                    print("DEBUG: Displaying Model - all components")
+                    self.display.DisplayShape(self.plate1_model, material=Graphic3d_NOM_ALUMINIUM, update=True)
+                    self.display.DisplayShape(self.plate2_model, update=True)
+                    for weld in self.weld_models:
+                        self.display.DisplayShape(weld, color=Quantity_NOC_RED, update=True)
+                    print("DEBUG: All shapes displayed, calling FitAll")
+
+                elif self.component == "Plate 1":
+                    print("DEBUG: Displaying Plate 1 only")
+                    self.display.DisplayShape(self.plate1_model, material=Graphic3d_NOM_ALUMINIUM, update=True)
+
+                elif self.component == "Plate 2":
+                    print("DEBUG: Displaying Plate 2 only")
+                    self.display.DisplayShape(self.plate2_model, update=True)
+
+                elif self.component == "Weld":
+                    print("DEBUG: Displaying Welds only")
+                    for weld in self.weld_models:
+                        self.display.DisplayShape(weld, color=Quantity_NOC_RED, update=True)
+                
+                # Force display update to stabilize before returning
                 self.display.FitAll()
-                self.display.View.Redraw()
-            elif self.component == "Plate 1":
-                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
-            elif self.component == "Plate 2":
-                osdag_display_shape(self.display, self.plate2_model, update=True, label=label_plate2, canvas=self.cad_widget)
-            elif self.component == "Weld":
-                for weld in self.weld_models:
-                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED, label=label_weld, canvas=self.cad_widget)
+                self.display.Context.UpdateCurrentViewer()
+                self.display.Repaint()
+                print("DEBUG: LapJointWelded display complete")
+            except Exception as e:
+                print(f"ERROR in LapJointWelded display: {e}")
+                import traceback
+                traceback.print_exc()
+
+
+
+
 
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if self.connection == KEY_DISP_BUTTJOINTBOLTED:
@@ -2937,6 +2960,12 @@ class CommonDesignLogic(object):
 
                 self.display_3DModel("Model", "gradient_bg")
 
+            else:
+                self.display.EraseAll()
+                self.cad_widget.display_view_cube()
+        elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
+            if flag is True:
+                self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
                 self.cad_widget.display_view_cube()

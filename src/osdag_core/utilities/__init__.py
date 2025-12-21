@@ -86,8 +86,11 @@ def color_the_edges(shp, display, color, width):
 
 
 def set_default_edge_style(shp, display):
-    color_the_edges(shp, display, Quantity_Color(Quantity_NOC_BLACK), 0.5)
-    # return shps
+    try:
+        color_the_edges(shp, display, Quantity_Color(Quantity_NOC_BLACK), 0.5)
+    except Exception as e:
+        # Edge styling is optional - don't crash if it fails
+        pass
 
 
 def osdag_display_shape(display, shapes, material=None, texture=None, color=None, transparency=None, update=False, label=[], canvas=None):
@@ -100,6 +103,7 @@ def osdag_display_shape(display, shapes, material=None, texture=None, color=None
         canvas.model_ais_objects[label[0]] += [ais]
     # Activate selection mode for whole entity
     display.Context.Activate(ais, 0)
+
 
 def rgb_color(r, g, b):
     return Quantity_Color(r, g, b, Quantity_NOC_BLACK)

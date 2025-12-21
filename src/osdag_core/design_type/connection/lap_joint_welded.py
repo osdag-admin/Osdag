@@ -661,21 +661,17 @@ class LapJointWelded(MomentConnection):
         return components
 
     def call_3DModel(self, ui, bgcolor):
-        from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
-        self.commLogicObj.display_3DModel("Model", bgcolor)
+        ui.commLogicObj.module_object = self
+        ui.commLogicObj.display_3DModel("Model", bgcolor)
 
     def call_3DPlate1(self, ui, bgcolor):
-        from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
-        self.commLogicObj.display_3DModel("Plate 1", bgcolor)
+        ui.commLogicObj.module_object = self
+        ui.commLogicObj.display_3DModel("Plate 1", bgcolor)
 
     def call_3DPlate2(self, ui, bgcolor):
-        from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
-        self.commLogicObj.display_3DModel("Plate 2", bgcolor)
+        ui.commLogicObj.module_object = self
+        ui.commLogicObj.display_3DModel("Plate 2", bgcolor)
 
     def call_3DWeld(self, ui, bgcolor):
-        from ...cad.common_logic import CommonDesignLogic
-        self.commLogicObj = CommonDesignLogic(ui.display, ui.cad_widget, ui.folder, self, self.mainmodule)
-        self.commLogicObj.display_3DModel("Weld", bgcolor)
+        ui.commLogicObj.module_object = self
+        ui.commLogicObj.display_3DModel("Weld", bgcolor)

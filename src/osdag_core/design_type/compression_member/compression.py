@@ -513,15 +513,15 @@ class Compression(Member):
         elif end1 == 'Roller':
             return ['Fixed', 'Hinged']
 
-    def fn_end1_image(self):
+    def fn_end1_image(self, arg):
 
-        if self == 'Fixed':
+        if arg == 'Fixed':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
-        elif self == 'Free':
+        elif arg == 'Free':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
-        elif self == 'Hinged':
+        elif arg == 'Hinged':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("RRRFstrut.png"))
-        elif self == 'Roller':
+        elif arg == 'Roller':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("RRRRstrut.png"))
 
     def fn_end2_image(self, arg):

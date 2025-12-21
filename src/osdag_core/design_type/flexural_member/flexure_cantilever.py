@@ -312,26 +312,26 @@ class Flexure_Cantilever(Member):
             return list(set(res1 + res2))
 
     def fn_torsion_warping(self, arg_list):
-        print( 'Inside fn_torsion_warping', self)
-        if self[0] == Torsion_Restraint1:
+        print( 'Inside fn_torsion_warping', arg_list)
+        if arg_list[0] == Torsion_Restraint1:
             return Warping_Restraint_list
-        elif self[0] == Torsion_Restraint2:
+        elif arg_list[0] == Torsion_Restraint2:
             return [Warping_Restraint5]
         else:
             return [Warping_Restraint5]
 
 
     def fn_supp_image(self, arg_list):
-        print( 'Inside fn_supp_image', self)
-        if self[0] == KEY_DISP_SUPPORT1:
+        print( 'Inside fn_supp_image', arg_list)
+        if arg_list[0] == KEY_DISP_SUPPORT1:
             return Simply_Supported_img
         else:
             return Cantilever_img
 
     def axis_bending_change(self, arg_list):
-        design = self[0]
-        print( 'Inside fn_supp_image', self)
-        if self[0] == KEY_DISP_DESIGN_TYPE_FLEXURE:
+        design = arg_list[0]
+        print( 'Inside fn_supp_image', arg_list)
+        if arg_list[0] == KEY_DISP_DESIGN_TYPE_FLEXURE:
             return ['NA']
         else:
             return VALUES_BENDING_TYPE
@@ -416,18 +416,18 @@ class Flexure_Cantilever(Member):
 
         return lst
 
-    def output_modifier(self):
-        print(self)
-        if self[0] == VALUES_SUPP_TYPE_temp[2]:
+    def output_modifier(self, arg_list):
+        print(arg_list)
+        if arg_list[0] == VALUES_SUPP_TYPE_temp[2]:
             return False
-        # elif self[0] == VALUES_SUPP_TYPE_temp[0] or self[0] == VALUES_SUPP_TYPE_temp[1] :
+        # elif arg_list[0] == VALUES_SUPP_TYPE_temp[0] or arg_list[0] == VALUES_SUPP_TYPE_temp[1] :
         #     return True
         else:
             return True
 
-    def major_bending_warning(self):
+    def major_bending_warning(self, arg_list):
 
-        if self[0] == VALUES_SUPP_TYPE_temp[2]:
+        if arg_list[0] == VALUES_SUPP_TYPE_temp[2]:
             return True
         else:
             return False

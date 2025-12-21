@@ -268,7 +268,7 @@ class Main():
     #     return d
 
 
-    def get_I_sec_properties(self):
+    def get_I_sec_properties(self, arg):
 
         if '' in self:
             mass = ''
@@ -286,11 +286,11 @@ class Main():
             image = ''
 
         else:
-            D = float(self[0])
-            B = float(self[1])
-            t_w = float(self[2])
-            t_f = float(self[3])
-            sl = float(self[4])
+            D = float(arg[0])
+            B = float(arg[1])
+            t_w = float(arg[2])
+            t_f = float(arg[3])
+            sl = float(arg[4])
 
             sec_prop = I_sectional_Properties()
             mass = sec_prop.calc_Mass(D, B, t_w, t_f)
@@ -327,7 +327,7 @@ class Main():
 
         return d
 
-    def get_SHS_RHS_properties(self):
+    def get_SHS_RHS_properties(self, arg):
 
         if '' in self:
             mass = ''
@@ -345,10 +345,10 @@ class Main():
             image = ''
 
         else:
-            D = float(self[0])
-            B = float(self[1])
-            t_w = float(self[2])
-            t_f = float(self[2])
+            D = float(arg[0])
+            B = float(arg[1])
+            t_w = float(arg[2])
+            t_f = float(arg[2])
             sl = 0.0
 
             sec_prop = SHS_RHS_Properties()
@@ -386,7 +386,7 @@ class Main():
 
         return d
 
-    def get_CHS_properties(self):
+    def get_CHS_properties(self, arg):
 
         if '' in self:
             mass = ''
@@ -404,10 +404,10 @@ class Main():
             image = ''
 
         else:
-            D = float(self[1])
-            B = float(self[1])
-            t_w = float(self[2])
-            t_f = float(self[2])
+            D = float(arg[1])
+            B = float(arg[1])
+            t_w = float(arg[2])
+            t_f = float(arg[2])
             sl = 0.0
 
             sec_prop = CHS_Properties()
@@ -444,9 +444,9 @@ class Main():
 
         return d
 
-    def change_source(self):
+    def change_source(self, arg):
 
-        designation = self[0]
+        designation = arg[0]
         source = 'Custom'
         if designation in connectdb("Columns", call_type="dropdown"):
             source = get_source("Columns", designation)

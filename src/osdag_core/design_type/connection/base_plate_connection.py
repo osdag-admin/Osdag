@@ -1327,151 +1327,151 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return weld
 
-    def major_minor(self):
-        if self[0] in ['Moment Base Plate']:
+    def major_minor(self, arg):
+        if arg[0] in ['Moment Base Plate']:
             return True
         else:
             return False
 
-    def stiffener_flange(self):
-        if self[0] in ['Moment Base Plate']:
+    def stiffener_flange(self, arg):
+        if arg[0] in ['Moment Base Plate']:
             return False
         else:
             return True
 
-    def stiffener_alongweb(self):
-        if self[0] in ['Moment Base Plate']:
+    def stiffener_alongweb(self, arg):
+        if arg[0] in ['Moment Base Plate']:
             return False
         else:
             return True
 
-    def stiffener_acrossweb(self):
-        if self[0] in ['Moment Base Plate', 'Welded Column Base']:
+    def stiffener_acrossweb(self, arg):
+        if arg[0] in ['Moment Base Plate', 'Welded Column Base']:
             return False
         else:
             return True
 
-    def stiffener_hollow_cs(self):
-        if self[0] in ['Moment Base Plate', 'Welded Column Base']:
+    def stiffener_hollow_cs(self, arg):
+        if arg[0] in ['Moment Base Plate', 'Welded Column Base']:
             return True
         else:
             return False
 
-    def stiffener_chs_len(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_len(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def stiffener_chs_height(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_height(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def stiffener_chs_thk(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_thk(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def stiffener_chs_shear_demand(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_shear_demand(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def stiffener_chs_shear_capa(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_shear_capa(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def stiffener_chs_moment_demand(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_moment_demand(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def stiffener_chs_moment_capa(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def stiffener_chs_moment_capa(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def conn_axial_tension(self):
-        if self[0] == 'Moment Base Plate':
+    def conn_axial_tension(self, arg):
+        if arg[0] == 'Moment Base Plate':
             return True
         else:
             return False
 
-    def label_end_condition(self):
-        if self[0] in ['Moment Base Plate', 'Hollow/Tubular Column Base']:
+    def label_end_condition(self, arg):
+        if arg[0] in ['Moment Base Plate', 'Hollow/Tubular Column Base']:
             return 'Fixed'
         else:
             return 'Pinned'
 
-    def anchor_type_warning(self):
+    def anchor_type_warning(self, arg):
 
-        if self[0] in ['IS 5624-Type A', 'IS 5624-Type B']:
+        if arg[0] in ['IS 5624-Type A', 'IS 5624-Type B']:
             return True
         else:
             return False
 
-    def conn_weld_type(self):
-        # if self[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base', 'Moment Base Plate']:
+    def conn_weld_type(self, arg):
+        # if arg[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base', 'Moment Base Plate']:
         #     return VALUES_WELD_TYPE
         # else:
         weld = []
         weld.append(VALUES_WELD_TYPE[1])
         return weld
 
-    def out_weld(self):
+    def out_weld(self, arg):
 
-        conn = self[0]
+        conn = arg[0]
         if conn == 'Groove Weld':
             return True
         else:
             return False
 
-    def out_anchor_tension(self):
-        if self[0] in ['Hollow/Tubular Column Base', 'Welded Column Base']:
+    def out_anchor_tension(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base', 'Welded Column Base']:
             return True
         else:
             return False
 
-    def in_anchor(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def in_anchor(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return True
         else:
             return False
 
-    def in_anchor_hollow(self):
-        if self[0] in ['Hollow/Tubular Column Base']:
+    def in_anchor_hollow(self, arg):
+        if arg[0] in ['Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def out_detail_projection(self):
-        if self[0] in ['Welded Column Base', 'Hollow/Tubular Column Base']:
+    def out_detail_projection(self, arg):
+        if arg[0] in ['Welded Column Base', 'Hollow/Tubular Column Base']:
             return False
         else:
             return True
 
-    def detailing_in(self):
-        if self[0] in ['Moment Base Plate', 'Welded Column Base']:
+    def detailing_in(self, arg):
+        if arg[0] in ['Moment Base Plate', 'Welded Column Base']:
             return False
         else:
             return True
 
-    def out_anchor_combined(self):
-        if self[0] != 'Welded Column Base':
+    def out_anchor_combined(self, arg):
+        if arg[0] != 'Welded Column Base':
             return True
         else:
             return False
 
-    def secsize_for_hollow(self):
-        if self[0] == 'Hollow/Tubular Column Base':
+    def secsize_for_hollow(self, arg):
+        if arg[0] == 'Hollow/Tubular Column Base':
             secsize = []
             secsize.extend(connectdb("RHS"))
             secsize.extend(connectdb("SHS", call_type="popup"))
@@ -1872,11 +1872,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return change_tab
 
-    def anchor_bolt_designation(self):
+    def anchor_bolt_designation(self, arg):
 
-        length = str(self[0])
-        galvanized = str(self[1])
-        input_dictionary = self[2]
+        length = str(arg[0])
+        galvanized = str(arg[1])
+        input_dictionary = arg[2]
         if not input_dictionary:
             d = ''
         else:
@@ -1894,10 +1894,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
              KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF: str(new_des)}
         return d
 
-    def anchor_length_validation(self):
+    def anchor_length_validation(self, arg):
 
-        length = str(self[0])
-        status = self[2]
+        length = str(arg[0])
+        status = arg[2]
         valid = True
         if length == "":
             return {"Validation": [valid, ""], KEY_DP_ANCHOR_BOLT_LENGTH_OCF: length,
@@ -1913,9 +1913,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
              KEY_DP_ANCHOR_BOLT_LENGTH_ICF: str(length)}
         return d
 
-    def anchor_hole_type_validation(self):
+    def anchor_hole_type_validation(self, arg):
 
-        hole_type = str(self[0])
+        hole_type = str(arg[0])
         if hole_type == 'Standard':
             return {"Validation":
                         [False, "Over-sized hole type for anchor is recommended by Osdag for Base Plate module."]

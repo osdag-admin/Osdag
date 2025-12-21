@@ -232,7 +232,7 @@ class ShearConnection(Connection):
 
         return section
 
-    def get_Angle_sec_properties(self):
+    def get_Angle_sec_properties(self, arg):
         # print(self,profile,"shxv")
         # print(self, "shxv")
         if '' in self:
@@ -256,9 +256,9 @@ class ShearConnection(Connection):
             image = ''
 
         else:
-            a = float(self[0])
-            b = float(self[1])
-            t = float(self[2])
+            a = float(arg[0])
+            b = float(arg[1])
+            t = float(arg[2])
             l = None
 
             sec_prop = Single_Angle_Properties()
@@ -308,10 +308,10 @@ class ShearConnection(Connection):
 
         return d
 
-    def get_new_angle_section_properties(self):
+    def get_new_angle_section_properties(self, arg):
 
-        designation = self[0]
-        material_grade = self[1]
+        designation = arg[0]
+        material_grade = arg[1]
 
 
         Angle_attributes = Angle(designation, material_grade)
@@ -511,9 +511,9 @@ class ShearConnection(Connection):
 
         return lst
 
-    def out_bolt_bearing(self):
+    def out_bolt_bearing(self, arg):
 
-        bolt_type = self[0]
+        bolt_type = arg[0]
         if bolt_type != TYP_BEARING:
             return True
         else:

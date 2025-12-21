@@ -213,45 +213,45 @@ def search_projects_and_modules(query: str) -> dict[str, list]:
 MODULE_MAP = {
     #----------------------------Connections-start-------------------------------------
     #--------------------Submodule---------Module---------Open-module-function---------
-    KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection', 'open_fin_plate_shear_connection'],
-    KEY_DISP_ENDPLATE: ['Header Plate', 'Shear Connection', 'open_header_plate_shear_connection'],
-    KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'open_cleat_angle_shear_connection'],
-    KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'open_seated_angle_shear_connection'],
+    KEY_DISP_FINPLATE: ['Fin Plate', 'Shear Connection', 'open_fin_plate_shear_conn'],
+    KEY_DISP_ENDPLATE: ['Header Plate', 'Shear Connection', 'open_header_plate_shear_conn'],
+    KEY_DISP_CLEATANGLE: ['Cleat Angle', 'Shear Connection', 'open_cleat_angle_shear_conn'],
+    KEY_DISP_SEATED_ANGLE: ['Seated Angle', 'Shear Connection', 'open_seated_angle_shear_conn'],
 
-    KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection', 'open_beam_cover_plate_moment_connection'],
-    KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection', 'open_beam_cover_plate_weld_moment_connection'],
-    KEY_DISP_BB_EP_SPLICE: ['Beam-to-Beam End Plate', 'Moment Connection', 'open_beam_beam_end_plate_splice_connection'],
+    KEY_DISP_BEAMCOVERPLATE: ['Beam to Beam Cover Plate Bolted', 'Moment Connection', 'open_btb_cover_plate_bolt_moment_conn'],
+    KEY_DISP_BEAMCOVERPLATEWELD: ['Beam to Beam Cover Plate Welded', 'Moment Connection', 'open_btb_cover_plate_weld_moment_conn'],
+    KEY_DISP_BB_EP_SPLICE: ['Beam-to-Beam End Plate', 'Moment Connection', 'open_btb_end_plate_moment_conn'],
 
-    KEY_DISP_COLUMNCOVERPLATE: ['Column to Column Cover Plate Bolted', 'Moment Connection', 'open_column_cover_plate_connection'],
-    KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection', 'open_column_cover_plate_weld_connection'],
-    KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection', 'open_column_end_plate_connection'],
+    KEY_DISP_COLUMNCOVERPLATE: ['Column to Column Cover Plate Bolted', 'Moment Connection', 'open_ctc_cover_plate_bolt_moment_conn'],
+    KEY_DISP_COLUMNCOVERPLATEWELD: ['Column to Column Cover Plate Welded', 'Moment Connection', 'open_ctc_cover_plate_weld_moment_conn'],
+    KEY_DISP_COLUMNENDPLATE: ['Column-to-Column End Plate', 'Moment Connection', 'open_ctc_end_plate_moment_connection'],
 
-    KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'open_end_plate_btc_page'],
+    KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'open_btc_end_plate_moment_conn'],
 
-    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection', 'open_lap_joint_bolted'],
-    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection', 'open_lap_joint_welded'],
-    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection', 'open_butt_joint_bolted'],
-    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection', 'open_butt_joint_welded'],
+    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Simple Connection', 'open_lap_joint_bolted_simple_conn'],
+    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Simple Connection', 'open_lap_joint_welded_simple_conn'],
+    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection', 'open_butt_joint_bolted_simple_conn'],
+    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection', 'open_butt_joint_welded_simple_conn'],
 
     KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection', 'None'],
     #---------Connections-end-----------------------------------------------------------
 
     #---------Tension-Member-start------------------------------------------------------
-    KEY_DISP_TENSION_BOLTED: ['Bolted to End Gusset', 'Tension Member', 'open_bolted_end_tension'],
-    KEY_DISP_TENSION_WELDED: ['Welded to End Gusset', 'Tension Member', 'open_tension_welded_page'],
+    KEY_DISP_TENSION_BOLTED: ['Bolted to End Gusset', 'Tension Member', 'open_tension_bolted'],
+    KEY_DISP_TENSION_WELDED: ['Welded to End Gusset', 'Tension Member', 'open_tension_welded'],
     #---------Tension-Member-end------------------------------------------------------
 
     #---------Compression-Member-start------------------------------------------------------
-    KEY_DISP_COMPRESSION_Strut: ['Struts Welded to End Gusset', 'Compression Member', 'open_struts_weld_end_gusset_compression_member'],
+    KEY_DISP_COMPRESSION_Strut: ['Struts Welded to End Gusset', 'Compression Member', 'open_struts_weld_end_gusset_compress_member'],
     KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member', 'None'],
-    KEY_DISP_COMPRESSION_COLUMN: ['Columns with Support', 'Compression Member', 'open_column_design'],
+    KEY_DISP_COMPRESSION_COLUMN: ['Columns with Support', 'Compression Member', 'open_column_design_compress_member'],
     #---------Compression-Member-end------------------------------------------------------
 
     #---------Flexural-Member-start------------------------------------------------------
-    KEY_DISP_FLEXURE: ['Simply Supported Beam', 'Flexural Members', 'open_flexure_member'],
-    KEY_DISP_FLEXURE2: ['Cantilever Beam', 'Flexural Members', 'open_flexure_cantilever_member'],
-    KEY_DISP_FLEXURE4: ['Purlins', 'Flexural Members', 'open_flexure_purlin'],
-    KEY_DISP_PLATE_GIRDER_WELDED: ['Plate Girder', 'Flexural Members', 'open_plate_girder']
+    KEY_DISP_FLEXURE: ['Simply Supported Beam', 'Flexural Members', 'open_simply_supported_beam_flexure'],
+    KEY_DISP_FLEXURE2: ['Cantilever Beam', 'Flexural Members', 'open_cantilever_beam_flexure'],
+    KEY_DISP_FLEXURE4: ['Purlins', 'Flexural Members', 'open_purlin_flexure'],
+    KEY_DISP_PLATE_GIRDER_WELDED: ['Plate Girder', 'Flexural Members', 'open_plate_girder_flexure']
     #---------Flexural-Member-end------------------------------------------------------
 
 }

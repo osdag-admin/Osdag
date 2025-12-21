@@ -540,52 +540,68 @@ class MainWindow(QMainWindow):
 
     def handle_card_open_clicked(self, card_title):
         # print(f"[INFO] Card opened: {card_title}")
+
+        #----------Shear-Connections--------------
         if card_title == "Fin Plate":
-            self.open_fin_plate_shear_connection()
+            self.open_fin_plate_shear_conn()
         elif card_title == "Cleat Angle":
-            self.open_cleat_angle_shear_connection()
+            self.open_cleat_angle_shear_conn()
         elif card_title == "Header Plate":
-            self.open_header_plate_shear_connection()
+            self.open_header_plate_shear_conn()
         elif card_title == "Seated Angle":
-            self.open_seated_angle_shear_connection()
+            self.open_seated_angle_shear_conn()
+
+        #----------Beam-to-Column-Connections--------------
         elif card_title == "End Plate":
-            self.open_end_plate_btc_page() 
-        elif card_title == "Plate Girder":
-            self.open_plate_girder()
-        elif card_title == "Bolted to End Gusset":
-            self.open_bolted_end_tension()
-        elif card_title == "Welded to End Gusset":
-            self.open_tension_welded_page()
-        elif card_title == "Lap Joint Welded":
-            self.open_lap_joint_welded()
-        elif card_title == "Lap Joint Bolted":
-            self.open_lap_joint_bolted()
-        elif card_title == "Butt Joint Bolted":
-            self.open_butt_joint_bolted()
-        elif card_title == "Butt Joint Welded":
-            self.open_butt_joint_welded()
-        elif card_title == "Column":
-            self.open_column_design()
+            self.open_btc_end_plate_moment_conn() 
+
+        #----------Beam-to-Beam-Connections--------------
         elif card_title == "Cover Plate Welded":
-            self.open_beam_cover_plate_weld_moment_connection()
+            self.open_btb_cover_plate_weld_moment_conn()
         elif card_title == "Cover Plate Bolted":
-            self.open_beam_cover_plate_moment_connection()
+            self.open_btb_cover_plate_bolt_moment_conn()
         elif card_title == "Beam Beam End Plate":
-            self.open_beam_beam_end_plate_splice_connection()
-        elif card_title == "Column End Plate":
-            self.open_column_end_plate_connection()
+            self.open_btb_end_plate_moment_conn()
+
+        #----------Column-to-Column-Connections--------------
         elif card_title == "Column Cover Plate Bolted":
-            self.open_column_cover_plate_connection()
+            self.open_ctc_cover_plate_bolt_moment_conn()
         elif card_title == "Column Cover Plate Welded":
-            self.open_column_cover_plate_weld_connection() 
-        elif card_title == "Simply Supported Beam":
-            self.open_flexure_member()
-        elif card_title == "Cantilever Beam":
-            self.open_flexure_cantilever_member()
+            self.open_ctc_cover_plate_weld_moment_conn()
+        elif card_title == "Column End Plate":
+            self.open_ctc_end_plate_moment_connection()
+
+        #----------Simple-Connections--------------
+        elif card_title == "Lap Joint Welded":
+            self.open_lap_joint_welded_simple_conn()
+        elif card_title == "Lap Joint Bolted":
+            self.open_lap_joint_bolted_simple_conn()
+        elif card_title == "Butt Joint Bolted":
+            self.open_butt_joint_bolted_simple_conn()
+        elif card_title == "Butt Joint Welded":
+            self.open_butt_joint_welded_simple_conn()
+
+        #----------Tension-Member--------------
+        elif card_title == "Bolted to End Gusset":
+            self.open_tension_bolted()
+        elif card_title == "Welded to End Gusset":
+            self.open_tension_welded()
+
+        #----------Compression-Member--------------
+        elif card_title == "Column Design":
+            self.open_column_design_compress_member()
         elif card_title == "Struts Welded to End Gusset":
-            self.open_struts_weld_end_gusset_compression_member()
+            self.open_struts_weld_end_gusset_compress_member()
+
+        #----------Flexure-Member--------------
+        elif card_title == "Simply Supported Beam":
+            self.open_simply_supported_beam_flexure()
+        elif card_title == "Cantilever Beam":
+            self.open_cantilever_beam_flexure()
+        elif card_title == "Plate Girder":
+            self.open_plate_girder_flexure()
         elif card_title == "Purlin":
-            self.open_flexure_purlin()
+            self.open_purlin_flexure()
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -618,95 +634,95 @@ class MainWindow(QMainWindow):
         self.tab_bar.setTabText(index, title)
 
     # 1-Fin-plate-shear-connection
-    def open_fin_plate_shear_connection(self):
+    def open_fin_plate_shear_conn(self):
         self.common_open_module(FinPlateConnection, "Fin Plate Connection")
 
     # 2-Cleat-angle-shear-connection
-    def open_cleat_angle_shear_connection(self):
+    def open_cleat_angle_shear_conn(self):
         self.common_open_module(CleatAngleConnection, "Cleat Angle Connection")
 
     # 3-Header-plate-shear-connection
-    def open_header_plate_shear_connection(self):
+    def open_header_plate_shear_conn(self):
         self.common_open_module(EndPlateConnection, "Header Plate Connection")  
     
     # 4-Seated-angle-shear-connection
-    def open_seated_angle_shear_connection(self):
+    def open_seated_angle_shear_conn(self):
         self.common_open_module(SeatedAngleConnection, "Seated Angle Connection")
     
-    # 5-Beam-column-end-plate
-    def open_end_plate_btc_page(self):
-        self.common_open_module(BeamColumnEndPlate, "Beam-to-Column End Plate Connection")
+    # 5-Beam-to-Column-end-plate-moment-connection
+    def open_btc_end_plate_moment_conn(self):
+        self.common_open_module(BeamColumnEndPlate, "Beam Column End Plate Connection")
 
-    # 6-Plate-girder
-    def open_plate_girder(self):
-        self.common_open_module(PlateGirderWelded, "Plate Girder")
+    # 6-Beam-to-Beam-cover-plate-welded-moment-connection
+    def open_btb_cover_plate_weld_moment_conn(self):
+        self.common_open_module(BeamCoverPlateWeld, "Beam Beam Cover Plate Welded")
 
-    # 7-Bolted-end-tension
-    def open_bolted_end_tension(self):
-        self.common_open_module(Tension_bolted, "Bolted to End Gusset")
- 
-    # 8-Tension-member-welded-to-end-gusset
-    def open_tension_welded_page(self):
-        self.common_open_module(Tension_welded, "Tension Member: Welded to End Gusset")
-
-    # 9-Lap-joint-welded
-    def open_lap_joint_welded(self):
-        self.common_open_module(LapJointWelded, "Lap Joint Welded Connection")
-
-    # 10-Lap-joint-bolted
-    def open_lap_joint_bolted(self):
-        self.common_open_module(LapJointBolted, "Lap Joint Bolted Connection")
+    # 7-Beam-to-Beam-cover-plate-bolted-moment-connection
+    def open_btb_cover_plate_bolt_moment_conn(self):
+        self.common_open_module(BeamCoverPlate, "Beam Beam Cover Plate Bolted")
         
-    # 11-Butt-joint-bolted
-    def open_butt_joint_bolted(self):
-        self.common_open_module(ButtJointBolted, "Butt Joint Bolted Connection")
-
-    # 12-Butt-joint-welded
-    def open_butt_joint_welded(self):
-        self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection")  
-    
-    # 13-Column-design
-    def open_column_design(self):
-        self.common_open_module(ColumnDesign, "Column Design")
-
-    # 14-Beam-cover-plate-weld-moment-connection
-    def open_beam_cover_plate_weld_moment_connection(self):
-        self.common_open_module(BeamCoverPlateWeld, "Cover Plate Welded")
-
-    # 15-Beam-cover-plate-moment-connection
-    def open_beam_cover_plate_moment_connection(self):
-        self.common_open_module(BeamCoverPlate, "Cover Plate Bolted")
-        
-    # 16-Beam-beam-end-plate-splice-connection
-    def open_beam_beam_end_plate_splice_connection(self):
+    # 8-Beam-to-Beam-end-plate-splice-moment-connection
+    def open_btb_end_plate_moment_conn(self):
         self.common_open_module(BeamBeamEndPlateSplice, "Beam Beam End Plate")
-        
-    # 17-Column-end-plate-connection
-    def open_column_end_plate_connection(self):
+
+    # 9-Column-to-Column-end-plate-moment-connection
+    def open_ctc_end_plate_moment_connection(self):
         self.common_open_module(ColumnEndPlate, "Column End plate")    
 
-    # 18-Column-cover-plate-connection
-    def open_column_cover_plate_connection(self):
-        self.common_open_module(ColumnCoverPlate, "Cover Plate Bolted")
+    # 10-Column-to-Column-cover-plate-bolted-moment-connection
+    def open_ctc_cover_plate_bolt_moment_conn(self):
+        self.common_open_module(ColumnCoverPlate, "Column Cover Plate Bolted")
         
-    # 19-Column-cover-plate-weld-connection
-    def open_column_cover_plate_weld_connection(self):
-        self.common_open_module(ColumnCoverPlateWeld, "Cover Plate Welded")
+    # 11-Column-to-Column-cover-plate-welded-moment-connection
+    def open_ctc_cover_plate_weld_moment_conn(self):
+        self.common_open_module(ColumnCoverPlateWeld, "Column Cover Plate Welded")
 
-    # 20-Flexure-member
-    def open_flexure_member(self):
+    # 12-Lap-joint-welded-simple-Connection
+    def open_lap_joint_welded_simple_conn(self):
+        self.common_open_module(LapJointWelded, "Lap Joint Welded Connection")
+
+    # 13-Lap-joint-bolted-simple-connection
+    def open_lap_joint_bolted_simple_conn(self):
+        self.common_open_module(LapJointBolted, "Lap Joint Bolted Connection")
+        
+    # 14-Butt-joint-bolted-simple-connection
+    def open_butt_joint_bolted_simple_conn(self):
+        self.common_open_module(ButtJointBolted, "Butt Joint Bolted Connection")
+
+    # 15-Butt-joint-welded-simple-connection
+    def open_butt_joint_welded_simple_conn(self):
+        self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection") 
+
+    # 16-Bolted-to-End-Gusset-Tension-Member
+    def open_tension_bolted(self):
+        self.common_open_module(Tension_bolted, "Tension Member: Bolted to End Gusset")
+ 
+    # 17-Welded-to-End-Gusset-Tension-Member
+    def open_tension_welded(self):
+        self.common_open_module(Tension_welded, "Tension Member: Welded to End Gusset")     
+ 
+    # 18-Column-design-Compression-Member
+    def open_column_design_compress_member(self):
+        self.common_open_module(ColumnDesign, "Column Design")
+
+    # 19-Struts-welded-to-end-gusset-compression-member
+    def open_struts_weld_end_gusset_compress_member(self):
+        self.common_open_module(Compression, "Struts: Welded to End Gusset")
+
+    # 20-Simply-Supported-Beam-Flexure-member
+    def open_simply_supported_beam_flexure(self):
         self.common_open_module(Flexure, "Simply Supported Beam")
         
-    # 21-Flexure-cantilever-member
-    def open_flexure_cantilever_member(self):
+    # 21-Cantilever-Beam-Flexure-member
+    def open_cantilever_beam_flexure(self):
         self.common_open_module(Flexure_Cantilever, "Cantilever Beam")
-    
-    # 22-Struts-in-trusses-compression-member
-    def open_struts_weld_end_gusset_compression_member(self):
-        self.common_open_module(Compression, "Struts: Welded to End Gusset")
-    
+
+    # 22-Plate-girder
+    def open_plate_girder_flexure(self):
+        self.common_open_module(PlateGirderWelded, "Plate Girder")  
+
     # 23-Flexure-purlin
-    def open_flexure_purlin(self):
+    def open_purlin_flexure(self):
         self.common_open_module(Flexure_Purlin, "Purlin")
 
     def open_home_page(self, module):

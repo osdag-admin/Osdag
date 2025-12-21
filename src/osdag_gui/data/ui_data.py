@@ -55,7 +55,7 @@ class Data:
         "Compression Member": 
         [
             ("Struts Welded to End Gusset", ":/vectors/struts_weld_end_gusset.svg"),
-            ("Column", ":/vectors/column_design_compression_mem.svg"),
+            ("Column Design", ":/vectors/column_design_compression_mem.svg"),
         ],
         "Flexural Member": 
         [

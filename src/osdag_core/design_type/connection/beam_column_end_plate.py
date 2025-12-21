@@ -243,36 +243,56 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.diag_stiffener_groove_weld_status = False
 
-    # Set logger
     def set_osdaglogger(self, key):
         """
-        Function to set logger for BeamColumnEndPlate module
+        Function to set Logger for FinPlate Module
         """
+        # @author Arsil Zunzunia
 
-        # Set CustomLogger as default
+        # Set Custom logger
         logging.setLoggerClass(CustomLogger)
-        self.logger = logging.getLogger('Osdag')
-        self.logger.setLevel(logging.DEBUG)
 
-        # Stream handler
-        stream_handler = logging.StreamHandler()
+        # Create unique logger name per instance
+        unique_logger_name = 'Osdag_btc_end_plate_moment_conn'
+        self.logger = logging.getLogger(unique_logger_name)
+
+        if not isinstance(self.logger, CustomLogger):
+            logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
+            self.logger = logging.getLogger(unique_logger_name)
+        
+        # Clear any existing handlers
+        self.logger.handlers.clear()
+        self.logger.setLevel(logging.DEBUG)
+        
+        # Shared formatter for all handlers
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
             datefmt='%Y-%m-%d %H:%M:%S'
         )
-        stream_handler.setFormatter(formatter)
-        self.logger.addHandler(stream_handler)
+        
+        # ---------- CONSOLE HANDLER ----------
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
 
-        # File handler
-        file_handler = logging.FileHandler('logging_text.log')
+        # ---------- FILE HANDLER (CLEAR & RESTART LOG) ----------
+        log_dir = Path("ResourceFiles") / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file_path = log_dir / f"{unique_logger_name}.log"
+        
+        file_handler = logging.FileHandler(
+            log_file_path,
+            mode="w",          # clears previous log
+            encoding="utf-8"
+        )
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
 
-        # GUI log handler
+        # ---------- GUI HANDLER ----------
         if key is not None:
-            handler = OurLog(key)
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
+            gui_handler = OurLog(key)
+            gui_handler.setFormatter(formatter)
+            self.logger.addHandler(gui_handler)
 
     # set module name
     def module_name(self):

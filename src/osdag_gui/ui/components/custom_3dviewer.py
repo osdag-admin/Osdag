@@ -263,6 +263,32 @@ class CustomViewer3d(qtViewer3d):
 
     def display_view_cube(self):
         import gc
+        if self.view_cube:
+            self.context.Remove(self.view_cube, False)
+
+        self.view_cube = AIS_ViewCube()
+        self.view_cube.SetSize(75)
+        self.view_cube.SetFontHeight(12)
+        self.context.SetPixelTolerance(15)
+        self.view_cube.SetAxesLabels("", "", "")
+        self.view_cube.SetDrawAxes(False)
+        
+        # Increased from 20 to 35 for larger chamfer/click area
+        self.view_cube.SetBoxCornerMinSize(60)
+
+        highlight_drawer = Prs3d_Drawer()
+        highlight_drawer.SetColor(Quantity_Color(Quantity_NOC_CYAN))
+        self.view_cube.SetHilightAttributes(highlight_drawer)
+
+        drawer = self.view_cube.Attributes()
+        drawer.SetDatumAspect(Prs3d_DatumAspect())
+
+        self.view_cube.SetColor(Quantity_Color(Quantity_NOC_WHITE))
+        self.view_cube.SetBoxColor(Quantity_Color(Quantity_NOC_GRAY50))
+        self.view_cube.SetTextColor(Quantity_Color(Quantity_NOC_BLACK))
+
+        self.context.Display(self.view_cube, False)
+
         try:
             # Force garbage collection before OCC operations to prevent heap corruption
             gc.collect()

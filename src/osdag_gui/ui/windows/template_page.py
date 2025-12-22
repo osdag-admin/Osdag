@@ -224,87 +224,89 @@ class CustomWindow(QWidget):
         return super().paintEvent(event)
     # Create the view control button on cad widget
     def create_cad_view_controls(self):
-        """Create view control buttons directly on the self.cad_widget"""
-        
-        # Create zoom buttons
+        """Create zoom controls anchored correctly below the view cube"""
+
+        # ---- Configuration (single source of truth) ----
+        self._view_cube_size = 75     # OCC default
+        self._view_cube_margin = 10   # distance from top-right
+        self._zoom_btn_size = 40
+        self._zoom_spacing = 6
+
+        # ---- Zoom In Button ----
         self.zoom_in_btn = QPushButton("+", self.cad_widget)
-        self.zoom_in_btn.setStyleSheet("""
-            QPushButton {
-                font-size: 16px;
-                font-weight: bold;
-                color: #000000;
-                background-color: #FFFFFF;
-                border: 1px solid #CCCCCC;
-                border-radius: 4px;
-                text-align: center;
-                padding : 5px;
-            }
-            QPushButton:hover {
-                background-color: #E0E0E0;
-            }
-            QPushButton:pressed {
-                background-color: #D0D0D0;
-            }
-        """)
+        self.zoom_in_btn.setFixedSize(self._zoom_btn_size, self._zoom_btn_size)
+        self.zoom_in_btn.setCursor(Qt.PointingHandCursor)
         self.zoom_in_btn.setToolTip("Zoom In (Ctrl+I)")
-        self.zoom_in_btn.setFixedSize(40, 40)
-        self.zoom_in_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.zoom_in_btn.clicked.connect(lambda: self.display.ZoomFactor(1.1))
-        self.zoom_in_btn.setObjectName("zoom_buttons")
-        self.zoom_in_btn.show()
-        
+        self._style_zoom_button(self.zoom_in_btn)
+
+        # ---- Zoom Out Button ----
         self.zoom_out_btn = QPushButton("-", self.cad_widget)
-        self.zoom_out_btn.setStyleSheet("""
+        self.zoom_out_btn.setFixedSize(self._zoom_btn_size, self._zoom_btn_size)
+        self.zoom_out_btn.setCursor(Qt.PointingHandCursor)
+        self.zoom_out_btn.setToolTip("Zoom Out (Ctrl+O)")
+        self.zoom_out_btn.clicked.connect(lambda: self.display.ZoomFactor(1 / 1.1))
+        self._style_zoom_button(self.zoom_out_btn)
+
+        self.zoom_in_btn.show()
+        self.zoom_out_btn.show()
+
+        # ---- Initial positioning ----
+        self.position_zoom_buttons()
+
+        # ---- Track resize safely ----
+        self._orig_resize_event = self.cad_widget.resizeEvent
+        self.cad_widget.resizeEvent = self._cad_resize_proxy
+
+
+    def _style_zoom_button(self, btn):
+        btn.setStyleSheet("""
             QPushButton {
-                font-size: 16px;
+                font-size: 20px;
                 font-weight: bold;
-                color: #000000;
-                background-color: #FFFFFF;
-                border: 1px solid #CCCCCC;
-                border-radius: 4px;
-                text-align: center;
-                padding : 5px;
-                
+                background-color: white;
+                border: 1px solid #bdbdbd;
+                border-radius: 0px;
             }
             QPushButton:hover {
-                background-color: #E0E0E0;
+                background-color: #e6e6e6;
             }
             QPushButton:pressed {
-                background-color: #D0D0D0;
+                background-color: #d6d6d6;
             }
         """)
-        self.zoom_out_btn.setToolTip("Zoom Out (Ctrl+O)")
-        self.zoom_out_btn.setFixedSize(40, 40)
-        self.zoom_out_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.zoom_out_btn.clicked.connect(lambda: self.display.ZoomFactor(1/1.1))
-        self.zoom_out_btn.setObjectName("zoom_buttons")
-        self.zoom_out_btn.show()
-        
-        
-        # Position zoom buttons
-        self.position_zoom_buttons()
-        
-        # Connect resize event to reposition buttons
-        self.original_resize_event = self.cad_widget.resizeEvent
-        self.cad_widget.resizeEvent = self.on_cad_widget_resize
+
+
 
     def position_zoom_buttons(self):
-        """Position the zoom buttons"""
-        # canvas_rect = self.cad_widget.rect()
+        if not hasattr(self, "zoom_in_btn"):
+            return
+
+        w = self.cad_widget.width()
+
+        # ---- View cube anchor (top-right) ----
+        cube_right = w - self._view_cube_margin
+        cube_left = cube_right - self._view_cube_size
+
         
-        button_size = 32
-        spacing = 2
-        
-        # Position at Top-Left
-        start_x = 20
-        start_y = 20
-        
-        if hasattr(self, 'zoom_in_btn') and hasattr(self, 'zoom_out_btn'):
-            zoom_in_y = start_y
-            zoom_out_y = start_y + button_size + spacing
-            
-            self.zoom_in_btn.move(start_x, zoom_in_y)
-            self.zoom_out_btn.move(start_x, zoom_out_y)
+        cube_render_padding = 14
+        cube_bottom = self._view_cube_margin + self._view_cube_size + cube_render_padding
+
+        # ---- Center buttons under cube ----
+        center_x = cube_left + (self._view_cube_size // 2)
+        btn_x = center_x - (self._zoom_btn_size // 2)
+
+        btn_y_1 = cube_bottom + self._zoom_spacing
+        btn_y_2 = btn_y_1 + self._zoom_btn_size + self._zoom_spacing
+
+        self.zoom_in_btn.move(btn_x, btn_y_1)
+        self.zoom_out_btn.move(btn_x, btn_y_2)
+
+    def _cad_resize_proxy(self, event):
+        if self._orig_resize_event:
+            self._orig_resize_event(event)
+        self.position_zoom_buttons()
+
 
     def on_cad_widget_resize(self, event):
         """Handle canvas resize to reposition buttons"""

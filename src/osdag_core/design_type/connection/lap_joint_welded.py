@@ -277,33 +277,6 @@ class LapJointWelded(MomentConnection):
     def module_name(self):
         return KEY_DISP_LAPJOINTWELDED
 
-    def call_3DColumn(self, ui, bgcolor):
-        if ui.chkBxCol.isChecked():
-            ui.btn3D.setChecked(False)
-            ui.chkBxCol.setChecked(False)
-            ui.mytabWidget.setCurrentIndex(0)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
-
-    def get_3d_components(self):
-        components = []
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
-        t3 = ('Plate1', self.call_3DColumn)
-        components.append(t3)
-        t4 = ('Plate2', self.call_3DPlate)
-        components.append(t4)
-        return components
-
-    def call_3DPlate(self, ui, bgcolor):
-        from PySide6.QtWidgets import QCheckBox
-        from PySide6.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(False)
-        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
-
     def func_for_validation(self, design_dictionary):
         all_errors = []
         self.design_status = False
@@ -661,17 +634,37 @@ class LapJointWelded(MomentConnection):
         return components
 
     def call_3DModel(self, ui, bgcolor):
-        ui.commLogicObj.module_object = self
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Model':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Model", bgcolor)
 
     def call_3DPlate1(self, ui, bgcolor):
-        ui.commLogicObj.module_object = self
-        ui.commLogicObj.display_3DModel("Plate 1", bgcolor)
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate 1':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Plate 1', bgcolor)
 
     def call_3DPlate2(self, ui, bgcolor):
-        ui.commLogicObj.module_object = self
-        ui.commLogicObj.display_3DModel("Plate 2", bgcolor)
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate 2':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Plate 2', bgcolor)
 
     def call_3DWeld(self, ui, bgcolor):
-        ui.commLogicObj.module_object = self
-        ui.commLogicObj.display_3DModel("Weld", bgcolor)
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Weld':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Weld', bgcolor)

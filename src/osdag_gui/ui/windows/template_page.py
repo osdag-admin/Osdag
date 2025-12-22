@@ -642,7 +642,7 @@ class CustomWindow(QWidget):
 
         quit_action = QAction("Quit", self)
         quit_action.setShortcut(QKeySequence("Shift+Q"))
-        # print("Quit..")
+
         # quit_action.triggered.connect(self.parent.close_current_tab)
         file_menu.addAction(quit_action)
 
@@ -810,6 +810,7 @@ class CustomWindow(QWidget):
                 self.ui_loaded = False
                 self.setDictToUserInputs(uiObj)
                 self.ui_loaded = True
+
             else:
                 CustomMessageBox(
                     title="Information",
@@ -1366,8 +1367,8 @@ class CustomWindow(QWidget):
         self.common_function_for_save_and_design(self.backend, data, "Design")
     
     def finished_loading(self):
-        print("Custom Logger: ")
-        print(self.backend.logger.logs)
+        # print("Custom Logger: ")
+        # print(self.backend.logger.logs)
         time.sleep(1)
         self.loading.hide()
         self.setEnabled(True)
@@ -1444,9 +1445,9 @@ class CustomWindow(QWidget):
                     txt = self.output_dock.output_widget.findChild(QWidget, option[0])
                     txt.setText(str(option[3]))
                     if status:
-                        txt.setVisible(bool(option[3] != ""))
+                        txt.setVisible(bool(option[3] is not None))
                         txt_label = self.output_dock.output_widget.findChild(QWidget, option[0]+"_label")
-                        txt_label.setVisible(bool(option[3] != ""))
+                        txt_label.setVisible(bool(option[3] is not None))
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.output_dock.output_widget.findChild(QWidget, option[0]).setEnabled(True)
@@ -1504,8 +1505,8 @@ class CustomWindow(QWidget):
                         self.splitter.setSizes([left_width, center_width, right_width])
                     hide_input()
 
-            self.output_dock.output_title_change(main)
             # print('[INFO] Output title changed: ',self.output_dock.output_title_change(main))
+            self.output_dock.output_title_change(main)
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
             # print('[INFO] last design: ',last_design_folder)
             if not os.path.isdir(last_design_folder):

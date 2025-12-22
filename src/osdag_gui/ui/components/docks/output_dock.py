@@ -48,8 +48,6 @@ from osdag_gui.ui.components.output_details.tensionBoltedSpacing import TensionB
 
 from osdag_gui.__config__ import CAD_BACKEND
 
-import yaml
-
 class OutputDock(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__(parent)
@@ -266,6 +264,7 @@ class OutputDock(QWidget):
         h_scroll_area.setWidget(right_content)
 
         output_layout.addWidget(h_scroll_area)
+
     # ----------------------------------Save-Design-Report-Start------------------------------------------------------
     
     def open_summary_popup(self, main):
@@ -759,6 +758,7 @@ class OutputDock(QWidget):
 
             if option[2] == TYPE_TEXTBOX:
                 if self.output_widget.findChild(QWidget, option[0]).isVisible():
+                    # print(f"\n[INFO] {option[0]} Is Visible")
                     visible_fields += 1
 
             elif option[2] == TYPE_OUT_BUTTON:
@@ -779,7 +779,7 @@ class OutputDock(QWidget):
             self.output_title_fields[no_field_title][0].setVisible(False)
 
     def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
-        # print(f"[INFO] key={key} \n titles={titles} ")
+        # print(f"[INFO] Output_Visibilty key={key} \n titles={titles} \n visible_fields={visible_fields}")
         if visible_fields == 0:
             if key in titles:
                 self.output_title_fields[key + str(title_repeat)][0].setVisible(False)

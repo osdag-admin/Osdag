@@ -246,32 +246,7 @@ class LapJointWelded(MomentConnection):
     def module_name(self):
         return KEY_DISP_LAPJOINTWELDED
 
-    def call_3DColumn(self, ui, bgcolor):
-        if ui.chkBxCol.isChecked():
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
 
-    def get_3d_components(self):
-        components = []
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
-        t3 = ('Plate1', self.call_3DColumn)
-        components.append(t3)
-        t4 = ('Plate2', self.call_3DPlate)
-        components.append(t4)
-        return components
-
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     def func_for_validation(self, design_dictionary):
         all_errors = []

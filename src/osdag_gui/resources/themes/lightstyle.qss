@@ -1084,9 +1084,9 @@ QScrollArea#outputs_vscrollarea QScrollBar::sub-page:vertical {
     border: 1px solid #94b816;
 } 
 #inputs_container QLineEdit {
-    padding: 1px 7px;
+    padding: 2px 7px;
     border: 1px solid #070707;
-    border-radius: 6px;
+    border-radius: 4px;
     background-color: white;
     color: #000000;
     font-weight: normal;
@@ -1148,7 +1148,7 @@ QWidget#outputs_container{
     background-color: white;
 }
 #outputs_container QPushButton {
-    padding: 3px 9px;
+    padding: 3px 10px;
     background-color: #888;
     color: white;
     border: 0px;

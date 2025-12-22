@@ -66,9 +66,9 @@ class InputDock(QWidget):
         input_field_list = self.backend.input_values()
         # To equalize the label length
         # So that they are of equal size
-        input_field_list = self.equalize_label_length(input_field_list)
+        label_width, input_width = self.calc_max_width(input_field_list)
 
-        self.build_left_panel(input_field_list)
+        self.build_left_panel(input_field_list, label_width, input_width)
         self.main_layout.addWidget(self.left_container)
 
         self.toggle_strip = QWidget()
@@ -91,24 +91,27 @@ class InputDock(QWidget):
         self.main_layout.addWidget(self.toggle_strip)
     
     # To equalize the size of label strings
-    def equalize_label_length(self, list):
+    def calc_max_width(self, in_list):
         # Calculate maximum size
-        max_len = 0
-        for t in list:
-            if t[2] not in [TYPE_TITLE, TYPE_IMAGE, TYPE_IMAGE_COMPRESSION] and t[1] is not None:
-                if len(t[1]) > max_len:
-                    max_len = len(t[1])
+        max_label_len = 0
+        max_input_len = 0
+        for t in in_list:
+            if t[2] in [TYPE_COMBOBOX, TYPE_COMBOBOX_FREEZE, TYPE_COMBOBOX_CUSTOMIZED, TYPE_TEXTBOX]:
+                if isinstance(t[3], list):
+                    # Check each Option
+                    for option in t[3]:
+                        if len(option) > max_input_len:
+                            max_input_len = len(option)
+                    
+                # check size of simultaneous label
+                if len(t[1]) > max_label_len:
+                    max_label_len = len(t[1])
         
-        # Create a new list with equal string length
-        return_list = [] 
-        for t in list:
-            if t[2] not in [TYPE_TITLE, TYPE_IMAGE, TYPE_IMAGE_COMPRESSION] and t[1] is not None:
-                new_tupple = (t[0], t[1].ljust(max_len)) + t[2:]
-            else:
-                new_tupple = t
-            return_list.append(new_tupple)
-
-        return return_list
+        # Width Calculation
+        print(f"max_label: {max_label_len}\nmax_input: {max_input_len}")
+        max_label_size = (max_label_len * 6) + 10
+        max_input_size = (max_input_len * 6) + 20
+        return max_label_size, max_input_size
 
     def get_validator(self, validator):
         if validator == 'Int Validator':
@@ -118,7 +121,7 @@ class InputDock(QWidget):
         else:
             return None
         
-    def build_left_panel(self, field_list):
+    def build_left_panel(self, field_list, label_width, input_width):
         print("\n","="*100,"\n\n")
         print("[INFO] Building Input Dock UI...")
         left_layout = QVBoxLayout(self.left_container)
@@ -181,6 +184,7 @@ class InputDock(QWidget):
         group_container_layout = QVBoxLayout(group_container)
 
         # --- Main Content (group boxes) ---
+        print(f"@Suh {input_width} {label_width}")
 
         # Track any group is active or not
         track_group = False
@@ -215,8 +219,10 @@ class InputDock(QWidget):
                 # Use monospace font for the label
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
+                left.setMinimumWidth(label_width)
 
                 right = NoScrollComboBox()
+                right.setMinimumWidth(input_width)
                 right.setObjectName(field[0])
                 right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 option_list = field[3]
@@ -250,8 +256,11 @@ class InputDock(QWidget):
 
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
-                left.setObjectName(field[0] + "_label")                
+                left.setObjectName(field[0] + "_label")
+                left.setMinimumWidth(label_width)
+
                 right = QLineEdit()
+                right.setMinimumWidth(input_width)
                 right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 right.setObjectName(field[0])
                 right.setEnabled(True if field[4] else False)
@@ -282,7 +291,7 @@ class InputDock(QWidget):
         Since, we don't know how may customized popups can be used in a module we have provided,
          "triggered.connect" for up to 10 customized popups
         """
-        # print("\n\n\n [INFO] ",self.backend,"$$$$",self.backend.customized_input,self.backend.input_value_changed)
+        # print("\n\n\n [INFO] ",self.backend,"\n\n",self.backend.customized_input,self.backend.input_value_changed)
         new_list = self.backend.customized_input()
         updated_list = self.backend.input_value_changed()
 

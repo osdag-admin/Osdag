@@ -258,11 +258,14 @@ class CustomViewer3d(qtViewer3d):
                 self.view_cube = None
 
             self.view_cube = AIS_ViewCube()
-            self.view_cube.SetSize(55)
+            self.view_cube.SetSize(45)
             self.view_cube.SetFontHeight(12)
             self.view_cube.SetAxesLabels("", "", "")
             self.view_cube.SetDrawAxes(False)
             
+            # Make corner and edge pieces larger for better interaction
+            self.view_cube.SetBoxFacetExtension(12)
+
             # Configure Highlight Attributes
             highlight_drawer = Prs3d_Drawer()
             highlight_drawer.SetColor(Quantity_Color(Quantity_NOC_CYAN))

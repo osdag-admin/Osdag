@@ -546,7 +546,7 @@ class InputDock(QWidget):
             if typ == TYPE_NOTE:
                 k2_key = k2_key + "_note"
             if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
-                k2 = self.input_widget.findChild(QWidget, k2_key)
+                k2 = self.parent.output_dock.output_widget.findChild(QWidget, k2_key)
             elif typ == TYPE_WARNING:
                 k2 = str(k2_key)
             else:
@@ -624,13 +624,13 @@ class InputDock(QWidget):
                 if val:
                     QMessageBox.warning(self, "Application", k2)
             elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
-                # print("\n\n[INFO] last")
+                # print(f"\n[INFO] {tup}")
                 if val:
                     k2.setVisible(False)
                 else:
                     k2.setVisible(True)
 
-    # For Plate-Girder Module-starts----------------------------------------------------
+    # For Plate-Girder Module-Functions-starts----------------------------------------------------
     def change_text_to_bound_btn(self, old_widget, tupple):
         layout = old_widget.parentWidget().layout()
         if layout is None:
@@ -734,9 +734,9 @@ class InputDock(QWidget):
             if name == KEY_OVERALL_DEPTH_PG:
                 self.backend.bounds_map['D'] = (result[0], result[1], result[2])
             elif name == KEY_TOP_Bflange_PG:
-                self.backend.bounds_map['tf'] = (result[0], result[1], result[2])
+                self.backend.bounds_map['bf_top'] = (result[0], result[1], result[2])
             elif name == KEY_BOTTOM_Bflange_PG:
-                self.backend.bounds_map['bf'] = (result[0], result[1], result[2]) 
+                self.backend.bounds_map['bf_bot'] = (result[0], result[1], result[2]) 
         else:
             # print("[INFO] Dialog was cancelled")
             pass

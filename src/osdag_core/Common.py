@@ -767,9 +767,11 @@ KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
 KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
 KEY_LongitudnalStiffener = 'LongitudnalStiffener.Data'
 KEY_LongitudnalStiffener_thickness = 'LongitudnalStiffner.Thickness'
+KEY_LongitudnalStiffener_thickness_val = 'LongitudnalStiffner.Thickness.val'
 KEY_DISP_LongitudnalStiffener = 'Longitudnal Stiffener'
 KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness'
 KEY_IntermediateStiffener_thickness = 'IntermediateStiffener.Thickness'
+KEY_IntermediateStiffener_thickness_val = 'IntermediateStiffener.Thickness.val'
 KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness'
 KEY_WeldWebtoflange= 'WeldWebtoflange.Data'
 KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange'
@@ -849,6 +851,16 @@ KEY_DISP_MAX_DEFL = 'Maximum Deflection'
 VALUES_MAX_DEFL = ['Span/600','Span/800','Span/400','Span/300','Span/360','Span/150','Span/180','Span/240','Span/120','Span/500','Span/750','Span/1000']
 KEY_SUPPORT_WIDTH = 'Support.Width'
 KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
+VALUES_STIFFENER_THICKNESS = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
+                        '110', '120']
+KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
+KEY_LongitudnalStiffener_numbers = 'LongitudnalStiffener.Numbers'
+KEY_LongitudinalStiffener1_pos = 'LongitudnalStiffener1.Position'
+KEY_DISP_LongitudinalStiffener1_pos = 'Position of Longitudnal Stiffener 1 from NA (mm) '
+KEY_LongitudinalStiffener2_pos = 'LongitudnalStiffener2.Position'
+KEY_DISP_LongitudinalStiffener2_pos = 'Position of Longitudnal Stiffener 2 from NA (mm)'
+KEY_DISP_LongitudnalStiffener_numbers = 'Number of Longitudnal Stiffeners'
+KEY_DISP_EndpanelStiffener_thickness = 'End Panel Stiffener Thickness (mm)'
  
 ###################################
 # All Input Keys

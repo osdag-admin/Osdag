@@ -370,42 +370,33 @@ class LapJointBolted(MomentConnection):
         t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         out_list.append(t21)
 
+        # Populate Hover Dict (Lap Joint Bolted)
+        self.hover_dict["Plate 1"] = (
+            f"<b>plate1</b><br>"
+            f"Length: {2} mm<br>"
+            f"Width: {2} mm<br>"
+            f"Thickness: {2} mm"
+        )
 
-        # Populate Hover Dict (Lap Joint Bolted) - use safe access
-        if flag and self.plate1:
-            self.hover_dict["plate1"] = (
-                f"<b>plate1</b><br>"
-                f"Length: {float(self.plate1.length)} mm<br>"
-                f"Width: {float(self.plate1.height)} mm<br>"
-                f"Thickness: {self.plate1.thickness} mm"
-            )
-        else:
-            self.hover_dict["plate1"] = "<b>plate1</b><br>Length:  mm<br>Width:  mm<br>Thickness:  mm"
+        self.hover_dict["Plate 2"] = (
+            f"<b>plate2</b><br>"
+            f"Length: {2} mm<br>"
+            f"Width: {2} mm<br>"
+            f"Thickness: {2} mm"
+        )
 
-        if flag and self.plate2:
-            self.hover_dict["plate2"] = (
-                f"<b>plate2</b><br>"
-                f"Length: {float(self.plate2.length)} mm<br>"
-                f"Width: {float(self.plate2.height)} mm<br>"
-                f"Thickness: {self.plate2.thickness} mm"
-            )
-        else:
-            self.hover_dict["plate2"] = "<b>plate2</b><br>Length:  mm<br>Width:  mm<br>Thickness:  mm"
+        self.hover_dict["Cover Plate"] = (
+            f"<b>plate2</b><br>"
+            f"Length: {2} mm<br>"
+            f"Width: {2} mm<br>"
+            f"Thickness: {2} mm"
+        )
 
-        if flag and self.bolt:
-            self.hover_dict["Bolt"] = (
-                f"<b>Bolt</b><br>"
-                f"Grade: {self.bolt.bolt_grade_provided}<br>"
-                f"Diameter: {int(self.bolt.bolt_diameter_provided)} mm<br>"
-                f"No. of Bolts: {self.number_bolts}"
-            )
-        else:
-            self.hover_dict["Bolt"] = "<b>Bolt</b><br>Grade: <br>Diameter:  mm<br>No. of Bolts: "
-
-        self.hover_dict["Nut"] = (
-            f"<b>Nut</b><br>"
-            f"Grade: <br>"
-            f"Thickness:  mm"
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>"
+            f"Grade: {self.bolt.bolt_grade_provided}<br>"
+            f"Diameter: {int(self.bolt.bolt_diameter_provided)} mm<br>"
+            f"No. of Bolts: {self.number_bolts}"
         )
 
         return out_list

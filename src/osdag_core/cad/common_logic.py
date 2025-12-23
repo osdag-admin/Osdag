@@ -2074,21 +2074,9 @@ class CommonDesignLogic(object):
             assembly = BackToBackAnglesWithGussetsOppSide(L, A, B, T, R1, R2, gusset_L, gusset_H, gusset_T, gusset_degree, spacing)
             assembly.place(origin, uDir, wDir)
             shape = assembly.create_model()
-
             return shape
 
-
     def display_3DModel(self, component, bgcolor):
-        hover_dict = {}
-        if hasattr(self, "module_object") and hasattr(self.module_object, "hover_dict"):
-            hover_dict = self.module_object.hover_dict
-        elif hasattr(self, "C") and hasattr(self.C, "hover_dict"):
-            hover_dict = self.C.hover_dict
-        elif hasattr(self, "col") and hasattr(self.col, "hover_dict"):
-            hover_dict = self.col.hover_dict
- 
-        if hasattr(self, "cad_widget"):
-            self.cad_widget.model_hover_labels = hover_dict
 
         # Component colors
         weld_color = Quantity_NOC_SADDLEBROWN
@@ -2147,7 +2135,7 @@ class CommonDesignLogic(object):
         if self.mainmodule  == "Shear Connection":
             # hover labels
             hover_dict = self.module_object.hover_dict
-            self.cad_widget.model_hover_labels = hover_dict
+            self.cad_widget.model_hover_labels = hover_dict.copy()
 
             A = self.module_object
 
@@ -2162,83 +2150,79 @@ class CommonDesignLogic(object):
 
             if self.component == "Column":
                 # hover label
-                label = ["Column", hover_dict.get("Column", "Column")]
+                label = ["Column", hover_dict.get("Column")]
                 osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), color=column_color, update=True, label=label, canvas=self.cad_widget)
             elif self.component == "Beam":
-                label = ["Beam", hover_dict.get("Beam", "Beam")]
+                label = ["Beam", hover_dict.get("Beam")]
                 osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), color=beam_color, update=True, label=label, canvas=self.cad_widget)
             elif self.component == "cleatAngle":
-                label = ["Angle", hover_dict.get("Angle", "Angle")]
+                label = ["Angle", hover_dict.get("Angle")]
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
+                    label = ["Bolt", hover_dict.get("Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "SeatAngle":
-                label = ["Angle", hover_dict.get("Angle", "Angle")]
+                label = ["Angle", hover_dict.get("Angle")]
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
+                    label = ["Bolt", hover_dict.get("Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "Plate":
                 # hover label
-                label = ["Weld", hover_dict.get("Weld", "Weld")]
+                label = ["Weld", hover_dict.get("Weld")]
                 osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=weld_color, update=True, label=label, canvas=self.cad_widget)
-                label = ["Plate", hover_dict.get("Plate", "Plate")]
+                label = ["Plate", hover_dict.get("Plate")]
                 osdag_display_shape(self.display, self.connectivityObj.plateModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
+                    label = ["Bolt", hover_dict.get("Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "Model":
                 # hover label
-                label = ["Column", hover_dict.get("Column", "Column")]
+                label = ["Column", hover_dict.get("Column")]
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, color=column_color, update=True, label=label, canvas=self.cad_widget)
-                label = ["Beam", hover_dict.get("Beam", "Beam")]
+                label = ["Beam", hover_dict.get("Beam")]
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, color=beam_color, update=True, label=label, canvas=self.cad_widget)
                 if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
                     # Colors to be set on self.components
-                    label = ["Weld", hover_dict.get("Weld", "Weld")]
+                    label = ["Weld", hover_dict.get("Weld")]
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True, label=label, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=weld_color, update=True, label=label, canvas=self.cad_widget)
-                    label = ["Plate", hover_dict.get("Plate", "Plate")]
+                    label = ["Plate", hover_dict.get("Plate")]
                     osdag_display_shape(self.display, self.connectivityObj.plateModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
 
                 elif self.connection == KEY_DISP_CLEATANGLE:
-                    label = ["Angle", hover_dict.get("Angle", "Angle")]
+                    label = ["Angle", hover_dict.get("Angle")]
                     osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 else:
-                    label = ["Angle", hover_dict.get("Angle", "Angle")]
+                    label = ["Angle", hover_dict.get("Angle")]
                     osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
-                    label = ["Bolt", hover_dict.get("Bolt", "Bolt")]
+                    label = ["Bolt", hover_dict.get("Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
         if self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE:
 
                 self.B = self.module_object
-                # else:
-                #     pass
-                #
-                # self.loc = A.connectivity
+
+                # self.CPObj = self.createBBCoverPlateCAD()
                 # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 
-                hover_dict = getattr(self.B, "hover_dict", {})
-
-                if hasattr(self, "cad_widget") and hasattr(self.B, "hover_dict"):
-                    self.cad_widget.model_hover_labels = self.B.hover_dict
+                hover_dict = self.B.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
                     
                 label_beam   = ["Beam",   hover_dict.get("Beam")]
                 label_plate  = ["Plate",  hover_dict.get("Plate")]
@@ -2270,14 +2254,13 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 self.B = self.module_object  
 
+                # self.ExtObj = self.createBBEndPlateCAD()
                 # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 # Do NOT call createBBEndPlateCAD() again here
-                hover_dict = getattr(self.B, "hover_dict", {})
 
-                # Safely set hover labels
-                if hasattr(self, "cad_widget") and hasattr(self.B, "hover_dict"):
-                    self.cad_widget.model_hover_labels = self.B.hover_dict
+                hover_dict = self.B.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
                     
                 label_beam      = ["Beam", hover_dict.get("Beam")]
                 label_plate     = ["Plate", hover_dict.get("Plate")]
@@ -2318,17 +2301,16 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 self.B = self.module_object
+
+                # self.CPObj = self.createBBCoverPlateCAD()
                 # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 beams = self.CPObj.get_beam_models()
                 plates = self.CPObj.get_plate_models()
                 welds = self.CPObj.get_welded_modules()
 
-                
-                hover_dict = getattr(self.module_object, "hover_dict", {})
-
-                if hasattr(self, "cad_widget") and hasattr(self.module_object, "hover_dict"):
-                    self.cad_widget.model_hover_labels = self.module_object.hover_dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
                     
                 label_beam   = ["Beam", hover_dict.get("Beam")]
                 label_plate  = ["Plate", hover_dict.get("Plate")]
@@ -2347,6 +2329,8 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE:
                 self.C = self.module_object  
+
+                # self.CPObj = self.createCCCoverPlateCAD()
                 # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 columns = self.CPObj.get_column_models()
@@ -2354,8 +2338,8 @@ class CommonDesignLogic(object):
                 nutbolt = self.CPObj.get_nut_bolt_models()
                 onlycolumn = self.CPObj.get_only_column_models()
                 
-                if hasattr(self, "cad_widget") and hasattr(self.module_object, "hover_dict"):
-                    self.cad_widget.model_hover_labels = self.module_object.hover_dict
+                hover_dict = self.module_object.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
 
                 label_column = ["Column", hover_dict.get("Column")]
                 label_plate  = ["Plate",  hover_dict.get("Plate")]
@@ -2375,13 +2359,17 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_BCENDPLATE:
                 self.Bc = self.module_object
+
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
+
                 label_column = ["Column", hover_dict.get("Column")]
                 label_beam = ["Beam", hover_dict.get("Beam")]
                 label_plate = ["Plate", hover_dict.get("Plate")]
                 label_weld = ["Weld", hover_dict.get("Weld")]
                 label_bolt = ["Bolt", hover_dict.get("Bolt")]
+
+                # self.ExtObj = self.createBCEndPlateCAD()
                 # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 # Do NOT call createBCEndPlateCAD() again here
@@ -2401,7 +2389,7 @@ class CommonDesignLogic(object):
                     # Point1 = gp_Pnt(-self.Bc.supporting_section.flange_width/2, 0, c_length)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                     # Point = gp_Pnt(0.0, 0.0, 10)
-                    # DisplayMsg(self.display,Point, "Column")
+                    # DisplayMsg(self.display,Point)
 
                 elif self.component == "Beam":
                     self.display.View_Iso()
@@ -2440,18 +2428,17 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_object
+
+                # self.CPObj = self.createCCCoverPlateCAD()
                 # NOTE: Reuse self.CPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 columns = self.CPObj.get_column_models()
                 plates = self.CPObj.get_plate_models()
                 welds = self.CPObj.get_welded_modules()
                 
-                hover_dict = getattr(self.C, "hover_dict", {})
-
-                if hasattr(self, "cad_widget") and hasattr(self.C, "hover_dict"):
-                    self.cad_widget.model_hover_labels = self.C.hover_dict
+                hover_dict = self.C.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
                     
-        
                 label_column = ["Column", hover_dict.get("Column")]
                 label_plate  = ["Plate",  hover_dict.get("Plate")]
                 label_weld   = ["Weld",   hover_dict.get("Weld")]
@@ -2470,6 +2457,8 @@ class CommonDesignLogic(object):
 
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
                 self.CEP = self.module_object  
+
+                # self.CEPObj = self.createCCEndPlateCAD()
                 # NOTE: Reuse self.CEPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
                 columns = self.CEPObj.get_column_models()
@@ -2478,7 +2467,7 @@ class CommonDesignLogic(object):
                 nutBolts = self.CEPObj.get_nut_bolt_models()
                 
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
                     
                 label_column = ["Column", hover_dict.get("Column")]
                 label_plate  = ["Plate",  hover_dict.get("Plate")]
@@ -2502,6 +2491,7 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_BASE_PLATE:
                 self.Bp = self.module_object  
 
+                # self.BPObj = self.createBasePlateCAD()
                 # NOTE: Reuse self.BPObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
 
@@ -2533,7 +2523,7 @@ class CommonDesignLogic(object):
             self.ColObj = self.createColumnInFrameCAD()
             
             hover_dict = self.module_object.hover_dict
-            self.cad_widget.model_hover_labels = hover_dict
+            self.cad_widget.model_hover_labels = hover_dict.copy()
                     
             label_column = ["Column", hover_dict.get("Column")]
                     
@@ -2547,7 +2537,7 @@ class CommonDesignLogic(object):
 
                 # Hover dict
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
 
                 if isinstance(self.ColObj, (tuple, list)):
                     _, plate1, plate2, _, _ = self.ColObj
@@ -2558,10 +2548,9 @@ class CommonDesignLogic(object):
                     nut = self.ColObj.nut        
 
                 # lap_joint, plate1, plate2, bolts, nuts
-                label_plate1 = ["Plate 1", hover_dict["Plate 1"]]
-                label_plate2 = ["Plate 2", hover_dict["Plate 2"]]
-                label_bolt = ["Bolt", hover_dict["Bolt"]]
-                label_nut = ["Nut", hover_dict["Nut"]]
+                label_plate1 = ["Plate 1", hover_dict.get("Plate 1")]
+                label_plate2 = ["Plate 2", hover_dict.get("Plate 2")]
+                label_bolt = ["Bolt", hover_dict.get("Bolt")]
 
                 self.assembly,self.plate1_model,self.plate2_model,self.bolt_models,self.nuts_models = self.createBoltedLapJoint()
 
@@ -2573,7 +2562,7 @@ class CommonDesignLogic(object):
                                                 color=bolt_color, label=label_bolt, canvas=self.cad_widget)
                     for nut in self.nuts_models:
                         osdag_display_shape(self.display, nut, update=True,
-                                                color=bolt_color, label=label_nut, canvas=self.cad_widget)
+                                                color=bolt_color, label=label_bolt, canvas=self.cad_widget)
                     
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if self.connection == KEY_DISP_BUTTJOINTBOLTED:
@@ -2587,7 +2576,7 @@ class CommonDesignLogic(object):
                     self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.createButtJointBoltedCAD()
 
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
                 
                 # Use the unpacked tuple variables directly
                 plate1 = self.plate1_model
@@ -2595,11 +2584,11 @@ class CommonDesignLogic(object):
                 platec = self.platec_model        
                 
                 # butt_joint, plate1, plate2, platec, bolts, nuts
-                label_plate1 = ["plate1", hover_dict.get("plate1", "Plate 1")]
-                label_plate2 = ["Plate2", hover_dict.get("plate2", "Plate 2")]
-                label_platec = ["Platec", hover_dict.get("platec", "Cover Plate")]
-                label_bolt = ["Bolt", hover_dict.get("bolts", hover_dict.get("Bolt", "Bolts"))]
-                label_nut = ["Nut", hover_dict.get("nuts", hover_dict.get("Nut", "Nuts"))]
+                label_plate1 = ["Plate 1", hover_dict.get("Plate 1")]
+                label_plate2 = ["Plate 2", hover_dict.get("Plate 2")]
+                label_platec = ["Cover Plate", hover_dict.get("Cover Plate")]
+                label_bolt = ["Bolt", hover_dict.get("Bolt")]
+
                 if self.component == "Model":
                     osdag_display_shape(self.display, plate1, update=True, material=Graphic3d_NOM_ALUMINIUM, label=label_plate1, canvas=self.cad_widget)
                     osdag_display_shape(self.display, plate2, update=True, label=label_plate2, canvas=self.cad_widget)
@@ -2609,16 +2598,16 @@ class CommonDesignLogic(object):
                                                 color=bolt_color, label=label_bolt, canvas=self.cad_widget)
                     for nut in self.nuts_models:
                         osdag_display_shape(self.display, nut, update=True,
-                                                color=bolt_color, label=label_nut, canvas=self.cad_widget)                     
+                                                color=bolt_color, label=label_bolt, canvas=self.cad_widget)                     
 
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_object  
             self.FObj = self.createSimplySupportedBeam()
             
             hover_dict = self.module_object.hover_dict
-            self.cad_widget.model_hover_labels = hover_dict
+            self.cad_widget.model_hover_labels = hover_dict.copy()
                 
-            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member", "Flexure Member")]    
+            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]    
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.FObj, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
@@ -2627,11 +2616,10 @@ class CommonDesignLogic(object):
             self.flex = self.module_object  
             self.FObj = self.createCantileverBeam()
             
-            
             hover_dict = self.module_object.hover_dict
-            self.cad_widget.model_hover_labels = hover_dict
+            self.cad_widget.model_hover_labels = hover_dict.copy()
                 
-            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member", "Flexure Member")]
+            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.FObj, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
@@ -2644,12 +2632,9 @@ class CommonDesignLogic(object):
                 
                 # Hover dict
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
 
-                if hasattr(self, "cad_widget") and hasattr(self.flex, "hover_dict"):
-                    self.cad_widget.model_hover_labels = self.flex.hover_dict
-
-                label_flexure = ["Flexural Members", hover_dict["Flexural Members"]]
+                label_flexure = ["Flexural Members", hover_dict.get("Flexural Members")]
                   
                 print(f"THIS IS SELF.MODULE_OBJECT {self.flex}")
                 self.FObj = self.createPurlin()
@@ -2657,7 +2642,7 @@ class CommonDesignLogic(object):
                 if self.component == "Model":
                     osdag_display_shape(self.display, self.FObj, update=True, label=label_flexure, canvas=self.cad_widget)
 
-        elif self.mainmodule == 'Struts in Trusses':
+        elif self.mainmodule == KEY_DISP_STRUT_WELDED_END_GUSSET:
             self.col = self.module_object  
             self.ColObj = self.createStrutsInTrusses()
             
@@ -2665,7 +2650,7 @@ class CommonDesignLogic(object):
             hover_dict = {}
             if hasattr(self.col, "hover_dict"):
                 hover_dict = self.col.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
             
             # Define labels for hover
             label_member = ["Member", hover_dict.get("Member")]
@@ -2682,9 +2667,12 @@ class CommonDesignLogic(object):
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_object
+
                  # Hover dict
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
+
+                # self.TObj = self.createTensionCAD()
                 # NOTE: Reuse self.TObj created in call_3DModel() to prevent duplicate CAD creation
                 # which causes OpenCASCADE memory corruption (malloc double linked list error)
 
@@ -2698,9 +2686,9 @@ class CommonDesignLogic(object):
                 # Point = gp_Pnt(distance, 0.0, 300)
                 # DisplayMsg(self.display, Point, self.T.section_size_1.designation)
                 
-                label_bolt = ["Bolt", hover_dict["Bolt"]]
-                label_plate = ["Plate", hover_dict["Plate"]]
-                label_member = ["Member", hover_dict["Member"]]
+                label_bolt = ["Bolt", hover_dict.get("Bolt")]
+                label_plate = ["Plate", hover_dict.get("Plate")]
+                label_member = ["Member", hover_dict.get("Member")]
 
                 if self.component == "Member":  # Todo: change this into key
                     osdag_display_shape(self.display, onlymember, color=beam_color, update=True,label=label_member, canvas=self.cad_widget)
@@ -2723,17 +2711,18 @@ class CommonDesignLogic(object):
             elif self.connection == KEY_DISP_TENSION_WELDED:
                 self.T = self.module_object
                 hover_dict = self.module_object.hover_dict
-                self.cad_widget.model_hover_labels = hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
 
+                # self.TObj = self.createTensionCAD()
                 # NOTE: self.TObj is already created in call_3DModel() before display_3DModel() is called
                 # Do NOT call createTensionCAD() again here - it causes OpenCASCADE memory corruption
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
 
-                label_plate = ["Plate", hover_dict["Plate"]]
-                label_weld = ["Weld", hover_dict["Weld"]]
-                label_member = ["Member", hover_dict["Member"]]
+                label_plate = ["Plate", hover_dict.get("Plate")]
+                label_weld = ["Weld", hover_dict.get("Weld")]
+                label_member = ["Member", hover_dict.get("Member")]
 
                 if hasattr(self, "cad_widget") and hasattr(self.T, "hover_dict"):
                     self.cad_widget.model_hover_labels = self.T.hover_dict
@@ -2761,7 +2750,6 @@ class CommonDesignLogic(object):
     #         #             2 * self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1) * self.T.plate.pitch_provided)
     #         # Point = gp_Pnt(distance, 0.0, 300)
     #         self.display_msg()
-
 
 
     def call_3DModel(self, flag, module_object):  # Done
@@ -2889,7 +2877,7 @@ class CommonDesignLogic(object):
             else:
                 self.display.EraseAll()
                 self.cad_widget.display_view_cube()
-        elif self.mainmodule == 'Struts in Trusses':
+        elif self.mainmodule == KEY_DISP_STRUT_WELDED_END_GUSSET:
             if flag is True:
                 self.ColObj = self.createStrutsInTrusses()
 

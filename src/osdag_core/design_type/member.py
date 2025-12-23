@@ -273,7 +273,7 @@ class Member(Main):
         t12 = ('Label_5', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
 
-        if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_COMPRESSION_Strut:
+        if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_STRUT_WELDED_END_GUSSET:
             t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, PLATE_THICKNESS_IS_1730_1989, plate_thk)
         else:
             t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
@@ -628,7 +628,7 @@ class Member(Main):
         t12 = ('Label_5', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
 
-        # if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_COMPRESSION_Strut:
+        # if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_STRUT_WELDED_END_GUSSET:
         #     t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, PLATE_THICKNESS_IS_1730_1989, plate_thk)
         # else:
         #     t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)

@@ -399,6 +399,28 @@ class ButtJointBolted(MomentConnection):
                self.len_conn if flag else '', True)
         out_list.append(t20)
 
+        # Populate Hover Dict (Butt Joint Bolted)
+        self.hover_dict["Plate 1"] = (
+            f"<b>plate1</b><br>"
+            f"Length: {float(self.plate1.length)} mm<br>"
+            f"Width: {float(self.plate1.height)} mm<br>"
+            f"Thickness: {self.plate1.thickness} mm"
+        )
+
+        self.hover_dict["Plate 2"] = (
+            f"<b>plate2</b><br>"
+            f"Length: {float(self.plate2.length)} mm<br>"
+            f"Width: {float(self.plate2.height)} mm<br>"
+            f"Thickness: {self.plate2.thickness} mm"
+        )
+
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>"
+            f"Grade: {self.bolt.bolt_grade_provided}<br>"
+            f"Diameter: {int(self.bolt.bolt_diameter_provided)} mm<br>"
+            f"No. of Bolts: {self.number_bolts}"
+        )
+
         return out_list
 
     def module_name(self):

@@ -226,7 +226,6 @@ class CustomWindow(QWidget):
     def create_cad_view_controls(self):
         """Create view control buttons directly on the self.cad_widget"""
         
-        
         # Create zoom buttons
         self.zoom_in_btn = QPushButton("+", self.cad_widget)
         self.zoom_in_btn.setStyleSheet("""
@@ -750,23 +749,6 @@ class CustomWindow(QWidget):
 
         graphics_menu.addSeparator()
 
-        self.menu_cad_components = []
-
-        for component in self.backend.get_3d_components():
-            cad_component_action = QAction(component[0], self)
-            cad_component_action.setObjectName(component[0])
-            cad_component_action.setEnabled(False)
-            self.menu_cad_components.append(cad_component_action)
-            graphics_menu.addAction(cad_component_action)
-            cad_component_action.triggered.connect(
-            # This approaches prevents from making trigger on all components same
-            lambda checked=False, 
-                act=cad_component_action, 
-                comp_id=component[1], 
-                comp_name=component[0]:
-                self.cadComponentControl(act, comp_id, comp_name)
-            )
-
         # Database Menu
         database_menu = self.menu_bar.addMenu("Database")
 
@@ -833,16 +815,6 @@ class CustomWindow(QWidget):
         check_update_action = QAction("Check For Update", self)
         check_update_action.triggered.connect(self.on_check_for_update)
         help_menu.addAction(check_update_action)
-    
-    def cadComponentControl(self, action, f, object_name):
-        # calling backend function
-        background = "gradient_light"
-        if not self.theme.is_light():
-            background = "gradient_dark"
-        f(self, background)
-        # find the check box and make it checked
-        checkBox = self.cad_comp_widget.findChild(QCheckBox, object_name)
-        checkBox.setChecked(True)
 
     #----------------Function-Trigger-for-MenuBar-START----------------------------------------
     
@@ -1607,7 +1579,7 @@ class CustomWindow(QWidget):
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
                                                   KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_FLEXURE3,KEY_DISP_FLEXURE4,
-                                                  KEY_DISP_COMPRESSION_Strut,KEY_DISP_LAPJOINTBOLTED,KEY_DISP_BUTTJOINTBOLTED]:
+                                                  KEY_DISP_STRUT_WELDED_END_GUSSET,KEY_DISP_LAPJOINTBOLTED,KEY_DISP_BUTTJOINTBOLTED]:
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 # print("[INFO] common start")
                 # print(f"[INFO] main object type: {type(main)}")
@@ -1623,7 +1595,7 @@ class CustomWindow(QWidget):
                 # status = True
                 ##############trial##############
 
-                # print("Hover Dictionary: ", main.hover_dict)
+                print("Hover Dictionary: ", main.hover_dict)
 
                 # CRITICAL: Garbage collect before heavy CAD operations to prevent heap corruption
                 # This is essential when creating 64+ OpenCASCADE shapes (bolts/nuts/welds)
@@ -1672,8 +1644,6 @@ class CustomWindow(QWidget):
                         checkbox_widget.setChecked(False)
                         checkbox_widget.blockSignals(False)
 
-                for action in self.menu_cad_components:
-                    action.setEnabled(True)
                 fName = str('./ResourceFiles/images/3d.png')
                 file_extension = fName.split(".")[-1]
             else:
@@ -1686,8 +1656,6 @@ class CustomWindow(QWidget):
                         checkbox_widget.blockSignals(True)
                         checkbox_widget.setChecked(False)
                         checkbox_widget.blockSignals(False)
-                for action in self.menu_cad_components:
-                    action.setEnabled(False)
             
     def design_fn(self, op_list, data_list, main):
         design_dictionary = {}
@@ -1981,6 +1949,8 @@ class CustomWindow(QWidget):
         
         # Clear logs
         self.logs_dock.clear_logs()
+        # Hide the 3d component checkboxes
+        self.cad_comp_widget.hide()
     
     # Clear Cad widget
     def flush_cad_widget(self):
@@ -2161,8 +2131,6 @@ class OutputDockIndicator(QWidget):
 class CadComponentCheckbox(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__(parent)
-        # Ensures automatic deletion when closed
-        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         # Fetch checkbox data
         data = backend.get_3d_components()
@@ -2179,11 +2147,11 @@ class CadComponentCheckbox(QWidget):
             check_box = QCheckBox(label)
             check_box.setObjectName(label)
             function_name = option[1]
-            self.component_connect(backend, check_box, function_name)
+            self.component_connect(check_box, function_name)
             self.checkbox_layout.addWidget(check_box)
         self.checkbox_layout.addStretch()
 
-    def component_connect(self, backend, check_box, f):
+    def component_connect(self, check_box, f):
         background = "gradient_light"
         if not self.parent.theme.is_light():
             background = "gradient_dark"

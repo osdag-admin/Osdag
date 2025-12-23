@@ -20,7 +20,7 @@ class CircularProgressWidget(QLabel):
     
     def rotate(self):
         # Smaller increment for ultra-smooth rotation (3 degrees instead of 6)
-        self.angle = (self.angle - 3) % 360
+        self.angle = (self.angle - 6) % 360
         self.update()
     
     def paintEvent(self, event):

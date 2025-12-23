@@ -184,7 +184,6 @@ class InputDock(QWidget):
         group_container_layout = QVBoxLayout(group_container)
 
         # --- Main Content (group boxes) ---
-        print(f"@Suh {input_width} {label_width}")
 
         # Track any group is active or not
         track_group = False

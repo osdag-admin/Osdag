@@ -431,7 +431,7 @@ DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
 KEY_DISP_COMPRESSION_COLUMN = 'Columns with known support conditions'
-KEY_DISP_COMPRESSION_Strut = 'Struts Welded to End Gusset'
+KEY_DISP_STRUT_WELDED_END_GUSSET = 'Struts Welded to End Gusset'
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'

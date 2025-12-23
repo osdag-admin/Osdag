@@ -268,7 +268,7 @@ class Compression(Member):
     ####################################
 
     def module_name(self):
-        return KEY_DISP_COMPRESSION_Strut
+        return KEY_DISP_STRUT_WELDED_END_GUSSET
 
     def set_osdaglogger(self, key):
         """
@@ -365,10 +365,10 @@ class Compression(Member):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_COMPRESSION_Strut
+        self.module = KEY_DISP_STRUT_WELDED_END_GUSSET
         options_list = []
 
-        t1 = (KEY_MODULE, KEY_DISP_COMPRESSION_Strut, TYPE_MODULE, None, True, 'No Validator')
+        t1 = (KEY_MODULE, KEY_DISP_STRUT_WELDED_END_GUSSET, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t1)
 
         t1 = (None, KEY_SECTION_DATA, TYPE_TITLE, None, True, 'No Validator')
@@ -1036,7 +1036,7 @@ class Compression(Member):
         # Reset per‑design flags
         self._logged_length_check = False
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = 'Struts in Trusses'
+        self.mainmodule = KEY_DISP_STRUT_WELDED_END_GUSSET
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.sec_list = design_dictionary[KEY_SECSIZE]

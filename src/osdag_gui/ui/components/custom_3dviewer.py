@@ -267,7 +267,7 @@ class CustomViewer3d(qtViewer3d):
             self.context.Remove(self.view_cube, False)
 
         self.view_cube = AIS_ViewCube()
-        self.view_cube.SetSize(55)
+        self.view_cube.SetSize(45)
         self.view_cube.SetFontHeight(12)
         self.context.SetPixelTolerance(8)
         self.view_cube.SetAxesLabels("", "", "")
@@ -300,7 +300,7 @@ class CustomViewer3d(qtViewer3d):
                     # Just log and continue - we'll create a fresh one
                     print(f"Note: Could not remove old ViewCube (may already be removed): {remove_error}")
                 self.view_cube = None
-
+            
             self.view_cube = AIS_ViewCube()
             self.view_cube.SetSize(45)
             self.view_cube.SetFontHeight(12)
@@ -336,7 +336,7 @@ class CustomViewer3d(qtViewer3d):
                 from OCC.Core.Aspect import Aspect_TOTP_RIGHT_UPPER
                 
                 # Create transform persistence anchored to top-right corner
-                offset = Graphic3d_Vec2i(70, 80)
+                offset = Graphic3d_Vec2i(60, 70)
                 transform_pers = Graphic3d_TransformPers(Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_UPPER, offset)
                 self.view_cube.SetTransformPersistence(transform_pers)
             except Exception as e:

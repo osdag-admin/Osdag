@@ -267,14 +267,12 @@ class CustomViewer3d(qtViewer3d):
             self.context.Remove(self.view_cube, False)
 
         self.view_cube = AIS_ViewCube()
-        self.view_cube.SetSize(75)
+        self.view_cube.SetSize(55)
         self.view_cube.SetFontHeight(12)
-        self.context.SetPixelTolerance(15)
+        self.context.SetPixelTolerance(8)
         self.view_cube.SetAxesLabels("", "", "")
         self.view_cube.SetDrawAxes(False)
-        
-        # Increased from 20 to 35 for larger chamfer/click area
-        self.view_cube.SetBoxCornerMinSize(60)
+        self.view_cube.SetBoxFacetExtension(16)
 
         highlight_drawer = Prs3d_Drawer()
         highlight_drawer.SetColor(Quantity_Color(Quantity_NOC_CYAN))

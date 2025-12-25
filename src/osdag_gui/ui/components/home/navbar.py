@@ -125,13 +125,13 @@ class VerticalMenuBar(QWidget):
             icon = icons.get(name)
             # If list is empty, Grey It
             if isinstance(data.get(name), list) and len(data.get(name))<=0:
-                btn = CustomButton("  " + name, icon[0], icon[1], icon[2], under_dev=True, group=self.button_group)
+                btn = CustomButton("  " + name, icon[0], icon[0], icon[1], under_dev=True, group=self.button_group)
                 btn.setDisabled(True)
                 btn.setObjectName("navbar_button_under_dev")
                 btn.setToolTip("Under Development")
                 btn.setCursor(Qt.CursorShape.ForbiddenCursor)
             else:
-                btn = CustomButton("  " + name, icon[0], icon[1], icon[2], group=self.button_group)
+                btn = CustomButton("  " + name, icon[0], icon[0], icon[1], group=self.button_group)
                 btn.setObjectName("navbar_button")
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Make buttons expand vertically
             btn.clicked.connect(lambda _,label=name, data=data.get(name): self._on_nav_button_clicked(data, label))
@@ -187,7 +187,7 @@ class VerticalMenuBar(QWidget):
         for btn in self.button_group:
             btn.set_font_size(button_font_size)
             # Adjust icon size based on button font size or a direct proportion
-            icon_size = max(16, int(button_font_size * 1.5))
+            icon_size = max(20, int(button_font_size * 2))
             btn.setIconSize(QSize(icon_size, icon_size))
             
             # Reapply style to ensure font update takes effect if style sheets override it

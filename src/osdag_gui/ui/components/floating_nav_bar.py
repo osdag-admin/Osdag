@@ -141,7 +141,7 @@ class SidebarWidget(QWidget):
 
         self.icon_size = 48  # px, you can adjust this value as needed
         for tooltip, icons in navbar_icons.items():
-            btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[1], hover_icon_path=icons[1], dark_icon_path=icons[2] ,group=self.button_group)
+            btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[0], hover_icon_path=icons[0], dark_icon_path=icons[1] ,group=self.button_group)
             self.button_layout.addWidget(btn)
             self.button_group.append(btn)
             btn.clicked.connect(lambda _,title=tooltip: self.openNewTab.emit(title))

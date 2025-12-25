@@ -653,7 +653,10 @@ class Connection(Main):
             if chkbox.objectName() == 'Column':
                 continue
             if isinstance(chkbox, QCheckBox):
+                # CRITICAL: Block signals to prevent cascading display_3DModel calls
+                chkbox.blockSignals(True)
                 chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Column", bgcolor)
 
     def call_3DBeam(self, ui, bgcolor):
@@ -662,7 +665,10 @@ class Connection(Main):
             if chkbox.objectName() == 'Beam':
                 continue
             if isinstance(chkbox, QCheckBox):
+                # CRITICAL: Block signals to prevent cascading display_3DModel calls
+                chkbox.blockSignals(True)
                 chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Beam", bgcolor)
 
     def new_material(self, input):

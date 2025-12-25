@@ -1953,13 +1953,13 @@ class CustomWindow(QWidget):
         
         # Clear logs
         self.logs_dock.clear_logs()
-        # Hide the 3d component checkboxes
         self.cad_comp_widget.hide()
     
     # Clear Cad widget
     def flush_cad_widget(self):
         """
-        Safely clear the CAD widget. Uses deferred execution to prevent
+        Safely clear the CAD widget using OCCMemoryManager.
+        Uses deferred execution and centralized memory management to prevent
         heap corruption from OCC operations conflicting with Qt rendering.
         """
         if not hasattr(self, 'cad_widget') or not self.cad_widget:
@@ -1970,51 +1970,86 @@ class CustomWindow(QWidget):
             print("[INFO] CAD widget not yet initialized, skipping flush")
             return
         
+        # Check if cleanup is already in progress
+        try:
+            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
+            manager = get_occ_memory_manager()
+            widget_id = id(self.cad_widget)
+            if manager.is_cleanup_in_progress(widget_id):
+                print("[INFO] Cleanup already in progress, skipping")
+                return
+        except Exception:
+            pass
+        
         # CRITICAL: Defer the actual OCC cleanup to avoid heap corruption
-        # The crash was caused by RemoveAll() conflicting with ongoing OCC operations
+        # This ensures all pending Qt events are processed first
         from PySide6.QtCore import QTimer
-        QTimer.singleShot(0, self._do_flush_cad_widget)
+        QTimer.singleShot(50, self._do_flush_cad_widget)
     
     def _do_flush_cad_widget(self):
         """
         Internal method that performs the actual CAD widget cleanup.
-        This is called via QTimer.singleShot to defer execution.
+        Uses OCCMemoryManager for safe, ordered cleanup of OCC objects.
         """
-        import gc
-        
         if not hasattr(self, 'cad_widget') or not self.cad_widget:
             return
+        
+        # Use OCCMemoryManager for safe cleanup
+        try:
+            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
+            manager = get_occ_memory_manager()
+            widget_id = id(self.cad_widget)
             
-        # Force garbage collection BEFORE OCC operations
+            # Get context for cleanup
+            context = getattr(self.cad_widget, 'context', None)
+            
+            # Use manager's safe_cleanup which handles GC and ordering
+            if manager.safe_cleanup(widget_id, context):
+                # Cleanup successful, also call widget's cleanup method
+                if hasattr(self.cad_widget, 'cleanup_for_new_model'):
+                    try:
+                        self.cad_widget.cleanup_for_new_model()
+                    except Exception as e:
+                        print(f"[WARNING] Error in cleanup_for_new_model: {e}")
+                
+                # Update the display
+                if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
+                    try:
+                        self.cad_widget._display.Repaint()
+                    except Exception as e:
+                        print(f"[WARNING] Error repainting display: {e}")
+            return
+        except ImportError:
+            pass  # Fall back to legacy cleanup
+        except Exception as e:
+            print(f"[WARNING] OCCMemoryManager cleanup failed: {e}")
+        
+        # Legacy cleanup if OCCMemoryManager is not available
+        import gc
         gc.collect()
         
-        # Use the new cleanup method to properly reset all internal state
-        # This prevents memory corruption from stale OCC object references
         if hasattr(self.cad_widget, 'cleanup_for_new_model'):
             try:
                 self.cad_widget.cleanup_for_new_model()
             except Exception as e:
                 print(f"[WARNING] Error in cleanup_for_new_model: {e}")
         
-        # Force garbage collection after cleanup
         gc.collect()
         
-        # Remove all AIS objects from context (with safety check)
-        # Use False to NOT force immediate update - this prevents crash
         if hasattr(self.cad_widget, 'context') and self.cad_widget.context:
             try:
-                self.cad_widget.context.RemoveAll(False)  # Changed from True to False
+                self.cad_widget.context.RemoveAll(False)
             except Exception as e:
                 print(f"[WARNING] Error removing AIS objects: {e}")
         
         gc.collect()
         
-        # Update the display (with safety check)
         if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
             try:
                 self.cad_widget._display.Repaint()
             except Exception as e:
                 print(f"[WARNING] Error repainting display: {e}")
+
 
     # Error Message Box
     def show_error_msg(self, error):

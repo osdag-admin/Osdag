@@ -752,8 +752,10 @@ class BeamBeamEndPlateSplice(MomentConnection):
             if chkbox.objectName() == 'Beam Beam End Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                print(f"clearing check of {chkbox.objectName()}")
+                # CRITICAL: Block signals to prevent cascading display_3DModel calls
+                chkbox.blockSignals(True)
                 chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
     # get the input values from UI and other functions

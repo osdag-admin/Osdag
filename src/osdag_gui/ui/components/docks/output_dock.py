@@ -532,10 +532,13 @@ class OutputDock(QWidget):
             ).exec()
         else:
             default_dir = os.path.join(get_documents_folder(), "Inputs.csv")
-            fileName, _ = QFileDialog.getSaveFileName(  self,
-                                                        "Save Output",
-                                                        default_dir,
-                                                        "Input Files(*.csv)")
+            fileName, _ = QFileDialog.getSaveFileName(
+                self.parent,
+                "Save Output",
+                default_dir,
+                "Input Files(*.csv)",
+                options=QFileDialog.Option.DontUseNativeDialog
+            )
             if fileName:
                 bigdata.to_csv(fileName, index=False, header=None)
                 CustomMessageBox(

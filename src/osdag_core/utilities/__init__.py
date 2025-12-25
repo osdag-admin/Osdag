@@ -94,13 +94,37 @@ def set_default_edge_style(shp, display):
 
 
 def osdag_display_shape(display, shapes, material=None, texture=None, color=None, transparency=None, update=False, label=[], canvas=None):
+    """
+    Display a shape with edge styling and register with memory manager.
+    
+    All shapes and AIS objects are registered with OCCMemoryManager to prevent
+    Python's garbage collector from freeing them while OCC/OpenGL are using them.
+    """
+    # Register shape with memory manager to prevent GC
+    try:
+        from osdag_gui.OS_safety_protocols import get_occ_memory_manager
+        manager = get_occ_memory_manager()
+        widget_id = id(canvas)
+        manager.register_widget(widget_id, display.Context)
+        manager.register_shape(widget_id, shapes)
+    except Exception:
+        pass  # Memory manager not available, continue without it
+    
     set_default_edge_style(shapes, display)
     ais_object = display.DisplayShape(shapes, material, texture, color, transparency, update=update)
     ais = ais_object[0] if isinstance(ais_object, list) else ais_object
+    
+    # Register AIS object with memory manager
+    try:
+        manager.register_ais_object(widget_id, ais)
+    except Exception:
+        pass
+    
     if canvas.model_ais_objects.get(label[0]) is None:
         canvas.model_ais_objects[label[0]] = [ais]
     else:
         canvas.model_ais_objects[label[0]] += [ais]
+    
     # Activate selection mode for whole entity
     display.Context.Activate(ais, 0)
 

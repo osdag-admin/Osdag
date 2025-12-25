@@ -1387,8 +1387,8 @@ class CustomWindow(QWidget):
     def start_thread(self, data):
         # Use safety module for multiprocessing (already initialized at startup)
         # This is safe to call multiple times - will be ignored if already set
-        from osdag_gui.osdag_safety import ensure_mp_spawn
-        ensure_mp_spawn()
+        from osdag_gui.OS_safety_protocols import ensure_safe_startup
+        ensure_safe_startup()
     
         self.loading = LoadingDialogManager(self.theme.is_light())
         self.loading.show()

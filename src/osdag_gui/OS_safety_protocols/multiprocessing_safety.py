@@ -1,8 +1,8 @@
 """
-Osdag Safety Module - Ensures application stability across all platforms.
+Multiprocessing and CAD Safety Module for Osdag
 
-This module provides:
-1. Safe multiprocessing initialization (prevents repeated set_start_method calls)
+This module provides thread-safe initialization and memory protection for:
+1. Multiprocessing start method (prevents repeated set_start_method calls)
 2. OpenCASCADE/CAD rendering protection
 3. Memory safety guards for native C++ operations
 4. Cross-platform compatibility layer
@@ -11,19 +11,28 @@ Author: Nishi Kant Mandal
 """
 
 import os
-import sys
 import platform
 import threading
 import functools
-from typing import Callable, Any, Optional
+from typing import Callable
 
 
-class OsdagSafetyManager:
+class SafetyManager:
     """
     Singleton manager for application-wide safety configurations.
     
     Ensures multiprocessing is initialized exactly once and provides
     guards for OpenCASCADE operations that can cause memory corruption.
+    
+    Usage:
+        # At application startup (before any other imports)
+        SafetyManager.initialize_multiprocessing()
+        
+        # For thread-safe CAD operations
+        @SafetyManager.safe_cad_operation
+        def render_3d_model(self):
+            # CAD operations here
+            pass
     """
     
     _instance = None
@@ -48,6 +57,7 @@ class OsdagSafetyManager:
         
         Args:
             method: Start method ('spawn', 'fork', or 'forkserver')
+                   'spawn' is recommended for GUI applications with OpenGL
             
         Returns:
             True if initialization was performed, False if already initialized
@@ -65,23 +75,23 @@ class OsdagSafetyManager:
                 # Check if already set
                 current_method = mp.get_start_method(allow_none=True)
                 if current_method is not None:
-                    print(f"[OsdagSafety] Multiprocessing already configured: {current_method}")
+                    print(f"[Osdag] Multiprocessing already configured: {current_method}")
                     cls._mp_initialized = True
                     return False
                 
-                # Set the start method (without force=True)
+                # Set the start method (without force=True to avoid corruption)
                 mp.set_start_method(method)
                 cls._mp_initialized = True
-                print(f"[OsdagSafety] Multiprocessing initialized with '{method}' method")
+                print(f"[Osdag] Multiprocessing initialized with '{method}' method")
                 return True
                 
             except RuntimeError as e:
                 # Already set by another path
-                print(f"[OsdagSafety] Multiprocessing already set: {e}")
+                print(f"[Osdag] Multiprocessing already set: {e}")
                 cls._mp_initialized = True
                 return False
             except Exception as e:
-                print(f"[OsdagSafety] Warning during multiprocessing init: {e}")
+                print(f"[Osdag] Warning during multiprocessing init: {e}")
                 cls._mp_initialized = True
                 return False
     
@@ -104,7 +114,7 @@ class OsdagSafetyManager:
         to prevent race conditions and ensure display stability.
         
         Usage:
-            @OsdagSafetyManager.safe_cad_operation
+            @SafetyManager.safe_cad_operation
             def render_3d_model(self):
                 # CAD operations here
                 pass
@@ -124,40 +134,43 @@ class OsdagSafetyManager:
                     return func(*args, **kwargs)
                     
                 except Exception as e:
-                    print(f"[OsdagSafety] CAD operation failed: {e}")
+                    print(f"[Osdag] CAD operation failed: {e}")
                     raise
         return wrapper
 
 
-def ensure_safe_startup():
+def ensure_safe_startup() -> None:
     """
     Call this at application startup to ensure safe initialization.
     
-    This function:
-    1. Initializes multiprocessing with platform-appropriate method
-    2. Sets up memory safety guards
-    3. Configures OpenCASCADE threading
+    This function MUST be called before importing PySide6/Qt modules.
+    
+    It performs:
+    1. Platform-specific multiprocessing configuration
+    2. OpenCASCADE threading settings
+    3. Memory safety guards
     """
     system = platform.system()
     
     # Platform-specific multiprocessing configuration
+    # All platforms use 'spawn' for GUI apps with OpenGL
     if system == "Darwin":  # macOS
         # macOS MUST use 'spawn' - 'fork' causes crashes with GUI apps
-        OsdagSafetyManager.initialize_multiprocessing('spawn')
+        SafetyManager.initialize_multiprocessing('spawn')
     elif system == "Windows":
         # Windows always uses 'spawn' (it's the only option)
-        OsdagSafetyManager.initialize_multiprocessing('spawn')
+        SafetyManager.initialize_multiprocessing('spawn')
     else:  # Linux
         # Linux: 'spawn' is safest for GUI apps with OpenGL
-        OsdagSafetyManager.initialize_multiprocessing('spawn')
+        SafetyManager.initialize_multiprocessing('spawn')
     
     # Set OpenCASCADE threading settings
     os.environ.setdefault("CSF_PARALLEL_THREADS", "1")
     
-    print("[OsdagSafety] Application safety initialized")
+    print("[Osdag] Application safety initialized")
 
 
-def safe_import_occ():
+def safe_import_occ() -> bool:
     """
     Safely import OpenCASCADE modules with proper error handling.
     
@@ -168,12 +181,12 @@ def safe_import_occ():
         import OCC.Core.TopoDS
         return True
     except ImportError as e:
-        print(f"[OsdagSafety] OpenCASCADE not available: {e}")
+        print(f"[Osdag] OpenCASCADE not available: {e}")
         return False
 
 
 # Convenience function for backward compatibility
-def ensure_mp_spawn():
+def ensure_mp_spawn() -> None:
     """
     Ensure multiprocessing uses 'spawn' method.
     
@@ -182,4 +195,4 @@ def ensure_mp_spawn():
     
     Can be called multiple times safely.
     """
-    OsdagSafetyManager.initialize_multiprocessing('spawn')
+    SafetyManager.initialize_multiprocessing('spawn')

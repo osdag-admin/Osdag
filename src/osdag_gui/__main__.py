@@ -1,7 +1,24 @@
 """
 Entry point for Osdag GUI application.
 Handles splash screen and main window launch.
+
+Startup sequence:
+1. OS/environment setup (GPU detection, Qt configuration)
+2. Safety initialization (multiprocessing spawn, OCC guards)  
+3. GUI launch
 """
+
+# =============================================================================
+# CRITICAL: Import and run safety protocols BEFORE any PySide6/Qt imports
+# =============================================================================
+from osdag_gui.OS_safety_protocols import setup_environment, ensure_safe_startup
+
+setup_environment()
+ensure_safe_startup()
+
+# =============================================================================
+# Now safe to import Qt and other modules
+# =============================================================================
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QThread, Signal, QFile, QTextStream
 from PySide6.QtGui import QFontDatabase, QFont, QIcon

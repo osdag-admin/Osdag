@@ -85,40 +85,35 @@ Contains SVGs, images, backgrounds, and theme files for the application.
 
         <file>backgrounds/splash_bg.jpg</file>
 
-        <file>vectors/home_default.svg</file>
-        <file>vectors/home_clicked.svg</file>
+        <file>images/home_default.svg</file>
+        <file>images/home_clicked.svg</file>
 
         <file>images/connection.svg</file>
         <file>images/connection_dark.svg</file>
-        <file>images/connection_clicked.svg</file>
 
         <file>images/tension_member.svg</file>
         <file>images/tension_member_dark.svg</file>
-        <file>images/tension_member_clicked.svg</file>
 
         <file>images/compression_member.svg</file>
         <file>images/compression_member_dark.svg</file>
-        <file>images/compression_member_clicked.svg</file>
 
         <file>images/flexural_member.svg</file>
         <file>images/flexural_member_dark.svg</file>
-        <file>images/flexural_member_clicked.svg</file>
 
         <file>images/beam_column.svg</file>
         <file>images/beam_column_dark.svg</file>
-        <file>images/beam_column_clicked.svg</file>
 
         <file>images/truss.svg</file>
         <file>images/truss_dark.svg</file>
-        <file>images/truss_clicked.svg</file>
 
         <file>images/2d_frame.svg</file>
         <file>images/2d_frame_dark.svg</file>
-        <file>images/2d_frame_clicked.svg</file>
 
         <file>images/3d_frame.svg</file>
         <file>images/3d_frame_dark.svg</file>
-        <file>images/3d_frame_clicked.svg</file>
+
+        <file>images/group_design.svg</file>
+        <file>images/group_design_dark.svg</file>
 
         <file>images/down_arrow_light.png</file>
         <file>images/down_arrow_dark.png</file>

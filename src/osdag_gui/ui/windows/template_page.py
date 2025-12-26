@@ -455,7 +455,7 @@ class CustomWindow(QWidget):
 
     def slide_in(self):
         self.sidebar_animation.stop()
-        end_x = 0
+        end_x = 5
         top_offset = self.sidebar_y
         self.sidebar_animation.setStartValue(self.sidebar.geometry())
         self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
@@ -1113,16 +1113,20 @@ class CustomWindow(QWidget):
         
         # Check if splitter exists and has children
         try:
+            # Normal Resize Event
+            self.sidebar.resize_sidebar(self.width(), self.height())
+            # Update sidebar position to keep it centered vertically
+            self.sidebar_y = (self.height() - self.menu_bar.height() - self.sidebar.height()) // 2 + self.menu_bar.height()
+            top_offset = self.sidebar_y
+            if self.sidebar.x() < 0:
+                self.sidebar.move(-self.sidebar.width() + 12, top_offset)
+            else:
+                self.sidebar.move(self.sidebar.x(), top_offset)
+                
             if not hasattr(self, 'splitter') or self.splitter is None:
                 return
             if self.splitter.count() < 3:
                 return
-            
-            # Normal Resize Event
-            self.sidebar.resize_sidebar(self.sidebar.width(), self.sidebar_y)
-            top_offset = self.menu_bar.height()
-            if self.sidebar.x() < 0:
-                self.sidebar.move(-self.sidebar.width() + 12, top_offset)
 
             if self.input_dock.isVisible():
                 input_dock_width = self.input_dock.sizeHint().width()

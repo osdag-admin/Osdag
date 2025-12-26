@@ -71,8 +71,6 @@ class Data:
         "2D Frame": 
         [],
         "3D Frame": 
-        [],
-        "Group Design": 
         []
     }
     
@@ -86,7 +84,7 @@ class Data:
         "Truss": [":/images/truss.svg", ":/images/truss_dark.svg"],
         "2D Frame": [":/images/2d_frame.svg", ":/images/2d_frame_dark.svg"],
         "3D Frame": [":/images/3d_frame.svg", ":/images/3d_frame_dark.svg"],
-        "Group Design": [":/images/group_design.svg", ":/images/group_design_dark.svg"],
+        # "Group Design": [":/images/group_design.svg", ":/images/group_design_dark.svg"],
     }
 
     FLOATING_NAVBAR = [

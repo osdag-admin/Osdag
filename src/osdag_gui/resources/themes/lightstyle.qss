@@ -196,6 +196,8 @@ QPushButton#navbar_button_under_dev[state="active"] {
     text-align: left;
 }
 
+
+
 /* Menu Button */
 QPushButton#menu_button {
     font-size: 14px;
@@ -931,6 +933,27 @@ QWidget#cad_custom_selector QCheckBox::indicator:unchecked {
     background-color: #ffffff;
 }
 /*==========floating-navbar=================================*/
+QPushButton#floating_btn:disabled[state="default"] {
+    background-color: #f1f1f1;
+    border: 0px;
+    border-radius: 5px;
+    margin: 3px;
+    padding: 1px;
+}
+QPushButton#floating_btn:disabled[state="selected"] {
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    border: 0px;
+    margin: 3px;
+    padding: 1px;
+}
+QPushButton#floating_btn:disabled[state="active"] {
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    border: 0px;
+    margin: 3px;
+    padding: 1px;
+}
 QWidget#floating_btn_container {
     background-color: #FFFFFF;
     border: 1px solid #90AF13;

@@ -6,15 +6,13 @@ import osdag_gui.resources.resources_rc
 from osdag_gui.data.ui_data import Data
 
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QPushButton, QToolTip, QApplication
+    QWidget, QVBoxLayout, QPushButton, QToolTip, QApplication, QSizePolicy
 )
 from PySide6.QtGui import QIcon, QCursor
-from PySide6.QtCore import Qt, QSize, QPoint, QTimer, Signal
+from PySide6.QtCore import Qt, QSize, QPoint, QTimer, QEvent, Signal
 
 class SidebarIconButton(QPushButton):
     # Class-level attribute for default hover color
-    BUTTON_MARGIN = 3
-    BUTTON_PADDING = 1
 
     def __init__(self, icon_path, tooltip_text="", selected_icon_path=None, hover_icon_path=None, dark_icon_path=None, group=None, parent=None):
         super().__init__(parent)
@@ -26,7 +24,17 @@ class SidebarIconButton(QPushButton):
         self.setObjectName("floating_btn")
 
         self.is_selected = False
-        self.custom_tooltip_text = tooltip_text
+
+        # Disable buttons
+        if tooltip_text in ["Beam Column",
+                            "Truss",
+                            "2D Frame",
+                            "3D Frame"]:
+            self.setDisabled(True)
+            self.custom_tooltip_text = "Under Development"
+            self.setCursor(Qt.CursorShape.ForbiddenCursor)
+        else:
+            self.custom_tooltip_text = tooltip_text
 
         # Load icons
         self.default_icon = self._load_icon(icon_path)
@@ -119,12 +127,15 @@ class SidebarIconButton(QPushButton):
 
 class SidebarWidget(QWidget):
     openNewTab = Signal(str)
+    
     def __init__(self, parent):
         super().__init__(parent)
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         
         self.parent = parent
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
@@ -134,36 +145,74 @@ class SidebarWidget(QWidget):
         self.button_layout = QVBoxLayout(self.button_container)
         self.button_layout.setAlignment(Qt.AlignHCenter)
         self.button_layout.setContentsMargins(0, 0, 0, 0)
-        self.button_layout.setSpacing(0)  # spacing between buttons
+        self.button_layout.setSpacing(0)  # spacing between buttons (matches navbar spacing)
 
         dat = Data()
         navbar_icons = dat.NAVBAR_ICONS
 
-        self.icon_size = 48  # px, you can adjust this value as needed
         for tooltip, icons in navbar_icons.items():
             btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[0], hover_icon_path=icons[0], dark_icon_path=icons[1] ,group=self.button_group)
+            btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             self.button_layout.addWidget(btn)
             self.button_group.append(btn)
             btn.clicked.connect(lambda _,title=tooltip: self.openNewTab.emit(title))
         self.button_container.setLayout(self.button_layout)
         self.layout.addWidget(self.button_container, alignment=Qt.AlignCenter)
-        self.update_sidebar_size()
+        
+        # Initial update of sizes
+        self.update_responsive_elements()
 
-    def update_sidebar_size(self):
+    def update_responsive_elements(self):
+        """Updates button sizes and icon sizes based on parent widget dimensions - matches navbar.py exactly."""
+        if not self.parent:
+            return
+            
+        # Use parent's height for calculations (same as navbar.py uses widget_height)
+        parent_height = self.parent.height()
+        parent_width = self.parent.width()
+
+        if parent_height <= 0 or parent_width <= 0:
+            return  # Avoid division by zero or invalid sizes
+
         num_buttons = len(self.button_group)
-        margin = SidebarIconButton.BUTTON_MARGIN
-        padding = SidebarIconButton.BUTTON_PADDING
+        if num_buttons == 0:
+            return
+
+        # Calculate button font size (same formula as navbar.py)
+        button_font_size = max(10, int(parent_height / 55))
+        
+        # Calculate icon size (same formula as navbar.py)
+        icon_size = max(20, int(button_font_size * 2))
+        
+        # Calculate button size to match navbar button dimensions
+        # Navbar buttons expand vertically, so we estimate their height
+        # Using similar proportions: button height is roughly 3.5x the font size
+        button_size = max(icon_size + 20, int(button_font_size * 3.5))
+        
+        # Calculate total sidebar dimensions
         spacing = self.button_layout.spacing()
-        icon_size = self.icon_size
-        button_size = icon_size + 2 * (margin + padding)
         sidebar_width = button_size
         sidebar_height = num_buttons * button_size + (num_buttons - 1) * spacing
+        
+        # Set fixed dimensions
         self.setFixedWidth(sidebar_width)
         self.setFixedHeight(sidebar_height)
+        
+        # Apply sizes to all buttons
         for btn in self.button_group:
-            btn.setFixedSize(icon_size, icon_size)
-            btn.setIconSize(QSize(icon_size * 0.4, icon_size * 0.4))
+            btn.setFixedSize(button_size, button_size)
+            btn.setIconSize(QSize(icon_size, icon_size))
+
+    def resizeEvent(self, event: QEvent):
+        """Called when the widget is resized."""
+        super().resizeEvent(event)
+        self.update_responsive_elements()  # Recalculate and apply sizes
 
     def resize_sidebar(self, window_width, window_height):
-        # No longer use window size for sidebar sizing
-        self.update_sidebar_size()
+        """Called when parent window is resized - updates sizes"""
+        self.update_responsive_elements()
+        
+    def showEvent(self, event):
+        """Called when the widget is shown."""
+        super().showEvent(event)
+        self.update_responsive_elements()

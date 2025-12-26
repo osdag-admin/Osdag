@@ -40,9 +40,10 @@ class SvgCard(QFrame):
 
         layout = QVBoxLayout(self)
         layout.setSpacing(8)
-        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setContentsMargins(0, 4, 0, 0)
 
         self.title_label = QLabel(title)
+        self.title_label.setWordWrap(True)
         self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setObjectName("svgCard_title")
 

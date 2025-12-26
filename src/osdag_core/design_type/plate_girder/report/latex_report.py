@@ -1,7 +1,7 @@
 """
 Module: latex_report.py
 Description: Design report generation for Plate Girder module
-Author: Based on Osdag report generation structure
+Author: Roushan Raj
 Date: 2025-12-26
 """
 

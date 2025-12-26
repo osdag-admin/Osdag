@@ -1157,6 +1157,11 @@ class PlateGirderWelded(Member):
         self.dimension_warning_logged = False
 
     def save_design(self, popup_summary):
+        """
+        Generate design report for plate girder
+        """
+        from ..report.latex_report import save_design
+        popup_summary['plate_girder_object'] = self
         save_design(popup_summary)
 
     def generate_missing_fields_error_string(self, missing_fields_list):

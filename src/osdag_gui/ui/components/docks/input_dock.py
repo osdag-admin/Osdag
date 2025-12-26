@@ -426,12 +426,12 @@ class InputDock(QWidget):
             self.update_lock_icon()
         else:
             if self.state_locked:
-                # Only clear UI output fields, NOT the 3D model
-                # The 3D model will stay visible until a new design runs
-                # This prevents heap corruption from premature OCC cleanup
+                # Clear UI output fields
                 self.parent.clear_output_fields()
-                # NOTE: We intentionally DON'T call flush_cad_widget() here
-                # The 3D model stays visible as reference for the user
+                # SAFE FLUSH: Use deferred execution to ensure Qt events are processed first
+                # This prevents heap corruption from OCC operations during Qt rendering
+                from PySide6.QtCore import QTimer
+                QTimer.singleShot(100, self.parent.flush_cad_widget)
             self.state_locked = not self.state_locked
             self.lock_btn.setChecked(self.state_locked)
             self.scroll_area.setDisabled(self.state_locked)

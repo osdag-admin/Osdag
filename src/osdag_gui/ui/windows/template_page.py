@@ -1989,61 +1989,44 @@ class CustomWindow(QWidget):
     def _do_flush_cad_widget(self):
         """
         Internal method that performs the actual CAD widget cleanup.
-        Uses OCCMemoryManager for safe, ordered cleanup of OCC objects.
+        Uses the same safe cleanup order as display_3DModel in common_logic.py:
+        1. cleanup_for_new_model() FIRST - clears internal Python state
+        2. EraseAll() SECOND - clears OCC context  
+        3. gc.collect() at safe points
+        
+        This order is critical to prevent heap corruption.
         """
         if not hasattr(self, 'cad_widget') or not self.cad_widget:
             return
         
-        # Use OCCMemoryManager for safe cleanup
-        try:
-            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
-            manager = get_occ_memory_manager()
-            widget_id = id(self.cad_widget)
-            
-            # Get context for cleanup
-            context = getattr(self.cad_widget, 'context', None)
-            
-            # Use manager's safe_cleanup which handles GC and ordering
-            if manager.safe_cleanup(widget_id, context):
-                # Cleanup successful, also call widget's cleanup method
-                if hasattr(self.cad_widget, 'cleanup_for_new_model'):
-                    try:
-                        self.cad_widget.cleanup_for_new_model()
-                    except Exception as e:
-                        print(f"[WARNING] Error in cleanup_for_new_model: {e}")
-                
-                # Update the display
-                if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
-                    try:
-                        self.cad_widget._display.Repaint()
-                    except Exception as e:
-                        print(f"[WARNING] Error repainting display: {e}")
-            return
-        except ImportError:
-            pass  # Fall back to legacy cleanup
-        except Exception as e:
-            print(f"[WARNING] OCCMemoryManager cleanup failed: {e}")
-        
-        # Legacy cleanup if OCCMemoryManager is not available
         import gc
+        
+        # Step 1: Initial GC before any OCC operations
         gc.collect()
         
+        # Step 2: Clear internal Python state FIRST (before OCC context operations)
+        # This clears model_ais_objects, hover labels, view_cube reference, etc.
+        # CRITICAL: Must happen BEFORE EraseAll to prevent double-free
         if hasattr(self.cad_widget, 'cleanup_for_new_model'):
             try:
                 self.cad_widget.cleanup_for_new_model()
             except Exception as e:
                 print(f"[WARNING] Error in cleanup_for_new_model: {e}")
         
+        # Step 3: GC after clearing internal state
         gc.collect()
         
-        if hasattr(self.cad_widget, 'context') and self.cad_widget.context:
+        # Step 4: Now safe to clear OCC context
+        if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
             try:
-                self.cad_widget.context.RemoveAll(False)
+                self.cad_widget._display.EraseAll()
             except Exception as e:
-                print(f"[WARNING] Error removing AIS objects: {e}")
+                print(f"[WARNING] Error erasing display: {e}")
         
+        # Step 5: Final GC to clean up released OCC objects
         gc.collect()
         
+        # Step 6: Repaint to show empty view
         if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
             try:
                 self.cad_widget._display.Repaint()

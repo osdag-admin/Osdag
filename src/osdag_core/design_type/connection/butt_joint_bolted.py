@@ -184,7 +184,6 @@ class ButtJointBolted(MomentConnection):
 
         return design
 
-
     def set_osdaglogger(self, key):
         """
         Function to set Logger for FinPlate Module
@@ -235,6 +234,7 @@ class ButtJointBolted(MomentConnection):
             gui_handler = OurLog(key)
             gui_handler.setFormatter(formatter)
             self.logger.addHandler(gui_handler)
+
 
     def input_value_changed(self):
 
@@ -400,25 +400,41 @@ class ButtJointBolted(MomentConnection):
         out_list.append(t20)
 
         # Populate Hover Dict (Butt Joint Bolted)
+
         self.hover_dict["Plate 1"] = (
-            f"<b>plate1</b><br>"
-            f"Length: {float(self.plate1.length)} mm<br>"
-            f"Width: {float(self.plate1.height)} mm<br>"
-            f"Thickness: {self.plate1.thickness} mm"
+            f"<b>Plate 1</b><br>"
+            f"Length: {float(self.plate1.length) if flag else ''} mm<br>"
+            f"Width: {float(self.plate1.height) if flag else ''} mm<br>"
+            f"Thickness: {self.plate1.thickness if flag else ''} mm"
         )
 
         self.hover_dict["Plate 2"] = (
-            f"<b>plate2</b><br>"
-            f"Length: {float(self.plate2.length)} mm<br>"
-            f"Width: {float(self.plate2.height)} mm<br>"
-            f"Thickness: {self.plate2.thickness} mm"
+            f"<b>Plate 2</b><br>"
+            f"Length: {float(self.plate2.length) if flag else ''} mm<br>"
+            f"Width: {float(self.plate2.height) if flag else ''} mm<br>"
+            f"Thickness: {self.plate2.thickness if flag else ''} mm"
+        )
+
+        self.hover_dict["Cover Plate"] = (
+            f"<b>Cover Plate</b><br>"
+            f"Length: {float(self.platec.length) if flag else ''} mm<br>"
+            f"Width: {float(self.platec.height) if flag else ''} mm<br>"
+            f"Thickness: {self.platec.thickness if flag else ''} mm"
+        )
+
+        self.hover_dict["Packing Plate"] = (
+            f"<b>Packing Plate</b><br>"
+            f"Length: {float(0)} mm<br>"
+            f"Width: {float(0)} mm<br>"
+            f"Thickness: {0} mm"
         )
 
         self.hover_dict["Bolt"] = (
-            f"<b>Bolt</b><br>"
-            f"Grade: {self.bolt.bolt_grade_provided}<br>"
-            f"Diameter: {int(self.bolt.bolt_diameter_provided)} mm<br>"
-            f"No. of Bolts: {self.number_bolts}"
+            f"<b>Bolts</b><br>"
+            f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
+            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>"
+            f"No. of Bolts: "
+            f"{int(self.platec.bolts_one_line) * int(self.platec.bolt_line) if flag else ''}"
         )
 
         return out_list
@@ -427,35 +443,65 @@ class ButtJointBolted(MomentConnection):
 
         return KEY_DISP_BUTTJOINTBOLTED
 
-    def call_3DColumn(self, ui, bgcolor):
-        # Temporarily disabled 3D functionality
-        pass
-        # if ui.chkBxCol.isChecked():
-        #     ui.btn3D.setChecked(Qt.Unchecked)
-        #     ui.chkBxCol.setChecked(Qt.Unchecked)
-        #     ui.mytabWidget.setCurrentIndex(0)
-        # ui.commLogicObj.display_3DModel("Column", bgcolor)
-
-    @staticmethod
-    def get_3d_components(main=None):
+    def get_3d_components(self):
         """Get 3D components for visualization"""
-        # Create placeholder files if they don't exist
-        ButtJointBolted.create_placeholder_files()
-
-        # Return empty components list for now
         components = []
-
-        # t1 = ('Model', self.call_3DModel)
-        # components.append(t1)
-
-        # t3 = ('Plate1', self.call_3DColumn)
-        # components.append(t3)
-
-        # t4 = ('Plate2', self.call_3DPlate)
-        # components.append(t4)
-
-
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+        t2 = ('Plate 1', self.call_3DPlate1)
+        components.append(t2)
+        t3 = ('Plate 2', self.call_3DPlate2)
+        components.append(t3)
+        t4 = ('Cover Plate', self.call_3DCoverPlate)
+        components.append(t4)
+        t5 = ('Bolts', self.call_3DBolt)
+        components.append(t5)
         return components
+
+    def call_3DModel(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Model':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
+    def call_3DPlate1(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate 1':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Plate 1', bgcolor)
+
+    def call_3DPlate2(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate 2':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Plate 2', bgcolor)
+    
+    def call_3DCoverPlate(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Cover Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Cover Plate', bgcolor)
+
+    def call_3DBolt(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Bolts':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Bolts', bgcolor)
 
     @staticmethod
     def create_placeholder_files():
@@ -479,36 +525,6 @@ class ButtJointBolted(MomentConnection):
 
         except Exception as e:
             print(f"Warning: Could not create placeholder files: {str(e)}")
-
-
-    # def call_3DPlate(self, ui, bgcolor):
-    #     from PyQt5.QtWidgets import QCheckBox
-    #     from PyQt5.QtCore import Qt
-    #     for chkbox in ui.frame.children():
-    #         if chkbox.objectName() == 'Cover Plate':
-    #             continue
-    #         if isinstance(chkbox, QCheckBox):
-    #             chkbox.setChecked(Qt.Unchecked)
-    #     ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
-
-    def get_3d_image_path(self):
-        image_path = "./ResourceFiles/images/3d.png"
-        fallback_image = str(files("osdag.data.ResourceFiles.images").joinpath("ButtJointBolted.png"))
-        if not os.path.exists(image_path):
-            return fallback_image
-        return image_path
-
-    def call_3DPlate(self, ui, bgcolor):
-        # Temporarily disabled 3D functionality
-        pass
-        # from PyQt5.QtWidgets import QCheckBox
-        # from PyQt5.QtCore import Qt
-        # for chkbox in ui.frame.children():
-        #     if chkbox.objectName() == 'Cover Plate':
-        #         continue
-        #     if isinstance(chkbox, QCheckBox):
-        #         chkbox.setChecked(Qt.Unchecked)
-        # ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     def func_for_validation(self, design_dictionary):
 
@@ -573,7 +589,7 @@ class ButtJointBolted(MomentConnection):
         super(ButtJointBolted, self).set_input_values(design_dictionary_with_defaults)
 
         self.module = design_dictionary[KEY_MODULE]
-        self.mainmodule = "Butt Joint Bolted Connection"
+        self.mainmodule = KEY_DISP_BUTTJOINTBOLTED
         self.main_material = design_dictionary[KEY_MATERIAL]
 
         self.design_for = design_dictionary.get(KEY_DESIGN_FOR, 'Tension')
@@ -599,19 +615,12 @@ class ButtJointBolted(MomentConnection):
                             material_grade=design_dictionary[KEY_MATERIAL],
                             width=design_dictionary[KEY_PLATE_WIDTH])
 
-        # Initialize bolt with properties
-        self.bolt = Bolt(grade=design_dictionary[KEY_GRD],
-                        diameter=design_dictionary[KEY_D],
-                        bolt_type=design_dictionary[KEY_TYP],
-                        bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                        edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-                        mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None))
-
         # Calculate cover plate thickness as per Cl. 10.2.4.2
         plate1_thk = float(design_dictionary[KEY_PLATE1_THICKNESS])
         plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
         Tmin = min(plate1_thk, plate2_thk)
         cover_plate_type_str = design_dictionary[KEY_COVER_PLATE]
+        self.cover_plate_type = cover_plate_type_str  # Store for CAD generation
 
         # Cover plate and packing plate logic as per documentation
         available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]
@@ -655,10 +664,21 @@ class ButtJointBolted(MomentConnection):
             self.packing_plate_thickness = 0.0
             self.beta_pkg = 1.0
 
-        # Initialize cover plate with calculated thickness
         self.platec = Plate(thickness=[self.calculated_cover_plate_thickness],
                             material_grade=design_dictionary[KEY_MATERIAL],
                             width=design_dictionary[KEY_PLATE_WIDTH])
+
+        # Initialize bolt with properties
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD],
+                        diameter=design_dictionary[KEY_D],
+                        bolt_type=design_dictionary[KEY_TYP],
+                        bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                        edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                        mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None))
+
+
+
+        # Initialize other parameters
         self.count = 0
         self.slip_res = None
         self.yield_stress = None
@@ -822,10 +842,6 @@ class ButtJointBolted(MomentConnection):
             else:
                 return False
 
-        self.cols = 1
-        self.rows = self.number_bolts
-        temp_rows = self.rows
-
         # Add safety check for minimum width
         min_required_width = 2 * self.bolt.min_end_dist_round
         if float(self.width) < min_required_width:
@@ -834,11 +850,23 @@ class ButtJointBolted(MomentConnection):
             self.logger.info(" :=========End Of design===========")
             return
 
+        # Calculate optimal bolt arrangement for even distribution
+        # Start with an approximately square grid, favoring more columns (length direction)
+        # This distributes bolts across multiple rows along the plate length
+        self.cols = max(1, math.ceil(math.sqrt(self.number_bolts)))
+        self.rows = math.ceil(self.number_bolts / self.cols)
+
+        # Ensure bolts fit across the width (check rows fit within plate width)
         while iteration_count < MAX_ITERATIONS:
             iteration_count += 1
-            if check_no_cols(temp_rows):
-                temp_rows = math.ceil(self.rows/(self.cols + 1))
-                self.cols += 1
+            # Check if current rows fit within plate width
+            if check_no_cols(self.rows):
+                # Too many bolts across width, reduce rows and increase cols
+                if self.rows > 1:
+                    self.rows -= 1
+                    self.cols = math.ceil(self.number_bolts / self.rows)
+                else:
+                    break
             else:
                 break
 
@@ -847,8 +875,6 @@ class ButtJointBolted(MomentConnection):
             self.logger.error(": Could not find valid bolt arrangement within maximum iterations")
             self.logger.info(" :=========End Of design===========")
             return
-
-        self.rows = math.ceil(self.rows/self.cols)
 
         if self.cols>1:
             self.len_conn = (self.cols - 1)*self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
@@ -1334,4 +1360,3 @@ class ButtJointBolted(MomentConnection):
             except Exception as e2:
                 self.logger.error(f"Critical error in save_design: {str(e2)}")
                 raise
-

@@ -59,6 +59,8 @@ def create_welded_butt_joint(plate1_thickness=4, plate2_thickness=4, cover_thick
     plates_models = [plate1_model, plate2_model]
     platec_model = None
     platec2_model = None
+    packing_plate1_model = None  # Initialize packing plates as None
+    packing_plate2_model = None
     
     # 1. Top Cover (Always present)
     # Center Z = Reference Top + Cover_Thickness / 2
@@ -92,6 +94,42 @@ def create_welded_butt_joint(plate1_thickness=4, plate2_thickness=4, cover_thick
         platec2.place(origin4, uDir4, wDir4)
         platec2_model = platec2.create_model()
         plates_models.append(platec2_model)
+        
+        # --- Create Packing Plates to fill gaps ---
+        # A packing plate is needed when a main plate doesn't reach the bottom cover
+        # Gap = MAX_THICKNESS - plate_thickness
+        
+        # Packing plate for Plate 1 side (if plate1 is thinner than MAX_THICKNESS)
+        gap1 = MAX_THICKNESS - plate1_thickness
+        if gap1 > 0.1:  # Only create if there's a meaningful gap
+            packing1_center_z = reference_bottom_z + (gap1 / 2.0)
+            
+            origin_pack1 = numpy.array([0.0, 0.0, packing1_center_z])
+            uDir_pack1 = numpy.array([0.0, 0.0, 1.0])
+            wDir_pack1 = numpy.array([1.0, 0.0, 0.0])
+            
+            # Packing plate has same length and width as the corresponding main plate
+            packing1 = Plate(plate_length, plate_width, gap1)
+            packing1.place(origin_pack1, uDir_pack1, wDir_pack1)
+            packing_plate1_model = packing1.create_model()
+            plates_models.append(packing_plate1_model)
+        
+        # Packing plate for Plate 2 side (if plate2 is thinner than MAX_THICKNESS)
+        gap2 = MAX_THICKNESS - plate2_thickness
+        if gap2 > 0.1:  # Only create if there's a meaningful gap
+            packing2_center_z = reference_bottom_z + (gap2 / 2.0)
+            
+            origin_pack2 = numpy.array([0.0, plate_length, packing2_center_z])
+            uDir_pack2 = numpy.array([0.0, 0.0, 1.0])
+            wDir_pack2 = numpy.array([1.0, 0.0, 0.0])
+            
+            packing2 = Plate(plate_length, plate_width, gap2)
+            packing2.place(origin_pack2, uDir_pack2, wDir_pack2)
+            packing_plate2_model = packing2.create_model()
+            plates_models.append(packing_plate2_model)
+    else:
+        # Single-Cover: Only Top Cover is created (platec)
+        pass
 
     # --- Create Welds ---
     # We use FilletWeld
@@ -170,6 +208,9 @@ def create_welded_butt_joint(plate1_thickness=4, plate2_thickness=4, cover_thick
         weld4.place(weld4_origin, weld4_uDir, weld4_wDir)
         weld4_model = weld4.create_model()
         welds_models.append(weld4_model)
+    else:
+        # Single-Cover: No bottom welds
+        pass
 
 
     # --- Assembly ---
@@ -183,10 +224,10 @@ def create_welded_butt_joint(plate1_thickness=4, plate2_thickness=4, cover_thick
     builder.Perform()
     assembly = builder.Shape()
     
-    return assembly, plate1_model, plate2_model, platec_model, platec2_model, welds_models
+    return assembly, plate1_model, plate2_model, platec_model, platec2_model, welds_models, packing_plate1_model, packing_plate2_model
 
 if __name__ == "__main__":
-    # Test Double Cover
+    # Test Single Cover
     assembly, plate1, plate2, platec, platec2, welds = create_welded_butt_joint(
         plate1_thickness=14,
         plate2_thickness=14,

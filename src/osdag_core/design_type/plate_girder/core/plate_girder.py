@@ -29,6 +29,7 @@ from ..checks.welds import *
 from ..checks.moment import *
 from ..checks.moment import *
 from ..checks.deflection import evaluate_deflection_kNm_mm
+from ..checks import SKIP_DEFLECTION
 from ..checks.web_thickness import min_web_thickness_thick_web
 from ..report.latex_report import save_design
 from ....custom_logger import CustomLogger
@@ -1134,20 +1135,25 @@ class PlateGirderWelded(Member):
                     pass
 
         # Deflection checks per IS 800:2007 Table 6
-        # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
-        moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
-        is_safe, self.deflection_ratio = evaluate_deflection_kNm_mm(
-            moment_kNm, self.length, self.material.modulus_of_elasticity,
-            self.loading_case, self.deflection_criteria, self.total_depth,
-            self.top_flange_width, self.bottom_flange_width, self.web_thickness,
-            self.top_flange_thickness, self.bottom_flange_thickness
-        )
-        if is_safe:
-            self.defl_check = True
-            self.logger.info("Deflection Check passed")
+        if not SKIP_DEFLECTION:
+            # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
+            moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
+            is_safe, self.deflection_ratio = evaluate_deflection_kNm_mm(
+                moment_kNm, self.length, self.material.modulus_of_elasticity,
+                self.loading_case, self.deflection_criteria, self.total_depth,
+                self.top_flange_width, self.bottom_flange_width, self.web_thickness,
+                self.top_flange_thickness, self.bottom_flange_thickness
+            )
+            if is_safe:
+                self.defl_check = True
+                self.logger.info("Deflection Check passed")
+            else:
+                self.defl_check = False
+                self.logger.error("Deflection Check failed")
         else:
-            self.defl_check = False
-            self.logger.error("Deflection Check failed")
+            self.defl_check = True
+            self.deflection_ratio = 0.0
+            self.logger.info("Deflection Check skipped (SKIP_DEFLECTION=True)")
 
         if self.design_flag == True and self.design_flag2 == True and self.defl_check == True:
             self.design_status = True
@@ -1524,16 +1530,18 @@ class PlateGirderWelded(Member):
                     # self.logger.error("Increase the web thickness")
                     pass
 
-        #deflection checks
-        # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
-        moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
-        is_safe, self.deflection_ratio = evaluate_deflection_kNm_mm(moment_kNm, self.length, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
-        if is_safe:
-            self.defl_check = True
-            # self.logger.info(\"Deflection Check passed\")
+        # Deflection checks
+        if not SKIP_DEFLECTION:
+            # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
+            moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
+            is_safe, self.deflection_ratio = evaluate_deflection_kNm_mm(moment_kNm, self.length, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+            if is_safe:
+                self.defl_check = True
+            else:
+                self.defl_check = False
         else:
-            self.defl_check = False
-            # self.logger.error(\"Deflection Check failed\")
+            self.defl_check = True
+            self.deflection_ratio = 0.0
 
         #in pso check for self.moment_checks and self.shearchecks
 

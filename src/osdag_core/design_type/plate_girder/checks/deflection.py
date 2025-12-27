@@ -115,7 +115,17 @@ def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_fla
     delta = deflection_from_moment_kNm_mm(M_kNm, L, E, I, case)
     
     # Calculate allowable deflection per IS 800:2007 Table 6
-    n = float(criteria)
+    if isinstance(criteria, str) and "Span/" in criteria:
+        try:
+            n = float(criteria.split("Span/")[1])
+        except (IndexError, ValueError):
+             # Fallback or default if parsing fails, though expected format is Span/N
+             # If "Span/" is not followed by a number, this might need better error handling,
+             # but assuming 600 as safe default or raising descriptive error could be options.
+             # For now raising error to be caught or debugged if format is weird.
+             raise ValueError(f"Invalid deflection criteria format: {criteria}")
+    else:
+        n = float(criteria)
     allowable = L / n  # mm
     
     # Check serviceability

@@ -177,9 +177,14 @@ def GUI():
     #     'CLOSE_BTN_CLICK': '#F1707A'
     # }
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
+    # Load bundled Ubuntu Sans font - works on all OS without needing font installed
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
-    # font = QFontDatabase.applicationFontFamilies(fid)[0]
-    # app.setFont(QFont(font))
+    if fid != -1:
+        font_family = QFontDatabase.applicationFontFamilies(fid)[0]
+        app.setFont(QFont(font_family, 10))  # Set as default app font
+    else:
+        print("[WARNING] Failed to load Ubuntu Sans font from resources")
 
     app.theme_manager = ThemeManager(app)
     app.theme_manager.load_theme(app.theme_manager.current_theme)

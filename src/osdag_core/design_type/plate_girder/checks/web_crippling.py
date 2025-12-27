@@ -1,7 +1,7 @@
 import math
 import logging
 
-def check_web_crippling(shear_force, b1, tw, fy, d, gamma_m0, logger):
+def check_web_crippling(shear_force, b1, tw, fy, d, gamma_m0, logger, debug=False):
     """
     Check web crippling as per IS 800:2007 Section 8.7.2.
     Returns: (is_safe, P_w) where P_w is the web crippling capacity
@@ -39,6 +39,8 @@ def check_web_crippling(shear_force, b1, tw, fy, d, gamma_m0, logger):
         
         # Compare with factored load as per IS 800:2007
         is_safe = P_w >= shear_force
+        if debug:
+            print(f"[DEBUG] Web Crippling: b1={b1}, tw={tw}, d={d}, Fy={fy}, P_w={P_w:.2f}, Applied={shear_force:.2f}, Ratio={shear_force/P_w if P_w > 0 else 100:.4f}")
         if not is_safe:
             logger.warning(f"Web crippling resistance ({P_w:.2f} N) is less than factored load ({shear_force:.2f} N)")
         

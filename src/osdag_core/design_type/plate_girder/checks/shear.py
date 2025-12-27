@@ -35,14 +35,16 @@ def calc_K_v(c, d, web_philosophy):
     return K_v
 
 
-def shear_capacity_laterally_supported_thick_web(Fy, gamma_m0, D, tw, tf_top, tf_bot, shear_force):
+def shear_capacity_laterally_supported_thick_web(Fy, gamma_m0, D, tw, tf_top, tf_bot, shear_force, debug=False):
     A_vg = (D - tf_top - tf_bot) * tw
     V_d = ((A_vg * Fy) / (math.sqrt(3) * gamma_m0))
     shear_ratio =  shear_force / V_d
     is_safe = V_d >= shear_force
+    if debug:
+        print(f"[DEBUG] Thick Web Shear: A_vg={A_vg:.2f}, V_d={V_d:.2f}, Applied={shear_force:.2f}, Ratio={shear_ratio:.4f}")
     return is_safe, V_d, shear_ratio
 
-def shear_buckling_check_simple_postcritical(eff_depth, D, tf_top, tf_bot, tw, V, web_philosophy, E, fy, shear_force, c=0):
+def shear_buckling_check_simple_postcritical(eff_depth, D, tf_top, tf_bot, tw, V, web_philosophy, E, fy, shear_force, c=0, debug=False):
     A_vg = eff_depth * tw
     K_v = calc_K_v(c, eff_depth, web_philosophy)
     
@@ -53,16 +55,17 @@ def shear_buckling_check_simple_postcritical(eff_depth, D, tf_top, tf_bot, tw, V
     V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_vg)
     
     # Print Simple Post Critical Method values
-    print(f"\n========== SIMPLE POST CRITICAL METHOD ==========")
-    print(f"  Shear Buckling Coefficient (K_v): {K_v:.4f}")
-    print(f"  Elastic Critical Stress (tau_crc): {tau_crc:.2f} N/mm²")
-    print(f"  Non-dimensional Web Slenderness Ratio (lambda_w): {lambda_w:.4f}")
-    print(f"  Local Buckling Resistance (tau_b): {tau_b:.2f} N/mm²")
-    print(f"  Yield Strength (Fy): {fy:.2f} N/mm²")
-    print(f"  Shear Resistance of Web (V_cr): {V_cr:.2f} N")
-    print(f"  Applied Shear Force (V): {V:.2f} N")
-    print(f"  Shear Area (A_vg): {A_vg:.2f} mm²")
-    print(f"=================================================\n")
+    if debug:
+        print(f"\n========== SIMPLE POST CRITICAL METHOD ==========")
+        print(f"  Shear Buckling Coefficient (K_v): {K_v:.4f}")
+        print(f"  Elastic Critical Stress (tau_crc): {tau_crc:.2f} N/mm²")
+        print(f"  Non-dimensional Web Slenderness Ratio (lambda_w): {lambda_w:.4f}")
+        print(f"  Local Buckling Resistance (tau_b): {tau_b:.2f} N/mm²")
+        print(f"  Yield Strength (Fy): {fy:.2f} N/mm²")
+        print(f"  Shear Resistance of Web (V_cr): {V_cr:.2f} N")
+        print(f"  Applied Shear Force (V): {V:.2f} N")
+        print(f"  Shear Area (A_vg): {A_vg:.2f} mm²")
+        print(f"=================================================\n")
     
     shear_ratio = 0.0
     if V_cr > V:
@@ -71,7 +74,7 @@ def shear_buckling_check_simple_postcritical(eff_depth, D, tf_top, tf_bot, tw, V
     else:
         return False, V_cr, shear_ratio
 
-def shear_buckling_check_intermediate_stiffener(d, tw, c, e, IntStiffThickness, IntStiffenerWidth, V_ed, gamma_m0, fy, E, web_philosophy, lefactor, shear_force):
+def shear_buckling_check_intermediate_stiffener(d, tw, c, e, IntStiffThickness, IntStiffenerWidth, V_ed, gamma_m0, fy, E, web_philosophy, lefactor, shear_force, debug=False):
     A_vg = d * tw
     K_v = calc_K_v(c, d, web_philosophy)
     mu = 0.3
@@ -129,9 +132,11 @@ def shear_buckling_check_intermediate_stiffener(d, tw, c, e, IntStiffThickness, 
     Pd = round(A_x * fcd , 2)
     shear_ratio =  max(shear_force / Pd , 0.0) # Assuming initial shear_ratio is 0 or passed in
     
+    if debug:
+        print(f"[DEBUG] Intermediate Stiffener Buckling: I_min_global={I_min_global:.2e}, I_s={I_s:.2e}, Pd={Pd:.2f}, Applied={shear_force:.2f}, Ratio={shear_ratio:.4f}")
     return True, Pd, shear_ratio, IntStiffenerWidth, V_cr
 
-def shear_buckling_check_tension_field(eff_depth, D, tf_top, tf_bot, tw, c, web_philosophy, E, fy, shear_force, moment, top_flange_width, top_flange_thickness, bottom_flange_width, bottom_flange_thickness, gamma_m0):
+def shear_buckling_check_tension_field(eff_depth, D, tf_top, tf_bot, tw, c, web_philosophy, E, fy, shear_force, moment, top_flange_width, top_flange_thickness, bottom_flange_width, bottom_flange_thickness, gamma_m0, debug=False):
     A_vg = (D - tf_top - tf_bot) * tw
     K_v = calc_K_v(c, eff_depth, web_philosophy)
     mu = 0.3
@@ -147,26 +152,27 @@ def shear_buckling_check_tension_field(eff_depth, D, tf_top, tf_bot, tw, c, web_
                                                                         A_vg, tau_b)
     
     # Print Tension Field Action values
-    print(f"\n========== TENSION FIELD ACTION ==========")
-    print(f"  --- Base Shear Buckling Parameters ---")
-    print(f"  Shear Buckling Coefficient (K_v): {K_v:.4f}")
-    print(f"  Elastic Critical Stress (tau_crc): {tau_crc:.2f} N/mm²")
-    print(f"  Non-dimensional Web Slenderness Ratio (lambda_w): {lambda_w:.4f}")
-    print(f"  Local Buckling Resistance (tau_b): {tau_b:.2f} N/mm²")
-    print(f"  Yield Strength (Fy): {fy:.2f} N/mm²")
-    print(f"  Shear Resistance of Web (V_cr): {V_cr:.2f} N")
-    print(f"  --- Tension Field Parameters ---")
-    print(f"  Tension Field Angle (phi): {phi:.2f} degrees")
-    print(f"  Reduced Plastic Moment - Top Flange (M_fr_top): {M_fr_t:.2f} N·mm")
-    print(f"  Reduced Plastic Moment - Bottom Flange (M_fr_bot): {M_fr_b:.2f} N·mm")
-    print(f"  Anchor Length - Top (s_t): {s_t:.2f} mm")
-    print(f"  Anchor Length - Bottom (s_b): {s_b:.2f} mm")
-    print(f"  Width of Tension Field (w_tf): {w_tf:.2f} mm")
-    print(f"  Yield Strength of Tension Field (F_v): {fv:.2f} N/mm²")
-    print(f"  Nominal Shear Resistance (V_tf): {V_tf:.2f} N")
-    print(f"  Applied Shear Force: {shear_force:.2f} N")
-    print(f"  Shear Area (A_vg): {A_vg:.2f} mm²")
-    print(f"============================================\n")
+    if debug:
+        print(f"\n========== TENSION FIELD ACTION ==========")
+        print(f"  --- Base Shear Buckling Parameters ---")
+        print(f"  Shear Buckling Coefficient (K_v): {K_v:.4f}")
+        print(f"  Elastic Critical Stress (tau_crc): {tau_crc:.2f} N/mm²")
+        print(f"  Non-dimensional Web Slenderness Ratio (lambda_w): {lambda_w:.4f}")
+        print(f"  Local Buckling Resistance (tau_b): {tau_b:.2f} N/mm²")
+        print(f"  Yield Strength (Fy): {fy:.2f} N/mm²")
+        print(f"  Shear Resistance of Web (V_cr): {V_cr:.2f} N")
+        print(f"  --- Tension Field Parameters ---")
+        print(f"  Tension Field Angle (phi): {phi:.2f} degrees")
+        print(f"  Reduced Plastic Moment - Top Flange (M_fr_top): {M_fr_t:.2f} N·mm")
+        print(f"  Reduced Plastic Moment - Bottom Flange (M_fr_bot): {M_fr_b:.2f} N·mm")
+        print(f"  Anchor Length - Top (s_t): {s_t:.2f} mm")
+        print(f"  Anchor Length - Bottom (s_b): {s_b:.2f} mm")
+        print(f"  Width of Tension Field (w_tf): {w_tf:.2f} mm")
+        print(f"  Yield Strength of Tension Field (F_v): {fv:.2f} N/mm²")
+        print(f"  Nominal Shear Resistance (V_tf): {V_tf:.2f} N")
+        print(f"  Applied Shear Force: {shear_force:.2f} N")
+        print(f"  Shear Area (A_vg): {A_vg:.2f} mm²")
+        print(f"============================================\n")
     
     shear_ratio =  max(shear_force / V_tf , 0.0)
     if V_tf >= shear_force:
@@ -174,7 +180,7 @@ def shear_buckling_check_tension_field(eff_depth, D, tf_top, tf_bot, tw, c, web_
     else:
         return False, V_tf, shear_ratio, V_cr
 
-def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosophy, E, top_flange_thickness, bottom_flange_thickness, top_flange_width, bottom_flange_width, gamma_m0, int_thickness_list, IntStiffnerwidth, IntStiffThickness, epsilon, lefactor):
+def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosophy, E, top_flange_thickness, bottom_flange_thickness, top_flange_width, bottom_flange_width, gamma_m0, int_thickness_list, IntStiffnerwidth, IntStiffThickness, epsilon, lefactor, debug=False):
     A_vg = d * tw
     K_v = calc_K_v(c, d, web_philosophy)
     mu = 0.3
@@ -207,6 +213,9 @@ def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosop
     M_q = (I * fyw) / (gamma_m0 * y)
     moment_ratio =  max(M_tf / M_q , 0.0)
     endshear_ratio =  max(R_tf / V_n, 0.0)
+    
+    if debug:
+        print(f"[DEBUG] Tension Field End Stiffener: M_tf={M_tf:.2f}, M_q={M_q:.2f}, R_tf={R_tf:.2f}, V_n={V_n:.2f}")
     
     end_stiffthickness = 0
     
@@ -258,6 +267,8 @@ def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosop
 
                 if endshear_ratio <= 1:
                     end_stiffthickness = t_stiff
+                    if debug:
+                        print(f"[DEBUG] End Stiffener Found: t={t_stiff}, Ratio={endshear_ratio:.4f}, Pd={Pd:.2f}")
                     return True, V_cr, moment_ratio, endshear_ratio, Critical_buckling_resistance, end_stiffthickness, IntStiffnerwidth, 0 # 0 for shear_ratio placeholder
                 else:
                     continue
@@ -267,7 +278,7 @@ def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosop
     
     return False, V_cr, moment_ratio, endshear_ratio, 0, 0, IntStiffnerwidth, 0
 
-def tension_field_intermediate_stiffener(d, tw, c, e, IntStiffThickness, IntStiffenerWidth, V_ed, gamma_m0, fy, E, web_philosophy, lefactor, shear_force):
+def tension_field_intermediate_stiffener(d, tw, c, e, IntStiffThickness, IntStiffenerWidth, V_ed, gamma_m0, fy, E, web_philosophy, lefactor, shear_force, debug=False):
     A_vg = d * tw
     K_v = calc_K_v(c, d, web_philosophy)
     mu = 0.3
@@ -325,9 +336,11 @@ def tension_field_intermediate_stiffener(d, tw, c, e, IntStiffThickness, IntStif
     Pd = round(A_x * fcd, 2)
     shear_ratio = max(shear_force / Pd, 0.0)
     
+    if debug:
+        print(f"[DEBUG] Tension Field Intermediate Stiffener: Pd={Pd:.2f}, Ratio={shear_ratio:.4f}")
     return True, Pd, shear_ratio, IntStiffenerWidth, V_cr
 
-def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, total_depth, effective_length, tf_bot, E, eps, c, web_philosophy, load_moment, load_shear_force, int_thickness_list, end_stiffwidth, end_stiffthickness, logger):
+def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, total_depth, effective_length, tf_bot, E, eps, c, web_philosophy, load_moment, load_shear_force, int_thickness_list, end_stiffwidth, end_stiffthickness, logger, debug=False):
     A_vg = d * tw
     if c is None:
         c = d
@@ -390,6 +403,9 @@ def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, to
     
     moment_ratio = M_tf / M_q
     endshear_ratio = R_tf / V_n
+    
+    if debug:
+        print(f"[DEBUG] end_panel_stiffener_calc: M_tf={M_tf:.2f}, M_q={M_q:.2f}, R_tf={R_tf:.2f}, V_n={V_n:.2f}")
     
     Fm = M_tf / c
     Fc = Fm + load_shear_force
@@ -457,6 +473,8 @@ def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, to
         
         if endshear_ratio <= 1.0 and moi_check:
             end_stiffthickness = t_stiff
+            if debug:
+                print(f"[DEBUG] End Panel Stiffener Found: t={t_stiff}, Ratio={endshear_ratio:.4f}, Pd={Pd:.2f}")
             return True, end_stiffwidth, end_stiffthickness, moment_ratio, endshear_ratio, Critical_buckling_resistance, 0 # 0 for shear_ratio placeholder
         else:
             continue

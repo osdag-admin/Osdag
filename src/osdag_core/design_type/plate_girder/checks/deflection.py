@@ -68,7 +68,7 @@ def deflection_from_moment_kNm_mm(M_kNm, L_mm, E, I, case):
             f"{KEY_DISP_PL_PIN_PIN_PG}, {KEY_DISP_PL_FIX_FIX_PG}"
         )
 
-def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_flange_width, bottom_flange_width, web_thickness, top_flange_thickness, bottom_flange_thickness):
+def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_flange_width, bottom_flange_width, web_thickness, top_flange_thickness, bottom_flange_thickness, debug=False):
     """
     Calculate deflection and compare against serviceability limits.
     
@@ -132,25 +132,26 @@ def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_fla
     is_safe = (delta <= allowable)
     deflection_ratio = delta / allowable if allowable > 0 else float('inf')
     
-    # Debug print statements for deflection check (commented out)
-    # print(f"\n========== DEFLECTION CHECK (IS 800:2007 Table 6) ==========")
-    # print(f"  --- Input Parameters ---")
-    # print(f"  Bending Moment (M): {M_kNm:.2f} kN·m")
-    # print(f"  Span Length (L): {L:.2f} mm")
-    # print(f"  Modulus of Elasticity (E): {E:.2f} MPa")
-    # print(f"  Moment of Inertia (I): {I:.2f} mm⁴ ({I/1e8:.4f} cm⁴)")
-    # print(f"  Loading Case: {case}")
-    # print(f"  --- Deflection Calculation ---")
-    # print(f"  Calculated Deflection (δ): {delta:.4f} mm")
-    # print(f"  Deflection Limit Criteria: L/{n:.0f}")
-    # print(f"  Allowable Deflection: {allowable:.4f} mm")
-    # print(f"  Deflection Ratio (δ/allowable): {deflection_ratio:.4f}")
-    # if is_safe:
-    #     print(f"  >>> DEFLECTION CHECK PASSED (δ ≤ L/{n:.0f}) <<<")
-    # else:
-    #     print(f"  >>> DEFLECTION CHECK FAILED (δ > L/{n:.0f}) <<<")
-    #     print(f"  Required Moment of Inertia for L/{n:.0f}: {I * deflection_ratio:.2f} mm⁴")
-    # print(f"=============================================================\n")
+    # Debug print statements for deflection check
+    if debug:
+        print(f"\n========== DEFLECTION CHECK (IS 800:2007 Table 6) ==========")
+        print(f"  --- Input Parameters ---")
+        print(f"  Bending Moment (M): {M_kNm:.2f} kN·m")
+        print(f"  Span Length (L): {L:.2f} mm")
+        print(f"  Modulus of Elasticity (E): {E:.2f} MPa")
+        print(f"  Moment of Inertia (I): {I:.2f} mm⁴ ({I/1e8:.4f} cm⁴)")
+        print(f"  Loading Case: {case}")
+        print(f"  --- Deflection Calculation ---")
+        print(f"  Calculated Deflection (δ): {delta:.4f} mm")
+        print(f"  Deflection Limit Criteria: L/{n:.0f}")
+        print(f"  Allowable Deflection: {allowable:.4f} mm")
+        print(f"  Deflection Ratio (δ/allowable): {deflection_ratio:.4f}")
+        if is_safe:
+            print(f"  >>> DEFLECTION CHECK PASSED (δ ≤ L/{n:.0f}) <<<")
+        else:
+            print(f"  >>> DEFLECTION CHECK FAILED (δ > L/{n:.0f}) <<<")
+            print(f"  Required Moment of Inertia for L/{n:.0f}: {I * deflection_ratio:.2f} mm⁴")
+        print(f"=============================================================\n")
     
     return is_safe, deflection_ratio, delta, allowable
 

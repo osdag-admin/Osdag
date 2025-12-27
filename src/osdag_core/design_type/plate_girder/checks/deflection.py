@@ -99,9 +99,11 @@ def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_fla
     
     Returns
     -------
-    tuple : (is_safe, deflection_ratio)
+    tuple : (is_safe, deflection_ratio, delta, allowable)
         is_safe: bool - True if deflection within allowable
         deflection_ratio: float - actual/allowable deflection ratio
+        delta: float - calculated deflection (mm)
+        allowable: float - allowable deflection (mm)
     """
     # Calculate moment of inertia about major axis (mm⁴)
     I = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(
@@ -140,5 +142,5 @@ def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_fla
     #     print(f"  Required Moment of Inertia for L/{n:.0f}: {I * deflection_ratio:.2f} mm⁴")
     # print(f"=============================================================\n")
     
-    return is_safe, deflection_ratio
+    return is_safe, deflection_ratio, delta, allowable
 

@@ -1,6 +1,6 @@
 
 from ....utils.common.is800_2007 import IS800_2007
-from ..data.constants import *
+from ....Common import *
 
 class Section:
     def __init__(self):
@@ -60,8 +60,14 @@ def shear_stress_unsym_I(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w):
     }
 
 def classify_section(top_flange_width, top_flange_thickness, bottom_flange_width, bottom_flange_thickness, total_depth, web_thickness, fy, web_philosophy):
-    flange_class_top = IS800_2007.Table2_i(((top_flange_width / 2)), top_flange_thickness, fy, 'Welded')[0]
-    flange_class_bottom = IS800_2007.Table2_i(((bottom_flange_width / 2)), bottom_flange_thickness, fy, 'Welded')[0]
+    # IS 800:2007 Table 2, Sr. No. (i): Outstanding element of compression flange
+    # For welded I-sections, outstand b = (B - tw)/2 where B = total flange width, tw = web thickness
+    # This measures from the web face to the flange tip, not from centerline
+    outstand_top = (top_flange_width - web_thickness) / 2
+    outstand_bottom = (bottom_flange_width - web_thickness) / 2
+    
+    flange_class_top = IS800_2007.Table2_i(outstand_top, top_flange_thickness, fy, 'Welded')[0]
+    flange_class_bottom = IS800_2007.Table2_i(outstand_bottom, bottom_flange_thickness, fy, 'Welded')[0]
     web_class = IS800_2007.Table2_iii((total_depth - top_flange_thickness - bottom_flange_thickness), web_thickness, fy)
     
     section_class = None

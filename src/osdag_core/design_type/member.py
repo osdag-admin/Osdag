@@ -2957,24 +2957,78 @@ class Member(Main):
 
 
     def tab_girder_sec(self, input_dictionary):
-       
-
-        #initialize variables
+        """
+        Create the Girder Section tab for design preferences.
+        Values are synced from the main input dock when available.
+        
+        Args:
+            input_dictionary: Dictionary containing current input values from main dock
+        """
+        # Get material info from database
         material = connectdb("Material", call_type="popup")
-        material_grade = material[1]
-        mat = Material(material_grade,41)
-        fu = mat.fu #material fu
-        fy = mat.fy #material fy
-        m_o_e = 200
-        m_o_r = 76.9
-        p_r = 0.3
-        t_e = 12
-        tot_depth = '750'
-        web_thickness = '10'
-        top_flange_width = '300'
-        top_flange_thickness = '15'
-        bottom_flange_width = '400'
-        bottom_flange_thickness = '20'
+        
+        # Use material from input_dictionary if available, otherwise use database default
+        if KEY_MATERIAL in input_dictionary and input_dictionary[KEY_MATERIAL] not in ['', None, 'Select Material']:
+            material_grade = input_dictionary[KEY_MATERIAL]
+        else:
+            material_grade = material[1]
+        
+        # Get web thickness for proper thickness-dependent Fy calculation
+        if KEY_WEB_THICKNESS_PG in input_dictionary and input_dictionary[KEY_WEB_THICKNESS_PG]:
+            web_thk_list = input_dictionary[KEY_WEB_THICKNESS_PG]
+            if isinstance(web_thk_list, list) and len(web_thk_list) > 0:
+                web_thickness = str(web_thk_list[0])
+                thickness_for_mat = float(web_thk_list[0])
+            else:
+                web_thickness = str(web_thk_list) if web_thk_list else '10'
+                thickness_for_mat = float(web_thk_list) if web_thk_list else 20
+        else:
+            web_thickness = '10'
+            thickness_for_mat = 20
+        
+        mat = Material(material_grade, thickness_for_mat)
+        fu = mat.fu
+        fy = mat.fy
+        m_o_e = 200  # Modulus of Elasticity (GPa)
+        m_o_r = 76.9  # Modulus of Rigidity (GPa)
+        p_r = 0.3  # Poisson's Ratio
+        t_e = 12  # Thermal Expansion (×10⁻⁶/°C)
+        
+        # Get dimensions from input_dictionary if available, otherwise use defaults
+        if KEY_OVERALL_DEPTH_PG in input_dictionary and input_dictionary[KEY_OVERALL_DEPTH_PG]:
+            tot_depth = str(input_dictionary[KEY_OVERALL_DEPTH_PG])
+        else:
+            tot_depth = '750'
+        
+        if KEY_TOP_Bflange_PG in input_dictionary and input_dictionary[KEY_TOP_Bflange_PG]:
+            top_flange_width = str(input_dictionary[KEY_TOP_Bflange_PG])
+        else:
+            top_flange_width = '300'
+        
+        if KEY_TOP_FLANGE_THICKNESS_PG in input_dictionary and input_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]:
+            tf_top_list = input_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]
+            if isinstance(tf_top_list, list) and len(tf_top_list) > 0:
+                top_flange_thickness = str(tf_top_list[0])
+            else:
+                top_flange_thickness = str(tf_top_list) if tf_top_list else '15'
+        else:
+            top_flange_thickness = '15'
+        
+        if KEY_BOTTOM_Bflange_PG in input_dictionary and input_dictionary[KEY_BOTTOM_Bflange_PG]:
+            bottom_flange_width = str(input_dictionary[KEY_BOTTOM_Bflange_PG])
+        else:
+            bottom_flange_width = '400'
+        
+        if KEY_BOTTOM_FLANGE_THICKNESS_PG in input_dictionary and input_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]:
+            tf_bot_list = input_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]
+            if isinstance(tf_bot_list, list) and len(tf_bot_list) > 0:
+                bottom_flange_thickness = str(tf_bot_list[0])
+            else:
+                bottom_flange_thickness = str(tf_bot_list) if tf_bot_list else '20'
+        else:
+            bottom_flange_thickness = '20'
+        
+        # Initialize section property values (will be calculated by Unsymm_I_Section_properties)
         mass = '' 
         area = '' 
         mom_inertia_z = '' 
@@ -2987,7 +3041,9 @@ class Member(Main):
         plast_sec_mod_y = '' 
         torsion_const = '' 
         warping_const = '' 
-        image = VALUES_IMG_BEAM[0]    #just any image put into the place just to check
+        image = VALUES_IMG_BEAM[0]
+
+
 
 
 
@@ -3124,11 +3180,17 @@ class Member(Main):
 
     def get_fu_fy_I_section_plate_girder(self, input):
         material_grade = input[0]
+        # Get web thickness from input if available, default to 20mm for consistent behavior
+        try:
+            web_thickness = float(input[1]) if len(input) > 1 and input[1] else 20
+        except (ValueError, TypeError):
+            web_thickness = 20
 
         fu = ''
         fy = ''
         if material_grade != "Select Material":
-            material = Material(material_grade, 41)
+            # Use actual web thickness for thickness-dependent Fy per IS 2062
+            material = Material(material_grade, web_thickness)
             fu = material.fu
             fy = material.fy
         else:
@@ -3140,7 +3202,18 @@ class Member(Main):
 
         return d
     
-    def Unsymm_I_Section_properties(self):
+    def Unsymm_I_Section_properties(self, input):
+        """
+        Calculate section properties for unsymmetrical I-sections.
+        
+        Args:
+            input: List containing [total_depth, web_thickness, top_flange_width, 
+                   top_flange_thickness, bottom_flange_width, bottom_flange_thickness, fy]
+        
+        Returns:
+            Dictionary with calculated section properties for Labels 12-23
+        """
+        # Initialize with empty strings for return values
         mass = '' 
         area = '' 
         mom_inertia_z = '' 
@@ -3154,47 +3227,76 @@ class Member(Main):
         torsion_const = '' 
         warping_const = '' 
 
-        t_d = float(input[0])
-        w_t = float(input[1])
-        t_f_w = float(input[2])
-        t_f_t = float(input[3])
-        b_f_w = float(input[4])
-        b_f_t = float(input[5])
+        try:
+            # Validate input
+            if not input or len(input) < 6:
+                return {
+                    'Label_12': mass, 'Label_13': area,
+                    'Label_14': mom_inertia_z, 'Label_15': mom_inertia_y,
+                    'Label_16': rad_of_gy_z, 'Label_17': rad_of_gy_y,
+                    'Label_18': elast_sec_mod_z, 'Label_19': elast_sec_mod_y,
+                    'Label_20': plast_sec_mod_z, 'Label_21': plast_sec_mod_y,
+                    'Label_22': torsion_const, 'Label_23': warping_const
+                }
+            
+            # Check if all required values are non-empty
+            for i in range(6):
+                if input[i] == '' or input[i] is None:
+                    return {
+                        'Label_12': mass, 'Label_13': area,
+                        'Label_14': mom_inertia_z, 'Label_15': mom_inertia_y,
+                        'Label_16': rad_of_gy_z, 'Label_17': rad_of_gy_y,
+                        'Label_18': elast_sec_mod_z, 'Label_19': elast_sec_mod_y,
+                        'Label_20': plast_sec_mod_z, 'Label_21': plast_sec_mod_y,
+                        'Label_22': torsion_const, 'Label_23': warping_const
+                    }
 
-        pc = Unsymmetrical_I_Section_Properties()
+            # Parse input values
+            # Input order from tab_value_changed: Label_6=depth, Label_7=web_thk, Label_8=top_flange_width,
+            # Label_9=top_flange_thk, Label_10=bot_flange_width, Label_11=bot_flange_thk
+            t_d = float(input[0])      # Total depth
+            w_t = float(input[1])      # Web thickness
+            t_f_w = float(input[2])    # Top flange width
+            t_f_t = float(input[3])    # Top flange thickness
+            b_f_w = float(input[4])    # Bottom flange width
+            b_f_t = float(input[5])    # Bottom flange thickness
 
-        mass = pc.calc_mass(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        area = pc.calc_area(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        mom_inertia_z = pc.calc_MomentOfAreaZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        mom_inertia_y = pc.calc_MomentOfAreaY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        rad_of_gy_z = pc.calc_RadiusOfGyrationZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        rad_of_gy_y = pc.calc_RadiusOfGyrationY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        elast_sec_mod_z = pc.calc_ElasticModulusZz(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        elast_sec_mod_y = pc.calc_ElasticModulusZy(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        plast_sec_mod_z = pc.calc_PlasticModulusZ(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        plast_sec_mod_y = pc.calc_PlasticModulusY(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        torsion_const = pc.calc_TorsionConstantIt(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
-        warping_const = pc.calc_WarpingConstantIw(t_d,t_f_w,b_f_w,w_t,t_f_t,b_f_t)
+            pc = Unsymmetrical_I_Section_Properties()
+
+            mass = pc.calc_mass(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            area = pc.calc_area(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            mom_inertia_z = pc.calc_MomentOfAreaZ(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            mom_inertia_y = pc.calc_MomentOfAreaY(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            rad_of_gy_z = pc.calc_RadiusOfGyrationZ(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            rad_of_gy_y = pc.calc_RadiusOfGyrationY(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            elast_sec_mod_z = pc.calc_ElasticModulusZz(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            elast_sec_mod_y = pc.calc_ElasticModulusZy(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            plast_sec_mod_z = pc.calc_PlasticModulusZ(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            plast_sec_mod_y = pc.calc_PlasticModulusY(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            torsion_const = pc.calc_TorsionConstantIt(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            warping_const = pc.calc_WarpingConstantIw(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+
+        except (ValueError, TypeError, IndexError) as e:
+            # If any conversion fails, return empty values
+            pass
 
 
 
 
+        return {'Label_12': str(mass),
+                'Label_13': str(area),
+                'Label_14': str(mom_inertia_z),
+                'Label_15': str(mom_inertia_y),
+                'Label_16': str(rad_of_gy_z),
+                'Label_17': str(rad_of_gy_y),
+                'Label_18': str(elast_sec_mod_z),
+                'Label_19': str(elast_sec_mod_y),
+                'Label_20': str(plast_sec_mod_z),
+                'Label_21': str(plast_sec_mod_y),
+                'Label_22': str(torsion_const),
+                'Label_23': str(warping_const)
+        }
 
-
-
-        return {'Label_11': str(mass),
-                'Label_12': str(area),
-                'Label_13': str(mom_inertia_z),
-                'Label_14': str(mom_inertia_y),
-                'Label_15': str(rad_of_gy_z),
-                'Label_16': str(rad_of_gy_y),
-                'Label_17': str(elast_sec_mod_z),
-                'Label_18': str(elast_sec_mod_y),
-                'Label_19': str(plast_sec_mod_z),
-                'Label_20': str(plast_sec_mod_y),
-                'Label_21': str(torsion_const),
-                'Label_22': str(warping_const)
-}
 
 
     @staticmethod

@@ -72,73 +72,91 @@ class Unsymmetrical_I_Section_Properties:
                 return round(Z_ey, 2)
 
         @staticmethod
-        def calc_PlasticModulusZ( D, bf_top, bf_bot, tw, tf_top, tf_bot, eps):
+        def calc_PlasticModulusZ( D, bf_top, bf_bot, tw, tf_top, tf_bot, eps=1.0):
             """
-                    Plastic section modulus Zp about strong axis for unequal flanges:
+            Plastic section modulus Zp about strong axis for unsymmetrical I-sections.
+            
+            For plastic modulus, we find the plastic neutral axis (PNA) which divides
+            the cross-section into two equal areas. Then Zp = sum of (Ai × yi) where
+            yi is the distance from PNA to centroid of each element.
 
-                    D       : total section depth between outer flange faces (mm)
-                    bf_top  : top flange width (mm)
-                    bf_bot  : bottom flange width (mm)
-                    tw      : web thickness (mm)
-                    tf_top  : top flange thickness (mm)
-                    tf_bot  : bottom flange thickness (mm)
-                    """
-            # clear web height between flange faces
+            D       : total section depth between outer flange faces (mm)
+            bf_top  : top flange width (mm)
+            bf_bot  : bottom flange width (mm)
+            tw      : web thickness (mm)
+            tf_top  : top flange thickness (mm)
+            tf_bot  : bottom flange thickness (mm)
+            eps     : epsilon factor (not used directly for Zp, kept for API compatibility)
+            """
+            # Web clear height between flanges
             h_w = D - tf_top - tf_bot
-            # thin-web check
-            if h_w/tw > 67 * eps:
-                # print("Thin web condition, using rectangular section properties", h_w/tw)
-                A_top = bf_top * tf_top
-                A_bot = bf_bot * tf_bot
-                A = A_top + A_bot
-
-                # Centroid location from top fiber
-                # top rectangle centroid at tf_top/2, bottom at D - tf_bot/2
-                c = (A_top * (tf_top / 2) + A_bot * (D - tf_bot / 2)) / A
-                c1 = D - c
-
-                # Distances from each rectangle's centroid to the composite centroid
-                y_top_centroid = abs((tf_top / 2) - c)
-                y_bot_centroid = abs((D - tf_bot / 2) - c)
-
-                # Second moment of area of each rectangle about its own centroid
-                I_top = (bf_top * tf_top ** 3) / 12.0
-                I_bot = (bf_bot * tf_bot ** 3) / 12.0
-
-                # Parallel-axis theorem
-                I = I_top + A_top * y_top_centroid ** 2 + I_bot + A_bot * y_bot_centroid ** 2
-
-                # Section moduli
-                Zp = I / c
-                return round(Zp, 2)
-                    
+            
+            # Calculate areas
+            A_top = bf_top * tf_top
+            A_bot = bf_bot * tf_bot
+            A_web = h_w * tw
+            A_total = A_top + A_bot + A_web
+            half_area = A_total / 2.0
+            
+            # Find plastic neutral axis location (from bottom of section)
+            # PNA divides the section into two equal areas
+            if A_bot >= half_area:
+                # PNA is in bottom flange
+                y_pna = half_area / bf_bot
+            elif A_bot + A_web >= half_area:
+                # PNA is in web
+                y_pna = tf_bot + (half_area - A_bot) / tw
             else:
-
-                A_u = bf_top * tf_top
-                A_d = bf_bot * tf_bot
-                A_w = h_w * tw
-                A = A_u + A_d + A_w
-                if h_w / tw <= 67.0 * eps:
-                        y = (A_u * tf_top/2 + A_d * (D - tf_bot/2))/(A_u + A_d)
-                        y1 = D - y
-
-                # centroids measured from bottom face
-                y_d = tf_bot / 2.0
-                y_w = tf_bot + h_w / 2.0
-                y_u = tf_bot + h_w + tf_top / 2.0
-                # plastic neutral axis from bottom face
-                if A_d < A / 2.0 and A_u < A / 2.0:
-                        y_pna = tf_bot + (A - 2 * A_d) / (2 * tw)
-                elif A_d >= A / 2.0:
-                        y_pna = A / (2 * bf_bot)
-                else:
-                        y_pna = D - A / (2 * bf_top)
-                # compute Zp as sum of Ai * distance from plastic axis
+                # PNA is in top flange
+                y_pna = D - (A_total - half_area) / bf_top
+            
+            # Calculate plastic section modulus Zp
+            # Zp = sum of (area × distance from PNA to centroid of that area)
+            # Using the formula: Zp = (bf_bot*y_pna² - (bf_bot-tw)*(y_pna-tf_bot)² + 
+            #                         bf_top*(D-y_pna)² - (bf_top-tw)*(D-tf_top-y_pna)²) / 2
+            
+            # This formula works when PNA is in the web
+            if y_pna >= tf_bot and y_pna <= D - tf_top:
                 Zp = (
-                                (bf_bot * y_pna ** 2 - (bf_bot - tw) * (y_pna - tf_bot) ** 2)
-                                + (bf_top * (D - y_pna) ** 2 - (bf_top - tw) * (D - tf_top - y_pna) ** 2)
-                        ) / 2.0
-                return round(Zp, 2)
+                    bf_bot * y_pna**2 - 
+                    (bf_bot - tw) * max(0, y_pna - tf_bot)**2 + 
+                    bf_top * (D - y_pna)**2 - 
+                    (bf_top - tw) * max(0, D - tf_top - y_pna)**2
+                ) / 2.0
+            else:
+                # PNA is in a flange - use component method
+                Zp = 0.0
+                # Bottom flange contribution
+                if y_pna > 0:
+                    if y_pna <= tf_bot:
+                        # PNA is in bottom flange
+                        Zp += bf_bot * y_pna * (y_pna / 2)  # area below PNA
+                        Zp += bf_bot * (tf_bot - y_pna) * ((tf_bot - y_pna) / 2 + y_pna - tf_bot)  # area above
+                    else:
+                        Zp += A_bot * abs(y_pna - tf_bot / 2)  # whole bottom flange
+                
+                # Web contribution
+                if y_pna > tf_bot and y_pna < D - tf_top:
+                    web_below = (y_pna - tf_bot) * tw
+                    web_above = (D - tf_top - y_pna) * tw
+                    Zp += web_below * (y_pna - tf_bot) / 2
+                    Zp += web_above * (D - tf_top - y_pna) / 2
+                elif y_pna <= tf_bot:
+                    Zp += A_web * (tf_bot + h_w / 2 - y_pna)
+                else:  # y_pna >= D - tf_top
+                    Zp += A_web * (y_pna - tf_bot - h_w / 2)
+                
+                # Top flange contribution
+                if y_pna >= D - tf_top:
+                    # PNA is in top flange
+                    above_pna = D - y_pna
+                    below_pna = y_pna - (D - tf_top)
+                    Zp += bf_top * above_pna * (above_pna / 2)
+                    Zp += bf_top * below_pna * (below_pna / 2)
+                else:
+                    Zp += A_top * abs(D - tf_top / 2 - y_pna)
+            
+            return round(Zp, 2)
 
         @staticmethod
         def calc_PlasticModulusY( D, B_top, B_bot, t_w, t_f_top, t_f_bot):

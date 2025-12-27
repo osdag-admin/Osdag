@@ -59,7 +59,7 @@ def shear_stress_unsym_I(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w):
         'q_bot_kN_per_mm': q_bot,
     }
 
-def classify_section(top_flange_width, top_flange_thickness, bottom_flange_width, bottom_flange_thickness, total_depth, web_thickness, fy, web_philosophy, has_longitudinal_stiffener=False):
+def classify_section(top_flange_width, top_flange_thickness, bottom_flange_width, bottom_flange_thickness, total_depth, web_thickness, fy, web_philosophy, has_longitudinal_stiffener=False, debug=False):
     """
     Classify plate girder section per IS 800:2007.
     
@@ -99,6 +99,9 @@ def classify_section(top_flange_width, top_flange_thickness, bottom_flange_width
     
     flange_class_top = IS800_2007.Table2_i(outstand_top, top_flange_thickness, fy, 'Welded')[0]
     flange_class_bottom = IS800_2007.Table2_i(outstand_bottom, bottom_flange_thickness, fy, 'Welded')[0]
+    if debug:
+        print(f"DEBUG: Section Classification -> Top Flange Outstand={outstand_top:.2f}, Bottom Flange Outstand={outstand_bottom:.2f}")
+        print(f"DEBUG: Flange Classes -> Top: {flange_class_top}, Bottom: {flange_class_bottom}")
     
     # Calculate web d/tw ratio
     web_depth = total_depth - top_flange_thickness - bottom_flange_thickness
@@ -106,12 +109,17 @@ def classify_section(top_flange_width, top_flange_thickness, bottom_flange_width
     
     # Web classification per Table 2 (used for thick webs and moment capacity)
     web_class = IS800_2007.Table2_iii(web_depth, web_thickness, fy)
+    if debug:
+        print(f"DEBUG: Web Classification -> d={web_depth:.2f}, tw={web_thickness:.2f}, d/tw={d_tw:.2f}")
+        print(f"DEBUG: Web Class (Table 2): {web_class}, Limit (Semi-Compact): {126 * epsilon:.2f}")
     
     # Check if flanges are slender (never allowed)
     flanges_slender = (flange_class_top == "Slender" or flange_class_bottom == "Slender")
     
     if flanges_slender:
         # Flanges are slender - not allowed regardless of web philosophy
+        if debug:
+            print("DEBUG: Classification Result -> FAILED (Slender Flanges)")
         return "Slender", False
     
     if web_philosophy == 'Thin Web with ITS':
@@ -124,21 +132,31 @@ def classify_section(top_flange_width, top_flange_thickness, bottom_flange_width
             # With transverse stiffeners only: d/tw <= 200ε
             max_d_tw = 200 * epsilon
         
+        if debug:
+            print(f"DEBUG: Thin Web Philosophy -> Limit d/tw={max_d_tw:.2f}")
         if d_tw > max_d_tw:
             # Web exceeds even the plate girder limits
+            if debug:
+                print(f"DEBUG: Classification Result -> FAILED (Web d/tw {d_tw:.2f} > {max_d_tw:.2f})")
             return "Slender", False
         else:
             # Web is valid per Cl. 8.6.1.2
             # Classify section based on flanges for moment capacity
             section_class = determine_section_class_from_flanges(flange_class_top, flange_class_bottom)
+            if debug:
+                print(f"DEBUG: Classification Result -> PASSED (Class based on flanges: {section_class})")
             return section_class, True
     else:
         # Thick Web without ITS: Use Table 2 limits
         # Both web and flanges must be non-slender per Table 2
         if web_class == "Slender":
+            if debug:
+                print(f"DEBUG: Classification Result -> FAILED (Slender Web per Table 2)")
             return "Slender", False
         else:
             section_class = determine_overall_section_class(flange_class_top, flange_class_bottom, web_class)
+            if debug:
+                print(f"DEBUG: Classification Result -> PASSED (Overall Class: {section_class})")
             return section_class, True
 
 

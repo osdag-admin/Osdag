@@ -22,7 +22,7 @@ def weld_leg_from_q_with_cl10(q_kN_per_mm, ultimate_stresses):
     # 4) leg size a = t·√2
     return t_throat * math.sqrt(2)
 
-def design_welds_with_strength_web_to_flange(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w, ultimate_stresses):
+def design_welds_with_strength_web_to_flange(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w, ultimate_stresses, debug=False):
     # compute shear flows
     sf = shear_stress_unsym_I(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, h_w)
     min_weld_legtop = IS800_2007.cl_10_5_2_3_min_weld_size(t_ft, t_w)
@@ -42,6 +42,8 @@ def design_welds_with_strength_web_to_flange(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, 
                                         ), min_weld_legbot) and min(weld_leg_from_q_with_cl10(sf['q_bot_kN_per_mm'], ultimate_stresses
                                         ), max_weld_legbot),1)
 
+    if debug:
+        print(f"[DEBUG] Welds: q_top={sf['q_top_kN_per_mm']:.2f}, q_bot={sf['q_bot_kN_per_mm']:.2f}, top_leg={a_top}, bot_leg={a_bot}")
     return a_top, a_bot
 
 def weld_for_end_stiffener(t_st, b_st, V_ed, V_unstf, D, t_ft, t_fb, tw, ultimate_stresses):

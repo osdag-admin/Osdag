@@ -10,13 +10,14 @@ class GlobalBestPSO:
         self.bounds = bounds
         self.swarm = type('Swarm', (), {'position': np.random.uniform(bounds[0], bounds[1], (n_particles, dimensions))})
 
-    def optimize(self, objective_func, iters):
+    def optimize(self, objective_func, iters, debug=True):
         xopt, fopt = pso(objective_func, self.bounds[0], self.bounds[1],
                         swarmsize=self.n_particles,
                         maxiter=iters,
                         omega=self.options.get('w', 0.5),
                         phip=self.options.get('c1', 0.5),
-                        phig=self.options.get('c2', 0.5))
+                        phig=self.options.get('c2', 0.5),
+                        debug=debug)
         return fopt, xopt
 
 def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
@@ -37,7 +38,8 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
 
     def is_feasible(x, eps=1e-12):
         cons_val = cons(x)
-        # print(f'Constraint values: {cons_val}')
+        if debug:
+            print(f'Constraint values: {cons_val}')
         return np.all(cons_val >= -eps)  # strictly >=0; small epsilon for numeric tolerance
 
     # Helper: generate a feasible position
@@ -95,26 +97,26 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
                 # Global best update
                 if fx < fg or not is_feasible(g):
                     if debug:
-                        # print(f'New best for swarm at iteration {it}: {x[i, :]} {fx}')
+                        print(f'New best for swarm at iteration {it}: {x[i, :]} {fx}')
                         pass
                     tmp = x[i, :].copy()
                     stepsize = np.sqrt(np.sum((g - tmp) ** 2)) if g is not None else np.inf
                     if np.abs(fg - fx) <= minfunc:
-                        # print(f'Stopping search: Swarm best objective change less than {minfunc}')
+                        print(f'Stopping search: Swarm best objective change less than {minfunc}')
                         return tmp, fx
                     elif stepsize <= minstep:
-                        # print(f'Stopping search: Swarm best position change less than {minstep}')
+                        print(f'Stopping search: Swarm best position change less than {minstep}')
                         return tmp, fx
                     else:
                         g = tmp.copy()
                         fg = fx
         if debug:
-            # print(f'Best after iteration {it}: {g} {fg}')
+            print(f'Best after iteration {it}: {g} {fg}')
             pass
         it += 1
 
-    # print(f'Stopping search: maximum iterations reached --> {maxiter}')
+    print(f'Stopping search: maximum iterations reached --> {maxiter}')
     if not is_feasible(g):
-        # print("However, the optimization couldn't find a feasible design. Sorry")
+        print("However, the optimization couldn't find a feasible design. Sorry")
         pass
     return g, fg

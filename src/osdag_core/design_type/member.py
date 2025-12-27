@@ -33,8 +33,9 @@ class Member(Main):
             return VALUES_IMG_TENSIONBOLTED[4]
 
 
-    def tab_angle_section(self, input_dictionary):
-        print(f"tab_angle_section input_dictionary {input_dictionary}")
+    def tab_angle_section(self, input_dictionary, debug=False):
+        if debug:
+            print(f"tab_angle_section input_dictionary {input_dictionary}")
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
         if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
@@ -77,7 +78,7 @@ class Member(Main):
             t_e = "12"
             image = ''
         else:
-            print(f'tab_angle_section input_dictionary{input_dictionary}')
+            # print(f'tab_angle_section input_dictionary{input_dictionary}')
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
             section_profile = str(input_dictionary[KEY_SEC_PROFILE])
@@ -128,7 +129,8 @@ class Member(Main):
 
             else:
                 if section_profile == "Back to Back Angles":
-                    print(section_profile, "hjcxhf")
+                    if debug:
+                        print(section_profile, "hjcxhf")
                     Angle_attributes = BBAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
                     if l == "Long Leg":
@@ -355,8 +357,9 @@ class Member(Main):
 
         return section
 
-    def tab_strut_angle_section(self, input_dictionary):
-        print(f"tab_angle_section input_dictionary {input_dictionary}")
+    def tab_strut_angle_section(self, input_dictionary, debug=False):
+        if debug:
+            print(f"tab_angle_section input_dictionary {input_dictionary}")
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
         if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
@@ -399,7 +402,7 @@ class Member(Main):
             t_e = "12"
             image = ''
         else:
-            print(f'tab_angle_section input_dictionary{input_dictionary}')
+            # print(f'tab_angle_section input_dictionary{input_dictionary}')
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
             section_profile = str(input_dictionary[KEY_SEC_PROFILE])
@@ -450,7 +453,8 @@ class Member(Main):
 
             else:
                 if section_profile == Profile_name_3:
-                    print(section_profile, "hjcxhf")
+                    if debug:
+                        print(section_profile, "hjcxhf")
                     Angle_attributes = BBAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
                     if l == "Long Leg":
@@ -483,7 +487,8 @@ class Member(Main):
                     plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
                     torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
                 elif section_profile == Profile_name_2:
-                    print(section_profile, "hjcxhf")
+                    if debug:
+                        print(section_profile, "hjcxhf")
                     Angle_attributes = BBAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
                     if l == "Long Leg":
@@ -3254,6 +3259,7 @@ class Member(Main):
             # Parse input values
             # Input order from tab_value_changed: Label_6=depth, Label_7=web_thk, Label_8=top_flange_width,
             # Label_9=top_flange_thk, Label_10=bot_flange_width, Label_11=bot_flange_thk
+            print(f"Unsymm_I_Section_properties inputs: {input}")
             t_d = float(input[0])      # Total depth
             w_t = float(input[1])      # Web thickness
             t_f_w = float(input[2])    # Top flange width
@@ -3275,6 +3281,7 @@ class Member(Main):
             plast_sec_mod_y = pc.calc_PlasticModulusY(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
             torsion_const = pc.calc_TorsionConstantIt(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
             warping_const = pc.calc_WarpingConstantIw(t_d, t_f_w, b_f_w, w_t, t_f_t, b_f_t)
+            print(f"  Calculated: mass={mass}, area={area}, Izz={mom_inertia_z}, Iyy={mom_inertia_y}, Zez={elast_sec_mod_z}, Zpz={plast_sec_mod_z}")
 
         except (ValueError, TypeError, IndexError) as e:
             # If any conversion fails, return empty values

@@ -23,7 +23,7 @@ class Unsymmetrical_I_Section_Properties:
                 return round(A, 2)
 
         @staticmethod
-        def calc_centroid(D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_centroid(D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 A_top = B_top * t_f_top
                 A_bot = B_bot * t_f_bot
                 A_web = (D - t_f_top - t_f_bot) * t_w
@@ -33,10 +33,15 @@ class Unsymmetrical_I_Section_Properties:
                 y_web = t_f_bot + (D - t_f_top - t_f_bot) / 2
 
                 y_neutral = (A_top * y_top + A_bot * y_bot + A_web * y_web) / (A_top + A_bot + A_web)
+                if debug:
+                    print(f"Centroid Calc: D={D}, B_top={B_top}, B_bot={B_bot}, tw={t_w}, tf_top={t_f_top}, tf_bot={t_f_bot}")
+                    print(f"  Areas: top={A_top}, bot={A_bot}, web={A_web}")
+                    print(f"  Y-centers: top={y_top}, bot={y_bot}, web={y_web}")
+                    print(f"  Y_neutral={y_neutral}")
                 return y_neutral
 
         @staticmethod
-        def calc_MomentOfAreaZ(D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_MomentOfAreaZ(D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 y_neutral = Unsymmetrical_I_Section_Properties.calc_centroid(D, B_top, B_bot, t_w, t_f_top, t_f_bot)
 
                 I_top = (B_top * t_f_top ** 3) / 12 + B_top * t_f_top * (D - t_f_top / 2 - y_neutral) ** 2
@@ -45,34 +50,42 @@ class Unsymmetrical_I_Section_Properties:
                             y_neutral - (t_f_bot + (D - t_f_top - t_f_bot) / 2)) ** 2
 
                 I_zz = (I_top + I_bot + I_web)
+                if debug:
+                    print(f"I_zz Calc: I_top={I_top}, I_bot={I_bot}, I_web={I_web}, I_zz={I_zz}")
                 return round(I_zz, 2)
 
         @staticmethod
-        def calc_MomentOfAreaY(D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_MomentOfAreaY(D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 I_top = (t_f_top * B_top ** 3) / 12
                 I_bot = (t_f_bot * B_bot ** 3) / 12
                 I_web = ((D - t_f_top - t_f_bot) * t_w ** 3) / 12
 
                 I_yy = (I_top + I_bot + I_web)
+                if debug:
+                    print(f"I_yy Calc: I_top={I_top}, I_bot={I_bot}, I_web={I_web}, I_yy={I_yy}")
                 return round(I_yy, 2)
 
         @staticmethod
-        def calc_ElasticModulusZz( D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_ElasticModulusZz( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 I_zz = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, B_top, B_bot, t_w, t_f_top, t_f_bot)
                 y_neutral = Unsymmetrical_I_Section_Properties.calc_centroid(D, B_top, B_bot, t_w, t_f_top, t_f_bot)
                 Z_ez_top = I_zz  / (D - y_neutral)
                 Z_ez_bot = I_zz  / y_neutral
+                if debug:
+                    print(f"Elastic Modulus Z: Izz={I_zz}, y_neutral={y_neutral}, Z_top={Z_ez_top}, Z_bot={Z_ez_bot}")
                 return round(min(Z_ez_top, Z_ez_bot), 2)
 
         @staticmethod
-        def calc_ElasticModulusZy( D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_ElasticModulusZy( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 I_yy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, B_top, B_bot, t_w, t_f_top, t_f_bot)
                 B_max = max(B_top, B_bot)
                 Z_ey = (I_yy * 2 ) / B_max
+                if debug:
+                    print(f"Elastic Modulus Y: Iyy={I_yy}, B_max={B_max}, Z_ey={Z_ey}")
                 return round(Z_ey, 2)
 
         @staticmethod
-        def calc_PlasticModulusZ( D, bf_top, bf_bot, tw, tf_top, tf_bot, eps=1.0):
+        def calc_PlasticModulusZ( D, bf_top, bf_bot, tw, tf_top, tf_bot, eps=1.0, debug=False):
             """
             Plastic section modulus Zp about strong axis for unsymmetrical I-sections.
             
@@ -103,12 +116,18 @@ class Unsymmetrical_I_Section_Properties:
             if A_bot >= half_area:
                 # PNA is in bottom flange
                 y_pna = half_area / bf_bot
+                if debug:
+                    print(f"  PNA in bottom flange: y_pna={y_pna}")
             elif A_bot + A_web >= half_area:
                 # PNA is in web
                 y_pna = tf_bot + (half_area - A_bot) / tw
+                if debug:
+                    print(f"  PNA in web: y_pna={y_pna}")
             else:
                 # PNA is in top flange
                 y_pna = D - (A_total - half_area) / bf_top
+                if debug:
+                    print(f"  PNA in top flange: y_pna={y_pna}")
             
             # Calculate plastic section modulus Zp
             # Zp = sum of (area × distance from PNA to centroid of that area)
@@ -123,6 +142,8 @@ class Unsymmetrical_I_Section_Properties:
                     bf_top * (D - y_pna)**2 - 
                     (bf_top - tw) * max(0, D - tf_top - y_pna)**2
                 ) / 2.0
+                if debug:
+                    print(f"  Zp (PNA in web) formula result: {Zp}")
             else:
                 # PNA is in a flange - use component method
                 Zp = 0.0
@@ -159,32 +180,40 @@ class Unsymmetrical_I_Section_Properties:
             return round(Zp, 2)
 
         @staticmethod
-        def calc_PlasticModulusY( D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_PlasticModulusY( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 Zpy = (t_f_top * B_top ** 2 / 4 + t_f_bot * B_bot ** 2 / 4 + (D - t_f_top - t_f_bot) * t_w ** 2 / 4)
+                if debug:
+                    print(f"Plastic Modulus Y (Zpy): {Zpy}")
                 return round(Zpy, 2)
 
         @staticmethod
-        def calc_TorsionConstantIt( D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_TorsionConstantIt( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                     h = D - ((t_f_top + t_f_bot)/2)
                     It = (1 / 3) * ( B_top * t_f_top  ** 3 +  B_bot * t_f_bot ** 3 +  h * t_w ** 3 )
+                    if debug:
+                        print(f"Torsion Constant (It): {It}")
                     return round(It, 2)
 
         @staticmethod
-        def calc_WarpingConstantIw( D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_WarpingConstantIw( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                     h = D - ((t_f_top + t_f_bot)/2)
                     numerator_Iw = (h ** 2) * t_f_top * t_f_bot * (B_top ** 3) * (B_bot ** 3)
                     denominator_Iw = 12 * (t_f_top * B_top ** 3 + t_f_bot * B_bot ** 3)
                     Iw = numerator_Iw / denominator_Iw
+                    if debug:
+                        print(f"Warping Constant (Iw): {Iw}")
                     return round(Iw, 2)
         
         @staticmethod
-        def calc_RadiusOfGyrationZ( D, B_top, B_bot, t_w, t_f_top, t_f_bot):
+        def calc_RadiusOfGyrationZ( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
                 """
                 Radius of gyration about z-axis (major axis)
                 """
                 I_zz = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, B_top, B_bot, t_w, t_f_top, t_f_bot)
                 A = Unsymmetrical_I_Section_Properties.calc_area(D, B_top, B_bot, t_w, t_f_top, t_f_bot)
                 r_z = math.sqrt(I_zz / A)
+                if debug:
+                    print(f"Radius of Gyration Z (rz): {r_z}")
                 return round(r_z, 2)
 
         @staticmethod

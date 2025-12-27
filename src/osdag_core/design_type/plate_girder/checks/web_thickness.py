@@ -2,7 +2,7 @@
 Web thickness checks for plate girders per IS 800:2007 Cl. 8.6.1
 """
 
-def min_web_thickness_thick_web(eff_depth, web_thickness, epsilon, stiffener_type, c_value):
+def min_web_thickness_thick_web(eff_depth, web_thickness, epsilon, stiffener_type, c_value, debug=False):
     """
     Check minimum web thickness requirements for thick web plate girders.
     Per IS 800:2007 Cl. 8.6.1.1 and 8.6.1.2, this validates web slenderness limits.
@@ -59,8 +59,10 @@ def min_web_thickness_thick_web(eff_depth, web_thickness, epsilon, stiffener_typ
             limit = 270 * epsilon
         else:
             # Intermediate spacing - linear interpolation between limits
-            # At c/d = 1.5: limit = 200ε, at c/d = 0.74: limit = 270ε
+            # High: 270ε at cd=0.74, Low: 200ε at cd=1.5
             limit = 200 * epsilon + (270 - 200) * epsilon * (1.5 - cd_ratio) / (1.5 - 0.74)
     
+    if debug:
+        print(f"[DEBUG] Web Thickness Check: d/tw={slenderness:.2f}, limit={limit:.2f}, type={stiffener_type}, ok={slenderness <= limit}")
     return slenderness <= limit
 

@@ -45,8 +45,8 @@ def create_welded_lap_joint(plate1_thickness, plate2_thickness, plate_width, ove
     weld_b = weld_size
     
     # Weld 1: Transverse weld at the "start" of overlap (Plate 2 edge)
-    # Visual preference: Match weld leg length to the plate thickness being welded
-    weld1 = FilletWeld(plate2_thickness, plate2_thickness, weld_l)
+    # Use the calculated weld size from design output
+    weld1 = FilletWeld(weld_size, weld_size, weld_l)
     # Origin at (0, offset - L/2, T1/2) - Interface level, start of overlap
     # uDir along +Z (Up Plate 2 face)
     # wDir along +X (Extrusion)
@@ -58,8 +58,8 @@ def create_welded_lap_joint(plate1_thickness, plate2_thickness, plate_width, ove
     weld1_model = weld1.create_model()
     
     # Weld 2: Transverse weld at the "end" of overlap (Plate 1 edge)
-    # Visual preference: Match weld leg length to the plate thickness being welded
-    weld2 = FilletWeld(plate1_thickness, plate1_thickness, weld_l)
+    # Use the calculated weld size from design output
+    weld2 = FilletWeld(weld_size, weld_size, weld_l)
     # Origin at (0, L/2, T1/2) - Interface level, end of overlap
     # uDir along -Z (Down Plate 1 face)
     # wDir along +X (Extrusion)

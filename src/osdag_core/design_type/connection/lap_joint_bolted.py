@@ -939,31 +939,43 @@ class LapJointBolted(MomentConnection):
         t1 = ('Model', self.call_3DModel)
         components.append(t1)
 
-        t2 = ('Plate1', self.call_3DPlate1)
+        t2 = ('Plate 1', self.call_3DPlate1)
         components.append(t2)
 
-        t3 = ('Plate2', self.call_3DPlate2)
+        t3 = ('Plate 2', self.call_3DPlate2)
         components.append(t3)
+
+        t4 = ('Bolts', self.call_3DBolt)
+        components.append(t4)
 
         return components
 
     def call_3DPlate1(self, ui, bgcolor):
         from PySide6.QtWidgets import QCheckBox
         for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Plate1':
+            if chkbox.objectName() == 'Plate 1':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(False)
-        ui.commLogicObj.display_3DModel("Plate1", bgcolor)
+        ui.commLogicObj.display_3DModel("Plate 1", bgcolor)
 
     def call_3DPlate2(self, ui, bgcolor):
         from PySide6.QtWidgets import QCheckBox
         for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Plate2':
+            if chkbox.objectName() == 'Plate 2':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(False)
-        ui.commLogicObj.display_3DModel("Plate2", bgcolor)
+        ui.commLogicObj.display_3DModel("Plate 2", bgcolor)
+    
+    def call_3DBolt(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Bolts':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Bolts", bgcolor)
     
     def warn_text(self):
 

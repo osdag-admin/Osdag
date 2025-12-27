@@ -1,10 +1,11 @@
 import numpy
 from OCC.Display.SimpleGui import init_display
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse, BRepAlgoAPI_Cut
 from OCC.Core.BOPAlgo import BOPAlgo_Builder
 from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN,Quantity_NOC_GRAY,Quantity_NOC_BLUE1,Quantity_NOC_RED
 from OCC.Core.Graphic3d import *
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere, BRepPrimAPI_MakeCylinder
+from OCC.Core.gp import gp_Ax2, gp_Pnt, gp_Dir
 # Import the component classes
 from ...items.bolt import Bolt
 from ...items.nut import Nut
@@ -97,6 +98,32 @@ def create_bolted_lap_joint(plate1_thickness = 16, plate2_thickness = 8, plate_w
         nut.place(nut_origin, nut_uDir, nut_wDir)
         nut_model = nut.create_model()
         nuts_models.append(nut_model)
+
+    # --- Cut Bolt Holes in Plates ---
+    # Hole radius slightly larger than bolt shaft for clearance
+    hole_radius = bolt_dia / 2.0 + 1.0  # 1mm clearance
+    
+    # Plate 1: Z from -plate1_thickness/2 to +plate1_thickness/2
+    plate1_z_bottom = -plate1_thickness / 2.0
+    plate1_z_top = plate1_thickness / 2.0
+    
+    # Plate 2: Z from plate1_thickness/2 to plate1_thickness/2 + plate2_thickness
+    plate2_z_bottom = plate1_thickness / 2.0
+    plate2_z_top = plate1_thickness / 2.0 + plate2_thickness
+    
+    # Cut holes in each plate at bolt positions
+    for pos in bolt_positions:
+        bolt_x, bolt_y, _ = pos
+        
+        # Cut hole in Plate 1 (all bolts go through plate1 in overlap area)
+        axis1 = gp_Ax2(gp_Pnt(bolt_x, bolt_y, plate1_z_bottom - 5), gp_Dir(0, 0, 1))
+        hole1 = BRepPrimAPI_MakeCylinder(axis1, hole_radius, plate1_thickness + 10).Shape()
+        plate1_model = BRepAlgoAPI_Cut(plate1_model, hole1).Shape()
+        
+        # Cut hole in Plate 2 (all bolts go through plate2 in overlap area)
+        axis2 = gp_Ax2(gp_Pnt(bolt_x, bolt_y, plate2_z_bottom - 5), gp_Dir(0, 0, 1))
+        hole2 = BRepPrimAPI_MakeCylinder(axis2, hole_radius, plate2_thickness + 10).Shape()
+        plate2_model = BRepAlgoAPI_Cut(plate2_model, hole2).Shape()
 
     # Use BOPAlgo_Builder for assembly
     builder = BOPAlgo_Builder()

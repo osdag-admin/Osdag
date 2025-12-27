@@ -31,6 +31,8 @@ import logging
 
 import math
 
+from PyQt5.QtCore import Qt
+
 class ButtJointWelded(MomentConnection):
     def __init__(self):
         super(ButtJointWelded, self).__init__()
@@ -47,7 +49,7 @@ class ButtJointWelded(MomentConnection):
         self.weld_fabrication = None
         self.weld_angle = None
         self.weld_length_effective = None
-
+        self.hover_dict = {}
 
     ###############################################
     # Design Preference Functions Start
@@ -415,47 +417,107 @@ class ButtJointWelded(MomentConnection):
                self.design_for if flag else '', True)
         out_list.append(t29)
 
+        # Populate Hover Dict (Butt Joint Bolted)
+        self.hover_dict["Plate 1"] = (
+            f"<b>plate1</b><br>"
+            f"Length: {float(0)} mm<br>"
+            f"Width: {float(0)} mm<br>"
+            f"Thickness: {0} mm"
+        )
+
+        self.hover_dict["Plate 2"] = (
+            f"<b>plate2</b><br>"
+            f"Length: {float(0)} mm<br>"
+            f"Width: {float(0)} mm<br>"
+            f"Thickness: {0} mm"
+        )
+
+        self.hover_dict["Cover Plate"] = (
+            f"<b>Cover Plate</b><br>"
+            f"Length: {float(0)} mm<br>"
+            f"Width: {float(0)} mm<br>"
+            f"Thickness: {0} mm"
+        )
+
+        self.hover_dict["Packing Plate"] = (
+            f"<b>Packing Plate</b><br>"
+            f"Length: {float(0)} mm<br>"
+            f"Width: {float(0)} mm<br>"
+            f"Thickness: {0} mm"
+        )
+
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>"
+            f"Grade: {0}<br>"
+            f"Diameter: {0} mm<br>"
+            f"No. of Bolts: {0}"
+        )
+
         return out_list
 
     def module_name(self):
 
         return KEY_DISP_BUTTJOINTWELDED
 
-    def call_3DColumn(self, ui, bgcolor):
-        # status = self.resultObj['Bolt']['status']
-        # if status is True:
-        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-        if ui.chkBxCol.isChecked():
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        # self.display_3DModel("Beam", bgcolor)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
-
     def get_3d_components(self):
+        """Get 3D components for visualization"""
         components = []
-
-        t30 = ('Model', self.call_3DModel)
-        components.append(t30)
-
-        t32 = ('Plate1', self.call_3DColumn)
-        components.append(t32)
-
-        t37 = ('Plate2', self.call_3DPlate)
-        components.append(t37)
-
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+        t2 = ('Plate 1', self.call_3DPlate1)
+        components.append(t2)
+        t3 = ('Plate 2', self.call_3DPlate2)
+        components.append(t3)
+        t4 = ('Cover Plate', self.call_3DCoverPlate)
+        components.append(t4)
+        t5 = ('Welds', self.call_3DWeld)
+        components.append(t5)
         return components
 
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+    def call_3DModel(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Model':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
+    def call_3DPlate1(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate 1':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Plate 1', bgcolor)
+
+    def call_3DPlate2(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Plate 2':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Plate 2', bgcolor)
+    
+    def call_3DCoverPlate(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Cover Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Cover Plate', bgcolor)
 
+    def call_3DWeld(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Welds':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel('Welds', bgcolor)
 
     def func_for_validation(self, design_dictionary):
 
@@ -568,6 +630,7 @@ class ButtJointWelded(MomentConnection):
         plate2_thk = float(design_dictionary[KEY_PLATE2_THICKNESS])
         Tmin = min(plate1_thk, plate2_thk)
         cover_plate_type_str = design_dictionary[KEY_COVER_PLATE]
+        self.cover_plate_type = cover_plate_type_str  # Store for CAD generation
 
         # Cover plate and packing plate logic as per documentation
         available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]

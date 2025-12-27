@@ -629,7 +629,7 @@ class LapJointWelded(MomentConnection):
         components.append(t2)
         t3 = ('Plate 2', self.call_3DPlate2)
         components.append(t3)
-        t4 = ('Weld', self.call_3DWeld)
+        t4 = ('Welds', self.call_3DWeld)
         components.append(t4)
         return components
 
@@ -663,8 +663,8 @@ class LapJointWelded(MomentConnection):
     def call_3DWeld(self, ui, bgcolor):
         from PySide6.QtWidgets import QCheckBox
         for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Weld':
+            if chkbox.objectName() == 'Welds':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(False)
-        ui.commLogicObj.display_3DModel('Weld', bgcolor)
+        ui.commLogicObj.display_3DModel('Welds', bgcolor)

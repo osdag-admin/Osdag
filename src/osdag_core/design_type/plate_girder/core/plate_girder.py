@@ -47,6 +47,9 @@ class PlateGirderWelded(Member):
     def __init__(self):
         super(PlateGirderWelded, self).__init__()
         self.design_status = False
+        self.calculated_deflection = 'N/A'
+        self.deflection_limit = 'N/A'
+        self.deflection_skipped = False
         # Instance-level warning flags
         self.flange_warning_logged = False  # Flag to log b/tf warnings only once per session
         self.dimension_warning_logged = False  # Flag to log dimension warnings only once per session
@@ -562,7 +565,7 @@ class PlateGirderWelded(Member):
         out_list.append(t1)
         t2 = (KEY_EndpanelStiffener_thickness, KEY_DISP_EndpanelStiffener_thickness, TYPE_TEXTBOX, self.end_panel_stiffener_thickness if flag else '', True)
         out_list.append(t2)
-        t1 = (KEY_MOMENT_STRENGTH, KEY_DISP_MOMENT, TYPE_TEXTBOX,
+        t1 = (KEY_MOMENT_STRENGTH, KEY_DISP_DESIGN_BENDING_STRENGTH, TYPE_TEXTBOX,
               self.design_moment if flag else '', True)
         out_list.append(t1)
         t1 = (KEY_WeldWebtoflange, KEY_DISP_WeldWebtoflange, TYPE_TEXTBOX,
@@ -582,6 +585,10 @@ class PlateGirderWelded(Member):
         out_list.append(t2)
         t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.critical_moment if flag else '', False)
         out_list.append(t2)
+        t_def = (KEY_MAX_DEFL, 'Calculated Deflection (mm)', TYPE_TEXTBOX, self.calculated_deflection if flag else '', True)
+        out_list.append(t_def)
+        t_def_limit = ('DeflectionLimit', 'Deflection Limit (mm)', TYPE_TEXTBOX, self.deflection_limit if flag else '', True)
+        out_list.append(t_def_limit)
         return out_list
 
     def spacing(self, status):
@@ -1151,12 +1158,15 @@ class PlateGirderWelded(Member):
         if not SKIP_DEFLECTION:
             # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
             moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
-            is_safe, self.deflection_ratio = evaluate_deflection_kNm_mm(
+            is_safe, self.deflection_ratio, delta, allowable = evaluate_deflection_kNm_mm(
                 moment_kNm, self.length, self.material.modulus_of_elasticity,
                 self.loading_case, self.deflection_criteria, self.total_depth,
                 self.top_flange_width, self.bottom_flange_width, self.web_thickness,
                 self.top_flange_thickness, self.bottom_flange_thickness
             )
+            self.calculated_deflection = round(delta, 2)
+            self.deflection_limit = round(allowable, 2)
+            
             if is_safe:
                 self.defl_check = True
                 self.logger.info("Deflection Check passed")
@@ -1166,6 +1176,8 @@ class PlateGirderWelded(Member):
         else:
             self.defl_check = True
             self.deflection_ratio = 0.0
+            self.calculated_deflection = "Skipped"
+            self.deflection_limit = "Skipped"
             self.logger.info("Deflection Check skipped (SKIP_DEFLECTION=True)")
 
         if self.design_flag == True and self.design_flag2 == True and self.defl_check == True:
@@ -1547,7 +1559,9 @@ class PlateGirderWelded(Member):
         if not SKIP_DEFLECTION:
             # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
             moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
-            is_safe, self.deflection_ratio = evaluate_deflection_kNm_mm(moment_kNm, self.length, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+            is_safe, self.deflection_ratio, delta, allowable = evaluate_deflection_kNm_mm(moment_kNm, self.length, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+            self.calculated_deflection = round(delta, 2)
+            self.deflection_limit = round(allowable, 2)
             if is_safe:
                 self.defl_check = True
             else:
@@ -1555,6 +1569,8 @@ class PlateGirderWelded(Member):
         else:
             self.defl_check = True
             self.deflection_ratio = 0.0
+            self.calculated_deflection = "Skipped"
+            self.deflection_limit = "Skipped"
 
         #in pso check for self.moment_checks and self.shearchecks
 
@@ -1680,7 +1696,7 @@ class PlateGirderWelded(Member):
     def final_format(self,design_dictionary):
         
         # Format: "D x tw x Bf_bot x tf_bot x Bf_top x tf_top" with dimension labels for clarity
-        self.result_designation = f"PG {int(self.total_depth)}×{int(self.web_thickness)}×{int(self.bottom_flange_width)}×{int(self.bottom_flange_thickness)}×{int(self.top_flange_width)}×{int(self.top_flange_thickness)}"
+        self.result_designation = f"PG {int(self.total_depth)}x{int(self.web_thickness)}x{int(self.bottom_flange_width)}x{int(self.bottom_flange_thickness)}x{int(self.top_flange_width)}x{int(self.top_flange_thickness)}"
         if self.moment_ratio == None:
             self.moment_ratio = 0
         if self.shear_ratio == None:
@@ -1688,10 +1704,26 @@ class PlateGirderWelded(Member):
         
         self.result_UR = max(self.moment_ratio,self.shear_ratio, self.deflection_ratio)
         self.section_classification_val = self.section_class
-        if self.beta_b_lt == None:
-            self.beta_b_lt = 0
+        
+        # Fix: Beta value should be 1.0 for Plastic/Compact sections
+        if self.beta_b_lt is None or self.beta_b_lt == 0:
+            if self.section_class == KEY_Plastic or self.section_class == KEY_Compact:
+                self.beta_b_lt = 1.0
+            elif self.section_class == KEY_SemiCompact:
+                # Assuming Ze and Zp are available
+                if hasattr(self, 'elast_sec_mod_z') and hasattr(self, 'plast_sec_mod_z') and self.plast_sec_mod_z > 0:
+                    self.beta_b_lt = self.elast_sec_mod_z / self.plast_sec_mod_z
+                else:
+                    self.beta_b_lt = 1.0 # Fallback
+            else:
+                 self.beta_b_lt = 1.0 # Fallback
+                 
         self.betab = round(self.beta_b_lt,2)
-        self.effectivearea = Unsymmetrical_I_Section_Properties.calc_area(self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)/100
+        
+        # Area already divided by 100 in logic, just need to ensure unit label in Common.py is correct (cm^2)
+        # Note: Unsymmetrical_I_Section_Properties.calc_area returns mm^2. Division by 100 gives cm^2? No, mm^2 to cm^2 is /100.
+        self.effectivearea = round(Unsymmetrical_I_Section_Properties.calc_area(self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)/100, 2)
+        
         if self.Md == None:
             self.Md = 0
 
@@ -1708,22 +1740,65 @@ class PlateGirderWelded(Member):
             self.design_moment = round(self.Md/1000000,1)
         else:
             self.design_moment = round(self.Md/1000000,1)
+        
+        self.critical_moment = 'N/A'
+        self.torsion_cnst = 'N/A'
+        self.warping_cnst = 'N/A'
         if self.support_type == 'Major Laterally Unsupported':
             self.critical_moment = round(self.M_cr/1000000,1)   
             self.torsion_cnst = round(self.It/10000,1)
             self.warping_cnst = round(self.Iw/1000000,1)
-        self.intstiffener_thk = self.IntStiffThickness
-        self.longstiffener_thk = self.LongStiffThickness
+            
+        # Stiffener Logic Fixes
+        if self.web_philosophy == 'Thick Web without ITS':
+             self.intstiffener_thk = "N/A"
+             self.longstiffener_thk = "N/A"
+             self.intstiffener_spacing = "N/A"
+             self.end_panel_stiffener_thickness = "N/A"
+             self.x1 = "N/A"
+             self.x2 = "N/A"
+        else:
+             self.intstiffener_thk = self.IntStiffThickness
+             self.longstiffener_thk = self.LongStiffThickness
+             self.intstiffener_spacing = self.c
+             
+             # End panel stiffener logic
+             if self.end_panel_stiffener_thickness is None or self.end_panel_stiffener_thickness == 0:
+                 if self.end_stiffthickness == 0:
+                      self.end_panel_stiffener_thickness = self.IntStiffThickness # Fallback to min
+                 else:
+                      self.end_panel_stiffener_thickness = self.end_stiffthickness
+             else:
+                 pass # already set correctly
+             
+             if isinstance(self.end_panel_stiffener_thickness, (int, float)):
+                 self.end_panel_stiffener_thickness = round(self.end_panel_stiffener_thickness, 2)
+
         self.longstiffener_no = 0
         if self.long_Stiffner == 'Yes and 1 stiffener':
             self.longstiffener_no = 1
+            self.x1 = round(0.2 * self.total_depth, 2)
+            self.x2 = "N/A"
         elif self.long_Stiffner == 'Yes and 2 stiffeners':
             self.longstiffener_no = 2
-        self.intstiffener_spacing = self.c
-        self.end_panel_stiffener_thickness = self.end_stiffthickness
+            self.x1 = round(0.2 * self.total_depth, 2)
+            self.x2 = round(0.5 * self.total_depth, 2)
+        else:
+            # If no longitudinal stiffener, hide thickness
+             self.longstiffener_thk = "N/A"
+             self.x1 = "N/A"
+             self.x2 = "N/A"
+             
+        # Redundant safety for calculated_deflection in case missed
+        if not hasattr(self, 'calculated_deflection'):
+             self.calculated_deflection = "Skipped"
+        if not hasattr(self, 'deflection_limit'):
+             self.deflection_limit = "Skipped"
+
         self.atop= 0
         self.abot= 0
         self.weld_stiff= None
         self.atop, self.abot= design_welds_with_strength_web_to_flange(self.load.shear_force, self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.web_thickness, self.eff_depth, [self.material.fu])
-        self.weld_stiff = weld_for_end_stiffener(self.end_stiffthickness, self.end_stiffwidth, self.load.shear_force, self.V_d, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, [self.material.fu])
+        self.weld_stiff = weld_for_end_stiffener(self.end_stiffthickness if self.end_stiffthickness > 0 else self.IntStiffThickness, self.end_stiffwidth, self.load.shear_force, self.V_d, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, [self.material.fu])
+        
         self.design_status = True

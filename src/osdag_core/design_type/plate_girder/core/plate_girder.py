@@ -887,7 +887,15 @@ class PlateGirderWelded(Member):
 
     def section_classification(self,design_dictionary):
         self.design_status = False
-        self.section_class, is_valid = classify_section(self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.total_depth, self.web_thickness, self.material.fy, self.web_philosophy)
+        # Check if longitudinal stiffener is provided (affects web slenderness limits per Cl. 8.6.1.2)
+        has_long_stiff = self.long_Stiffner in ['Yes and 1 stiffener', 'Yes and 2 stiffeners']
+        self.section_class, is_valid = classify_section(
+            self.top_flange_width, self.top_flange_thickness, 
+            self.bottom_flange_width, self.bottom_flange_thickness, 
+            self.total_depth, self.web_thickness, 
+            self.material.fy, self.web_philosophy, 
+            has_longitudinal_stiffener=has_long_stiff
+        )
         return is_valid
 
     def design_check(self,design_dictionary):
@@ -942,11 +950,11 @@ class PlateGirderWelded(Member):
                 self.total_depth, self.top_flange_width, self.bottom_flange_width,
                 self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness
             )
-            # print(f"\n========== PLATE GIRDER DESIGN VALUES ==========")
-            # print(f"Plastic Modulus (Zp): {self.plast_sec_mod_z:.2f} mm³")
-            # print(f"Elastic Modulus (Ze): {self.elast_sec_mod_z:.2f} mm³")
-            # print(f"Section Classification: {self.section_class}")
-            # print(f"=================================================\n")
+            print(f"\n========== PLATE GIRDER DESIGN VALUES ==========")
+            print(f"Plastic Modulus (Zp): {self.plast_sec_mod_z:.2f} mm³")
+            print(f"Elastic Modulus (Ze): {self.elast_sec_mod_z:.2f} mm³")
+            print(f"Section Classification: {self.section_class}")
+            print(f"=================================================\n")
 
             if self.web_philosophy == 'Thick Web without ITS':
                 self.design_flag2 = min_web_thickness_thick_web(self.eff_depth,self.web_thickness,self.epsilon,"no_stiffener",0)
@@ -993,7 +1001,7 @@ class PlateGirderWelded(Member):
                         self.logger.error("Shear Check failed")
 
                     is_safe, self.V_cr = web_buckling_laterally_supported_thick_web(self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.b1, self.load.shear_force)
-                    # print(f"Buckling Resistance (V_cr): {self.V_cr:.2f} N")
+                    print(f"Buckling Resistance (V_cr): {self.V_cr:.2f} N")
                     if is_safe:
                         self.shearflag2 = True
                         self.logger.info("Web Buckling Check passed")
@@ -1003,7 +1011,7 @@ class PlateGirderWelded(Member):
                     
                     web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
                     is_safe, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger)
-                    # print(f"Crippling Resistance (F_q): {self.F_q:.2f} N")
+                    print(f"Crippling Resistance (F_q): {self.F_q:.2f} N")
                     if is_safe:
                         self.shearflag3 = True
                         self.logger.info("Web Crippling Check passed")
@@ -1018,7 +1026,7 @@ class PlateGirderWelded(Member):
                     
                     if self.support_type == 'Major Laterally Supported':
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment)
-                        # print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
+                        print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
                         if is_safe:
                             self.momentchecks = True
                             self.logger.info("Moment Check passed")
@@ -1027,7 +1035,7 @@ class PlateGirderWelded(Member):
                             self.logger.error("Moment Check failed")
                     else: 
                         is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt)
-                        # print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
+                        print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
                         if is_safe:
                             self.momentchecks = True
                             self.logger.info("Moment Check passed")
@@ -1282,13 +1290,16 @@ class PlateGirderWelded(Member):
         self.eff_depth = section.D - section.tf_top - section.tf_bot
         self.IntStiffnerwidth = min(self.top_flange_width,self.bottom_flange_width) - self.web_thickness/2 - 10
         self.end_stiffwidth = self.IntStiffnerwidth
-        self.c = section.c
-        self.IntStiffThickness = section.t_stiff
+        # Only update c and t_stiff if they were in the variable list (thin web case)
+        if section.c is not None:
+            self.c = section.c
+        if section.t_stiff is not None:
+            self.IntStiffThickness = section.t_stiff
 
     def evaluate_particle_cost(self, particle, variable_list, design_dictionary, is_symmetric, is_thick_web):
         sec = Section()
         self.assign_particle_to_section(particle, variable_list, sec)
-        self.design_check(design_dictionary)
+        # Only call optimized version for PSO iterations (design_check has side effects)
         max_ratio, slender_ok, thickness_ok = self.design_check_optimized_version(design_dictionary)
 
         area = ((self.top_flange_thickness * self.top_flange_width) +
@@ -1298,6 +1309,14 @@ class PlateGirderWelded(Member):
         mass = volume * 7.85e-6  # kg
         P = 1e6  # penalty coefficient (tune as needed)
         penalty = 0.0
+
+        # Section classification failure (slender sections not allowed)
+        if not slender_ok:
+            penalty += 2.0  # Heavy penalty for slender section
+        
+        # Web thickness check failure
+        if not thickness_ok:
+            penalty += 1.5  # Penalty for web thickness violation
 
         # Shear capacity (shear_ratio > 1.0 means failure)
         if self.shear_ratio > 1.0:
@@ -1315,11 +1334,10 @@ class PlateGirderWelded(Member):
         if not self.defl_check:
             penalty += 1.0
 
-        # (Optional) any other flags: e.g. slenderness or plate-thickness,
-        # but those are already implicit in design_check for PSO—no need to repeat.
-
         # 5) Return penalized objective
-        return mass + P * penalty
+        final_cost = mass + P * penalty
+        print(f"[PSO] dims: D={self.total_depth}, tw={self.web_thickness}, bf={self.top_flange_width}, tf={self.top_flange_thickness} | Mass={mass:.2f}, Penalty={penalty:.4f} (S:{self.shear_ratio:.2f}, M:{self.moment_ratio:.2f}, B:{not self.shearchecks}, D:{not self.defl_check}), Cost={final_cost:.2e}")
+        return final_cost
 
     def design_check_optimized_version(self,design_dictionary):
         self.design_flag = False
@@ -1366,6 +1384,18 @@ class PlateGirderWelded(Member):
                 self.dimension_warning_logged = True
             
             # self.beta_value(design_dictionary,self.section_class)
+
+            # Calculate section properties needed for moment capacity checks
+            # CRITICAL: Must recalculate for each particle in PSO optimization
+            from ....utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
+            self.plast_sec_mod_z = Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(
+                self.total_depth, self.top_flange_width, self.bottom_flange_width,
+                self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness,
+                self.epsilon)
+            self.elast_sec_mod_z = Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(
+                self.total_depth, self.top_flange_width, self.bottom_flange_width,
+                self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness
+            )
 
             if self.web_philosophy == 'Thick Web without ITS':
                 # print('THICK WEB')
@@ -1588,8 +1618,15 @@ class PlateGirderWelded(Member):
         bounds=(lb, ub)
     )
         
-        fp = self.generate_first_particle(float(self.length) * 1000, float(self.load.moment), float(self.material.fy),is_thick_web,is_symmetric)
+        fp = self.generate_first_particle(float(self.length), float(self.load.moment), float(self.material.fy),is_thick_web,is_symmetric)
+        
+        # Debug: Log PSO input parameters
+        self.logger.info(f"PSO Input - Length: {self.length} mm, Moment: {self.load.moment} N-mm, Fy: {self.material.fy} MPa")
+        self.logger.info(f"PSO Bounds - Lower: {lb}, Upper: {ub}")
+        self.logger.info(f"PSO First Particle (before clip): {fp}")
+        
         optimizer.swarm.position[0] = np.clip(fp, lb, ub)
+        self.logger.info(f"PSO First Particle (after clip): {optimizer.swarm.position[0]}")
 
 
         best_cost, best_pos = optimizer.optimize(
@@ -1598,9 +1635,9 @@ class PlateGirderWelded(Member):
     )
 
         self.logger.info("PSO calculation successfully completed")
-        # print("Best cost:", best_cost)
+        print(f"\n[PSO RESULT] Best Cost (Mass + Penalty): {best_cost:.2f}")
         best_design_var = dict(zip(variable_list, best_pos))
-        # print("Best design variables:", best_design_var)
+        print(f"[PSO RESULT] Best Dimensions: {best_design_var}")
         
         if is_symmetric:
             self.bottom_flange_thickness = self.top_flange_thickness = float(best_design_var['tf'])

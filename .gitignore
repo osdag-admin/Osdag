@@ -39,3 +39,4 @@ Output_PDF/*
 **/ResourceFiles/html_page/*
 *.xlsx
 *.code-workspace
+**/testing_code/

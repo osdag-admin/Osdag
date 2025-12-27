@@ -1,5 +1,5 @@
 from ....utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
-from ..data.constants import *
+from ....Common import *
 
 def deflection_from_moment_kNm_mm(M_kNm, L_mm, E, I, case):
     """

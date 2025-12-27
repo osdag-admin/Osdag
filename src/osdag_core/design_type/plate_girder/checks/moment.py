@@ -3,7 +3,7 @@ from ....utils.common.is800_2007 import IS800_2007
 from ....utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
 from ..core.utils import get_K_from_warping_restraint
 from ..core.section import calc_yj
-from ..data.constants import *
+from ....Common import *
 
 def corrected_design_bending_strength(section_class, Zp, Ze, Fy, gamma_m0, support_condition):
     """

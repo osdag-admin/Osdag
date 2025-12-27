@@ -16,7 +16,7 @@ from ....utils.common import is800_2007
 from ....utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
 
 # New imports
-from ..data.constants import *
+from ....Common import *
 from ..gui.dialogs import RangeInputDialog, PopupDialog
 from ..gui.widgets import My_ListWidget, My_ListWidgetItem
 from .section import Section, calc_yj, shear_stress_unsym_I, classify_section
@@ -96,7 +96,8 @@ class PlateGirderWelded(Member):
     def tab_value_changed(self):
         change_tab = []
 
-        t1 = (KEY_DISP_GIRDERSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section_plate_girder)
+        # Include Label_7 (web thickness) to get correct thickness-dependent Fy values
+        t1 = (KEY_DISP_GIRDERSEC, [KEY_SEC_MATERIAL, 'Label_7'], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section_plate_girder)
         change_tab.append(t1)
 
         t4 = (KEY_DISP_GIRDERSEC, ['Label_6', 'Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11',KEY_SEC_FY],
@@ -538,6 +539,16 @@ class PlateGirderWelded(Member):
         out_list.append(t4)
         t5 = (KEY_EFF_SEC_AREA, KEY_DISP_EFF_SEC_AREA, TYPE_TEXTBOX, self.effectivearea if flag else '', True)
         out_list.append(t5)
+        # Add thickness values for visibility in output dock
+        t_web = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_TEXTBOX,
+                 self.web_thickness if flag else '', True)
+        out_list.append(t_web)
+        t_tf_top = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_TEXTBOX,
+                    self.top_flange_thickness if flag else '', True)
+        out_list.append(t_tf_top)
+        t_tf_bot = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_TEXTBOX,
+                    self.bottom_flange_thickness if flag else '', True)
+        out_list.append(t_tf_bot)
         t10 = (KEY_IntermediateStiffener_thickness, KEY_DISP_IntermediateStiffener_thickness, TYPE_TEXTBOX,
               self.intstiffener_thk if flag else '', True)
         out_list.append(t10)
@@ -1668,7 +1679,8 @@ class PlateGirderWelded(Member):
     
     def final_format(self,design_dictionary):
         
-        self.result_designation = (str(int(self.total_depth)) + " x " +str(int(self.web_thickness)) + " x " +str(int(self.bottom_flange_width)) + " x " +str(int(self.bottom_flange_thickness)) + " x " +str(int(self.top_flange_width)) + " x "  +str(int(self.top_flange_thickness)))
+        # Format: "D x tw x Bf_bot x tf_bot x Bf_top x tf_top" with dimension labels for clarity
+        self.result_designation = f"PG {int(self.total_depth)}×{int(self.web_thickness)}×{int(self.bottom_flange_width)}×{int(self.bottom_flange_thickness)}×{int(self.top_flange_width)}×{int(self.top_flange_thickness)}"
         if self.moment_ratio == None:
             self.moment_ratio = 0
         if self.shear_ratio == None:

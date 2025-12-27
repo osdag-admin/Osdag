@@ -35,9 +35,16 @@ class OsdagLaunchScreen(object):
         self.AnimatedGIF.setGeometry(QRect(330, 110, 320, 180))
         
         from pathlib import Path
-        base_path = Path.cwd() / "osdag_gui" / "resources" / "animation"
-        animation_path = str(base_path / "{:04d}.png")
-        self.AnimatedGIF.load_sequence(animation_path, 96, 34)
+        # Use module's location to find resources - works on Linux/Windows/Mac
+        # pathlib automatically handles path separators for each OS
+        module_dir = Path(__file__).resolve().parent.parent.parent  # Goes up to osdag_gui/
+        base_path = module_dir / "resources" / "animation"
+        
+        if base_path.exists():
+            animation_path = str(base_path / "{:04d}.png")
+            self.AnimatedGIF.load_sequence(animation_path, 96, 34)
+        else:
+            print(f"Warning: Animation path not found: {base_path}")
 
         self.AestheticVector = QSvgWidget(self.centralwidget)
         self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")
@@ -86,7 +93,7 @@ class OsdagLaunchScreen(object):
         self.LoadingLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.LoadingLabel.setGeometry(QRect(20, 290, 160, 25))
         self.LoadingLabel.setObjectName("splash_loading_label")
-        self.LoadingLabel.setFont(QFont("Arial", 11))
+        self.LoadingLabel.setFont(QFont("Ubuntu Sans", 11))
 
         # aligned at to right with margin(top = right = 10 wrt size of MainWindow)
         self.IITBLogo = QSvgWidget(self.centralwidget)

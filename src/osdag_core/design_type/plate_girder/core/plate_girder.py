@@ -720,7 +720,7 @@ class PlateGirderWelded(Member):
         self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]
         self.beta_b_lt = None
         self.web_philosophy = design_dictionary[KEY_WEB_PHILOSOPHY]
-        self.epsilon = math.sqrt(250 / (self.material.fy / 1e6))
+        self.epsilon = math.sqrt(250 / self.material.fy)  # IS 800:2007: ε = √(250/fy), fy in MPa
         self.b1 = float(design_dictionary[KEY_SUPPORT_WIDTH])
         self.c = design_dictionary[KEY_IntermediateStiffener_spacing]
         self.Is = None
@@ -890,11 +890,13 @@ class PlateGirderWelded(Member):
                 self.flange_warning_logged = False
             if not hasattr(self, 'dimension_warning_logged'):
                 self.dimension_warning_logged = False
-            
+            # Design efficiency check: warn if b/tf is too small (flanges too thick for their width)
+            # NOTE: This is NOT an IS 800:2007 requirement. IS 800 Table 2 has MAXIMUM b/tf limits only.
+            # The 7.4ε threshold is an engineering guideline to avoid material waste.
             min_b_tf = 7.4 * self.epsilon
             b_tf_top = (self.top_flange_width - self.web_thickness) / (2 * self.top_flange_thickness)
             if b_tf_top < min_b_tf and not self.flange_warning_logged:
-                self.logger.warning(f"Top flange b/tf ratio ({b_tf_top:.2f}) is less than minimum ({min_b_tf:.2f}), flanges may be too thick")
+                self.logger.warning(f"Top flange b/tf ratio ({b_tf_top:.2f}) is below efficiency guideline ({min_b_tf:.2f}), consider using thinner flanges")
                 self.flange_warning_logged = True
             
             b_tf_bot = (self.bottom_flange_width - self.web_thickness) / (2 * self.bottom_flange_thickness)
@@ -1318,12 +1320,12 @@ class PlateGirderWelded(Member):
                 self.flange_warning_logged = False
             if not hasattr(self, 'dimension_warning_logged'):
                 self.dimension_warning_logged = False
-            
-            # Check minimum b/tf ratio for flanges to prevent overly thick flanges
+            # Design efficiency check: warn if b/tf is too small (flanges too thick for their width)
+            # NOTE: This is NOT an IS 800:2007 requirement. IS 800 Table 2 has MAXIMUM b/tf limits only.
             min_b_tf = 7.4 * self.epsilon
             b_tf_top = (self.top_flange_width - self.web_thickness) / (2 * self.top_flange_thickness)
             if b_tf_top < min_b_tf and not self.flange_warning_logged:
-                self.logger.warning(f"Top flange b/tf ratio ({b_tf_top:.2f}) is less than minimum ({min_b_tf:.2f}), flanges may be too thick")
+                self.logger.warning(f"Top flange b/tf ratio ({b_tf_top:.2f}) is below efficiency guideline ({min_b_tf:.2f}), consider using thinner flanges")
                 self.flange_warning_logged = True
             
             b_tf_bot = (self.bottom_flange_width - self.web_thickness) / (2 * self.bottom_flange_thickness)

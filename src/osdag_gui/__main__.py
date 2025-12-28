@@ -20,8 +20,12 @@ ensure_safe_startup()
 # Now safe to import Qt and other modules
 # =============================================================================
 from PySide6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtCore import QThread, Signal, QFile, QTextStream
+from PySide6.QtCore import Qt, QThread, Signal, QFile, QTextStream
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
+
+# Disable native file dialogs globally to prevent OpenGL context conflicts
+# This is critical for Linux systems with Intel/Mesa graphics drivers
+QApplication.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeDialogs, True)
 from osdag_core.utils.internet_connectivity import InternetConnectivity
 from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
 from osdag_gui.data.database.database_config import refactor_database, create_user_database

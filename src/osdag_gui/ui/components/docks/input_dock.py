@@ -241,6 +241,7 @@ class InputDock(QWidget):
                 right.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 cur_box_form.addRow(left, left_aligned_widget(right))
             
+            # For Some Compression Member Images
             elif type == TYPE_IMAGE_COMPRESSION:
                 left = ""
                 right = QLabel()
@@ -266,6 +267,20 @@ class InputDock(QWidget):
                 if field[5] != 'No Validator':
                     right.setValidator(self.get_validator(field[5]))
                 cur_box_form.addRow(left, right_aligned_widget(right))
+            
+            # For Base Plate
+            elif type == TYPE_NOTE:
+                left = QLabel(label)
+                left.setObjectName(field[0] + "_label")
+                left.setMinimumWidth(label_width)
+
+                right = QLineEdit()
+                right.setText(field[3])
+                right.setMinimumWidth(input_width)
+                right.setObjectName(field[0] + "_note")
+                right.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                right.setDisabled(True)
+                cur_box_form.addRow(left, left_aligned_widget(right))
             
             if index == len(field_list):
                 # Last Data tupple

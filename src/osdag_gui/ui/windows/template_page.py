@@ -753,7 +753,7 @@ class CustomWindow(QWidget):
         graphics_menu.addSeparator()
         
         # Toggle Optimization Graphs (for Plate Girder PSO visualization)
-        self.toggle_opt_action = QAction("Toggle Optimization Graphs", self)
+        self.toggle_opt_action = QAction("Show Optimization Graph", self)
         self.toggle_opt_action.setShortcut(QKeySequence("Alt+G"))
         self.toggle_opt_action.triggered.connect(self.toggle_optimization_view)
         self.toggle_opt_action.setEnabled(False)  # Enabled after PSO runs
@@ -2165,6 +2165,8 @@ class CustomWindow(QWidget):
     def clear_output_fields(self):
         # Flush PSO Visualization when inputs are unlocked/cleared
         self._cleanup_pso_resources()
+        if hasattr(self, 'toggle_opt_action'):
+            self.toggle_opt_action.setEnabled(False)
         self.cad_widget.show()
         if hasattr(self, 'logs_dock') and self.logs_dock:
             self.logs_dock.show()

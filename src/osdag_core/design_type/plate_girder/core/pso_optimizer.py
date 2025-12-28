@@ -10,19 +10,21 @@ class GlobalBestPSO:
         self.bounds = bounds
         self.swarm = type('Swarm', (), {'position': np.random.uniform(bounds[0], bounds[1], (n_particles, dimensions))})
 
-    def optimize(self, objective_func, iters, debug=True):
+    def optimize(self, objective_func, iters, debug=True, progress_callback=None):
         xopt, fopt = pso(objective_func, self.bounds[0], self.bounds[1],
                         swarmsize=self.n_particles,
                         maxiter=iters,
                         omega=self.options.get('w', 0.5),
                         phip=self.options.get('c1', 0.5),
                         phig=self.options.get('c2', 0.5),
-                        debug=debug)
+                        debug=debug,
+                        progress_callback=progress_callback)
         return fopt, xopt
+
 
 def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         swarmsize=600, omega=0.5, phip=0.5, phig=0.5, maxiter=1000,
-        minstep=1e-8, minfunc=1e-8, debug=False):
+        minstep=1e-8, minfunc=1e-8, debug=False, progress_callback=None):
     assert len(lb) == len(ub)
     lb = np.array(lb)
     ub = np.array(ub)
@@ -88,6 +90,10 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
                 # Option 2 (alternative): reflect or repair (optional)
 
             fx = obj(x[i, :])
+            
+            # Emit progress for visualization
+            if progress_callback:
+                progress_callback(it, i, x[i, :], fx)
 
             # Personal best update
             if is_feasible(x[i, :]) and (fx < fp[i] or not is_feasible(p[i, :])):

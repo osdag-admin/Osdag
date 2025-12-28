@@ -858,7 +858,8 @@ class PlateGirderWelded(Member):
                 is_symmetric = True
             else:
                 is_symmetric = False
-            self.optimized_method(design_dictionary,is_thick_web,is_symmetric)
+            self.optimized_method(design_dictionary, is_thick_web, is_symmetric, 
+                                   viz_callback=getattr(self, '_viz_callback', None))
         else:
             self.design_check(design_dictionary)
 
@@ -1390,6 +1391,46 @@ class PlateGirderWelded(Member):
         if section.t_stiff is not None:
             self.IntStiffThickness = section.t_stiff
 
+    def _calc_particle_area(self, particle, variable_list):
+        """
+        Calculate cross-sectional area (in cm²) from particle position.
+        Used for weight calculation in visualization.
+        
+        Args:
+            particle: Particle position array
+            variable_list: List of variable names corresponding to particle dimensions
+            
+        Returns:
+            Cross-sectional area in cm²
+        """
+        # Extract dimensions from particle based on variable list
+        var_dict = dict(zip(variable_list, particle))
+        
+        # Get dimensions, handling symmetric vs asymmetric cases
+        if 'tf' in var_dict:
+            tf_top = tf_bot = var_dict['tf']
+            bf_top = bf_bot = var_dict.get('bf', 200)
+        else:
+            tf_top = var_dict.get('tf_top', 10)
+            tf_bot = var_dict.get('tf_bot', 10)
+            bf_top = var_dict.get('bf_top', 200)
+            bf_bot = var_dict.get('bf_bot', 200)
+        
+        tw = var_dict.get('tw', 8)
+        D = var_dict.get('D', 1000)
+        
+        # Web height
+        d_web = D - tf_top - tf_bot
+        
+        # Area in mm²
+        area_mm2 = (tf_top * bf_top) + (tf_bot * bf_bot) + (tw * d_web)
+        
+        # Convert to cm²
+        area_cm2 = area_mm2 / 100
+        
+        return area_cm2
+
+
     def evaluate_particle_cost(self, particle, variable_list, design_dictionary, is_symmetric, is_thick_web):
         sec = Section()
         self.assign_particle_to_section(particle, variable_list, sec)
@@ -1705,9 +1746,40 @@ class PlateGirderWelded(Member):
         print(f"RATIOS  moment {self.moment_ratio} shear {self.shear_ratio} deflection {self.deflection_ratio}")
         return max(self.moment_ratio,self.shear_ratio,self.deflection_ratio),self.design_flag,self.design_flag2
 
-    def optimized_method(self,design_dictionary,is_thick_web, is_symmetric):
+    def optimized_method(self, design_dictionary, is_thick_web, is_symmetric, viz_callback=None):
+        """
+        Perform PSO optimization to find optimal plate girder dimensions.
+        
+        Args:
+            design_dictionary: Design input dictionary
+            is_thick_web: True if thick web design
+            is_symmetric: True if symmetric flanges
+            viz_callback: Optional callback(depth, ur, weight, iteration, particle_idx)
+                         for real-time visualization
+        """
         variable_list = self.build_variable_structure(is_thick_web, is_symmetric)
         lb, ub = self.get_bounds(variable_list)
+        
+        # Get index of 'D' (depth) in variable list for visualization
+        depth_idx = variable_list.index('D') if 'D' in variable_list else -1
+        
+        # Create PSO progress callback for visualization
+        def pso_progress_callback(iteration, particle_idx, position, cost):
+            if viz_callback and depth_idx >= 0:
+                # Extract depth from particle position
+                depth = position[depth_idx]
+                
+                # Get current utilization ratio (computed in objective function)
+                ur = getattr(self, 'moment_ratio', 0) or 0
+                
+                # Calculate weight: Area (cm²→m²) × 7850 kg/m³ × Length (mm→m)
+                area_cm2 = self._calc_particle_area(position, variable_list)
+                area_m2 = area_cm2 / 10000  # cm² to m²
+                length_m = self.length / 1000  # mm to m
+                weight_kg = area_m2 * 7850 * length_m
+                
+                # Emit to visualization
+                viz_callback(depth, ur, weight_kg, iteration, particle_idx)
         
         if self.use_intelligent_pso:
             # Prepare discrete lists for Intelligent PSO
@@ -1757,7 +1829,8 @@ class PlateGirderWelded(Member):
         best_cost, best_pos = optimizer.optimize(
             objective_func=lambda particle: self.objective_function(particle, variable_list, design_dictionary, is_symmetric, is_thick_web),
             iters=100,
-            debug=self.debug
+            debug=self.debug,
+            progress_callback=pso_progress_callback
         )
 
         self.logger.info("PSO calculation successfully completed")

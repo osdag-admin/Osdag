@@ -59,9 +59,16 @@ class IntelligentPSO:
                 snapped[idx] = closest
         return snapped
 
-    def optimize(self, objective_func, iters, debug=False):
+    def optimize(self, objective_func, iters, debug=False, progress_callback=None):
         """
         Run the optimization loop.
+        
+        Args:
+            objective_func: Objective function to minimize
+            iters: Number of iterations
+            debug: Enable debug printing
+            progress_callback: Optional callback(iteration, particle_idx, position, score)
+                             for real-time visualization
         """
         for i in range(iters):
             # 1. Evaluate Particles
@@ -72,6 +79,10 @@ class IntelligentPSO:
                 
                 # Evaluate
                 score = objective_func(real_position)
+                
+                # Emit progress for visualization
+                if progress_callback:
+                    progress_callback(i, j, real_position, score)
                 
                 # Update Personal Best
                 if score < self.P_best_scores[j]:

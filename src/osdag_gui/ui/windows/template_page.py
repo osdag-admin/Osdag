@@ -544,6 +544,7 @@ class CustomWindow(QWidget):
         self._input_dock_default_width = input_dock_width
         self.splitter.addWidget(self.input_dock)
 
+
         central_widget = QWidget()
         central_H_layout = QHBoxLayout(central_widget)
 
@@ -750,6 +751,16 @@ class CustomWindow(QWidget):
         graphics_menu.addAction(side_view_action)
 
         graphics_menu.addSeparator()
+        
+        # Toggle Optimization Graphs (for Plate Girder PSO visualization)
+        self.toggle_opt_action = QAction("Toggle Optimization Graphs", self)
+        self.toggle_opt_action.setShortcut(QKeySequence("Alt+G"))
+        self.toggle_opt_action.triggered.connect(self.toggle_optimization_view)
+        self.toggle_opt_action.setEnabled(False)  # Enabled after PSO runs
+        graphics_menu.addAction(self.toggle_opt_action)
+
+        graphics_menu.addSeparator()
+
 
         # Database Menu
         database_menu = self.menu_bar.addMenu("Database")
@@ -1390,15 +1401,221 @@ class CustomWindow(QWidget):
     # This opens loading widget and execute Design
     def start_thread(self, data):
         # Use safety module for multiprocessing (already initialized at startup)
-        # This is safe to call multiple times - will be ignored if already set
         from osdag_gui.OS_safety_protocols import ensure_safe_startup
         ensure_safe_startup()
+        
+        # Cleanup any previous PSO visualization before new design
+        self._cleanup_pso_resources()
+        
+        # Ensure CAD widget is visible
+        self.cad_widget.show()
+        
+        # Check if this is Plate Girder with Optimized design type
+        module_name = self.backend.module_name()
+        is_plate_girder = module_name.upper() == "PLATE GIRDER"
+        
+        # Read design type from the actual input widget (combobox)
+        design_type = 'Unknown'
+        if is_plate_girder and hasattr(self, 'input_dock') and self.input_dock:
+            design_type_widget = self.input_dock.input_widget.findChild(QComboBox, 'Total.Design_Type')
+            if design_type_widget:
+                design_type = design_type_widget.currentText()
+        
+        is_optimized = design_type == 'Optimized'
+        
+        print(f"[DEBUG] module_name: '{module_name}', design_type: '{design_type}'")
+        print(f"[DEBUG] is_plate_girder: {is_plate_girder}, is_optimized: {is_optimized}")
+        
+        if is_plate_girder and is_optimized:
+            print("[DEBUG] → Using PSO Visualization")
+            # Use PSO visualization instead of loading popup
+            self._start_pso_visualization(data)
+        else:
+            print("[DEBUG] → Using standard loading popup")
+            # Standard loading popup for all other modules
+            self.loading = LoadingDialogManager(self.theme.is_light())
+            self.loading.show()
+            self.setEnabled(False)
+            time.sleep(1)
+            self.common_function_for_save_and_design(self.backend, data, "Design")
     
+    def _start_pso_visualization(self, data):
+        """Start PSO optimization with real-time 3D visualization.
+        
+        Replaces CAD Area with Graph Area directly in Splitter.
+        Log Dock remains visible.
+        Graph PERSISTS after optimization until user toggles or unlocks input.
+        """
+        # Cleanup any previous visualization first
+        self._cleanup_pso_resources()
+        
+        try:
+            from osdag_core.design_type.plate_girder.visualization.pso_visualizer import (
+                PSOVisualizerWidget
+            )
+        except ImportError as e:
+            print(f"[WARNING] PSO Visualization not available: {e}")
+            self._run_standard_design(data)
+            return
+        
+        # Build complete design dictionary
+        option_list = self.backend.input_values()
+        for data_key_tuple in self.backend.customized_input():
+            data_key = data_key_tuple[0] + "_customized"
+            if data_key in data.keys() and len(data_key_tuple) == 4:
+                data[data_key] = [data_values for data_values in data[data_key]
+                                  if data_values not in data_key_tuple[2]]
+        
+        # Populate design_inputs
+        self.design_fn(option_list, data, self.backend)
+        
+        # Create visualization widget
+        try:
+            # 1. Hide CAD widget (so it relinquishes space in splitter)
+            self.cad_widget.hide()
+            
+            # 2. Create Viz Widget with splitter as parent
+            self.pso_viz = PSOVisualizerWidget(self.cad_log_splitter, max_iterations=100)
+            
+            # 3. Insert into splitter at index 0 (CAD's position)
+            self.cad_log_splitter.insertWidget(0, self.pso_viz)
+            
+            # 4. Show Viz
+            self.pso_viz.show()
+            
+            # Keep log dock visible
+            if hasattr(self, 'logs_dock') and self.logs_dock:
+                self.logs_dock.show()
+                
+            # Store reference for toggle
+            self._pso_viz_widget = self.pso_viz
+            
+            # Connect toggle
+            self.pso_viz.switch_to_cad.connect(self.toggle_optimization_view)
+            
+            # Callback
+            def viz_callback(depth, ur, weight, iteration, particle_idx):
+                if hasattr(self, 'pso_viz') and self.pso_viz:
+                    self.pso_viz.add_particle_data(depth, ur, weight, iteration, particle_idx)
+            
+            self.backend._viz_callback = viz_callback
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"[WARNING] Failed to create visualization widget: {e}")
+            self.cad_widget.show()
+            self._run_standard_design(data)
+            return
+        
+        # Disable input dock
+        if hasattr(self, 'input_dock'):
+            self.input_dock.setEnabled(False)
+        
+        # Run design
+        try:
+            self.common_function_for_save_and_design(self.backend, data, "Design")
+        finally:
+            if hasattr(self, 'input_dock'):
+                self.input_dock.setEnabled(True)
+        
+        # After completion:
+        # Mark complete, but STAY ON GRAPH.
+        # Do NOT auto-switch to CAD. User must toggle manually.
+        if hasattr(self, 'pso_viz') and self.pso_viz:
+            self.pso_viz.set_complete()
+            # self.pso_viz.hide() # REMOVED: Keep graph visible!
+        
+        # Enable toggle action
+        if hasattr(self, 'toggle_opt_action'):
+            self.toggle_opt_action.setEnabled(True)
+    
+    def _run_standard_design(self, data):
+        """Run standard design flow with loading popup (for non-Plate Girder modules)."""
         self.loading = LoadingDialogManager(self.theme.is_light())
         self.loading.show()
         self.setEnabled(False)
         time.sleep(1)
         self.common_function_for_save_and_design(self.backend, data, "Design")
+    
+    def _cleanup_pso_resources(self):
+        """Clean up PSO visualization resources safely without triggering heap corruption."""
+        from PySide6.QtWidgets import QApplication
+        
+        # First, clear the callback to prevent any more updates
+        if hasattr(self, 'backend') and hasattr(self.backend, '_viz_callback'):
+            self.backend._viz_callback = None
+        
+        # Cleanup visualization widget
+        if hasattr(self, 'pso_viz') and self.pso_viz:
+            try:
+                # Stop all timers first
+                self.pso_viz.cleanup()
+            except Exception:
+                pass
+            
+            try:
+                # Hide and remove from parent
+                self.pso_viz.hide()
+                self.pso_viz.setParent(None)
+            except Exception:
+                pass
+            
+            # Process events to ensure Qt state is consistent
+            try:
+                QApplication.processEvents()
+            except Exception:
+                pass
+            
+            try:
+                # Schedule for deletion
+                self.pso_viz.deleteLater()
+            except Exception:
+                pass
+            
+            # Clear references
+            self.pso_viz = None
+        
+        # Clear widget reference
+        if hasattr(self, '_pso_viz_widget'):
+            self._pso_viz_widget = None
+        
+        # Clear replay data
+        if hasattr(self, '_pso_data_for_replay'):
+            self._pso_data_for_replay = None
+        
+        # Final process events to flush deletion
+        try:
+            QApplication.processEvents()
+        except Exception:
+            pass
+    
+    def _on_pso_complete(self, data, success):
+        """Handle PSO optimization completion (legacy method)."""
+        # Switch to CAD view
+        if hasattr(self, 'pso_viz') and self.pso_viz:
+            self.pso_viz.hide()
+        self.cad_widget.show()
+        
+        # Enable toggle
+        if hasattr(self, 'toggle_opt_action'):
+            self.toggle_opt_action.setEnabled(True)
+    
+    def toggle_optimization_view(self):
+        """Toggle between PSO visualization and CAD view. 
+        Simply flips visibility, preserving layout.
+        """
+        if not hasattr(self, '_pso_viz_widget') or not self._pso_viz_widget:
+            return
+            
+        if self._pso_viz_widget.isVisible():
+            # Switch to CAD
+            self._pso_viz_widget.hide()
+            self.cad_widget.show()
+        else:
+            # Switch to Graphs
+            self.cad_widget.hide()
+            self._pso_viz_widget.show()
     
     def finished_loading(self):
         # print("Custom Logger: ")
@@ -1946,6 +2163,12 @@ class CustomWindow(QWidget):
     #--------------------Unlocking-Inputs-After-Design-Start-----------------------
     # Clear output fields
     def clear_output_fields(self):
+        # Flush PSO Visualization when inputs are unlocked/cleared
+        self._cleanup_pso_resources()
+        self.cad_widget.show()
+        if hasattr(self, 'logs_dock') and self.logs_dock:
+            self.logs_dock.show()
+            
         # Reset the design status
         self.backend.design_status = False
         self.backend.design_button_status = False

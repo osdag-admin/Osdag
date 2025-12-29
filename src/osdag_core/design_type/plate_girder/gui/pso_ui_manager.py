@@ -145,9 +145,9 @@ class PSOUIManager:
             self._last_pso_iter = -1
             
             # Callback for real-time updates (throttled to once per iteration)
-            def viz_callback(depth, ur, weight, iteration, particle_idx):
+            def viz_callback(depth, ur, weight, iteration, particle_idx, position=None, variables=None, lb=None, ub=None):
                 if self.pso_viz:
-                    self.pso_viz.add_particle_data(depth, ur, weight, iteration, particle_idx)
+                    self.pso_viz.add_particle_data(depth, ur, weight, iteration, particle_idx, position, variables, lb, ub)
                     # Only process events once per iteration (not per particle!)
                     if iteration != self._last_pso_iter:
                         self._last_pso_iter = iteration

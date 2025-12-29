@@ -1779,7 +1779,8 @@ class PlateGirderWelded(Member):
                 weight_kg = area_m2 * 7850 * length_m
                 
                 # Emit to visualization
-                viz_callback(depth, ur, weight_kg, iteration, particle_idx)
+                # Pass full position, variable names, and BOUNDS for accurate Parallel Coordinates
+                viz_callback(depth, ur, weight_kg, iteration, particle_idx, list(position), variable_list, list(lb), list(ub))
         
         if self.use_intelligent_pso:
             # Prepare discrete lists for Intelligent PSO

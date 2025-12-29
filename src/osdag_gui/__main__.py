@@ -177,7 +177,6 @@ def GUI():
     #     'CLOSE_BTN_CLICK': '#F1707A'
     # }
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     # font = QFontDatabase.applicationFontFamilies(fid)[0]
     # app.setFont(QFont(font))
@@ -204,6 +203,7 @@ def GUI():
         import time 
         time.sleep(1)
         app.main_window.show()
+        app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
     splash = LaunchScreenPopup(on_finish=show_main_window)
     splash.show()   

@@ -27,7 +27,7 @@ from .utils import ceil_to_nearest, get_K_from_warping_restraint
 # ==============================================================================
 # OPTIMIZATION & DEBUG CONFIGURATION
 # ==============================================================================
-USE_INTELLIGENT_PSO = False  # Set False to use legacy PSO
+USE_INTELLIGENT_PSO = True  # Set False to use legacy PSO
 DEBUG_MODE = False          # Set True to enable detail printing
 # ==============================================================================
 from ..checks.shear import *

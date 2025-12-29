@@ -625,22 +625,23 @@ class PSOVisualizerWidget(QWidget):
             font-weight: bold;
         """)
         
-        # Close button (matching Osdag button style)
+        # Close button (styled with #90AF13 lime green - same as Generate Design Report)
         close_btn = QPushButton("CLOSE")
         close_btn.clicked.connect(self.switch_to_cad.emit)
         close_btn.setStyleSheet("""
             QPushButton { 
-                background-color: #282828; 
-                color: #D0D0D0; 
-                border: 1px solid #D0D0D0;
+                background-color: #90AF13; 
+                color: white; 
+                border: 0px;
                 border-radius: 5px; 
                 padding: 6px 14px; 
                 font-weight: bold; 
             }
             QPushButton:hover { 
-                background-color: #90AF13; 
-                border: 1px solid #90AF13;
-                color: white;
+                background-color: #a0c020; 
+            }
+            QPushButton:pressed { 
+                background-color: #7a9a12; 
             }
         """)
         
@@ -743,18 +744,20 @@ class PSOVisualizerWidget(QWidget):
         replay_title.setStyleSheet("color: #666; font-size: 10px; font-weight: bold; letter-spacing: 1px;")
         replay_layout.addWidget(replay_title)
         
+        # Replay button (styled with #90AF13 lime green - same as Generate Design Report)
         self.replay_btn = QPushButton("▶ REPLAY")
         self.replay_btn.clicked.connect(self.start_replay)
         self.replay_btn.setStyleSheet("""
             QPushButton { 
-                background-color: #6B7D20; 
+                background-color: #90AF13; 
                 color: white; 
                 border-radius: 5px; 
                 padding: 8px; 
                 font-weight: bold;
                 font-size: 11px;
             }
-            QPushButton:hover { background-color: #90AF13; }
+            QPushButton:hover { background-color: #a0c020; }
+            QPushButton:pressed { background-color: #7a9a12; }
         """)
         replay_layout.addWidget(self.replay_btn)
         

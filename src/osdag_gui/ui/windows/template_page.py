@@ -1442,12 +1442,15 @@ class CustomWindow(QWidget):
     def _start_pso_visualization(self, data):
         """Start PSO optimization with real-time 3D visualization.
         
-        Replaces CAD Area with Graph Area directly in Splitter.
-        Log Dock remains visible.
-        Graph PERSISTS after optimization until user toggles or unlocks input.
+        Uses a background thread for optimization so UI updates in real-time.
+        PSO widget replaces CAD widget in the splitter layout directly.
         """
         # Cleanup any previous visualization first
         self._cleanup_pso_resources()
+        
+        # PLATE GIRDER ONLY: Restore the initial horizontal splitter layout
+        # This ensures the input dock retains its original narrow width on re-design
+        self._restore_initial_layout_for_plate_girder()
         
         try:
             from osdag_core.design_type.plate_girder.visualization.pso_visualizer import (
@@ -1471,19 +1474,43 @@ class CustomWindow(QWidget):
         
         # Create visualization widget
         try:
-            # 1. Hide CAD widget (so it relinquishes space in splitter)
+            # Create PSO viz widget
+            self.pso_viz = PSOVisualizerWidget(None, max_iterations=100)
+            
+            # Store CAD widget's parent and layout position
+            # Simply hide CAD and place PSO viz in the same layout
+            # Get splitter index of CAD widget
+            cad_index = self.cad_log_splitter.indexOf(self.cad_widget)
+            
+            # Hide CAD widget completely
             self.cad_widget.hide()
             
-            # 2. Create Viz Widget with splitter as parent
-            self.pso_viz = PSOVisualizerWidget(self.cad_log_splitter, max_iterations=100)
+            # Replace CAD widget with PSO viz at the same index
+            # Note: replaceWidget removes CAD from splitter, so we need to re-add it later
+            # Instead, let's use a different approach: just insert and manage visibility
             
-            # 3. Insert into splitter at index 0 (CAD's position)
+            # The splitter currently has: [cad_widget, logs_dock]
+            # We want: [pso_viz, logs_dock] with cad_widget hidden
+            # After: [cad_widget, logs_dock] again
+            
+            # Remove cad_widget from splitter temporarily
+            self.cad_widget.setParent(None)
+            
+            # Insert PSO viz at index 0
             self.cad_log_splitter.insertWidget(0, self.pso_viz)
-            
-            # 4. Show Viz
             self.pso_viz.show()
             
-            # Keep log dock visible
+            # Store CAD widget for later restoration  
+            self._hidden_cad_widget = self.cad_widget
+            
+            # Set splitter sizes: [viz, logs]
+            total_height = self.cad_log_splitter.height()
+            if total_height > 0:
+                viz_h = int(total_height * 6 / 7)
+                log_h = total_height - viz_h
+                self.cad_log_splitter.setSizes([viz_h, log_h])
+            
+            # Ensure log dock is visible
             if hasattr(self, 'logs_dock') and self.logs_dock:
                 self.logs_dock.show()
                 
@@ -1491,14 +1518,24 @@ class CustomWindow(QWidget):
             self._pso_viz_widget = self.pso_viz
             
             # Connect toggle
-            self.pso_viz.switch_to_cad.connect(self.toggle_optimization_view)
+            self.pso_viz.switch_to_cad.connect(self._restore_cad_from_pso)
             
-            # Callback
+            # Throttle state for UI updates
+            self._last_pso_iter = -1
+            
+            # Callback for real-time updates (throttled to once per iteration)
             def viz_callback(depth, ur, weight, iteration, particle_idx):
                 if hasattr(self, 'pso_viz') and self.pso_viz:
                     self.pso_viz.add_particle_data(depth, ur, weight, iteration, particle_idx)
+                    # Only process events once per iteration (not per particle!)
+                    if iteration != self._last_pso_iter:
+                        self._last_pso_iter = iteration
+                        QApplication.processEvents()
             
             self.backend._viz_callback = viz_callback
+            
+            # Force UI update before starting design
+            QApplication.processEvents()
             
         except Exception as e:
             import traceback
@@ -1508,27 +1545,166 @@ class CustomWindow(QWidget):
             self._run_standard_design(data)
             return
         
-        # Disable input dock
+        # Disable input dock during optimization
         if hasattr(self, 'input_dock'):
             self.input_dock.setEnabled(False)
         
-        # Run design
+        # Hide output dock during optimization
+        if hasattr(self, 'output_dock'):
+            self.output_dock.hide()
+        
+        # Run design SYNCHRONOUSLY on main thread (required for OpenGL safety)
+        # The viz_callback includes processEvents() to update UI in real-time
         try:
             self.common_function_for_save_and_design(self.backend, data, "Design")
         finally:
             if hasattr(self, 'input_dock'):
                 self.input_dock.setEnabled(True)
         
-        # After completion:
-        # Mark complete, but STAY ON GRAPH.
-        # Do NOT auto-switch to CAD. User must toggle manually.
+        # Show output dock after optimization
+        if hasattr(self, 'output_dock'):
+            self.output_dock.show()
+        
+        # Mark PSO visualization as complete
         if hasattr(self, 'pso_viz') and self.pso_viz:
             self.pso_viz.set_complete()
-            # self.pso_viz.hide() # REMOVED: Keep graph visible!
+        
+        # Auto-switch to CAD view after 1.5 second delay
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(1500, self._restore_cad_from_pso)
+        
+        # Log message about Alt+G to see graph (after delay)
+        def log_alt_g_message():
+            if hasattr(self, 'backend') and hasattr(self.backend, 'logger'):
+                self.backend.logger.info("Optimization complete. Press Alt+G to view the optimization graph.")
+        QTimer.singleShot(1500, log_alt_g_message)
         
         # Enable toggle action
         if hasattr(self, 'toggle_opt_action'):
             self.toggle_opt_action.setEnabled(True)
+    
+    def _restore_cad_from_pso(self):
+        """Swap from PSO visualization to CAD widget.
+        Properly removes PSO from splitter before inserting CAD.
+        """
+        # FIRST: Remove PSO viz from splitter (store for later toggle)
+        if hasattr(self, 'pso_viz') and self.pso_viz:
+            self.pso_viz.hide()
+            self.pso_viz.setParent(None)  # Remove from splitter
+            self._hidden_pso_widget = self.pso_viz
+        
+        # THEN: Restore CAD widget to splitter at index 0
+        if hasattr(self, '_hidden_cad_widget') and self._hidden_cad_widget:
+            self.cad_log_splitter.insertWidget(0, self._hidden_cad_widget)
+            self._hidden_cad_widget.show()
+            self.cad_widget = self._hidden_cad_widget
+            self._hidden_cad_widget = None
+        elif hasattr(self, 'cad_widget') and self.cad_widget:
+            # CAD is still in splitter, just show it
+            self.cad_widget.show()
+        
+        # Ensure logs dock is visible
+        if hasattr(self, 'logs_dock') and self.logs_dock:
+            self.logs_dock.show()
+        
+        # Reset splitter sizes for 2 widgets: [cad, logs]
+        total_height = self.cad_log_splitter.height()
+        if total_height > 0:
+            cad_h = int(total_height * 6 / 7)
+            log_h = total_height - cad_h
+            self.cad_log_splitter.setSizes([cad_h, log_h])
+    
+    def _show_pso_from_cad(self):
+        """Swap from CAD widget to PSO visualization.
+        Properly removes CAD from splitter before inserting PSO.
+        """
+        # Only works if we have a hidden PSO widget
+        if not hasattr(self, '_hidden_pso_widget') or not self._hidden_pso_widget:
+            return False
+        
+        # FIRST: Remove CAD from splitter (store for later toggle)
+        if hasattr(self, 'cad_widget') and self.cad_widget:
+            self.cad_widget.hide()
+            self.cad_widget.setParent(None)  # Remove from splitter
+            self._hidden_cad_widget = self.cad_widget
+        
+        # THEN: Insert PSO at index 0
+        self.cad_log_splitter.insertWidget(0, self._hidden_pso_widget)
+        self._hidden_pso_widget.show()
+        self._pso_viz_widget = self._hidden_pso_widget
+        self.pso_viz = self._hidden_pso_widget  # Update main reference
+        self._hidden_pso_widget = None
+        
+        # Ensure logs dock is visible
+        if hasattr(self, 'logs_dock') and self.logs_dock:
+            self.logs_dock.show()
+        
+        # Set splitter sizes for 2 widgets: [pso, logs]
+        total_height = self.cad_log_splitter.height()
+        if total_height > 0:
+            viz_h = int(total_height * 6 / 7)
+            log_h = total_height - viz_h
+            self.cad_log_splitter.setSizes([viz_h, log_h])
+        
+        return True
+    
+    def _restore_initial_layout_for_plate_girder(self):
+        """Restore the initial horizontal splitter layout for Plate Girder module.
+        
+        This ensures the input dock retains its original narrow width when
+        pressing Design multiple times. Only affects horizontal splitter,
+        not the vertical CAD/logs splitter.
+        """
+        try:
+            # Show input dock with original width
+            if hasattr(self, 'input_dock') and self.input_dock:
+                self.input_dock.show()
+                self.input_dock.setEnabled(True)
+                # Unlock input dock for editing during PSO
+                if hasattr(self.input_dock, 'toggle_lock'):
+                    self.input_dock.toggle_lock(set_locked_state=False)
+            
+            # Hide input dock indicator label
+            if hasattr(self, 'input_dock_label'):
+                self.input_dock_label.setVisible(False)
+            
+            # Hide output dock during PSO optimization
+            if hasattr(self, 'output_dock') and self.output_dock:
+                self.output_dock.hide()
+            
+            # Show output dock indicator label
+            if hasattr(self, 'output_dock_label'):
+                self.output_dock_label.setVisible(True)
+            
+            # Restore splitter sizes: [input_dock, central, output_dock=0]
+            if hasattr(self, 'splitter') and self.splitter:
+                # Use stored default width or sizeHint
+                input_width = getattr(self, '_input_dock_default_width', None)
+                if input_width is None:
+                    input_width = self.input_dock.sizeHint().width() if self.input_dock else 320
+                
+                total_width = self.splitter.width()
+                if total_width <= 0:
+                    total_width = self.width()
+                
+                # Layout: [input_dock, central_widget, output_dock=0]
+                center_width = max(0, total_width - input_width)
+                target_sizes = [input_width, center_width, 0]
+                
+                self.splitter.setSizes(target_sizes)
+                try:
+                    self.splitter.refresh()
+                except Exception:
+                    pass
+                self.splitter.update()
+            
+            # Update dock control icons
+            self.input_dock_active = True
+            self.output_dock_active = False
+            self.update_docking_icons(input_is_active=True, output_is_active=False)
+            
+        except Exception as e:
+            print(f"[WARNING] Failed to restore initial layout: {e}")
     
     def _run_standard_design(self, data):
         """Run standard design flow with loading popup (for non-Plate Girder modules)."""
@@ -1576,13 +1752,46 @@ class CustomWindow(QWidget):
             # Clear references
             self.pso_viz = None
         
-        # Clear widget reference
+        # Clear widget references
         if hasattr(self, '_pso_viz_widget'):
             self._pso_viz_widget = None
+        if hasattr(self, '_hidden_pso_widget'):
+            self._hidden_pso_widget = None
         
         # Clear replay data
         if hasattr(self, '_pso_data_for_replay'):
             self._pso_data_for_replay = None
+        
+        # IMPORTANT: Restore hidden CAD widget if it was removed from splitter
+        try:
+            if hasattr(self, '_hidden_cad_widget') and self._hidden_cad_widget:
+                # CAD widget was removed from splitter, restore it
+                self.cad_log_splitter.insertWidget(0, self._hidden_cad_widget)
+                self._hidden_cad_widget.show()
+                self.cad_widget = self._hidden_cad_widget
+                self._hidden_cad_widget = None
+            elif hasattr(self, 'cad_widget') and self.cad_widget:
+                # CAD widget is still in splitter, just show it
+                self.cad_widget.show()
+            
+            # Ensure logs dock is visible
+            if hasattr(self, 'logs_dock') and self.logs_dock:
+                self.logs_dock.show()
+            
+            if hasattr(self, 'cad_log_splitter'):
+                total_height = self.cad_log_splitter.height()
+                if total_height > 0:
+                    cad_h = int(total_height * 6 / 7)
+                    log_h = total_height - cad_h
+                    self.cad_log_splitter.setSizes([cad_h, log_h])
+                    self.cad_log_splitter.setStretchFactor(0, 6)
+                    self.cad_log_splitter.setStretchFactor(1, 1)
+        except Exception:
+            pass
+        
+        # Reset throttle variable for next design run
+        if hasattr(self, '_last_pso_iter'):
+            self._last_pso_iter = -1
         
         # Final process events to flush deletion
         try:
@@ -1603,19 +1812,24 @@ class CustomWindow(QWidget):
     
     def toggle_optimization_view(self):
         """Toggle between PSO visualization and CAD view. 
-        Simply flips visibility, preserving layout.
+        Bidirectional toggle that preserves both widgets.
         """
-        if not hasattr(self, '_pso_viz_widget') or not self._pso_viz_widget:
-            return
-            
-        if self._pso_viz_widget.isVisible():
-            # Switch to CAD
-            self._pso_viz_widget.hide()
-            self.cad_widget.show()
+        # Check if PSO is visible
+        pso_visible = False
+        if hasattr(self, 'pso_viz') and self.pso_viz and self.pso_viz.isVisible():
+            pso_visible = True
+        elif hasattr(self, '_pso_viz_widget') and self._pso_viz_widget and self._pso_viz_widget.isVisible():
+            pso_visible = True
+        
+        if pso_visible:
+            # PSO is visible, switch to CAD
+            self._restore_cad_from_pso()
         else:
-            # Switch to Graphs
-            self.cad_widget.hide()
-            self._pso_viz_widget.show()
+            # CAD is visible, try to switch to PSO
+            if not self._show_pso_from_cad():
+                # No PSO widget available, ensure CAD is shown
+                if hasattr(self, 'cad_widget') and self.cad_widget:
+                    self.cad_widget.show()
     
     def finished_loading(self):
         # print("Custom Logger: ")

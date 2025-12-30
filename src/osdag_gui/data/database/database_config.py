@@ -233,7 +233,7 @@ MODULE_MAP = {
     KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Simple Connection', 'open_butt_joint_bolted_simple_conn'],
     KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Simple Connection', 'open_butt_joint_welded_simple_conn'],
 
-    KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection', 'None'],
+    KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection', 'open_base_plate_conn'],
     #---------Connections-end-----------------------------------------------------------
 
     #---------Tension-Member-start------------------------------------------------------

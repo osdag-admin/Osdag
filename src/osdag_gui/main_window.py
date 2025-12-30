@@ -47,6 +47,7 @@ from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBea
 from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
 from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
 from osdag_core.design_type.flexural_member.flexure import Flexure
 from osdag_core.design_type.flexural_member.flexure_purlin import Flexure_Purlin
 from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
@@ -603,6 +604,11 @@ class MainWindow(QMainWindow):
         elif card_title == "Purlin":
             self.open_purlin_flexure()
 
+        #---------Base Plate Connection------------------
+        elif card_title == "Base Plate Connection":
+            self.open_base_plate_conn()
+
+
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
     def common_open_module(self, backend_class, title):
@@ -724,6 +730,10 @@ class MainWindow(QMainWindow):
     # 23-Flexure-purlin
     def open_purlin_flexure(self):
         self.common_open_module(Flexure_Purlin, "Purlin")
+
+    # 24-Base-Plate-connection
+    def open_base_plate_conn(self):
+        self.common_open_module(BasePlateConnection, "Base Plate Connection")
 
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)

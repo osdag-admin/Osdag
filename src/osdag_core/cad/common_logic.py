@@ -2577,7 +2577,35 @@ class CommonDesignLogic(object):
                 column = self.BPObj.get_column_model()
                 plate = self.BPObj.get_plate_connector_models()
                 weld = self.BPObj.get_welded_models()
+                nut_bolt = self.BPObj.get_nut_bolt_array_models()
+                conc = self.BPObj.get_concrete_models()
+                grout = self.BPObj.get_grout_models()
 
+                hover_dict = self.Bp.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
+
+                label_column = ["Column", hover_dict.get("Column")]
+                label_plate = ["Plate", hover_dict.get("Plate")]
+                label_weld = ["Weld", hover_dict.get("Weld")]
+                label_bolt = ["Bolt", hover_dict.get("Bolt")]
+                label_conc = ["Conc", hover_dict.get("Conc")]
+                label_grout = ["Grout", hover_dict.get("Grout")]
+
+                if self.component == "Model":  # Todo: change this into key
+                    osdag_display_shape(self.display, column, update=True, color=column_color, label=label_column, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, plate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, weld, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nut_bolt, update=True, color=bolt_color, label=label_bolt, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, conc, transparency=0.5, color=GRAY, update=True , label=label_conc, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, grout, transparency=0.5, color=GRAY, update=True , label=label_grout, canvas=self.cad_widget)
+
+                elif self.component == "Column":
+                    osdag_display_shape(self.display, column, update=True, color=column_color, label=label_column,canvas=self.cad_widget)
+
+                elif self.component == "Connector":
+                    osdag_display_shape(self.display, plate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, weld, color=weld_color, label=label_weld,canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nut_bolt, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Columns with known support conditions':
             self.col = self.module_object  

@@ -2,7 +2,7 @@ from osdag_core.Common import (KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CL
                                KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED, KEY_DISP_BUTTJOINTBOLTED,
                                KEY_DISP_BUTTJOINTWELDED, KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_STRUT_WELDED_END_GUSSET,
-                               KEY_DISP_COMPRESSION_COLUMN, KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_FLEXURE4, KEY_DISP_PLATE_GIRDER_WELDED)
+                               KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_COMPRESSION_COLUMN, KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_FLEXURE4, KEY_DISP_PLATE_GIRDER_WELDED)
 from pathlib import Path
 from importlib.resources import files
 
@@ -46,6 +46,7 @@ SEARCH_MODULE_MAP = {
     'Bolted to End Gusset Tension Member': KEY_DISP_TENSION_BOLTED,
     'Welded to End Gusset Tension Member': KEY_DISP_TENSION_WELDED,
     'Struts Welded to End Gusset Compression Member': KEY_DISP_STRUT_WELDED_END_GUSSET,
+    'Struts Bolted to End Gusset Compression Member': KEY_DISP_STRUT_BOLTED_END_GUSSET,
     'Axially Loaded Columns Compression Member': KEY_DISP_COMPRESSION_COLUMN,
     'Simply Supported Beam Flexural Member': KEY_DISP_FLEXURE,
     'Cantilever Beam Flexural Member': KEY_DISP_FLEXURE2,
@@ -242,6 +243,7 @@ MODULE_MAP = {
     #---------Tension-Member-end------------------------------------------------------
 
     #---------Compression-Member-start------------------------------------------------------
+    KEY_DISP_STRUT_BOLTED_END_GUSSET: ['Struts Bolted to End Gusset', 'Compression Member', 'open_struts_bolted_end_gusset_compress_member'],
     KEY_DISP_STRUT_WELDED_END_GUSSET: ['Struts Welded to End Gusset', 'Compression Member', 'open_struts_weld_end_gusset_compress_member'],
     KEY_DISP_COMPRESSION_COLUMN: ['Axially Loaded Columns', 'Compression Member', 'None'],
     KEY_DISP_COMPRESSION_COLUMN: ['Columns with Support', 'Compression Member', 'open_column_design_compress_member'],

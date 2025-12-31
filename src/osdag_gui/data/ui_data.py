@@ -54,6 +54,7 @@ class Data:
         ],
         "Compression Member": 
         [
+            ("Struts Bolted to End Gusset", ":/vectors/struts_weld_end_gusset.svg"),
             ("Struts Welded to End Gusset", ":/vectors/struts_weld_end_gusset.svg"),
             ("Column Design", ":/vectors/column_design_compression_mem.svg"),
         ],

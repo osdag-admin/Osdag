@@ -39,6 +39,7 @@ from osdag_core.design_type.connection.lap_joint_bolted import LapJointBolted
 from osdag_core.design_type.connection.butt_joint_bolted import ButtJointBolted
 from osdag_core.design_type.connection.butt_joint_welded import ButtJointWelded
 from osdag_core.design_type.compression_member.compression import Compression
+from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
 from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
 from osdag_core.design_type.compression_member.Column import ColumnDesign
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
@@ -593,6 +594,8 @@ class MainWindow(QMainWindow):
             self.open_column_design_compress_member()
         elif card_title == "Struts Welded to End Gusset":
             self.open_struts_weld_end_gusset_compress_member()
+        elif card_title == "Struts Bolted to End Gusset":
+            self.open_struts_bolted_end_gusset_compress_member()
 
         #----------Flexure-Member--------------
         elif card_title == "Simply Supported Beam":
@@ -714,6 +717,9 @@ class MainWindow(QMainWindow):
     # 19-Struts-welded-to-end-gusset-compression-member
     def open_struts_weld_end_gusset_compress_member(self):
         self.common_open_module(Compression, "Struts: Welded to End Gusset")
+
+    def open_struts_bolted_end_gusset_compress_member(self):
+        self.common_open_module(Compression_bolted, "Struts: Bolted to End Gusset")
 
     # 20-Simply-Supported-Beam-Flexure-member
     def open_simply_supported_beam_flexure(self):

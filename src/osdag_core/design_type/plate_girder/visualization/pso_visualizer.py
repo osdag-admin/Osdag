@@ -100,7 +100,7 @@ class DataProcessor:
                     'iteration': iteration, 'particle_idx': particle_idx
                 }
                 if position:
-                    entry['position'] = position
+                    entry['position'] = list(position)  # Store a copy
                 self.history.append(entry)
             
             # Update ranges for dynamic scaling
@@ -111,13 +111,19 @@ class DataProcessor:
             self.ur_range[1] = max(self.ur_range[1], ur)
             
             # Update best tracking (feasible solutions only)
+            # CRITICAL: Update ALL best fields atomically when a new best is found
             if weight < self.best_weight and ur <= 1.0:
                 self.best_weight = weight
                 self.best_pos = (depth, ur, weight)
                 self.best_iteration = iteration
                 self.best_particle_id = particle_idx
+                # Always update position vector when best changes
                 if position:
                     self.best_position_vector = list(position)
+                else:
+                    # Position not passed - try to find from current entry or keep existing
+                    # This shouldn't happen in normal flow, but guard against it
+                    pass
             
             # Update particle trails (keep last 15 points)
             if particle_idx not in self.particles:
@@ -126,7 +132,7 @@ class DataProcessor:
             self.particles[particle_idx]['current'] = (depth, ur, weight)
             self.particles[particle_idx]['iteration'] = iteration
             if position:
-                self.particles[particle_idx]['position'] = position
+                self.particles[particle_idx]['position'] = list(position)
                 
     def get_render_data(self) -> dict:
         """Get current state for rendering."""
@@ -428,58 +434,40 @@ class MatplotlibCanvas(FigureCanvas):
         ax.set_xlim(-max(bf_top, bf_bot)/2 - margin, max(bf_top, bf_bot)/2 + margin)
         ax.set_ylim(-margin * 0.5, D + margin * 0.5)
         
-        # ===== DIMENSION LABELS =====
-        label_offset = max_dim * 0.08
-        arrow_props = dict(arrowstyle='<->', color='black', lw=1.5)
+        # ===== CLEAN DIMENSION LABELS =====
+        label_offset = max_dim * 0.06
+        arrow_props = dict(arrowstyle='<->', color='#333', lw=1.2)
         
-        # Y-Y Axis (vertical, through center)
-        ax.annotate('', xy=(0, -margin * 0.3), xytext=(0, D + margin * 0.2),
-                   arrowprops=dict(arrowstyle='-', color='red', lw=1.5, linestyle='--'))
-        ax.text(label_offset * 0.5, D + margin * 0.3, 'Y', fontsize=12, fontweight='bold', color='red')
-        ax.text(label_offset * 0.5, -margin * 0.4, 'Y', fontsize=12, fontweight='bold', color='red')
+        # Y-Y Axis (vertical, through center) - subtle dashed line
+        ax.plot([0, 0], [-margin * 0.2, D + margin * 0.15], 
+               color='#C41E3A', lw=1.2, linestyle='--', alpha=0.7)
+        ax.text(label_offset * 0.4, D + margin * 0.2, 'Y', fontsize=10, fontweight='bold', color='#C41E3A')
+        ax.text(label_offset * 0.4, -margin * 0.28, 'Y', fontsize=10, fontweight='bold', color='#C41E3A')
         
-        # Z-Z Axis (horizontal, through mid-height)
+        # Z-Z Axis (horizontal, through mid-height) - subtle dashed line
         mid_y = D / 2
-        ax.annotate('', xy=(-max(bf_top, bf_bot)/2 - margin * 0.2, mid_y), 
-                   xytext=(max(bf_top, bf_bot)/2 + margin * 0.2, mid_y),
-                   arrowprops=dict(arrowstyle='-', color='red', lw=1.5, linestyle='--'))
-        ax.text(max(bf_top, bf_bot)/2 + margin * 0.3, mid_y, 'Z', fontsize=12, fontweight='bold', color='red')
-        ax.text(-max(bf_top, bf_bot)/2 - margin * 0.4, mid_y, 'Z', fontsize=12, fontweight='bold', color='red')
+        half_w = max(bf_top, bf_bot) / 2
+        ax.plot([-half_w - margin * 0.15, half_w + margin * 0.15], [mid_y, mid_y],
+               color='#C41E3A', lw=1.2, linestyle='--', alpha=0.7)
+        ax.text(half_w + margin * 0.2, mid_y, 'Z', fontsize=10, fontweight='bold', color='#C41E3A')
+        ax.text(-half_w - margin * 0.25, mid_y, 'Z', fontsize=10, fontweight='bold', color='#C41E3A')
         
-        # D (Total Depth) - right side
-        x_d = max(bf_top, bf_bot)/2 + label_offset * 2
-        ax.annotate('', xy=(x_d, 0), xytext=(x_d, D),
-                   arrowprops=arrow_props)
-        ax.text(x_d + label_offset, D/2, f'D\n{D:.0f}', fontsize=10, ha='left', va='center', fontweight='bold')
+        # D (Total Depth) - right side, clean arrow
+        x_d = half_w + label_offset * 2.5
+        ax.annotate('', xy=(x_d, 0), xytext=(x_d, D), arrowprops=arrow_props)
+        ax.text(x_d + label_offset * 0.8, D/2, f'D={D:.0f}', fontsize=9, ha='left', va='center', fontweight='bold')
         
-        # B (Flange Width) - bottom
-        y_b = -label_offset * 2
-        ax.annotate('', xy=(-bf_bot/2, y_b), xytext=(bf_bot/2, y_b),
-                   arrowprops=arrow_props)
-        ax.text(0, y_b - label_offset, f'B = {bf_bot:.0f}', fontsize=10, ha='center', va='top', fontweight='bold')
+        # B (Flange Width) - bottom, clean arrow
+        y_b = -label_offset * 2.5
+        ax.annotate('', xy=(-bf_bot/2, y_b), xytext=(bf_bot/2, y_b), arrowprops=arrow_props)
+        ax.text(0, y_b - label_offset * 1.2, f'B={bf_bot:.0f}', fontsize=9, ha='center', va='top', fontweight='bold')
         
-        # t (Web Thickness) - at mid-height
-        y_t = D / 2
-        ax.annotate('', xy=(-tw/2, y_t + label_offset * 0.5), xytext=(tw/2, y_t + label_offset * 0.5),
-                   arrowprops=dict(arrowstyle='<->', color='blue', lw=1))
-        ax.text(tw/2 + label_offset * 0.5, y_t + label_offset, f't={tw:.1f}', fontsize=9, ha='left', color='blue')
-        
-        # tf (Flange Thickness) - top flange, left side
-        x_tf = -bf_top/2 - label_offset
-        ax.annotate('', xy=(x_tf, D - tf_top), xytext=(x_tf, D),
-                   arrowprops=dict(arrowstyle='<->', color='green', lw=1))
-        ax.text(x_tf - label_offset, D - tf_top/2, f'tf={tf_top:.1f}', fontsize=9, ha='right', color='green', va='center')
-        
-        # R1, R2 fillet indicators (small arcs at web-flange junctions)
-        # Top-right fillet
-        arc1 = Arc((tw/2, D - tf_top), R1*2, R1*2, angle=0, theta1=0, theta2=90, color='purple', lw=1)
-        ax.add_patch(arc1)
-        ax.text(tw/2 + R1 + label_offset * 0.3, D - tf_top - R1, f'R1', fontsize=8, color='purple')
-        
-        # Bottom-right fillet
-        arc2 = Arc((tw/2, tf_bot), R2*2, R2*2, angle=0, theta1=270, theta2=360, color='purple', lw=1)
-        ax.add_patch(arc2)
-        ax.text(tw/2 + R2 + label_offset * 0.3, tf_bot + R2, f'R2', fontsize=8, color='purple')
+        # ===== DIMENSION TABLE (below I-beam, clean format) =====
+        table_y = -margin * 0.45
+        table_text = f"tw={tw:.1f}  │  tf={tf_top:.1f}  │  R1={R1:.1f}  │  R2={R2:.1f}"
+        ax.text(0, table_y, table_text, fontsize=8, ha='center', va='top', 
+               color='#555', fontfamily='monospace',
+               bbox=dict(boxstyle='round,pad=0.3', facecolor='#f8f8f8', edgecolor='#ddd', alpha=0.9))
         
         # ===== GLOBAL BEST INFO BOX =====
         if best_pos:
@@ -768,12 +756,18 @@ class PSOVisualizerWidget(QWidget):
         self._flush_buffer()
         self.is_complete = True
         
-        # Final update
+        # CRITICAL: Force final canvas update with latest data
         data = self.data_processor.get_render_data()
         if data:
+            # Update the canvas with final data
+            self.canvas.update_plot(data)
+            
+            # Update header labels
             best_iter = data.get('best_iteration', 0)
             best_pid = data.get('best_particle_id', 0)
             self.lbl_iter.setText(f"COMPLETE: {data['iteration'] + 1} iterations")
+            self.lbl_best.setText(f"BEST: {data['best_weight']:.0f} kg")
+            self.lbl_particle.setText(f"PARTICLE: {best_pid + 1} @ Iter {best_iter + 1}")
             self.lbl_status.setText(
                 f"Optimization Complete | Best found at Iteration {best_iter + 1}, Particle {best_pid + 1}"
             )

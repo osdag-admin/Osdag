@@ -1769,8 +1769,12 @@ class PlateGirderWelded(Member):
                 # Extract depth from particle position
                 depth = position[depth_idx]
                 
-                # Get current utilization ratio (computed in objective function)
-                ur = getattr(self, 'moment_ratio', 0) or 0
+                # Get current utilization ratio - use max of all constraint ratios
+                # This matches how result_UR is calculated in final_format()
+                moment_r = getattr(self, 'moment_ratio', 0) or 0
+                shear_r = getattr(self, 'shear_ratio', 0) or 0
+                defl_r = getattr(self, 'deflection_ratio', 0) or 0
+                ur = max(moment_r, shear_r, defl_r)
                 
                 # Calculate weight: Area (cm²→m²) × 7850 kg/m³ × Length (mm→m)
                 area_cm2 = self._calc_particle_area(position, variable_list)

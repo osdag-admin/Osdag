@@ -187,6 +187,61 @@ class PSOUIManager:
         if hasattr(self.parent, 'output_dock'):
             self.parent.output_dock.show()
         
+        # CRITICAL: Sync final design data to visualizer (after adjustments like rounding)
+        # This ensures the visualization shows the same values as the Output Dock
+        if self.pso_viz and hasattr(self.parent, 'backend'):
+            backend = self.parent.backend
+            try:
+                # Get final adjusted values from backend
+                final_d = getattr(backend, 'total_depth', 0)
+                final_tw = getattr(backend, 'web_thickness', 0)
+                final_bf_top = getattr(backend, 'top_flange_width', 0)
+                final_bf_bot = getattr(backend, 'bottom_flange_width', 0)
+                final_tf_top = getattr(backend, 'top_flange_thickness', 0)
+                final_tf_bot = getattr(backend, 'bottom_flange_thickness', 0)
+                final_ur = getattr(backend, 'result_UR', 0) or 0
+                
+                # Calculate final weight
+                area_mm2 = (final_tf_top * final_bf_top) + (final_tf_bot * final_bf_bot) + \
+                           (final_tw * (final_d - final_tf_top - final_tf_bot))
+                area_m2 = area_mm2 / 1e6
+                length_m = getattr(backend, 'length', 0) / 1000
+                final_weight = area_m2 * 7850 * length_m
+                
+                # Use the data processor lock for thread safety
+                dp = self.pso_viz.data_processor
+                with dp.lock:
+                    # Build position vector matching the EXISTING variable_names from PSO
+                    existing_names = dp.variable_names or []
+                    
+                    # Map from variable name to backend value
+                    var_to_value = {
+                        'D': final_d, 'd': final_d,
+                        'tw': final_tw,
+                        'bf': final_bf_top, 'bf_top': final_bf_top, 'bf_bot': final_bf_bot,
+                        'tf': final_tf_top, 'tf_top': final_tf_top, 'tf_bot': final_tf_bot,
+                        'c': getattr(backend, 'c', 0) or 0,
+                        't_stiff': getattr(backend, 'IntStiffThickness', 0) or 0
+                    }
+                    
+                    # Build position vector in same order as PSO variable_names
+                    if existing_names:
+                        final_position = [var_to_value.get(name, 0) for name in existing_names]
+                    else:
+                        # Fallback: simple symmetric girder layout
+                        final_position = [final_d, final_tw, final_bf_top, final_tf_top]
+                        dp.variable_names = ['D', 'tw', 'bf', 'tf']
+                    
+                    # Update best data
+                    dp.best_weight = final_weight
+                    dp.best_pos = (final_d, final_ur, final_weight)
+                    dp.best_position_vector = final_position
+                        
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(f"[WARNING] Failed to sync final data: {e}")
+        
         # Mark PSO visualization as complete
         if self.pso_viz:
             self.pso_viz.set_complete()

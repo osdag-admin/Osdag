@@ -1,55 +1,46 @@
 """
-Matplotlib 3D PSO Visualizer
-============================
-Beautiful 3D visualization of Particle Swarm Optimization using Matplotlib.
-
-Features:
-- 3D scatter plot with labeled X, Y, Z axes in empty space
-- 2D convergence graph showing global best over iterations
-- Threaded data processing for smooth real-time updates
-- Replay functionality after optimization completes
-- Save animation as GIF
-- Proper labels, legends, and color coding
+PSO Visualizer - 3D Cloud Plot + Cross-Section View
+=====================================================
+Visualization of Particle Swarm Optimization results with:
+- 3D scatter plot: Utilization Ratio vs Weight vs Depth
+- Engineering cross-section view with dimension labels
+- Global best particle tracking with iteration and particle ID
 """
 
 from typing import List, Dict, Tuple, Optional
 import numpy as np
 from collections import deque
 from threading import RLock
-import os
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle
-from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.patches import Rectangle, FancyBboxPatch, FancyArrowPatch, Arc
+from matplotlib.collections import PatchCollection
 from matplotlib.colors import Normalize
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('QtAgg')
 
 from PySide6.QtCore import Qt, Signal, QTimer
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QPushButton, QApplication, QFrame, QSlider,
-    QSizePolicy, QFileDialog, QRadioButton
+    QPushButton, QApplication, QFrame,
+    QSizePolicy, QFileDialog
 )
 from PySide6.QtGui import QFont
-
-# Matplotlib imports with Qt backend
-import matplotlib
-matplotlib.use('QtAgg')
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.animation as animation
 
 
 # ============== COLORS (matching Osdag theme) ==============
 SAFE_COLOR = '#4ADE80'      # Green for feasible (UR <= 1)
 FAIL_COLOR = '#F87171'      # Red for infeasible (UR > 1)
 OPTIMAL_COLOR = '#FFD700'   # Gold for global best
-ACCENT_BLUE = '#38BDF8'     # Sky Blue
+ACCENT_BLUE = '#2563EB'     # Strong blue for cross-section
 OSDAG_GREEN = '#2E9F4F'     # Osdag theme green
 HEADER_GREEN = '#6B7D20'    # Osdag olive header
+SECTION_FILL = '#4A90D9'    # Blue fill for I-beam section
+SECTION_EDGE = '#1E3A8A'    # Dark blue edge
 
 
 # Memory limit constants for 8GB RAM compatibility
@@ -71,20 +62,20 @@ class DataProcessor:
         
         # History
         self.history: List[Dict] = []
-        self.convergence_history: List[Tuple[int, float]] = []
         
         # Current visible particles
         self.particles: Dict[int, Dict] = {}
         
         # Variable Metadata
         self.variable_names = []
-        self.variable_bounds = {}
+        self.variable_bounds = {'lb': [], 'ub': []}
         
         # Best Solution Tracking
         self.best_weight = float('inf')
         self.best_pos = None
         self.best_position_vector = None
-        self.variable_bounds = {'lb': [], 'ub': []}
+        self.best_iteration = 0
+        self.best_particle_id = 0
         
     def add_particle_data(self, depth: float, ur: float, weight: float,
                           iteration: int, particle_idx: int, position: list = None, 
@@ -119,18 +110,14 @@ class DataProcessor:
             self.weight_range[1] = max(self.weight_range[1], weight)
             self.ur_range[1] = max(self.ur_range[1], ur)
             
-            # Update best and convergence history
+            # Update best tracking (feasible solutions only)
             if weight < self.best_weight and ur <= 1.0:
                 self.best_weight = weight
                 self.best_pos = (depth, ur, weight)
+                self.best_iteration = iteration
+                self.best_particle_id = particle_idx
                 if position:
                     self.best_position_vector = list(position)
-            
-            # Always record running best at each iteration (for smooth convergence curve)
-            if self.best_weight != float('inf'):
-                if (not self.convergence_history or 
-                    self.convergence_history[-1][0] != iteration):
-                    self.convergence_history.append((iteration, self.best_weight))
             
             # Update particle trails (keep last 15 points)
             if particle_idx not in self.particles:
@@ -171,64 +158,10 @@ class DataProcessor:
                 'best_pos': self.best_pos,
                 'global_best_position': self.best_position_vector,
                 'best_weight': self.best_weight,
-                'convergence': list(self.convergence_history),
+                'best_iteration': self.best_iteration,
+                'best_particle_id': self.best_particle_id,
                 'history': list(self.history),
                 'iteration': max((p.get('iteration', 0) for p in self.particles.values()), default=0),
-                'variable_names': self.variable_names,
-                'variable_bounds': self.variable_bounds
-            }
-    
-    def get_history_frame(self, frame_idx: int) -> Optional[dict]:
-        """Get accumulated particle data up to a specific frame for replay."""
-        with self.lock:
-            if frame_idx >= len(self.history):
-                return None
-            
-            current_iteration = self.history[frame_idx]['iteration']
-            particles = {}
-            best_w = float('inf')
-            best_p = None
-            best_position_vector = None
-            convergence = []
-            
-            # Build particles from ALL history up to this frame
-            # This shows the evolution of particles across iterations
-            for i in range(frame_idx + 1):
-                h = self.history[i]
-                pid = h['particle_idx']
-                
-                # Create particle entry if needed
-                if pid not in particles:
-                    particles[pid] = {'trail': deque(maxlen=10)}
-                
-                # Add to trail
-                particles[pid]['trail'].append((h['depth'], h['ur'], h['weight']))
-                particles[pid]['current'] = (h['depth'], h['ur'], h['weight'])
-                if 'position' in h:
-                    particles[pid]['position'] = h['position']
-                particles[pid]['iteration'] = h['iteration']
-                
-                # Track best
-                if h['weight'] < best_w and h['ur'] <= 1.0:
-                    best_w = h['weight']
-                    best_p = (h['depth'], h['ur'], h['weight'])
-                    if 'position' in h:
-                        best_position_vector = list(h['position'])
-                    if (not convergence or convergence[-1][0] != h['iteration']):
-                        convergence.append((h['iteration'], h['weight']))
-            
-            return {
-                'particles': particles,
-                'depth_range': list(self.depth_range),
-                'ur_range': list(self.ur_range),
-                'weight_range': list(self.weight_range),
-                'best_pos': best_p,
-                'global_best_position': best_position_vector,
-                'best_weight': best_w,
-                'convergence': convergence,
-                'history': list(self.history[:frame_idx+1]),
-                'iteration': current_iteration,
-                'is_replay': True,
                 'variable_names': self.variable_names,
                 'variable_bounds': self.variable_bounds
             }
@@ -243,27 +176,21 @@ class DataProcessor:
         with self.lock:
             self.history.clear()
             self.history = []
-            self.convergence_history.clear()
-            self.convergence_history = []
             self.particles.clear()
             self.particles = {}
             self.best_weight = float('inf')
             self.best_pos = None
+            self.best_position_vector = None
             self.depth_range = [float('inf'), float('-inf')]
             self.ur_range = [0.0, 2.0]
             self.weight_range = [float('inf'), float('-inf')]
 
 
 class MatplotlibCanvas(FigureCanvas):
-    """Scientific Engineering Dashboard for PSO Optimization.
-    
-    Layout:
-    [        Parallel Coordinates Plot (Search History)          ]
-    [ Performance Map (Weight vs UR) ] [ Live Cross-Section View ]
-    """
+    """Two-Panel Visualization: 3D Cloud Plot + Cross-Section View."""
     
     def __init__(self, parent=None):
-        self.fig = Figure(figsize=(14, 9), dpi=80, facecolor='#ffffff')
+        self.fig = Figure(figsize=(16, 8), dpi=90, facecolor='#ffffff')
         super().__init__(self.fig)
         self.setParent(parent)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -273,313 +200,59 @@ class MatplotlibCanvas(FigureCanvas):
         self._setup_layout()
         
     def _setup_layout(self):
-        """Create the 3-panel dashboard layout."""
-        # GridSpec: 2 Rows. Top row is taller (1.2x).
-        self.gs = self.fig.add_gridspec(2, 2, height_ratios=[1.1, 1], hspace=0.30, wspace=0.20, 
-                                   left=0.06, right=0.96, top=0.92, bottom=0.08)
+        """Create the 2-panel layout: 3D plot + Cross-section."""
+        # GridSpec: 1 Row, 2 Columns (60% / 40% split)
+        self.gs = self.fig.add_gridspec(1, 5, wspace=0.15, 
+                                        left=0.05, right=0.95, top=0.90, bottom=0.10)
         
-        # 1. Parallel Coordinates (Top)
-        self.ax_parallel = self.fig.add_subplot(self.gs[0, :])
+        # 1. 3D Cloud Scatter Plot (Left - 60%)
+        self.ax_3d = self.fig.add_subplot(self.gs[0, :3], projection='3d')
         
-        # 2. Performance Map (Bottom Left)
-        self.ax_perf = self.fig.add_subplot(self.gs[1, 0])
-        
-        # 3. Cross Section Preview (Bottom Right)
-        self.ax_sect = self.fig.add_subplot(self.gs[1, 1])
+        # 2. Cross-Section View (Right - 40%)
+        self.ax_sect = self.fig.add_subplot(self.gs[0, 3:])
 
     def update_plot(self, data: dict):
-        """Update the entire dashboard with new frame data."""
+        """Update both panels with new data."""
         # Clear Axes
-        self.ax_parallel.cla()
-        self.ax_perf.cla()
+        self.ax_3d.cla()
         self.ax_sect.cla()
-        self.ax_parallel.set_title("Search Dynamics V3 | Design Variable Convergence", fontsize=10, pad=10)
         
-        # 1. Setup Parallel Coordinates
-        self._setup_parallel_axes(data)
-        self._plot_parallel_coords(data)
+        # 1. 3D Cloud Plot
+        self._setup_3d_axes(data)
+        self._plot_3d_cloud(data)
         
-        # 2. Setup Performance Map
-        self._setup_perf_axes(data)
-        self._plot_performance(data)
-        
-        # 3. Setup Section View
+        # 2. Cross-Section View
         self._setup_section_axes()
-        self._plot_best_section(data)
+        self._plot_cross_section(data)
         
         self.draw_idle()
 
-    def _setup_parallel_axes(self, data):
-        """Configure Parallel Coordinates Axis."""
-        self.ax_parallel.set_title("Search Dynamics | Design Variable Convergence", fontsize=10, fontweight='bold', pad=8)
-        self.ax_parallel.set_ylabel("Normalized Range (%)", fontsize=9)
-        self.ax_parallel.set_ylim(-2, 102)  # 0-100% with padding
-        self.ax_parallel.grid(True, alpha=0.3)
-        self.ax_parallel.axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
-        self.ax_parallel.axhline(y=100, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
-        
-        names = data.get('variable_names', [])
-        if names:
-            self.ax_parallel.set_xticks(range(len(names)))
-            self.ax_parallel.set_xticklabels(names, rotation=15, fontsize=8)
-            self.ax_parallel.set_xlim(-0.5, len(names) - 0.5)
-
-    def _setup_perf_axes(self, data):
-        """Configure Performance Map Axis."""
-        self.ax_perf.set_title("Objective Space: Weight vs Constraints", fontsize=10, fontweight='bold')
-        self.ax_perf.set_xlabel("Weight (kg)", fontsize=9)
-        self.ax_perf.set_ylabel("Utilization Ratio (UR)", fontsize=9)
-        self.ax_perf.grid(True, linestyle='--', alpha=0.5)
-        
-        # Feasibility Line
-        self.ax_perf.axhline(y=1.0, color='r', linestyle='-', linewidth=1.5, alpha=0.6)
-        self.ax_perf.text(0.02, 1.02, "Limit (UR=1.0)", transform=self.ax_perf.transAxes, color='red', fontsize=8)
-
-    def _setup_section_axes(self):
-        """Configure Section Preview Axis."""
-        self.ax_sect.set_title("Best Cross-Section (To Scale)", fontsize=10, fontweight='bold')
-        self.ax_sect.set_aspect('equal')
-        self.ax_sect.axis('off')
-
-    def _plot_parallel_coords(self, data):
-        """Render Parallel Coordinates lines."""
-        particles = data.get('particles', {})
-        bounds = data.get('variable_bounds', {})
-        lbs = bounds.get('lb', [])
-        ubs = bounds.get('ub', [])
-        
-        if not lbs or not ubs:
-            # Try to grab from global if available (fallback)
-            self.ax_parallel.text(0.5, 0.5, "Waiting for Bounds...", ha='center', transform=self.ax_parallel.transAxes)
-            return
-
-        segments = []
-        colors = []
-        
-        # 1. Plot History (Faint Background)
-        history = data.get('history', [])
-        # Optimization: Limit history rendering to last 500 feasible points to avoid lag if critical
-        # But user asked for it, so let's try rendering 1000 sample
-        
-        hist_segments = []
-        hist_colors = []
-        
-        for entry in history[-2000:]: # Limit to last 2000 for perf
-            pos = entry.get('position')
-            ur = entry.get('ur', 0)
-            
-            if pos and len(pos) == len(lbs):
-                 norm_pos = []
-                 for i, val in enumerate(pos):
-                    span = ubs[i] - lbs[i]
-                    if span == 0: span = 1
-                    norm = (val - lbs[i]) / span * 100
-                    norm_pos.append(norm)
-                 
-                 hist_segments.append(list(enumerate(norm_pos)))
-                 hist_colors.append((0.5, 0.5, 0.6, 0.05)) # Neutral Grey-Blue for History
-
-        if hist_segments:
-             lc_hist = LineCollection(hist_segments, colors=hist_colors, linewidths=0.5)
-             self.ax_parallel.add_collection(lc_hist)
-
-        # 2. Plot Current Swarm (Bold)
-        segments = []
-        colors = []
-        
-        for p_data in particles.values():
-            pos = p_data.get('position')
-            ur = p_data.get('current', (0,0,0))[1]
-            
-            if pos and len(pos) == len(lbs):
-                # Normalize Position
-                norm_pos = []
-                for i, val in enumerate(pos):
-                    span = ubs[i] - lbs[i]
-                    if span == 0: span = 1
-                    norm = (val - lbs[i]) / span * 100
-                    norm_pos.append(norm)
-                
-                points = list(enumerate(norm_pos))
-                segments.append(points)
-                
-                # Color Code
-                if ur <= 1.0:
-                    colors.append('blue') # Standard Blue
-                else:
-                    colors.append('red') # Standard Red
-            else:
-                 # Debug check
-                 pass # Already debugged
-
-        if segments:
-            lc = LineCollection(segments, colors=colors, linewidths=2.0) # Thicker lines
-            self.ax_parallel.add_collection(lc)
-
-        # 3. Plot Global Best (Persistent Gold Line)
-        best_vec = data.get('global_best_position')
-        if best_vec and len(best_vec) == len(lbs):
-             norm_best = []
-             for i, val in enumerate(best_vec):
-                span = ubs[i] - lbs[i]
-                if span == 0: span = 1
-                norm = (val - lbs[i]) / span * 100
-                norm_best.append(norm)
-             
-             # Plot as a distinct dashed line
-             self.ax_parallel.plot(range(len(norm_best)), norm_best, color='gold', linewidth=3.0, linestyle='--', label='Global Best')
-             # Add dots at vertices
-             self.ax_parallel.scatter(range(len(norm_best)), norm_best, color='gold', s=40, zorder=10)
-
-    def _plot_performance(self, data):
-        """Render Performance Scatter with History."""
-        particles = data.get('particles', {})
-        history = data.get('history', [])
-        
-        # 1. History Points
-        h_weights = []
-        h_urs = []
-        h_colors = []
-        
-        for entry in history[-3000:]: # Limit to last 3000
-            w = entry.get('weight', 0)
-            ur = entry.get('ur', 0)
-            h_weights.append(w)
-            h_urs.append(ur)
-            if ur > 1.0: h_colors.append('#FCA5A533') # Fade Red
-            else: h_colors.append('#93C5FD44') # Fade Blue (Wait, #93C5FD is blue-300)
-            
-        if h_weights:
-            self.ax_perf.scatter(h_weights, h_urs, c=h_colors, s=10, marker='.', edgecolors='none') # Bigger dots
-            
-        # 2. Current Swarm
-        weights = []
-        urs = []
-        colors = []
-        
-        for p_data in particles.values():
-            _, ur, w = p_data.get('current', (0,0,0))
-            weights.append(w)
-            urs.append(ur)
-            
-            if ur > 1.0:
-                colors.append('#DC2626') # Strong Red
-            else:
-                colors.append('#2563EB') # Strong Blue
-        
-        if weights:
-             self.ax_perf.scatter(weights, urs, c=colors, s=30, alpha=1.0, edgecolors='white', linewidth=0.5)
-             
-             # Highlight Best (Vertical Line + Star)
-             best_w = data.get('best_weight')
-             best_p = data.get('best_pos') # (depth, ur, weight)
-             
-             if best_w and best_w != float('inf'):
-                 self.ax_perf.axvline(x=best_w, color='#F59E0B', linestyle='--', alpha=0.8, linewidth=1.5)
-                 
-                 # Plot the specific Best Point if available
-                 if best_p:
-                     _, best_ur, _ = best_p
-                     self.ax_perf.scatter([best_w], [best_ur], c='gold', s=80, marker='D', edgecolors='black', zorder=20, label='Global Best')
-                 
-                 # Dynamic Limits
-                 all_w = weights + h_weights
-                 all_ur = urs + h_urs
-                 if all_w:
-                     min_w, max_w = min(all_w), max(all_w)
-                     margin = (max_w - min_w) * 0.1 if max_w != min_w else 1000
-                     self.ax_perf.set_xlim(min_w - margin, max_w + margin)
-                     self.ax_perf.set_ylim(0, max(2.0, max(all_ur) if all_ur else 2.0))
-
-    def _plot_best_section(self, data):
-        """Render the best cross-section using stored GLOBAL BEST vector."""
-        names = data.get('variable_names', [])
-        best_vector = data.get('global_best_position')
-        
-        if best_vector and names:
-            dims = dict(zip(names, best_vector))
-            D = dims.get('D', 1000)
-            tw = dims.get('tw', 8)
-            
-            if 'bf' in dims and 'tf' in dims:
-                 bf_top = bf_bot = dims['bf']
-                 tf_top = tf_bot = dims['tf']
-            else:
-                bf_top = dims.get('bf_top', 200)
-                bf_bot = dims.get('bf_bot', 200)
-                tf_top = dims.get('tf_top', 12)
-                tf_bot = dims.get('tf_bot', 12)
-            
-            patches = []
-            patches.append(Rectangle((-bf_bot/2, 0), bf_bot, tf_bot)) # Bot
-            patches.append(Rectangle((-tw/2, tf_bot), tw, D - tf_top - tf_bot)) # Web
-            patches.append(Rectangle((-bf_top/2, D - tf_top), bf_top, tf_top)) # Top
-            
-            pc = PatchCollection(patches, facecolor='#2563EB', edgecolor='#1E3A8A', alpha=0.9)
-            self.ax_sect.add_collection(pc)
-            
-            max_w = max(bf_top, bf_bot)
-            self.ax_sect.set_xlim(-max_w - 50, max_w + 50)
-            self.ax_sect.set_ylim(-100, D + 150)
-            
-            self.ax_sect.text(0, D/2, f"D={D:.0f}\ntw={tw:.1f}", ha='center', va='center', fontsize=10, color='white', fontweight='bold')
-            self.ax_sect.text(0, -50, f"Bot: {bf_bot:.0f}x{tf_bot:.1f}", ha='center', fontsize=9)
-            self.ax_sect.text(0, D + 20, f"Top: {bf_top:.0f}x{tf_top:.1f}", ha='center', fontsize=9)
-        else:
-             msg = "No Feasible Solution Yet"
-             if not names: msg += "\n(Waiting for Metadata)"
-             elif not best_vector: msg += "\n(Searching...)"
-             self.ax_sect.text(0.5, 0.5, msg, ha='center', transform=self.ax_sect.transAxes)
-
-    def cleanup(self):
-        """Clean up matplotlib resources."""
-        try:
-            plt.close(self.fig)
-        except Exception:
-            pass
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.updateGeometry()
-        
-        # Create subplots: 3D on left (75% width), 2D convergence on right (25%)
-        from matplotlib.gridspec import GridSpec
-        gs = GridSpec(1, 4, figure=self.fig)  # 4 columns
-        self.ax_3d = self.fig.add_subplot(gs[0, :3], projection='3d')  # First 3 columns
-        self.ax_conv = self.fig.add_subplot(gs[0, 3])  # Last column
-        
-        # Style the 3D axes
-        self._setup_3d_axes()
-        self._setup_convergence_axes()
-        
-        self.fig.tight_layout(pad=2.0)
-        
-        # Data lock
-        self.lock = Lock()
-        self.render_data = None
-        
-        # Scatter and line plot references (for efficient updates)
-        self._scatter_feasible = None
-        self._scatter_infeasible = None
-        self._scatter_best = None
-        self._conv_line = None
-        
-    def _setup_3d_axes(self):
+    def _setup_3d_axes(self, data):
         """Configure 3D axes appearance."""
         ax = self.ax_3d
         
-        # Set labels
-        ax.set_xlabel('X (Depth)', fontsize=10, fontweight='bold', labelpad=10)
-        ax.set_ylabel('Y (Weight)', fontsize=10, fontweight='bold', labelpad=10)
-        ax.set_zlabel('Z (Feasibility)', fontsize=10, fontweight='bold', labelpad=10)
-        
         # Title
-        ax.set_title('3D PSO Convergence', fontsize=12, fontweight='bold', pad=15)
+        ax.set_title('3D Scatter Plot: Utilization Ratio vs Depth vs Weight', 
+                     fontsize=11, fontweight='bold', pad=15)
         
-        # Set background to white (empty space style)
+        # Axis labels with units
+        ax.set_xlabel('Utilization Ratio', fontsize=10, labelpad=10)
+        ax.set_ylabel('Depth (mm)', fontsize=10, labelpad=10)
+        ax.set_zlabel('Weight (kg)', fontsize=10, labelpad=10)
+        
+        # Set axis ranges from data
+        ur_range = data.get('ur_range', [0, 2])
+        depth_range = data.get('depth_range', [0, 2000])
+        weight_range = data.get('weight_range', [0, 50000])
+        
+        ax.set_xlim(0, max(1.5, ur_range[1]))
+        ax.set_ylim(depth_range[0], depth_range[1])
+        ax.set_zlim(weight_range[0], weight_range[1])
+        
+        # Background style (white, clean)
         ax.xaxis.pane.fill = False
         ax.yaxis.pane.fill = False
         ax.zaxis.pane.fill = False
-        
-        # Make panes transparent
         ax.xaxis.pane.set_edgecolor('lightgray')
         ax.yaxis.pane.set_edgecolor('lightgray')
         ax.zaxis.pane.set_edgecolor('lightgray')
@@ -587,230 +260,249 @@ class MatplotlibCanvas(FigureCanvas):
         # Grid
         ax.grid(True, alpha=0.3, linestyle='--')
         
-        # Initial view angle
-        ax.view_init(elev=25, azim=225)
+        # View angle (same as reference)
+        ax.view_init(elev=20, azim=225)
         
-    def _setup_convergence_axes(self):
-        """Configure 2D convergence axes appearance."""
-        ax = self.ax_conv
-        
-        ax.set_xlabel('Iteration', fontsize=11, fontweight='bold')
-        ax.set_ylabel('Best Value', fontsize=11, fontweight='bold')
-        ax.set_title('Global Best Convergence', fontsize=12, fontweight='bold')
-        
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.set_facecolor('white')
-        
-        # Initialize Layout
-        self._setup_layout()
-        
-    def _setup_layout(self):
-        """Create the 3-panel dashboard layout."""
-        # GridSpec: 2 Rows. Top row is taller (1.2x).
-        self.gs = self.fig.add_gridspec(2, 2, height_ratios=[1.1, 1], hspace=0.30, wspace=0.20, 
-                                   left=0.06, right=0.96, top=0.92, bottom=0.08)
-        
-        # 1. Parallel Coordinates (Top)
-        self.ax_parallel = self.fig.add_subplot(self.gs[0, :])
-        
-        # 2. Performance Map (Bottom Left)
-        self.ax_perf = self.fig.add_subplot(self.gs[1, 0])
-        
-        # 3. Cross Section Preview (Bottom Right)
-        self.ax_sect = self.fig.add_subplot(self.gs[1, 1])
+        # Add UR=1.0 plane reference (feasibility boundary)
+        ur_limit = 1.0
+        d_vals = np.linspace(depth_range[0], depth_range[1], 2)
+        w_vals = np.linspace(weight_range[0], weight_range[1], 2)
+        DV, WV = np.meshgrid(d_vals, w_vals)
+        UV = np.ones_like(DV) * ur_limit
+        ax.plot_surface(UV, DV, WV, alpha=0.1, color='red', linewidth=0)
 
-    def update_plot(self, data: dict):
-        """Update the entire dashboard with new frame data."""
-        # Clear Axes
-        self.ax_parallel.cla()
-        self.ax_perf.cla()
-        self.ax_sect.cla()
+    def _plot_3d_cloud(self, data):
+        """Render 3D scatter cloud plot."""
+        ax = self.ax_3d
+        history = data.get('history', [])
         
-        # 1. Setup Parallel Coordinates
-        self._setup_parallel_axes(data)
-        self._plot_parallel_coords(data)
+        if not history:
+            ax.text2D(0.5, 0.5, "Waiting for data...", 
+                     transform=ax.transAxes, ha='center', fontsize=12, color='gray')
+            return
         
-        # 2. Setup Performance Map
-        self._setup_perf_axes(data)
-        self._plot_performance(data)
+        # Separate feasible and infeasible points
+        feasible_pts = []
+        infeasible_pts = []
         
-        # 3. Setup Section View
-        self._setup_section_axes()
-        self._plot_best_section(data)
+        for entry in history:
+            ur = entry.get('ur', 0)
+            depth = entry.get('depth', 0)
+            weight = entry.get('weight', 0)
+            
+            if ur <= 1.0:
+                feasible_pts.append((ur, depth, weight))
+            else:
+                infeasible_pts.append((ur, depth, weight))
         
-        self.draw_idle()
-
-    def _setup_parallel_axes(self, data):
-        """Configure Parallel Coordinates Axis."""
-        self.ax_parallel.set_title("Search Dynamics | Design Variable Convergence", fontsize=10, fontweight='bold', pad=8)
-        self.ax_parallel.set_ylabel("Normalized Range (%)", fontsize=9)
-        self.ax_parallel.set_ylim(-2, 102)  # 0-100% with padding
-        self.ax_parallel.grid(True, alpha=0.3)
-        self.ax_parallel.axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
-        self.ax_parallel.axhline(y=100, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
+        # Plot infeasible points (red, smaller, faint)
+        if infeasible_pts:
+            inf_ur, inf_d, inf_w = zip(*infeasible_pts)
+            ax.scatter(inf_ur, inf_d, inf_w, 
+                      c=FAIL_COLOR, s=20, alpha=0.4, marker='s',
+                      label='Utilization > 1')
         
-        # Set x-ticks from variable names
-        names = data.get('variable_names', [])
-        if names:
-            self.ax_parallel.set_xticks(range(len(names)))
-            self.ax_parallel.set_xticklabels(names, rotation=15, fontsize=8)
-            self.ax_parallel.set_xlim(-0.5, len(names) - 0.5)
-
-    def _setup_perf_axes(self, data):
-        """Configure Performance Map Axis."""
-        self.ax_perf.set_title("Objective Space: Weight vs Constraints", fontsize=10, fontweight='bold')
-        self.ax_perf.set_xlabel("Weight (kg)", fontsize=9)
-        self.ax_perf.set_ylabel("Utilization Ratio (UR)", fontsize=9)
-        self.ax_perf.grid(True, linestyle='--', alpha=0.5)
+        # Plot feasible points (green)
+        if feasible_pts:
+            feas_ur, feas_d, feas_w = zip(*feasible_pts)
+            ax.scatter(feas_ur, feas_d, feas_w, 
+                      c=SAFE_COLOR, s=30, alpha=0.7, marker='o',
+                      label='Utilization ≤ 1')
         
-        # Feasibility Line
-        self.ax_perf.axhline(y=1.0, color='r', linestyle='-', linewidth=1.5, alpha=0.6)
-        self.ax_perf.text(0.02, 1.02, "Limit (UR=1.0)", transform=self.ax_perf.transAxes, color='red', fontsize=8)
+        # Plot global best (gold star, prominent)
+        best_pos = data.get('best_pos')
+        best_weight = data.get('best_weight', float('inf'))
+        
+        if best_pos and best_weight != float('inf'):
+            b_depth, b_ur, b_weight = best_pos
+            
+            # Large gold star marker
+            ax.scatter([b_ur], [b_depth], [b_weight], 
+                      c=OPTIMAL_COLOR, s=200, marker='*', 
+                      edgecolors='black', linewidth=1,
+                      label='Global Best', zorder=10)
+            
+            # Draw trajectory line from origin to best
+            ax.plot([0, b_ur], [b_depth, b_depth], [b_weight, b_weight],
+                   color=OPTIMAL_COLOR, linewidth=2, linestyle='-', alpha=0.8)
+            
+            # Annotation box
+            best_vector = data.get('global_best_position')
+            names = data.get('variable_names', [])
+            best_iter = data.get('best_iteration', 0)
+            best_pid = data.get('best_particle_id', 0)
+            
+            if best_vector and names:
+                dims = dict(zip(names, best_vector))
+                D = dims.get('D', dims.get('d', 0))
+                tw = dims.get('tw', 0)
+                bf = dims.get('bf', dims.get('bf_top', 0))
+                tf = dims.get('tf', dims.get('tf_top', 0))
+                
+                annotation_text = (
+                    f"Global Best:\n"
+                    f"  Iter: {best_iter + 1} | Particle: {best_pid + 1}\n"
+                    f"  Depth: {D:.1f} mm\n"
+                    f"  Width: {bf:.1f} mm\n"
+                    f"  Weight: {b_weight:.1f} kg\n"
+                    f"  UR: {b_ur:.3f}"
+                )
+                
+                # Text box annotation (2D overlay)
+                ax.text2D(0.02, 0.98, annotation_text, 
+                         transform=ax.transAxes, fontsize=9,
+                         verticalalignment='top',
+                         bbox=dict(boxstyle='round,pad=0.5', 
+                                  facecolor='lightyellow', 
+                                  edgecolor='gray', alpha=0.9),
+                         fontfamily='monospace')
+        
+        # Legend
+        ax.legend(loc='upper right', fontsize=8, framealpha=0.9)
 
     def _setup_section_axes(self):
-        """Configure Section Preview Axis."""
-        self.ax_sect.set_title("Best Cross-Section (To Scale)", fontsize=10, fontweight='bold')
-        self.ax_sect.set_aspect('equal')
-        self.ax_sect.axis('off')
+        """Configure cross-section view axes."""
+        ax = self.ax_sect
+        ax.set_title('Best Cross-Section (I-Beam)', fontsize=11, fontweight='bold', pad=10)
+        ax.set_aspect('equal')
+        ax.axis('off')
 
-    def _plot_parallel_coords(self, data):
-        """Render Parallel Coordinates lines."""
-        particles = data.get('particles', {})
-        bounds = data.get('variable_bounds', {})
-        lbs = bounds.get('lb', [])
-        ubs = bounds.get('ub', [])
-        
-        if not lbs or not ubs:
-            self.ax_parallel.text(0.5, 0.5, "Waiting for Bounds...", ha='center', transform=self.ax_parallel.transAxes)
-            return
-
-        segments = []
-        colors = []
-        
-        # Iterate particles
-        for p_data in particles.values():
-            pos = p_data.get('position')
-            ur = p_data.get('current', (0,0,0))[1]
-            
-            if pos and len(pos) == len(lbs):
-                # Normalize Position: (val - min) / (max - min) * 100
-                norm_pos = []
-                for i, val in enumerate(pos):
-                    span = ubs[i] - lbs[i]
-                    if span == 0: span = 1  # Avoid division by zero
-                    norm = (val - lbs[i]) / span * 100
-                    norm_pos.append(norm)
-                
-                # Create polyline points: (x_idx, y_norm_val)
-                points = list(enumerate(norm_pos))
-                segments.append(points)
-                
-                # Color Code
-                if ur <= 1.0:
-                    colors.append((0.1, 0.7, 0.3, 0.2)) # Green, translucent
-                else:
-                    colors.append((0.9, 0.1, 0.1, 0.05)) # Red, very faint
-
-        if segments:
-            from matplotlib.collections import LineCollection
-            lc = LineCollection(segments, colors=colors, linewidths=1.0)
-            self.ax_parallel.add_collection(lc)
-
-    def _plot_performance(self, data):
-        """Render Performance Scatter."""
-        particles = data.get('particles', {})
-        weights = []
-        urs = []
-        colors = []
-        
-        for p_data in particles.values():
-            # Get currentUR/Weight
-            _, ur, w = p_data.get('current', (0,0,0))
-            weights.append(w)
-            urs.append(ur)
-            
-            # Color map based heavily on Feasibility
-            if ur > 1.0:
-                colors.append('#F87171') # Red
-            else:
-                colors.append('#4ADE80') # Green
-        
-        if weights:
-             self.ax_perf.scatter(weights, urs, c=colors, s=20, alpha=0.7, edgecolors='none')
-             
-             # Highlight Global Best
-             best_w = data.get('best_weight')
-             if best_w and best_w != float('inf'):
-                 # Find matching point (heuristic)
-                 self.ax_perf.axvline(x=best_w, color='blue', linestyle='--', alpha=0.4)
-                 
-                 # Set dynamic limits
-                 min_w, max_w = min(weights), max(weights)
-                 margin = (max_w - min_w) * 0.1 if max_w != min_w else 100
-                 self.ax_perf.set_xlim(min_w - margin, max_w + margin)
-                 self.ax_perf.set_ylim(0, max(2.0, max(urs)))
-
-    def _plot_best_section(self, data):
-        """Render the best cross-section."""
-        particles = data.get('particles', {})
+    def _plot_cross_section(self, data):
+        """Render I-beam cross-section with engineering labels."""
+        ax = self.ax_sect
         names = data.get('variable_names', [])
-        best_w = data.get('best_weight', float('inf'))
+        best_vector = data.get('global_best_position')
+        best_iter = data.get('best_iteration', 0)
+        best_pid = data.get('best_particle_id', 0)
+        best_weight = data.get('best_weight', float('inf'))
+        best_pos = data.get('best_pos')
         
-        best_vector = None
+        if not best_vector or not names:
+            ax.text(0.5, 0.5, "No Feasible Solution Yet\n(Searching...)", 
+                   ha='center', va='center', transform=ax.transAxes,
+                   fontsize=14, color='gray')
+            return
         
-        # Find the vector corresponding to best weight (feasible)
-        # Note: DataProcessor tracks 'best_pos' but it is (d, u, w). Use particles to find full vector.
-        for p_data in particles.values():
-            _, ur, w = p_data.get('current', (0,0,0))
-            if w == best_w and ur <= 1.0:
-                 best_vector = p_data.get('position')
-                 break
+        # Extract dimensions from best solution
+        dims = dict(zip(names, best_vector))
         
-        if best_vector and names:
-            from matplotlib.patches import Rectangle
-            from matplotlib.collections import PatchCollection
-            # Map values
-            dims = dict(zip(names, best_vector))
-            
-            # Extract Dimensions
-            D = dims.get('D', 1000)
-            tw = dims.get('tw', 8)
-            
-            if 'bf' in dims:
-                bf_top = bf_bot = dims['bf']
-                tf_top = tf_bot = dims['tf']
-            else:
-                bf_top = dims.get('bf_top', 200)
-                bf_bot = dims.get('bf_bot', 200)
-                tf_top = dims.get('tf_top', 12)
-                tf_bot = dims.get('tf_bot', 12)
-            
-            # Draw Patches
-            patches = []
-            
-            # Bottom Flange
-            patches.append(Rectangle((-bf_bot/2, 0), bf_bot, tf_bot))
-            
-            # Web
-            patches.append(Rectangle((-tw/2, tf_bot), tw, D - tf_top - tf_bot))
-            
-            # Top Flange
-            patches.append(Rectangle((-bf_top/2, D - tf_top), bf_top, tf_top))
-            
-            pc = PatchCollection(patches, facecolor='#3b82f6', edgecolor='#1e40af', alpha=0.8)
-            self.ax_sect.add_collection(pc)
-            
-            # Set Limits
-            max_w = max(bf_top, bf_bot)
-            self.ax_sect.set_xlim(-max_w, max_w)
-            self.ax_sect.set_ylim(-100, D + 100)
-            
-            # Annotate
-            self.ax_sect.text(0, D/2, f"D={D:.0f}\ntw={tw:.1f}", ha='center', va='center', fontsize=9, color='white', fontweight='bold')
-            self.ax_sect.text(0, -50, f"Bot: {bf_bot:.0f}x{tf_bot:.1f}", ha='center', fontsize=8)
-            self.ax_sect.text(0, D + 20, f"Top: {bf_top:.0f}x{tf_top:.1f}", ha='center', fontsize=8)
+        D = dims.get('D', dims.get('d', 1000))
+        tw = dims.get('tw', 10)
+        
+        # Handle symmetric or asymmetric flanges
+        if 'bf' in dims and 'tf' in dims:
+            bf_top = bf_bot = dims['bf']
+            tf_top = tf_bot = dims['tf']
         else:
-             self.ax_sect.text(0.5, 0.5, "No Feasible Solution Yet", ha='center', transform=self.ax_sect.transAxes)
+            bf_top = dims.get('bf_top', 200)
+            bf_bot = dims.get('bf_bot', 200)
+            tf_top = dims.get('tf_top', 15)
+            tf_bot = dims.get('tf_bot', 15)
+        
+        # Fillet radii (if available, else defaults)
+        R1 = dims.get('R1', min(tw, tf_top) * 0.5)
+        R2 = dims.get('R2', min(tw, tf_bot) * 0.5)
+        
+        # Draw I-beam cross-section
+        # Scale factor for visibility
+        max_dim = max(D, bf_top, bf_bot)
+        
+        # Bottom flange
+        bot_flange = Rectangle((-bf_bot/2, 0), bf_bot, tf_bot,
+                               facecolor=SECTION_FILL, edgecolor=SECTION_EDGE, linewidth=2)
+        ax.add_patch(bot_flange)
+        
+        # Web
+        web_height = D - tf_top - tf_bot
+        web = Rectangle((-tw/2, tf_bot), tw, web_height,
+                        facecolor=SECTION_FILL, edgecolor=SECTION_EDGE, linewidth=2)
+        ax.add_patch(web)
+        
+        # Top flange
+        top_flange = Rectangle((-bf_top/2, D - tf_top), bf_top, tf_top,
+                               facecolor=SECTION_FILL, edgecolor=SECTION_EDGE, linewidth=2)
+        ax.add_patch(top_flange)
+        
+        # Set view limits
+        margin = max_dim * 0.4
+        ax.set_xlim(-max(bf_top, bf_bot)/2 - margin, max(bf_top, bf_bot)/2 + margin)
+        ax.set_ylim(-margin * 0.5, D + margin * 0.5)
+        
+        # ===== DIMENSION LABELS =====
+        label_offset = max_dim * 0.08
+        arrow_props = dict(arrowstyle='<->', color='black', lw=1.5)
+        
+        # Y-Y Axis (vertical, through center)
+        ax.annotate('', xy=(0, -margin * 0.3), xytext=(0, D + margin * 0.2),
+                   arrowprops=dict(arrowstyle='-', color='red', lw=1.5, linestyle='--'))
+        ax.text(label_offset * 0.5, D + margin * 0.3, 'Y', fontsize=12, fontweight='bold', color='red')
+        ax.text(label_offset * 0.5, -margin * 0.4, 'Y', fontsize=12, fontweight='bold', color='red')
+        
+        # Z-Z Axis (horizontal, through mid-height)
+        mid_y = D / 2
+        ax.annotate('', xy=(-max(bf_top, bf_bot)/2 - margin * 0.2, mid_y), 
+                   xytext=(max(bf_top, bf_bot)/2 + margin * 0.2, mid_y),
+                   arrowprops=dict(arrowstyle='-', color='red', lw=1.5, linestyle='--'))
+        ax.text(max(bf_top, bf_bot)/2 + margin * 0.3, mid_y, 'Z', fontsize=12, fontweight='bold', color='red')
+        ax.text(-max(bf_top, bf_bot)/2 - margin * 0.4, mid_y, 'Z', fontsize=12, fontweight='bold', color='red')
+        
+        # D (Total Depth) - right side
+        x_d = max(bf_top, bf_bot)/2 + label_offset * 2
+        ax.annotate('', xy=(x_d, 0), xytext=(x_d, D),
+                   arrowprops=arrow_props)
+        ax.text(x_d + label_offset, D/2, f'D\n{D:.0f}', fontsize=10, ha='left', va='center', fontweight='bold')
+        
+        # B (Flange Width) - bottom
+        y_b = -label_offset * 2
+        ax.annotate('', xy=(-bf_bot/2, y_b), xytext=(bf_bot/2, y_b),
+                   arrowprops=arrow_props)
+        ax.text(0, y_b - label_offset, f'B = {bf_bot:.0f}', fontsize=10, ha='center', va='top', fontweight='bold')
+        
+        # t (Web Thickness) - at mid-height
+        y_t = D / 2
+        ax.annotate('', xy=(-tw/2, y_t + label_offset * 0.5), xytext=(tw/2, y_t + label_offset * 0.5),
+                   arrowprops=dict(arrowstyle='<->', color='blue', lw=1))
+        ax.text(tw/2 + label_offset * 0.5, y_t + label_offset, f't={tw:.1f}', fontsize=9, ha='left', color='blue')
+        
+        # tf (Flange Thickness) - top flange, left side
+        x_tf = -bf_top/2 - label_offset
+        ax.annotate('', xy=(x_tf, D - tf_top), xytext=(x_tf, D),
+                   arrowprops=dict(arrowstyle='<->', color='green', lw=1))
+        ax.text(x_tf - label_offset, D - tf_top/2, f'tf={tf_top:.1f}', fontsize=9, ha='right', color='green', va='center')
+        
+        # R1, R2 fillet indicators (small arcs at web-flange junctions)
+        # Top-right fillet
+        arc1 = Arc((tw/2, D - tf_top), R1*2, R1*2, angle=0, theta1=0, theta2=90, color='purple', lw=1)
+        ax.add_patch(arc1)
+        ax.text(tw/2 + R1 + label_offset * 0.3, D - tf_top - R1, f'R1', fontsize=8, color='purple')
+        
+        # Bottom-right fillet
+        arc2 = Arc((tw/2, tf_bot), R2*2, R2*2, angle=0, theta1=270, theta2=360, color='purple', lw=1)
+        ax.add_patch(arc2)
+        ax.text(tw/2 + R2 + label_offset * 0.3, tf_bot + R2, f'R2', fontsize=8, color='purple')
+        
+        # ===== GLOBAL BEST INFO BOX =====
+        if best_pos:
+            b_depth, b_ur, b_weight = best_pos
+            info_text = (
+                f"GLOBAL BEST SOLUTION\n"
+                f"━━━━━━━━━━━━━━━━━━━━━\n"
+                f"Iteration: {best_iter + 1}\n"
+                f"Particle ID: {best_pid + 1}\n"
+                f"━━━━━━━━━━━━━━━━━━━━━\n"
+                f"Weight: {b_weight:.1f} kg\n"
+                f"Utilization: {b_ur:.4f}"
+            )
+            
+            # Position info box at top-left
+            ax.text(0.02, 0.98, info_text, 
+                   transform=ax.transAxes, fontsize=10,
+                   verticalalignment='top', ha='left',
+                   bbox=dict(boxstyle='round,pad=0.6', 
+                            facecolor='#f0f9ff', 
+                            edgecolor=HEADER_GREEN, 
+                            linewidth=2, alpha=0.95),
+                   fontfamily='monospace', fontweight='bold')
 
     def cleanup(self):
         """Clean up matplotlib resources."""
@@ -821,51 +513,31 @@ class MatplotlibCanvas(FigureCanvas):
 
 
 class PSOVisualizerWidget(QWidget):
-    """Main PSO Visualizer Widget with Matplotlib rendering."""
+    """Main PSO Visualizer Widget with 3D Cloud Plot + Cross-Section."""
     switch_to_cad = Signal()
     
     def __init__(self, parent=None, max_iterations=100):
         super().__init__(parent)
-        print("DEBUG: Loading Updated PSO Visualizer V2 (Blue Theme + Global Best)")
+        print("DEBUG: Loading PSO Visualizer V3 (3D Cloud + Cross-Section)")
         self.setWindowFlags(self.windowFlags() | Qt.Dialog)
         self.max_iter = max_iterations
         self.is_complete = False
-        self.is_replaying = False
         
         # Data processor
         self.data_processor = DataProcessor()
         
         # Batch buffer for performance
-        self.batch_buffer = {'d': [], 'u': [], 'w': [], 'i': [], 'p': []}
-        
-        # Pre-rendered frame cache for smooth replay
-        self.cached_frames = []  # List of (iteration, best_w, history_idx) tuples
-        self.is_replaying = False
-        self.cache_index = 0
-        self.cached_data = {}
-        self.cache_ready = False
-        
-        # Interactive Tooltip State
-        self.tooltip = None
-        self.hover_active = False
-        self.current_scatters = {}
-        self.current_frame_real_data = {}
+        self.batch_buffer = {'d': [], 'u': [], 'w': [], 'i': [], 'p': [], 
+                            'pos': [], 'vars': [], 'lb': [], 'ub': []}
         
         # Setup UI
         self.setup_ui()
         
-        # Timer for replay
-        self.replay_timer = QTimer()
-        self.replay_timer.timeout.connect(self._replay_tick)
-        self.replay_frame = 0
-        self.replay_speed = 5
-        
         # Render timer (update canvas from data)
         self.render_timer = QTimer()
         self.render_timer.timeout.connect(self._update_canvas)
-        self.render_timer.start(100)  # 10 FPS for smooth performance
+        self.render_timer.start(150)  # ~7 FPS for smooth performance
         
-    
     def setup_ui(self):
         """Setup the UI components."""
         self.setStyleSheet("""
@@ -916,6 +588,13 @@ class PSOVisualizerWidget(QWidget):
             font-weight: bold;
         """)
         
+        # Best particle info
+        self.lbl_particle = QLabel("PARTICLE: ---")
+        self.lbl_particle.setStyleSheet("""
+            color: rgba(255,255,255,0.8); 
+            font-size: 12px;
+        """)
+        
         # Close button
         close_btn = QPushButton("CLOSE")
         close_btn.clicked.connect(self.switch_to_cad.emit)
@@ -937,28 +616,21 @@ class PSOVisualizerWidget(QWidget):
         header_layout.addWidget(self.lbl_iter)
         header_layout.addSpacing(25)
         header_layout.addWidget(self.lbl_best)
+        header_layout.addSpacing(15)
+        header_layout.addWidget(self.lbl_particle)
         header_layout.addSpacing(25)
         header_layout.addWidget(close_btn)
         
         layout.addWidget(header)
         
-        # ===== MAIN CONTENT =====
-        content = QHBoxLayout()
-        content.setContentsMargins(0, 0, 0, 0)
-        
-        # Matplotlib Canvas
+        # ===== MAIN CONTENT: Matplotlib Canvas =====
         self.canvas = MatplotlibCanvas(self)
-        self.canvas.mpl_connect("motion_notify_event", self._on_hover)
         self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(self.canvas, 1)
         
-        # Just the canvas - no side panel!
-        content.addWidget(self.canvas, 1)
-        
-        layout.addLayout(content)
-        
-        # ===== COMPACT BOTTOM TOOLBAR (Plain white) =====
+        # ===== BOTTOM TOOLBAR (Simplified) =====
         bottom_bar = QFrame()
-        bottom_bar.setFixedHeight(45)
+        bottom_bar.setFixedHeight(40)
         bottom_bar.setStyleSheet("""
             QFrame {
                 background-color: white;
@@ -967,101 +639,53 @@ class PSOVisualizerWidget(QWidget):
         """)
         bottom_layout = QHBoxLayout(bottom_bar)
         bottom_layout.setContentsMargins(15, 5, 15, 5)
-        bottom_layout.setSpacing(8)
+        bottom_layout.setSpacing(15)
         
-        # Common button style (light theme)
+        # Status label
+        self.lbl_status = QLabel("Optimizing...")
+        self.lbl_status.setStyleSheet("color: #666; font-size: 11px;")
+        
+        # Save button
         btn_style = """
             QPushButton { 
                 background-color: #f0f0f0; 
                 color: #333; 
                 border: 1px solid #ccc;
                 border-radius: 3px; 
-                padding: 4px 8px;
-                font-size: 14px;
-                min-width: 28px;
+                padding: 4px 12px;
+                font-size: 12px;
             }
             QPushButton:hover { background-color: #e0e0e0; }
             QPushButton:pressed { background-color: #d0d0d0; }
             QPushButton:disabled { background-color: #f8f8f8; color: #aaa; }
         """
         
-        # Step back button |<
-        self.btn_step_back = QPushButton("⏮")
-        self.btn_step_back.setStyleSheet(btn_style)
-        self.btn_step_back.clicked.connect(self._step_back)
-        self.btn_step_back.setEnabled(False)
-        
-        # Previous frame <
-        self.btn_prev = QPushButton("◀")
-        self.btn_prev.setStyleSheet(btn_style)
-        self.btn_prev.clicked.connect(self._prev_frame)
-        self.btn_prev.setEnabled(False)
-        
-        # Play/Pause button
-        self.btn_play = QPushButton("▶")
-        self.btn_play.setStyleSheet(btn_style.replace("min-width: 28px", "min-width: 35px"))
-        self.btn_play.clicked.connect(self._toggle_play)
-        self.btn_play.setEnabled(False)
-        
-        # Next frame >
-        self.btn_next = QPushButton("▶")
-        self.btn_next.setStyleSheet(btn_style)
-        self.btn_next.clicked.connect(self._next_frame)
-        self.btn_next.setEnabled(False)
-        
-        # Step forward >|
-        self.btn_step_fwd = QPushButton("⏭")
-        self.btn_step_fwd.setStyleSheet(btn_style)
-        self.btn_step_fwd.clicked.connect(self._step_forward)
-        self.btn_step_fwd.setEnabled(False)
-        
-        # Loop mode radio buttons
-        self.loop_once = QRadioButton("Once")
-        self.loop_loop = QRadioButton("Loop")
-        self.loop_loop.setChecked(True)
-        for rb in [self.loop_once, self.loop_loop]:
-            rb.setStyleSheet("color: #333; font-size: 11px;")
-        
-        # Save GIF button
-        self.btn_save = QPushButton("💾 Save")
-        self.btn_save.setStyleSheet(btn_style.replace("min-width: 28px", "min-width: 60px"))
-        self.btn_save.clicked.connect(self.save_animation)
+        self.btn_save = QPushButton("💾 Save Plot")
+        self.btn_save.setStyleSheet(btn_style)
+        self.btn_save.clicked.connect(self.save_plot)
         self.btn_save.setEnabled(False)
         
-        # Frame counter
-        self.lbl_frame = QLabel("Frame: 0/0")
-        self.lbl_frame.setStyleSheet("color: #666; font-size: 10px;")
+        # Legend
+        legend_text = QLabel(
+            "<span style='color: #FFD700;'>★</span> Best  "
+            "<span style='color: #4ADE80;'>●</span> Feasible  "
+            "<span style='color: #F87171;'>■</span> Infeasible"
+        )
+        legend_text.setStyleSheet("color: #333; font-size: 11px;")
         
-        # Legend info (compact) - colored icons for clarity
-        legend_text = QLabel("<span style='color: #FFD700;'>★</span> Best  <span style='color: #4ADE80;'>●</span> Feasible  <span style='color: #F87171;'>●</span> Infeasible")
-        legend_text.setStyleSheet("color: #333; font-size: 10px;")
-        
-        bottom_layout.addWidget(self.btn_step_back)
-        bottom_layout.addWidget(self.btn_prev)
-        bottom_layout.addWidget(self.btn_play)
-        bottom_layout.addWidget(self.btn_next)
-        bottom_layout.addWidget(self.btn_step_fwd)
-        bottom_layout.addSpacing(15)
-        bottom_layout.addWidget(self.loop_once)
-        bottom_layout.addWidget(self.loop_loop)
-        bottom_layout.addSpacing(15)
-        bottom_layout.addWidget(self.btn_save)
+        bottom_layout.addWidget(self.lbl_status)
         bottom_layout.addStretch()
-        bottom_layout.addWidget(self.lbl_frame)
-        bottom_layout.addSpacing(20)
         bottom_layout.addWidget(legend_text)
+        bottom_layout.addSpacing(20)
+        bottom_layout.addWidget(self.btn_save)
         
         layout.addWidget(bottom_bar)
-        
-        # Store reference for enabling later
-        self.bottom_controls = [self.btn_step_back, self.btn_prev, self.btn_play, 
-                                self.btn_next, self.btn_step_fwd, self.btn_save]
     
     def add_particle_data(self, depth: float, ur: float, weight: float,
                           iteration: int, particle_idx: int, position: list = None, 
                           variables: list = None, lb: list = None, ub: list = None):
         """Add particle data (called from optimization)."""
-        if self.is_complete and not self.is_replaying:
+        if self.is_complete:
             return
         
         # Buffer for batch processing
@@ -1070,13 +694,6 @@ class PSOVisualizerWidget(QWidget):
         self.batch_buffer['w'].append(weight)
         self.batch_buffer['i'].append(iteration)
         self.batch_buffer['p'].append(particle_idx)
-        # Store position/vars only if present (assume parallel lists or just append None)
-        # To keep it simple, we will expand the buffer dict
-        if 'pos' not in self.batch_buffer: self.batch_buffer['pos'] = []
-        if 'vars' not in self.batch_buffer: self.batch_buffer['vars'] = []
-        if 'lb' not in self.batch_buffer: self.batch_buffer['lb'] = []
-        if 'ub' not in self.batch_buffer: self.batch_buffer['ub'] = []
-        
         self.batch_buffer['pos'].append(position)
         self.batch_buffer['vars'].append(variables)
         self.batch_buffer['lb'].append(lb)
@@ -1104,176 +721,28 @@ class PSOVisualizerWidget(QWidget):
                 self.batch_buffer['ub'][i]
             )
         
-        self.batch_buffer = {'d': [], 'u': [], 'w': [], 'i': [], 'p': [], 'pos': [], 'vars': [], 'lb': [], 'ub': []}
+        self.batch_buffer = {'d': [], 'u': [], 'w': [], 'i': [], 'p': [], 
+                            'pos': [], 'vars': [], 'lb': [], 'ub': []}
     
     def _update_canvas(self):
         """Update canvas with latest data."""
-        if self.is_replaying:
-            return
-        
         data = self.data_processor.get_render_data()
         if data:
             self.canvas.update_plot(data)
-        
-        # Update labels
-        if data:
+            
+            # Update header labels
             self.lbl_iter.setText(f"ITERATION: {data['iteration'] + 1}")
+            
             if data['best_weight'] != float('inf'):
                 self.lbl_best.setText(f"BEST: {data['best_weight']:.0f} kg")
+                self.lbl_particle.setText(
+                    f"PARTICLE: {data['best_particle_id'] + 1} @ Iter {data['best_iteration'] + 1}"
+                )
     
-    def _step_back(self):
-        """Go to first cached frame."""
-        if self.cache_ready and len(self.cached_frames) > 0:
-            self.cache_index = 0
-            self._show_cached_frame()
-        else:
-            self.replay_frame = 0
-            self._show_frame()
-    
-    def _prev_frame(self):
-        """Go to previous cached frame."""
-        if self.cache_ready and len(self.cached_frames) > 0:
-            self.cache_index = max(0, self.cache_index - 1)
-            self._show_cached_frame()
-        else:
-            self.replay_frame = max(0, self.replay_frame - 10)
-            self._show_frame()
-    
-    def _toggle_play(self):
-        """Toggle play/pause - uses cached frames for smooth playback."""
-        if self.is_replaying:
-            self.replay_timer.stop()
-            self.is_replaying = False
-            self.btn_play.setText("▶")
-        else:
-            if not self.cache_ready or len(self.cached_frames) == 0:
-                print("[INFO] Cache not ready, building...")
-                self._build_frame_cache()
-            self.is_replaying = True
-            self.cache_index = 0
-            self.btn_play.setText("⏸")
-            self.replay_timer.start(200)  # 5 FPS for smooth cached playback
-    
-    def _next_frame(self):
-        """Go to next cached frame."""
-        if self.cache_ready and len(self.cached_frames) > 0:
-            self.cache_index = min(len(self.cached_frames) - 1, self.cache_index + 1)
-            self._show_cached_frame()
-        else:
-            # Fallback to live rendering
-            history_len = self.data_processor.get_history_length()
-            self.replay_frame = min(history_len - 1, self.replay_frame + 10)
-            self._show_frame()
-    
-    def _step_forward(self):
-        """Go to last cached frame."""
-        if self.cache_ready and len(self.cached_frames) > 0:
-            self.cache_index = len(self.cached_frames) - 1
-            self._show_cached_frame()
-        else:
-            history_len = self.data_processor.get_history_length()
-            self.replay_frame = history_len - 1
-            self._show_frame()
-    
-    def _show_frame(self):
-        """Display current frame (live render - slow, used as fallback)."""
-        data = self.data_processor.get_history_frame(self.replay_frame)
-        if data:
-            # Remove is_replay flag to get full mesh
-            data['is_replay'] = False
-            self.canvas.update_plot(data)
-            self.lbl_iter.setText(f"ITERATION: {data['iteration'] + 1}")
-            if data['best_weight'] != float('inf'):
-                self.lbl_best.setText(f"BEST: {data['best_weight']:.0f} kg")
-        history_len = self.data_processor.get_history_length()
-        self.lbl_frame.setText(f"Frame: {self.replay_frame}/{history_len}")
-    
-    def _show_cached_frame(self):
-        """Display a pre-computed cached frame - Batched Rendering."""
-        if not self.cached_frames or self.cache_index >= len(self.cached_frames):
-            return
-        
-        iteration, best_w, history_idx = self.cached_frames[self.cache_index]
-        
-        if self.cache_index in self.cached_data:
-            data = self.cached_data[self.cache_index]
-            self.canvas.update_plot(data)
-            
-            # Update labels (1-based)
-            self.lbl_iter.setText(f"ITERATION: {data['iteration'] + 1}")
-            if data['best_weight'] != float('inf'):
-                self.lbl_best.setText(f"BEST: {data['best_weight']:.0f} kg")
-            self.lbl_frame.setText(f"Frame: {self.cache_index + 1}/{len(self.cached_frames)}")
-    
-    def _render_batched_scene(self, cache_idx: int):
-        """Render Cached Frame to Dashboard."""
-        if cache_idx not in self.cached_data:
-            return
-            
-        data = self.cached_data[cache_idx]
-        self.canvas.update_plot(data)
-
-    def _on_hover(self, event):
-        """Hover interaction handled by interactive backend if needed."""
-        pass
-    
-    def _replay_tick(self):
-        """Advance replay using cached iteration frames."""
-        if not self.cache_ready or len(self.cached_frames) == 0:
-            self.replay_timer.stop()
-            self.is_replaying = False
-            self.btn_play.setText("▶")
-            return
-        
-        self.cache_index += 1
-        
-        if self.cache_index >= len(self.cached_frames):
-            if self.loop_loop.isChecked():
-                self.cache_index = 0
-            else:
-                self.cache_index = len(self.cached_frames) - 1
-                self.replay_timer.stop()
-                self.is_replaying = False
-                self.btn_play.setText("▶")
-        
-        self._show_cached_frame()
-    
-    def _build_frame_cache(self):
-        """Build cache for Replay."""
-        self.cached_frames = []
-        self.cached_data = {}
-        history_len = self.data_processor.get_history_length()
-        
-        print(f"[INFO] Caching {history_len} frames for Dashboard...")
-        
-        # Optimize: Access history directly to find last index per iteration
-        with self.data_processor.lock:
-            full_history = self.data_processor.history
-            seen_iterations = {}
-            for i, h in enumerate(full_history):
-                it = h['iteration']
-                # Always overwrite to store the LAST index for this iteration
-                # This ensures we show the state after ALL particles have moved
-                seen_iterations[it] = (it, h['weight'], i)
-        
-        self.cached_frames = sorted(seen_iterations.values(), key=lambda x: x[0])
-        
-        # Store raw frames
-        for cidx, (iteration, best_w, hidx) in enumerate(self.cached_frames):
-            data = self.data_processor.get_history_frame(hidx)
-            if data:
-                self.cached_data[cidx] = data
-            
-        self.cache_ready = True
-        print(f"[INFO] Built {len(self.cached_frames)} history frames")
-    
-    def save_animation(self):
-        """Save convergence as static image (fast, no animation lag)."""
-        history_len = self.data_processor.get_history_length()
-        
-        # Save as PNG instead of GIF (much faster, no animation processing)
+    def save_plot(self):
+        """Save the current visualization as PNG."""
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Save Convergence Plot", "pso_convergence.png", 
+            self, "Save Plot", "pso_visualization.png", 
             "PNG Files (*.png);;All Files (*)"
         )
         
@@ -1285,71 +754,38 @@ class PSOVisualizerWidget(QWidget):
         QApplication.processEvents()
         
         try:
-            # Create a simple static convergence plot (FAST - no animation)
-            fig = Figure(figsize=(10, 5), dpi=100, facecolor='white')
-            ax = fig.add_subplot(111)
-            
-            # Get final convergence data
-            final_data = self.data_processor.get_render_data()
-            conv = final_data.get('convergence', [])
-            
-            if conv:
-                iters = [c[0] for c in conv]
-                vals = [c[1] for c in conv]
-                ax.plot(iters, vals, 'b-', linewidth=2, marker='o', markersize=4)
-                ax.fill_between(iters, vals, alpha=0.3)
-            
-            ax.set_xlabel('Iteration', fontsize=12)
-            ax.set_ylabel('Best Weight (kg)', fontsize=12)
-            ax.set_title('PSO Convergence', fontsize=14, fontweight='bold')
-            ax.grid(True, alpha=0.3)
-            
-            # Add best value annotation
-            best_w = final_data.get('best_weight', float('inf'))
-            if best_w != float('inf'):
-                ax.axhline(y=best_w, color='green', linestyle='--', alpha=0.7, 
-                          label=f'Best: {best_w:.0f} kg')
-                ax.legend(loc='upper right')
-            
-            fig.tight_layout()
-            fig.savefig(file_path, dpi=150, bbox_inches='tight')
-            plt.close(fig)
-            
+            self.canvas.fig.savefig(file_path, dpi=150, bbox_inches='tight', facecolor='white')
             self.btn_save.setText("✓ Saved!")
         except Exception as e:
             print(f"[WARNING] Failed to save: {e}")
             self.btn_save.setText("❌ Failed")
         finally:
-            QTimer.singleShot(2000, lambda: self.btn_save.setText("💾 Save"))
+            QTimer.singleShot(2000, lambda: self.btn_save.setText("💾 Save Plot"))
             QTimer.singleShot(2000, lambda: self.btn_save.setEnabled(True))
     
     def set_complete(self):
-        """Mark optimization as complete and prepare replay cache."""
+        """Mark optimization as complete."""
         self._flush_buffer()
         self.is_complete = True
-        self.lbl_iter.setText("OPTIMIZATION COMPLETE")
         
-        # Build iteration cache for smooth replay
-        self._build_frame_cache()
+        # Final update
+        data = self.data_processor.get_render_data()
+        if data:
+            best_iter = data.get('best_iteration', 0)
+            best_pid = data.get('best_particle_id', 0)
+            self.lbl_iter.setText(f"COMPLETE: {data['iteration'] + 1} iterations")
+            self.lbl_status.setText(
+                f"Optimization Complete | Best found at Iteration {best_iter + 1}, Particle {best_pid + 1}"
+            )
         
-        # Enable bottom toolbar controls
-        for ctrl in self.bottom_controls:
-            ctrl.setEnabled(True)
-        
-        # Update frame counter with cached frame count
-        self.lbl_frame.setText(f"Frame: {len(self.cached_frames)}/{len(self.cached_frames)}")
+        # Enable save button
+        self.btn_save.setEnabled(True)
     
     def cleanup(self):
         """Clean up resources safely."""
         try:
             if hasattr(self, 'render_timer') and self.render_timer:
                 self.render_timer.stop()
-        except Exception:
-            pass
-        
-        try:
-            if hasattr(self, 'replay_timer') and self.replay_timer:
-                self.replay_timer.stop()
         except Exception:
             pass
         

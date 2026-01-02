@@ -1291,7 +1291,6 @@ class CustomWindow(QWidget):
                 self.input_dock_label.setVisible(False)
             else:
                 target_sizes[0] = 0
-                self.input_dock_label.setVisible(True)
             target_sizes[2] = sizes[2]
             remaining_width = total_width - target_sizes[0] - target_sizes[2]
             target_sizes[1] = max(0, remaining_width)
@@ -1326,6 +1325,8 @@ class CustomWindow(QWidget):
             duration=0,
             on_finished=after_anim
         )
+        if dock == 'input' and not show:
+            self.input_dock_label.setVisible(True)
 
     def animate_splitter_sizes(self, splitter, start_sizes, end_sizes, duration, on_finished=None):
         if duration <= 0:

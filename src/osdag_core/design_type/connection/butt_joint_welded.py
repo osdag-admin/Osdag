@@ -417,40 +417,54 @@ class ButtJointWelded(MomentConnection):
                self.design_for if flag else '', True)
         out_list.append(t29)
 
-        # Populate Hover Dict (Butt Joint Bolted)
+        # Populate Hover Dict (Butt Joint Welded) with actual dimensions
+        plate_length = getattr(self, 'weld_length_provided', 0)
+        plate_width = getattr(self, 'plates_width', 0)
+        plate1_thk = float(self.plate1.thickness[0]) if hasattr(self, 'plate1') and self.plate1 and self.plate1.thickness else 0
+        plate2_thk = float(self.plate2.thickness[0]) if hasattr(self, 'plate2') and self.plate2 and self.plate2.thickness else 0
+        cover_thk = getattr(self, 'calculated_cover_plate_thickness', 0)
+        packing_thk = getattr(self, 'packing_plate_thickness', 0)
+        
         self.hover_dict["Plate 1"] = (
-            f"<b>plate1</b><br>"
-            f"Length: {float(0)} mm<br>"
-            f"Width: {float(0)} mm<br>"
-            f"Thickness: {0} mm"
+            f"<b>Plate 1</b><br>"
+            f"Length: {round(float(plate_length), 2) if flag and plate_length else ''} mm<br>"
+            f"Width: {round(float(plate_width), 2) if flag and plate_width else ''} mm<br>"
+            f"Thickness: {round(float(plate1_thk), 2) if flag and plate1_thk else ''} mm"
         )
 
         self.hover_dict["Plate 2"] = (
-            f"<b>plate2</b><br>"
-            f"Length: {float(0)} mm<br>"
-            f"Width: {float(0)} mm<br>"
-            f"Thickness: {0} mm"
+            f"<b>Plate 2</b><br>"
+            f"Length: {round(float(plate_length), 2) if flag and plate_length else ''} mm<br>"
+            f"Width: {round(float(plate_width), 2) if flag and plate_width else ''} mm<br>"
+            f"Thickness: {round(float(plate2_thk), 2) if flag and plate2_thk else ''} mm"
         )
 
         self.hover_dict["Cover Plate"] = (
             f"<b>Cover Plate</b><br>"
-            f"Length: {float(0)} mm<br>"
-            f"Width: {float(0)} mm<br>"
-            f"Thickness: {0} mm"
+            f"Length: {round(float(plate_length), 2) if flag and plate_length else ''} mm<br>"
+            f"Width: {round(float(plate_width), 2) if flag and plate_width else ''} mm<br>"
+            f"Thickness: {round(float(cover_thk), 2) if flag and cover_thk else ''} mm"
         )
 
-        self.hover_dict["Packing Plate"] = (
-            f"<b>Packing Plate</b><br>"
-            f"Length: {float(0)} mm<br>"
-            f"Width: {float(0)} mm<br>"
-            f"Thickness: {0} mm"
-        )
+        # Packing plate - only show if thickness > 0
+        if flag and packing_thk > 0:
+            self.hover_dict["Packing Plate"] = (
+                f"<b>Packing Plate</b><br>"
+                f"Length: {round(float(plate_length), 2)} mm<br>"
+                f"Width: {round(float(plate_width), 2)} mm<br>"
+                f"Thickness: {round(float(packing_thk), 2)} mm"
+            )
+        else:
+            self.hover_dict["Packing Plate"] = (
+                f"<b>Packing Plate</b><br>"
+                f"Not required for this configuration"
+            )
 
         self.hover_dict["Weld"] = (
-            f"<b>Weld</b><br>"
-            f"Grade: {0}<br>"
-            f"Diameter: {0} mm<br>"
-            f"No. of Bolts: {0}"
+            f"<b>Fillet Weld</b><br>"
+            f"Size: {round(float(self.weld_size), 1) if flag and self.weld_size else ''} mm<br>"
+            f"Type: {'Shop weld' if flag else ''}<br>"
+            f"Effective Length: {round(float(self.weld_length_effective), 1) if flag and hasattr(self, 'weld_length_effective') and self.weld_length_effective else ''} mm"
         )
 
         return out_list

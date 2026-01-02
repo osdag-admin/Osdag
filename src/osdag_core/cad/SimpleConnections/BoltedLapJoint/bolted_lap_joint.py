@@ -101,7 +101,7 @@ def create_bolted_lap_joint(plate1_thickness = 16, plate2_thickness = 8, plate_w
 
     # --- Cut Bolt Holes in Plates ---
     # Hole radius slightly larger than bolt shaft for clearance
-    hole_radius = bolt_dia / 2.0 + 1.0  # 1mm clearance
+    hole_radius = (bolt_dia / 2.0) * 0.7 # Exact fit with bolt
     
     # Plate 1: Z from -plate1_thickness/2 to +plate1_thickness/2
     plate1_z_bottom = -plate1_thickness / 2.0

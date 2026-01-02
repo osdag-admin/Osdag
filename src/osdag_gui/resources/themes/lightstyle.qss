@@ -1107,7 +1107,7 @@ QScrollArea#outputs_vscrollarea QScrollBar::sub-page:vertical {
     border: 1px solid #94b816;
 } 
 #inputs_container QLineEdit {
-    padding: 2px 7px;
+    padding: 2px;
     border: 1px solid #070707;
     border-radius: 4px;
     background-color: white;

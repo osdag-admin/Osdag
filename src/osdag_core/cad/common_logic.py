@@ -854,24 +854,16 @@ class CommonDesignLogic(object):
         beam_alpha = 0.0
         beam_length = 500
 
-
-
         beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                              R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                              length=beam_length, notchObj=None)
         # CRITICAL: Create new instance instead of copy.copy to prevent shared numpy array state
-        beam_Right = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
-                              R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-                              length=beam_length, notchObj=None)
-
+        beam_Right = copy.copy(beam_Left) # Since both the beams are same
 
         plate_Left = Plate(W=BBE.ep_width_provided,
                            L=BBE.ep_height_provided,
                            T=BBE.plate_thickness)
-        # CRITICAL: Create new instance instead of copy.copy to prevent shared numpy array state
-        plate_Right = Plate(W=BBE.ep_width_provided,
-                            L=BBE.ep_height_provided,
-                            T=BBE.plate_thickness)
+        plate_Right = copy.copy(plate_Left) # Since both the end plates are identical
 
         # Beam stiffeners 4 if extended both ways, only 1 and 3 if extended oneway and non for flus type
         beam_stiffeners = StiffenerPlate(W=BBE.stiffener_height, L=BBE.stiffener_length,

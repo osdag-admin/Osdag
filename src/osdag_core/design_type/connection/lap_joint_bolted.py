@@ -373,29 +373,22 @@ class LapJointBolted(MomentConnection):
         # Populate Hover Dict (Lap Joint Bolted)
         self.hover_dict["Plate 1"] = (
             f"<b>Plate 1</b><br>"
-            f"Length: {2} mm<br>"
-            f"Width: {2} mm<br>"
-            f"Thickness: {2} mm"
+            f"Length: {round(float(self.plate1.length), 2) if flag and self.plate1 and self.plate1.length else ''} mm<br>"
+            f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1 and self.plate1.height else ''} mm<br>"
+            f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1 and self.plate1.thickness_provided else ''} mm"
         )
 
         self.hover_dict["Plate 2"] = (
             f"<b>Plate 2</b><br>"
-            f"Length: {2} mm<br>"
-            f"Width: {2} mm<br>"
-            f"Thickness: {2} mm"
-        )
-
-        self.hover_dict["Cover Plate"] = (
-            f"<b>Cover Plate</b><br>"
-            f"Length: {2} mm<br>"
-            f"Width: {2} mm<br>"
-            f"Thickness: {2} mm"
+            f"Length: {round(float(self.plate2.length), 2) if flag and self.plate2 and self.plate2.length else ''} mm<br>"
+            f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2 and self.plate2.height else ''} mm<br>"
+            f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2 and self.plate2.thickness_provided else ''} mm"
         )
 
         self.hover_dict["Bolt"] = (
-            f"<b>Bolt</b><br>"
+            f"<b>Bolts</b><br>"
             f"Grade: {self.bolt.bolt_grade_provided if flag and self.bolt else ''}<br>"
-            f"Diameter: {self.bolt.bolt_diameter_provided if flag and self.bolt else ''} mm<br>"
+            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag and self.bolt else ''} mm<br>"
             f"No. of Bolts: {self.number_bolts if flag else ''}"
         )
 
@@ -872,7 +865,28 @@ class LapJointBolted(MomentConnection):
         print("Max and min end edge dist ", self.bolt.max_end_dist_round, self.bolt.min_end_dist_round, self.bolt.max_edge_dist_round, self.bolt.min_edge_dist_round)
         print("Max min gauge pitch dist", self.max_gauge_round, self.bolt.min_gauge_round, self.max_pitch_round, self.bolt.min_pitch_round)
 
-
+        # Set plate dimensions for hover_dict display
+        # plate length = connection length (along the bolt pitch direction)
+        # plate height = plate width (perpendicular to pitch direction)
+        plate_length = self.len_conn
+        plate_width = float(self.width)
+        
+        # Plate 1 dimensions
+        self.plate1.length = plate_length
+        self.plate1.height = plate_width
+        self.plate1.thickness_provided = float(self.plate1thk)
+        
+        # Plate 2 dimensions
+        self.plate2.length = plate_length
+        self.plate2.height = plate_width
+        self.plate2.thickness_provided = float(self.plate2thk)
+        
+        # Store spacing values on main plate for output compatibility
+        self.plate.pitch_provided = self.final_pitch
+        self.plate.gauge_provided = self.final_gauge
+        self.plate.edge_dist_provided = self.final_edge_dist
+        self.plate.end_dist_provided = self.final_end_dist
+        
     def check_base_metal_strength(self):
         
         try:

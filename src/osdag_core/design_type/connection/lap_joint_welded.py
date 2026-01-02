@@ -40,6 +40,7 @@ class LapJointWelded(MomentConnection):
         self.weld_fabrication = None
         self.weld_angle = None
         self.weld_length_effective = None
+        self.hover_dict = {}
 
     ###############################################
     # Design Preference Functions Start
@@ -272,6 +273,42 @@ class LapJointWelded(MomentConnection):
         t29 = (KEY_OUT_DESIGN_FOR, KEY_OUT_DISP_DESIGN_FOR, TYPE_TEXTBOX,
                self.design_for if flag and hasattr(self, 'design_for') else '', True)
         out_list.append(t29)
+
+        # Hover Dictionary
+        plate_length = getattr(self, 'connection_length', 0)
+        plate_width = float(self.width) if hasattr(self, 'width') else 0
+        plate1_thk = float(self.plate1.thickness[0]) if hasattr(self, 'plate1') and self.plate1 and self.plate1.thickness else 0
+        plate2_thk = float(self.plate2.thickness[0]) if hasattr(self, 'plate2') and self.plate2 and self.plate2.thickness else 0
+        
+        # Store dimensions on plate objects
+        if hasattr(self, 'plate1') and self.plate1:
+            self.plate1.length = plate_length
+            self.plate1.height = plate_width
+            self.plate1.thickness_provided = plate1_thk
+        if hasattr(self, 'plate2') and self.plate2:
+            self.plate2.length = plate_length
+            self.plate2.height = plate_width
+            self.plate2.thickness_provided = plate2_thk
+
+        self.hover_dict["Plate 1"] = (
+            f"<b>Plate 1</b><br>"
+            f"Length: {round(float(self.plate1.length), 2) if flag and self.plate1.length else ''} mm<br>"
+            f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1.height else ''} mm<br>"
+            f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1.thickness_provided else ''} mm"
+        )
+        self.hover_dict["Plate 2"] = (
+            f"<b>Plate 2</b><br>"
+            f"Length: {round(float(self.plate2.length), 2) if flag and self.plate2.length else ''} mm<br>"
+            f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2.height else ''} mm<br>"
+            f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2.thickness_provided else ''} mm"
+        )
+        self.hover_dict["Weld"] = (
+            f"<b>Fillet Weld</b><br>"
+            f"Size: {round(float(self.weld_size), 1) if flag and self.weld_size else ''} mm<br>"
+            f"Type: {getattr(self.weld, 'type', 'Fillet') if flag else ''}<br>"
+            f"Effective Length: {round(float(self.weld_length_effective), 1) if flag and self.weld_length_effective else ''} mm"
+        )
+
         return out_list
 
     def module_name(self):
@@ -358,13 +395,6 @@ class LapJointWelded(MomentConnection):
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
         self.design_of_weld(design_dictionary)
-
-        # 3D Display Labels
-        self.hover_dict = {}
-        self.hover_dict["Model"] = "Lap Joint Welded Connection"
-        self.hover_dict["Plate 1"] = f"Plate 1 ({self.plate1.thickness[0]} mm)"
-        self.hover_dict["Plate 2"] = f"Plate 2 ({self.plate2.thickness[0]} mm)"
-        self.hover_dict["Weld"] = f"Fillet Weld ({self.weld.size} mm)"
 
     def design_of_weld(self, design_dictionary):
         self.logger.info(": =========== Design of Lap Joint Welded Connection ==========")

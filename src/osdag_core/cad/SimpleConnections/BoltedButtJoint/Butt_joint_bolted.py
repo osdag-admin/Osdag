@@ -233,7 +233,7 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     
     # --- Cut Bolt Holes in Plates ---
     # Hole radius slightly larger than bolt shaft for clearance
-    hole_radius = bolt_dia / 2.0 + 1.0  # 1mm clearance
+    hole_radius = (bolt_dia / 2.0) * 0.7 # Exact fit with bolt
     
     # Plate 1: Y from 0 to plate_length (centered at plate_length/2 origin is 0)
     # Plate 1 spans Y from -plate_length/2 to +plate_length/2 (relative to origin1 at y=0)

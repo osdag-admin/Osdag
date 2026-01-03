@@ -1144,7 +1144,31 @@ class Compression(Member):
             weld_fab = KEY_DP_FAB_SHOP
             
         self.weld = Weld(material_g_o=weld_fu, fabrication=weld_fab)
-
+        
+        # Store parent reference for closure
+        parent = self
+        
+        # Create wrapper method with proper context
+        original_get_weld_stress = self.weld.get_weld_stress if hasattr(self.weld, 'get_weld_stress') else None
+        
+        def get_weld_stress_corrected(weld_shear, weld_axial, l_weld):
+            # Ensure throat is set
+            if not hasattr(parent.weld, 'throat') or parent.weld.throat <= 0:
+                parent.weld.throat = 0.7 * parent.weld.size
+            
+            throat = parent.weld.throat
+            
+            # Calculate stress with throat thickness
+            if weld_shear > 0:
+                stress_axial = weld_axial / (throat * l_weld)
+                stress_shear = weld_shear / (throat * l_weld)
+                parent.weld.stress = round(math.sqrt(stress_axial**2 + stress_shear**2), 2)
+            else:
+                parent.weld.stress = round(weld_axial / (throat * l_weld), 2)
+        
+        # Override method
+        self.weld.get_weld_stress = get_weld_stress_corrected
+        
         # initialize the design status
         self.design_status_list = []
         self.design_status = False
@@ -2309,9 +2333,13 @@ class Compression(Member):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
         self.Kt = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(weld_angle)
+        
+        # Calculate strength per mm of weld (for effective length calculation)
         weld_strength = f_wd * throat_tk
+        
         L_eff = round_up((force/weld_strength), 5, 100)
-        self.weld.strength = round(weld_strength, 2)
+        
+        self.weld.strength = round(f_wd, 2)
         self.weld.effective = L_eff
         self.weld.throat = throat_tk
 
@@ -2403,18 +2431,18 @@ class Compression(Member):
             self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
                                                         thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-                self.plate.tension_yielding(length=(self.plate.height - max((4 * self.weld.size), 30)), 
-                                           thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                self.plate.tension_yielding(length=self.plate.height, 
+                                        thickness=self.plate.thickness_provided, fy=self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size), 30)) * self.plate.thickness_provided
 
             else:
                 if design_dictionary[KEY_LOCATION] == 'Long Leg':
-                    self.plate.tension_yielding(length=(self.plate.height - max((4 * self.weld.size), 30)), 
-                                               thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                    self.plate.tension_yielding(length=self.plate.height,
+                                            thickness=self.plate.thickness_provided, fy=self.plate.fy)
                     self.net_area = (self.plate.height - max((4 * self.weld.size), 30)) * self.plate.thickness_provided
                 else:
-                    self.plate.tension_yielding(length=(self.plate.height - max((4 * self.weld.size), 30)), 
-                                               thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                    self.plate.tension_yielding(length=self.plate.height,
+                                            thickness=self.plate.thickness_provided, fy=self.plate.fy)
                     self.net_area = (self.plate.height - max((4 * self.weld.size), 30)) * self.plate.thickness_provided
 
             self.plate.tension_rupture(A_n=self.net_area, F_u=self.plate.fu)
@@ -2424,11 +2452,13 @@ class Compression(Member):
             A_tg = (self.plate.height - max((2 * self.weld.size), 15)) * self.plate.thickness_provided
             A_tn = A_tg
 
-            self.plate.tension_blockshear_area_input(A_vg=A_vg, A_vn=A_vn, A_tg=A_tg, A_tn=A_tn, 
+            self.plate.tension_blockshear_area_input(A_vg=A_vg, A_vn=A_vn, A_tg=A_tg, A_tn=A_tn,
                                                     f_u=self.plate.fu, f_y=self.plate.fy)
-            self.plate_tension_capacity = min(self.plate.tension_yielding_capacity, 
-                                             self.plate.tension_rupture_capacity, 
-                                             self.plate.block_shear_capacity)
+
+            self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,
+                                            self.plate.tension_rupture_capacity,
+                                            self.plate.block_shear_capacity)
+            
             print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity, self.plate.block_shear_capacity)
 
             if self.plate_tension_capacity > self.res_force:
@@ -2834,7 +2864,15 @@ class Compression(Member):
                     KEY_DISP_EFFECTIVE_AREA_PARA: self.effective_area_factor,
                     KEY_DISP_SECSIZE:  str(self.sec_list),
                     "Selected Section Details": self.report_column,
-                    }
+                    'Weld Details': '',
+                    KEY_DISP_WELD_SIZE: str(self.weld.size) if hasattr(self.weld, 'size') else 'N/A',
+                    KEY_DISP_DP_WELD_FAB: self.weld.fabrication if hasattr(self.weld, 'fabrication') else 'Shop',
+                    KEY_DISP_DP_WELD_MATERIAL_G_O: str(self.weld.fu_overwrite) if hasattr(self.weld, 'fu_overwrite') else 'N/A',
+                    'Gusset Plate Details': '',
+                    KEY_OUT_GUSSET_PLATE_THICKNNESS: str(int(round(self.plate.thickness_provided, 0))) if hasattr(self.plate, 'thickness_provided') else 'N/A',
+                    KEY_OUT_PLATE_HEIGHT: str(int(round(self.plate.height, 0))) if hasattr(self.plate, 'height') else 'N/A',
+                    KEY_OUT_PLATE_LENGTH: str(int(round(self.plate.length, 0))) if hasattr(self.plate, 'length') else 'N/A',
+                }
 
             self.report_check = []
 
@@ -2930,6 +2968,187 @@ class Compression(Member):
                                 get_pass_fail(self.load.axial_force * 10 ** -3, round(self.result_capacity * 10 ** -3, 2), relation="leq"))
             self.report_check.append(t1)
 
+            # Added Weld Design Section
+            t1 = ('SubSection', 'Design of Weld', '|p{5cm}|p{2cm}|p{7cm}|p{2cm}|')
+            self.report_check.append(t1)
+
+            t1 = ('Weld Type', '', 'Fillet Weld', '')
+            self.report_check.append(t1)
+
+            if hasattr(self.weld, 'size'):
+                t1 = ('Weld Size (mm)', '', 
+                    NoEscape(f'$s_w = {self.weld.size}$ mm'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.weld, 'strength'):
+                fu = getattr(self.weld, 'fu', 410)
+                gamma_mw = 1.25
+                
+                t1 = ('Design Strength of Weld (N/mm)', '',
+                    NoEscape(f'$f_w = \\dfrac{{f_u}}{{\\sqrt{{3}} \\times \\gamma_{{mw}}}} = \\dfrac{{{fu}}}{{\\sqrt{{3}} \\times {gamma_mw}}} = {round(self.weld.strength, 2)}$ N/mm [Ref. IS 800:2007, Cl. 10.5.7.1]'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.weld, 'beta_lw'):
+                t1 = ('Long Joint Reduction Factor', '',
+                    NoEscape(f'$\\beta_{{lw}} = {round(self.weld.beta_lw, 2)}$ [Ref. IS 800:2007, Cl. 10.5.7.3]'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.weld, 'strength_red') and hasattr(self.weld, 'beta_lw') and hasattr(self.weld, 'strength'):
+                fw = round(self.weld.strength, 2)
+                beta_lw = round(self.weld.beta_lw, 2)
+                fw_red = round(self.weld.strength_red, 2)
+                
+                t1 = ('Reduced Design Strength (N/mm)', '',
+                    NoEscape(f"$f'_w = \\beta_{{lw}} \\times f_w = {beta_lw} \\times {fw} = {fw_red}$ N/mm"),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.weld, 'stress') and hasattr(self, 'load'):
+                P = round(self.load.axial_force / 1000, 2)
+                sw = self.weld.size
+                Leff = int(round(self.weld.length, 0))
+                tau_w = round(self.weld.stress, 2)
+
+                # Get throat thickness
+                if hasattr(self.weld, 'throat'):
+                    tt = round(self.weld.throat, 2)
+                else:
+                    tt = round(0.7 * sw, 2)
+
+                t1 = ('Actual Stress in Weld (N/mm)', '',
+                    NoEscape(f'$\\tau_w = \\dfrac{{P}}{{t_t \\times L_{{eff}}}} = \\dfrac{{{P} \\times 10^3}}{{{tt} \\times {Leff}}} = {tau_w}$ N/mm'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.weld, 'length'):
+                t1 = ('Effective Weld Length (mm)', '',
+                    NoEscape(f'$L_{{eff}} = {int(round(self.weld.length, 0))}$ mm'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.weld, 'stress') and hasattr(self.weld, 'strength_red'):
+                tau_w = round(self.weld.stress, 2)
+                fw_red = round(self.weld.strength_red, 2)
+                weld_status = get_pass_fail(self.weld.stress, self.weld.strength_red, relation='leq')
+                
+                t1 = ('Weld Check', NoEscape(r"$\tau_{w} \leq f'_{w}$"),
+                    NoEscape(f'${tau_w} \\leq {fw_red}$'),
+                    weld_status)
+                self.report_check.append(t1)
+
+            # Added Gusset Plate Design Section
+            t1 = ('SubSection', 'Design of Gusset Plate', '|p{5cm}|p{2cm}|p{7cm}|p{2cm}|')
+            self.report_check.append(t1)
+
+            if hasattr(self.plate, 'thickness_provided'):
+                tp = int(round(self.plate.thickness_provided, 0))
+                t1 = ('Gusset Plate Thickness (mm)', '',
+                    NoEscape(f'$t_p = {tp}$ mm'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'height'):
+                hp = int(round(self.plate.height, 0))
+                t1 = ('Gusset Plate Height (mm)', '',
+                    NoEscape(f'$h_p = {hp}$ mm'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'length'):
+                lp = int(round(self.plate.length, 0))
+                t1 = ('Gusset Plate Length (mm)', '',
+                    NoEscape(f'$l_p = {lp}$ mm'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'material'):
+                t1 = ('Plate Material', '', str(self.plate.material), '')
+                self.report_check.append(t1)
+            elif hasattr(self, 'material'):
+                t1 = ('Plate Material', '', self.material, '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'fy'):
+                fyp = round(self.plate.fy, 2)
+                t1 = ('Plate Yield Strength (MPa)', '',
+                    NoEscape(f'$f_{{yp}} = {fyp}$ MPa'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'fu'):
+                fup = round(self.plate.fu, 2)
+                t1 = ('Plate Ultimate Strength (MPa)', '',
+                    NoEscape(f'$f_{{up}} = {fup}$ MPa'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'tension_yielding_capacity'):
+                Tdy_val = round(self.plate.tension_yielding_capacity / 1000, 2)
+                
+                if hasattr(self.plate, 'height') and hasattr(self.plate, 'thickness_provided'):
+                    Ag = self.plate.height * self.plate.thickness_provided
+                    fy = getattr(self.plate, 'fy', 250)
+                    gamma_m0 = 1.1
+                    
+                    t1 = ('Tension Yielding Capacity (kN)', '',
+                        NoEscape(f'$T_{{dy}} = \\dfrac{{A_g \\times f_y}}{{\\gamma_{{m0}}}} = \\dfrac{{{Ag} \\times {fy}}}{{10^3 \\times {gamma_m0}}} = {Tdy_val}$ kN [Ref. IS 800:2007, Cl. 6.2]'),
+                        '')
+                else:
+                    t1 = ('Tension Yielding Capacity (kN)', '',
+                        NoEscape(f'$T_{{dy}} = \\dfrac{{A_g \\times f_y}}{{\\gamma_{{m0}}}} = {Tdy_val}$ kN [Ref. IS 800:2007, Cl. 6.2]'),
+                        '')
+                self.report_check.append(t1)
+
+            if hasattr(self.plate, 'block_shear_capacity'):
+                Tdb_val = round(self.plate.block_shear_capacity / 1000, 2)
+                t1 = ('Block Shear Capacity (kN)', '',
+                    NoEscape(f'$T_{{db}} = \\min\\left[\\dfrac{{A_{{vg}} f_y}}{{\\sqrt{{3}} \\gamma_{{m0}}}} + \\dfrac{{0.9 A_{{tn}} f_u}}{{\\gamma_{{m1}}}}, \\dfrac{{A_{{vn}} f_u}}{{\\sqrt{{3}} \\gamma_{{m1}}}} + \\dfrac{{A_{{tg}} f_y}}{{\\gamma_{{m0}}}}\\right] = {Tdb_val}$ kN [Ref. IS 800:2007, Cl. 6.4]'),
+                    '')
+                self.report_check.append(t1)
+            elif hasattr(self.plate, 'blockshear_capacity'):
+                Tdb_val = round(self.plate.blockshear_capacity / 1000, 2)
+                t1 = ('Block Shear Capacity (kN)', '',
+                    NoEscape(f'$T_{{db}} = \\min\\left[\\dfrac{{A_{{vg}} f_y}}{{\\sqrt{{3}} \\gamma_{{m0}}}} + \\dfrac{{0.9 A_{{tn}} f_u}}{{\\gamma_{{m1}}}}, \\dfrac{{A_{{vn}} f_u}}{{\\sqrt{{3}} \\gamma_{{m1}}}} + \\dfrac{{A_{{tg}} f_y}}{{\\gamma_{{m0}}}}\\right] = {Tdb_val}$ kN [Ref. IS 800:2007, Cl. 6.4]'),
+                    '')
+                self.report_check.append(t1)
+
+            if hasattr(self, 'plate_tension_capacity'):
+                Td_val = round(self.plate_tension_capacity / 1000, 2)
+
+                if hasattr(self.plate, 'tension_rupture_capacity'):
+                    Tdu = round(self.plate.tension_rupture_capacity / 1000, 2)
+                else:
+                    Tdu = Tdy
+                
+                if hasattr(self.plate, 'tension_yielding_capacity'):
+                    Tdy = round(self.plate.tension_yielding_capacity / 1000, 2)
+                    if hasattr(self.plate, 'block_shear_capacity'):
+                        Tdb = round(self.plate.block_shear_capacity / 1000, 2)
+                    elif hasattr(self.plate, 'blockshear_capacity'):
+                        Tdb = round(self.plate.blockshear_capacity / 1000, 2)
+                    else:
+                        Tdb = Tdy
+                    
+                    t1 = ('Design Tension Capacity (kN)', '',
+                    NoEscape(f'$T_d = \\min(T_{{dy}}, T_{{du}}, T_{{db}}) = \\min({Tdy}, {Tdu}, {Tdb}) = {Td_val}$ kN'),
+                    '')
+                else:
+                    t1 = ('Design Tension Capacity (kN)', '',
+                        NoEscape(f'$T_d = {Td_val}$ kN'),
+                        '')
+                self.report_check.append(t1)
+
+                P_applied = round(self.load.axial_force / 1000, 2)
+                plate_status = get_pass_fail(self.load.axial_force / 1000,
+                                            self.plate_tension_capacity / 1000, relation='leq')
+                t1 = ('Plate Capacity Check', NoEscape(r'$P \leq T_{d}$'),
+                    NoEscape(f'${P_applied} \\leq {Td_val}$'),
+                    plate_status)
+                self.report_check.append(t1)
+
         else:
             self.report_input = \
             {#KEY_MAIN_MODULE: self.mainmodule,
@@ -2948,11 +3167,11 @@ class Compression(Member):
                 KEY_DISP_SECSIZE:  str(self.sec_list),
 
                 # "Failed Section Details": self.report_column,
-                }  
+                }
             self.report_check = []
 
             t1 = ('Selected', 'All Members Failed', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
-            self.report_check.append(t1) 
+            self.report_check.append(t1)
         
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"

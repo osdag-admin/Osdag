@@ -2928,6 +2928,7 @@ class CommonDesignLogic(object):
             web_color = Quantity_Color(47/255.0, 47/255.0, 35/255.0, Quantity_TOC_RGB)
             flange_color = Quantity_Color(134/255.0, 134/255.0, 100/255.0, Quantity_TOC_RGB)
             stiffener_color = Quantity_Color(72/255.0, 72/255.0, 54/255.0, Quantity_TOC_RGB)
+            weld_color = Quantity_NOC_SADDLEBROWN
             
             # Create hover labels dictionary
             hover_dict = {}

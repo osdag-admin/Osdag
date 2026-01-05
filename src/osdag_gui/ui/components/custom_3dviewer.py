@@ -214,8 +214,6 @@ class CustomViewer3d(qtViewer3d):
         Clean up all internal state before displaying a new model.
         This prevents memory corruption from stale OCC object references.
         """
-        import gc
-        
         # Reset view cube state
         if hasattr(self, 'view_cube') and self.view_cube:
             try:
@@ -254,19 +252,17 @@ class CustomViewer3d(qtViewer3d):
         # Clear hover labels
         self.model_hover_labels.clear()
         
-        # Force garbage collection to clean up OCC shapes
-        gc.collect()
+        # NOTE: Do NOT call gc.collect() here!
+        # The gdb backtrace shows the crash happens during GC when trying to clean up
+        # Shiboken MetaObjectBuilder objects. Let Python handle GC naturally.
 
     # ------------------------------------------------------------------
     # View Cube Display
     # ------------------------------------------------------------------
 
     def display_view_cube(self):
-        import gc
-
         try:
-            # Force garbage collection before OCC operations to prevent heap corruption
-            gc.collect()
+            # NOTE: Do NOT call gc.collect() here - it causes Shiboken wrapper corruption
             
             # Remove existing view cube if it exists using safe method
             if hasattr(self, 'view_cube') and self.view_cube:

@@ -1,0 +1,28 @@
+[
+  {
+    "command": "fu",
+    "args": [
+      "410",
+      "True"
+    ],
+    "result": true
+  },
+  {
+    "command": "bolt",
+    "args": [
+      "M20",
+      "8.8",
+      "False"
+    ],
+    "result": true
+  },
+  {
+    "command": "plate",
+    "args": [
+      "10",
+      "250",
+      "False"
+    ],
+    "result": true
+  }
+]

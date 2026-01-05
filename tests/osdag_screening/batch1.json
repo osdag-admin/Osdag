@@ -1,0 +1,13 @@
+[
+  {"command": "fu", "args": ["410"]},
+  {"command": "fy", "args": ["250"]},
+  {"command": "tf", "args": ["10"]},
+  {"command": "bolt", "args": ["M20", "8.8"]},
+  {"command": "plate", "args": ["10", "250"]},
+  {"command": "fu", "args": ["0"]},
+  {"command": "fy", "args": ["-10"]},
+  {"command": "tf", "args": ["-5"]},
+  {"command": "bolt", "args": ["M99", "8.8"]},
+  {"command": "plate", "args": ["-10", "200"]}
+]
+

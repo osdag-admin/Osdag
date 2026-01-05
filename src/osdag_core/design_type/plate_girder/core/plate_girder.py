@@ -58,6 +58,8 @@ class PlateGirderWelded(Member):
         self.calculated_deflection = 'N/A'
         self.deflection_limit = 'N/A'
         self.deflection_skipped = False
+        self.hover_dict = {}  # Required for CAD display tooltips
+        self.mainmodule = 'PLATE GIRDER'  # Required for CommonDesignLogic routing
         
         # Configuration control
         self.debug = DEBUG_MODE
@@ -711,9 +713,64 @@ class PlateGirderWelded(Member):
 
     def get_3d_components(self):
         components = []
-        t3 = ('Model', self.call_3DModel)
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+        t2 = ('Web', self.call_3DWeb)
+        components.append(t2)
+        t3 = ('Top Flange', self.call_3DTopFlange)
         components.append(t3)
+        t4 = ('Bottom Flange', self.call_3DBottomFlange)
+        components.append(t4)
+        t5 = ('Stiffeners', self.call_3DStiffeners)
+        components.append(t5)
+        t6 = ('Welds', self.call_3DWelds)
+        components.append(t6)
         return components
+
+    def call_3DWeb(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Web':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Web", bgcolor)
+
+    def call_3DTopFlange(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Top Flange':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Top Flange", bgcolor)
+
+    def call_3DBottomFlange(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Bottom Flange':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Bottom Flange", bgcolor)
+
+    def call_3DStiffeners(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Stiffeners':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Stiffeners", bgcolor)
+
+    def call_3DWelds(self, ui, bgcolor):
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Welds':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(False)
+        ui.commLogicObj.display_3DModel("Welds", bgcolor)
 
     def warn_text(self):
         red_list = red_list_function()

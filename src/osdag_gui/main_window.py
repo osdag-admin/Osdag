@@ -96,6 +96,9 @@ class MainWindow(QMainWindow):
         # Before maximizing, so that when we click on Restore it comes to normal state.
         QTimer.singleShot(0, self.showMaximized)
 
+        # Ensure correct deletion on close
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
+
 
     def init_ui(self):
         # Main Vertical Layout for the entire window's *content*
@@ -915,6 +918,12 @@ class MainWindow(QMainWindow):
                 dialogType=MessageBoxType.Information
             ).exec()
             return
+    def closeEvent(self, event):
+        """Explicitly schedule deletion on close."""
+        self.delete_all_children(self)
+        event.accept()
+        self.deleteLater()
+
     #----------------------------Download-Database/Excel--END----------------------------------------
 
 # if __name__ == "__main__":

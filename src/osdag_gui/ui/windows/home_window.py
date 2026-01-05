@@ -232,7 +232,8 @@ class HomeWindow(QWidget):
                 button = TopButton(black_icon, white_icon, label)
 
             if label.strip() == "Import":
-                button.clicked.connect(lambda checked=False: self.triggerLoadOsi.emit())
+                # button.clicked.connect(lambda checked=False: self.triggerLoadOsi.emit())
+                button.clicked.connect(self.debug_window_count)
             
             self.buttons.append(button)
             self.button_group.addButton(button, i) # Add button to the group with an ID
@@ -569,6 +570,30 @@ class HomeWindow(QWidget):
 
     def set_active_button(self, module):
         self.nav_bar.set_active_button_by_name(module)
+
+    def debug_window_count(self):
+        """Debug method to count active top-level widgets."""
+        top_level_widgets = QApplication.topLevelWidgets()
+        all_widgets = QApplication.allWidgets()
+        count = len(top_level_widgets)
+        total_count = len(all_widgets)
+        
+        # Filter for actual windows/dialogs we care about
+        visible_windows = [w for w in top_level_widgets if w.isVisible()]
+        visible_count = len(visible_windows)
+        
+        print("\n" + "="*40)
+        print(f"DEBUG: Window Count Report")
+        print("="*40)
+        print(f"Top-level Widgets: {count}")
+        print(f"Visible Top-level: {visible_count}")
+        print(f"Total Widgets:     {total_count}")
+        print("-" * 20)
+        print("Visible Windows:")
+        
+        for w in visible_windows:
+            print(f"- {w.objectName()} ({w.__class__.__name__})")
+        print("="*40 + "\n")
 
 # if __name__ == "__main__":
 #     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

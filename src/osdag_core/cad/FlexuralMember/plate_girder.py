@@ -485,6 +485,7 @@ def create_plate_girder(
 if __name__ == "__main__":
     from OCC.Display.SimpleGui import init_display
     from OCC.Core.Graphic3d import Graphic3d_NOM_ALUMINIUM
+    from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN
     
     print("Generating plate girder model...")
     
@@ -512,9 +513,9 @@ if __name__ == "__main__":
     display.DisplayShape(components['model'], update=True)
     display.DisplayShape(components['web_plate'], update=True)
     display.DisplayShape(components['stiffener_plates'], material=Graphic3d_NOM_ALUMINIUM, update=True)
-    display.DisplayShape(components['longitudinal_welds'], color="red", update=True)
+    display.DisplayShape(components['longitudinal_welds'], color=Quantity_NOC_SADDLEBROWN, update=True)
     if components['stiffener_welds'] is not None:
-        display.DisplayShape(components['stiffener_welds'], color="red", update=True)
+        display.DisplayShape(components['stiffener_welds'], color=Quantity_NOC_SADDLEBROWN, update=True)
     
     print("Model generated successfully!")
     

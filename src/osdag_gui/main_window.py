@@ -442,16 +442,16 @@ class MainWindow(QMainWindow):
                 has_cad_widget = hasattr(template_instance, 'cad_widget') and template_instance.cad_widget
                 
                 if has_cad_widget:
-                    # CRITICAL: For CAD templates, DON'T use delete_all_children
-                    # The recursive deleteLater corrupts OCC heap
-                    # Instead, just let Qt's normal parent-child destruction handle it
+                    # CRITICAL: For CAD templates, do minimal cleanup
+                    # The gdb backtrace shows crashes in QWidget::setParent -> inheritStyle
+                    # So we avoid setParent(None) entirely and let Qt handle parent-child destruction
                     try:
                         template_instance.cad_widget.cleanup_for_new_model()
                     except Exception as e:
                         print(f"[WARNING] CAD cleanup error: {e}")
                     
-                    # Just delete the template - Qt will delete children properly
-                    template_instance.setParent(None)
+                    # Just queue for deletion - don't call setParent(None)
+                    # Qt's deleteLater handles reparenting internally
                     template_instance.deleteLater()
                 else:
                     # For non-CAD templates, use the aggressive cleanup
@@ -467,13 +467,15 @@ class MainWindow(QMainWindow):
             except (RuntimeError, AttributeError) as e:
                 print(f"[ERROR] Error in pre-cleanup: {e}")
         
-        # Remove from UI structures
+        # Remove from UI structures first
         self.tab_widget.removeTab(index)
         self.tab_bar.removeTab(index)
         self.tab_widget_content.pop(index)
         
+        # For CAD widgets, we ONLY call deleteLater without setParent(None)
+        # The gdb backtrace showed crash in QWidget::setParent -> inheritStyle -> free()
+        # removeTab() already handles the tab widget, deleteLater handles cleanup
         if widget:
-            widget.setParent(None)
             widget.deleteLater()
         
         self._synchronize_tab_widget()
@@ -481,9 +483,11 @@ class MainWindow(QMainWindow):
         # Force immediate processing of deferred deletions
         QApplication.processEvents()
         
-        # Force garbage collection
-        import gc
-        gc.collect()
+        # NOTE: Do NOT call gc.collect() here!
+        # The gdb backtrace shows the crash happens during GC when it tries to 
+        # clean up Shiboken MetaObjectBuilder objects. The Qt/OCC objects need
+        # more event loop cycles to fully release before GC can safely run.
+        # Let Python's natural GC handle cleanup instead.
         
         # print(f"@After cleanup - Total Widgets: {len(QApplication.allWidgets())}\n")
     

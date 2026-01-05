@@ -59,6 +59,8 @@ from .SimpleConnections.WeldedLapJoint.welded_lap_joint import *
 from .SimpleConnections.BoltedButtJoint.Butt_joint_bolted import *
 from .SimpleConnections.WeldedButtJoint.Butt_joint_welded import *
 
+from .FlexuralMember.plate_girder import create_plate_girder
+
 from .MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
 from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
 from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADGroove
@@ -1874,6 +1876,87 @@ class CommonDesignLogic(object):
         print(f"DEBUG: create_welded_lap_joint returned: {lap_joint}, {plate1}, {plate2}, {welds}")
         return lap_joint, plate1, plate2, welds
 
+    def createPlateGirderCAD(self):
+        """
+        Create the 3D CAD model for a welded plate girder.
+        Extracts parameters from the PlateGirderWelded module object.
+        """
+        Conn = self.module_object
+        
+        print("DEBUG: createPlateGirderCAD called")
+        print(f"DEBUG: Module object type: {type(Conn).__name__}")
+        
+        # Extract parameters from the PlateGirderWelded object
+        D = float(getattr(Conn, 'total_depth', 750))
+        tw = float(getattr(Conn, 'web_thickness', 14))
+        length = float(getattr(Conn, 'length', 15000))
+        T_ft = float(getattr(Conn, 'top_flange_thickness', 20))
+        T_fb = float(getattr(Conn, 'bottom_flange_thickness', 20))
+        B_ft = float(getattr(Conn, 'top_flange_width', 400))
+        B_fb = float(getattr(Conn, 'bottom_flange_width', 400))
+        
+        # Stiffener parameters
+        stiffener_spacing = float(getattr(Conn, 'c', 750)) if hasattr(Conn, 'c') and Conn.c not in ['NA', None, ''] else 750
+        T_is = float(getattr(Conn, 'IntStiffThickness', 15)) if hasattr(Conn, 'IntStiffThickness') else 15
+        
+        # Handle NA values for spacing
+        if isinstance(stiffener_spacing, str):
+            stiffener_spacing = 750
+        
+        print(f"DEBUG: Plate Girder Parameters:")
+        print(f"  D={D}, tw={tw}, length={length}")
+        print(f"  T_ft={T_ft}, T_fb={T_fb}, B_ft={B_ft}, B_fb={B_fb}")
+        print(f"  stiffener_spacing={stiffener_spacing}, T_is={T_is}")
+        
+        
+        # Horizontal plate / Longitudinal Stiffener parameters
+        include_horizontal_plate = False
+        T_hp = 15.0
+        horizontal_plate_offset_ratio = 0.2
+
+        try:
+            # Check number of longitudinal stiffeners
+            num_long_stiff = getattr(Conn, 'longstiffener_no', 0)
+            if num_long_stiff is not None and str(num_long_stiff).strip() != '' and float(num_long_stiff) > 0:
+                include_horizontal_plate = True
+                
+                # Get thickness
+                thk_val = getattr(Conn, 'longstiffener_thk', 15)
+                if thk_val is not None and str(thk_val).strip() != '':
+                     T_hp = float(thk_val)
+                
+                # Get position/offset
+                pos_val = getattr(Conn, 'x1', 0)
+                if pos_val is not None and str(pos_val).strip() != '':
+                    # x1 is distance from compression flange (top)
+                    horizontal_plate_offset_ratio = float(pos_val) / D
+        except Exception as e:
+            print(f"Error extracting horizontal plate params: {e}")
+            include_horizontal_plate = False
+
+        # Create the plate girder model
+        components = create_plate_girder(
+            D=D,
+            tw=tw,
+            length=length,
+            T_ft=T_ft,
+            T_fb=T_fb,
+            B_ft=B_ft,
+            B_fb=B_fb,
+            stiffener_spacing=stiffener_spacing,
+            T_is=T_is,
+            chamfer_length=30,
+            weld_size=15,
+            include_horizontal_plate=include_horizontal_plate,
+            horizontal_plate_offset_ratio=horizontal_plate_offset_ratio,
+            T_hp=T_hp,
+        )
+        
+        # Store components for display_3DModel
+        self.plate_girder_components = components
+        
+        return components
+
     def createButtJointBoltedCAD(self):
           
             # Get input values from the design object (i.e., instance of ButtJointBolted)
@@ -2831,6 +2914,100 @@ class CommonDesignLogic(object):
                 if self.component == "Model":
                     osdag_display_shape(self.display, self.FObj, update=True, label=label_flexure, canvas=self.cad_widget)
 
+        elif self.mainmodule == 'PLATE GIRDER':
+            # Plate Girder display logic
+            self.col = self.module_object
+            
+            # Reuse PGObj if already created by call_3DModel
+            if hasattr(self, 'PGObj') and self.PGObj is not None:
+                components = self.PGObj
+            else:
+                components = self.createPlateGirderCAD()
+            
+            # Define colors for components
+            web_color = Quantity_Color(47/255.0, 47/255.0, 35/255.0, Quantity_TOC_RGB)
+            flange_color = Quantity_Color(134/255.0, 134/255.0, 100/255.0, Quantity_TOC_RGB)
+            stiffener_color = Quantity_Color(72/255.0, 72/255.0, 54/255.0, Quantity_TOC_RGB)
+            
+            # Create hover labels dictionary
+            hover_dict = {}
+            if hasattr(self.col, "hover_dict"):
+                hover_dict = self.col.hover_dict
+                self.cad_widget.model_hover_labels = hover_dict.copy()
+            
+            label_web = ["Web Plate", hover_dict.get("Web Plate", "Web plate of the plate girder")]
+            label_flange = ["Flange", hover_dict.get("Flange", "Flange plate of the plate girder")]
+            label_stiffener = ["Stiffeners", hover_dict.get("Stiffeners", "Intermediate stiffener plates")]
+            label_weld = ["Weld", hover_dict.get("Weld", "Fillet welds")]
+            
+            if self.component == "Model":
+                # Display web plate
+                if components.get('web_plate') is not None:
+                    osdag_display_shape(self.display, components['web_plate'], update=True, 
+                                       color=web_color, label=label_web, canvas=self.cad_widget)
+                
+                # Display top flange
+                if components.get('top_flange') is not None:
+                    osdag_display_shape(self.display, components['top_flange'], update=True, 
+                                       color=flange_color, label=label_flange, canvas=self.cad_widget)
+                
+                # Display bottom flange
+                if components.get('bottom_flange') is not None:
+                    osdag_display_shape(self.display, components['bottom_flange'], update=True, 
+                                       color=flange_color, label=label_flange, canvas=self.cad_widget)
+                
+                # Display stiffener plates
+                if components.get('stiffener_plates') is not None:
+                    osdag_display_shape(self.display, components['stiffener_plates'], update=True, 
+                                       color=stiffener_color, label=label_stiffener, canvas=self.cad_widget)
+                
+                # Display horizontal plate (Longitudinal stiffener)
+                if components.get('horizontal_plate') is not None:
+                    osdag_display_shape(self.display, components['horizontal_plate'], update=True, 
+                                       color=stiffener_color, label=label_stiffener, canvas=self.cad_widget)
+                
+                # Display longitudinal welds
+                if components.get('longitudinal_welds') is not None:
+                    osdag_display_shape(self.display, components['longitudinal_welds'], update=True, 
+                                       color=weld_color, label=label_weld, canvas=self.cad_widget)
+                
+                # Display stiffener welds
+                if components.get('stiffener_welds') is not None:
+                    osdag_display_shape(self.display, components['stiffener_welds'], update=True, 
+                                       color=weld_color, label=label_weld, canvas=self.cad_widget)
+            
+            elif self.component == "Web":
+                if components.get('web_plate') is not None:
+                    osdag_display_shape(self.display, components['web_plate'], update=True, 
+                                       color=web_color, label=label_web, canvas=self.cad_widget)
+            
+            elif self.component == "Top Flange":
+                if components.get('top_flange') is not None:
+                    osdag_display_shape(self.display, components['top_flange'], update=True, 
+                                       color=flange_color, label=label_flange, canvas=self.cad_widget)
+            
+            elif self.component == "Bottom Flange":
+                if components.get('bottom_flange') is not None:
+                    osdag_display_shape(self.display, components['bottom_flange'], update=True, 
+                                       color=flange_color, label=label_flange, canvas=self.cad_widget)
+            
+            elif self.component == "Stiffeners":
+                if components.get('stiffener_plates') is not None:
+                    osdag_display_shape(self.display, components['stiffener_plates'], update=True, 
+                                       color=stiffener_color, label=label_stiffener, canvas=self.cad_widget)
+                
+                if components.get('horizontal_plate') is not None:
+                    osdag_display_shape(self.display, components['horizontal_plate'], update=True, 
+                                       color=stiffener_color, label=label_stiffener, canvas=self.cad_widget)
+            
+            elif self.component == "Welds":
+                if components.get('longitudinal_welds') is not None:
+                    osdag_display_shape(self.display, components['longitudinal_welds'], update=True, 
+                                       color=weld_color, label=label_weld, canvas=self.cad_widget)
+                if components.get('stiffener_welds') is not None:
+                    osdag_display_shape(self.display, components['stiffener_welds'], update=True, 
+                                       color=weld_color, label=label_weld, canvas=self.cad_widget)
+
         elif self.mainmodule == KEY_DISP_STRUT_WELDED_END_GUSSET:
             self.col = self.module_object  
             self.ColObj = self.createStrutsInTrusses()
@@ -3093,6 +3270,22 @@ class CommonDesignLogic(object):
         elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
             if flag is True:
                 self.display_3DModel("Model", "gradient_bg")
+            else:
+                self.display.EraseAll()
+                self.cad_widget.display_view_cube()
+        elif self.mainmodule == 'PLATE GIRDER':
+            print("DEBUG: PLATE GIRDER case triggered")
+            if flag is True:
+                print("DEBUG: Flag is True, calling createPlateGirderCAD")
+                try:
+                    self.PGObj = self.createPlateGirderCAD()
+                    print(f"DEBUG: createPlateGirderCAD returned: {self.PGObj}")
+                    self.display_3DModel("Model", "gradient_bg")
+                    print("DEBUG: display_3DModel completed")
+                except Exception as e:
+                    print(f"ERROR in PLATE GIRDER CAD: {e}")
+                    import traceback
+                    traceback.print_exc()
             else:
                 self.display.EraseAll()
                 self.cad_widget.display_view_cube()

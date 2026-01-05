@@ -34,8 +34,8 @@ class MyTableWidget(QWidget):
 
 class Window(QDialog):
     downloadDatabase = Signal(str, str)
-    def __init__(self, main, input_dictionary):
-        super().__init__()
+    def __init__(self, main, input_dictionary, parent=None):
+        super().__init__(parent)
         self.input_dictionary = input_dictionary
         self.do_not_clear_list = []
         self.save_changes_list = []
@@ -1324,7 +1324,7 @@ class Window(QDialog):
 class AdditionalInputs():
     downloadDatabase = Signal(str, str)
     def __init__(self, main, module_window, input_dictionary, parent=None):
-        self.ui = Window(main, input_dictionary)
+        self.ui = Window(main, input_dictionary, parent=parent)
         self.ui.downloadDatabase.connect(self.downloadDatabase)
         self.main = main
         self.main_controller = parent

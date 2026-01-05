@@ -545,7 +545,7 @@ class InputDock(QWidget):
         """
         if disabled_values is None:
             disabled_values = []
-        self.window = QDialog()
+        self.window = QDialog(self)
         self.ui = CustomValueSelectPopup()
         self.ui.setupUi(self.window, disabled_values, note)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
@@ -755,7 +755,7 @@ class InputDock(QWidget):
         elif name == KEY_BOTTOM_Bflange_PG:
             bounds = self.backend.bounds_map.get('bf_bot')
 
-        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]])
+        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]], parent=self)
         result = dialog.exec()
         
         if result:

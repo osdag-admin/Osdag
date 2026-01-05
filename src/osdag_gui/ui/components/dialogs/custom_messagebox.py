@@ -22,6 +22,7 @@ class CustomMessageBox(QDialog):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         self.setObjectName("CustomDialog")
 

@@ -429,18 +429,31 @@ class MainWindow(QMainWindow):
                 template_instance.blockSignals(True)
                 template_instance.hide()
                 
-                # Find and clean all scroll areas first (they create the container widgets)
-                from PySide6.QtWidgets import QScrollArea
-                scroll_areas = template_instance.findChildren(QScrollArea)
-                for scroll_area in scroll_areas:
-                    self._cleanup_scroll_area(scroll_area)
+                # Check if this template has a CAD widget
+                has_cad_widget = hasattr(template_instance, 'cad_widget') and template_instance.cad_widget
                 
-                # Recursively delete all children
-                self.delete_all_children(template_instance)
-                
-                # Finally delete the template instance itself
-                template_instance.setParent(None)
-                template_instance.deleteLater()
+                if has_cad_widget:
+                    # CRITICAL: For CAD templates, DON'T use delete_all_children
+                    # The recursive deleteLater corrupts OCC heap
+                    # Instead, just let Qt's normal parent-child destruction handle it
+                    try:
+                        template_instance.cad_widget.cleanup_for_new_model()
+                    except Exception as e:
+                        print(f"[WARNING] CAD cleanup error: {e}")
+                    
+                    # Just delete the template - Qt will delete children properly
+                    template_instance.setParent(None)
+                    template_instance.deleteLater()
+                else:
+                    # For non-CAD templates, use the aggressive cleanup
+                    from PySide6.QtWidgets import QScrollArea
+                    scroll_areas = template_instance.findChildren(QScrollArea)
+                    for scroll_area in scroll_areas:
+                        self._cleanup_scroll_area(scroll_area)
+                    
+                    self.delete_all_children(template_instance)
+                    template_instance.setParent(None)
+                    template_instance.deleteLater()
                         
             except (RuntimeError, AttributeError) as e:
                 print(f"[ERROR] Error in pre-cleanup: {e}")
@@ -469,8 +482,10 @@ class MainWindow(QMainWindow):
             """
             Recursively delete all child widgets of the given widget.
             Traverses depth-first, deleting only QWidget children on the way back up.
+            Skips CustomViewer3d to prevent OCC heap corruption.
             """
             from PySide6.QtWidgets import QWidget
+            from osdag_gui.ui.components.custom_3dviewer import CustomViewer3d
             
             # Get all immediate children
             children = widget.children()
@@ -479,6 +494,11 @@ class MainWindow(QMainWindow):
             for child in children:
                 # Only process QWidget instances
                 if isinstance(child, QWidget):
+                    # Skip CustomViewer3d - deleteLater on it corrupts OCC heap
+                    # It will be deleted when parent is deleted
+                    if isinstance(child, CustomViewer3d):
+                        continue
+                    
                     # First, recursively delete this child's children
                     self.delete_all_children(child)
                     

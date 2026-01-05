@@ -381,6 +381,15 @@ class MainWindow(QMainWindow):
                             except:
                                 pass
                     
+                    # CRITICAL: Check for CAD widget and clean it up safely
+                    # This prevents "free(): corrupted unsorted chunks" errors
+                    if hasattr(widget, 'cad_widget') and widget.cad_widget:
+                        try:
+                            # print(f"[INFO] Safely cleaning up CAD widget in clear_layout")
+                            widget.cad_widget.cleanup_for_new_model()
+                        except Exception as e:
+                            print(f"[WARNING] CAD cleanup error in clear_layout: {e}")
+
                     widget.setParent(None)
                     widget.deleteLater()
                 except (RuntimeError, TypeError):

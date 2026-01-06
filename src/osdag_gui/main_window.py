@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
     
     @classmethod
     def _flush_oldest_viewer(cls):
-        """Immediately delete the oldest viewer from graveyard (blocking)."""
+        """Immediately delete the oldest viewer from graveyard."""
         import gc
         
         if not cls._occ_viewer_graveyard:
@@ -75,18 +75,10 @@ class MainWindow(QMainWindow):
         gc.disable()
         
         try:
-            # Force immediate cleanup
-            if hasattr(widget, 'cad_widget') and widget.cad_widget:
-                try:
-                    widget.cad_widget.cleanup_for_new_model()
-                    if hasattr(widget.cad_widget, '_display') and widget.cad_widget._display:
-                        widget.cad_widget._display.EraseAll()
-                except Exception:
-                    pass
-            
+            # Just queue for deletion - don't call OCC methods here
+            # as the object might already be in a corrupted state
             widget.deleteLater()
-            # Process the deletion immediately
-            QApplication.processEvents()
+            # DON'T call processEvents() - it causes OpenGL race conditions
             
         finally:
             if gc_was_enabled:
@@ -120,8 +112,8 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"[WARNING] Safe deletion error: {e}")
         
-        # Schedule deletion after 3 seconds
-        QTimer.singleShot(3000, do_safe_delete)
+        # Schedule deletion after 5 seconds (more time for OpenGL to settle)
+        QTimer.singleShot(5000, do_safe_delete)
     
     def __init__(self):
         super().__init__()
@@ -504,9 +496,17 @@ class MainWindow(QMainWindow):
         """Close tab with comprehensive cleanup."""
         widget = self.tab_widget.widget(index)
         
-        # print(f"\n@Before cleanup - Total Widgets: {len(QApplication.allWidgets())}")
-        
         template_instance = self._get_template_instance(index)
+        
+        # Get module name for debug logging
+        module_name = "Unknown"
+        if template_instance and hasattr(template_instance, 'backend') and template_instance.backend:
+            try:
+                module_name = template_instance.backend.module_name()
+            except Exception:
+                pass
+        
+        print(f"[TAB CLOSE] Closing tab index {index}: '{module_name}'")
         
         if template_instance:
             try:
@@ -560,8 +560,9 @@ class MainWindow(QMainWindow):
         
         self._synchronize_tab_widget()
         
-        # Force immediate processing of deferred deletions
-        QApplication.processEvents()
+        # NOTE: DO NOT call processEvents() here!
+        # It forces immediate deletion while OCC resources may still be in use,
+        # causing heap corruption. Let Qt handle deletions naturally in the event loop.
         
         # NOTE: Do NOT call gc.collect() here!
         # The gdb backtrace shows the crash happens during GC when it tries to 
@@ -569,7 +570,7 @@ class MainWindow(QMainWindow):
         # more event loop cycles to fully release before GC can safely run.
         # Let Python's natural GC handle cleanup instead.
         
-        # print(f"@After cleanup - Total Widgets: {len(QApplication.allWidgets())}\n")
+        print(f"[TAB CLOSE] Tab '{module_name}' closed successfully. @Total widgets: {len(QApplication.allWidgets())}")
     
     def delete_all_children(self, widget):
             """

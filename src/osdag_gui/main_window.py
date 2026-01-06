@@ -56,6 +56,41 @@ from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Ca
 import openpyxl
 
 class MainWindow(QMainWindow):
+    # DELAYED DELETION: Temporarily hold old OCC viewers to prevent OpenGL context overlap
+    # After 2 seconds (when new viewer is stable), the old viewer is safely deleted
+    _occ_viewer_graveyard = []
+    
+    @classmethod
+    def _schedule_safe_deletion(cls, widget):
+        """Schedule safe deletion of CAD widget after new viewer is stable.
+        
+        The 2-second delay ensures the new OCC viewer is fully initialized
+        before the old one's OpenGL resources are released.
+        """
+        import gc
+        
+        def do_safe_delete():
+            try:
+                # Remove from graveyard
+                if widget in cls._occ_viewer_graveyard:
+                    cls._occ_viewer_graveyard.remove(widget)
+                
+                # Disable GC during deletion to ensure correct destruction order
+                gc_was_enabled = gc.isenabled()
+                gc.disable()
+                
+                try:
+                    widget.deleteLater()
+                finally:
+                    if gc_was_enabled:
+                        gc.enable()
+                        
+            except Exception as e:
+                print(f"[WARNING] Safe deletion error: {e}")
+        
+        # Schedule deletion after 2 seconds (enough time for new viewer to stabilize)
+        QTimer.singleShot(2000, do_safe_delete)
+    
     def __init__(self):
         super().__init__()
         self.main_widget_instance = None
@@ -381,14 +416,22 @@ class MainWindow(QMainWindow):
                             except:
                                 pass
                     
-                    # CRITICAL: Check for CAD widget and clean it up safely
-                    # This prevents "free(): corrupted unsorted chunks" errors
+                    # DELAYED SAFE DELETION: Archive temporarily, then delete after 2 seconds
+                    # This prevents OpenGL context overlap while still freeing memory
                     if hasattr(widget, 'cad_widget') and widget.cad_widget:
+                        # Clear displayed shapes
                         try:
-                            # print(f"[INFO] Safely cleaning up CAD widget in clear_layout")
                             widget.cad_widget.cleanup_for_new_model()
+                            if hasattr(widget.cad_widget, '_display') and widget.cad_widget._display:
+                                widget.cad_widget._display.EraseAll()
                         except Exception as e:
-                            print(f"[WARNING] CAD cleanup error in clear_layout: {e}")
+                            print(f"[WARNING] CAD cleanup error: {e}")
+                        
+                        # Archive temporarily, then schedule safe deletion after delay
+                        widget.setParent(None)
+                        MainWindow._occ_viewer_graveyard.append(widget)
+                        MainWindow._schedule_safe_deletion(widget)
+                        continue  # Skip immediate deleteLater
 
                     widget.setParent(None)
                     widget.deleteLater()
@@ -442,17 +485,18 @@ class MainWindow(QMainWindow):
                 has_cad_widget = hasattr(template_instance, 'cad_widget') and template_instance.cad_widget
                 
                 if has_cad_widget:
-                    # CRITICAL: For CAD templates, do minimal cleanup
-                    # The gdb backtrace shows crashes in QWidget::setParent -> inheritStyle
-                    # So we avoid setParent(None) entirely and let Qt handle parent-child destruction
+                    # DELAYED SAFE DELETION: Archive temporarily, then delete after 2 seconds
                     try:
                         template_instance.cad_widget.cleanup_for_new_model()
+                        if hasattr(template_instance.cad_widget, '_display') and template_instance.cad_widget._display:
+                            template_instance.cad_widget._display.EraseAll()
                     except Exception as e:
                         print(f"[WARNING] CAD cleanup error: {e}")
                     
-                    # Just queue for deletion - don't call setParent(None)
-                    # Qt's deleteLater handles reparenting internally
-                    template_instance.deleteLater()
+                    # Archive temporarily, then schedule safe deletion
+                    template_instance.setParent(None)
+                    MainWindow._occ_viewer_graveyard.append(template_instance)
+                    MainWindow._schedule_safe_deletion(template_instance)
                 else:
                     # For non-CAD templates, use the aggressive cleanup
                     from PySide6.QtWidgets import QScrollArea

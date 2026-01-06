@@ -56,26 +56,58 @@ from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Ca
 import openpyxl
 
 class MainWindow(QMainWindow):
-    # DELAYED DELETION: Temporarily hold old OCC viewers to prevent OpenGL context overlap
-    # After 2 seconds (when new viewer is stable), the old viewer is safely deleted
+    # RATE-LIMITED OCC DELETION: Limit concurrent viewers to prevent OpenGL corruption
+    # When graveyard gets full, we BLOCK and cleanup before creating new viewer
     _occ_viewer_graveyard = []
+    _MAX_CONCURRENT_VIEWERS = 2  # Max old viewers in graveyard at once
+    
+    @classmethod
+    def _flush_oldest_viewer(cls):
+        """Immediately delete the oldest viewer from graveyard (blocking)."""
+        import gc
+        
+        if not cls._occ_viewer_graveyard:
+            return
+        
+        widget = cls._occ_viewer_graveyard.pop(0)  # Remove oldest
+        
+        gc_was_enabled = gc.isenabled()
+        gc.disable()
+        
+        try:
+            # Force immediate cleanup
+            if hasattr(widget, 'cad_widget') and widget.cad_widget:
+                try:
+                    widget.cad_widget.cleanup_for_new_model()
+                    if hasattr(widget.cad_widget, '_display') and widget.cad_widget._display:
+                        widget.cad_widget._display.EraseAll()
+                except Exception:
+                    pass
+            
+            widget.deleteLater()
+            # Process the deletion immediately
+            QApplication.processEvents()
+            
+        finally:
+            if gc_was_enabled:
+                gc.enable()
+    
+    @classmethod
+    def _ensure_graveyard_space(cls):
+        """Ensure graveyard has space for a new viewer, flushing oldest if needed."""
+        while len(cls._occ_viewer_graveyard) >= cls._MAX_CONCURRENT_VIEWERS:
+            cls._flush_oldest_viewer()
     
     @classmethod
     def _schedule_safe_deletion(cls, widget):
-        """Schedule safe deletion of CAD widget after new viewer is stable.
-        
-        The 2-second delay ensures the new OCC viewer is fully initialized
-        before the old one's OpenGL resources are released.
-        """
+        """Schedule safe deletion of CAD widget after new viewer is stable."""
         import gc
         
         def do_safe_delete():
             try:
-                # Remove from graveyard
                 if widget in cls._occ_viewer_graveyard:
                     cls._occ_viewer_graveyard.remove(widget)
                 
-                # Disable GC during deletion to ensure correct destruction order
                 gc_was_enabled = gc.isenabled()
                 gc.disable()
                 
@@ -88,8 +120,8 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"[WARNING] Safe deletion error: {e}")
         
-        # Schedule deletion after 2 seconds (enough time for new viewer to stabilize)
-        QTimer.singleShot(2000, do_safe_delete)
+        # Schedule deletion after 3 seconds
+        QTimer.singleShot(3000, do_safe_delete)
     
     def __init__(self):
         super().__init__()
@@ -416,9 +448,11 @@ class MainWindow(QMainWindow):
                             except:
                                 pass
                     
-                    # DELAYED SAFE DELETION: Archive temporarily, then delete after 2 seconds
-                    # This prevents OpenGL context overlap while still freeing memory
+                    # RATE-LIMITED DELETION: Ensure graveyard has space before adding
                     if hasattr(widget, 'cad_widget') and widget.cad_widget:
+                        # Ensure we don't have too many concurrent viewers
+                        MainWindow._ensure_graveyard_space()
+                        
                         # Clear displayed shapes
                         try:
                             widget.cad_widget.cleanup_for_new_model()
@@ -427,7 +461,7 @@ class MainWindow(QMainWindow):
                         except Exception as e:
                             print(f"[WARNING] CAD cleanup error: {e}")
                         
-                        # Archive temporarily, then schedule safe deletion after delay
+                        # Archive and schedule delayed deletion
                         widget.setParent(None)
                         MainWindow._occ_viewer_graveyard.append(widget)
                         MainWindow._schedule_safe_deletion(widget)
@@ -485,7 +519,9 @@ class MainWindow(QMainWindow):
                 has_cad_widget = hasattr(template_instance, 'cad_widget') and template_instance.cad_widget
                 
                 if has_cad_widget:
-                    # DELAYED SAFE DELETION: Archive temporarily, then delete after 2 seconds
+                    # RATE-LIMITED DELETION: Ensure graveyard has space
+                    MainWindow._ensure_graveyard_space()
+                    
                     try:
                         template_instance.cad_widget.cleanup_for_new_model()
                         if hasattr(template_instance.cad_widget, '_display') and template_instance.cad_widget._display:
@@ -493,7 +529,7 @@ class MainWindow(QMainWindow):
                     except Exception as e:
                         print(f"[WARNING] CAD cleanup error: {e}")
                     
-                    # Archive temporarily, then schedule safe deletion
+                    # Archive and schedule delayed deletion
                     template_instance.setParent(None)
                     MainWindow._occ_viewer_graveyard.append(template_instance)
                     MainWindow._schedule_safe_deletion(template_instance)

@@ -1448,10 +1448,10 @@ class Compression_bolted(Member):
             self.min_plate_height = self.section_size_1.min_leg - self.section_size_1.root_radius - self.section_size_1.thickness
             self.max_plate_height = self.section_size_1.min_leg - self.section_size_1.root_radius - self.section_size_1.thickness
 
-        # Calculate res_force (design force for connection)
+        # Calculate res_force (design force for connection) - uses compression_capacity for compression members
         self.res_force = max((self.load.axial_force * 1000), (0.3 * self.section_size_1.compression_capacity))
 
-        # Calculate member and plate thicknesses
+        # Calculate member and plate thicknesses based on section profile
         if design_dictionary[KEY_SEC_PROFILE] == "Channels":
             bolts_required_previous = 2
             self.thick_plate = (self.res_force * 1.1) / (self.section_size_1.depth * self.plate.fy)
@@ -1470,27 +1470,16 @@ class Compression_bolted(Member):
             else:
                 self.thick_plate = (self.res_force * 1.1) / (2 * self.section_size_1.min_leg * self.plate.fy)
 
-        elif design_dictionary[KEY_SEC_PROFILE] == "Back to Back Angles":
+        else:  # Angles, Back to Back Angles
             bolts_required_previous = 1
-            self.thick = 2 * self.section_size_1.thickness
+            if self.sec_profile == "Back to Back Angles":
+                self.thick = 2 * self.section_size_1.thickness
+            else:
+                self.thick = self.section_size_1.thickness
             if self.loc == "Long Leg":
                 self.thick_plate = (self.res_force * 1.1) / (self.section_size_1.max_leg * self.plate.fy)
             else:
                 self.thick_plate = (self.res_force * 1.1) / (self.section_size_1.min_leg * self.plate.fy)
-
-        else:  # Single Angles
-            bolts_required_previous = 1
-            self.thick = self.section_size_1.thickness
-            if self.loc == "Long Leg":
-                self.thick_plate = (self.res_force * 1.1) / (self.section_size_1.max_leg * self.plate.fy)
-            else:
-                self.thick_plate = (self.res_force * 1.1) / (self.section_size_1.min_leg * self.plate.fy)
-
-        # Determine number of shear planes
-        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Angles', 'Star Angles']:
-            self.planes = 1
-        else:
-            self.planes = 2
 
         # Initial plate thickness selection
         if self.thk_count == 0:
@@ -1499,134 +1488,351 @@ class Compression_bolted(Member):
                 self.plate.thickness_provided = min(thickness_provided)
             else:
                 self.plate.thickness_provided = thickness_provided[0] if thickness_provided else self.plate.thickness[0]
-        
-        self.plate.connect_to_database_to_get_fy_fu(self.plate.material, self.plate.thickness_provided)
+
+        # Determine number of shear planes
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Angles', 'Star Angles']:
+            self.planes = 1
+        else:
+            self.planes = 2
 
         # Set up bolt connection plate properties
         self.bolt_conn_plates_t_fu_fy = []
         self.bolt_conn_plates_t_fu_fy.append((self.thick, self.section_size_1.fu, self.section_size_1.fy))
         self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
 
-        # Iterate through bolt diameters
-        for self.bolt.bolt_diameter_provided in self.bolt.bolt_diameter:
+        # Initialize tracking variables
+        bolt_diameter_previous = self.bolt.bolt_diameter[-1]
+        self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
+        bolt_min = min(self.bolt.bolt_diameter)
+        count = 0
+        bolt_design_status_1 = False
+        bolt_force_previous = 0.0
+
+        # Filter bolt diameters based on grip length check [Ref. Cl.10.3.3.2, IS 800:2007]
+        self.bolt_diameter_possible = []
+        for d in self.bolt.bolt_diameter:
+            if 8 * d < (self.plate.thickness_provided + self.thick):
+                continue
+            else:
+                self.bolt_diameter_possible.append(d)
+
+        if len(self.bolt_diameter_possible) == 0:
+            self.design_status = False
+            self.logger.warning(" : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
+                           "bolt diameter of {} mm [Ref. Cl.10.3.3.2, IS 800:2007]."
+                           .format((self.plate.thickness_provided + self.thick), (8 * self.bolt.bolt_diameter[-1]), self.bolt.bolt_diameter[-1]))
+            self.logger.error(": Design is unsafe. \n ")
+            self.logger.info(" :=========End Of design===========")
+        else:
+            self.bolt_design_status = False
+            # Iterate through diameters in reverse (largest to smallest) for optimization
+            for self.bolt.bolt_diameter_provided in reversed(self.bolt_diameter_possible):
+
+                self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n=self.planes)
+
+                self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(
+                    self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type, 'machine_flame_cut'), 2)
+                self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
+
+                self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                  bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                                  conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                                  n_planes=self.planes, e=self.bolt.min_end_dist_round,
+                                                  p=self.bolt.min_pitch_round)
+
+                # Get plate details based on section profile
+                if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+                    self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                     web_plate_h_min=self.min_plate_height,
+                                                     web_plate_h_max=self.max_plate_height,
+                                                     bolt_capacity=self.bolt.bolt_capacity,
+                                                     min_edge_dist=self.bolt.min_edge_dist_round,
+                                                     min_gauge=self.bolt.min_gauge_round,
+                                                     max_spacing=self.bolt.max_spacing_round,
+                                                     max_edge_dist=self.bolt.max_edge_dist_round,
+                                                     shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
+                                                     shear_ecc=False, min_bolts_one_line=2, min_bolt_line=2,
+                                                     beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
+                else:
+                    if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
+                        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                         web_plate_h_min=self.min_plate_height,
+                                                         web_plate_h_max=self.max_plate_height,
+                                                         bolt_capacity=self.bolt.bolt_capacity,
+                                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                                         min_gauge=self.bolt.min_gauge_round,
+                                                         max_spacing=self.bolt.max_spacing_round,
+                                                         max_edge_dist=self.bolt.max_edge_dist_round,
+                                                         shear_load=0, axial_load=self.res_force / 2,
+                                                         gap=self.plate.gap,
+                                                         shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,
+                                                         beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
+                    else:
+                        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                         web_plate_h_min=self.min_plate_height,
+                                                         web_plate_h_max=self.max_plate_height,
+                                                         bolt_capacity=self.bolt.bolt_capacity,
+                                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                                         min_gauge=self.bolt.min_gauge_round,
+                                                         max_spacing=self.bolt.max_spacing_round,
+                                                         max_edge_dist=self.bolt.max_edge_dist_round,
+                                                         shear_load=0, axial_load=self.res_force,
+                                                         gap=self.plate.gap,
+                                                         shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,
+                                                         beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
+
+                # Check plate design status and optimize bolt selection
+                if self.plate.design_status is True:
+                    if self.plate.bolts_required > bolts_required_previous and count >= 1:
+                        self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                        self.plate.bolts_required = bolts_required_previous
+                        self.plate.bolt_force = bolt_force_previous
+                        self.bolt_design_status = self.plate.design_status
+                        break
+                    bolts_required_previous = self.plate.bolts_required
+                    bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                    bolt_force_previous = self.plate.bolt_force
+                    count += 1
+                    self.bolt_design_status = self.plate.design_status
+                else:
+                    pass
+            bolt_capacity_req = self.bolt.bolt_capacity
+
+        # Handle design status after loop
+        if self.plate.design_status == False and self.bolt_design_status != True:
+            self.design_status = False
+        else:
+            self.bolt.bolt_diameter_provided = bolt_diameter_previous
+            self.plate.bolts_required = bolts_required_previous
+            self.plate.bolt_force = bolt_force_previous
+
+        # Call get_bolt_grade if bolt design succeeded
+        if self.bolt_design_status == True:
+            self.design_status = True
+            print("bolt ok")
+            self.get_bolt_grade(design_dictionary)
+        else:
+            self.design_status = False
+            if hasattr(self.plate, 'reason') and self.plate.reason != "":
+                self.logger.warning(self.plate.reason)
+            self.logger.error(": Design is unsafe. \n ")
+            self.logger.info(" :=========End Of design===========")
+
+    def get_bolt_grade(self, design_dictionary):
+        """Selection of bolt (grade) from the available list based on spacing limits and capacity"""
+        
+        bolt_grade_previous = self.bolt.bolt_grade[-1]
+        bolts_required_previous = self.plate.bolts_required if hasattr(self.plate, 'bolts_required') else 0
+        
+        # Set up bolt connection plate properties
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.thick, self.section_size_1.fu, self.section_size_1.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+        
+        # Iterate through grades in reverse (highest to lowest) to find optimal (lowest sufficient) grade
+        for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
+            count = 1
+            self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n=self.planes)
+            
             self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(
                 self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type, 'machine_flame_cut'), 2)
             self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
-            self.pitch_round = round_up((2.5 * self.bolt.bolt_diameter_provided), 5)
-
-            self.get_bolt_grade(design_dictionary)
             
-            if self.bolt_design_status:
-                self.member_check(design_dictionary)
-                if self.design_status:
-                    break
+            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                              bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                              n_planes=self.planes, e=self.bolt.min_end_dist_round,
+                                              p=self.bolt.min_pitch_round)
+            
+            # Check reduced bolt capacity (for long joints / large grip)
+            bolt_capacity_reduced = self.plate.get_bolt_red(
+                self.plate.bolts_one_line if hasattr(self.plate, 'bolts_one_line') else 1,
+                self.plate.gauge_provided if hasattr(self.plate, 'gauge_provided') else self.bolt.min_gauge_round,
+                self.plate.bolt_line if hasattr(self.plate, 'bolt_line') else 1,
+                self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else self.bolt.min_pitch_round,
+                self.bolt.bolt_capacity,
+                self.bolt.bolt_diameter_provided,
+                beta_lg=self.bolt.beta_lg)
+            
+            bolt_force = self.plate.bolt_force if hasattr(self.plate, 'bolt_force') else self.res_force
+            
+            if bolt_capacity_reduced < bolt_force and count >= 1:
+                self.bolt.bolt_grade_provided = bolt_grade_previous
+                break
+            
+            bolts_required_previous = self.plate.bolts_required if hasattr(self.plate, 'bolts_required') else 0
+            bolt_grade_previous = self.bolt.bolt_grade_provided
+            count += 1
         
-        if not self.design_status:
-             if hasattr(self.plate, 'reason') and self.plate.reason:
-                 self.logger.warning(self.plate.reason)
-             self.logger.warning(" : Design failed for all bolt diameters.")
-             self.logger.error(": Design is unsafe. \n ")
-             self.logger.info(" :=========End Of design===========")
-
-    def get_bolt_grade(self, design_dictionary):
-        """Select bolt grade - stub implementation"""
-        # For now, just select the first (highest) grade
-        if len(self.bolt.bolt_grade) > 0:
-            self.bolt.bolt_grade_provided = self.bolt.bolt_grade[0]
-            self.bolt_design_status = True
+        # Recalculate with final selected grade
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n=self.planes)
+        
+        self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(
+            self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type, 'machine_flame_cut'), 2)
+        self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
+        
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                          n_planes=self.planes, 
+                                          e=self.plate.end_dist_provided if hasattr(self.plate, 'end_dist_provided') else self.bolt.min_end_dist_round,
+                                          p=self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else self.bolt.min_pitch_round)
+        
+        # Get plate details with final bolt configuration
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+            self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                             web_plate_h_min=self.min_plate_height,
+                                             web_plate_h_max=self.max_plate_height,
+                                             bolt_capacity=self.bolt.bolt_capacity,
+                                             min_edge_dist=self.bolt.min_edge_dist_round,
+                                             min_gauge=self.bolt.min_gauge_round,
+                                             max_spacing=self.bolt.max_spacing_round,
+                                             max_edge_dist=self.bolt.max_edge_dist_round,
+                                             shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
+                                             shear_ecc=False, min_bolts_one_line=2, min_bolt_line=2,
+                                             beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
         else:
-            self.bolt_design_status = False
+            if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
+                self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                 web_plate_h_min=self.min_plate_height,
+                                                 web_plate_h_max=self.max_plate_height,
+                                                 bolt_capacity=self.bolt.bolt_capacity,
+                                                 min_edge_dist=self.bolt.min_edge_dist_round,
+                                                 min_gauge=self.bolt.min_gauge_round,
+                                                 max_spacing=self.bolt.max_spacing_round,
+                                                 max_edge_dist=self.bolt.max_edge_dist_round,
+                                                 shear_load=0, axial_load=self.res_force / 2,
+                                                 gap=self.plate.gap,
+                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,
+                                                 beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
+            else:
+                self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                 web_plate_h_min=self.min_plate_height,
+                                                 web_plate_h_max=self.max_plate_height,
+                                                 bolt_capacity=self.bolt.bolt_capacity,
+                                                 min_edge_dist=self.bolt.min_edge_dist_round,
+                                                 min_gauge=self.bolt.min_gauge_round,
+                                                 max_spacing=self.bolt.max_spacing_round,
+                                                 max_edge_dist=self.bolt.max_edge_dist_round,
+                                                 shear_load=0, axial_load=self.res_force,
+                                                 gap=self.plate.gap,
+                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,
+                                                 beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
+        
+        # Update edge distance provided
+        self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line - 1) * self.plate.gauge_provided)) / 2), 2)
+        print(self.plate.bolt_line)
+        
+        # Call member_check for final compression capacity verification
+        self.member_check(design_dictionary)
 
     def member_check(self, design_dictionary):
-        # 1. Calculate Member Compression Capacity (Buckling) with detailed properties
-        # This acts as the final verification of the member.
-        # Determine if section is angle-based or channel-based
-        is_angle_profile = self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']
-        
-        min_rad = self.min_rad_gyration_calc(designation=self.section_size_1.designation,
-                                             material_grade=self.material,
-                                             key=self.sec_profile, subkey=self.loc,
-                                             D_a=self.section_size_1.a if is_angle_profile else self.section_size_1.depth,
-                                             B_b=self.section_size_1.b if is_angle_profile else self.section_size_1.flange_width,
-                                             T_t=self.section_size_1.thickness if is_angle_profile else self.section_size_1.flange_thickness,
-                                             t=self.section_size_1.web_thickness if hasattr(self.section_size_1, 'web_thickness') else 0.0)
-                                             
-        # Note: min_rad_gyration_calc stores result in self.min_radius_gyration
-        
-        self.section_size_1.design_check_for_slenderness(self.K, self.length, self.min_radius_gyration)
-        
-        # Calculate buckling strength P_d
-        # self.section_size_1.compression_member_design_buckling(self.K, self.length, self.section_size_1.fy) 
-        # But this method might not exist on component. We use IS800 util directly or component method check.
-        # compression.py uses 'IS800_2007.cl_7_1_2_1_design_compressisive_stress'
-        
-        # Manually calculating P_d using IS 800:2007 Cl 7.1.2.1
-        # Buckling class 'c' assumed for hot-rolled Angles/Channels about any axis
-        # Ref: IS 800:2007 Table 10 - conservative assumption for general design
-        buckling_class = 'c'
-        imperfection_factor = IS800_2007.cl_7_1_2_1_imperfection_factor(buckling_class)
-        
-        results = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
-            self.section_size_1.fy, self.gamma_m0, self.section_size_1.slenderness, 
-            imperfection_factor, 200000, check_type='Concentric') # E=200000
+        try:
+            print("Entering member_check")  # Debug
+            # 1. Calculate Member Compression Capacity (Buckling) with detailed properties
+            # This acts as the final verification of the member.
+            # Determine if section is angle-based or channel-based
+            is_angle_profile = self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']
+            print(f"is_angle_profile: {is_angle_profile}, sec_profile: {self.sec_profile}")  # Debug
             
-        # --- IS 800:2007 Cl 7.5.1.2 Single Angle Strut Loaded Through One Leg ---
-        if self.load_type == "Leg Load" and is_angle_profile and design_dictionary[KEY_SEC_PROFILE] == 'Angles':
-            # Note: Double Angles (Back to Back) connected to opposite sides of gusset 
-            # are treated as concentrically loaded (modified KL/r) - Cl 7.5.2.1
-            # So this block applies essentially to Single Angles.
+            min_rad = self.min_rad_gyration_calc(designation=self.section_size_1.designation,
+                                                 material_grade=self.material,
+                                                 key=self.sec_profile, subkey=self.loc,
+                                                 D_a=self.section_size_1.a if is_angle_profile else self.section_size_1.depth,
+                                                 B_b=self.section_size_1.b if is_angle_profile else self.section_size_1.flange_width,
+                                                 T_t=self.section_size_1.thickness if is_angle_profile else self.section_size_1.flange_thickness,
+                                                 t=self.section_size_1.web_thickness if hasattr(self.section_size_1, 'web_thickness') else 0.0)
+            print(f"min_rad_gyration_calc done, min_rad={self.min_radius_gyration}")  # Debug
+                                                 
+            # Note: min_rad_gyration_calc stores result in self.min_radius_gyration
             
-            # Constants for >= 2 bolts (Fixed assumed for capacity check before bolt calc)
-            k1 = 0.20
-            k2 = 0.35
-            k3 = 20.0
+            self.section_size_1.design_check_for_slenderness(self.K, self.length, self.min_radius_gyration)
+            print(f"slenderness check done, slenderness={self.section_size_1.slenderness}")  # Debug
             
-            b1 = self.section_size_1.a
-            b2 = self.section_size_1.b
-            t = self.section_size_1.thickness
-            r_vv = self.section_size_1.rad_of_gy_v
+            # Calculate buckling strength P_d
+            # Manually calculating P_d using IS 800:2007 Cl 7.1.2.1
+            # Buckling class 'c' assumed for hot-rolled Angles/Channels about any axis
+            # Ref: IS 800:2007 Table 10 - conservative assumption for general design
+            buckling_class = 'c'
+            imperfection_factor = IS800_2007.cl_7_1_2_1_imperfection_factor(buckling_class)
+            print(f"imperfection_factor={imperfection_factor}")  # Debug
             
-            if r_vv > 0:
-                lambda_vv = (self.length / r_vv)
-                lambda_phi = (b1 + b2) / (2 * t)
-                lambda_e = math.sqrt(k1 + k2 * lambda_vv**2 + k3 * lambda_phi**2)
+            results = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
+                self.section_size_1.fy, self.gamma_m0, self.section_size_1.slenderness, 
+                imperfection_factor, 200000, check_type='Concentric') # E=200000
+            print(f"design_compressisive_stress results: {results}")  # Debug
                 
-                # Recalculate stress with lambda_e
-                results = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
-                    self.section_size_1.fy, self.gamma_m0, lambda_e, 
-                    imperfection_factor, 200000, check_type='Concentric')
+            # --- IS 800:2007 Cl 7.5.1.2 Single Angle Strut Loaded Through One Leg ---
+            # For struts bolted to end gusset, single angles are inherently loaded through one leg
+            # Apply this calculation automatically for Single Angles profile
+            if is_angle_profile and design_dictionary[KEY_SEC_PROFILE] == 'Angles':
+                # Note: Double Angles (Back to Back) connected to opposite sides of gusset 
+                # are treated as concentrically loaded (modified KL/r) - Cl 7.5.2.1
+                # So this block applies to Single Angles only.
                 
-                # Update slenderness for reporting/output?
-                # Ideally self.section_size_1.slenderness should reflect lambda_e for consistency in reports
-                self.section_size_1.slenderness = lambda_e
+                # Constants for >= 2 bolts (Fixed assumed for capacity check before bolt calc)
+                k1 = 0.20
+                k2 = 0.35
+                k3 = 20.0
+                
+                b1 = self.section_size_1.a
+                b2 = self.section_size_1.b
+                t = self.section_size_1.thickness
+                r_vv = self.section_size_1.rad_of_gy_v
+                
+                if r_vv > 0:
+                    lambda_vv = (self.length / r_vv)
+                    lambda_phi = (b1 + b2) / (2 * t)
+                    lambda_e = math.sqrt(k1 + k2 * lambda_vv**2 + k3 * lambda_phi**2)
+                    
+                    # Recalculate stress with lambda_e
+                    results = IS800_2007.cl_7_1_2_1_design_compressisive_stress(
+                        self.section_size_1.fy, self.gamma_m0, lambda_e, 
+                        imperfection_factor, 200000, check_type='Concentric')
+                    
+                    # Update slenderness for reporting/output?
+                    # Ideally self.section_size_1.slenderness should reflect lambda_e for consistency in reports
+                    self.section_size_1.slenderness = lambda_e
+                
+            f_cd = results[5] # Design compressive stress
+            print(f"f_cd={f_cd}")  # Debug
             
-        f_cd = results[5] # Design compressive stress
-        
-        # Store for output display
-        self.f_cd = round(f_cd, 2)  # Design Compressive Stress (MPa)
-        self.effective_length = round(self.K * self.length, 2)  # Effective Length (mm)
-        
-        # Effective Area check (Class 4?)
-        # For rolled sections (Angle/Channel), usually Class 1-3. 
-        # Assuming Ag for now (conservative for standard hot rolled)
-        # Verify Class in real implementation.
-        
-        self.section_size_1.compression_capacity = self.section_size_1.area * f_cd # N
-        
-
-        
-        if self.section_size_1.compression_capacity < self.load.axial_force * 1000:
+            # Store for output display
+            self.f_cd = round(f_cd, 2)  # Design Compressive Stress (MPa)
+            self.effective_length = round(self.K * self.length, 2)  # Effective Length (mm)
+            
+            # Effective Area check (Class 4?)
+            # For rolled sections (Angle/Channel), usually Class 1-3. 
+            # Assuming Ag for now (conservative for standard hot rolled)
+            # Verify Class in real implementation.
+            
+            self.section_size_1.compression_capacity = self.section_size_1.area * f_cd # N
+            print(f"compression_capacity={self.section_size_1.compression_capacity}")  # Debug
+            
+            if self.section_size_1.compression_capacity < self.load.axial_force * 1000:
+                self.design_status = False
+                self.logger.warning(" : Compression Capacity ({} kN) < Applied Load ({} kN)".format(
+                    round(self.section_size_1.compression_capacity/1000, 2), self.load.axial_force))
+                self.logger.info(" : Select member(s) with a higher cross sectional area.")
+                self.logger.error(": Design is unsafe. \n ")
+                self.logger.info(" :=========End Of design===========")
+                return
+            
+            self.efficiency = round(self.load.axial_force * 1000 / self.section_size_1.compression_capacity, 2)
+            print(f"efficiency={self.efficiency}, calling member_recheck")  # Debug
+            
+            # Call member_recheck to handle capacity verification and plate thickness
+            self.member_recheck(design_dictionary)
+        except Exception as e:
+            print(f"EXCEPTION in member_check: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
             self.design_status = False
-            # self.logger.warning(f" : Compression Capacity ({round(self.section_size_1.compression_capacity/1000, 2)} kN) < Applied Load ({self.load.axial_force} kN)")
-            # self.logger.info(" : Select member(s) with a higher cross sectional area.")
-            # self.logger.error(": Design is unsafe. \n ")
-            # self.logger.info(" :=========End Of design===========")
-            return
-        
-        self.efficiency = round(self.load.axial_force * 1000 / self.section_size_1.compression_capacity, 2)
-        
-        # Call member_recheck to handle capacity verification and plate thickness
-        self.member_recheck(design_dictionary)
+            self.logger.error(f": Internal error in member_check: {e}")
+            self.logger.info(" :=========End Of design===========")
 
     def get_plate_thickness(self, design_dictionary):
         """Select gusset plate thickness that satisfies bearing and yielding checks."""
@@ -1922,9 +2128,10 @@ class Compression_bolted(Member):
         # Only log if status_pass was never called
         self.design_status = False
         self.plate.reason = "Gusset Plate / Bolt Design Failed. Possible causes: plate thickness too small or grip exceeds limit."
-        # self.logger.warning(": Gusset Plate / Bolt Design Failed.")
-        # self.logger.info(": Possible causes: plate thickness too small or grip exceeds limit.")
-        # self.logger.error(": Design is unsafe. \n ")
+        self.logger.warning(": Gusset Plate / Bolt Design Failed.")
+        self.logger.info(": Possible causes: plate thickness too small or grip exceeds limit.")
+        self.logger.error(": Design is unsafe. \n ")
+        self.logger.info(" :=========End Of design===========")
 
     def status_pass(self, design_dictionary):
         """
@@ -1935,10 +2142,11 @@ class Compression_bolted(Member):
             self.design_status = False
             self.plate.reason = ": The plate length of {} mm is larger than the member length of {} mm.".format(
                 2 * self.plate.length, self.length)
-            # self.logger.warning(": The plate length of {} mm is larger than the member length of {} mm.".format(
-            #     2 * self.plate.length, self.length))
-            # self.logger.info(": Try a bolt of larger diameter and/or increase the member length.")
-            # self.logger.error(": Design is unsafe. \n ")
+            self.logger.warning(": The plate length of {} mm is larger than the member length of {} mm.".format(
+                2 * self.plate.length, self.length))
+            self.logger.info(": Try a bolt of larger diameter and/or increase the member length.")
+            self.logger.error(": Design is unsafe. \n ")
+            self.logger.info(" :=========End Of design===========")
         else:
             self.plate_design_status = True
             self.design_status = True
@@ -2123,25 +2331,36 @@ class Compression_bolted(Member):
     def member_recheck(self, design_dictionary):
         """Comparing applied force and compression capacity and if failed, 
         it returns to initial member selection which selects member of higher area"""
+        try:
+            print("Entering member_recheck")  # Debug
+            
+            if self.section_size_1.compression_capacity >= self.load.axial_force * 1000:
+                self.design_status = True
+                self.efficiency = round((self.load.axial_force * 1000 / self.section_size_1.compression_capacity), 2)
+                print(f"Calling get_plate_thickness, efficiency={self.efficiency}")  # Debug
+                self.get_plate_thickness(design_dictionary)
+                print("get_plate_thickness completed")  # Debug
 
-        if self.section_size_1.compression_capacity >= self.load.axial_force * 1000:
-            self.design_status = True
-            self.efficiency = round((self.load.axial_force * 1000 / self.section_size_1.compression_capacity), 2)
-            self.get_plate_thickness(design_dictionary)
-
-        else:
-            if len(self.sizelist) >= 2:
-                size = self.section_size_1.designation
-                print("recheck", size)
-                self.initial_member_capacity(design_dictionary, size)
             else:
-                self.design_status = False
-                self.logger.warning(" : The factored compression force ({} kN) exceeds the compression capacity ({} kN) with respect to the maximum available "
-                               "member size {}."
-                               .format(round(self.load.axial_force, 2), round(self.section_size_1.compression_capacity/1000, 2), self.max_area))
-                self.logger.info(" : Select member(s) with a higher cross sectional area.")
-                self.logger.error(": Design is unsafe. \n ")
-                self.logger.info(" :=========End Of design===========")
+                if len(self.sizelist) >= 2:
+                    size = self.section_size_1.designation
+                    print("recheck", size)
+                    self.initial_member_capacity(design_dictionary, size)
+                else:
+                    self.design_status = False
+                    self.logger.warning(" : The factored compression force ({} kN) exceeds the compression capacity ({} kN) with respect to the maximum available "
+                                   "member size {}."
+                                   .format(round(self.load.axial_force, 2), round(self.section_size_1.compression_capacity/1000, 2), self.max_area))
+                    self.logger.info(" : Select member(s) with a higher cross sectional area.")
+                    self.logger.error(": Design is unsafe. \n ")
+                    self.logger.info(" :=========End Of design===========")
+        except Exception as e:
+            print(f"EXCEPTION in member_recheck: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            self.design_status = False
+            self.logger.error(f": Internal error in member_recheck: {e}")
+            self.logger.info(" :=========End Of design===========")
 
     def results_to_test(self, filename):
         """Output design results to test file"""

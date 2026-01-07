@@ -2693,218 +2693,679 @@ class Compression_bolted(Member):
         self.report_check.append(t1)
 
         if self.member_design_status == True:
-            # Spacing Check Section
-            t1 = ('SubSection', 'Spacing Check', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
-            self.report_check.append(t1)
-            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt.bolt_diameter_provided), "d"), '')
-            self.report_check.append(t6)
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.bolt.d_0), "d_0"), '')
-            self.report_check.append(t8)
-            t8 = (KEY_DISP_MIN_BOLT, " ", display_prov(int(row), "r_l"), '')
-            self.report_check.append(t8)
-            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided, row_limit), 
-                  self.bolt.min_gauge_round if hasattr(self.bolt, 'min_gauge_round') else min_gauge, 
-                  get_pass_fail(self.bolt.min_gauge if hasattr(self.bolt, 'min_gauge') else 0, 
-                               self.bolt.min_gauge_round if hasattr(self.bolt, 'min_gauge_round') else min_gauge, relation="leq"))
-            self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, 'machine_flame_cut'),
-                  self.bolt.min_edge_dist_round if hasattr(self.bolt, 'min_edge_dist_round') else 0, 
-                  get_pass_fail(self.bolt.min_edge_dist if hasattr(self.bolt, 'min_edge_dist') else 0, 
-                               self.bolt.min_edge_dist_round if hasattr(self.bolt, 'min_edge_dist_round') else 0, relation='leq'))
-            self.report_check.append(t3)
-            t3 = (KEY_SPACING, depth_req(self.bolt.min_edge_dist_round if hasattr(self.bolt, 'min_edge_dist_round') else 30, 
-                                        self.bolt.min_pitch_round if hasattr(self.bolt, 'min_pitch_round') else 40, row, text), 
-                  depth_max, get_pass_fail(depth, depth_max, relation="lesser"))
-            self.report_check.append(t3)
 
-            # Member Check Section - COMPRESSION SPECIFIC
-            t1 = ('SubSection', 'Member Check (Compression)', '|p{2.5cm}|p{4cm}|p{7.5cm}|p{1.5cm}|')
+            # =========================================================================
+            # SECTION 1: BUCKLING CLASS & IMPERFECTION FACTOR
+            # =========================================================================
+            t1 = ('SubSection', 'Buckling Class & Imperfection Factor', 
+                '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            # Compression capacity (IS 800:2007 Cl 7.1.2.1)
-            if self.sec_profile in ['Angles', "Channels"]:
-                area_used = round(section_size.area, 2)
+            # Get imperfection factor (should be calculated in member_check)
+            imperfection_factor = self.imperfection_factor if hasattr(self, 'imperfection_factor') else 0.49
+            bucklingclass = 'c'  # Conservative assumption for angles/channels (Table 10, IS 800:2007)
+
+            t1 = ('Buckling Curve Classification', 
+                '',
+                NoEscape(f'{bucklingclass}'+'\\newline'+f'[Ref.~IS~800:2007,~Table~10]'),
+                '')
+            self.report_check.append(t1)
+
+            t1 = (r'Imperfection Factor ($\alpha$)',
+                '',
+                NoEscape(f'{str(imperfection_factor)}'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~7.1.2.2]'),
+                '')
+            self.report_check.append(t1)
+
+            # =========================================================================
+            # SECTION 2: SECTION CLASSIFICATION
+            # =========================================================================
+            t1 = ('SubSection', 'Section Classification', 
+                '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            epsilon = math.sqrt(250 / section_size.fy)
+
+            if self.sec_profile in ["Angles", "Back to Back Angles", "Star Angles"]:
+                # For angles
+                b = section_size.min_leg
+                d = section_size.max_leg
+                t = section_size.thickness
+
+                b_t_ratio = round(b / t, 2)
+                d_t_ratio = round(d / t, 2)
+                bd_t_ratio = round((b + d) / (2 * t), 2)
+
+                limit_1 = round(15.7 * epsilon, 2)
+                limit_2 = round(25 * epsilon, 2)
+
+                t1 = ('Outstanding element', 
+                    NoEscape(r'$\dfrac{b}{t} \leq 15.7\varepsilon$'),
+                    NoEscape(f'$\\dfrac{{{b}}}{{{t}}} = {b_t_ratio} \\leq {limit_1}$'),
+                    get_pass_fail(limit_1, b_t_ratio, relation='geq'))
+                self.report_check.append(t1)
+
+                t1 = ('Outstanding element', 
+                    NoEscape(r'$\dfrac{d}{t} \leq 15.7\varepsilon$'),
+                    NoEscape(f'$\\dfrac{{{d}}}{{{t}}} = {d_t_ratio} \\leq {limit_1}$'),
+                    get_pass_fail(limit_1, d_t_ratio, relation='geq'))
+                self.report_check.append(t1)
+
+                t1 = ('Axial Compression', 
+                    NoEscape(r'$\dfrac{(b+d)}{2t} \leq 25\varepsilon$'),
+                    NoEscape(f'$\\dfrac{{{b + d}}}{{2 \\times {t}}} = {bd_t_ratio} \\leq {limit_2}$'),
+                    get_pass_fail(limit_2, bd_t_ratio, relation='geq'))
+                self.report_check.append(t1)
+
+            elif self.sec_profile in ["Channels", "Back to Back Channels"]:
+                # For channels
+                b_tf = section_size.flange_width / 2
+                tf = section_size.flange_thickness
+                d_web = section_size.depth - 2 * section_size.flange_thickness
+                tw = section_size.web_thickness
+
+                b_tf_ratio = round(b_tf / tf, 2)
+                d_tw_ratio = round(d_web / tw, 2)
+
+                limit_flange = round(10.5 * epsilon, 2)
+                limit_web = round(42 * epsilon, 2)
+
+                t1 = ('Flange (Outstanding)', 
+                    NoEscape(r'$\dfrac{b/2}{t_f} \leq 10.5\varepsilon$'),
+                    NoEscape(f'$\\dfrac{{{round(b_tf, 2)}}}{{{tf}}} = {b_tf_ratio} \\leq {limit_flange}$'),
+                    get_pass_fail(limit_flange, b_tf_ratio, relation='geq'))
+                self.report_check.append(t1)
+
+                t1 = ('Web (Internal)', 
+                    NoEscape(r'$\dfrac{d}{t_w} \leq 42\varepsilon$'),
+                    NoEscape(f'$\\dfrac{{{round(d_web, 2)}}}{{{tw}}} = {d_tw_ratio} \\leq {limit_web}$'),
+                    get_pass_fail(limit_web, d_tw_ratio, relation='geq'))
+                self.report_check.append(t1)
+
+            t1 = ('Note', '', 
+                'All above criteria should be satisfied', 
+                '')
+            self.report_check.append(t1)
+
+            section_class = "Semi-Compact"  # Conservative for compression members
+            t1 = ('Section Class', 
+                '',
+                NoEscape(f'{section_class}'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~3.7]'), 
+                '')
+            self.report_check.append(t1)
+
+            # =========================================================================
+            # SECTION 3: EFFECTIVE SLENDERNESS RATIO
+            # =========================================================================
+            t1 = ('SubSection', 'Effective Slenderness Ratio', 
+                '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            K = self.K
+            L = self.length
+            r_min = self.min_radius_gyration
+            lambda_e = round(section_size.slenderness, 2)
+
+            if self.sec_profile == "Angles" and hasattr(self, 'k1'):
+                # For angles loaded through one leg - show detailed calculation
+                k1 = self.k1 if hasattr(self, 'k1') else 0.2
+                k2 = self.k2 if hasattr(self, 'k2') else 0.35
+                k3 = self.k3 if hasattr(self, 'k3') else 20.0
+
+                t1 = ('Formula',
+                    '',
+                    NoEscape(r'$\lambda_e = \sqrt{k_1 + k_2\lambda_{vv}^2 + k_3\lambda_\psi^2}$'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~7.5.1.2]'),
+                    '')
+                self.report_check.append(t1)
+
+                # Show constants based on fixity and number of bolts
+                fixity_str = 'Hinged' if not hasattr(self, 'fixity') else self.fixity
+                bolts_str = '2' if not hasattr(self, 'num_bolts') else str(self.num_bolts)
+
+                t1 = (r'Constants', 
+                    f'{bolts_str}~bolts,~{fixity_str}',
+                    NoEscape(f'$k_1 = {k1},~k_2 = {k2},~k_3 = {k3}$'),
+                    '')
+                self.report_check.append(t1)
+
+                if hasattr(self, 'lambda_vv'):
+                    t1 = (r'$\lambda_{vv}$', 
+                        '',
+                        NoEscape(f'$\\lambda_{{vv}} = \\dfrac{{L}}{{r_v}} \\sqrt{{\\dfrac{{f_y}}{{2\\pi^2 E}}}} = {round(self.lambda_vv, 2)}$'),
+                        '')
+                    self.report_check.append(t1)
+
+                if hasattr(self, 'lambda_psi'):
+                    t1 = (r'$\lambda_\psi$', 
+                        '',
+                        NoEscape(f'$\\lambda_\\psi = \\dfrac{{b_1 + b_2}}{{2t}} \\sqrt{{\\dfrac{{f_y}}{{2\\pi^2 E}}}} = {round(self.lambda_psi, 2)}$'),
+                        '')
+                    self.report_check.append(t1)
+
+                t1 = (r'$\lambda_e$', 
+                    '',
+                    NoEscape(f'$\\lambda_e = {lambda_e}$'),
+                    '')
+                self.report_check.append(t1)
             else:
-                area_used = round(2 * section_size.area, 2)
-            
-            t2 = (KEY_DISP_DESIGN_STRENGTH_COMPRESSION, '', 
-                  f"$P_d = A \\times f_{{cd}} = {area_used} \\times {round(self.f_cd, 2)} = {compression_capacity_kn}$ kN", '')
-            self.report_check.append(t2)
+                # For other sections or concentrically loaded
+                t1 = ('Effective Length Factor', '', f'$K = {K}$', '')
+                self.report_check.append(t1)
 
-            # Slenderness check (max 180 for compression)
-            t5 = (KEY_DISP_SLENDER, "\\lambda \\leq 180",
-                  f"$\\lambda = \\frac{{KL}}{{r_{{min}}}} = \\frac{{{round(self.K, 2)} \\times {self.length}}}{{{round(gyration, 2)}}} = {round(slenderness, 2)}$",
-                  'Pass' if slenderness <= 180 else 'Fail')
-            self.report_check.append(t5)
+                t1 = ('Unsupported Length', '', f'$L = {L}$ mm', '')
+                self.report_check.append(t1)
+
+                t1 = ('Minimum Radius of Gyration', '', 
+                    NoEscape(f'$r_{{min}} = {round(r_min, 2)}$ mm'), '')
+                self.report_check.append(t1)
+
+                t1 = ('Effective Slenderness', 
+                    '',
+                    NoEscape(f'$\\lambda_e = \\dfrac{{KL}}{{r_{{min}}}} = \\dfrac{{{K} \\times {L}}}{{{round(r_min, 2)}}} = {lambda_e}$'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~7.1.2]'),
+                    '')
+                self.report_check.append(t1)
+
+            # Slenderness check
+            t1 = ('Slenderness Limit', 
+                '',
+                NoEscape(f'$\\lambda_e = {lambda_e} \\leq 180$'+'\\newline'+f'[Ref.~IS~800:2007,~Table~3]'),
+                get_pass_fail(180, lambda_e, relation='geq'))
+            self.report_check.append(t1)
+
+            # =========================================================================
+            # SECTION 4: CHECKS FOR STRENGTH
+            # =========================================================================
+            t1 = ('SubSection', 'Checks for Strength', 
+                '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            # Euler Buckling Stress
+            E = 200000  # MPa
+            f_cc = round((math.pi**2 * E) / (lambda_e**2), 2) if lambda_e > 0 else 999999
+
+            t1 = ('Euler Buckling Stress', 
+                '',
+                NoEscape(f'$f_{{cc}} = \\dfrac{{\\pi^2 E}}{{\\lambda_e^2}} = \\dfrac{{\\pi^2 \\times {E}}}{{{lambda_e}^2}} = {f_cc}$ MPa'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~7.1.2.1]'),
+                '')
+            self.report_check.append(t1)
+
+            # Non-dimensional slenderness
+            f_y = section_size.fy
+            lambda_bar = round(math.sqrt(f_y / f_cc), 3) if f_cc > 0 else 0
+
+            t1 = (r'Non-dimensional slenderness', 
+                '',
+                NoEscape(f'$\\bar{{\\lambda}} = \\sqrt{{\\dfrac{{f_y}}{{f_{{cc}}}}}} = \\sqrt{{\\dfrac{{{f_y}}}{{{f_cc}}}}} = {lambda_bar}$'),
+                '')
+            self.report_check.append(t1)
+
+            # Phi calculation
+            alpha = imperfection_factor
+            phi = round(0.5 * (1 + alpha * (lambda_bar - 0.2) + lambda_bar**2), 3)
+
+            t1 = (r'$\phi$ factor',
+                '',
+                NoEscape(f'$\\phi = 0.5[1 + \\alpha(\\bar{{\\lambda}} - 0.2) + \\bar{{\\lambda}}^2]$' + '\\newline'+
+                        f'$= 0.5[1 + {alpha} \\times ({lambda_bar} - 0.2) + {lambda_bar}^2]$' + '\\newline' + f'$  = {phi}$'),
+                '')
+            self.report_check.append(t1)
+
+            # Stress reduction factor (chi)
+            chi = round(1 / (phi + math.sqrt(phi**2 - lambda_bar**2)), 3) if phi**2 >= lambda_bar**2 else 1.0
+            chi = min(chi, 1.0)  # Chi cannot exceed 1.0
+
+            t1 = (r'Stress reduction factor',
+                '',
+                NoEscape((f'$\\chi = \\dfrac{{1}}{{\\phi + \\sqrt{{\\phi^2 - \\bar{{\\lambda}}^2}}}}$') + '\\newline' +
+                         (f'$= \\dfrac{{1}}{{{phi} + \\sqrt{{{phi}^2 - {lambda_bar}^2}}}}$' + '\\newline' + f'$  = {chi}$')),
+                '')
+            self.report_check.append(t1)
+
+            # Design compressive stress
+            f_cd = round(chi * f_y / gamma_m0, 2)
+
+            t1 = (r'Design Compressive Stress',
+                '',
+                NoEscape(f'$f_{{cd}} = \\dfrac{{\\chi f_y}}{{\\gamma_{{m0}}}} = \\dfrac{{{chi} \\times {f_y}}}{{{gamma_m0}}} = {f_cd}$ N/mm$^2$'+'\\newline'+
+                f'[Ref.~IS~800:2007,~Cl.~7.1.2]'),
+                '')
+            self.report_check.append(t1)
+
+            # Design Compressive Strength
+            if self.sec_profile in ['Angles', "Channels"]:
+                A_e = round(section_size.area, 2)
+            else:
+                A_e = round(2 * section_size.area, 2)
+
+            P_d = round((A_e * f_cd) / 1000, 2)  # kN
+            P_applied = self.load.axial_force
+
+            t1 = (r'Design Compressive Strength', 
+                '',
+                NoEscape(f'$P_d = A_e \\times f_{{cd}} = {A_e} \\times {f_cd} \\times 10^{{-3}} = {P_d}$ kN'),
+                '')
+            self.report_check.append(t1)
+
+            t1 = ('Capacity Check', 
+                NoEscape(r'$P \leq P_d$'),
+                NoEscape(f'${P_applied} \\leq {P_d}$'),
+                get_pass_fail(P_applied, P_d, relation='leq'))
+            self.report_check.append(t1)
 
             # Efficiency
-            t6 = (KEY_DISP_EFFICIENCY, "< 1.0",
-                  f"$\\eta = \\frac{{P}}{{P_d}} = \\frac{{{self.load.axial_force}}}{{{compression_capacity_kn}}} = {self.efficiency}$", 
-                  'Pass' if self.efficiency <= 1.0 else 'Fail')
-            self.report_check.append(t6)
-
-            # Capacity vs Load
-            t8 = (KEY_DISP_DESIGN_STRENGTH_COMPRESSION, self.load.axial_force,
-                  f"Compression Capacity = {compression_capacity_kn} kN",
-                  get_pass_fail(self.load.axial_force, compression_capacity_kn, relation="leq"))
-            self.report_check.append(t8)
-
-        else:
-            # Spacing Check Section for failed design
-            t1 = ('SubSection', 'Spacing Check', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
+            efficiency = round(P_applied / P_d, 3) if P_d > 0 else 999
+            t1 = ('Efficiency', 
+                NoEscape(r'$\eta < 1.0$'),
+                NoEscape(f'$\\eta = \\dfrac{{P}}{{P_d}} = \\dfrac{{{P_applied}}}{{{P_d}}} = {efficiency}$'),
+                get_pass_fail(1.0, efficiency, relation='geq'))
             self.report_check.append(t1)
-            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min) if hasattr(self, 'bolt_diameter_min') else 12, "d"), '')
-            self.report_check.append(t6)
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min) if hasattr(self, 'd_0_min') else 14, "d_0"), '')
-            self.report_check.append(t8)
-            t8 = (KEY_DISP_MIN_BOLT, " ", display_prov(int(row), "r_l"), '')
-            self.report_check.append(t8)
-            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt_diameter_min if hasattr(self, 'bolt_diameter_min') else 12, row_limit), 
-                  min_gauge, get_pass_fail(self.bolt.min_gauge if hasattr(self.bolt, 'min_gauge') else 0, min_gauge, relation="leq"))
-            self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.d_0_min if hasattr(self, 'd_0_min') else 14, 'machine_flame_cut'),
-                  self.edge_dist_min_round if hasattr(self, 'edge_dist_min_round') else 30, 
-                  get_pass_fail(self.bolt.min_edge_dist if hasattr(self.bolt, 'min_edge_dist') else 0, 
-                               self.bolt.min_edge_dist_round if hasattr(self.bolt, 'min_edge_dist_round') else 30, relation='leq'))
-            self.report_check.append(t3)
-            t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round if hasattr(self, 'edge_dist_min_round') else 30, 
-                                        self.pitch_round if hasattr(self, 'pitch_round') else 40, row, text), 
-                  depth_max, get_pass_fail(depth, depth_max, relation="lesser"))
-            self.report_check.append(t3)
 
-            # Member Check Section for failed design
-            t1 = ('SubSection', 'Member Check (Compression)', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
-            self.report_check.append(t1)
-            
-            # Show failed member capacity
-            if self.sec_profile in ['Angles', "Channels"]:
-                area_used = round(section_size.area, 2)
-            else:
-                area_used = round(2 * section_size.area, 2)
-            
-            t5 = (KEY_DISP_SLENDER, "\\lambda \\leq 180",
-                  f"$\\lambda = {round(slenderness, 2)}$",
-                  get_pass_fail(180, slenderness, relation="geq"))
-            self.report_check.append(t5)
-
-        # Bolt Design Section
-        if self.member_design_status == True:
-            t7 = ('SubSection', 'Bolt Design', '|p{2.5cm}|p{5.5cm}|p{6.5cm}|p{1cm}|')
+            # =========================================================================
+            # SECTION 5: BOLT DESIGN (Enhanced)
+            # =========================================================================
+            t7 = ('SubSection', 'Design of Bolts', 
+                '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t7)
 
-            t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimization", 
-                  display_prov(int(self.bolt.bolt_diameter_provided), "d"), '')
+            # Bolt Properties
+            t1 = ('Bolt Type', '', self.bolt.bolt_type, '')
+            self.report_check.append(t1)
+
+            t6 = (KEY_OUT_DISP_D_PROVIDED, '',
+                display_prov(int(self.bolt.bolt_diameter_provided), "d"), '')
             self.report_check.append(t6)
 
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.bolt.d_0), "d_0"), '')
+            t8 = (KEY_DISP_BOLT_HOLE, '', 
+                display_prov(int(self.bolt.d_0), "d_0"), '')
             self.report_check.append(t8)
 
-            t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimization", self.bolt.bolt_grade_provided, '')
+            t8 = (KEY_OUT_DISP_GRD_PROVIDED, '', 
+                self.bolt.bolt_grade_provided, '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_DP_BOLT_FU, "", display_prov(round(self.bolt.bolt_fu, 2), "f_{u_{b}}"), '')
+            f_ub = round(self.bolt.bolt_fu, 2)
+            t8 = (KEY_DISP_DP_BOLT_FU, '',
+                display_prov(f_ub, "f_{u_{b}}"), '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_DP_BOLT_FY, "", display_prov(round(self.bolt.bolt_fy, 2) if hasattr(self.bolt, 'bolt_fy') else 0, "f_{y_{b}}"), '')
+            # Bolt Areas
+            A_nb = self.bolt.bolt_net_area if hasattr(self.bolt, 'bolt_net_area') else 0
+            A_sb = self.bolt.bolt_shank_area if hasattr(self.bolt, 'bolt_shank_area') else A_nb
+
+            t8 = (KEY_DISP_BOLT_AREA, 
+                '',
+                NoEscape(f'$A_{{n_b}} = {round(A_nb, 2)}$ mm$^2$'+'\\newline'+f'[Ref.~IS~1367-3~(2002)]'),
+                '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area if hasattr(self.bolt, 'bolt_net_area') else 0, "A_{n_{b}}", " [Ref.~IS~1367-3~(2002)]"), '')
-            self.report_check.append(t8)
-
-            # Pitch checks
-            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
-                  self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0,
-                  get_pass_fail(self.bolt.min_pitch if hasattr(self.bolt, 'min_pitch') else 0, 
-                               self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0, relation='leq'))
-            self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates),
-                  self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0,
-                  get_pass_fail(self.bolt.max_spacing if hasattr(self.bolt, 'max_spacing') else 300, 
-                               self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0, relation='geq'))
-            self.report_check.append(t1)
-
-            # Gauge checks
-            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
-                  self.plate.gauge_provided if hasattr(self.plate, 'gauge_provided') else 0,
-                  get_pass_fail(self.bolt.min_gauge if hasattr(self.bolt, 'min_gauge') else 0, 
-                               self.plate.gauge_provided if hasattr(self.plate, 'gauge_provided') else 0, relation="leq"))
-            self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(connecting_plates),
-                  self.plate.gauge_provided if hasattr(self.plate, 'gauge_provided') else 0,
-                  get_pass_fail(self.bolt.max_spacing if hasattr(self.bolt, 'max_spacing') else 300, 
-                               self.plate.gauge_provided if hasattr(self.plate, 'gauge_provided') else 0, relation="geq"))
-            self.report_check.append(t2)
-
-            # End/Edge distance checks
-            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type if hasattr(self.bolt, 'edge_type') else 'machine_flame_cut'),
-                  self.plate.end_dist_provided if hasattr(self.plate, 'end_dist_provided') else 0,
-                  get_pass_fail(self.bolt.min_end_dist if hasattr(self.bolt, 'min_end_dist') else 0, 
-                               self.plate.end_dist_provided if hasattr(self.plate, 'end_dist_provided') else 0, relation='leq'))
-            self.report_check.append(t3)
-
-            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, 'machine_flame_cut'),
-                  self.plate.edge_dist_provided if hasattr(self.plate, 'edge_dist_provided') else 0,
-                  get_pass_fail(self.bolt.min_edge_dist if hasattr(self.bolt, 'min_edge_dist') else 0, 
-                               self.plate.edge_dist_provided if hasattr(self.plate, 'edge_dist_provided') else 0, relation='leq'))
-            self.report_check.append(t3)
-
-            bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2) if hasattr(self.bolt, 'bolt_shear_capacity') else 0.0
-            bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2) if self.bolt.bolt_capacity else 0.0
-
+            # Bolt Capacity Calculations
             if self.bolt.bolt_type == TYP_BEARING:
-                bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2) if hasattr(self.bolt, 'bolt_bearing_capacity') else 0.0
-                t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', 
-                      f"$V_{{dsb}} = {bolt_shear_capacity_kn}$ kN", '')
+                # Shear Capacity
+                gamma_mb = 1.25
+                n_s = 1  # Number of shear planes (single shear for end plate connection)
+                n_n = 1  # Planes with threads
+
+                # Calculate nominal shear capacity
+                V_nsb = round((f_ub / math.sqrt(3)) * ((n_n * A_nb) + (n_s - n_n) * A_sb), 2)
+                V_dsb = round(V_nsb / gamma_mb, 2)
+                V_dsb_kn = round(V_dsb / 1000, 2)
+
+                t1 = ('Bolt Shear Capacity',
+                    '',
+                    NoEscape(f'$V_{{nsb}} = \\dfrac{{f_{{ub}}}}{{\\sqrt{{3}}}}(n_n A_{{nb}} + n_s A_{{sb}})$' + '\\newline'+
+                            f'$= \\dfrac{{{f_ub}}}{{\\sqrt{{3}}}}({n_n} \\times {round(A_nb, 2)} + {n_s} - {n_n} \\times {round(A_sb, 2)})$'+ '\\newline'+ f'$= {V_nsb}$ N'
+                            + '\\newline' + f'[Ref.~IS~800:2007,~Cl.~10.3.3]'),
+                    '')
                 self.report_check.append(t1)
-                t2 = (KEY_OUT_DISP_BOLT_BEARING, '', 
-                      f"$V_{{dpb}} = {bolt_bearing_capacity_kn}$ kN", '')
-                self.report_check.append(t2)
-                t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
-                      f"$V_{{db}} = min(V_{{dsb}}, V_{{dpb}}) = {bolt_capacity_kn}$ kN", '')
+
+                # Bearing Capacity
+                if hasattr(self.bolt, 'bolt_bearing_capacity'):
+                    bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+
+                    # Calculate k_b factor
+                    d = self.bolt.bolt_diameter_provided
+                    d_0 = self.bolt.d_0
+                    e_provided = self.plate.end_dist_provided if hasattr(self.plate, 'end_dist_provided') else 1.5 * d_0
+                    p_provided = self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 3 * d_0
+
+                    k_b_e = round(e_provided / (3 * d_0), 3)
+                    k_b_p = round(p_provided / (3 * d_0) - 0.25, 3)
+                    k_b_fu = round(self.bolt.bolt_fu / self.plate.fu, 3) if hasattr(self.plate, 'fu') else 1.0
+                    k_b = min(k_b_e, k_b_p, k_b_fu, 1.0)
+
+                    t2 = ('Bearing Factor', 
+                        '',
+                        NoEscape(f'$k_b = \\min\\left(\\dfrac{{e}}{{3d_0}}, \\dfrac{{p}}{{3d_0}} - 0.25, \\dfrac{{f_{{ub}}}}{{f_u}}, 1.0\\right) = {round(k_b, 2)}$'),
+                        '')
+                    self.report_check.append(t2)
+
+                    t2 = ('Bolt Bearing Capacity', 
+                        '',
+                        NoEscape(f'$V_{{dpb}} = \\dfrac{{2.5 k_b d t f_u}}{{\\gamma_{{mb}}}} = {bolt_bearing_capacity_kn}$ kN'+'\\newline'+
+                        f'[Ref.~IS~800:2007,~Cl.~10.3.4]'),
+                        '')
+                    self.report_check.append(t2)
+
+                # Long Joint Reduction Factor
+                if hasattr(self.bolt, 'beta_lj') and self.bolt.beta_lj < 1.0:
+                    beta_lj = round(self.bolt.beta_lj, 3)
+                    l_j = (self.plate.bolts_one_line - 1) * self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0
+
+                    t3 = ('Long Joint Reduction', 
+                        '',
+                        NoEscape(f'$\\beta_{{lj}} = 1.075 - \\dfrac{{l_j}}{{200d}}$'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~10.3.3.1]'),
+                        '')
+                    self.report_check.append(t3)
+
+                    t3 = ('', 
+                        f'$l_j = {l_j}$ mm',
+                        NoEscape(f'$\\beta_{{lj}} = 1.075 - \\dfrac{{{l_j}}}{{200 \\times {d}}} = {beta_lj}$'),
+                        '')
+                    self.report_check.append(t3)
+
+                    V_dsb_reduced = round(V_dsb * beta_lj / 1000, 2)
+                    t4 = ('Reduced Shear Capacity', 
+                        '',
+                        NoEscape(f'$V\'_{{dsb}} = \\beta_{{lj}} V_{{dsb}} = {beta_lj} \\times {V_dsb_kn} = {V_dsb_reduced}$ kN'),
+                        '')
+                    self.report_check.append(t4)
+
+                # Large Grip Reduction Factor
+                if hasattr(self.bolt, 'beta_lg') and self.bolt.beta_lg < 1.0:
+                    beta_lg = round(self.bolt.beta_lg, 3)
+                    l_g = self.plate.thickness_provided + section_size.thickness if self.sec_profile in ["Angles", "Back to Back Angles", "Star Angles"] else self.plate.thickness_provided + section_size.web_thickness
+
+                    t3 = ('Large Grip Reduction', 
+                        '',
+                        NoEscape(f'$\\beta_{{lg}} = \\dfrac{{8d}}{{3d + l_g}}$, $l_g = {round(l_g, 2)}$ mm'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~10.3.3.2]'),
+                        '')
+                    self.report_check.append(t3)
+
+                    t3 = ('', 
+                        '',
+                        NoEscape(f'$\\beta_{{lg}} = \\dfrac{{8 \\times {d}}}{{3 \\times {d} + {round(l_g, 2)}}} = {beta_lg}$'),
+                        '')
+                    self.report_check.append(t3)
+
+                # Final Bolt Capacity
+                bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2) if self.bolt.bolt_capacity else 0.0
+                bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2) if hasattr(self.bolt, 'bolt_shear_capacity') else 0.0
+                bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2) if hasattr(self.bolt, 'bolt_bearing_capacity') else 999
+
+                t3 = ('Bolt Capacity', '',
+                    NoEscape(f'$V_{{db}} = \\min(V_{{dsb}}, V_{{dpb}}) = \\min({bolt_shear_capacity_kn}, {bolt_bearing_capacity_kn}) = {bolt_capacity_kn}$ kN'),
+                    '')
                 self.report_check.append(t3)
 
-            t5 = (DISP_NUM_OF_BOLTS, '',
-                  display_prov(self.plate.bolts_required if hasattr(self.plate, 'bolts_required') else self.plate.bolts_one_line, "n"), '')
+            elif self.bolt.bolt_type == TYP_FRICTION:
+                # Slip Resistance for HSFG bolts
+                mu_f = self.bolt.mu_f if hasattr(self.bolt, 'mu_f') else 0.55
+                n_e = 1  # Number of friction interfaces
+                K_h = 1.0  # Hole factor (1.0 for standard holes)
+                f_0 = 0.7 * f_ub
+                F_0 = round(A_nb * f_0, 2)
+
+                gamma_mf = 1.25
+                V_nsf = round(mu_f * n_e * K_h * F_0, 2)
+                V_dsf = round(V_nsf / gamma_mf, 2)
+                V_dsf_kn = round(V_dsf / 1000, 2)
+
+                t1 = ('Proof Load', 
+                    '',
+                    NoEscape(f'$F_0 = 0.7 f_{{ub}} A_{{nb}} = 0.7 \\times {f_ub} \\times {round(A_nb, 2)} \\times 10^{{-3}} = {round(F_0/1000, 2)}$ kN'),
+                    '')
+                self.report_check.append(t1)
+
+                t1 = ('Slip Coefficient', '', f'$\\mu_f = {mu_f}$', '[Ref.~IS~800:2007,~Table~20]')
+                self.report_check.append(t1)
+
+                t1 = ('Slip Resistance', 
+                    '[Ref.~IS~800:2007,~Cl.~10.4.3]',
+                    NoEscape(f'$V_{{nsf}} = \\mu_f n_e K_h F_0 = {mu_f} \\times {n_e} \\times {K_h} \\times {round(F_0/1000, 2)} = {round(V_nsf/1000, 2)}$ kN'),
+                    '')
+                self.report_check.append(t1)
+
+                t1 = ('Design Slip Resistance', 
+                    '',
+                    NoEscape(f'$V_{{dsf}} = \\dfrac{{V_{{nsf}}}}{{\\gamma_{{mf}}}} = \\dfrac{{{round(V_nsf/1000, 2)}}}{{{gamma_mf}}} = {V_dsf_kn}$ kN'),
+                    '')
+                self.report_check.append(t1)
+
+                bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2) if self.bolt.bolt_capacity else V_dsf_kn
+
+            # Number of Bolts Required
+            n_bolts = self.plate.bolts_required if hasattr(self.plate, 'bolts_required') else self.plate.bolts_one_line
+            n_bolts_calc = math.ceil(P_applied / bolt_capacity_kn) if bolt_capacity_kn > 0 else 2
+
+            t5 = ('Number of Bolts Required', '',
+                NoEscape(f'$n = \\left\\lceil \\dfrac{{P}}{{V_{{db}}}} \\right\\rceil = \\left\\lceil \\dfrac{{{P_applied}}}{{{bolt_capacity_kn}}} \\right\\rceil = {n_bolts}$'),
+                '')
             self.report_check.append(t5)
-            t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.plate.bolt_line if hasattr(self.plate, 'bolt_line') else 1, "n_c"), '')
+
+            t6 = (DISP_NUM_OF_COLUMNS, '', 
+                display_prov(self.plate.bolt_line if hasattr(self.plate, 'bolt_line') else 1, "n_c"), '')
             self.report_check.append(t6)
-            t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.plate.bolts_one_line if hasattr(self.plate, 'bolts_one_line') else 1, "n_r"), '')
+
+            t7 = (DISP_NUM_OF_ROWS, '', 
+                display_prov(self.plate.bolts_one_line if hasattr(self.plate, 'bolts_one_line') else 1, "n_r"), '')
             self.report_check.append(t7)
 
-        # Gusset Plate Check Section
-        if self.bolt_design_status == True:
-            t7 = ('SubSection', 'Gusset Plate Check', '|p{2.5cm}|p{5cm}|p{7cm}|p{1cm}|')
-            self.report_check.append(t7)
-
-            plate_yield_kn = round(self.plate.tension_yielding_capacity / 1000, 2) if hasattr(self.plate, 'tension_yielding_capacity') else 0.0
-            plate_rupture_kn = round(self.plate.tension_rupture_capacity / 1000, 2) if hasattr(self.plate, 'tension_rupture_capacity') else 0.0
-            plate_blockshear_kn = round(self.plate.block_shear_capacity / 1000, 2) if hasattr(self.plate, 'block_shear_capacity') else 0.0
-
-            t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', f"$h_p = {int(self.plate.height)}$ mm" if hasattr(self.plate, 'height') else "N/A", "")
-            self.report_check.append(t3)
-
-            t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "", f"$l_p = {int(self.plate.length)}$ mm" if hasattr(self.plate, 'length') else "N/A", '')
-            self.report_check.append(t4)
-
-            t4 = (KEY_OUT_DISP_MEMB_MIN_LENGTH, f"{2 * self.plate.length if hasattr(self.plate, 'length') else 0}", self.length, 
-                  get_pass_fail((2 * self.plate.length) if hasattr(self.plate, 'length') else 0, self.length, relation="leq"))
-            self.report_check.append(t4)
-
-            t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "T_p" if self.sec_profile in ["Channels", "Back to Back Channels"] else "T"), "")
-            self.report_check.append(t5)
-
-            t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', f"$T_{{dg}} = {plate_yield_kn}$ kN", '')
-            self.report_check.append(t2)
-
-            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', f"$T_{{dn}} = {plate_rupture_kn}$ kN", '')
+            # =====================================================================
+            # SECTION 6: DETAILING CHECKS
+            # =====================================================================
+            t1 = ('SubSection', 'Detailing Checks', 
+                  '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-            t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', f"$T_{{db}} = {plate_blockshear_kn}$ kN", '')
-            self.report_check.append(t4)
+            d = self.bolt.bolt_diameter_provided
+            d_0 = self.bolt.d_0
+            t_plate = self.plate.thickness_provided
+
+            # Pitch checks
+            p_provided = self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0
+            p_min = round(2.5 * d, 2)
+            p_max = round(min(32 * t_plate, 300), 2)
+
+            t1 = (DISP_MIN_PITCH, 
+                  cl_10_2_2_min_spacing(d),
+                  f'{p_provided} mm',
+                  get_pass_fail(p_min, p_provided, relation='leq'))
+            self.report_check.append(t1)
+
+            t1 = (DISP_MAX_PITCH,
+                  cl_10_2_3_1_max_spacing(connecting_plates),
+                  f'{p_provided} mm',
+                  get_pass_fail(p_max, p_provided, relation='geq'))
+            self.report_check.append(t1)
+
+            # Gauge checks (if applicable)
+            if self.plate.bolt_line > 1:
+                g_provided = self.plate.gauge_provided if hasattr(self.plate, 'gauge_provided') else 0
+                g_min = p_min
+                g_max = p_max
+
+                t2 = (DISP_MIN_GAUGE,
+                      cl_10_2_2_min_spacing(d),
+                      f'{g_provided} mm',
+                      get_pass_fail(g_min, g_provided, relation="leq"))
+                self.report_check.append(t2)
+
+                t2 = (DISP_MAX_GAUGE,
+                      cl_10_2_3_1_max_spacing(connecting_plates),
+                      f'{g_provided} mm',
+                      get_pass_fail(g_max, g_provided, relation="geq"))
+                self.report_check.append(t2)
+
+            # Edge distance checks
+            e_provided = self.plate.edge_dist_provided if hasattr(self.plate, 'edge_dist_provided') else 0
+            edge_type = self.bolt.edge_type if hasattr(self.bolt, 'edge_type') else 'machine_flame_cut'
+            e_min = round(1.5 * d_0, 2) if edge_type == 'machine_flame_cut' else round(1.7 * d_0, 2)
+            e_max = round(12 * t_plate * epsilon, 2)
+
+            t3 = (DISP_MIN_EDGE,
+                  cl_10_2_4_2_min_edge_end_dist(d_0, edge_type),
+                  f'{e_provided} mm',
+                  get_pass_fail(e_min, e_provided, relation='leq'))
+            self.report_check.append(t3)
+
+            t3 = (DISP_MAX_EDGE,
+                  NoEscape(f'$\\leq 12t\\varepsilon = {e_max}$ mm'),
+                  f'{e_provided} mm',
+                  get_pass_fail(e_max, e_provided, relation='geq'))
+            self.report_check.append(t3)
+
+            # End distance checks
+            end_provided = self.plate.end_dist_provided if hasattr(self.plate, 'end_dist_provided') else 0
+            end_min = e_min
+            end_max = e_max
+
+            t3 = (DISP_MIN_END,
+                  cl_10_2_4_2_min_edge_end_dist(d_0, edge_type),
+                  f'{end_provided} mm',
+                  get_pass_fail(end_min, end_provided, relation='leq'))
+            self.report_check.append(t3)
+
+            t3 = (DISP_MAX_END,
+                  NoEscape(f'$\\leq 12t\\varepsilon = {end_max}$ mm'),
+                  f'{end_provided} mm',
+                  get_pass_fail(end_max, end_provided, relation='geq'))
+            self.report_check.append(t3)
+
+            # =========================================================================
+            # SECTION 7: GUSSET PLATE DESIGN (Enhanced)
+            # =========================================================================
+            if self.bolt_design_status == True:
+                t7 = ('SubSection', 'Design of Gusset Plate', 
+                    '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
+                self.report_check.append(t7)
+
+                # Plate Geometry
+                h_p = int(self.plate.height) if hasattr(self.plate, 'height') else 0
+                l_p = int(self.plate.length) if hasattr(self.plate, 'length') else 0
+                t_p = self.plate.thickness_provided
+
+                t1 = ('Plate Thickness', '', 
+                    display_prov(t_p, "t_p"), '')
+                self.report_check.append(t1)
+
+                t3 = ('Plate Height', '', 
+                    NoEscape(f'$h_p = {h_p}$ mm'), '')
+                self.report_check.append(t3)
+
+                t4 = ('Plate Length', '', 
+                    NoEscape(f'$l_p = {l_p}$ mm'), '')
+                self.report_check.append(t4)
+
+                # Check plate length vs member length
+                t4 = (KEY_OUT_DISP_MEMB_MIN_LENGTH, 
+                    NoEscape(r'$2l_p \leq L_{member}$'),
+                    NoEscape(f'$2 \\times {l_p} = {2 * l_p} \\leq {self.length}$'),
+                    get_pass_fail(2 * l_p, self.length, relation="leq"))
+                self.report_check.append(t4)
+
+                # Material Properties
+                f_y_plate = round(self.plate.fy, 2) if hasattr(self.plate, 'fy') else 250
+                f_u_plate = round(self.plate.fu, 2) if hasattr(self.plate, 'fu') else 410
+
+                t1 = ('Plate Material', '', 
+                    self.plate.material if hasattr(self.plate, 'material') else 'E250', 
+                    '')
+                self.report_check.append(t1)
+
+                t1 = ('Plate Yield Strength', '', 
+                    NoEscape(f'$f_{{y,p}} = {f_y_plate}$ MPa'), '')
+                self.report_check.append(t1)
+
+                t1 = ('Plate Ultimate Strength', '', 
+                    NoEscape(f'$f_{{u,p}} = {f_u_plate}$ MPa'), '')
+                self.report_check.append(t1)
+
+                # Tension Yielding Capacity (Tdg)
+                A_g = h_p * t_p
+                T_dg = round((A_g * f_y_plate) / gamma_m0, 2)
+                T_dg_kN = round(T_dg / 1000, 2)
+
+                t2 = ('Gross Area', '', 
+                    NoEscape(f'$A_g = h_p \\times t_p = {h_p} \\times {t_p} = {A_g}$ mm$^2$'),
+                    '')
+                self.report_check.append(t2)
+
+                t2 = ('Tension Yielding Capacity', 
+                    '',
+                    NoEscape(f'$T_{{dg}} = \\dfrac{{A_g f_{{y,p}}}}{{\\gamma_{{m0}}}}$' +
+                             f'$= \\dfrac{{{A_g} \\times {f_y_plate}}}{{{gamma_m0}}} \\times 10^{{-3}} = {T_dg_kN}$ kN'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~6.2]'),
+                    '')
+                self.report_check.append(t2)
+
+                # Tension Rupture Capacity (Tdn)
+                n_bolts_plate = self.plate.bolts_one_line
+                A_nc = A_g - n_bolts_plate * d_0 * t_p
+                T_dn = round((0.9 * A_nc * f_u_plate) / gamma_m1, 2)
+                T_dn_kN = round(T_dn / 1000, 2)
+
+                t1 = ('Net Area', 
+                    '',
+                    NoEscape(f'$A_{{nc}} = A_g - n \\times d_0 \\times t_p = {A_g} - {n_bolts_plate} \\times {d_0} \\times {t_p} = {round(A_nc, 2)}$ mm$^2$'),
+                    '')
+                self.report_check.append(t1)
+
+                t1 = ('Tension Rupture Capacity', 
+                    '',
+                    NoEscape(f'$T_{{dn}} = \\dfrac{{0.9 A_{{nc}} f_{{u,p}}}}{{\\gamma_{{m1}}}}$'+
+                             f'$= \\dfrac{{0.9 \\times {round(A_nc, 2)} \\times {f_u_plate}}}{{{gamma_m1}}} \\times 10^{{-3}} = {T_dn_kN}$ kN'+'\\newline'+f'[Ref.~IS~800:2007,~Cl.~6.3]'),
+                    '')
+                self.report_check.append(t1)
+
+                # Block Shear Capacity (Tdb)
+                p = self.plate.pitch_provided if hasattr(self.plate, 'pitch_provided') else 0
+                e = self.plate.end_dist_provided if hasattr(self.plate, 'end_dist_provided') else 0
+                l_j = (n_bolts_plate - 1) * p
+
+                A_vg = l_j * t_p
+                A_vn = (l_j - (n_bolts_plate - 0.5) * d_0) * t_p
+                A_tg = e * t_p
+                A_tn = (e - 0.5 * d_0) * t_p
+
+                T_db1 = round((A_vg * f_y_plate / (math.sqrt(3) * gamma_m0)) + (0.9 * A_tn * f_u_plate / gamma_m1), 2)
+                T_db2 = round((0.9 * A_vn * f_u_plate / (math.sqrt(3) * gamma_m1)) + (A_tg * f_y_plate / gamma_m0), 2)
+                T_db = min(T_db1, T_db2)
+                T_db_kN = round(T_db / 1000, 2)
+
+                t4 = ('Block Shear Areas', 
+                    '',
+                    NoEscape(f'$A_{{vg}} = {round(A_vg, 2)}$ mm$^2$,'+'\\newline'+ f'$A_{{vn}} = {round(A_vn, 2)}$ mm$^2$'+ '\\newline'+
+                             f'$A_{{tg}} = {round(A_tg, 2)}$ mm$^2$,'+'\\newline'+ f'$A_{{tn}} = {round(A_tn, 2)}$ mm$^2$'),
+                    '')
+                self.report_check.append(t4)
+
+
+                t4 = ('Block Shear Capacity', 
+                    '',
+                    NoEscape(f'$T_{{db1}} = \\dfrac{{A_{{vg}} f_y}}{{\\sqrt{{3}}\\gamma_{{m0}}}} + \\dfrac{{0.9 A_{{tn}} f_u}}{{\\gamma_{{m1}}}} = {round(T_db1/1000, 2)}$ kN'+ '\\newline'+
+                             f'$T_{{db2}} = \\dfrac{{0.9 A_{{vn}} f_u}}{{\\sqrt{{3}}\\gamma_{{m1}}}} + \\dfrac{{A_{{tg}} f_y}}{{\\gamma_{{m0}}}} = {round(T_db2/1000, 2)}$ kN'+ '\\newline'+
+                             f'$T_{{db}} = \\min(T_{{db1}}, T_{{db2}}) = {T_db_kN}$ kN'+ '\\newline'+ f'[Ref.~IS~800:2007,~Cl.~6.4]'),
+                    '')
+                self.report_check.append(t4)
+
+                # Design Tension Capacity (Td)
+                T_d = min(T_dg, T_dn, T_db)
+                T_d_kN = round(T_d / 1000, 2)
+
+                t1 = ('Design Tension Capacity', '',
+                    NoEscape(f'$T_d = \\min(T_{{dg}}, T_{{dn}}, T_{{db}})$'+'\\newline'+f'$T_d = \\min({T_dg_kN}, {T_dn_kN}, {T_db_kN}) = {T_d_kN}$ kN'),
+                    '')
+                self.report_check.append(t1)
+
+                # Plate Capacity Check
+                t1 = ('Plate Capacity Check', 
+                    NoEscape(r'$P \leq T_d$'),
+                    NoEscape(f'${P_applied} \\leq {T_d_kN}$'),
+                    get_pass_fail(P_applied, T_d_kN, relation='leq'))
+                self.report_check.append(t1)
 
         # Intermittent Connection Section
         if self.plate_design_status == True and self.sec_profile not in ["Angles", "Channels"] and hasattr(self, 'inter_length') and self.inter_length > 1000:
-            t7 = ('SubSection', 'Intermittent Connection', '|p{2.5cm}|p{5cm}|p{7cm}|p{1cm}|')
+            t7 = ('SubSection', 'Intermittent Connection', '|p{5cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t7)
 
             t5 = (KEY_OUT_DISP_INTERCONNECTION, " ", self.inter_conn if hasattr(self, 'inter_conn') else 0, "")

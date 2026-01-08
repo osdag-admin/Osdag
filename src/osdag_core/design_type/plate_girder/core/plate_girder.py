@@ -2104,4 +2104,3 @@ class PlateGirderWelded(Member):
         self.atop, self.abot= design_welds_with_strength_web_to_flange(self.load.shear_force, self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.web_thickness, self.eff_depth, [self.material.fu], debug=self.debug)
         self.weld_stiff = weld_for_end_stiffener(self.end_stiffthickness if self.end_stiffthickness > 0 else self.IntStiffThickness, self.end_stiffwidth, self.load.shear_force, self.V_d, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, [self.material.fu])
         
-        self.design_status = True

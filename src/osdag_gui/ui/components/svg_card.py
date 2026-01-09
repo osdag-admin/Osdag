@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, Signal, QEvent, QPropertyAnimation, QEasingCurve
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QPixmap
 
 class ClickableLabel(QLabel):
     clicked = Signal(str)
@@ -47,8 +47,17 @@ class SvgCard(QFrame):
         self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setObjectName("svgCard_title")
 
-        self.svg_widget = QSvgWidget(svg_path)
-        self.svg_widget.setFixedSize(90, 80)
+        pixmap = QPixmap(svg_path)
+        pixmap.setDevicePixelRatio(2.0)
+
+        self.svg_widget = QLabel(self)
+        self.svg_widget.setPixmap(pixmap)
+
+        # Actual image(png) must be 180x160
+        self.svg_widget.setFixedSize(120, 80)
+        self.svg_widget.setAlignment(Qt.AlignCenter)
+        self.svg_widget.setScaledContents(False)
+
 
         self.open_label = ClickableLabel("Open")
         self.open_label.set_id(title)

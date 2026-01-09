@@ -1046,30 +1046,7 @@ class CustomWindow(QWidget):
                 title="Warning",
                 text="Design Unsafe: 3D Model cannot be saved",
                 dialogType=MessageBoxType.Warning
-            ).exec()
-
-    # Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
-    def save_cadImages(self, main):
-        if main.design_status:
-            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-            filePath, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
-                                                      files_types)
-            fName = str(filePath)
-            file_extension = fName.split(".")[-1]
-
-            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
-                self.display.ExportToImage(fName)
-                CustomMessageBox(
-                    title="Information",
-                    text="File saved",
-                    dialogType=MessageBoxType.About
-                ).exec()
-        else:
-            CustomMessageBox(
-                    title="Information",
-                    text="Design Unsafe: CAD image cannot be saved",
-                    dialogType=MessageBoxType.About
-                ).exec()    
+            ).exec()   
 
     # To change mode to Pan/Rotate using keyboard keys
     def assign_display_mode(self, mode):
@@ -2126,7 +2103,6 @@ class CustomWindow(QWidget):
             except Exception as e:
                 print(f"[WARNING] Error repainting display: {e}")
 
-
     # Error Message Box
     def show_error_msg(self, error):
         # Prevent duplicate message boxes by checking if one is already open
@@ -2156,7 +2132,55 @@ class CustomWindow(QWidget):
 
         msg_box.finished.connect(lambda: setattr(self, '_error_dialog_open', False))
         msg_box.exec()
-        
+
+    #----------------------Cad-image-export-Start-----------------------
+    def save_cadImages(self, main):
+        """Save CAD model as raster image (PNG, JPEG, BMP, TIFF)"""
+
+        if not main.design_status:
+            CustomMessageBox(
+                title="Information",
+                text="Design Unsafe: CAD image cannot be saved",
+                dialogType=MessageBoxType.About
+            ).exec()
+            return
+
+        file_types = (
+            "PNG (*.png);;"
+            "JPEG (*.jpeg *.jpg);;"
+            "TIFF (*.tiff *.tif);;"
+            "BMP (*.bmp)"
+        )
+
+        filePath, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export CAD Image",
+            os.path.join(str(self.folder), "cad.png"),
+            file_types
+        )
+
+        if not filePath:
+            return
+
+        _, ext = os.path.splitext(filePath)
+        ext = ext.lower()
+
+        if ext in [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"]:
+            self.display.ExportToImage(filePath)
+            CustomMessageBox(
+                title="Information",
+                text="File saved successfully",
+                dialogType=MessageBoxType.About
+            ).exec()
+        else:
+            CustomMessageBox(
+                title="Error",
+                text="Unsupported file format selected",
+                dialogType=MessageBoxType.Critical
+            ).exec()
+    #----------------------Cad-image-export-Start-----------------------
+
+      
 class InputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)

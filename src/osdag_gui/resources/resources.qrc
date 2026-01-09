@@ -49,71 +49,61 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/internet_disconnected_default.svg</file>
         <file>vectors/internet_disconnected_hover.svg</file>       
 
-
         <file>vectors/search_icon.svg</file>
         <file>vectors/night_button.svg</file>
         <file>vectors/day_button.svg</file>
         <file>vectors/background_light.svg</file>
         <file>vectors/background_dark.svg</file>
         
-        <file>vectors/lap_joint_bolted_simple_connec.svg</file>
-        <file>vectors/butt_joint_bolted_simple_connec.svg</file>
-        <file>vectors/lap_joint_welded_simple_connec.svg</file>
-        <file>vectors/butt_joint_welded_simple_connec.svg</file>
-        <file>vectors/shear_fin_plate_connec.svg</file>
-        <file>vectors/shear_cleat_angle_connec.svg</file>
-        <file>vectors/end_plate_connec.svg</file>
-        <file>vectors/seated_angle_connec.svg</file>
-        <file>vectors/cover_plate_bolted_btb_moment_connec.svg</file>
-        <file>vectors/cover_plate_welded_btb_moment_connec.svg</file>
-        <file>vectors/end_plate_btb_moment_connec.svg</file>
-        <file>vectors/end_plate_btc_moment_connec.svg</file>
-        <file>vectors/cover_plate_bolted_ctc_moment_connec.svg</file>
-        <file>vectors/cover_plate_welded_ctc_moment_connec.svg</file>
-        <file>vectors/end_plate_ctc_moment_connec.svg</file>
-        <file>vectors/base_plate_connec.svg</file>
-        <file>vectors/bolted_tension_member.svg</file>
-        <file>vectors/welded_tension_member.svg</file>
-        <file>vectors/struts_weld_end_gusset.svg</file>
-        <file>vectors/cantilever_beam_flexural_mem.svg</file>
-        <file>vectors/ss_beam_flexural_mem.svg</file>
-        <file>vectors/simple_supported_plate_girder.svg</file>
-        <file>vectors/column_design_compression_mem.svg</file>        
-        <file>vectors/purlin_flexure_member.svg</file>
-        
 
+        <file>images/modules/lap_joint_bolted_simple_connec.png</file>
+        <file>images/modules/lap_joint_welded_simple_connec.png</file>
+        <file>images/modules/butt_joint_bolted_simple_connec.png</file>
+        <file>images/modules/butt_joint_welded_simple_connec.png</file>
+        <file>images/modules/shear_fin_plate_connec.png</file>
+        <file>images/modules/shear_cleat_angle_connec.png</file>        
+        <file>images/modules/header_plate_connec.png</file>        
+        <file>images/modules/seated_angle_connec.png</file>        
+        <file>images/modules/cover_plate_bolted_btb_moment_connec.png</file>
+        <file>images/modules/cover_plate_welded_btb_moment_connec.png</file>
+        <file>images/modules/end_plate_btb_moment_connec.png</file>
+        <file>images/modules/end_plate_btc_moment_connec.png</file>
+        <file>images/modules/cover_plate_bolted_ctc_moment_connec.png</file>
+        <file>images/modules/cover_plate_welded_ctc_moment_connec.png</file>
+        <file>images/modules/end_plate_ctc_moment_connec.png</file>
+        <file>images/modules/base_plate_connec.png</file>
+        <file>images/modules/bolted_tension_member.png</file>
+        <file>images/modules/welded_tension_member.png</file>
+        <file>images/modules/struts_bolt_end_gusset.png</file>
+        <file>images/modules/struts_weld_end_gusset.png</file>
+        <file>images/modules/column_design_compression_mem.png</file>        
+        <file>images/modules/ss_beam_flexural_mem.png</file>
+        <file>images/modules/cantilever_beam_flexural_mem.png</file>
+        <file>images/modules/plate_girder_flexural_mem.png</file>
+        <file>images/modules/purlin_flexure_member.png</file>
+
+        <file>vectors/nav_icons/home_default.svg</file>
+        <file>vectors/nav_icons/home_clicked.svg</file>
+        <file>vectors/nav_icons/connection.svg</file>
+        <file>vectors/nav_icons/connection_dark.svg</file>
+        <file>vectors/nav_icons/tension_member.svg</file>
+        <file>vectors/nav_icons/tension_member_dark.svg</file>
+        <file>vectors/nav_icons/compression_member.svg</file>
+        <file>vectors/nav_icons/compression_member_dark.svg</file>
+        <file>vectors/nav_icons/flexural_member.svg</file>
+        <file>vectors/nav_icons/flexural_member_dark.svg</file>
+        <file>vectors/nav_icons/beam_column.svg</file>
+        <file>vectors/nav_icons/beam_column_dark.svg</file>
+        <file>vectors/nav_icons/truss.svg</file>
+        <file>vectors/nav_icons/truss_dark.svg</file>
+        <file>vectors/nav_icons/2d_frame.svg</file>
+        <file>vectors/nav_icons/2d_frame_dark.svg</file>
+        <file>vectors/nav_icons/3d_frame.svg</file>
+        <file>vectors/nav_icons/3d_frame_dark.svg</file>
+        <file>vectors/nav_icons/group_design.svg</file>
+        <file>vectors/nav_icons/group_design_dark.svg</file>
 
         <file>backgrounds/splash_bg.jpg</file>
-
-        <file>images/home_default.svg</file>
-        <file>images/home_clicked.svg</file>
-
-        <file>images/connection.svg</file>
-        <file>images/connection_dark.svg</file>
-
-        <file>images/tension_member.svg</file>
-        <file>images/tension_member_dark.svg</file>
-
-        <file>images/compression_member.svg</file>
-        <file>images/compression_member_dark.svg</file>
-
-        <file>images/flexural_member.svg</file>
-        <file>images/flexural_member_dark.svg</file>
-
-        <file>images/beam_column.svg</file>
-        <file>images/beam_column_dark.svg</file>
-
-        <file>images/truss.svg</file>
-        <file>images/truss_dark.svg</file>
-
-        <file>images/2d_frame.svg</file>
-        <file>images/2d_frame_dark.svg</file>
-
-        <file>images/3d_frame.svg</file>
-        <file>images/3d_frame_dark.svg</file>
-
-        <file>images/group_design.svg</file>
-        <file>images/group_design_dark.svg</file>
 
         <file>images/down_arrow_light.png</file>
         <file>images/down_arrow_dark.png</file>

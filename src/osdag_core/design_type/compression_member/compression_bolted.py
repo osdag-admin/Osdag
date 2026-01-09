@@ -206,14 +206,15 @@ class Compression_bolted(Member):
         """
         design_input = []
         
-        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
+        # Use actual tab names like tension_bolted.py does
+        t1 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
         design_input.append(t1)
 
-        t2 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE])
-        design_input.append(t2)
+        t1a = (DISP_TITLE_CHANNEL, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t1a)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_SLIP_FACTOR])
-        design_input.append(t3)
+        t2 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t2)
 
         t4 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
         design_input.append(t4)

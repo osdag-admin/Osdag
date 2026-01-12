@@ -19,6 +19,7 @@ from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
 from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
 from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
 from osdag_gui.common_functions import design_examples
+from osdag_gui.ui.components.dialogs.check_for_updates import UpdateDialog
 
 from osdag_core.Common import *
 
@@ -837,7 +838,7 @@ class CustomWindow(QWidget):
         help_menu.addSeparator()
 
         check_update_action = QAction("Check For Update", self)
-        check_update_action.triggered.connect(self.on_check_for_update)
+        check_update_action.triggered.connect(lambda: UpdateDialog().exec())
         help_menu.addAction(check_update_action)
 
     #----------------Function-Trigger-for-MenuBar-START----------------------------------------

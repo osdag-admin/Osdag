@@ -206,10 +206,11 @@ class MatplotlibCanvas(FigureCanvas):
         self._setup_layout()
         
     def _setup_layout(self):
-        """Create the 2-panel layout: 3D plot + Cross-section."""
+        """Create the 2-panel layout: 3D plot + Cross-section with tables at bottom."""
         # GridSpec: 1 Row, 2 Columns (60% / 40% split)
+        # Adjusted margins: top=0.92, bottom=0.18 to leave space for tables at bottom
         self.gs = self.fig.add_gridspec(1, 5, wspace=0.15, 
-                                        left=0.05, right=0.95, top=0.90, bottom=0.10)
+                                        left=0.05, right=0.95, top=0.92, bottom=0.22)
         
         # 1. 3D Cloud Scatter Plot (Left - 60%)
         self.ax_3d = self.fig.add_subplot(self.gs[0, :3], projection='3d')
@@ -223,6 +224,10 @@ class MatplotlibCanvas(FigureCanvas):
         self.ax_3d.cla()
         self.ax_sect.cla()
         
+        # Clear any previous figure texts (tables)
+        for txt in self.fig.texts:
+            txt.remove()
+        
         # 1. 3D Cloud Plot
         self._setup_3d_axes(data)
         self._plot_3d_cloud(data)
@@ -230,6 +235,9 @@ class MatplotlibCanvas(FigureCanvas):
         # 2. Cross-Section View
         self._setup_section_axes()
         self._plot_cross_section(data)
+        
+        # 3. Add tables at bottom
+        self._add_bottom_tables(data)
         
         self.draw_idle()
 
@@ -301,32 +309,35 @@ class MatplotlibCanvas(FigureCanvas):
             else:
                 infeasible_pts.append((ur, depth, weight))
         
-        # Plot infeasible points (red, smaller, faint)
+        # Plot infeasible points (red hollow circles) - more transparent
         if infeasible_pts:
             inf_ur, inf_d, inf_w = zip(*infeasible_pts)
             ax.scatter(inf_ur, inf_d, inf_w, 
-                      c=FAIL_COLOR, s=20, alpha=0.4, marker='s',
+                      facecolors='none', edgecolors=FAIL_COLOR, s=25, alpha=0.4, 
+                      marker='o', linewidths=1.0, depthshade=False,
                       label='Utilization > 1')
         
-        # Plot feasible points (green)
+        # Plot feasible points (olive green hollow circles) - more transparent
         if feasible_pts:
             feas_ur, feas_d, feas_w = zip(*feasible_pts)
             ax.scatter(feas_ur, feas_d, feas_w, 
-                      c=SAFE_COLOR, s=30, alpha=0.7, marker='o',
+                      facecolors='none', edgecolors='#6B8E23', s=30, alpha=0.5, 
+                      marker='o', linewidths=1.0, depthshade=False,
                       label='Utilization ≤ 1')
         
-        # Plot global best (gold star, prominent)
+        # Plot global best (gold star, prominent - rendered as solid with no depth shading)
         best_pos = data.get('best_pos')
         best_weight = data.get('best_weight', float('inf'))
         
         if best_pos and best_weight != float('inf'):
             b_depth, b_ur, b_weight = best_pos
             
-            # Large gold star marker
+            # Large gold star marker - solid fill, no depth shading for consistent visibility
+            # depthshade=False ensures it maintains full opacity regardless of position
             ax.scatter([b_ur], [b_depth], [b_weight], 
-                      c=OPTIMAL_COLOR, s=200, marker='*', 
-                      edgecolors='black', linewidth=1,
-                      label='Global Best', zorder=10)
+                      c=OPTIMAL_COLOR, s=350, marker='*', 
+                      edgecolors='#8B4513', linewidths=1.5,
+                      label='Global Best', depthshade=False)
             
             # Draw trajectory line from origin to best
             ax.plot([0, b_ur], [b_depth, b_depth], [b_weight, b_weight],
@@ -338,32 +349,7 @@ class MatplotlibCanvas(FigureCanvas):
             best_iter = data.get('best_iteration', 0)
             best_pid = data.get('best_particle_id', 0)
             
-            if best_vector and names:
-                dims = dict(zip(names, best_vector))
-                D = dims.get('D', dims.get('d', 0))
-                tw = dims.get('tw', 0)
-                bf = dims.get('bf', dims.get('bf_top', 0))
-                tf = dims.get('tf', dims.get('tf_top', 0))
-                
-                annotation_text = (
-                    f"Global Best:\n"
-                    f"  Iter: {best_iter + 1} | Particle: {best_pid + 1}\n"
-                    f"  Depth: {D:.1f} mm\n"
-                    f"  Width: {bf:.1f} mm\n"
-                    f"  Weight: {b_weight:.1f} kg\n"
-                    f"  UR: {b_ur:.3f}"
-                )
-                
-                # Text box annotation (2D overlay)
-                ax.text2D(0.02, 0.98, annotation_text, 
-                         transform=ax.transAxes, fontsize=9,
-                         verticalalignment='top',
-                         bbox=dict(boxstyle='round,pad=0.5', 
-                                  facecolor='lightyellow', 
-                                  edgecolor='gray', alpha=0.9),
-                         fontfamily='monospace')
-        
-        # Legend
+        # Legend (moved to bottom of plot)
         ax.legend(loc='upper right', fontsize=8, framealpha=0.9)
 
     def _setup_section_axes(self):
@@ -469,28 +455,50 @@ class MatplotlibCanvas(FigureCanvas):
                color='#555', fontfamily='monospace',
                bbox=dict(boxstyle='round,pad=0.3', facecolor='#f8f8f8', edgecolor='#ddd', alpha=0.9))
         
-        # ===== GLOBAL BEST INFO BOX =====
-        if best_pos:
-            b_depth, b_ur, b_weight = best_pos
-            info_text = (
-                f"GLOBAL BEST SOLUTION\n"
-                f"━━━━━━━━━━━━━━━━━━━━━\n"
-                f"Iteration: {best_iter + 1}\n"
-                f"Particle ID: {best_pid + 1}\n"
-                f"━━━━━━━━━━━━━━━━━━━━━\n"
-                f"Weight: {b_weight:.1f} kg\n"
-                f"Utilization: {b_ur:.4f}"
-            )
-            
-            # Position info box at top-left
-            ax.text(0.02, 0.98, info_text, 
-                   transform=ax.transAxes, fontsize=10,
-                   verticalalignment='top', ha='left',
-                   bbox=dict(boxstyle='round,pad=0.6', 
-                            facecolor='#f0f9ff', 
-                            edgecolor=HEADER_GREEN, 
-                            linewidth=2, alpha=0.95),
-                   fontfamily='monospace', fontweight='bold')
+        # Cross-section info is now shown in bottom table instead of floating box
+
+    def _add_bottom_tables(self, data):
+        """Add tabular information at the bottom of the figure."""
+        best_pos = data.get('best_pos')
+        best_weight = data.get('best_weight', float('inf'))
+        best_iter = data.get('best_iteration', 0)
+        best_pid = data.get('best_particle_id', 0)
+        best_vector = data.get('global_best_position')
+        names = data.get('variable_names', [])
+        
+        # Extract dimensions for display
+        if best_vector and names:
+            dims = dict(zip(names, best_vector))
+            D = dims.get('D', dims.get('d', 0))
+            tw = dims.get('tw', 0)
+            bf = dims.get('bf', dims.get('bf_top', 0))
+            tf = dims.get('tf', dims.get('tf_top', 0))
+        else:
+            D = tw = bf = tf = 0
+        
+        # Get UR
+        b_ur = best_pos[1] if best_pos else 0
+        
+        # === LEFT TABLE (3D Scatter Plot Info) ===
+        left_table_text = (
+            f"│ Global Best │ Iter: {best_iter + 1:3d} │ Particle: {best_pid + 1:3d} │ "
+            f"Weight: {best_weight:.1f} kg │ UR: {b_ur:.4f} │"
+        )
+        self.fig.text(0.30, 0.12, left_table_text, 
+                     fontsize=9, ha='center', va='top',
+                     fontfamily='monospace', fontweight='bold',
+                     bbox=dict(boxstyle='round,pad=0.4', 
+                              facecolor='#fffef0', edgecolor='#ccc', alpha=0.95))
+        
+        # === RIGHT TABLE (Cross-Section Info) ===
+        right_table_text = (
+            f"│ D: {D:.0f} mm │ B: {bf:.0f} mm │ tw: {tw:.1f} mm │ tf: {tf:.1f} mm │"
+        )
+        self.fig.text(0.72, 0.12, right_table_text,
+                     fontsize=9, ha='center', va='top',
+                     fontfamily='monospace', fontweight='bold',
+                     bbox=dict(boxstyle='round,pad=0.4',
+                              facecolor='#f0f9ff', edgecolor='#ccc', alpha=0.95))
 
     def cleanup(self):
         """Clean up matplotlib resources."""
@@ -653,11 +661,11 @@ class PSOVisualizerWidget(QWidget):
         self.btn_save.clicked.connect(self.save_plot)
         self.btn_save.setEnabled(False)
         
-        # Legend
+        # Legend - updated to match hollow circle markers
         legend_text = QLabel(
             "<span style='color: #FFD700;'>★</span> Best  "
-            "<span style='color: #4ADE80;'>●</span> Feasible  "
-            "<span style='color: #F87171;'>■</span> Infeasible"
+            "<span style='color: #6B8E23;'>◯</span> Feasible  "
+            "<span style='color: #F87171;'>◯</span> Infeasible"
         )
         legend_text.setStyleSheet("color: #333; font-size: 11px;")
         

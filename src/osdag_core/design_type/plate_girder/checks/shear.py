@@ -480,3 +480,209 @@ def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, to
             continue
             
     return False, end_stiffwidth, 0, moment_ratio, endshear_ratio, 0, 0
+
+def check_longitudinal_stiffener_required(d, tw, c, epsilon, debug=False):
+    """
+    Determine if longitudinal stiffeners are required per IS 800:2007 Cl. 8.7.13 / DDCL 1.5.3.1.
+    
+    Per IS 800:2007 Clause 8.7.13:
+    - First stiffener at 0.2d (1/5 distance from compression flange) required when d/tw exceeds limits
+    - Second stiffener at neutral axis (0.5d) required when d/tw > 400εw
+    
+    Args:
+        d: Web depth (mm)
+        tw: Web thickness (mm) 
+        c: Transverse stiffener spacing (mm), or 'NA'/None if not applicable
+        epsilon: √(250/fy) - yield stress ratio
+        debug: Enable debug output
+        
+    Returns:
+        tuple: (num_required, x1_pos, x2_pos, reason)
+            - num_required: 0, 1, or 2 stiffeners required
+            - x1_pos: Position of first stiffener from compression flange (mm) or None
+            - x2_pos: Position of second stiffener from compression flange (mm) or None
+            - reason: String explaining why stiffeners are/aren't required
+    """
+    import math
+    
+    # Handle c value
+    if c is None or c == 'NA' or c == 0:
+        c_val = 3.0 * d  # Conservative large value if undefined
+    else:
+        c_val = float(c)
+    
+    d_tw_ratio = d / tw
+    
+    # Calculate slenderness limits per IS 800:2007 Cl. 8.6.1.2 / DDCL Eq 1.35-1.37
+    # First stiffener limit depends on c/d ratio
+    c_d_ratio = c_val / d
+    
+    if c_d_ratio >= 1.0 and c_d_ratio <= 2.4:
+        # d/tw <= 250εw (Eq 1.35)
+        first_limit = 250 * epsilon
+    elif c_d_ratio >= 0.74 and c_d_ratio < 1.0:
+        # c/tw <= 250εw (Eq 1.36) - use c instead of d
+        first_limit = 250 * epsilon * (c_val / d)
+    elif c_d_ratio < 0.74:
+        # d/tw <= 340εw (Eq 1.37)
+        first_limit = 340 * epsilon
+    else:
+        # c/d > 2.4 - conservative: use 250εw
+        first_limit = 250 * epsilon
+    
+    # Second stiffener limit: d/tw <= 400εw (Eq 1.38)
+    second_limit = 400 * epsilon
+    
+    num_required = 0
+    x1_pos = None
+    x2_pos = None
+    reason = ""
+    
+    if debug:
+        print(f"[DEBUG] Longitudinal Stiffener Check: d/tw={d_tw_ratio:.2f}, c/d={c_d_ratio:.2f}")
+        print(f"[DEBUG] First limit (250-340εw): {first_limit:.2f}, Second limit (400εw): {second_limit:.2f}")
+    
+    # Check if first stiffener is required
+    if d_tw_ratio > first_limit:
+        num_required = 1
+        x1_pos = round(0.2 * d, 2)  # 1/5 distance from compression flange per Cl. 8.7.13
+        reason = f"d/tw ({d_tw_ratio:.1f}) > {first_limit:.1f}εw - First stiffener at 0.2d from compression flange"
+        
+        # Check if second stiffener is also required
+        if d_tw_ratio > second_limit:
+            num_required = 2
+            x2_pos = round(0.5 * d, 2)  # At neutral axis per Cl. 8.7.13
+            reason += f"; d/tw > {second_limit:.1f}εw - Second stiffener at neutral axis (0.5d)"
+    else:
+        reason = f"d/tw ({d_tw_ratio:.1f}) <= {first_limit:.1f}εw - No longitudinal stiffener required"
+    
+    if debug:
+        print(f"[DEBUG] Result: {num_required} stiffener(s) required. x1={x1_pos}, x2={x2_pos}")
+        print(f"[DEBUG] Reason: {reason}")
+    
+    return num_required, x1_pos, x2_pos, reason
+
+
+def design_longitudinal_stiffener(d, tw, c, num_stiffeners, thickness_list, web_philosophy, epsilon, gamma_m0, fy, debug=False):
+    """
+    Design longitudinal stiffeners per IS 800:2007 Clause 8.7.13.
+    Matches DDCL Section 1.5.3 logic.
+
+    Args:
+        d: Web depth (mm) - typically clear distance between flanges
+        tw: Web thickness (mm)
+        c: Transverse stiffener spacing (mm) (or 'NA'/'None' if not applicable)
+        num_stiffeners: 1 or 2
+        thickness_list: List of available plate thicknesses
+        web_philosophy: 'Thick Web without ITS' or 'Thin Web with ITS'
+        epsilon: yield stress ratio
+        gamma_m0: Partial safety factor (not used in Is check but good to have)
+        fy: Yield strength (MPa)
+        debug: boolean
+
+    Returns:
+        tuple: (is_safe, selected_thickness, selected_width, x1, x2, I_required_1, I_provided_1, I_required_2, I_provided_2)
+    """
+    import math
+    
+    if debug:
+        print(f"[DEBUG] Designing Longitudinal Stiffener: d={d}, tw={tw}, c={c}, num={num_stiffeners}")
+
+    # Handle 'NA' or None c (though Longitudinal usually implies Thin Web with ITS)
+    # If c is None or large, d/c ratio check handles it.
+    if c is None or c == 'NA' or c == 0:
+        c_val = 3.0 * d # Use large value if undefined
+    else:
+        c_val = float(c)
+
+    # 1. First Stiffener (at 0.2 d from compression flange)
+    # IS 800 Cl. 8.7.13.2 / DDCL 1.5.3.2 Eq 1.39-1.41
+    
+    # Calculate Required MoI for First Stiffener
+    # Eq 1.39: Is >= 4 c tw^3
+    I_req_1 = 4 * c_val * tw**3 
+    
+    if d / c_val >= math.sqrt(2):
+        # Eq 1.40
+        I_req_1_b = 0.75 * d * tw**3
+    else:
+        # Eq 1.41
+        I_req_1_b = (1.5 * (d**3) * (tw**3)) / (c_val**2)
+    
+    # Enforce max of applicable limits for safety
+    I_req_1 = max(I_req_1, I_req_1_b)
+    
+    # Second Stiffener (at Neutral Axis - 0.5 d)
+    # Eq 1.42: Is >= d2 * tw^3 -> Is >= d * tw^3.
+    
+    I_req_2 = 0
+    if num_stiffeners == 2:
+        I_req_2 = d * tw**3
+
+    selected_thickness = 0.0
+    selected_width = 0.0
+    
+    I_provided_1 = 0
+    I_provided_2 = 0
+    
+    # Positions per IS 800:2007 Cl. 8.7.13
+    x1 = round(0.2 * d, 2)  # 1/5 distance from compression flange
+    x2 = round(0.5 * d, 2)  # At neutral axis
+
+    # Convert thickness list to floats
+    t_list = [float(x) for x in thickness_list]
+    t_list.sort()
+
+    for t_stiff in t_list:
+        if t_stiff <= 0: continue
+            
+        # Determine minimum required width b based on I_req_1
+        # I_prov = t * b^3 / 3 >= I_req
+        # b >= (3 * I_req / t)^(1/3)
+        
+        # Check First Stiffener Requirement
+        b_req_1 = (3 * I_req_1 / t_stiff) ** (1/3)
+        
+        # Check Second Stiffener Requirement (if applicable)
+        b_req_2 = 0
+        if num_stiffeners == 2:
+            b_req_2 = (3 * I_req_2 / t_stiff) ** (1/3)
+            
+        b_req = max(b_req_1, b_req_2)
+        
+        # Round up to nearest 5 or 10 mm
+        b_stiff = math.ceil(b_req / 5) * 5
+        
+        # Check Limits
+        # Max outstand: 20 * t * epsilon (Cl. 8.7.1.2)
+        max_b = 20 * t_stiff * epsilon
+        
+        # Practical min width check (e.g., related to thickness or web)
+        min_b = 50 # minimal practical width?
+        
+        if b_stiff <= max_b:
+            if b_stiff < min_b: b_stiff = min_b # Enforce min width
+            if b_stiff > max_b: continue # Cannot satisfy both min and max
+
+            # Found a valid size!
+            selected_thickness = t_stiff
+            selected_width = b_stiff
+            
+            # Calculate Provided
+            I_provided_1 = t_stiff * b_stiff**3 / 3
+            I_provided_2 = I_provided_1 
+            
+            safe_1 = (I_provided_1 >= I_req_1)
+            safe_2 = True
+            if num_stiffeners == 2:
+                safe_2 = (I_provided_2 >= I_req_2)
+            
+            if safe_1 and safe_2:
+                 return True, selected_thickness, selected_width, x1, x2, I_req_1, I_provided_1, I_req_2, I_provided_2
+            else:
+                 continue
+        else:
+            continue
+
+    return False, selected_thickness, selected_width, x1, x2, I_req_1, I_provided_1, I_req_2, I_provided_2
+

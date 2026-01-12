@@ -622,6 +622,9 @@ class InputDock(QWidget):
                 k2.setText(val)
             elif typ == TYPE_IMAGE:
                 # print("\n\n[INFO] Img")
+                if val is None:
+                    # To handle NoneType error
+                    continue
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
 

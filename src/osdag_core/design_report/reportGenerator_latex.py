@@ -528,7 +528,9 @@ class CreateLatex(Document):
             
             return False
 
-
+        except Exception as e:
+            raise Exception({e})
+            
 
 def color_cell(cellcolor,celltext):
     string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')

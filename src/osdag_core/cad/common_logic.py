@@ -77,6 +77,7 @@ from .BasePlateCad.baseplateconnection import BasePlateCad, HollowBasePlateCad
 from .BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 
 from .CompressionMembers.column import CompressionMemberCAD
+from .CompressionMembers.BoltedCAD import StrutAngleBoltCAD, StrutChannelBoltCAD
 
 from .Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from .Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
@@ -2115,15 +2116,58 @@ class CommonDesignLogic(object):
         column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
         column_length = float(Flex.result_eff_len)*1000
 
+        # Create the beam section
         sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
                               alpha=column_alpha, length=column_length, notchObj=None)
         _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
         col = CompressionMemberCAD(sec)
 
-        sec=sec.create_model()
+        beam_model = sec.create_model()
         col.create_Flex3DModel()
+        
+        print("DEBUG: Beam model created successfully, now creating support block...")
 
-        return sec
+        try:
+            # Create cuboidal support block at the left end
+            # Block dimensions: proportional to beam size, compact and thick
+            block_width = column_B * 1.5  # 1.5x beam flange width
+            block_height = column_d * 1.2  # 1.2x beam depth
+            block_thickness = 225.0  # Compact, thick block (225mm)
+            
+            print(f"DEBUG: Creating support block - Width: {block_width}, Height: {block_height}, Thickness: {block_thickness}")
+            
+            # Position block so beam penetrates ~25% into it
+            beam_penetration = block_thickness * 0.25
+            block_x_position = -block_thickness + beam_penetration
+            
+            print(f"DEBUG: Support block position - X: {block_x_position}, Beam penetration: {beam_penetration}")
+            
+            # Create the support block using Plate (L=height, W=width, T=thickness/depth)
+            support_block = Plate(L=block_height, W=block_width, T=block_thickness)
+            print(f"DEBUG: Support block object created: {support_block}")
+            
+            # Position the support block at the left end
+            # The plate's length (L) is along Z, width (W) along Y, thickness (T) along X
+            # We need to position it so the beam enters from the right side of the block
+            support_block.place(
+                numpy.array([block_x_position, 0., 0.]),  # Position at left with penetration
+                numpy.array([1., 0., 0.]),  # X direction (thickness direction)
+                numpy.array([0., 1., 0.])   # Y direction (width direction)
+            )
+            print(f"DEBUG: Support block placed")
+            
+            support_model = support_block.create_model()
+            print(f"DEBUG: Support model created: {support_model}")
+            print(f"DEBUG: Support model type: {type(support_model)}")
+            
+            # Return both beam and support block as a dictionary
+            return {'beam': beam_model, 'support_block': support_model}
+        except Exception as e:
+            print(f"ERROR creating support block: {e}")
+            import traceback
+            traceback.print_exc()
+            # Return just the beam if support block creation fails
+            return {'beam': beam_model, 'support_block': None}
 
     def createPurlin(self):
 
@@ -2248,6 +2292,78 @@ class CommonDesignLogic(object):
             assembly.place(origin, uDir, wDir)
             shape = assembly.create_model()
             return shape
+
+    def createStrutBoltedCAD(self):
+        """
+        :return: The calculated values/parameters to create 3D CAD model of individual components for Strut Bolted to End Gusset.
+        """
+        print("DEBUG: Entered createStrutBoltedCAD")
+        Col = self.module_object
+
+        # Types of connections =  #'Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels'
+        
+        # Extract Bolt Parameters
+        bolt_d = float(Col.bolt.bolt_diameter_provided)  # Bolt diameter (shank part)
+        bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+        bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
+        bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+        bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+        nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
+
+        # Extract Plate Parameters
+        # Assuming Col.plate has these attributes populated after design
+        plate_L = float(Col.plate.length) + 50 if hasattr(Col, 'plate') and hasattr(Col.plate, 'length') else 300
+        plate_H = float(Col.plate.height) if hasattr(Col, 'plate') and hasattr(Col.plate, 'height') else 300
+        plate_T = float(Col.plate.thickness_provided) if hasattr(Col, 'plate') and hasattr(Col.plate, 'thickness_provided') else 10
+        
+        plate = GassetPlate(L=plate_L, H=plate_H, T=plate_T, degree=30)
+        
+        # Intermittent Connection Plates (if applicable)
+        inter_plate_L = float(Col.inter_plate_length) if hasattr(Col, 'inter_plate_length') else 100
+        inter_plate_H = float(Col.inter_plate_height) if hasattr(Col, 'inter_plate_height') else 100
+        intermittentPlates = Plate(L=inter_plate_H, W=inter_plate_L, T=plate.T)
+
+
+        if Col.sec_profile == 'Channels' or Col.sec_profile == 'Back to Back Channels':
+            member = Channel(B=float(Col.section_size_1.flange_width), T=float(Col.section_size_1.flange_thickness),
+                             D=float(Col.section_size_1.depth), t=float(Col.section_size_1.web_thickness),
+                             R1=float(Col.section_size_1.root_radius), R2=float(Col.section_size_1.toe_radius),
+                             L=float(Col.length))
+            if Col.sec_profile == 'Channels':
+                nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
+
+            else:
+                nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
+
+            intermittentConnection = IntermittentNutBoltPlateArray(Col, nut, bolt, intermittentPlates, nut_space)
+            nut_bolt_array = TNutBoltArray(Col, nut, bolt, nut_space)
+            strutCAD = StrutChannelBoltCAD(Col, member, plate, nut_bolt_array, intermittentConnection)
+
+        else: # Angles
+            member = Angle(L=float(Col.length), A=float(Col.section_size_1.max_leg), B=float(Col.section_size_1.min_leg),
+                           T=float(Col.section_size_1.thickness), R1=float(Col.section_size_1.root_radius),
+                           R2=float(Col.section_size_1.toe_radius))
+            if Col.sec_profile == 'Back to Back Angles':
+                nut_space = 2 * member.T + plate.T + nut.T
+            else:
+                nut_space = member.T + plate.T + nut.T
+
+            print(f"DEBUG: Creating IntermittentNutBoltPlateArray with nut_space={nut_space}")
+            intermittentConnection = IntermittentNutBoltPlateArray(Col, nut, bolt, intermittentPlates, nut_space)
+            print("DEBUG: Creating TNutBoltArray")
+            nut_bolt_array = TNutBoltArray(Col, nut, bolt, nut_space)
+            print(f"DEBUG: Creating StrutAngleBoltCAD with parameters: {Col.sec_profile}, {member}, {plate}")
+            strutCAD = StrutAngleBoltCAD(Col, member, plate, nut_bolt_array, intermittentConnection)
+
+        print("DEBUG: Calling create_3DModel on strutCAD")
+        strutCAD.create_3DModel()
+        print("DEBUG: createStrutBoltedCAD completed successfully")
+
+        return strutCAD
 
     def display_3DModel(self, component, bgcolor):
         
@@ -2906,15 +3022,43 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             self.flex = self.module_object  
-            self.FObj = self.createCantileverBeam()
+            cantilever_components = self.createCantileverBeam()
+            
+            print(f"DEBUG DISPLAY: Received components: {cantilever_components}")
+            print(f"DEBUG DISPLAY: Beam: {cantilever_components.get('beam')}")
+            print(f"DEBUG DISPLAY: Support block: {cantilever_components.get('support_block')}")
             
             hover_dict = self.module_object.hover_dict
+            # Add support block to hover dictionary
+            hover_dict["Support Block"] = (
+                f"<b>Support Block</b><br>"
+                f"Fixed support at cantilever left end<br>"
+                f"Type: Cuboidal block<br>"
+                f"Function: Represents fixed boundary condition"
+            )
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
-            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]
+            label_flexure = ["Flexure Member (Cantilever)", hover_dict.get("Flexure Member")]
+            label_support = ["Support Block", hover_dict.get("Support Block")]
+            
+            # Define support block color (steel gray)
+            support_color = Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB)
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.FObj, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
+                # Display beam
+                osdag_display_shape(self.display, cantilever_components['beam'], 
+                                   update=True, color=Quantity_NOC_SADDLEBROWN, 
+                                   label=label_flexure, canvas=self.cad_widget)
+                # Display support block if it exists
+                if cantilever_components.get('support_block') is not None:
+                    print("DEBUG DISPLAY: Displaying support block...")
+                    osdag_display_shape(self.display, cantilever_components['support_block'], 
+                                       update=True, color=support_color, 
+                                       label=label_support, canvas=self.cad_widget)
+                    print("DEBUG DISPLAY: Support block displayed")
+                else:
+                    print("DEBUG DISPLAY: Support block is None, not displaying")
+
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             if self.connection == KEY_DISP_FLEXURE4 :
@@ -3051,6 +3195,46 @@ class CommonDesignLogic(object):
             elif self.component == "Plate":
                 osdag_display_shape(self.display, self.ColObj, update=True, label=label_plate, canvas=self.cad_widget)
 
+        elif self.mainmodule == KEY_DISP_STRUT_BOLTED_END_GUSSET:
+            print(f"DEBUG: display_3DModel called for KEY_DISP_STRUT_BOLTED_END_GUSSET. Component: {self.component}")
+            self.col = self.module_object
+            
+            # Use self.ColObj if already created
+            if hasattr(self, 'ColObj') and self.ColObj is not None:
+                print("DEBUG: Using existing self.ColObj")
+                strutCAD = self.ColObj
+            else:
+                print("DEBUG: Creating new strutCAD object")
+                strutCAD = self.createStrutBoltedCAD()
+            
+            hover_dict = self.col.hover_dict
+            self.cad_widget.model_hover_labels = hover_dict.copy()
+
+            print("DEBUG: Fetching models from strutCAD")
+            member = strutCAD.get_members_models()
+            plate = strutCAD.get_plates_models()
+            nutbolt = strutCAD.get_nut_bolt_array_models()
+            onlymember = strutCAD.get_only_members_models()
+            print(f"DEBUG: Models fetched. Member: {member}, Plate: {plate}, Bolts: {nutbolt}")
+
+            label_member = ["Member", hover_dict.get("Member")]
+            label_plate = ["Plate", hover_dict.get("Plate")]
+            label_bolt = ["Bolt", hover_dict.get("Bolt")]
+
+            if self.component == "Member":
+                print("DEBUG: Displaying Member component")
+                osdag_display_shape(self.display, onlymember, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
+            elif self.component == "Plate":
+                print("DEBUG: Displaying Plate component")
+                osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
+            else: # Model
+                print("DEBUG: Displaying Full Model")
+                osdag_display_shape(self.display, member, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
+                osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
+            print("DEBUG: Strut Bolted display logic finished")
+
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_object
@@ -3132,7 +3316,12 @@ class CommonDesignLogic(object):
     def call_3DModel(self, flag, module_object):  # Done
 
         self.module_object = module_object  # Store the object directly
-        print(self.mainmodule)
+        
+        # Override mainmodule for Strut Bolted connection to ensure correct CAD generation
+        # This handles the case where the module inherits from 'Member' generic class
+        if hasattr(module_object, "module") and module_object.module == KEY_DISP_STRUT_BOLTED_END_GUSSET:
+            self.mainmodule = KEY_DISP_STRUT_BOLTED_END_GUSSET
+
 
         if self.mainmodule == "Shear Connection":
 
@@ -3260,6 +3449,14 @@ class CommonDesignLogic(object):
 
                 self.display_3DModel("Model", "gradient_bg")
 
+            else:
+                self.display.EraseAll()
+                self.cad_widget.display_view_cube()
+        elif self.mainmodule == KEY_DISP_STRUT_BOLTED_END_GUSSET:
+            if flag is True:
+                print("DEBUG: Flag is True, calling createStrutBoltedCAD")
+                self.ColObj = self.createStrutBoltedCAD()
+                self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
                 self.cad_widget.display_view_cube()

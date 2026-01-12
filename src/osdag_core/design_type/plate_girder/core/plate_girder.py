@@ -416,12 +416,6 @@ class PlateGirderWelded(Member):
 
     def customized_input(self):
         c_lst = []
-        t1 = (KEY_TOP_FLANGE_THICKNESS_PG, self.plate_thick_customized)
-        c_lst.append(t1)
-        t2 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, self.plate_thick_customized)
-        c_lst.append(t2)
-        t3= (KEY_WEB_THICKNESS_PG, self.plate_thick_customized)
-        c_lst.append(t3)
         return c_lst
 
     def input_values(self):
@@ -437,15 +431,15 @@ class PlateGirderWelded(Member):
         options_list.append(t2)
         t33 = (KEY_OVERALL_DEPTH_PG, KEY_DISP_OVERALL_DEPTH_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t33)
-        t4 = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'Int Validator')
+        t4 = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_COMBOBOX, ['All'] + VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t4)
         t2 = (KEY_TOP_Bflange_PG, KEY_DISP_TOP_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t2)
-        t4 = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'Int Validator')
+        t4 = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, ['All'] + VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
         options_list.append(t4)
         t22 = (KEY_BOTTOM_Bflange_PG, KEY_DISP_BOTTOM_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t22)
-        t4 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
+        t4 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, ['All'] + VALUES_PLATETHK_CUSTOMIZED, True, 'No Validator')
         options_list.append(t4)
         t2 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX ,None, True, 'No Validator')
         options_list.append(t2)
@@ -886,24 +880,53 @@ class PlateGirderWelded(Member):
         self.section_class = None
         if self.design_type == 'Optimized':
             self.total_depth = 1
-            self.web_thickness_list = design_dictionary[KEY_WEB_THICKNESS_PG]
+            if design_dictionary[KEY_WEB_THICKNESS_PG] == 'All':
+                self.web_thickness_list = VALUES_PLATETHK_CUSTOMIZED
+                self.web_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
+            else:
+                self.web_thickness_list = [design_dictionary[KEY_WEB_THICKNESS_PG]]
+                self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG])
+
             self.top_flange_width = 1
-            self.top_flange_thickness_list = design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]
+            if design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG] == 'All':
+                self.top_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
+                self.top_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
+            else:
+                self.top_flange_thickness_list = [design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]]
+                self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG])
+
             self.bottom_flange_width = 1
-            self.bottom_flange_thickness_list = design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]
-            self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG][0])
-            self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG][0])
-            self.bottom_flange_thickness = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG][0])
+            if design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG] == 'All':
+                self.bottom_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
+                self.bottom_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
+            else:
+                self.bottom_flange_thickness_list = [design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]]
+                self.bottom_flange_thickness = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG])
+
         else:
             self.total_depth = float(design_dictionary[KEY_OVERALL_DEPTH_PG])
-            self.web_thickness_list = design_dictionary[KEY_WEB_THICKNESS_PG]
-            self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG][0])
+            if design_dictionary[KEY_WEB_THICKNESS_PG] == 'All':
+                self.web_thickness_list = VALUES_PLATETHK_CUSTOMIZED
+                self.web_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
+            else:
+                self.web_thickness_list = [design_dictionary[KEY_WEB_THICKNESS_PG]]
+                self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG])
+
             self.top_flange_width = float(design_dictionary[KEY_TOP_Bflange_PG])
-            self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG][0])
-            self.top_flange_thickness_list = design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]
+            if design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG] == 'All':
+                self.top_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
+                self.top_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
+            else:
+                self.top_flange_thickness_list = [design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]]
+                self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG])
+
             self.bottom_flange_width = float(design_dictionary[KEY_BOTTOM_Bflange_PG])
-            self.bottom_flange_thickness = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG][0])
-            self.bottom_flange_thickness_list = design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]
+            if design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG] == 'All':
+                self.bottom_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
+                self.bottom_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
+            else:
+                self.bottom_flange_thickness_list = [design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]]
+                self.bottom_flange_thickness = float(design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG])
 
         thickness_for_mat = max(self.web_thickness,self.top_flange_thickness, self.bottom_flange_thickness)
         self.eff_depth = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness

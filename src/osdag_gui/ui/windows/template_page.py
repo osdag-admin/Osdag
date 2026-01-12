@@ -961,16 +961,19 @@ class CustomWindow(QWidget):
             key = input_widget.findChild(QWidget, key_str)
             if op[2] == TYPE_COMBOBOX:
                 if key_str in uiObj.keys():
-                    index = key.findText(uiObj[key_str], Qt.MatchFixedString)
+                    val = uiObj[key_str]
+                    if isinstance(val, list):
+                        val = val[0] if len(val) > 0 else "All"
+                    index = key.findText(val, Qt.MatchFixedString)
                     if index >= 0:
                         key.setCurrentIndex(index)
                     else:
                         if key_str in [KEY_SUPTDSEC, KEY_SUPTNGSEC]:
                             self.load_input_error_message += \
-                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Select from available Sections! \n"
+                                str(key_str) + ": (" + str(val) + ") - Select from available Sections! \n"
                         else:
                             self.load_input_error_message += \
-                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Default Value Considered! \n"
+                                str(key_str) + ": (" + str(val) + ") - Default Value Considered! \n"
             elif op[2] == TYPE_TEXTBOX:
                 if key_str in uiObj.keys():
                     if key_str == KEY_SHEAR or key_str==KEY_AXIAL or key_str == KEY_MOMENT:

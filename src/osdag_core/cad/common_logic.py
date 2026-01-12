@@ -1916,24 +1916,44 @@ class CommonDesignLogic(object):
 
         try:
             # Check number of longitudinal stiffeners
+            # Handle both numeric values (0, 1, 2) and string "Not Required"
             num_long_stiff = getattr(Conn, 'longstiffener_no', 0)
-            if num_long_stiff is not None and str(num_long_stiff).strip() != '' and float(num_long_stiff) > 0:
+            
+            # Convert to number for comparison, treating "Not Required" and similar strings as 0
+            if num_long_stiff is None or str(num_long_stiff).strip() in ['', 'Not Required', 'N/A', '0']:
+                num_long_stiff_val = 0
+            else:
+                try:
+                    num_long_stiff_val = float(num_long_stiff)
+                except (ValueError, TypeError):
+                    num_long_stiff_val = 0
+            
+            if num_long_stiff_val > 0:
                 include_horizontal_plate = True
                 
                 # Get thickness
                 thk_val = getattr(Conn, 'longstiffener_thk', 15)
-                if thk_val is not None and str(thk_val).strip() != '':
-                     T_hp = float(thk_val)
+                if thk_val is not None and str(thk_val).strip() not in ['', 'Not Required', 'N/A']:
+                    try:
+                        T_hp = float(thk_val)
+                    except (ValueError, TypeError):
+                        T_hp = 15.0
                 
                 # Get position/offset
                 pos_val = getattr(Conn, 'x1', 0)
-                if pos_val is not None and str(pos_val).strip() != '':
-                    # x1 is distance from compression flange (top)
-                    horizontal_plate_offset_ratio = float(pos_val) / D
+                if pos_val is not None and str(pos_val).strip() not in ['', 'Not Required', 'N/A']:
+                    try:
+                        # x1 is distance from compression flange (top)
+                        horizontal_plate_offset_ratio = float(pos_val) / D
+                    except (ValueError, TypeError):
+                        horizontal_plate_offset_ratio = 0.2
         except Exception as e:
             print(f"Error extracting horizontal plate params: {e}")
             include_horizontal_plate = False
 
+        # DEBUG: Print horizontal plate status
+        print(f"DEBUG CAD: include_horizontal_plate={include_horizontal_plate}, num_long_stiff_val={num_long_stiff_val if 'num_long_stiff_val' in dir() else 'not set'}")
+        
         # Create the plate girder model
         components = create_plate_girder(
             D=D,

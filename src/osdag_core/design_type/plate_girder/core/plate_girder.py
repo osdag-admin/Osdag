@@ -69,6 +69,32 @@ class PlateGirderWelded(Member):
         self.flange_warning_logged = False  # Flag to log b/tf warnings only once per session
         self.dimension_warning_logged = False  # Flag to log dimension warnings only once per session
         self.web_crippling_warning_logged = False  # Flag to log web crippling warnings only once per session
+        
+        # Initialize output-related attributes (needed for output_values before design runs)
+        self.result_designation = 'N/A'
+        self.section_classification_val = 'N/A'
+        self.result_UR = 0
+        self.effectivearea = 'N/A'
+        self.web_thickness = 0
+        self.top_flange_thickness = 0
+        self.bottom_flange_thickness = 0
+        self.betab = 'N/A'
+        self.warping_cnst = 'N/A'
+        self.torsion_cnst = 'N/A'
+        self.critical_moment = 'N/A'
+        self.design_moment = 'N/A'
+        self.V_d = 0
+        self.V_cr = 0
+        self.F_q = 0
+        self.x = 'N/A'  # Shear buckling method
+        self.end_panel_stiffener_thickness = 'N/A'
+        self.intstiffener_thk = 'N/A'
+        self.intstiffener_spacing = 'N/A'
+        self.longstiffener_thk = 'N/A'
+        self.longstiffener_no = 'N/A'
+        self.x1 = 0
+        self.x2 = 0
+        
         # Defining default Bounds
         self.bounds_map = {
             'tf': (6, 100),
@@ -217,7 +243,7 @@ class PlateGirderWelded(Member):
             KEY_IntermediateStiffener_spacing:'NA',
             KEY_IntermediateStiffener: 'No',
             KEY_IntermediateStiffener_thickness:'All',
-            KEY_LongitudnalStiffener: 'Yes and 1 stiffener',
+            KEY_LongitudnalStiffener: 'No',
             KEY_LongitudnalStiffener_thickness:'All',
             KEY_STR_TYPE:'Highway Bridge',
             KEY_DESIGN_LOAD:'Live Load',
@@ -555,67 +581,133 @@ class PlateGirderWelded(Member):
 
     def output_values(self, flag):
         out_list = []
-        t0 = (None, DISP_TITLE_STRUT_SECTION, TYPE_TITLE, None, True)
+        
+        # 1. Section Details
+        t0 = (None, KEY_DISP_PG_SectionDetail, TYPE_TITLE, None, True)
         out_list.append(t0)
+        
         t1 = (KEY_TITLE_OPTIMUM_DESIGNATION, KEY_DISP_TITLE_OPTIMUM_DESIGNATION, TYPE_TEXTBOX,
               self.result_designation if flag else '', True)
         out_list.append(t1)
-        t2 = (KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_OPTIMUM_UR_COMPRESSION, TYPE_TEXTBOX, round(self.result_UR,3) if flag else '', True)
+        
+        t2 = (KEY_OPTIMUM_SC, KEY_DISP_OPTIMUM_SC, TYPE_TEXTBOX, self.section_classification_val if flag else '', True)
         out_list.append(t2)
-        t3 = (KEY_OPTIMUM_SC, KEY_DISP_OPTIMUM_SC, TYPE_TEXTBOX, self.section_classification_val if flag else '', True)
+        
+        t3 = (KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_OPTIMUM_UR_COMPRESSION, TYPE_TEXTBOX, round(self.result_UR,3) if flag else '', True)
         out_list.append(t3)
-        t4 = (KEY_betab_constatnt,KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
-              self.betab if flag else '', True)
+        
+        t4 = (KEY_EFF_SEC_AREA, KEY_DISP_EFF_SEC_AREA, TYPE_TEXTBOX, self.effectivearea if flag else '', True)
         out_list.append(t4)
-        t5 = (KEY_EFF_SEC_AREA, KEY_DISP_EFF_SEC_AREA, TYPE_TEXTBOX, self.effectivearea if flag else '', True)
-        out_list.append(t5)
-        # Add thickness values for visibility in output dock
+        
         t_web = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_TEXTBOX,
                  self.web_thickness if flag else '', True)
         out_list.append(t_web)
+        
         t_tf_top = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_TEXTBOX,
                     self.top_flange_thickness if flag else '', True)
         out_list.append(t_tf_top)
+        
         t_tf_bot = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_TEXTBOX,
                     self.bottom_flange_thickness if flag else '', True)
         out_list.append(t_tf_bot)
-        t10 = (KEY_IntermediateStiffener_thickness, KEY_DISP_IntermediateStiffener_thickness, TYPE_TEXTBOX,
-              self.intstiffener_thk if flag else '', True)
-        out_list.append(t10)
-        t10 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX,
-              self.intstiffener_spacing if flag else '', True)
-        out_list.append(t10)
-        t1 = (KEY_LongitudnalStiffener_thickness, KEY_DISP_LongitudnalStiffener_thickness, TYPE_TEXTBOX,
-              self.longstiffener_thk if flag else '', True)
-        out_list.append(t1)
-        t1 = (KEY_LongitudnalStiffener_numbers, KEY_DISP_LongitudnalStiffener_numbers, TYPE_TEXTBOX, self.longstiffener_no if flag else '', True)
-        out_list.append(t1)
-        t2 = (KEY_EndpanelStiffener_thickness, KEY_DISP_EndpanelStiffener_thickness, TYPE_TEXTBOX, self.end_panel_stiffener_thickness if flag else '', True)
-        out_list.append(t2)
-        t1 = (KEY_MOMENT_STRENGTH, KEY_DISP_DESIGN_BENDING_STRENGTH, TYPE_TEXTBOX,
+
+        # 2. Moment Design Details
+        t0 = (None, DISP_TITLE_MOMENT_DESIGN, TYPE_TITLE, None, True)
+        out_list.append(t0)
+        
+        t_beta = (KEY_betab_constatnt, KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
+                  self.betab if flag else '', True)
+        out_list.append(t_beta)
+        
+        t_warp = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.warping_cnst if flag else '', True)
+        out_list.append(t_warp)
+        
+        t_tor = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
+              self.torsion_cnst if flag else '', True)
+        out_list.append(t_tor)
+        
+        # Mcr
+        t_mcr = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.critical_moment if flag else '', True)
+        out_list.append(t_mcr)
+        
+        t_md = (KEY_MOMENT_STRENGTH, KEY_DISP_DESIGN_BENDING_STRENGTH, TYPE_TEXTBOX,
               self.design_moment if flag else '', True)
-        out_list.append(t1)
-        t1 = (KEY_WeldWebtoflange, KEY_DISP_WeldWebtoflange, TYPE_TEXTBOX,
-              max(self.atop, self.abot) if flag else '', True)
-        out_list.append(t1)
-        t1 = (KEY_WeldStiffenertoweb, KEY_DISP_WeldStiffenertoweb, TYPE_TEXTBOX,
-              self.weld_stiff if flag else '', True)
-        out_list.append(t1)
-        t2 = (KEY_T_constatnt, KEY_DISP_T_constatnt, TYPE_TEXTBOX,
-              self.torsion_cnst if flag else '', False)
-        out_list.append(t2)
-        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.warping_cnst if flag else '', False)
-        out_list.append(t2)
-        t2 = (KEY_LongitudinalStiffener1_pos, KEY_DISP_LongitudinalStiffener1_pos, TYPE_TEXTBOX, self.x1 if flag else '',True)
-        out_list.append(t2)
-        t2 = (KEY_LongitudinalStiffener2_pos, KEY_DISP_LongitudinalStiffener2_pos, TYPE_TEXTBOX, self.x2 if flag else '',True)
-        out_list.append(t2)
-        t2 = (KEY_Elastic_CM, KEY_DISP_Elastic_CM, TYPE_TEXTBOX, self.critical_moment if flag else '', False)
-        out_list.append(t2)
+        out_list.append(t_md)
+
+        # 3. Shear Design Details
+        t0 = (None, DISP_TITLE_SHEAR_DESIGN, TYPE_TITLE, None, True)
+        out_list.append(t0)
+        
+        # Shear Capacity (Vd)
+        if not hasattr(self, 'V_d') or self.V_d is None: self.V_d = 0
+        t_vd = (KEY_SHEAR_STRENGTH, "Shear Capacity (kN)", TYPE_TEXTBOX, round(self.V_d, 2) if flag else '', True)
+        out_list.append(t_vd)
+        
+        # Shear Buckling Resistance (Vcr)
+        if not hasattr(self, 'V_cr') or self.V_cr is None: self.V_cr = 0
+        t_vcr = (KEY_BUCKLING_STRENGTH, "Shear Buckling Resistance (kN)", TYPE_TEXTBOX, round(self.V_cr, 2) if flag else '', True)
+        out_list.append(t_vcr)
+        
+        # Web Crippling (Fq)
+        if not hasattr(self, 'F_q') or self.F_q is None: self.F_q = 0
+        t_fq = (KEY_WEB_CRIPPLING, "Web Crippling Strength (kN)", TYPE_TEXTBOX, round(self.F_q, 2) if flag else '', True)
+        out_list.append(t_fq)
+
+        # 4. Stiffener Design
+        t0 = (None, KEY_DISP_DESIGN_STIFFER, TYPE_TITLE, None, True)
+        out_list.append(t0)
+        
+        # Capacity based on Method
+        # Assuming user means the method used? or the capacity? 
+        # I'll display the Method Name for now as "Capacity based on..." is ambiguous if value is Vd.
+        method_name = "N/A"
+        if hasattr(self, 'x'): method_name = self.x # self.x stores the method ('Simple Post...' or 'Tension Field')
+        t_method = ('ShearBucklingMethod', "Method", TYPE_TEXTBOX, method_name if flag else '', True)
+        out_list.append(t_method)
+        
+        t_end_thk = (KEY_EndpanelStiffener_thickness, "End Panel Stiffener Thickness (mm)", TYPE_TEXTBOX, self.end_panel_stiffener_thickness if flag else '', True)
+        out_list.append(t_end_thk)
+        
+        # Number of End Panel Stiffeners
+        # Default to 2 (Pair) if designed? 
+        if flag:
+            num_end = "2 (Pair)" if (self.end_panel_stiffener_thickness != "N/A" and self.end_panel_stiffener_thickness != 0) else "0"
+        else:
+            num_end = ''
+        t_end_no = ('EndPanelStiffenerNo', "Number of End Panel Stiffeners", TYPE_TEXTBOX, num_end, True)
+        out_list.append(t_end_no)
+        
+        t_int_thk = (KEY_IntermediateStiffener_thickness, KEY_DISP_IntermediateStiffener_thickness, TYPE_TEXTBOX,
+              self.intstiffener_thk if flag else '', True)
+        out_list.append(t_int_thk)
+        
+        t_int_space = (KEY_IntermediateStiffener_spacing, "Intermediate Stiffener Spacing (mm)", TYPE_TEXTBOX,
+              self.intstiffener_spacing if flag else '', True)
+        out_list.append(t_int_space)
+        
+        t_long_thk = (KEY_LongitudnalStiffener_thickness, KEY_DISP_LongitudnalStiffener_thickness, TYPE_TEXTBOX,
+              self.longstiffener_thk if flag else '', True)
+        out_list.append(t_long_thk)
+        
+        t_long_no = (KEY_LongitudnalStiffener_numbers, KEY_DISP_LongitudnalStiffener_numbers, TYPE_TEXTBOX, self.longstiffener_no if flag else '', True)
+        out_list.append(t_long_no)
+        
+        # Stiffener positions
+        t_x1 = (KEY_LongitudinalStiffener1_pos, "Stiffener 1 Pos. from Comp. Flange (mm)", TYPE_TEXTBOX, self.x1 if flag else '',True)
+        out_list.append(t_x1)
+        t_x2 = (KEY_LongitudinalStiffener2_pos, "Stiffener 2 Pos. from Comp. Flange (mm)", TYPE_TEXTBOX, self.x2 if flag else '',True)
+        out_list.append(t_x2)
+
+        # 5. Deflection Check
+        t0 = (None, DISP_TITLE_DEFLECTION, TYPE_TITLE, None, True)
+        out_list.append(t0)
+        
         t_def = (KEY_MAX_DEFL, 'Calculated Deflection (mm)', TYPE_TEXTBOX, self.calculated_deflection if flag else '', True)
         out_list.append(t_def)
-        t_def_limit = ('DeflectionLimit', 'Deflection Limit (mm)', TYPE_TEXTBOX, self.deflection_limit if flag else '', True)
+        
+        t_def_limit = ('DeflectionLimit', 'Permissible Deflection (mm)', TYPE_TEXTBOX, self.deflection_limit if flag else '', True)
         out_list.append(t_def_limit)
+        
         return out_list
 
     def spacing(self, status):
@@ -1205,11 +1297,35 @@ class PlateGirderWelded(Member):
                     second_stiffener = False
                     if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
                         second_stiffener = True
-                    # TODO: Extract design_longitudinal_stiffeners
-                    # For now assuming it's extracted or I need to extract it.
-                    # I extracted it to shear.py? No, I extracted shear checks.
-                    # Let's check shear.py.
-                    pass # Placeholder for longitudinal stiffener check
+                    
+                    # Longitudinal stiffener design per IS 800:2007 Cl. 8.7.13
+                    # Position: First at 0.2d from compression flange, second at 0.5d (neutral axis) if needed
+                    num_long_stiff = 1
+                    if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
+                        num_long_stiff = 2
+                    self.longstiffener_no = num_long_stiff
+                    
+                    # Use stiffener spacing if available, otherwise design_longitudinal_stiffener handles default
+                    c_input = self.c
+                    
+                    is_safe_long, t_long_sel, b_long_sel, x1, x2, I_req1, I_prov1, I_req2, I_prov2 = design_longitudinal_stiffener(
+                        self.eff_depth, self.web_thickness, c_input, num_long_stiff, 
+                        self.long_thickness_list, self.web_philosophy, self.epsilon, 
+                        self.gamma_m0, self.material.fy, debug=self.debug
+                    )
+                    
+                    if is_safe_long:
+                        self.long_check = True
+                        self.longstiffener_thk = t_long_sel
+                        self.x1 = round(x1, 2)
+                        if num_long_stiff == 2:
+                            self.x2 = round(x2, 2)
+                        else:
+                            self.x2 = 0
+                        self.logger.info(f"Longitudinal Stiffener Check passed (t={t_long_sel}mm)")
+                    else:
+                        self.long_check = False
+                        self.logger.error("Longitudinal Stiffener Check failed (available thickness insufficient)")
 
                 if self.c == 'NA':
                     # Calculate c per IS 800:2007 Cl. 8.6.1.1, 8.6.1.2 and 8.7
@@ -2077,20 +2193,48 @@ class PlateGirderWelded(Member):
              if isinstance(self.end_panel_stiffener_thickness, (int, float)):
                  self.end_panel_stiffener_thickness = round(self.end_panel_stiffener_thickness, 2)
 
-        self.longstiffener_no = 0
+        # Longitudinal Stiffener Position Calculation per IS 800:2007 Cl. 8.7.13 / DDCL 1.5.3
+        # Automatically determine if stiffeners are required based on d/tw ratio limits
+        num_long_required, x1_auto, x2_auto, long_reason = check_longitudinal_stiffener_required(
+            self.eff_depth, self.web_thickness, self.c, self.epsilon, debug=self.debug
+        )
+        
+        # Log the automatic check result
+        self.logger.info(f"Longitudinal Stiffener Check: {long_reason}")
+        
+        # Get user preference
+        user_num = 0
         if self.long_Stiffner == 'Yes and 1 stiffener':
-            self.longstiffener_no = 1
-            self.x1 = round(0.2 * self.total_depth, 2)
-            self.x2 = "N/A"
+            user_num = 1
         elif self.long_Stiffner == 'Yes and 2 stiffeners':
-            self.longstiffener_no = 2
-            self.x1 = round(0.2 * self.total_depth, 2)
-            self.x2 = round(0.5 * self.total_depth, 2)
-        else:
-            # If no longitudinal stiffener, hide thickness
-             self.longstiffener_thk = "N/A"
-             self.x1 = "N/A"
-             self.x2 = "N/A"
+            user_num = 2
+        
+        # Respect user preference, but warn if codal requirements differ
+        if user_num == 0 and num_long_required > 0:
+            self.logger.warning(f"User selected 'No' for longitudinal stiffener, but IS 800:2007 Cl. 8.7.13 requires {num_long_required} stiffener(s) for d/tw = {self.eff_depth/self.web_thickness:.1f}")
+            self.longstiffener_no = "Not Required"
+            self.longstiffener_thk = "Not Required"
+            self.x1 = "Not Required"
+            self.x2 = "Not Required"
+        elif user_num == 0 and num_long_required == 0:
+            # User selected No and code also says not required
+            self.logger.info("Longitudinal stiffener not required per IS 800:2007 Cl. 8.7.13")
+            self.longstiffener_no = "Not Required"
+            self.longstiffener_thk = "Not Required"
+            self.x1 = "Not Required"
+            self.x2 = "Not Required"
+        elif user_num >= 1:
+            # User explicitly requested stiffeners
+            self.longstiffener_no = user_num
+            # First stiffener at 0.2d from compression flange per Cl. 8.7.13
+            self.x1 = x1_auto if x1_auto is not None else round(0.2 * self.eff_depth, 2)
+            if user_num >= 2:
+                # Second stiffener at neutral axis (0.5d) per Cl. 8.7.13
+                self.x2 = x2_auto if x2_auto is not None else round(0.5 * self.eff_depth, 2)
+                self.logger.info(f"Longitudinal stiffeners provided: x1={self.x1}mm (0.2d), x2={self.x2}mm (0.5d)")
+            else:
+                self.x2 = "Not Required"
+                self.logger.info(f"Longitudinal stiffener provided: x1={self.x1}mm (0.2d from compression flange)")
              
         # Redundant safety for calculated_deflection in case missed
         if not hasattr(self, 'calculated_deflection'):

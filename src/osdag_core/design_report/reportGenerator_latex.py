@@ -504,9 +504,11 @@ class CreateLatex(Document):
 
             # Ensure the path is absolute
             latex_executable = os.path.abspath(latex_executable)
+            doc.generate_tex(filename)
             doc.generate_pdf(filename, compiler=latex_executable, clean_tex = False)
-        except:
-            pass
+        except Exception as e:
+            raise Exception({e})
+            
 
 def color_cell(cellcolor,celltext):
     string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')

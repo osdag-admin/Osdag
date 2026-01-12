@@ -23,7 +23,7 @@ from osdag_gui.ui.components.dialogs.check_for_updates import UpdateDialog
 
 from osdag_core.Common import *
 
-from osdag_gui.ui.windows.design_preferences import AdditionalInputs
+from osdag_gui.ui.windows.additional_inputs import AdditionalInputs
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_gui.data.database.database_config import *
 

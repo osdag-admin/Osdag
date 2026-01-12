@@ -171,15 +171,7 @@ class LaunchScreenPopup(QMainWindow):
             self.on_finish()
 
 def GUI():
-    # const = {
-    #     'GREEN_LIGHT_MODE': '#90AF13',
-    #     'WHITE': '#FFFFFF',
-    #     'OFF_WHITE': '#F4F4F4',
-    #     'CONTROL_BTN_HOVER': '#D9D7D7',
-    #     'CONTROL_BTN_CLICK': '#CFCFCF',
-    #     'CLOSE_BTN_HOVER': '#E81123',
-    #     'CLOSE_BTN_CLICK': '#F1707A'
-    # }
+
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
     # Load bundled Ubuntu Sans font - works on all OS without needing font installed

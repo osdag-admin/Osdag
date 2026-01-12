@@ -427,21 +427,18 @@ class ButtJointWelded(MomentConnection):
         
         self.hover_dict["Plate 1"] = (
             f"<b>Plate 1</b><br>"
-            f"Length: {round(float(plate_length), 2) if flag and plate_length else ''} mm<br>"
             f"Width: {round(float(plate_width), 2) if flag and plate_width else ''} mm<br>"
             f"Thickness: {round(float(plate1_thk), 2) if flag and plate1_thk else ''} mm"
         )
 
         self.hover_dict["Plate 2"] = (
             f"<b>Plate 2</b><br>"
-            f"Length: {round(float(plate_length), 2) if flag and plate_length else ''} mm<br>"
             f"Width: {round(float(plate_width), 2) if flag and plate_width else ''} mm<br>"
             f"Thickness: {round(float(plate2_thk), 2) if flag and plate2_thk else ''} mm"
         )
 
         self.hover_dict["Cover Plate"] = (
             f"<b>Cover Plate</b><br>"
-            f"Length: {round(float(plate_length), 2) if flag and plate_length else ''} mm<br>"
             f"Width: {round(float(plate_width), 2) if flag and plate_width else ''} mm<br>"
             f"Thickness: {round(float(cover_thk), 2) if flag and cover_thk else ''} mm"
         )
@@ -450,7 +447,6 @@ class ButtJointWelded(MomentConnection):
         if flag and packing_thk > 0:
             self.hover_dict["Packing Plate"] = (
                 f"<b>Packing Plate</b><br>"
-                f"Length: {round(float(plate_length), 2)} mm<br>"
                 f"Width: {round(float(plate_width), 2)} mm<br>"
                 f"Thickness: {round(float(packing_thk), 2)} mm"
             )

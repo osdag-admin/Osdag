@@ -373,14 +373,12 @@ class LapJointBolted(MomentConnection):
         # Populate Hover Dict (Lap Joint Bolted)
         self.hover_dict["Plate 1"] = (
             f"<b>Plate 1</b><br>"
-            f"Length: {round(float(self.plate1.length), 2) if flag and self.plate1 and self.plate1.length else ''} mm<br>"
             f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1 and self.plate1.height else ''} mm<br>"
             f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1 and self.plate1.thickness_provided else ''} mm"
         )
 
         self.hover_dict["Plate 2"] = (
             f"<b>Plate 2</b><br>"
-            f"Length: {round(float(self.plate2.length), 2) if flag and self.plate2 and self.plate2.length else ''} mm<br>"
             f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2 and self.plate2.height else ''} mm<br>"
             f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2 and self.plate2.thickness_provided else ''} mm"
         )

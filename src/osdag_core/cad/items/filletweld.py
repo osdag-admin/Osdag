@@ -70,7 +70,8 @@ class FilletWeld(object):
             prism = makePrismFromFace(aFace, extrudeDir)
             trns = gp_Trsf()
             angle = radians(rotate_angle)
-            trns.SetRotation(gp_OX(), angle)
+            from OCC.Core.gp import gp
+            trns.SetRotation(gp.OX(), angle)
             brep_trns = BRepBuilderAPI_Transform(prism, trns, False)
             brep_trns.Build()
             prism1 = brep_trns.Shape()

@@ -28,7 +28,7 @@ from .utils import ceil_to_nearest, get_K_from_warping_restraint
 # OPTIMIZATION & DEBUG CONFIGURATION
 # ==============================================================================
 USE_INTELLIGENT_PSO = True  # Set False to use legacy PSO
-DEBUG_MODE = False          # Set True to enable detail printing
+DEBUG_MODE = True          # Set True to enable detail printing
 # ==============================================================================
 from ..checks.shear import *
 from ..checks.web_buckling import *
@@ -1414,6 +1414,18 @@ class PlateGirderWelded(Member):
                         else:
                             self.shearflag2 = False
                             self.logger.error("Shear Buckling Check failed with intermediate stiffeners, increase stiffener thickness")
+
+                        # Web Crippling Check (Added for Thin Web with ITS/Simple Post Critical)
+                        web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
+                        is_safe_crip, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger, debug=self.debug)
+                        if is_safe_crip:
+                            self.shearflag3 = True
+                            self.logger.info("Web Crippling Check passed")
+                        else:
+                            self.shearflag3 = False
+                            self.logger.error("Web Crippling Check failed")
+                            
+
                     
                     else: #tension field
                         is_safe_tf, self.V_tf, self.shear_ratio, self.V_cr = shear_buckling_check_tension_field(self.eff_depth, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, self.c, self.web_philosophy, self.material.modulus_of_elasticity, self.material.fy, self.load.shear_force, self.load.moment, self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.gamma_m0, debug=self.debug)
@@ -1448,7 +1460,17 @@ class PlateGirderWelded(Member):
                             self.shearflag2 = False
                             self.logger.error("Shear Buckling Check failed, increase stiffener thickness")
 
-                    if self.shearflag1 == True and self.shearflag2 == True:
+                        # Web Crippling Check (Added for Thin Web with ITS/Tension Field)
+                        web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
+                        is_safe_crip, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger, debug=self.debug)
+                        if is_safe_crip:
+                            self.shearflag3 = True
+                            self.logger.info("Web Crippling Check passed")
+                        else:
+                            self.shearflag3 = False
+                            self.logger.error("Web Crippling Check failed")
+
+                    if self.shearflag1 == True and self.shearflag2 == True and self.shearflag3 == True:
                         self.shearchecks = True
                     else:
                         self.shearchecks = False

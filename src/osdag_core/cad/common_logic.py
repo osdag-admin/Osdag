@@ -2788,30 +2788,10 @@ class CommonDesignLogic(object):
 
         self.component = component
 
-        # CRITICAL: Garbage collect before any OCC operations to prevent heap corruption
-        gc.collect()
-        
-        # CRITICAL: Clean up all internal widget state BEFORE EraseAll
-        # This prevents memory corruption from stale OCC object references
-        # (fixes "object has been displayed in another context" segfault)
-        if hasattr(self, 'cad_widget') and hasattr(self.cad_widget, 'cleanup_for_new_model'):
-            self.cad_widget.cleanup_for_new_model()
-        
-        # Garbage collect after cleanup
-        gc.collect()
-        
-        try:
-            self.display.EraseAll()
-        except Exception as e:
-            print(f"[WARNING] Error erasing display: {e}")
-        
-        # Garbage collect between major OCC operations
-        gc.collect()
-        
-        try:
-            self.cad_widget.display_view_cube()
-        except Exception as e:
-            print(f"[WARNING] Error displaying view cube: {e}")
+        # Use CleanupCoordinator for centralized cleanup
+        from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+        coordinator = get_cleanup_coordinator()
+        coordinator.cleanup_for_new_design(self.cad_widget, self.display)
 
         try:
             self.display.View_Iso()

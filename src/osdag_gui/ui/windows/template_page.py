@@ -1,5 +1,6 @@
-import sys, os, yaml, time, gc
+import sys, os, yaml, time
 import osdag_gui.resources.resources_rc
+from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
     QPushButton, QFileDialog,  QCheckBox, QComboBox, QLineEdit,
@@ -88,56 +89,21 @@ class CustomWindow(QWidget):
         self.downloadDatabase.emit(table, call_type)
         
     def closeEvent(self, event):
-        """Handle window close event with GC-safe OCC cleanup.
-        
-        THE KEY INSIGHT: gc.collect() forces Python to destroy C++ wrappers in 
-        arbitrary order, but OpenCascade's Handle system requires View→Context→Driver 
-        destruction order. By disabling GC during cleanup, we let reference counting 
-        naturally handle the correct destruction order when Qt deletes the widget.
         """
-        import gc
-        
-        # CRITICAL: Disable GC during the entire sensitive cleanup window
-        # This prevents Python from freeing OCC objects in the wrong order
-        gc_was_enabled = gc.isenabled()
-        gc.disable()
-        
-        try:
-            # 1. Cleanup PSO resources
-            if hasattr(self, '_pso_manager') and self._pso_manager:
-                try:
-                    self._pso_manager.cleanup()
-                except Exception:
-                    pass
+        Handle window close event with GC-safe OCC cleanup via CleanupCoordinator.
+        Does NOT manually disable GC or manage OCC objects anymore - delegates to centralized logic.
+        """
+        # 1. Cleanup PSO resources
+        if hasattr(self, '_pso_manager') and self._pso_manager:
+            try:
+                self._pso_manager.cleanup()
+            except Exception:
+                pass
 
-            # 2. GC-SAFE OCC CLEANUP: Clear objects but DON'T force destruction
-            if hasattr(self, 'cad_widget') and self.cad_widget:
-                try:
-                    # Step A: Clear Python-side references (model_ais_objects, view_cube, etc)
-                    # This breaks Python reference cycles without touching OCC internals
-                    if hasattr(self.cad_widget, 'cleanup_for_new_model'):
-                        self.cad_widget.cleanup_for_new_model()
-                    
-                    # Step B: Tell OCC to release all displayed shapes from GPU memory
-                    # EraseAll() properly releases OpenGL resources
-                    if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
-                        self.cad_widget._display.EraseAll()
-                    
-                    # DO NOT: call view.SetWindow(None) - corrupts driver state
-                    # DO NOT: set view/context = None - breaks OCC destruction order  
-                    # DO NOT: call gc.collect() - this is what causes the heap corruption!
-                    #
-                    # Qt's parent-child deletion will properly destroy the cad_widget,
-                    # which triggers qtViewer3d's destructor that knows the correct
-                    # cleanup sequence for OpenCascade's graphics pipeline.
-                    
-                except Exception as e:
-                    print(f"[WARNING] OCC cleanup: {e}")
-                    
-        finally:
-            # Re-enable GC after sensitive window (if it was enabled before)
-            if gc_was_enabled:
-                gc.enable()
+        # 2. Use CleanupCoordinator for OCC safety
+        coordinator = get_cleanup_coordinator()
+        # This handles GC disabling, OCC object erasure, and reference clearing safely
+        coordinator.cleanup_for_tab_close(self)
 
         super().closeEvent(event)
 
@@ -187,8 +153,8 @@ class CustomWindow(QWidget):
                 # Complete the CAD setup that depends on InitDriver
                 self._complete_cad_init()
                 
-                # Process events to ensure UI remains responsive
-                QApplication.processEvents()
+                # Process events removed to prevent cleanup race conditions
+                # QApplication.processEvents()
                 
         except Exception as e:
             print(f"[WARNING] OpenGL initialization failed: {e}")
@@ -2203,92 +2169,16 @@ class CustomWindow(QWidget):
         # Reset the design status
         self.backend.design_status = False
         self.backend.design_button_status = False
-        for output_field in self.output_dock.output_widget.findChildren(QLineEdit):
-            output_field.clear()
-        for output_field in self.output_dock.output_widget.findChildren(QPushButton):
-            if output_field.objectName() == "dock_custom_button":
-                continue
-            output_field.setEnabled(False)
+        
+        # Delegate to OutputDock for field clearing
+        if self.output_dock:
+             self.output_dock.clear_output_fields()
         
         # Clear logs
         self.logs_dock.clear_logs()
         self.cad_comp_widget.hide()
     
-    # Clear Cad widget
-    def flush_cad_widget(self):
-        """
-        Safely clear the CAD widget using OCCMemoryManager.
-        Uses deferred execution and centralized memory management to prevent
-        heap corruption from OCC operations conflicting with Qt rendering.
-        """
-        if not hasattr(self, 'cad_widget') or not self.cad_widget:
-            return
-            
-        # Check if CAD widget is fully initialized (deferred init may not be complete)
-        if getattr(self, '_cad_init_pending', True):
-            print("[INFO] CAD widget not yet initialized, skipping flush")
-            return
-        
-        # Check if cleanup is already in progress
-        try:
-            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
-            manager = get_occ_memory_manager()
-            widget_id = id(self.cad_widget)
-            if manager.is_cleanup_in_progress(widget_id):
-                print("[INFO] Cleanup already in progress, skipping")
-                return
-        except Exception:
-            pass
-        
-        # CRITICAL: Defer the actual OCC cleanup to avoid heap corruption
-        # This ensures all pending Qt events are processed first
-        from PySide6.QtCore import QTimer
-        QTimer.singleShot(50, self._do_flush_cad_widget)
-    
-    def _do_flush_cad_widget(self):
-        """
-        Internal method that performs GC-safe CAD widget cleanup.
-        
-        KEY INSIGHT: We disable GC during cleanup to prevent Python from destroying
-        OCC C++ wrappers in arbitrary order. OpenCascade's Handle system requires
-        specific destruction ordering (View → Context → Driver).
-        """
-        if not hasattr(self, 'cad_widget') or not self.cad_widget:
-            return
-        
-        import gc
-        
-        # CRITICAL: Disable GC during cleanup to prevent wrong destruction order
-        gc_was_enabled = gc.isenabled()
-        gc.disable()
-        
-        try:
-            # Step 1: Clear internal Python state (model_ais_objects, view_cube, etc)
-            # This breaks Python reference cycles without forcing C++ destruction
-            if hasattr(self.cad_widget, 'cleanup_for_new_model'):
-                try:
-                    self.cad_widget.cleanup_for_new_model()
-                except Exception as e:
-                    print(f"[WARNING] Error in cleanup_for_new_model: {e}")
-            
-            # Step 2: Tell OCC to release displayed shapes from GPU memory
-            if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
-                try:
-                    self.cad_widget._display.EraseAll()
-                except Exception as e:
-                    print(f"[WARNING] Error erasing display: {e}")
-            
-            # Step 3: Repaint to show empty view
-            if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
-                try:
-                    self.cad_widget._display.Repaint()
-                except Exception as e:
-                    print(f"[WARNING] Error repainting display: {e}")
-                    
-        finally:
-            # Re-enable GC after sensitive cleanup window
-            if gc_was_enabled:
-                gc.enable()
+
 
     # Error Message Box
     def show_error_msg(self, error):
@@ -2496,7 +2386,7 @@ class CadComponentCheckbox(QWidget):
                         cb.blockSignals(True)
                         cb.setChecked(False)
                         cb.blockSignals(False)
-                QApplication.processEvents()
+                # QApplication.processEvents() - Removed for safety
                 # Call display function
                 f(self.parent, background)
             else:

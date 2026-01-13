@@ -47,6 +47,22 @@ from osdag_gui.ui.components.output_details.cleatAngle import CleatAngleDetails
 from osdag_gui.ui.components.output_details.tensionBoltedSpacing import TensionBoltedDetails
 
 from osdag_gui.__config__ import CAD_BACKEND
+from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+
+class DummyCADWidget:
+    """
+    A lightweight mock of the CAD widget for off-screen rendering.
+    Allows us to capture and clean up OCC objects generated purely for
+    reports without polluting the main application's CAD widget state.
+    """
+    def __init__(self):
+        self.model_ais_objects = {}
+        self.model_hover_labels = {}
+        
+    def cleanup_for_new_model(self):
+        # Allow cleanup coordinator to clear references
+        self.model_ais_objects = {}
+        self.model_hover_labels = {}
 
 class OutputDock(QWidget):
     def __init__(self, backend:object, parent):
@@ -299,31 +315,46 @@ class OutputDock(QWidget):
                     # Store original display settings
                     original_display = self.parent.commLogicObj.display
                     original_component = getattr(self.parent.commLogicObj, 'component', None)
+                    original_cad_widget = getattr(self.parent.commLogicObj, 'cad_widget', None)
                     
-                    # Set up for image generation
-                    self.parent.commLogicObj.display = off_display
-                    self.parent.commLogicObj.display_3DModel("Model", "gradient_bg")
-
-                    image_folder_path = "./ResourceFiles/images"
-                    if not os.path.exists(image_folder_path):
-                        os.makedirs(image_folder_path)
-
-                    off_display.set_bg_gradient_color([255,255,255],[255,255,255])
-                    off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
-                    off_display.View_Front()
-                    off_display.FitAll()
-                    off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
-                    off_display.View_Top()
-                    off_display.FitAll()
-                    off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
-                    off_display.View_Right()
-                    off_display.FitAll()
-                    off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
+                    # Create a dummy widget to capture off-screen objects
+                    # This prevents polluting the main CAD widget with temporary report objects
+                    dummy_widget = DummyCADWidget()
                     
-                    # Restore original display settings
-                    self.parent.commLogicObj.display = original_display
-                    if original_component is not None:
-                        self.parent.commLogicObj.component = original_component
+                    try:
+                        # Set up for image generation with ISOLATION
+                        self.parent.commLogicObj.display = off_display
+                        self.parent.commLogicObj.cad_widget = dummy_widget
+                        
+                        self.parent.commLogicObj.display_3DModel("Model", "gradient_bg")
+
+                        image_folder_path = "./ResourceFiles/images"
+                        if not os.path.exists(image_folder_path):
+                            os.makedirs(image_folder_path)
+
+                        off_display.set_bg_gradient_color([255,255,255],[255,255,255])
+                        off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
+                        off_display.View_Front()
+                        off_display.FitAll()
+                        off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
+                        off_display.View_Top()
+                        off_display.FitAll()
+                        off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
+                        off_display.View_Right()
+                        off_display.FitAll()
+                        off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
+                        
+                    finally:
+                        # CRITICAL: Clean up the dummy widget's objects
+                        # This ensures the off-screen objects are properly deregistered/erased
+                        get_cleanup_coordinator().cleanup_for_new_design(dummy_widget, off_display)
+                        
+                        # Restore original display settings
+                        self.parent.commLogicObj.display = original_display
+                        if original_cad_widget is not None:
+                            self.parent.commLogicObj.cad_widget = original_cad_widget
+                        if original_component is not None:
+                            self.parent.commLogicObj.component = original_component
                         
                     # print("[INFO] 3D images generated successfully")
                 else:
@@ -367,35 +398,48 @@ class OutputDock(QWidget):
                     # Store original display settings
                     original_display = self.parent.commLogicObj.display
                     original_component = getattr(self.parent.commLogicObj, 'component', None)
-                    
-                    # Set up for image generation
-                    self.parent.commLogicObj.display = off_display
-                    self.parent.commLogicObj.display_3DModel("Model", "gradient_bg")
+                    original_cad_widget = getattr(self.parent.commLogicObj, 'cad_widget', None)
 
-                    image_folder_path = "./ResourceFiles/images"
-                    if not os.path.exists(image_folder_path):
-                        os.makedirs(image_folder_path)
-
-                    off_display.set_bg_gradient_color([255,255,255],[255,255,255])
-                    off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
-                    cad_pngs.append(os.path.join(image_folder_path, '3d.png'))
-                    off_display.View_Front()
-                    off_display.FitAll()
-                    off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
-                    cad_pngs.append(os.path.join(image_folder_path, 'front.png'))
-                    off_display.View_Top()
-                    off_display.FitAll()
-                    off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
-                    cad_pngs.append(os.path.join(image_folder_path, 'top.png'))
-                    off_display.View_Right()
-                    off_display.FitAll()
-                    off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
-                    cad_pngs.append(os.path.join(image_folder_path, 'side.png'))
+                    # Create a dummy widget to capture off-screen objects
+                    dummy_widget = DummyCADWidget()
                     
-                    # Restore original display settings
-                    self.parent.commLogicObj.display = original_display
-                    if original_component is not None:
-                        self.parent.commLogicObj.component = original_component
+                    try:
+                        # Set up for image generation with ISOLATION
+                        self.parent.commLogicObj.display = off_display
+                        self.parent.commLogicObj.cad_widget = dummy_widget
+                        
+                        self.parent.commLogicObj.display_3DModel("Model", "gradient_bg")
+
+                        image_folder_path = "./ResourceFiles/images"
+                        if not os.path.exists(image_folder_path):
+                            os.makedirs(image_folder_path)
+
+                        off_display.set_bg_gradient_color([255,255,255],[255,255,255])
+                        off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
+                        cad_pngs.append(os.path.join(image_folder_path, '3d.png'))
+                        off_display.View_Front()
+                        off_display.FitAll()
+                        off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
+                        cad_pngs.append(os.path.join(image_folder_path, 'front.png'))
+                        off_display.View_Top()
+                        off_display.FitAll()
+                        off_display.ExportToImage(os.path.join(image_folder_path, 'top.png'))
+                        cad_pngs.append(os.path.join(image_folder_path, 'top.png'))
+                        off_display.View_Right()
+                        off_display.FitAll()
+                        off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
+                        cad_pngs.append(os.path.join(image_folder_path, 'side.png'))
+                        
+                    finally:
+                        # CRITICAL: Clean up the dummy widget's objects
+                        get_cleanup_coordinator().cleanup_for_new_design(dummy_widget, off_display)
+
+                        # Restore original display settings
+                        self.parent.commLogicObj.display = original_display
+                        if original_cad_widget is not None:
+                            self.parent.commLogicObj.cad_widget = original_cad_widget
+                        if original_component is not None:
+                            self.parent.commLogicObj.component = original_component
                         
                     print("[INFO] 3D images generated successfully")
                 else:
@@ -810,6 +854,16 @@ class OutputDock(QWidget):
                 self.output_title_fields[key][0].setVisible(True)
 
         return title_repeat
+
+    def clear_output_fields(self):
+        """Clear all output fields and reset buttons."""
+        for output_field in self.output_widget.findChildren(QLineEdit):
+            output_field.clear()
+        
+        for output_field in self.output_widget.findChildren(QPushButton):
+            if output_field.objectName() == "dock_custom_button":
+                continue
+            output_field.setEnabled(False)
 
 #----------------Standalone-Test-Code--------------------------------
 

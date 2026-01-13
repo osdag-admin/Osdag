@@ -1007,20 +1007,20 @@ class CADGroove(object):
         # self.create_bbWeldFlushstiffHeight()
         # self.create_bbWeldFlushstiffLength()
 
-        gc.collect()
+        # gc.collect() - Removed to prevent heap corruption
         
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
-        gc.collect()
+        # gc.collect()
         self.beamRModel = self.beamRight.create_model()
-        gc.collect()
+        # gc.collect()
         self.plateLModel = self.plateLeft.create_model()
-        gc.collect()
+        # gc.collect()
         self.plateRModel = self.plateRight.create_model()
-        gc.collect()
+        # gc.collect()
         
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
-        gc.collect()
+        # gc.collect()
 
 
         self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
@@ -1708,14 +1708,14 @@ class CADGroove(object):
             #                        self.beam_stiffener_F7Model,self.beam_stiffener_F8Model]
 
         # CRITICAL: Garbage collect before heavy fuse operations
-        import gc
-        gc.collect()
+        # import gc
+        # gc.collect()
 
         plates = connector_plate[0]
         for comp in connector_plate[1:]:
             plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
 
-        gc.collect()
+        # gc.collect()
         return plates
 
     def get_welded_models(self):
@@ -1771,17 +1771,17 @@ class CADGroove(object):
             #                   self.bbWeldstiff8_l2Model
             #                   ]
         # CRITICAL: Garbage collect before heavy fuse operations
-        import gc
-        gc.collect()
+        # import gc
+        # gc.collect()
 
         welds = welded_sec[0]
         for idx, comp in enumerate(welded_sec[1:]):
             welds = BRepAlgoAPI_Fuse(comp, welds).Shape()
             # Periodic garbage collection every 8 fuse operations to prevent heap corruption
-            if (idx + 1) % 8 == 0:
-                gc.collect()
+            # if (idx + 1) % 8 == 0:
+            #     gc.collect()
 
-        gc.collect()
+        # gc.collect()
         return welds
 
     def get_nut_bolt_array_models(self):
@@ -1789,22 +1789,20 @@ class CADGroove(object):
 
         :return: CAD model for nut bolt array
         """
-        import gc
+        # import gc
         
         # CRITICAL: Garbage collect before heavy fuse operations
-        gc.collect()
+        
+        
         
         nut_bolts = self.nut_bolt_array.get_models()
         print(nut_bolts)
         array = nut_bolts[0]
         for idx, comp in enumerate(nut_bolts):
             array = BRepAlgoAPI_Fuse(comp, array).Shape()
-            # Periodic garbage collection every 5 fuse operations to prevent heap corruption
-            if (idx + 1) % 5 == 0:
-                gc.collect()
+            
         
-        # Final garbage collection
-        gc.collect()
+        
         return array
 
     def get_connector_models(self):

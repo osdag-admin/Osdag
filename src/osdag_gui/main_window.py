@@ -27,6 +27,7 @@ from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_pro
 from osdag_gui.data.database.database_config import get_module_function
 from osdag_core.Common import *
 # Backend Class Imports
+from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
@@ -56,65 +57,6 @@ from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Ca
 import openpyxl
 
 class MainWindow(QMainWindow):
-    # RATE-LIMITED OCC DELETION: Limit concurrent viewers to prevent OpenGL corruption
-    # When graveyard gets full, we BLOCK and cleanup before creating new viewer
-    _occ_viewer_graveyard = []
-    _MAX_CONCURRENT_VIEWERS = 2  # Max old viewers in graveyard at once
-    
-    @classmethod
-    def _flush_oldest_viewer(cls):
-        """Immediately delete the oldest viewer from graveyard."""
-        import gc
-        
-        if not cls._occ_viewer_graveyard:
-            return
-        
-        widget = cls._occ_viewer_graveyard.pop(0)  # Remove oldest
-        
-        gc_was_enabled = gc.isenabled()
-        gc.disable()
-        
-        try:
-            # Just queue for deletion - don't call OCC methods here
-            # as the object might already be in a corrupted state
-            widget.deleteLater()
-            # DON'T call processEvents() - it causes OpenGL race conditions
-            
-        finally:
-            if gc_was_enabled:
-                gc.enable()
-    
-    @classmethod
-    def _ensure_graveyard_space(cls):
-        """Ensure graveyard has space for a new viewer, flushing oldest if needed."""
-        while len(cls._occ_viewer_graveyard) >= cls._MAX_CONCURRENT_VIEWERS:
-            cls._flush_oldest_viewer()
-    
-    @classmethod
-    def _schedule_safe_deletion(cls, widget):
-        """Schedule safe deletion of CAD widget after new viewer is stable."""
-        import gc
-        
-        def do_safe_delete():
-            try:
-                if widget in cls._occ_viewer_graveyard:
-                    cls._occ_viewer_graveyard.remove(widget)
-                
-                gc_was_enabled = gc.isenabled()
-                gc.disable()
-                
-                try:
-                    widget.deleteLater()
-                finally:
-                    if gc_was_enabled:
-                        gc.enable()
-                        
-            except Exception as e:
-                print(f"[WARNING] Safe deletion error: {e}")
-        
-        # Schedule deletion after 5 seconds (more time for OpenGL to settle)
-        QTimer.singleShot(5000, do_safe_delete)
-    
     def __init__(self):
         super().__init__()
         self.main_widget_instance = None
@@ -478,28 +420,20 @@ class MainWindow(QMainWindow):
                             except:
                                 pass
                     
-                    # RATE-LIMITED DELETION: Ensure graveyard has space before adding
+                    
+                    # Use CleanupCoordinator for safe cleanup
+                    # This replaces the legacy graveyard/setParent(None) logic
+                    from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+                    coordinator = get_cleanup_coordinator()
+                    
+                    # If the widget has CAD capability, treat it carefully
                     if hasattr(widget, 'cad_widget') and widget.cad_widget:
-                        # Ensure we don't have too many concurrent viewers
-                        MainWindow._ensure_graveyard_space()
+                        coordinator.cleanup_for_tab_close(widget)
+                    else:
+                        widget.deleteLater()
                         
-                        # Clear displayed shapes
-                        try:
-                            widget.cad_widget.cleanup_for_new_model()
-                            if hasattr(widget.cad_widget, '_display') and widget.cad_widget._display:
-                                widget.cad_widget._display.EraseAll()
-                        except Exception as e:
-                            print(f"[WARNING] CAD cleanup error: {e}")
-                        
-                        # Archive and schedule delayed deletion
-                        widget.setParent(None)
-                        MainWindow._occ_viewer_graveyard.append(widget)
-                        MainWindow._schedule_safe_deletion(widget)
-                        continue  # Skip immediate deleteLater
-
-                    widget.setParent(None)
-                    widget.deleteLater()
-                except (RuntimeError, TypeError):
+                except (RuntimeError, TypeError, Exception) as e:
+                    print(f"[WARNING] Error clearing layout widget: {e}")
                     pass
             else:
                 sub_layout = item.layout()
@@ -531,9 +465,8 @@ class MainWindow(QMainWindow):
             print(f"[ERROR] Error cleaning scroll area: {e}")
 
     def _close_tab(self, index):
-        """Close tab with comprehensive cleanup."""
+        """Close tab with comprehensive cleanup via CleanupCoordinator."""
         widget = self.tab_widget.widget(index)
-        
         template_instance = self._get_template_instance(index)
         
         # Get module name for debug logging
@@ -545,70 +478,23 @@ class MainWindow(QMainWindow):
                 pass
         
         print(f"[TAB CLOSE] Closing tab index {index}: '{module_name}'")
-        
+
+        # Use CleanupCoordinator
         if template_instance:
-            try:
-                # Disable updates immediately
-                template_instance.setUpdatesEnabled(False)
-                template_instance.blockSignals(True)
-                template_instance.hide()
-                
-                # Check if this template has a CAD widget
-                has_cad_widget = hasattr(template_instance, 'cad_widget') and template_instance.cad_widget
-                
-                if has_cad_widget:
-                    # RATE-LIMITED DELETION: Ensure graveyard has space
-                    MainWindow._ensure_graveyard_space()
-                    
-                    try:
-                        template_instance.cad_widget.cleanup_for_new_model()
-                        if hasattr(template_instance.cad_widget, '_display') and template_instance.cad_widget._display:
-                            template_instance.cad_widget._display.EraseAll()
-                    except Exception as e:
-                        print(f"[WARNING] CAD cleanup error: {e}")
-                    
-                    # Archive and schedule delayed deletion
-                    template_instance.setParent(None)
-                    MainWindow._occ_viewer_graveyard.append(template_instance)
-                    MainWindow._schedule_safe_deletion(template_instance)
-                else:
-                    # For non-CAD templates, use the aggressive cleanup
-                    from PySide6.QtWidgets import QScrollArea
-                    scroll_areas = template_instance.findChildren(QScrollArea)
-                    for scroll_area in scroll_areas:
-                        self._cleanup_scroll_area(scroll_area)
-                    
-                    self.delete_all_children(template_instance)
-                    template_instance.setParent(None)
-                    template_instance.deleteLater()
-                        
-            except (RuntimeError, AttributeError) as e:
-                print(f"[ERROR] Error in pre-cleanup: {e}")
-        
-        # Remove from UI structures first
+             coordinator = get_cleanup_coordinator()
+             coordinator.cleanup_for_tab_close(template_instance)
+
+        # Remove from UI structures
         self.tab_widget.removeTab(index)
         self.tab_bar.removeTab(index)
         self.tab_widget_content.pop(index)
         
-        # For CAD widgets, we ONLY call deleteLater without setParent(None)
-        # The gdb backtrace showed crash in QWidget::setParent -> inheritStyle -> free()
-        # removeTab() already handles the tab widget, deleteLater handles cleanup
+        # Final widget deletion
         if widget:
             widget.deleteLater()
         
         self._synchronize_tab_widget()
-        
-        # NOTE: DO NOT call processEvents() here!
-        # It forces immediate deletion while OCC resources may still be in use,
-        # causing heap corruption. Let Qt handle deletions naturally in the event loop.
-        
-        # NOTE: Do NOT call gc.collect() here!
-        # The gdb backtrace shows the crash happens during GC when it tries to 
-        # clean up Shiboken MetaObjectBuilder objects. The Qt/OCC objects need
-        # more event loop cycles to fully release before GC can safely run.
-        # Let Python's natural GC handle cleanup instead.
-        
-        print(f"[TAB CLOSE] Tab '{module_name}' closed successfully. @Total widgets: {len(QApplication.allWidgets())}")
+        print(f"[TAB CLOSE] Tab '{module_name}' closed successfully via Coordinator.")
     
     def delete_all_children(self, widget):
             """
@@ -1127,8 +1013,9 @@ class MainWindow(QMainWindow):
             ).exec()
             return
     def closeEvent(self, event):
-        """Explicitly schedule deletion on close."""
-        self.delete_all_children(self)
+        """Explicitly schedule deletion on close via CleanupCoordinator."""
+        coordinator = get_cleanup_coordinator()
+        coordinator.cleanup_for_app_exit(self)
         event.accept()
         self.deleteLater()
 

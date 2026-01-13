@@ -12,6 +12,7 @@ Author: Nishi Kant Mandal
 from .environment_config import setup_environment
 from .multiprocessing_safety import SafetyManager, ensure_safe_startup
 from .occ_memory_manager import OCCMemoryManager, get_occ_memory_manager
+from .cleanup_coordinator import CleanupCoordinator, get_cleanup_coordinator
 
 __all__ = [
     'setup_environment',
@@ -19,4 +20,6 @@ __all__ = [
     'ensure_safe_startup',
     'OCCMemoryManager',
     'get_occ_memory_manager',
+    'CleanupCoordinator',
+    'get_cleanup_coordinator',
 ]

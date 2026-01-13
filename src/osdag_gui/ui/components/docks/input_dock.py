@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QListView
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
 from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
         QRegularExpressionValidator, QIntValidator, QIcon)
+from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
@@ -499,12 +500,9 @@ class InputDock(QWidget):
             self.update_lock_icon()
         else:
             if self.state_locked:
-                # Clear UI output fields
-                self.parent.clear_output_fields()
-                # SAFE FLUSH: Use deferred execution to ensure Qt events are processed first
-                # This prevents heap corruption from OCC operations during Qt rendering
-                from PySide6.QtCore import QTimer
-                QTimer.singleShot(100, self.parent.flush_cad_widget)
+                # Use CleanupCoordinator for redesign cleanup
+                coordinator = get_cleanup_coordinator()
+                coordinator.cleanup_for_redesign(self.parent)
             self.state_locked = not self.state_locked
             self.lock_btn.setChecked(self.state_locked)
             self.input_widget.setDisabled(self.state_locked)
@@ -1106,6 +1104,8 @@ class InputDock(QWidget):
     
 #----------------Standalone-Test-Code--------------------------------
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_gui.OS_safety_protocols import setup_environment
+from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
 
 class MyMainWindow(QMainWindow):
     def __init__(self):

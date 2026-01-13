@@ -38,10 +38,10 @@ from osdag_core.design_type.connection.lap_joint_welded import LapJointWelded
 from osdag_core.design_type.connection.lap_joint_bolted import LapJointBolted
 from osdag_core.design_type.connection.butt_joint_bolted import ButtJointBolted
 from osdag_core.design_type.connection.butt_joint_welded import ButtJointWelded
-from osdag_core.design_type.compression_member.compression import Compression
+from osdag_core.design_type.compression_member.compression_welded import Compression_welded
 from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
 from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
-from osdag_core.design_type.compression_member.Column import ColumnDesign
+from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
 from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
@@ -716,7 +716,7 @@ class MainWindow(QMainWindow):
 
     # 19-Struts-welded-to-end-gusset-compression-member
     def open_struts_weld_end_gusset_compress_member(self):
-        self.common_open_module(Compression, "Struts: Welded to End Gusset")
+        self.common_open_module(Compression_welded, "Struts: Welded to End Gusset")
 
     def open_struts_bolted_end_gusset_compress_member(self):
         self.common_open_module(Compression_bolted, "Struts: Bolted to End Gusset")

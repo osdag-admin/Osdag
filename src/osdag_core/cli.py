@@ -12,8 +12,9 @@ from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBea
 from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
-from osdag_core.design_type.compression_member.compression import Compression
+from osdag_core.design_type.compression_member.compression_welded import Compression_welded
 from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
+from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 from osdag_core.design_type.main import Main
 from osdag_core.Common import TYPE_TEXTBOX, TYPE_OUT_BUTTON
 from osdag_core.Common import (
@@ -40,9 +41,9 @@ from osdag_core.Common import (
     KEY_DISP_TENSION_WELDED,
 
     # Compression Member
-    KEY_DISP_COMPRESSION,
-    KEY_DISP_STRUT_BOLTED_END_GUSSET
-
+    KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DISP_STRUT_BOLTED_END_GUSSET,
+    KEY_DISP_STRUT_WELDED_END_GUSSET
 )
 
 
@@ -57,12 +58,13 @@ available_modules = {
     KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, 
     KEY_DISP_TENSION_BOLTED:Tension_bolted,
     KEY_DISP_TENSION_WELDED:Tension_welded, 
-    KEY_DISP_COMPRESSION:Compression, 
     KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
     KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld, 
     KEY_DISP_BB_EP_SPLICE:BeamBeamEndPlateSplice,
     KEY_DISP_BCENDPLATE:BeamColumnEndPlate,
     KEY_DISP_STRUT_BOLTED_END_GUSSET:Compression_bolted,
+    KEY_DISP_STRUT_WELDED_END_GUSSET:Compression_welded,
+    KEY_DISP_COMPRESSION_COLUMN:ColumnDesign
 }
 
 from pathlib import Path

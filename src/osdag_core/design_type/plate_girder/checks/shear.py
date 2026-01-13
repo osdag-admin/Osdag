@@ -1,6 +1,65 @@
 import math
 from ....utils.common.is800_2007 import IS800_2007
 
+
+def tension_field_unequal_I_corrected(c, d, tw, fyw, bf_top, tf_top, bf_bot, tf_bot, Nf, gamma_m0, A_v, tau_b):
+    """
+    Corrected Tension Field method per IS 800:2007 Cl. 8.4.2.2 / DDCL Eq 1.30.
+    
+    This is a LOCAL corrected version that fixes issues in IS800_2007.cl_8_4_2_2_TensionField_unequal_Isection:
+    1. phi angle: DDCL uses arctan(d/c), NOT arctan((d/c)/1.5)
+    2. w_tf formula: DDCL uses '+' for the second term, NOT '-'
+    
+    Parameters match IS800_2007 version for drop-in replacement.
+    
+    Returns:
+        tuple: (phi, Mfr_top, Mfr_bot, s_top, s_bot, w_tf, psi, fv, V_tf)
+    """
+    # 1) Tension‐field angle φ - CORRECTED per DDCL Eq 1.30
+    # DDCL: φ = tan⁻¹(d/c)  (NOT divided by 1.5)
+    if c == 0:
+        phi = 90.0
+    else:
+        phi = math.degrees(math.atan(d / c))  # Corrected: removed /1.5
+
+    # 2) Reduced plastic moment of each flange
+    def Mfr(bf, tf):
+        Mp = 0.25 * bf * tf**2 * fyw
+        ratio = Nf / (bf * tf * fyw / gamma_m0)
+        if ratio >= 1:
+            return 0
+        else:
+            return Mp * (1 - ratio**2)
+
+    Mfr_t = Mfr(bf_top, tf_top)
+    Mfr_b = Mfr(bf_bot, tf_bot)
+
+    # 3) s‐values for each flange, limited to c
+    sinφ = math.sin(math.radians(phi))
+    if sinφ == 0:
+        s_t = 0
+        s_b = 0
+    else:
+        s_t = min(2 * math.sqrt(Mfr_t / (fyw * tw)) / sinφ, c) if Mfr_t > 0 else 0
+        s_b = min(2 * math.sqrt(Mfr_b / (fyw * tw)) / sinφ, c) if Mfr_b > 0 else 0
+
+    # 4) Width of the tension field w_tf - CORRECTED per DDCL Eq 1.30
+    # DDCL: w_tf = d·cos(φ) + (c - s_c - s_t)·sin(φ)  (note the PLUS sign)
+    cosφ = math.cos(math.radians(phi))
+    w_tf = d * cosφ + (c - s_t - s_b) * sinφ  # Corrected: changed - to +
+
+    # 5) Field yield strength f_v
+    psi = 1.5 * tau_b * math.sin(2 * math.radians(phi))
+    fv = math.sqrt(fyw**2 - 3 * tau_b**2 + psi**2) - psi
+
+    # 6) Nominal shear resistance V_tf
+    V_tf = (A_v * tau_b + 0.9 * w_tf * tw * fv * sinφ)
+    V_p = d * tw * fyw / (math.sqrt(3) * gamma_m0)  # Plastic shear strength
+    V_tf = min(V_tf, V_p)
+
+    return phi, Mfr_t, Mfr_b, s_t, s_b, w_tf, psi, fv, V_tf
+
+
 def calc_K_v(c, d, web_philosophy):
     """
     Calculate shear buckling coefficient K_v per IS 800:2007 Cl. 8.4.2.2.
@@ -83,6 +142,12 @@ def shear_buckling_check_intermediate_stiffener(d, tw, c, e, IntStiffThickness, 
     tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fy)
     V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_vg)
     
+    # Check minimum stiffener thickness (IS 800 Cl 8.7.1.3)
+    if IntStiffThickness < d / 50.0:
+        if debug:
+            print(f"[DEBUG] Stiffener thickness {IntStiffThickness} < d/50 ({d/50.0}). FAILED.")
+        return False, 0.0, 100.0, IntStiffenerWidth, V_cr
+    
     # 1. Global buckling check of stiffener
     cd_ratio = c / d
     if cd_ratio >= math.sqrt(2):
@@ -128,13 +193,20 @@ def shear_buckling_check_intermediate_stiffener(d, tw, c, e, IntStiffThickness, 
         fy, gamma_m0, slenderness_input, E
     )
 
-    # Critical buckling resistance (kN)
+    # Critical buckling resistance (N)
     Pd = round(A_x * fcd , 2)
-    shear_ratio =  max(shear_force / Pd , 0.0) # Assuming initial shear_ratio is 0 or passed in
+    
+    # DDCL Eq 2.31: Check F_q = (V - V_cr)/gamma_m0 against stiffener capacity Pd
+    # NOT the total shear force V (which was the previous incorrect implementation)
+    F_q = max((V_ed - V_cr) / gamma_m0, 0.0)  # Stiffener force per DDCL
+    stiffener_ratio = F_q / Pd if Pd > 0 else 1e6
     
     if debug:
-        print(f"[DEBUG] Intermediate Stiffener Buckling: I_min_global={I_min_global:.2e}, I_s={I_s:.2e}, Pd={Pd:.2f}, Applied={shear_force:.2f}, Ratio={shear_ratio:.4f}")
-    return True, Pd, shear_ratio, IntStiffenerWidth, V_cr
+        print(f"[DEBUG] Intermediate Stiffener Buckling: I_min_global={I_min_global:.2e}, I_s={I_s:.2e}")
+        print(f"[DEBUG]   V_ed={V_ed:.2f}, V_cr={V_cr:.2f}, F_q={F_q:.2f}, Pd={Pd:.2f}, Ratio={stiffener_ratio:.4f}")
+    
+    is_safe = (F_q <= Pd) and (I_s >= I_min_global)
+    return is_safe, Pd, stiffener_ratio, IntStiffenerWidth, V_cr
 
 def shear_buckling_check_tension_field(eff_depth, D, tf_top, tf_bot, tw, c, web_philosophy, E, fy, shear_force, moment, top_flange_width, top_flange_thickness, bottom_flange_width, bottom_flange_thickness, gamma_m0, debug=False):
     A_vg = (D - tf_top - tf_bot) * tw
@@ -145,7 +217,7 @@ def shear_buckling_check_tension_field(eff_depth, D, tf_top, tf_bot, tw, c, web_
     tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fy)
     V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_vg)
     Nf = moment / (eff_depth + (tf_top + tf_bot) / 2)
-    phi, M_fr_t, M_fr_b, s_t, s_b, w_tf, sai, fv, V_tf = IS800_2007.cl_8_4_2_2_TensionField_unequal_Isection(c, eff_depth, tw,
+    phi, M_fr_t, M_fr_b, s_t, s_b, w_tf, sai, fv, V_tf = tension_field_unequal_I_corrected(c, eff_depth, tw,
                                                                         fy, top_flange_width,
                                                                         top_flange_thickness, bottom_flange_width, bottom_flange_thickness,
                                                                         Nf, gamma_m0,
@@ -189,7 +261,7 @@ def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosop
     tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fyw)
     V_cr = IS800_2007.cl_8_4_2_2_Vcr_Simple_postcritical(tau_b, A_vg)
     Nf = moment / (d + (top_flange_thickness + bottom_flange_thickness) / 2)
-    result= IS800_2007.cl_8_4_2_2_TensionField_unequal_Isection(c, d, tw,
+    result= tension_field_unequal_I_corrected(c, d, tw,
                                                             fyw, top_flange_width,
                                                             top_flange_thickness, bottom_flange_width,
                                                             bottom_flange_thickness,
@@ -356,9 +428,9 @@ def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, to
     
     if c is None or c == 0:
         c = d
-        phi = math.degrees(math.atan(1/1.5))
+        phi = math.degrees(math.atan(1))  # DDCL: φ = arctan(d/c), when c=d, φ=45°
     else:
-        phi = math.degrees(math.atan((d / float(c)) / 1.5))
+        phi = math.degrees(math.atan(d / float(c)))  # DDCL Eq 1.29: φ = arctan(d/c), NOT /1.5
 
     ratio_t = Nf / (Bf_top * tf_top * fy / gamma_m0)
     if ratio_t >= 1:
@@ -380,7 +452,7 @@ def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, to
         s_t = min(2 * math.sqrt(M_fr_t / (fy * tw)) / sinφ, c)
         s_b = min(2 * math.sqrt(M_fr_b / (fy * tw)) / sinφ, c)
 
-    w_tf = d * math.cos(math.radians(phi)) - (c - s_t - s_b) * sinφ
+    w_tf = d * math.cos(math.radians(phi)) + (c - s_t - s_b) * sinφ  # DDCL Eq 1.30: PLUS sign, not minus
     sai = 1.5 * tau_b * math.sin(2 * math.radians(phi))
     fv = math.sqrt(fy**2 - 3 * tau_b**2 + sai**2) - sai
     V_tf = (A_vg * tau_b + 0.9 * w_tf * tw * fv * sinφ)

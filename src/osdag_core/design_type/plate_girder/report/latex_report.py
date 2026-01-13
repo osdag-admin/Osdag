@@ -220,11 +220,16 @@ def prepare_design_checks(pg_obj, logger):
             if c != 'NA' and c > 0:
                 c_val = float(c)
                 c_d_ratio = c_val / d
-                kv = 5.35 if c_d_ratio > 1.0 else round(4.0 + 5.35 / (c_d_ratio**2), 3)
+                if c_d_ratio > 1.0:
+                    kv = round(5.35 + 4.0 / (c_d_ratio**2), 3)
+                    calc_str = rf'$k_v = 5.35 + \dfrac{{4.0}}{{(c/d)^2}} = 5.35 + \dfrac{{4.0}}{{({c_val:.1f}/{d:.1f})^2}} = {kv:.3f}$'
+                else:
+                    kv = round(4.0 + 5.35 / (c_d_ratio**2), 3)
+                    calc_str = rf'$k_v = 4.0 + \dfrac{{5.35}}{{(c/d)^2}} = 4.0 + \dfrac{{5.35}}{{({c_val:.1f}/{d:.1f})^2}} = {kv:.3f}$'
                 
                 report_check.append([
                     NoEscape(r'Buckling Coefficient, $k_v$'),
-                    NoEscape(rf'$k_v = 4.0 + \dfrac{{5.35}}{{(c/d)^2}} = 4.0 + \dfrac{{5.35}}{{({c_val:.1f}/{d:.1f})^2}} = {kv:.3f}$ [Ref: IS 800:2007, Cl.8.4.2.2]'),
+                    NoEscape(calc_str + ' [Ref: IS 800:2007, Cl.8.4.2.2]'),
                     f'{kv:.3f}',
                     'Pass'
                 ])

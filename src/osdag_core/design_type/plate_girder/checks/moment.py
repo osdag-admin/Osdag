@@ -232,4 +232,4 @@ def moment_capacity_laterally_unsupported(E, LLT, D, tf_top, tf_bot, Bf_top, Bf_
         
     is_safe = Md >= load_moment and Md > 0
     
-    return is_safe, Md, moment_ratio, V_d, M_cr, lambda_lt, phi_lt, X_lt, fbd_lt
+    return is_safe, Md, moment_ratio, V_d, M_cr, lambda_lt, phi_lt, X_lt, fbd_lt, It, Iw

@@ -105,8 +105,8 @@ class PlateGirderWelded(Member):
             'bf_top': (100, 1000, 10), # width of top flange
             'bf_bot': (100, 1000, 10), # width of bottom flange
             'D': (200, 2000, 25), # total depth
-            'c': (75, 3000),
-            't_stiff': (6, 40)
+            'c': (100, 6000), # IS 800: 0.5d (min 100) to 3d (max 6000)
+            't_stiff': (6, 50) # IS 800: d/50 (max 40) + margin
         }        
         # to save bound input widgets
         self.bound_widgets = {}
@@ -634,17 +634,17 @@ class PlateGirderWelded(Member):
         
         # Shear Capacity (Vd)
         if not hasattr(self, 'V_d') or self.V_d is None: self.V_d = 0
-        t_vd = (KEY_SHEAR_STRENGTH, "Shear Capacity (kN)", TYPE_TEXTBOX, round(self.V_d, 2) if flag else '', True)
+        t_vd = (KEY_SHEAR_STRENGTH, "Shear Capacity (kN)", TYPE_TEXTBOX, round(self.V_d/1000, 2) if flag else '', True)
         out_list.append(t_vd)
         
         # Shear Buckling Resistance (Vcr)
         if not hasattr(self, 'V_cr') or self.V_cr is None: self.V_cr = 0
-        t_vcr = (KEY_BUCKLING_STRENGTH, "Shear Buckling Resistance (kN)", TYPE_TEXTBOX, round(self.V_cr, 2) if flag else '', True)
+        t_vcr = (KEY_BUCKLING_STRENGTH, "Shear Buckling Resistance (kN)", TYPE_TEXTBOX, round(self.V_cr/1000, 2) if flag else '', True)
         out_list.append(t_vcr)
         
         # Web Crippling (Fq)
         if not hasattr(self, 'F_q') or self.F_q is None: self.F_q = 0
-        t_fq = (KEY_WEB_CRIPPLING, "Web Crippling Strength (kN)", TYPE_TEXTBOX, round(self.F_q, 2) if flag else '', True)
+        t_fq = (KEY_WEB_CRIPPLING, "Web Crippling Strength (kN)", TYPE_TEXTBOX, round(self.F_q/1000, 2) if flag else '', True)
         out_list.append(t_fq)
 
         # 4. Stiffener Design
@@ -701,6 +701,25 @@ class PlateGirderWelded(Member):
         
         t_def_limit = ('DeflectionLimit', 'Permissible Deflection (mm)', TYPE_TEXTBOX, self.deflection_limit if flag else '', True)
         out_list.append(t_def_limit)
+        
+        # 6. Weld Details
+        t0 = (None, "Weld Details", TYPE_TITLE, None, True)
+        out_list.append(t0)
+        
+        # Web-to-Top Flange Weld
+        if not hasattr(self, 'atop') or self.atop is None: self.atop = 0
+        t_weld_top = ('WeldTopFlange', "Web-to-Top Flange Weld Size (mm)", TYPE_TEXTBOX, round(self.atop, 1) if flag else '', True)
+        out_list.append(t_weld_top)
+        
+        # Web-to-Bottom Flange Weld
+        if not hasattr(self, 'abot') or self.abot is None: self.abot = 0
+        t_weld_bot = ('WeldBotFlange', "Web-to-Bottom Flange Weld Size (mm)", TYPE_TEXTBOX, round(self.abot, 1) if flag else '', True)
+        out_list.append(t_weld_bot)
+        
+        # Stiffener Weld
+        if not hasattr(self, 'weld_stiff') or self.weld_stiff is None: self.weld_stiff = 0
+        t_weld_stiff = ('WeldStiffener', "Stiffener Weld Size (mm)", TYPE_TEXTBOX, round(self.weld_stiff, 1) if flag and self.weld_stiff else 'N/A', True)
+        out_list.append(t_weld_stiff)
         
         return out_list
 
@@ -1283,7 +1302,7 @@ class PlateGirderWelded(Member):
                     else:
                         self.shearchecks = False
                     
-                    if self.support_type == 'Major Laterally Supported' or 'Minor' in self.support_type:
+                    if self.support_type == 'Major Laterally Supported':
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment, debug=self.debug)
                         if self.debug:
                             print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
@@ -1294,7 +1313,7 @@ class PlateGirderWelded(Member):
                             self.momentchecks = False
                             self.logger.error("Moment Check failed")
                     else: 
-                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt, debug=self.debug)
+                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt, self.It, self.Iw = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt, debug=self.debug)
                         if self.debug:
                             print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
                         if is_safe:
@@ -1385,7 +1404,10 @@ class PlateGirderWelded(Member):
                             else:
                                 self.logger.error("End Panel Stiffener Check failed")
                     
-                        is_safe_int, self.V_cr, _, self.IntStiffnerwidth, _ = shear_buckling_check_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c, self.epsilon, self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
+                        is_safe_int, Pd, _, self.IntStiffnerwidth, self.V_cr_new = shear_buckling_check_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c, self.epsilon, self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
+                        if self.V_cr_new is not None:
+                             self.V_cr = self.V_cr_new
+
                         if is_safe_int:
                             self.shearflag2 = True
                             self.logger.info("Shear Buckling Check passed with intermediate stiffeners")
@@ -1401,11 +1423,11 @@ class PlateGirderWelded(Member):
                         else:
                             self.logger.error("Shear Buckling Check failed, provide end panel stiffeners")
                             result_tf = tension_field_end_stiffener(self.eff_depth, self.web_thickness, self.material.fy,
-                                                             self.load.shear_force, self.load.moment,
-                                                             self.c, self.web_philosophy, self.material.modulus_of_elasticity,
-                                                             self.top_flange_thickness, self.bottom_flange_thickness,
-                                                             self.top_flange_width, self.bottom_flange_width,
-                                                             self.gamma_m0, self.int_thickness_list, self.IntStiffnerwidth, self.IntStiffThickness, self.epsilon, self.lefactor, debug=self.debug)
+                                                              self.load.shear_force, self.load.moment,
+                                                              self.c, self.web_philosophy, self.material.modulus_of_elasticity,
+                                                              self.top_flange_thickness, self.bottom_flange_thickness,
+                                                              self.top_flange_width, self.bottom_flange_width,
+                                                              self.gamma_m0, self.int_thickness_list, self.IntStiffnerwidth, self.IntStiffThickness, self.epsilon, self.lefactor, debug=self.debug)
                             is_safe_end_tf = result_tf[0]
                             self.end_stiffthickness = result_tf[5] if len(result_tf) > 5 else 0
                             if is_safe_end_tf:
@@ -1415,7 +1437,10 @@ class PlateGirderWelded(Member):
                                 self.shearflag1 = False
                                 self.logger.error("Tension Field Check failed, increase stiffener thickness")
 
-                        is_safe_int_tf, self.V_tf, _, self.IntStiffnerwidth, _ = tension_field_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c, self.epsilon, self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
+                        is_safe_int_tf, self.V_tf, _, self.IntStiffnerwidth, self.V_cr_new = tension_field_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c, self.epsilon, self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
+                        if self.V_cr_new is not None:
+                             self.V_cr = self.V_cr_new
+                        
                         if is_safe_int_tf:
                             self.shearflag2 = True
                             self.logger.info("Shear Buckling Check passed with intermediate stiffeners")
@@ -1428,7 +1453,7 @@ class PlateGirderWelded(Member):
                     else:
                         self.shearchecks = False
 
-                    if self.support_type == 'Major Laterally Supported' or 'Minor' in self.support_type:
+                    if self.support_type == 'Major Laterally Supported':
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment, debug=self.debug)
                         if self.debug:
                             print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
@@ -1439,7 +1464,7 @@ class PlateGirderWelded(Member):
                             self.momentchecks = False
                             self.logger.error("Moment Check failed")
                     else:
-                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt, debug=self.debug)
+                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt, self.It, self.Iw = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt, debug=self.debug)
                         if is_safe:
                             self.momentchecks = True
                             self.logger.info("Moment Check passed")
@@ -1665,10 +1690,29 @@ class PlateGirderWelded(Member):
         if not self.defl_check:
             penalty += 1.0
 
+        # --- DDCL Constraint Penalties for Thin Web / Stiffeners ---
+        if not is_thick_web:
+            # 1. Stiffener Spacing Limits (IS 800 Cl. 8.7.2.4)
+            # 0.5d <= c <= 3d
+            eff_d = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
+            min_c = 0.5 * eff_d
+            max_c = 3.0 * eff_d
+            
+            if self.c < min_c: 
+                penalty += 1.0 + (min_c - self.c)/100.0  # Proportional penalty
+            elif self.c > max_c:
+                penalty += 1.0 + (self.c - max_c)/100.0
+
+            # 2. Stiffener Thickness Limit (IS 800 Cl. 8.7.1.3)
+            # t >= d/50
+            min_t = eff_d / 50.0
+            if self.IntStiffThickness < min_t:
+                penalty += 1.0 + (min_t - self.IntStiffThickness) # Strong penalty
+
         # 5) Return penalized objective
         final_cost = mass + P * penalty
         if self.debug:
-            print(f"[PSO] dims: D={self.total_depth}, tw={self.web_thickness}, bf={self.top_flange_width}, tf={self.top_flange_thickness} | Mass={mass:.2f}, Penalty={penalty:.4f} (S:{self.shear_ratio:.2f}, M:{self.moment_ratio:.2f}, B:{not self.shearchecks}, D:{not self.defl_check}), Cost={final_cost:.2e}")
+            print(f"[PSO] dims: D={self.total_depth}, tw={self.web_thickness}, bf={self.top_flange_width}, tf={self.top_flange_thickness}, c={ getattr(self, 'c', 'NA') } | Mass={mass:.2f}, Penalty={penalty:.4f} (S:{self.shear_ratio:.2f}, M:{self.moment_ratio:.2f}, B:{not self.shearchecks}, D:{not self.defl_check}), Cost={final_cost:.2e}")
         return final_cost
 
     def design_check_optimized_version(self,design_dictionary):
@@ -1787,7 +1831,7 @@ class PlateGirderWelded(Member):
                     else:  #unsupp
 
                         #moment check unspp
-                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt)
+                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt, self.It, self.Iw = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt)
                         if is_safe:
                             self.momentchecks = True
                             # self.logger.info("Moment Check passed")
@@ -1905,7 +1949,7 @@ class PlateGirderWelded(Member):
                     else:  #unsupp
 
                         #moment check unspp
-                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt)
+                        is_safe, self.Md, self.moment_ratio, self.V_d, self.M_cr, self.lambda_lt, self.phi_lt, self.X_lt, self.fbd_lt, self.It, self.Iw = moment_capacity_laterally_unsupported(self.material.modulus_of_elasticity,self.effective_length,self.total_depth,self.top_flange_thickness,self.bottom_flange_thickness,self.top_flange_width,self.bottom_flange_width,self.web_thickness,self.loading_case,self.gamma_m0,self.material.fy,self.load.shear_force, self.warping, self.load.moment, self.plast_sec_mod_z, self.elast_sec_mod_z, self.section_class, self.alpha_lt)
                         if is_safe:
                             self.momentchecks = True
 
@@ -2086,16 +2130,37 @@ class PlateGirderWelded(Member):
             self.total_depth = round(float(best_design_var['D']),0)
             self.total_depth =  ceil_to_nearest(self.total_depth,25)
             
+        self.eff_depth = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
 
         if not is_thick_web:
+            # Enforce IS 800 Cl. 8.7.1.3: t_stiff >= d/50
+            min_t_stiff = self.eff_depth / 50.0
+            
             self.IntStiffThickness = float(best_design_var['t_stiff'])
+            
+            # Start search from the discrete list closest to optim result or min_t_stiff
+            start_thickness = max(self.IntStiffThickness, min_t_stiff)
+            
+            found_thickness = False
             for i in self.int_thickness_list:
-                if float(i) > self.IntStiffThickness:
+                if float(i) >= start_thickness:  # strictly >= min_t_stiff
                     self.IntStiffThickness = float(i)
+                    found_thickness = True
                     break
             
-            self.c = round(float(best_design_var['c']),0)
-            self.c = ceil_to_nearest(self.c,25)
+            # If no thickness in list satisfies d/50, take the largest available
+            if not found_thickness and len(self.int_thickness_list) > 0:
+                 self.IntStiffThickness = float(self.int_thickness_list[-1])
+
+            # Enforce IS 800 Cl. 8.7.2.4: 0.5d <= c <= 3d
+            min_c = 0.5 * self.eff_depth
+            max_c = 3.0 * self.eff_depth
+            
+            raw_c = round(float(best_design_var['c']), 0)
+            
+            # Clamp c to valid range
+            self.c = max(min_c, min(raw_c, max_c))
+            self.c = ceil_to_nearest(self.c, 25)
         
         self.logger.info(f"Optimized values : Flange width top and bottom {self.top_flange_width} {self.bottom_flange_width} flange thickness top and bottom {self.top_flange_thickness} { self.bottom_flange_thickness} web_thickness  {self.web_thickness} total depth { self.total_depth} C value {self.c} thickness stiffener { self.IntStiffThickness}")
         
@@ -2186,7 +2251,7 @@ class PlateGirderWelded(Member):
         self.critical_moment = 'N/A'
         self.torsion_cnst = 'N/A'
         self.warping_cnst = 'N/A'
-        if self.support_type == 'Major Laterally Unsupported':
+        if self.support_type == 'Major Laterally Unsupported' or self.support_type == 'Minor Laterally Unsupported':
             self.critical_moment = round(self.M_cr/1000000,1)   
             self.torsion_cnst = round(self.It/10000,1)
             self.warping_cnst = round(self.Iw/1000000,1)

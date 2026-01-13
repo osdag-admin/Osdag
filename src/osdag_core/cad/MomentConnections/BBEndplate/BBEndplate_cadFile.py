@@ -720,16 +720,13 @@ class CADFillet(object): # not used in the current version as groove weld is pre
 
     def get_beam_models(self):
         """
-
         :return: CAD model of both left and right beam
         """
-
-        beams = BRepAlgoAPI_Fuse(self.beamLModel, self.beamRModel).Shape()
-        return beams
+        # Optimized: Return list instead of Fusing
+        return [self.beamLModel, self.beamRModel]
 
     def get_plate_connector_models(self):
         """
-
         :return: CAD model of extended end plate and stiffeners
         """
 
@@ -745,12 +742,13 @@ class CADFillet(object): # not used in the current version as groove weld is pre
         elif self.module.endplate_type == 'Flushed - Reversible Moment':
             connector_plate = [self.plateLModel, self.plateRModel, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model,
                     self.beam_stiffener_F3Model,self.beam_stiffener_F4Model]
+        
+        else:
+             # Fallback or default
+             connector_plate = [self.plateLModel, self.plateRModel]
 
-        plates = connector_plate[0]
-        for comp in connector_plate[1:]:
-            plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
+        return connector_plate
 
-        return plates
 
     def get_welded_models(self):
         """

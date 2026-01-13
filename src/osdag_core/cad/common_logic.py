@@ -3774,6 +3774,12 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
 
     def call_3DModel(self, flag, module_object):  # Done
+        # CRITICAL memory cleanup:
+        try:
+            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
+            get_occ_memory_manager().safe_cleanup(id(self.cad_widget))
+        except Exception:
+            pass
 
         self.module_object = module_object  # Store the object directly
         
@@ -3783,6 +3789,7 @@ class CommonDesignLogic(object):
             self.mainmodule = KEY_DISP_STRUT_BOLTED_END_GUSSET
         elif hasattr(module_object, "module") and module_object.module == KEY_DISP_STRUT_WELDED_END_GUSSET:
              self.mainmodule = KEY_DISP_STRUT_WELDED_END_GUSSET
+
 
 
         if self.mainmodule == "Shear Connection":
@@ -4157,5 +4164,28 @@ class CommonDesignLogic(object):
         elif cadlist and len(cadlist) == 1:
             final_model = cadlist[0]
 
+        # Fix for optimized modules returning lists (e.g. BB Endplate)
+        # Exporters require a single TopoDS_Shape, so we must fuse here if we have a list.
+        if isinstance(final_model, list):
+            if len(final_model) > 0:
+                fused_shape = final_model[0]
+                for item in final_model[1:]:
+                    fused_shape = BRepAlgoAPI_Fuse(item, fused_shape).Shape()
+                final_model = fused_shape
+            else:
+                final_model = None
+
+        # Fix for optimized modules returning lists (e.g. BB Endplate)
+        # Exporters require a single TopoDS_Shape, so we must fuse here if we have a list.
+        if isinstance(final_model, list):
+            if len(final_model) > 0:
+                fused_shape = final_model[0]
+                for item in final_model[1:]:
+                    fused_shape = BRepAlgoAPI_Fuse(item, fused_shape).Shape()
+                final_model = fused_shape
+            else:
+                final_model = None
+
         return final_model
+
         

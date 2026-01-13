@@ -70,20 +70,61 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.a6 = self.getPoint(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
 
+
     def create_model(self):
+        # Standardize cache key
+        cache_key = (self.R, self.T, self.H, self.r1)
+        
+        if not hasattr(Nut, "_shape_cache"):
+            Nut._shape_cache = {}
+            
+        if cache_key in Nut._shape_cache:
+            standard_shape = Nut._shape_cache[cache_key]
+        else:
+            # Create standard nut at Origin, Z+
+            std_uDir = numpy.array([1.0, 0.0, 0.0])
+            std_wDir = numpy.array([0.0, 0.0, 1.0]) # +Z
+            std_vDir = numpy.array([0.0, 1.0, 0.0])
+            
+            # Recompute points for standard hex
+            def get_std_point(theta):
+                rad = math.radians(theta)
+                return numpy.array([0.,0.,0.]) + (self.R * math.cos(rad)) * std_uDir + (self.R * math.sin(rad)) * std_vDir
 
-        edges = makeEdgesFromPoints(self.points)
-        wire = makeWireFromEdges(edges)
-        aFace = makeFaceFromWire(wire)
-        extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
-        prism = makePrismFromFace(aFace, extrudeDir)
+            a1 = get_std_point(0)
+            a2 = get_std_point(60)
+            a3 = get_std_point(120)
+            a4 = get_std_point(180)
+            a5 = get_std_point(240)
+            a6 = get_std_point(300)
+            
+            points = [a1, a2, a3, a4, a5, a6]
+            
+            edges = makeEdgesFromPoints(points)
+            wire = makeWireFromEdges(edges)
+            aFace = makeFaceFromWire(wire)
+            
+            extrudeDir = self.T * std_wDir
+            prism = makePrismFromFace(aFace, extrudeDir)
+            
+            # Inner cylinder for hole
+            innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(numpy.array([0.,0.,0.])), getGpDir(std_wDir)), self.r1, self.H).Shape()
+            
+            standard_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape()
+            Nut._shape_cache[cache_key] = standard_shape
 
-        cylOrigin = self.sec_origin
-        innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r1, self.H).Shape()
+        # Transform to location
+        from OCC.Core.gp import gp_Trsf, gp_Ax3, gp_Dir, gp_Pnt
+        from OCC.Core.TopLoc import TopLoc_Location
+        
+        target_ax3 = gp_Ax3(getGpPt(self.sec_origin), getGpDir(self.wDir), getGpDir(self.uDir))
+        standard_ax3 = gp_Ax3(gp_Pnt(0.,0.,0.), gp_Dir(0.,0.,1.), gp_Dir(1.,0.,0.))
+        
+        trsf = gp_Trsf()
+        trsf.SetTransformation(target_ax3, standard_ax3)
+        
+        return standard_shape.Moved(TopLoc_Location(trsf))
 
-        result_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape()
-
-        return result_shape
 
 
 if __name__ == '__main__':

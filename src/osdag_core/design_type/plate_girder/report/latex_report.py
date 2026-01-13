@@ -2,161 +2,84 @@
 Module: latex_report.py
 Description: Design report generation for Plate Girder module
 Author: Roushan Raj
-Date: 2026-01-12
+Date: 2025-01-13
 """
 
 import logging
 import os
 import sys
-import ctypes
+import shutil
+from pathlib import Path
 from ....design_report.reportGenerator_latex import CreateLatex
 from ....Report_functions import *
 from pylatex import Math
 from pylatex.utils import NoEscape
 
-def get_short_path(path):
-    """
-    Convert a path to Windows 8.3 short path format to handle spaces and underscores
-    (e.g., 'C:/Users/Roushan Raj' -> 'C:/Users/ROUSHA~1').
-    """
-    if sys.platform == 'win32':
-        try:
-            if not os.path.exists(path):
-                dirname = os.path.dirname(path)
-                basename = os.path.basename(path)
-                if os.path.exists(dirname):
-                    short_dir = get_short_path(dirname)
-                    return os.path.join(short_dir, basename).replace('\\', '/')
-                return path.replace('\\', '/')
-            
-            # Create a buffer for the short path
-            buffer_size = ctypes.windll.kernel32.GetShortPathNameW(path, None, 0)
-            buffer = ctypes.create_unicode_buffer(buffer_size)
-            # Get the short path
-            ctypes.windll.kernel32.GetShortPathNameW(path, buffer, buffer_size)
-            # Return normalized path with forward slashes for LaTeX
-            return buffer.value.replace('\\', '/')
-        except Exception:
-            return path.replace('\\', '/')
-    return path.replace('\\', '/')
-
 def save_design(popup_summary):
     """
     Generate LaTeX design report for Plate Girder module
-    
-    Args:
-        popup_summary: Dictionary containing report metadata from GUI
     """
     unique_logger_name = 'Osdag_plate_girder_flexure'
     logger = logging.getLogger(unique_logger_name)
     logger.info(" :=========Start of design report generation===========")
     
     try:
-        # Get the plate girder object from popup_summary
         pg_obj = popup_summary.get('plate_girder_object')
         if pg_obj is None:
-            logger.error(" :Plate girder object not found in popup_summary")
-            return
+            logger.error(" :Plate girder object not found")
+            return False
         
-        # Prepare report input dictionary
+        if not pg_obj.design_status:
+            logger.error(" :Design not complete")
+            return False
+        
         report_input = prepare_report_input(pg_obj, logger)
-        
-        # Prepare design checks
         report_check = prepare_design_checks(pg_obj, logger)
         
-        full_filename_path = popup_summary.get('filename', 'plate_girder_report')
-        
-        folder_path = popup_summary.get('folder', os.path.dirname(full_filename_path))
-        if not folder_path: 
-            folder_path = os.getcwd()
-            
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        short_folder_path = get_short_path(folder_path)
-        
-        # Sanitize Filename (No spaces in the file name itself)
-        filename_only = os.path.basename(full_filename_path)
-        filename_only = os.path.splitext(filename_only)[0]
-        filename_only = filename_only.replace(' ', '_')
-        
-        # Construct Final Output Path (Short Folder + Safe Filename)
-        # This ensures the file is created WHERE the GUI expects it, but WITHOUT spaces
-        final_output_path_no_ext = os.path.join(short_folder_path, filename_only).replace('\\', '/')
-        
-        raw_rel_path = os.path.abspath('..') 
-        rel_path = get_short_path(raw_rel_path)
-        
-        # Ensure report_summary has the correct structure
+        # Prepare report summary
         report_summary = popup_summary.copy()
-        
-        # Add ProfileSummary if not present
         if 'ProfileSummary' not in report_summary:
             report_summary['ProfileSummary'] = {
                 'CompanyName': report_summary.get('CompanyName', ''),
                 'CompanyLogo': report_summary.get('CompanyLogo', ''),
-                'GroupTeamName': report_summary.get('Group/TeamName', ''),
+                'Group/TeamName': report_summary.get('Group/TeamName', ''),
                 'Designer': report_summary.get('Designer', '')
             }
         
-        # Add other required fields
-        if 'ProjectTitle' not in report_summary:
-            report_summary['ProjectTitle'] = 'Plate Girder Design'
-        if 'Subtitle' not in report_summary:
-            report_summary['Subtitle'] = 'Welded Plate Girder'
-        if 'JobNumber' not in report_summary:
-            report_summary['JobNumber'] = ''
-        if 'Client' not in report_summary:
-            report_summary['Client'] = ''
-        
-        # Add design status
+        report_summary.setdefault('ProjectTitle', 'Plate Girder Design')
+        report_summary.setdefault('Subtitle', 'Welded Plate Girder')
+        report_summary.setdefault('JobNumber', '')
+        report_summary.setdefault('Client', '')
         report_summary['does_design_exist'] = pg_obj.design_status
-        if 'logger_messages' not in report_summary:
-            report_summary['logger_messages'] = ''
-
+        report_summary.setdefault('logger_messages', '')
+        
+        # Image paths
         Disp_2d_image = []
-        Disp_3d_image = popup_summary.get('Disp_3d_image', '')
-        
-        # --- GENERATION BLOCK WITH ERROR HANDLING ---
-        try:
-            CreateLatex.save_latex(
-                CreateLatex(),
-                report_input,
-                report_check,
-                report_summary,
-                final_output_path_no_ext, # <--- Passing full short path
-                rel_path,
-                Disp_2d_image,
-                Disp_3d_image,
-                module='Plate Girder'
-            )
-        except Exception as e:
-            # CHECK IF PDF WAS ACTUALLY GENERATED
-            # We check the short path we calculated
-            expected_pdf_path = f"{final_output_path_no_ext}.pdf"
-            
-            # Also check using the original long path to be safe (OS maps them to same file)
-            long_path_check = os.path.join(folder_path, f"{filename_only}.pdf")
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+        rel_path = os.path.abspath(".").replace("\\", "/")
+        fname_no_ext = popup_summary.get("filename", "ButtJointWeldedReport")
+        folder = popup_summary.get('folder', './reports')
+        os.makedirs(folder, exist_ok=True)
+                
+        CreateLatex.save_latex(
+            CreateLatex(), report_input, report_check,
+            popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image,
+            module="Plate Girder"
+        )
+        logger.info(f"Report generated successfully: {fname_no_ext}.pdf")
+                
+        pdf_file_path = os.path.join(folder, f"{fname_no_ext}.pdf")
+        if os.path.exists(pdf_file_path):
+            file_size = os.path.getsize(pdf_file_path)
+            print(f"SUCCESS: Report generated: {pdf_file_path} ({file_size} bytes)")
+            return True
+        else:
+            print("ERROR: PDF not found")
+            return False
 
-            pdf_exists = False
-            if os.path.exists(expected_pdf_path) and os.path.getsize(expected_pdf_path) > 0:
-                pdf_exists = True
-                logger.info(f" :PDF found at {expected_pdf_path} despite compiler exit code.")
-            elif os.path.exists(long_path_check) and os.path.getsize(long_path_check) > 0:
-                pdf_exists = True
-                logger.info(f" :PDF found at {long_path_check} despite compiler exit code.")
-            
-            if pdf_exists:
-                logger.warning(" :LaTeX compiler returned error code 1, but PDF was generated. Ignoring error.")
-            else:
-                logger.error(f" :Critical Error generating LaTeX report: {str(e)}")
-                # Suppress raising to avoid crashing GUI if we can't help it
-                # raise e 
-
-        logger.info(" :=========Design report generated successfully===========")
-        
     except Exception as e:
-        logger.error(f" :Final Error in save_design: {str(e)}")
+        logger.warning(f" : Warning: {str(e)}")
+        return False 
 
 
 def prepare_report_input(pg_obj, logger):

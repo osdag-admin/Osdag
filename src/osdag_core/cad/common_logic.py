@@ -49,6 +49,7 @@ from .ShearConnections.SeatedAngle.CAD_col_flange_beam_web_connectivity import C
 from .ShearConnections.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
 # from .ShearConnections.SeatedAngle.seat_angle_calc import SeatAngleCalculation
 
+from .CompressionMembers.WeldedCAD import StrutAngleWeldCAD, StrutChannelWeldCAD
 from .BBCad.nutBoltPlacement_AF import NutBoltArray_AF
 from .BBCad.nutBoltPlacement_BF import NutBoltArray_BF
 from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
@@ -2365,6 +2366,58 @@ class CommonDesignLogic(object):
 
         return strutCAD
 
+    def createStrutWeldedCAD(self):
+        T = self.module_object
+
+        plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
+                            T=float(T.plate.thickness_provided), degree=30)
+
+        intermittentPlates = Plate(L=float(getattr(T, 'inter_plate_height', 0.0)), W=float(getattr(T, 'inter_plate_length', 0.0)), T=plate.T)
+        intermittentWelds = FilletWeld(h=float(getattr(T, 'inter_weld_size', 0.0)), b=float(getattr(T, 'inter_weld_size', 0.0)), L=intermittentPlates.W)
+        if not hasattr(T, 'inter_memb_length'):
+            T.inter_memb_length = 0.0
+        if not hasattr(T, 'inter_conn'):
+            T.inter_conn = "0" 
+        # Alias section_size_1 -> section_property for compatibility with IntermittentWelds
+        if not hasattr(T, 'section_size_1') and hasattr(T, 'section_property'):
+            T.section_size_1 = T.section_property
+        # Inject 'depth' attribute for Angle sections to avoid AttributeError in IntermittentWelds
+        if hasattr(T, 'section_size_1') and not hasattr(T.section_size_1, 'depth'):
+            if hasattr(T.section_size_1, 'max_leg'):
+                T.section_size_1.depth = T.section_size_1.max_leg
+        weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+
+        s = max(15, float(T.weld.size))
+        plate_intercept = plate.L - s - 50
+        print(f"DEBUG createStrutWeldedCAD: sec_profile = '{T.sec_profile}', section_property type = {type(T.section_property).__name__}")
+        if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
+            member = Channel(B=float(T.section_property.flange_width), T=float(T.section_property.flange_thickness),
+                             D=float(T.section_property.depth), t=float(T.section_property.web_thickness),
+                             R1=float(T.section_property.root_radius), R2=float(T.section_property.toe_radius),
+                             L=float(T.length))
+            inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+            opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
+
+
+            strutCAD = StrutChannelWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+
+        else:
+            member = Angle(L=float(T.length), A=float(T.section_property.max_leg), B=float(T.section_property.min_leg),
+                           T=float(T.section_property.thickness), R1=float(T.section_property.root_radius),
+                           R2=float(T.section_property.toe_radius))
+            inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+            if T.loc == 'Long Leg':
+                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.A))
+            else:  # 'Short Leg'
+                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
+
+            # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+            strutCAD = StrutAngleWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+
+        strutCAD.create_3DModel()
+
+        return strutCAD
+
     def display_3DModel(self, component, bgcolor):
         
         # Component colors
@@ -3175,7 +3228,11 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == KEY_DISP_STRUT_WELDED_END_GUSSET:
             self.col = self.module_object  
-            self.ColObj = self.createStrutsInTrusses()
+            # self.ColObj is created in call_3DModel
+            if hasattr(self, 'ColObj') and self.ColObj is not None and not isinstance(self.ColObj, OCC.Core.TopoDS.TopoDS_Shape):
+                 strutCAD = self.ColObj
+            else:
+                 strutCAD = self.createStrutWeldedCAD()
             
             # Setup hover labels
             hover_dict = {}
@@ -3183,17 +3240,25 @@ class CommonDesignLogic(object):
                 hover_dict = self.col.hover_dict
                 self.cad_widget.model_hover_labels = hover_dict.copy()
             
+            member = strutCAD.get_members_models()
+            plate = strutCAD.get_plates_models()
+            welds = strutCAD.get_welded_models()
+
             # Define labels for hover
             label_member = ["Member", hover_dict.get("Member")]
             label_plate = ["Plate", hover_dict.get("Plate")]
             label_weld = ["Weld", hover_dict.get("Weld")]
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.ColObj, update=True, label=label_member, canvas=self.cad_widget)
+                osdag_display_shape(self.display, member, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
+                osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, welds, color=weld_color, update=True, label=label_weld, canvas=self.cad_widget)
             elif self.component == "Member":
-                osdag_display_shape(self.display, self.ColObj, update=True, label=label_member, canvas=self.cad_widget)
+                osdag_display_shape(self.display, member, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
             elif self.component == "Plate":
-                osdag_display_shape(self.display, self.ColObj, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, welds, color=weld_color, update=True, label=label_weld, canvas=self.cad_widget)
+
 
         elif self.mainmodule == KEY_DISP_STRUT_BOLTED_END_GUSSET:
             print(f"DEBUG: display_3DModel called for KEY_DISP_STRUT_BOLTED_END_GUSSET. Component: {self.component}")
@@ -3321,6 +3386,8 @@ class CommonDesignLogic(object):
         # This handles the case where the module inherits from 'Member' generic class
         if hasattr(module_object, "module") and module_object.module == KEY_DISP_STRUT_BOLTED_END_GUSSET:
             self.mainmodule = KEY_DISP_STRUT_BOLTED_END_GUSSET
+        elif hasattr(module_object, "module") and module_object.module == KEY_DISP_STRUT_WELDED_END_GUSSET:
+             self.mainmodule = KEY_DISP_STRUT_WELDED_END_GUSSET
 
 
         if self.mainmodule == "Shear Connection":
@@ -3445,7 +3512,7 @@ class CommonDesignLogic(object):
                 self.cad_widget.display_view_cube()
         elif self.mainmodule == KEY_DISP_STRUT_WELDED_END_GUSSET:
             if flag is True:
-                self.ColObj = self.createStrutsInTrusses()
+                self.ColObj = self.createStrutWeldedCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
 

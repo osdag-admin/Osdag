@@ -19,11 +19,11 @@ from ...design_report.reportGenerator_latex import CreateLatex
 from ...custom_logger import CustomLogger
 from pylatex.utils import NoEscape
 
-class Compression(Member):
+class Compression_welded(Member):
 
     def __init__(self):
         # print(f"Here Compression")
-        super(Compression, self).__init__()
+        super(Compression_welded, self).__init__()
         self.design_status = False
         self.hover_dict = {}
         # To avoid duplicate "Length provided is within the limit allowed" logs
@@ -1030,7 +1030,7 @@ class Compression(Member):
     # Setting inputs from the input dock GUI
 
     def set_input_values(self, design_dictionary):
-        super(Compression,self).set_input_values(design_dictionary)
+        super(Compression_welded,self).set_input_values(design_dictionary)
         #self.sizelist == self.sec_list
         # section properties
         # Reset per‑design flags

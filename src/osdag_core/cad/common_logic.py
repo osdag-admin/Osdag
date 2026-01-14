@@ -143,7 +143,9 @@ from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
                                      BRepBuilderAPI_MakeWire,
                                      BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakeEdge2d,
                                      BRepBuilderAPI_Transform)
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder, BRepPrimAPI_MakePrism
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder, BRepPrimAPI_MakePrism, BRepPrimAPI_MakeBox
+from OCC.Core.BRep import BRep_Builder
+from OCC.Core.TopoDS import TopoDS_Compound
 
 import OCC.Core.V3d
 from OCC.Core.Quantity import *
@@ -2095,144 +2097,217 @@ class CommonDesignLogic(object):
         col.create_Flex3DModel()
 
         # --- Create Supports ---
-        # Dimensions
-        x_start = -column_B / 2.0
-        # Set contact level to the Bottom Flange
-        # Based on ISection orientation, Top Flange is Z = -D/2? No, ISection vDir is -Z.
-        # c1 (Top) = D/2 * vDir = -D/2. c3 (Bottom) = -D/2 * vDir = +D/2.
-        # Wait, if c3 is Bottom in diagram but has Z=+D/2.
-        # If user saw supports at Z=+D/2 as "Top", then Z=+D/2 IS THE TOP.
-        # This implies Global Z Axis points UP? And Beam is Inverted?
-        # Or Global Z Axis points DOWN?
-        # If User says Z=+D/2 is TOP.
-        # Then I need to move to Z=-D/2 for BOTTOM.
-        # And extend further negative (-Z direction) for supports "below" the beam.
-        z_contact = -column_d / 2.0
-        
-        # 2. Cylindrical Support at End (Right) - Roller
-        # Tangent to Bottom Surface at Y = Length.
-        r_cyl = 50.0
-        z_cyl_center = z_contact - r_cyl # Below beam
-        
-        # 1. Triangular Support at Start (Left) - Fixed/Pinned
-        # Scale Height to Diameter of Cylinder
-        h_supp = 2 * r_cyl  
-        # Scale Base proportionally (Original: H=150, W=100 -> Ratio 1.5)
-        # We keep the aspect ratio: w_supp = h_supp / 1.5
-        w_supp = h_supp / 1.5 # half width of base
-        
-        # Position Apex at Y = w_supp (so start of base is at Y=0)
-        y_apex = w_supp
-        
-        p1 = gp_Pnt(x_start, y_apex, z_contact) # Apex (touching beam)
-        p2 = gp_Pnt(x_start, y_apex - w_supp, z_contact - h_supp) # Base point 1 (Y=0, below)
-        p3 = gp_Pnt(x_start, y_apex + w_supp, z_contact - h_supp)  # Base point 2 (Y=2*w, below)
-        
-        edge1 = BRepBuilderAPI_MakeEdge(p1, p2).Edge()
-        edge2 = BRepBuilderAPI_MakeEdge(p2, p3).Edge()
-        edge3 = BRepBuilderAPI_MakeEdge(p3, p1).Edge()
-        
-        wire_maker = BRepBuilderAPI_MakeWire()
-        wire_maker.Add(edge1)
-        wire_maker.Add(edge2)
-        wire_maker.Add(edge3)
-        wire = wire_maker.Wire()
-        
-        face = BRepBuilderAPI_MakeFace(wire).Face()
-        vec = gp_Vec(column_B, 0, 0)
-        triangle_supp = BRepPrimAPI_MakePrism(face, vec).Shape()
-        
-        # Create Cylinder
-        # Shift cylinder center inwards by radius so it doesn't stick out
-        y_cyl = column_length - r_cyl
-        pt_cyl = gp_Pnt(x_start, y_cyl, z_cyl_center)
-        axis_cyl = gp_Ax2(pt_cyl, gp_Dir(1, 0, 0))
-        
-        cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, column_B).Shape()
+        triangle_supp = None
+        cyl_supp = None
+        support_block = None
+        hatching_lines = None
+
+        if Flex.support == 'Simply Supported':
+            # Dimensions
+            x_start = -column_B / 2.0
+            # Set contact level to the Bottom Flange
+            z_contact = -column_d / 2.0
+            
+            # 2. Cylindrical Support at End (Right) - Roller
+            # Tangent to Bottom Surface at Y = Length.
+            r_cyl = 50.0
+            # Shift cylinder center inwards by radius so it doesn't stick out
+            y_cyl = column_length - r_cyl
+            z_cyl_center = z_contact - r_cyl # Below beam
+            
+            pt_cyl = gp_Pnt(x_start, y_cyl, z_cyl_center)
+            axis_cyl = gp_Ax2(pt_cyl, gp_Dir(1, 0, 0))
+            
+            cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, column_B).Shape()
+            
+            # 1. Triangular Support at Start (Left) - Fixed/Pinned
+            # Scale Height to Diameter of Cylinder
+            h_supp = 2 * r_cyl  
+            # Scale Base proportionally (Original: H=150, W=100 -> Ratio 1.5)
+            # We keep the aspect ratio: w_supp = h_supp / 1.5
+            w_supp = h_supp / 1.5 # half width of base
+            
+            # Position Apex at Y = w_supp (so start of base is at Y=0)
+            y_apex = w_supp
+            
+            p1 = gp_Pnt(x_start, y_apex, z_contact) # Apex (touching beam)
+            p2 = gp_Pnt(x_start, y_apex - w_supp, z_contact - h_supp) # Base point 1 (Y=0, below)
+            p3 = gp_Pnt(x_start, y_apex + w_supp, z_contact - h_supp)  # Base point 2 (Y=2*w, below)
+            
+            edge1 = BRepBuilderAPI_MakeEdge(p1, p2).Edge()
+            edge2 = BRepBuilderAPI_MakeEdge(p2, p3).Edge()
+            edge3 = BRepBuilderAPI_MakeEdge(p3, p1).Edge()
+            
+            wire_maker = BRepBuilderAPI_MakeWire()
+            wire_maker.Add(edge1)
+            wire_maker.Add(edge2)
+            wire_maker.Add(edge3)
+            wire = wire_maker.Wire()
+            
+            face = BRepBuilderAPI_MakeFace(wire).Face()
+            vec = gp_Vec(column_B, 0, 0)
+            triangle_supp = BRepPrimAPI_MakePrism(face, vec).Shape()
+            
+        elif Flex.support == 'Cantilever':
+            # Create Support Block (Fixed Support)
+            # Dimensions: Large block extending around the beam start
+            block_h = column_d * 2.5  
+            block_w = column_B * 2.5  
+            block_t = 250.0           # Total Thickness
+            beam_embed = 25.0         # Embed beam 25mm into block
+            
+            # Position: 
+            # X: Centered [-w/2, w/2]
+            # Z: Centered [-h/2, h/2] (Beam is at Z=0 relative to section center)
+            # Y: Behind beam start [-t + embed, embed] to represent embedding/wall
+            
+            y_max = beam_embed
+            y_min = -(block_t - beam_embed)
+            
+            pt_min = gp_Pnt(-block_w / 2.0, y_min, -block_h / 2.0)
+            pt_max = gp_Pnt(block_w / 2.0, y_max, block_h / 2.0)
+            
+            
+            support_block = BRepPrimAPI_MakeBox(pt_min, pt_max).Shape()
+
+            # Create Hatching Lines (Diagonal lines on side faces)
+            # Face bounds: Y [y_min, y_max], Z [-block_h/2, block_h/2]
+            # Line Eq: Z = Y + c  =>  c = Z - Y
+            # Min c: (-h/2) - y_max
+            # Max c: (h/2) - y_min
+            # Step: 50mm
+            
+            # Use Compound instead of Wire for disconnected edges
+            hatching_lines = TopoDS_Compound()
+            builder = BRep_Builder()
+            builder.MakeCompound(hatching_lines)
+            
+            has_lines = False
+            
+            c_min = (-block_h / 2.0) - y_max
+            c_max = (block_h / 2.0) - y_min
+            step = 50.0
+            
+            for c in numpy.arange(c_min, c_max, step):
+                # Intersection of Line Z = Y + c with Rectangle Bounds
+                points = []
+                z_min, z_max = -block_h / 2.0, block_h / 2.0
+                
+                # Check Y edges
+                z1 = y_min + c
+                if z_min <= z1 <= z_max:
+                    points.append((y_min, z1))
+                
+                z2 = y_max + c
+                if z_min <= z2 <= z_max:
+                    points.append((y_max, z2))
+                    
+                # Check Z edges
+                y1 = z_min - c
+                if y_min <= y1 <= y_max:
+                    points.append((y1, z_min))
+                    
+                y2 = z_max - c
+                if y_min <= y2 <= y_max:
+                    points.append((y2, z_max))
+                
+                points = list(set(points))
+                
+                if len(points) == 2:
+                    p1_2d, p2_2d = points[0], points[1]
+                    for x_val in [-block_w / 2.0, block_w / 2.0]:
+                        pt1 = gp_Pnt(x_val, p1_2d[0], p1_2d[1])
+                        pt2 = gp_Pnt(x_val, p2_2d[0], p2_2d[1])
+                        edge = BRepBuilderAPI_MakeEdge(pt1, pt2).Edge()
+                        builder.Add(hatching_lines, edge)
+                        has_lines = True
+            
+            if not has_lines:
+                hatching_lines = None
         
         # Return Dictionary of Components
         components = {
             'beam': beam_model,
             'support_tri': triangle_supp,
-            'support_cyl': cyl_supp
+            'support_cyl': cyl_supp,
+            'support_block': support_block,
+            'support_hatch': hatching_lines
         }
 
         return components
 
     def createCantileverBeam(self):
-
-        Flex = self.module_object
-
-        print(f"Flex.support {Flex.support}")
-
-        Flex.section_property = Flex.section_connect_database(Flex.result_designation)
-        column_tw = float(Flex.section_property.web_thickness)
-        print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
-        column_T = float(Flex.section_property.flange_thickness)
-        print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
-        column_d = float(Flex.section_property.depth)
-        print(f"Flex.section_property.depth : {Flex.section_property.depth}")
-        column_B = float(Flex.section_property.flange_width)
-        print(f"Flex.section_property.flange_width : {Flex.section_property.flange_width}")
-        column_R1 = float(Flex.section_property.root_radius)
-        print(f"Flex.section_property.root_radius : {Flex.section_property.root_radius}")
-        column_R2 = float(Flex.section_property.toe_radius)
-        print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
-        column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
-        column_length = float(Flex.result_eff_len)*1000
-
-        # Create the beam section
-        sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
-                              alpha=column_alpha, length=column_length, notchObj=None)
-        _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
-        col = CompressionMemberCAD(sec)
-
-        beam_model = sec.create_model()
-        col.create_Flex3DModel()
-        
-        print("DEBUG: Beam model created successfully, now creating support block...")
-
+        print("DEBUG: Entering createCantileverBeam")
         try:
-            # Create cuboidal support block at the left end
-            # Block dimensions: proportional to beam size, compact and thick
-            block_width = column_B * 1.5  # 1.5x beam flange width
-            block_height = column_d * 1.2  # 1.2x beam depth
-            block_thickness = 225.0  # Compact, thick block (225mm)
-            
-            print(f"DEBUG: Creating support block - Width: {block_width}, Height: {block_height}, Thickness: {block_thickness}")
-            
-            # Position block so beam penetrates ~25% into it
-            beam_penetration = block_thickness * 0.25
-            block_x_position = -block_thickness + beam_penetration
-            
-            print(f"DEBUG: Support block position - X: {block_x_position}, Beam penetration: {beam_penetration}")
-            
-            # Create the support block using Plate (L=height, W=width, T=thickness/depth)
-            support_block = Plate(L=block_height, W=block_width, T=block_thickness)
-            print(f"DEBUG: Support block object created: {support_block}")
-            
-            # Position the support block at the left end
-            # The plate's length (L) is along Z, width (W) along Y, thickness (T) along X
-            # We need to position it so the beam enters from the right side of the block
-            support_block.place(
-                numpy.array([block_x_position, 0., 0.]),  # Position at left with penetration
-                numpy.array([1., 0., 0.]),  # X direction (thickness direction)
-                numpy.array([0., 1., 0.])   # Y direction (width direction)
-            )
-            print(f"DEBUG: Support block placed")
-            
-            support_model = support_block.create_model()
-            print(f"DEBUG: Support model created: {support_model}")
-            print(f"DEBUG: Support model type: {type(support_model)}")
-            
-            # Return both beam and support block as a dictionary
-            return {'beam': beam_model, 'support_block': support_model}
-        except Exception as e:
-            print(f"ERROR creating support block: {e}")
             import traceback
+            Flex = self.module_object
+    
+            print(f"Flex.support {Flex.support}")
+    
+            Flex.section_property = Flex.section_connect_database(Flex.result_designation)
+            column_tw = float(Flex.section_property.web_thickness)
+            print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
+            column_T = float(Flex.section_property.flange_thickness)
+            print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
+            column_d = float(Flex.section_property.depth)
+            print(f"Flex.section_property.depth : {Flex.section_property.depth}")
+            column_B = float(Flex.section_property.flange_width)
+            print(f"Flex.section_property.flange_width : {Flex.section_property.flange_width}")
+            column_R1 = float(Flex.section_property.root_radius)
+            print(f"Flex.section_property.root_radius : {Flex.section_property.root_radius}")
+            column_R2 = float(Flex.section_property.toe_radius)
+            print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
+            column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
+            column_length = float(Flex.result_eff_len)*1000
+    
+            # Create the beam section
+            sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
+                                  alpha=column_alpha, length=column_length, notchObj=None)
+            _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
+            
+            print("DEBUG: Creating CompressionMemberCAD...")
+            col = CompressionMemberCAD(sec)
+    
+            print("DEBUG: Creating beam model...")
+            beam_model = sec.create_model()
+            
+            print("DEBUG: Creating Flex3DModel...")
+            col.create_Flex3DModel()
+            
+            print("DEBUG: Beam model created successfully, now creating support block...")
+    
+            # Create Support Block (Fixed Support)
+            # Dimensions based on sketch: Large block extending around the beam start
+            # Increased size as per user request (was 2.0x, now 2.5x)
+            block_h = column_d * 2.5  
+            block_w = column_B * 2.5  
+            block_t = 250.0           # Total Thickness
+            beam_embed = 25.0         # Embed beam 25mm into block
+            
+            # Position: 
+            # X: Centered [-w/2, w/2]
+            # Z: Centered [-h/2, h/2] (Beam is at Z=0 relative to section center)
+            # Y: Behind beam start [-t + embed, embed] to represent embedding/wall
+            # If Beam starts at Y=0, we want block to go from -(Thickness - Embed) to +Embed
+            
+            y_max = beam_embed
+            y_min = -(block_t - beam_embed)
+            
+            pt_min = gp_Pnt(-block_w / 2.0, y_min, -block_h / 2.0)
+            pt_max = gp_Pnt(block_w / 2.0, y_max, block_h / 2.0)
+            
+            print(f"DEBUG: Creating Box with min={pt_min.Coord()}, max={pt_max.Coord()}")
+            support_block = BRepPrimAPI_MakeBox(pt_min, pt_max).Shape()
+            print("DEBUG: Support block created successfully")
+    
+            # Return both beam and support block as a dictionary
+            return {'beam': beam_model, 'support_block': support_block}
+            
+        except Exception as e:
+            print("DEBUG ERROR in createCantileverBeam:")
+            print(e)
             traceback.print_exc()
-            # Return just the beam if support block creation fails
-            return {'beam': beam_model, 'support_block': None}
+            return {'beam': None, 'support_block': None}
 
     def createPurlin(self):
 
@@ -3133,13 +3208,13 @@ class CommonDesignLogic(object):
             hover_dict = self.module_object.hover_dict
             hover_dict["Triangular Support"] = "<b>Triangular Support</b><br>Left End Support"
             hover_dict["Cylindrical Support"] = "<b>Cylindrical Support</b><br>Right End Support"
+            hover_dict["Support Block"] = "<b>Support Block</b><br>Fixed Support (Cantilever)"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]
             label_tri = ["Triangular Support", hover_dict.get("Triangular Support")]
             label_cyl = ["Cylindrical Support", hover_dict.get("Cylindrical Support")]
-            
-            label_cyl = ["Cylindrical Support", hover_dict.get("Cylindrical Support")]
+            label_block = ["Support Block", hover_dict.get("Support Block")]
             
             support_color_gray = Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB)
             support_color_red = Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB)
@@ -3151,6 +3226,10 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, components['support_tri'], update=True, color=support_color_red, label=label_tri, canvas=self.cad_widget)
                 if components.get('support_cyl'):
                     osdag_display_shape(self.display, components['support_cyl'], update=True, color=support_color_gray, label=label_cyl, canvas=self.cad_widget)
+                if components.get('support_block'):
+                    osdag_display_shape(self.display, components['support_block'], update=True, color=support_color_gray, transparency=0.6, label=label_block, canvas=self.cad_widget)
+                if components.get('support_hatch'):
+                     osdag_display_shape(self.display, components['support_hatch'], update=True, color=Quantity_NOC_BLACK, label=label_block, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             self.flex = self.module_object  
@@ -3181,13 +3260,21 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, cantilever_components['beam'], 
                                    update=True, color=Quantity_NOC_SADDLEBROWN, 
                                    label=label_flexure, canvas=self.cad_widget)
+                
+                # Debugging Support Block
+                supp_block = cantilever_components.get('support_block')
+                print(f"DEBUG DISPLAY: Support Block Object: {supp_block}")
+                
                 # Display support block if it exists
-                if cantilever_components.get('support_block') is not None:
-                    print("DEBUG DISPLAY: Displaying support block...")
-                    osdag_display_shape(self.display, cantilever_components['support_block'], 
-                                       update=True, color=support_color, 
-                                       label=label_support, canvas=self.cad_widget)
-                    print("DEBUG DISPLAY: Support block displayed")
+                if supp_block is not None:
+                    print("DEBUG DISPLAY: Attempting to display support block...")
+                    try:
+                        osdag_display_shape(self.display, supp_block, 
+                                           update=True, color=support_color, 
+                                           label=label_support, canvas=self.cad_widget)
+                        print("DEBUG DISPLAY: Support block display command executed.")
+                    except Exception as e:
+                        print(f"DEBUG DISPLAY ERROR: Failed to display support block: {e}")
                 else:
                     print("DEBUG DISPLAY: Support block is None, not displaying")
 

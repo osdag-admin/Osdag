@@ -854,23 +854,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t19)
 
         # Populate Hover Dict — Base Plate Connection
-
+        thk_along_flange = str(self.stiffener_plt_thick_along_flange) + " mm" if flag and self.stiffener_along_flange == 'Yes' else VALUE_NOT_APPLICABLE
+        thk_along_web = str(self.stiffener_plt_thick_along_web) + " mm" if flag and self.stiffener_along_web == 'Yes' else VALUE_NOT_APPLICABLE
         # Base Plate
         self.hover_dict["Plate"] = (
-            f"<b>Plate</b><br>"
+            f"<b>Plate Details:</b><br>"
+            f"<b>Steel Base Plate</b><br>"
             f"Length: {self.bp_length_provided if flag else ''} mm<br>"
             f"Width: {self.bp_width_provided if flag else ''} mm<br>"
-            f"Thickness: {self.plate_thk if flag else ''} mm"
+            f"Thickness: {int(self.plate_thk_provided) if flag else ''} mm<br>"
+            f"<b>Stiffener thickness along flange:</b> {thk_along_flange}<br>"
+            f"<b>Stiffener thickness along web:</b> {thk_along_web}"
         )
 
         # Column (generic — works for both I-section & hollow)
         self.hover_dict["Column"] = (
             f"<b>Column</b><br>"
-            f"Designation: {self.dp_column_designation if flag else ''}<br>"
-            f"Depth: {self.column_D if flag else ''} mm<br>"
-            f"Flange Width / Width: {self.column_bf if flag else ''} mm<br>"
-            f"Flange Thickness / Wall Thickness: {self.column_tf if flag else ''} mm<br>"
-            f"Web Thickness (if I-section): {self.column_tw if flag else ''} mm"
+            f"Designation: {self.dp_column_designation if flag else ''}"
         )
 
         # Anchor Bolts (Outside Flange — primary governing)
@@ -902,10 +902,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
        # Conc (Concrete Block)
         self.hover_dict["Conc"] = (
-            f"<b>Concrete</b><br>"
-            f"Length: {self.bp_length_provided * 1.5 if flag else ''} mm<br>"
-            f"Width: {self.bp_width_provided * 1.5 if flag else ''} mm<br>"
-            f"Depth: {(self.anchor_len_below_footing_out * 1.2) if flag else ''} mm"
+            f"<b>Concrete Pedestal</b><br>"
+            f"Grade: {self.footing_grade if flag else ''} mm<br>"
         )
 
         # Grout

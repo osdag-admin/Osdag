@@ -253,7 +253,7 @@ class BeamCoverPlateWeld(MomentConnection):
         
         # Shared formatter for all handlers
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+            fmt='%(asctime)s - Osdag - %(levelname)s - %(message)s', 
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         

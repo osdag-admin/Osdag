@@ -105,37 +105,3 @@ class Material(object):
     #     Tdb = min(T_db1, T_db2)
     #     # Tdb = round(Tdb, 3)
     #     self.block_shear_capacity_axial = round(Tdb/1000,2)
-
-    def set_osdaglogger(key):
-
-        """
-        Function to set Logger for Tension Module
-        """
-
-        # @author Arsil Zunzunia
-        global logger
-        logger = logging.getLogger('osdag')
-
-        logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler()
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        handler = logging.FileHandler('logging_text.log')
-
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        # handler.setLevel(logging.INFO)
-        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        # handler.setFormatter(formatter)
-        # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-

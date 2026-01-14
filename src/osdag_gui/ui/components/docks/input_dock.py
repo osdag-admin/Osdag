@@ -277,10 +277,11 @@ class InputDock(QWidget):
                 right = QLineEdit()
                 right.setText(field[3])
                 right.setMinimumWidth(input_width)
+                right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 right.setObjectName(field[0] + "_note")
                 right.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 right.setDisabled(True)
-                cur_box_form.addRow(left, left_aligned_widget(right))
+                cur_box_form.addRow(left, right_aligned_widget(right))
             
             if index == len(field_list):
                 # Last Data tupple

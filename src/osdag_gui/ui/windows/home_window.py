@@ -8,7 +8,7 @@ from PySide6.QtCore import QRectF, Signal, Slot
 
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication,
-    QLabel, QSizePolicy, QFrame, QScrollArea, QButtonGroup
+    QLabel, QSizePolicy, QFrame, QScrollArea, QButtonGroup, QToolTip
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, Signal, QSize, QPropertyAnimation, QEasingCurve, Property
@@ -63,7 +63,16 @@ class ThemeToggleButton(QPushButton):
         self.setObjectName("themeToggle")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.update_icon()
-        self.clicked.connect(self._toggle_theme)
+        # Disabled Toggle Theme
+        # self.clicked.connect(self._toggle_theme)
+
+        self.setToolTip("Under Development")
+        self.clicked.connect(self._show_tooltip)
+
+    def _show_tooltip(self):
+        # Show tooltip at the center of the button
+        pos = self.mapToGlobal(self.rect().center())
+        QToolTip.showText(pos, self.toolTip(), self)
 
     def _toggle_theme(self):
         self.theme.toggle_theme()

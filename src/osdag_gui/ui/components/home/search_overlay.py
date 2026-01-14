@@ -3,12 +3,13 @@ Search overlay components for Osdag GUI
 Displays search results in a dropdown below the search bar
 """
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QScrollArea, QFrame, QPushButton, QApplication
 )
-from PySide6.QtCore import Qt, Signal, QPoint, QPropertyAnimation, QEasingCurve, QTimer, QEvent
-from PySide6.QtGui import QCursor, QPainterPath, QRegion
+from PySide6.QtCore import Qt, Signal, QPoint, QPropertyAnimation, QEasingCurve, QTimer, QEvent, QSize
+from PySide6.QtGui import QCursor, QPainterPath, QRegion, QIcon
 from osdag_gui.data.database.database_config import *
+from osdag_gui.data.ui_data import Data
 
 class SearchResultItem(QFrame):
     """Individual search result item with expandable action buttons"""
@@ -43,10 +44,17 @@ class SearchResultItem(QFrame):
         info_layout.setSpacing(12)
         
         # Icon/Letter
-        icon_label = QLabel("L")
+        icon_label = QLabel()
         icon_label.setObjectName("iconLabel")
-        icon_label.setFixedSize(20, 20)
+        icon_label.setFixedSize(24, 24)
         icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # Module Key
+        key = self.item_data.get(MODULE_KEY)
+        parent_navbar = MODULE_MAP.get(key)[3]
+        icon_path = Data().NAVBAR_ICONS.get(parent_navbar)[0]
+        icon_label.setPixmap(QIcon(icon_path).pixmap(QSize(24, 24)))
+
         info_layout.addWidget(icon_label)
         
         # Content layout

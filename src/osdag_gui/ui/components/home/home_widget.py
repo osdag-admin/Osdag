@@ -17,6 +17,7 @@ import osdag_gui.resources.resources_rc
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.home.search_overlay import SearchOverlay
 from osdag_gui.data.database.database_config import *
+from osdag_gui.data.ui_data import Data
 
 # --- SVG Widget with Theme Support ---
 class ThemedSvgWidget(QSvgWidget):
@@ -179,10 +180,17 @@ class ProjectItem(QFrame):
         info_layout.setSpacing(0)
         
         # Number label
-        number_label = QLabel("L")
+        number_label = QLabel()
         number_label.setObjectName("record_icon_label")
-        number_label.setFixedSize(20, 20)
+        number_label.setFixedSize(24, 24)
         number_label.setAlignment(Qt.AlignCenter)
+
+        # Module Key
+        key = self.project_data.get(MODULE_KEY)
+        parent_navbar = MODULE_MAP.get(key)[3]
+        icon_path = Data().NAVBAR_ICONS.get(parent_navbar)[0]
+        number_label.setPixmap(QIcon(icon_path).pixmap(QSize(24, 24)))
+
         info_layout.addWidget(number_label)
 
         # Project details
@@ -339,9 +347,14 @@ class ModuleItem(QFrame):
         
         # Icon with proper SVG handling
         self.icon_label = QLabel()
-        self.icon_label.setFixedSize(20, 20)
+        self.icon_label.setFixedSize(24, 24)
         self.icon_label.setAlignment(Qt.AlignCenter)
         self.icon_label.setObjectName("moduleIcon")
+        # Module Key
+        key = self.module_data.get(MODULE_KEY)
+        parent_navbar = MODULE_MAP.get(key)[3]
+        icon_path = Data().NAVBAR_ICONS.get(parent_navbar)[0]
+        self.icon_label.setPixmap(QIcon(icon_path).pixmap(QSize(24, 24)))
         
         layout.addWidget(self.icon_label)
 
@@ -369,13 +382,6 @@ class ModuleItem(QFrame):
 
         details_layout.addLayout(sub_detail_layout)
         layout.addLayout(details_layout)
-    
-    def paintEvent(self, event):
-        if self.theme.is_light():
-            self.icon_label.setPixmap(QIcon(":/vectors/recently_used_module_icon_light.svg").pixmap(QSize(16, 16)))   
-        else:
-            self.icon_label.setPixmap(QIcon(":/vectors/recently_used_module_icon_dark.svg").pixmap(QSize(16, 16)))   
-        super().paintEvent(event)
 
     # Mouse Press Event
     def mousePressEvent(self, event):

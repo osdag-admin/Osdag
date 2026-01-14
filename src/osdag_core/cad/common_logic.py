@@ -143,6 +143,7 @@ from OCC.Core.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
                                      BRepBuilderAPI_MakeWire,
                                      BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakeEdge2d,
                                      BRepBuilderAPI_Transform)
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder, BRepPrimAPI_MakePrism
 
 import OCC.Core.V3d
 from OCC.Core.Quantity import *
@@ -2090,10 +2091,73 @@ class CommonDesignLogic(object):
         _place=sec.place(numpy.array([0.,0.,0.]),numpy.array([1.,0.,0.]),numpy.array([0.,1.,0.]))
         col = CompressionMemberCAD(sec)
 
-        sec=sec.create_model()
+        beam_model = sec.create_model()
         col.create_Flex3DModel()
 
-        return sec
+        # --- Create Supports ---
+        # Dimensions
+        x_start = -column_B / 2.0
+        # Set contact level to the Bottom Flange
+        # Based on ISection orientation, Top Flange is Z = -D/2? No, ISection vDir is -Z.
+        # c1 (Top) = D/2 * vDir = -D/2. c3 (Bottom) = -D/2 * vDir = +D/2.
+        # Wait, if c3 is Bottom in diagram but has Z=+D/2.
+        # If user saw supports at Z=+D/2 as "Top", then Z=+D/2 IS THE TOP.
+        # This implies Global Z Axis points UP? And Beam is Inverted?
+        # Or Global Z Axis points DOWN?
+        # If User says Z=+D/2 is TOP.
+        # Then I need to move to Z=-D/2 for BOTTOM.
+        # And extend further negative (-Z direction) for supports "below" the beam.
+        z_contact = -column_d / 2.0
+        
+        # 2. Cylindrical Support at End (Right) - Roller
+        # Tangent to Bottom Surface at Y = Length.
+        r_cyl = 50.0
+        z_cyl_center = z_contact - r_cyl # Below beam
+        
+        # 1. Triangular Support at Start (Left) - Fixed/Pinned
+        # Scale Height to Diameter of Cylinder
+        h_supp = 2 * r_cyl  
+        # Scale Base proportionally (Original: H=150, W=100 -> Ratio 1.5)
+        # We keep the aspect ratio: w_supp = h_supp / 1.5
+        w_supp = h_supp / 1.5 # half width of base
+        
+        # Position Apex at Y = w_supp (so start of base is at Y=0)
+        y_apex = w_supp
+        
+        p1 = gp_Pnt(x_start, y_apex, z_contact) # Apex (touching beam)
+        p2 = gp_Pnt(x_start, y_apex - w_supp, z_contact - h_supp) # Base point 1 (Y=0, below)
+        p3 = gp_Pnt(x_start, y_apex + w_supp, z_contact - h_supp)  # Base point 2 (Y=2*w, below)
+        
+        edge1 = BRepBuilderAPI_MakeEdge(p1, p2).Edge()
+        edge2 = BRepBuilderAPI_MakeEdge(p2, p3).Edge()
+        edge3 = BRepBuilderAPI_MakeEdge(p3, p1).Edge()
+        
+        wire_maker = BRepBuilderAPI_MakeWire()
+        wire_maker.Add(edge1)
+        wire_maker.Add(edge2)
+        wire_maker.Add(edge3)
+        wire = wire_maker.Wire()
+        
+        face = BRepBuilderAPI_MakeFace(wire).Face()
+        vec = gp_Vec(column_B, 0, 0)
+        triangle_supp = BRepPrimAPI_MakePrism(face, vec).Shape()
+        
+        # Create Cylinder
+        # Shift cylinder center inwards by radius so it doesn't stick out
+        y_cyl = column_length - r_cyl
+        pt_cyl = gp_Pnt(x_start, y_cyl, z_cyl_center)
+        axis_cyl = gp_Ax2(pt_cyl, gp_Dir(1, 0, 0))
+        
+        cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, column_B).Shape()
+        
+        # Return Dictionary of Components
+        components = {
+            'beam': beam_model,
+            'support_tri': triangle_supp,
+            'support_cyl': cyl_supp
+        }
+
+        return components
 
     def createCantileverBeam(self):
 
@@ -3063,15 +3127,30 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_object  
-            self.FObj = self.createSimplySupportedBeam()
+            components = self.createSimplySupportedBeam()
+            self.FObj = components.get('beam')
             
             hover_dict = self.module_object.hover_dict
+            hover_dict["Triangular Support"] = "<b>Triangular Support</b><br>Left End Support"
+            hover_dict["Cylindrical Support"] = "<b>Cylindrical Support</b><br>Right End Support"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
-            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]    
+            label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]
+            label_tri = ["Triangular Support", hover_dict.get("Triangular Support")]
+            label_cyl = ["Cylindrical Support", hover_dict.get("Cylindrical Support")]
+            
+            label_cyl = ["Cylindrical Support", hover_dict.get("Cylindrical Support")]
+            
+            support_color_gray = Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB)
+            support_color_red = Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB)
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.FObj, update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
+                if components.get('beam'):
+                    osdag_display_shape(self.display, components['beam'], update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
+                if components.get('support_tri'):
+                    osdag_display_shape(self.display, components['support_tri'], update=True, color=support_color_red, label=label_tri, canvas=self.cad_widget)
+                if components.get('support_cyl'):
+                    osdag_display_shape(self.display, components['support_cyl'], update=True, color=support_color_gray, label=label_cyl, canvas=self.cad_widget)
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             self.flex = self.module_object  

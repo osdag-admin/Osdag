@@ -2101,6 +2101,7 @@ class CommonDesignLogic(object):
         cyl_supp = None
         support_block = None
         hatching_lines = None
+        support_knot = None
 
         if Flex.support == 'Simply Supported':
             # Dimensions
@@ -2109,8 +2110,9 @@ class CommonDesignLogic(object):
             z_contact = -column_d / 2.0
             
             # 2. Cylindrical Support at End (Right) - Roller
-            # Tangent to Bottom Surface at Y = Length.
-            r_cyl = 50.0
+            # Diameter = 1/10th of Beam Length => Radius = Length / 20
+            r_cyl = column_length / 20.0
+            
             # Shift cylinder center inwards by radius so it doesn't stick out
             y_cyl = column_length - r_cyl
             z_cyl_center = z_contact - r_cyl # Below beam
@@ -2121,18 +2123,32 @@ class CommonDesignLogic(object):
             cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, column_B).Shape()
             
             # 1. Triangular Support at Start (Left) - Fixed/Pinned
-            # Scale Height to Diameter of Cylinder
-            h_supp = 2 * r_cyl  
-            # Scale Base proportionally (Original: H=150, W=100 -> Ratio 1.5)
-            # We keep the aspect ratio: w_supp = h_supp / 1.5
-            w_supp = h_supp / 1.5 # half width of base
+            # Base width = 1/10th of Beam Length => Half-Base w_supp = Length / 20
+            w_supp = column_length / 20.0
+            # Height: Match the cylinder diameter for visual consistency
+            h_supp = 2 * r_cyl
             
             # Position Apex at Y = w_supp (so start of base is at Y=0)
             y_apex = w_supp
             
-            p1 = gp_Pnt(x_start, y_apex, z_contact) # Apex (touching beam)
-            p2 = gp_Pnt(x_start, y_apex - w_supp, z_contact - h_supp) # Base point 1 (Y=0, below)
-            p3 = gp_Pnt(x_start, y_apex + w_supp, z_contact - h_supp)  # Base point 2 (Y=2*w, below)
+            # small cylinder at the top of the prism 
+            # diameter is 10% of the height of the triangular prism
+            d_small = 0.10 * h_supp
+            r_small = d_small / 2.0
+            
+            # Position small cylinder:
+            # Centered at apex Y (y_apex)
+            # Touching Beam Bottom (z_contact) -> Center at z_contact - r_small
+            pt_small = gp_Pnt(x_start, y_apex, z_contact - r_small)
+            axis_small = gp_Ax2(pt_small, gp_Dir(1, 0, 0))
+            support_knot = BRepPrimAPI_MakeCylinder(axis_small, r_small, column_B).Shape()
+            
+            # Shift Triangle Down by Small Cylinder Diameter (2*r_small)
+            z_apex = z_contact - d_small
+            
+            p1 = gp_Pnt(x_start, y_apex, z_apex) # Apex (touching small cylinder)
+            p2 = gp_Pnt(x_start, y_apex - w_supp, z_apex - h_supp) # Base point 1 
+            p3 = gp_Pnt(x_start, y_apex + w_supp, z_apex - h_supp)  # Base point 2
             
             edge1 = BRepBuilderAPI_MakeEdge(p1, p2).Edge()
             edge2 = BRepBuilderAPI_MakeEdge(p2, p3).Edge()
@@ -2229,6 +2245,7 @@ class CommonDesignLogic(object):
         components = {
             'beam': beam_model,
             'support_tri': triangle_supp,
+            'support_knot': support_knot,
             'support_cyl': cyl_supp,
             'support_block': support_block,
             'support_hatch': hatching_lines
@@ -3206,28 +3223,31 @@ class CommonDesignLogic(object):
             self.FObj = components.get('beam')
             
             hover_dict = self.module_object.hover_dict
-            hover_dict["Triangular Support"] = "<b>Triangular Support</b><br>Left End Support"
-            hover_dict["Cylindrical Support"] = "<b>Cylindrical Support</b><br>Right End Support"
+            hover_dict["Hinged Support"] = "<b>Hinged Support</b>"
+            hover_dict["Roller Support"] = "<b>Roller Support</b>"
             hover_dict["Support Block"] = "<b>Support Block</b><br>Fixed Support (Cantilever)"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]
-            label_tri = ["Triangular Support", hover_dict.get("Triangular Support")]
-            label_cyl = ["Cylindrical Support", hover_dict.get("Cylindrical Support")]
+            label_hinge = ["Hinged Support", hover_dict.get("Hinged Support")]
+            label_roller = ["Roller Support", hover_dict.get("Roller Support")]
             label_block = ["Support Block", hover_dict.get("Support Block")]
             
-            support_color_gray = Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB)
-            support_color_red = Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB)
+           
+            support_color_custom = Quantity_Color(20/255.0, 20/255.0, 20/255.0, Quantity_TOC_RGB)
+            support_color_red = Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB) # Keeping red definition just in case, though unused for these supports now
 
             if self.component == "Model":
                 if components.get('beam'):
                     osdag_display_shape(self.display, components['beam'], update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
                 if components.get('support_tri'):
-                    osdag_display_shape(self.display, components['support_tri'], update=True, color=support_color_red, label=label_tri, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, components['support_tri'], update=True, color=support_color_custom, transparency=0.6, label=label_hinge, canvas=self.cad_widget)
+                if components.get('support_knot'):
+                    osdag_display_shape(self.display, components['support_knot'], update=True, color=support_color_custom, transparency=0.6, label=label_hinge, canvas=self.cad_widget)
                 if components.get('support_cyl'):
-                    osdag_display_shape(self.display, components['support_cyl'], update=True, color=support_color_gray, label=label_cyl, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, components['support_cyl'], update=True, color=support_color_custom, transparency=0.6, label=label_roller, canvas=self.cad_widget)
                 if components.get('support_block'):
-                    osdag_display_shape(self.display, components['support_block'], update=True, color=support_color_gray, transparency=0.6, label=label_block, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, components['support_block'], update=True, color=support_color_custom, transparency=0.6, label=label_block, canvas=self.cad_widget)
                 if components.get('support_hatch'):
                      osdag_display_shape(self.display, components['support_hatch'], update=True, color=Quantity_NOC_BLACK, label=label_block, canvas=self.cad_widget)
 

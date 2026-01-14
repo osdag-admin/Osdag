@@ -2165,11 +2165,15 @@ class CommonDesignLogic(object):
             
         elif Flex.support == 'Cantilever':
             # Create Support Block (Fixed Support)
-            # Dimensions: Large block extending around the beam start
-            block_h = column_d * 2.5  
-            block_w = column_B * 2.5  
-            block_t = 250.0           # Total Thickness
-            beam_embed = 25.0         # Embed beam 25mm into block
+            # Dimensions: Large block extending around the beam start (Referenced from user image)
+            # Resized to be substantial (wall-like)
+            # Make block Square (Height = Width)
+            block_dim = max(column_d, column_B) * 4.0
+            block_h = block_dim
+            block_w = block_dim  
+            # Thickness = 25% of total Beam Length
+            block_t = column_length * 0.15
+            beam_embed = 100.0         # Embed beam 25mm into block
             
             # Position: 
             # X: Centered [-w/2, w/2]
@@ -3198,7 +3202,7 @@ class CommonDesignLogic(object):
             hover_dict = self.module_object.hover_dict
             hover_dict["Hinged Support"] = "<b>Hinged Support</b>"
             hover_dict["Roller Support"] = "<b>Roller Support</b>"
-            hover_dict["Support Block"] = "<b>Support Block</b><br>Fixed Support (Cantilever)"
+            hover_dict["Support Block"] = "<b>Cantilever Support</b>"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]

@@ -431,15 +431,15 @@ class PlateGirderWelded(Member):
         options_list.append(t2)
         t33 = (KEY_OVERALL_DEPTH_PG, KEY_DISP_OVERALL_DEPTH_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t33)
-        t4 = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_COMBOBOX, ['All'] + VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
+        t4 = (KEY_WEB_THICKNESS_PG, KEY_DISP_WEB_THICKNESS_PG, TYPE_COMBOBOX, VALUES_PLATETHK, True, 'Int Validator')
         options_list.append(t4)
         t2 = (KEY_TOP_Bflange_PG, KEY_DISP_TOP_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t2)
-        t4 = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, ['All'] + VALUES_PLATETHK_CUSTOMIZED, True, 'Int Validator')
+        t4 = (KEY_TOP_FLANGE_THICKNESS_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, VALUES_PLATETHK, True, 'Int Validator')
         options_list.append(t4)
         t22 = (KEY_BOTTOM_Bflange_PG, KEY_DISP_BOTTOM_Bflange_PG, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t22)
-        t4 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, ['All'] + VALUES_PLATETHK_CUSTOMIZED, True, 'No Validator')
+        t4 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, VALUES_PLATETHK, True, 'No Validator')
         options_list.append(t4)
         t2 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX ,None, True, 'No Validator')
         options_list.append(t2)
@@ -498,6 +498,13 @@ class PlateGirderWelded(Member):
             return True
         else:
             return False
+    
+    def customize_combo_dims(self, arg):
+        conn = arg[0]
+        if conn == "Customized":
+            return VALUES_PLATETHK_CUSTOMIZED
+        else:
+            return VALUES_PLATETHK
 
     def input_value_changed(self):
         lst = []
@@ -509,6 +516,14 @@ class PlateGirderWelded(Member):
         lst.append(t3)
         t24 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_BOTTOM_Bflange_PG, TYPE_TEXTBOX, self.customized_dims)
         lst.append(t24)
+        
+        t25 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_WEB_THICKNESS_PG, TYPE_COMBOBOX, self.customize_combo_dims)
+        lst.append(t25)
+        t26 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, self.customize_combo_dims)
+        lst.append(t26)
+        t27 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_BOTTOM_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, self.customize_combo_dims)
+        lst.append(t27)
+        
         t3 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t3)
         t18 = ([KEY_DESIGN_TYPE_FLEXURE], KEY_T_constatnt, TYPE_OUT_LABEL, self.output_modifier)

@@ -227,6 +227,11 @@ class InputDock(QWidget):
                 option_list = field[3]
                 right.addItems(option_list)
 
+                # To disable option at index [1, 2] in Connectivity Combo of Beam to Beam End Plate
+                if len(field) == 7:
+                    for disabled in field[6]:
+                        right.model().item(disabled).setEnabled(False)
+
                 cur_box_form.addRow(left, right_aligned_widget(right))
             
             elif type == TYPE_IMAGE:

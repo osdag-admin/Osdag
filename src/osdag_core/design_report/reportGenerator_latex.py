@@ -421,7 +421,7 @@ class CreateLatex(Document):
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
             with doc.create(Section('3D Views')):
-                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
                     view_topimg_path = rel_path + Disp_top_image
                     view_sideimg_path = rel_path + Disp_side_image
@@ -450,7 +450,7 @@ class CreateLatex(Document):
             view_sideimg_path = imgpath_broken
             view_frontimg_path = imgpath_broken
             with doc.create(Section('3D Views')):
-                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
                     view_3dimg_path = imgpath_broken
                     view_topimg_path = imgpath_broken
                     view_sideimg_path = imgpath_broken

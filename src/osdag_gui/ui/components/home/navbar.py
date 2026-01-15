@@ -29,7 +29,7 @@ class CustomButton(QPushButton):
             self.setIcon(self.default_icon)
         else:
             self.setIcon(self.dark_icon)
-        self.setIconSize(QSize(20, 20)) # Initial size, will be updated
+        self.setIconSize(QSize(35, 35)) # Initial size, will be updated
         self.set_default_style()
 
     def mousePressEvent(self, event):
@@ -187,7 +187,7 @@ class VerticalMenuBar(QWidget):
         for btn in self.button_group:
             btn.set_font_size(button_font_size)
             # Adjust icon size based on button font size or a direct proportion
-            icon_size = max(20, int(button_font_size * 2))
+            icon_size = max(35, int(button_font_size * 2))
             btn.setIconSize(QSize(icon_size, icon_size))
             
             # Reapply style to ensure font update takes effect if style sheets override it

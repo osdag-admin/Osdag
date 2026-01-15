@@ -139,7 +139,7 @@ QPushButton#themeToggle:hover {
 QPushButton#navbar_button {
     background-color: #ffffff;
     color: #000000;
-    padding: 4px 4px 8px 8px;
+    padding: 4px 4px 4px 8px;
     font-weight: normal;
     border-radius: 0px;
     border: none;
@@ -160,7 +160,7 @@ QPushButton#navbar_button[state="active"] {
     color: #ffffff;
     border-radius: 0px;
     border: none;
-    padding: 4px 4px 8px 8px;
+    padding: 4px 4px 4px 8px;
     border-top: 1px solid #90AF13;
     border-bottom: 1px solid #90AF13;
     text-align: left;
@@ -169,7 +169,7 @@ QPushButton#navbar_button[state="active"] {
 QPushButton#navbar_button_under_dev {
     background-color: #f8f9fa;
     color: #817d86;
-    padding: 4px 4px 8px 8px;
+    padding: 4px 4px 4px 8px;
     font-weight: normal;
     border-radius: 0px;
     border: none;
@@ -190,7 +190,7 @@ QPushButton#navbar_button_under_dev[state="active"] {
     color: #000000;
     border-radius: 0px;
     border: none;
-    padding: 4px 4px 8px 8px;
+    padding: 4px 4px 4px 8px;
     border-top: 1px solid #888888;
     border-bottom: 1px solid #888888;
     text-align: left;

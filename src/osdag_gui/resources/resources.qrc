@@ -103,6 +103,16 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>vectors/nav_icons/group_design.svg</file>
         <file>vectors/nav_icons/group_design_dark.svg</file>
 
+        <file>vectors/recents/connection.svg</file>
+        <file>vectors/recents/tension_member.svg</file>
+        <file>vectors/recents/compression_member.svg</file>
+        <file>vectors/recents/flexural_member.svg</file>
+        <file>vectors/recents/beam_column.svg</file>
+        <file>vectors/recents/truss.svg</file>
+        <file>vectors/recents/2d_frame.svg</file>
+        <file>vectors/recents/3d_frame.svg</file>
+        <file>vectors/recents/group_design.svg</file>
+
         <file>backgrounds/splash_bg.jpg</file>
 
         <file>images/down_arrow_light.png</file>

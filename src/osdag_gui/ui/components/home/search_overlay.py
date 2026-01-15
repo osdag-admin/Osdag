@@ -52,7 +52,8 @@ class SearchResultItem(QFrame):
         # Module Key
         key = self.item_data.get(MODULE_KEY)
         parent_navbar = MODULE_MAP.get(key)[3]
-        icon_path = Data().NAVBAR_ICONS.get(parent_navbar)[0]
+        # Replacing since these icons are in recents folder
+        icon_path = Data().NAVBAR_ICONS.get(parent_navbar)[0].replace("nav_icons", "recents")
         icon_label.setPixmap(QIcon(icon_path).pixmap(QSize(24, 24)))
 
         info_layout.addWidget(icon_label)

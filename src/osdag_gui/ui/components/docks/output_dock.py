@@ -188,12 +188,15 @@ class OutputDock(QWidget):
                 
                 right = QLineEdit()
                 right.setObjectName(field[0])
+                right.setFixedWidth(150)
+                # Add size policy
+                right.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 right.setReadOnly(True)
                 # To Right Align
                 layout = QHBoxLayout()
                 layout.setSpacing(0)
                 layout.setContentsMargins(0,0,0,0)
-                layout.addStretch()
+                layout.setAlignment(Qt.AlignmentFlag.AlignRight)
                 layout.addWidget(right)
                 cur_box_form.addRow(left, layout)
                 fields += 1
@@ -204,6 +207,9 @@ class OutputDock(QWidget):
                 left.setObjectName(field[0] + "_label")
                 
                 right = QPushButton(label.strip())
+                right.setFixedWidth(150)
+                # Add size policy
+                right.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 right.setCursor(Qt.CursorShape.PointingHandCursor)
                 spacing_button_list.append(field)
                 right.setObjectName(field[0])
@@ -212,7 +218,7 @@ class OutputDock(QWidget):
                 layout = QHBoxLayout()
                 layout.setSpacing(0)
                 layout.setContentsMargins(0,0,0,0)
-                layout.addStretch()
+                layout.setAlignment(Qt.AlignmentFlag.AlignRight)
                 layout.addWidget(right)
                 cur_box_form.addRow(left, layout)
                 fields += 1

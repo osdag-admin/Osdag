@@ -173,7 +173,6 @@ class LaunchScreenPopup(QMainWindow):
 def GUI():
 
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
     # Load bundled Ubuntu Sans font - works on all OS without needing font installed
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     if fid != -1:
@@ -198,11 +197,9 @@ def GUI():
     
     def show_main_window():
         from osdag_gui.main_window import MainWindow
-        app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
+        # app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
         # Parallely load the MainWindow
         app.main_window = MainWindow()
-        import time 
-        time.sleep(1)
         app.main_window.show()
         app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 

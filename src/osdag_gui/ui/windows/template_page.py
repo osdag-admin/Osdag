@@ -190,6 +190,9 @@ class CustomWindow(QWidget):
             print(f"[WARNING] OpenGL initialization failed: {e}")
             print("[INFO] 3D view may be unavailable. Try setting LIBGL_ALWAYS_SOFTWARE=1")
             self._cad_init_pending = False
+
+        #Update Output Buttons after CAD init
+        self.update_docking_icons(output_is_active=False)
     
     def _is_display_ready(self):
         """Check if the CAD display is initialized and ready to use."""
@@ -278,6 +281,7 @@ class CustomWindow(QWidget):
             else:
                 self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
         return super().paintEvent(event)
+    
     # Create the view control button on cad widget
     def create_cad_view_controls(self):
         """Create zoom controls anchored correctly below the view cube"""
@@ -1233,7 +1237,6 @@ class CustomWindow(QWidget):
     def update_docking_icons(self, input_is_active=None, log_is_active=None, output_is_active=None):
             
         if(input_is_active is not None):
-            self.input_dock_active = input_is_active
             # Update and save control state
             self.input_dock_active = input_is_active
             if self.input_dock_active:
@@ -1264,9 +1267,8 @@ class CustomWindow(QWidget):
 
         # Update log dock icon
         if(log_is_active is not None):
-            self.log_dock_active = log_is_active
             # Update and save control state
-            self.logs_dock_active = log_is_active
+            self.log_dock_active = log_is_active
             if self.log_dock_active:
                 if self.theme.is_light():
                     self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
@@ -1562,7 +1564,7 @@ class CustomWindow(QWidget):
                 # Open Logs and close Loading
                 try:
                     self.toggle_animate(True, 'log', on_finished=self.finished_loading)
-                    self.logs_dock_active = True
+                    self.log_dock_active = True
                 except Exception:
                     if hasattr(self, 'logs_dock'):
                         self.logs_dock.setVisible(True)
@@ -1613,7 +1615,7 @@ class CustomWindow(QWidget):
                 def show_logs():
                     try:
                         self.toggle_animate(True, 'log', on_finished=self.finished_loading)
-                        self.logs_dock_active = True
+                        self.log_dock_active = True
                     except Exception:
                         if hasattr(self, 'logs_dock'):
                             self.logs_dock.setVisible(True)

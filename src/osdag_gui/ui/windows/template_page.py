@@ -62,6 +62,7 @@ class CustomWindow(QWidget):
         self.ui_loaded = False
         self.backend.design_status = False
         self.backend.design_button_status = False
+        # This is used to save 3D Cad
         self.fuse_model = None
         self._pso_manager = None  # Lazy init for Plate Girder PSO UI management
         self.setObjectName("template_page")

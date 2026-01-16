@@ -138,6 +138,7 @@ class SpacingDialog(QDialog):
                 
             if option_type == TYPE_TEXTBOX:
                 r = QLineEdit(inner_grid_widget)
+                r.setDisabled(True)
                 r.setFixedSize(100, 27)
                 r.setObjectName(option[0])
                 r.setText(str(value))

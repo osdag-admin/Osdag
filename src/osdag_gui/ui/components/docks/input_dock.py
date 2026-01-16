@@ -454,7 +454,7 @@ class InputDock(QWidget):
         if set_locked_state:
             self.state_locked = True
             self.lock_btn.setChecked(True)
-            self.scroll_area.setDisabled(True)
+            self.input_widget.setDisabled(True)
             self.update_lock_icon()
         else:
             if self.state_locked:
@@ -466,7 +466,7 @@ class InputDock(QWidget):
                 QTimer.singleShot(100, self.parent.flush_cad_widget)
             self.state_locked = not self.state_locked
             self.lock_btn.setChecked(self.state_locked)
-            self.scroll_area.setDisabled(self.state_locked)
+            self.input_widget.setDisabled(self.state_locked)
             self.update_lock_icon()
 
     def update_lock_icon(self):

@@ -26,6 +26,8 @@ def get_documents_folder():
     if system == "Windows":
         # Windows: typically C:\Users\Username\Documents
         docs_path = Path.home() / "Documents"
+        if not docs_path.exists():
+            docs_path = Path.home() / "OneDrive" / "Documents"
     elif system == "Darwin":  # macOS
         # macOS: typically /Users/Username/Documents
         docs_path = Path.home() / "Documents"

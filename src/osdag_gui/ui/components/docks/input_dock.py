@@ -15,6 +15,7 @@ from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 import osdag_gui.resources.resources_rc
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
@@ -386,7 +387,7 @@ class InputDock(QWidget):
         btn_button_layout.addStretch(2)
 
         save_input_btn = DockCustomButton("       Save Input        ", ":/vectors/save.svg")
-        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Save"))
+        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Save_OSI"))
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
@@ -688,7 +689,11 @@ class InputDock(QWidget):
             elif typ == TYPE_WARNING:
                 # print("\n\n[INFO] warning")
                 if val:
-                    QMessageBox.warning(self, "Application", k2)
+                    CustomMessageBox(
+                        title="Application",
+                        text=k2,
+                        dialogType=MessageBoxType.Warning
+                    ).exec()
             elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 # print(f"\n[INFO] {tup}")
                 if val:

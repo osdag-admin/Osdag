@@ -493,7 +493,7 @@ class OutputDock(QWidget):
     #----------------------create-tex-to-save-project-END----------------------------------------
 
     # ----------------------------------Save-Outputs-START------------------------------------------------------
-    def save_output_to_csv(self, main):
+    def save_output_to_csv(self, main, file_name):
         status = main.design_status
         if(not status):
             CustomMessageBox(
@@ -531,12 +531,12 @@ class OutputDock(QWidget):
                 dialogType=MessageBoxType.Information
             ).exec()
         else:
-            default_dir = os.path.join(get_documents_folder(), "Inputs.csv")
+            default_dir = os.path.join(get_documents_folder(), f"{file_name}.csv")
             fileName, _ = QFileDialog.getSaveFileName(
                 self.parent,
-                "Save Output",
+                f"Save {file_name}",
                 default_dir,
-                "Input Files(*.csv)",
+                f"{file_name}(*.csv)",
                 options=QFileDialog.Option.DontUseNativeDialog
             )
             if fileName:

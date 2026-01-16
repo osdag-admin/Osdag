@@ -369,7 +369,7 @@ class MainWindow(QMainWindow):
             
             if result == "Save and Exit":
                 # Call Save Function
-                module.saveDesign_inputs()
+                module.saveDesign()
                 # Exit Osdag
                 self.close()
             elif result == "Exit Without Saving":
@@ -386,7 +386,7 @@ class MainWindow(QMainWindow):
 
             if result == "Yes":
                 # Call Save Function
-                module.saveDesign_inputs()
+                module.saveDesign()
                 self._close_tab(index)
             elif result == "No":
                 # Close Tab
@@ -965,6 +965,7 @@ class MainWindow(QMainWindow):
             # Set variables in template page because it is opened project
             self.main_widget_instance.setDictToUserInputs(uiObj)
             self.main_widget_instance.project_id = id
+            self.main_widget_instance.save_state = True
 
         except IOError:
             CustomMessageBox(

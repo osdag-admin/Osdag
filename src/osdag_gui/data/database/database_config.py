@@ -513,7 +513,14 @@ def insert_recent_project(data: dict) -> int | None:
             last_edited
         ))
         conn.commit()
-        return cursor.lastrowid
+        
+        cursor.execute(
+            f"SELECT id FROM {PROJECT_TABLE} WHERE {PROJECT_PATH} = ?",
+            (data[PROJECT_PATH],)
+        )
+        row = cursor.fetchone()
+        return row[0] if row else None
+    
     except sqlite3.Error as e:
         print(f"[ERROR] Database error: {e}")
         return None

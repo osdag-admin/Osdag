@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QToolTip,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout
+from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QListView
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
 from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
         QRegularExpressionValidator, QIntValidator, QIcon)
@@ -23,8 +23,36 @@ from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
 from osdag_core.Common import *
 
 class NoScrollComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        view = QListView(self)
+        view.window().setWindowFlags(Qt.Popup)
+        self.setView(view)
+
     def wheelEvent(self, event):
-        event.ignore()  # Prevent changing selection on scroll
+        event.ignore()
+
+    def showPopup(self):
+        super().showPopup()
+
+        popup = self.view().window()
+
+        # Global position below combo
+        combo_pos = self.mapToGlobal(QPoint(0, self.height()))
+
+        # Screen geometry where combo exists
+        screen = QApplication.screenAt(combo_pos)
+        if not screen:
+            screen = QApplication.primaryScreen()
+
+        available = screen.availableGeometry()
+
+        # Max height till bottom of screen
+        max_height = available.bottom() - combo_pos.y()
+
+        # Apply constraints
+        popup.move(combo_pos)
+        popup.setMaximumHeight(max_height)
 
 def right_aligned_widget(widget):
     container = QWidget()

@@ -173,6 +173,7 @@ class LaunchScreenPopup(QMainWindow):
 def GUI():
 
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
     # Load bundled Ubuntu Sans font - works on all OS without needing font installed
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     if fid != -1:

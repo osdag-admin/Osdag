@@ -848,8 +848,8 @@ class CommonDesignLogic(object):
         Calls the CAD components like beam, plate, stiffeners, fillet and grove weld, nut and bolt. Also calls CAD file
         :return: creates CAD model
         """
-        # CRITICAL: Garbage collect before creating CAD model to prevent heap corruption
-        gc.collect()
+        # NOTE: Do NOT call gc.collect() during CAD operations - it causes heap corruption
+        # See OCC Memory Architecture documentation for details
 
         BBE = self.module_object  
 
@@ -2949,34 +2949,28 @@ class CommonDesignLogic(object):
                 label_bolt      = ["Bolt", hover_dict.get("Bolt")]
 
                 if self.component == "Beam":
-                    gc.collect()  # CRITICAL: GC before heavy fuse operations
+                    # NOTE: Do NOT call gc.collect() during CAD operations - it causes heap corruption
                     osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                                         color=beam_color, label=label_beam, canvas=self.cad_widget)
 
                 elif self.component == "Connector":
-                    gc.collect()  # CRITICAL: GC before heavy fuse operations
+                    # NOTE: Do NOT call gc.collect() during CAD operations - it causes heap corruption
                     osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                                         color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                                         color=weld_color, label=label_weld, canvas=self.cad_widget)
-                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
+
                 elif self.component == "Model":
-                    # CRITICAL: Add garbage collection between heavy shape fusing operations
-                    # to prevent "free(): corrupted unsorted chunks" heap corruption
-                    gc.collect()
+                    # NOTE: Do NOT call gc.collect() during CAD operations - it causes heap corruption
                     osdag_display_shape(self.display, self.CPObj.get_beam_models(), update=True,
                                         color=beam_color, label=label_beam, canvas=self.cad_widget)
-                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_plate_connector_models(), update=True,
                                         color=plate_color, label=label_plate, canvas=self.cad_widget)
-                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_welded_models(), update=True,
                                         color=weld_color, label=label_weld, canvas=self.cad_widget)
-                    gc.collect()
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_array_models(), update=True,
                                         color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 

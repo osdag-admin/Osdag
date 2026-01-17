@@ -2109,8 +2109,16 @@ class CommonDesignLogic(object):
             z_contact = -column_d / 2.0
             
             # 2. Cylindrical Support at End (Right) - Roller
-            # Diameter = 1/10th of Beam Length => Radius = Length / 20
-            r_cyl = column_length / 20.0
+            # Determine Support Height based on Beam Length vs Depth
+            if column_length <= column_d:
+                h_supp = 0.30 * column_d
+            else:
+                h_supp = 0.75 * column_d
+            
+            # 2. Cylindrical Support at End (Right) - Roller
+            # Radius = Half of Total Triangular Height (Prism + Small Cylinder)
+            # Total Height = h_supp + 0.10 * h_supp = 1.10 * h_supp
+            r_cyl = (1.10 * h_supp) / 2.0
             
             # Shift cylinder center inwards by radius so it doesn't stick out
             y_cyl = column_length - r_cyl
@@ -2122,10 +2130,10 @@ class CommonDesignLogic(object):
             cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, column_B).Shape()
             
             # 1. Triangular Support at Start (Left) - Fixed/Pinned
-            # Base width = 1/10th of Beam Length => Half-Base w_supp = Length / 20
-            w_supp = column_length / 20.0
             # Height: Match the cylinder diameter for visual consistency
-            h_supp = 2 * r_cyl
+            # h_supp already calculated above
+            # Base width = 1.5 times of height => Half-Base w_supp = 0.75 * height
+            w_supp = 0.75 * h_supp
             
             # Position Apex at Y = w_supp (so start of base is at Y=0)
             y_apex = w_supp
@@ -2165,15 +2173,15 @@ class CommonDesignLogic(object):
             
         elif Flex.support == 'Cantilever':
             # Create Support Block (Fixed Support)
-            # Dimensions: Large block extending around the beam start (Referenced from user image)
-            # Resized to be substantial (wall-like)
+            # Dimensions: Large block extending around the beam start
+            # Resized to be standard (wall-like)
             # Make block Square (Height = Width)
-            block_dim = max(column_d, column_B) * 4.0
+            block_dim = max(column_d, column_B) * 2.5
             block_h = block_dim
             block_w = block_dim  
-            # Thickness = 25% of total Beam Length
-            block_t = column_length * 0.15
-            beam_embed = 100.0         # Embed beam 25mm into block
+            # Thickness = Fixed 250.0 mm (User Request: Prevent scaling with length)
+            block_t = 250.0
+            beam_embed = 25.0         # Embed beam 25mm into block
             
             # Position: 
             # X: Centered [-w/2, w/2]
@@ -2190,11 +2198,16 @@ class CommonDesignLogic(object):
             support_block = BRepPrimAPI_MakeBox(pt_min, pt_max).Shape()
 
             # Create Hatching Lines (Diagonal lines on side faces)
-            # Face bounds: Y [y_min, y_max], Z [-block_h/2, block_h/2]
+            # User Request: Remove lines from block, add them at the left end (outside support)
+            # We will create hatching lines in the region BEHIND the support: [y_min - block_t, y_min]
+            # This simulates the "Fixed Wall" extending backwards.
+            
+            hatch_width = block_t # Arbitrary width for the hatching zone behind support
+            y_hatch_end = y_min
+            y_hatch_start = y_min - hatch_width
+            
+            # Face bounds for hatching: Y [y_hatch_start, y_hatch_end], Z [-block_h/2, block_h/2]
             # Line Eq: Z = Y + c  =>  c = Z - Y
-            # Min c: (-h/2) - y_max
-            # Max c: (h/2) - y_min
-            # Step: 50mm
             
             # Use Compound instead of Wire for disconnected edges
             hatching_lines = TopoDS_Compound()
@@ -2203,31 +2216,35 @@ class CommonDesignLogic(object):
             
             has_lines = False
             
-            c_min = (-block_h / 2.0) - y_max
-            c_max = (block_h / 2.0) - y_min
+            # Recalculate c range for the new Y-bounds
+            # Min c: (-h/2) - y_hatch_end
+            # Max c: (h/2) - y_hatch_start
+            
+            c_min = (-block_h / 2.0) - y_hatch_end
+            c_max = (block_h / 2.0) - y_hatch_start
             step = 50.0
             
             for c in numpy.arange(c_min, c_max, step):
-                # Intersection of Line Z = Y + c with Rectangle Bounds
+                # Intersection of Line Z = Y + c with Rectangle Bounds [y_hatch_start, y_hatch_end] x [-h/2, h/2]
                 points = []
                 z_min, z_max = -block_h / 2.0, block_h / 2.0
                 
-                # Check Y edges
-                z1 = y_min + c
+                # Check Y edges (Vertical lines at y_start and y_end)
+                z1 = y_hatch_start + c
                 if z_min <= z1 <= z_max:
-                    points.append((y_min, z1))
+                    points.append((y_hatch_start, z1))
                 
-                z2 = y_max + c
+                z2 = y_hatch_end + c
                 if z_min <= z2 <= z_max:
-                    points.append((y_max, z2))
+                    points.append((y_hatch_end, z2))
                     
-                # Check Z edges
+                # Check Z edges (Horizontal lines at z_min and z_max)
                 y1 = z_min - c
-                if y_min <= y1 <= y_max:
+                if y_hatch_start <= y1 <= y_hatch_end:
                     points.append((y1, z_min))
                     
                 y2 = z_max - c
-                if y_min <= y2 <= y_max:
+                if y_hatch_start <= y2 <= y_hatch_end:
                     points.append((y2, z_max))
                 
                 points = list(set(points))
@@ -2319,9 +2336,57 @@ class CommonDesignLogic(object):
             print(f"DEBUG: Creating Box with min={pt_min.Coord()}, max={pt_max.Coord()}")
             support_block = BRepPrimAPI_MakeBox(pt_min, pt_max).Shape()
             print("DEBUG: Support block created successfully")
-    
-            # Return both beam and support block as a dictionary
-            return {'beam': beam_model, 'support_block': support_block}
+            
+            # --- Hatching Lines (Behind Support) ---
+            # Region: [y_min - block_t, y_min]
+            hatch_width = block_t
+            y_hatch_end = y_min
+            y_hatch_start = y_min - hatch_width
+            
+            hatching_lines = TopoDS_Compound()
+            builder = BRep_Builder()
+            builder.MakeCompound(hatching_lines)
+            
+            has_lines = False
+            
+            c_min = (-block_h / 2.0) - y_hatch_end
+            c_max = (block_h / 2.0) - y_hatch_start
+            step = 50.0
+            
+            for c in numpy.arange(c_min, c_max, step):
+                points = []
+                z_min, z_max = -block_h / 2.0, block_h / 2.0
+                
+                # Check Y edges
+                z1 = y_hatch_start + c
+                if z_min <= z1 <= z_max: points.append((y_hatch_start, z1))
+                
+                z2 = y_hatch_end + c
+                if z_min <= z2 <= z_max: points.append((y_hatch_end, z2))
+                    
+                # Check Z edges
+                y1 = z_min - c
+                if y_hatch_start <= y1 <= y_hatch_end: points.append((y1, z_min))
+                    
+                y2 = z_max - c
+                if y_hatch_start <= y2 <= y_hatch_end: points.append((y2, z_max))
+                
+                points = list(set(points))
+                
+                if len(points) == 2:
+                    p1_2d, p2_2d = points[0], points[1]
+                    for x_val in [-block_w / 2.0, block_w / 2.0]:
+                        pt1 = gp_Pnt(x_val, p1_2d[0], p1_2d[1])
+                        pt2 = gp_Pnt(x_val, p2_2d[0], p2_2d[1])
+                        edge = BRepBuilderAPI_MakeEdge(pt1, pt2).Edge()
+                        builder.Add(hatching_lines, edge)
+                        has_lines = True
+            
+            if not has_lines:
+                hatching_lines = None
+
+            # Return both beam and support block + hatch as a dictionary
+            return {'beam': beam_model, 'support_block': support_block, 'support_hatch': hatching_lines}
             
         except Exception as e:
             print("DEBUG ERROR in createCantileverBeam:")
@@ -3274,6 +3339,16 @@ class CommonDesignLogic(object):
                         print(f"DEBUG DISPLAY ERROR: Failed to display support block: {e}")
                 else:
                     print("DEBUG DISPLAY: Support block is None, not displaying")
+                    
+                # Display hatching lines if they exist
+                supp_hatch = cantilever_components.get('support_hatch')
+                if supp_hatch is not None:
+                    try:
+                        osdag_display_shape(self.display, supp_hatch,
+                                            update=True, color=Quantity_NOC_BLACK,
+                                            label=label_support, canvas=self.cad_widget)
+                    except Exception as e:
+                        print(f"DEBUG DISPLAY ERROR: Failed to display support hatch: {e}")
 
 
         elif self.mainmodule == 'Flexural Members - Purlins':

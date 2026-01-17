@@ -1048,7 +1048,6 @@ class MainWindow(QMainWindow):
 #     from PySide6.QtWidgets import QApplication
 #     app = QApplication(sys.argv)
 #     app.theme_manager = ThemeManager(app)
-#     app.setStyle("Fusion")
 #     main_window = MainWindow()
 #     main_window.show()
 #     sys.exit(app.exec())

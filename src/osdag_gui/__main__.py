@@ -234,7 +234,7 @@ Examples:\n
   osdag\n
   osdag-cli run -i TensionBolted.osi\n
   osdag-cli run -i TensionBolted.osi -t save_csv -o result.csv\n
-  osdag-cli run -i TensionBolted.osi -t save_pdf -o result.pdf\n
+  osdag-cli run -i TensionBolted.osi -t generate_report -o result.pdf\n
   osdag-cli run -i TensionBolted.osi -t print_result\n
 ==================================================\n
 """
@@ -270,7 +270,7 @@ def cli():
               required=True,
               help="Path to input file (.osi)")
 @click.option("-t", "--op_type", "op_type",
-              type=click.Choice(["save_csv", "save_pdf", "print_result"]),
+              type=click.Choice(["save_csv", "generate_report", "print_result"]),
               default="print_result",
               show_default=True,
               help="Type of operation")

@@ -3545,6 +3545,46 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
             print("DEBUG: Strut Bolted display logic finished")
 
+        elif self.mainmodule == KEY_DISP_STRUT_BOLTED_END_GUSSET:
+            print(f"DEBUG: display_3DModel called for KEY_DISP_STRUT_BOLTED_END_GUSSET. Component: {self.component}")
+            self.col = self.module_object
+            
+            # Use self.ColObj if already created
+            if hasattr(self, 'ColObj') and self.ColObj is not None:
+                print("DEBUG: Using existing self.ColObj")
+                strutCAD = self.ColObj
+            else:
+                print("DEBUG: Creating new strutCAD object")
+                strutCAD = self.createStrutBoltedCAD()
+            
+            hover_dict = self.col.hover_dict
+            self.cad_widget.model_hover_labels = hover_dict.copy()
+
+            print("DEBUG: Fetching models from strutCAD")
+            member = strutCAD.get_members_models()
+            plate = strutCAD.get_plates_models()
+            nutbolt = strutCAD.get_nut_bolt_array_models()
+            onlymember = strutCAD.get_only_members_models()
+            print(f"DEBUG: Models fetched. Member: {member}, Plate: {plate}, Bolts: {nutbolt}")
+
+            label_member = ["Member", hover_dict.get("Member")]
+            label_plate = ["Plate", hover_dict.get("Plate")]
+            label_bolt = ["Bolt", hover_dict.get("Bolt")]
+
+            if self.component == "Member":
+                print("DEBUG: Displaying Member component")
+                osdag_display_shape(self.display, onlymember, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
+            elif self.component == "Plate":
+                print("DEBUG: Displaying Plate component")
+                osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
+            else: # Model
+                print("DEBUG: Displaying Full Model")
+                osdag_display_shape(self.display, member, color=beam_color, update=True, label=label_member, canvas=self.cad_widget)
+                osdag_display_shape(self.display, plate, color=plate_color, update=True, label=label_plate, canvas=self.cad_widget)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label_bolt, canvas=self.cad_widget)
+            print("DEBUG: Strut Bolted display logic finished")
+
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_object

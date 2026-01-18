@@ -71,6 +71,7 @@ import pandas as pd
 
 def _print_result(out_dict:dict):
     print("="*100)
+    print("--Design Results--\n")
     for key, value in out_dict.items():
         print(f"|| {key}: {value}")
     print("="*100)
@@ -80,10 +81,10 @@ def _get_design_dictionary(osi_path:Path) -> dict:
     with open(osi_path, 'r') as file:
         return yaml.safe_load(file)
     
-def _get_output_dictionary(module_class:Main) -> dict:
+def _get_output_dictionary(module:Main) -> dict:
     """return the output dictionary for the design"""
-    status = module_class.design_status
-    out_list = module_class.output_values(module_class, status)
+    status = module.design_status
+    out_list = module.output_values(status)
     out_dict = {"Parameter": "Value"}
     for option in out_list:
         if option[0] is not None and option[2] == TYPE_TEXTBOX:
@@ -91,7 +92,7 @@ def _get_output_dictionary(module_class:Main) -> dict:
         if option[2] == TYPE_OUT_BUTTON:
             tup = option[3]
             fn = tup[1]
-            for item in fn(module_class, status):
+            for item in fn(status):
                 lable = item[0]
                 value = item[3]
                 if lable!=None and value!=None:
@@ -99,13 +100,13 @@ def _get_output_dictionary(module_class:Main) -> dict:
     return out_dict
 
 
-def _save_to_csv(output_dictionary:dict, output_file:str):
+def _generate_csv(output_dictionary:dict, output_file:str):
     """save the output dictionary to a csv file"""
     df = pd.DataFrame(output_dictionary.items())
     df.to_csv(output_file, index=False, header=None)
 
-def _save_to_pdf(module_class:Main, output_file:Path):
-    """save the output dictionary to a pdf file"""
+def _generate_report(module:Main, output_file:Path):
+    """generate pdf and tex report file for the output dictionary."""
     popup_summary = {
             'ProfileSummary': {
             'CompanyName': 'LoremIpsum', 
@@ -122,7 +123,7 @@ def _save_to_pdf(module_class:Main, output_file:Path):
         'does_design_exist': True, 
         'logger_messages': ''
         }
-    module_class.save_design(module_class, popup_summary)
+    module.save_design(popup_summary)
 
 def _get_documents_folder() -> Path:
     """Get the user's Documents folder path."""
@@ -193,7 +194,8 @@ def run_module(*args, **kargs) -> dict:
         result["errors"].append(f"Not a valid module class: {module_name}")
         # print(result)
         return result
-    
+    module = module_class()
+
     input_filename = osi_path.stem
     output_filename = output_path.stem if output_path else None
     if not output_path:
@@ -207,34 +209,34 @@ def run_module(*args, **kargs) -> dict:
     output_folder_path.mkdir(parents=True, exist_ok=True)
     output_file = output_folder_path / f"{output_filename if output_filename else input_filename}"
 
-    module_class.set_osdaglogger(None)
-    val_errors = module_class.func_for_validation(module_class, design_dict)
+    module.set_osdaglogger(None)
+    val_errors = module.func_for_validation(design_dict)
 
     if val_errors:
         result["errors"].extend(val_errors)
         # print(result)
         return result
 
-    out_dict = _get_output_dictionary(module_class)
+    out_dict = _get_output_dictionary(module)
     result["data"] = out_dict
     if op_type == "save_csv":
         try:
             output_file = output_file.with_suffix('.csv')
-            _save_to_csv(out_dict, str(output_file))
+            _generate_csv(out_dict, str(output_file))
             result["success"] = True
-            result["output"] = str(output_file)
+            result["output"] = str(output_folder_path)
         except Exception as e:
             result["success"] = False
             result["errors"].append(f"Failed to save CSV: {e}")
 
-    elif op_type == "save_pdf":
+    elif op_type == "generate_report":
         try:
-            _save_to_pdf(module_class, output_file)
+            _generate_report(module, output_file)
             result["success"] = True
-            result["output"] = str(output_file) + ".pdf"
+            result["output"] = str(output_folder_path)
         except Exception as e:
             result["success"] = False
-            result["errors"].append(f"Failed to save PDF: {e}")
+            result["errors"].append(f"Failed to save Report: {e}")
 
     elif op_type == "print_result":
         try:

@@ -941,7 +941,7 @@ def prepare_design_checks(pg_obj, logger):
 
 
         # ==================== INTERMEDIATE STIFFENER - SECTION 1.5.1 ====================
-        report_check.append(['SubSection', 'Intermediate Stiffener - Section 1.5.1', table_format])
+        report_check.append(['SubSection', 'Intermediate Stiffener', table_format])
 
         c = getattr(pg_obj, 'c', 0)
 
@@ -1000,7 +1000,7 @@ def prepare_design_checks(pg_obj, logger):
             
 
         # ==================== END PANEL STIFFENER - SECTION 1.5.2 ====================
-        report_check.append(['SubSection', 'End Panel Stiffener - Section 1.5.2', table_format])
+        report_check.append(['SubSection', 'End Panel Stiffener', table_format])
 
         # Vertical Anchor Force
         Vp = round((d * tw * fy) / (3**0.5), 2)
@@ -1103,7 +1103,7 @@ def prepare_design_checks(pg_obj, logger):
             pg_obj.endstiffthickness = 0
 
         # ==================== LONGITUDINAL STIFFENER - SECTION 1.5.3 ====================
-        report_check.append(['SubSection', 'Longitudinal Stiffener - Section 1.5.3', table_format])
+        report_check.append(['SubSection', 'Longitudinal Stiffener', table_format])
 
         # Epsilon_w parameter
         epsilon_w = round((250 / fy)**0.5, 3)

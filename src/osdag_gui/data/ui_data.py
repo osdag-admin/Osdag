@@ -56,7 +56,7 @@ class Data:
         [
             ("Struts Bolted to End Gusset", ":/images/modules/struts_bolt_end_gusset.png"),
             ("Struts Welded to End Gusset", ":/images/modules/struts_weld_end_gusset.png"),
-            ("Column Design", ":/images/modules/column_design_compression_mem.png"),
+            ("Axially Loaded Column", ":/images/modules/column_design_compression_mem.png"),
         ],
         "Flexural Member": 
         [

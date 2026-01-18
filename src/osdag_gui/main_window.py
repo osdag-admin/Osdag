@@ -745,7 +745,7 @@ class MainWindow(QMainWindow):
             self.open_tension_welded()
 
         #----------Compression-Member--------------
-        elif card_title == "Column Design":
+        elif card_title == "Axially Loaded Column":
             self.open_column_design_compress_member()
         elif card_title == "Struts Welded to End Gusset":
             self.open_struts_weld_end_gusset_compress_member()

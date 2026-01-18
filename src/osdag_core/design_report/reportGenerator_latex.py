@@ -91,69 +91,113 @@ class CreateLatex(Document):
         doc.change_document_style("header")
         extra_page = False
         with doc.create(Section('Input Parameters')):
-            with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
-                table.add_hline()
-                for i in uiObj:
-                    # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
-                    # if type(uiObj[i]) == list:
-                        continue
-                    if type(uiObj[i]) == dict:
-                        table.add_hline()
-                        sectiondetails = uiObj[i]
-                        image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+            # Determine if we need the complex 5-column layout (for images/dicts) or simple 2-column layout
+            complex_layout_needed = False
+            for i in uiObj:
+                # Skip the keys that are explicitly skipped in the loop below
+                if i == "Selected Section Details" or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i == KEY_DISP_CLEAT_ANGLE_LIST:
+                    continue
+                if type(uiObj[i]) == dict:
+                    complex_layout_needed = True
+                    break
 
-                        Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
-                        if (len(sectiondetails))% 2 == 0:
-                        # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
-                            merge_rows = int((len(sectiondetails)/2)) +2
+            if complex_layout_needed:
+                with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
+                    table.add_hline()
+                    for i in uiObj:
+                        # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
+                        if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
+                        # if type(uiObj[i]) == list:
+                            continue
+                        if type(uiObj[i]) == dict:
+                            table.add_hline()
+                            sectiondetails = uiObj[i]
+                            image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+
+                            Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
+                            if (len(sectiondetails))% 2 == 0:
+                            # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                                merge_rows = int((len(sectiondetails)/2)) +2
+                            else:
+                                merge_rows = round_up((len(sectiondetails)/2),2)
+                            if (len(sectiondetails))% 2 == 0:
+                                sectiondetails['']=''
+
+                            a = list(sectiondetails.keys())
+                            # index=0
+                            for x in range(1, (merge_rows + 1)):
+                                # table.add_row("Col.Det.",i,columndetails[i])
+                                if x == 1:
+                                    table.add_row(
+                                        (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
+                                                                                    filename=Img_path)),
+                                        MultiColumn(2, align='|c|', data=a[x]),
+                                        MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                elif x <= 4:
+                                    table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                                MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
+                                else:
+                                    table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
+                                                sectiondetails[a[merge_rows + x - 4]],))
+                                table.add_hline(2, 5)
+                        elif uiObj[i] == "TITLE":
+                            table.add_hline()
+                            table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+                            table.add_hline()
+                        elif i == 'Section Size*':
+                            table.add_hline()
+                            table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
+                            table.add_hline()
+                        elif len(str(uiObj[i])) > 55 and type(uiObj[i]) != pyl.math.Math:
+                            str_len = len(str(uiObj[i]))
+                            loop_len = round_up((str_len / 55), 1, 1)
+                            for j in range(1, loop_len + 1):
+                                b = 55 * j + 1
+                                if j == 1:
+                                    table.add_row(
+                                        (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
+                                else:
+                                    table.add_row(
+                                        (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
+                                        MultiColumn(2, align='|c|', data=uiObj[i][b - 55:b]),))
+                            table.add_hline()
                         else:
-                            merge_rows = round_up((len(sectiondetails)/2),2)
-                        if (len(sectiondetails))% 2 == 0:
-                            sectiondetails['']=''
-
-                        a = list(sectiondetails.keys())
-                        # index=0
-                        for x in range(1, (merge_rows + 1)):
-                            # table.add_row("Col.Det.",i,columndetails[i])
-                            if x == 1:
-                                table.add_row(
-                                    (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                                                                 filename=Img_path)),
-                                     MultiColumn(2, align='|c|', data=a[x]),
-                                     MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
-                            elif x <= 4:
-                                table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
-                                               MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
-                            else:
-                                table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
-                                               sectiondetails[a[merge_rows + x - 4]],))
-                            table.add_hline(2, 5)
-                    elif uiObj[i] == "TITLE":
-                        table.add_hline()
-                        table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
-                        table.add_hline()
-                    elif i == 'Section Size*':
-                        table.add_hline()
-                        table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
-                        table.add_hline()
-                    elif len(str(uiObj[i])) > 55 and type(uiObj[i]) != pyl.math.Math:
-                        str_len = len(str(uiObj[i]))
-                        loop_len = round_up((str_len / 55), 1, 1)
-                        for j in range(1, loop_len + 1):
-                            b = 55 * j + 1
-                            if j == 1:
-                                table.add_row(
-                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
-                            else:
-                                table.add_row(
-                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
-                                     MultiColumn(2, align='|c|', data=uiObj[i][b - 55:b]),))
-                        table.add_hline()
-                    else:
-                        table.add_hline()
-                        table.add_row((MultiColumn(3, align='|c|', data=NoEscape(i)), MultiColumn(2, align='|c|', data=uiObj[i]),))
-                        table.add_hline()
+                            table.add_hline()
+                            table.add_row((MultiColumn(3, align='|c|', data=NoEscape(i)), MultiColumn(2, align='|c|', data=uiObj[i]),))
+                            table.add_hline()
+            else:
+                # Use a wider 2-column table for simple modules (approx 17cm width)
+                # Using 10cm for Key and 7cm for Value to accommodate long keys and keep it balanced
+                with doc.create(LongTable('|p{9cm}|p{7.5cm}|', row_height=1.2)) as table:
+                    table.add_hline()
+                    for i in uiObj:
+                        if i == "Selected Section Details" or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i == KEY_DISP_CLEAT_ANGLE_LIST:
+                            continue
+                        
+                        # No dict handling needed here as we checked complex_layout_needed is False
+                        
+                        if uiObj[i] == "TITLE":
+                            table.add_hline()
+                            table.add_row((MultiColumn(2, align='|c|', data=bold(i), ),))
+                            table.add_hline()
+                        elif i == 'Section Size*':
+                            table.add_hline()
+                            table.add_row((i, "Ref List of Input Section"))
+                            table.add_hline()
+                        elif len(str(uiObj[i])) > 65 and type(uiObj[i]) != pyl.math.Math: # Adjusted char limit for wider column
+                            str_len = len(str(uiObj[i]))
+                            loop_len = round_up((str_len / 65), 1, 1)
+                            for j in range(1, loop_len + 1):
+                                b = 65 * j + 1
+                                if j == 1:
+                                    table.add_row((MultiRow(loop_len, data=i), uiObj[i][0:b]))
+                                else:
+                                    table.add_row(("", uiObj[i][b - 65:b]))
+                            table.add_hline()
+                        else:
+                            table.add_hline()
+                            table.add_row((NoEscape(i), uiObj[i]))
+                            table.add_hline()
             for i in uiObj:
                 if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):

@@ -171,17 +171,9 @@ class LaunchScreenPopup(QMainWindow):
             self.on_finish()
 
 def GUI():
-    # const = {
-    #     'GREEN_LIGHT_MODE': '#90AF13',
-    #     'WHITE': '#FFFFFF',
-    #     'OFF_WHITE': '#F4F4F4',
-    #     'CONTROL_BTN_HOVER': '#D9D7D7',
-    #     'CONTROL_BTN_CLICK': '#CFCFCF',
-    #     'CLOSE_BTN_HOVER': '#E81123',
-    #     'CLOSE_BTN_CLICK': '#F1707A'
-    # }
+
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
+    app.setStyle("Fusion")
     # Load bundled Ubuntu Sans font - works on all OS without needing font installed
     fid = QFontDatabase.addApplicationFont(":/fonts/UbuntuSans-Regular.ttf")
     if fid != -1:
@@ -206,11 +198,9 @@ def GUI():
     
     def show_main_window():
         from osdag_gui.main_window import MainWindow
-        app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
+        # app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
         # Parallely load the MainWindow
         app.main_window = MainWindow()
-        import time 
-        time.sleep(1)
         app.main_window.show()
         app.setWindowIcon(QIcon(":/images/osdag_logo.png"))
 
@@ -234,7 +224,7 @@ Examples:\n
   osdag\n
   osdag-cli run -i TensionBolted.osi\n
   osdag-cli run -i TensionBolted.osi -t save_csv -o result.csv\n
-  osdag-cli run -i TensionBolted.osi -t save_pdf -o result.pdf\n
+  osdag-cli run -i TensionBolted.osi -t generate_report -o result.pdf\n
   osdag-cli run -i TensionBolted.osi -t print_result\n
 ==================================================\n
 """
@@ -270,7 +260,7 @@ def cli():
               required=True,
               help="Path to input file (.osi)")
 @click.option("-t", "--op_type", "op_type",
-              type=click.Choice(["save_csv", "save_pdf", "print_result"]),
+              type=click.Choice(["save_csv", "generate_report", "print_result"]),
               default="print_result",
               show_default=True,
               help="Type of operation")

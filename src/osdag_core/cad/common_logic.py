@@ -1921,24 +1921,44 @@ class CommonDesignLogic(object):
 
         try:
             # Check number of longitudinal stiffeners
+            # Handle both numeric values (0, 1, 2) and string "Not Required"
             num_long_stiff = getattr(Conn, 'longstiffener_no', 0)
-            if num_long_stiff is not None and str(num_long_stiff).strip() != '' and float(num_long_stiff) > 0:
+            
+            # Convert to number for comparison, treating "Not Required" and similar strings as 0
+            if num_long_stiff is None or str(num_long_stiff).strip() in ['', 'Not Required', 'N/A', '0']:
+                num_long_stiff_val = 0
+            else:
+                try:
+                    num_long_stiff_val = float(num_long_stiff)
+                except (ValueError, TypeError):
+                    num_long_stiff_val = 0
+            
+            if num_long_stiff_val > 0:
                 include_horizontal_plate = True
                 
                 # Get thickness
                 thk_val = getattr(Conn, 'longstiffener_thk', 15)
-                if thk_val is not None and str(thk_val).strip() != '':
-                     T_hp = float(thk_val)
+                if thk_val is not None and str(thk_val).strip() not in ['', 'Not Required', 'N/A']:
+                    try:
+                        T_hp = float(thk_val)
+                    except (ValueError, TypeError):
+                        T_hp = 15.0
                 
                 # Get position/offset
                 pos_val = getattr(Conn, 'x1', 0)
-                if pos_val is not None and str(pos_val).strip() != '':
-                    # x1 is distance from compression flange (top)
-                    horizontal_plate_offset_ratio = float(pos_val) / D
+                if pos_val is not None and str(pos_val).strip() not in ['', 'Not Required', 'N/A']:
+                    try:
+                        # x1 is distance from compression flange (top)
+                        horizontal_plate_offset_ratio = float(pos_val) / D
+                    except (ValueError, TypeError):
+                        horizontal_plate_offset_ratio = 0.2
         except Exception as e:
             print(f"Error extracting horizontal plate params: {e}")
             include_horizontal_plate = False
 
+        # DEBUG: Print horizontal plate status
+        print(f"DEBUG CAD: include_horizontal_plate={include_horizontal_plate}, num_long_stiff_val={num_long_stiff_val if 'num_long_stiff_val' in dir() else 'not set'}")
+        
         # Create the plate girder model
         components = create_plate_girder(
             D=D,
@@ -3830,103 +3850,8 @@ class CommonDesignLogic(object):
                     self.display.EraseAll()
                 self.cad_widget.display_view_cube()
 
-    # def call_saveOutputs(self):  # Done
-    #     return self.call_calculation(self.uiObj)
-    #
-    # def call2D_Drawing(self, viKEY_DISP_BASE_PLATEew, fileName, folder):  # Rename function with call_view_images()
-    #     ''' This routine saves the 2D SVG image as per the connectivity selected
-    #     SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
-    #     '''
-    #     if view == "All":
-    #
-    #         self.callDesired_View(fileName, view, folder)
-    #         # self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-    #         #
-    #         # data = os.path.join(str(folder), "images_html", "3D_Model.png")
-    #         #
-    #         # self.display.ExportToImage(data)
-    #         #
-    #         # # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-    #         # self.display.View_Iso()
-    #         # self.display.FitAll()
-    #
-    #     else:
-    #
-    #         f = open(fileName, 'w')
-    #
-    #         self.callDesired_View(fileName, view, folder)
-    #         f.close()
-    #
-    # def callDesired_View(self, fileName, view, folder):
-    #
-    #     if self.connection == "Fin Plate":
-    #         finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
-    #         finCommonObj.saveToSvg(str(fileName), view)
-    #     elif self.connection == "Endplate":
-    #         endCommonObj = EndCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
-    #         endCommonObj.save_to_svg(str(fileName), view)
-    #     elif self.connection == "cleatAngle":
-    #         cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata,
-    #                                          self.dictangledata, folder)
-    #         cleatCommonObj.save_to_svg(str(fileName), view)
-    #     else:
-    #         seatCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata,
-    #                                        self.dictangledata, self.dicttopangledata, folder)
-    #         seatCommonObj.save_to_svg(str(fileName), view)
-    #
-    # def call_saveMessages(self):  # Done
-    #
-    #     if self.connection == "Fin Plate":
-    #         fileName = os.path.join("Connections", "Shear", "Fin Plate", "fin.log")
-    #
-    #     elif self.connection == "Endplate":
-    #         fileName = os.path.join("Connections", "Shear", "Endplate", "end.log")
-    #
-    #     elif self.connection == "cleatAngle":
-    #         fileName = os.path.join("Connections", "Shear", "cleatAngle", "cleat.log")
-    #
-    #     else:
-    #         fileName = os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")
-    #
-    #     return fileName
-    #
-    # def call_designReport(self, htmlfilename, profileSummary):
-    #
-    #     fileName = str(htmlfilename)
-    #
-    #     if self.connection == "Fin Plate":
-    #         fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
-    #                       htmlfilename, self.folder)
-    #     elif self.connection == "Endplate":
-    #         end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
-    #                       htmlfilename, self.folder)
-    #     elif self.connection == "cleatAngle":
-    #         cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
-    #                         profileSummary,htmlfilename, self.folder)
-    #     else:
-    #         self.sa_report = ReportGenerator(self.sa_calc_obj)
-    #         self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
-    #
-    # def load_userProfile(self):
-    #     # TODO load_userProfile - deepa
-    #     pass
-    #
-    #
-    # def save_userProfile(self, profile_summary, fileName):
-    #     # TODO save_userProfile - deepa
-    #     filename = str(fileName)
-    #
-    #     infile = open(filename, 'w')
-    #     json.dump(profile_summary, infile)
-    #     infile.close()
-    #     pass
-    #
-    # def save_CADimages(self):  # png,jpg and tiff
-    #     # TODO save_CADimages - deepa
-    #     pass
-
     def create2Dcad(self):
-        ''' Returns the 3D model of finplate depending upon component
+        ''' Returns the 3D model depending upon component
         '''
 
         final_model = None
@@ -3939,13 +3864,13 @@ class CommonDesignLogic(object):
                 final_model = self.connectivityObj.get_columnModel()
             elif self.component == "Plate":
                 cadlist = [self.connectivityObj.weldModelLeft, self.connectivityObj.weldModelRight,
-                           self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
+                        self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
             elif self.component == "cleatAngle":
                 cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel] + \
-                          self.connectivityObj.nut_bolt_array.get_models()
+                        self.connectivityObj.nut_bolt_array.get_models()
             elif self.component == "SeatAngle":
                 cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel] + \
-                          self.connectivityObj.nut_bolt_array.get_models()
+                        self.connectivityObj.nut_bolt_array.get_models()
             else:
                 cadlist = self.connectivityObj.get_models()
 
@@ -3967,32 +3892,22 @@ class CommonDesignLogic(object):
                     cadlist = self.CPObj.get_models()
 
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
-
                 if self.component == "Beam":
                     final_model = self.CPObj.get_beam_models()
-
                 elif self.component == "Connector":
-
                     final_model = self.CPObj.get_connector_models()
-
                 else:
                     final_model = self.CPObj.get_models()
 
             elif self.connection == KEY_DISP_BCENDPLATE:
-
-                # self.ExtObj = self.create_extended_both_ways()
                 if self.component == "Column":
                     final_model = self.CPObj.get_column_models()
-
                 elif self.component == "Beam":
                     final_model = self.CPObj.get_beam_models()
-
                 elif self.component == "Connector":
                     final_model = self.CPObj.get_connector_models()
-
                 else:
                     final_model = self.CPObj.get_models()
-
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 if self.component == "Column":
@@ -4030,6 +3945,63 @@ class CommonDesignLogic(object):
                 else:
                     final_model = self.BPObj.get_models()
 
+        elif self.mainmodule == 'Flexure Member':
+            # Simply supported beam - only has one component (the beam section)
+            final_model = self.FObj
+
+        elif self.mainmodule == 'Flexural Members - Cantilever':
+            # Cantilever beam - only has one component (the beam section)
+            final_model = self.FObj
+
+        elif self.mainmodule == 'Flexural Members - Purlins':
+            # Purlin - only has one component (the C-section)
+            final_model = self.FObj
+
+        elif self.mainmodule == 'Columns with known support conditions':
+            # Column - only has one component (the column section)
+            final_model = self.ColObj
+
+        elif self.mainmodule == 'Struts in Trusses':
+            # Strut - can be angle or back-to-back angles with gussets
+            final_model = self.ColObj
+
+        elif self.mainmodule == 'Lap Joint Bolted Connection':
+            if self.component == "Plate1":
+                final_model = self.plate1_model
+            elif self.component == "Plate2":
+                final_model = self.plate2_model
+            elif self.component == "Connector":
+                # Return bolts and nuts
+                cadlist = self.bolt_models + self.nuts_models
+            else:
+                # Return complete assembly
+                final_model = self.assembly
+
+        elif self.mainmodule == 'Lap Joint Welded Connection':
+            if self.component == "Plate1":
+                final_model = self.plate1_model
+            elif self.component == "Plate2":
+                final_model = self.plate2_model
+            elif self.component == "Weld":
+                cadlist = self.weld_models
+            else:
+                # Return complete assembly
+                final_model = self.assembly
+
+        elif self.mainmodule == 'Butt Joint Bolted Connection':
+            if self.component == "Plate1":
+                final_model = self.plate1_model
+            elif self.component == "Plate2":
+                final_model = self.plate2_model
+            elif self.component == "Cover Plate":
+                final_model = self.platec_model
+            elif self.component == "Connector":
+                # Return bolts and nuts
+                cadlist = self.bolt_models + self.nuts_models
+            else:
+                # Return complete assembly
+                final_model = self.assembly
+
         elif self.mainmodule == "Member":
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
                 if self.component == "Member":
@@ -4039,45 +4011,21 @@ class CommonDesignLogic(object):
                         cadlist = [self.TObj.get_plates_models(), self.TObj.get_nut_bolt_array_models()]
                     else:
                         cadlist = [self.TObj.get_plates_models(), self.TObj.get_welded_models()]
+                elif self.component == "Endplate":
+                    if self.connection == KEY_DISP_TENSION_BOLTED:
+                        cadlist = [self.TObj.get_end_plates_models(), self.TObj.get_end_nut_bolt_array_models()]
+                    else:
+                        cadlist = [self.TObj.get_end_plates_models()]
                 else:
-                    # print(type(self.TObj.shape))
                     final_model = self.TObj.shape
-                    # cadlist = self.TObj.get_models() #TODO: get_models() in BoltedCAD.py and WeldedCAD.py is not returning anything right now.
 
+        # Fuse multiple models if cadlist is populated
         if cadlist and len(cadlist) > 1:
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        elif cadlist and len(cadlist) == 1:
+            final_model = cadlist[0]
 
         return final_model
-
-        # if self.component == "Beam":
-        #     # final_model = self.connectivityObj.get_beamModel()
-        #     final_model = Obj.get_beamModel()
-        #
-        # elif self.component == "Column":
-        #     # final_model = self.connectivityObj.columnModel
-        #     final_model = Obj.columnModel
-        #
-        # elif self.component == "Plate":
-        #     # cadlist = [self.connectivityObj.weldModelLeft,
-        #     #            self.connectivityObj.weldModelRight,
-        #     #            self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
-        #     cadlist = [Obj.weldModelLeft,
-        #                Obj.weldModelRight,
-        #                Obj.plateModel] + Obj.nut_bolt_array.get_models()
-        #     final_model = cadlist[0]
-        #     for model in cadlist[1:]:
-        #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-        # else:
-        #     # cadlist = self.connectivityObj.get_models()
-        #     cadlist = Obj.get_models()
-        #     if self.connection == KEY_DISP_BASE_PLATE:
-        #         return cadlist
-        #     final_model = cadlist[0]
-        #     for model in cadlist[1:]:
-        #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-
-# if __name__!= "__main__":
-#
-#     CommonDesignLogic()
+        

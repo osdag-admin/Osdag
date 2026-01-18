@@ -32,6 +32,8 @@ def get_documents_folder():
     if system == "Windows":
         # Windows: typically C:\Users\Username\Documents
         docs_path = Path.home() / "Documents"
+        if not docs_path.exists():
+            docs_path = Path.home() / "OneDrive" / "Documents"
     elif system == "Darwin":  # macOS
         # macOS: typically /Users/Username/Documents
         docs_path = Path.home() / "Documents"
@@ -844,6 +846,9 @@ KEY_DISP_PL_PIN_PIN_PG='Concentrate Load with pinned-pinned support'
 KEY_PL_FIX_FIX_PG= 'PLFIXFIX.Data'
 KEY_DISP_PL_FIX_FIX_PG= 'Concentrate load with fixed-fixed support'
 KEY_DISP_GIRDERSEC = 'Girder Properties'
+DISP_TITLE_MOMENT_DESIGN = 'Moment Design Details'
+DISP_TITLE_SHEAR_DESIGN = 'Shear Design Details'
+DISP_TITLE_DEFLECTION = 'Deflection Check'
 Bending_moment_shape_list= list((KEY_DISP_UDL_PIN_PIN_PG, KEY_DISP_UDL_FIX_FIX_PG, KEY_DISP_PL_PIN_PIN_PG,KEY_DISP_PL_FIX_FIX_PG))
 VALUES_DEPTH_PG = ['Customized','Optimized']
 VALUES_OPT = ['All']
@@ -2508,7 +2513,14 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
 KEY_DISP_SEC_TYPE = 'Section Type'
 VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
-VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
+VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels', 'Flat Plates']
+KEY_FLAT_PLATES = 'Flat Plates'
+KEY_PLATETHK_1 = 'PlateThk1'
+KEY_DISP_PLATETHK_1 = 'Thickness of Plate-1 (mm)'
+KEY_PLATETHK_2 = 'PlateThk2'
+KEY_DISP_PLATETHK_2 = 'Thickness of Plate-2 (mm)'
+KEY_PLATE_WIDTH = 'PlateWidth'
+KEY_DISP_PLATE_WIDTH = 'Width of Plate (mm)'
 #, 'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE4 = ['Channels']

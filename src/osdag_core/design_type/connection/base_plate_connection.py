@@ -486,7 +486,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.hover_dict = {}
 
     # setting logger for the module
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Set logger for Base Plate Module.
         """
@@ -495,11 +495,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_base_plate_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -507,7 +507,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         
         # Shared formatter for all handlers
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+            fmt='%(asctime)s - Osdag - %(levelname)s - %(message)s', 
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
@@ -535,10 +535,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             gui_handler.setFormatter(formatter)
             self.logger.addHandler(gui_handler)
 
-    def module_name(self):
-        """
-        Call the Base Plate Module key for displaying the module name.
-        """
+    @staticmethod
+    def module_name():
         return KEY_DISP_BASE_PLATE
 
     # define fields for the input dock to create UI
@@ -854,23 +852,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t19)
 
         # Populate Hover Dict — Base Plate Connection
-
+        thk_along_flange = str(self.stiffener_plt_thick_along_flange) + " mm" if flag and self.stiffener_along_flange == 'Yes' else VALUE_NOT_APPLICABLE
+        thk_along_web = str(self.stiffener_plt_thick_along_web) + " mm" if flag and self.stiffener_along_web == 'Yes' else VALUE_NOT_APPLICABLE
         # Base Plate
         self.hover_dict["Plate"] = (
-            f"<b>Plate</b><br>"
+            f"<b>Plate Details:</b><br>"
+            f"<b>Steel Base Plate</b><br>"
             f"Length: {self.bp_length_provided if flag else ''} mm<br>"
             f"Width: {self.bp_width_provided if flag else ''} mm<br>"
-            f"Thickness: {self.plate_thk if flag else ''} mm"
+            f"Thickness: {int(self.plate_thk_provided) if flag else ''} mm<br>"
+            f"<b>Stiffener thickness along flange:</b> {thk_along_flange}<br>"
+            f"<b>Stiffener thickness along web:</b> {thk_along_web}"
         )
 
         # Column (generic — works for both I-section & hollow)
         self.hover_dict["Column"] = (
             f"<b>Column</b><br>"
-            f"Designation: {self.dp_column_designation if flag else ''}<br>"
-            f"Depth: {self.column_D if flag else ''} mm<br>"
-            f"Flange Width / Width: {self.column_bf if flag else ''} mm<br>"
-            f"Flange Thickness / Wall Thickness: {self.column_tf if flag else ''} mm<br>"
-            f"Web Thickness (if I-section): {self.column_tw if flag else ''} mm"
+            f"Designation: {self.dp_column_designation if flag else ''}"
         )
 
         # Anchor Bolts (Outside Flange — primary governing)
@@ -902,10 +900,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
        # Conc (Concrete Block)
         self.hover_dict["Conc"] = (
-            f"<b>Concrete</b><br>"
-            f"Length: {self.bp_length_provided * 1.5 if flag else ''} mm<br>"
-            f"Width: {self.bp_width_provided * 1.5 if flag else ''} mm<br>"
-            f"Depth: {(self.anchor_len_below_footing_out * 1.2) if flag else ''} mm"
+            f"<b>Concrete Pedestal</b><br>"
+            f"Grade: {self.footing_grade if flag else ''} mm<br>"
         )
 
         # Grout

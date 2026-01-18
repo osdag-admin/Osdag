@@ -28,7 +28,7 @@ from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleC
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
-from osdag_core.design_type.compression_member.Column import ColumnDesign
+from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 
 # Spacing Detail
 from osdag_gui.ui.components.output_details.b2bCoverPlateWelded import B2BCoverPlateWeldedDetails
@@ -188,12 +188,15 @@ class OutputDock(QWidget):
                 
                 right = QLineEdit()
                 right.setObjectName(field[0])
+                right.setFixedWidth(150)
+                # Add size policy
+                right.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 right.setReadOnly(True)
                 # To Right Align
                 layout = QHBoxLayout()
                 layout.setSpacing(0)
                 layout.setContentsMargins(0,0,0,0)
-                layout.addStretch()
+                layout.setAlignment(Qt.AlignmentFlag.AlignRight)
                 layout.addWidget(right)
                 cur_box_form.addRow(left, layout)
                 fields += 1
@@ -204,6 +207,9 @@ class OutputDock(QWidget):
                 left.setObjectName(field[0] + "_label")
                 
                 right = QPushButton(label.strip())
+                right.setFixedWidth(150)
+                # Add size policy
+                right.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
                 right.setCursor(Qt.CursorShape.PointingHandCursor)
                 spacing_button_list.append(field)
                 right.setObjectName(field[0])
@@ -212,7 +218,7 @@ class OutputDock(QWidget):
                 layout = QHBoxLayout()
                 layout.setSpacing(0)
                 layout.setContentsMargins(0,0,0,0)
-                layout.addStretch()
+                layout.setAlignment(Qt.AlignmentFlag.AlignRight)
                 layout.addWidget(right)
                 cur_box_form.addRow(left, layout)
                 fields += 1
@@ -493,7 +499,7 @@ class OutputDock(QWidget):
     #----------------------create-tex-to-save-project-END----------------------------------------
 
     # ----------------------------------Save-Outputs-START------------------------------------------------------
-    def save_output_to_csv(self, main):
+    def save_output_to_csv(self, main, file_name):
         status = main.design_status
         if(not status):
             CustomMessageBox(
@@ -531,12 +537,12 @@ class OutputDock(QWidget):
                 dialogType=MessageBoxType.Information
             ).exec()
         else:
-            default_dir = os.path.join(get_documents_folder(), "Inputs.csv")
+            default_dir = os.path.join(get_documents_folder(), f"{file_name}.csv")
             fileName, _ = QFileDialog.getSaveFileName(
                 self.parent,
-                "Save Output",
+                f"Save {file_name}",
                 default_dir,
-                "Input Files(*.csv)",
+                f"{file_name}(*.csv)",
                 options=QFileDialog.Option.DontUseNativeDialog
             )
             if fileName:

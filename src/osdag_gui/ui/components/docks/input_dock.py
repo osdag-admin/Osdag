@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QToolTip,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout
+from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QListView
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
 from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
         QRegularExpressionValidator, QIntValidator, QIcon)
@@ -15,6 +15,7 @@ from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 import osdag_gui.resources.resources_rc
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
@@ -22,8 +23,36 @@ from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
 from osdag_core.Common import *
 
 class NoScrollComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        view = QListView(self)
+        view.window().setWindowFlags(Qt.Popup)
+        self.setView(view)
+
     def wheelEvent(self, event):
-        event.ignore()  # Prevent changing selection on scroll
+        event.ignore()
+
+    def showPopup(self):
+        super().showPopup()
+
+        popup = self.view().window()
+
+        # Global position below combo
+        combo_pos = self.mapToGlobal(QPoint(0, self.height()))
+
+        # Screen geometry where combo exists
+        screen = QApplication.screenAt(combo_pos)
+        if not screen:
+            screen = QApplication.primaryScreen()
+
+        available = screen.availableGeometry()
+
+        # Max height till bottom of screen
+        max_height = available.bottom() - combo_pos.y()
+
+        # Apply constraints
+        popup.move(combo_pos)
+        popup.setMaximumHeight(max_height)
 
 def right_aligned_widget(widget):
     container = QWidget()
@@ -227,6 +256,11 @@ class InputDock(QWidget):
                 option_list = field[3]
                 right.addItems(option_list)
 
+                # To disable option at index [1, 2] in Connectivity Combo of Beam to Beam End Plate
+                if len(field) == 7:
+                    for disabled in field[6]:
+                        right.model().item(disabled).setEnabled(False)
+
                 cur_box_form.addRow(left, right_aligned_widget(right))
             
             elif type == TYPE_IMAGE:
@@ -277,10 +311,11 @@ class InputDock(QWidget):
                 right = QLineEdit()
                 right.setText(field[3])
                 right.setMinimumWidth(input_width)
+                right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 right.setObjectName(field[0] + "_note")
                 right.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 right.setDisabled(True)
-                cur_box_form.addRow(left, left_aligned_widget(right))
+                cur_box_form.addRow(left, right_aligned_widget(right))
             
             if index == len(field_list):
                 # Last Data tupple
@@ -361,6 +396,16 @@ class InputDock(QWidget):
                     key_changed = self.input_widget.findChild(QWidget, key_name)
                     self.on_change_connect(key_changed, updated_list, self.data, self.backend)                    
                     # print(f"[INFO] key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
+            
+            # Trigger initial visibility update for all connected keys
+            triggered_keys = set()
+            for t in updated_list:
+                for key_name in t[0]:
+                    if key_name not in triggered_keys:
+                        key_changed = self.input_widget.findChild(QWidget, key_name)
+                        if key_changed is not None:
+                            self.change(key_changed, updated_list, self.data, self.backend)
+                            triggered_keys.add(key_name)
 
         panel_layout.addWidget(self.scroll_area)
 
@@ -370,7 +415,7 @@ class InputDock(QWidget):
         btn_button_layout.addStretch(2)
 
         save_input_btn = DockCustomButton("       Save Input        ", ":/vectors/save.svg")
-        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Save"))
+        save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Save_OSI"))
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 
@@ -437,7 +482,7 @@ class InputDock(QWidget):
         if set_locked_state:
             self.state_locked = True
             self.lock_btn.setChecked(True)
-            self.scroll_area.setDisabled(True)
+            self.input_widget.setDisabled(True)
             self.update_lock_icon()
         else:
             if self.state_locked:
@@ -449,7 +494,7 @@ class InputDock(QWidget):
                 QTimer.singleShot(100, self.parent.flush_cad_widget)
             self.state_locked = not self.state_locked
             self.lock_btn.setChecked(self.state_locked)
-            self.scroll_area.setDisabled(self.state_locked)
+            self.input_widget.setDisabled(self.state_locked)
             self.update_lock_icon()
 
     def update_lock_icon(self):
@@ -545,7 +590,7 @@ class InputDock(QWidget):
         """
         if disabled_values is None:
             disabled_values = []
-        self.window = QDialog()
+        self.window = QDialog(self)
         self.ui = CustomValueSelectPopup()
         self.ui.setupUi(self.window, disabled_values, note)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
@@ -573,6 +618,9 @@ class InputDock(QWidget):
             if typ == TYPE_NOTE:
                 k2_key = k2_key + "_note"
             if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
+                # Skip if output_dock doesn't exist yet (during initial build)
+                if not hasattr(self.parent, 'output_dock') or self.parent.output_dock is None:
+                    continue
                 k2 = self.parent.output_dock.output_widget.findChild(QWidget, k2_key)
             elif typ == TYPE_WARNING:
                 k2 = str(k2_key)
@@ -616,12 +664,32 @@ class InputDock(QWidget):
 
             elif typ == TYPE_LABEL:
                 # print("\n\n[INFO] Label")
-                k2.setText(val)
+                # Handle boolean values for visibility control
+                if isinstance(val, bool):
+                    if val:
+                        k2.setVisible(True)
+                        # Also show/hide the corresponding input widget
+                        input_widget_key = k2_key.replace("_label", "")
+                        input_widget = self.input_widget.findChild(QWidget, input_widget_key)
+                        if input_widget:
+                            input_widget.setVisible(True)
+                    else:
+                        k2.setVisible(False)
+                        # Also show/hide the corresponding input widget
+                        input_widget_key = k2_key.replace("_label", "")
+                        input_widget = self.input_widget.findChild(QWidget, input_widget_key)
+                        if input_widget:
+                            input_widget.setVisible(False)
+                else:
+                    k2.setText(val)
             elif typ == TYPE_NOTE:
                 # print("\n\n[INFO] Note")
                 k2.setText(val)
             elif typ == TYPE_IMAGE:
                 # print("\n\n[INFO] Img")
+                if val is None:
+                    # To handle NoneType error
+                    continue
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
 
@@ -649,7 +717,11 @@ class InputDock(QWidget):
             elif typ == TYPE_WARNING:
                 # print("\n\n[INFO] warning")
                 if val:
-                    QMessageBox.warning(self, "Application", k2)
+                    CustomMessageBox(
+                        title="Application",
+                        text=k2,
+                        dialogType=MessageBoxType.Warning
+                    ).exec()
             elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 # print(f"\n[INFO] {tup}")
                 if val:
@@ -752,7 +824,7 @@ class InputDock(QWidget):
         elif name == KEY_BOTTOM_Bflange_PG:
             bounds = self.backend.bounds_map.get('bf_bot')
 
-        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]])
+        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]], parent=self)
         result = dialog.exec()
         
         if result:

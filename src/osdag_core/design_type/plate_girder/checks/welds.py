@@ -30,21 +30,18 @@ def design_welds_with_strength_web_to_flange(V_ed, b_ft, t_ft, b_fb, t_fb, t_w, 
     max_weld_legtop = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(t_ft, t_w)
     max_weld_legbot = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(t_fb, t_w)
     
-    # weld legs using cl.10 strength
-    a_top = round_up(max(weld_leg_from_q_with_cl10(
-                                        sf['q_top_kN_per_mm'], ultimate_stresses
-                                        ), min_weld_legtop) and min(weld_leg_from_q_with_cl10(
-                                        sf['q_top_kN_per_mm'], ultimate_stresses
-                                        ), max_weld_legtop),1)
-
-    a_bot = round_up(max(weld_leg_from_q_with_cl10(
-                                        sf['q_bot_kN_per_mm'], ultimate_stresses
-                                        ), min_weld_legbot) and min(weld_leg_from_q_with_cl10(sf['q_bot_kN_per_mm'], ultimate_stresses
-                                        ), max_weld_legbot),1)
+    # Calculate required weld size from shear flow
+    a_top_calc = weld_leg_from_q_with_cl10(sf['q_top_kN_per_mm'], ultimate_stresses)
+    a_bot_calc = weld_leg_from_q_with_cl10(sf['q_bot_kN_per_mm'], ultimate_stresses)
+    
+    # Clamp to min and max: max(min_size, min(calculated, max_size))
+    a_top = round_up(max(min_weld_legtop, min(a_top_calc, max_weld_legtop)), 1)
+    a_bot = round_up(max(min_weld_legbot, min(a_bot_calc, max_weld_legbot)), 1)
 
     if debug:
-        print(f"[DEBUG] Welds: q_top={sf['q_top_kN_per_mm']:.2f}, q_bot={sf['q_bot_kN_per_mm']:.2f}, top_leg={a_top}, bot_leg={a_bot}")
+        print(f"[DEBUG] Welds: q_top={sf['q_top_kN_per_mm']:.2f}, q_bot={sf['q_bot_kN_per_mm']:.2f}, calc_top={a_top_calc:.2f}, calc_bot={a_bot_calc:.2f}, min_top={min_weld_legtop}, max_top={max_weld_legtop}, top_leg={a_top}, bot_leg={a_bot}")
     return a_top, a_bot
+
 
 def weld_for_end_stiffener(t_st, b_st, V_ed, V_unstf, D, t_ft, t_fb, tw, ultimate_stresses):
     """

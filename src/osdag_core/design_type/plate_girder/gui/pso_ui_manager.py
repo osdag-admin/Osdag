@@ -381,11 +381,8 @@ class PSOUIManager:
             except Exception:
                 pass
             
-            # Process events to ensure Qt state is consistent
-            try:
-                QApplication.processEvents()
-            except Exception:
-                pass
+            # NOTE: DO NOT call QApplication.processEvents() here!
+            # It causes OpenGL race conditions that corrupt memory.
             
             try:
                 # Schedule for deletion
@@ -433,11 +430,8 @@ class PSOUIManager:
         # Reset throttle variable for next design run
         self._last_pso_iter = -1
         
-        # Final process events to flush deletion
-        try:
-            QApplication.processEvents()
-        except Exception:
-            pass
+        # NOTE: DO NOT call QApplication.processEvents() here!
+        # It causes OpenGL race conditions that corrupt memory.
     
     def _restore_initial_layout(self):
         """Restore the initial horizontal splitter layout for Plate Girder module.

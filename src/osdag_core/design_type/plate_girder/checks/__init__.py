@@ -15,4 +15,4 @@ To skip deflection, set this to True before running design.
 """
 
 # Independent checks that can be safely skipped
-SKIP_DEFLECTION: bool = True
+SKIP_DEFLECTION: bool = False

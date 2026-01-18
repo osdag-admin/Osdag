@@ -1254,6 +1254,59 @@ class Plate(Material):
         return repr
 
 
+
+class FlatPlate(Plate):
+    """
+    Class for Flat Plate properties and design checks.
+    Inherits from Plate class.
+    """
+    def __init__(self, width, thickness, material_grade):
+        # Wrap thickness in list if it's a single value (Plate expects list)
+        thickness_list = [thickness] if not isinstance(thickness, list) else thickness
+        super(FlatPlate, self).__init__(thickness=thickness_list, material_grade=material_grade, width=width)
+        self.width = float(width)
+        self.thickness = float(thickness) if not isinstance(thickness, list) else float(thickness[0])
+        self.area = self.width * self.thickness # Gross Area
+        
+        # Set designation for compatibility with output_values
+        self.designation = f"Flat Plate {int(self.width)}x{int(self.thickness)}"
+        
+        # Slenderness is N/A for flat plates (DDCL: slenderness check not performed)
+        self.slenderness = 0
+        
+        # Set gamma values from IS 800:2007 Table 5
+        self.gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  # 1.10
+        self.gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']  # 1.25
+
+    def get_tension_yielding_capacity(self):
+        """
+        Calculate tension yielding capacity (Tdg)
+        Tdg = (Ag * fy) / gamma_m0
+        """
+        return (self.area * self.fy) / self.gamma_m0
+
+    def get_tension_rupture_capacity(self, dia_hole, n_bolts_section):
+        """
+        Calculate tension rupture capacity (Tdn) for Flat Plate
+        Tdn = 0.9 * An * fu / gamma_m1
+        An = (Width - n * d0) * t
+        Note: Shear lag factor is ignored as per requirement.
+        """
+        area_net = (self.width - n_bolts_section * dia_hole) * self.thickness
+        return (0.9 * area_net * self.fu) / self.gamma_m1
+
+    def get_block_shear_capacity(self, A_vg, A_vn, A_tg, A_tn):
+        """
+        Calculate block shear capacity (Tdb)
+        Tdb1 = (Avg * fy / (sqrt(3) * gamma_m0)) + (0.9 * Atn * fu / gamma_m1)
+        Tdb2 = (0.9 * Avn * fu / (sqrt(3) * gamma_m1)) + (Atg * fy / gamma_m0)
+        Tdb = min(Tdb1, Tdb2)
+        """
+        Tdb1 = (A_vg * self.fy / (math.sqrt(3) * self.gamma_m0)) + (0.9 * A_tn * self.fu / self.gamma_m1)
+        Tdb2 = (0.9 * A_vn * self.fu / (math.sqrt(3) * self.gamma_m1)) + (A_tg * self.fy / self.gamma_m0)
+        return min(Tdb1, Tdb2)
+
+
 class ISection(Material):
 
     def __init__(self, designation, material_grade="", table=""):

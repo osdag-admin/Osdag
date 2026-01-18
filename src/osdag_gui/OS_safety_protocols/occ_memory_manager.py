@@ -159,9 +159,9 @@ class OCCMemoryManager:
             self._cleanup_in_progress[widget_id] = True
         
         try:
-            # Step 1: Disable garbage collection
+            # Step 1: Disable garbage collection during entire cleanup
+            gc_was_enabled = gc.isenabled()
             gc.disable()
-            self._gc_disabled = True
             
             # Get context
             ctx = context or self._contexts.get(widget_id)
@@ -173,15 +173,10 @@ class OCCMemoryManager:
                 except Exception as e:
                     print(f"[OCCMemoryManager] Error in RemoveAll: {e}")
             
-            # Step 3: Process Qt events to flush OpenGL operations
-            try:
-                from PySide6.QtWidgets import QApplication
-                if QApplication.instance():
-                    QApplication.processEvents()
-            except ImportError:
-                pass
+            # NOTE: DO NOT call QApplication.processEvents() here!
+            # It causes OpenGL race conditions that corrupt memory.
             
-            # Step 4: Clear all references in correct order
+            # Step 3: Clear all references in correct order
             with self._lock:
                 if widget_id in self._registry:
                     # Clear in reverse order of dependency
@@ -190,23 +185,22 @@ class OCCMemoryManager:
                     self._registry[widget_id]['other'].clear()
                     self._registry[widget_id]['shapes'].clear()
             
-            # Step 5: Re-enable GC and collect
-            gc.enable()
-            self._gc_disabled = False
-            gc.collect()
+            # NOTE: DO NOT call gc.collect() here!
+            # It forces Python to destroy OCC wrappers in arbitrary order,
+            # but OpenCascade's Handle system requires View→Context→Driver order.
+            # Let natural reference counting handle cleanup.
             
             print(f"[OCCMemoryManager] Cleanup complete for widget {widget_id}")
             return True
             
         except Exception as e:
             print(f"[OCCMemoryManager] Error during cleanup: {e}")
-            # Ensure GC is re-enabled
-            if self._gc_disabled:
-                gc.enable()
-                self._gc_disabled = False
             return False
             
         finally:
+            # Re-enable GC if it was enabled before
+            if gc_was_enabled:
+                gc.enable()
             with self._lock:
                 self._cleanup_in_progress[widget_id] = False
     

@@ -1,6 +1,6 @@
 """
 Module: lap_joint_welded.py
-Author: Aman, Nishi Kant Mandal, Tanu Singh
+Author: Aman, Nishi Kant Mandal, Tanu Singh, Roushan Raj
 Date: 2025-07-14
 
 Description:
@@ -23,6 +23,10 @@ from ...custom_logger import CustomLogger
 import logging
 
 import math
+
+import os
+from pylatex.utils import NoEscape
+from pylatex import Math
 
 class LapJointWelded(MomentConnection):
     def __init__(self):
@@ -156,7 +160,7 @@ class LapJointWelded(MomentConnection):
         weld.append(t2)
         return weld
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -167,11 +171,11 @@ class LapJointWelded(MomentConnection):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_lap_joint_welded_simple_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -179,7 +183,7 @@ class LapJointWelded(MomentConnection):
         
         # Shared formatter for all handlers
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+            fmt='%(asctime)s - Osdag - %(levelname)s - %(message)s', 
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
@@ -292,13 +296,11 @@ class LapJointWelded(MomentConnection):
 
         self.hover_dict["Plate 1"] = (
             f"<b>Plate 1</b><br>"
-            f"Length: {round(float(self.plate1.length), 2) if flag and self.plate1.length else ''} mm<br>"
             f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1.height else ''} mm<br>"
             f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1.thickness_provided else ''} mm"
         )
         self.hover_dict["Plate 2"] = (
             f"<b>Plate 2</b><br>"
-            f"Length: {round(float(self.plate2.length), 2) if flag and self.plate2.length else ''} mm<br>"
             f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2.height else ''} mm<br>"
             f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2.thickness_provided else ''} mm"
         )
@@ -311,7 +313,8 @@ class LapJointWelded(MomentConnection):
 
         return out_list
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_LAPJOINTWELDED
 
     def func_for_validation(self, design_dictionary):
@@ -449,33 +452,29 @@ class LapJointWelded(MomentConnection):
         # IS800:2007 Cl.10.5.3.2: Throat thickness a = K * s, where K depends on angle
         # For fillet welds, K = sin(θ), θ = weld angle (default 45° if not specified)
         weld_angle = design_dictionary.get('weld_angle', 45)
-        if not isinstance(weld_angle, (int, float)):
-            try:
-                weld_angle = float(weld_angle)
-            except Exception:
-                weld_angle = 45
-        # K = sin(angle)
-        K = round(math.sin(math.radians(weld_angle)), 3)
-        if K <= 0:
-            self.logger.error(f": Invalid weld angle {weld_angle}°. Using default K=0.7 (45°)")
-            K = 0.7
+        # IS 800:2007 Cl.10.5.3.2 Table 22:
+        # For Angle between fusion faces 60-90 degrees, K = 0.7.
+        # Lap Joint fusion faces are at 90 degrees.
+        # Previous code used sin(45) = 0.707 which caused discrepancy with standard report values (0.7).
+        K = 0.7
+        
         self.effective_throat_thickness = K * self.weld_size  # Cl.10.5.3.2
-        self.logger.info(f": Effective throat thickness (a) = {self.effective_throat_thickness:.2f} mm [Cl.10.5.3.2, K={K}, θ={weld_angle}°]")
-        self.fu = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
-        self.gamma_mw = 1.25 if design_dictionary[KEY_DP_WELD_TYPE] == "Shop weld" else 1.50  # Cl.10.5.7.1
-        self.weld_design_strength = (self.fu * self.effective_throat_thickness) / (math.sqrt(3) * self.gamma_mw)  # Cl.10.5.7.1
-        self.parent_design_strength = 0.6 * self.fu * self.effective_throat_thickness / self.gamma_mw  # Cl.10.5.7.2
+        self.logger.info(f": Effective throat thickness (a) = {self.effective_throat_thickness:.2f} mm [Cl.10.5.3.2, K={K}, Fusion Angle=90°]")
+        
+        self.fu_weld = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
+        self.fu_parent = min(self.plate1.fu, self.plate2.fu) # Use stronger/weaker? Strength governed by weaker parent.
+
+        self.gamma_mw = 1.25 if design_dictionary.get(KEY_DP_WELD_TYPE, "Shop weld") == "Shop weld" else 1.50  # Cl.10.5.7.1
+        
+        # P_wd (Weld Metal Strength per unit length)
+        self.weld_design_strength = (self.fu_weld * self.effective_throat_thickness) / (math.sqrt(3) * self.gamma_mw)  # Cl.10.5.7.1
+        
+        # P_md (Parent Metal Strength per unit length)
+        self.parent_design_strength = 0.6 * self.fu_parent * self.effective_throat_thickness / self.gamma_mw  # Cl.10.5.7.2
+        
         self.fillet_weld_design_strength = min(self.weld_design_strength, self.parent_design_strength)
-        self.logger.info(f": Design strength of fillet weld = {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]")
-        # Weld stress check (Cl.10.5.7):
-        self.weld_stress = self.tensile_force / (2 * self.effective_throat_thickness * self.l_eff) if hasattr(self, 'l_eff') and self.l_eff else 0
-        if self.weld_stress > self.fillet_weld_design_strength:
-            error_msg = f"Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]"
-            self.logger.error(": " + error_msg)
-            print("[Osdag ERROR]", error_msg)
-            self.design_status = False
-            self.design_error = "Weld stress exceeds design strength."
-            return
+        self.logger.info(f": Design strength of fillet weld = {self.fillet_weld_design_strength:.2f} N/mm [Cl.10.5.7]")
+
 
     def calculate_weld_length(self):
         self.logger.info(": ============== Weld Length Calculation ==============")
@@ -525,20 +524,18 @@ class LapJointWelded(MomentConnection):
         self.end_return_length = max(2 * self.weld_size, 12)  # Cl.10.5.4.5
         self.logger.info(f": End return length = {self.end_return_length} mm [Cl.10.5.4.5]")
         # Overlap length (Cl.10.5.4.3): min overlap = 4*s or 40mm, whichever is more
-        self.overlap_length = max(4 * self.weld_size, 40)
-        self.logger.info(f": Overlap length = {self.overlap_length} mm [Cl.10.5.4.3]")
+        min_overlap = max(4 * self.weld_size, 40)
+        
         self.connection_length = self.l_eff + 2 * self.end_return_length
+        
+        # Overlap must accommodate connection length plus clearances (assuming 10mm each side)
+        self.overlap_length = max(min_overlap, self.connection_length + 20) 
+        
+        self.logger.info(f": Overlap length = {self.overlap_length} mm [Cl.10.5.4.3]")
+
         # Design capacity (Cl.10.5.7.3):
         self.design_capacity = 2 * self.l_eff * self.fillet_weld_design_strength * self.beta_lw
-        # Weld stress check (Cl.10.5.7):
-        self.weld_stress = self.tensile_force / (2 * self.effective_throat_thickness * self.l_eff) if self.l_eff else 0
-        if self.weld_stress > self.fillet_weld_design_strength:
-            error_msg = f"Weld stress {self.weld_stress:.2f} N/mm^2 exceeds design strength {self.fillet_weld_design_strength:.2f} N/mm^2 [Cl.10.5.7]"
-            self.logger.error(": " + error_msg)
-            print("[Osdag ERROR]", error_msg)
-            self.design_status = False
-            self.design_error = "Weld stress exceeds design strength."
-            return
+        
         self.utilization_ratios['weld'] = self.tensile_force / self.design_capacity if self.design_capacity > 0 else float('inf')
         self.logger.info(f": Provided effective length = {self.l_eff:.2f} mm")
         self.logger.info(f": Design capacity of weld = {self.design_capacity/1000:.2f} kN")
@@ -589,67 +586,396 @@ class LapJointWelded(MomentConnection):
         self.weld_length_effective = self.l_eff
 
     def save_design(self, popup_summary):
-        self.report_input = {
-            KEY_MODULE: self.module,
-            KEY_MAIN_MODULE: self.mainmodule,
-            KEY_DISP_AXIAL: round(self.axial_force / 1000, 2),
-            KEY_DISP_DESIGN_FOR: self.design_for,
-            KEY_DISP_PLATETHK: str([int(d) for d in [self.plate1.thickness[0], self.plate2.thickness[0]]]),
-            KEY_DISP_MATERIAL: self.main_material,
-            KEY_DISP_ULTIMATE_STRENGTH_REPORT: self.plate1.fu,
-            KEY_DISP_YIELD_STRENGTH_REPORT: self.plate1.fy,
-            KEY_DISP_PLATE_WIDTH: self.width,
-            "Weld Details - Input and Design Preference": "TITLE",
-            KEY_DISP_DP_WELD_TYPE: self.weld.type,
-            KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-            KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT: self.weld.fu,
-            KEY_DISP_WELD_SIZE: self.weld_size,
-            "Safety Factors": "TITLE",
-            KEY_DISP_GAMMA_MW: self.gamma_mw,
-            "Weld Angle (deg)": getattr(self, 'weld_angle', 45),
-            "Effective Throat Thickness (mm)": getattr(self, 'effective_throat_thickness', None),
-            "Long Joint Reduction Factor β_lw": getattr(self, 'beta_lw', 1.0),
-            "End Return Length (mm)": getattr(self, 'end_return_length', None),
-            "Overlap Length (mm)": getattr(self, 'overlap_length', None),
-            "Shear Lag Factor": 0.7,
-        }
-        
-        self.report_check = []
-        if self.design_status:
-            t1 = ('SubSection', 'Weld Design', '|p{3cm}|p{6.5cm}|p{5cm}|p{1cm}|')
-            self.report_check.append(t1)
+        """
+        Generate the LaTeX design report for Lap Joint Welded Connection (Tension/Compression)
+        per IS 800:2007.
+        """
+        try:
+            #=======================================
+            #=========== HELPER FUNCTIONS ==========
+            #=======================================
+            def g(attr, default=None):
+                """Get attribute value with default"""
+                v = getattr(self, attr, default)
+                return default if v is None else v
             
-            # Add appropriate design capacity calculation based on design mode
-            if self.design_for == 'Compression':
-                t1 = ('Base Metal Capacity',
-                      f"P_d = A_g × f_y/γ_m0 = {self.A_g:.2f} × {self.plate1.fy}/{self.gamma_m0} = {self.T_db/1000:.2f} kN [Ref: IS 800:2007, Cl.7.1.2]",
-                      f"{self.T_db/1000:.2f} kN",
-                      "Pass" if self.T_db >= self.axial_force else "Fail")
+            def f2(x, default=0.0):
+                """Format to 2 decimal places"""
+                try:
+                    return round(float(x), 2)
+                except (TypeError, ValueError):
+                    return default
+
+            #================================================
+            #=========== EXTRACT ALL DESIGN VALUES ==========
+            #================================================
+            module = g('module', 'Lap Joint Welded')
+            mainmodule = 'Simple Connection'
+            design_for = g('design_for', 'Tension').strip()
+            is_comp = design_for.lower().startswith('c')
+            
+            edge_type = g('edgetype', 'Sheared or hand flame cut')
+            
+            # Plate properties
+            plate1_thk = f2(self.plate1.thickness[0] if isinstance(self.plate1.thickness, list) else self.plate1.thickness, 0.0)
+            plate2_thk = f2(self.plate2.thickness[0] if isinstance(self.plate2.thickness, list) else self.plate2.thickness, 0.0)
+            plate_thk_min = min(plate1_thk, plate2_thk)
+            width = f2(g('width', 0.0), 0.0)
+            fy = f2(self.plate1.fy if hasattr(self, 'plate1') else 250, 250)
+            fu = f2(self.plate1.fu if hasattr(self, 'plate1') else 410, 410)
+            
+            # Use stored values for strength calculation variables to match Dock exactly
+            fu_weld = g('fu_weld', float(g('weld.fu', 410)))
+            fu_parent = g('fu_parent', min(self.plate1.fu, self.plate2.fu) if hasattr(self, 'plate1') else 410)
+            
+            # Load
+            axial_force_N = f2(g('axial_force', g('axialforce', g('tensileforce', 0.0))), 0.0)
+            axial_kN = f2(axial_force_N / 1000, 0.0)
+            
+            # Weld properties
+            weld_size = f2(g('weld_size', g('weldsize', 0.0)), 0.0)
+            weld_type = g('weld.type', 'Shop weld')
+            weld_fabrication = g('weld.fabrication', 'Shop Weld')
+            gamma_mw = 1.25 if 'shop' in weld_type.lower() else 1.50
+            
+            # Effective throat thickness
+            effective_throat = f2(g('effective_throat_thickness', 0.7 * weld_size), 0.0)
+            
+            # Weld lengths
+            l_eff = f2(g('l_eff', g('weld_length_effective', g('weldlengtheffective', 0.0))), 0.0)
+            l_eff_min = f2(max(4 * weld_size, 40), 0.0)
+            l_eff_max = f2(70 * weld_size, 0.0)
+            
+            # Long joint reduction factor
+            beta_lw = f2(g('beta_lw', g('betalw', 1.0)), 1.0)
+            
+            # End return and connection length
+            end_return = f2(g('end_return_length', max(2 * weld_size, 12)), 0.0)
+            
+            # Overlap: Use calculated value if available to capture clearance logic
+            min_overlap_req = max(4 * weld_size, 40)
+            overlap_length = f2(g('overlap_length', min_overlap_req), 0.0)
+            
+            conn_length = f2(g('connection_length', l_eff + 2 * end_return), 0.0)
+            
+            # Base metal capacity
+            Ag = plate_thk_min * width
+            gamma_m0 = 1.10
+            gamma_m1 = 1.25
+            
+            if is_comp:
+                base_metal_capacity_kN = f2((Ag * fy / gamma_m0) / 1000, 0.0)
             else:
-                t1 = ('Base Metal Capacity',
-                      f"min(T_dg, T_dn) = min({self.A_g * self.plate1.fy / self.gamma_m0/1000:.2f}, {0.9 * self.A_g * self.plate1.fu * 0.7 / self.gamma_m1/1000:.2f}) = {self.T_db/1000:.2f} kN [Ref: IS 800:2007, Cl.6.2, 6.3]",
-                      f"{self.T_db/1000:.2f} kN",
-                      "Pass" if self.T_db >= self.axial_force else "Fail")
-            self.report_check.append(t1)
+                Tdg = (Ag * fy / gamma_m0) / 1000
+                Tdn = (0.9 * Ag * fu * 0.7 / gamma_m1) / 1000
+                base_metal_capacity_kN = f2(min(Tdg, Tdn), 0.0)
+
+            # Retrieve calculated unit design strengths to match Dock
+            P_wd_val = g('weld_design_strength', (fu_weld * effective_throat) / (math.sqrt(3) * gamma_mw))
+            P_md_val = g('parent_design_strength', 0.6 * fu_parent * effective_throat / gamma_mw)
+            P_d_val = g('fillet_weld_design_strength', min(P_wd_val, P_md_val))
+
+            #====================================================
+            #=========== BUILD REPORT INPUT DICTIONARY ==========
+            #====================================================
+            self.report_input = {
+                KEY_MODULE: module,
+                KEY_MAIN_MODULE: mainmodule,
+                KEY_DISP_DESIGN_FOR: design_for,
+                f"Thickness of Plate-1 (mm) *": plate1_thk,
+                f"Thickness of Plate-2 (mm) *": plate2_thk,
+                KEY_DISP_PLATE_WIDTH: width,
+                KEY_DISP_MATERIAL: g('main_material', g('mainmaterial', 'N/A')),
+                KEY_DISP_WELD_SIZE: weld_size,
+                f"{'Tensile' if not is_comp else 'Axial'} Force (kN) *": axial_kN,
+                
+                "Additional inputs": "TITLE",
+                "Edge Preparation Method": edge_type,
+                KEY_DISP_DP_WELD_TYPE: weld_fabrication,
+                KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT: f2(fu_weld, 410),
+            }
             
-            t1 = (DISP_WELD_STRENGTH,
-                  f"Required: {self.tensile_force / 1000:.2f} kN",
-                  f"Provided: {self.design_capacity / 1000:.2f} kN",
-                  "Pass" if self.design_capacity >= self.tensile_force else "Fail")
-            self.report_check.append(t1)
-            t1 = ('Overall Utilization Ratio',
-                  "<= 1.0",
-                  f"{self.utilization_ratio:.3f}",
-                  "Pass" if self.utilization_ratio <= 1.0 else "Fail")
-            self.report_check.append(t1)
-        else:
-            t1 = ('SubSection', 'Design Status', '|p{3.5cm}|p{4.5cm}|p{6cm}|p{1.5cm}|')
-            self.report_check.append(t1)
-            t1 = ('Design Status', '', 'Design Fails', 'Fail')
-            self.report_check.append(t1)
-        fname_no_ext = popup_summary['filename']
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary,
-                             fname_no_ext, os.path.abspath(".").replace("\\", "/"), [], "/ResourceFiles/images/3d.png", module=self.module)
+            # ========== BUILD REPORT CHECK ==========
+            self.report_check = []
+
+            # ==========================================================================
+            # SECTION 3.1: CALCULATING WELD STRENGTH
+            # ==========================================================================
+            # 3.2.1 Weld Size Requirements
+            self.report_check.append([
+                "SubSection", "Weld Size Check", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            s_min = IS800_2007.cl_10_5_2_3_min_weld_size(plate1_thk, plate2_thk)
+            if plate_thk_min >= 10:
+                s_max = plate_thk_min - 1.5
+            else:
+                s_max = plate_thk_min
+            s_max = f2(s_max, 0.0)
+            
+            size_check_req = Math(inline=True)
+            size_check_req.append(NoEscape(r'\begin{aligned}'))
+            size_check_req.append(NoEscape(r's_{\text{min}} &= ' + str(s_min) + r' \text{ mm}\\'))
+            size_check_req.append(NoEscape(r'&[\text{As per Table 21, IS 800:2007}]\\'))
+            size_check_req.append(NoEscape(r's_{\text{max}} &= ' + str(s_max) + r' \text{ mm}\\'))
+            size_check_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.2.3, 10.5.2.4}]'))
+            size_check_req.append(NoEscape(r'\end{aligned}'))
+            
+            size_check_prov = Math(inline=True)
+            size_check_prov.append(NoEscape(r's = ' + str(weld_size) + r' \text{ mm}'))
+            
+            size_status = "PASS" if (s_min <= weld_size <= s_max) else "FAIL"
+            self.report_check.append(["Weld Size", size_check_req, size_check_prov, size_status])
+
+            # 3.1.1 Fillet Weld (Strength Calculation + Throat Thickness)
+            self.report_check.append([
+                "SubSection", "Weld Strength Calculation", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            # Effective Throat Thickness (Eq 3.2/3.3)
+            throat_req = Math(inline=True)
+            throat_req.append(NoEscape(r'\begin{aligned}'))
+            throat_req.append(NoEscape(r't_t &= K \times s\\'))
+            throat_req.append(NoEscape(r'&= 0.7 \times ' + str(weld_size) + r'\\'))
+            throat_req.append(NoEscape(r'&= ' + str(effective_throat) + r' \text{ mm}\\'))
+            throat_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.3.2}]'))
+            throat_req.append(NoEscape(r'\end{aligned}'))
+            self.report_check.append(["Throat Thickness", "", throat_req, ""])
+
+            # Weld Metall Strength (Pwd) (Eq 3.1)
+            weld_metal_req = Math(inline=True)
+            weld_metal_req.append(NoEscape(r'\begin{aligned}\\'))
+            weld_metal_req.append(NoEscape(r'P_{wd} &= \frac{f_u}{\sqrt{3}} \cdot \frac{t_t}{\gamma_{mw}}\\\\'))
+            weld_metal_req.append(NoEscape(r'&= \frac{' + str(f2(fu_weld)) + r'}{\sqrt{3}} \times \frac{' + str(effective_throat) + r'}{' + str(gamma_mw) + r'}\\\\'))
+            weld_metal_req.append(NoEscape(r'&= ' + f'{P_wd_val:.2f}' + r' \text{ N/mm}\\'))
+            weld_metal_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.7.1.1}]'))
+            weld_metal_req.append(NoEscape(r'\end{aligned}'))
+            self.report_check.append(["Weld Metal Strength", "", weld_metal_req, ""])
+            
+            # Parent Metal Strength (Pmd) (Eq 3.4)
+            parent_metal_req = Math(inline=True)
+            parent_metal_req.append(NoEscape(r'\begin{aligned}\\'))
+            parent_metal_req.append(NoEscape(r'P_{md} &= 0.6 \cdot f_u \cdot \frac{t_t}{\gamma_{mw}}\\\\'))
+            parent_metal_req.append(NoEscape(r'&= 0.6 \times ' + str(f2(fu_parent)) + r' \times \frac{' + str(effective_throat) + r'}{' + str(gamma_mw) + r'}\\\\'))
+            parent_metal_req.append(NoEscape(r'&= ' + f'{P_md_val:.2f}' + r' \text{ N/mm}\\'))
+            parent_metal_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.7.1.2}]'))
+            parent_metal_req.append(NoEscape(r'\end{aligned}'))
+            self.report_check.append(["Parent Metal Strength", "", parent_metal_req, ""])
+            
+            # Governing Design Strength (Pd) (Eq 3.5)
+            design_strength_eq = Math(inline=True)
+            design_strength_eq.append(NoEscape(r'\begin{aligned}'))
+            design_strength_eq.append(NoEscape(r'P_d &= \min(P_{wd}, P_{md})\\'))
+            design_strength_eq.append(NoEscape(r'&= \min(' + f'{P_wd_val:.2f}' + r', ' + f'{P_md_val:.2f}' + r')\\'))
+            design_strength_eq.append(NoEscape(r'&= ' + f'{P_d_val:.2f}' + r' \text{ N/mm}\\'))
+            design_strength_eq.append(NoEscape(r'&[\text{Ref. Cl. 10.5.7.1}]'))
+            design_strength_eq.append(NoEscape(r'\end{aligned}'))
+            self.report_check.append(["Design Strength", "", design_strength_eq, ""])
+
+            # 3.1.2 Reduction Factors (Long Weld)
+            self.report_check.append([
+                "SubSection", "Long Joint Reduction Factor", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+
+            if l_eff > 150 * effective_throat:
+                beta_req = Math(inline=True)
+                beta_req.append(NoEscape(r'\begin{aligned}'))
+                beta_req.append(NoEscape(r'\text{Since } l_w &> 150 \times t_t\\'))
+                beta_req.append(NoEscape(r'\beta_{lw} &= 1.2 - 0.2 \times \frac{l_w}{150 \times t_t}\\'))
+                beta_req.append(NoEscape(r'&= 1.2 - 0.2 \times \frac{' + str(l_eff) + r'}{150 \times ' + str(effective_throat) + r'}\\'))
+                beta_calc = 1.2 - 0.2 * (l_eff / (150 * effective_throat))
+                beta_req.append(NoEscape(r'&= ' + f'{beta_calc:.3f}' + r'\\'))
+                beta_req.append(NoEscape(r'&\text{(but } 0.6 \leq \beta_{lw} \leq 1.0\text{)}\\'))
+                # Use stored beta_lw which should match
+                beta_req.append(NoEscape(r'\beta_{lw} &= ' + f'{beta_lw:.2f}' + r'\\'))
+                beta_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.7.2}]'))
+                beta_req.append(NoEscape(r'\end{aligned}'))
+                beta_status = ""
+            else:
+                beta_req = Math(inline=True)
+                beta_req.append(NoEscape(r'\begin{aligned}'))
+                beta_req.append(NoEscape(r'\text{Since } l_w &\leq 150 \times t_t\\'))
+                beta_req.append(NoEscape(r'\beta_{lw} &= 1.0\\'))
+                beta_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.7.2}]'))
+                beta_req.append(NoEscape(r'\end{aligned}'))
+                beta_status = "PASS"
+
+            beta_prov = Math(inline=True)
+            beta_prov.append(NoEscape(r'\beta_{lw} = ' + f'{beta_lw:.1f}'))
+            self.report_check.append(["Long Joint Factor", beta_req, beta_prov, beta_status])
+
+            # ==========================================================================
+            # SECTION 3.2: DETAILING CHECKLIST
+            # ==========================================================================
+
+            # 3.2.2 Effective Length of Weld (Limits)
+            self.report_check.append([
+                "SubSection", "Effective Length Limits", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            eff_len_req = Math(inline=True)
+            eff_len_req.append(NoEscape(r'\begin{aligned}'))
+            eff_len_req.append(NoEscape(r'l_{\text{eff,min}} &= \max(4s, 40)\\'))  # Step 1: Formula
+            eff_len_req.append(NoEscape(r'&= \max(4 \times ' + str(weld_size) + r', 40)\\'))  # Step 2: Substitution
+            eff_len_req.append(NoEscape(r'&= ' + str(l_eff_min) + r' \text{ mm}\\'))  # Step 3: Result
+            eff_len_req.append(NoEscape(r'l_{\text{eff,max}} &= 70s\\'))
+            eff_len_req.append(NoEscape(r'&= 70 \times ' + str(weld_size) + r'\\'))
+            eff_len_req.append(NoEscape(r'&= ' + str(l_eff_max) + r' \text{ mm}\\'))
+            eff_len_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.3}]'))
+            eff_len_req.append(NoEscape(r'\end{aligned}'))
+            
+            eff_len_prov = Math(inline=True)
+            eff_len_prov.append(NoEscape(r'l_{\text{eff}} = ' + str(l_eff) + r' \text{ mm}'))
+            
+            eff_status = "PASS" if (l_eff_min <= l_eff <= l_eff_max) else "FAIL"
+            self.report_check.append(["Length Limits", eff_len_req, eff_len_prov, eff_status])
+
+            # 3.2.3 End Returns
+            self.report_check.append([
+                "SubSection", "End Returns", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            return_req = Math(inline=True)
+            return_req.append(NoEscape(r'\begin{aligned}'))
+            return_req.append(NoEscape(r'\text{Min. Length} &= \max(2s, 12)\\'))
+            return_req.append(NoEscape(r'&= \max(2 \times ' + str(weld_size) + r', 12)\\'))
+            return_req.append(NoEscape(r'&= ' + str(end_return) + r' \text{ mm}\\'))
+            return_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.4.5}]'))
+            return_req.append(NoEscape(r'\end{aligned}'))
+            
+            return_prov = Math(inline=True)
+            return_prov.append(NoEscape(str(end_return) + r' \text{ mm}'))
+            
+            self.report_check.append(["End Returns", return_req, return_prov, "PASS"])
+
+            # ==========================================================================
+            # SECTION 3.3: DETAILING
+            # ==========================================================================
+
+            # 3.3.1 Calculating Required Weld Length
+            self.report_check.append([
+                "SubSection", "Required Weld Length", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            # Required Length Calculation (Eq 3.15)
+            # Use P_d_val from object to be consistent
+            l_req_base = axial_force_N / (2 * P_d_val) if P_d_val > 0 else 9999
+            l_req_disp = f2(l_req_base, 0.0)
+            
+            length_req_calc = Math(inline=True)
+            length_req_calc.append(NoEscape(r'\begin{aligned}\\'))
+            length_req_calc.append(NoEscape(r'l_{\text{req}} &= \frac{P}{2 \cdot P_d}\\\\'))
+            length_req_calc.append(NoEscape(r'&= \frac{' + str(int(axial_force_N)) + r'}{2 \times ' + f'{P_d_val:.2f}' + r'}\\\\'))
+            length_req_calc.append(NoEscape(r'&= ' + str(l_req_disp) + r' \text{ mm}\\\\'))
+            if beta_lw < 1.0:
+                l_req_final = l_req_base / beta_lw
+                length_req_calc.append(NoEscape(r'l_{\text{req,mod}} &= \frac{l_{\text{req}}}{\beta_{lw}} = \frac{' + str(l_req_disp) + r'}{' + str(beta_lw) + r'} = ' + f'{l_req_final:.1f}' + r' \text{ mm}\\'))
+            else:
+                length_req_calc.append(NoEscape(r'&\text{No long joint reduction.}\\'))
+            length_req_calc.append(NoEscape(r'\end{aligned}'))
+            
+            self.report_check.append(["Required Length", "", length_req_calc, ""])
+
+            # 3.3.2 Determining Connection Configuration
+            self.report_check.append([
+                "SubSection", "Connection Configuration", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            config_calc = Math(inline=True)
+            config_calc.append(NoEscape(r'\begin{aligned}'))
+            config_calc.append(NoEscape(r'L_{\text{conn}} &= l_{\text{eff}} + 2 \times l_{\text{return}}\\' ))
+            config_calc.append(NoEscape(r'&= ' + str(l_eff) + r' + 2 \times ' + str(end_return) + r'\\'))
+            config_calc.append(NoEscape(r'&= ' + str(conn_length) + r' \text{ mm}\\'))
+            config_calc.append(NoEscape(r'\end{aligned}'))
+            
+            self.report_check.append(["Configuration", "", config_calc, ""])
+
+            # ==========================================================================
+            # ADDITIONAL CHECKS
+            # ==========================================================================
+
+            # Base Metal Strength
+            self.report_check.append([
+                "SubSection", "Base Metal Strength", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            if is_comp:
+                comp_req = Math(inline=True)
+                comp_req.append(NoEscape(r'\begin{aligned}\\'))
+                comp_req.append(NoEscape(r'P_d &= \frac{A_g \times f_y}{\gamma_{m0}}\\\\'))
+                comp_req.append(NoEscape(r'&= \frac{' + f'{Ag:.1f}' + r' \times ' + str(fy) + r'}{' + str(gamma_m0) + r'}\\\\'))
+                comp_req.append(NoEscape(r'&= ' + str(base_metal_capacity_kN) + r' \text{ kN}\\'))
+                comp_req.append(NoEscape(r'&[\text{Ref. Cl. 7.1.2}]'))
+                comp_req.append(NoEscape(r'\end{aligned}'))
+                comp_status = "PASS" if base_metal_capacity_kN >= axial_kN else "FAIL"
+                self.report_check.append(["Plate Tension Capacity", f"{axial_kN:.2f} kN", comp_req, comp_status])
+            else:
+                ten_req = Math(inline=True)
+                ten_req.append(NoEscape(r'\begin{aligned}'))
+                ten_req.append(NoEscape(r'T_{dg} &= \frac{A_g f_y}{\gamma_{m0}} = ' + f'{Tdg:.2f}' + r' \text{ kN}\\'))
+                ten_req.append(NoEscape(r'T_{dn} &= \frac{0.9 A_g f_u \beta}{\gamma_{m1}} = ' + f'{Tdn:.2f}' + r' \text{ kN}\\'))
+                ten_req.append(NoEscape(r'T_d &= \min(T_{dg}, T_{dn}) = ' + str(base_metal_capacity_kN) + r' \text{ kN}\\'))
+                ten_req.append(NoEscape(r'&[\text{Ref. Cl. 6.2, 6.3}]'))
+                ten_req.append(NoEscape(r'\end{aligned}'))
+                ten_status = "PASS" if base_metal_capacity_kN >= axial_kN else "FAIL"
+                self.report_check.append(["Plate Tension Capacity", f"{axial_kN:.2f} kN", ten_req, ten_status])
+
+            # ==========================================================================
+            # UTILIZATION RATIO
+            # ==========================================================================
+            self.report_check.append([
+                "SubSection", "Utilization Ratio", "|p{4cm}|p{6cm}|p{4.5cm}|p{1.5cm}|"
+            ])
+            
+            n = 2
+            # Use stored capacity from design capacity if available to be exact
+            weld_capacity_val = g('design_capacity', 2 * l_eff * P_d_val * beta_lw)
+            weld_capacity_kN = f2(weld_capacity_val / 1000, 0.0)
+            
+            # Use stored UR if available
+            utilization_ratio_val = g('utilization_ratio', axial_kN / weld_capacity_kN if weld_capacity_kN > 0 else 0.0)
+            utilization_ratio = f2(utilization_ratio_val, 0.0)
+
+            util_req = Math(inline=True)
+            util_req.append(NoEscape(r'\begin{aligned}'))
+            util_req.append(NoEscape(r'P_{\text{capacity}} &= n \times l_{\text{eff}} \times P_d \times \beta_{lw}\\'))
+            util_req.append(NoEscape(r'&= ' + str(n) + r' \times ' + str(l_eff) + r' \times ' + f'{P_d_val:.2f}' + r' \times ' + str(beta_lw) + r'\\'))
+            util_req.append(NoEscape(r'&= ' + str(weld_capacity_kN) + r' \text{ kN}\\\\'))
+            util_req.append(NoEscape(r'\text{UR} &= \frac{P}{P_{\text{capacity}}}\\\\'))
+            util_req.append(NoEscape(r'&= \frac{' + str(axial_kN) + r'}{' + str(weld_capacity_kN) + r'}\\\\'))
+            util_req.append(NoEscape(r'&= ' + str(utilization_ratio) + r'\\'))
+            util_req.append(NoEscape(r'\end{aligned}'))
+
+            util_prov = Math(inline=True)
+            util_prov.append(NoEscape(str(utilization_ratio) + r' \leq 1.0'))
+
+            util_status = "PASS" if utilization_ratio <= 1.0 else "FAIL"
+            self.report_check.append(["Utilization", f"{axial_kN:.2f} kN", util_req, util_status])
+
+            #==========================================
+            #=========== GENERATE PDF REPORT ==========
+            #==========================================
+            Disp_2d_image = []
+            Disp_3D_image = "/ResourceFiles/images/3d.png"
+            rel_path = os.path.abspath(".").replace("\\", "/")
+            fname_no_ext = popup_summary.get("filename", "LapJointWeldedReport")
+            folder = popup_summary.get('folder', './reports')
+            os.makedirs(folder, exist_ok=True)
+
+            CreateLatex.save_latex(
+                CreateLatex(), self.report_input, self.report_check,
+                popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image,
+                module=self.module
+            )
+            self.logger.info(f"Report generated successfully: {fname_no_ext}.pdf")
+            return True
+
+        except Exception as e:
+            print(f"WARNING in save_design(): {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
 
     def get_3d_components(self):
         components = []

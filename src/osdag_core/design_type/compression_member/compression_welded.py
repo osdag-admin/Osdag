@@ -19,11 +19,11 @@ from ...design_report.reportGenerator_latex import CreateLatex
 from ...custom_logger import CustomLogger
 from pylatex.utils import NoEscape
 
-class Compression(Member):
+class Compression_welded(Member):
 
     def __init__(self):
         # print(f"Here Compression")
-        super(Compression, self).__init__()
+        super(Compression_welded, self).__init__()
         self.design_status = False
         self.hover_dict = {}
         # To avoid duplicate "Length provided is within the limit allowed" logs
@@ -267,10 +267,11 @@ class Compression(Member):
     # Design Preference Functions End
     ####################################
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_STRUT_WELDED_END_GUSSET
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -281,11 +282,11 @@ class Compression(Member):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_struts_weld_end_gusset_compress_member'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -293,7 +294,7 @@ class Compression(Member):
         
         # Shared formatter for all handlers
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+            fmt='%(asctime)s - Osdag - %(levelname)s - %(message)s', 
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
@@ -936,10 +937,6 @@ class Compression(Member):
         all_errors = []
         self.design_status = False
         
-        # Initialize logger if not already set
-        if not hasattr(self, 'logger'):
-            self.set_osdaglogger(None)
-        
         flag = False
         flag1 = False  # length > 0
         flag2 = False  # axial force > 0
@@ -1037,7 +1034,7 @@ class Compression(Member):
     # Setting inputs from the input dock GUI
 
     def set_input_values(self, design_dictionary):
-        super(Compression,self).set_input_values(design_dictionary)
+        super(Compression_welded,self).set_input_values(design_dictionary)
         #self.sizelist == self.sec_list
         # section properties
         # Reset per‑design flags

@@ -30,6 +30,7 @@ class BoundsSelectorDialog(QDialog):
         lower_bound = max(0.0, lower_bound)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.setObjectName("BoundsSelectorDialog")
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         

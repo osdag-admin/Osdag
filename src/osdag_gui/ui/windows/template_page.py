@@ -19,10 +19,11 @@ from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
 from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
 from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
 from osdag_gui.common_functions import design_examples
+from osdag_gui.ui.components.dialogs.check_for_updates import UpdateDialog
 
 from osdag_core.Common import *
 
-from osdag_gui.ui.windows.design_preferences import AdditionalInputs
+from osdag_gui.ui.windows.additional_inputs import AdditionalInputs
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_gui.data.database.database_config import *
 
@@ -31,7 +32,7 @@ from osdag_gui.__config__ import CAD_BACKEND
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
     downloadDatabase = Signal(str, str)
-    def __init__(self, title: str, backend: object, parent):
+    def __init__(self, title: str, backend: object, id:int, parent):
         super().__init__()
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
@@ -61,16 +62,17 @@ class CustomWindow(QWidget):
         self.ui_loaded = False
         self.backend.design_status = False
         self.backend.design_button_status = False
+        # This is used to save 3D Cad
         self.fuse_model = None
         self._pso_manager = None  # Lazy init for Plate Girder PSO UI management
         self.setObjectName("template_page")
 
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
-        self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs, parent=self)
         self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabase)
 
-        self.init_ui(title)
+        self.init_ui(title, id)
         self.sidebar = SidebarWidget(parent=self)
         self.sidebar.openNewTab.connect(self.openNewTabEmit)
         self.sidebar.resize_sidebar(self.width(), self.height())
@@ -83,13 +85,57 @@ class CustomWindow(QWidget):
         self.sidebar.raise_()
         
     def closeEvent(self, event):
-        """Handle window close event to ensure proper resource cleanup."""
-        # Cleanup PSO resources if they exist
-        if hasattr(self, '_pso_manager') and self._pso_manager:
-            try:
-                self._pso_manager.cleanup()
-            except Exception:
-                pass
+        """Handle window close event with GC-safe OCC cleanup.
+        
+        THE KEY INSIGHT: gc.collect() forces Python to destroy C++ wrappers in 
+        arbitrary order, but OpenCascade's Handle system requires View→Context→Driver 
+        destruction order. By disabling GC during cleanup, we let reference counting 
+        naturally handle the correct destruction order when Qt deletes the widget.
+        """
+        import gc
+        
+        # CRITICAL: Disable GC during the entire sensitive cleanup window
+        # This prevents Python from freeing OCC objects in the wrong order
+        gc_was_enabled = gc.isenabled()
+        gc.disable()
+        
+        try:
+            # 1. Cleanup PSO resources
+            if hasattr(self, '_pso_manager') and self._pso_manager:
+                try:
+                    self._pso_manager.cleanup()
+                except Exception:
+                    pass
+
+            # 2. GC-SAFE OCC CLEANUP: Clear objects but DON'T force destruction
+            if hasattr(self, 'cad_widget') and self.cad_widget:
+                try:
+                    # Step A: Clear Python-side references (model_ais_objects, view_cube, etc)
+                    # This breaks Python reference cycles without touching OCC internals
+                    if hasattr(self.cad_widget, 'cleanup_for_new_model'):
+                        self.cad_widget.cleanup_for_new_model()
+                    
+                    # Step B: Tell OCC to release all displayed shapes from GPU memory
+                    # EraseAll() properly releases OpenGL resources
+                    if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
+                        self.cad_widget._display.EraseAll()
+                    
+                    # DO NOT: call view.SetWindow(None) - corrupts driver state
+                    # DO NOT: set view/context = None - breaks OCC destruction order  
+                    # DO NOT: call gc.collect() - this is what causes the heap corruption!
+                    #
+                    # Qt's parent-child deletion will properly destroy the cad_widget,
+                    # which triggers qtViewer3d's destructor that knows the correct
+                    # cleanup sequence for OpenCascade's graphics pipeline.
+                    
+                except Exception as e:
+                    print(f"[WARNING] OCC cleanup: {e}")
+                    
+        finally:
+            # Re-enable GC after sensitive window (if it was enabled before)
+            if gc_was_enabled:
+                gc.enable()
+
         super().closeEvent(event)
 
     #---------------------------------CAD-SETUP-START----------------------------------------------
@@ -145,6 +191,9 @@ class CustomWindow(QWidget):
             print(f"[WARNING] OpenGL initialization failed: {e}")
             print("[INFO] 3D view may be unavailable. Try setting LIBGL_ALWAYS_SOFTWARE=1")
             self._cad_init_pending = False
+
+        #Update Output Buttons after CAD init
+        self.update_docking_icons(output_is_active=False)
     
     def _is_display_ready(self):
         """Check if the CAD display is initialized and ready to use."""
@@ -233,6 +282,7 @@ class CustomWindow(QWidget):
             else:
                 self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
         return super().paintEvent(event)
+    
     # Create the view control button on cad widget
     def create_cad_view_controls(self):
         """Create zoom controls anchored correctly below the view cube"""
@@ -481,7 +531,7 @@ class CustomWindow(QWidget):
         self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
         self.sidebar_animation.start()
 
-    def init_ui(self, title: str):
+    def init_ui(self, title: str, id: int):
         # Docking icons Parent class
         class ClickableSvgWidget(QSvgWidget):
             clicked = Signal()  # Define a custom clicked signal
@@ -585,7 +635,7 @@ class CustomWindow(QWidget):
         self.logs_dock.setVisible(False)
         # log text
         self.textEdit = self.logs_dock.log_display
-        self.backend.set_osdaglogger(self.textEdit)
+        self.backend.set_osdaglogger(self.textEdit, id)
         self.cad_log_splitter.addWidget(self.logs_dock)
 
         # Prefer stretch factors so ratio persists on resize
@@ -678,9 +728,9 @@ class CustomWindow(QWidget):
 
         file_menu.addSeparator()
 
-        save_input_action = QAction("Save Input", self)
+        save_input_action = QAction("Save Project", self)
         save_input_action.setShortcut(QKeySequence("Ctrl+S"))
-        save_input_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save"))
+        save_input_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save_Project"))
         file_menu.addAction(save_input_action)
 
         save_log_action = QAction("Save Log Messages", self)
@@ -777,15 +827,15 @@ class CustomWindow(QWidget):
         database_menu = self.menu_bar.addMenu("Database")
 
         input_csv_action = QAction("Save Inputs (.csv)", self)
-        input_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend))
+        input_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend, "Inputs"))
         database_menu.addAction(input_csv_action)
 
         output_csv_action = QAction("Save Outputs (.csv)", self)
-        output_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend))
+        output_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend, "Outputs"))
         database_menu.addAction(output_csv_action)
 
         input_osi_action = QAction("Save Inputs (.osi)", self)
-        input_osi_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save"))
+        input_osi_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save_OSI"))
         database_menu.addAction(input_osi_action)
 
         download_database_menu = database_menu.addMenu("Download Database")
@@ -837,7 +887,7 @@ class CustomWindow(QWidget):
         help_menu.addSeparator()
 
         check_update_action = QAction("Check For Update", self)
-        check_update_action.triggered.connect(self.on_check_for_update)
+        check_update_action.triggered.connect(lambda: UpdateDialog().exec())
         help_menu.addAction(check_update_action)
 
     #----------------Function-Trigger-for-MenuBar-START----------------------------------------
@@ -916,16 +966,19 @@ class CustomWindow(QWidget):
             key = input_widget.findChild(QWidget, key_str)
             if op[2] == TYPE_COMBOBOX:
                 if key_str in uiObj.keys():
-                    index = key.findText(uiObj[key_str], Qt.MatchFixedString)
+                    val = uiObj[key_str]
+                    if isinstance(val, list):
+                        val = val[0] if len(val) > 0 else "All"
+                    index = key.findText(val, Qt.MatchFixedString)
                     if index >= 0:
                         key.setCurrentIndex(index)
                     else:
                         if key_str in [KEY_SUPTDSEC, KEY_SUPTNGSEC]:
                             self.load_input_error_message += \
-                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Select from available Sections! \n"
+                                str(key_str) + ": (" + str(val) + ") - Select from available Sections! \n"
                         else:
                             self.load_input_error_message += \
-                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Default Value Considered! \n"
+                                str(key_str) + ": (" + str(val) + ") - Default Value Considered! \n"
             elif op[2] == TYPE_TEXTBOX:
                 if key_str in uiObj.keys():
                     if key_str == KEY_SHEAR or key_str==KEY_AXIAL or key_str == KEY_MOMENT:
@@ -1185,7 +1238,6 @@ class CustomWindow(QWidget):
     def update_docking_icons(self, input_is_active=None, log_is_active=None, output_is_active=None):
             
         if(input_is_active is not None):
-            self.input_dock_active = input_is_active
             # Update and save control state
             self.input_dock_active = input_is_active
             if self.input_dock_active:
@@ -1216,9 +1268,8 @@ class CustomWindow(QWidget):
 
         # Update log dock icon
         if(log_is_active is not None):
-            self.log_dock_active = log_is_active
             # Update and save control state
-            self.logs_dock_active = log_is_active
+            self.log_dock_active = log_is_active
             if self.log_dock_active:
                 if self.theme.is_light():
                     self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
@@ -1479,8 +1530,10 @@ class CustomWindow(QWidget):
 
         self.design_fn(option_list, data, main)
 
-        if trigger_type == "Save":
-            self.saveDesign_inputs()
+        if trigger_type == "Save_OSI":
+            self.saveOSI_inputs()
+        elif trigger_type == "Save_Project":
+            self.saveDesign()
         elif trigger_type == "Design_Pref":
             # print(f"trigger_type == Design_Pref")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
@@ -1514,7 +1567,7 @@ class CustomWindow(QWidget):
                 # Open Logs and close Loading
                 try:
                     self.toggle_animate(True, 'log', on_finished=self.finished_loading)
-                    self.logs_dock_active = True
+                    self.log_dock_active = True
                 except Exception:
                     if hasattr(self, 'logs_dock'):
                         self.logs_dock.setVisible(True)
@@ -1565,7 +1618,7 @@ class CustomWindow(QWidget):
                 def show_logs():
                     try:
                         self.toggle_animate(True, 'log', on_finished=self.finished_loading)
-                        self.logs_dock_active = True
+                        self.log_dock_active = True
                     except Exception:
                         if hasattr(self, 'logs_dock'):
                             self.logs_dock.setVisible(True)
@@ -1663,20 +1716,15 @@ class CustomWindow(QWidget):
 
                 print("Hover Dictionary: ", main.hover_dict)
 
-                # CRITICAL: Garbage collect before heavy CAD operations to prevent heap corruption
-                # This is essential when creating 64+ OpenCASCADE shapes (bolts/nuts/welds)
-                gc.collect()
-                
-                # Process Qt events before OpenGL rendering to prevent segfault on Linux
-                from PySide6.QtWidgets import QApplication
-                QApplication.processEvents()
+                # NOTE: DO NOT call gc.collect() or processEvents() here!
+                # They force OCC wrapper cleanup in arbitrary order, causing heap corruption.
+                # The OCC memory manager and Qt event loop handle cleanup safely.
                 
                 # Ensure display is ready before 3D rendering
                 if self._is_display_ready():
                     try:
                         self.commLogicObj.call_3DModel(status, main)
-                        # Garbage collect after CAD operations to clean up OCC shapes
-                        gc.collect()
+                        # NOTE: DO NOT call gc.collect() after CAD operations!
                     except Exception as e:
                         print(f"[ERROR] 3D model rendering failed: {e}")
                 else:
@@ -1829,7 +1877,6 @@ class CustomWindow(QWidget):
         # print(f"\n ========================Check done ===========================")
 
         self.design_inputs = design_dictionary
-        self.design_inputs = design_dictionary
         # print(f"\n[INFO] self.input_dock_inputs {self.input_dock_inputs}")
         # print(f"\n[INFO] design_fn design_dictionary{self.design_inputs}")
         # print(f"\n[INFO] main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref()}")
@@ -1925,31 +1972,76 @@ class CustomWindow(QWidget):
         self.designPrefDialog.ui.set_lock()
         self.designPrefDialog.show()
 
-    def saveDesign_inputs(self):
+    # This is to save Design as Project if Design is already done
+    # Else Save only OSI file
+    def saveDesign(self):
         design_state = self.backend.design_status
         filePath = None
         fileName = None
-        if not self.save_state:
-            default_dir = os.path.join(get_documents_folder(), "Inputs.osi")
+        if not design_state:
+            result = CustomMessageBox(
+                title="Save Options",
+                text=f"To Save As Project Perform Design First.",
+                buttons=["Save OSI Only", "Cancel"],
+                dialogType=MessageBoxType.Information,
+            ).exec()
+
+            # Handle result
+            if result == "Save OSI Only":
+                self.saveOSI_inputs()  
+                return
+                    
+            elif result == "Cancel":
+                return
+
+        elif not self.save_state:
+            # Get Save Dir and Filename
+            default_dir = os.path.join(get_documents_folder(), "Project.osi")
             filePath, _ = QFileDialog.getSaveFileName(self,
-                                                    "Save Design",
-                                                    default_dir,
-                                                    "Input Files(*.osi)",
-                                                    None)
+                                                        "Save Design as Project",
+                                                        default_dir,
+                                                        "Project Files(*.osi)",
+                                                        None)
             fileName = Path(filePath).stem
+
+            # Create New Record in Database
+            record = {
+                PROJECT_NAME: fileName,
+                PROJECT_PATH: filePath,
+                MODULE_KEY: self.backend.module_name(),
+            }
+            self.project_id = self.output_dock.save_to_database(record)
+   
+        # If already Saved
         else:
+            # Get Overwrite Location
             record = get_project_by_id(self.project_id)
             filePath = record.get(PROJECT_PATH)
             fileName = record.get(PROJECT_NAME)
-            
-        try:
-            with open(filePath, 'w') as input_file:
-                yaml.dump(self.design_inputs, input_file)
-            
-            # Design must be done before saving project
-            if design_state or self.save_state:
-                # Insert saved data in database and update states
-                self.save_state = True
+
+            result = CustomMessageBox(
+                title="Save Options",
+                text=f"Do you want to Overwrite\nthe existing project '{fileName}.osi'?",
+                buttons=["Yes Overwrite", "Save as New", "Cancel"],
+                dialogType=MessageBoxType.Information,
+            ).exec()
+
+            # Handle result
+            if result == "Yes Overwrite":
+                # Will be OverWritten Automatically
+                pass
+
+            elif result == "Save as New":
+                # Get Save Dir and Filename
+                default_dir = os.path.join(get_documents_folder(), "Project.osi")
+                filePath, _ = QFileDialog.getSaveFileName(self,
+                                                        "Save Design as Project",
+                                                        default_dir,
+                                                        "Project Files(*.osi)",
+                                                        None)
+                fileName = Path(filePath).stem
+
+                # Create New Record in Database
                 record = {
                     PROJECT_NAME: fileName,
                     PROJECT_PATH: filePath,
@@ -1957,6 +2049,44 @@ class CustomWindow(QWidget):
                 }
                 self.project_id = self.output_dock.save_to_database(record)
 
+            elif result == "Cancel":
+                return
+
+        # Try to save the Project    
+        try:
+            with open(filePath, 'w') as input_file:
+                yaml.dump(self.design_inputs, input_file)
+            
+            self.save_state = True 
+            # Save and Update ID 
+            self.project_id = self.output_dock.save_to_database(record)   
+
+            CustomMessageBox(
+                title="Success",
+                text="Saved OSI as Project Successfully!",
+                dialogType=MessageBoxType.Success
+            ).exec()
+
+        except Exception as e:
+            CustomMessageBox(
+                title="Unsaved File",
+                text="OSI file not saved.",
+                dialogType=MessageBoxType.Warning
+            ).exec()
+            return
+
+    def saveOSI_inputs(self):
+        # Get Save Dir and Filename
+        default_dir = os.path.join(get_documents_folder(), "Inputs.osi")
+        filePath, _ = QFileDialog.getSaveFileName(self,
+                                                    "Save Design Inputs",
+                                                    default_dir,
+                                                    "Input Files(*.osi)",
+                                                    None)
+        try:
+            with open(filePath, 'w') as input_file:
+                yaml.dump(self.design_inputs, input_file)
+            
             CustomMessageBox(
                 title="Success",
                 text="Saved OSI Successfully!",
@@ -1965,7 +2095,7 @@ class CustomWindow(QWidget):
 
         except Exception as e:
             CustomMessageBox(
-                title="Application",
+                title="Unsaved File",
                 text="OSI file not saved.",
                 dialogType=MessageBoxType.Warning
             ).exec()
@@ -2059,50 +2189,48 @@ class CustomWindow(QWidget):
     
     def _do_flush_cad_widget(self):
         """
-        Internal method that performs the actual CAD widget cleanup.
-        Uses the same safe cleanup order as display_3DModel in common_logic.py:
-        1. cleanup_for_new_model() FIRST - clears internal Python state
-        2. EraseAll() SECOND - clears OCC context  
-        3. gc.collect() at safe points
+        Internal method that performs GC-safe CAD widget cleanup.
         
-        This order is critical to prevent heap corruption.
+        KEY INSIGHT: We disable GC during cleanup to prevent Python from destroying
+        OCC C++ wrappers in arbitrary order. OpenCascade's Handle system requires
+        specific destruction ordering (View → Context → Driver).
         """
         if not hasattr(self, 'cad_widget') or not self.cad_widget:
             return
         
         import gc
         
-        # Step 1: Initial GC before any OCC operations
-        gc.collect()
+        # CRITICAL: Disable GC during cleanup to prevent wrong destruction order
+        gc_was_enabled = gc.isenabled()
+        gc.disable()
         
-        # Step 2: Clear internal Python state FIRST (before OCC context operations)
-        # This clears model_ais_objects, hover labels, view_cube reference, etc.
-        # CRITICAL: Must happen BEFORE EraseAll to prevent double-free
-        if hasattr(self.cad_widget, 'cleanup_for_new_model'):
-            try:
-                self.cad_widget.cleanup_for_new_model()
-            except Exception as e:
-                print(f"[WARNING] Error in cleanup_for_new_model: {e}")
-        
-        # Step 3: GC after clearing internal state
-        gc.collect()
-        
-        # Step 4: Now safe to clear OCC context
-        if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
-            try:
-                self.cad_widget._display.EraseAll()
-            except Exception as e:
-                print(f"[WARNING] Error erasing display: {e}")
-        
-        # Step 5: Final GC to clean up released OCC objects
-        gc.collect()
-        
-        # Step 6: Repaint to show empty view
-        if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
-            try:
-                self.cad_widget._display.Repaint()
-            except Exception as e:
-                print(f"[WARNING] Error repainting display: {e}")
+        try:
+            # Step 1: Clear internal Python state (model_ais_objects, view_cube, etc)
+            # This breaks Python reference cycles without forcing C++ destruction
+            if hasattr(self.cad_widget, 'cleanup_for_new_model'):
+                try:
+                    self.cad_widget.cleanup_for_new_model()
+                except Exception as e:
+                    print(f"[WARNING] Error in cleanup_for_new_model: {e}")
+            
+            # Step 2: Tell OCC to release displayed shapes from GPU memory
+            if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
+                try:
+                    self.cad_widget._display.EraseAll()
+                except Exception as e:
+                    print(f"[WARNING] Error erasing display: {e}")
+            
+            # Step 3: Repaint to show empty view
+            if hasattr(self.cad_widget, '_display') and self.cad_widget._display:
+                try:
+                    self.cad_widget._display.Repaint()
+                except Exception as e:
+                    print(f"[WARNING] Error repainting display: {e}")
+                    
+        finally:
+            # Re-enable GC after sensitive cleanup window
+            if gc_was_enabled:
+                gc.enable()
 
     # Error Message Box
     def show_error_msg(self, error):

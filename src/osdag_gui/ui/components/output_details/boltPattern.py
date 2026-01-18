@@ -360,23 +360,27 @@ class BoltPatternGenerator(QDialog):
              rem_len = width - last_bolt_x
              self.addHorizontalDimension(last_bolt_x, -h_offset, width, -h_offset, f"{rem_len:g}", pen)
              
-             # Vertical Dimensions (Right)
+             # Vertical Dimensions
+             # Detailed on Left, Overall on Right (Unified for Strut and Lap Joint)
+             detailed_x = -v_offset
+             overall_x = width + v_offset
+
              # Edge Distance (Top Edge -> First Bolt Row)
-             self.addVerticalDimension(width + v_offset, 0, width + v_offset, edge, f"{edge:g}", pen)
+             self.addVerticalDimension(detailed_x, 0, detailed_x, edge, f"{edge:g}", pen)
              
              # Gauge Spacing (Between Rows)
              for i in range(self.rows - 1):
                  y1 = edge + i * gauge1
                  y2 = edge + (i + 1) * gauge1
-                 self.addVerticalDimension(width + v_offset, y1, width + v_offset, y2, f"{gauge1:g}", pen)
+                 self.addVerticalDimension(detailed_x, y1, detailed_x, y2, f"{gauge1:g}", pen)
                  
              # Remaining Height (Last Bolt Row -> Bottom Edge)
              last_bolt_y = edge + (self.rows - 1) * gauge1
              rem_h = height - last_bolt_y
-             self.addVerticalDimension(width + v_offset, last_bolt_y, width + v_offset, height, f"{rem_h:g}", pen)
+             self.addVerticalDimension(detailed_x, last_bolt_y, detailed_x, height, f"{rem_h:g}", pen)
              
-             # Overall Height (Left)
-             self.addVerticalDimension(-v_offset, 0, -v_offset, height, f"{height:g}", pen)
+             # Overall Height
+             self.addVerticalDimension(overall_x, 0, overall_x, height, f"{height:g}", pen)
              
              # Overall Width (Bottom) - Optional but good for complete member detail
              # self.addHorizontalDimension(0, height + h_offset, width, height + h_offset, f"{width:g}", pen)

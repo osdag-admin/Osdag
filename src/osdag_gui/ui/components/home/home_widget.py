@@ -713,8 +713,10 @@ class HomeWidget(QWidget):
                         shutil.copy2(src, dst)
 
                 # 3. Run pdflatex
+                from osdag_core.design_report.reportGenerator_latex import get_latex_executable
+                latex_exec = get_latex_executable()
                 result = subprocess.run(
-                    ["pdflatex", "-interaction=nonstopmode", os.path.basename(tex_path)],
+                    [latex_exec, "-interaction=nonstopmode", os.path.basename(tex_path)],
                     cwd=os.path.dirname(tex_path),
                     capture_output=True,
                     text=True,

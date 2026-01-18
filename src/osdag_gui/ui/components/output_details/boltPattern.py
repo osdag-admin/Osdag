@@ -32,9 +32,12 @@ class BoltPatternGenerator(QDialog):
         
         # Check if Strut Bolted module
         self.is_strut = False
+        self.is_lap = False
         if self.main:
             try:
-                self.is_strut = (self.main.module_name() == 'Struts Bolted to End Gusset')
+                module_name = self.main.module_name()
+                self.is_strut = (module_name == 'Struts Bolted to End Gusset')
+                self.is_lap = (module_name == 'Lap Joint Bolted Connection')
             except AttributeError:
                 pass
         
@@ -248,8 +251,8 @@ class BoltPatternGenerator(QDialog):
         width = self.plate_width
 
         height = self.plate_height
-        if self.is_strut:
-             if self.member_height_designation is not None:
+        if self.is_strut or self.is_lap:
+             if self.is_strut and self.member_height_designation is not None:
                  height = self.member_height_designation
              elif 'Member.Depth' in params:
                  height = params['Member.Depth']
@@ -280,8 +283,8 @@ class BoltPatternGenerator(QDialog):
         # Draw holes
         for row in range(self.rows):
             for col in range(self.cols):
-                if self.is_strut:
-                    # Strut Logic (Horizontal Member)
+                if self.is_strut or self.is_lap:
+                    # Strut/Lap Logic (Horizontal Member)
                     # X = Left Start + End Dist (First Bolt margin) + Column Index * Pitch
                     # Y = Top Start + Edge Dist + Row Index * Gauge
                     # Note: Using 'end' as horizontal margin (End Distance) and 'pitch' as horizontal spacing
@@ -312,7 +315,7 @@ class BoltPatternGenerator(QDialog):
                 # print(f"row: {row}, col: {col}, x: {x}, y: {y}")
                 self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
         
-        if not self.is_strut:
+        if not self.is_strut and not self.is_lap:
             weld_size=self.weldsize
             self.scene.addRect(0, 0, weld_size, height, weld_pen,red_brush)
 
@@ -339,8 +342,8 @@ class BoltPatternGenerator(QDialog):
         h_offset = 15
         v_offset = 10
         
-        if self.is_strut:
-             # STRUT DIMENSIONS (Horizontal Layout)
+        if self.is_strut or self.is_lap:
+             # STRUT/LAP DIMENSIONS (Horizontal Layout)
              
              # Horizontal Dimensions (Top)
              # End Distance (Left Edge -> First Bolt Column)

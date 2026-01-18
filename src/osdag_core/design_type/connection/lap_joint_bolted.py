@@ -280,17 +280,21 @@ class LapJointBolted(MomentConnection):
             [str(files("osdag.data.ResourceFiles.images").joinpath("spacing_3.png")), 400, 277, ""])
         spacing.append(t99)
 
-        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.final_gauge if status else '')
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.final_pitch if status else '')
         spacing.append(t9)
 
         t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.final_end_dist if status else '')
         spacing.append(t10)
 
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.final_pitch if status else '')
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.final_gauge if status else '')
         spacing.append(t11)
 
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.final_edge_dist if status else '')
         spacing.append(t12)
+
+        # Add Member Depth (Plate Width) for Diagram
+        t_depth = ('Member.Depth', 'Member Depth', TYPE_TEXTBOX, self.width if status else 0.0)
+        spacing.append(t_depth)
 
         return spacing
     

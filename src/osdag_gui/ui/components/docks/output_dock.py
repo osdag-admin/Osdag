@@ -650,6 +650,8 @@ class OutputDock(QWidget):
                     elif main.module_name()==KEY_DISP_STRUT_BOLTED_END_GUSSET:
                         self.run_spacing_script(rows=self.backend.plate.bolt_line,cols=self.backend.plate.bolts_one_line,
                                                 main=main)
+                    elif main.module_name()==KEY_DISP_LAPJOINTBOLTED:
+                        self.run_spacing_script(rows=self.backend.rows, cols=self.backend.cols, main=main)
                     else :
                         flag_legacyspacing = True
 

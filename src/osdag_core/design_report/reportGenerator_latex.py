@@ -507,7 +507,7 @@ class CreateLatex(Document):
             doc.generate_tex(filename)
             doc.generate_pdf(filename, compiler=latex_executable, clean_tex = False)
         except Exception as e:
-            raise Exception({e})
+            pass
             
 
 def color_cell(cellcolor,celltext):

@@ -32,7 +32,7 @@ from osdag_gui.__config__ import CAD_BACKEND
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
     downloadDatabase = Signal(str, str)
-    def __init__(self, title: str, backend: object, parent):
+    def __init__(self, title: str, backend: object, id:int, parent):
         super().__init__()
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
@@ -72,7 +72,7 @@ class CustomWindow(QWidget):
         self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs, parent=self)
         self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabase)
 
-        self.init_ui(title)
+        self.init_ui(title, id)
         self.sidebar = SidebarWidget(parent=self)
         self.sidebar.openNewTab.connect(self.openNewTabEmit)
         self.sidebar.resize_sidebar(self.width(), self.height())
@@ -531,7 +531,7 @@ class CustomWindow(QWidget):
         self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
         self.sidebar_animation.start()
 
-    def init_ui(self, title: str):
+    def init_ui(self, title: str, id: int):
         # Docking icons Parent class
         class ClickableSvgWidget(QSvgWidget):
             clicked = Signal()  # Define a custom clicked signal
@@ -635,7 +635,7 @@ class CustomWindow(QWidget):
         self.logs_dock.setVisible(False)
         # log text
         self.textEdit = self.logs_dock.log_display
-        self.backend.set_osdaglogger(self.textEdit)
+        self.backend.set_osdaglogger(self.textEdit, id)
         self.cad_log_splitter.addWidget(self.logs_dock)
 
         # Prefer stretch factors so ratio persists on resize

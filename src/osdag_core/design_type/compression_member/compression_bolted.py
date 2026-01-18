@@ -44,10 +44,11 @@ class Compression_bolted(Member):
         self.design_status = False
         self.hover_dict = {}
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_STRUT_BOLTED_END_GUSSET
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for Compression Bolted Module
         """
@@ -56,11 +57,11 @@ class Compression_bolted(Member):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_struts_bolted_end_gusset_compress_member'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()

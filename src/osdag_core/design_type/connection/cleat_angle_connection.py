@@ -569,7 +569,7 @@ class CleatAngleConnection(ShearConnection):
 
         return spting_spacing
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -579,11 +579,11 @@ class CleatAngleConnection(ShearConnection):
 
         # Create unique logger name per instance
         unique_logger_name = f'Osdag_cleat_angle_shear_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -619,7 +619,8 @@ class CleatAngleConnection(ShearConnection):
             gui_handler.setFormatter(formatter)
             self.logger.addHandler(gui_handler)
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_CLEATANGLE
 
     def set_input_values(self, design_dictionary):

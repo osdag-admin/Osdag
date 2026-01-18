@@ -122,6 +122,44 @@ class MainWindow(QMainWindow):
         self.setCursor(Qt.CursorShape.ArrowCursor)
         # Apply global QToolTip stylesheet here
 
+        # To track the number of tabs for each Module
+        # To avoid logger dublicacy
+        self.module_count = {
+            KEY_DISP_FINPLATE: -1,
+            KEY_DISP_CLEATANGLE: -1,
+            KEY_DISP_ENDPLATE: -1,
+            KEY_DISP_SEATED_ANGLE: -1,
+
+            KEY_DISP_BCENDPLATE: -1,
+
+            KEY_DISP_BEAMCOVERPLATE: -1,
+            KEY_DISP_BEAMCOVERPLATEWELD: -1,
+            KEY_DISP_BB_EP_SPLICE: -1,
+
+            KEY_DISP_COLUMNCOVERPLATE: -1,
+            KEY_DISP_COLUMNCOVERPLATEWELD: -1,
+            KEY_DISP_COLUMNENDPLATE: -1,
+
+            KEY_DISP_LAPJOINTBOLTED: -1,
+            KEY_DISP_LAPJOINTWELDED: -1,
+            KEY_DISP_BUTTJOINTBOLTED: -1,
+            KEY_DISP_BUTTJOINTWELDED: -1,
+
+            KEY_DISP_TENSION_BOLTED: -1,
+            KEY_DISP_TENSION_WELDED: -1,
+
+            KEY_DISP_COMPRESSION_COLUMN: -1,
+            KEY_DISP_STRUT_WELDED_END_GUSSET: -1,
+            KEY_DISP_STRUT_BOLTED_END_GUSSET: -1,
+
+            KEY_DISP_FLEXURE: -1,
+            KEY_DISP_FLEXURE2: -1,
+            KEY_DISP_PLATE_GIRDER_WELDED: -1,
+            KEY_DISP_FLEXURE4: -1,
+
+            KEY_DISP_BASE_PLATE: -1,
+        }
+
         screen = QGuiApplication.primaryScreen()
         screen_size = screen.availableGeometry()
 
@@ -728,12 +766,17 @@ class MainWindow(QMainWindow):
         elif card_title == "Base Plate Connection":
             self.open_base_plate_conn()
 
+    # TO update count of opened module in current session
+    def update_module_count(self, backend:object) -> int:
+        key = backend.module_name()
+        # Increment module count
+        self.module_count[key] += 1
+        return self.module_count[key]
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
-
-    def common_open_module(self, backend_class, title):
+    def common_open_module(self, backend_class, title, id):
         self.clear_layout(self.main_widget_layout)
-        template_page = CustomWindow(title, backend_class, parent=self)
+        template_page = CustomWindow(title, backend_class, id, parent=self)
 
         # Load the last Design Inputs-start------------------------------------
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
@@ -761,102 +804,152 @@ class MainWindow(QMainWindow):
 
     # 1-Fin-plate-shear-connection
     def open_fin_plate_shear_conn(self):
-        self.common_open_module(FinPlateConnection, "Fin Plate Connection")
+        backend = FinPlateConnection
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Fin Plate Connection", id)
 
     # 2-Cleat-angle-shear-connection
     def open_cleat_angle_shear_conn(self):
-        self.common_open_module(CleatAngleConnection, "Cleat Angle Connection")
+        backend = CleatAngleConnection
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Cleat Angle Connection", id)
 
     # 3-Header-plate-shear-connection
     def open_header_plate_shear_conn(self):
-        self.common_open_module(EndPlateConnection, "Header Plate Connection")  
+        backend = EndPlateConnection
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Header Plate Connection", id)  
     
     # 4-Seated-angle-shear-connection
     def open_seated_angle_shear_conn(self):
-        self.common_open_module(SeatedAngleConnection, "Seated Angle Connection")
+        backend = SeatedAngleConnection
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Seated Angle Connection", id)
     
     # 5-Beam-to-Column-end-plate-moment-connection
     def open_btc_end_plate_moment_conn(self):
-        self.common_open_module(BeamColumnEndPlate, "Beam Column End Plate Connection")
+        backend = BeamColumnEndPlate
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Beam Column End Plate Connection", id)
 
     # 6-Beam-to-Beam-cover-plate-welded-moment-connection
     def open_btb_cover_plate_weld_moment_conn(self):
-        self.common_open_module(BeamCoverPlateWeld, "Beam Beam Cover Plate Welded")
+        backend = BeamCoverPlateWeld
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Beam Beam Cover Plate Welded", id)
 
     # 7-Beam-to-Beam-cover-plate-bolted-moment-connection
     def open_btb_cover_plate_bolt_moment_conn(self):
-        self.common_open_module(BeamCoverPlate, "Beam Beam Cover Plate Bolted")
+        backend = BeamCoverPlate
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Beam Beam Cover Plate Bolted", id)
         
     # 8-Beam-to-Beam-end-plate-splice-moment-connection
     def open_btb_end_plate_moment_conn(self):
-        self.common_open_module(BeamBeamEndPlateSplice, "Beam Beam End Plate")
+        backend = BeamBeamEndPlateSplice
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Beam Beam End Plate", id)
 
     # 9-Column-to-Column-end-plate-moment-connection
     def open_ctc_end_plate_moment_connection(self):
-        self.common_open_module(ColumnEndPlate, "Column End plate")    
+        backend = ColumnEndPlate
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Column End plate", id)    
 
     # 10-Column-to-Column-cover-plate-bolted-moment-connection
     def open_ctc_cover_plate_bolt_moment_conn(self):
-        self.common_open_module(ColumnCoverPlate, "Column Cover Plate Bolted")
+        backend = ColumnCoverPlate
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Column Cover Plate Bolted", id)
         
     # 11-Column-to-Column-cover-plate-welded-moment-connection
     def open_ctc_cover_plate_weld_moment_conn(self):
-        self.common_open_module(ColumnCoverPlateWeld, "Column Cover Plate Welded")
+        backend = ColumnCoverPlateWeld
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Column Cover Plate Welded", id)
 
     # 12-Lap-joint-welded-simple-Connection
     def open_lap_joint_welded_simple_conn(self):
-        self.common_open_module(LapJointWelded, "Lap Joint Welded Connection")
+        backend = LapJointWelded
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Lap Joint Welded Connection", id)
 
     # 13-Lap-joint-bolted-simple-connection
     def open_lap_joint_bolted_simple_conn(self):
-        self.common_open_module(LapJointBolted, "Lap Joint Bolted Connection")
+        backend = LapJointBolted
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Lap Joint Bolted Connection", id)
         
     # 14-Butt-joint-bolted-simple-connection
     def open_butt_joint_bolted_simple_conn(self):
-        self.common_open_module(ButtJointBolted, "Butt Joint Bolted Connection")
+        backend = ButtJointBolted
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Butt Joint Bolted Connection", id)
 
     # 15-Butt-joint-welded-simple-connection
     def open_butt_joint_welded_simple_conn(self):
-        self.common_open_module(ButtJointWelded, "Butt Joint Welded Connection") 
+        backend = ButtJointWelded
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Butt Joint Welded Connection", id) 
 
     # 16-Bolted-to-End-Gusset-Tension-Member
     def open_tension_bolted(self):
-        self.common_open_module(Tension_bolted, "Tension Member: Bolted to End Gusset")
+        backend = Tension_bolted
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Tension Member: Bolted to End Gusset", id)
  
     # 17-Welded-to-End-Gusset-Tension-Member
     def open_tension_welded(self):
-        self.common_open_module(Tension_welded, "Tension Member: Welded to End Gusset")     
+        backend = Tension_welded
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Tension Member: Welded to End Gusset", id)     
  
     # 18-Column-design-Compression-Member
     def open_column_design_compress_member(self):
-        self.common_open_module(ColumnDesign, "Column Design")
+        backend = ColumnDesign
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Column Design", id)
 
     # 19-Struts-welded-to-end-gusset-compression-member
     def open_struts_weld_end_gusset_compress_member(self):
-        self.common_open_module(Compression_welded, "Struts: Welded to End Gusset")
+        backend = Compression_welded
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Struts: Welded to End Gusset", id)
 
     def open_struts_bolted_end_gusset_compress_member(self):
-        self.common_open_module(Compression_bolted, "Struts: Bolted to End Gusset")
+        backend = Compression_bolted
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Struts: Bolted to End Gusset", id)
 
     # 20-Simply-Supported-Beam-Flexure-member
     def open_simply_supported_beam_flexure(self):
-        self.common_open_module(Flexure, "Simply Supported Beam")
+        backend = Flexure
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Simply Supported Beam", id)
         
     # 21-Cantilever-Beam-Flexure-member
     def open_cantilever_beam_flexure(self):
-        self.common_open_module(Flexure_Cantilever, "Cantilever Beam")
+        backend = Flexure_Cantilever
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Cantilever Beam", id)
 
     # 22-Plate-girder
     def open_plate_girder_flexure(self):
-        self.common_open_module(PlateGirderWelded, "Plate Girder")  
+        backend = PlateGirderWelded
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Plate Girder", id)  
 
     # 23-Flexure-purlin
     def open_purlin_flexure(self):
-        self.common_open_module(Flexure_Purlin, "Purlin")
+        backend = Flexure_Purlin
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Purlin", id)
 
     # 24-Base-Plate-connection
     def open_base_plate_conn(self):
-        self.common_open_module(BasePlateConnection, "Base Plate Connection")
+        backend = BasePlateConnection
+        id = self.update_module_count(backend)
+        self.common_open_module(backend, "Base Plate Connection", id)
 
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)

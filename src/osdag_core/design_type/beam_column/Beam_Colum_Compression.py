@@ -237,7 +237,8 @@ class ColumnDesign(Member):
 
     # Setting up logger and Input and Output Docks
     ####################################
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_COMPRESSION_COLUMN
 
     def set_osdaglogger(key):

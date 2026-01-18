@@ -267,10 +267,11 @@ class Compression_welded(Member):
     # Design Preference Functions End
     ####################################
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_STRUT_WELDED_END_GUSSET
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -281,11 +282,11 @@ class Compression_welded(Member):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_struts_weld_end_gusset_compress_member'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -928,10 +929,6 @@ class Compression_welded(Member):
         '''Need to check'''
         all_errors = []
         self.design_status = False
-        
-        # Initialize logger if not already set
-        if not hasattr(self, 'logger'):
-            self.set_osdaglogger(None)
         
         flag = False
         flag1 = False  # length > 0

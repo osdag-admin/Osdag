@@ -21,8 +21,23 @@ class BoltPatternGenerator(QDialog):
         self.plate_height = main.plate.height
         self.plate_width = main.plate.length 
         self.hole_dia=main.bolt.bolt_diameter_provided
-        self.rows=main.plate.bolts_one_line
-        self.cols=main.plate.bolt_line
+        self.rows=rows
+        self.cols=cols
+        if self.rows is None or self.rows == 0:
+             self.rows = main.plate.bolts_one_line
+        if self.cols is None or self.cols == 0:
+             self.cols = main.plate.bolt_line
+        if self.cols is None or self.cols == 0:
+             self.cols = main.plate.bolt_line
+        
+        # Check if Strut Bolted module
+        self.is_strut = False
+        if self.main:
+            try:
+                self.is_strut = (self.main.module_name() == 'Struts Bolted to End Gusset')
+            except AttributeError:
+                pass
+        
         print(self.plate_height,self.plate_width)
         output=main.output_values(True)
         dict1={i[0] : i[3] for i in output}
@@ -31,6 +46,27 @@ class BoltPatternGenerator(QDialog):
         self.weldsize=0
         if 'Weld.Size' in dict1:
             self.weldsize=dict1['Weld.Size']
+            
+        self.member_height_designation = None
+        if 'section_size.designation' in dict1:
+             desig = str(dict1['section_size.designation'])
+             # Expected format "60 x 60 x 4" or "ISA 60 x 60 x 6"
+             parts = []
+             if 'x' in desig:
+                 parts = desig.split('x')
+             elif 'X' in desig:
+                 parts = desig.split('X')
+             
+             if parts:
+                 try:
+                     # parts[0] might be "ISA 60 " or "60 "
+                     tup = parts[0].strip().split()
+                     # Take the last token which should be the number
+                     val_str = tup[-1]
+                     self.member_height_designation = float(val_str)
+                 except (ValueError, IndexError):
+                     pass
+                     
         self.initUI()
 
     def setupWrapper(self):
@@ -117,6 +153,16 @@ class BoltPatternGenerator(QDialog):
         spacing_data = self.connection.spacing(status=True)  # Get actual values
         param_map = {}
         print('spacing_data length' , len(spacing_data))
+        
+        # Check if Strut Bolted module
+        is_strut = False
+        if self.main:
+            try:
+                # Import commonly used keys if needed or rely on string comparison since main.module_name returns string
+                is_strut = (self.main.module_name() == 'Struts Bolted to End Gusset')
+            except AttributeError:
+                pass
+
         for item in spacing_data:
             key, _, _, value = item
             # print('key : ', key)
@@ -132,6 +178,48 @@ class BoltPatternGenerator(QDialog):
                 param_map['gauge'] = float(value)
             elif key == KEY_OUT_EDGE_DIST:
                 param_map['edge'] = float(value)
+            elif key == 'Member.Depth':
+                param_map['Member.Depth'] = float(value)
+
+        # For Strut Bolted module, the interpretation of parameters changes for drawing.
+        # The drawing assumes:
+        #   'pitch' for vertical spacing (Y-axis)
+        #   'gauge' for horizontal spacing (X-axis)
+        #   'end' for vertical margin (Y-axis)
+        #   'edge' for horizontal margin (X-axis)
+        #
+        # Osdag Core for Strut (Horizontal Member):
+        #   KEY_OUT_PITCH: Axial/Horizontal spacing
+        #   KEY_OUT_GAUGE: Transverse/Vertical spacing
+        #   KEY_OUT_END_DIST: Axial/Horizontal margin
+        #   KEY_OUT_EDGE_DIST: Transverse/Vertical margin
+        
+        if self.is_strut:
+            # Map Strut's horizontal spacing (Pitch) to drawing's horizontal spacing (gauge)
+            # Map Strut's vertical spacing (Gauge) to drawing's vertical spacing (pitch)
+            drawing_gauge = param_map['pitch']
+            drawing_pitch = param_map['gauge']
+            
+            # Map Strut's horizontal margin (End Dist) to drawing's horizontal margin (edge)
+            # Map Strut's vertical margin (Edge Dist) to drawing's vertical margin (end)
+            drawing_edge = param_map['end']
+            drawing_end = param_map['edge']
+
+            param_map['pitch'] = drawing_pitch
+            param_map['gauge'] = drawing_gauge
+            param_map['end'] = drawing_end
+            param_map['edge'] = drawing_edge
+            
+            # If gauge1/gauge2 were present, they would also need to be remapped if they represent horizontal spacing.
+            # Assuming for strut, 'gauge' is the primary transverse spacing.
+            if param_map.get('gauge1', 0) != 0 or param_map.get('gauge2', 0) != 0:
+                # If gauge1/gauge2 are used for strut, they would represent vertical spacing.
+                # In the drawing, vertical spacing is 'pitch'.
+                # So, if strut uses gauge1/gauge2, they should be mapped to drawing's pitch.
+                # This scenario is less common for struts, but if it happens, it needs careful handling.
+                # For now, we'll assume 'gauge' is the primary transverse spacing for strut.
+                pass
+
 
         # Add hardcoded hole diameter
         param_map['hole'] = self.main.bolt.bolt_diameter_provided
@@ -160,6 +248,11 @@ class BoltPatternGenerator(QDialog):
         width = self.plate_width
 
         height = self.plate_height
+        if self.is_strut:
+             if self.member_height_designation is not None:
+                 height = self.member_height_designation
+             elif 'Member.Depth' in params:
+                 height = params['Member.Depth']
         
         # Set up pens
         if self.theme.is_light():
@@ -171,43 +264,63 @@ class BoltPatternGenerator(QDialog):
         red_brush = QBrush(Qt.red)
 
         # Dimension offsets
-        h_offset = 40
+        h_offset = 60 # Increased to ensure left dimensions fit
         v_offset = 60
         
         # Create scene rectangle with extra space for dimensions
+        # setSceneRect(x, y, w, h)
         self.scene.setSceneRect(-h_offset, -v_offset, 
-                               width + 2*v_offset, height + 2*h_offset)
+                                width + 2*h_offset, height + 2*v_offset)
         
         # Draw rectangle
         background_brush = QBrush(QColor("#A7A796"))
         self.scene.addRect(0, 0, width, height, dimension_pen, background_brush)
 
         # Draw holes
+        # Draw holes
         for row in range(self.rows):
             for col in range(self.cols):
-                # Start from right edge (for example: total plate width - edge)
-                x_center = self.plate_width - edge
+                if self.is_strut:
+                    # Strut Logic (Horizontal Member)
+                    # X = Left Start + End Dist (First Bolt margin) + Column Index * Pitch
+                    # Y = Top Start + Edge Dist + Row Index * Gauge
+                    # Note: Using 'end' as horizontal margin (End Distance) and 'pitch' as horizontal spacing
+                    # Using 'edge' as vertical margin (Edge Distance) and 'gauge' as vertical spacing
+                    
+                    x_center = end + col * pitch
+                    # Assuming symmetric placement vertically or just simple pattern from top
+                    y_center = edge + row * gauge1 # Use gauge1/gauge/gauge2 logic if needed, simplify to gauge
+                    
+                    x = x_center - hole_diameter / 2
+                    y = y_center - hole_diameter / 2
+                else:
+                    # Fin Plate Logic (Vertical Member/Plate)
+                    # Start from right edge (for example: total plate width - edge)
+                    x_center = self.plate_width - edge
 
-                # Subtract gauges from right to left
-                for i in range(col):
-                    x_center -= gauge1 if i % 2 == 0 else gauge2
+                    # Subtract gauges from right to left
+                    for i in range(col):
+                        x_center -= gauge1 if i % 2 == 0 else gauge2
 
-                # Y-position stays the same
-                y_center = end + row * pitch
+                    # Y-position stays the same
+                    y_center = end + row * pitch
 
-                # Top-left corner for drawing the circle
-                x = x_center - hole_diameter / 2
-                y = y_center - hole_diameter / 2
+                    # Top-left corner for drawing the circle
+                    x = x_center - hole_diameter / 2
+                    y = y_center - hole_diameter / 2
 
-                print(f"row: {row}, col: {col}, x: {x}, y: {y}")
+                # print(f"row: {row}, col: {col}, x: {x}, y: {y}")
                 self.scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
-        weld_size=self.weldsize
-        self.scene.addRect(0, 0, weld_size, height, weld_pen,red_brush)
+        
+        if not self.is_strut:
+            weld_size=self.weldsize
+            self.scene.addRect(0, 0, weld_size, height, weld_pen,red_brush)
+
         print(params,dimension_pen)
         # Add dimensions
-        self.addDimensions(params, dimension_pen)
+        self.addDimensions(params, dimension_pen, width, height)
 
-    def addDimensions(self, params, pen):
+    def addDimensions(self, params, pen, width, height):
         # Extract parameters
         pitch = params['pitch']
         end = params['end']
@@ -222,40 +335,87 @@ class BoltPatternGenerator(QDialog):
             gauge1 = gauge
             gauge2 = gauge
         
-        width = self.plate_width
-        height = self.plate_height
-        
         # Offsets for dimension lines
         h_offset = 15
         v_offset = 10
         
-        # Add horizontal dimensions
-        x_start = width
-        segments = []
-        # First edge
-        segments.append(('edge', x_start-edge, x_start ))
-        x_start -=edge
-       
-        # Last edge
-        segments.append(('edge', 0, x_start))
+        if self.is_strut:
+             # STRUT DIMENSIONS (Horizontal Layout)
+             
+             # Horizontal Dimensions (Top)
+             # End Distance (Left Edge -> First Bolt Column)
+             self.addHorizontalDimension(0, -h_offset, end, -h_offset, f"{end:g}", pen)
+             
+             # Pitch Spacing (Between Columns)
+             for i in range(self.cols - 1):
+                 x1 = end + i * pitch
+                 x2 = end + (i + 1) * pitch
+                 self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{pitch:g}", pen)
+                 
+             # Remaining Length (Last Bolt Column -> Right Edge)
+             last_bolt_x = end + (self.cols - 1) * pitch
+             rem_len = width - last_bolt_x
+             self.addHorizontalDimension(last_bolt_x, -h_offset, width, -h_offset, f"{rem_len:g}", pen)
+             
+             # Vertical Dimensions (Right)
+             # Edge Distance (Top Edge -> First Bolt Row)
+             self.addVerticalDimension(width + v_offset, 0, width + v_offset, edge, f"{edge:g}", pen)
+             
+             # Gauge Spacing (Between Rows)
+             for i in range(self.rows - 1):
+                 y1 = edge + i * gauge1
+                 y2 = edge + (i + 1) * gauge1
+                 self.addVerticalDimension(width + v_offset, y1, width + v_offset, y2, f"{gauge1:g}", pen)
+                 
+             # Remaining Height (Last Bolt Row -> Bottom Edge)
+             last_bolt_y = edge + (self.rows - 1) * gauge1
+             rem_h = height - last_bolt_y
+             self.addVerticalDimension(width + v_offset, last_bolt_y, width + v_offset, height, f"{rem_h:g}", pen)
+             
+             # Overall Height (Left)
+             self.addVerticalDimension(-v_offset, 0, -v_offset, height, f"{height:g}", pen)
+             
+             # Overall Width (Bottom) - Optional but good for complete member detail
+             # self.addHorizontalDimension(0, height + h_offset, width, height + h_offset, f"{width:g}", pen)
 
-        # Draw each segment
-        for label, x1, x2 in segments:
-            value = x2 - x1
-            self.addHorizontalDimension(x1, -h_offset + 5, x2, -h_offset + 5, f"{value:.1f}", pen)
-        # Add vertical dimensions
-        self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
-        for i in range(self.rows - 1):
-            self.addVerticalDimension(width + v_offset, end + i * pitch, width + v_offset, end + (i + 1) * pitch, str(pitch), pen)
+        else:
+            # FIN PLATE LOGIC (Vertical Layout)
+            
+            # Add horizontal dimensions (Gauge/Edge from Right)
+            x_start = width
+            segments = []
+            # First edge
+            segments.append(('edge', x_start-edge, x_start ))
+            x_start -=edge
         
-        # Add bottom end distance dimension
-        self.addVerticalDimension(width + v_offset, height, width + v_offset, height - end, str(end), pen)
-        
-        # Add left side dimension
-        total_height = 2 * end + (self.rows - 1) * pitch
-        self.addVerticalDimension(-v_offset, 0, -v_offset, total_height, str(total_height), pen)
+            # Last edge
+            segments.append(('edge', 0, x_start))
+
+            # Draw each segment
+            for label, x1, x2 in segments:
+                value = x2 - x1
+                self.addHorizontalDimension(x1, -h_offset + 5, x2, -h_offset + 5, f"{value:g}", pen)
+            # Add vertical dimensions (Pitch/End from Top)
+            self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, f"{end:g}", pen)
+            for i in range(self.rows - 1):
+                self.addVerticalDimension(width + v_offset, end + i * pitch, width + v_offset, end + (i + 1) * pitch, f"{pitch:g}", pen)
+            
+            # Add bottom end distance dimension
+            last_bolt_y = end + (self.rows - 1) * pitch
+            rem_len = height - last_bolt_y
+            self.addVerticalDimension(width + v_offset, last_bolt_y, width + v_offset, height, f"{rem_len:g}", pen)
+            
+            # Add left side dimension
+            self.addVerticalDimension(-v_offset, 0, -v_offset, height, f"{height:g}", pen)
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
+        try:
+            val = float(text)
+            if val == 0:
+                return
+        except ValueError:
+            pass
+            
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = 3
         ext_length = 10
@@ -280,10 +440,11 @@ class BoltPatternGenerator(QDialog):
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
         if self.theme.is_light():
-            polygon_left.setBrush(QBrush(Qt.black))
+            polygon_right.setBrush(QBrush(Qt.black))
         else:
             polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
         
+        # Add text
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(5)
@@ -299,6 +460,13 @@ class BoltPatternGenerator(QDialog):
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
+        try:
+            val = float(text)
+            if val == 0:
+                return
+        except ValueError:
+            pass
+
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = 3
         ext_length = 10

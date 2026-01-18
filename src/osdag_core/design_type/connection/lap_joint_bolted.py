@@ -1010,24 +1010,23 @@ class LapJointBolted(MomentConnection):
         Generate the LaTeX design report for Lap Joint Bolted Connection (Tension/Compression)
         per IS 800:2007.
         """
-        
         try:
             def g(attr, default=None):
                 v = getattr(self, attr, default)
                 return default if v is None else v
-            
+
             def f2(x, default=0.0):
                 try:
                     return round(float(x), 2)
                 except (TypeError, ValueError):
                     return default
-            
+
             def as_int(x, default=0):
                 try:
                     return int(round(float(x)))
                 except (TypeError, ValueError):
                     return default
-            
+
             if not getattr(self, 'design_status', False):
                 self.report_input = {
                     KEY_MODULE: "Lap Joint Bolted Connection",
@@ -1063,10 +1062,9 @@ class LapJointBolted(MomentConnection):
             plate1_thk = f2(g('plate1thk', g('pltthk', 0.0)), 0.0)
             plate2_thk = f2(g('plate2thk', g('pltthk', 0.0)), 0.0)
             width = f2(g('width', 0.0), 0.0)
-            
             axial_kN = f2(g('axial_force_kN', g('tensile_force', 0.0)), 0.0)
+            
             edge_type = getattr(self.bolt, 'edgetype', 'Sheared or hand flame cut')
-
             bolt_dia_prov = f2(getattr(self.bolt, 'bolt_diameter_provided', 0.0) if hasattr(self, 'bolt') else 0.0, 0.0)
             bolt_grade_prov = f2(getattr(self.bolt, 'bolt_grade_provided', 0.0) if hasattr(self, 'bolt') else 0.0, 0.0)
             bolt_type = getattr(self.bolt, 'bolt_type', VALUE_NOT_APPLICABLE) if hasattr(self, 'bolt') else VALUE_NOT_APPLICABLE
@@ -1078,14 +1076,9 @@ class LapJointBolted(MomentConnection):
             rows = as_int(g('rows', 0), 0)
             cols = as_int(g('cols', 0), 0)
             n_bolts = as_int(g('number_bolts', 0), 0)
-            pitch = as_int(g('final_pitch', 0), 0)
+            pitch = f2(g('final_pitch', 0.0), 0.0)
             gauge = f2(g('final_gauge', 0.0), 0.0)
             e_dist = f2(g('final_edge_dist', 0.0), 0.0)
-            
-            p_min = as_int(getattr(self.bolt, 'min_pitch', 0) if hasattr(self, 'bolt') else 0, 0)
-            g_min = as_int(getattr(self.bolt, 'min_gauge', 0) if hasattr(self, 'bolt') else 0, 0)
-            e_min = f2(getattr(self.bolt, 'min_edge_dist', 0.0) if hasattr(self, 'bolt') else 0.0, 0.0)
-            e_max = f2(getattr(self.bolt, 'max_edge_dist', 0.0) if hasattr(self, 'bolt') else 0.0, 0.0)
             
             t_fu_fy_list = getattr(self, 'bolt_conn_plates_t_fu_fy', [])
             if t_fu_fy_list and len(t_fu_fy_list) > 0:
@@ -1094,20 +1087,15 @@ class LapJointBolted(MomentConnection):
             else:
                 fy = g('yield_stress', 0)
                 fu = 0
-            
+
             base_metal_capacity_kN = f2(g('base_metal_capacity_kN', 0.0), 0.0)
+            
             A_g = f2(g('A_g', 0.0), 0.0)
-            Tdg = f2(g('Tdg', 0.0), 0.0)
-            Tdn = f2(g('Tdn', 0.0), 0.0)
+            T_dg = f2(g('T_dg', 0.0), 0.0)
+            T_dn = f2(g('T_dn', 0.0), 0.0)
             T_db = f2(g('T_db', 0.0), 0.0)
             
-            # Utilization
             overall_ur = round(g('utilization_ratio', 0.0), 3)
-            
-            # Bolt values for equations
-            bolt_fu = as_int(bolt_grade_prov * 100, 0)
-            bolt_net_area = f2(math.pi * (bolt_dia_prov ** 2) / 4, 0.0)
-            kb = f2(getattr(self.bolt, 'kb', 1.0) if hasattr(self, 'bolt') else 1.0, 1.0)
 
             self.report_input = {
                 KEY_MODULE: "Lap Joint Bolted Connection",
@@ -1121,42 +1109,42 @@ class LapJointBolted(MomentConnection):
                 "Property Class *": bolt_grade_prov,
                 "Type *": bolt_type,
                 f"{'Tensile' if not is_comp else 'Axial'} Force (kN) *": axial_kN,
-                "Additional inputs and Design Preferences": "TITLE",
+                "Additional inputs": "TITLE",
                 "Bolt Hole Type": getattr(self.bolt, 'boltholetype', 'Standard'),
                 "Slip Factor (μf)": getattr(self.bolt, 'mu_f', 'N/A'),
                 "Edge Preparation Method": edge_type
             }
-            
+
             self.report_check = []
 
             #=============================================================
             #=========== SECTION 2.1: CALCULATING BOLT STRENGTH ==========
             #=============================================================
             self.report_check.append([
-                "SubSection", "Calculating Bolt Strength", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
+                "SubSection", "Calculating Bolt Strength", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
             d = float(self.bolt.bolt_diameter_provided)
             bolt_grade = float(self.bolt.bolt_grade_provided)
             f_ub = int(bolt_grade * 100)
-
-            plate1_thk = float(self.plate1.thickness[0]) if isinstance(self.plate1.thickness, list) else float(self.plate1.thickness)
-            plate2_thk = float(self.plate2.thickness[0]) if isinstance(self.plate2.thickness, list) else float(self.plate2.thickness)
-
-            # Calculate bolt areas
-            bolt_shank_area = (math.pi * d**2) / 4
-            bolt_net_area = (math.pi * (d - 0.9382 * math.sqrt(d))**2) / 4
-
+            
+            plate1_thk_raw = float(self.plate1.thickness[0]) if isinstance(self.plate1.thickness, list) else float(self.plate1.thickness)
+            plate2_thk_raw = float(self.plate2.thickness[0]) if isinstance(self.plate2.thickness, list) else float(self.plate2.thickness)
+            
+            bolt_shank_area = f2(math.pi * d**2 / 4, 0.0)
+            
+            if hasattr(self.bolt, 'bolt_net_area_provided'):
+                bolt_net_area = f2(self.bolt.bolt_net_area_provided, 0.0)
+            else:
+                bolt_net_area = f2(math.pi * (d - 0.9382 * math.sqrt(d))**2 / 4, 0.0)
+            
             gamma_mb = 1.25
 
             if self.bolt.bolt_type != "Bearing Bolt":
                 # ========== FRICTION GRIP TYPE BOLTING (Cl. 10.4.3) ==========
-                
-                # Calculate bolt proof load F_o
                 f_0 = 0.7 * f_ub
                 F_o = bolt_net_area * f_0
-                
-                mu = float(self.bolt.muf) if hasattr(self.bolt, 'muf') else 0.3
+                mu = float(self.bolt.mu_f) if hasattr(self.bolt, 'mu_f') else 0.3
                 n_e = 1  # Number of effective interfaces (single lap joint)
                 
                 bolt_hole_type_str = str(self.bolt.bolt_hole_type) if hasattr(self.bolt, 'bolt_hole_type') else "Standard"
@@ -1169,12 +1157,11 @@ class LapJointBolted(MomentConnection):
                     K_h = 0.85
                 else:  # long slotted
                     K_h = 0.7
-                
-                # Calculate V_nsf
+
                 V_nsf = mu * n_e * K_h * F_o
                 gamma_mf = 1.25  # For ultimate load
-                V_dsf = V_nsf / gamma_mf
-                V_dsf_kN = V_dsf / 1000
+                V_dsf_theoretical = V_nsf / gamma_mf
+                V_dsf_kN_theoretical = V_dsf_theoretical / 1000
                 
                 slip_req = Math(inline=True)
                 slip_req.append(NoEscape(r'\begin{aligned}'))
@@ -1188,7 +1175,7 @@ class LapJointBolted(MomentConnection):
                 slip_req.append(NoEscape(r'F_o &= A_{nb} \times f_0 = ' + f'{F_o:.2f}' + r' \text{ N}\\'))
                 slip_req.append(NoEscape(r'V_{nsf} &= ' + f'{mu:.2f}' + r' \times ' + str(n_e) + r' \times ' + f'{K_h:.2f}' + r' \times ' + f'{F_o:.2f}' + r'\\'))
                 slip_req.append(NoEscape(r'&= ' + f'{V_nsf:.2f}' + r' \text{ N}\\'))
-                slip_req.append(NoEscape(r'V_{dsf} &= \frac{' + f'{V_nsf:.2f}' + r'}{' + str(gamma_mf) + r'} = ' + f'{V_dsf_kN:.2f}' + r' \text{ kN}\\'))
+                slip_req.append(NoEscape(r'V_{dsf} &= \frac{' + f'{V_nsf:.2f}' + r'}{' + str(gamma_mf) + r'} = ' + f'{V_dsf_kN_theoretical:.2f}' + r' \text{ kN}\\'))
                 slip_req.append(NoEscape(r'&[\text{Ref. Cl. 10.4.3}]'))
                 slip_req.append(NoEscape(r'\end{aligned}'))
                 
@@ -1196,72 +1183,89 @@ class LapJointBolted(MomentConnection):
 
             else:  # Bearing Bolt
                 # ========== SHEAR CAPACITY (Cl. 10.3.3) ==========
+                V_dsb_kN = bolt_shear_kN
+                V_nsb = V_dsb_kN * gamma_mb
+                
                 n_n = 1  # Threads intercepting shear plane
                 n_s = 0  # No threads without shear
                 
-                V_nsb = (f_ub / math.sqrt(3)) * (n_n * bolt_net_area + n_s * bolt_shank_area)
-                V_dsb = V_nsb / gamma_mb
-                V_dsb_kN = V_dsb / 1000
-                
                 shear_req = Math(inline=True)
-                shear_req.append(NoEscape(r'\begin{aligned}'))
-                shear_req.append(NoEscape(r'V_{dsb} &= \frac{V_{nsb}}{\gamma_{mb}}\\'))
+                shear_req.append(NoEscape(r'\begin{aligned}\\'))
+                shear_req.append(NoEscape(r'V_{dsb} &= \frac{V_{nsb}}{\gamma_{mb}}\\\\'))
                 shear_req.append(NoEscape(r'V_{nsb} &= \frac{f_{ub}}{\sqrt{3}} \cdot (n_n \cdot A_{nb} + n_s \cdot A_{sb})\\'))
-                shear_req.append(NoEscape(r'A_{nb} &= ' + f'{bolt_net_area:.2f}' + r' \text{ mm}^2\\'))
-                shear_req.append(NoEscape(r'V_{nsb} &= \frac{' + str(f_ub) + r'}{\sqrt{3}} \times (1 \times ' + f'{bolt_net_area:.2f}' + r')\\'))
-                shear_req.append(NoEscape(r'&= ' + f'{V_nsb:.2f}' + r' \text{ N}\\'))
+                shear_req.append(NoEscape(r'&= \frac{' + str(f_ub) + r'}{\sqrt{3}} \times (1 \times ' + f'{bolt_net_area:.2f}' + r')\\'))
+                shear_req.append(NoEscape(r'&= ' + f'{V_nsb:.2f}' + r' \text{ kN}\\\\'))
                 shear_req.append(NoEscape(r'V_{dsb} &= \frac{' + f'{V_nsb:.2f}' + r'}{' + str(gamma_mb) + r'}\\'))
-                shear_req.append(NoEscape(r'&= ' + f'{V_dsb:.2f}' + r' \text{ N} = ' + f'{V_dsb_kN:.2f}' + r' \text{ kN}\\'))
+                shear_req.append(NoEscape(r'&= ' + f'{V_dsb_kN:.2f}' + r' \text{ kN}\\'))
                 shear_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.3}]'))
                 shear_req.append(NoEscape(r'\end{aligned}'))
                 
                 self.report_check.append(["Shear Capacity", "", shear_req, ""])
-                
+
                 # ========== BEARING CAPACITY (Cl. 10.3.4) ==========
-                t_min = min(plate1_thk, plate2_thk)
+                V_dpb_kN = bolt_bearing_kN 
+                V_npb = V_dpb_kN * gamma_mb 
+                
+                t_min = min(plate1_thk_raw, plate2_thk_raw)
                 f_u_plate = min(self.plate1.fu, self.plate2.fu)
                 
                 bolt_hole_type_str = str(self.bolt.bolt_hole_type) if hasattr(self.bolt, 'bolt_hole_type') else "Standard"
                 d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type_str)
                 
-                e = float(self.bolt.min_end_dist_round)
-                p = float(self.bolt.min_pitch_round)
+                e = float(self.final_end_dist) if hasattr(self, 'final_end_dist') and self.final_end_dist > 0 else float(self.bolt.min_end_dist_round)
+                p = float(self.final_pitch) if hasattr(self, 'final_pitch') and self.final_pitch > 0 else float(self.bolt.min_pitch_round)
                 
-                # Calculate k_b factor
+                # Calculate kb factor components (always calculate for report display)
                 if p > 0:
-                    k_b = min(
-                        e / (3.0 * d_0),
-                        p / (3.0 * d_0) - 0.25,
-                        f_ub / f_u_plate,
-                        1.0
-                    )
+                    kb_1 = e / (3.0 * d_0)
+                    kb_2 = p / (3.0 * d_0) - 0.25
+                    kb_3 = f_ub / f_u_plate
+                    kb_4 = 1.0
+                    kb_calc = min(kb_1, kb_2, kb_3, kb_4)
                 else:
-                    k_b = min(e / (3.0 * d_0), f_ub / f_u_plate, 1.0)
+                    kb_1 = e / (3.0 * d_0)
+                    kb_2 = float('inf')  # Not applicable
+                    kb_3 = f_ub / f_u_plate
+                    kb_4 = 1.0
+                    kb_calc = min(kb_1, kb_3, kb_4)
+
+                if hasattr(self.bolt, 'kb') and self.bolt.kb is not None:
+                    k_b = f2(self.bolt.kb, 1.0)
+                else:
+                    k_b = f2(kb_calc, 1.0)
                 
-                V_npb = 2.5 * k_b * d * t_min * f_u_plate
-                V_dpb = V_npb / gamma_mb
-                V_dpb_kN = V_dpb / 1000
+                kb_req = Math(inline=True)
+                kb_req.append(NoEscape(r'\begin{aligned}\\'))
+                kb_req.append(NoEscape(r'k_b &= \min\left(\frac{e}{3d_0}, \frac{p}{3d_0}-0.25, \frac{f_{ub}}{f_u}, 1.0\right)\\\\'))
+                kb_req.append(NoEscape(r'&= \min\left(\frac{' + f'{e:.1f}' + r'}{3 \times ' + f'{d_0:.1f}' + r'}, \frac{' + f'{p:.1f}' + r'}{3 \times ' + f'{d_0:.1f}' + r'}-0.25, \frac{' + str(f_ub) + r'}{' + str(f_u_plate) + r'}, 1.0\right)\\\\'))
+                
+                if p > 0:
+                    kb_req.append(NoEscape(r'&= \min(' + f'{kb_1:.2f}' + r', ' + f'{kb_2:.2f}' + r', ' + f'{kb_3:.2f}' + r', 1.0)\\\\'))
+                else:
+                    kb_req.append(NoEscape(r'&= \min(' + f'{kb_1:.2f}' + r', ' + f'{kb_3:.2f}' + r', 1.0)\\\\'))
+                
+                kb_req.append(NoEscape(r'&= ' + f'{k_b:.2f}'))
+                kb_req.append(NoEscape(r'\end{aligned}'))
+                self.report_check.append(["Bearing Factor", "", kb_req, ""])
                 
                 bearing_req = Math(inline=True)
                 bearing_req.append(NoEscape(r'\begin{aligned}'))
-                bearing_req.append(NoEscape(r'V_{dpb} &= \frac{V_{npb}}{\gamma_{mb}}\\'))
+                bearing_req.append(NoEscape(r'V_{dpb} &= \frac{V_{npb}}{\gamma_{mb}}\\\\'))
                 bearing_req.append(NoEscape(r'V_{npb} &= 2.5 \cdot k_b \cdot d \cdot t \cdot f_u\\'))
-                bearing_req.append(NoEscape(r'k_b &= \min\left(\frac{e}{3d_0}, \frac{p}{3d_0} - 0.25, \frac{f_{ub}}{f_u}, 1.0\right)\\'))
-                bearing_req.append(NoEscape(r'&= ' + f'{k_b:.3f}' + r'\\'))
-                bearing_req.append(NoEscape(r'V_{npb} &= 2.5 \times ' + f'{k_b:.3f}' + r' \times ' + f'{d:.1f}' + r' \times ' + f'{t_min:.1f}' + r' \times ' + str(f_u_plate) + r'\\'))
-                bearing_req.append(NoEscape(r'&= ' + f'{V_npb:.2f}' + r' \text{ N}\\'))
-                bearing_req.append(NoEscape(r'V_{dpb} &= ' + f'{V_dpb_kN:.2f}' + r' \text{ kN}\\'))
+                bearing_req.append(NoEscape(r'&= 2.5 \times ' + f'{k_b:.3f}' + r' \times ' + f'{d:.1f}' + r' \times ' + f'{t_min:.1f}' + r' \times ' + str(f_u_plate) + r'\\'))
+                bearing_req.append(NoEscape(r'&= ' + f'{V_npb:.2f}' + r' \text{ kN}\\\\'))
+                bearing_req.append(NoEscape(r'V_{dpb} &= \frac{' + f'{V_npb:.2f}' + r'}{' + f'{gamma_mb:.2f}' + r'}\\'))
+                bearing_req.append(NoEscape(r'&= ' + f'{V_dpb_kN:.2f}' + r' \text{ kN}\\'))
                 bearing_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.4}]'))
                 bearing_req.append(NoEscape(r'\end{aligned}'))
                 
                 self.report_check.append(["Bearing Capacity", "", bearing_req, ""])
-                
-                # Design Bolt Capacity
-                V_db_kN = min(V_dsb_kN, V_dpb_kN)
+
+                V_db_kN = bolt_final_cap
                 
                 cap_req = Math(inline=True)
                 cap_req.append(NoEscape(r'\begin{aligned}'))
-                cap_req.append(NoEscape(r'V_{db} = \min(' + f'{V_dsb_kN:.2f}' + r', ' + f'{V_dpb_kN:.2f}' + r')'+r'\\'))
+                cap_req.append(NoEscape(r'V_{db} &= \min(' + f'{bolt_shear_kN:.2f}' + r', ' + f'{bolt_bearing_kN:.2f}' + r')'+r'\\'))
                 cap_req.append(NoEscape(r'&= ' + f'{V_db_kN:.2f}' + r' \text{ kN}'+r'\\'))
                 cap_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.2, IS 800:2007}]'))
                 cap_req.append(NoEscape(r'\end{aligned}'))
@@ -1272,19 +1276,18 @@ class LapJointBolted(MomentConnection):
             #=========== SECTION 2.2: REDUCTION FACTORS ============
             #=======================================================
             self.report_check.append([
-                "SubSection", "Reduction Factors", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
+                "SubSection", "Reduction Factors", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
             l_j = (self.rows - 1) * self.final_pitch if self.rows > 1 else 0
             d = self.bolt.bolt_diameter_provided
-
+            
             lj_req = Math(inline=True)
             lj_req.append(NoEscape(r'\begin{aligned}'))
-
+            
             if l_j > 15 * d:
                 beta_lj = 1.075 - (l_j / (200 * d))
                 beta_lj = max(0.75, min(beta_lj, 1.0))
-
                 lj_req.append(NoEscape(r'\text{Since } l_j &> 15d\\'))
                 lj_req.append(NoEscape(r'l_j &= ' + str(l_j) + r' \text{ mm}, \quad 15d = ' + str(15 * d) + r' \text{ mm}\\'))
                 lj_req.append(NoEscape(r'\beta_{lj} &= 1.075 - \frac{l_j}{200 \cdot d}\\'))
@@ -1299,26 +1302,23 @@ class LapJointBolted(MomentConnection):
                 lj_req.append(NoEscape(r'l_j &= ' + str(l_j) + r' \text{ mm}, \quad 15d = ' + str(15 * d) + r' \text{ mm}\\'))
                 lj_req.append(NoEscape(r'\beta_{lj} &= 1.0 \text{ (No reduction)}\\'))
                 lj_status = "PASS"
-
+            
             lj_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.3.1}]'))
             lj_req.append(NoEscape(r'\end{aligned}'))
-
+            
             lj_prov = Math(inline=True)
             lj_prov.append(NoEscape(r'\beta_{lj} = ' + f'{beta_lj:.2f}'))
+            
+            self.report_check.append(["Long Joint Factor", '', lj_prov, ''])
 
-            self.report_check.append(["Long Joint Factor", lj_req, lj_prov, lj_status])
-
-            plate1_thk = float(self.plate1.thickness[0]) if isinstance(self.plate1.thickness, list) else float(self.plate1.thickness)
-            plate2_thk = float(self.plate2.thickness[0]) if isinstance(self.plate2.thickness, list) else float(self.plate2.thickness)
-            l_g = plate1_thk + plate2_thk
-
+            l_g = plate1_thk_raw + plate2_thk_raw
+            
             lg_req = Math(inline=True)
             lg_req.append(NoEscape(r'\begin{aligned}'))
-
+            
             if l_g > 5 * d:
                 beta_lg = (8 * d) / (3 * d + l_g)
                 beta_lg = min(beta_lg, beta_lj) if beta_lj else beta_lg
-                
                 lg_req.append(NoEscape(r'\text{Since } l_g &> 5d\\'))
                 lg_req.append(NoEscape(r'l_g &= ' + str(l_g) + r' \text{ mm}, \quad 5d = ' + str(5 * d) + r' \text{ mm}\\'))
                 lg_req.append(NoEscape(r'\beta_{lg} &= \frac{8d}{3d + l_g}\\'))
@@ -1333,45 +1333,39 @@ class LapJointBolted(MomentConnection):
                 lg_req.append(NoEscape(r'l_g &= ' + str(l_g) + r' \text{ mm}, \quad 5d = ' + str(5 * d) + r' \text{ mm}\\'))
                 lg_req.append(NoEscape(r'\beta_{lg} &= 1.0 \text{ (No reduction)}\\'))
                 lg_status = "PASS"
-
+            
             lg_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.3.2}]'))
             lg_req.append(NoEscape(r'\end{aligned}'))
-
+            
             lg_prov = Math(inline=True)
             lg_prov.append(NoEscape(r'\beta_{lg} = ' + f'{beta_lg:.2f}'))
-
-            self.report_check.append(["Large Grip Factor", lg_req, lg_prov, lg_status])
+            
+            self.report_check.append(["Large Grip Factor", '', lg_prov, ''])
 
             if self.bolt.bolt_hole_type != "Standard":
                 hole_req = Math(inline=True)
                 hole_req.append(NoEscape(r'\begin{aligned}'))
                 hole_req.append(NoEscape(r'\text{Hole Type: }' + self.bolt.bolt_hole_type + r'\\'))
-                
                 if "oversized" in self.bolt.bolt_hole_type.lower() or "short" in self.bolt.bolt_hole_type.lower():
                     hole_factor = 0.7
                 else:  # long-slotted
                     hole_factor = 0.5
-                
                 hole_req.append(NoEscape(r'\text{Reduction Factor} &= ' + str(hole_factor) + r'\\'))
                 hole_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.4}]'))
                 hole_req.append(NoEscape(r'\end{aligned}'))
-                
                 self.report_check.append(["Hole Type Reduction", hole_req, "", ""])
-            
+
             #=====================================
             # Section 2.3: Detailing Requirements
             #=====================================
             self.report_check.append([
-                "SubSection", "Detailing Requirements", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
+                "SubSection", "Detailing Requirements", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
-            # Get edge type from bolt object
-            edge_type = getattr(self.bolt, 'edgetype', 'Sheared or hand flame cut')
-
-            # 2.4.1 Minimum Spacing (Cl. 10.2.2)
+            # 2.3.1 Minimum Spacing (Cl. 10.2.2)
             p_min = as_int(2.5 * bolt_dia_prov, 0)
             g_min = as_int(2.5 * bolt_dia_prov, 0)
-
+            
             spacing_req = Math(inline=True)
             spacing_req.append(NoEscape(r'\begin{aligned}'))
             spacing_req.append(NoEscape(r'p_{\text{min}} &= 2.5 \cdot d\\'))
@@ -1382,21 +1376,21 @@ class LapJointBolted(MomentConnection):
             spacing_req.append(NoEscape(r'&= ' + str(g_min) + r' \text{ mm}\\ \\'))
             spacing_req.append(NoEscape(r'&[\text{Ref. Cl. 10.2.2}]'))
             spacing_req.append(NoEscape(r'\end{aligned}'))
-
+            
             spacing_prov = Math(inline=True)
             spacing_prov.append(NoEscape(r'\begin{aligned}'))
             spacing_prov.append(NoEscape(r'p_{\text{prov}} &= ' + str(pitch) + r' \text{ mm}\\'))
             spacing_prov.append(NoEscape(r'g_{\text{prov}} &= ' + str(gauge) + r' \text{ mm}'))
             spacing_prov.append(NoEscape(r'\end{aligned}'))
-
+            
             spacing_status = "PASS" if (pitch >= p_min and gauge >= g_min) else "FAIL"
             self.report_check.append(["Minimum Spacing", spacing_req, spacing_prov, spacing_status])
 
-            # 2.4.2 Maximum Spacing (Cl. 10.2.3.1)
-            plate_thk_min = min(plate1_thk, plate2_thk)
+            # 2.3.2 Maximum Spacing (Cl. 10.2.3.1)
+            plate_thk_min = min(plate1_thk_raw, plate2_thk_raw)
             p_max = as_int(min(32 * plate_thk_min, 300), 0)
             g_max = as_int(min(32 * plate_thk_min, 300), 0)
-
+            
             max_spacing_req = Math(inline=True)
             max_spacing_req.append(NoEscape(r'\begin{aligned}'))
             max_spacing_req.append(NoEscape(r'p_{\text{max}} &= \min(32 \cdot t, 300 \text{ mm})\\'))
@@ -1407,47 +1401,43 @@ class LapJointBolted(MomentConnection):
             max_spacing_req.append(NoEscape(r'&= ' + str(g_max) + r' \text{ mm}\\ \\'))
             max_spacing_req.append(NoEscape(r'&[\text{Ref. Cl. 10.2.3.1}]'))
             max_spacing_req.append(NoEscape(r'\end{aligned}'))
-
+            
             max_spacing_prov = Math(inline=True)
             max_spacing_prov.append(NoEscape(r'\begin{aligned}'))
             max_spacing_prov.append(NoEscape(r'p_{\text{prov}} &= ' + str(pitch) + r' \text{ mm}\\'))
             max_spacing_prov.append(NoEscape(r'g_{\text{prov}} &= ' + str(gauge) + r' \text{ mm}'))
             max_spacing_prov.append(NoEscape(r'\end{aligned}'))
-
+            
             max_spacing_status = "PASS" if (pitch <= p_max and gauge <= g_max) else "FAIL"
             self.report_check.append(["Maximum Spacing", max_spacing_req, max_spacing_prov, max_spacing_status])
 
-            # 2.4.3 Edge Distance (Cl. 10.2.4)
+            # 2.3.3 Edge Distance (Cl. 10.2.4)
             bolt_hole_type_str = str(self.bolt.bolt_hole_type) if hasattr(self.bolt, 'bolt_hole_type') else "Standard"
             d_hole = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type_str)
-
+            
             if "Sheared" in edge_type or "hand flame cut" in edge_type:
                 e_min_calc = f2(1.7 * d_hole, 0.0)
                 e_min_multiplier = 1.7
             else:  # Rolled, machine-flame cut, sawn and planed
                 e_min_calc = f2(1.5 * d_hole, 0.0)
                 e_min_multiplier = 1.5
-
-            # Calculate maximum edge distance
+            
             epsilon = math.sqrt(250 / fy)
             e_max_calc = f2(12 * plate_thk_min * epsilon, 0.0)
-
+            
             edge_req = Math(inline=True)
             edge_req.append(NoEscape(r'\begin{aligned}'))
             edge_req.append(NoEscape(r'e_{\min} &= ' + str(e_min_multiplier) + r' \cdot d_0\\'))
-            edge_req.append(NoEscape(r'd_0 &= \text{' + bolt_hole_type_str + r' hole diameter}\\'))
-            edge_req.append(NoEscape(r'&= ' + f'{d_hole:.1f}' + r' \text{ mm (Table 19)}\\'))
-            edge_req.append(NoEscape(r'e_{\min} &= ' + str(e_min_multiplier) + r' \times ' + f'{d_hole:.1f}' + r' = ' + f'{e_min_calc:.1f}' + r' \text{ mm}\\'))
+            edge_req.append(NoEscape(r'&= ' + str(e_min_multiplier) + r' \times ' + f'{d_hole:.1f}' + r' = ' + f'{e_min_calc:.1f}' + r' \text{ mm}\\'))
             edge_req.append(NoEscape(r'e_{\text{max}} &= 12 \cdot t \cdot \varepsilon\\'))
-            edge_req.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}} = \sqrt{\frac{250}{' + str(fy) + r'}} = ' + f'{epsilon:.2f}' + r'\\'))
-            edge_req.append(NoEscape(r'e_{\text{max}} &= 12 \times ' + str(plate_thk_min) + r' \times ' + f'{epsilon:.2f}' + r'\\'))
+            edge_req.append(NoEscape(r'&= 12 \times ' + str(plate_thk_min) + r' \times ' + f'{epsilon:.2f}' + r'\\'))
             edge_req.append(NoEscape(r'&= ' + str(e_max_calc) + r' \text{ mm}\\ \\'))
             edge_req.append(NoEscape(r'&[\text{Ref. Cl. 10.2.4}]'))
             edge_req.append(NoEscape(r'\end{aligned}'))
-
+            
             edge_prov = Math(inline=True)
             edge_prov.append(NoEscape(r'e_{\text{prov}} = ' + str(e_dist) + r' \text{ mm}'))
-
+            
             edge_status = "PASS" if (e_dist >= e_min_calc and e_dist <= e_max_calc) else "FAIL"
             self.report_check.append(["Edge Distance", edge_req, edge_prov, edge_status])
 
@@ -1455,57 +1445,142 @@ class LapJointBolted(MomentConnection):
             # Section 2.4: Number of Bolts
             #===============================
             self.report_check.append([
-                "SubSection", "Number of Bolts Required", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
+                "SubSection", "Number of Bolts Required", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
             bolts_req_initial = math.ceil(axial_kN / bolt_final_cap) if bolt_final_cap > 0 else 0
-            n_bolts = as_int(g("number_bolts"), 0)
-
+            
             bolts_eq = Math(inline=True)
-            bolts_eq.append(NoEscape(r'\begin{aligned}'))
-            bolts_eq.append(NoEscape(r'n &= \frac{P}{V_{db}}\\'))
-            bolts_eq.append(NoEscape(r'&= \frac{' + str(axial_kN) + r'}{' + str(bolt_final_cap) + r'}\\'))
+            bolts_eq.append(NoEscape(r'\begin{aligned}\\'))
+            bolts_eq.append(NoEscape(r'n &= \frac{P}{V_{db}}\\\\'))
+            bolts_eq.append(NoEscape(r'&= \frac{' + str(axial_kN) + r'}{' + str(bolt_final_cap) + r'}\\\\'))
             bolts_eq.append(NoEscape(r'&= ' + str(bolts_req_initial) + r' \text{ nos.}\\'))
             bolts_eq.append(NoEscape(r'\end{aligned}'))
-
-            self.report_check.append(["Bolts Required", bolts_eq, n_bolts, ""])
             
+            self.report_check.append(["Bolts Required", f" {axial_kN:.2f} kN", bolts_eq, ""])
+
             #===============================
             # Section 2.5: Bolt Arrangement
             #===============================
             self.report_check.append([
-                "SubSection", "Bolt Arrangement", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
+                "SubSection", "Bolt Arrangement", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
             
             self.report_check.append([
-                "Bolt Pattern", "", f"Arrangement: {rows} rows × {cols} columns", ""
+                "Bolt Pattern", "2", f"Arrangement: {rows} rows × {cols} columns", ""
             ])
 
+            #================================
+            # Section 2.6: Base Metal Strength
+            #================================
+            self.report_check.append([
+                "SubSection", "Base Metal Strength", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+            ])
+
+            if is_comp:
+                base_req = Math(inline=True)
+                base_req.append(NoEscape(r'\begin{aligned}\\'))
+                base_req.append(NoEscape(r'P_d &= \frac{A_g \cdot f_y}{\gamma_{m0}}\\\\'))
+                base_req.append(NoEscape(r'&= \frac{' + str(A_g) + r' \times ' + str(fy) + r'}{1.10}\\\\'))
+                base_req.append(NoEscape(r'&= ' + f'{base_metal_capacity_kN:.2f}' + r' \text{ kN}\\'))
+                base_req.append(NoEscape(r'&[\text{Ref. Cl. 7.1.2}]'))
+                base_req.append(NoEscape(r'\end{aligned}'))
+                
+                base_status = "PASS" if base_metal_capacity_kN >= axial_kN else "FAIL"
+                self.report_check.append(["Plate Tension Capacity", "", base_req, base_status])
+            else:
+                # 1. Gross Section Yielding
+                yield_req = Math(inline=True)
+                yield_req.append(NoEscape(r'\begin{aligned}\\'))
+                yield_req.append(NoEscape(r'T_{dg} &= \frac{A_g \cdot f_y}{\gamma_{m0}}\\\\'))
+                yield_req.append(NoEscape(r'&= \frac{' + str(A_g) + r' \times ' + str(fy) + r'}{1.10}\\\\'))
+                yield_req.append(NoEscape(r'&= ' + f'{T_dg:.2f}' + r' \text{ kN}\\'))
+                yield_req.append(NoEscape(r'&[\text{Ref. Cl. 6.2}]'))
+                yield_req.append(NoEscape(r'\end{aligned}'))
+                self.report_check.append(["Gross Section Yield", "", yield_req, ""])
+
+                # 2. Net Section Rupture
+                rup_req = Math(inline=True)
+                rup_req.append(NoEscape(r'\begin{aligned}'))
+                rup_req.append(NoEscape(r'T_{dn} &= \frac{0.9 A_n f_u}{\gamma_{m1}}\\'))
+                rup_req.append(NoEscape(r'&= ' + f'{T_dn:.2f}' + r' \text{ kN}\\'))
+                rup_req.append(NoEscape(r'&[\text{Ref. Cl. 6.3}]'))
+                rup_req.append(NoEscape(r'\end{aligned}'))
+                self.report_check.append(["Net Section Rupture", "", rup_req, ""])
+
+                # 3. Block Shear (Cl 6.4)
+                # Recalculate areas for report clarity
+                # Note: We use the same logic as the solver's check_base_metal_strength
+                n_r = self.rows
+                p = self.final_pitch
+                g_val = self.final_gauge
+                e_val = self.final_end_dist
+                dia_hole = IS800_2007.cl_10_2_1_bolt_hole_size(d, str(self.bolt.bolt_hole_type))
+                
+                t_min = min(plate1_thk_raw, plate2_thk_raw)
+                
+                Avg = t_min * ((n_r - 1) * g_val + e_val)
+                Avn = t_min * ((n_r - 1) * g_val + e_val - (n_r - 0.5) * dia_hole)
+                Atg = t_min * e_val
+                Atn = t_min * (e_val - 0.5 * dia_hole)
+                
+                Tdb1 = (Avg * fy / (math.sqrt(3) * 1.10) + 0.9 * Atn * fu / 1.25) / 1000
+                Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.10) / 1000
+                Tdb = min(Tdb1, Tdb2)
+
+                block_req = Math(inline=True)
+                block_req.append(NoEscape(r'\begin{aligned}'))
+                block_req.append(NoEscape(r'A_{vg} &= ' + f'{Avg:.0f}' + r' \text{ mm}^2, \quad A_{vn} = ' + f'{Avn:.0f}' + r' \text{ mm}^2\\'))
+                block_req.append(NoEscape(r'A_{tg} &= ' + f'{Atg:.0f}' + r' \text{ mm}^2, \quad A_{tn} = ' + f'{Atn:.0f}' + r' \text{ mm}^2\\'))
+                block_req.append(NoEscape(r'T_{db1} &= \frac{A_{vg} f_y}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_u}{\gamma_{m1}} = ' + f'{Tdb1:.2f}' + r' \text{ kN}\\'))
+                block_req.append(NoEscape(r'T_{db2} &= \frac{0.9 A_{vn} f_u}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_y}{\gamma_{m0}} = ' + f'{Tdb2:.2f}' + r' \text{ kN}\\'))
+                block_req.append(NoEscape(r'T_{db} &= \min(T_{db1}, T_{db2}) = ' + f'{Tdb:.2f}' + r' \text{ kN}\\'))
+                block_req.append(NoEscape(r'&[\text{Ref. Cl. 6.4.1}]'))
+                block_req.append(NoEscape(r'\end{aligned}'))
+                self.report_check.append(["Block Shear", "", block_req, ""])
+
+                # Governing Strength
+                base_req = Math(inline=True)
+                base_req.append(NoEscape(r'\begin{aligned}'))
+                base_req.append(NoEscape(r'T_d &= \min(T_{dg}, T_{dn}, T_{db})\\'))
+                base_req.append(NoEscape(r'&= ' + f'{base_metal_capacity_kN:.2f}' + r' \text{ kN}\\'))
+                base_req.append(NoEscape(r'\end{aligned}'))
+                
+                base_status = "PASS" if base_metal_capacity_kN >= axial_kN else "FAIL"
+                self.report_check.append(["Plate Tension Capacity", "", base_req, base_status])
+
             #=============================
-            # Section 2.6: Design Summary
+            # Section 2.7: Design Summary
             #=============================
             self.report_check.append([
-                "SubSection", "Design Summary", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
+                "SubSection", "Design Summary", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
-            total_capacity = f2(bolt_final_cap * n_bolts, 0.0)
-            if total_capacity > 0:
-                utilization_ratio = axial_kN / total_capacity
-                overall_ur = round(utilization_ratio, 2)
-            else:
-                utilization_ratio = float('inf')
-                overall_ur = "Inf"
+            bolt_capacity_total = f2(bolt_final_cap * n_bolts, 0.0)
+            bolt_ur = axial_kN / bolt_capacity_total if bolt_capacity_total > 0 else 999.0
+            
+            plate_ur = axial_kN / base_metal_capacity_kN if base_metal_capacity_kN > 0 else 999.0
+            
+            # Overall UR is max of both
+            overall_ur_val = max(bolt_ur, plate_ur)
+            overall_ur = round(overall_ur_val, 3)
 
             ur_req = Math(inline=True)
-            ur_req.append(NoEscape(r'\begin{aligned} UR &= \frac{\text{Applied Force}}{\text{Design Capacity}}\\'))
-            ur_req.append(NoEscape(r'&= \frac{' + str(axial_kN) + '}{' + str(total_capacity) + r'}\\'))
-            ur_req.append(NoEscape(r'&= ' + str(overall_ur) + r' \end{aligned}'))
-
+            ur_req.append(NoEscape(r'\begin{aligned}\\'))
+            ur_req.append(NoEscape(r'\text{Bolt Capacity} &= ' + str(bolt_capacity_total) + r' \text{ kN}\\'))
+            ur_req.append(NoEscape(r'\text{Plate Capacity} &= ' + str(base_metal_capacity_kN) + r' \text{ kN}\\\\'))
+            ur_req.append(NoEscape(r'\text{UR}_{\text{bolt}} &= \frac{' + str(axial_kN) + r'}{' + str(bolt_capacity_total) + r'}\\'))
+            ur_req.append(NoEscape(r'&= ' + f'{bolt_ur:.3f}' + r'\\\\'))
+            ur_req.append(NoEscape(r'\text{UR}_{\text{plate}} &= \frac{' + str(axial_kN) + r'}{' + str(base_metal_capacity_kN) + r'}\\'))
+            ur_req.append(NoEscape(r'&= ' + f'{plate_ur:.3f}' + r'\\\\'))
+            ur_req.append(NoEscape(r'\text{UR}_{\text{final}} &= \max(\text{UR}_{\text{bolt}}, \text{UR}_{\text{plate}})\\'))
+            ur_req.append(NoEscape(r'&= ' + str(overall_ur) + r'\end{aligned}'))
+            
             util_prov = Math(inline=True)
-            util_prov.append(NoEscape(str(overall_ur) + r' < 1.0'))
-
-            util_status = "PASS" if utilization_ratio <= 1.0 else "FAIL"
-            self.report_check.append(["Utilization", ur_req, util_prov, util_status])
+            util_prov.append(NoEscape(str(overall_ur) + r' \leq 1.0'))
+        
+            util_status = "PASS" if overall_ur_val <= 1.0 else "FAIL"
+            self.report_check.append(["Utilization Ratio", f"{axial_kN:.2f} kN", ur_req, util_status])
 
             Disp_2d_image = []
             Disp_3D_image = "/ResourceFiles/images/3d.png"
@@ -1513,15 +1588,18 @@ class LapJointBolted(MomentConnection):
             fname_no_ext = popup_summary.get("filename", "LapJointBoltedReport")
             folder = popup_summary.get('folder', './reports')
             os.makedirs(folder, exist_ok=True)
-
+            
             CreateLatex.save_latex(
                 CreateLatex(), self.report_input, self.report_check,
                 popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image,
                 module=self.module
             )
+            
             self.logger.info(f"Report generated successfully: {fname_no_ext}.pdf")
             return True
 
         except Exception as e:
             print(f"WARNING in save_design(): {e}")
+            import traceback
+            traceback.print_exc()
             return False

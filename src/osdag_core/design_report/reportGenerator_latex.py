@@ -529,7 +529,7 @@ class CreateLatex(Document):
             return False
 
         except Exception as e:
-            raise Exception({e})
+            pass
             
 
 def color_cell(cellcolor,celltext):

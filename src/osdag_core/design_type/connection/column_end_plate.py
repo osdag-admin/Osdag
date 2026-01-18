@@ -225,7 +225,7 @@ class ColumnEndPlate(MomentConnection):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -236,11 +236,11 @@ class ColumnEndPlate(MomentConnection):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_ctc_end_plate_moment_connection'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -276,7 +276,8 @@ class ColumnEndPlate(MomentConnection):
             gui_handler.setFormatter(formatter)
             self.logger.addHandler(gui_handler)
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_COLUMNENDPLATE
 
     def input_values(self):

@@ -224,7 +224,7 @@ class Tension_bolted(Member):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -235,11 +235,11 @@ class Tension_bolted(Member):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_tension_bolted'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -274,13 +274,8 @@ class Tension_bolted(Member):
             gui_handler = OurLog(key)
             gui_handler.setFormatter(formatter)
             self.logger.addHandler(gui_handler)
-
-    def module_name(self):
-
-        """
-        Function to call the module name
-        """
-
+    @staticmethod
+    def module_name():
         return KEY_DISP_TENSION_BOLTED
 
     def customized_input(self):

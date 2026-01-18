@@ -486,7 +486,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.hover_dict = {}
 
     # setting logger for the module
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Set logger for Base Plate Module.
         """
@@ -495,11 +495,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_base_plate_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -535,10 +535,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             gui_handler.setFormatter(formatter)
             self.logger.addHandler(gui_handler)
 
-    def module_name(self):
-        """
-        Call the Base Plate Module key for displaying the module name.
-        """
+    @staticmethod
+    def module_name():
         return KEY_DISP_BASE_PLATE
 
     # define fields for the input dock to create UI

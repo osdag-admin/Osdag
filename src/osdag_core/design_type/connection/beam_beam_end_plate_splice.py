@@ -178,7 +178,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # self.func_for_validation(self, design_dictionary)
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -189,11 +189,11 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_btb_end_plate_moment_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -230,7 +230,8 @@ class BeamBeamEndPlateSplice(MomentConnection):
             self.logger.addHandler(gui_handler)
 
     # set module name
-    def module_name(self):
+    @staticmethod
+    def module_name():
         """ display module name """
         return KEY_DISP_BB_EP_SPLICE
 

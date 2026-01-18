@@ -243,7 +243,7 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.diag_stiffener_groove_weld_status = False
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -254,11 +254,11 @@ class BeamColumnEndPlate(MomentConnection):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_btc_end_plate_moment_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -295,7 +295,8 @@ class BeamColumnEndPlate(MomentConnection):
             self.logger.addHandler(gui_handler)
 
     # set module name
-    def module_name(self):
+    @staticmethod
+    def module_name():
         """ display module name """
         return KEY_DISP_BCENDPLATE
 

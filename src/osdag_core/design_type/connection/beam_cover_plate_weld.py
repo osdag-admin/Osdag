@@ -230,7 +230,7 @@ class BeamCoverPlateWeld(MomentConnection):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(self, key):
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
@@ -241,11 +241,11 @@ class BeamCoverPlateWeld(MomentConnection):
 
         # Create unique logger name per instance
         unique_logger_name = 'Osdag_btb_cover_plate_weld_moment_conn'
-        self.logger = logging.getLogger(unique_logger_name)
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
-            self.logger = logging.getLogger(unique_logger_name)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -650,8 +650,8 @@ class BeamCoverPlateWeld(MomentConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
 
-    def module_name(self):
-
+    @staticmethod
+    def module_name():
         return KEY_DISP_BEAMCOVERPLATEWELD
 
     def set_input_values(self, design_dictionary):

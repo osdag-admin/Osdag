@@ -59,7 +59,8 @@ class TrussConnectionBolted(TrussConnection):
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_TRUSS_BOLTED
 
     def member(self, status):

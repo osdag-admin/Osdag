@@ -656,11 +656,11 @@ class Compression_bolted(Member):
         spacing.append(t99)
 
         t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
-               self.plate.bolts_one_line if status else '', True)
+               self.plate.bolts_one_line if status else '')
         spacing.append(t16)
 
         t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX,
-               self.plate.bolt_line if status else '', True)
+               self.plate.bolt_line if status else '')
         spacing.append(t15)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX,
@@ -678,6 +678,20 @@ class Compression_bolted(Member):
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX,
                self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
+
+        # Calculate member depth for diagram
+        member_depth = 0.0
+        if status:
+            if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+                if self.loc == "Long Leg":
+                    member_depth = self.section_size.max_leg
+                else:
+                    member_depth = self.section_size.min_leg
+            elif self.sec_profile in ['Channels', 'Back to Back Channels']:
+                member_depth = self.section_size.depth
+                
+        t_depth = ('Member.Depth', 'Member Depth', TYPE_TEXTBOX, member_depth)
+        spacing.append(t_depth)
 
         return spacing
 

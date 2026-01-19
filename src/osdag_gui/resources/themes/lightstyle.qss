@@ -1143,8 +1143,10 @@ QScrollArea#outputs_vscrollarea QScrollBar::sub-page:vertical {
     background: #D0D0D0;
     color: #666;
 }
-#AdditionalInputs QLineEdit:disabled, #AdditionalInputs QComboBox:disabled{
-    background: #f1f1f1;
+#AdditionalInputs QLineEdit:disabled,
+#AdditionalInputs QComboBox:disabled,
+#AdditionalInputs QPushButton:disabled{
+    background-color: #d0d0d0;
     color: #666;
 }
 
@@ -1594,22 +1596,19 @@ QDialog#AdditionalInputs{
     background-color: #FFFFFF;
     border: 1px solid #91b014;
 }
-QWidget#TableWidget QTabWidget QWidget{
-    background-color: #ffffff;
-}
-QWidget#TableWidget QTabWidget > QWidget > QWidget > QWidget{
-    background-color: #ffffff;
-    border: 1px solid #D0D0D0;
+#AdditionalInputs QScrollArea {
+    border: 1px solid #d0d0d0;
+    padding: 5px;
 }
 #AdditionalInputs QTabBar::tab {
-    background: #F4F4F4;
+    background: #ffffff;
     border: 1px solid #d9d7d7;
     padding: 6px 18px 6px 18px;
     color: #000000;
     margin-left: 0px;
 }
 #AdditionalInputs QTabBar::tab:selected {
-    background: #ffffff;
+    background: #F4F4F4;
     color: #000000;
     border: 1px solid #000000;
     border-bottom: 1px solid #ffffff;
@@ -1617,6 +1616,9 @@ QWidget#TableWidget QTabWidget > QWidget > QWidget > QWidget{
 }
 #AdditionalInputs QTabBar::tab:hover {
     border: 1px solid #000000;
+}
+#AdditionalInputs QLabel {
+    background: transparent;
 }
 /* Additional Input Button */
 QDialog#AdditionalInputs QPushButton {
@@ -1642,9 +1644,13 @@ QDialog#AdditionalInputs QLineEdit {
     padding: 2px 7px;
     border: 1px solid #A6A6A6;
     border-radius: 4px;
-    background-color: transparent;
+    background-color: #ffffff;
     color: #000000;
     font-weight: normal;
+}
+QDialog#AdditionalInputs QLineEdit:read-only {
+    background: transparent;
+    color: #333333;
 }
 QDialog#AdditionalInputs QComboBox{
     padding: 2px 7px;
@@ -1691,6 +1697,10 @@ QDialog#AdditionalInputs QComboBox QAbstractItemView::item:selected:hover{
     background-color: #91b014;
     color: black;
     border: 1px solid #94b816;
+}
+QDialog#AdditionalInputs QComboBox QAbstractItemView::item:disabled {
+    background-color: #f1f1f1;
+    color: #666;
 }
 /* Plate-Girder Bounds Dialog */
 QDialog#BoundsSelectorDialog {

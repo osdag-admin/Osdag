@@ -89,7 +89,7 @@ class DesignReportDialog(QDialog):
         self.btn_cancel = QPushButton("Cancel")
         self.btn_next = QPushButton("Next")
         self.btn_back = QPushButton("Back")
-        self.btn_finish = QPushButton("Finish")
+        self.btn_finish = QPushButton("Save PDF")
         
         # Initially hide back and finish
         self.btn_back.hide()

@@ -288,7 +288,7 @@ class CustomizationWidget(QWidget):
         
         # Action buttons
         action_layout = QHBoxLayout()
-        self.btn_open_pdf = QPushButton("Open PDF")
+        self.btn_open_pdf = QPushButton("Preview PDF")
         self.btn_open_pdf.clicked.connect(self.open_pdf)
         
         action_layout.addWidget(self.btn_open_pdf)

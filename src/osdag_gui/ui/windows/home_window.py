@@ -344,20 +344,20 @@ class HomeWindow(QWidget):
         self.bottom_right_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.bottom_svg_widget_1 = QSvgWidget()
-        self.bottom_svg_widget_1.setFixedSize(100, 46)         # 1032 x 479(ratio 2.15) ~ 100 x 46
+        self.bottom_svg_widget_1.setFixedSize(100, 46)        # 1032 x 479 ~ 100 x 46
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_1)
 
         self.bottom_svg_widget_2 = QSvgWidget()
-        self.bottom_svg_widget_2.setFixedSize(95, 47)         # 970 x 479(ratio 2.02) ~ 95 x 47
+        self.bottom_svg_widget_2.setFixedSize(95, 47)         # 970 x 479 ~ 95 x 47
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
 
         self.bottom_svg_widget_3 = QSvgWidget()
-        self.bottom_svg_widget_3.setFixedSize(306, 35)  # 2048 x 234 (ratio 8.75) ~ 250 x 28.6
+        self.bottom_svg_widget_3.setFixedSize(214, 24)        # 2048 x 234 ~ 214 x 24
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         self.bottom_svg_widget_4 = QSvgWidget()
-        self.bottom_svg_widget_4.setFixedSize(41, 43)       # 490 x 510(ratio 0.96) ~ 58 x 60
-        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_4, alignment=Qt.AlignmentFlag.AlignBottom)
+        self.bottom_svg_widget_4.setFixedSize(41, 43)         # 490 x 510 ~ 41 x 43
+        self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_4)
 
         self.bottom_right_h_layout.addStretch(1)
 

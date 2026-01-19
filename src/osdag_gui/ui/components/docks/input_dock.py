@@ -91,13 +91,18 @@ class InputDock(QWidget):
         self.left_container = QWidget()
         self.original_width = int(self.width())
 
+        # To connect input dock options with additional inputs
+        input_dp_conn_list = self.backend.input_dictionary_without_design_pref()
+        input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
+        print(f'input_dp_conn_list {input_dp_conn_list}')
+
         # Bring the data instance from `design_type` folder
         input_field_list = self.backend.input_values()
         # To equalize the label length
         # So that they are of equal size
         label_width, input_width = self.calc_max_width(input_field_list)
 
-        self.build_left_panel(input_field_list, label_width, input_width)
+        self.build_left_panel(input_field_list, label_width, input_width, input_dp_conn_list)
         self.main_layout.addWidget(self.left_container)
 
         self.toggle_strip = QWidget()
@@ -150,7 +155,7 @@ class InputDock(QWidget):
         else:
             return None
         
-    def build_left_panel(self, field_list, label_width, input_width):
+    def build_left_panel(self, field_list, label_width, input_width, input_dp_conn_list):
         print("\n","="*100,"\n\n")
         print("[INFO] Building Input Dock UI...")
         left_layout = QVBoxLayout(self.left_container)
@@ -175,7 +180,7 @@ class InputDock(QWidget):
         # additonal input button
         additional_inputs_btn = AdditionalInputsButton()
         additional_inputs_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Design_Pref"))
-        additional_inputs_btn.clicked.connect(lambda: self.parent.combined_design_prefer(self.data,self.backend))
+        additional_inputs_btn.clicked.connect(lambda: self.parent.combined_design_prefer(self.data, self.backend))
         additional_inputs_btn.clicked.connect(lambda: self.parent.design_preferences())
         additional_inputs_btn.setToolTip("Additional Inputs")
         additional_inputs_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -256,6 +261,10 @@ class InputDock(QWidget):
                 option_list = field[3]
                 right.addItems(option_list)
 
+                # additonal input connector
+                if field[0] in input_dp_conn_list:
+                    self.parent.input_dp_connection(right)
+
                 # To disable option at index [1, 2] in Connectivity Combo of Beam to Beam End Plate
                 if len(field) == 7:
                     for disabled in field[6]:
@@ -301,7 +310,11 @@ class InputDock(QWidget):
                 if field[5] != 'No Validator':
                     right.setValidator(self.get_validator(field[5]))
                 cur_box_form.addRow(left, right_aligned_widget(right))
-            
+                
+                # additonal input connector
+                if field[0] in input_dp_conn_list:
+                    self.parent.input_dp_connection(right)
+
             # For Base Plate
             elif type == TYPE_NOTE:
                 left = QLabel(label)
@@ -522,7 +535,7 @@ class InputDock(QWidget):
             if isinstance(child, QWidget):
                 self.print_widget_tree(child, indent+1)
 
-    def popup(self,key, for_custom_list,updated_list,data):
+    def popup(self, key, for_custom_list, updated_list, data):
 
         """
         Function for retaining the values in the popup once it is closed.
@@ -728,6 +741,10 @@ class InputDock(QWidget):
                     k2.setVisible(False)
                 else:
                     k2.setVisible(True)
+
+        # Update Output Dock
+        # if self.parent.ui_loaded:
+        #     self.parent.output_dock.output_title_change(self.backend)
 
     # For Plate-Girder Module-Functions-starts----------------------------------------------------
     def change_text_to_bound_btn(self, old_widget, tupple):
@@ -1086,7 +1103,7 @@ class InputDock(QWidget):
             elif self.width() > 0:
                 if hasattr(self.parent, 'update_docking_icons'):
                     self.parent.update_docking_icons(input_is_active=True)
-
+    
 #----------------Standalone-Test-Code--------------------------------
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 

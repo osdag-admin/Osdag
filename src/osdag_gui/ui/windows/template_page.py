@@ -1,13 +1,13 @@
 import sys, os, yaml, time, gc
 import osdag_gui.resources.resources_rc
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
     QPushButton, QFileDialog,  QCheckBox, QComboBox, QLineEdit,
-    QMenuBar, QSplitter, QSizePolicy, QDialog
+    QMenuBar, QSplitter, QSizePolicy, QDialog, QLabel
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, Signal, QTimer
-from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush
+from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush, QPixmap
 
 from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
 from osdag_gui.ui.components.docks.input_dock import InputDock
@@ -70,7 +70,7 @@ class CustomWindow(QWidget):
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
         self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs, parent=self)
-        self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabase)
+        self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabaseEmit)
 
         self.init_ui(title, id)
         self.sidebar = SidebarWidget(parent=self)
@@ -83,6 +83,9 @@ class CustomWindow(QWidget):
         self.sidebar_animation.setDuration(150)
         self.sidebar.installEventFilter(self)
         self.sidebar.raise_()
+    
+    def downloadDatabaseEmit(self, table, call_type):
+        self.downloadDatabase.emit(table, call_type)
         
     def closeEvent(self, event):
         """Handle window close event with GC-safe OCC cleanup.
@@ -769,7 +772,7 @@ class CustomWindow(QWidget):
         design_prefs_action = QAction("Additional Inputs", self)
         design_prefs_action.setShortcut(QKeySequence("Alt+P"))
         design_prefs_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Design_Pref"))
-        design_prefs_action.triggered.connect(lambda: self.combined_design_prefer(self.input_dock.data,self.backend))
+        design_prefs_action.triggered.connect(lambda: self.combined_design_prefer(self.input_dock.data, self.backend))
         design_prefs_action.triggered.connect(lambda: self.design_preferences())
         edit_menu.addAction(design_prefs_action)
 
@@ -910,7 +913,8 @@ class CustomWindow(QWidget):
                 self.ui_loaded = False
                 self.setDictToUserInputs(uiObj)
                 self.ui_loaded = True
-
+                # Update Output Dock Fields
+                # self.output_dock.output_title_change(self.backend)
             else:
                 CustomMessageBox(
                     title="Information",
@@ -1535,10 +1539,12 @@ class CustomWindow(QWidget):
         elif trigger_type == "Save_Project":
             self.saveDesign()
         elif trigger_type == "Design_Pref":
-            # print(f"trigger_type == Design_Pref")
+            print(f"changes = {self.designPrefDialog.changes}")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
-                # print(f"QDialog.Accepted")
+                # Whenever inputdock is updated, its captured in self.input_dock_inputs and hence 
+                # Additional Input Is being recreated and hence Updated
                 self.designPrefDialog = AdditionalInputs(main, self, input_dictionary=self.input_dock_inputs)
+                self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabaseEmit)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     # print(f"self.designPrefDialog.flag = False")
@@ -1770,7 +1776,9 @@ class CustomWindow(QWidget):
                         checkbox_widget.blockSignals(True)
                         checkbox_widget.setChecked(False)
                         checkbox_widget.blockSignals(False)
-            
+    
+    # This Captures all the values from Input Dock and Populate it in 
+    # self.input_dock_inputs dict which is passed in Additonal Inputs to update additional Inputs
     def design_fn(self, op_list, data_list, main):
         design_dictionary = {}
         self.input_dock_inputs = {}
@@ -1804,8 +1812,6 @@ class CustomWindow(QWidget):
             design_dictionary.update(d1)
 
             self.input_dock_inputs.update(d1)
-            # print(f"\n self.input_dock_inputs{self.input_dock_inputs}")
-
 
         for design_pref_key in self.design_pref_inputs.keys():
             if design_pref_key not in self.input_dock_inputs.keys():
@@ -1880,18 +1886,28 @@ class CustomWindow(QWidget):
         # print(f"\n[INFO] design_fn design_dictionary{self.design_inputs}")
         # print(f"\n[INFO] main.input_dictionary_without_design_pref(main){main.input_dictionary_without_design_pref()}")
 
+    # ===========Input Dock Connector for Additonal Inputs Starts============
+    def input_dp_connection(self, widget):
+        if isinstance(widget, QComboBox):
+            widget.currentIndexChanged.connect(self.clear_design_pref_dictionary)
+        elif isinstance(widget, QLineEdit):
+            widget.textChanged.connect(self.clear_design_pref_dictionary)
+
+    def clear_design_pref_dictionary(self):
+        if self.ui_loaded:
+            self.design_pref_inputs = {}
+
+    # ===========Input Dock Connector for Additonal Inputs Ends==============
+
+    # ============================= Additional Inputs Connectors Starts ==========================
     def combined_design_prefer(self, data, main):
         on_change_tab_list = main.tab_value_changed()
-        # print(f"[INFO] ui_template combined_design_prefer on_change_tab_list= {on_change_tab_list} \n")
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
-            # print(f"[INFO] key_list = {key_list} \n"
-            #       f"[INFO] tab {tab}")
-
+            # print(f"@: On Change Tab {tab_name}, {key_list}, {key_to_change}, {key_type}, {f}")
             for key_name in key_list:
                 key = tab.findChild(QWidget, key_name)
-                # print(f"[INFO] key= {key} \n")
 
                 if isinstance(key, QComboBox):
                     self.connect_combobox_for_tab(key, tab, on_change_tab_list, main)
@@ -1902,20 +1918,20 @@ class CustomWindow(QWidget):
             (tab_name, input_dock_key_name, change_typ, f) = edit
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
             input_dock_key = self.input_dock.input_widget.findChild(QWidget, input_dock_key_name)
+            # print(f"@: Additonal Inputs(Edit) {tab_name}, {input_dock_key_name}, {change_typ}, {f}, {input_dock_key}")
             if change_typ == TYPE_CHANGE_TAB_NAME:
                 self.designPrefDialog.ui.tabWidget.tabs.setTabText(
                     self.designPrefDialog.ui.tabWidget.tabs.indexOf(tab), f(input_dock_key.currentText()))
+            
             elif change_typ == TYPE_REMOVE_TAB:
-
                 if tab.objectName() != f(input_dock_key.currentText()):
                     self.designPrefDialog.ui.tabWidget.tabs.removeTab(
                         self.designPrefDialog.ui.tabWidget.tabs.indexOf(tab))
-                # if tab:
-                #     self.designPrefDialog.ui.tabWidget.insertTab(0, tab, tab_name)
-
+                    
         for refresh in main.refresh_input_dock():
             (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
+            # print(f"@: Additonal Inputs(Refresh) {tab_name}, {key_name}, {key_type}, {tab_key}, {master_key}, {value}, {database_arg}")
             if tab:
                 add_button = tab.findChild(QWidget, "pushButton_Add_"+tab_name)
                 key = self.input_dock.input_widget.findChild(QWidget, key_name)
@@ -1924,18 +1940,58 @@ class CustomWindow(QWidget):
                     val = self.input_dock.input_widget.findChild(QWidget, master_key).currentText()
                     if val not in value:
                         continue
-                self.refresh_section_connect(add_button, selected, key_name, key_type, tab_key, database_arg,data)
-
+                self.refresh_section_connect(add_button, selected, key_name, key_type, tab_key, database_arg, data)
+    
     def connect_textbox_for_tab(self, key, tab, new, main):
         key.textChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
     def connect_combobox_for_tab(self, key, tab, new, main):
         key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
+    # This connects Additional Input Tabs and updates values
+    def tab_change(self, key, tab, new, main):
+
+        for tup in new:
+            (tab_name, key_list, k2_key_list, typ, f) = tup
+            if tab_name != tab.objectName() or (key and key.objectName()) not in key_list:
+                continue
+            arg_list = []
+            for key_name in key_list:
+
+                key = tab.findChild(QWidget, key_name)
+                if isinstance(key, QComboBox):
+                    arg_list.append(key.currentText())
+                elif isinstance(key, QLineEdit):
+                    arg_list.append(key.text())
+
+            arg_list.append(self.input_dock_inputs)
+            arg_list.append(main.design_button_status)
+            val = f(arg_list)
+
+            for k2_key_name in k2_key_list:
+                k2 = tab.findChild(QWidget, k2_key_name)
+                if isinstance(k2, QComboBox):
+                    if k2_key_name in val.keys():
+                        k2.clear()
+                        for values in val[k2_key_name]:
+                            k2.addItem(str(values))
+                if isinstance(k2, QLineEdit):
+                    k2.setText(str(val[k2_key_name]))
+                if isinstance(k2, QLabel):
+                    pixmap1 = QPixmap(val[k2_key_name])
+                    k2.setPixmap(pixmap1)
+
+            if typ == TYPE_OVERWRITE_VALIDATION and not val["Validation"][0]:
+                CustomMessageBox(
+                    title="Warning",
+                    text= val["Validation"][1],
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
+
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))
 
-    def refresh_section(self, prev, key_name, key_type, tab_key, arg,data):
+    def refresh_section(self, prev, key_name, key_type, tab_key, arg, data):
         if key_type == TYPE_COMBOBOX_CUSTOMIZED:
             current_list = connectdb(arg,"popup")
         else:
@@ -1954,7 +2010,7 @@ class CustomWindow(QWidget):
             current_red_list = list(current_list_set.intersection(red_list_set))
             for value in current_red_list:
                 indx = current_list.index(str(value))
-                key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                key.setItemData(indx, QBrush(QColor("red")), Qt.ItemDataRole.ForegroundRole)
             text_index = key.findText(text, Qt.MatchFixedString)
             if text_index >= 0:
                 key.setCurrentIndex(text_index)
@@ -1970,6 +2026,8 @@ class CustomWindow(QWidget):
         self.designPrefDialog.ui.state_locked = self.input_dock.state_locked
         self.designPrefDialog.ui.set_lock()
         self.designPrefDialog.show()
+    
+    # ============================= Additional Inputs Connectors Ends ==========================
 
     # This is to save Design as Project if Design is already done
     # Else Save only OSI file

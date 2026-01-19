@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QComboBox, QScrollArea, QLabel, QLineEdit, QSizePolicy, QTabWidget
 )
 from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog
-from PySide6.QtCore import Qt, QRegularExpression, Signal
+from PySide6.QtCore import Qt, QRegularExpression, Signal, QObject
 from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIcon, QFontMetrics, QTextCursor, QGuiApplication, QTextCharFormat, QCursor
 
 from osdag_core.Common import *
@@ -11,6 +11,7 @@ from osdag_core.utils.common.Section_Properties_Calculator import *
 from osdag_core.utils.common.component import *
 from osdag_core.utils.common.other_standards import *
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 
 import os
 import sqlite3
@@ -43,7 +44,9 @@ class Window(QDialog):
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         for t in main.input_dictionary_design_pref():
             self.save_changes_list.extend(t[2])
-        self.initUI(main,input_dictionary)
+        
+        print(f"\n@@@SS: additionalInputs.input_dictionary{input_dictionary}")
+        self.initUI(main, input_dictionary)
 
     def center(self):
         frameGm = self.frameGeometry()
@@ -57,23 +60,22 @@ class Window(QDialog):
 
     def closeEvent(self, event):
         if self.values_changed:
-            popup = QMessageBox(self)
-            popup.setIcon(QMessageBox.Information)
-            popup.setWindowTitle("Save")
-            popup.setText('Do you want to save the changes?')
-            popup.setStandardButtons(QMessageBox.Yes |
-                                     QMessageBox.No |
-                                     QMessageBox.Cancel)
-            popup.setDefaultButton(QMessageBox.Cancel)
-            answer = popup.exec_()
-            if answer == QMessageBox.Yes:
+            result = CustomMessageBox(
+                title="Save",
+                text=f"Do you want to save the changes?",
+                buttons=["Yes", "No", "Cancel"],
+                dialogType=MessageBoxType.Information,
+            ).exec()
+            
+            if result == "Yes":
                 self.accept()
                 event.accept()
-            elif answer == QMessageBox.No:
+            elif result == "No":
                 self.reject()
                 event.accept()
-            elif answer == QMessageBox.Cancel:
+            else:
                 event.ignore()
+
         else:
             QDialog.closeEvent(self, event)
 
@@ -86,7 +88,7 @@ class Window(QDialog):
     def something_changed(self):
         self.values_changed = True
 
-    def initUI(self,main,input_dictionary):
+    def initUI(self, main, input_dictionary):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("AdditionalInputs")
@@ -120,7 +122,7 @@ class Window(QDialog):
         self.button_layout.addStretch()
 
         tab_index = -1
-        # print(f"\n main.tab_list(main)= {main.tab_list()} ")
+        # print(f"@tab_list()= {main.tab_list()} ")
         for tab_details in main.tab_list():
             last_title = ""
             tab_name = tab_details[0]
@@ -155,6 +157,7 @@ class Window(QDialog):
                             (str("pushButton_Import_" + tab_name), "Import xlsx file"), (str("pushButton_Download_" + tab_name), "Download xlsx file")]
 
                 elements = tab_elements(input_dictionary)
+                # print(f"@elements: {elements}")
                 for i in range(len(buttons)):
                     object_name = buttons[i][0]
                     btn_text = buttons[i][1]
@@ -190,7 +193,7 @@ class Window(QDialog):
                         grid.addWidget(line,r,2)
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        line.setFixedSize(85, 20)
+                        line.setFixedSize(120, 20)
                         if lable == 'Designation' or lable == KEY_DISP_SEC_PROFILE:
                             line.textChanged.connect(self.manage_designation_size(line))
 
@@ -238,11 +241,9 @@ class Window(QDialog):
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
 
                         if lable == KEY_DISP_MATERIAL:
-                            combo.setFixedSize(115, 20)
                             self.do_not_clear_list.append(combo)
-                        else:
-                            combo.setFixedSize(85,20)
 
+                        combo.setFixedSize(120,20)
                         if element[0] in self.save_changes_list:
                             self.connect_widget_for_change(combo)
                         r += 1
@@ -323,7 +324,7 @@ class Window(QDialog):
                         grid.addWidget(line,r,2)
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         line.setObjectName(element[0])
-                        line.setFixedSize(130, 22)
+                        line.setFixedSize(120, 22)
                         if element[3]:
                             line.setText(element[3])
                         dbl_validator = QDoubleValidator()
@@ -354,12 +355,12 @@ class Window(QDialog):
                         combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                         combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
-                        combo.setFixedSize(130, 22)
                         combo.addItems(element[3])
                         font = combo.font()
                         metrices = QFontMetrics(font)
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
+                        combo.setFixedSize(120, 22)
                         if element[0] == KEY_DP_DESIGN_METHOD:
                             combo.model().item(1).setEnabled(False)
                             combo.model().item(2).setEnabled(False)
@@ -589,10 +590,9 @@ class Window(QDialog):
 
         # Tooltip on dialog
         if locked:
-            self.setToolTip("Inputs are locked")
+            self.setToolTip("🔒Unlock to Edit")
         else:
             self.setToolTip("")
-
 
     def manage_designation_size(self,line_edit):
         def change_size():
@@ -604,7 +604,7 @@ class Window(QDialog):
             if width > 91:
                 line_edit.setFixedWidth(width)
             else:
-                line_edit.setFixedWidth(91)
+                line_edit.setFixedWidth(120)
         return change_size
 
     def clear_tab(self, tab_name):
@@ -657,7 +657,11 @@ class Window(QDialog):
 
         for ch in tab_Column.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Please fill all the missing parameters!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
                 return
             elif isinstance(ch, QLineEdit) and ch.text() != "":
                 if ch.objectName() in keys_to_add:
@@ -720,10 +724,17 @@ class Window(QDialog):
                     conn.commit()
                 c.close()
                 conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
-
+                CustomMessageBox(
+                    title="Information",
+                    text="Data is added successfully to the database!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Designation already exists in the database!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
 
     def add_tab_column(self):
         '''
@@ -739,7 +750,11 @@ class Window(QDialog):
             pass
         for ch in tab_Column.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Designation already exists in the database!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
                 return
             elif isinstance(ch, QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
@@ -828,10 +843,18 @@ class Window(QDialog):
                     conn.commit()
                 c.close()
                 conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+                CustomMessageBox(
+                    title="Information",
+                    text="Data is added successfully to the database!",
+                    dialogType=MessageBoxType.Information,
+                ).exec()
 
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Designation already exists in the database!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
 
     def add_tab_beam(self):
         '''
@@ -841,7 +864,11 @@ class Window(QDialog):
         name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Beam))
         for ch in tab_Beam.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Please fill all the missing parameters!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
                 add_bm = tab_Beam.findChild(QWidget, 'pushButton_Add_'+KEY_DISP_BEAMSEC)
                 add_bm.setDisabled(True)
                 return
@@ -922,9 +949,17 @@ class Window(QDialog):
                 conn.commit()
                 c.close()
                 conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+                CustomMessageBox(
+                    title="Information",
+                    text="Data is added successfully to the database.",
+                    dialogType=MessageBoxType.Information
+                ).exec()
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Designation already exists in the database!",
+                    dialogType=MessageBoxType.Warning
+                ).exec()
 
     def add_tab_angle(self):
         '''
@@ -948,7 +983,11 @@ class Window(QDialog):
             return
         for ch in tab_Angle.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Please fill all the missing parameters!",
+                    dialogType=MessageBoxType.Warning
+                ).exec()
                 add_bm = tab_Angle.findChild(QWidget, 'pushButton_Add_'+tab_name)
                 add_bm.setDisabled(True)
                 return
@@ -1041,9 +1080,18 @@ class Window(QDialog):
                 conn.commit()
                 c.close()
                 conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+                
+                CustomMessageBox(
+                    title="Information",
+                    text="Data is added successfully to the database.",
+                    dialogType=MessageBoxType.Information
+                ).exec()
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Designation already exists in the database!",
+                    dialogType=MessageBoxType.Warning
+                ).exec()
 
     def add_tab_channel(self):
         '''
@@ -1321,11 +1369,9 @@ class Window(QDialog):
                 text_ignored.append(i)
         dialog.exec()
 
-class AdditionalInputs():
-    downloadDatabase = Signal(str, str)
+class AdditionalInputs(QObject):
     def __init__(self, main, module_window, input_dictionary, parent=None):
         self.ui = Window(main, input_dictionary, parent=parent)
-        self.ui.downloadDatabase.connect(self.downloadDatabase)
         self.main = main
         self.main_controller = parent
         self.module_window = module_window

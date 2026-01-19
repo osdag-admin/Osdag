@@ -739,10 +739,12 @@ class OutputDock(QWidget):
                 if hasattr(self.parent, 'update_docking_icons'):
                     self.parent.update_docking_icons(output_is_active=False)
             elif self.width() > 0:
+                # Update Output Dock
                 if hasattr(self.parent, 'update_docking_icons'):
                     self.parent.update_docking_icons(output_is_active=True)
 
     # Functions for Design
+    # This function Updates the visibility of output titles based on Input Dock Selections
     def output_title_change(self, main):
         status = main.design_status
         out_list = main.output_values(status)

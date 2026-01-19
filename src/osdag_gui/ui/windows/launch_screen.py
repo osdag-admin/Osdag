@@ -98,20 +98,12 @@ class OsdagLaunchScreen(object):
         # aligned at to right with margin(top = right = 10 wrt size of MainWindow)
         self.IITBLogo = QSvgWidget(self.centralwidget)
         self.IITBLogo.setObjectName(u"SplashScreen_IITBLogo")
-        self.IITBLogo.setGeometry(QRect(539, 10, 61, 60)) # Exact ratio 61 = (1200/1176)(size)*60
+        self.IITBLogo.setGeometry(QRect(508, 10, 92, 90)) # Exact ratio 92 = (1200/1176)(size)*90
 
         # All 3 are aligned in bottom with line y = 340+41 = 357+24
         self.FOSSEELogo = QSvgWidget(self.centralwidget)
         self.FOSSEELogo.setObjectName(u"SplashScreen_FOSSEELogo")
-        self.FOSSEELogo.setGeometry(QRect(20, 340, 111, 41)) # Exact ratio 111 = (1883/695)(size)*41
-        # Gap of 19px in x
-        self.MOSLogo = QSvgWidget(self.centralwidget)
-        self.MOSLogo.setObjectName(u"SplashScreen_MOSLogo")
-        self.MOSLogo.setGeometry(QRect(150, 340, 84, 41)) # Exact ratio 111 = (1883/695)(size)*41
-        # Gap of 19px in x
-        self.ConstructsteelLogo = QSvgWidget(self.centralwidget)
-        self.ConstructsteelLogo.setObjectName(u"SplashScreen_ConstructsteelLogo")
-        self.ConstructsteelLogo.setGeometry(QRect(253, 357, 211, 24)) # Exact ratio 211 = (904/103)(size)*24
+        self.FOSSEELogo.setGeometry(QRect(20, 330, 138, 51)) # Exact ratio 138 = (1883/695)(size)*51
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -158,10 +150,6 @@ class OsdagLaunchScreen(object):
         self.IITBLogo.load(":/vectors/IITB_logo_light.svg")
 
         self.FOSSEELogo.load(":/vectors/FOSSEE_light.svg")
-   
-        self.MOSLogo.load(":/vectors/MOS_light.svg")
-   
-        self.ConstructsteelLogo.load(":/vectors/ConstructSteel_light.svg")
 
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QPixmap

@@ -416,13 +416,11 @@ class PlateGirderWelded(Member):
             self.logger.addHandler(gui_handler)
 
     def customized_input(self):
+        # Thickness popup for Optimized mode is currently disabled
+        # due to conflicts with the GUI signal handling.
+        # The popup mechanism requires TYPE_COMBOBOX_CUSTOMIZED in input_value_changed()
+        # but we need TYPE_COMBOBOX for dynamic content switching.
         c_lst = []
-        t1 = (KEY_WEB_THICKNESS_PG, self.web_thickness_customized)
-        c_lst.append(t1)
-        t2 = (KEY_TOP_FLANGE_THICKNESS_PG, self.top_flange_thickness_customized)
-        c_lst.append(t2)
-        t3 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, self.bottom_flange_thickness_customized)
-        c_lst.append(t3)
         return c_lst
 
     @staticmethod

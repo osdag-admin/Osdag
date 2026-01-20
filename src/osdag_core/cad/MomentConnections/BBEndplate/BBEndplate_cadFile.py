@@ -1674,8 +1674,11 @@ class CADGroove(object):
 
         :return: CAD model of bothe left and right beam
         """
-        beams = BRepAlgoAPI_Fuse(self.beamLModel, self.beamRModel).Shape()
-        return beams
+        """
+        :return: CAD model of bothe left and right beam
+        """
+        # Optimized: Return list instead of Fusing
+        return [self.beamLModel, self.beamRModel]
 
     def get_plate_connector_models(self):
         """
@@ -1705,16 +1708,8 @@ class CADGroove(object):
             #                        self.beam_stiffener_F4Model, self.beam_stiffener_F5Model,self.beam_stiffener_F6Model,
             #                        self.beam_stiffener_F7Model,self.beam_stiffener_F8Model]
 
-        # CRITICAL: Garbage collect before heavy fuse operations
-        # import gc
-        # gc.collect()
-
-        plates = connector_plate[0]
-        for comp in connector_plate[1:]:
-            plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
-
-        # gc.collect()
-        return plates
+        # Optimized: Return list instead of Fusing to prevent heap corruption
+        return connector_plate
 
     def get_welded_models(self):
         """
@@ -1768,19 +1763,8 @@ class CADGroove(object):
             #                   self.bbWeldstiff8_u2Model, self.bbWeldstiff8_l1Model,
             #                   self.bbWeldstiff8_l2Model
             #                   ]
-        # CRITICAL: Garbage collect before heavy fuse operations
-        # import gc
-        # gc.collect()
-
-        welds = welded_sec[0]
-        for idx, comp in enumerate(welded_sec[1:]):
-            welds = BRepAlgoAPI_Fuse(comp, welds).Shape()
-            # Periodic garbage collection every 8 fuse operations to prevent heap corruption
-            # if (idx + 1) % 8 == 0:
-            #     gc.collect()
-
-        # gc.collect()
-        return welds
+        # Optimized: Return list instead of Fusing to prevent heap corruption
+        return welded_sec
 
     def get_nut_bolt_array_models(self):
         """
@@ -1793,14 +1777,8 @@ class CADGroove(object):
         
         
         
-        nut_bolts = self.nut_bolt_array.get_models()
-        array = nut_bolts[0]
-        for comp in nut_bolts[1:]:
-            array = BRepAlgoAPI_Fuse(comp, array).Shape()
-            
-        
-        
-        return array
+        # Optimized: Return list instead of Fusing
+        return self.nut_bolt_array.get_models()
 
     def get_connector_models(self):
         """

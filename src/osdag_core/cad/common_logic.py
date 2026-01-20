@@ -3767,13 +3767,6 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
 
     def call_3DModel(self, flag, module_object):  # Done
-        # CRITICAL memory cleanup:
-        try:
-            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
-            get_occ_memory_manager().safe_cleanup(id(self.cad_widget))
-        except Exception:
-            pass
-
         self.module_object = module_object  # Store the object directly
         
         # Override mainmodule for Strut Bolted connection to ensure correct CAD generation

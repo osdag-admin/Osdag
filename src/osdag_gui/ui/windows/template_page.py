@@ -1695,6 +1695,11 @@ class CustomWindow(QWidget):
                 # Ensure display is ready before 3D rendering
                 if self._is_display_ready():
                     try:
+                        # Use CleanupCoordinator for safe cleanup before new model
+                        from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+                        coordinator = get_cleanup_coordinator()
+                        coordinator.cleanup_for_new_design(self.cad_widget, self.display)
+                        
                         self.commLogicObj.call_3DModel(status, main)
                         # NOTE: DO NOT call gc.collect() after CAD operations!
                     except Exception as e:

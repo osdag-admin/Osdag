@@ -3102,17 +3102,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
                     osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
 
-    def call_3DModel(self, flag, module_object):  # Done
-<<<<<<< HEAD
-=======
-        # CRITICAL memory cleanup:
-        try:
-            from osdag_gui.OS_safety_protocols import get_occ_memory_manager
-            get_occ_memory_manager().safe_cleanup(id(self.cad_widget))
-        except Exception:
-            pass
-
->>>>>>> 902c0508 (added for cached mesh rather than individual)
+    def call_3DModel(self, flag, module_object):  
         self.module_object = module_object  # Store the object directly
         print(self.mainmodule)
 
@@ -3124,7 +3114,6 @@ class CommonDesignLogic(object):
             self.loc = A.connectivity
 
             if flag is True:
-
                 if self.loc == CONN_CWBW:
                     self.connectivityObj = self.create3DColWebBeamWeb()
 
@@ -3491,9 +3480,6 @@ class CommonDesignLogic(object):
                 final_model = fused_shape
             else:
                 final_model = None
-<<<<<<< HEAD
-        
-=======
 
         # Fix for optimized modules returning lists (e.g. BB Endplate)
         # Exporters require a single TopoDS_Shape, so we must fuse here if we have a list.
@@ -3506,7 +3492,6 @@ class CommonDesignLogic(object):
             else:
                 final_model = None
 
->>>>>>> 902c0508 (added for cached mesh rather than individual)
         return final_model
 
         

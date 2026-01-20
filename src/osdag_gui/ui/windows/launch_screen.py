@@ -29,23 +29,6 @@ class OsdagLaunchScreen(object):
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")
 
-        # Use instead of QSvgWidget
-        self.AnimatedGIF = PNGSequencePlayer(self.centralwidget)
-        self.AnimatedGIF.setObjectName(u"SplashScreen_AnimatedGIF")
-        self.AnimatedGIF.setGeometry(QRect(330, 110, 320, 180))
-        
-        from pathlib import Path
-        # Use module's location to find resources - works on Linux/Windows/Mac
-        # pathlib automatically handles path separators for each OS
-        module_dir = Path(__file__).resolve().parent.parent.parent  # Goes up to osdag_gui/
-        base_path = module_dir / "resources" / "animation"
-        
-        if base_path.exists():
-            animation_path = str(base_path / "{:04d}.png")
-            self.AnimatedGIF.load_sequence(animation_path, 96, 34)
-        else:
-            print(f"Warning: Animation path not found: {base_path}")
-
         self.AestheticVector = QSvgWidget(self.centralwidget)
         self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")
         self.AestheticVector.setGeometry(QRect(0, 0, 610, 380))
@@ -150,81 +133,3 @@ class OsdagLaunchScreen(object):
         self.IITBLogo.load(":/vectors/IITB_logo_light.svg")
 
         self.FOSSEELogo.load(":/vectors/FOSSEE_light.svg")
-
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QLabel, QApplication
-
-class PNGSequencePlayer(QLabel):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.frames = []
-        self.current_frame = 0
-        self.frame_count = 0
-        self.timer = QTimer()
-        self.timer.setTimerType(Qt.TimerType.PreciseTimer)  # Use precise timer for smooth animation
-        self.setScaledContents(True)
-        self.timer.timeout.connect(self.next_frame)
-        self.loop = False
-        self._target_size = None
-        
-    def load_sequence(self, base_path, frame_count, fps=24, loop=False):
-        """
-        Load PNG sequence
-        base_path: path pattern like ":/animation/{:04d}.png"
-        frame_count: total number of frames
-        fps: frames per second
-        """
-        self.frame_count = frame_count
-        self.frames = []
-        self.loop = loop
-        self._target_size = self.size()
-        
-        # Pre-load and pre-scale all frames for smoother playback
-        for i in range(1, frame_count + 1):
-            frame_path = base_path.format(i)
-            pixmap = QPixmap(frame_path)
-            if not pixmap.isNull():
-                # Pre-scale to widget size for faster rendering
-                if self._target_size.isValid() and self._target_size.width() > 0:
-                    pixmap = pixmap.scaled(
-                        self._target_size, 
-                        Qt.AspectRatioMode.KeepAspectRatio,
-                        Qt.TransformationMode.SmoothTransformation
-                    )
-                self.frames.append(pixmap)
-            
-            # Process events periodically to keep UI responsive during loading
-            if i % 10 == 0:
-                QApplication.processEvents()
-        
-        # Show first frame immediately
-        if self.frames:
-            self.setPixmap(self.frames[0])
-        
-        # Set timer interval based on FPS
-        interval = int(1000 / fps)  # Convert to milliseconds
-        self.timer.start(interval)
-        
-    def next_frame(self):
-        if self.frames:
-            self.current_frame += 1
-            
-            # Stop when reaching the end if not looping
-            if self.current_frame >= len(self.frames):
-                if self.loop:
-                    self.current_frame = 0  # Loop back to start
-                else:
-                    self.timer.stop()  # Stop animation
-                    self.current_frame = len(self.frames) - 1  # Stay on last frame
-                    return
-            
-            self.setPixmap(self.frames[self.current_frame])
-    
-    def stop_animation(self):
-        self.timer.stop()
-        
-    def start_animation(self):
-        if self.frames and not self.timer.isActive():
-            self.current_frame = 0
-            self.timer.start()

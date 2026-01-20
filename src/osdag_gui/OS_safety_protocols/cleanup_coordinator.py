@@ -85,7 +85,10 @@ class CleanupCoordinator:
                 manager = get_occ_memory_manager()
                 widget_id = id(cad_widget)
                 context = display.Context if display else None
-                manager.safe_cleanup(widget_id, context)
+                if is_final:
+                    manager.unregister_widget(widget_id)
+                else:
+                    manager.safe_cleanup(widget_id, context)
             except Exception as e:
                 print(f"[CleanupCoordinator] Memory manager error: {e}")
 
@@ -139,7 +142,11 @@ class CleanupCoordinator:
 
     def cleanup_for_tab_close(self, template_page) -> bool:
         """Called when closing a module tab."""
-        return self._execute_cleanup(
+        # Prevent double cleanup
+        if getattr(template_page, '_cleanup_done', False):
+            return True
+            
+        result = self._execute_cleanup(
             cad_widget=template_page.cad_widget,
             display=template_page.display,
             clear_output=True,
@@ -148,6 +155,10 @@ class CleanupCoordinator:
             logs_dock=getattr(template_page, 'logs_dock', None),
             is_final=True
         )
+        
+        # Mark as cleaned up to prevent reentry (e.g. from closeEvent)
+        template_page._cleanup_done = True
+        return result
 
     def cleanup_for_app_exit(self, main_window) -> bool:
         """Called before application exit to clean all tabs."""

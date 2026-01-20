@@ -14,22 +14,24 @@ from ...items.plate import Plate
 def create_bolted_lap_joint(plate1_thickness = 16, plate2_thickness = 8, plate_width = 100, bolt_dia = 16, actual_overlap_length=50,
                             bolt_rows=4,bolt_cols=2,pitch=20,gauge=20,edge=12,end=13.6,number_bolts=7):
 
-    plate_length = 3 * actual_overlap_length
+    plate_length = 2 * actual_overlap_length
     
     # Calculate the offset of the second plate
     plate2_offset = plate_length - actual_overlap_length
     
-    nut_thickness = 3.0
+    nut_thickness = bolt_dia * 0.5
     # Bolt parameters
-    bolt_head_radius = bolt_dia/2
-    bolt_head_thickness = 3.0
-    bolt_length = (plate1_thickness + plate2_thickness) + nut_thickness   # Enough to go through both plates
-    bolt_shaft_radius = 1.5
+    bolt_head_radius = bolt_dia * 0.8
+    bolt_head_thickness = bolt_dia * 0.4
+    bolt_shaft_radius = bolt_dia / 2.0
+    
+    extra_length = 5.0 # stickout
+    bolt_length = (plate1_thickness + plate2_thickness) + nut_thickness + extra_length
     
     # Nut parameters
     nut_radius = bolt_head_radius
     
-    nut_height = bolt_head_radius
+    nut_height = nut_thickness + 2.0 # Ensure hole cuts through
     nut_inner_radius = bolt_shaft_radius
     
     # Create the first plate

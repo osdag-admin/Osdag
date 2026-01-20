@@ -261,7 +261,7 @@ class TensionAngleBoltCAD(object):
             nut_bolts = [self.nutboltArrayLModels, self.nutboltArrayRModels, self.nutboltArrayL_SAModels,
                          self.nutboltArrayR_SAModels]
             array = nut_bolts[0]
-            for comp in nut_bolts:
+            for comp in nut_bolts[1:]:
                 array = BRepAlgoAPI_Fuse(comp, array).Shape()
         else:
             array = BRepAlgoAPI_Fuse(self.nutboltArrayLModels, self.nutboltArrayRModels).Shape()
@@ -279,7 +279,7 @@ class TensionAngleBoltCAD(object):
         if self.Obj.sec_profile == 'Star Angles':
             nut_bolts = [self.nutboltArrayLModels, self.nutboltArrayL_SAModels]
             array = nut_bolts[0]
-            for comp in nut_bolts:
+            for comp in nut_bolts[1:]:
                 array = BRepAlgoAPI_Fuse(comp, array).Shape()
         else:
             array =  self.nutboltArrayLModels

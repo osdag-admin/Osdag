@@ -312,7 +312,6 @@ class BBENutBoltArray(object):
         self.boltDir = boltDir
 
         self.calculatePositions(self.numOfBolts)
-        print(self.numOfBolts)
         for index, pos in enumerate(self.positions):
             self.bolts[index].place(pos, gaugeDir, boltDir)
             self.nuts[index].place((pos + self.gap * boltDir), gaugeDir,

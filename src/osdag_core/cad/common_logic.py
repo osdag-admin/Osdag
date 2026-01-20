@@ -890,7 +890,6 @@ class CommonDesignLogic(object):
 
         bolt_d = float(BBE.bolt_diameter_provided)  # Bolt diameter, entered by user
         bolt_r = bolt_d / 2
-        print(bolt_d)
         bolt_T = self.boltHeadThick_Calculation(bolt_d)
         bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2
         bolt_Ht = self.boltLength_Calculation(bolt_d)

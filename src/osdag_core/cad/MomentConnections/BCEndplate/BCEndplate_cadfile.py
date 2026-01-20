@@ -737,7 +737,7 @@ class CADFillet(object):# not used in the current version as groove weld is pref
     def get_nut_bolt_array_models(self):
         nut_bolts = self.nut_bolt_array.get_models()
         array = nut_bolts[0]
-        for comp in nut_bolts:
+        for comp in nut_bolts[1:]:
             array = BRepAlgoAPI_Fuse(comp, array).Shape()
 
         return array
@@ -2323,7 +2323,7 @@ class CADGroove(object):
     def get_nut_bolt_array_models(self):
         nut_bolts = self.nut_bolt_array.get_models()
         array = nut_bolts[0]
-        for comp in nut_bolts:
+        for comp in nut_bolts[1:]:
             array = BRepAlgoAPI_Fuse(comp, array).Shape()
 
         return array

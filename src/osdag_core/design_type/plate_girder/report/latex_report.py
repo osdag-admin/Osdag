@@ -259,7 +259,6 @@ def prepare_design_checks(pg_obj, logger):
         # Top flange slenderness
         if bf_top > 0 and tf_top > 0:
             btf_top = round((bf_top - tw) / (2 * tf_top), 2)
-            btf_limit_compact = round(9.4 * epsilon, 2)
 
             btf_eq = Math(inline=True)
             btf_eq.append(NoEscape(r'\begin{aligned}\\'))
@@ -268,11 +267,15 @@ def prepare_design_checks(pg_obj, logger):
             btf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 2]}\\'))
             btf_eq.append(NoEscape(r'\end{aligned}'))
 
+            # Determine Class
+            outstand_top = (bf_top - tw) / 2
+            class_top = IS800_2007.Table2_i(outstand_top, tf_top, fy, 'Welded')[0]
+
             report_check.append([
                 'Top Flange Slenderness Ratio',
                 '',
                 btf_eq,
-                ''
+                class_top
             ])
 
         # Bottom flange slenderness
@@ -286,11 +289,15 @@ def prepare_design_checks(pg_obj, logger):
             btf_bot_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 2]}\\'))
             btf_bot_eq.append(NoEscape(r'\end{aligned}'))
 
+            # Determine Class
+            outstand_bot = (bf_bot - tw) / 2
+            class_bot = IS800_2007.Table2_i(outstand_bot, tf_bot, fy, 'Welded')[0]
+
             report_check.append([
                 'Bottom Flange Slenderness Ratio',
                 '',
                 btf_bot_eq,
-                ''
+                class_bot
             ])
 
         # Web slenderness
@@ -303,18 +310,21 @@ def prepare_design_checks(pg_obj, logger):
         dtw_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 2]}\\'))
         dtw_eq.append(NoEscape(r'\end{aligned}'))
 
+        web_depth = d
+        class_web = IS800_2007.Table2_iii(web_depth, tw, fy)
+
         report_check.append([
             'Web Slenderness Ratio',
             '',
             dtw_eq,
-            ''
+            class_web
         ])
 
         # Overall section classification
         overall_eq = Math(inline=True)
         overall_eq.append(NoEscape(r'\begin{aligned}\\'))
-        overall_eq.append(NoEscape(r'&\text{Governing classification based on most}\\'))
-        overall_eq.append(NoEscape(r'&\text{critical element}\\'))
+        overall_eq.append(NoEscape(r'&\text{Governing classification based on}\\'))
+        overall_eq.append(NoEscape(r'&\text{most critical element}\\'))
         overall_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 2]}\\'))
         overall_eq.append(NoEscape(r'\end{aligned}'))
 
@@ -581,13 +591,6 @@ def prepare_design_checks(pg_obj, logger):
             if b1 <= 0 or b1 < pg_obj.web_thickness * 2:
                 bearing_note = " (min. assumed)"
 
-            report_check.append([
-                'Bearing Width',
-                '', 
-                NoEscape(rf"$b_1 = {b1:.1f}$ mm{bearing_note}"), 
-                ''
-            ])
-
             fq_eq = Math(inline=True)
             fq_eq.append(NoEscape(r'\begin{aligned}\\'))
             
@@ -642,19 +645,6 @@ def prepare_design_checks(pg_obj, logger):
             Z_used = Ze
             Z_label = 'Z_e'
 
-        # Section Modulus
-        z_eq = Math(inline=True)
-        z_eq.append(NoEscape(r'\begin{aligned}\\'))
-        z_eq.append(NoEscape(rf'{Z_label} &= {Z_used:.2f} \text{{ cm}}^3\\'))
-        z_eq.append(NoEscape(r'\end{aligned}'))
-
-        report_check.append([
-            NoEscape(rf'Section Modulus'),
-            '',
-            z_eq,
-            ''
-        ])
-
         # Beta_b
         beta_eq = Math(inline=True)
         beta_eq.append(NoEscape(r'\begin{aligned}\\'))
@@ -662,7 +652,7 @@ def prepare_design_checks(pg_obj, logger):
         beta_eq.append(NoEscape(r'\end{aligned}'))
 
         report_check.append([
-            NoEscape(r'Bending Resistance Factor'),
+            NoEscape(r'Betab Factor'),
             '',
             beta_eq,
             ''
@@ -1105,100 +1095,134 @@ def prepare_design_checks(pg_obj, logger):
         # ==================== LONGITUDINAL STIFFENER - SECTION 1.5.3 ====================
         report_check.append(['SubSection', 'Longitudinal Stiffener', table_format])
 
-        # Epsilon_w parameter
+        # Calculate epsilon and limits
         epsilon_w = round((250 / fy)**0.5, 3)
+        limit_200_eps = round(200 * epsilon_w, 2)
+        limit_250_eps = round(250 * epsilon_w, 2)
+        limit_400_eps = round(400 * epsilon_w, 2)
+        
+        d_tw_ratio = round(d / tw, 2)
 
-        eps_w_eq = Math(inline=True)
-        eps_w_eq.append(NoEscape(r'\begin{aligned}\\'))
-        eps_w_eq.append(NoEscape(r'\epsilon_w &= \sqrt{\dfrac{250}{f_{yw}}}\\\\'))
-        eps_w_eq.append(NoEscape(rf'&= \sqrt{{\dfrac{{250}}{{{fy:.1f}}}}}\\\\'))
-        eps_w_eq.append(NoEscape(rf'&= {epsilon_w:.3f}\\\\'))
-        eps_w_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.13]}\\'))
-        eps_w_eq.append(NoEscape(r'\end{aligned}'))
+        # Row 1: Web Thickness Limits (Check for Longitudinal Stiffener Requirement)
+        req_check_eq = Math(inline=True)
+        req_check_eq.append(NoEscape(r'\begin{aligned}\\'))
+        req_check_eq.append(NoEscape(rf'1.&\text{{Transverse Stiffeners only: }}\\'))
+        req_check_eq.append(NoEscape((rf'&\dfrac{{d}}{{t_w}} \leq 200 \epsilon_w = {limit_200_eps:.2f}\\\\')))
+        req_check_eq.append(NoEscape(rf'2.&\text{{With 1st Longitudinal Stiffener: }}\\'))
+        req_check_eq.append(NoEscape(rf'&\dfrac{{d}}{{t_w}} \leq 250 \epsilon_w = {limit_250_eps:.2f}\\\\'))    
+        req_check_eq.append(NoEscape(rf'3.&\text{{With 2nd Longitudinal Stiffener: }}\\'))
+        req_check_eq.append(NoEscape(rf'&\dfrac{{d}}{{t_w}} \leq 400 \epsilon_w = {limit_400_eps:.2f}\\\\'))
+        req_check_eq.append(NoEscape(rf'4.&\text{{Actual Web Slenderness: }}\\\\'))
+        req_check_eq.append(NoEscape(rf'&\dfrac{{d}}{{t_w}} = {d_tw_ratio:.2f}\\\\'))
+        
+        long_stiff_required = False
+        second_stiff_required = False
 
-        report_check.append([
-            'Web Thickness Parameter (εw)',
-            '',
-            eps_w_eq,
-            ''
-        ])
+        if d_tw_ratio <= limit_200_eps:
+             req_check_eq.append(NoEscape(rf'&\text{{Since }} {d_tw_ratio:.2f} \leq {limit_200_eps:.2f}, \text{{ Limit Satsified.}}\\\\'))
+             req_check_eq.append(NoEscape(r'&\text{Longitudinal Stiffeners NOT Required.}\\'))
+             req_check_eq.append(NoEscape(r'\end{aligned}'))
+             
+             report_check.append([
+                'Web Thickness Limits',
+                '',
+                req_check_eq,
+                ''
+            ])
+             
+             # Add placeholder rows for consistency
+             report_check.append(['First Stiffener Placement', '', 'Not Required', ''])
+             report_check.append(['First Stiffener - Moment of Inertia', '', 'Not Required', ''])
+             report_check.append(['Second Stiffener (Neutral Axis)', '', 'Not Required', ''])
 
-        # First Stiffener Placement
-        y_comp = round((D - tf_top - tf_bot) / 5, 2)
+        else:
+             long_stiff_required = True
+             req_check_eq.append(NoEscape(rf'&\text{{Since }} {d_tw_ratio:.2f} > {limit_200_eps:.2f}, \text{{ Limit NOT Satsified.}}\\\\'))
+             req_check_eq.append(NoEscape(r'&\text{Longitudinal Stiffeners REQUIRED.}\\\\'))
+             req_check_eq.append(NoEscape(r'\end{aligned}'))
+             
+             report_check.append([
+                'Web Thickness Limits',
+                '',
+                req_check_eq,
+                ''
+            ])
 
-        y_comp_eq = Math(inline=True)
-        y_comp_eq.append(NoEscape(r'\begin{aligned}\\'))
-        y_comp_eq.append(NoEscape(r'y &= \dfrac{1}{5}(D - t_f - t_f)\\\\'))
-        y_comp_eq.append(NoEscape(rf'&= \dfrac{{1}}{{5}}({D:.1f} - {tf_top:.1f} - {tf_bot:.1f})\\\\'))
-        y_comp_eq.append(NoEscape(rf'&= {y_comp:.2f} \text{{ mm}}\\\\'))
-        y_comp_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.13.1]}\\'))
-        y_comp_eq.append(NoEscape(r'\end{aligned}'))
+             # First Stiffener Placement
+             y_comp = round((D - tf_top - tf_bot) / 5, 2)
 
-        report_check.append([
-            'First Stiffener Placement',
-            'Distance from compression flange',
-            y_comp_eq,
-            ''
-        ])
+             y_comp_eq = Math(inline=True)
+             y_comp_eq.append(NoEscape(r'\begin{aligned}\\'))
+             y_comp_eq.append(NoEscape(r'y &= \dfrac{1}{5}(D - t_f - t_f)\\\\'))
+             y_comp_eq.append(NoEscape(rf'&= \dfrac{{1}}{{5}}({D:.1f} - {tf_top:.1f} - {tf_bot:.1f})\\\\'))
+             y_comp_eq.append(NoEscape(rf'&= {y_comp:.2f} \text{{ mm}}\\\\'))
+             y_comp_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.3]}\\'))
+             y_comp_eq.append(NoEscape(r'\end{aligned}'))
 
-        limit_250_eps = round(250 * epsilon_w, 1)
-        limit_340_eps = round(340 * epsilon_w, 1)
-        limit_400_eps = round(400 * epsilon_w, 1)
+             report_check.append([
+                'First Stiffener Placement',
+                'Distance from compression flange',
+                y_comp_eq,
+                ''
+             ])
 
-        limits_eq = Math(inline=True)
-        limits_eq.append(NoEscape(r'\begin{aligned}\\'))
-        limits_eq.append(NoEscape(r'&\text{Web thickness requirements:}\\\\'))
-        limits_eq.append(NoEscape(rf'&1.\text{{ If }} 2.4d \geq c \geq d: \quad \dfrac{{d}}{{t_w}} \leq 250\epsilon_w = {limit_250_eps:.1f}\\\\'))
-        limits_eq.append(NoEscape(rf'&2.\text{{ If }} 0.74d \leq c \leq d: \quad \dfrac{{c}}{{t_w}} \leq 250\epsilon_w = {limit_250_eps:.1f}\\\\'))
-        limits_eq.append(NoEscape(rf'&3.\text{{ If }} c < 0.74d: \quad \dfrac{{d}}{{t_w}} \leq 340\epsilon_w = {limit_340_eps:.1f}\\\\'))
-        limits_eq.append(NoEscape(rf'&\text{{For 2nd stiffener at N.A.: }} \dfrac{{d}}{{t_w}} \leq 400\epsilon_w = {limit_400_eps:.1f}\\\\'))
-        limits_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.13.1]}\\'))
-        limits_eq.append(NoEscape(r'\end{aligned}'))
+             # First Stiffener Design (Is_1 calculation)
+             Is_1 = round(4 * c * (tw**3), 2)
 
-        report_check.append([
-            'Web Thickness Limits',
-            '',
-            limits_eq,
-            ''
-        ])
+             Is1_eq = Math(inline=True)
+             Is1_eq.append(NoEscape(r'\begin{aligned}\\'))
+             Is1_eq.append(NoEscape(r'I_s &\geq 4 c t_w^3\\\\'))
+             Is1_eq.append(NoEscape(rf'&\geq 4 \times {c:.1f} \times ({tw:.1f})^3\\\\'))
+             Is1_eq.append(NoEscape(rf'&\geq {Is_1:.2f} \text{{ mm}}^4\\\\'))
+             Is1_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.2.4]}\\'))
+             Is1_eq.append(NoEscape(r'\end{aligned}'))
 
-        Is_1 = round(4 * c * (tw**3), 2)
+             report_check.append([
+                 'First Stiffener - Moment of Inertia',
+                 '',
+                 Is1_eq,
+                 ''
+             ])
 
-        Is1_eq = Math(inline=True)
-        Is1_eq.append(NoEscape(r'\begin{aligned}\\'))
-        Is1_eq.append(NoEscape(r'I_s &\geq 4 c t_w^3\\\\'))
-        Is1_eq.append(NoEscape(rf'&\geq 4 \times {c:.1f} \times ({tw:.1f})^3\\\\'))
-        Is1_eq.append(NoEscape(rf'&\geq {Is_1:.2f} \text{{ mm}}^4\\\\'))
-        Is1_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.13.2, Eq. 1.39]}\\'))
-        Is1_eq.append(NoEscape(r'\end{aligned}'))
-
-        report_check.append([
-            'First Stiffener - Moment of Inertia',
-            '',
-            Is1_eq,
-            ''
-        ])
-
-        d_2 = round(D - tf_top - tf_bot, 2)
-        Is_2 = round(d_2 * (tw**3), 2)
-
-        Is2_eq = Math(inline=True)
-        Is2_eq.append(NoEscape(r'\begin{aligned}\\'))
-        Is2_eq.append(NoEscape(r'I_s &\geq d_2 \times t_w^3\\\\'))
-        Is2_eq.append(NoEscape(rf'd_2 &= D - t_f - t_f\\\\'))
-        Is2_eq.append(NoEscape(rf'&= {D:.1f} - {tf_top:.1f} - {tf_bot:.1f}\\\\'))
-        Is2_eq.append(NoEscape(rf'&= {d_2:.2f} \text{{ mm}}\\\\'))
-        Is2_eq.append(NoEscape(r'I_s &\geq ' + f'{d_2:.2f}' + r' \times (' + f'{tw:.1f}' + r')^3\\\\'))
-        Is2_eq.append(NoEscape(rf'&\geq {Is_2:.2f} \text{{ mm}}^4\\\\'))
-        Is2_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.13.2, Eq. 1.42]}\\'))
-        Is2_eq.append(NoEscape(r'\end{aligned}'))
-
-        report_check.append([
-            'Second Stiffener (Neutral Axis)',
-            '',
-            Is2_eq,
-            ''
-        ])
+             # Check for Second Stiffener Requirement
+             Is2_check_eq = Math(inline=True)
+             Is2_check_eq.append(NoEscape(r'\begin{aligned}\\'))
+             Is2_check_eq.append(NoEscape(r'\text{Limit for single longitudinal stiffener:}\\\\'))
+             Is2_check_eq.append(NoEscape(rf'\dfrac{{d}}{{t_w}} \leq 250 \epsilon_w = {limit_250_eps:.2f}\\\\'))
+             Is2_check_eq.append(NoEscape(r'\text{Actual Web Slenderness:}\\\\'))
+             Is2_check_eq.append(NoEscape(rf'\dfrac{{d}}{{t_w}} &= {d_tw_ratio:.2f}\\\\'))
+             
+             if d_tw_ratio > limit_250_eps:
+                 second_stiff_required = True
+                 Is2_check_eq.append(NoEscape(rf'\text{{Since }} {d_tw_ratio:.2f} > {limit_250_eps:.2f}, \text{{ Limit NOT Satsified.}}\\\\'))
+                 Is2_check_eq.append(NoEscape(r'\text{Second Stiffener at N.A. REQUIRED.}\\'))
+                 
+                 # Add 2nd stiffener calculation to the same block or next
+                 d_2 = round(D - tf_top - tf_bot, 2)
+                 Is_2 = round(d_2 * (tw**3), 2)
+                 Is2_check_eq.append(NoEscape(r'I_s &\geq d_2 \times t_w^3\\\\'))
+                 Is2_check_eq.append(NoEscape(rf'&\geq {d_2:.2f} \times ({tw:.1f})^3\\\\'))
+                 Is2_check_eq.append(NoEscape(rf'&\geq {Is_2:.2f} \text{{ mm}}^4\\\\'))
+                 Is2_check_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.13.2, Eq. 1.42]}\\'))
+                 Is2_check_eq.append(NoEscape(r'\end{aligned}'))
+                 
+                 report_check.append([
+                    'Second Stiffener (Neutral Axis)',
+                    '',
+                    Is2_check_eq,
+                    ''
+                 ])
+             else:
+                 Is2_check_eq.append(NoEscape(rf'\text{{Since }} {d_tw_ratio:.2f} \leq {limit_250_eps:.2f}, \text{{ Limit Satsified.}}\\\\'))
+                 Is2_check_eq.append(NoEscape(r'\text{NOT Required.}\\'))
+                 Is2_check_eq.append(NoEscape(r'\end{aligned}'))
+                 
+                 report_check.append([
+                    'Second Stiffener (Neutral Axis)',
+                    '',
+                    Is2_check_eq,
+                    ''
+                 ])
 
 
         # ==================== STIFFENER DESIGN SUMMARY ====================
@@ -1207,12 +1231,21 @@ def prepare_design_checks(pg_obj, logger):
         # Get all stiffener parameters from pg_obj
         t_int_stiff = getattr(pg_obj, 'IntStiffThickness', 0)
         t_end_stiff = getattr(pg_obj, 'endstiffthickness', 0)
-        t_long_stiff = getattr(pg_obj, 'longstiffenerthk', 'NA')
+        
+        # Determine Longitudinal Stiffener values based on requirement
+        if long_stiff_required:
+            t_long_stiff = getattr(pg_obj, 'longstiffenerthk', 'NA')
+            num_long = getattr(pg_obj, 'longstiffenerno', 'Not Required')
+            stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
+            stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
+        else:
+            t_long_stiff = 'Not Required'
+            num_long = 'Not Required'
+            stiff_1_pos = 'Not Required'
+            stiff_2_pos = 'Not Required'
+
         method_name = getattr(pg_obj, 'x', 'Simple Post Critical')
         int_spacing = getattr(pg_obj, 'c', 0)
-        num_long = getattr(pg_obj, 'longstiffenerno', 'Not Required')
-        stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
-        stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
 
         # Calculate number of end panel stiffeners
         if isinstance(t_end_stiff, (int, float)) and t_end_stiff > 0:

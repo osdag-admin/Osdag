@@ -1,6 +1,6 @@
 """
 Module: lap_joint_bolted.py
-Author: Aman
+Author: Aman, Roushan Raj
 Date: 2025-02-18
 
 Description:
@@ -1121,7 +1121,7 @@ class LapJointBolted(MomentConnection):
             #=========== SECTION 2.1: CALCULATING BOLT STRENGTH ==========
             #=============================================================
             self.report_check.append([
-                "SubSection", "Calculating Bolt Strength", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Calculating Bolt Strength", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
             d = float(self.bolt.bolt_diameter_provided)
@@ -1276,7 +1276,7 @@ class LapJointBolted(MomentConnection):
             #=========== SECTION 2.2: REDUCTION FACTORS ============
             #=======================================================
             self.report_check.append([
-                "SubSection", "Reduction Factors", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Reduction Factors", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
             l_j = (self.rows - 1) * self.final_pitch if self.rows > 1 else 0
@@ -1309,7 +1309,7 @@ class LapJointBolted(MomentConnection):
             lj_prov = Math(inline=True)
             lj_prov.append(NoEscape(r'\beta_{lj} = ' + f'{beta_lj:.2f}'))
             
-            self.report_check.append(["Long Joint Factor", '', lj_prov, ''])
+            self.report_check.append(["Long Joint Factor", lj_req, lj_prov, ''])
 
             l_g = plate1_thk_raw + plate2_thk_raw
             
@@ -1340,7 +1340,7 @@ class LapJointBolted(MomentConnection):
             lg_prov = Math(inline=True)
             lg_prov.append(NoEscape(r'\beta_{lg} = ' + f'{beta_lg:.2f}'))
             
-            self.report_check.append(["Large Grip Factor", '', lg_prov, ''])
+            self.report_check.append(["Large Grip Factor", lg_req, lg_prov, ''])
 
             if self.bolt.bolt_hole_type != "Standard":
                 hole_req = Math(inline=True)
@@ -1359,7 +1359,7 @@ class LapJointBolted(MomentConnection):
             # Section 2.3: Detailing Requirements
             #=====================================
             self.report_check.append([
-                "SubSection", "Detailing Requirements", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Detailing Requirements", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
             # 2.3.1 Minimum Spacing (Cl. 10.2.2)
@@ -1445,7 +1445,7 @@ class LapJointBolted(MomentConnection):
             # Section 2.4: Number of Bolts
             #===============================
             self.report_check.append([
-                "SubSection", "Number of Bolts Required", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Number of Bolts Required", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
             bolts_req_initial = math.ceil(axial_kN / bolt_final_cap) if bolt_final_cap > 0 else 0
@@ -1463,7 +1463,7 @@ class LapJointBolted(MomentConnection):
             # Section 2.5: Bolt Arrangement
             #===============================
             self.report_check.append([
-                "SubSection", "Bolt Arrangement", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Bolt Arrangement", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
             
             self.report_check.append([
@@ -1474,7 +1474,7 @@ class LapJointBolted(MomentConnection):
             # Section 2.6: Base Metal Strength
             #================================
             self.report_check.append([
-                "SubSection", "Base Metal Strength", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Base Metal Strength", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
             if is_comp:
@@ -1553,7 +1553,7 @@ class LapJointBolted(MomentConnection):
             # Section 2.7: Design Summary
             #=============================
             self.report_check.append([
-                "SubSection", "Design Summary", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
+                "SubSection", "Design Summary", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
             bolt_capacity_total = f2(bolt_final_cap * n_bolts, 0.0)

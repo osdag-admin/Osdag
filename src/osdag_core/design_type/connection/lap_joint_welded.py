@@ -409,7 +409,11 @@ class LapJointWelded(MomentConnection):
 
         self.calculate_weld_strength(design_dictionary)
         self.calculate_weld_length()
+        if not self.design_status:
+            return  # Weld length exceeded max limit
         self.check_long_joint()
+        if not self.design_status:
+            return  # Modified weld length exceeded max limit
         self.check_base_metal_strength(design_dictionary)
         self.calculate_final_utilization_ratio()
 
@@ -492,7 +496,7 @@ class LapJointWelded(MomentConnection):
         elif self.weld_length_required > self.leff_max:
             self.logger.error(": Required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
             self.design_status = False
-            raise ValueError("Required weld length exceeds maximum allowed.")
+            return  # Design fails - let GUI show error via logs
         else:
             self.l_eff = self.weld_length_required
             self.logger.info(": Required weld length is within limits (Pass)")
@@ -517,7 +521,7 @@ class LapJointWelded(MomentConnection):
         elif l_req_modified > self.leff_max:
             self.logger.error(": Modified required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
             self.design_status = False
-            raise ValueError("Modified required weld length exceeds maximum allowed.")
+            return  # Design fails - let GUI show error via logs
         else:
             self.l_eff = l_req_modified
         # End return length (Cl.10.5.4.5): min(2*s, 12mm)

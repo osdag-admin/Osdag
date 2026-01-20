@@ -417,7 +417,25 @@ class PlateGirderWelded(Member):
 
     def customized_input(self):
         c_lst = []
+        t1 = (KEY_WEB_THICKNESS_PG, self.web_thickness_customized)
+        c_lst.append(t1)
+        t2 = (KEY_TOP_FLANGE_THICKNESS_PG, self.top_flange_thickness_customized)
+        c_lst.append(t2)
+        t3 = (KEY_BOTTOM_FLANGE_THICKNESS_PG, self.bottom_flange_thickness_customized)
+        c_lst.append(t3)
         return c_lst
+
+    @staticmethod
+    def web_thickness_customized():
+        return [str(thk) for thk in VALUES_PLATETHK_CUSTOMIZED]
+
+    @staticmethod
+    def top_flange_thickness_customized():
+        return [str(thk) for thk in VALUES_PLATETHK_CUSTOMIZED]
+
+    @staticmethod
+    def bottom_flange_thickness_customized():
+        return [str(thk) for thk in VALUES_PLATETHK_CUSTOMIZED]
 
     def input_values(self):
         self.module = KEY_DISP_PLATE_GIRDER_WELDED
@@ -501,11 +519,15 @@ class PlateGirderWelded(Member):
             return False
     
     def customize_combo_dims(self, arg):
+        """Return thickness options based on Design Type.
+        - Customized: regular thickness dropdown
+        - Optimized: All/Customized dropdown for popup selection
+        """
         conn = arg[0]
         if conn == "Customized":
             return VALUES_PLATETHK_CUSTOMIZED
-        else:
-            return VALUES_PLATETHK
+        else:  # Optimized
+            return VALUES_ALL_CUSTOMIZED
 
     def input_value_changed(self):
         lst = []
@@ -517,7 +539,7 @@ class PlateGirderWelded(Member):
         lst.append(t3)
         t24 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_BOTTOM_Bflange_PG, TYPE_TEXTBOX, self.customized_dims)
         lst.append(t24)
-        
+
         t25 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_WEB_THICKNESS_PG, TYPE_COMBOBOX, self.customize_combo_dims)
         lst.append(t25)
         t26 = ([KEY_OVERALL_DEPTH_PG_TYPE], KEY_TOP_FLANGE_THICKNESS_PG, TYPE_COMBOBOX, self.customize_combo_dims)
@@ -2352,6 +2374,7 @@ class PlateGirderWelded(Member):
         elif user_num >= 1:
             # User explicitly requested stiffeners
             self.longstiffener_no = user_num
+            self.longstiffener_thk = self.LongStiffThickness
             # First stiffener at 0.2d from compression flange per Cl. 8.7.13
             self.x1 = x1_auto if x1_auto is not None else round(0.2 * self.eff_depth, 2)
             if user_num >= 2:

@@ -241,8 +241,8 @@ class HomeWindow(QWidget):
                 button = TopButton(black_icon, white_icon, label)
 
             if label.strip() == "Import":
-                #button.clicked.connect(lambda checked=False: self.triggerLoadOsi.emit())
-                button.clicked.connect(lambda checked=False: print(f"@Total: {len(QApplication.allWidgets())}"))
+                button.clicked.connect(lambda checked=False: self.triggerLoadOsi.emit())
+                # button.clicked.connect(lambda checked=False: print(f"@Total: {len(QApplication.allWidgets())}"))
 
             self.buttons.append(button)
             self.button_group.addButton(button, i) # Add button to the group with an ID

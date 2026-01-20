@@ -270,7 +270,7 @@ class OutputDock(QWidget):
         btn_button_layout.addStretch(1)    
 
         save_output_csv_btn = DockCustomButton("  Save Outputs (csv)  ", ":/vectors/design_report.svg")
-        save_output_csv_btn.clicked.connect(lambda: self.save_output_to_csv(self.backend))
+        save_output_csv_btn.clicked.connect(lambda: self.save_output_to_csv(self.backend, "Outputs"))
         btn_button_layout.addWidget(save_output_csv_btn)
         btn_button_layout.addStretch(2)
 

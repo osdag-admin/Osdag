@@ -4168,18 +4168,7 @@ class CommonDesignLogic(object):
                 final_model = fused_shape
             else:
                 final_model = None
-
-        # Fix for optimized modules returning lists (e.g. BB Endplate)
-        # Exporters require a single TopoDS_Shape, so we must fuse here if we have a list.
-        if isinstance(final_model, list):
-            if len(final_model) > 0:
-                fused_shape = final_model[0]
-                for item in final_model[1:]:
-                    fused_shape = BRepAlgoAPI_Fuse(item, fused_shape).Shape()
-                final_model = fused_shape
-            else:
-                final_model = None
-
+        
         return final_model
 
         

@@ -2507,14 +2507,7 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 KEY_DISP_SEC_PROFILE = 'Section Profile*'
 KEY_DISP_SEC_TYPE = 'Section Type'
 VALUES_SEC_PROFILE = ['Beams and Columns', 'RHS and SHS', 'CHS'] #,'Channels', 'Back to Back Channels'
-VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels', 'Flat Plates']
-KEY_FLAT_PLATES = 'Flat Plates'
-KEY_PLATETHK_1 = 'PlateThk1'
-KEY_DISP_PLATETHK_1 = 'Thickness of Plate-1 (mm)'
-KEY_PLATETHK_2 = 'PlateThk2'
-KEY_DISP_PLATETHK_2 = 'Thickness of Plate-2 (mm)'
-KEY_PLATE_WIDTH = 'PlateWidth'
-KEY_DISP_PLATE_WIDTH = 'Width of Plate (mm)'
+VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 #, 'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE3 = ['Beams and Columns'] #,'Channels', 'Back to Back Channels'
 VALUES_SEC_PROFILE4 = ['Channels']

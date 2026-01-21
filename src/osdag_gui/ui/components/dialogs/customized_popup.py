@@ -41,14 +41,9 @@ class My_ListWidgetItem(QListWidgetItem):
     def __lt__(self, other):
         try:
             import re
-            self_text = str(re.sub("[^0-9.]", "", self.text()))
-            other_text = str(re.sub("[^0-9.]", "", other.text()))
-            # Handle empty strings - fall back to string comparison
-            if not self_text or not other_text:
-                return self.text() < other.text()
+            self_text = str(re.sub("[^0-9]", "", self.text()))
+            other_text = str(re.sub("[^0-9]", "", other.text()))
             return float(self_text) < float(other_text)
-        except (ValueError, TypeError):
-            return self.text() < other.text()
         except Exception:
             return QListWidgetItem.__lt__(self, other)
 

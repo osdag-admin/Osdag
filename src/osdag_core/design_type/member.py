@@ -3317,7 +3317,7 @@ class Member(Main):
         return c
 
     @staticmethod
-    def plate_thick_customized(args=None):
+    def plate_thick_customized():
         d = VALUES_PLATETHK_CUSTOMIZED
         return d
 

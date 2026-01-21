@@ -31,54 +31,33 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     nut_height = bolt_head_radius
     nut_inner_radius = bolt_shaft_radius
     
-    # Create the first plate (Left Side)
+    # Create the first plate
     # Position it at the origin
-    # Align along X-axis (Length) and Y-axis (Width)
-    # Joint connection at X=0
-    
-    # Plate 1: from X = -plate_length to 0
-    origin1 = numpy.array([-plate_length, -plate_width/2, 0.0]) 
-    uDir1 = numpy.array([1.0, 0.0, 0.0])  # Points along X axis (Length)
-    wDir1 = numpy.array([0.0, 1.0, 0.0])  # Points along Y axis (Width)
+    origin1 = numpy.array([0.0, 0.0, 0.0]) # Global origin lies at midpoint of plate 1
+    uDir1 = numpy.array([0.0, 0.0, 1.0])  # Points along Z axis (height)
+    wDir1 = numpy.array([1.0, 0.0, 0.0])  # Points along X axis (length)
     
     plate1 = Plate(plate_length, plate_width, plate1_thickness)
     plate1.place(origin1, uDir1, wDir1)
     plate1_model = plate1.create_model()
     
-    # Create the second plate (Right Side)
-    # Plate 2: from X = 0 + gap to plate_length + gap (Assuming 0 gap for now as per previous logic)
-    gap = 2 # Small gap for visualization
-    origin2 = numpy.array([gap, -plate_width/2, 0.0])
-    uDir2 = numpy.array([1.0, 0.0, 0.0])
-    wDir2 = numpy.array([0.0, 1.0, 0.0])
+    # Create the second plate 
+    # Position it so that it properly overlaps with the first plate
+    # The second plate is elevated by plate1_thickness and offset in Y direction
+
+    origin2 = numpy.array([0.0,plate_length, 0])
+    uDir2 = numpy.array([0.0, 0.0, 1.0])
+    wDir2 = numpy.array([1.0, 0.0, 0.0])
     
     plate2 = Plate(plate_length, plate_width, plate2_thickness)
     plate2.place(origin2, uDir2, wDir2)
     plate2_model = plate2.create_model()
     
-    # Top Cover Plate
-    # Spans across both plates
-    # Length = 2 * (end + (cols-1)*pitch + edge_of_cover) 
-    # Usually cover plate length is calculated based on bolt layout
-    # Let's assume cover plate is centered at X = gap/2
+    origin3 = numpy.array([0.0, (plate_width*1.5)/2, max(plate1_thickness, plate2_thickness)]) # Global origin lies at midpoint of plate 1
+    uDir3 = numpy.array([0.0, 0.0, 1.0])  # Points along Z axis (height)
+    wDir3 = numpy.array([1.0, 0.0, 0.0])  # Points along X axis (length)
     
-    # Calculate required cover plate length based on bolts
-    # Bolts outermost position from center = end + (cols-1)*pitch
-    # Cover plate needs 'edge' distance beyond that.
-    # So half_length = end + (cols-1)*pitch + edge (or end, depending on which is which)
-    # Usually: Pitch is spacing between cols. End is dist from plate end to first bolt. Edge is dist from cover end to last bolt.
-    # Let's use the parameters passed (assuming they are for the main plate).
-    # For cover plate, the 'End' distance of main plate becomes 'Edge' distance? 
-    # Let's approximate cover plate length to cover all bolts with some margin.
-    
-    cover_len_half = end + (bolt_cols-1)*pitch + end # Using 'end' as margin for cover plate too
-    cover_length = 2 * cover_len_half + gap
-    
-    origin3 = numpy.array([-cover_len_half + gap/2, -plate_width/2, max(plate1_thickness, plate2_thickness)]) 
-    uDir3 = numpy.array([1.0, 0.0, 0.0])  
-    wDir3 = numpy.array([0.0, 1.0, 0.0])  
-    
-    platec = Plate(cover_length, plate_width, cover_thickness)
+    platec = Plate(plate_length, plate_width, plate1_thickness)
     platec.place(origin3, uDir3, wDir3)
     platec_model = platec.create_model()
     
@@ -86,40 +65,24 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
 
     # --- Calculate Bolt Positions ---
     bolt_positions = []
-    
-    # Calculate Y-coordinates (Rows)
-    # Centered on width
-    # If 1 row: at 0 (relative to center) -> 0 absolute if width extends -w/2 to w/2
-    # If multiple rows: distributed with 'gauge' spacing
-    # First row at: - ((rows-1) * gauge) / 2
-    
-    # Check if edge distance is sufficient
-    # total_width_required = (bolt_rows - 1) * gauge + 2 * edge
-    
-    start_y = -((bolt_rows - 1) * gauge) / 2
-    
-    # Calculate X-coordinates (Cols)
-    # Starts at 'end' distance from the gap
-    # Left side: - (end + col * pitch)
-    # Right side: gap + end + col * pitch
-    
-    gap_center = gap / 2.0
-    
-    bolt_z = max(plate1_thickness, plate2_thickness) + cover_thickness # Head on top of cover plate
-    
-    # Left Side Bolts
-    for c in range(bolt_cols):
-        x_pos = - (end + c * pitch)
-        for r in range(bolt_rows):
-            y_pos = start_y + r * gauge
-            bolt_positions.append((x_pos, y_pos, bolt_z))
+    count = 0
+    exit_loops = False
 
-    # Right Side Bolts
-    for c in range(bolt_cols):
-        x_pos = gap + (end + c * pitch)
-        for r in range(bolt_rows):
-            y_pos = start_y + r * gauge
-            bolt_positions.append((x_pos, y_pos, bolt_z))
+    for col in range(bolt_cols):
+        for row in range(bolt_rows):
+            bolt_positions.append(( 
+                edge + (row * gauge),
+                end + (col * pitch), 
+                (max(plate1_thickness, plate2_thickness))/2 + cover_thickness
+            ))
+            count += 1
+
+            # Exit after completing current column
+            if count == number_bolts and row == bolt_rows - 1:  
+                exit_loops = True
+                break
+        if exit_loops:
+            break
 
     # --- Create and Place Bolts & Nuts ---
     bolts_models = []
@@ -135,13 +98,7 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
         bolts_models.append(bolt_model)
 
         # Nut
-        # Nut is at bottom of plates (z = 0 or -plate_thickness?)
-        # Base plate is at Z=0 to T.
-        # So nut should be at Z=0.
-        # Wait, plate1 goes from Z=0 to T1.
-        # So nut top face is at Z=0. Nut extends downwards.
-        
-        nut_origin = numpy.array([pos[0], pos[1], 0.0])
+        nut_origin = numpy.array([pos[0], pos[1],-0.5*plate1_thickness])
         nut_uDir = numpy.array([1.0, 0.0, 0.0])
         nut_wDir = numpy.array([0.0, 0.0, -1.0])
 

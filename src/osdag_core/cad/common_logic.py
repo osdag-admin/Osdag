@@ -3400,7 +3400,7 @@ class CommonDesignLogic(object):
             hover_dict = self.module_object.hover_dict
             hover_dict["Hinged Support"] = "<b>Hinged Support</b>"
             hover_dict["Roller Support"] = "<b>Roller Support</b>"
-            hover_dict["Support Block"] = "<b>Cantilever Support (Represented) </b>"
+            hover_dict["Support Block"] = "<b>Cantilever Support</b>"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]

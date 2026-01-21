@@ -26,8 +26,6 @@ import os
 from importlib.resources import files
 
 
-from ...cad.SimpleConnections.BoltedButtJoint.Butt_joint_bolted import create_bolted_butt_joint
-
 class ButtJointBolted(MomentConnection):
     def __init__(self):
         super(ButtJointBolted, self).__init__()
@@ -392,72 +390,24 @@ class ButtJointBolted(MomentConnection):
         #     ui.mytabWidget.setCurrentIndex(0)
         # ui.commLogicObj.display_3DModel("Column", bgcolor)
 
-        return components
-
-    def call_3DModel(self, ui, bgcolor):
-        """Call CAD model generation"""
-        # Ensure design is done
-        if not self.design_status:
-            return
-
-        # Prepare parameters for CAD
-        plate1_thickness = float(self.plate1thk)
-        plate2_thickness = float(self.plate2thk)
-        cover_thickness = float(self.calculated_cover_plate_thickness)
-        plate_width = float(self.width)
-        bolt_dia = float(self.bolt.bolt_diameter_provided)
-        bolt_rows = int(self.rows)
-        bolt_cols = int(self.cols)
-        pitch = float(self.final_pitch)
-        gauge = float(self.final_gauge)
-        edge = float(self.final_edge_dist)
-        end = float(self.final_end_dist)
-        number_bolts = int(self.number_bolts)
-
-        # Call CAD function
-        # Note: create_bolted_butt_joint returns tuple of shapes/lists
-        # We need to adapt this to what common_logic or the UI expects
-        # For now, let's assume valid return and handling needs to be done here or in common_logic
-        # But this method creates the model display in the UI usually via commLogicObj
-
-        # Since common_logic.display_3DModel calls this, we should actually construct the model here or return it
-        # However, looking at other modules, usually they call a common_logic function or do it directly.
-        # But here we want to use our specific CAD function.
-
-        pass
-        # Logic to be handled in get_3d_components or a dedicated display method
-        # if UI integration is needed
-
     @staticmethod
-    def get_3d_components(base, main=None):
+    def get_3d_components(main=None):
         """Get 3D components for visualization"""
         # Create placeholder files if they don't exist
         ButtJointBolted.create_placeholder_files()
-        
+
+        # Return empty components list for now
         components = []
-        
-        if base.design_status:
-            # Prepare parameters
-            plate1_thickness = float(base.plate1thk)
-            plate2_thickness = float(base.plate2thk)
-            cover_thickness = float(base.calculated_cover_plate_thickness)
-            plate_width = float(base.width)
-            bolt_dia = float(base.bolt.bolt_diameter_provided)
-            bolt_rows = int(base.rows)
-            bolt_cols = int(base.cols)
-            pitch = float(base.final_pitch)
-            gauge = float(base.final_gauge)
-            edge = float(base.final_edge_dist)
-            end = float(base.final_end_dist)
-            number_bolts = int(base.number_bolts)
-            
-            # Call CAD function
-            assembly, plate1, plate2, platec, bolts, nuts = create_bolted_butt_joint(
-                plate1_thickness, plate2_thickness, cover_thickness, plate_width, bolt_dia,
-                bolt_rows, bolt_cols, pitch, gauge, edge, end, number_bolts
-            )
-            
-            components.append(assembly)
+
+        # t1 = ('Model', self.call_3DModel)
+        # components.append(t1)
+
+        # t3 = ('Plate1', self.call_3DColumn)
+        # components.append(t3)
+
+        # t4 = ('Plate2', self.call_3DPlate)
+        # components.append(t4)
+
 
         return components
 
@@ -940,8 +890,8 @@ class ButtJointBolted(MomentConnection):
                     self.design_status = False
                     self.number_r_c_bolts(design_dictionary,0,1)
                 else:
-                    self.final_end_dist = self.bolt.min_end_dist_round # Keep End Distance minimal/standard
-                    self.final_edge_dist = enddist # Use centering distance for Edge Distance
+                    self.final_end_dist = enddist
+                    self.final_edge_dist = enddist
                     self.design_status = True
             else:
                 self.final_gauge = gauge_dist
@@ -951,8 +901,8 @@ class ButtJointBolted(MomentConnection):
                     self.design_status = False
                     self.number_r_c_bolts(design_dictionary,0,1)
                 else:
-                    self.final_end_dist = self.bolt.min_end_dist_round # Keep End Distance minimal/standard
-                    self.final_edge_dist = enddist # Use centering distance for Edge Distance
+                    self.final_end_dist = enddist
+                    self.final_edge_dist = enddist
                     self.design_status = True
 
         if self.design_status:

@@ -1977,138 +1977,6 @@ class CommonDesignLogic(object):
             T_hp=T_hp,
         )
         
-        
-        # --- Create Supports ---
-        triangle_supp = None
-        cyl_supp = None
-        support_knot = None
-        
-        # Calculate Total Depth for Support Height Logic
-        # D in create_plate_girder is Total Depth (Web + Flanges)? 
-        # Looking at create_plate_girder implementation:
-        # eff_depth = D - T_ft - T_fb  => So D is indeed Total Depth.
-        column_d = D 
-        
-        # Dimensions for Supports
-        # We need the bottom level of the girder. 
-        # create_plate_girder places:
-        # Web at 0,0,0
-        # Bottom Flange at -(D + T_fb)/2 ?? No.
-        # Let's check create_plate_girder placement:
-        # bottom_flange = create_plate_model(..., -(D + T_fb) / 2) -> Center of flange is at -(D+T_fb)/2?
-        # create_plate_model(origin, ...): origin is center.
-        # Height of flange is T_fb.
-        # So bottom surface is at -(D + T_fb)/2 - T_fb/2 = -(D/2 + T_fb).
-        # Wait, let's re-read create_plate_girder line 335:
-        # numpy.array([0., 0., -(D + T_fb) / 2])
-        # This seems to imply the center of the bottom flange is slightly below -D/2?
-        # If Web is height D... 
-        # web_plate = create_plate_model(..., D) -> Centered at 0, height D. Z range: [-D/2, D/2].
-        # Bottom flange should attach to bottom of web (-D/2).
-        # Center of bottom flange should be at -D/2 - T_fb/2 = -(D+T_fb)/2.
-        # YES. So the bottom SURFACE of the bottom flange is at -D/2 - T_fb.
-        # So z_contact = -(D/2 + T_fb).
-        
-        z_contact = -(D/2 + T_fb)
-        x_start = 0.0 # Centered along X (Web is at X=0)
-        
-        # Support Width (Extending across flange width)
-        # Use max flange width
-        support_width = max(B_ft, B_fb)
-        
-        # Determine Support Height based on Beam Length vs Depth
-        if length <= column_d:
-            h_supp = 0.30 * column_d
-        else:
-            h_supp = 0.75 * column_d
-        
-        # 2. Cylindrical Support at End (Right) - Roller
-        # Placed at Y = length (End of girder)
-        # Radius = Half of Total Triangular Height (Prism + Small Cylinder)
-        # Total Height = h_supp + 0.10 * h_supp = 1.10 * h_supp
-        r_cyl = (1.10 * h_supp) / 2.0
-        
-        # Shift cylinder center inwards by radius so it doesn't stick out?
-        # In simply supported beam: y_cyl = column_length - r_cyl
-        y_cyl = length - r_cyl
-        z_cyl_center = z_contact - r_cyl # Below beam
-        
-        pt_cyl = gp_Pnt(x_start, y_cyl, z_cyl_center)
-        # Axis along X for cylinder lying down
-        axis_cyl = gp_Ax2(pt_cyl, gp_Dir(1, 0, 0))
-        
-        cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, support_width).Shape()
-        # The cylinder is created from axis towards +Z? No, MakeCylinder(Ax2, R, H) creates along the main direction of Ax2.
-        # My Ax2 main direction is (1,0,0). So it creates along X.
-        # Center is at x_start=0. Length is support_width.
-        # It creates from 0 to +support_width relative to Ax2 origin?
-        # I need it centered on X=0.
-        # Cylinder by default is base circle at Origin, extends H along Dir.
-        # So it goes from X=0 to X=support_width.
-        # I need it from -width/2 to +width/2.
-        # So I should start at X = -support_width/2.
-        pt_cyl = gp_Pnt(-support_width/2.0, y_cyl, z_cyl_center)
-        axis_cyl = gp_Ax2(pt_cyl, gp_Dir(1, 0, 0))
-        cyl_supp = BRepPrimAPI_MakeCylinder(axis_cyl, r_cyl, support_width).Shape()
-
-        
-        # 1. Triangular Support at Start (Left) - Fixed/Pinned
-        # Placed at Y = 0 (Start of girder)
-        # Height: Match the cylinder diameter for visual consistency
-        # Base width = 1.5 times of height => Half-Base w_supp = 0.75 * height
-        w_supp = 0.75 * h_supp
-        
-        # Position Apex at Y = w_supp (so start of base is at Y=0)
-        y_apex = w_supp
-        
-        # small cylinder at the top of the prism 
-        # diameter is 10% of the height of the triangular prism
-        d_small = 0.10 * h_supp
-        r_small = d_small / 2.0
-        
-        # Position small cylinder:
-        # Centered at apex Y (y_apex)
-        # Touching Beam Bottom (z_contact) -> Center at z_contact - r_small
-        # Cylinder oriented along X, centered on web
-        pt_small = gp_Pnt(-support_width/2.0, y_apex, z_contact - r_small)
-        axis_small = gp_Ax2(pt_small, gp_Dir(1, 0, 0))
-        support_knot = BRepPrimAPI_MakeCylinder(axis_small, r_small, support_width).Shape()
-        
-        # Shift Triangle Down by Small Cylinder Diameter (2*r_small)
-        z_apex = z_contact - d_small
-        
-        # Triangle Prism Profile (in Y-Z plane)
-        # Apex at (y_apex, z_apex)
-        # Base at z_apex - h_supp, from y_apex - w_supp to y_apex + w_supp
-        # Since y_apex = w_supp, base goes from 0 to 2*w_supp.
-        
-        # Note: BRepBuilderAPI_MakePolygon/Edge takes 3D points.
-        # We draw the triangle face at X= -support_width/2.0
-        x_face = -support_width/2.0
-        
-        p1 = gp_Pnt(x_face, y_apex, z_apex) # Apex (touching small cylinder)
-        p2 = gp_Pnt(x_face, y_apex - w_supp, z_apex - h_supp) # Base point 1 
-        p3 = gp_Pnt(x_face, y_apex + w_supp, z_apex - h_supp)  # Base point 2
-        
-        edge1 = BRepBuilderAPI_MakeEdge(p1, p2).Edge()
-        edge2 = BRepBuilderAPI_MakeEdge(p2, p3).Edge()
-        edge3 = BRepBuilderAPI_MakeEdge(p3, p1).Edge()
-        
-        wire_maker = BRepBuilderAPI_MakeWire()
-        wire_maker.Add(edge1)
-        wire_maker.Add(edge2)
-        wire_maker.Add(edge3)
-        wire = wire_maker.Wire()
-        
-        face = BRepBuilderAPI_MakeFace(wire).Face()
-        vec = gp_Vec(support_width, 0, 0) # Extrude along X
-        triangle_supp = BRepPrimAPI_MakePrism(face, vec).Shape()
-        
-        # Add to components
-        components['support_tri'] = triangle_supp
-        components['support_cyl'] = cyl_supp
-        components['support_knot'] = support_knot
-        
         # Store components for display_3DModel
         self.plate_girder_components = components
         
@@ -3528,8 +3396,6 @@ class CommonDesignLogic(object):
             label_flange = ["Flange", hover_dict.get("Flange", "Flange plate of the plate girder")]
             label_stiffener = ["Stiffeners", hover_dict.get("Stiffeners", "Intermediate stiffener plates")]
             label_weld = ["Weld", hover_dict.get("Weld", "Fillet welds")]
-            label_support_tri = ["Support (Fixed)", hover_dict.get("Support (Fixed)", "Triangular Support (Fixed)")]
-            label_support_cyl = ["Support (Roller)", hover_dict.get("Support (Roller)", "Cylindrical Support (Roller)")]
             
             if self.component == "Model":
                 # Display web plate
@@ -3566,21 +3432,6 @@ class CommonDesignLogic(object):
                 if components.get('stiffener_welds') is not None:
                     osdag_display_shape(self.display, components['stiffener_welds'], update=True, 
                                        color=weld_color, label=label_weld, canvas=self.cad_widget)
-
-                # Display Supports
-                # Triangular Support (Left)
-                if components.get('support_tri') is not None:
-                     osdag_display_shape(self.display, components['support_tri'], update=True, 
-                                        color=stiffener_color, transparency=0.6, label=label_support_tri, canvas=self.cad_widget)
-                
-                if components.get('support_knot') is not None:
-                     osdag_display_shape(self.display, components['support_knot'], update=True, 
-                                        color=stiffener_color, transparency=0.6, label=label_support_tri, canvas=self.cad_widget)
-
-                # Cylindrical Support (Right)
-                if components.get('support_cyl') is not None:
-                     osdag_display_shape(self.display, components['support_cyl'], update=True, 
-                                        color=stiffener_color, transparency=0.6, label=label_support_cyl, canvas=self.cad_widget)
             
             elif self.component == "Web":
                 if components.get('web_plate') is not None:

@@ -148,12 +148,6 @@ import multiprocessing
 from OCC.Core.Geom import Geom_CartesianPoint
 from OCC.Core.AIS import AIS_Point
 from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
-try:
-    from OCC.Core.Quantity import Quantity_TOC_sRGB
-except ImportError:
-    Quantity_TOC_sRGB = Quantity_TOC_RGB
-
-import traceback
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData
@@ -2465,32 +2459,14 @@ class CommonDesignLogic(object):
             self.FObj = self.createSimplySupportedBeam()
 
             if self.component == "Model":
-                try:
-                     print("DEBUG: Setting custom color for Simply Supported Beam")
-                     # Color #868664: R=134, G=134, B=100
-                     # Using sRGB if available, otherwise fallback to standard RGB type
-                     # 134/255 = 0.5255, 100/255 = 0.3922
-                     color_beam = Quantity_Color(0.5255, 0.5255, 0.3922, Quantity_TOC_sRGB)
-                     osdag_display_shape(self.display, self.FObj, update=True, color=color_beam)
-                except Exception as e:
-                     print("ERROR: Failed to set beam color:", e)
-                     traceback.print_exc()
-                     osdag_display_shape(self.display, self.FObj, update=True)
+                osdag_display_shape(self.display, self.FObj, update=True)
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             self.flex = self.module_class()
             self.FObj = self.createCantileverBeam()
 
             if self.component == "Model":
-                try:
-                     print("DEBUG: Setting custom color for Cantilever Beam")
-                     # Color #868664: R=134, G=134, B=100
-                     color_beam = Quantity_Color(0.5255, 0.5255, 0.3922, Quantity_TOC_sRGB)
-                     osdag_display_shape(self.display, self.FObj, update=True, color=color_beam)
-                except Exception as e:
-                     print("ERROR: Failed to set cantilever color:", e)
-                     traceback.print_exc()
-                     osdag_display_shape(self.display, self.FObj, update=True)
+                osdag_display_shape(self.display, self.FObj, update=True)
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             self.flex = self.module_class()

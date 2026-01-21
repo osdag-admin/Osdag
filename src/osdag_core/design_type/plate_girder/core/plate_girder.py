@@ -1458,16 +1458,27 @@ class PlateGirderWelded(Member):
                             else:
                                 self.logger.error("End Panel Stiffener Check failed")
                     
-                        is_safe_int, Pd, _, self.IntStiffnerwidth, self.V_cr_new = shear_buckling_check_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c, self.epsilon, self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
-                        if self.V_cr_new is not None:
-                             self.V_cr = self.V_cr_new
+                        # Iterate through available stiffener thicknesses to find one that passes
+                        is_safe_int = False
+                        for stiff_thickness in self.int_thickness_list:
+                            self.IntStiffThickness = float(stiff_thickness)
+                            is_safe_int, Pd, _, self.IntStiffnerwidth, self.V_cr_new = shear_buckling_check_intermediate_stiffener(
+                                self.eff_depth, self.web_thickness, self.c, self.epsilon, 
+                                self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, 
+                                self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, 
+                                self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
+                            if self.V_cr_new is not None:
+                                self.V_cr = self.V_cr_new
+                            if is_safe_int:
+                                self.logger.info(f"Shear Buckling Check passed with intermediate stiffener thickness = {self.IntStiffThickness} mm")
+                                break
 
                         if is_safe_int:
                             self.shearflag2 = True
                             self.logger.info("Shear Buckling Check passed with intermediate stiffeners")
                         else:
                             self.shearflag2 = False
-                            self.logger.error("Shear Buckling Check failed with intermediate stiffeners, increase stiffener thickness")
+                            self.logger.error("Shear Buckling Check failed with all available intermediate stiffener thicknesses")
 
                         # Web Crippling Check (Added for Thin Web with ITS/Simple Post Critical)
                         web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
@@ -1503,16 +1514,27 @@ class PlateGirderWelded(Member):
                                 self.shearflag1 = False
                                 self.logger.error("Tension Field Check failed, increase stiffener thickness")
 
-                        is_safe_int_tf, self.V_tf, _, self.IntStiffnerwidth, self.V_cr_new = tension_field_intermediate_stiffener(self.eff_depth, self.web_thickness, self.c, self.epsilon, self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
-                        if self.V_cr_new is not None:
-                             self.V_cr = self.V_cr_new
+                        # Iterate through available stiffener thicknesses to find one that passes
+                        is_safe_int_tf = False
+                        for stiff_thickness in self.int_thickness_list:
+                            self.IntStiffThickness = float(stiff_thickness)
+                            is_safe_int_tf, self.V_tf, _, self.IntStiffnerwidth, self.V_cr_new = tension_field_intermediate_stiffener(
+                                self.eff_depth, self.web_thickness, self.c, self.epsilon, 
+                                self.IntStiffThickness, self.IntStiffnerwidth, self.load.shear_force, 
+                                self.gamma_m0, self.material.fy, self.material.modulus_of_elasticity, 
+                                self.web_philosophy, self.lefactor, self.load.shear_force, debug=self.debug)
+                            if self.V_cr_new is not None:
+                                self.V_cr = self.V_cr_new
+                            if is_safe_int_tf:
+                                self.logger.info(f"Tension Field Check passed with intermediate stiffener thickness = {self.IntStiffThickness} mm")
+                                break
                         
                         if is_safe_int_tf:
                             self.shearflag2 = True
                             self.logger.info("Shear Buckling Check passed with intermediate stiffeners")
                         else:
                             self.shearflag2 = False
-                            self.logger.error("Shear Buckling Check failed, increase stiffener thickness")
+                            self.logger.error("Shear Buckling Check failed with all available stiffener thicknesses")
 
                         # Web Crippling Check (Added for Thin Web with ITS/Tension Field)
                         web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness

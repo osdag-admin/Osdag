@@ -879,8 +879,6 @@ class CustomWindow(QWidget):
                 self.ui_loaded = False
                 self.setDictToUserInputs(uiObj)
                 self.ui_loaded = True
-                # Update Output Dock Fields
-                # self.output_dock.output_title_change(self.backend)
             else:
                 CustomMessageBox(
                     title="Information",
@@ -1546,6 +1544,8 @@ class CustomWindow(QWidget):
                 
                 # Update logs dock control icon
                 self.update_docking_icons(log_is_active=True)
+                # Nothing to do further, Just return
+                return
 
             if error is not None:
                 self.show_error_msg(error)
@@ -1625,12 +1625,10 @@ class CustomWindow(QWidget):
                         self.splitter.setSizes([left_width, center_width, right_width])
                     hide_input()
 
-            # print('[INFO] Output title changed: ',self.output_dock.output_title_change(main))
+            # Update Output Dock fields wrt Input Dock fields
             self.output_dock.output_title_change(main)
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-            # print('[INFO] last design: ',last_design_folder)
             if not os.path.isdir(last_design_folder):
-                # print('[INFO] not os.path.isdir')
                 os.makedirs(last_design_folder)
             last_design_file = str(main.module_name()).replace(' ', '') + ".osi"
             last_design_file = os.path.join(last_design_folder, last_design_file)
@@ -1653,16 +1651,6 @@ class CustomWindow(QWidget):
                 yaml.dump(self.design_inputs, last_design)
             self.design_inputs.pop("out_titles_status")
 
-            # if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
-            #                                       KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
-            #                                       KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-            #                                       KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
-            #                                       KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
-
-            # ##############trial##############
-            # status = True
-            # ##############trial##############
-
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
@@ -1670,7 +1658,6 @@ class CustomWindow(QWidget):
                                                   KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_FLEXURE3,KEY_DISP_FLEXURE4,
                                                   KEY_DISP_COMPRESSION_STRUT, KEY_DISP_STRUT_WELDED_END_GUSSET, KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_LAPJOINTBOLTED,KEY_DISP_BUTTJOINTBOLTED, 
                                                   KEY_DISP_LAPJOINTWELDED, KEY_DISP_BUTTJOINTWELDED, KEY_PLATE_GIRDER_MAIN_MODULE]:
-                # print(self.display, self.folder, main.module, main.mainmodule)
                 # print("[INFO] common start")
                 # print(f"[INFO] main object type: {type(main)}")
                 # print(f"[INFO] main attributes: {dir(main)}")

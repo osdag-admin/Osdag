@@ -676,6 +676,7 @@ class InputDock(QWidget):
 
             elif typ == TYPE_TEXTBOX:
                 # print("\n\n[INFO] text")
+                # Trigger to launch Bounds Button for Plate-Girder Module
                 if main.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
                     w = self.get_current_widget_in_layout(k2_key)
                     if not val and isinstance(w, QLineEdit):  # Show optimization button
@@ -709,10 +710,6 @@ class InputDock(QWidget):
                     k2.setVisible(False)
                 else:
                     k2.setVisible(True)
-
-        # Update Output Dock
-        # if self.parent.ui_loaded:
-        #     self.parent.output_dock.output_title_change(self.backend)
 
     # For Plate-Girder Module-Functions-starts----------------------------------------------------
     def change_text_to_bound_btn(self, old_widget, tupple):
@@ -808,7 +805,7 @@ class InputDock(QWidget):
             bounds = self.backend.bounds_map.get('bf_top')
         elif name == KEY_BOTTOM_Bflange_PG:
             bounds = self.backend.bounds_map.get('bf_bot')
-
+        
         dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]], parent=self)
         result = dialog.exec()
         

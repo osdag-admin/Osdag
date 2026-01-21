@@ -19,7 +19,7 @@ ensure_safe_startup()
 # =============================================================================
 # Now safe to import Qt and other modules
 # =============================================================================
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtCore import Qt, QThread, Signal, QFile, QTextStream
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
 
@@ -170,6 +170,24 @@ class LaunchScreenPopup(QMainWindow):
         if self.on_finish:
             self.on_finish()
 
+def show_crash_dialog(reason, excecption, logfile):
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setWindowTitle("Osdag Error")
+
+    if reason == "PYTHON EXCEPTION":
+        text = "Osdag encountered an internal error"
+    elif "FREEZE" in reason:
+        text = "Not responding. Osdag has detected a freeze."
+    else:
+        text = "Osdag crashed due to a system error."
+
+    msg.setText(text)
+    msg.setInformativeText(f"A crash report was saved to:\n{logfile}")
+    msg.exec()
+    QApplication.quit()
+
+
 def GUI():
 
     app = QApplication(sys.argv)
@@ -283,4 +301,10 @@ def run(input_path, op_type, output_path):
 
 
 if __name__ == "__main__":
+    from osdag_gui.error_handler import CrashLogger
+
+    # Start crash logger
+    crashlog = CrashLogger(on_crash=show_crash_dialog)
+    crashlog.start()
+
     main()

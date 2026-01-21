@@ -1356,7 +1356,7 @@ class PlateGirderWelded(Member):
                     else:
                         self.shearchecks = False
                     
-                    if self.support_type == 'Major Laterally Supported':
+                    if self.support_type != 'Major Laterally Unsupported':
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment, debug=self.debug)
                         if self.debug:
                             print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
@@ -1551,7 +1551,7 @@ class PlateGirderWelded(Member):
                     else:
                         self.shearchecks = False
 
-                    if self.support_type == 'Major Laterally Supported':
+                    if self.support_type != 'Major Laterally Unsupported':
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment, debug=self.debug)
                         if self.debug:
                             print(f"Moment Capacity (Md / design_moment): {self.Md:.2f} N-mm")
@@ -1913,7 +1913,7 @@ class PlateGirderWelded(Member):
                         self.shearchecks = False
                     
                     #support type supp or unsupp
-                    if self.support_type == 'Major Laterally Supported':
+                    if self.support_type != 'Major Laterally Unsupported':
 
                         #moment check supp
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment)
@@ -2032,7 +2032,7 @@ class PlateGirderWelded(Member):
                         self.shearchecks = False
 
                     # support type supp or unsupp
-                    if self.support_type == 'Major Laterally Supported':
+                    if self.support_type != 'Major Laterally Unsupported':
                         #moment check supp
                         is_safe, self.Md, self.moment_ratio, self.V_d = moment_capacity_laterally_supported(self.load.shear_force,self.plast_sec_mod_z,self.elast_sec_mod_z,self.material.fy,self.gamma_m0,self.total_depth,self.web_thickness,self.top_flange_thickness,self.bottom_flange_thickness,self.section_class, self.support_condition, self.load.moment)
                         if is_safe:

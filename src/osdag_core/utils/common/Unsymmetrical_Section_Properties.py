@@ -181,7 +181,7 @@ class Unsymmetrical_I_Section_Properties:
 
         @staticmethod
         def calc_PlasticModulusY( D, B_top, B_bot, t_w, t_f_top, t_f_bot, debug=False):
-                Zpy = (t_f_top * B_top ** 2 / 4 + t_f_bot * B_bot ** 2 / 4 + (D - t_f_top - t_f_bot) * t_w ** 2 / 4)
+                Zpy = (t_f_top * B_top ** 2 / 2 + t_f_bot * B_bot ** 2 / 2 + (D - t_f_top - t_f_bot) * t_w ** 2 / 2)
                 if debug:
                     print(f"Plastic Modulus Y (Zpy): {Zpy}")
                 return round(Zpy, 2)

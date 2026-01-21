@@ -29,7 +29,7 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     # bolt_cols is the number of columns on ONE side of the joint
     cover_plate_length = 2 * ((2 * end) + (bolt_cols - 1) * pitch)
     
-    plate_length =  1.25 * cover_plate_length #initially i set it as 2 * cover_plate_length
+    plate_length =  1.25 * cover_plate_length  #initially i had set it as 2 * cover_plate_length
     
     nut_thickness = 3.0
     # Bolt parameters

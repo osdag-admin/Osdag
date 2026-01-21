@@ -764,16 +764,9 @@ class Compression_welded(Member):
 
         out_list.append(t21)
 
-        # Populate hover_dict for 3D model tooltips
-        if flag and hasattr(self, 'hover_dict'):
-             if hasattr(self, 'section_size_1'):
-                 self.hover_dict["Member"] = f"Member: {self.section_size_1.designation}"
-             if hasattr(self, 'plate'):
-                 self.hover_dict["Plate"] = f"Plate: {self.plate.length}x{self.plate.height}x{self.plate.thickness_provided}"
-             if hasattr(self, 'weld'):
-                 self.hover_dict["Weld"] = f"Weld: {self.weld.size}mm size, {self.weld.length}mm length"
         
-        return out_list
+
+     
 
 
         # t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,

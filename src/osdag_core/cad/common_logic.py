@@ -79,7 +79,6 @@ from .BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 
 from .CompressionMembers.column import CompressionMemberCAD
 from .CompressionMembers.BoltedCAD import StrutAngleBoltCAD, StrutChannelBoltCAD
-from .CompressionMembers.BoltedCAD import StrutAngleBoltCAD, StrutChannelBoltCAD
 
 from .Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from .Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD

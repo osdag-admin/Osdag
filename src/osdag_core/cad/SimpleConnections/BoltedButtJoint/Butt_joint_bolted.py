@@ -25,7 +25,11 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     MAX_THICKNESS = max(plate1_thickness, plate2_thickness)
     reference_top_z = MAX_THICKNESS / 2.0
     
-    plate_length = 1.5*plate_width
+    # Calculate cover plate length based on the formula: 2 * [(2*end) + (cols-1)*pitch]
+    # bolt_cols is the number of columns on ONE side of the joint
+    cover_plate_length = 2 * ((2 * end) + (bolt_cols - 1) * pitch)
+    
+    plate_length =  cover_plate_length #initially i set it as 2 * cover_plate_length
     
     nut_thickness = 3.0
     # Bolt parameters
@@ -83,7 +87,7 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     uDir3 = numpy.array([0.0, 0.0, 1.0])
     wDir3 = numpy.array([1.0, 0.0, 0.0])
     
-    platec = Plate(plate_length, plate_width, cover_thickness)
+    platec = Plate(cover_plate_length, plate_width, cover_thickness)
     platec.place(origin3, uDir3, wDir3)
     platec_model = platec.create_model()
     
@@ -99,7 +103,7 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
         uDir4 = numpy.array([0.0, 0.0, 1.0])
         wDir4 = numpy.array([1.0, 0.0, 0.0])
         
-        platec2 = Plate(plate_length, plate_width, cover_thickness)
+        platec2 = Plate(cover_plate_length, plate_width, cover_thickness)
         platec2.place(origin4, uDir4, wDir4)
         platec2_model = platec2.create_model()
         

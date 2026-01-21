@@ -43,7 +43,6 @@ class Compression_bolted(Member):
         super(Compression_bolted, self).__init__()
         self.design_status = False
         self.hover_dict = {}
-        self.mainmodule = KEY_DISP_STRUT_BOLTED_END_GUSSET
 
     @staticmethod
     def module_name():
@@ -634,14 +633,6 @@ class Compression_bolted(Member):
         t21_inter_plate = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX, int(round(self.inter_plate_length, 0)) if flag else '', False)
         out_list.append(t21_inter_plate)
 
-        if flag and hasattr(self, 'hover_dict'):
-             if hasattr(self, 'section_size_1'):
-                 self.hover_dict["Member"] = f"Member: {self.section_size_1.designation}"
-             if hasattr(self, 'plate'):
-                 self.hover_dict["Plate"] = f"Plate: {self.plate.length}x{self.plate.height}x{self.plate.thickness_provided}"
-             if hasattr(self, 'bolt'):
-                 self.hover_dict["Bolt"] = f"Bolt: {self.bolt.bolt_diameter_provided}mm dia, Grade {self.bolt.bolt_grade}"
-        
         return out_list
 
     def spacing(self, status):
@@ -3398,15 +3389,6 @@ class Compression_bolted(Member):
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "", int(self.inter_plate_length) if hasattr(self, 'inter_plate_length') else 0, "")
             self.report_check.append(t4)
 
-        # Update overall design status
-        if self.bolt_design_status and self.plate_design_status:
-             self.design_status = True
-
-        # Populate hover_dict for 3D model tooltips
-        self.hover_dict["Member"] = f"Member: {self.section_size_1.designation}"
-        self.hover_dict["Plate"] = f"Plate: {self.plate.length}x{self.plate.height}x{self.plate.thickness_provided}"
-        self.hover_dict["Bolt"] = f"Bolt: {self.bolt.bolt_diameter_provided}mm dia, Grade {self.bolt.bolt_grade}"
-        
         # Generate LaTeX report
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"

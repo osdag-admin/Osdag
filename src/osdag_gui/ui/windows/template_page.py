@@ -1662,13 +1662,12 @@ class CustomWindow(QWidget):
             # ##############trial##############
             # status = True
             # ##############trial##############
-
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE, KEY_DISP_TENSION_BOLTED,
                                                   KEY_DISP_TENSION_WELDED, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
                                                   KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_BB_EP_SPLICE,
                                                   KEY_DISP_COMPRESSION_COLUMN,KEY_DISP_FLEXURE,KEY_DISP_FLEXURE2,KEY_DISP_FLEXURE3,KEY_DISP_FLEXURE4,
-                                                  KEY_DISP_COMPRESSION_STRUT, KEY_DISP_STRUT_WELDED_END_GUSSET, KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_LAPJOINTBOLTED,KEY_DISP_BUTTJOINTBOLTED, 
+                                                  KEY_DISP_COMPRESSION_STRUT, KEY_DISP_STRUT_WELDED_END_GUSSET,KEY_DISP_LAPJOINTBOLTED,KEY_DISP_BUTTJOINTBOLTED, 
                                                   KEY_DISP_LAPJOINTWELDED, KEY_DISP_BUTTJOINTWELDED, KEY_PLATE_GIRDER_MAIN_MODULE]:
                 # print(self.display, self.folder, main.module, main.mainmodule)
                 # print("[INFO] common start")

@@ -28,7 +28,7 @@ class BoundsSelectorDialog(QDialog):
         
         # Ensure lower_bound is at least 0
         lower_bound = max(0.0, lower_bound)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.setObjectName("BoundsSelectorDialog")
@@ -402,14 +402,13 @@ class BoundsSelectorDialog(QDialog):
 
 
 # For testing
-if __name__ == "__main__":
-    from PySide6.QtWidgets import QApplication
+# if __name__ == "__main__":
+#     from PySide6.QtWidgets import QApplication
     
-    app = QApplication(sys.argv)
-    dialog = BoundsSelectorDialog("Diameter", default=[100.0, 0.0, 0.1])
-    result = dialog.exec()
-    if result:
-        print(f"Selected bounds: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
-    else:
-        print("Dialog was cancelled")
-    sys.exit()
+#     app = QApplication(sys.argv)
+#     dialog = BoundsSelectorDialog("Diameter", default=[100.0, 0.0, 0.1])
+#     result = dialog.exec()
+#     if result:
+#         print(f"Selected bounds: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
+#     else:
+#         print("Dialog was cancelled")

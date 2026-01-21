@@ -993,15 +993,31 @@ class PlateGirderWelded(Member):
             print(f"DEBUG: Material Created -> Grade: {design_dictionary[KEY_MATERIAL]}, Thickness: {thickness_for_mat}mm, fy={self.material.fy} MPa, fu={self.material.fu} MPa")
         self.eff_width_longitudnal = min(self.top_flange_width,self.bottom_flange_width) - self.web_thickness/2 - 10
         
+        # Handle intermediate stiffener thickness with safe fallback
         if design_dictionary[KEY_IntermediateStiffener_thickness] == 'Customized':
-            design_dictionary[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
+            customized_list = PlateGirderWelded.int_thicklist
+            # Fallback to default if customized list is empty (no values selected in popup)
+            if customized_list and len(customized_list) > 0:
+                design_dictionary[KEY_IntermediateStiffener_thickness_val] = customized_list
+            else:
+                design_dictionary[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
+                if self.debug:
+                    print("DEBUG: Customized intermediate stiffener list is empty, falling back to default VALUES_STIFFENER_THICKNESS")
         else:
             design_dictionary[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
         
         self.int_thickness_list = design_dictionary[KEY_IntermediateStiffener_thickness_val]
 
+        # Handle longitudinal stiffener thickness with safe fallback
         if design_dictionary[KEY_LongitudnalStiffener_thickness] == 'Customized':
-            design_dictionary[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist
+            customized_list = PlateGirderWelded.long_thicklist
+            # Fallback to default if customized list is empty (no values selected in popup)
+            if customized_list and len(customized_list) > 0:
+                design_dictionary[KEY_LongitudnalStiffener_thickness_val] = customized_list
+            else:
+                design_dictionary[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
+                if self.debug:
+                    print("DEBUG: Customized longitudinal stiffener list is empty, falling back to default VALUES_STIFFENER_THICKNESS")
         else:
             design_dictionary[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
 

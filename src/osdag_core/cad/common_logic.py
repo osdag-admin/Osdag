@@ -2744,6 +2744,9 @@ class CommonDesignLogic(object):
         coordinator = get_cleanup_coordinator()
         coordinator.cleanup_for_new_design(self.cad_widget, self.display)
 
+        # Show Cube
+        self.cad_widget.display_view_cube()
+
         try:
             self.display.View_Iso()
         except Exception as e:
@@ -3713,9 +3716,7 @@ class CommonDesignLogic(object):
 
 
         if self.mainmodule == "Shear Connection":
-
             A = self.module_object  
-
             self.loc = A.connectivity
 
             if flag is True:
@@ -3724,27 +3725,20 @@ class CommonDesignLogic(object):
 
                 elif self.loc == CONN_CFBW:
                     self.connectivityObj = self.create3DColFlangeBeamWeb()
-
                 else:
                     self.connectivityObj = self.create3DBeamWebBeamWeb()
-
                 self.display_3DModel("Model","gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == "Moment Connection":
-
             if self.connection == KEY_DISP_BEAMCOVERPLATE or self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 if flag is True:
-
                     self.B = module_object
                     self.CPObj = self.createBBCoverPlateCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 if flag is True:
@@ -3752,119 +3746,90 @@ class CommonDesignLogic(object):
                     self.display_3DModel("Model", "gradient_bg")
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
-            elif self.connection == KEY_DISP_BCENDPLATE:
+            elif self.connection == KEY_DISP_BCENDPLATE: 
                 if flag is True:
-
                     self.CPObj = self.createBCEndPlateCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
-
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
-            elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
+            elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:       
                 if flag is True:
-
                     self.CPObj = self.createCCCoverPlateCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
-
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
                 if flag is True:
                     self.CEPObj = self.createCCEndPlateCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
             elif self.connection == KEY_DISP_BASE_PLATE:
-
                 if flag is True:
                     self.BPObj = self.createBasePlateCAD()
-
                     self.display_3DModel("Model", "gradient_bg")
-
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+
         elif self.mainmodule == 'Flexure Member':
             if flag is True:
                 self.FObj = self.createSimplySupportedBeam()
-
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             if flag is True:
                 self.FObj = self.createCantileverBeam()
-
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             if flag is True:
                 self.FObj = self.createPurlin()
-
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Columns with known support conditions':
             if flag is True:
                 self.ColObj = self.createColumnInFrameCAD()
-
                 self.display_3DModel("Model", "gradient_bg")
-
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+        
         elif self.mainmodule == KEY_DISP_STRUT_WELDED_END_GUSSET:
             if flag is True:
                 self.ColObj = self.createStrutWeldedCAD()
-
                 self.display_3DModel("Model", "gradient_bg")
-
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+
         elif self.mainmodule == KEY_DISP_STRUT_BOLTED_END_GUSSET:
             if flag is True:
-                print("DEBUG: Flag is True, calling createStrutBoltedCAD")
                 self.ColObj = self.createStrutBoltedCAD()
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+
         elif self.mainmodule == 'Lap Joint Bolted Connection':
             if flag is True:
                 self.ColObj = self.createBoltedLapJoint()
                 self.display_3DModel("Model", "gradient_bg")
-
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
                 
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             if flag is True:
                 self.ColObj = self.createButtJointBoltedCAD()
                 self.display_3DModel("Model", "gradient_bg")
-
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
         elif self.mainmodule == 'Butt Joint Welded Connection':
             if flag is True:
@@ -3872,39 +3837,31 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+
         elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
             if flag is True:
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+
         elif self.mainmodule == 'PLATE GIRDER':
-            print("DEBUG: PLATE GIRDER case triggered")
             if flag is True:
-                print("DEBUG: Flag is True, calling createPlateGirderCAD")
                 try:
                     self.PGObj = self.createPlateGirderCAD()
-                    print(f"DEBUG: createPlateGirderCAD returned: {self.PGObj}")
                     self.display_3DModel("Model", "gradient_bg")
-                    print("DEBUG: display_3DModel completed")
                 except Exception as e:
-                    print(f"ERROR in PLATE GIRDER CAD: {e}")
                     import traceback
                     traceback.print_exc()
             else:
                 self.display.EraseAll()
-                self.cad_widget.display_view_cube()
+
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
-
                 if flag is True:
                     self.TObj = self.createTensionCAD()
                     self.display_3DModel("Model", "gradient_bg")
-
                 else:
                     self.display.EraseAll()
-                self.cad_widget.display_view_cube()
 
     def create2Dcad(self):
         ''' Returns the 3D model depending upon component

@@ -2,6 +2,7 @@ import logging
 import math
 import numpy as np
 from PySide6.QtWidgets import QDialog
+from PySide6.QtCore import Qt
 
 from ....Common import *
 from ....utils.common.material import *
@@ -336,18 +337,7 @@ class PlateGirderWelded(Member):
             else:
                 return {KEY_MAX_DEFL : 'NA'}
             
-    def Int_stiffener_thickness_customized(self, arg):
-        selected_items = []
-        if arg[0] == 'All':
-            return {KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
-        else:
-            popup = PopupDialog()
-            popup.listWidget.addItems(VALUES_STIFFENER_THICKNESS)
-            if popup.exec_() == QDialog.Accepted:
-                selected_items = popup.get_selected_items()
-            PlateGirderWelded.int_thicklist = selected_items
-            return {KEY_IntermediateStiffener_thickness_val : selected_items}                                 
-            
+
     def Int_stiffener_thickness_customized(self, arg):
         selected_items = []
         if arg[0] == 'All':
